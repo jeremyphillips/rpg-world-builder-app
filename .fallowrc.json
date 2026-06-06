@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": ["eslint-import-resolver-typescript"],
   "rules": {
     "unused-files": "warn",
     "unused-exports": "warn",

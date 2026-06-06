@@ -4,7 +4,12 @@ packages:
 
 allowBuilds:
   esbuild: set this to true or false
+  mongodb-memory-server: set this to true or false
+
+minimumReleaseAgeExclude:
+  - "@types/node@25.9.2"
 
 onlyBuiltDependencies:
   - esbuild
+  - mongodb-memory-server
   - unrs-resolver
