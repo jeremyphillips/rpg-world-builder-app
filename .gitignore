@@ -13,6 +13,12 @@ storybook-static/
 # Turbo
 .turbo/
 
+# Fallow cache
+.fallow/
+
+# Husky (generated wrappers)
+.husky/_/
+
 # Test / coverage
 coverage/
 .vitest/

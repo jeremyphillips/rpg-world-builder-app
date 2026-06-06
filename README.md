@@ -54,23 +54,23 @@ Once the apps exist, open the proxy URL (default `http://localhost:8080`).
 
 ### Proxy ports (override via env)
 
-| Var             | Default                 | Purpose            |
-| --------------- | ----------------------- | ------------------ |
-| `PROXY_PORT`    | `8080`                  | single dev origin  |
-| `PUBLIC_URL`    | `http://localhost:3000` | Next public app    |
-| `DASHBOARD_URL` | `http://localhost:5173` | Vite dashboard     |
-| `API_URL`       | `http://localhost:5001` | Express API        |
+| Var             | Default                 | Purpose           |
+| --------------- | ----------------------- | ----------------- |
+| `PROXY_PORT`    | `8080`                  | single dev origin |
+| `PUBLIC_URL`    | `http://localhost:3000` | Next public app   |
+| `DASHBOARD_URL` | `http://localhost:5173` | Vite dashboard    |
+| `API_URL`       | `http://localhost:5001` | Express API       |
 
 ## Scripts
 
-| Script            | Description                              |
-| ----------------- | ---------------------------------------- |
-| `pnpm dev`        | Dev proxy + all workspace dev servers    |
-| `pnpm dev:proxy`  | Just the single-origin dev reverse proxy |
-| `pnpm build`      | Build all workspaces (turbo)             |
-| `pnpm lint`       | Lint all workspaces (turbo)              |
-| `pnpm typecheck`  | Typecheck all workspaces (turbo)         |
-| `pnpm test`       | Test all workspaces (turbo)              |
+| Script           | Description                              |
+| ---------------- | ---------------------------------------- |
+| `pnpm dev`       | Dev proxy + all workspace dev servers    |
+| `pnpm dev:proxy` | Just the single-origin dev reverse proxy |
+| `pnpm build`     | Build all workspaces (turbo)             |
+| `pnpm lint`      | Lint all workspaces (turbo)              |
+| `pnpm typecheck` | Typecheck all workspaces (turbo)         |
+| `pnpm test`      | Test all workspaces (turbo)              |
 
 ## Tech stack
 
