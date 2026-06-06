@@ -1,0 +1,23 @@
+{
+  "name": "rpg-world-builder",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.5.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n proxy,apps -c blue,green \"pnpm dev:proxy\" \"turbo run dev\"",
+    "dev:proxy": "node tools/proxy/dev-proxy.mjs",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "http-proxy": "^1.18.1",
+    "turbo": "^2.9.16"
+  }
+}
