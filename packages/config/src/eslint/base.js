@@ -59,13 +59,32 @@ export default tseslint.config(
       ],
     },
     rules: {
-      "boundaries/entry-point": [
+      // Cross-feature imports must go through a feature's public entry point
+      // (index.ts/tsx). Imports within the same feature are unrestricted, and
+      // imports to/from shared code or external packages are allowed.
+      "boundaries/dependencies": [
         "error",
         {
-          default: "disallow",
+          default: "allow",
           rules: [
-            { target: ["feature"], allow: ["index.ts", "index.tsx"] },
-            { target: ["shared"], allow: ["**"] },
+            {
+              from: { type: "feature" },
+              disallow: {
+                to: { type: "feature", captured: { feature: "!({{from.captured.feature}})" } },
+              },
+              message:
+                "Import another feature only through its public entry point (index.ts), not its internals.",
+            },
+            {
+              from: { type: "feature" },
+              allow: {
+                to: {
+                  type: "feature",
+                  captured: { feature: "!({{from.captured.feature}})" },
+                  internalPath: "index.@(ts|tsx)",
+                },
+              },
+            },
           ],
         },
       ],

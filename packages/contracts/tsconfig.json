@@ -1,0 +1,9 @@
+{
+  "extends": "@rpg/config/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
