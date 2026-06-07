@@ -44,3 +44,5 @@ pnpm-debug.log*
 
 # Cursor
 .cursor/plans
+
+MONGO_CHEATSHEET.md

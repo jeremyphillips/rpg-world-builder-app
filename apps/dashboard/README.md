@@ -61,6 +61,17 @@ Tailwind v4 is wired through the `@tailwindcss/vite` plugin; UI primitives and
 design tokens come from [`@rpg/ui`](../../packages/ui) and session types from
 [`@rpg/contracts`](../../packages/contracts).
 
+### Feature slots
+
+Beyond the implemented `auth` feature, `src/features/` holds documented
+scaffolds (`README.md` + placeholder `index.ts`) for the workspace's domain
+areas: `user`, `campaign`, `character`, `notification`, `message`, and `content`
+(with `species`, `classes`, `spells`, `skillProficiencies`,
+`equipment/{weapons,armor,gear,magicItems}`, `locations`, `monsters`). Each is
+built out in a later phase. See
+[`docs/feature-conventions.md`](./docs/feature-conventions.md) for the folder
+layout and the ESLint feature-boundary rule.
+
 ## Commands
 
 ```sh
@@ -72,4 +83,6 @@ pnpm --filter @rpg/dashboard typecheck
 pnpm --filter @rpg/dashboard lint
 ```
 
-See [`docs/`](./docs) for the auth-guard data flow.
+See [`docs/auth-guard.md`](./docs/auth-guard.md) for the auth-guard data flow
+and [`docs/feature-conventions.md`](./docs/feature-conventions.md) for the
+feature-folder convention.
