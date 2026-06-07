@@ -17,6 +17,7 @@
     }
   },
   "scripts": {
+    "dev": "storybook dev -p 6006",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",

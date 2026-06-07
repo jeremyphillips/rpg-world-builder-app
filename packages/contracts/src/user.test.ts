@@ -3,9 +3,9 @@ import { sessionUserSchema, userSchema } from './user'
 
 const validUser = {
   id: 'u_1',
-  email: 'dm@example.com',
-  displayName: 'Dungeon Master',
-  role: 'dm',
+  email: 'user@example.com',
+  displayName: 'Test User',
+  role: 'user',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
@@ -28,9 +28,9 @@ describe('sessionUserSchema', () => {
   it('strips down to the session fields', () => {
     expect(sessionUserSchema.parse(validUser)).toStrictEqual({
       id: 'u_1',
-      email: 'dm@example.com',
-      displayName: 'Dungeon Master',
-      role: 'dm',
+      email: 'user@example.com',
+      displayName: 'Test User',
+      role: 'user',
     })
   })
 })

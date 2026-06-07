@@ -1,12 +1,12 @@
 import jwt, { type SignOptions } from 'jsonwebtoken'
-import type { Role } from '@rpg/contracts'
+import type { PlatformRole } from '@rpg/contracts'
 
 import { loadEnv } from '../env'
 
 /** Claims we put in the session JWT. Kept minimal; everything else is looked up. */
 export interface SessionClaims {
   sub: string
-  role: Role
+  role: PlatformRole
 }
 
 export function signSessionToken(claims: SessionClaims): string {
@@ -23,7 +23,7 @@ export function verifySessionToken(token: string): SessionClaims | null {
     if (typeof decoded === 'string' || !decoded.sub || typeof decoded.sub !== 'string') {
       return null
     }
-    return { sub: decoded.sub, role: (decoded as { role: Role }).role }
+    return { sub: decoded.sub, role: (decoded as { role: PlatformRole }).role }
   } catch {
     return null
   }

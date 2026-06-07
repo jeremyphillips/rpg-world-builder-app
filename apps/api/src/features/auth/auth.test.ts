@@ -71,7 +71,7 @@ describe('auth flow', () => {
     expect(registerRes.body.user).toMatchObject({
       email: credentials.email,
       displayName: credentials.displayName,
-      role: 'pc',
+      role: 'user',
     })
     expect(registerRes.body.user.password).toBeUndefined()
     expect(registerRes.body.user.passwordHash).toBeUndefined()

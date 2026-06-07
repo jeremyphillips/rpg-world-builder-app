@@ -7,7 +7,7 @@ import { SESSION_COOKIE } from '../lib/cookies'
 import { signSessionToken } from '../lib/jwt'
 import { errorHandler } from './error-handler'
 import { requireAuth } from './require-auth'
-import { requireRole } from './require-role'
+import { requirePlatformRole } from './require-role'
 import { createUser } from '../features/user'
 import { clearTestDb, startTestDb, stopTestDb } from '../test/db'
 
@@ -19,7 +19,7 @@ beforeAll(async () => {
 
   app = express()
   app.use(cookieParser())
-  app.get('/admin-only', requireAuth, requireRole('admin', 'superadmin'), (_req, res) => {
+  app.get('/admin-only', requireAuth, requirePlatformRole('admin', 'superadmin'), (_req, res) => {
     res.status(200).json({ ok: true })
   })
   app.use(errorHandler)
@@ -36,7 +36,7 @@ function sessionCookie(
   return `${SESSION_COOKIE}=${signSessionToken({ sub: userId, role })}`
 }
 
-describe('requireRole', () => {
+describe('requirePlatformRole', () => {
   it('allows a user whose role is permitted', async () => {
     const admin = await createUser({
       email: 'admin@example.com',
@@ -51,15 +51,15 @@ describe('requireRole', () => {
   })
 
   it('denies a user whose role is not permitted (403)', async () => {
-    const player = await createUser({
-      email: 'player@example.com',
+    const user = await createUser({
+      email: 'user@example.com',
       passwordHash: 'x',
-      displayName: 'Player',
-      role: 'pc',
+      displayName: 'Regular User',
+      role: 'user',
     })
     const res = await request(app)
       .get('/admin-only')
-      .set('Cookie', sessionCookie(player.id, 'pc'))
+      .set('Cookie', sessionCookie(user.id, 'user'))
       .expect(403)
     expect(res.body.error.code).toBe('forbidden')
   })
