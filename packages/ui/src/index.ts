@@ -1,5 +1,6 @@
 export { cn } from "./lib/utils";
-export { Button, buttonVariants, type ButtonProps } from "./components/ui/button";
+export { Button, type ButtonProps } from "./components/ui/button";
+export { buttonVariants } from "./components/ui/button-variants";
 export { Input } from "./components/ui/input";
 export {
   Card,
