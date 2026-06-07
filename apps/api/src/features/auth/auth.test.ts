@@ -21,6 +21,12 @@ async function newAgent(): Promise<{ agent: Agent; csrfToken: string }> {
   return { agent, csrfToken: res.body.csrfToken as string };
 }
 
+async function registerUser(): Promise<{ agent: Agent; csrfToken: string }> {
+  const { agent, csrfToken } = await newAgent();
+  await agent.post("/api/auth/register").set(CSRF_HEADER, csrfToken).send(credentials).expect(201);
+  return { agent, csrfToken };
+}
+
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
   const { agent } = await newAgent();
   const csrf1 = (await agent.get("/api/auth/csrf")).body.csrfToken as string;
@@ -90,12 +96,7 @@ describe("auth flow", () => {
   });
 
   it("rejects login with a wrong password", async () => {
-    const { agent, csrfToken } = await newAgent();
-    await agent
-      .post("/api/auth/register")
-      .set(CSRF_HEADER, csrfToken)
-      .send(credentials)
-      .expect(201);
+    const { agent, csrfToken } = await registerUser();
     await agent
       .post("/api/auth/login")
       .set(CSRF_HEADER, csrfToken)
@@ -108,12 +109,7 @@ describe("auth flow", () => {
   });
 
   it("rejects duplicate registration with 409", async () => {
-    const { agent, csrfToken } = await newAgent();
-    await agent
-      .post("/api/auth/register")
-      .set(CSRF_HEADER, csrfToken)
-      .send(credentials)
-      .expect(201);
+    const { agent, csrfToken } = await registerUser();
     await agent
       .post("/api/auth/register")
       .set(CSRF_HEADER, csrfToken)

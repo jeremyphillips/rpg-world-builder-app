@@ -2,6 +2,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { expectFieldsInvalid, fillSignupFields } from "./auth-test-utils";
+
 const { register, login } = vi.hoisted(() => ({ register: vi.fn(), login: vi.fn() }));
 
 vi.mock("../api/auth-client", () => ({
@@ -12,12 +14,6 @@ vi.mock("../api/auth-client", () => ({
     status = 0;
     code = "error";
   },
-}));
-
-vi.mock("next/link", () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
 }));
 
 import { SignupForm } from "./signup-form";
@@ -33,25 +29,17 @@ describe("SignupForm", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /create account/i }));
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/display name/i)).toHaveAttribute("aria-invalid", "true");
-    });
-    expect(screen.getByLabelText(/email/i)).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByLabelText(/password/i)).toHaveAttribute("aria-invalid", "true");
+    await expectFieldsInvalid(/display name/i, /email/i, /password/i);
     expect(register).not.toHaveBeenCalled();
   });
 
   it("rejects a too-short password", async () => {
     render(<SignupForm onSuccess={vi.fn()} />);
 
-    await userEvent.type(screen.getByLabelText(/display name/i), "Game Master");
-    await userEvent.type(screen.getByLabelText(/email/i), "dm@example.com");
-    await userEvent.type(screen.getByLabelText(/password/i), "short");
+    await fillSignupFields("Game Master", "dm@example.com", "short");
     await userEvent.click(screen.getByRole("button", { name: /create account/i }));
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/password/i)).toHaveAttribute("aria-invalid", "true");
-    });
+    await expectFieldsInvalid(/password/i);
     expect(register).not.toHaveBeenCalled();
   });
 
@@ -61,9 +49,7 @@ describe("SignupForm", () => {
     const onSuccess = vi.fn();
     render(<SignupForm onSuccess={onSuccess} />);
 
-    await userEvent.type(screen.getByLabelText(/display name/i), "Game Master");
-    await userEvent.type(screen.getByLabelText(/email/i), "dm@example.com");
-    await userEvent.type(screen.getByLabelText(/password/i), "supersecret");
+    await fillSignupFields("Game Master", "dm@example.com", "supersecret");
     await userEvent.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {

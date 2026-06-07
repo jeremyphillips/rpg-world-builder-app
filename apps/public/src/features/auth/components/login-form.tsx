@@ -6,18 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
 import { loginInputSchema, type LoginInput } from "@rpg/contracts";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-} from "@rpg/ui";
+import { Button, CardFooter, Input } from "@rpg/ui";
 
 import { ApiError, DASHBOARD_PATH, login } from "../api/auth-client";
+import { AuthEmailField, AuthFormCard } from "./auth-form-card";
+import { FormField } from "./form-field";
 
 export interface LoginFormProps {
   /** Called after a successful login. Defaults to a same-origin redirect to the dashboard. */
@@ -43,49 +36,12 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   });
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Log in</CardTitle>
-        <CardDescription>Welcome back. Enter your details to continue.</CardDescription>
-      </CardHeader>
-      <form onSubmit={onSubmit} noValidate>
-        <CardContent className="space-y-4">
-          {formError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {formError}
-            </p>
-          ) : null}
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              aria-invalid={Boolean(errors.email)}
-              {...field("email")}
-            />
-            {errors.email ? (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={Boolean(errors.password)}
-              {...field("password")}
-            />
-            {errors.password ? (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            ) : null}
-          </div>
-        </CardContent>
+    <AuthFormCard
+      title="Log in"
+      description="Welcome back. Enter your details to continue."
+      onSubmit={onSubmit}
+      formError={formError}
+      footer={
         <CardFooter className="flex-col items-stretch gap-3">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Logging in…" : "Log in"}
@@ -100,7 +56,22 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             </Link>
           </p>
         </CardFooter>
-      </form>
-    </Card>
+      }
+    >
+      <AuthEmailField
+        error={errors.email?.message}
+        aria-invalid={Boolean(errors.email)}
+        {...field("email")}
+      />
+      <FormField id="password" label="Password" error={errors.password?.message}>
+        <Input
+          id="password"
+          type="password"
+          autoComplete="current-password"
+          aria-invalid={Boolean(errors.password)}
+          {...field("password")}
+        />
+      </FormField>
+    </AuthFormCard>
   );
 }

@@ -1,6 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { expectFieldsInvalid, fillEmailAndPassword } from "./auth-test-utils";
 
 const { login } = vi.hoisted(() => ({ login: vi.fn() }));
 
@@ -12,12 +14,6 @@ vi.mock("../api/auth-client", () => ({
     status = 0;
     code = "error";
   },
-}));
-
-vi.mock("next/link", () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
 }));
 
 import { LoginForm } from "./login-form";
@@ -33,10 +29,7 @@ describe("LoginForm", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /log in/i }));
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/email/i)).toHaveAttribute("aria-invalid", "true");
-    });
-    expect(screen.getByLabelText(/password/i)).toHaveAttribute("aria-invalid", "true");
+    await expectFieldsInvalid(/email/i, /password/i);
     expect(login).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });
@@ -46,8 +39,7 @@ describe("LoginForm", () => {
     const onSuccess = vi.fn();
     render(<LoginForm onSuccess={onSuccess} />);
 
-    await userEvent.type(screen.getByLabelText(/email/i), "dm@example.com");
-    await userEvent.type(screen.getByLabelText(/password/i), "supersecret");
+    await fillEmailAndPassword("dm@example.com", "supersecret");
     await userEvent.click(screen.getByRole("button", { name: /log in/i }));
 
     await waitFor(() => {
@@ -62,8 +54,7 @@ describe("LoginForm", () => {
     );
     render(<LoginForm onSuccess={vi.fn()} />);
 
-    await userEvent.type(screen.getByLabelText(/email/i), "dm@example.com");
-    await userEvent.type(screen.getByLabelText(/password/i), "wrongpassword");
+    await fillEmailAndPassword("dm@example.com", "wrongpassword");
     await userEvent.click(screen.getByRole("button", { name: /log in/i }));
 
     expect(await screen.findByRole("alert")).toBeInTheDocument();
