@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": [
+    "eslint-import-resolver-typescript",
+    "@next/eslint-plugin-next",
+    "eslint-plugin-storybook"
+  ],
+  "ignorePatterns": ["**/*.config.*"],
+  "rules": {
+    "unused-files": "warn",
+    "unused-exports": "warn",
+    "unused-types": "warn",
+    "circular-dependencies": "error"
+  }
+}

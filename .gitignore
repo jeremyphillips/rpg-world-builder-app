@@ -6,12 +6,19 @@ node_modules/
 dist/
 build/
 .next/
+next-env.d.ts
 out/
 storybook-static/
 *.tsbuildinfo
 
 # Turbo
 .turbo/
+
+# Fallow cache
+.fallow/
+
+# Husky (generated wrappers)
+.husky/_/
 
 # Test / coverage
 coverage/
@@ -34,3 +41,8 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# Cursor
+.cursor/plans
+
+MONGO_CHEATSHEET.md
