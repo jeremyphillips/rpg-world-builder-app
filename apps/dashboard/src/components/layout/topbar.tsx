@@ -12,7 +12,13 @@ export function Topbar() {
       <div className="flex items-center gap-4">
         {user ? (
           <span className="text-sm text-muted-foreground">
-            {user.displayName} · <span className="capitalize">{user.role}</span>
+            {user.displayName}
+            {user.role !== 'user' && (
+              <>
+                {' '}
+                · <span className="capitalize">{user.role}</span>
+              </>
+            )}
           </span>
         ) : null}
         <Button
