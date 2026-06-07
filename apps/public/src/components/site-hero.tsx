@@ -1,6 +1,6 @@
-import Link from "next/link";
+import Link from 'next/link'
 
-import { buttonVariants } from "@rpg/ui";
+import { buttonVariants } from '@rpg/ui'
 
 export function SiteHero() {
   return (
@@ -16,13 +16,13 @@ export function SiteHero() {
         focused DM dashboard. No spreadsheets, no clutter.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Link href="/signup" className={buttonVariants({ size: "lg" })}>
+        <Link href="/signup" className={buttonVariants({ size: 'lg' })}>
           Get started
         </Link>
-        <Link href="/login" className={buttonVariants({ variant: "outline", size: "lg" })}>
+        <Link href="/login" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
           Log in
         </Link>
       </div>
     </section>
-  );
+  )
 }

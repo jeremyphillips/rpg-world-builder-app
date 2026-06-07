@@ -1,6 +1,6 @@
-import Link from "next/link";
+import Link from 'next/link'
 
-import { buttonVariants } from "@rpg/ui";
+import { buttonVariants } from '@rpg/ui'
 
 export function SiteHeader() {
   return (
@@ -10,14 +10,14 @@ export function SiteHeader() {
           RPG World Builder
         </Link>
         <nav className="flex items-center gap-2">
-          <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <Link href="/login" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
             Log in
           </Link>
-          <Link href="/signup" className={buttonVariants({ size: "sm" })}>
+          <Link href="/signup" className={buttonVariants({ size: 'sm' })}>
             Sign up
           </Link>
         </nav>
       </div>
     </header>
-  );
+  )
 }

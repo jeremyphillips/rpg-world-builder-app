@@ -6,5 +6,5 @@ export function SiteFooter() {
         <p>Built for game masters.</p>
       </div>
     </footer>
-  );
+  )
 }

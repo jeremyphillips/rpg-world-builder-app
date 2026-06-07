@@ -1,18 +1,18 @@
-"use client";
+'use client'
 
-import type { ComponentProps } from "react";
+import type { ComponentProps } from 'react'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from "@rpg/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@rpg/ui'
 
-import { FormField } from "./form-field";
+import { FormField } from './form-field'
 
 interface AuthFormCardProps {
-  title: string;
-  description: string;
-  onSubmit: React.FormEventHandler<HTMLFormElement>;
-  formError: string | null;
-  children: React.ReactNode;
-  footer: React.ReactNode;
+  title: string
+  description: string
+  onSubmit: React.FormEventHandler<HTMLFormElement>
+  formError: string | null
+  children: React.ReactNode
+  footer: React.ReactNode
 }
 
 export function AuthFormCard({
@@ -41,14 +41,14 @@ export function AuthFormCard({
         {footer}
       </form>
     </Card>
-  );
+  )
 }
 
 interface AuthEmailFieldProps extends Omit<
   ComponentProps<typeof Input>,
-  "id" | "type" | "autoComplete"
+  'id' | 'type' | 'autoComplete'
 > {
-  error?: string;
+  error?: string
 }
 
 export function AuthEmailField({ error, ...inputProps }: AuthEmailFieldProps) {
@@ -56,5 +56,5 @@ export function AuthEmailField({ error, ...inputProps }: AuthEmailFieldProps) {
     <FormField id="email" label="Email" error={error}>
       <Input id="email" type="email" autoComplete="email" {...inputProps} />
     </FormField>
-  );
+  )
 }

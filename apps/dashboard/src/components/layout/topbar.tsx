@@ -1,10 +1,10 @@
-import { Button } from "@rpg/ui";
+import { Button } from '@rpg/ui'
 
-import { useSession, useLogout } from "@/features/auth";
+import { useSession, useLogout } from '@/features/auth'
 
 export function Topbar() {
-  const { data: user } = useSession();
-  const logout = useLogout();
+  const { data: user } = useSession()
+  const logout = useLogout()
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border px-6">
@@ -21,9 +21,9 @@ export function Topbar() {
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
         >
-          {logout.isPending ? "Logging out…" : "Log out"}
+          {logout.isPending ? 'Logging out…' : 'Log out'}
         </Button>
       </div>
     </header>
-  );
+  )
 }

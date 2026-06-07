@@ -1,20 +1,20 @@
-import { defineConfig, mergeConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
-import base from "@rpg/config/vitest/base";
+import { defineConfig, mergeConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+import base from '@rpg/config/vitest/base'
 
 export default mergeConfig(
   base,
   defineConfig({
     plugins: [react()],
     test: {
-      environment: "jsdom",
-      setupFiles: ["./vitest.setup.ts"],
-      include: ["src/**/*.test.{ts,tsx}"],
+      environment: 'jsdom',
+      setupFiles: ['./vitest.setup.ts'],
+      include: ['src/**/*.test.{ts,tsx}'],
     },
     resolve: {
       alias: {
-        "@": new URL("./src", import.meta.url).pathname,
+        '@': new URL('./src', import.meta.url).pathname,
       },
     },
   }),
-);
+)

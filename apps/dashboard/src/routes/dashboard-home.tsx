@@ -1,15 +1,15 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@rpg/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@rpg/ui'
 
-import { useSession } from "@/features/auth";
+import { useSession } from '@/features/auth'
 
 export function DashboardHome() {
-  const { data: user } = useSession();
+  const { data: user } = useSession()
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="space-y-1">
         <h2 className="text-2xl font-semibold tracking-tight">
-          Welcome{user ? `, ${user.displayName}` : ""}
+          Welcome{user ? `, ${user.displayName}` : ''}
         </h2>
         <p className="text-muted-foreground">
           This is the authenticated DM workspace shell. Campaign and content features land here in
@@ -30,5 +30,5 @@ export function DashboardHome() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -1,12 +1,12 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import { AuthGuard } from "@/features/auth";
-import { AppShell } from "@/components/layout/app-shell";
-import { DashboardHome } from "@/routes/dashboard-home";
+import { AuthGuard } from '@/features/auth'
+import { AppShell } from '@/components/layout/app-shell'
+import { DashboardHome } from '@/routes/dashboard-home'
 
 // Vite serves the app under `base: "/app/"`; React Router needs the matching
 // basename (without the trailing slash) so route paths resolve under `/app`.
-const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 export function AppRouter() {
   return (
@@ -21,5 +21,5 @@ export function AppRouter() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }

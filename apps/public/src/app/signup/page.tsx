@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next'
 
-import { SiteHeader } from "@/components/site-header";
-import { SignupForm } from "@/features/auth";
+import { SiteHeader } from '@/components/site-header'
+import { SignupForm } from '@/features/auth'
 
 export const metadata: Metadata = {
-  title: "Sign up - RPG World Builder",
-};
+  title: 'Sign up - RPG World Builder',
+}
 
 export default function SignupPage() {
   return (
@@ -15,5 +15,5 @@ export default function SignupPage() {
         <SignupForm />
       </main>
     </div>
-  );
+  )
 }

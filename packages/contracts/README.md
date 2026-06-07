@@ -21,13 +21,13 @@ them for form validation (react-hook-form + `@hookform/resolvers/zod`).
 ## Usage
 
 ```ts
-import { loginInputSchema, type LoginInput } from "@rpg/contracts";
+import { loginInputSchema, type LoginInput } from '@rpg/contracts'
 
-const result = loginInputSchema.safeParse(body);
+const result = loginInputSchema.safeParse(body)
 if (!result.success) {
   // result.error.issues -> 400
 }
-const input: LoginInput = result.data;
+const input: LoginInput = result.data
 ```
 
 ## Adding a schema

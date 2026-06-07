@@ -1,9 +1,9 @@
 interface FormFieldProps {
-  id: string;
-  label: string;
-  error?: string;
-  hint?: string;
-  children: React.ReactNode;
+  id: string
+  label: string
+  error?: string
+  hint?: string
+  children: React.ReactNode
 }
 
 export function FormField({ id, label, error, hint, children }: FormFieldProps) {
@@ -19,5 +19,5 @@ export function FormField({ id, label, error, hint, children }: FormFieldProps) 
         <p className="text-sm text-muted-foreground">{hint}</p>
       ) : null}
     </div>
-  );
+  )
 }

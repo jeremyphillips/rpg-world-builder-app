@@ -1,3 +1,3 @@
-import react from "@rpg/config/eslint/react";
+import react from '@rpg/config/eslint/react'
 
-export default [...react];
+export default [...react]

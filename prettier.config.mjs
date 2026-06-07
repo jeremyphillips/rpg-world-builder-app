@@ -1,1 +1,1 @@
-export { default } from "@rpg/config/prettier";
+export { default } from '@rpg/config/prettier'

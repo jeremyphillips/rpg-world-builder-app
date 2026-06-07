@@ -1,8 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom'
 
-import { cn } from "@rpg/ui";
+import { cn } from '@rpg/ui'
 
-const NAV_ITEMS = [{ to: "/", label: "Overview", end: true }] as const;
+const NAV_ITEMS = [{ to: '/', label: 'Overview', end: true }] as const
 
 export function Sidebar() {
   return (
@@ -18,10 +18,10 @@ export function Sidebar() {
             end={item.end}
             className={({ isActive }) =>
               cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
               )
             }
           >
@@ -30,5 +30,5 @@ export function Sidebar() {
         ))}
       </nav>
     </aside>
-  );
+  )
 }

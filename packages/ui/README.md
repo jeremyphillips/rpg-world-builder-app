@@ -32,12 +32,12 @@ Tailwind's content scan.
 
 ```ts
 // app root (Next.js layout or Vite main.tsx)
-import "@rpg/ui/styles.css";
+import '@rpg/ui/styles.css'
 ```
 
 ```css
 /* the app's own globals.css */
-@import "tailwindcss";
+@import 'tailwindcss';
 @source "../../node_modules/@rpg/ui/src";
 ```
 
@@ -47,7 +47,7 @@ the `dark` class on a root element to switch themes.
 ## Importing components
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle, Input } from "@rpg/ui";
+import { Button, Card, CardHeader, CardTitle, Input } from '@rpg/ui'
 
 export function Example() {
   return (
@@ -58,7 +58,7 @@ export function Example() {
       <Input aria-label="Email" type="email" />
       <Button>Continue</Button>
     </Card>
-  );
+  )
 }
 ```
 

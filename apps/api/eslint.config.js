@@ -1,3 +1,3 @@
-import base from "@rpg/config/eslint/base";
+import base from '@rpg/config/eslint/base'
 
-export default [...base];
+export default [...base]

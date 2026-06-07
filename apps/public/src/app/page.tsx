@@ -1,6 +1,6 @@
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { SiteHero } from "@/components/site-hero";
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
+import { SiteHero } from '@/components/site-hero'
 
 export default function HomePage() {
   return (
@@ -11,5 +11,5 @@ export default function HomePage() {
       </main>
       <SiteFooter />
     </div>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   // Workspace packages ship TypeScript source, so Next must transpile them.
-  transpilePackages: ["@rpg/ui", "@rpg/contracts"],
-};
+  transpilePackages: ['@rpg/ui', '@rpg/contracts'],
+}
 
-export default nextConfig;
+export default nextConfig

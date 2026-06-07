@@ -1,58 +1,58 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Button } from "../components/ui/button";
+import { Button } from '../components/ui/button'
 
 const meta = {
-  title: "Primitives/Button",
+  title: 'Primitives/Button',
   component: Button,
   args: {
-    children: "Button",
+    children: 'Button',
   },
   argTypes: {
     variant: {
-      control: "select",
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      control: 'select',
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
     },
     size: {
-      control: "select",
-      options: ["default", "sm", "lg", "icon"],
+      control: 'select',
+      options: ['default', 'sm', 'lg', 'icon'],
     },
   },
-} satisfies Meta<typeof Button>;
+} satisfies Meta<typeof Button>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
-export const Default: Story = {};
+export const Default: Story = {}
 
 export const Secondary: Story = {
-  args: { variant: "secondary" },
-};
+  args: { variant: 'secondary' },
+}
 
 export const Destructive: Story = {
-  args: { variant: "destructive" },
-};
+  args: { variant: 'destructive' },
+}
 
 export const Outline: Story = {
-  args: { variant: "outline" },
-};
+  args: { variant: 'outline' },
+}
 
 export const Ghost: Story = {
-  args: { variant: "ghost" },
-};
+  args: { variant: 'ghost' },
+}
 
 export const Link: Story = {
-  args: { variant: "link" },
-};
+  args: { variant: 'link' },
+}
 
 export const Small: Story = {
-  args: { size: "sm" },
-};
+  args: { size: 'sm' },
+}
 
 export const Large: Story = {
-  args: { size: "lg" },
-};
+  args: { size: 'lg' },
+}
 
 export const Disabled: Story = {
   args: { disabled: true },
-};
+}

@@ -15,4 +15,4 @@ export default {
     restoreMocks: true,
     passWithNoTests: true,
   },
-};
+}

@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query'
 
 /**
  * Shared TanStack Query client. Auth/session queries opt out of retries so a
@@ -13,5 +13,5 @@ export function createQueryClient(): QueryClient {
         staleTime: 30_000,
       },
     },
-  });
+  })
 }

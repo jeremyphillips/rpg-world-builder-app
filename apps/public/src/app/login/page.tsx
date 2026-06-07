@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next'
 
-import { SiteHeader } from "@/components/site-header";
-import { LoginForm } from "@/features/auth";
+import { SiteHeader } from '@/components/site-header'
+import { LoginForm } from '@/features/auth'
 
 export const metadata: Metadata = {
-  title: "Log in - RPG World Builder",
-};
+  title: 'Log in - RPG World Builder',
+}
 
 export default function LoginPage() {
   return (
@@ -15,5 +15,5 @@ export default function LoginPage() {
         <LoginForm />
       </main>
     </div>
-  );
+  )
 }

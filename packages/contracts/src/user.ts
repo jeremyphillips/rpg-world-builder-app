@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { roleSchema } from "./roles";
+import { z } from 'zod'
+import { roleSchema } from './roles'
 
 /** Canonical user as exposed by the API (never includes the password hash). */
 export const userSchema = z.object({
@@ -9,9 +9,9 @@ export const userSchema = z.object({
   role: roleSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
-});
+})
 
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema>
 
 /** Subset returned from `GET /auth/me` and embedded in the client session. */
 export const sessionUserSchema = userSchema.pick({
@@ -19,6 +19,6 @@ export const sessionUserSchema = userSchema.pick({
   email: true,
   displayName: true,
   role: true,
-});
+})
 
-export type SessionUser = z.infer<typeof sessionUserSchema>;
+export type SessionUser = z.infer<typeof sessionUserSchema>

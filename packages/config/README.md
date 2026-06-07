@@ -36,9 +36,9 @@ config imports the plugin objects directly, avoiding plugin-resolution issues.
 
 ```js
 // apps/<app>/eslint.config.js
-import react from "@rpg/config/eslint/react";
+import react from '@rpg/config/eslint/react'
 
-export default [...react];
+export default [...react]
 ```
 
 Backend/packages use `@rpg/config/eslint/base`.
@@ -47,16 +47,16 @@ Backend/packages use `@rpg/config/eslint/base`.
 
 ```js
 // prettier.config.mjs
-export { default } from "@rpg/config/prettier";
+export { default } from '@rpg/config/prettier'
 ```
 
 ### Vitest
 
 ```js
-import { defineConfig, mergeConfig } from "vitest/config";
-import base from "@rpg/config/vitest/base";
+import { defineConfig, mergeConfig } from 'vitest/config'
+import base from '@rpg/config/vitest/base'
 
-export default mergeConfig(base, defineConfig({ test: { environment: "jsdom" } }));
+export default mergeConfig(base, defineConfig({ test: { environment: 'jsdom' } }))
 ```
 
 ## Feature-boundary rule

@@ -3,5 +3,5 @@
  * Tailwind ignores node_modules by default, so explicitly register the UI
  * package source as a class scan target. The app's own src/ is auto-detected.
  */
-@import "@rpg/ui/styles.css";
+@import '@rpg/ui/styles.css';
 @source "../node_modules/@rpg/ui/src";

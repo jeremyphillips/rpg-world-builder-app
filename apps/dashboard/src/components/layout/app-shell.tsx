@@ -1,7 +1,7 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom'
 
-import { Sidebar } from "./sidebar";
-import { Topbar } from "./topbar";
+import { Sidebar } from './sidebar'
+import { Topbar } from './topbar'
 
 /** Authenticated workspace chrome: sidebar + topbar around the routed page. */
 export function AppShell() {
@@ -15,5 +15,5 @@ export function AppShell() {
         </main>
       </div>
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Button } from "../components/ui/button";
+import { Button } from '../components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,16 +8,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Input } from "../components/ui/input";
+} from '../components/ui/card'
+import { Input } from '../components/ui/input'
 
 const meta = {
-  title: "Primitives/Card",
+  title: 'Primitives/Card',
   component: Card,
-} satisfies Meta<typeof Card>;
+} satisfies Meta<typeof Card>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   render: () => (
@@ -38,4 +38,4 @@ export const Default: Story = {
       </CardFooter>
     </Card>
   ),
-};
+}
