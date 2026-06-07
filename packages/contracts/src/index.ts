@@ -1,3 +1,4 @@
+export * from './campaign'
 export * from './csrf'
 export * from './errors'
 export * from './roles'

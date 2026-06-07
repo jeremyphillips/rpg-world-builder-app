@@ -4,7 +4,7 @@ import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 // some bindings (e.g. `models`) as named exports, so destructure from default.
 const { model, models, Schema } = mongoose
 
-import { ROLES } from '@rpg/contracts'
+import { PLATFORM_ROLES } from '@rpg/contracts'
 
 const userSchema = new Schema(
   {
@@ -18,7 +18,7 @@ const userSchema = new Schema(
     },
     passwordHash: { type: String, required: true },
     displayName: { type: String, required: true, trim: true },
-    role: { type: String, enum: ROLES, required: true, default: 'pc' },
+    role: { type: String, enum: PLATFORM_ROLES, required: true, default: 'user' },
   },
   { timestamps: true },
 )

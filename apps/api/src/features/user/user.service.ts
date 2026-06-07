@@ -1,5 +1,5 @@
 import { isValidObjectId } from 'mongoose'
-import type { Role, SessionUser, User } from '@rpg/contracts'
+import type { PlatformRole, SessionUser, User } from '@rpg/contracts'
 
 import { UserModel, type UserSchemaType } from './user.model'
 
@@ -19,7 +19,7 @@ function toUser(doc: UserRecord): User {
     id: String(doc._id),
     email: doc.email,
     displayName: doc.displayName,
-    role: doc.role as Role,
+    role: doc.role as PlatformRole,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   }
@@ -34,7 +34,7 @@ export interface CreateUserInput {
   email: string
   passwordHash: string
   displayName: string
-  role?: Role
+  role?: PlatformRole
 }
 
 export async function createUser(input: CreateUserInput): Promise<User> {
