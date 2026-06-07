@@ -1,4 +1,8 @@
-import { model, models, Schema, type InferSchemaType, type Model } from "mongoose";
+import mongoose, { type InferSchemaType, type Model } from "mongoose";
+
+// Mongoose is CommonJS; under ESM, Node's static export analysis doesn't expose
+// some bindings (e.g. `models`) as named exports, so destructure from default.
+const { model, models, Schema } = mongoose;
 
 import { ROLES } from "@rpg/contracts";
 

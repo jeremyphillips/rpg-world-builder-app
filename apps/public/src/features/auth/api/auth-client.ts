@@ -2,8 +2,12 @@ import type { LoginInput, RegisterInput, SessionUser } from "@rpg/contracts";
 
 const CSRF_HEADER = "x-csrf-token";
 
-/** Where to land after a successful auth handshake (the dashboard, same origin). */
-export const DASHBOARD_PATH = "/app";
+/**
+ * Where to land after a successful auth handshake (the dashboard, same origin).
+ * Trailing slash matters: the dashboard is served under a `/app/` base, so
+ * `/app` (no slash) would hit the dev server's base-mismatch hint page.
+ */
+export const DASHBOARD_PATH = "/app/";
 
 export class ApiError extends Error {
   readonly status: number;

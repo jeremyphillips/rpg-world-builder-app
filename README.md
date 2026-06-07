@@ -41,16 +41,67 @@ reverse proxy / CDN performs the same path routing.
 
 - Node `>= 22` (see [`.nvmrc`](.nvmrc); `nvm use`)
 - pnpm `>= 10` (repo pins `pnpm@11.5.2` via `packageManager`; enable with `corepack enable`)
-- MongoDB (added in the API phase)
+- MongoDB `>= 7` running locally (see [Getting started](#getting-started)), or Docker to run one
 
 ## Getting started
 
+### 1. Install dependencies
+
 ```bash
+nvm use            # Node >= 22 (see .nvmrc)
+corepack enable    # provides the pinned pnpm
 pnpm install
+```
+
+### 2. Start a local MongoDB
+
+The API connects to `MONGODB_URI` (default `mongodb://127.0.0.1:27017/rpg`).
+Use whichever option you prefer:
+
+**Docker (recommended — disposable, no host install):**
+
+```bash
+# start a local mongo on the default port, persisting data in a named volume
+docker run -d --name rpg-mongo -p 27017:27017 -v rpg-mongo-data:/data/db mongo:7
+
+# stop / start / remove later
+docker stop rpg-mongo
+docker start rpg-mongo
+docker rm -f rpg-mongo            # delete the container (volume survives)
+docker volume rm rpg-mongo-data   # delete the data too
+```
+
+**macOS (Homebrew, native service):**
+
+```bash
+brew tap mongodb/brew
+brew install mongodb-community@7.0
+brew services start mongodb-community@7.0   # run on boot/login
+# or run it in the foreground:
+mongod --dbpath ~/data/rpg-mongo
+brew services stop mongodb-community@7.0
+```
+
+Verify the connection (optional, needs `mongosh`):
+
+```bash
+mongosh "mongodb://127.0.0.1:27017/rpg" --eval "db.runCommand({ ping: 1 })"
+```
+
+### 3. Configure the API env
+
+```bash
+cp apps/api/.env.example apps/api/.env
+# set JWT_SECRET (>= 16 chars); MONGODB_URI already points at the local mongo
+```
+
+### 4. Run the dev servers
+
+```bash
 pnpm dev        # runs the dev proxy + all app dev servers (via turbo)
 ```
 
-Once the apps exist, open the proxy URL (default `http://localhost:8080`).
+Then open the proxy URL (default `http://localhost:8080`).
 
 ### Proxy ports (override via env)
 

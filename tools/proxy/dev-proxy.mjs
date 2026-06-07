@@ -41,6 +41,13 @@ function resolveTarget(url = "/") {
 }
 
 const server = http.createServer((req, res) => {
+  // The dashboard is served under a `/app/` base; redirect the bare `/app`
+  // to `/app/` so it doesn't hit Vite's base-mismatch hint page.
+  if (req.url === "/app") {
+    res.writeHead(302, { location: "/app/" });
+    res.end();
+    return;
+  }
   proxy.web(req, res, { target: resolveTarget(req.url) });
 });
 

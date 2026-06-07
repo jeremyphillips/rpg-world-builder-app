@@ -7,7 +7,7 @@ const { login } = vi.hoisted(() => ({ login: vi.fn() }));
 vi.mock("../api/auth-client", () => ({
   login,
   register: vi.fn(),
-  DASHBOARD_PATH: "/app",
+  DASHBOARD_PATH: "/app/",
   ApiError: class ApiError extends Error {
     status = 0;
     code = "error";

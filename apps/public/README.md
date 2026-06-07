@@ -31,7 +31,7 @@ use `pnpm dev` from the repo root to bring up the proxy + all apps.
 2. It `POST`s to `/api/auth/login` (or `/register`) with the `x-csrf-token`
    header and `credentials: "include"`.
 3. On success the API sets the host-only session cookie and the form does a
-   relative redirect to `DASHBOARD_PATH` (`/app`). Signup registers, then logs
+   relative redirect to `DASHBOARD_PATH` (`/app/`). Signup registers, then logs
    in, so new users land authenticated.
 
 ## Layout
