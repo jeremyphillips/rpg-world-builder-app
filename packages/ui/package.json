@@ -23,7 +23,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test-storybook": "test-storybook"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -38,6 +39,7 @@
     "@rpg/config": "workspace:*",
     "@storybook/addon-a11y": "^10.4.2",
     "@storybook/react-vite": "^10.4.2",
+    "@storybook/test-runner": "^0.24.4",
     "@tailwindcss/vite": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.0",
     "@testing-library/react": "^16.3.2",

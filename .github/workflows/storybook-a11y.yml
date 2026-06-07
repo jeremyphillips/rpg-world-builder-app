@@ -1,0 +1,47 @@
+name: Storybook A11y
+
+on:
+  push:
+    branches:
+      - feat/**
+      - fix/**
+      - chore/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  storybook-a11y:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @rpg/ui playwright install --with-deps chromium
+
+      - name: Build Storybook
+        run: pnpm --filter @rpg/ui build-storybook --quiet
+
+      - name: Upload Storybook build on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: storybook-static
+          path: packages/ui/storybook-static
+
+      - name: Run Storybook a11y tests
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" \
+            "npx http-server packages/ui/storybook-static --port 6006 --silent" \
+            "npx wait-on http://127.0.0.1:6006 && pnpm --filter @rpg/ui test-storybook --url http://127.0.0.1:6006"
