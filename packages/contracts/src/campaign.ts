@@ -2,6 +2,73 @@ import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
 
 // ---------------------------------------------------------------------------
+// Campaign identity
+// ---------------------------------------------------------------------------
+
+export const campaignIdentitySchema = z.object({
+  name: z.string().min(1).max(100),
+  // Future: slug, description, imageKey, tags
+})
+
+export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>
+
+// ---------------------------------------------------------------------------
+// Campaign configuration
+// ---------------------------------------------------------------------------
+
+export const campaignConfigurationSchema = z.object({
+  // Future: gameSystem, maxPlayers, sessionSchedule, isInviteOnly
+})
+
+export type CampaignConfiguration = z.infer<typeof campaignConfigurationSchema>
+
+// ---------------------------------------------------------------------------
+// Campaign status
+// ---------------------------------------------------------------------------
+
+export const CAMPAIGN_STATUSES = ['draft', 'active', 'archived'] as const
+
+export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES)
+
+export type CampaignStatus = z.infer<typeof campaignStatusSchema>
+
+// ---------------------------------------------------------------------------
+// Campaign visibility
+// ---------------------------------------------------------------------------
+
+/**
+ * Controls whether a campaign appears on the public landing page.
+ *
+ * - private → invite-only; never listed publicly (default)
+ * - public  → listed on the landing page when status is 'active'
+ *
+ * Future: 'unlisted' — accessible via shareable link but not indexed.
+ */
+export const CAMPAIGN_VISIBILITY = ['public', 'private'] as const
+
+export const campaignVisibilitySchema = z.enum(CAMPAIGN_VISIBILITY)
+
+export type CampaignVisibility = z.infer<typeof campaignVisibilitySchema>
+
+// ---------------------------------------------------------------------------
+// Campaign
+// ---------------------------------------------------------------------------
+
+export const campaignSchema = z.object({
+  id: z.string().min(1),
+  identity: campaignIdentitySchema,
+  configuration: campaignConfigurationSchema,
+  status: campaignStatusSchema,
+  visibility: campaignVisibilitySchema,
+  /** The userId who created this campaign. Immutable — distinct from the current owner, which is transferable. */
+  createdBy: z.string().min(1),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+
+export type Campaign = z.infer<typeof campaignSchema>
+
+// ---------------------------------------------------------------------------
 // Content visibility
 // ---------------------------------------------------------------------------
 
