@@ -12,18 +12,23 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 
 ## What's inside
 
-| Export                                    | Kind       | Notes                                                                    |
-| ----------------------------------------- | ---------- | ------------------------------------------------------------------------ |
-| `cn`                                      | util       | `clsx` + `tailwind-merge` class composer                                 |
-| `Button`, `buttonVariants`, `ButtonProps` | component  | 6 variants (`default` … `link`), 4 sizes                                 |
-| `Input`                                   | component  | Styled text input                                                        |
-| `Card` + subcomponents                    | component  | `CardHeader/Title/Description/Content/Footer`                            |
-| `FormField`                               | component  | Label + control slot + inline error/hint                                 |
-| `TextField`, `TextFieldProps`             | component  | `FormField` + `Input`; derives `aria-invalid` from `error`, forwards ref |
-| `FormCard`                                | component  | Card-shaped form shell: header + `<form>` + error alert + footer slot    |
-| `SubmitButton`, `SubmitButtonProps`       | component  | `type="submit"` button with pending state + label                        |
-| `@rpg/ui/styles.css`                      | stylesheet | Tailwind + design tokens (the shared "preset")                           |
-| `@rpg/ui/lib/utils`                       | util       | Direct path to `cn` for shadcn's CLI alias                               |
+| Export                                    | Kind       | Notes                                                                                                                                       |
+| ----------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cn`                                      | util       | `clsx` + `tailwind-merge` class composer                                                                                                    |
+| `Button`, `buttonVariants`, `ButtonProps` | component  | 6 variants (`default` … `link`), 4 sizes                                                                                                    |
+| `Input`                                   | component  | Styled text input                                                                                                                           |
+| `Card` + subcomponents                    | component  | `CardHeader/Title/Description/Content/Footer`                                                                                               |
+| `Field` (compound)                        | component  | `Field.Root/Label/Control/Hint/Error`; centralizes id + aria wiring                                                                         |
+| `FormField`                               | component  | Label + control slot + inline error/hint (+ optional `[i]` info)                                                                            |
+| Field wrappers                            | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField` |
+| `FieldGroup`, `FieldRow`                  | component  | Layout: semantic fieldset/legend group; responsive token-width row                                                                          |
+| `Tooltip` + `InfoTooltip`                 | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                      |
+| `RichTextEditor`, `sanitizeHtml`          | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                             |
+| `FormCard`, `formCardContentClass`        | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                  |
+| `SubmitButton`, `SubmitButtonProps`       | component  | `type="submit"` button with pending state + label                                                                                           |
+| `@rpg/ui/form`                            | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer)                                                                    |
+| `@rpg/ui/styles.css`                      | stylesheet | Tailwind + design tokens (the shared "preset")                                                                                              |
+| `@rpg/ui/lib/utils`                       | util       | Direct path to `cn` for shadcn's CLI alias                                                                                                  |
 
 Interactive primitives (`Button`, `Input`) carry `"use client"` so they work
 inside Next.js Server Components.
@@ -68,35 +73,58 @@ export function Example() {
 }
 ```
 
-For forms, prefer the higher-level helpers — `FormCard` (header + `<form>` + error
-alert + footer), `TextField` (labelled, validation-aware input), and `SubmitButton`
-(pending state). They are UI-only and pair cleanly with `react-hook-form`: spread
-`register(...)` onto `TextField` and it forwards the ref.
+For forms, prefer the schema-driven `<Form>` (see [Forms](#forms) below). `FormCard`
+is the card-shaped chrome it renders into — a header above a body slot, with **no
+`<form>` of its own** — so a `<Form>` child owns the single form element. Pass
+`formCardContentClass` to the `<Form>`'s `contentClassName` so the fields inset
+like `CardContent`.
 
 ```tsx
-import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
+import { CardFooter, FormCard, SubmitButton, formCardContentClass } from '@rpg/ui'
+import { Form } from '@rpg/ui/form'
 
 export function SignInForm({ onSubmit, formError }) {
   return (
     <FormCard
       title="Sign in"
       description="Enter your details to continue."
-      onSubmit={onSubmit}
-      formError={formError}
       className="w-full max-w-sm"
-      footer={
-        <CardFooter className="justify-end">
-          <SubmitButton pending={false} pendingLabel="Signing in…">
-            Continue
-          </SubmitButton>
-        </CardFooter>
-      }
     >
-      <TextField id="email" label="Email" type="email" autoComplete="email" />
+      <Form
+        schema={loginInputSchema}
+        fields={[{ type: 'text', name: 'email', label: 'Email', inputType: 'email' }]}
+        onSubmit={onSubmit}
+        formError={formError}
+        contentClassName={formCardContentClass}
+        footer={(form) => (
+          <CardFooter className="justify-end">
+            <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Signing in…">
+              Continue
+            </SubmitButton>
+          </CardFooter>
+        )}
+      />
     </FormCard>
   )
 }
 ```
+
+## Forms
+
+The form system is two layers: RHF-agnostic field primitives (compound `Field.*`,
+the typed wrappers, `FieldGroup`/`FieldRow`) imported from `@rpg/ui`, and a
+schema-driven `<Form>` renderer — the only `react-hook-form`-aware surface —
+imported from the `@rpg/ui/form` subpath:
+
+```tsx
+import { Form } from '@rpg/ui/form'
+;<Form schema={schema} fields={fields} onSubmit={onSubmit} />
+```
+
+See **[docs/forms.md](docs/forms.md)** for the full guide: when to use which layer,
+the field anatomy + a11y contract, the `size`/`width` token scales (with the XdY
+recipe), contracts-first validation, the RHF boundary, rich-text/JSON handling,
+and conditional fields.
 
 ## Adding a new shadcn primitive
 

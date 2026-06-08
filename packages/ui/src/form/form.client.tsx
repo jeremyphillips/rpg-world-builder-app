@@ -9,10 +9,12 @@ import {
   type FieldValues,
   type Resolver,
   type SubmitHandler,
+  type UseFormReturn,
 } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
+import { cn } from '../lib/utils'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import { FieldRenderer } from './field-renderer.client'
@@ -75,9 +77,15 @@ export interface FormProps<TFieldValues extends FieldValues> {
   defaultValues?: DefaultValues<TFieldValues>
   /** Form-level error rendered as an alert above the fields. */
   formError?: string | null
-  /** Actions row (e.g. submit button); rendered after the fields. */
-  footer?: React.ReactNode
+  /**
+   * Actions row (e.g. submit button), rendered after the fields. Pass a function
+   * to read form state (e.g. `formState.isSubmitting`) for a pending submit
+   * button — useful now that `<Form>` owns `useForm` internally.
+   */
+  footer?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   className?: string
+  /** Classes for the fields wrapper; e.g. `formCardContentClass` inside a `FormCard`. */
+  contentClassName?: string
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
 }
@@ -97,6 +105,7 @@ export function Form<TFieldValues extends FieldValues>({
   formError,
   footer,
   className,
+  contentClassName,
   id,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
@@ -123,15 +132,15 @@ export function Form<TFieldValues extends FieldValues>({
         onSubmit={form.handleSubmit(onSubmit as SubmitHandler<TFieldValues>)}
         className={className}
       >
-        {formError ? (
-          <p role="alert" className="mb-4 text-sm text-destructive">
-            {formError}
-          </p>
-        ) : null}
-        <div className="space-y-4">
+        <div className={cn('space-y-4', contentClassName)}>
+          {formError ? (
+            <p role="alert" className="text-sm text-destructive">
+              {formError}
+            </p>
+          ) : null}
           <FormItems items={fields} idPrefix={formId} />
         </div>
-        {footer}
+        {typeof footer === 'function' ? footer(form) : footer}
       </form>
     </FormProvider>
   )

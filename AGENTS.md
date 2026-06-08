@@ -38,6 +38,10 @@ Any string literal used in 2+ places → extract to a named constant.
   `<name>.tsx` (no directive).
 - Shared primitives live in `packages/ui` so both `dashboard` and `public` can
   consume them. Authoring detail → [packages/ui/README.md](packages/ui/README.md).
+- Forms: prefer the schema-driven `<Form>` (`@rpg/ui/form`) — the only
+  `react-hook-form`-aware surface — over hand-wiring primitives. Layer choice,
+  the a11y contract, `size`/`width` tokens, and conditional fields are documented
+  in [packages/ui/docs/forms.md](packages/ui/docs/forms.md).
 
 ## Accessibility
 

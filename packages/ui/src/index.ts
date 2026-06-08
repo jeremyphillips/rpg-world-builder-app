@@ -57,7 +57,7 @@ export { RichTextField, type RichTextFieldProps } from './components/ui/rich-tex
 export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
-export { FormCard } from './components/ui/form-card'
+export { FormCard, formCardContentClass } from './components/ui/form-card'
 export { SubmitButton, type SubmitButtonProps } from './components/ui/submit-button'
 export { SidebarTrigger, type SidebarTriggerProps } from './components/ui/sidebar-trigger.client'
 

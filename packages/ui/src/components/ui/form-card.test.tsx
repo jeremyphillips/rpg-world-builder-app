@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 
 import { FormCard } from './form-card'
@@ -8,55 +7,38 @@ import { FormCard } from './form-card'
 const baseProps = {
   title: 'Sign in',
   description: 'Enter your details to continue.',
-  footer: <button type="submit">Continue</button>,
 }
 
 describe('FormCard', () => {
-  it('renders the title and description', () => {
+  it('renders the title, description, and body', () => {
     render(
-      <FormCard {...baseProps} onSubmit={(event) => event.preventDefault()}>
-        <input aria-label="Email" />
+      <FormCard {...baseProps}>
+        <p>Body content</p>
       </FormCard>,
     )
     expect(screen.getByText('Sign in')).toBeInTheDocument()
     expect(screen.getByText('Enter your details to continue.')).toBeInTheDocument()
+    expect(screen.getByText('Body content')).toBeInTheDocument()
   })
 
-  it('renders a form-level alert only when formError is set', () => {
-    const { rerender } = render(
-      <FormCard {...baseProps} onSubmit={(event) => event.preventDefault()}>
-        <input aria-label="Email" />
+  it('renders chrome only — no form element of its own', () => {
+    const { container } = render(
+      <FormCard {...baseProps}>
+        <form aria-label="inner">
+          <input aria-label="Email" />
+        </form>
       </FormCard>,
     )
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-
-    rerender(
-      <FormCard
-        {...baseProps}
-        onSubmit={(event) => event.preventDefault()}
-        formError="Invalid email or password."
-      >
-        <input aria-label="Email" />
-      </FormCard>,
-    )
-    expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password.')
-  })
-
-  it('calls onSubmit when the form is submitted', async () => {
-    const onSubmit = vi.fn((event) => event.preventDefault())
-    render(
-      <FormCard {...baseProps} onSubmit={onSubmit}>
-        <input aria-label="Email" />
-      </FormCard>,
-    )
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(onSubmit).toHaveBeenCalledOnce()
+    // Exactly the child form; FormCard adds none, so a nested <form> never occurs.
+    expect(container.querySelectorAll('form')).toHaveLength(1)
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <FormCard {...baseProps} onSubmit={(event) => event.preventDefault()}>
-        <input aria-label="Email" />
+      <FormCard {...baseProps}>
+        <form>
+          <input aria-label="Email" />
+        </form>
       </FormCard>,
     )
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
