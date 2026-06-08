@@ -1,0 +1,23 @@
+---
+description: UI primitive (CVA) file structure
+globs: packages/ui/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# UI primitives (CVA)
+
+A primitive follows this layout:
+
+```text
+index.ts          # barrel re-export
+<name>.variants.ts # all CVA / Tailwind classes live here
+<name>.tsx         # component (add 'use client' or use <name>.client.tsx if interactive)
+<name>.stories.tsx # CSF3 story
+<name>.types.ts    # optional shared types
+```
+
+- Keep all Tailwind classes in `*.variants.ts` — prefer named CVA variants over
+  long inline strings.
+- Use design-token classes only; never hardcode colors or font sizes.
+
+Detail: [packages/ui/README.md](../../packages/ui/README.md).

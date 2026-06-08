@@ -100,14 +100,34 @@ export function SignInForm({ onSubmit, formError }) {
 
 ## Adding a new shadcn primitive
 
-1. Add the component file under `src/components/ui/<name>.tsx`, composing classes
-   with `cn` from `../../lib/utils` (match the new-york style of the existing
-   primitives). The shadcn CLI can scaffold it: `pnpm dlx shadcn@latest add <name>`
-   (config lives in `components.json`).
-2. If it is interactive, add `"use client"` at the top so Next.js RSC works.
+A primitive follows the CVA file layout (all under `src/components/ui/`):
+
+```text
+index.ts            # barrel re-export
+<name>.variants.ts  # all CVA / Tailwind classes live here
+<name>.tsx          # component (server) — or <name>.client.tsx if interactive
+<name>.stories.tsx  # CSF3 story (required for every component)
+<name>.types.ts     # optional shared types
+```
+
+1. Put **all** Tailwind classes in `<name>.variants.ts` via `cva` — prefer named
+   CVA variants over long inline strings. Use design-token classes only; never
+   hardcode color values or font sizes. The shadcn CLI can scaffold a starting
+   point: `pnpm dlx shadcn@latest add <name>` (config lives in `components.json`).
+2. The component file composes classes with `cn` from `../../lib/utils` (match the
+   new-york style of the existing primitives). If it is interactive, name it
+   `<name>.client.tsx` and add `'use client'` at the top so Next.js RSC works; a
+   non-interactive (server) component is `<name>.tsx` with no directive.
 3. Re-export it from `src/index.ts`.
-4. Add a co-located `<name>.stories.tsx` next to the component and, for
-   logic-bearing components, a co-located `<name>.test.tsx`.
+4. Add a co-located `<name>.stories.tsx` for **every** component (CSF3), and a
+   co-located `<name>.test.tsx` for logic-bearing or interactive components. Every
+   UI/interactive component must pass vitest-axe and the Storybook test runner's
+   axe-playwright check, and introduce no `eslint-plugin-jsx-a11y` violations
+   (target WCAG 2.2 AA); never suppress axe rules globally.
+
+> Note: some existing primitives (e.g. `button-variants.ts`) predate the dotted
+> `*.variants.ts` naming and the `*.client.tsx` suffix. New work follows the
+> conventions above; existing files are migrated opportunistically, not in bulk.
 
 ## Running Storybook
 
