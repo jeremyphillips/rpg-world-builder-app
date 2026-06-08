@@ -23,6 +23,9 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | Field wrappers                            | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField` |
 | `FieldGroup`, `FieldRow`                  | component  | Layout: semantic fieldset/legend group; responsive token-width row                                                                          |
 | `Tooltip` + `InfoTooltip`                 | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                      |
+| `Modal` (compound)                        | component  | `Modal.Root/Trigger/Content/Header/Body/Footer/Close` on Radix Dialog; `size`, `closeOnOutsideClick`, `closeOnEscape`                       |
+| `useModal`                                | hook       | Modal open/close state + promise-based `confirm()` + guarded-close helpers                                                                  |
+| `ConfirmDialog`                           | component  | Radix AlertDialog "are you sure?"; pairs with `useModal`'s guarded close                                                                    |
 | `RichTextEditor`, `sanitizeHtml`          | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                             |
 | `FormCard`, `formCardContentClass`        | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                  |
 | `SubmitButton`, `SubmitButtonProps`       | component  | `type="submit"` button with pending state + label                                                                                           |
