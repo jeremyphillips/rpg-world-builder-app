@@ -6,6 +6,7 @@ const validUser = {
   email: 'user@example.com',
   displayName: 'Test User',
   role: 'user',
+  lastSelectedCampaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
@@ -31,6 +32,7 @@ describe('sessionUserSchema', () => {
       email: 'user@example.com',
       displayName: 'Test User',
       role: 'user',
+      lastSelectedCampaignId: null,
     })
   })
 })

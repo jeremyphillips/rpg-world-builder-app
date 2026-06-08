@@ -36,11 +36,30 @@ export async function postJson<T>(
   body: unknown,
   fallbackMessage?: string,
 ): Promise<T> {
+  return sendJson<T>('POST', path, body, fallbackMessage)
+}
+
+/** PUT a JSON body with the double-submit CSRF token attached. */
+export async function putJson<T>(
+  path: string,
+  body: unknown,
+  fallbackMessage?: string,
+): Promise<T> {
+  return sendJson<T>('PUT', path, body, fallbackMessage)
+}
+
+/** Shared JSON-body sender for mutating methods; attaches the CSRF token. */
+async function sendJson<T>(
+  method: 'POST' | 'PUT' | 'PATCH',
+  path: string,
+  body: unknown,
+  fallbackMessage?: string,
+): Promise<T> {
   const csrfToken = await fetchCsrfToken()
   return request<T>(
     path,
     {
-      method: 'POST',
+      method,
       headers: { 'content-type': 'application/json', [CSRF_HEADER]: csrfToken },
       body: JSON.stringify(body),
     },

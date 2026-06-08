@@ -67,7 +67,7 @@ describe('AuthGuard', () => {
       id: '1',
       email: 'dm@example.com',
       displayName: 'Dungeon Master',
-      role: 'dm',
+      role: 'user',
     })
 
     renderGuard()

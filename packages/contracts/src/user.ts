@@ -7,6 +7,8 @@ export const userSchema = z.object({
   email: z.email(),
   displayName: z.string().min(1).max(80),
   role: platformRoleSchema,
+  /** The campaign this user most recently selected; drives the dashboard landing redirect. */
+  lastSelectedCampaignId: z.string().min(1).nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })
@@ -19,6 +21,7 @@ export const sessionUserSchema = userSchema.pick({
   email: true,
   displayName: true,
   role: true,
+  lastSelectedCampaignId: true,
 })
 
 export type SessionUser = z.infer<typeof sessionUserSchema>

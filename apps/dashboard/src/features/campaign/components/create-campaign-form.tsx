@@ -9,16 +9,23 @@ import {
 import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
 
 import { useCreateCampaign } from '../hooks/use-create-campaign'
+import { useSelectCampaign } from '../hooks/use-select-campaign'
 
 export function CreateCampaignForm() {
   const mutation = useCreateCampaign()
+  const selectCampaign = useSelectCampaign()
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateCampaignInput>({ resolver: zodResolver(createCampaignInputSchema) })
 
-  const onSubmit = handleSubmit((values) => mutation.mutate(values))
+  const onSubmit = handleSubmit((values) =>
+    mutation.mutate(values, {
+      // The new campaign becomes the selection: persist it and navigate to its landing.
+      onSuccess: (campaign) => selectCampaign(campaign.id),
+    }),
+  )
 
   return (
     <FormCard

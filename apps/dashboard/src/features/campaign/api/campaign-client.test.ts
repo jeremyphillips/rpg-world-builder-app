@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@rpg/contracts'
 
-import { createCampaign } from './campaign-client'
+import { createCampaign, listCampaigns, rememberSelectedCampaign } from './campaign-client'
 
 function fakeResponse(ok: boolean, status: number, body: unknown) {
   return { ok, status, json: async () => body } as unknown as Response
@@ -42,5 +42,40 @@ describe('createCampaign', () => {
     stubFetch(fakeResponse(false, 500, null))
 
     await expect(createCampaign({ name: 'X' })).rejects.toThrow('Could not create campaign.')
+  })
+})
+
+describe('listCampaigns', () => {
+  it('unwraps and returns the campaigns array on success', async () => {
+    stubFetch(fakeResponse(true, 200, { campaigns: [{ id: 'c1' }, { id: 'c2' }] }))
+
+    await expect(listCampaigns()).resolves.toEqual([{ id: 'c1' }, { id: 'c2' }])
+  })
+
+  it('throws ApiError with the server message when the request fails', async () => {
+    stubFetch(fakeResponse(false, 401, { error: { code: 'unauthorized', message: 'Nope.' } }))
+
+    const err = await listCampaigns().catch((e: unknown) => e)
+    expect(err).toBeInstanceOf(ApiError)
+    expect(err).toMatchObject({ status: 401, message: 'Nope.' })
+  })
+})
+
+describe('rememberSelectedCampaign', () => {
+  it('returns the updated session user on success', async () => {
+    stubFetch(fakeResponse(true, 200, { user: { id: 'u1', lastSelectedCampaignId: 'c1' } }))
+
+    await expect(rememberSelectedCampaign('c1')).resolves.toEqual({
+      id: 'u1',
+      lastSelectedCampaignId: 'c1',
+    })
+  })
+
+  it('falls back to a default message when the error body is missing', async () => {
+    stubFetch(fakeResponse(false, 403, null))
+
+    await expect(rememberSelectedCampaign('c1')).rejects.toThrow(
+      'Could not update selected campaign.',
+    )
   })
 })
