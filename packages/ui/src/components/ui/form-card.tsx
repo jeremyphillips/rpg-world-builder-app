@@ -1,48 +1,36 @@
-import type { FormEventHandler, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card'
+import { Card, CardDescription, CardHeader, CardTitle } from './card'
+
+/**
+ * Padding for a form body rendered inside `FormCard` chrome — mirrors
+ * `CardContent` (`p-6 pt-0`). Pass to `<Form contentClassName={...}>` so the
+ * fields inset from the card edge while the header/footer keep their own
+ * padding. (`<Form>` owns the `<form>`; `FormCard` is pure chrome.)
+ */
+export const formCardContentClass = 'p-6 pt-0'
 
 interface FormCardProps {
   title: string
   description: string
-  onSubmit: FormEventHandler<HTMLFormElement>
-  /** Form-level error message rendered as an alert above the fields. */
-  formError?: string | null
+  /** The form body — typically a `<Form>` (which owns the `<form>` element). */
   children: ReactNode
-  footer: ReactNode
   className?: string
 }
 
 /**
- * Generic card-shaped form shell: header (title + description), a `<form>` with a
- * form-level error alert above its fields, and a footer slot for actions.
+ * Card-shaped chrome for a form: a header (title + description) above a body
+ * slot. It deliberately does **not** render a `<form>` — render a `<Form>` (from
+ * `@rpg/ui/form`) as its child so there is exactly one form element.
  */
-export function FormCard({
-  title,
-  description,
-  onSubmit,
-  formError,
-  children,
-  footer,
-  className,
-}: FormCardProps) {
+export function FormCard({ title, description, children, className }: FormCardProps) {
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <form onSubmit={onSubmit} noValidate>
-        <CardContent className="space-y-4">
-          {formError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {formError}
-            </p>
-          ) : null}
-          {children}
-        </CardContent>
-        {footer}
-      </form>
+      {children}
     </Card>
   )
 }

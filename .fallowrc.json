@@ -3,7 +3,9 @@
   "ignoreDependencies": [
     "eslint-import-resolver-typescript",
     "@next/eslint-plugin-next",
-    "eslint-plugin-storybook"
+    "eslint-plugin-storybook",
+    "react-hook-form",
+    "@hookform/resolvers"
   ],
   "ignorePatterns": ["**/*.config.*", "**/__mocks__/**"],
   "rules": {

@@ -1,0 +1,36 @@
+import { describe, expect, it } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import axe from 'axe-core'
+
+import { FieldGroup } from './field-group'
+import { TextField } from './text-field'
+
+describe('FieldGroup', () => {
+  it('renders a group named by its legend', () => {
+    render(
+      <FieldGroup legend="Character basics">
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+    expect(screen.getByRole('group', { name: /Character basics/ })).toBeInTheDocument()
+  })
+
+  it('renders an optional description', () => {
+    render(
+      <FieldGroup legend="Character basics" description="Shown on your sheet.">
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+    expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <FieldGroup legend="Character basics">
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+})
