@@ -24,7 +24,8 @@
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook"
+    "test-storybook": "test-storybook",
+    "playwright:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -50,6 +51,7 @@
     "eslint": "^10.4.1",
     "eslint-plugin-storybook": "^10.4.2",
     "jsdom": "^26.1.0",
+    "playwright": "^1.60.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "storybook": "^10.4.2",

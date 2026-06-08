@@ -346,6 +346,9 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
+      playwright:
+        specifier: ^1.60.0
+        version: 1.60.0
       react:
         specifier: ^19.2.0
         version: 19.2.7
