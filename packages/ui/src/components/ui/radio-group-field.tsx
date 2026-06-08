@@ -26,6 +26,8 @@ export interface RadioGroupFieldProps {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
+  /** Forwarded to the group root so RHF's `field.onBlur` (touched state) can fire. */
+  onBlur?: () => void
 }
 
 /**
@@ -46,6 +48,7 @@ export function RadioGroupField({
   value,
   defaultValue,
   onValueChange,
+  onBlur,
 }: RadioGroupFieldProps) {
   const labelId = `${id}-label`
   return (
@@ -67,6 +70,7 @@ export function RadioGroupField({
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}
+          onBlur={onBlur}
         >
           {options.map((option) => {
             const optionId = `${id}-${option.value}`

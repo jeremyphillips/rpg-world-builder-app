@@ -27,6 +27,8 @@ export interface SelectFieldProps {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
+  /** Forwarded to the trigger so RHF's `field.onBlur` (touched state) can fire. */
+  onBlur?: () => void
 }
 
 /** Labelled Radix Select bound to the compound `Field`. */
@@ -46,6 +48,7 @@ export function SelectField({
   value,
   defaultValue,
   onValueChange,
+  onBlur,
 }: SelectFieldProps) {
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
@@ -61,7 +64,7 @@ export function SelectField({
         disabled={disabled}
       >
         <Field.Control>
-          <SelectTrigger size={size}>
+          <SelectTrigger size={size} onBlur={onBlur}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
         </Field.Control>
