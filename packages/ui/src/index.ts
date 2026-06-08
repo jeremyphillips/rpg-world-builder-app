@@ -103,3 +103,12 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 } from './components/ui/dropdown-menu.client'
+
+export { Modal, type ModalContentProps, type ModalHeaderProps } from './components/ui/modal.client'
+export {
+  modalOverlayVariants,
+  modalContentVariants,
+  type ModalContentVariantProps,
+  type ModalSize,
+} from './components/ui/modal.variants'
+export { useModal, type UseModalReturn } from './hooks/use-modal'
