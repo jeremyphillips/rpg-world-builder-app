@@ -19,6 +19,9 @@ const userSchema = new Schema(
     passwordHash: { type: String, required: true },
     displayName: { type: String, required: true, trim: true },
     role: { type: String, enum: PLATFORM_ROLES, required: true, default: 'user' },
+    // The campaign this user most recently selected in the dashboard. Null until
+    // they pick one; cleared lazily (never validated here) if the campaign is gone.
+    lastSelectedCampaignId: { type: String, default: null },
   },
   { timestamps: true },
 )

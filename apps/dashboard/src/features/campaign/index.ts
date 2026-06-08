@@ -1,2 +1,8 @@
 export { CreateCampaignForm } from './components/create-campaign-form'
+export { CampaignSwitcher } from './components/campaign-switcher'
+export { CampaignPicker } from './components/campaign-picker'
 export { CampaignDetail } from './routes/campaign-detail'
+export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
+export { useSelectCampaign } from './hooks/use-select-campaign'
+export { readStoredCampaignId } from './lib/selected-campaign-storage'
+export { resolveLandingCampaignId, resolveLandingPath } from './lib/campaign-selection'

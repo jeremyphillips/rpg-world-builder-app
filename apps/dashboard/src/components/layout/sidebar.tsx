@@ -2,6 +2,8 @@ import { NavLink } from 'react-router-dom'
 
 import { cn } from '@rpg/ui'
 
+import { CampaignSwitcher } from '@/features/campaign'
+
 const NAV_ITEMS = [{ to: '/', label: 'Overview', end: true }] as const
 
 export function Sidebar() {
@@ -10,6 +12,7 @@ export function Sidebar() {
       <div className="flex h-16 items-center px-6">
         <span className="text-lg font-semibold tracking-tight">RPG World Builder</span>
       </div>
+      {/* Global (non-campaign) navigation lives above the switcher. */}
       <nav className="flex flex-col gap-1 px-3 py-2" aria-label="Primary">
         {NAV_ITEMS.map((item) => (
           <NavLink
@@ -29,6 +32,11 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      {/* The switcher is a context boundary: items below it are campaign-scoped. */}
+      <div className="my-2 border-t border-border" />
+      <div className="px-3 py-2">
+        <CampaignSwitcher />
+      </div>
     </aside>
   )
 }

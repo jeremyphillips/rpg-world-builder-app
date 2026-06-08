@@ -1,14 +1,19 @@
-import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import type { Campaign } from '@rpg/contracts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { createCampaign } from '../api/campaign-client'
+import { campaignsQueryKey } from './use-campaigns'
 
-/** Create a campaign, then navigate to its detail route on success. */
+/**
+ * Create a campaign and refresh the campaign list. Selection + navigation are
+ * the caller's responsibility (the URL is the source of truth), so the form
+ * calls `selectCampaign(campaign.id)` in its own success handler.
+ */
 export function useCreateCampaign() {
-  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createCampaign,
-    onSuccess: (campaign: Campaign) => navigate(`/campaigns/${campaign.id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: campaignsQueryKey })
+    },
   })
 }

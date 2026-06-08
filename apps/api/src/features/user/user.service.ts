@@ -20,14 +20,15 @@ function toUser(doc: UserRecord): User {
     email: doc.email,
     displayName: doc.displayName,
     role: doc.role as PlatformRole,
+    lastSelectedCampaignId: doc.lastSelectedCampaignId ?? null,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   }
 }
 
 export function toSessionUser(user: User): SessionUser {
-  const { id, email, displayName, role } = user
-  return { id, email, displayName, role }
+  const { id, email, displayName, role, lastSelectedCampaignId } = user
+  return { id, email, displayName, role, lastSelectedCampaignId }
 }
 
 export interface CreateUserInput {
@@ -56,6 +57,24 @@ export async function findUserByEmailWithSecret(email: string): Promise<UserWith
 export async function findSessionUserById(id: string): Promise<SessionUser | null> {
   if (!isValidObjectId(id)) return null
   const doc = await UserModel.findById(id).lean<UserRecord | null>()
+  if (!doc) return null
+  return toSessionUser(toUser(doc))
+}
+
+/**
+ * Persist the user's most recently selected campaign. Membership is validated
+ * by the caller; this only writes the preference and returns the updated user.
+ */
+export async function updateLastSelectedCampaign(
+  userId: string,
+  campaignId: string,
+): Promise<SessionUser | null> {
+  if (!isValidObjectId(userId)) return null
+  const doc = await UserModel.findByIdAndUpdate(
+    userId,
+    { lastSelectedCampaignId: campaignId },
+    { new: true },
+  ).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))
 }

@@ -3,4 +3,5 @@ export {
   findUserByEmailWithSecret,
   findSessionUserById,
   toSessionUser,
+  updateLastSelectedCampaign,
 } from './user.service'

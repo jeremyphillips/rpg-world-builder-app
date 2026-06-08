@@ -65,3 +65,29 @@ export async function findCampaignById(id: string): Promise<Campaign | null> {
   if (!doc) return null
   return toCampaign(doc)
 }
+
+/**
+ * List every campaign the user can reach via membership. Because the creator is
+ * given an `owner` membership on create, this covers both campaigns they own and
+ * campaigns they merely belong to. Sorted by name for a stable switcher order.
+ */
+export async function listCampaignsForUser(userId: string): Promise<Campaign[]> {
+  const memberships = await CampaignMembershipModel.find({ userId })
+    .select('campaignId')
+    .lean<{ campaignId: string }[]>()
+
+  const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
+  if (campaignIds.length === 0) return []
+
+  const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
+  return docs.map(toCampaign).sort((a, b) => a.identity.name.localeCompare(b.identity.name))
+}
+
+/** Whether the user has any membership in the given campaign. */
+export async function isCampaignMember(userId: string, campaignId: string): Promise<boolean> {
+  if (!isValidObjectId(campaignId)) return false
+  const membership = await CampaignMembershipModel.findOne({ campaignId, userId })
+    .select('_id')
+    .lean()
+  return membership !== null
+}

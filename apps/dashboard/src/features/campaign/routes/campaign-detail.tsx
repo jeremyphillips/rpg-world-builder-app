@@ -1,8 +1,13 @@
 import { useParams } from 'react-router-dom'
 
+import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
+
 /** Placeholder detail route so post-create navigation resolves. */
 export function CampaignDetail() {
   const { campaignId } = useParams<{ campaignId: string }>()
+
+  // Viewing a campaign (link/bookmark/refresh) makes it the remembered "last".
+  usePersistViewedCampaign(campaignId)
 
   return (
     <div className="mx-auto max-w-3xl space-y-2">

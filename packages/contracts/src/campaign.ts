@@ -83,6 +83,20 @@ export const createCampaignInputSchema = z.object({
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
 
 // ---------------------------------------------------------------------------
+// Select campaign input
+// ---------------------------------------------------------------------------
+
+/**
+ * Payload for remembering the user's most recently selected campaign. The
+ * server validates that the user is a member before persisting.
+ */
+export const selectCampaignInputSchema = z.object({
+  campaignId: z.string().min(1),
+})
+
+export type SelectCampaignInput = z.infer<typeof selectCampaignInputSchema>
+
+// ---------------------------------------------------------------------------
 // Content visibility
 // ---------------------------------------------------------------------------
 

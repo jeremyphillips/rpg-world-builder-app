@@ -1,6 +1,6 @@
-import type { Campaign, CreateCampaignInput } from '@rpg/contracts'
+import type { Campaign, CreateCampaignInput, SessionUser } from '@rpg/contracts'
 
-import { postJson } from '@/lib/api-client'
+import { postJson, putJson, request } from '@/lib/api-client'
 
 /** Create a campaign, or throw `ApiError` on failure. */
 export async function createCampaign(input: CreateCampaignInput): Promise<Campaign> {
@@ -10,4 +10,27 @@ export async function createCampaign(input: CreateCampaignInput): Promise<Campai
     'Could not create campaign.',
   )
   return campaign
+}
+
+/** List every campaign the current user owns or belongs to. */
+export async function listCampaigns(): Promise<Campaign[]> {
+  const { campaigns } = await request<{ campaigns: Campaign[] }>(
+    '/api/campaigns',
+    undefined,
+    'Could not load campaigns.',
+  )
+  return campaigns
+}
+
+/**
+ * Persist the user's most recently selected campaign on the server. Returns the
+ * updated session user so the caller can refresh the session cache.
+ */
+export async function rememberSelectedCampaign(campaignId: string): Promise<SessionUser> {
+  const { user } = await putJson<{ user: SessionUser }>(
+    '/api/campaigns/selection',
+    { campaignId },
+    'Could not update selected campaign.',
+  )
+  return user
 }
