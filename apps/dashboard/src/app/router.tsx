@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { AuthGuard } from '@/features/auth'
+import { ROUTES } from '@/app/routes'
 import { CampaignDetail, CampaignSessions, CampaignSettings } from '@/features/campaign'
 import { AppShell } from '@/components/layout/app-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
@@ -32,7 +33,7 @@ export function AppRouter() {
             <Route path="admin/settings" element={<AdminSettings />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>
     </BrowserRouter>
   )

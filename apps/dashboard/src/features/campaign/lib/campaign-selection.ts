@@ -4,6 +4,8 @@
  * e.g. localStorage and the session preference).
  */
 
+import { ROUTES } from '@/app/routes'
+
 /** Minimal shape needed to validate a campaign id; satisfied by `Campaign`. */
 interface CampaignIdentity {
   id: string
@@ -45,7 +47,7 @@ export function resolveLandingPath(
     campaigns.length === 1 ? campaigns[0]?.id : undefined,
   ]
   const id = resolveLandingCampaignId(campaigns, candidates)
-  return id ? `/campaigns/${id}` : null
+  return id ? ROUTES.campaign.detail(id) : null
 }
 
 interface SwitcherLabelState {

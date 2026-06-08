@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { NavSection } from '@rpg/ui'
 
+import { ROUTES } from '@/app/routes'
 import { CampaignSwitcher } from '@/features/campaign'
 
 import { NavItem } from './nav-item'
@@ -16,8 +17,8 @@ export function CampaignNavSection() {
       </div>
       {campaignId && (
         <>
-          <NavItem to={`/campaigns/${campaignId}`} label="Overview" end />
-          <NavItem to={`/campaigns/${campaignId}/sessions`} label="Sessions" />
+          <NavItem to={ROUTES.campaign.detail(campaignId)} label="Overview" end />
+          <NavItem to={ROUTES.campaign.sessions(campaignId)} label="Sessions" />
         </>
       )}
     </NavSection>
