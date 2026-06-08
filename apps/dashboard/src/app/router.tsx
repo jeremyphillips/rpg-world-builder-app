@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { AuthGuard } from '@/features/auth'
+import { CampaignDetail } from '@/features/campaign'
 import { AppShell } from '@/components/layout/app-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
 
@@ -16,6 +17,7 @@ export function AppRouter() {
         <Route element={<AuthGuard />}>
           <Route element={<AppShell />}>
             <Route index element={<DashboardHome />} />
+            <Route path="campaigns/:campaignId" element={<CampaignDetail />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,2 @@
-// fallow-ignore-file unused-file
-// `campaign` feature — scaffold only. Export the public surface here as it's built.
-export {}
+export { CreateCampaignForm } from './components/create-campaign-form'
+export { CampaignDetail } from './routes/campaign-detail'

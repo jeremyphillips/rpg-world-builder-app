@@ -9,3 +9,12 @@ export class ApiError extends Error {
     this.code = code
   }
 }
+
+/**
+ * Extract a user-facing message from a thrown value: the `ApiError` message when
+ * available, otherwise the provided fallback. Keeps error handling consistent
+ * across API clients and form components.
+ */
+export function getErrorMessage(err: unknown, fallback: string): string {
+  return err instanceof ApiError ? err.message : fallback
+}
