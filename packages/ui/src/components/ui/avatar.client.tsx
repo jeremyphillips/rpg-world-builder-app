@@ -1,25 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-
-const avatarVariants = cva(
-  'relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full bg-muted font-medium text-muted-foreground',
-  {
-    variants: {
-      size: {
-        sm: 'size-7 text-xs',
-        md: 'size-9 text-sm',
-        lg: 'size-11 text-base',
-      },
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-  },
-)
+import { avatarVariants, type AvatarVariantProps } from './avatar.variants'
 
 function getInitials(name: string): string {
   return name
@@ -30,7 +14,7 @@ function getInitials(name: string): string {
     .join('')
 }
 
-export interface AvatarProps extends VariantProps<typeof avatarVariants> {
+export interface AvatarProps extends AvatarVariantProps {
   name: string
   src?: string
   className?: string

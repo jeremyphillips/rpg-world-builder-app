@@ -1,0 +1,8 @@
+---
+description: Repo-wide conventions and quality gate
+alwaysApply: true
+---
+
+Follow the conventions in [AGENTS.md](../../AGENTS.md).
+
+Work is not done until the quality gate in [.husky/pre-commit](../../.husky/pre-commit) passes.

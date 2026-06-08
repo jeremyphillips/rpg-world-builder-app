@@ -1,0 +1,14 @@
+---
+description: Feature-folder boundaries and data access
+globs: apps/*/src/features/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Features
+
+- A feature may only be imported through its `index.ts` barrel — never its
+  internals (ESLint-enforced).
+- Data access goes through TanStack Query (in `hooks/`), not ad-hoc `fetch` in
+  components.
+
+Detail: [apps/dashboard/docs/feature-conventions.md](../../apps/dashboard/docs/feature-conventions.md).

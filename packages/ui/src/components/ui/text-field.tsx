@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { FormField } from './form-field'
-import { Input } from './input'
+import { Input } from './input.client'
 
 export interface TextFieldProps extends Omit<React.ComponentProps<typeof Input>, 'id'> {
   id: string
