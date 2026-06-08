@@ -5,12 +5,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 
-import { registerInputSchema, type RegisterInput } from '@rpg/contracts'
-import { Button, CardFooter, Input } from '@rpg/ui'
+import { getErrorMessage, registerInputSchema, type RegisterInput } from '@rpg/contracts'
+import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
 
-import { ApiError, DASHBOARD_PATH, login, register } from '../api/auth-client'
-import { AuthEmailField, AuthFormCard } from './auth-form-card'
-import { FormField } from './form-field'
+import { DASHBOARD_PATH, login, register } from '../api/auth-client'
 
 export interface SignupFormProps {
   /** Called after a successful signup. Defaults to a same-origin redirect to the dashboard. */
@@ -33,23 +31,22 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       await login({ email: values.email, password: values.password })
       ;(onSuccess ?? (() => window.location.assign(DASHBOARD_PATH)))()
     } catch (err) {
-      setFormError(
-        err instanceof ApiError ? err.message : 'Unable to create your account. Please try again.',
-      )
+      setFormError(getErrorMessage(err, 'Unable to create your account. Please try again.'))
     }
   })
 
   return (
-    <AuthFormCard
+    <FormCard
       title="Create your account"
       description="Start building your worlds in minutes."
       onSubmit={onSubmit}
       formError={formError}
+      className="w-full max-w-sm"
       footer={
         <CardFooter className="flex-col items-stretch gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating account…' : 'Create account'}
-          </Button>
+          <SubmitButton pending={isSubmitting} pendingLabel="Creating account…">
+            Create account
+          </SubmitButton>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link
@@ -62,33 +59,30 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         </CardFooter>
       }
     >
-      <FormField id="displayName" label="Display name" error={errors.displayName?.message}>
-        <Input
-          id="displayName"
-          autoComplete="nickname"
-          aria-invalid={Boolean(errors.displayName)}
-          {...field('displayName')}
-        />
-      </FormField>
-      <AuthEmailField
+      <TextField
+        id="displayName"
+        label="Display name"
+        autoComplete="nickname"
+        error={errors.displayName?.message}
+        {...field('displayName')}
+      />
+      <TextField
+        id="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
         error={errors.email?.message}
-        aria-invalid={Boolean(errors.email)}
         {...field('email')}
       />
-      <FormField
+      <TextField
         id="password"
         label="Password"
-        error={errors.password?.message}
+        type="password"
+        autoComplete="new-password"
         hint="At least 8 characters."
-      >
-        <Input
-          id="password"
-          type="password"
-          autoComplete="new-password"
-          aria-invalid={Boolean(errors.password)}
-          {...field('password')}
-        />
-      </FormField>
-    </AuthFormCard>
+        error={errors.password?.message}
+        {...field('password')}
+      />
+    </FormCard>
   )
 }

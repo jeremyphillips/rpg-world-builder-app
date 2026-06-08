@@ -5,9 +5,11 @@ import type {
   CampaignIdentity,
   CampaignStatus,
   CampaignVisibility,
+  CreateCampaignInput,
 } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
+import { CampaignMembershipModel } from './campaign-membership.model'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
@@ -28,17 +30,32 @@ function toCampaign(doc: CampaignRecord): Campaign {
   }
 }
 
-export interface CreateCampaignInput {
-  name: string
-  createdBy: string
-}
-
-export async function createCampaign(input: CreateCampaignInput): Promise<Campaign> {
+export async function createCampaign(
+  input: CreateCampaignInput & { createdBy: string },
+): Promise<Campaign> {
   const doc = await CampaignModel.create({
     identity: { name: input.name },
     configuration: {},
     createdBy: input.createdBy,
   })
+
+  // Access control is membership-based, so the creator's owner membership must
+  // exist for the campaign to be reachable. No replica set is guaranteed in
+  // local dev (so no transaction); compensate by deleting the orphan on failure.
+  try {
+    await CampaignMembershipModel.create({
+      campaignId: String(doc._id),
+      userId: input.createdBy,
+      campaignRole: 'owner',
+      characterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+  } catch (err) {
+    await CampaignModel.deleteOne({ _id: doc._id })
+    throw err
+  }
+
   return toCampaign(doc.toObject() as CampaignRecord)
 }
 

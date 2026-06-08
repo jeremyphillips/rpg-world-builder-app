@@ -69,6 +69,20 @@ export const campaignSchema = z.object({
 export type Campaign = z.infer<typeof campaignSchema>
 
 // ---------------------------------------------------------------------------
+// Create campaign input
+// ---------------------------------------------------------------------------
+
+/**
+ * Client-facing payload for creating a campaign. `createdBy` is set server-side
+ * from the session, so the client only sends the campaign name.
+ */
+export const createCampaignInputSchema = z.object({
+  name: z.string().min(1).max(100),
+})
+
+export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
+
+// ---------------------------------------------------------------------------
 // Content visibility
 // ---------------------------------------------------------------------------
 

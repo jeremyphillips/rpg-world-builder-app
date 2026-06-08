@@ -12,14 +12,18 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 
 ## What's inside
 
-| Export                                    | Kind       | Notes                                          |
-| ----------------------------------------- | ---------- | ---------------------------------------------- |
-| `cn`                                      | util       | `clsx` + `tailwind-merge` class composer       |
-| `Button`, `buttonVariants`, `ButtonProps` | component  | 6 variants (`default` … `link`), 4 sizes       |
-| `Input`                                   | component  | Styled text input                              |
-| `Card` + subcomponents                    | component  | `CardHeader/Title/Description/Content/Footer`  |
-| `@rpg/ui/styles.css`                      | stylesheet | Tailwind + design tokens (the shared "preset") |
-| `@rpg/ui/lib/utils`                       | util       | Direct path to `cn` for shadcn's CLI alias     |
+| Export                                    | Kind       | Notes                                                                    |
+| ----------------------------------------- | ---------- | ------------------------------------------------------------------------ |
+| `cn`                                      | util       | `clsx` + `tailwind-merge` class composer                                 |
+| `Button`, `buttonVariants`, `ButtonProps` | component  | 6 variants (`default` … `link`), 4 sizes                                 |
+| `Input`                                   | component  | Styled text input                                                        |
+| `Card` + subcomponents                    | component  | `CardHeader/Title/Description/Content/Footer`                            |
+| `FormField`                               | component  | Label + control slot + inline error/hint                                 |
+| `TextField`, `TextFieldProps`             | component  | `FormField` + `Input`; derives `aria-invalid` from `error`, forwards ref |
+| `FormCard`                                | component  | Card-shaped form shell: header + `<form>` + error alert + footer slot    |
+| `SubmitButton`, `SubmitButtonProps`       | component  | `type="submit"` button with pending state + label                        |
+| `@rpg/ui/styles.css`                      | stylesheet | Tailwind + design tokens (the shared "preset")                           |
+| `@rpg/ui/lib/utils`                       | util       | Direct path to `cn` for shadcn's CLI alias                               |
 
 Interactive primitives (`Button`, `Input`) carry `"use client"` so they work
 inside Next.js Server Components.
@@ -46,6 +50,8 @@ the `dark` class on a root element to switch themes.
 
 ## Importing components
 
+Low-level primitives compose directly:
+
 ```tsx
 import { Button, Card, CardHeader, CardTitle, Input } from '@rpg/ui'
 
@@ -62,6 +68,36 @@ export function Example() {
 }
 ```
 
+For forms, prefer the higher-level helpers — `FormCard` (header + `<form>` + error
+alert + footer), `TextField` (labelled, validation-aware input), and `SubmitButton`
+(pending state). They are UI-only and pair cleanly with `react-hook-form`: spread
+`register(...)` onto `TextField` and it forwards the ref.
+
+```tsx
+import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
+
+export function SignInForm({ onSubmit, formError }) {
+  return (
+    <FormCard
+      title="Sign in"
+      description="Enter your details to continue."
+      onSubmit={onSubmit}
+      formError={formError}
+      className="w-full max-w-sm"
+      footer={
+        <CardFooter className="justify-end">
+          <SubmitButton pending={false} pendingLabel="Signing in…">
+            Continue
+          </SubmitButton>
+        </CardFooter>
+      }
+    >
+      <TextField id="email" label="Email" type="email" autoComplete="email" />
+    </FormCard>
+  )
+}
+```
+
 ## Adding a new shadcn primitive
 
 1. Add the component file under `src/components/ui/<name>.tsx`, composing classes
@@ -70,8 +106,8 @@ export function Example() {
    (config lives in `components.json`).
 2. If it is interactive, add `"use client"` at the top so Next.js RSC works.
 3. Re-export it from `src/index.ts`.
-4. Add a story in `src/stories/<name>.stories.tsx` and, for logic-bearing
-   components, a co-located `*.test.tsx`.
+4. Add a co-located `<name>.stories.tsx` next to the component and, for
+   logic-bearing components, a co-located `<name>.test.tsx`.
 
 ## Running Storybook
 

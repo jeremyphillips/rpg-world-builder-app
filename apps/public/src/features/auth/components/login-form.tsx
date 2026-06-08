@@ -5,12 +5,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 
-import { loginInputSchema, type LoginInput } from '@rpg/contracts'
-import { Button, CardFooter, Input } from '@rpg/ui'
+import { getErrorMessage, loginInputSchema, type LoginInput } from '@rpg/contracts'
+import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
 
-import { ApiError, DASHBOARD_PATH, login } from '../api/auth-client'
-import { AuthEmailField, AuthFormCard } from './auth-form-card'
-import { FormField } from './form-field'
+import { DASHBOARD_PATH, login } from '../api/auth-client'
 
 export interface LoginFormProps {
   /** Called after a successful login. Defaults to a same-origin redirect to the dashboard. */
@@ -31,21 +29,22 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       await login(values)
       ;(onSuccess ?? (() => window.location.assign(DASHBOARD_PATH)))()
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Unable to log in. Please try again.')
+      setFormError(getErrorMessage(err, 'Unable to log in. Please try again.'))
     }
   })
 
   return (
-    <AuthFormCard
+    <FormCard
       title="Log in"
       description="Welcome back. Enter your details to continue."
       onSubmit={onSubmit}
       formError={formError}
+      className="w-full max-w-sm"
       footer={
         <CardFooter className="flex-col items-stretch gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Logging in…' : 'Log in'}
-          </Button>
+          <SubmitButton pending={isSubmitting} pendingLabel="Logging in…">
+            Log in
+          </SubmitButton>
           <p className="text-center text-sm text-muted-foreground">
             No account?{' '}
             <Link
@@ -58,20 +57,22 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         </CardFooter>
       }
     >
-      <AuthEmailField
+      <TextField
+        id="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
         error={errors.email?.message}
-        aria-invalid={Boolean(errors.email)}
         {...field('email')}
       />
-      <FormField id="password" label="Password" error={errors.password?.message}>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          aria-invalid={Boolean(errors.password)}
-          {...field('password')}
-        />
-      </FormField>
-    </AuthFormCard>
+      <TextField
+        id="password"
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        error={errors.password?.message}
+        {...field('password')}
+      />
+    </FormCard>
   )
 }
