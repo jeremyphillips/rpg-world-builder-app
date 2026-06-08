@@ -5,7 +5,7 @@
     "@next/eslint-plugin-next",
     "eslint-plugin-storybook"
   ],
-  "ignorePatterns": ["**/*.config.*"],
+  "ignorePatterns": ["**/*.config.*", "**/__mocks__/**"],
   "rules": {
     "unused-files": "warn",
     "unused-exports": "warn",

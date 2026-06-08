@@ -1,4 +1,7 @@
 export { cn } from './lib/utils'
+export { Avatar, type AvatarProps } from './components/ui/avatar'
+export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
+export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export { Button, type ButtonProps } from './components/ui/button'
 export { buttonVariants } from './components/ui/button-variants'
 export { Input } from './components/ui/input'

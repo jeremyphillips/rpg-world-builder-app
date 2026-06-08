@@ -3,14 +3,12 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-const { fetchSession } = vi.hoisted(() => ({ fetchSession: vi.fn() }))
+vi.mock('../api/auth-client')
 
-vi.mock('../api/auth-client', () => ({
-  fetchSession,
-  LOGIN_PATH: '/login',
-}))
-
+import { fetchSession as fetchSessionFn } from '../api/auth-client'
 import { AuthGuard } from './auth-guard'
+
+const fetchSession = vi.mocked(fetchSessionFn)
 
 function renderGuard() {
   const queryClient = new QueryClient({
@@ -68,6 +66,7 @@ describe('AuthGuard', () => {
       email: 'dm@example.com',
       displayName: 'Dungeon Master',
       role: 'user',
+      lastSelectedCampaignId: null,
     })
 
     renderGuard()
