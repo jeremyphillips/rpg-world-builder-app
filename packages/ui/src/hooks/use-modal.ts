@@ -2,6 +2,16 @@
 
 import * as React from 'react'
 
+export interface UseModalOptions {
+  /**
+   * When `true`, attempts to close the modal (Esc, overlay, the built-in X
+   * button, or `requestClose()`) are intercepted: the modal stays open and
+   * `confirmingClose` flips to `true` so a `ConfirmDialog` can ask the user.
+   * Wire this to dirty state (e.g. `form.formState.isDirty`).
+   */
+  shouldConfirmClose?: boolean
+}
+
 export interface UseModalReturn {
   /** Whether the modal is currently open. */
   open: boolean
@@ -17,6 +27,14 @@ export interface UseModalReturn {
   handleConfirm: () => void
   /** Resolve a pending `confirm()` with `false` and close. */
   handleCancel: () => void
+  /** Whether the guarded-close confirmation is showing — bind to `ConfirmDialog`'s `open`. */
+  confirmingClose: boolean
+  /** Attempt to close: opens the guard when `shouldConfirmClose`, otherwise closes immediately. */
+  requestClose: () => void
+  /** Dismiss the guard and keep the modal open. */
+  cancelClose: () => void
+  /** Dismiss the guard and actually close the modal. */
+  confirmCloseAndExit: () => void
 }
 
 /**
@@ -29,12 +47,26 @@ export interface UseModalReturn {
  * if (await modal.confirm()) await destroy()
  * ```
  *
- * `confirm()` never hangs: dismissing the modal (Esc, overlay, X) or unmounting
- * resolves the pending promise with `false`.
+ * Pass `{ shouldConfirmClose }` to guard the close (unsaved changes). The hook's
+ * `onOpenChange` is the single close choke point, so it also intercepts the
+ * built-in X button. Render a `ConfirmDialog` wired to `confirmingClose` /
+ * `confirmCloseAndExit` / `cancelClose`.
+ *
+ * `confirm()` never hangs: dismissing the modal or unmounting resolves the
+ * pending promise with `false`.
  */
-export function useModal(): UseModalReturn {
+export function useModal(options: UseModalOptions = {}): UseModalReturn {
+  const { shouldConfirmClose = false } = options
   const [open, setOpen] = React.useState(false)
+  const [confirmingClose, setConfirmingClose] = React.useState(false)
   const resolverRef = React.useRef<((value: boolean) => void) | null>(null)
+
+  // Mirror the latest guard flag into a ref so the memoized callbacks (read in
+  // event handlers) always see the current value without being re-created.
+  const shouldConfirmCloseRef = React.useRef(shouldConfirmClose)
+  React.useEffect(() => {
+    shouldConfirmCloseRef.current = shouldConfirmClose
+  }, [shouldConfirmClose])
 
   const settle = React.useCallback((result: boolean) => {
     const resolve = resolverRef.current
@@ -44,12 +76,24 @@ export function useModal(): UseModalReturn {
     }
   }, [])
 
+  const requestClose = React.useCallback(() => {
+    if (shouldConfirmCloseRef.current) {
+      setConfirmingClose(true)
+      return
+    }
+    setOpen(false)
+    settle(false)
+  }, [settle])
+
   const onOpenChange = React.useCallback(
     (next: boolean) => {
-      setOpen(next)
-      if (!next) settle(false)
+      if (next) {
+        setOpen(true)
+        return
+      }
+      requestClose()
     },
-    [settle],
+    [requestClose],
   )
 
   const openModal = React.useCallback(() => {
@@ -57,6 +101,7 @@ export function useModal(): UseModalReturn {
   }, [])
 
   const closeModal = React.useCallback(() => {
+    setConfirmingClose(false)
     setOpen(false)
     settle(false)
   }, [settle])
@@ -80,8 +125,30 @@ export function useModal(): UseModalReturn {
     setOpen(false)
   }, [settle])
 
+  const cancelClose = React.useCallback(() => {
+    setConfirmingClose(false)
+  }, [])
+
+  const confirmCloseAndExit = React.useCallback(() => {
+    setConfirmingClose(false)
+    setOpen(false)
+    settle(false)
+  }, [settle])
+
   // Never leave a hanging promise if the host unmounts while awaiting.
   React.useEffect(() => () => settle(false), [settle])
 
-  return { open, onOpenChange, openModal, closeModal, confirm, handleConfirm, handleCancel }
+  return {
+    open,
+    onOpenChange,
+    openModal,
+    closeModal,
+    confirm,
+    handleConfirm,
+    handleCancel,
+    confirmingClose,
+    requestClose,
+    cancelClose,
+    confirmCloseAndExit,
+  }
 }

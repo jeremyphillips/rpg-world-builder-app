@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
+import { ConfirmDialog } from './confirm-dialog.client'
+import { Input } from './input.client'
 import { useModal } from '../../hooks/use-modal'
 
 const meta = {
@@ -113,6 +116,61 @@ export const NonDismissable: StoryObj = {
       </Modal.Content>
     </Modal.Root>
   ),
+}
+
+/**
+ * Guarded close: once the field is dirty, dismissing the modal (Esc, overlay, or
+ * the X button) asks for confirmation via a `ConfirmDialog` instead of closing.
+ */
+export const GuardedClose: StoryObj = {
+  render: () => {
+    const [value, setValue] = useState('')
+    const modal = useModal({ shouldConfirmClose: value.length > 0 })
+    return (
+      <>
+        <Button onClick={modal.openModal}>Edit name</Button>
+        <Modal.Root open={modal.open} onOpenChange={modal.onOpenChange}>
+          <Modal.Content size="sm">
+            <Modal.Header headline="Edit campaign" description="Type to make the form dirty." />
+            <Modal.Body>
+              <Input
+                aria-label="Campaign name"
+                placeholder="Campaign name"
+                value={value}
+                onChange={(event) => setValue(event.target.value)}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="outline" onClick={modal.requestClose}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setValue('')
+                  modal.closeModal()
+                }}
+              >
+                Save
+              </Button>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal.Root>
+        <ConfirmDialog
+          open={modal.confirmingClose}
+          onOpenChange={(next) => !next && modal.cancelClose()}
+          headline="Discard changes?"
+          confirmLabel="Discard"
+          cancelLabel="Keep editing"
+          confirmVariant="destructive"
+          onConfirm={() => {
+            setValue('')
+            modal.confirmCloseAndExit()
+          }}
+          onCancel={modal.cancelClose}
+        />
+      </>
+    )
+  },
 }
 
 /** Long body content scrolls inside the height-capped panel; header/footer stay pinned. */

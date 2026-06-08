@@ -5,6 +5,8 @@ import axe from 'axe-core'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
+import { ConfirmDialog } from './confirm-dialog.client'
+import { useModal } from '../../hooks/use-modal'
 
 function renderModal(contentProps: Record<string, unknown> = {}) {
   return render(
@@ -90,5 +92,77 @@ describe('Modal', () => {
       rules: { 'color-contrast': { enabled: false } },
     })
     expect(results.violations).toEqual([])
+  })
+})
+
+function GuardedModal({ shouldConfirmClose }: { shouldConfirmClose: boolean }) {
+  const modal = useModal({ shouldConfirmClose })
+  return (
+    <>
+      <Button onClick={modal.openModal}>Open</Button>
+      <Modal.Root open={modal.open} onOpenChange={modal.onOpenChange}>
+        <Modal.Content>
+          <Modal.Header headline="Edit campaign" />
+          <Modal.Body>Body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>
+      <ConfirmDialog
+        open={modal.confirmingClose}
+        onOpenChange={(next) => !next && modal.cancelClose()}
+        headline="Discard changes?"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        onConfirm={modal.confirmCloseAndExit}
+        onCancel={modal.cancelClose}
+      />
+    </>
+  )
+}
+
+describe('Modal guarded close', () => {
+  it('intercepts the X button and opens the confirmation when dirty', async () => {
+    const user = userEvent.setup()
+    render(<GuardedModal shouldConfirmClose />)
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    await screen.findByRole('dialog')
+
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+    expect(await screen.findByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument()
+    // The modal is still mounted underneath (Radix marks it aria-hidden while the
+    // alertdialog is on top), so query by its text rather than the dialog role.
+    expect(screen.getByText('Edit campaign')).toBeInTheDocument()
+  })
+
+  it('keeps editing when the guard is cancelled', async () => {
+    const user = userEvent.setup()
+    render(<GuardedModal shouldConfirmClose />)
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    await user.keyboard('{Escape}')
+
+    await user.click(await screen.findByRole('button', { name: 'Keep editing' }))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('closes both when the guard is confirmed', async () => {
+    const user = userEvent.setup()
+    render(<GuardedModal shouldConfirmClose />)
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    await user.keyboard('{Escape}')
+
+    await user.click(await screen.findByRole('button', { name: 'Discard' }))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes immediately when not dirty', async () => {
+    const user = userEvent.setup()
+    render(<GuardedModal shouldConfirmClose={false} />)
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    await screen.findByRole('dialog')
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 })

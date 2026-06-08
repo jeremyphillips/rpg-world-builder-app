@@ -111,4 +111,5 @@ export {
   type ModalContentVariantProps,
   type ModalSize,
 } from './components/ui/modal.variants'
-export { useModal, type UseModalReturn } from './hooks/use-modal'
+export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
+export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'

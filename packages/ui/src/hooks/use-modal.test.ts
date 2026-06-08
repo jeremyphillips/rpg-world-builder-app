@@ -65,4 +65,44 @@ describe('useModal', () => {
     unmount()
     await expect(promise).resolves.toBe(false)
   })
+
+  describe('guarded close', () => {
+    it('closes immediately when shouldConfirmClose is false', () => {
+      const { result } = renderHook(() => useModal({ shouldConfirmClose: false }))
+      act(() => result.current.openModal())
+
+      act(() => result.current.onOpenChange(false))
+      expect(result.current.open).toBe(false)
+      expect(result.current.confirmingClose).toBe(false)
+    })
+
+    it('opens the guard instead of closing when shouldConfirmClose is true', () => {
+      const { result } = renderHook(() => useModal({ shouldConfirmClose: true }))
+      act(() => result.current.openModal())
+
+      act(() => result.current.onOpenChange(false))
+      expect(result.current.open).toBe(true)
+      expect(result.current.confirmingClose).toBe(true)
+    })
+
+    it('cancelClose dismisses the guard and keeps the modal open', () => {
+      const { result } = renderHook(() => useModal({ shouldConfirmClose: true }))
+      act(() => result.current.openModal())
+      act(() => result.current.requestClose())
+
+      act(() => result.current.cancelClose())
+      expect(result.current.confirmingClose).toBe(false)
+      expect(result.current.open).toBe(true)
+    })
+
+    it('confirmCloseAndExit dismisses the guard and closes the modal', () => {
+      const { result } = renderHook(() => useModal({ shouldConfirmClose: true }))
+      act(() => result.current.openModal())
+      act(() => result.current.requestClose())
+
+      act(() => result.current.confirmCloseAndExit())
+      expect(result.current.confirmingClose).toBe(false)
+      expect(result.current.open).toBe(false)
+    })
+  })
 })
