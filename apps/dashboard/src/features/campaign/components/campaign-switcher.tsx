@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import type { Campaign } from '@rpg/contracts'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 
+import { ROUTES } from '@/app/routes'
 import {
   cn,
   DropdownMenu,
@@ -95,7 +96,7 @@ export function CampaignSwitcher() {
           onSelect={selectCampaign}
         />
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => navigate('/')}>
+        <DropdownMenuItem onSelect={() => navigate(ROUTES.home)}>
           <Plus className="size-4" />
           Create campaign
         </DropdownMenuItem>

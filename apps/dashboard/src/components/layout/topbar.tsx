@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+import { ROUTES } from '@/app/routes'
 import {
   Avatar,
   DropdownMenu,
@@ -38,8 +39,8 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
             <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onSelect={() => navigate('/profile')}>Profile</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => navigate('/account')}>
+            <DropdownMenuItem onSelect={() => navigate(ROUTES.profile)}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate(ROUTES.account)}>
               Account Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />

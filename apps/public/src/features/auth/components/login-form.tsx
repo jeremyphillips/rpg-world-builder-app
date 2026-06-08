@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { getErrorMessage, loginInputSchema, type LoginInput } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, TextField } from '@rpg/ui'
 
+import { ROUTES } from '@/lib/routes'
 import { DASHBOARD_PATH, login } from '../api/auth-client'
 
 export interface LoginFormProps {
@@ -48,7 +49,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <p className="text-center text-sm text-muted-foreground">
             No account?{' '}
             <Link
-              href="/signup"
+              href={ROUTES.signup}
               className="font-medium text-foreground underline-offset-4 hover:underline"
             >
               Sign up

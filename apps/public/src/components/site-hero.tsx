@@ -2,6 +2,8 @@ import Link from 'next/link'
 
 import { buttonVariants } from '@rpg/ui'
 
+import { ROUTES } from '@/lib/routes'
+
 export function SiteHero() {
   return (
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-24 text-center">
@@ -16,10 +18,10 @@ export function SiteHero() {
         focused DM dashboard. No spreadsheets, no clutter.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Link href="/signup" className={buttonVariants({ size: 'lg' })}>
+        <Link href={ROUTES.signup} className={buttonVariants({ size: 'lg' })}>
           Get started
         </Link>
-        <Link href="/login" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
+        <Link href={ROUTES.login} className={buttonVariants({ variant: 'outline', size: 'lg' })}>
           Log in
         </Link>
       </div>
