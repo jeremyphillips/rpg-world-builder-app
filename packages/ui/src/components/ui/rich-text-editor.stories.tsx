@@ -31,6 +31,10 @@ export const ErrorState: Story = {
 
 export const Disabled: Story = {
   args: { disabled: true, value: '<p>Locked entry.</p>' },
+  // The disabled editor fades its text via `opacity-50`; WCAG 2.2 SC 1.4.3
+  // exempts disabled/inactive components from contrast minimums, so scope the
+  // color-contrast check off for this state only (mirrors the unit tests).
+  parameters: { a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } } },
 }
 
 /** Round-trips edits and renders the stored HTML via the `sanitizeHtml` helper. */

@@ -23,4 +23,10 @@ export const Linkable: Story = { args: { linkable: true } }
 
 export const WithError: Story = { args: { error: 'Add a short backstory.', value: '' } }
 
-export const Disabled: Story = { args: { disabled: true } }
+export const Disabled: Story = {
+  args: { disabled: true },
+  // The disabled editor fades its text via `opacity-50`; WCAG 2.2 SC 1.4.3
+  // exempts disabled/inactive components from contrast minimums, so scope the
+  // color-contrast check off for this state only (mirrors the unit tests).
+  parameters: { a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } } },
+}
