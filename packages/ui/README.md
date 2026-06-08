@@ -125,9 +125,10 @@ index.ts            # barrel re-export
    axe-playwright check, and introduce no `eslint-plugin-jsx-a11y` violations
    (target WCAG 2.2 AA); never suppress axe rules globally.
 
-> Note: some existing primitives (e.g. `button-variants.ts`) predate the dotted
-> `*.variants.ts` naming and the `*.client.tsx` suffix. New work follows the
-> conventions above; existing files are migrated opportunistically, not in bulk.
+> Note: all interactive primitives now follow these conventions — `*.client.tsx`
+> for client components (`button`, `input`, `avatar`, `dropdown-menu`,
+> `sidebar-trigger`) with their CVA classes in a `*.variants.ts` sibling. Non-
+> interactive (server) primitives correctly stay as plain `*.tsx` with no directive.
 
 ## Running Storybook
 

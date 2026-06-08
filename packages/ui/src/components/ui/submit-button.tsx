@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Button, type ButtonProps } from './button'
+import { Button, type ButtonProps } from './button.client'
 
 export interface SubmitButtonProps extends Omit<ButtonProps, 'type'> {
   /** When true, the button is disabled and (if provided) shows `pendingLabel`. */

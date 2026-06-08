@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { FormField } from './form-field'
-import { Input } from './input'
+import { Input } from './input.client'
 
 const meta = {
   title: 'Forms/FormField',

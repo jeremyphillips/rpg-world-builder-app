@@ -58,6 +58,20 @@ classes belong in `*.variants.ts` via CVA, not long inline strings.
 - Dashboard data access goes through TanStack Query, not ad-hoc `fetch` in
   components.
 
+## Same-origin API
+
+All apps sit behind one origin (see [docs/architecture.md](docs/architecture.md)).
+Call the API with relative paths (`fetch('/api/...')`) — never hardcode an origin
+or `localhost` port. Send the CSRF token header on state-changing requests
+(POST/PUT/PATCH/DELETE).
+
+## Auth model
+
+The session is a host-only `httpOnly` cookie plus a readable CSRF token
+(double-submit). Login/signup live **only** in the public app; the dashboard
+gates itself via `GET /api/auth/me`. Don't read the session cookie in client code
+or duplicate auth flows into the dashboard.
+
 ## Secrets / RSC boundary
 
 No secrets in client bundles. Respect the Next.js server/client boundary —

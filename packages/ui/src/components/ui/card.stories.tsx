@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Button } from './button'
+import { Button } from './button.client'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
-import { Input } from './input'
+import { Input } from './input.client'
 
 const meta = {
   title: 'Primitives/Card',
