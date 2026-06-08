@@ -1,6 +1,7 @@
 // Public surface of the `@rpg/ui/form` subpath: the schema-driven, RHF-aware
-// form layer. Config types + pure helpers are exported here; the `<Form>`
-// renderer (a client component) is added in a later phase.
+// form layer — the `<Form>` renderer plus the config types + pure helpers.
+
+export { Form, type FormProps } from './form.client'
 
 export {
   flattenFields,

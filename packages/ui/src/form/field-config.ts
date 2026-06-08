@@ -137,6 +137,7 @@ export interface RowConfig {
 export interface GroupConfig {
   kind: 'group'
   legend: string
+  description?: string
   fields: Array<FieldConfig | RowConfig>
   className?: string
 }
@@ -193,4 +194,16 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
     values[field.name] = fieldDefaultValue(field)
   }
   return values
+}
+
+/** Whether a field should render given the current values (always-visible if no `visibility`). */
+export function isFieldVisible(field: FieldConfig, values: Record<string, unknown>): boolean {
+  return field.visibility ? field.visibility.visibleWhen(values) : true
+}
+
+/** Names of fields currently hidden by their `visibility` predicate. */
+export function hiddenFieldNames(items: FormItem[], values: Record<string, unknown>): string[] {
+  return flattenFields(items)
+    .filter((field) => !isFieldVisible(field, values))
+    .map((field) => field.name)
 }
