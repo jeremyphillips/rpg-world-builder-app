@@ -4,22 +4,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import type { Campaign, SessionUser } from '@rpg/contracts'
 
-const { fetchSession } = vi.hoisted(() => ({ fetchSession: vi.fn() }))
-const { listCampaigns } = vi.hoisted(() => ({ listCampaigns: vi.fn() }))
+vi.mock('@/features/auth/api/auth-client')
+vi.mock('@/features/campaign/api/campaign-client')
 
-vi.mock('@/features/auth/api/auth-client', () => ({
-  fetchSession,
-  logout: vi.fn(),
-  LOGIN_PATH: '/login',
-}))
-
-vi.mock('@/features/campaign/api/campaign-client', () => ({
-  listCampaigns,
-  createCampaign: vi.fn(),
-  rememberSelectedCampaign: vi.fn(),
-}))
-
+import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
+import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
 import { DashboardHome } from './dashboard-home'
+
+const fetchSession = vi.mocked(fetchSessionFn)
+const listCampaigns = vi.mocked(listCampaignsFn)
 
 const user: SessionUser = {
   id: 'u1',

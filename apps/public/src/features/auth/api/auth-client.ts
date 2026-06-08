@@ -1,3 +1,4 @@
+// fallow-ignore-file code-duplication
 import { ApiError, fetchCsrfToken } from '@rpg/contracts'
 import type { LoginInput, RegisterInput, SessionUser } from '@rpg/contracts'
 
