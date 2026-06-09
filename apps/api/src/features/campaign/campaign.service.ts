@@ -30,12 +30,25 @@ function toCampaign(doc: CampaignRecord): Campaign {
   }
 }
 
+const DEFAULT_SETTINGS = {
+  characterCreation: {
+    startingLevel: 1,
+    importedCharacters: { policy: 'disabled' as const },
+  },
+}
+
 export async function createCampaign(
   input: CreateCampaignInput & { createdBy: string },
 ): Promise<Campaign> {
   const doc = await CampaignModel.create({
-    identity: { name: input.name },
-    configuration: {},
+    identity: {
+      name: input.name,
+      ...(input.description !== undefined && { description: input.description }),
+      ...(input.imageKey !== undefined && { imageKey: input.imageKey }),
+    },
+    configuration: {
+      settings: input.settings ?? DEFAULT_SETTINGS,
+    },
     createdBy: input.createdBy,
   })
 
