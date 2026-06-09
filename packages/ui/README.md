@@ -31,6 +31,7 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `RichTextEditor`, `sanitizeHtml`          | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                             |
 | `FormCard`, `formCardContentClass`        | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                  |
 | `SubmitButton`, `SubmitButtonProps`       | component  | `type="submit"` button with pending state + label                                                                                           |
+| `Wizard`, `WizardFooter`, `useWizard`     | component  | Multi-step form wizard; schema-agnostic; per-step `<Form>` pattern; see [Wizard pattern](#wizard-pattern) below                             |
 | `@rpg/ui/form`                            | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer)                                                                    |
 | `@rpg/ui/styles.css`                      | stylesheet | Tailwind + design tokens (the shared "preset")                                                                                              |
 | `@rpg/ui/lib/utils`                       | util       | Direct path to `cn` for shadcn's CLI alias                                                                                                  |
@@ -257,6 +258,84 @@ index.ts            # barrel re-export
 > for client components (`button`, `input`, `avatar`, `dropdown-menu`,
 > `sidebar-trigger`) with their CVA classes in a `*.variants.ts` sibling. Non-
 > interactive (server) primitives correctly stay as plain `*.tsx` with no directive.
+
+## Wizard pattern
+
+`Wizard` is a **schema-agnostic** multi-step form container. Each step owns its
+own `<Form>` (with its own Zod schema); the wizard accumulates values across
+steps and delivers all of them to `onComplete` when the last step is submitted.
+
+### Per-step `<Form>` pattern
+
+```tsx
+import { Wizard, WizardFooter, useWizard, type WizardStepDef } from '@rpg/ui'
+import { Form } from '@rpg/ui/form'
+import { z } from 'zod'
+
+const STEPS: WizardStepDef[] = [
+  { id: 'info', label: 'Info' },
+  { id: 'review', label: 'Review' },
+]
+
+const infoSchema = z.object({ name: z.string().min(1) })
+
+function InfoStep() {
+  const { completeStep } = useWizard()
+  return (
+    <Form
+      schema={infoSchema}
+      fields={[{ type: 'text', name: 'name', label: 'Name', required: true }]}
+      mode="onChange" // enables reactive isValid for Next button
+      onSubmit={(values) => completeStep(values)}
+      footer={(form) => (
+        <WizardFooter isValid={form.formState.isValid} isSubmitting={form.formState.isSubmitting} />
+      )}
+    />
+  )
+}
+
+function ReviewStep() {
+  const { accumulatedValues, complete } = useWizard()
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        void complete()
+      }}
+    >
+      <p>Name: {String(accumulatedValues.name)}</p>
+      <WizardFooter submitLabel="Finish" />
+    </form>
+  )
+}
+
+function MyWizard() {
+  return (
+    <Wizard
+      steps={STEPS}
+      onComplete={async (values) => {
+        /* save values */
+      }}
+      hint="You can change these settings later."
+    >
+      <InfoStep />
+      <ReviewStep />
+    </Wizard>
+  )
+}
+```
+
+### API summary
+
+| Export            | Role                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `<Wizard>`        | Root container. Owns step index + accumulated values. Renders only the active step      |
+| `useWizard()`     | Hook for step components. Returns `completeStep`, `retreat`, `complete`, etc.           |
+| `<WizardFooter>`  | Back / Next / Submit buttons. Reads `isCompleting` from context automatically           |
+| `<WizardStepNav>` | Progress bar rendered inside `<Wizard>` automatically; also exported for custom layouts |
+
+Pass `mode="onChange"` to each step's `<Form>` so `formState.isValid` updates
+reactively and the Next button can be disabled until required fields are filled.
 
 ## Running Storybook
 

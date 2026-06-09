@@ -2,7 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { AuthGuard } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
-import { CampaignDetail, CampaignSessions, CampaignSettings } from '@/features/campaign'
+import {
+  CampaignCreate,
+  CampaignDetail,
+  CampaignSessions,
+  CampaignSettings,
+} from '@/features/campaign'
 import { AppShell } from '@/components/layout/app-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
 import { Characters } from '@/routes/characters'
@@ -26,6 +31,7 @@ export function AppRouter() {
             <Route path="characters" element={<Characters />} />
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<AccountSettings />} />
+            <Route path="campaigns/new" element={<CampaignCreate />} />
             <Route path="campaigns/:campaignId" element={<CampaignDetail />} />
             <Route path="campaigns/:campaignId/sessions" element={<CampaignSessions />} />
             <Route path="campaigns/:campaignId/settings" element={<CampaignSettings />} />
