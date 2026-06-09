@@ -41,6 +41,15 @@ export interface FileDropzoneProps {
   maxFiles?: number
   /** Maximum size per file in bytes. */
   maxSize?: number
+  /**
+   * URL for an already-uploaded image when `value` is empty (e.g. from a storage key).
+   * Shown as a remote row in the file list until a new file is selected or cleared.
+   */
+  existingImageUrl?: string
+  /** Label for the remote preview row. Defaults to "Current image". */
+  existingImageLabel?: string
+  /** Called when the user removes the stored image without selecting a replacement. */
+  onClearExisting?: () => void
   disabled?: boolean
   className?: string
   /** Forwarded to the drop-zone div — allows `id` injection from `Field.Control`. */
@@ -300,9 +309,41 @@ interface FileListProps {
   onRemove: (file: File) => void
 }
 
+const DEFAULT_EXISTING_IMAGE_LABEL = 'Current image'
+
+interface ExistingImageRowProps {
+  url: string
+  label: string
+  disabled: boolean
+  onRemove?: () => void
+}
+
+function ExistingImageRow({ url, label, disabled, onRemove }: ExistingImageRowProps) {
+  return (
+    <li className={fileItemVariants()}>
+      <img src={url} alt={label} className={fileThumbnailVariants()} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{label}</p>
+        <p className="text-xs text-muted-foreground">Saved</p>
+      </div>
+      {onRemove ? (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={`Remove ${label}`}
+          className={removeButtonVariants()}
+          disabled={disabled}
+        >
+          <X className="size-4" aria-hidden="true" />
+        </button>
+      ) : null}
+    </li>
+  )
+}
+
 function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
   return (
-    <ul className={fileListVariants()} aria-label="Selected files">
+    <>
       {files.map((file, index) => {
         const previewUrl = getPreviewUrl(file)
         return (
@@ -330,7 +371,7 @@ function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
           </li>
         )
       })}
-    </ul>
+    </>
   )
 }
 
@@ -353,6 +394,9 @@ export function FileDropzone({
   multiple = false,
   maxFiles,
   maxSize,
+  existingImageUrl,
+  existingImageLabel = DEFAULT_EXISTING_IMAGE_LABEL,
+  onClearExisting,
   disabled = false,
   className,
   id,
@@ -375,6 +419,8 @@ export function FileDropzone({
 
   const atLimit = !multiple || (maxFiles !== undefined && value.length >= maxFiles)
   const showDropZone = !atLimit || value.length === 0
+  const showExistingImage = value.length === 0 && Boolean(existingImageUrl)
+  const showFileList = value.length > 0 || showExistingImage
 
   return (
     <div className="w-full space-y-1">
@@ -415,13 +461,24 @@ export function FileDropzone({
         </p>
       ) : null}
 
-      {value.length > 0 ? (
-        <FileList
-          files={value}
-          disabled={disabled}
-          getPreviewUrl={getPreviewUrl}
-          onRemove={removeFile}
-        />
+      {showFileList ? (
+        <ul className={fileListVariants()} aria-label="Selected files">
+          {showExistingImage ? (
+            <ExistingImageRow
+              url={existingImageUrl!}
+              label={existingImageLabel}
+              disabled={disabled}
+              onRemove={onClearExisting}
+            />
+          ) : (
+            <FileList
+              files={value}
+              disabled={disabled}
+              getPreviewUrl={getPreviewUrl}
+              onRemove={removeFile}
+            />
+          )}
+        </ul>
       ) : null}
     </div>
   )

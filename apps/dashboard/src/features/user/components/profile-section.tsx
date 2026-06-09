@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 import { SubmitButton } from '@rpg/ui'
-import type { UpdateProfileInput } from '@rpg/contracts'
+import { getAssetUrl, type UpdateProfileInput } from '@rpg/contracts'
 
 import { useSession } from '@/features/auth'
 import { uploadFile } from '@/lib/api-client'
@@ -10,10 +10,17 @@ import { toFormError } from '@/lib/to-form-error'
 import { useUpdateProfile } from '../hooks/use-update-profile'
 import { accountFormSchema, accountFields, type AccountFormValues } from '../lib/account-fields'
 
+const CURRENT_AVATAR_LABEL = 'Current avatar'
+
 export function ProfileSection() {
   const { data: session } = useSession()
   const { mutateAsync, isPending, error, isSuccess } = useUpdateProfile()
   const [submitError, setSubmitError] = useState<unknown>(null)
+  const [avatarCleared, setAvatarCleared] = useState(false)
+
+  useEffect(() => {
+    setAvatarCleared(false)
+  }, [session?.id, session?.avatarKey])
 
   async function onSubmit(values: AccountFormValues) {
     setSubmitError(null)
@@ -24,6 +31,8 @@ export function ProfileSection() {
       }
       if (values.avatar?.[0]) {
         input.avatarKey = await uploadFile(values.avatar[0], 'Could not upload avatar.')
+      } else if (avatarCleared) {
+        input.avatarKey = ''
       }
       await mutateAsync(input)
     } catch (err) {
@@ -46,6 +55,14 @@ export function ProfileSection() {
         key={session?.id ?? 'loading'}
         schema={accountFormSchema}
         fields={accountFields}
+        fileFieldProps={{
+          avatar: {
+            existingImageUrl:
+              session?.avatarKey && !avatarCleared ? getAssetUrl(session.avatarKey) : undefined,
+            existingImageLabel: CURRENT_AVATAR_LABEL,
+            onClearExisting: () => setAvatarCleared(true),
+          },
+        }}
         defaultValues={
           session
             ? ({ displayName: session.displayName, email: session.email } as Partial<

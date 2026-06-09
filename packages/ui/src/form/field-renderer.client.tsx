@@ -14,6 +14,7 @@ import { SelectField } from '../components/ui/select-field'
 import { SwitchField } from '../components/ui/switch-field'
 import { TextareaField } from '../components/ui/textarea-field'
 import { TextField } from '../components/ui/text-field'
+import { useFileFieldRemotePreview } from './file-field-props.context'
 import type { FieldConfig, FieldType } from './field-config'
 
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
@@ -28,6 +29,7 @@ interface RenderArgs<K extends FieldType> {
   field: ControllerRenderProps
   id: string
   error?: string
+  remotePreview?: ReturnType<typeof useFileFieldRemotePreview>
 }
 
 /**
@@ -197,7 +199,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       onBlur={field.onBlur}
     />
   ),
-  file: ({ config, field, id, error }) => (
+  file: ({ config, field, id, error, remotePreview }) => (
     <FileField
       id={id}
       label={config.label}
@@ -213,6 +215,9 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       disabled={config.disabled}
       value={field.value ?? []}
       onChange={field.onChange}
+      existingImageUrl={remotePreview?.existingImageUrl}
+      existingImageLabel={remotePreview?.existingImageLabel}
+      onClearExisting={remotePreview?.onClearExisting}
     />
   ),
   chips: ({ config, field, id, error }) => (
@@ -248,8 +253,9 @@ export interface FieldRendererProps {
 export function FieldRenderer({ config, idPrefix }: FieldRendererProps) {
   const { field, fieldState } = useController({ name: config.name })
   const id = `${idPrefix}-${config.name}`
+  const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
   const render = fieldRenderers[config.type] as (args: RenderArgs<FieldType>) => React.ReactElement
-  return render({ config, field, id, error: fieldState.error?.message })
+  return render({ config, field, id, error: fieldState.error?.message, remotePreview })
 }

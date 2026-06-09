@@ -3,7 +3,12 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createUser } from '../user'
 import { CampaignMembershipModel } from './campaign-membership.model'
-import { createCampaign, isCampaignMember, listCampaignsForUser } from './campaign.service'
+import {
+  createCampaign,
+  isCampaignMember,
+  listCampaignsForUser,
+  updateCampaign,
+} from './campaign.service'
 
 beforeAll(async () => {
   await startTestDb()
@@ -58,6 +63,54 @@ describe('listCampaignsForUser', () => {
     await createCampaign({ name: 'Private', createdBy: owner.id })
 
     await expect(listCampaignsForUser(stranger.id)).resolves.toEqual([])
+  })
+})
+
+describe('updateCampaign', () => {
+  it('merges identity, settings, and flavor into the existing document', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Original', createdBy: owner.id })
+
+    const updated = await updateCampaign(campaign.id, {
+      name: 'Renamed',
+      description: 'New blurb',
+      settings: {
+        characterCreation: {
+          startingLevel: 5,
+          importedCharacters: { policy: 'approval_required' },
+        },
+      },
+      flavor: {
+        playStyle: ['sandbox'],
+        mood: ['heroic'],
+        magicLevel: 'high_magic',
+        difficulty: 'brutal',
+      },
+    })
+
+    expect(updated).toMatchObject({
+      identity: { name: 'Renamed', description: 'New blurb' },
+      configuration: {
+        settings: {
+          characterCreation: {
+            startingLevel: 5,
+            importedCharacters: { policy: 'approval_required' },
+          },
+        },
+        flavor: {
+          playStyle: ['sandbox'],
+          mood: ['heroic'],
+          magicLevel: 'high_magic',
+          difficulty: 'brutal',
+        },
+      },
+    })
+  })
+
+  it('returns null for an unknown campaign id', async () => {
+    const owner = await makeUser('owner@example.com')
+    await expect(updateCampaign('507f1f77bcf86cd799439011', { name: 'Nope' })).resolves.toBeNull()
+    void owner
   })
 })
 

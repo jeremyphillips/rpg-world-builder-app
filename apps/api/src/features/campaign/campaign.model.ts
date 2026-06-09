@@ -7,7 +7,11 @@ const { model, models, Schema } = mongoose
 import {
   CAMPAIGN_STATUSES,
   CAMPAIGN_VISIBILITY,
+  DIFFICULTIES,
   IMPORTED_CHARACTERS_POLICIES,
+  MAGIC_LEVELS,
+  MOODS,
+  PLAY_STYLES,
 } from '@rpg/contracts'
 
 const campaignSchema = new Schema(
@@ -29,6 +33,12 @@ const campaignSchema = new Schema(
             },
           },
         },
+      },
+      flavor: {
+        playStyle: [{ type: String, enum: PLAY_STYLES }],
+        mood: [{ type: String, enum: MOODS }],
+        magicLevel: { type: String, enum: MAGIC_LEVELS },
+        difficulty: { type: String, enum: DIFFICULTIES },
       },
     },
     status: { type: String, enum: CAMPAIGN_STATUSES, required: true, default: 'draft' },

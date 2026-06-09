@@ -54,6 +54,13 @@ describe('ProfileSection', () => {
     expect(screen.getByDisplayValue('dm@example.com')).toBeInTheDocument()
   })
 
+  it('shows the saved avatar preview when the session has an avatarKey', async () => {
+    fetchSession.mockResolvedValue({ ...session, avatarKey: 'saved-avatar.png' })
+    renderSection()
+    const img = await screen.findByRole('img', { name: 'Current avatar' })
+    expect(img).toHaveAttribute('src', '/api/uploads/saved-avatar.png')
+  })
+
   it('calls updateProfile with the current values on submit', async () => {
     const user = userEvent.setup()
     updateProfile.mockResolvedValue(session)

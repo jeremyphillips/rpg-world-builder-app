@@ -6,6 +6,7 @@ import type {
   CampaignStatus,
   CampaignVisibility,
   CreateCampaignInput,
+  UpdateCampaignInput,
 } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
@@ -94,6 +95,71 @@ export async function listCampaignsForUser(userId: string): Promise<Campaign[]> 
 
   const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
   return docs.map(toCampaign).sort((a, b) => a.identity.name.localeCompare(b.identity.name))
+}
+
+function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {
+  const $set: Record<string, unknown> = {}
+  if (input.name !== undefined) $set['identity.name'] = input.name
+  if (input.description !== undefined) $set['identity.description'] = input.description
+  if (input.imageKey !== undefined) $set['identity.imageKey'] = input.imageKey
+  return $set
+}
+
+function buildSettingsUpdateSet(
+  settings: NonNullable<UpdateCampaignInput['settings']>,
+): Record<string, unknown> {
+  return {
+    'configuration.settings.characterCreation.startingLevel':
+      settings.characterCreation.startingLevel,
+    'configuration.settings.characterCreation.importedCharacters.policy':
+      settings.characterCreation.importedCharacters.policy,
+  }
+}
+
+const FLAVOR_PATHS = {
+  playStyle: 'configuration.flavor.playStyle',
+  mood: 'configuration.flavor.mood',
+  magicLevel: 'configuration.flavor.magicLevel',
+  difficulty: 'configuration.flavor.difficulty',
+} as const satisfies Record<keyof NonNullable<UpdateCampaignInput['flavor']>, string>
+
+function buildFlavorUpdateSet(
+  flavor: NonNullable<UpdateCampaignInput['flavor']>,
+): Record<string, unknown> {
+  const $set: Record<string, unknown> = {}
+  for (const key of Object.keys(FLAVOR_PATHS) as Array<keyof typeof FLAVOR_PATHS>) {
+    if (flavor[key] !== undefined) $set[FLAVOR_PATHS[key]] = flavor[key]
+  }
+  return $set
+}
+
+function buildCampaignUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {
+  return {
+    ...buildIdentityUpdateSet(input),
+    ...(input.settings ? buildSettingsUpdateSet(input.settings) : {}),
+    ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
+  }
+}
+
+/** Merge a partial update into an existing campaign document. Returns null when the id is invalid or missing. */
+export async function updateCampaign(
+  campaignId: string,
+  input: UpdateCampaignInput,
+): Promise<Campaign | null> {
+  if (!isValidObjectId(campaignId)) return null
+
+  const $set = buildCampaignUpdateSet(input)
+  if (Object.keys($set).length === 0) {
+    return findCampaignById(campaignId)
+  }
+
+  const doc = await CampaignModel.findByIdAndUpdate(
+    campaignId,
+    { $set },
+    { new: true },
+  ).lean<CampaignRecord | null>()
+  if (!doc) return null
+  return toCampaign(doc)
 }
 
 /** Whether the user has any membership in the given campaign. */
