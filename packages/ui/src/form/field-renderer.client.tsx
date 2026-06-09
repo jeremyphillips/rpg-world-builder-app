@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useController, type ControllerRenderProps } from 'react-hook-form'
 
 import { CheckboxField } from '../components/ui/checkbox-field'
+import { ChipsField } from '../components/ui/chips-field.client'
 import { FileField } from '../components/ui/file-field.client'
 import { JsonField } from '../components/ui/json-field.client'
 import { NumberField } from '../components/ui/number-field'
@@ -211,6 +212,23 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       disabled={config.disabled}
       value={field.value ?? []}
       onChange={field.onChange}
+    />
+  ),
+  chips: ({ config, field, id, error }) => (
+    <ChipsField
+      id={id}
+      label={config.label}
+      options={config.options}
+      multiple={config.multiple}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      disabled={config.disabled}
+      value={field.value ?? (config.multiple === false ? '' : [])}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
     />
   ),
 }

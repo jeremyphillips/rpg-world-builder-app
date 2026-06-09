@@ -15,6 +15,7 @@ export type FieldType =
   | 'json'
   | 'richtext'
   | 'file'
+  | 'chips'
 
 /** Option for the `select` and `radio` field types. */
 export interface FieldOption {
@@ -130,6 +131,22 @@ export interface FileFieldConfig extends BaseFieldConfig {
   maxSize?: number
 }
 
+/**
+ * A set of pill-shaped toggle buttons.
+ * `multiple: true` (default) → value is `string[]`; pick any number.
+ * `multiple: false` → value is `string`; acts as a styled single-select.
+ */
+export interface ChipsFieldConfig extends BaseFieldConfig {
+  type: 'chips'
+  options: FieldOption[]
+  /**
+   * Allow selecting more than one option. Defaults to `true`.
+   * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
+   */
+  multiple?: boolean
+  defaultValue?: string | string[]
+}
+
 /** Discriminated union of every leaf field, keyed by `type`. */
 export type FieldConfig =
   | TextFieldConfig
@@ -142,6 +159,7 @@ export type FieldConfig =
   | JsonFieldConfig
   | RichTextFieldConfig
   | FileFieldConfig
+  | ChipsFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
 export interface RowConfig {
@@ -198,12 +216,17 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   json: '',
   richtext: '',
   file: [],
+  chips: [],
 }
 
 /** Type-appropriate default for a single field; an explicit `defaultValue` wins. */
 export function fieldDefaultValue(field: FieldConfig): unknown {
   const explicit = (field as { defaultValue?: unknown }).defaultValue
-  return explicit !== undefined ? explicit : TYPE_DEFAULTS[field.type]
+  if (explicit !== undefined) return explicit
+  if (field.type === 'chips') {
+    return (field as ChipsFieldConfig).multiple === false ? '' : []
+  }
+  return TYPE_DEFAULTS[field.type]
 }
 
 /** Builds the `defaultValues` object RHF needs from a form's items. */

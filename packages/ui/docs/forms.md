@@ -12,8 +12,8 @@ The form system is two layers, and which one you reach for depends on the form:
    for you. Import it from the `@rpg/ui/form` subpath.
 
 ```text
-@rpg/ui            → Field.* , TextField … , FieldGroup , FieldRow   (RHF-agnostic)
-@rpg/ui/form       → <Form> , FieldConfig types                       (RHF-aware)
+@rpg/ui            → Field.* , TextField … , FieldGroup , FieldRow , Tabs , ChipsField   (RHF-agnostic)
+@rpg/ui/form       → <Form> , <TabbedForm> , FieldConfig types                            (RHF-aware)
 ```
 
 ## When to use which layer
@@ -21,12 +21,14 @@ The form system is two layers, and which one you reach for depends on the form:
 | Use…                                | When…                                                                                                                                                     |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<Form>` (`@rpg/ui/form`)           | A standard, config-shaped form: a list of labelled fields, optional groups/rows, conditional visibility, Zod validation. This is the default — prefer it. |
+| `<TabbedForm>` (`@rpg/ui/form`)     | A settings-style form where fields are grouped into tabs and a single global Save button validates all tabs together. All tab panels stay mounted.        |
 | Field wrappers + your own `useForm` | The form is mostly standard but needs a hand-placed custom control, bespoke submit logic, or a layout the config can't express.                           |
 | Compound `Field.*`                  | A truly one-off layout (a control embedded in prose, a non-standard arrangement) where you want the a11y wiring but not the prop/config shape.            |
 
-Rule of thumb: start with `<Form>`. Drop a layer only when you hit something it
-can't express — and consider whether the missing capability belongs in the
-renderer instead.
+Rule of thumb: start with `<Form>`. Use `<TabbedForm>` when the form has a
+naturally tabbed structure (e.g. settings pages). Drop a layer only when you hit
+something it can't express — and consider whether the missing capability belongs
+in the renderer instead.
 
 ## Field anatomy & the a11y contract
 
@@ -204,6 +206,25 @@ import { sanitizeHtml } from '@rpg/ui'
   on blur; invalid JSON surfaces through the standard `error`/aria path.
 - Pass an `example` (object or string) and the field shows an **"Insert example"**
   button that pretty-prints it into the field — an authoring aid, not a default.
+
+### Chips (`chips` / `ChipsField`)
+
+A group of pill-shaped toggle buttons for selecting one or more string values
+from a fixed set — suitable for tags, moods, play styles, etc.
+
+```ts
+// Multi-select (default): value is string[]
+{ type: 'chips', name: 'playStyle', label: 'Play Style', multiple: true,
+  options: [{ value: 'dungeon_crawl', label: 'Dungeon Crawl' }, ...] }
+
+// Single-select: value is string (mutually exclusive, like a styled radio)
+{ type: 'chips', name: 'difficulty', label: 'Difficulty', multiple: false,
+  options: [{ value: 'casual', label: 'Casual' }, ...] }
+```
+
+- Renders as a `<fieldset>` / `<legend>` (a11y group labelling).
+- `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
+- `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
 ## Conditional fields
 

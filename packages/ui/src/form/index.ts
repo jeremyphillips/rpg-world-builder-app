@@ -2,6 +2,7 @@
 // form layer — the `<Form>` renderer plus the config types + pure helpers.
 
 export { Form, type FormProps } from './form.client'
+export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
 
 export {
   flattenFields,
@@ -20,6 +21,7 @@ export {
   type JsonFieldConfig,
   type RichTextFieldConfig,
   type FileFieldConfig,
+  type ChipsFieldConfig,
   type FieldConfig,
   type RowConfig,
   type GroupConfig,
