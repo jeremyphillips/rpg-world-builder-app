@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   SidebarTrigger,
+  ThemeSwitch,
 } from '@rpg/ui'
 
 import { useSession, useLogout } from '@/features/auth'
@@ -42,6 +43,9 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
             <DropdownMenuItem onSelect={() => navigate(ROUTES.profile)}>Profile</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => navigate(ROUTES.account)}>
               Account Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <ThemeSwitch />
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -1,3 +1,12 @@
+export {
+  ThemeProvider,
+  useTheme,
+  ThemeContext,
+  type ThemeContextValue,
+  THEME_STORAGE_KEY,
+} from './providers/theme-provider.client'
+export { ThemeSwitch } from './components/ui/theme-switch.client'
+
 export { cn } from './lib/utils'
 export { sanitizeHtml } from './lib/sanitize-html'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'

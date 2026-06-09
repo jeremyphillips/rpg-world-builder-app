@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RPG World Builder — Dashboard</title>
+    <script>
+      // Apply saved theme before React mounts to prevent a flash of unstyled content.
+      // Key must match THEME_STORAGE_KEY in packages/ui/src/providers/theme-provider.client.tsx
+      ;(function () {
+        if (localStorage.getItem('rpg-theme') === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
