@@ -24,3 +24,8 @@ export const WithHint: Story = { args: { hint: 'Between 1 and 20.' } }
 export const WithError: Story = { args: { error: 'Must be at least 1.', defaultValue: 0 } }
 
 export const Disabled: Story = { args: { disabled: true } }
+
+/** Container fills available space while the input is capped at a narrow intrinsic width. */
+export const WithInputWidth: Story = {
+  args: { hint: 'Container is full-width; input is capped at sm.', inputWidth: 'sm' },
+}

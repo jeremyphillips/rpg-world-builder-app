@@ -139,3 +139,20 @@ export {
   type WizardStepDef,
   type WizardFooterProps,
 } from './components/ui/wizard.client'
+
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  type TabsProps,
+  type TabsListProps,
+  type TabsTriggerProps,
+} from './components/ui/tabs'
+export {
+  tabsListVariants,
+  tabsTriggerVariants,
+  type TabsVariant,
+} from './components/ui/tabs.variants'
+
+export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'

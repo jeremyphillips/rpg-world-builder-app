@@ -107,7 +107,7 @@ FieldRoot.displayName = 'Field.Root'
 const labelSizeClasses: Record<FieldSize, string> = {
   sm: 'text-xs',
   md: 'text-sm',
-  lg: 'text-base',
+  lg: 'text-sm',
 }
 
 export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>

@@ -24,6 +24,54 @@ export const importedCharactersPolicySchema = z.enum(IMPORTED_CHARACTERS_POLICIE
 
 export type ImportedCharactersPolicy = z.infer<typeof importedCharactersPolicySchema>
 
+export const PLAY_STYLES = [
+  'dungeon_crawl',
+  'urban_adventure',
+  'political_intrigue',
+  'exploration',
+  'survival',
+  'mystery',
+  'sandbox',
+  'tactical_combat',
+  'roleplay_driven',
+] as const
+
+export const playStyleSchema = z.enum(PLAY_STYLES)
+export type PlayStyle = z.infer<typeof playStyleSchema>
+
+export const MOODS = [
+  'heroic',
+  'dark_fantasy',
+  'gritty',
+  'horror',
+  'humorous',
+  'weird',
+  'epic',
+  'hopeful',
+] as const
+
+export const moodSchema = z.enum(MOODS)
+export type Mood = z.infer<typeof moodSchema>
+
+export const MAGIC_LEVELS = ['low_magic', 'standard_fantasy', 'high_magic'] as const
+
+export const magicLevelSchema = z.enum(MAGIC_LEVELS)
+export type MagicLevel = z.infer<typeof magicLevelSchema>
+
+export const DIFFICULTIES = ['casual', 'dangerous', 'brutal'] as const
+
+export const difficultySchema = z.enum(DIFFICULTIES)
+export type Difficulty = z.infer<typeof difficultySchema>
+
+export const campaignFlavorSchema = z.object({
+  playStyle: z.array(playStyleSchema).optional(),
+  mood: z.array(moodSchema).optional(),
+  magicLevel: magicLevelSchema.optional(),
+  difficulty: difficultySchema.optional(),
+})
+
+export type CampaignFlavor = z.infer<typeof campaignFlavorSchema>
+
 export const campaignConfigurationSchema = z.object({
   settings: z
     .object({
@@ -35,6 +83,7 @@ export const campaignConfigurationSchema = z.object({
       }),
     })
     .optional(),
+  flavor: campaignFlavorSchema.optional(),
 })
 
 export type CampaignConfiguration = z.infer<typeof campaignConfigurationSchema>
@@ -112,6 +161,34 @@ export const createCampaignInputSchema = z.object({
 })
 
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
+
+// ---------------------------------------------------------------------------
+// Update campaign input
+// ---------------------------------------------------------------------------
+
+/**
+ * Partial update payload. All fields are optional; the server merges the patch
+ * with the existing campaign document. `imageKey` is set server-side after an
+ * upload completes, so clients send the key returned by the upload service.
+ */
+export const updateCampaignInputSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  imageKey: z.string().optional(),
+  settings: z
+    .object({
+      characterCreation: z.object({
+        startingLevel: z.number().int().min(1).max(25),
+        importedCharacters: z.object({
+          policy: importedCharactersPolicySchema,
+        }),
+      }),
+    })
+    .optional(),
+  flavor: campaignFlavorSchema.optional(),
+})
+
+export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 
 // ---------------------------------------------------------------------------
 // Select campaign input

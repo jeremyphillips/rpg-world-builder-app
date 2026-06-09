@@ -1,6 +1,11 @@
-import type { Campaign, CreateCampaignInput, SessionUser } from '@rpg/contracts'
+import type {
+  Campaign,
+  CreateCampaignInput,
+  UpdateCampaignInput,
+  SessionUser,
+} from '@rpg/contracts'
 
-import { postJson, putJson, request } from '@/lib/api-client'
+import { patchJson, postJson, putJson, request } from '@/lib/api-client'
 
 /** Create a campaign, or throw `ApiError` on failure. */
 export async function createCampaign(input: CreateCampaignInput): Promise<Campaign> {
@@ -8,6 +13,19 @@ export async function createCampaign(input: CreateCampaignInput): Promise<Campai
     '/api/campaigns',
     input,
     'Could not create campaign.',
+  )
+  return campaign
+}
+
+/** Update a campaign's identity, settings, or flavor, or throw `ApiError` on failure. */
+export async function updateCampaign(
+  campaignId: string,
+  input: UpdateCampaignInput,
+): Promise<Campaign> {
+  const { campaign } = await patchJson<{ campaign: Campaign }>(
+    `/api/campaigns/${campaignId}`,
+    input,
+    'Could not update campaign.',
   )
   return campaign
 }

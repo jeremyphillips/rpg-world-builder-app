@@ -48,6 +48,15 @@ export async function putJson<T>(
   return sendJson<T>('PUT', path, body, fallbackMessage)
 }
 
+/** PATCH a JSON body with the double-submit CSRF token attached. */
+export async function patchJson<T>(
+  path: string,
+  body: unknown,
+  fallbackMessage?: string,
+): Promise<T> {
+  return sendJson<T>('PATCH', path, body, fallbackMessage)
+}
+
 /** Shared JSON-body sender for mutating methods; attaches the CSRF token. */
 async function sendJson<T>(
   method: 'POST' | 'PUT' | 'PATCH',

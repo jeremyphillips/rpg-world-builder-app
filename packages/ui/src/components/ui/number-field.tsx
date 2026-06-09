@@ -1,7 +1,9 @@
 import * as React from 'react'
 
+import { cn } from '../../lib/utils'
 import { FormField } from './form-field'
 import { Input } from './input.client'
+import { fieldWidthVariants } from './field-control.variants'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 
@@ -12,14 +14,34 @@ export interface NumberFieldProps extends Omit<React.ComponentProps<typeof Input
   hint?: string
   info?: React.ReactNode
   required?: boolean
-  /** Defaults to `xs` — numeric fields are usually only a few characters wide. */
+  /** Container layout width. Defaults to `full`. */
   width?: FieldWidth
   size?: FieldSize
+  /**
+   * Max-width applied directly to the `<input>` element, independent of the
+   * container's layout `width`. Use intrinsic tokens (`xs`–`xl`, `auto`).
+   */
+  inputWidth?: FieldWidth
 }
 
-/** Labelled numeric input. Defaults to a narrow `xs` width for short numbers. */
+/** Labelled numeric input. Container fills available space by default; use `inputWidth` to cap the input element itself. */
 export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
-  ({ id, label, error, hint, info, required, width = 'xs', size = 'md', ...inputProps }, ref) => {
+  (
+    {
+      id,
+      label,
+      error,
+      hint,
+      info,
+      required,
+      width = 'full',
+      inputWidth,
+      size = 'md',
+      className,
+      ...inputProps
+    },
+    ref,
+  ) => {
     return (
       <FormField
         id={id}
@@ -31,7 +53,17 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         width={width}
         size={size}
       >
-        <Input ref={ref} type="number" inputMode="numeric" size={size} {...inputProps} />
+        <Input
+          ref={ref}
+          type="number"
+          inputMode="numeric"
+          size={size}
+          className={cn(
+            inputWidth ? fieldWidthVariants({ width: inputWidth }) : undefined,
+            className,
+          )}
+          {...inputProps}
+        />
       </FormField>
     )
   },

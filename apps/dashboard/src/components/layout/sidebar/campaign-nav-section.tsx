@@ -13,7 +13,7 @@ export function CampaignNavSection() {
   return (
     <NavSection label="Campaign">
       <div className="py-1">
-        <CampaignSwitcher />
+        <CampaignSwitcher showLabel={false} />
       </div>
       {campaignId && (
         <>
