@@ -67,6 +67,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       info={config.info}
       required={config.required}
       width={config.width}
+      inputWidth={config.inputWidth}
       size={config.size}
       placeholder={config.placeholder}
       min={config.min}

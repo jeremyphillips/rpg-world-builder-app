@@ -19,7 +19,8 @@ export const identityFields: FormItem[] = [
     type: 'text',
     name: 'name',
     label: 'Campaign name',
-    placeholder: 'The Sunless Citadel',
+    size: 'lg',
+    placeholder: 'Your campaign name',
     required: true,
   },
   {
@@ -55,23 +56,31 @@ export const rulesFields: FormItem[] = [
     legend: 'Basic',
     fields: [
       {
-        type: 'number',
-        name: 'startingLevel',
-        label: 'Character starting level',
-        min: 1,
-        max: 25,
-        defaultValue: 1,
-        required: true,
-        hint: 'The level at which new player characters begin (1–25).',
-      },
-      {
-        type: 'radio',
-        name: 'importedCharactersPolicy',
-        label: 'Allow imported characters?',
-        required: true,
-        options: [
-          { value: 'approval_required', label: 'Yes, with DM approval' },
-          { value: 'disabled', label: 'No, players must roll new characters' },
+        kind: 'row',
+        fields: [
+          {
+            type: 'number',
+            name: 'startingLevel',
+            label: 'Character starting level',
+            min: 1,
+            max: 25,
+            defaultValue: 1,
+            required: true,
+            hint: 'The level at which new player characters begin (1–25).',
+            width: '1/2',
+            inputWidth: 'sm',
+          },
+          {
+            type: 'radio',
+            name: 'importedCharactersPolicy',
+            label: 'Allow imported characters?',
+            required: true,
+            width: '1/2',
+            options: [
+              { value: 'approval_required', label: 'Yes, with DM approval' },
+              { value: 'disabled', label: 'No, players must roll new characters' },
+            ],
+          },
         ],
       },
     ],

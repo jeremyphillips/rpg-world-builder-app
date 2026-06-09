@@ -69,6 +69,11 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   max?: number
   step?: number
   defaultValue?: number
+  /**
+   * Max-width applied to the `<input>` element itself, independent of the
+   * container's layout `width`. Use intrinsic tokens (`xs`–`xl`, `auto`).
+   */
+  inputWidth?: FieldWidth
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {
