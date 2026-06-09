@@ -73,7 +73,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
   })
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         className={cn(
           'flex h-14 w-full items-center justify-between gap-2 rounded-lg border border-input bg-background px-4 text-left',

@@ -35,7 +35,7 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
       </div>
 
       {user ? (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
             <Avatar
               name={user.displayName}
