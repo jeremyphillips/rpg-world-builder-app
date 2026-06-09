@@ -11,16 +11,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Eyebrow,
 } from '@rpg/ui'
 
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import { getCampaignSwitcherLabel } from '../lib/campaign-selection'
 
+interface CampaignSwitcherProps {
+  showLabel?: boolean
+}
+
 interface CampaignSwitcherListProps {
   campaigns: Campaign[] | undefined
   activeId: string | undefined
   onSelect: (campaignId: string) => void
+  showLabel?: boolean
 }
 
 /** The selectable campaign rows inside the switcher menu. */
@@ -53,7 +59,7 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
  * the URL (`/campaigns/:campaignId`) - selecting one simply navigates there.
  * Future per-campaign menu items will render below this control.
  */
-export function CampaignSwitcher() {
+export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
   const { campaignId } = useParams<{ campaignId: string }>()
   const navigate = useNavigate()
   const selectCampaign = useSelectCampaign()
@@ -78,9 +84,7 @@ export function CampaignSwitcher() {
         disabled={isPending || isError}
       >
         <span className="flex min-w-0 flex-col">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Campaign
-          </span>
+          {showLabel && <Eyebrow>Campaign</Eyebrow>}
           <span className="truncate text-sm font-semibold">{triggerLabel}</span>
         </span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
