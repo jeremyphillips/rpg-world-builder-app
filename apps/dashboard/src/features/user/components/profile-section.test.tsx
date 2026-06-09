@@ -6,16 +6,20 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { SessionUser } from '@rpg/contracts'
 
-vi.mock('@/features/auth/api/auth-client')
+vi.mock('@/features/auth')
 vi.mock('@/features/user/api/user-client')
 
-import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
+import { useSession as useSessionFn } from '@/features/auth'
 import { updateProfile as updateProfileFn } from '@/features/user/api/user-client'
 import * as apiClient from '@/lib/api-client'
 import { ProfileSection } from './profile-section'
 
-const fetchSession = vi.mocked(fetchSessionFn)
+const useSession = vi.mocked(useSessionFn)
 const updateProfile = vi.mocked(updateProfileFn)
+
+function mockSession(data: SessionUser) {
+  useSession.mockReturnValue({ data } as ReturnType<typeof useSessionFn>)
+}
 
 const session: SessionUser = {
   id: 'u1',
@@ -38,9 +42,9 @@ function renderSection() {
 
 describe('ProfileSection', () => {
   beforeEach(() => {
-    fetchSession.mockReset()
+    useSession.mockReset()
     updateProfile.mockReset()
-    fetchSession.mockResolvedValue(session)
+    mockSession(session)
     vi.spyOn(apiClient, 'uploadFile').mockResolvedValue('uploaded-key.png')
   })
 
@@ -55,7 +59,7 @@ describe('ProfileSection', () => {
   })
 
   it('shows the saved avatar preview when the session has an avatarKey', async () => {
-    fetchSession.mockResolvedValue({ ...session, avatarKey: 'saved-avatar.png' })
+    mockSession({ ...session, avatarKey: 'saved-avatar.png' })
     renderSection()
     const img = await screen.findByRole('img', { name: 'Current avatar' })
     expect(img).toHaveAttribute('src', '/api/uploads/saved-avatar.png')

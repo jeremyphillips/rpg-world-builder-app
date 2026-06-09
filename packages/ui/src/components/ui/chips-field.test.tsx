@@ -188,4 +188,20 @@ describe('ChipsField', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  it('has no accessibility violations when required and in error state', async () => {
+    const { container } = render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        required
+        error="Select at least one."
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
 })

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import type { z } from 'zod'
 import type { Campaign, UpdateCampaignInput } from '@rpg/contracts'
 
 import { identitySchema, rulesSchema, flavorSchema } from './campaign-fields'

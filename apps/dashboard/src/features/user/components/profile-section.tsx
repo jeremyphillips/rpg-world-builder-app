@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 import { SubmitButton } from '@rpg/ui'
@@ -16,11 +16,7 @@ export function ProfileSection() {
   const { data: session } = useSession()
   const { mutateAsync, isPending, error, isSuccess } = useUpdateProfile()
   const [submitError, setSubmitError] = useState<unknown>(null)
-  const [avatarCleared, setAvatarCleared] = useState(false)
-
-  useEffect(() => {
-    setAvatarCleared(false)
-  }, [session?.id, session?.avatarKey])
+  const [clearedAvatarKey, setClearedAvatarKey] = useState<string | null>(null)
 
   async function onSubmit(values: AccountFormValues) {
     setSubmitError(null)
@@ -31,7 +27,7 @@ export function ProfileSection() {
       }
       if (values.avatar?.[0]) {
         input.avatarKey = await uploadFile(values.avatar[0], 'Could not upload avatar.')
-      } else if (avatarCleared) {
+      } else if (clearedAvatarKey !== null) {
         input.avatarKey = ''
       }
       await mutateAsync(input)
@@ -58,9 +54,11 @@ export function ProfileSection() {
         fileFieldProps={{
           avatar: {
             existingImageUrl:
-              session?.avatarKey && !avatarCleared ? getAssetUrl(session.avatarKey) : undefined,
+              session?.avatarKey && session.avatarKey !== clearedAvatarKey
+                ? getAssetUrl(session.avatarKey)
+                : undefined,
             existingImageLabel: CURRENT_AVATAR_LABEL,
-            onClearExisting: () => setAvatarCleared(true),
+            onClearExisting: () => setClearedAvatarKey(session?.avatarKey ?? null),
           },
         }}
         defaultValues={

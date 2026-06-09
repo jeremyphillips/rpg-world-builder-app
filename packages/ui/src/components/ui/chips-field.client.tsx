@@ -77,7 +77,6 @@ export function ChipsField({
       id={id}
       aria-describedby={describedBy}
       aria-invalid={error ? true : undefined}
-      aria-required={required || undefined}
       disabled={disabled}
       className={cn('space-y-2', width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}

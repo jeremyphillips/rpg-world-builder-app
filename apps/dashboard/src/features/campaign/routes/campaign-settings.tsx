@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getAssetUrl } from '@rpg/contracts'
 import { TabbedForm, type TabbedFormTab } from '@rpg/ui/form'
@@ -34,11 +34,7 @@ export function CampaignSettings() {
 
   const { mutateAsync, isPending, error, isSuccess } = useUpdateCampaign(campaignId ?? '')
   const [submitError, setSubmitError] = useState<unknown>(null)
-  const [bannerCleared, setBannerCleared] = useState(false)
-
-  useEffect(() => {
-    setBannerCleared(false)
-  }, [campaign?.id, campaign?.identity.imageKey])
+  const [clearedBannerKey, setClearedBannerKey] = useState<string | null>(null)
 
   async function onSubmit(values: CampaignSettingsValues) {
     setSubmitError(null)
@@ -46,7 +42,7 @@ export function CampaignSettings() {
       let imageKey: string | undefined
       if (values.banner?.[0]) {
         imageKey = await uploadFile(values.banner[0], 'Could not upload campaign image.')
-      } else if (bannerCleared) {
+      } else if (clearedBannerKey !== null) {
         imageKey = ''
       }
       await mutateAsync(buildUpdateCampaignInput(values, imageKey))
@@ -87,11 +83,11 @@ export function CampaignSettings() {
         fileFieldProps={{
           banner: {
             existingImageUrl:
-              campaign.identity.imageKey && !bannerCleared
+              campaign.identity.imageKey && campaign.identity.imageKey !== clearedBannerKey
                 ? getAssetUrl(campaign.identity.imageKey)
                 : undefined,
             existingImageLabel: CURRENT_BANNER_LABEL,
-            onClearExisting: () => setBannerCleared(true),
+            onClearExisting: () => setClearedBannerKey(campaign.identity.imageKey ?? null),
           },
         }}
         onSubmit={onSubmit}
