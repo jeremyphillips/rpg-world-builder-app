@@ -11,7 +11,7 @@ export interface NavSectionProps {
 
 export function NavSection({ label, children, className }: NavSectionProps) {
   return (
-    <div className={cn('flex flex-col gap-1', className)}>
+    <div className={cn('flex flex-col gap-1 mb-2.5', className)}>
       <Eyebrow className="px-3 pb-1 pt-3">{label}</Eyebrow>
       {children}
     </div>

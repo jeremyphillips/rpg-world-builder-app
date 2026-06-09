@@ -77,6 +77,50 @@ describe('FileDropzone', () => {
     expect(screen.getByText('banner.webp')).toBeInTheDocument()
   })
 
+  it('renders a remote preview when existingImageUrl is set and value is empty', () => {
+    render(
+      <FileDropzone
+        value={[]}
+        onChange={() => undefined}
+        existingImageUrl="/api/uploads/avatar.png"
+        existingImageLabel="Current avatar"
+      />,
+    )
+    const img = screen.getByRole('img', { name: 'Current avatar' })
+    expect(img).toHaveAttribute('src', '/api/uploads/avatar.png')
+    expect(screen.getByText('Current avatar')).toBeInTheDocument()
+  })
+
+  it('calls onClearExisting when the remote preview remove button is clicked', async () => {
+    const user = userEvent.setup()
+    const onClearExisting = vi.fn()
+    render(
+      <FileDropzone
+        value={[]}
+        onChange={() => undefined}
+        existingImageUrl="/api/uploads/banner.jpg"
+        existingImageLabel="Saved banner"
+        onClearExisting={onClearExisting}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: /remove saved banner/i }))
+    expect(onClearExisting).toHaveBeenCalledTimes(1)
+  })
+
+  it('prefers newly selected files over the remote preview', () => {
+    const file = makeFile('new.png', 'image/png')
+    render(
+      <FileDropzone
+        value={[file]}
+        onChange={() => undefined}
+        existingImageUrl="/api/uploads/old.png"
+        existingImageLabel="Old image"
+      />,
+    )
+    expect(screen.getByText('new.png')).toBeInTheDocument()
+    expect(screen.queryByText('Old image')).not.toBeInTheDocument()
+  })
+
   it('opens the file picker on Enter key', async () => {
     const user = userEvent.setup()
     render(<FileDropzone value={[]} onChange={() => undefined} />)

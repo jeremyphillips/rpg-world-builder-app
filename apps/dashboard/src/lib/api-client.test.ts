@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@rpg/contracts'
 
-import { postJson, request } from './api-client'
+import { postJson, request, uploadFile } from './api-client'
 
 function fakeResponse(ok: boolean, status: number, body: unknown, throwOnJson = false) {
   return {
@@ -47,6 +47,32 @@ describe('request', () => {
     await expect(request('/api/thing', undefined, 'Custom fallback.')).rejects.toThrow(
       'Custom fallback.',
     )
+  })
+})
+
+describe('uploadFile', () => {
+  it('fetches a CSRF token, then POSTs multipart form data with the file field', async () => {
+    let uploadBody: FormData | undefined
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.includes('/api/auth/csrf')) return fakeResponse(true, 200, { csrfToken: 'tok-123' })
+      uploadBody = init?.body as FormData
+      return fakeResponse(true, 201, { key: 'abc-123.jpg' })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const file = new File(['img'], 'avatar.png', { type: 'image/png' })
+    await expect(uploadFile(file)).resolves.toBe('abc-123.jpg')
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/uploads',
+      expect.objectContaining({
+        credentials: 'include',
+        method: 'POST',
+        headers: { 'x-csrf-token': 'tok-123' },
+      }),
+    )
+    expect(uploadBody).toBeInstanceOf(FormData)
+    expect(uploadBody?.get('file')).toBe(file)
   })
 })
 

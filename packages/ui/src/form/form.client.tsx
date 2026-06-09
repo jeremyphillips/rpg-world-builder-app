@@ -18,10 +18,12 @@ import { cn } from '../lib/utils'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import { FieldRenderer } from './field-renderer.client'
+import { FileFieldPropsProvider } from './file-field-props.context'
 import {
   buildDefaultValues,
   hiddenFieldNames,
   type FieldConfig,
+  type FileFieldPropsMap,
   type FormItem,
   type RowConfig,
 } from './field-config'
@@ -89,6 +91,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
   /**
+   * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
+   * Keyed by field name; not part of the Zod schema.
+   */
+  fileFieldProps?: FileFieldPropsMap
+  /**
    * react-hook-form validation trigger mode. Defaults to `'onSubmit'`.
    * Use `'onChange'` in wizard steps so `formState.isValid` updates reactively
    * and can drive a disabled Next button.
@@ -113,6 +120,7 @@ export function Form<TFieldValues extends FieldValues>({
   className,
   contentClassName,
   id,
+  fileFieldProps,
   mode,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
@@ -120,36 +128,39 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolver = React.useMemo(() => makeResolver<TFieldValues>(schema, fields), [schema, fields])
 
-  const resolvedDefaults = React.useMemo(
+  // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
+  // changes reference; callers use the `key` prop to remount when defaults change.
+  const [formDefaults] = React.useState(
     () => ({ ...buildDefaultValues(fields), ...defaultValues }) as DefaultValues<TFieldValues>,
-    [fields, defaultValues],
   )
 
   const form = useForm<TFieldValues>({
     resolver,
-    defaultValues: resolvedDefaults,
+    defaultValues: formDefaults,
     shouldUnregister: true,
     mode,
   })
 
   return (
     <FormProvider {...form}>
-      <form
-        id={formId}
-        noValidate
-        onSubmit={form.handleSubmit(onSubmit as SubmitHandler<TFieldValues>)}
-        className={className}
-      >
-        <div className={cn('space-y-4', contentClassName)}>
-          {formError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {formError}
-            </p>
-          ) : null}
-          <FormItems items={fields} idPrefix={formId} />
-        </div>
-        {typeof footer === 'function' ? footer(form) : footer}
-      </form>
+      <FileFieldPropsProvider value={fileFieldProps ?? {}}>
+        <form
+          id={formId}
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit as SubmitHandler<TFieldValues>)}
+          className={className}
+        >
+          <div className={cn('space-y-4', contentClassName)}>
+            {formError ? (
+              <p role="alert" className="text-sm text-destructive">
+                {formError}
+              </p>
+            ) : null}
+            <FormItems items={fields} idPrefix={formId} />
+          </div>
+          {typeof footer === 'function' ? footer(form) : footer}
+        </form>
+      </FileFieldPropsProvider>
     </FormProvider>
   )
 }

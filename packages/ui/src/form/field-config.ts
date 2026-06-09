@@ -121,6 +121,19 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   defaultValue?: string
 }
 
+/** Remote preview for a stored asset key — passed at the form level, not in the schema. */
+export interface FileFieldRemotePreview {
+  /** Resolved URL for an already-uploaded image (e.g. via `getAssetUrl(key)`). */
+  existingImageUrl?: string
+  /** Label shown beside the remote preview row. */
+  existingImageLabel?: string
+  /** Called when the user removes the stored image without selecting a new file. */
+  onClearExisting?: () => void
+}
+
+/** Per-field remote preview overrides keyed by form field name. */
+export type FileFieldPropsMap = Partial<Record<string, FileFieldRemotePreview>>
+
 export interface FileFieldConfig extends BaseFieldConfig {
   type: 'file'
   /**

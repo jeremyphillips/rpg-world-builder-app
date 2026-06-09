@@ -17,3 +17,16 @@ export const registerInputSchema = z.object({
 })
 
 export type RegisterInput = z.infer<typeof registerInputSchema>
+
+/**
+ * Input for `PATCH /api/users/me/password`. `confirmNewPassword` is validated
+ * client-side only and must NOT be included in this API schema — the server
+ * has no use for it and we avoid sending an extra copy of the plaintext
+ * password over the wire.
+ */
+export const changePasswordInputSchema = z.object({
+  currentPassword: passwordSchema,
+  newPassword: passwordSchema,
+})
+
+export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>

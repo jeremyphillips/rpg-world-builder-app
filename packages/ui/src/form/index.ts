@@ -21,6 +21,8 @@ export {
   type JsonFieldConfig,
   type RichTextFieldConfig,
   type FileFieldConfig,
+  type FileFieldRemotePreview,
+  type FileFieldPropsMap,
   type ChipsFieldConfig,
   type FieldConfig,
   type RowConfig,

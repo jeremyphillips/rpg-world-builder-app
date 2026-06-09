@@ -41,6 +41,15 @@ export interface FileDropzoneProps {
   maxFiles?: number
   /** Maximum size per file in bytes. */
   maxSize?: number
+  /**
+   * URL for an already-uploaded image when `value` is empty (e.g. from a storage key).
+   * Shown as a remote row in the file list until a new file is selected or cleared.
+   */
+  existingImageUrl?: string
+  /** Label for the remote preview row. Defaults to "Current image". */
+  existingImageLabel?: string
+  /** Called when the user removes the stored image without selecting a replacement. */
+  onClearExisting?: () => void
   disabled?: boolean
   className?: string
   /** Forwarded to the drop-zone div — allows `id` injection from `Field.Control`. */
@@ -73,40 +82,36 @@ function useFileDropzone({
   disabled,
 }: UseFileDropzoneOptions) {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const previewUrlsRef = React.useRef(new Map<File, string>())
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
-  const [previewUrls, setPreviewUrls] = React.useState<Map<File, string>>(() => new Map())
+
+  // Revoke blob URLs for files removed from the controlled value. No setState —
+  // the parent re-render already dropped the preview from the tree.
+  React.useEffect(() => {
+    for (const [file, url] of [...previewUrlsRef.current]) {
+      if (!value.includes(file)) {
+        URL.revokeObjectURL(url)
+        previewUrlsRef.current.delete(file)
+      }
+    }
+  }, [value])
 
   React.useEffect(() => {
+    const cache = previewUrlsRef.current
     return () => {
-      for (const url of previewUrls.values()) URL.revokeObjectURL(url)
+      for (const url of cache.values()) URL.revokeObjectURL(url)
+      cache.clear()
     }
-    // Cleanup only on unmount; per-removal cleanup is in revokeRemovedUrls.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function getOrCreatePreviewUrl(file: File): string | null {
+  function getPreviewUrl(file: File): string | null {
     if (!file.type.startsWith('image/')) return null
-    if (previewUrls.has(file)) return previewUrls.get(file)!
-    const url = URL.createObjectURL(file)
-    setPreviewUrls((prev) => new Map(prev).set(file, url))
-    return url
-  }
-
-  function revokeRemovedUrls(prev: File[], next: File[]) {
-    const removed = prev.filter((f) => !next.includes(f))
-    if (removed.length === 0) return
-    setPreviewUrls((current) => {
-      const updated = new Map(current)
-      for (const f of removed) {
-        const url = updated.get(f)
-        if (url) {
-          URL.revokeObjectURL(url)
-          updated.delete(f)
-        }
-      }
-      return updated
-    })
+    const cache = previewUrlsRef.current
+    if (!cache.has(file)) {
+      cache.set(file, URL.createObjectURL(file))
+    }
+    return cache.get(file) ?? null
   }
 
   function validateAndFilter(files: File[]): { accepted: File[]; error: string | null } {
@@ -133,13 +138,11 @@ function useFileDropzone({
     }
     setErrorMsg(null)
     const next = multiple ? [...value, ...accepted].slice(0, maxFiles) : accepted.slice(0, 1)
-    revokeRemovedUrls(value, next)
     onChange?.(next)
   }
 
   function removeFile(file: File) {
     const next = value.filter((f) => f !== file)
-    revokeRemovedUrls(value, next)
     onChange?.(next)
     setErrorMsg(null)
   }
@@ -181,7 +184,7 @@ function useFileDropzone({
     inputRef,
     isDragOver,
     errorMsg,
-    getOrCreatePreviewUrl,
+    getPreviewUrl,
     openPicker,
     removeFile,
     handleDragOver,
@@ -297,9 +300,41 @@ interface FileListProps {
   onRemove: (file: File) => void
 }
 
+const DEFAULT_EXISTING_IMAGE_LABEL = 'Current image'
+
+interface ExistingImageRowProps {
+  url: string
+  label: string
+  disabled: boolean
+  onRemove?: () => void
+}
+
+function ExistingImageRow({ url, label, disabled, onRemove }: ExistingImageRowProps) {
+  return (
+    <li className={fileItemVariants()}>
+      <img src={url} alt={label} className={fileThumbnailVariants()} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{label}</p>
+        <p className="text-xs text-muted-foreground">Saved</p>
+      </div>
+      {onRemove ? (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={`Remove ${label}`}
+          className={removeButtonVariants()}
+          disabled={disabled}
+        >
+          <X className="size-4" aria-hidden="true" />
+        </button>
+      ) : null}
+    </li>
+  )
+}
+
 function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
   return (
-    <ul className={fileListVariants()} aria-label="Selected files">
+    <>
       {files.map((file, index) => {
         const previewUrl = getPreviewUrl(file)
         return (
@@ -327,7 +362,7 @@ function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
           </li>
         )
       })}
-    </ul>
+    </>
   )
 }
 
@@ -350,6 +385,9 @@ export function FileDropzone({
   multiple = false,
   maxFiles,
   maxSize,
+  existingImageUrl,
+  existingImageLabel = DEFAULT_EXISTING_IMAGE_LABEL,
+  onClearExisting,
   disabled = false,
   className,
   id,
@@ -360,7 +398,7 @@ export function FileDropzone({
     inputRef,
     isDragOver,
     errorMsg,
-    getOrCreatePreviewUrl,
+    getPreviewUrl,
     openPicker,
     removeFile,
     handleDragOver,
@@ -372,6 +410,8 @@ export function FileDropzone({
 
   const atLimit = !multiple || (maxFiles !== undefined && value.length >= maxFiles)
   const showDropZone = !atLimit || value.length === 0
+  const showExistingImage = value.length === 0 && Boolean(existingImageUrl)
+  const showFileList = value.length > 0 || showExistingImage
 
   return (
     <div className="w-full space-y-1">
@@ -412,13 +452,24 @@ export function FileDropzone({
         </p>
       ) : null}
 
-      {value.length > 0 ? (
-        <FileList
-          files={value}
-          disabled={disabled}
-          getPreviewUrl={getOrCreatePreviewUrl}
-          onRemove={removeFile}
-        />
+      {showFileList ? (
+        <ul className={fileListVariants()} aria-label="Selected files">
+          {showExistingImage ? (
+            <ExistingImageRow
+              url={existingImageUrl!}
+              label={existingImageLabel}
+              disabled={disabled}
+              onRemove={onClearExisting}
+            />
+          ) : (
+            <FileList
+              files={value}
+              disabled={disabled}
+              getPreviewUrl={getPreviewUrl}
+              onRemove={removeFile}
+            />
+          )}
+        </ul>
       ) : null}
     </div>
   )

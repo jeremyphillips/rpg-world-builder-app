@@ -6,6 +6,7 @@ import { errorHandler, notFound } from './middleware/error-handler'
 import { authRouter } from './features/auth'
 import { campaignRouter } from './features/campaign'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
+import { userRouter } from './features/user/user.routes'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
@@ -33,6 +34,7 @@ export function createApp(): Express {
   api.use('/auth', authRouter)
   api.use('/campaigns', campaignRouter)
   api.use('/uploads', uploadsRouter)
+  api.use('/users', userRouter)
 
   app.use('/api', api)
 

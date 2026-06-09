@@ -15,14 +15,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import { FieldRenderer } from './field-renderer.client'
+import { FileFieldPropsProvider } from './file-field-props.context'
 import {
   buildDefaultValues,
   hiddenFieldNames,
   type FieldConfig,
+  type FileFieldPropsMap,
   type FormItem,
   type RowConfig,
 } from './field-config'
@@ -51,6 +53,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   footer?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   /** Optional id for the `<form>` element. */
   id?: string
+  /**
+   * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
+   * Keyed by field name; not part of the Zod schema.
+   */
+  fileFieldProps?: FileFieldPropsMap
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
@@ -159,6 +166,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   formError,
   footer,
   id,
+  fileFieldProps,
   className,
   mode,
 }: TabbedFormProps<TFieldValues>) {
@@ -185,40 +193,42 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 
   return (
     <FormProvider {...form}>
-      <form
-        id={formId}
-        noValidate
-        onSubmit={form.handleSubmit(onSubmit as SubmitHandler<TFieldValues>)}
-        className={cn('space-y-6', className)}
-      >
-        <Tabs defaultValue={tabs[0]?.id} variant="line">
-          <TabsList>
+      <FileFieldPropsProvider value={fileFieldProps ?? {}}>
+        <form
+          id={formId}
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit as SubmitHandler<TFieldValues>)}
+          className={cn('space-y-6', className)}
+        >
+          <Tabs defaultValue={tabs[0]?.id} variant="line">
+            <TabsList>
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
             {tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id}>
-                {tab.label}
-              </TabsTrigger>
+              // forceMount keeps all panels mounted so every field is registered
+              // with RHF and validated on global save; inactive panels are hidden
+              // by Radix via the HTML `hidden` attribute.
+              <TabsContent key={tab.id} value={tab.id} forceMount>
+                <div className="space-y-4">
+                  <TabItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+                </div>
+              </TabsContent>
             ))}
-          </TabsList>
-          {tabs.map((tab) => (
-            // forceMount keeps all panels mounted so every field is registered
-            // with RHF and validated on global save; inactive panels are hidden
-            // by Radix via the HTML `hidden` attribute.
-            <TabsContent key={tab.id} value={tab.id} forceMount>
-              <div className="space-y-4">
-                <TabItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+          </Tabs>
 
-        {formError ? (
-          <p role="alert" className="text-sm text-destructive">
-            {formError}
-          </p>
-        ) : null}
+          {formError ? (
+            <p role="alert" className="text-sm text-destructive">
+              {formError}
+            </p>
+          ) : null}
 
-        {typeof footer === 'function' ? footer(form) : footer}
-      </form>
+          {typeof footer === 'function' ? footer(form) : footer}
+        </form>
+      </FileFieldPropsProvider>
     </FormProvider>
   )
 }

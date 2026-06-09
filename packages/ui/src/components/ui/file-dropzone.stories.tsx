@@ -57,3 +57,20 @@ export const WithFile: StoryObj = {
     return <FileDropzone value={files} onChange={setFiles} />
   },
 }
+
+/** Remote preview for an already-uploaded image (no local File). */
+export const WithExistingImage: StoryObj = {
+  render: () => {
+    const [files, setFiles] = useState<File[]>([])
+    const [cleared, setCleared] = useState(false)
+    return (
+      <FileDropzone
+        value={files}
+        onChange={setFiles}
+        existingImageUrl={cleared ? undefined : 'https://picsum.photos/seed/rpg-avatar/96/96'}
+        existingImageLabel="Current avatar"
+        onClearExisting={() => setCleared(true)}
+      />
+    )
+  },
+}

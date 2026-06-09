@@ -1,9 +1,9 @@
 import { cva } from 'class-variance-authority'
 
-export const tabsListVariants = cva('inline-flex items-center text-muted-foreground', {
+export const tabsListVariants = cva('inline-flex items-center', {
   variants: {
     variant: {
-      line: 'w-full border-b border-border gap-0',
+      line: 'w-full border-b border-border gap-0 text-muted-foreground',
       pill: 'h-9 rounded-lg bg-muted p-1 gap-1',
     },
   },
@@ -18,7 +18,7 @@ export const tabsTriggerVariants = cva(
     variants: {
       variant: {
         line: 'relative h-9 px-4 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:rounded-full data-[state=active]:after:bg-foreground',
-        pill: 'h-7 rounded-md px-3 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+        pill: 'h-7 rounded-md px-3 text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
       },
     },
     defaultVariants: {
