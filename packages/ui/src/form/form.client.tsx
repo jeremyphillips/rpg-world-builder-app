@@ -88,6 +88,12 @@ export interface FormProps<TFieldValues extends FieldValues> {
   contentClassName?: string
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
+  /**
+   * react-hook-form validation trigger mode. Defaults to `'onSubmit'`.
+   * Use `'onChange'` in wizard steps so `formState.isValid` updates reactively
+   * and can drive a disabled Next button.
+   */
+  mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
 }
 
 /**
@@ -107,6 +113,7 @@ export function Form<TFieldValues extends FieldValues>({
   className,
   contentClassName,
   id,
+  mode,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -122,6 +129,7 @@ export function Form<TFieldValues extends FieldValues>({
     resolver,
     defaultValues: resolvedDefaults,
     shouldUnregister: true,
+    mode,
   })
 
   return (

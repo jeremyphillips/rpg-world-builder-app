@@ -1,6 +1,6 @@
-export { CreateCampaignForm } from './components/create-campaign-form'
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
+export { CampaignCreate } from './routes/campaign-create'
 export { CampaignDetail } from './routes/campaign-detail'
 export { CampaignSessions } from './routes/campaign-sessions'
 export { CampaignSettings } from './routes/campaign-settings'

@@ -7,9 +7,9 @@ import { campaignRoleSchema } from './roles'
 
 export const campaignIdentitySchema = z.object({
   name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
   /** Storage key for the campaign banner image — resolve to a URL with `getAssetUrl`. */
   imageKey: z.string().optional(),
-  // Future: slug, description, tags
 })
 
 export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>
@@ -18,8 +18,23 @@ export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>
 // Campaign configuration
 // ---------------------------------------------------------------------------
 
+export const IMPORTED_CHARACTERS_POLICIES = ['disabled', 'approval_required'] as const
+
+export const importedCharactersPolicySchema = z.enum(IMPORTED_CHARACTERS_POLICIES)
+
+export type ImportedCharactersPolicy = z.infer<typeof importedCharactersPolicySchema>
+
 export const campaignConfigurationSchema = z.object({
-  // Future: gameSystem, maxPlayers, sessionSchedule, isInviteOnly
+  settings: z
+    .object({
+      characterCreation: z.object({
+        startingLevel: z.number().int().min(1).max(25),
+        importedCharacters: z.object({
+          policy: importedCharactersPolicySchema,
+        }),
+      }),
+    })
+    .optional(),
 })
 
 export type CampaignConfiguration = z.infer<typeof campaignConfigurationSchema>
@@ -76,10 +91,24 @@ export type Campaign = z.infer<typeof campaignSchema>
 
 /**
  * Client-facing payload for creating a campaign. `createdBy` is set server-side
- * from the session, so the client only sends the campaign name.
+ * from the session, so the client only sends the campaign identity and initial
+ * configuration. All fields except `name` are optional — the server applies
+ * defaults for any omitted configuration.
  */
 export const createCampaignInputSchema = z.object({
   name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  imageKey: z.string().optional(),
+  settings: z
+    .object({
+      characterCreation: z.object({
+        startingLevel: z.number().int().min(1).max(25),
+        importedCharacters: z.object({
+          policy: importedCharactersPolicySchema,
+        }),
+      }),
+    })
+    .optional(),
 })
 
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>

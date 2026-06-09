@@ -4,6 +4,7 @@ export const ROUTES = {
   profile: '/profile',
   account: '/account',
   campaign: {
+    create: '/campaigns/new',
     detail: (id: string) => `/campaigns/${id}`,
     sessions: (id: string) => `/campaigns/${id}/sessions`,
     settings: (id: string) => `/campaigns/${id}/settings`,

@@ -1,10 +1,9 @@
+import { Link } from 'react-router-dom'
+import { buttonVariants } from '@rpg/ui'
+
 import { useSession } from '@/features/auth'
-import {
-  CampaignPicker,
-  CreateCampaignForm,
-  useCampaigns,
-  useSelectCampaign,
-} from '@/features/campaign'
+import { CampaignPicker, useCampaigns, useSelectCampaign } from '@/features/campaign'
+import { ROUTES } from '@/app/routes'
 
 import { useLandingRedirect } from './use-landing-redirect'
 
@@ -23,20 +22,23 @@ export function DashboardHome() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Welcome{user ? `, ${user.displayName}` : ''}
-        </h2>
-        <p className="text-muted-foreground">
-          {hasCampaigns
-            ? 'Choose a campaign to continue, or start a new one.'
-            : 'Create your first campaign to get started.'}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Welcome{user ? `, ${user.displayName}` : ''}
+          </h2>
+          <p className="text-muted-foreground">
+            {hasCampaigns
+              ? 'Choose a campaign to continue, or start a new one.'
+              : 'Create your first campaign to get started.'}
+          </p>
+        </div>
+        <Link to={ROUTES.campaign.create} className={buttonVariants({ variant: 'default' })}>
+          New campaign
+        </Link>
       </div>
 
       {hasCampaigns ? <CampaignPicker campaigns={campaigns} onSelect={selectCampaign} /> : null}
-
-      <CreateCampaignForm />
     </div>
   )
 }

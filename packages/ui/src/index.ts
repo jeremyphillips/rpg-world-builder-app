@@ -129,3 +129,13 @@ export {
 } from './components/ui/modal.variants'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
+
+export {
+  Wizard,
+  WizardStepNav,
+  WizardFooter,
+  useWizard,
+  type WizardProps,
+  type WizardStepDef,
+  type WizardFooterProps,
+} from './components/ui/wizard.client'
