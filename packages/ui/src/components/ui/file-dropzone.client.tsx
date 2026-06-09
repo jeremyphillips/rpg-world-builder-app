@@ -82,45 +82,36 @@ function useFileDropzone({
   disabled,
 }: UseFileDropzoneOptions) {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const previewUrlsRef = React.useRef(new Map<File, string>())
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
-  const [previewUrls, setPreviewUrls] = React.useState<Map<File, string>>(() => new Map())
-  const previewUrlsRef = React.useRef(previewUrls)
-  previewUrlsRef.current = previewUrls
 
+  // Revoke blob URLs for files removed from the controlled value. No setState —
+  // the parent re-render already dropped the preview from the tree.
   React.useEffect(() => {
-    setPreviewUrls((prev) => {
-      const next = new Map(prev)
-      let changed = false
-
-      for (const [file, url] of prev) {
-        if (!value.includes(file)) {
-          URL.revokeObjectURL(url)
-          next.delete(file)
-          changed = true
-        }
+    for (const [file, url] of [...previewUrlsRef.current]) {
+      if (!value.includes(file)) {
+        URL.revokeObjectURL(url)
+        previewUrlsRef.current.delete(file)
       }
-
-      for (const file of value) {
-        if (file.type.startsWith('image/') && !next.has(file)) {
-          next.set(file, URL.createObjectURL(file))
-          changed = true
-        }
-      }
-
-      return changed ? next : prev
-    })
+    }
   }, [value])
 
   React.useEffect(() => {
+    const cache = previewUrlsRef.current
     return () => {
-      for (const url of previewUrlsRef.current.values()) URL.revokeObjectURL(url)
+      for (const url of cache.values()) URL.revokeObjectURL(url)
+      cache.clear()
     }
   }, [])
 
   function getPreviewUrl(file: File): string | null {
     if (!file.type.startsWith('image/')) return null
-    return previewUrls.get(file) ?? null
+    const cache = previewUrlsRef.current
+    if (!cache.has(file)) {
+      cache.set(file, URL.createObjectURL(file))
+    }
+    return cache.get(file) ?? null
   }
 
   function validateAndFilter(files: File[]): { accepted: File[]; error: string | null } {

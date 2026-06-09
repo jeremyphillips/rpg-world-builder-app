@@ -128,19 +128,15 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolver = React.useMemo(() => makeResolver<TFieldValues>(schema, fields), [schema, fields])
 
-  const resolvedDefaults = React.useMemo(
+  // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
+  // changes reference; callers use the `key` prop to remount when defaults change.
+  const [formDefaults] = React.useState(
     () => ({ ...buildDefaultValues(fields), ...defaultValues }) as DefaultValues<TFieldValues>,
-    [fields, defaultValues],
   )
-
-  // Capture the defaults once at mount time. RHF v7.52+ auto-resets when
-  // `defaultValues` changes reference; callers use the `key` prop to remount
-  // when defaults genuinely need to change, so the ref stays stable.
-  const stableDefaults = React.useRef(resolvedDefaults)
 
   const form = useForm<TFieldValues>({
     resolver,
-    defaultValues: stableDefaults.current,
+    defaultValues: formDefaults,
     shouldUnregister: true,
     mode,
   })
