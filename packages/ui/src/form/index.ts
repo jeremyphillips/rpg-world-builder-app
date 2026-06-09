@@ -19,6 +19,7 @@ export {
   type SwitchFieldConfig,
   type JsonFieldConfig,
   type RichTextFieldConfig,
+  type FileFieldConfig,
   type FieldConfig,
   type RowConfig,
   type GroupConfig,

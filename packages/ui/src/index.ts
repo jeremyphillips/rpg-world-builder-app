@@ -113,6 +113,13 @@ export {
   DropdownMenuRadioGroup,
 } from './components/ui/dropdown-menu.client'
 
+export {
+  FileDropzone,
+  type FileDropzoneProps,
+  DEFAULT_ACCEPT,
+} from './components/ui/file-dropzone.client'
+export { FileField, type FileFieldProps } from './components/ui/file-field.client'
+
 export { Modal, type ModalContentProps, type ModalHeaderProps } from './components/ui/modal.client'
 export {
   modalOverlayVariants,

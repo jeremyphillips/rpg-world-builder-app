@@ -10,6 +10,10 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1).default('mongodb://127.0.0.1:27017/rpg'),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
+  /** Directory where uploaded files are stored (relative to the API process CWD). */
+  UPLOAD_DIR: z.string().min(1).default('./uploads'),
+  /** Maximum allowed upload size in bytes. */
+  MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5_242_880),
 })
 
 export type Env = z.infer<typeof envSchema> & { isProduction: boolean }
@@ -28,6 +32,8 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
       source.JWT_SECRET ??
       (source.NODE_ENV === 'production' ? undefined : 'dev-insecure-secret-change-me'),
     JWT_EXPIRES_IN: source.JWT_EXPIRES_IN,
+    UPLOAD_DIR: source.UPLOAD_DIR,
+    MAX_UPLOAD_BYTES: source.MAX_UPLOAD_BYTES,
   })
 
   if (!parsed.success) {
