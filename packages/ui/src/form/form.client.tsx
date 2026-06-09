@@ -125,9 +125,14 @@ export function Form<TFieldValues extends FieldValues>({
     [fields, defaultValues],
   )
 
+  // Capture the defaults once at mount time. RHF v7.52+ auto-resets when
+  // `defaultValues` changes reference; callers use the `key` prop to remount
+  // when defaults genuinely need to change, so the ref stays stable.
+  const stableDefaults = React.useRef(resolvedDefaults)
+
   const form = useForm<TFieldValues>({
     resolver,
-    defaultValues: resolvedDefaults,
+    defaultValues: stableDefaults.current,
     shouldUnregister: true,
     mode,
   })

@@ -76,37 +76,42 @@ function useFileDropzone({
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
   const [previewUrls, setPreviewUrls] = React.useState<Map<File, string>>(() => new Map())
+  const previewUrlsRef = React.useRef(previewUrls)
+  previewUrlsRef.current = previewUrls
+
+  React.useEffect(() => {
+    setPreviewUrls((prev) => {
+      const next = new Map(prev)
+      let changed = false
+
+      for (const [file, url] of prev) {
+        if (!value.includes(file)) {
+          URL.revokeObjectURL(url)
+          next.delete(file)
+          changed = true
+        }
+      }
+
+      for (const file of value) {
+        if (file.type.startsWith('image/') && !next.has(file)) {
+          next.set(file, URL.createObjectURL(file))
+          changed = true
+        }
+      }
+
+      return changed ? next : prev
+    })
+  }, [value])
 
   React.useEffect(() => {
     return () => {
-      for (const url of previewUrls.values()) URL.revokeObjectURL(url)
+      for (const url of previewUrlsRef.current.values()) URL.revokeObjectURL(url)
     }
-    // Cleanup only on unmount; per-removal cleanup is in revokeRemovedUrls.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function getOrCreatePreviewUrl(file: File): string | null {
+  function getPreviewUrl(file: File): string | null {
     if (!file.type.startsWith('image/')) return null
-    if (previewUrls.has(file)) return previewUrls.get(file)!
-    const url = URL.createObjectURL(file)
-    setPreviewUrls((prev) => new Map(prev).set(file, url))
-    return url
-  }
-
-  function revokeRemovedUrls(prev: File[], next: File[]) {
-    const removed = prev.filter((f) => !next.includes(f))
-    if (removed.length === 0) return
-    setPreviewUrls((current) => {
-      const updated = new Map(current)
-      for (const f of removed) {
-        const url = updated.get(f)
-        if (url) {
-          URL.revokeObjectURL(url)
-          updated.delete(f)
-        }
-      }
-      return updated
-    })
+    return previewUrls.get(file) ?? null
   }
 
   function validateAndFilter(files: File[]): { accepted: File[]; error: string | null } {
@@ -133,13 +138,11 @@ function useFileDropzone({
     }
     setErrorMsg(null)
     const next = multiple ? [...value, ...accepted].slice(0, maxFiles) : accepted.slice(0, 1)
-    revokeRemovedUrls(value, next)
     onChange?.(next)
   }
 
   function removeFile(file: File) {
     const next = value.filter((f) => f !== file)
-    revokeRemovedUrls(value, next)
     onChange?.(next)
     setErrorMsg(null)
   }
@@ -181,7 +184,7 @@ function useFileDropzone({
     inputRef,
     isDragOver,
     errorMsg,
-    getOrCreatePreviewUrl,
+    getPreviewUrl,
     openPicker,
     removeFile,
     handleDragOver,
@@ -360,7 +363,7 @@ export function FileDropzone({
     inputRef,
     isDragOver,
     errorMsg,
-    getOrCreatePreviewUrl,
+    getPreviewUrl,
     openPicker,
     removeFile,
     handleDragOver,
@@ -416,7 +419,7 @@ export function FileDropzone({
         <FileList
           files={value}
           disabled={disabled}
-          getPreviewUrl={getOrCreatePreviewUrl}
+          getPreviewUrl={getPreviewUrl}
           onRemove={removeFile}
         />
       ) : null}

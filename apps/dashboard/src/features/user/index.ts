@@ -1,3 +1,4 @@
-// fallow-ignore-file unused-file
-// `user` feature — scaffold only. Export the public surface here as it's built.
-export {}
+export { useUpdateProfile } from './hooks/use-update-profile'
+export { useChangePassword } from './hooks/use-change-password'
+export { ProfileSection } from './components/profile-section'
+export { ChangePasswordSection } from './components/change-password-section'

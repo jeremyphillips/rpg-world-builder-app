@@ -148,7 +148,7 @@ export {
   type TabsProps,
   type TabsListProps,
   type TabsTriggerProps,
-} from './components/ui/tabs'
+} from './components/ui/tabs.client'
 export {
   tabsListVariants,
   tabsTriggerVariants,

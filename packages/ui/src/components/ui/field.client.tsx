@@ -119,19 +119,16 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
       <label
         ref={ref}
         htmlFor={controlId}
+        data-required={required || undefined}
         className={cn(
           'flex items-center gap-1.5 font-medium leading-none',
+          "data-[required]:after:content-['*'] data-[required]:after:text-destructive",
           labelSizeClasses[size],
           className,
         )}
         {...props}
       >
         {children}
-        {required ? (
-          <span aria-hidden="true" className="text-destructive">
-            *
-          </span>
-        ) : null}
       </label>
     )
   },

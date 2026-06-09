@@ -4,4 +4,6 @@ export {
   findSessionUserById,
   toSessionUser,
   updateLastSelectedCampaign,
+  updateProfile,
+  changePassword,
 } from './user.service'

@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import { FieldRenderer } from './field-renderer.client'

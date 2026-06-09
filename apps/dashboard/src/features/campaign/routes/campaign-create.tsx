@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ApiError, fetchCsrfToken, getErrorMessage, type CreateCampaignInput } from '@rpg/contracts'
+import { getErrorMessage, type CreateCampaignInput } from '@rpg/contracts'
 import { Wizard, type WizardStepDef } from '@rpg/ui'
 
-import { CSRF_HEADER } from '@/lib/api-client'
+import { uploadFile } from '@/lib/api-client'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import { IdentityStep } from '../components/steps/identity-step'
@@ -24,28 +24,6 @@ interface WizardValues {
   settings?: CreateCampaignInput['settings']
 }
 
-async function uploadBanner(file: File): Promise<string> {
-  const csrfToken = await fetchCsrfToken()
-  const fd = new FormData()
-  fd.append('file', file)
-  const res = await fetch('/api/uploads', {
-    method: 'POST',
-    credentials: 'include',
-    headers: { [CSRF_HEADER]: csrfToken },
-    body: fd,
-  })
-  if (!res.ok) {
-    const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null
-    throw new ApiError(
-      res.status,
-      'upload_failed',
-      body?.error?.message ?? 'Could not upload campaign image.',
-    )
-  }
-  const { key } = (await res.json()) as { key: string }
-  return key
-}
-
 export function CampaignCreate() {
   const { mutateAsync } = useCreateCampaign()
   const selectCampaign = useSelectCampaign()
@@ -58,7 +36,7 @@ export function CampaignCreate() {
     try {
       let imageKey: string | undefined
       if (banner?.[0]) {
-        imageKey = await uploadBanner(banner[0])
+        imageKey = await uploadFile(banner[0], 'Could not upload campaign image.')
       }
 
       const campaign = await mutateAsync({

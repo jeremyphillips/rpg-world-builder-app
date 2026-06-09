@@ -100,7 +100,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
           onSelect={selectCampaign}
         />
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => navigate(ROUTES.home)}>
+        <DropdownMenuItem onSelect={() => navigate(ROUTES.campaign.create)}>
           <Plus className="size-4" />
           Create campaign
         </DropdownMenuItem>
