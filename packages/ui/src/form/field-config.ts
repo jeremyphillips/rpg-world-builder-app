@@ -14,6 +14,7 @@ export type FieldType =
   | 'switch'
   | 'json'
   | 'richtext'
+  | 'file'
 
 /** Option for the `select` and `radio` field types. */
 export interface FieldOption {
@@ -114,6 +115,21 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   defaultValue?: string
 }
 
+export interface FileFieldConfig extends BaseFieldConfig {
+  type: 'file'
+  /**
+   * Accepted MIME types or file extensions (e.g. `['image/*']`, `['.pdf']`).
+   * Defaults to `['image/*']`.
+   */
+  accept?: string[]
+  /** Allow selecting multiple files. Defaults to `false`. */
+  multiple?: boolean
+  /** Maximum number of files when `multiple` is true. */
+  maxFiles?: number
+  /** Maximum size per file in bytes. */
+  maxSize?: number
+}
+
 /** Discriminated union of every leaf field, keyed by `type`. */
 export type FieldConfig =
   | TextFieldConfig
@@ -125,6 +141,7 @@ export type FieldConfig =
   | SwitchFieldConfig
   | JsonFieldConfig
   | RichTextFieldConfig
+  | FileFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
 export interface RowConfig {
@@ -180,11 +197,13 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   switch: false,
   json: '',
   richtext: '',
+  file: [],
 }
 
 /** Type-appropriate default for a single field; an explicit `defaultValue` wins. */
 export function fieldDefaultValue(field: FieldConfig): unknown {
-  return field.defaultValue !== undefined ? field.defaultValue : TYPE_DEFAULTS[field.type]
+  const explicit = (field as { defaultValue?: unknown }).defaultValue
+  return explicit !== undefined ? explicit : TYPE_DEFAULTS[field.type]
 }
 
 /** Builds the `defaultValues` object RHF needs from a form's items. */

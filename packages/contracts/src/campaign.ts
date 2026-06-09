@@ -7,7 +7,9 @@ import { campaignRoleSchema } from './roles'
 
 export const campaignIdentitySchema = z.object({
   name: z.string().min(1).max(100),
-  // Future: slug, description, imageKey, tags
+  /** Storage key for the campaign banner image — resolve to a URL with `getAssetUrl`. */
+  imageKey: z.string().optional(),
+  // Future: slug, description, tags
 })
 
 export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>

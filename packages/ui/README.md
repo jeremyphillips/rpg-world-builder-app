@@ -21,6 +21,8 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `Field` (compound)                        | component  | `Field.Root/Label/Control/Hint/Error`; centralizes id + aria wiring                                                                         |
 | `FormField`                               | component  | Label + control slot + inline error/hint (+ optional `[i]` info)                                                                            |
 | Field wrappers                            | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField` |
+| `FileDropzone`                            | component  | Drag-and-drop / click-to-browse file primitive; controlled (`value`/`onChange: File[]`); MIME validation, previews, remove                  |
+| `FileField`                               | component  | `FormField`-shim wrapper around `FileDropzone` — adds label, hint, error, `[i]` info                                                        |
 | `FieldGroup`, `FieldRow`                  | component  | Layout: semantic fieldset/legend group; responsive token-width row                                                                          |
 | `Tooltip` + `InfoTooltip`                 | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                      |
 | `Modal` (compound)                        | component  | `Modal.Root/Trigger/Content/Header/Body/Footer/Close` on Radix Dialog; `size`, `closeOnOutsideClick`, `closeOnEscape`                       |
@@ -128,6 +130,101 @@ See **[docs/forms.md](docs/forms.md)** for the full guide: when to use which lay
 the field anatomy + a11y contract, the `size`/`width` token scales (with the XdY
 recipe), contracts-first validation, the RHF boundary, rich-text/JSON handling,
 and conditional fields.
+
+## File uploads
+
+`FileDropzone` is a controlled primitive for drag-and-drop or click-to-browse
+file selection. `FileField` is the standard `FormField`-shim wrapper that adds a
+label, hint, and error message. The form value is `File[]` — consumers own the
+upload step.
+
+### Standalone (with your own `useForm`)
+
+```tsx
+import { FileField } from '@rpg/ui'
+
+function AvatarUpload() {
+  const [files, setFiles] = useState<File[]>([])
+  return (
+    <FileField
+      id="avatar"
+      label="Campaign banner"
+      hint="JPEG, PNG, WebP or GIF. Max 5 MB."
+      value={files}
+      onChange={setFiles}
+    />
+  )
+}
+```
+
+### Inside the schema-driven `<Form>`
+
+Add `type: 'file'` to the `fields` array. The form value for the field will be
+`File[]`:
+
+```tsx
+import { Form } from '@rpg/ui/form'
+import { z } from 'zod'
+
+const fileValidator = z.custom<File>((v) => v instanceof File, 'Must be a file')
+
+const schema = z.object({
+  name: z.string().min(1),
+  banner: fileValidator.array().min(1, 'A banner image is required'),
+})
+
+<Form
+  schema={schema}
+  fields={[
+    { type: 'text', name: 'name', label: 'Campaign name', required: true },
+    {
+      type: 'file',
+      name: 'banner',
+      label: 'Banner image',
+      hint: 'JPEG, PNG, WebP or GIF. Max 5 MB.',
+      required: true,
+      accept: ['image/*'],
+      maxSize: 5_242_880,
+    },
+  ]}
+  onSubmit={async (values) => {
+    // values.banner is File[] — call POST /api/uploads to persist
+    const formData = new FormData()
+    formData.append('file', values.banner[0])
+    const res = await fetch('/api/uploads', {
+      method: 'POST',
+      body: formData,
+      headers: { 'x-csrf-token': csrfToken },
+    })
+    const { key } = await res.json()
+    await saveCampaign({ ...values, imageKey: key })
+  }}
+/>
+```
+
+### `FileDropzone` props
+
+| Prop       | Type                      | Default       | Description                                |
+| ---------- | ------------------------- | ------------- | ------------------------------------------ |
+| `value`    | `File[]`                  | `[]`          | Current file list (controlled)             |
+| `onChange` | `(files: File[]) => void` | —             | Called when files are added or removed     |
+| `accept`   | `string[]`                | `['image/*']` | MIME types or extensions (e.g. `['.pdf']`) |
+| `multiple` | `boolean`                 | `false`       | Allow multiple files                       |
+| `maxFiles` | `number`                  | —             | Cap on number of files (when `multiple`)   |
+| `maxSize`  | `number`                  | —             | Max bytes per file                         |
+| `disabled` | `boolean`                 | `false`       | Disables all interaction                   |
+
+### Rendering stored images
+
+Use `getAssetUrl` from `@rpg/contracts` to resolve a stored key to a URL. Never
+store the full URL — store the key and resolve at render time:
+
+```tsx
+import { getAssetUrl } from '@rpg/contracts'
+;<img src={getAssetUrl(campaign.imageKey)} alt={campaign.name} />
+```
+
+CDN upgrade: set `STORAGE_BASE_URL=https://cdn.example.com` — zero code changes.
 
 ## Adding a new shadcn primitive
 

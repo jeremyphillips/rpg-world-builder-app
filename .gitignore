@@ -11,6 +11,9 @@ out/
 storybook-static/
 *.tsbuildinfo
 
+# Uploaded files
+apps/api/uploads/
+
 # Turbo
 .turbo/
 

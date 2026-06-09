@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useController, type ControllerRenderProps } from 'react-hook-form'
 
 import { CheckboxField } from '../components/ui/checkbox-field'
+import { FileField } from '../components/ui/file-field.client'
 import { JsonField } from '../components/ui/json-field.client'
 import { NumberField } from '../components/ui/number-field'
 import { RadioGroupField } from '../components/ui/radio-group-field'
@@ -192,6 +193,24 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       value={field.value ?? ''}
       onChange={field.onChange}
       onBlur={field.onBlur}
+    />
+  ),
+  file: ({ config, field, id, error }) => (
+    <FileField
+      id={id}
+      label={config.label}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      accept={config.accept}
+      multiple={config.multiple}
+      maxFiles={config.maxFiles}
+      maxSize={config.maxSize}
+      disabled={config.disabled}
+      value={field.value ?? []}
+      onChange={field.onChange}
     />
   ),
 }
