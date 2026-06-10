@@ -1,40 +1,33 @@
-import { useState } from 'react'
 import type { z } from 'zod'
-import { Form } from '@rpg/ui/form'
-import { SubmitButton } from '@rpg/ui'
-import { getAssetUrl, type UpdateProfileInput } from '@rpg/contracts'
+import { Form, FormSaveFooter } from '@rpg/ui/form'
+import type { UpdateProfileInput } from '@rpg/contracts'
 
 import { useSession } from '@/features/auth'
-import { uploadFile } from '@/lib/api-client'
-import { toFormError } from '@/lib/to-form-error'
+import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { useUpdateProfile } from '../hooks/use-update-profile'
 import { accountFormSchema, accountFields, type AccountFormValues } from '../lib/account-fields'
 
-const CURRENT_AVATAR_LABEL = 'Current avatar'
-
 export function ProfileSection() {
   const { data: session } = useSession()
-  const { mutateAsync, isPending, error, isSuccess } = useUpdateProfile()
-  const [submitError, setSubmitError] = useState<unknown>(null)
-  const [clearedAvatarKey, setClearedAvatarKey] = useState<string | null>(null)
+  const { mutateAsync, isPending, isSuccess } = useUpdateProfile()
 
-  async function onSubmit(values: AccountFormValues) {
-    setSubmitError(null)
-    try {
-      const input: UpdateProfileInput = {
-        displayName: values.displayName,
-        email: values.email,
-      }
-      if (values.avatar?.[0]) {
-        input.avatarKey = await uploadFile(values.avatar[0], 'Could not upload avatar.')
-      } else if (clearedAvatarKey !== null) {
-        input.avatarKey = ''
-      }
-      await mutateAsync(input)
-    } catch (err) {
-      setSubmitError(err)
+  const avatarField = useExistingImageField({
+    fieldName: 'avatar',
+    currentKey: session?.avatarKey,
+    label: 'Current avatar',
+    uploadErrorMessage: 'Could not upload avatar.',
+  })
+
+  const { onSubmit, formError } = useSubmitHandler<AccountFormValues>(async (values) => {
+    const input: UpdateProfileInput = {
+      displayName: values.displayName,
+      email: values.email,
     }
-  }
+    const avatarKey = await avatarField.resolveImageKey(values.avatar)
+    if (avatarKey !== undefined) input.avatarKey = avatarKey
+    await mutateAsync(input)
+  }, 'Could not save profile.')
 
   return (
     <section aria-labelledby="profile-heading" className="space-y-4">
@@ -51,16 +44,7 @@ export function ProfileSection() {
         key={session?.id ?? 'loading'}
         schema={accountFormSchema}
         fields={accountFields}
-        fileFieldProps={{
-          avatar: {
-            existingImageUrl:
-              session?.avatarKey && session.avatarKey !== clearedAvatarKey
-                ? getAssetUrl(session.avatarKey)
-                : undefined,
-            existingImageLabel: CURRENT_AVATAR_LABEL,
-            onClearExisting: () => setClearedAvatarKey(session?.avatarKey ?? null),
-          },
-        }}
+        fileFieldProps={avatarField.fileFieldProps}
         defaultValues={
           session
             ? ({ displayName: session.displayName, email: session.email } as Partial<
@@ -69,14 +53,14 @@ export function ProfileSection() {
             : undefined
         }
         onSubmit={onSubmit}
-        formError={toFormError(submitError ?? error, 'Could not save profile.')}
+        formError={formError}
         footer={(form) => (
-          <div className="flex items-center justify-end gap-3 pt-2">
-            {isSuccess ? <p className="text-sm text-muted-foreground">Profile saved.</p> : null}
-            <SubmitButton disabled={isPending || form.formState.isSubmitting}>
-              {isPending ? 'Saving…' : 'Save profile'}
-            </SubmitButton>
-          </div>
+          <FormSaveFooter
+            pending={isPending || form.formState.isSubmitting}
+            isSuccess={isSuccess}
+            submitLabel="Save profile"
+            successMessage="Profile saved."
+          />
         )}
       />
     </section>

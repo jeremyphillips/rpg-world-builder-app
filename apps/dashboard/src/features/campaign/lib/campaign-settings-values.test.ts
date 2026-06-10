@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { Campaign } from '@rpg/contracts'
 
-import { buildUpdateCampaignInput, mapCampaignToSettingsValues } from './campaign-settings-values'
+import {
+  buildCreateCampaignInput,
+  buildUpdateCampaignInput,
+  mapCampaignToSettingsValues,
+} from './campaign-settings-values'
 
 const campaign: Campaign = {
   id: 'c1',
@@ -56,6 +60,36 @@ describe('mapCampaignToSettingsValues', () => {
       startingLevel: 1,
       importedCharactersPolicy: 'disabled',
     })
+  })
+})
+
+describe('buildCreateCampaignInput', () => {
+  it('maps the flat wizard values to the create payload including flavor', () => {
+    const values = mapCampaignToSettingsValues(campaign)
+
+    expect(buildCreateCampaignInput(values, 'banner.webp')).toEqual({
+      name: 'Sunless Citadel',
+      description: 'A classic dungeon delve.',
+      imageKey: 'banner.webp',
+      settings: {
+        characterCreation: {
+          startingLevel: 3,
+          importedCharacters: { policy: 'approval_required' },
+        },
+      },
+      flavor: {
+        playStyle: ['dungeon_crawl'],
+        mood: ['heroic'],
+        magicLevel: 'standard_fantasy',
+        difficulty: 'dangerous',
+      },
+    })
+  })
+
+  it('omits imageKey when no banner was uploaded', () => {
+    const values = mapCampaignToSettingsValues(campaign)
+
+    expect(buildCreateCampaignInput(values)).not.toHaveProperty('imageKey')
   })
 })
 

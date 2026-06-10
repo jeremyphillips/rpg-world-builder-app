@@ -3,11 +3,15 @@
 
 export { Form, type FormProps } from './form.client'
 export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
+export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
+export { WizardStepForm, type WizardStepFormProps } from './wizard-step-form.client'
 
 export {
   flattenFields,
   fieldDefaultValue,
   buildDefaultValues,
+  isContainer,
+  toOptions,
   type FieldType,
   type FieldOption,
   type FieldVisibility,

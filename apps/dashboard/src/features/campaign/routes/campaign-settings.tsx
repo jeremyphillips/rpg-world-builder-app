@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getAssetUrl } from '@rpg/contracts'
-import { TabbedForm, type TabbedFormTab } from '@rpg/ui/form'
-import { SubmitButton } from '@rpg/ui'
+import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
-import { uploadFile } from '@/lib/api-client'
-import { toFormError } from '@/lib/to-form-error'
+import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { identityFields, rulesFields, flavorFields } from '../lib/campaign-fields'
 import {
   campaignSettingsSchema,
@@ -16,8 +13,6 @@ import {
 import { useCampaigns } from '../hooks/use-campaigns'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 import { useUpdateCampaign } from '../hooks/use-update-campaign'
-
-const CURRENT_BANNER_LABEL = 'Current campaign image'
 
 const tabs: TabbedFormTab[] = [
   { id: 'identity', label: 'Identity', fields: identityFields },
@@ -32,24 +27,19 @@ export function CampaignSettings() {
 
   usePersistViewedCampaign(campaignId)
 
-  const { mutateAsync, isPending, error, isSuccess } = useUpdateCampaign(campaignId ?? '')
-  const [submitError, setSubmitError] = useState<unknown>(null)
-  const [clearedBannerKey, setClearedBannerKey] = useState<string | null>(null)
+  const { mutateAsync, isPending, isSuccess } = useUpdateCampaign(campaignId ?? '')
 
-  async function onSubmit(values: CampaignSettingsValues) {
-    setSubmitError(null)
-    try {
-      let imageKey: string | undefined
-      if (values.banner?.[0]) {
-        imageKey = await uploadFile(values.banner[0], 'Could not upload campaign image.')
-      } else if (clearedBannerKey !== null) {
-        imageKey = ''
-      }
-      await mutateAsync(buildUpdateCampaignInput(values, imageKey))
-    } catch (err) {
-      setSubmitError(err)
-    }
-  }
+  const bannerField = useExistingImageField({
+    fieldName: 'banner',
+    currentKey: campaign?.identity.imageKey,
+    label: 'Current campaign image',
+    uploadErrorMessage: 'Could not upload campaign image.',
+  })
+
+  const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values) => {
+    const imageKey = await bannerField.resolveImageKey(values.banner)
+    await mutateAsync(buildUpdateCampaignInput(values, imageKey))
+  }, 'Could not save campaign.')
 
   if (isLoadingCampaigns) {
     return (
@@ -80,25 +70,16 @@ export function CampaignSettings() {
         schema={campaignSettingsSchema}
         tabs={tabs}
         defaultValues={mapCampaignToSettingsValues(campaign)}
-        fileFieldProps={{
-          banner: {
-            existingImageUrl:
-              campaign.identity.imageKey && campaign.identity.imageKey !== clearedBannerKey
-                ? getAssetUrl(campaign.identity.imageKey)
-                : undefined,
-            existingImageLabel: CURRENT_BANNER_LABEL,
-            onClearExisting: () => setClearedBannerKey(campaign.identity.imageKey ?? null),
-          },
-        }}
+        fileFieldProps={bannerField.fileFieldProps}
         onSubmit={onSubmit}
-        formError={toFormError(submitError ?? error, 'Could not save campaign.')}
+        formError={formError}
         footer={(form) => (
-          <div className="flex items-center justify-end gap-3 pt-2">
-            {isSuccess ? <p className="text-sm text-muted-foreground">Changes saved.</p> : null}
-            <SubmitButton disabled={isPending || form.formState.isSubmitting}>
-              {isPending ? 'Saving…' : 'Save changes'}
-            </SubmitButton>
-          </div>
+          <FormSaveFooter
+            pending={isPending || form.formState.isSubmitting}
+            isSuccess={isSuccess}
+            submitLabel="Save changes"
+            successMessage="Changes saved."
+          />
         )}
       />
     </div>

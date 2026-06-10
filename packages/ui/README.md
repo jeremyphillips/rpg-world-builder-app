@@ -265,11 +265,17 @@ index.ts            # barrel re-export
 own `<Form>` (with its own Zod schema); the wizard accumulates values across
 steps and delivers all of them to `onComplete` when the last step is submitted.
 
-### Per-step `<Form>` pattern
+### Per-step `WizardStepForm` pattern
+
+Schema-driven steps should use `WizardStepForm` (`@rpg/ui/form`), which wires
+the standard step skeleton — `mode="onChange"`, submit via `completeStep`, and a
+`WizardFooter` — and seeds its defaults from the wizard's accumulated values so
+navigating Back restores what was entered. Keep step values **flat** (map to
+nested API shapes at `onComplete` time), otherwise they can't be seeded back.
 
 ```tsx
 import { Wizard, WizardFooter, useWizard, type WizardStepDef } from '@rpg/ui'
-import { Form } from '@rpg/ui/form'
+import { WizardStepForm } from '@rpg/ui/form'
 import { z } from 'zod'
 
 const STEPS: WizardStepDef[] = [
@@ -278,21 +284,7 @@ const STEPS: WizardStepDef[] = [
 ]
 
 const infoSchema = z.object({ name: z.string().min(1) })
-
-function InfoStep() {
-  const { completeStep } = useWizard()
-  return (
-    <Form
-      schema={infoSchema}
-      fields={[{ type: 'text', name: 'name', label: 'Name', required: true }]}
-      mode="onChange" // enables reactive isValid for Next button
-      onSubmit={(values) => completeStep(values)}
-      footer={(form) => (
-        <WizardFooter isValid={form.formState.isValid} isSubmitting={form.formState.isSubmitting} />
-      )}
-    />
-  )
-}
+const infoFields = [{ type: 'text', name: 'name', label: 'Name', required: true }]
 
 function ReviewStep() {
   const { accumulatedValues, complete } = useWizard()
@@ -318,7 +310,7 @@ function MyWizard() {
       }}
       hint="You can change these settings later."
     >
-      <InfoStep />
+      <WizardStepForm schema={infoSchema} fields={infoFields} />
       <ReviewStep />
     </Wizard>
   )
@@ -327,15 +319,17 @@ function MyWizard() {
 
 ### API summary
 
-| Export            | Role                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| `<Wizard>`        | Root container. Owns step index + accumulated values. Renders only the active step      |
-| `useWizard()`     | Hook for step components. Returns `completeStep`, `retreat`, `complete`, etc.           |
-| `<WizardFooter>`  | Back / Next / Submit buttons. Reads `isCompleting` from context automatically           |
-| `<WizardStepNav>` | Progress bar rendered inside `<Wizard>` automatically; also exported for custom layouts |
+| Export                              | Role                                                                                     |
+| ----------------------------------- | ---------------------------------------------------------------------------------------- |
+| `<Wizard>`                          | Root container. Owns step index + accumulated values. Renders only the active step       |
+| `useWizard()`                       | Hook for step components. Returns `completeStep`, `retreat`, `complete`, etc.            |
+| `<WizardFooter>`                    | Back / Next / Submit buttons. Reads `isCompleting` from context automatically            |
+| `<WizardStepNav>`                   | Progress bar rendered inside `<Wizard>` automatically; also exported for custom layouts  |
+| `<WizardStepForm>` (`@rpg/ui/form`) | A schema-driven step: `<Form mode="onChange">` + `WizardFooter` + Back-restore via seeds |
 
-Pass `mode="onChange"` to each step's `<Form>` so `formState.isValid` updates
-reactively and the Next button can be disabled until required fields are filled.
+Hand-rolled steps (custom controls, read-only review) keep using `useWizard()`
+directly; pass `mode="onChange"` to a hand-wired step `<Form>` so
+`formState.isValid` updates reactively and can disable the Next button.
 
 ## Running Storybook
 

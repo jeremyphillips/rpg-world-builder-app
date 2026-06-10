@@ -25,6 +25,18 @@ export interface FieldOption {
 }
 
 /**
+ * Builds `FieldOption[]` from a value list (typically a contract enum constant)
+ * and a label map. Keying the labels by the value union makes a missing or
+ * stale label a type error when the contract enum changes.
+ */
+export function toOptions<T extends string>(
+  values: readonly T[],
+  labels: Record<T, string>,
+): FieldOption[] {
+  return values.map((value) => ({ value, label: labels[value] }))
+}
+
+/**
  * Conditional-visibility contract. `dependsOn` lists the field names the
  * predicate reads so the renderer can subscribe to *only* those values
  * (`useWatch`) instead of re-rendering the whole form. A field is required only
@@ -198,7 +210,8 @@ export interface GroupConfig {
 /** Any item allowed at the top level of a form's `fields` array. */
 export type FormItem = FieldConfig | RowConfig | GroupConfig
 
-function isContainer(item: FormItem): item is RowConfig | GroupConfig {
+/** Narrows a `FormItem` to a container (row/group) vs. a leaf field. */
+export function isContainer(item: FormItem): item is RowConfig | GroupConfig {
   return 'kind' in item
 }
 

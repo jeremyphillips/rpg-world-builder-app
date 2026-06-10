@@ -1,13 +1,26 @@
 import { useState } from 'react'
-import { getErrorMessage, type CreateCampaignInput } from '@rpg/contracts'
+import { getErrorMessage } from '@rpg/contracts'
 import { Wizard, type WizardStepDef } from '@rpg/ui'
+import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
-import { IdentityStep } from '../components/steps/identity-step'
-import { RulesStep } from '../components/steps/rules-step'
-import { FlavorStep } from '../components/steps/flavor-step'
+import {
+  identitySchema,
+  identityFields,
+  rulesSchema,
+  rulesFields,
+  flavorSchema,
+  flavorFields,
+  type IdentityValues,
+  type RulesValues,
+  type FlavorValues,
+} from '../lib/campaign-fields'
+import {
+  buildCreateCampaignInput,
+  type CampaignSettingsValues,
+} from '../lib/campaign-settings-values'
 import { ReviewStep } from '../components/steps/review-step'
 
 const STEPS: WizardStepDef[] = [
@@ -17,13 +30,6 @@ const STEPS: WizardStepDef[] = [
   { id: 'review', label: 'Review' },
 ]
 
-interface WizardValues {
-  name?: string
-  description?: string
-  banner?: File[]
-  settings?: CreateCampaignInput['settings']
-}
-
 export function CampaignCreate() {
   const { mutateAsync } = useCreateCampaign()
   const selectCampaign = useSelectCampaign()
@@ -31,20 +37,15 @@ export function CampaignCreate() {
 
   const onComplete = async (values: Record<string, unknown>) => {
     setCreateError(null)
-    const { name, description, banner, settings } = values as WizardValues
+    const settingsValues = values as CampaignSettingsValues
 
     try {
       let imageKey: string | undefined
-      if (banner?.[0]) {
-        imageKey = await uploadFile(banner[0], 'Could not upload campaign image.')
+      if (settingsValues.banner?.[0]) {
+        imageKey = await uploadFile(settingsValues.banner[0], 'Could not upload campaign image.')
       }
 
-      const campaign = await mutateAsync({
-        name: name ?? '',
-        description,
-        imageKey,
-        settings,
-      })
+      const campaign = await mutateAsync(buildCreateCampaignInput(settingsValues, imageKey))
 
       selectCampaign(campaign.id)
     } catch (err) {
@@ -60,9 +61,9 @@ export function CampaignCreate() {
         onComplete={onComplete}
         hint="You can change these settings later from Campaign Settings."
       >
-        <IdentityStep />
-        <RulesStep />
-        <FlavorStep />
+        <WizardStepForm<IdentityValues> schema={identitySchema} fields={identityFields} />
+        <WizardStepForm<RulesValues> schema={rulesSchema} fields={rulesFields} />
+        <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
         <ReviewStep error={createError} />
       </Wizard>
     </div>

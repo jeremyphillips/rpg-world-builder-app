@@ -24,6 +24,17 @@ export const importedCharactersPolicySchema = z.enum(IMPORTED_CHARACTERS_POLICIE
 
 export type ImportedCharactersPolicy = z.infer<typeof importedCharactersPolicySchema>
 
+export const campaignSettingsSchema = z.object({
+  characterCreation: z.object({
+    startingLevel: z.number().int().min(1).max(25),
+    importedCharacters: z.object({
+      policy: importedCharactersPolicySchema,
+    }),
+  }),
+})
+
+export type CampaignSettings = z.infer<typeof campaignSettingsSchema>
+
 export const PLAY_STYLES = [
   'dungeon_crawl',
   'urban_adventure',
@@ -73,16 +84,7 @@ export const campaignFlavorSchema = z.object({
 export type CampaignFlavor = z.infer<typeof campaignFlavorSchema>
 
 export const campaignConfigurationSchema = z.object({
-  settings: z
-    .object({
-      characterCreation: z.object({
-        startingLevel: z.number().int().min(1).max(25),
-        importedCharacters: z.object({
-          policy: importedCharactersPolicySchema,
-        }),
-      }),
-    })
-    .optional(),
+  settings: campaignSettingsSchema.optional(),
   flavor: campaignFlavorSchema.optional(),
 })
 
@@ -144,20 +146,9 @@ export type Campaign = z.infer<typeof campaignSchema>
  * configuration. All fields except `name` are optional — the server applies
  * defaults for any omitted configuration.
  */
-export const createCampaignInputSchema = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
-  imageKey: z.string().optional(),
-  settings: z
-    .object({
-      characterCreation: z.object({
-        startingLevel: z.number().int().min(1).max(25),
-        importedCharacters: z.object({
-          policy: importedCharactersPolicySchema,
-        }),
-      }),
-    })
-    .optional(),
+export const createCampaignInputSchema = campaignIdentitySchema.extend({
+  settings: campaignSettingsSchema.optional(),
+  flavor: campaignFlavorSchema.optional(),
 })
 
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
@@ -171,22 +162,7 @@ export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
  * with the existing campaign document. `imageKey` is set server-side after an
  * upload completes, so clients send the key returned by the upload service.
  */
-export const updateCampaignInputSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  description: z.string().max(500).optional(),
-  imageKey: z.string().optional(),
-  settings: z
-    .object({
-      characterCreation: z.object({
-        startingLevel: z.number().int().min(1).max(25),
-        importedCharacters: z.object({
-          policy: importedCharactersPolicySchema,
-        }),
-      }),
-    })
-    .optional(),
-  flavor: campaignFlavorSchema.optional(),
-})
+export const updateCampaignInputSchema = createCampaignInputSchema.partial({ name: true })
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 

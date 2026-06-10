@@ -49,6 +49,7 @@ export async function createCampaign(
     },
     configuration: {
       settings: input.settings ?? DEFAULT_SETTINGS,
+      ...(input.flavor !== undefined && { flavor: input.flavor }),
     },
     createdBy: input.createdBy,
   })

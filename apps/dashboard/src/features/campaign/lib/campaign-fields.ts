@@ -1,6 +1,14 @@
 import { z } from 'zod'
 import { PLAY_STYLES, MOODS, MAGIC_LEVELS, DIFFICULTIES } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import { toOptions, type FormItem } from '@rpg/ui/form'
+
+import {
+  PLAY_STYLE_LABELS,
+  MOOD_LABELS,
+  MAGIC_LEVEL_LABELS,
+  DIFFICULTY_LABELS,
+  IMPORTED_CHARACTERS_POLICY_LABELS,
+} from './labels'
 
 // ---------------------------------------------------------------------------
 // Identity
@@ -76,10 +84,10 @@ export const rulesFields: FormItem[] = [
             label: 'Allow imported characters?',
             required: true,
             width: '1/2',
-            options: [
-              { value: 'approval_required', label: 'Yes, with DM approval' },
-              { value: 'disabled', label: 'No, players must roll new characters' },
-            ],
+            options: toOptions(
+              ['approval_required', 'disabled'],
+              IMPORTED_CHARACTERS_POLICY_LABELS,
+            ),
           },
         ],
       },
@@ -113,17 +121,7 @@ export const flavorFields: FormItem[] = [
     label: 'Play Style',
     multiple: true,
     hint: 'Pick as many as apply.',
-    options: [
-      { value: 'dungeon_crawl', label: 'Dungeon Crawl' },
-      { value: 'urban_adventure', label: 'Urban Adventure' },
-      { value: 'political_intrigue', label: 'Political Intrigue' },
-      { value: 'exploration', label: 'Exploration' },
-      { value: 'survival', label: 'Survival' },
-      { value: 'mystery', label: 'Mystery' },
-      { value: 'sandbox', label: 'Sandbox' },
-      { value: 'tactical_combat', label: 'Tactical Combat' },
-      { value: 'roleplay_driven', label: 'Roleplay-Driven' },
-    ],
+    options: toOptions(PLAY_STYLES, PLAY_STYLE_LABELS),
   },
   {
     type: 'chips',
@@ -131,37 +129,20 @@ export const flavorFields: FormItem[] = [
     label: 'Mood',
     multiple: true,
     hint: 'Pick as many as apply.',
-    options: [
-      { value: 'heroic', label: 'Heroic' },
-      { value: 'dark_fantasy', label: 'Dark Fantasy' },
-      { value: 'gritty', label: 'Gritty' },
-      { value: 'horror', label: 'Horror' },
-      { value: 'humorous', label: 'Humorous' },
-      { value: 'weird', label: 'Weird' },
-      { value: 'epic', label: 'Epic' },
-      { value: 'hopeful', label: 'Hopeful' },
-    ],
+    options: toOptions(MOODS, MOOD_LABELS),
   },
   {
     type: 'chips',
     name: 'magicLevel',
     label: 'Magic Level',
     multiple: false,
-    options: [
-      { value: 'low_magic', label: 'Low Magic' },
-      { value: 'standard_fantasy', label: 'Standard Fantasy' },
-      { value: 'high_magic', label: 'High Magic' },
-    ],
+    options: toOptions(MAGIC_LEVELS, MAGIC_LEVEL_LABELS),
   },
   {
     type: 'chips',
     name: 'difficulty',
     label: 'Difficulty',
     multiple: false,
-    options: [
-      { value: 'casual', label: 'Casual' },
-      { value: 'dangerous', label: 'Dangerous' },
-      { value: 'brutal', label: 'Brutal' },
-    ],
+    options: toOptions(DIFFICULTIES, DIFFICULTY_LABELS),
   },
 ]
