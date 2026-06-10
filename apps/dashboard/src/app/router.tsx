@@ -9,6 +9,7 @@ import {
   CampaignSettings,
 } from '@/features/campaign'
 import { AppShell } from '@/components/layout/app-shell'
+import { ConcentrationShell } from '@/components/layout/concentration-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
 import { Characters } from '@/routes/characters'
 import { Profile } from '@/routes/profile'
@@ -31,12 +32,14 @@ export function AppRouter() {
             <Route path="characters" element={<Characters />} />
             <Route path="profile" element={<Profile />} />
             <Route path="account" element={<AccountSettings />} />
-            <Route path="campaigns/new" element={<CampaignCreate />} />
             <Route path="campaigns/:campaignId" element={<CampaignDetail />} />
             <Route path="campaigns/:campaignId/sessions" element={<CampaignSessions />} />
             <Route path="campaigns/:campaignId/settings" element={<CampaignSettings />} />
             <Route path="admin/users" element={<AdminUsers />} />
             <Route path="admin/settings" element={<AdminSettings />} />
+          </Route>
+          <Route element={<ConcentrationShell />}>
+            <Route path="campaigns/new" element={<CampaignCreate />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
