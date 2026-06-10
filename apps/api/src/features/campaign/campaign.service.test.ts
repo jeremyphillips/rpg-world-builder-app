@@ -26,6 +26,44 @@ async function makeUser(email: string) {
   return createUser({ email, passwordHash: 'x', displayName: email })
 }
 
+describe('createCampaign', () => {
+  it('persists the initial settings and flavor', async () => {
+    const owner = await makeUser('owner@example.com')
+
+    const campaign = await createCampaign({
+      name: 'Flavored',
+      createdBy: owner.id,
+      settings: {
+        characterCreation: {
+          startingLevel: 3,
+          importedCharacters: { policy: 'approval_required' },
+        },
+      },
+      flavor: {
+        playStyle: ['mystery', 'sandbox'],
+        mood: ['gritty'],
+        magicLevel: 'low_magic',
+        difficulty: 'dangerous',
+      },
+    })
+
+    expect(campaign.configuration).toMatchObject({
+      settings: {
+        characterCreation: {
+          startingLevel: 3,
+          importedCharacters: { policy: 'approval_required' },
+        },
+      },
+      flavor: {
+        playStyle: ['mystery', 'sandbox'],
+        mood: ['gritty'],
+        magicLevel: 'low_magic',
+        difficulty: 'dangerous',
+      },
+    })
+  })
+})
+
 describe('listCampaignsForUser', () => {
   it('returns every campaign the user owns or belongs to, sorted by name', async () => {
     const owner = await makeUser('owner@example.com')

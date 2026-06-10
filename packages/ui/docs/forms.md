@@ -12,8 +12,8 @@ The form system is two layers, and which one you reach for depends on the form:
    for you. Import it from the `@rpg/ui/form` subpath.
 
 ```text
-@rpg/ui            → Field.* , TextField … , FieldGroup , FieldRow , Tabs , ChipsField   (RHF-agnostic)
-@rpg/ui/form       → <Form> , <TabbedForm> , FieldConfig types                            (RHF-aware)
+@rpg/ui            → Field.* , TextField … , FieldGroup , FieldRow , Tabs , ChipsField        (RHF-agnostic)
+@rpg/ui/form       → <Form> , <TabbedForm> , <WizardStepForm> , <FormSaveFooter> , FieldConfig (RHF-aware)
 ```
 
 ## When to use which layer
@@ -22,6 +22,7 @@ The form system is two layers, and which one you reach for depends on the form:
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<Form>` (`@rpg/ui/form`)           | A standard, config-shaped form: a list of labelled fields, optional groups/rows, conditional visibility, Zod validation. This is the default — prefer it. |
 | `<TabbedForm>` (`@rpg/ui/form`)     | A settings-style form where fields are grouped into tabs and a single global Save button validates all tabs together. All tab panels stay mounted.        |
+| `<WizardStepForm>` (`@rpg/ui/form`) | A schema-driven step inside a `<Wizard>`. Wires `mode="onChange"`, `completeStep`, a `WizardFooter`, and Back-restore from accumulated values.            |
 | Field wrappers + your own `useForm` | The form is mostly standard but needs a hand-placed custom control, bespoke submit logic, or a layout the config can't express.                           |
 | Compound `Field.*`                  | A truly one-off layout (a control embedded in prose, a non-standard arrangement) where you want the a11y wiring but not the prop/config shape.            |
 
@@ -146,6 +147,86 @@ import { CreateCampaignInput } from '@rpg/contracts'
 The renderer mounts `<form noValidate>` and lets RHF + Zod own validation, so
 messages stay consistent with the server. (Storybook templates use an inline
 schema only because they have no real contract to import.)
+
+For option lists (`select`/`radio`/`chips`) whose values are contract enums, use
+`toOptions` with a label map keyed by the contract type, so a new enum member
+without a label is a type error:
+
+```ts
+import { toOptions } from '@rpg/ui/form'
+import { PLAY_STYLES, type PlayStyle } from '@rpg/contracts'
+
+const PLAY_STYLE_LABELS: Record<PlayStyle, string> = { dungeon_crawl: 'Dungeon Crawl', ... }
+
+{ type: 'chips', name: 'playStyle', label: 'Play Style',
+  options: toOptions(PLAY_STYLES, PLAY_STYLE_LABELS) }
+```
+
+## Submit & server errors
+
+`onSubmit` receives the validated values **and the form instance**:
+
+- **Form-level errors** (network failure, generic API error): surface them
+  through the `formError` prop — rendered as a `role="alert"` paragraph above the
+  fields.
+- **Field-level server errors** (e.g. "name already taken"): call
+  `form.setError('name', { message: '…' })` from `onSubmit`'s second argument so
+  the message lands on the field through the standard error/aria path.
+
+```tsx
+<Form
+  schema={schema}
+  fields={fields}
+  formError={formError}
+  onSubmit={async (values, form) => {
+    try {
+      await save(values)
+    } catch (err) {
+      if (isFieldError(err)) form.setError(err.field, { message: err.message })
+      else throw err // let the caller's wrapper map it to formError
+    }
+  }}
+/>
+```
+
+## `FormSaveFooter`
+
+The standard actions row for save-style forms (settings, profile): an optional
+success confirmation (`role="status"`) plus a pending-aware `SubmitButton`. Use
+it in the `footer` render prop instead of hand-wiring the same row per form:
+
+```tsx
+footer={(form) => (
+  <FormSaveFooter
+    pending={mutation.isPending || form.formState.isSubmitting}
+    isSuccess={mutation.isSuccess}
+    submitLabel="Save changes"
+    successMessage="Changes saved."
+  />
+)}
+```
+
+## Wizard steps
+
+Schema-driven wizard steps use `<WizardStepForm>` rather than composing `<Form>`
+by hand. It owns the step skeleton (`mode="onChange"` so validity drives the
+Next button, submit via `completeStep`, a `WizardFooter`) and seeds its
+`defaultValues` from the wizard's accumulated values, so navigating Back
+restores what was entered.
+
+```tsx
+<Wizard steps={STEPS} onComplete={onComplete}>
+  <WizardStepForm schema={identitySchema} fields={identityFields} />
+  <WizardStepForm schema={rulesSchema} fields={rulesFields} />
+  <ReviewStep />
+</Wizard>
+```
+
+Keep step values **flat** — map them to nested API payload shapes in
+`onComplete`, not in the steps — otherwise Back-restore can't seed them. A
+read-only review step stays hand-rolled: a plain `<form>` whose submit calls
+`useWizard().complete()`. See the [Wizard pattern](../README.md#wizard-pattern)
+section of the package README for the full picture.
 
 ## The RHF boundary
 

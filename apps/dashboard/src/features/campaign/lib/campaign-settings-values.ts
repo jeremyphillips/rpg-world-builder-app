@@ -1,5 +1,5 @@
 import type { z } from 'zod'
-import type { Campaign, UpdateCampaignInput } from '@rpg/contracts'
+import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '@rpg/contracts'
 
 import { identitySchema, rulesSchema, flavorSchema } from './campaign-fields'
 
@@ -29,11 +29,11 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSetting
   }
 }
 
-/** Builds the API patch payload from validated form values. */
-export function buildUpdateCampaignInput(
+/** Builds the create payload from the flat values accumulated by the wizard. */
+export function buildCreateCampaignInput(
   values: CampaignSettingsValues,
   imageKey?: string,
-): UpdateCampaignInput {
+): CreateCampaignInput {
   return {
     name: values.name,
     description: values.description,
@@ -51,4 +51,12 @@ export function buildUpdateCampaignInput(
       difficulty: values.difficulty,
     },
   }
+}
+
+/** Builds the API patch payload from validated form values (same flat shape as create). */
+export function buildUpdateCampaignInput(
+  values: CampaignSettingsValues,
+  imageKey?: string,
+): UpdateCampaignInput {
+  return buildCreateCampaignInput(values, imageKey)
 }
