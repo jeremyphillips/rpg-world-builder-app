@@ -3,6 +3,7 @@ import { buttonVariants } from '@rpg/ui'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
@@ -70,16 +71,11 @@ function ClassDetailContent({
   classId,
   subclasses,
 }: ClassDetailContentProps) {
+  useSetBreadcrumbLabel(characterClass.name)
   const editHref = ROUTES.content.classes.edit(campaignId, classId)
-  const backHref = ROUTES.content.classes.overview(campaignId)
 
   return (
     <div className="space-y-6">
-      <nav aria-label="Breadcrumb">
-        <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-          ← Classes
-        </Link>
-      </nav>
       <ContentDetailLayout
         imageUrl={getContentImageUrl(characterClass.imageKey)}
         imageName={characterClass.name}
