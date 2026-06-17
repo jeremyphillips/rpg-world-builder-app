@@ -8,7 +8,7 @@ import {
   CampaignSessions,
   CampaignSettings,
 } from '@/features/campaign'
-import { ClassesOverview } from '@/features/content'
+import { ClassesOverview, ClassDetail } from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
@@ -37,6 +37,7 @@ export function AppRouter() {
             <Route path="campaigns/:campaignId/sessions" element={<CampaignSessions />} />
             <Route path="campaigns/:campaignId/settings" element={<CampaignSettings />} />
             <Route path="campaigns/:campaignId/classes" element={<ClassesOverview />} />
+            <Route path="campaigns/:campaignId/classes/:classId" element={<ClassDetail />} />
             <Route path="admin/users" element={<AdminUsers />} />
             <Route path="admin/settings" element={<AdminSettings />} />
           </Route>

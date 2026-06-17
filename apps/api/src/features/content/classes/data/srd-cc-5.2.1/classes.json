@@ -23,8 +23,13 @@
       }
     },
     "features": [
-      { "id": "rage", "name": "Rage", "level": 1 },
-      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1 }
+      { "id": "rage", "name": "Rage", "level": 1, "description": "" },
+      {
+        "id": "unarmored-defense",
+        "name": "Unarmored Defense",
+        "level": 1,
+        "description": "While you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit."
+      }
     ]
   },
   {
@@ -80,8 +85,8 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "bardic-inspiration", "name": "Bardic Inspiration", "level": 1 }
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "bardic-inspiration", "name": "Bardic Inspiration", "level": 1, "description": "" }
     ]
   },
   {
@@ -118,8 +123,8 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "channel-divinity", "name": "Channel Divinity", "level": 2 }
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "channel-divinity", "name": "Channel Divinity", "level": 2, "description": "" }
     ]
   },
   {
@@ -165,8 +170,8 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "wild-shape", "name": "Wild Shape", "level": 2 }
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "wild-shape", "name": "Wild Shape", "level": 2, "description": "" }
     ]
   },
   {
@@ -203,9 +208,9 @@
       }
     },
     "features": [
-      { "id": "fighting-style", "name": "Fighting Style", "level": 1 },
-      { "id": "second-wind", "name": "Second Wind", "level": 1 },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+      { "id": "fighting-style", "name": "Fighting Style", "level": 1, "description": "" },
+      { "id": "second-wind", "name": "Second Wind", "level": 1, "description": "" },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
     ]
   },
   {
@@ -232,9 +237,9 @@
       }
     },
     "features": [
-      { "id": "martial-arts", "name": "Martial Arts", "level": 1 },
-      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1 },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+      { "id": "martial-arts", "name": "Martial Arts", "level": 1, "description": "" },
+      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1, "description": "" },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
     ]
   },
   {
@@ -266,9 +271,9 @@
       }
     },
     "features": [
-      { "id": "lay-on-hands", "name": "Lay On Hands", "level": 1 },
-      { "id": "spellcasting", "name": "Spellcasting", "level": 2 },
-      { "id": "divine-smite", "name": "Divine Smite", "level": 2 }
+      { "id": "lay-on-hands", "name": "Lay On Hands", "level": 1, "description": "" },
+      { "id": "spellcasting", "name": "Spellcasting", "level": 2, "description": "" },
+      { "id": "divine-smite", "name": "Divine Smite", "level": 2, "description": "" }
     ]
   },
   {
@@ -309,9 +314,9 @@
       }
     },
     "features": [
-      { "id": "favored-enemy", "name": "Favored Enemy", "level": 1 },
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+      { "id": "favored-enemy", "name": "Favored Enemy", "level": 1, "description": "" },
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
     ]
   },
   {
@@ -350,9 +355,9 @@
       }
     },
     "features": [
-      { "id": "expertise", "name": "Expertise", "level": 1 },
-      { "id": "sneak-attack", "name": "Sneak Attack", "level": 1 },
-      { "id": "thieves-cant", "name": "Thieves' Cant", "level": 1 }
+      { "id": "expertise", "name": "Expertise", "level": 1, "description": "" },
+      { "id": "sneak-attack", "name": "Sneak Attack", "level": 1, "description": "" },
+      { "id": "thieves-cant", "name": "Thieves' Cant", "level": 1, "description": "" }
     ]
   },
   {
@@ -389,8 +394,8 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "font-of-magic", "name": "Font of Magic", "level": 2 }
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "font-of-magic", "name": "Font of Magic", "level": 2, "description": "" }
     ]
   },
   {
@@ -435,8 +440,13 @@
       }
     },
     "features": [
-      { "id": "pact-magic", "name": "Pact Magic", "level": 1 },
-      { "id": "eldritch-invocations", "name": "Eldritch Invocations", "level": 1 }
+      { "id": "pact-magic", "name": "Pact Magic", "level": 1, "description": "" },
+      {
+        "id": "eldritch-invocations",
+        "name": "Eldritch Invocations",
+        "level": 1,
+        "description": ""
+      }
     ]
   },
   {
@@ -473,8 +483,8 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
-      { "id": "arcane-recovery", "name": "Arcane Recovery", "level": 1 }
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
+      { "id": "arcane-recovery", "name": "Arcane Recovery", "level": 1, "description": "" }
     ]
   }
 ]

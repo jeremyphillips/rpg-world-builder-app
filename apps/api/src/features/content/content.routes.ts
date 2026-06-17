@@ -17,3 +17,10 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listClasses,
 )
+
+contentRouter.get(
+  '/classes/:classId/subclasses',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listSubclasses,
+)

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -31,16 +32,28 @@ const BASE_SOURCE_FILTER: FilterDef = {
   group: 'secondary',
 }
 
+export type ContentTableOptions<T> = {
+  /** When provided, the name cell renders as a link to this href. */
+  nameHref?: (row: T) => string
+}
+
 /**
  * Wraps content-specific columns with the shared image + name (prepended) and
  * source (appended) columns. Every content overview uses this to stay consistent.
  *
+ * Pass `options.nameHref` to make the name cell a navigable link.
+ *
  * @example
- * const columns = buildContentColumns<CharacterClass>([hitDieCol, spellcastingCol])
+ * const columns = buildContentColumns<CharacterClass>([hitDieCol, spellcastingCol], {
+ *   nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
+ * })
  */
 export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
+  options?: ContentTableOptions<T>,
 ): ColumnDef<T>[] {
+  const { nameHref } = options ?? {}
+
   const imageColumn: ColumnDef<T> = {
     accessorKey: 'imageKey',
     header: () => <span className="sr-only">Image</span>,
@@ -63,6 +76,16 @@ export function buildContentColumns<T extends ContentBase>(
   const nameColumn: ColumnDef<T> = {
     accessorKey: 'name',
     header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
+    cell: nameHref
+      ? ({ row }) => (
+          <Link
+            to={nameHref(row.original)}
+            className="font-medium hover:underline focus-visible:underline"
+          >
+            {row.getValue<string>('name')}
+          </Link>
+        )
+      : undefined,
   }
 
   const sourceColumn: ColumnDef<T> = {

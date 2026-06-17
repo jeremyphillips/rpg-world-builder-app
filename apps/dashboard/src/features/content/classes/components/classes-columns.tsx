@@ -2,6 +2,7 @@ import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 import { BooleanCell, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
+import { ROUTES } from '@/app/routes'
 import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
 
 const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
@@ -49,5 +50,11 @@ const CLASS_SPECIFIC_FILTERS: FilterDef[] = [
   },
 ]
 
-export const classColumns = buildContentColumns(CLASS_MIDDLE_COLUMNS)
+/** Class column definitions with the name cell linked to the class detail page. */
+export function classColumns(campaignId: string) {
+  return buildContentColumns<CharacterClass>(CLASS_MIDDLE_COLUMNS, {
+    nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
+  })
+}
+
 export const classFilters = buildContentFilters(CLASS_SPECIFIC_FILTERS)

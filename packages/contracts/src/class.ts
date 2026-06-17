@@ -116,6 +116,8 @@ export type ClassPatch = z.infer<typeof classPatchSchema>
 
 export const subclassBodySchema = contentBodyBaseSchema.extend({
   classId: z.string().min(1),
+  /** Short italic lead-in matching the SRD's em-formatted tagline (e.g. "Channel Rage into Violent Fury"). */
+  tagline: z.string().optional(),
 })
 
 export type SubclassBody = z.infer<typeof subclassBodySchema>
