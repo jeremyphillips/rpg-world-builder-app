@@ -2,7 +2,12 @@ import { z } from 'zod'
 import { abilitySchema } from './ability'
 import { hitDieSchema } from './dice'
 import { levelSchema } from './level'
-import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './content'
+import {
+  contentBodyBaseSchema,
+  contentMetaSchema,
+  contentPatchBaseSchema,
+  slugSchema,
+} from './content'
 import { weaponCategorySchema } from './weapon'
 import { armorCategorySchema } from './armor'
 import { skillSchema } from './skill'
@@ -71,9 +76,7 @@ export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 // ---------------------------------------------------------------------------
 
 /** The editable shape: what a form authors and what a patch overrides. */
-export const classBodySchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
+export const classBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   asiLevels: z.array(levelSchema),
@@ -111,10 +114,8 @@ export type ClassPatch = z.infer<typeof classPatchSchema>
 // Subclass — references its parent class by the opaque `id` (not slug)
 // ---------------------------------------------------------------------------
 
-export const subclassBodySchema = z.object({
+export const subclassBodySchema = contentBodyBaseSchema.extend({
   classId: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional(),
 })
 
 export type SubclassBody = z.infer<typeof subclassBodySchema>
