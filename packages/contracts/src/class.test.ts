@@ -1,0 +1,164 @@
+import { describe, expect, it } from 'vitest'
+import {
+  classBodySchema,
+  classPatchSchema,
+  classSchema,
+  createClassInputSchema,
+  subclassSchema,
+  updateClassInputSchema,
+} from './class'
+
+const fighterBody = {
+  name: 'Fighter',
+  description: 'A master of martial combat.',
+  primaryAbilities: ['str'],
+  hitDie: 10,
+  asiLevels: [4, 6, 8, 12, 14, 16, 19],
+  subclassLevels: [3],
+  proficiencies: {
+    savingThrows: ['str', 'con'],
+    armor: ['light', 'medium', 'heavy', 'shields'],
+    weapons: { categories: ['simple', 'martial'] },
+    skills: { choose: 2, from: ['acrobatics', 'athletics', 'history'] },
+  },
+  features: [{ id: 'second-wind', name: 'Second Wind', level: 1 }],
+} as const
+
+const timestamps = {
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+} as const
+
+const fighter = {
+  id: 'srd-cc-5.2.1:fighter',
+  slug: 'fighter',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  ...timestamps,
+  ...fighterBody,
+} as const
+
+describe('classSchema', () => {
+  it('parses a well-formed system class', () => {
+    expect(classSchema.parse(fighter)).toEqual(fighter)
+  })
+
+  it('parses a homebrew class with a campaignId', () => {
+    const homebrew = { ...fighter, source: 'homebrew', campaignId: 'camp_1' }
+    expect(classSchema.parse(homebrew)).toEqual(homebrew)
+  })
+
+  it('allows 1–3 saving throws (relaxed for homebrew) but rejects 0 or 4', () => {
+    const withSaves = (savingThrows: string[]) => ({
+      ...fighter,
+      proficiencies: { ...fighterBody.proficiencies, savingThrows },
+    })
+    expect(classSchema.safeParse(withSaves(['str'])).success).toBe(true)
+    expect(classSchema.safeParse(withSaves(['str', 'con', 'dex'])).success).toBe(true)
+    expect(classSchema.safeParse(withSaves([])).success).toBe(false)
+    expect(classSchema.safeParse(withSaves(['str', 'con', 'dex', 'wis'])).success).toBe(false)
+  })
+
+  it('requires at least one subclass level', () => {
+    expect(classSchema.safeParse({ ...fighter, subclassLevels: [] }).success).toBe(false)
+  })
+
+  it('rejects a hit die outside the class range', () => {
+    expect(classSchema.safeParse({ ...fighter, hitDie: 4 }).success).toBe(false)
+  })
+})
+
+describe('createClassInputSchema', () => {
+  it('accepts a body plus a slug', () => {
+    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'fighter' }).success).toBe(true)
+  })
+
+  it('requires a slug', () => {
+    expect(createClassInputSchema.safeParse(fighterBody).success).toBe(false)
+  })
+
+  it('rejects an invalid slug', () => {
+    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'Fighter' }).success).toBe(
+      false,
+    )
+  })
+})
+
+describe('updateClassInputSchema', () => {
+  it('allows a partial body (including empty)', () => {
+    expect(updateClassInputSchema.safeParse({}).success).toBe(true)
+    expect(updateClassInputSchema.safeParse({ hitDie: 12 }).success).toBe(true)
+  })
+
+  it('still validates provided fields', () => {
+    expect(updateClassInputSchema.safeParse({ hitDie: 4 }).success).toBe(false)
+  })
+})
+
+describe('classPatchSchema', () => {
+  it('accepts an overlay with a partial patch body', () => {
+    const patch = {
+      id: 'patch_1',
+      campaignId: 'camp_1',
+      targetId: fighter.id,
+      patch: { hitDie: 12 },
+      ...timestamps,
+    }
+    expect(classPatchSchema.safeParse(patch).success).toBe(true)
+  })
+
+  it('requires campaignId and targetId', () => {
+    expect(classPatchSchema.safeParse({ id: 'patch_1', patch: {}, ...timestamps }).success).toBe(
+      false,
+    )
+  })
+
+  it('validates fields inside the patch body', () => {
+    const patch = {
+      id: 'patch_1',
+      campaignId: 'camp_1',
+      targetId: fighter.id,
+      patch: { hitDie: 4 },
+      ...timestamps,
+    }
+    expect(classPatchSchema.safeParse(patch).success).toBe(false)
+  })
+})
+
+describe('subclassSchema', () => {
+  it('parses a subclass referencing its parent class id', () => {
+    const champion = {
+      id: 'srd-cc-5.2.1:champion',
+      slug: 'champion',
+      rulesetId: 'srd-cc-5.2.1',
+      source: 'system',
+      campaignId: null,
+      ...timestamps,
+      classId: fighter.id,
+      name: 'Champion',
+    }
+    expect(subclassSchema.parse(champion)).toEqual(champion)
+  })
+
+  it('requires a classId', () => {
+    expect(
+      subclassSchema.safeParse({
+        id: 'srd-cc-5.2.1:champion',
+        slug: 'champion',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'system',
+        campaignId: null,
+        ...timestamps,
+        name: 'Champion',
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('classBodySchema', () => {
+  it('is the editable surface (no envelope fields)', () => {
+    expect(classBodySchema.safeParse(fighterBody).success).toBe(true)
+    expect('id' in classBodySchema.shape).toBe(false)
+  })
+})
