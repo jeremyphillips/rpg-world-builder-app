@@ -18,6 +18,7 @@ export function CampaignNavSection() {
         <>
           <NavItem to={ROUTES.campaign.detail(activeCampaignId)} label="Overview" end />
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
+          <NavItem to={ROUTES.content.classes.overview(activeCampaignId)} label="Classes" />
         </>
       )}
     </NavSection>

@@ -1,3 +1,2 @@
-// fallow-ignore-file unused-file
-// content/classes — scaffold only. Export the public surface here as it's built.
-export {}
+export { ClassesOverview } from './routes/classes-overview'
+export { useClasses, classesQueryKey } from './hooks/use-classes'

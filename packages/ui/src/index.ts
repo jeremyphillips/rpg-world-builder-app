@@ -190,6 +190,7 @@ export type {
   BooleanFilterDef,
   FilterGroup,
 } from './components/ui/data-table.types'
+export type { ColumnDef } from '@tanstack/react-table'
 export {
   dataTableRootVariants,
   dataTableToolbarVariants,
