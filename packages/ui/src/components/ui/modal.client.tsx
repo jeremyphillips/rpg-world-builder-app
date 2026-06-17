@@ -90,7 +90,7 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, headline, description, children, ...props }, ref) => (
     <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      <DialogPrimitive.Title className="font-semibold leading-none tracking-tight">
+      <DialogPrimitive.Title className="font-display text-lg font-semibold leading-none tracking-tight">
         {headline}
       </DialogPrimitive.Title>
       {description ? (

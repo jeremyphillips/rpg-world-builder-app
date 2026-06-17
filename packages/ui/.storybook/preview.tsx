@@ -1,6 +1,8 @@
 import type { Decorator, Preview } from '@storybook/react-vite'
 import { withThemeByClassName } from '@storybook/addon-themes'
 
+import '@fontsource-variable/inter'
+import '@fontsource-variable/lora'
 import '../src/styles/globals.css'
 import { ThemeContext, type ThemeContextValue } from '../src/providers/theme-provider.client'
 
