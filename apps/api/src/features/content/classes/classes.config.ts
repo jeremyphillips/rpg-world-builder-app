@@ -1,28 +1,15 @@
-import type { CharacterClass, SystemRulesetId } from '@rpg/contracts'
+import type { CharacterClass } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { ClassPatchModel } from './class-patch.model'
-import { HomebrewClassModel } from './homebrew-class.model'
+import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
 import { loadSeedClasses, seedClassSlugs } from './seed'
 
-interface HomebrewClassRecord {
-  _id: unknown
-  slug: string
-  rulesetId: SystemRulesetId
-  campaignId: string
-  name: string
-  description?: string
-  primaryAbilities: CharacterClass['primaryAbilities']
-  hitDie: CharacterClass['hitDie']
-  asiLevels: CharacterClass['asiLevels']
-  subclassLevels: CharacterClass['subclassLevels']
-  spellcasting?: CharacterClass['spellcasting']
-  proficiencies: CharacterClass['proficiencies']
-  features: CharacterClass['features']
-  createdAt: Date
-  updatedAt: Date
-}
+// InferSchemaType gives wider primitives (string, number, string[]) for
+// enum-constrained fields; Mixed fields become any. The single `as CharacterClass`
+// cast in toHomebrewClass is safe because Zod validates data at write time.
+type HomebrewClassRecord = HomebrewClassSchemaType & { _id: unknown }
 
 interface ClassPatchRecord {
   targetId: string
@@ -47,7 +34,7 @@ function toHomebrewClass(doc: HomebrewClassRecord): CharacterClass {
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
     proficiencies: doc.proficiencies,
     features: doc.features ?? [],
-  }
+  } as CharacterClass
 }
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
