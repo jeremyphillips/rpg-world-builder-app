@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
+import { systemRulesetIdSchema } from './ruleset'
 
 // ---------------------------------------------------------------------------
 // Campaign identity
@@ -128,6 +129,12 @@ export const campaignSchema = z.object({
   configuration: campaignConfigurationSchema,
   status: campaignStatusSchema,
   visibility: campaignVisibilitySchema,
+  /**
+   * The system ruleset (content catalog version) this campaign uses. Pinned at
+   * creation and immutable thereafter — homebrew and overlay patches are scoped
+   * to it, so changing it would orphan that content.
+   */
+  rulesetId: systemRulesetIdSchema,
   /** The userId who created this campaign. Immutable — distinct from the current owner, which is transferable. */
   createdBy: z.string().min(1),
   createdAt: z.iso.datetime(),
@@ -149,6 +156,8 @@ export type Campaign = z.infer<typeof campaignSchema>
 export const createCampaignInputSchema = campaignIdentitySchema.extend({
   settings: campaignSettingsSchema.optional(),
   flavor: campaignFlavorSchema.optional(),
+  /** Optional at create; the server falls back to `DEFAULT_SYSTEM_RULESET_ID`. */
+  rulesetId: systemRulesetIdSchema.optional(),
 })
 
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
@@ -161,8 +170,11 @@ export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
  * Partial update payload. All fields are optional; the server merges the patch
  * with the existing campaign document. `imageKey` is set server-side after an
  * upload completes, so clients send the key returned by the upload service.
+ * `rulesetId` is intentionally omitted — it is immutable after creation.
  */
-export const updateCampaignInputSchema = createCampaignInputSchema.partial({ name: true })
+export const updateCampaignInputSchema = createCampaignInputSchema
+  .partial({ name: true })
+  .omit({ rulesetId: true })
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 

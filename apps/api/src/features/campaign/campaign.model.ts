@@ -7,11 +7,13 @@ const { model, models, Schema } = mongoose
 import {
   CAMPAIGN_STATUSES,
   CAMPAIGN_VISIBILITY,
+  DEFAULT_SYSTEM_RULESET_ID,
   DIFFICULTIES,
   IMPORTED_CHARACTERS_POLICIES,
   MAGIC_LEVELS,
   MOODS,
   PLAY_STYLES,
+  SYSTEM_RULESET_IDS,
 } from '@rpg/contracts'
 
 const campaignSchema = new Schema(
@@ -43,6 +45,13 @@ const campaignSchema = new Schema(
     },
     status: { type: String, enum: CAMPAIGN_STATUSES, required: true, default: 'draft' },
     visibility: { type: String, enum: CAMPAIGN_VISIBILITY, required: true, default: 'private' },
+    /** System ruleset (content catalog version). Pinned at creation, immutable after. */
+    rulesetId: {
+      type: String,
+      enum: SYSTEM_RULESET_IDS,
+      required: true,
+      default: DEFAULT_SYSTEM_RULESET_ID,
+    },
     /** userId of the creator. Immutable after creation; distinct from the current owner. */
     createdBy: { type: String, required: true, index: true },
   },
