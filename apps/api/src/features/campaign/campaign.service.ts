@@ -1,4 +1,5 @@
 import { isValidObjectId } from 'mongoose'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import type {
   Campaign,
   CampaignConfiguration,
@@ -26,7 +27,7 @@ function toCampaign(doc: CampaignRecord): Campaign {
     configuration: (doc.configuration ?? {}) as CampaignConfiguration,
     status: doc.status as CampaignStatus,
     visibility: doc.visibility as CampaignVisibility,
-    rulesetId: doc.rulesetId as SystemRulesetId,
+    rulesetId: (doc.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
     createdBy: doc.createdBy,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
