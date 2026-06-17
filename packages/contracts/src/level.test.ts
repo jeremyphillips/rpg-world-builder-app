@@ -1,0 +1,15 @@
+import { describe, expect, it } from 'vitest'
+import { MAX_CHARACTER_LEVEL, levelSchema } from './level'
+
+describe('levelSchema', () => {
+  it('accepts the full 1–20 range', () => {
+    expect(levelSchema.parse(1)).toBe(1)
+    expect(levelSchema.parse(MAX_CHARACTER_LEVEL)).toBe(MAX_CHARACTER_LEVEL)
+  })
+
+  it('rejects out-of-range and non-integer levels', () => {
+    expect(levelSchema.safeParse(0).success).toBe(false)
+    expect(levelSchema.safeParse(MAX_CHARACTER_LEVEL + 1).success).toBe(false)
+    expect(levelSchema.safeParse(5.5).success).toBe(false)
+  })
+})
