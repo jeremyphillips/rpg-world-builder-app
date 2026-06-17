@@ -156,3 +156,50 @@ export {
 } from './components/ui/tabs.variants'
 
 export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from './components/ui/table'
+export { Badge, badgeVariants, type BadgeProps } from './components/ui/badge'
+export {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from './components/ui/collapsible.client'
+
+export {
+  BooleanCell,
+  DataTable,
+  RowActionsMenu,
+  SortableHeader,
+} from './components/ui/data-table.client'
+export type { BooleanCellProps, RowActionsMenuProps } from './components/ui/data-table.client'
+export type {
+  ColumnChangeState,
+  DataTableProps,
+  FilterDef,
+  TextFilterDef,
+  SelectFilterDef,
+  BooleanFilterDef,
+  FilterGroup,
+} from './components/ui/data-table.types'
+export {
+  dataTableRootVariants,
+  dataTableToolbarVariants,
+  dataTableFilterGroupVariants,
+  dataTableFilterControlVariants,
+  dataTableAdvancedPanelVariants,
+  dataTableAdvancedInnerVariants,
+  dataTablePaginationVariants,
+  dataTableTableWrapVariants,
+  dataTableColumnPanelVariants,
+  dataTableColumnItemVariants,
+  dataTableColumnDragHandleVariants,
+} from './components/ui/data-table.variants'
