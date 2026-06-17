@@ -1,7 +1,8 @@
+import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { DataTable, SortableHeader } from './data-table.client'
+import { BooleanCell, DataTable, RowActionsMenu, SortableHeader } from './data-table.client'
 import type { DataTableProps, FilterDef } from './data-table.types'
 
 // ---------------------------------------------------------------------------
@@ -136,7 +137,7 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
   {
     accessorKey: 'spellcasting',
     header: 'Spellcasting',
-    cell: ({ row }) => (row.getValue('spellcasting') ? 'Yes' : '—'),
+    cell: ({ row }) => <BooleanCell value={row.getValue('spellcasting')} />,
     filterFn: 'boolean',
   },
   {
@@ -252,21 +253,27 @@ export const WithRowSelection: Story = {
   },
 }
 
+// Per-row stateful wrapper so each row manages its own enabled state independently.
+function ClassRowActions({ row }: { row: CharacterClass }) {
+  const [enabled, setEnabled] = React.useState(true)
+  return (
+    <RowActionsMenu
+      editHref={`/classes/${row.id}/edit`}
+      enabled={enabled}
+      onToggleEnabled={setEnabled}
+      enabledTooltip="Hides this class from players in the current campaign. The class remains available globally."
+      itemLabel="class"
+    />
+  )
+}
+
 export const WithRowActions: Story = {
   args: {
     columns: BASE_COLUMNS,
     data: CLASSES,
     filters: [{ type: 'text', id: 'name', label: 'Name', placeholder: 'Search…' }],
     enableRowSelection: true,
-    rowActions: (row) => (
-      <button
-        type="button"
-        className="text-xs text-muted-foreground hover:text-foreground"
-        onClick={() => alert(`Edit: ${row.name}`)}
-      >
-        Edit
-      </button>
-    ),
+    rowActions: (row) => <ClassRowActions row={row} />,
     defaultPageSize: 10,
   },
 }

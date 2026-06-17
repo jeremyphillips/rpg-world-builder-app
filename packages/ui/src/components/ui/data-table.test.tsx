@@ -13,7 +13,7 @@ declare module '@tanstack/react-table' {
   }
 }
 
-import { DataTable, SortableHeader } from './data-table.client'
+import { BooleanCell, DataTable, RowActionsMenu, SortableHeader } from './data-table.client'
 import type { FilterDef } from './data-table.types'
 
 // ---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ const COLUMNS: ColumnDef<Item>[] = [
   {
     accessorKey: 'active',
     header: 'Active',
-    cell: ({ row }) => (row.getValue('active') ? 'Yes' : 'No'),
+    cell: ({ row }) => <BooleanCell value={row.getValue('active')} />,
     filterFn: 'boolean',
   },
 ]
@@ -363,6 +363,146 @@ describe('DataTable — pagination', () => {
 
     await user.click(screen.getByRole('button', { name: 'Go to next page' }))
     expect(screen.getByText(/3–4 of 5/)).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// BooleanCell
+// ---------------------------------------------------------------------------
+
+describe('BooleanCell', () => {
+  it('renders a Check icon with aria-label "Yes" when value is true', () => {
+    render(<BooleanCell value={true} />)
+    expect(screen.getByLabelText('Yes')).toBeInTheDocument()
+  })
+
+  it('renders an X icon with aria-label "No" when value is false', () => {
+    render(<BooleanCell value={false} />)
+    expect(screen.getByLabelText('No')).toBeInTheDocument()
+  })
+
+  it('renders text "Yes" when icons is false and value is true', () => {
+    render(<BooleanCell value={true} icons={false} />)
+    expect(screen.getByText('Yes')).toBeInTheDocument()
+  })
+
+  it('renders text "—" when icons is false and value is false', () => {
+    render(<BooleanCell value={false} icons={false} />)
+    expect(screen.getByText('—')).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Column panel
+// ---------------------------------------------------------------------------
+
+describe('DataTable — column panel', () => {
+  it('renders a Columns button', () => {
+    renderTable()
+    expect(screen.getByRole('button', { name: /columns/i })).toBeInTheDocument()
+  })
+
+  it('opens the column panel and shows a search input', async () => {
+    const user = userEvent.setup()
+    renderTable()
+    await user.click(screen.getByRole('button', { name: /columns/i }))
+    expect(screen.getByRole('searchbox', { name: /search columns/i })).toBeInTheDocument()
+  })
+
+  it('shows a Reset Column Order button in the column panel', async () => {
+    const user = userEvent.setup()
+    renderTable()
+    await user.click(screen.getByRole('button', { name: /columns/i }))
+    expect(screen.getByRole('button', { name: /reset column order/i })).toBeInTheDocument()
+  })
+
+  it('calls onColumnChange when a column is hidden', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    renderTable({ onColumnChange: onChange })
+
+    await user.click(screen.getByRole('button', { name: /columns/i }))
+    // Toggle the "Category" column off
+    await user.click(screen.getByRole('button', { name: /hide category column/i }))
+
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        visibility: expect.objectContaining({ category: false }),
+      }),
+    )
+  })
+})
+
+// ---------------------------------------------------------------------------
+// RowActionsMenu
+// ---------------------------------------------------------------------------
+
+describe('RowActionsMenu', () => {
+  it('renders an ellipsis trigger button', () => {
+    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
+    expect(screen.getByRole('button', { name: /open actions/i })).toBeInTheDocument()
+  })
+
+  it('shows Edit menu item and active toggle switch when opened', async () => {
+    const user = userEvent.setup()
+    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    // DropdownMenuItem with asChild renders the anchor as role="menuitem"
+    const editItem = screen.getByRole('menuitem', { name: /edit/i })
+    expect(editItem).toBeInTheDocument()
+    expect(editItem).toHaveAttribute('href', '/edit/1')
+    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+  })
+
+  it('reflects the enabled prop on the switch', async () => {
+    const user = userEvent.setup()
+    render(<RowActionsMenu editHref="/edit/1" enabled={false} onToggleEnabled={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    expect(screen.getByRole('switch', { name: /active in campaign/i })).toHaveAttribute(
+      'data-state',
+      'unchecked',
+    )
+  })
+
+  it('calls onToggleEnabled with the new value when the switch is clicked', async () => {
+    const user = userEvent.setup()
+    const onToggle = vi.fn()
+    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={onToggle} />)
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+
+    expect(onToggle).toHaveBeenCalledWith(false)
+  })
+
+  it('renders a custom enabledLabel', async () => {
+    const user = userEvent.setup()
+    render(
+      <RowActionsMenu
+        editHref="/edit/1"
+        enabled={true}
+        onToggleEnabled={vi.fn()}
+        enabledLabel="Active in world"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    expect(screen.getByRole('switch', { name: 'Active in world' })).toBeInTheDocument()
+  })
+
+  it('keeps the menu open after the switch is toggled', async () => {
+    const user = userEvent.setup()
+    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+
+    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
   })
 })
 

@@ -1,4 +1,18 @@
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, VisibilityState } from '@tanstack/react-table'
+
+/**
+ * Emitted by `onColumnChange` whenever column visibility or order changes.
+ * Intended for consumers who want to persist column preferences externally.
+ */
+export interface ColumnChangeState {
+  /** Map of column id → visible. Omitted columns are visible by default. */
+  visibility: VisibilityState
+  /**
+   * Ordered list of all user-facing column ids (excludes injected `select`/`actions`
+   * columns). Empty array means the consumer's original definition order is used.
+   */
+  order: string[]
+}
 
 /**
  * Which toolbar row a filter appears in.
@@ -70,4 +84,9 @@ export interface DataTableProps<TData> {
   defaultPageSize?: number
   /** Accessible caption rendered below the table. */
   caption?: string
+  /**
+   * Called whenever column visibility or order changes.
+   * Use to persist column preferences; persistence itself is not in scope here.
+   */
+  onColumnChange?: (state: ColumnChangeState) => void
 }

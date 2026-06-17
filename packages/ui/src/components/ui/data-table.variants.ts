@@ -45,3 +45,18 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container with border + rounded corners. */
 export const dataTableTableWrapVariants = cva('rounded-md border border-border')
+
+/** Popover panel for the column visibility / order editor. */
+export const dataTableColumnPanelVariants = cva(
+  'z-50 w-[240px] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-md',
+)
+
+/** A single row inside the column panel list. */
+export const dataTableColumnItemVariants = cva(
+  'flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground',
+)
+
+/** The drag handle button inside a column panel row. */
+export const dataTableColumnDragHandleVariants = cva(
+  'flex cursor-grab items-center rounded p-0.5 text-muted-foreground hover:text-foreground active:cursor-grabbing',
+)

@@ -9,6 +9,14 @@ declare module '@tanstack/react-table' {
     boolean: FilterFn<unknown>
     equalsString: FilterFn<unknown>
   }
+  // Allow column defs to pass className overrides through meta
+  interface ColumnMeta<TData, TValue> {
+    headerClassName?: string
+    cellClassName?: string
+    // Suppress unused type param warnings
+    _data?: TData
+    _value?: TValue
+  }
 }
 
 import * as React from 'react'
@@ -22,26 +30,60 @@ import {
   type Column,
   type ColumnDef,
   type ColumnFiltersState,
+  type ColumnOrderState,
   type PaginationState,
   type RowSelectionState,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, ChevronUp, Columns3, Filter, X } from 'lucide-react'
+import {
+  ArrowUpDown,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Columns3,
+  Ellipsis,
+  Filter,
+  GripVertical,
+  Pencil,
+  RotateCcw,
+  Search,
+  X,
+} from 'lucide-react'
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { CSS } from '@dnd-kit/utilities'
+import * as PopoverPrimitive from '@radix-ui/react-popover'
 
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
 import { Input } from './input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
+import { Switch } from './switch.client'
+import { InfoTooltip } from './tooltip.client'
 import {
   Table,
   TableBody,
@@ -54,6 +96,7 @@ import {
 import { Badge } from './badge'
 import type {
   BooleanFilterDef,
+  ColumnChangeState,
   DataTableProps,
   FilterDef,
   SelectFilterDef,
@@ -62,6 +105,9 @@ import type {
 import {
   dataTableAdvancedInnerVariants,
   dataTableAdvancedPanelVariants,
+  dataTableColumnDragHandleVariants,
+  dataTableColumnItemVariants,
+  dataTableColumnPanelVariants,
   dataTableFilterControlVariants,
   dataTableFilterGroupVariants,
   dataTablePaginationVariants,
@@ -179,6 +225,191 @@ function FilterControl({ filter, column }: FilterControlProps) {
 }
 
 // ---------------------------------------------------------------------------
+// DataTableColumnPanel — DnD-sortable column visibility + order editor
+// ---------------------------------------------------------------------------
+
+interface ColumnPanelItemProps<TData> {
+  col: Column<TData>
+  colName: string
+}
+
+function ColumnPanelItem<TData>({ col, colName }: ColumnPanelItemProps<TData>) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: col.id,
+  })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: 'relative',
+    zIndex: isDragging ? 1 : 'auto',
+  }
+
+  const isVisible = col.getIsVisible()
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div
+        className={dataTableColumnItemVariants()}
+        onClick={() => col.toggleVisibility()}
+        role="button"
+        tabIndex={0}
+        aria-pressed={isVisible}
+        aria-label={`${isVisible ? 'Hide' : 'Show'} ${colName} column`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            col.toggleVisibility()
+          }
+        }}
+      >
+        {/* Drag handle — separate from the visibility click target */}
+        <button
+          type="button"
+          className={dataTableColumnDragHandleVariants()}
+          aria-label={`Drag to reorder ${colName}`}
+          onClick={(e) => e.stopPropagation()}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-3.5" />
+        </button>
+
+        <span className="flex-1 select-none text-sm">{colName}</span>
+
+        {isVisible && <Check className="size-3.5 shrink-0 text-foreground" aria-hidden />}
+      </div>
+    </div>
+  )
+}
+
+interface DataTableColumnPanelProps<TData> {
+  table: ReturnType<typeof useReactTable<TData>>
+  onColumnChange?: (state: ColumnChangeState) => void
+}
+
+function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnPanelProps<TData>) {
+  const [search, setSearch] = React.useState('')
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  // Only show hideable columns (excludes injected select / actions)
+  const hideableCols = table.getAllColumns().filter((col) => col.getCanHide())
+
+  const filteredCols = search.trim()
+    ? hideableCols.filter((col) => {
+        const name = typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
+        return name.toLowerCase().includes(search.toLowerCase())
+      })
+    : hideableCols
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIds = hideableCols.map((c) => c.id)
+    const oldIndex = oldIds.indexOf(String(active.id))
+    const newIndex = oldIds.indexOf(String(over.id))
+    const newOrder = arrayMove(oldIds, oldIndex, newIndex)
+
+    // Prepend injected non-hideable column ids so TanStack gets the full list
+    const nonHideable = table
+      .getAllColumns()
+      .filter((c) => !c.getCanHide())
+      .map((c) => c.id)
+    const fullOrder = [
+      ...nonHideable.filter((id) => id === 'select'),
+      ...newOrder,
+      ...nonHideable.filter((id) => id === 'actions'),
+    ]
+
+    table.setColumnOrder(fullOrder)
+    onColumnChange?.({
+      visibility: table.getState().columnVisibility,
+      order: newOrder,
+    })
+  }
+
+  function handleReset() {
+    table.setColumnOrder([])
+    table.resetColumnVisibility()
+    onColumnChange?.({ visibility: {}, order: [] })
+  }
+
+  const colIds = filteredCols.map((c) => c.id)
+
+  return (
+    <PopoverPrimitive.Root>
+      <PopoverPrimitive.Trigger asChild>
+        <Button variant="outline" size="sm" className="gap-1.5">
+          <Columns3 className="size-3.5" />
+          Columns
+        </Button>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          align="end"
+          sideOffset={4}
+          className={dataTableColumnPanelVariants()}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          {/* Search */}
+          <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+            <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            <input
+              type="search"
+              placeholder="Search columns..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              aria-label="Search columns"
+            />
+          </div>
+
+          {/* Sortable column list */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
+              <div className="max-h-[320px] overflow-y-auto py-1">
+                {filteredCols.length > 0 ? (
+                  filteredCols.map((col) => {
+                    const name =
+                      typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
+                    return <ColumnPanelItem key={col.id} col={col} colName={name} />
+                  })
+                ) : (
+                  <p className="px-3 py-2 text-sm text-muted-foreground">No columns found.</p>
+                )}
+              </div>
+            </SortableContext>
+          </DndContext>
+
+          {/* Reset */}
+          <div className="border-t border-border px-1 py-1.5">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            >
+              <RotateCcw className="size-3.5" />
+              Reset Column Order
+            </button>
+          </div>
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // DataTableToolbar
 // ---------------------------------------------------------------------------
 
@@ -189,6 +420,7 @@ interface DataTableToolbarProps<TData> {
   activeSecondaryCount: number
   advancedOpen: boolean
   onToggleAdvanced: () => void
+  onColumnChange?: (state: ColumnChangeState) => void
 }
 
 function DataTableToolbar<TData>({
@@ -198,6 +430,7 @@ function DataTableToolbar<TData>({
   activeSecondaryCount,
   advancedOpen,
   onToggleAdvanced,
+  onColumnChange,
 }: DataTableToolbarProps<TData>) {
   return (
     <div className={dataTableToolbarVariants()}>
@@ -238,32 +471,8 @@ function DataTableToolbar<TData>({
           </Button>
         )}
 
-        {/* Column visibility toggle */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Columns3 className="size-3.5" />
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[160px]">
-            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {table
-              .getAllColumns()
-              .filter((col) => col.getCanHide())
-              .map((col) => (
-                <DropdownMenuCheckboxItem
-                  key={col.id}
-                  checked={col.getIsVisible()}
-                  onCheckedChange={(v) => col.toggleVisibility(!!v)}
-                  className="capitalize"
-                >
-                  {typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Column panel */}
+        <DataTableColumnPanel table={table} onColumnChange={onColumnChange} />
       </div>
     </div>
   )
@@ -393,23 +602,144 @@ function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) 
 interface SortableHeaderProps<TData, TValue> {
   column: Column<TData, TValue>
   children: React.ReactNode
+  /**
+   * Explicit accessible label for the sort button.
+   * Required when `children` contains non-string nodes (e.g. an `InfoTooltip`);
+   * falls back to `children.toString()` for plain string children.
+   */
+  label?: string
 }
 
 export function SortableHeader<TData, TValue>({
   column,
   children,
+  label,
 }: SortableHeaderProps<TData, TValue>) {
+  const ariaLabel = `Sort by ${label ?? (typeof children === 'string' ? children : '')}`
   return (
     <Button
       variant="ghost"
       size="sm"
       className="-ml-3 h-8 data-[state=open]:bg-accent"
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      aria-label={`Sort by ${children?.toString()}`}
+      aria-label={ariaLabel}
     >
       {children}
       <ArrowUpDown className="ml-1 size-3.5 opacity-50" />
     </Button>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// BooleanCell helper — renders a check / x icon for boolean column values
+// ---------------------------------------------------------------------------
+
+export interface BooleanCellProps {
+  value: boolean
+  /**
+   * When true (default), renders Lucide icons instead of text.
+   * The false/negative icon is rendered at reduced opacity to reduce visual noise.
+   */
+  icons?: boolean
+}
+
+export function BooleanCell({ value, icons = true }: BooleanCellProps) {
+  if (!icons) return <>{value ? 'Yes' : '—'}</>
+  return value ? (
+    <Check className="size-4" aria-label="Yes" />
+  ) : (
+    <X className="size-4 opacity-30" aria-label="No" />
+  )
+}
+
+// ---------------------------------------------------------------------------
+// RowActionsMenu — standard ellipsis actions menu for table rows
+// ---------------------------------------------------------------------------
+
+export interface RowActionsMenuProps {
+  /** Href for the edit route — rendered as an `<a>` tag so Next.js Link can wrap it. */
+  editHref: string
+  /** Whether this item is currently active in the campaign. */
+  enabled: boolean
+  /** Called with the new boolean when the active-in-campaign toggle changes. */
+  onToggleEnabled: (enabled: boolean) => void
+  /**
+   * Label for the campaign toggle.
+   * Should be scoped to the context: "Active in campaign", not just "Enabled".
+   * Defaults to "Active in campaign".
+   */
+  enabledLabel?: string
+  /**
+   * Tooltip text that answers "what happens when I turn this off?".
+   * Shown via the info icon next to the toggle label.
+   */
+  enabledTooltip?: string
+  /**
+   * Human-readable noun for this row's item type, used in the trigger aria-label.
+   * Defaults to "item". Pass "class", "spell", etc. for more specific labels.
+   */
+  itemLabel?: string
+}
+
+/**
+ * Pre-built row actions dropdown for the `rowActions` prop.
+ *
+ * Renders an ellipsis (⋯) trigger that opens a menu containing:
+ * - An **Edit** link (navigates to `editHref`)
+ * - An **Active in campaign** toggle (Switch + InfoTooltip)
+ *
+ * The dropdown stays open when the switch is clicked so the user can see
+ * the state change before dismissing. A future warning modal should be
+ * wired in the `onToggleEnabled` handler — check whether the item is
+ * in use before committing the change, then show a `<ConfirmDialog>` if so.
+ */
+export function RowActionsMenu({
+  editHref,
+  enabled,
+  onToggleEnabled,
+  enabledLabel = 'Active in campaign',
+  enabledTooltip = 'Hides this item from players in the current campaign. The item remains available globally.',
+  itemLabel = 'item',
+}: RowActionsMenuProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="size-8 p-0"
+          aria-label={`Open actions for this ${itemLabel}`}
+        >
+          <Ellipsis className="size-4" aria-hidden />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem asChild className="text-xs [&_svg]:size-3">
+          <a href={editHref}>
+            <Pencil />
+            Edit
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* onSelect preventDefault keeps the menu open after the switch is toggled */}
+        <DropdownMenuItem
+          onSelect={(e) => e.preventDefault()}
+          className="flex items-center justify-between gap-2 pr-1.5 text-xs [&_svg]:size-3"
+        >
+          <div className="flex items-center gap-1">
+            <span>{enabledLabel}</span>
+            <InfoTooltip aria-label={`About: ${enabledLabel}`}>{enabledTooltip}</InfoTooltip>
+          </div>
+          <Switch
+            checked={enabled}
+            onCheckedChange={onToggleEnabled}
+            aria-label={enabledLabel}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-7 [&>[data-state]]:size-3 [&>[data-state=checked]]:translate-x-3"
+          />
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -426,10 +756,12 @@ export function DataTable<TData>({
   onRowSelectionChange,
   defaultPageSize = 20,
   caption,
+  onColumnChange,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -451,6 +783,17 @@ export function DataTable<TData>({
     // Only run on mount — columns/filters are treated as stable config
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Notify parent when column visibility changes
+  const onColumnChangeRef = React.useRef(onColumnChange)
+  onColumnChangeRef.current = onColumnChange
+  React.useEffect(() => {
+    onColumnChangeRef.current?.({
+      visibility: columnVisibility,
+      order: columnOrder,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnVisibility, columnOrder])
 
   // Inject selection column
   const selectionColumn: ColumnDef<TData> = {
@@ -474,6 +817,7 @@ export function DataTable<TData>({
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: { headerClassName: 'w-px', cellClassName: 'w-px' },
   }
 
   // Inject actions column
@@ -494,7 +838,7 @@ export function DataTable<TData>({
   const table = useReactTable({
     data,
     columns: resolvedColumns,
-    state: { sorting, columnFilters, columnVisibility, rowSelection, pagination },
+    state: { sorting, columnFilters, columnVisibility, columnOrder, rowSelection, pagination },
     onSortingChange: setSorting,
     onColumnFiltersChange: (updater) => {
       // Reset to first page whenever filters change
@@ -502,6 +846,7 @@ export function DataTable<TData>({
       setColumnFilters(updater)
     },
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnOrderChange: setColumnOrder,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
@@ -543,6 +888,7 @@ export function DataTable<TData>({
         activeSecondaryCount={activeSecondaryCount}
         advancedOpen={advancedOpen}
         onToggleAdvanced={() => setAdvancedOpen((o) => !o)}
+        onColumnChange={onColumnChange}
       />
 
       {/* Advanced filters panel */}
@@ -562,7 +908,11 @@ export function DataTable<TData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={header.column.columnDef.meta?.headerClassName}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -576,7 +926,7 @@ export function DataTable<TData>({
               rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() ? 'selected' : undefined}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className={cell.column.columnDef.meta?.cellClassName}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

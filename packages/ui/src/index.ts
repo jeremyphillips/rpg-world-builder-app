@@ -174,8 +174,15 @@ export {
   CollapsibleContent,
 } from './components/ui/collapsible.client'
 
-export { DataTable, SortableHeader } from './components/ui/data-table.client'
+export {
+  BooleanCell,
+  DataTable,
+  RowActionsMenu,
+  SortableHeader,
+} from './components/ui/data-table.client'
+export type { BooleanCellProps, RowActionsMenuProps } from './components/ui/data-table.client'
 export type {
+  ColumnChangeState,
   DataTableProps,
   FilterDef,
   TextFilterDef,
@@ -192,4 +199,7 @@ export {
   dataTableAdvancedInnerVariants,
   dataTablePaginationVariants,
   dataTableTableWrapVariants,
+  dataTableColumnPanelVariants,
+  dataTableColumnItemVariants,
+  dataTableColumnDragHandleVariants,
 } from './components/ui/data-table.variants'
