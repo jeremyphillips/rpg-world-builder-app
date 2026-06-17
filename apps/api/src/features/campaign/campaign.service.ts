@@ -6,6 +6,7 @@ import type {
   CampaignStatus,
   CampaignVisibility,
   CreateCampaignInput,
+  SystemRulesetId,
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
@@ -25,6 +26,7 @@ function toCampaign(doc: CampaignRecord): Campaign {
     configuration: (doc.configuration ?? {}) as CampaignConfiguration,
     status: doc.status as CampaignStatus,
     visibility: doc.visibility as CampaignVisibility,
+    rulesetId: doc.rulesetId as SystemRulesetId,
     createdBy: doc.createdBy,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
@@ -51,6 +53,8 @@ export async function createCampaign(
       settings: input.settings ?? DEFAULT_SETTINGS,
       ...(input.flavor !== undefined && { flavor: input.flavor }),
     },
+    // Omit when undefined so the model default (DEFAULT_SYSTEM_RULESET_ID) applies.
+    ...(input.rulesetId !== undefined && { rulesetId: input.rulesetId }),
     createdBy: input.createdBy,
   })
 

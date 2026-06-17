@@ -155,3 +155,11 @@ Target one workspace with a filter, e.g. `pnpm --filter @rpg/api dev`.
 
 React, Next.js (public), Vite (dashboard), Express + Mongoose (API), TypeScript,
 Tailwind + shadcn/ui, Zod, TanStack Query, Vitest, Storybook, Turborepo, pnpm.
+
+## Licenses & attribution
+
+The system content catalog includes material from the System Reference Document
+5.2.1 by Wizards of the Coast LLC, used under
+[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode) and modified
+for this project. See [`NOTICE`](NOTICE) for the full attribution and a summary
+of changes.

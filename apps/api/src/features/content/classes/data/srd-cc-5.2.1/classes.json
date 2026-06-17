@@ -1,0 +1,480 @@
+[
+  {
+    "id": "srd-cc-5.2.1:barbarian",
+    "slug": "barbarian",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Barbarian",
+    "description": "A fierce warrior who can enter a battle rage.",
+    "primaryAbilities": ["str"],
+    "hitDie": 12,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "proficiencies": {
+      "savingThrows": ["str", "con"],
+      "armor": ["light", "medium", "shields"],
+      "weapons": { "categories": ["simple", "martial"] },
+      "skills": {
+        "choose": 2,
+        "from": ["animal-handling", "athletics", "intimidation", "nature", "perception", "survival"]
+      }
+    },
+    "features": [
+      { "id": "rage", "name": "Rage", "level": 1 },
+      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:bard",
+    "slug": "bard",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bard",
+    "description": "An inspiring magician whose power echoes the music of creation.",
+    "primaryAbilities": ["cha"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "full",
+      "ability": "cha",
+      "preparation": "prepared",
+      "cantrips": [
+        { "level": 1, "known": 2 },
+        { "level": 4, "known": 3 },
+        { "level": 10, "known": 4 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["dex", "cha"],
+      "armor": ["light"],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 3,
+        "from": [
+          "acrobatics",
+          "animal-handling",
+          "arcana",
+          "athletics",
+          "deception",
+          "history",
+          "insight",
+          "intimidation",
+          "investigation",
+          "medicine",
+          "nature",
+          "perception",
+          "performance",
+          "persuasion",
+          "religion",
+          "sleight-of-hand",
+          "stealth",
+          "survival"
+        ]
+      }
+    },
+    "features": [
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "bardic-inspiration", "name": "Bardic Inspiration", "level": 1 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:cleric",
+    "slug": "cleric",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cleric",
+    "description": "A priestly champion who wields divine magic in service of a higher power.",
+    "primaryAbilities": ["wis"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "full",
+      "ability": "wis",
+      "preparation": "prepared",
+      "cantrips": [
+        { "level": 1, "known": 3 },
+        { "level": 4, "known": 4 },
+        { "level": 10, "known": 5 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["wis", "cha"],
+      "armor": ["light", "medium", "shields"],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": ["history", "insight", "medicine", "persuasion", "religion"]
+      }
+    },
+    "features": [
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "channel-divinity", "name": "Channel Divinity", "level": 2 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:druid",
+    "slug": "druid",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Druid",
+    "description": "A priest of the Old Faith, wielding the powers of nature.",
+    "primaryAbilities": ["wis"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "full",
+      "ability": "wis",
+      "preparation": "prepared",
+      "cantrips": [
+        { "level": 1, "known": 2 },
+        { "level": 4, "known": 3 },
+        { "level": 10, "known": 4 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["int", "wis"],
+      "armor": ["light", "medium", "shields"],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": [
+          "arcana",
+          "animal-handling",
+          "insight",
+          "medicine",
+          "nature",
+          "perception",
+          "religion",
+          "survival"
+        ]
+      }
+    },
+    "features": [
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "wild-shape", "name": "Wild Shape", "level": 2 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:fighter",
+    "slug": "fighter",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Fighter",
+    "description": "A master of martial combat, skilled with a variety of weapons and armor.",
+    "primaryAbilities": ["str", "dex"],
+    "hitDie": 10,
+    "asiLevels": [4, 6, 8, 12, 14, 16, 19],
+    "subclassLevels": [3],
+    "proficiencies": {
+      "savingThrows": ["str", "con"],
+      "armor": ["light", "medium", "heavy", "shields"],
+      "weapons": { "categories": ["simple", "martial"] },
+      "skills": {
+        "choose": 2,
+        "from": [
+          "acrobatics",
+          "animal-handling",
+          "athletics",
+          "history",
+          "insight",
+          "intimidation",
+          "perception",
+          "persuasion",
+          "survival"
+        ]
+      }
+    },
+    "features": [
+      { "id": "fighting-style", "name": "Fighting Style", "level": 1 },
+      { "id": "second-wind", "name": "Second Wind", "level": 1 },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:monk",
+    "slug": "monk",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Monk",
+    "description": "A master of martial arts, harnessing the power of the body in pursuit of perfection.",
+    "primaryAbilities": ["dex", "wis"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "proficiencies": {
+      "savingThrows": ["str", "dex"],
+      "armor": [],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"]
+      }
+    },
+    "features": [
+      { "id": "martial-arts", "name": "Martial Arts", "level": 1 },
+      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1 },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:paladin",
+    "slug": "paladin",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Paladin",
+    "description": "A holy warrior bound to a sacred oath.",
+    "primaryAbilities": ["str", "cha"],
+    "hitDie": 10,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "half",
+      "ability": "cha",
+      "preparation": "prepared"
+    },
+    "proficiencies": {
+      "savingThrows": ["wis", "cha"],
+      "armor": ["light", "medium", "heavy", "shields"],
+      "weapons": { "categories": ["simple", "martial"] },
+      "skills": {
+        "choose": 2,
+        "from": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"]
+      }
+    },
+    "features": [
+      { "id": "lay-on-hands", "name": "Lay On Hands", "level": 1 },
+      { "id": "spellcasting", "name": "Spellcasting", "level": 2 },
+      { "id": "divine-smite", "name": "Divine Smite", "level": 2 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:ranger",
+    "slug": "ranger",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ranger",
+    "description": "A warrior who combats threats on the edges of civilization.",
+    "primaryAbilities": ["dex", "wis"],
+    "hitDie": 10,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "half",
+      "ability": "wis",
+      "preparation": "prepared"
+    },
+    "proficiencies": {
+      "savingThrows": ["str", "dex"],
+      "armor": ["light", "medium", "shields"],
+      "weapons": { "categories": ["simple", "martial"] },
+      "skills": {
+        "choose": 3,
+        "from": [
+          "animal-handling",
+          "athletics",
+          "insight",
+          "investigation",
+          "nature",
+          "perception",
+          "stealth",
+          "survival"
+        ]
+      }
+    },
+    "features": [
+      { "id": "favored-enemy", "name": "Favored Enemy", "level": 1 },
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "extra-attack", "name": "Extra Attack", "level": 5 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:rogue",
+    "slug": "rogue",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rogue",
+    "description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies.",
+    "primaryAbilities": ["dex"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 10, 12, 16, 19],
+    "subclassLevels": [3],
+    "proficiencies": {
+      "savingThrows": ["dex", "int"],
+      "armor": ["light"],
+      "weapons": { "categories": ["simple", "martial"] },
+      "skills": {
+        "choose": 4,
+        "from": [
+          "acrobatics",
+          "athletics",
+          "deception",
+          "insight",
+          "intimidation",
+          "investigation",
+          "perception",
+          "performance",
+          "persuasion",
+          "sleight-of-hand",
+          "stealth"
+        ]
+      }
+    },
+    "features": [
+      { "id": "expertise", "name": "Expertise", "level": 1 },
+      { "id": "sneak-attack", "name": "Sneak Attack", "level": 1 },
+      { "id": "thieves-cant", "name": "Thieves' Cant", "level": 1 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:sorcerer",
+    "slug": "sorcerer",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sorcerer",
+    "description": "A spellcaster who draws on inherent magic from a gift or bloodline.",
+    "primaryAbilities": ["cha"],
+    "hitDie": 6,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "full",
+      "ability": "cha",
+      "preparation": "known",
+      "cantrips": [
+        { "level": 1, "known": 4 },
+        { "level": 4, "known": 5 },
+        { "level": 10, "known": 6 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["con", "cha"],
+      "armor": [],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]
+      }
+    },
+    "features": [
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "font-of-magic", "name": "Font of Magic", "level": 2 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:warlock",
+    "slug": "warlock",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Warlock",
+    "description": "A wielder of magic that is derived from a bargain with an extraplanar entity.",
+    "primaryAbilities": ["cha"],
+    "hitDie": 8,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "pact",
+      "ability": "cha",
+      "preparation": "known",
+      "cantrips": [
+        { "level": 1, "known": 2 },
+        { "level": 4, "known": 3 },
+        { "level": 10, "known": 4 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["wis", "cha"],
+      "armor": ["light"],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": [
+          "arcana",
+          "deception",
+          "history",
+          "intimidation",
+          "investigation",
+          "nature",
+          "religion"
+        ]
+      }
+    },
+    "features": [
+      { "id": "pact-magic", "name": "Pact Magic", "level": 1 },
+      { "id": "eldritch-invocations", "name": "Eldritch Invocations", "level": 1 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:wizard",
+    "slug": "wizard",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wizard",
+    "description": "A scholarly magic-user capable of manipulating the structures of reality.",
+    "primaryAbilities": ["int"],
+    "hitDie": 6,
+    "asiLevels": [4, 8, 12, 16, 19],
+    "subclassLevels": [3],
+    "spellcasting": {
+      "progression": "full",
+      "ability": "int",
+      "preparation": "prepared",
+      "cantrips": [
+        { "level": 1, "known": 3 },
+        { "level": 4, "known": 4 },
+        { "level": 10, "known": 5 }
+      ]
+    },
+    "proficiencies": {
+      "savingThrows": ["int", "wis"],
+      "armor": [],
+      "weapons": { "categories": ["simple"] },
+      "skills": {
+        "choose": 2,
+        "from": ["arcana", "history", "insight", "investigation", "medicine", "nature", "religion"]
+      }
+    },
+    "features": [
+      { "id": "spellcasting", "name": "Spellcasting", "level": 1 },
+      { "id": "arcane-recovery", "name": "Arcane Recovery", "level": 1 }
+    ]
+  }
+]
