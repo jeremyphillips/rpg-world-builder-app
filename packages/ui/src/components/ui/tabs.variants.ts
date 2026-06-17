@@ -17,7 +17,7 @@ export const tabsTriggerVariants = cva(
   {
     variants: {
       variant: {
-        line: 'relative h-9 px-4 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:rounded-full data-[state=active]:after:bg-foreground',
+        line: 'relative h-9 px-4 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:rounded-full data-[state=active]:after:bg-primary',
         pill: 'h-7 rounded-md px-3 text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
       },
     },

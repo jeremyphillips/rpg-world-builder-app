@@ -2,6 +2,12 @@
  * Pull in the shared @rpg/ui preset (Tailwind + design tokens + base layer).
  * Tailwind ignores node_modules by default, so explicitly register the UI
  * package source as a class scan target. The app's own src/ is auto-detected.
+ *
+ * Fonts: self-hosted variable faces whose family names ('Inter Variable',
+ * 'Lora Variable') match the fallbacks in the preset's --font-sans /
+ * --font-display tokens.
  */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/lora';
 @import '@rpg/ui/styles.css';
 @source "../node_modules/@rpg/ui/src";

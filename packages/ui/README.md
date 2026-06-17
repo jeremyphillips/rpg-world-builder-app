@@ -57,7 +57,22 @@ import '@rpg/ui/styles.css'
 ```
 
 The stylesheet defines CSS-variable design tokens on `:root` and `.dark`; toggle
-the `dark` class on a root element to switch themes.
+the `dark` class on a root element to switch themes. The palette is a warm
+amber/gold primary over parchment-tinted neutrals (light) and warm charcoal
+(dark); all text/background token pairings meet WCAG 2.2 AA.
+
+### Fonts
+
+The preset defines two font tokens — `--font-sans` (body, Inter) and
+`--font-display` (headings, Lora; used by `CardTitle` and `Modal.Header`).
+Apps provide the actual faces:
+
+- **Next.js (public)**: load via `next/font` with `variable: '--font-body'` /
+  `'--font-heading'` on the `<html>` element.
+- **Vite (dashboard, Storybook)**: import `@fontsource-variable/inter` and
+  `@fontsource-variable/lora`; their family names match the tokens' fallbacks.
+
+If an app loads neither, the tokens fall back to system stacks.
 
 ## Importing components
 
