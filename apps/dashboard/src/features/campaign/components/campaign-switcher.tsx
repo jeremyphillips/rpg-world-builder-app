@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { Campaign } from '@rpg/contracts'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 
@@ -17,6 +17,7 @@ import {
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import { getCampaignSwitcherLabel } from '../lib/campaign-selection'
+import { useCampaignStore } from '../store/campaign-store'
 
 interface CampaignSwitcherProps {
   showLabel?: boolean
@@ -60,12 +61,12 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
  * Future per-campaign menu items will render below this control.
  */
 export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
-  const { campaignId } = useParams<{ campaignId: string }>()
+  const activeCampaignId = useCampaignStore((s) => s.activeCampaignId)
   const navigate = useNavigate()
   const selectCampaign = useSelectCampaign()
   const { data: campaigns, isPending, isError } = useCampaigns()
 
-  const active = campaigns?.find((campaign) => campaign.id === campaignId)
+  const active = campaigns?.find((campaign) => campaign.id === activeCampaignId)
   const triggerLabel = getCampaignSwitcherLabel({
     isPending,
     isError,
@@ -96,7 +97,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
         <DropdownMenuLabel>Campaigns</DropdownMenuLabel>
         <CampaignSwitcherList
           campaigns={campaigns}
-          activeId={campaignId}
+          activeId={activeCampaignId ?? undefined}
           onSelect={selectCampaign}
         />
         <DropdownMenuSeparator />

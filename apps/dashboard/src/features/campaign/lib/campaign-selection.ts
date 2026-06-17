@@ -50,6 +50,26 @@ export function resolveLandingPath(
   return id ? ROUTES.campaign.detail(id) : null
 }
 
+/**
+ * Resolve the target campaign path when switching campaigns. Preserves the
+ * current section (e.g. /sessions, /settings) but strips any entity-specific
+ * IDs deeper than one segment — they belong to the old campaign and cannot
+ * transfer. Falls back to the campaign detail route if the pathname doesn't
+ * match the expected campaign prefix.
+ *
+ * Examples:
+ *   /campaigns/abc           → /campaigns/xyz
+ *   /campaigns/abc/sessions  → /campaigns/xyz/sessions
+ *   /campaigns/abc/sessions/123 → /campaigns/xyz/sessions
+ */
+export function resolveTargetPathOnSwitch(pathname: string, fromId: string, toId: string): string {
+  const prefix = `/campaigns/${fromId}`
+  if (!pathname.startsWith(prefix)) return ROUTES.campaign.detail(toId)
+  const segments = pathname.slice(prefix.length).split('/').filter(Boolean)
+  const section = segments[0] ? `/${segments[0]}` : ''
+  return `/campaigns/${toId}${section}`
+}
+
 interface SwitcherLabelState {
   isPending: boolean
   isError: boolean

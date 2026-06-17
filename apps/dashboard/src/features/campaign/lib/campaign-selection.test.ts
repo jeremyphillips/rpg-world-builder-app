@@ -4,6 +4,7 @@ import {
   getCampaignSwitcherLabel,
   resolveLandingCampaignId,
   resolveLandingPath,
+  resolveTargetPathOnSwitch,
 } from './campaign-selection'
 
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
@@ -47,6 +48,28 @@ describe('resolveLandingPath', () => {
 
   it('ignores a stored/preferred id that is no longer a campaign', () => {
     expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'gone' }, 'stale')).toBeNull()
+  })
+})
+
+describe('resolveTargetPathOnSwitch', () => {
+  it('substitutes the campaign id on the detail route', () => {
+    expect(resolveTargetPathOnSwitch('/campaigns/abc', 'abc', 'xyz')).toBe('/campaigns/xyz')
+  })
+
+  it('preserves a single section segment', () => {
+    expect(resolveTargetPathOnSwitch('/campaigns/abc/sessions', 'abc', 'xyz')).toBe(
+      '/campaigns/xyz/sessions',
+    )
+  })
+
+  it('strips entity ids deeper than one section segment', () => {
+    expect(resolveTargetPathOnSwitch('/campaigns/abc/sessions/123', 'abc', 'xyz')).toBe(
+      '/campaigns/xyz/sessions',
+    )
+  })
+
+  it('falls back to the campaign detail when the pathname does not match', () => {
+    expect(resolveTargetPathOnSwitch('/characters', 'abc', 'xyz')).toBe('/campaigns/xyz')
   })
 })
 
