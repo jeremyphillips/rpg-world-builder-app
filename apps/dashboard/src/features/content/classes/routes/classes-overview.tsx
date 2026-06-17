@@ -37,7 +37,7 @@ export function ClassesOverview() {
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold tracking-tight">Classes</h2>
       <DataTable
-        columns={classColumns}
+        columns={classColumns(campaignId ?? '')}
         data={classes}
         filters={classFilters}
         rowActions={(row) => <ClassRowActions row={row} />}

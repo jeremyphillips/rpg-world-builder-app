@@ -2,6 +2,9 @@ import type { Request, Response } from 'express'
 
 import { getContentTypeConfig } from './content-types'
 import { resolveCatalogForCampaign } from './content.service'
+import { loadSubclassesByClassId } from './classes/seed'
+import { findCampaignById } from '../campaign'
+import { HttpError } from '../../lib/http-error'
 
 export async function listClasses(req: Request, res: Response): Promise<void> {
   // `campaignId` is validated by `requireCampaignRole` (membership) upstream.
@@ -9,4 +12,14 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
   const config = getContentTypeConfig('classes')
   const classes = await resolveCatalogForCampaign(config, campaignId)
   res.status(200).json({ classes })
+}
+
+export async function listSubclasses(req: Request, res: Response): Promise<void> {
+  const { campaignId, classId } = req.params as { campaignId: string; classId: string }
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+  const subclasses = loadSubclassesByClassId(campaign.rulesetId, classId)
+  res.status(200).json({ subclasses })
 }

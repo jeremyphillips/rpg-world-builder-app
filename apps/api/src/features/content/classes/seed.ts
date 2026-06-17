@@ -29,6 +29,11 @@ export function loadSeedSubclasses(rulesetId: SystemRulesetId): Subclass[] {
   return SEED_BY_RULESET[rulesetId].subclasses
 }
 
+/** Subclasses belonging to one parent class, identified by the class's opaque id. */
+export function loadSubclassesByClassId(rulesetId: SystemRulesetId, classId: string): Subclass[] {
+  return loadSeedSubclasses(rulesetId).filter((s) => s.classId === classId)
+}
+
 /** System class slugs for a ruleset — used by the homebrew slug guard. */
 export function seedClassSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return new Set(loadSeedClasses(rulesetId).map((c) => c.slug))

@@ -1,1 +1,1 @@
-export { ClassesOverview, useClasses, classesQueryKey } from './classes'
+export { ClassesOverview, ClassDetail, useClasses, classesQueryKey } from './classes'
