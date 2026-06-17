@@ -1,11 +1,14 @@
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
+import { getContentImageUrl } from './content-image-url'
+
 /**
  * Minimum shape every content type shares. Used to constrain the generic
- * so the shared name and source columns are type-safe.
+ * so the shared image, name, and source columns are type-safe.
  */
 export type ContentBase = {
+  imageKey?: string
   name: string
   source: 'system' | 'homebrew'
 }
@@ -29,8 +32,8 @@ const BASE_SOURCE_FILTER: FilterDef = {
 }
 
 /**
- * Wraps content-specific columns with the shared name (prepended) and source
- * (appended) columns. Every content overview uses this to stay consistent.
+ * Wraps content-specific columns with the shared image + name (prepended) and
+ * source (appended) columns. Every content overview uses this to stay consistent.
  *
  * @example
  * const columns = buildContentColumns<CharacterClass>([hitDieCol, spellcastingCol])
@@ -38,6 +41,25 @@ const BASE_SOURCE_FILTER: FilterDef = {
 export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
 ): ColumnDef<T>[] {
+  const imageColumn: ColumnDef<T> = {
+    accessorKey: 'imageKey',
+    header: () => <span className="sr-only">Image</span>,
+    cell: ({ row }) => {
+      const key = row.getValue<string | undefined>('imageKey')
+      return (
+        <img
+          src={getContentImageUrl(key)}
+          alt=""
+          aria-hidden="true"
+          className="size-9 shrink-0 rounded-md object-cover"
+        />
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+    meta: { headerClassName: 'w-16', cellClassName: 'w-16' },
+  }
+
   const nameColumn: ColumnDef<T> = {
     accessorKey: 'name',
     header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
@@ -50,7 +72,7 @@ export function buildContentColumns<T extends ContentBase>(
     enableSorting: false,
   }
 
-  return [nameColumn, ...middleColumns, sourceColumn]
+  return [imageColumn, nameColumn, ...middleColumns, sourceColumn]
 }
 
 /**

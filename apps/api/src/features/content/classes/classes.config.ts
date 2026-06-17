@@ -26,6 +26,7 @@ function toHomebrewClass(doc: HomebrewClassRecord): CharacterClass {
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
     name: doc.name,
+    ...(doc.imageKey !== undefined && { imageKey: doc.imageKey }),
     ...(doc.description !== undefined && { description: doc.description }),
     primaryAbilities: doc.primaryAbilities,
     hitDie: doc.hitDie,

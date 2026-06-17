@@ -16,6 +16,7 @@ const homebrewClassSchema = new Schema(
     rulesetId: { type: String, enum: [...SYSTEM_RULESET_IDS], required: true },
     campaignId: { type: String, required: true, index: true },
     name: { type: String, required: true, trim: true },
+    imageKey: { type: String },
     description: { type: String },
     primaryAbilities: [{ type: String, enum: [...ABILITY_IDS] }],
     hitDie: { type: Number, enum: [...CLASS_HIT_DICE], required: true },

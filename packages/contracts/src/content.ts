@@ -59,6 +59,24 @@ export type ContentMeta = z.infer<typeof contentMetaSchema>
  * in a single content feature. A `(campaignId, targetId)` uniqueness rule (one
  * patch per record per campaign) is enforced at the Mongo/service layer.
  */
+/**
+ * Shared editable base for every content type body. Each content type's body
+ * schema extends this so that fields like `imageKey` are uniformly available
+ * across classes, spells, monsters, etc. without being part of the ownership
+ * envelope (`contentMetaSchema`).
+ *
+ * Add new cross-type body fields here — they propagate automatically to every
+ * content type's patch schema via `<typeBodySchema>.partial()`.
+ */
+export const contentBodyBaseSchema = z.object({
+  /** Storage key for the content item's artwork. Resolve to a URL with `getAssetUrl`. */
+  imageKey: z.string().optional(),
+  name: z.string().min(1),
+  description: z.string().optional(),
+})
+
+export type ContentBodyBase = z.infer<typeof contentBodyBaseSchema>
+
 export const contentPatchBaseSchema = z.object({
   id: z.string().min(1),
   campaignId: z.string().min(1),
