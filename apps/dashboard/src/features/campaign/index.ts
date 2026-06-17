@@ -6,7 +6,13 @@ export { CampaignSessions } from './routes/campaign-sessions'
 export { CampaignSettings } from './routes/campaign-settings'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useSelectCampaign } from './hooks/use-select-campaign'
+export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
 export { useUpdateCampaign } from './hooks/use-update-campaign'
+export { useCampaignStore } from './store/campaign-store'
 export { readStoredCampaignId } from './lib/selected-campaign-storage'
-export { resolveLandingCampaignId, resolveLandingPath } from './lib/campaign-selection'
+export {
+  resolveLandingCampaignId,
+  resolveLandingPath,
+  resolveTargetPathOnSwitch,
+} from './lib/campaign-selection'

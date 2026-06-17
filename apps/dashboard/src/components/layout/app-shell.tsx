@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
+import { useSyncActiveCampaign } from '@/features/campaign'
 import { Sidebar } from './sidebar/index'
 import { Topbar } from './topbar'
 
 /** Authenticated workspace chrome: sidebar + topbar around the routed page. */
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  useSyncActiveCampaign()
 
   return (
     <div className="flex min-h-dvh">
