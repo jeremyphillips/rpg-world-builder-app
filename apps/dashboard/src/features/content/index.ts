@@ -8,3 +8,4 @@ export {
 } from './skillProficiencies'
 export { WeaponsOverview, WeaponDetail, useWeapons, weaponsQueryKey } from './weapons'
 export { ArmorOverview, ArmorDetail, useArmor, armorQueryKey } from './armor'
+export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
