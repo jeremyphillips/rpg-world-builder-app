@@ -38,3 +38,17 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listEquipment,
 )
+
+contentRouter.get(
+  '/weapons',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listWeapons,
+)
+
+contentRouter.get(
+  '/armor',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listArmor,
+)
