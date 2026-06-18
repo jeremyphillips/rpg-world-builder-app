@@ -1,3 +1,3 @@
-// fallow-ignore-file unused-file
-// content/equipment — scaffold only. Export the public surface here as it's built.
-export {}
+export { EquipmentOverview } from './routes/equipment-overview'
+export { EquipmentDetail } from './routes/equipment-detail'
+export { useEquipment, equipmentQueryKey } from './hooks/use-equipment'

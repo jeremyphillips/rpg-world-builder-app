@@ -11,6 +11,7 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     header: ({ column }) => <SortableHeader column={column}>Hit Die</SortableHeader>,
     cell: ({ row }) => `d${row.getValue<number>('hitDie')}`,
     filterFn: 'equalsString',
+    meta: { label: 'Hit Die' },
   },
   {
     accessorKey: 'primaryAbilities',

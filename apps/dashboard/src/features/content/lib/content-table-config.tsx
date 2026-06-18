@@ -70,7 +70,7 @@ export function buildContentColumns<T extends ContentBase>(
     },
     enableSorting: false,
     enableHiding: false,
-    meta: { headerClassName: 'w-16', cellClassName: 'w-16' },
+    meta: { headerClassName: 'w-16', cellClassName: 'w-16', label: 'Image', locked: true },
   }
 
   const nameColumn: ColumnDef<T> = {
@@ -86,6 +86,8 @@ export function buildContentColumns<T extends ContentBase>(
           </Link>
         )
       : undefined,
+    enableHiding: false,
+    meta: { label: 'Name', locked: true },
   }
 
   const sourceColumn: ColumnDef<T> = {
@@ -93,6 +95,7 @@ export function buildContentColumns<T extends ContentBase>(
     header: 'Source',
     cell: ({ row }) => <span className="capitalize">{row.getValue<string>('source')}</span>,
     enableSorting: false,
+    meta: { label: 'Source' },
   }
 
   return [imageColumn, nameColumn, ...middleColumns, sourceColumn]

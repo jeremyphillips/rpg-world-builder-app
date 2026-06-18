@@ -12,8 +12,14 @@ import {
 import {
   ClassesOverview,
   ClassDetail,
+  EquipmentOverview,
+  EquipmentDetail,
   SkillProficienciesOverview,
   SkillProficiencyDetail,
+  WeaponsOverview,
+  WeaponDetail,
+  ArmorOverview,
+  ArmorDetail,
 } from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
@@ -118,6 +124,28 @@ const router = createBrowserRouter(
                   ],
                 },
                 {
+                  path: 'equipment',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Equipment',
+                      href: ROUTES.content.equipment.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <EquipmentOverview /> },
+                    {
+                      path: ':equipmentId',
+                      element: <EquipmentDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
                   path: 'skill-proficiencies',
                   element: <Outlet />,
                   handle: {
@@ -131,6 +159,50 @@ const router = createBrowserRouter(
                     {
                       path: ':skillId',
                       element: <SkillProficiencyDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
+                  path: 'weapons',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Weapons',
+                      href: ROUTES.content.weapons.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <WeaponsOverview /> },
+                    {
+                      path: ':weaponId',
+                      element: <WeaponDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
+                  path: 'armor',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Armor',
+                      href: ROUTES.content.armor.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <ArmorOverview /> },
+                    {
+                      path: ':armorId',
+                      element: <ArmorDetail />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',

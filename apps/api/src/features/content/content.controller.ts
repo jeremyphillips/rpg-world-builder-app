@@ -30,3 +30,24 @@ export async function listSkillProficiencies(req: Request, res: Response): Promi
   const skillProficiencies = await resolveCatalogForCampaign(config, campaignId)
   res.status(200).json({ skillProficiencies })
 }
+
+export async function listEquipment(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('equipment')
+  const equipment = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ equipment })
+}
+
+export async function listWeapons(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('weapons')
+  const weapons = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ weapons })
+}
+
+export async function listArmor(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('armor')
+  const armor = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ armor })
+}

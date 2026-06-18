@@ -13,6 +13,13 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
     headerClassName?: string
     cellClassName?: string
+    /** Display name shown in the column visibility panel. Required when the
+     *  column header is a JSX function (e.g. SortableHeader) so the panel
+     *  does not fall back to the raw column id. */
+    label?: string
+    /** When true the column appears in the panel with a lock icon but cannot
+     *  be hidden or drag-reordered. Pair with `enableHiding: false`. */
+    locked?: boolean
     // Suppress unused type param warnings
     _data?: TData
     _value?: TValue
@@ -45,6 +52,7 @@ import {
   Ellipsis,
   Filter,
   GripVertical,
+  Lock,
   Pencil,
   RotateCcw,
   Search,
@@ -284,6 +292,26 @@ function ColumnPanelItem<TData>({ col, colName }: ColumnPanelItemProps<TData>) {
   )
 }
 
+/**
+ * A non-interactive panel row for columns that are always visible (locked).
+ * Shows a lock icon in place of the drag handle and a muted check to signal
+ * the column is permanently on. No toggle, no drag.
+ */
+function LockedColumnItem<TData>({ colName }: Pick<ColumnPanelItemProps<TData>, 'colName'>) {
+  return (
+    <div
+      className="flex cursor-default items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground"
+      aria-label={`${colName} column (always visible)`}
+    >
+      <span className="flex shrink-0 items-center justify-center rounded p-0.5">
+        <Lock className="size-3.5" aria-hidden />
+      </span>
+      <span className="flex-1 select-none">{colName}</span>
+      <Check className="size-3.5 shrink-0" aria-hidden />
+    </div>
+  )
+}
+
 interface DataTableColumnPanelProps<TData> {
   table: ReturnType<typeof useReactTable<TData>>
   onColumnChange?: (state: ColumnChangeState) => void
@@ -297,14 +325,25 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  // Only show hideable columns (excludes injected select / actions)
-  const hideableCols = table.getAllColumns().filter((col) => col.getCanHide())
+  // Locked cols (meta.locked + enableHiding:false) appear in the panel but
+  // cannot be hidden or dragged. Regular hideable cols participate in DnD.
+  const allCols = table.getAllColumns()
+  const lockedCols = allCols.filter((col) => Boolean(col.columnDef.meta?.locked))
+  const hideableCols = allCols.filter((col) => col.getCanHide())
 
-  const filteredCols = search.trim()
-    ? hideableCols.filter((col) => {
-        const name = typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
-        return name.toLowerCase().includes(search.toLowerCase())
-      })
+  function getColName(col: (typeof allCols)[number]): string {
+    return (
+      col.columnDef.meta?.label ??
+      (typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id)
+    )
+  }
+
+  const query = search.trim().toLowerCase()
+  const filteredLockedCols = query
+    ? lockedCols.filter((col) => getColName(col).toLowerCase().includes(query))
+    : lockedCols
+  const filteredHideableCols = query
+    ? hideableCols.filter((col) => getColName(col).toLowerCase().includes(query))
     : hideableCols
 
   function handleDragEnd(event: DragEndEvent) {
@@ -316,13 +355,12 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
     const newIndex = oldIds.indexOf(String(over.id))
     const newOrder = arrayMove(oldIds, oldIndex, newIndex)
 
-    // Prepend injected non-hideable column ids so TanStack gets the full list
-    const nonHideable = table
-      .getAllColumns()
-      .filter((c) => !c.getCanHide())
-      .map((c) => c.id)
+    // Build the full column order: select → locked/pinned → reordered → actions.
+    // Non-hideable covers select, locked cols (image, name), and actions.
+    const nonHideable = allCols.filter((c) => !c.getCanHide()).map((c) => c.id)
     const fullOrder = [
       ...nonHideable.filter((id) => id === 'select'),
+      ...nonHideable.filter((id) => id !== 'select' && id !== 'actions'),
       ...newOrder,
       ...nonHideable.filter((id) => id === 'actions'),
     ]
@@ -340,7 +378,7 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
     onColumnChange?.({ visibility: {}, order: [] })
   }
 
-  const colIds = filteredCols.map((c) => c.id)
+  const colIds = filteredHideableCols.map((c) => c.id)
 
   return (
     <PopoverPrimitive.Root>
@@ -370,27 +408,40 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
             />
           </div>
 
-          {/* Sortable column list */}
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
-              <div className="max-h-[320px] overflow-y-auto py-1">
-                {filteredCols.length > 0 ? (
-                  filteredCols.map((col) => {
-                    const name =
-                      typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
-                    return <ColumnPanelItem key={col.id} col={col} colName={name} />
-                  })
-                ) : (
-                  <p className="px-3 py-2 text-sm text-muted-foreground">No columns found.</p>
-                )}
+          {/* Column list: locked (non-interactive) + sortable (DnD) */}
+          <div className="max-h-[320px] overflow-y-auto">
+            {/* Locked columns — always visible, cannot be hidden or reordered */}
+            {filteredLockedCols.length > 0 && (
+              <div className="py-1">
+                {filteredLockedCols.map((col) => (
+                  <LockedColumnItem key={col.id} colName={getColName(col)} />
+                ))}
               </div>
-            </SortableContext>
-          </DndContext>
+            )}
+            {filteredLockedCols.length > 0 && filteredHideableCols.length > 0 && (
+              <div className="border-t border-border" />
+            )}
+
+            {/* Sortable columns */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
+                <div className="py-1">
+                  {filteredHideableCols.length > 0 ? (
+                    filteredHideableCols.map((col) => (
+                      <ColumnPanelItem key={col.id} col={col} colName={getColName(col)} />
+                    ))
+                  ) : filteredLockedCols.length === 0 ? (
+                    <p className="px-3 py-2 text-sm text-muted-foreground">No columns found.</p>
+                  ) : null}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
 
           {/* Reset */}
           <div className="border-t border-border px-1 py-1.5">

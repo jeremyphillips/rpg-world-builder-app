@@ -28,3 +28,32 @@ export const hitDieSchema = z.union(
     ...z.ZodLiteral<ClassHitDie>[],
   ],
 )
+
+// ---------------------------------------------------------------------------
+// Dice expression — a structured count+faces pair, the canonical way to store
+// weapon damage and other roll expressions (as opposed to a raw string like
+// "2d6"). Use `formatDice` for display.
+// ---------------------------------------------------------------------------
+
+export const diceSchema = z.object({
+  count: z.number().int().min(1),
+  faces: dieFaceSchema,
+})
+
+export type Dice = z.infer<typeof diceSchema>
+
+/** Formats a dice expression as a human-readable string (e.g. "2d6"). */
+export function formatDice(d: Dice): string {
+  return `${d.count}d${d.faces}`
+}
+
+/**
+ * Returns the average result of rolling a dice expression.
+ * Uses the standard formula: count × (faces + 1) / 2.
+ *
+ * @example averageDiceRoll({ count: 1, faces: 8 }) // 4.5
+ * @example averageDiceRoll({ count: 2, faces: 6 }) // 7
+ */
+export function averageDiceRoll(d: Dice): number {
+  return (d.count * (d.faces + 1)) / 2
+}

@@ -12,6 +12,7 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
     cell: ({ row }) => ABILITIES[row.getValue<SkillProficiency['ability']>('ability')],
     filterFn: 'equalsString',
+    meta: { label: 'Ability' },
   },
 ]
 

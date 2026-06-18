@@ -93,7 +93,62 @@ Add a co-located `<type>.test.ts` covering:
 - `update*InputSchema` allows partial updates.
 - `*PatchSchema` requires `campaignId` and `targetId`.
 
-If the type has a **closed set of ids** (like skills or classes), export a static `NAME_MAP` constant and a `getXName(id): string` helper with a homebrew-safe fallback:
+If the type has a **closed set of ids** used as enums (weapon properties, armor
+categories, skill slugs, etc.), export reference vocabulary from `@rpg/contracts`
+and derive the Zod enum from the map keys.
+
+#### Reference vocabulary (`GameTermEntry`)
+
+Use this when a closed id set needs both a display label and SRD rule text
+(tooltips, detail pages, form help). Shared shape in `vocab/types.ts`:
+
+```typescript
+export type GameTermEntry = {
+  readonly label: string
+  readonly description: string
+}
+```
+
+Pattern (see `WEAPON_PROPERTY_ENTRIES`, `WEAPON_MASTERY_ENTRIES`, and
+`ARMOR_CATEGORY_ENTRIES` in `weapon.ts` / `armor.ts`):
+
+```typescript
+import type { GameTermEntry } from './vocab/types'
+
+export const THING_ENTRIES = {
+  'slug-a': {
+    label: 'Display A',
+    description: 'SRD rule text for this term…',
+  },
+  // ...
+} as const satisfies Record<string, GameTermEntry>
+
+export type ThingId = keyof typeof THING_ENTRIES
+export const THING_IDS = Object.keys(THING_ENTRIES) as [ThingId, ...ThingId[]]
+export const thingIdSchema = z.enum(THING_IDS)
+
+export function getThingEntry(id: string): GameTermEntry | undefined {
+  return THING_ENTRIES[id as ThingId]
+}
+
+export function getThingLabel(id: string): string {
+  return getThingEntry(id)?.label ?? id
+}
+```
+
+Rules:
+
+- **Keys** drive validation (`z.enum`); never maintain a parallel string-literal
+  array that can drift from the map.
+- **Descriptions** are reference vocabulary, not fields on catalog records. Per-item
+  prose that varies (e.g. a weapon's `specialRules` for the `special` property)
+  stays on the entity schema.
+- Add a co-located test asserting every enum member has a non-empty `label` and
+  `description`, and that `Object.keys(ENTRIES)` matches the derived id tuple.
+
+#### Display names only (`NAME_MAP`)
+
+When you only need id → label (no SRD text yet), a flat map is still fine:
 
 ```typescript
 export const THING_NAMES = { 'slug-a': 'Display A', ... } as const
@@ -104,7 +159,39 @@ export function getThingName(id: string): string {
 }
 ```
 
-See `SKILLS`/`getSkillName` in `skill-proficiency.ts` and `CLASS_NAMES`/`getClassName` in `class.ts` as canonical examples.
+See `SKILLS`/`getSkillName` in `skill-proficiency.ts` and `CLASS_NAMES`/`getClassName`
+in `class.ts`. Prefer `*_ENTRIES` when rule text is available or likely soon.
+
+#### Discriminated-union content types (variant pattern)
+
+Most content types are a single object shape and use the one-liner DTOs above
+(`<body>.extend({ slug })`, `.partial()`). Some types instead cover several
+sub-kinds whose fields genuinely differ (only a few fields are universal). Model
+those as a Zod **discriminated union** on a `kind` field — one content type, one
+registry entry, scales by adding a union variant instead of a new content type.
+`equipment.ts` (gear, ammunition, focus, tool, mount, vehicle, ship, misc) is
+the reference implementation.
+
+Rules specific to union-shaped types:
+
+- Define one body schema per `kind` from a shared base
+  (`<base>.extend({ kind: z.literal('<kind>'), ...fields })`); put only that
+  kind's real fields on each variant.
+- The four derived schemas (`<type>Schema`, `create*`, `update*`, `*Patch`) must
+  be written as **explicit array literals** of the variants — do NOT build them
+  by `.map()`-ing a transform over a variant tuple. Mapping collapses the
+  variants through `.extend`/`.partial` and loses per-kind narrowing.
+- `z.discriminatedUnion` (Zod v4) takes `(discriminator, [variantA, variantB, ...])`
+  and requires a non-empty tuple of object schemas, each carrying the literal
+  discriminator.
+- Stored shape: union of `contentMetaSchema.extend(<variant>.shape)`.
+- `create*`: union of `<variant>.extend({ slug: slugSchema })`.
+- `update*` / `*Patch` bodies: union of `<variant>.partial().extend({ kind: <variant>.shape.kind })`
+  — `.partial()` makes everything optional, so re-pin `kind` (the discriminant)
+  as required. `create`-derived updates may keep `slug` optional; patch bodies
+  omit `slug` (slugs are not patchable).
+- Keep a `KIND_ENTRIES` map (the `GameTermEntry` pattern) or `KIND_LABELS` map +
+  `getXKindLabel(kind)` helper for kind display names and filter options.
 
 ### 2. API seed data (`apps/api/src/features/content/<type>/data/srd-cc-5.2.1/`)
 

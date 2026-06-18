@@ -1,6 +1,9 @@
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { classContentConfig } from './classes/classes.config'
+import { equipmentContentConfig } from './equipment/equipment.config'
 import { skillProficiencyContentConfig } from './skill-proficiencies/skill-proficiencies.config'
+import { weaponsContentConfig } from './weapons/weapons.config'
+import { armorContentConfig } from './armor/armor.config'
 
 /**
  * The registry of content types. This is the single extension point: adding a
@@ -9,7 +12,10 @@ import { skillProficiencyContentConfig } from './skill-proficiencies/skill-profi
  */
 const CONTENT_TYPES = {
   classes: classContentConfig,
+  equipment: equipmentContentConfig,
   'skill-proficiencies': skillProficiencyContentConfig,
+  weapons: weaponsContentConfig,
+  armor: armorContentConfig,
 } as const satisfies Record<string, ContentTypeConfig>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES
