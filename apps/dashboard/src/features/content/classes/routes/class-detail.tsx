@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
+import { ABILITIES, SKILLS } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -7,6 +8,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
 function FeatureItem({ feature }: { feature: ClassFeature }) {
@@ -58,6 +60,32 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   )
 }
 
+function titleCase(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function ClassStatsSection({ characterClass }: { characterClass: CharacterClass }) {
+  const { hitDie, primaryAbilities, proficiencies } = characterClass
+
+  const primaryAbilitiesLabel = primaryAbilities.map((a) => ABILITIES[a]).join(', ')
+  const savingThrowsLabel = proficiencies.savingThrows.map((a) => ABILITIES[a]).join(', ')
+  const skillsLabel = `Choose ${proficiencies.skills.choose} from: ${proficiencies.skills.from.map((s) => SKILLS[s]).join(', ')}`
+  const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
+  const armorLabel =
+    proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'
+
+  return (
+    <div className="space-y-3">
+      <ContentStatRow label="Hit Die" value={`d${hitDie} per level`} />
+      <ContentStatRow label="Primary Abilities" value={primaryAbilitiesLabel} />
+      <ContentStatRow label="Saving Throws" value={savingThrowsLabel} />
+      <ContentStatRow label="Skills" value={skillsLabel} />
+      <ContentStatRow label="Weapons" value={weaponsLabel} />
+      <ContentStatRow label="Armor" value={armorLabel} />
+    </div>
+  )
+}
+
 type ClassDetailContentProps = {
   characterClass: CharacterClass
   campaignId: string
@@ -85,11 +113,16 @@ function ClassDetailContent({
           </Link>
         }
       >
-        <div className="space-y-2">
+        <div className="space-y-4">
           <h2 className="text-3xl font-bold tracking-tight">{characterClass.name}</h2>
+          <ClassStatsSection characterClass={characterClass} />
           {characterClass.description && (
             <p className="text-muted-foreground">{characterClass.description}</p>
           )}
+          <ContentStatRow
+            label="Ability Score Improvement"
+            value={characterClass.asiLevels.join(', ')}
+          />
         </div>
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />
