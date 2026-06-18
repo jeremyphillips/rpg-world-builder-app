@@ -17,6 +17,8 @@ import { skillSchema } from './skill'
 // ---------------------------------------------------------------------------
 
 export const SPELLCASTING_PROGRESSIONS = ['full', 'half', 'pact'] as const
+export type SpellcastingProgression = (typeof SPELLCASTING_PROGRESSIONS)[number]
+
 export const SPELL_PREPARATION = ['prepared', 'known'] as const
 
 /**

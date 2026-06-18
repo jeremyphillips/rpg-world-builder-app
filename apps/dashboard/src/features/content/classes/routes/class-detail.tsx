@@ -10,6 +10,7 @@ import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
+import { ClassProgressionTable } from '../components/class-progression-table'
 
 function FeatureItem({ feature }: { feature: ClassFeature }) {
   return (
@@ -128,6 +129,7 @@ function ClassDetailContent({
           <FeaturesList className={characterClass.name} features={characterClass.features} />
         )}
       </ContentDetailLayout>
+      <ClassProgressionTable characterClass={characterClass} />
       <SubclassesList subclasses={subclasses} />
     </div>
   )
