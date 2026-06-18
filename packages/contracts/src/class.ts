@@ -10,7 +10,7 @@ import {
 } from './content'
 import { weaponCategorySchema } from './weapon'
 import { armorCategorySchema } from './armor'
-import { skillSchema } from './skill'
+import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
 // Spellcasting
@@ -159,6 +159,44 @@ export type CreateSubclassInput = z.infer<typeof createSubclassInputSchema>
 
 export const updateSubclassInputSchema = createSubclassInputSchema.partial()
 export type UpdateSubclassInput = z.infer<typeof updateSubclassInputSchema>
+
+// ---------------------------------------------------------------------------
+// Class taxonomy — SRD 5.2 class slugs -> display names, mirroring the SKILLS
+// and ABILITIES maps. Used for name lookup (e.g. rendering `suggestedClasses`
+// on skill proficiency detail pages). Homebrew classes are not enumerated here;
+// `getClassName` falls back to the raw slug for unknown values.
+// ---------------------------------------------------------------------------
+
+/**
+ * SRD 5.2 class slug -> display name. Doubles as form select options
+ * (`value: slug`, `label: CLASS_NAMES[slug]`).
+ */
+export const CLASS_NAMES = {
+  barbarian: 'Barbarian',
+  bard: 'Bard',
+  cleric: 'Cleric',
+  druid: 'Druid',
+  fighter: 'Fighter',
+  monk: 'Monk',
+  paladin: 'Paladin',
+  ranger: 'Ranger',
+  rogue: 'Rogue',
+  sorcerer: 'Sorcerer',
+  warlock: 'Warlock',
+  wizard: 'Wizard',
+} as const
+
+export type ClassSlug = keyof typeof CLASS_NAMES
+
+/**
+ * Returns the display name for a class slug.
+ * Falls back to the raw slug for homebrew/unknown classes.
+ *
+ * @example getClassName('paladin') // → 'Paladin'
+ */
+export function getClassName(slug: string): string {
+  return CLASS_NAMES[slug as ClassSlug] ?? slug
+}
 
 // ---------------------------------------------------------------------------
 // Deferred — documented intentionally, not built in this phase:

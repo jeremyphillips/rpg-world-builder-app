@@ -1,5 +1,6 @@
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { classContentConfig } from './classes/classes.config'
+import { skillProficiencyContentConfig } from './skill-proficiencies/skill-proficiencies.config'
 
 /**
  * The registry of content types. This is the single extension point: adding a
@@ -8,6 +9,7 @@ import { classContentConfig } from './classes/classes.config'
  */
 const CONTENT_TYPES = {
   classes: classContentConfig,
+  'skill-proficiencies': skillProficiencyContentConfig,
 } as const satisfies Record<string, ContentTypeConfig>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES
