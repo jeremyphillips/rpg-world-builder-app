@@ -152,6 +152,12 @@ const SORCERER: CharacterClass = {
     { id: 'spellcasting', name: 'Spellcasting', level: 1 },
     { id: 'font-of-magic', name: 'Font of Magic', level: 2 },
   ],
+  resources: [
+    {
+      name: 'Sorcery Points',
+      entries: Array.from({ length: 19 }, (_, i) => ({ level: i + 2, value: i + 2 })),
+    },
+  ],
 }
 
 export const NonSpellcaster: Story = {

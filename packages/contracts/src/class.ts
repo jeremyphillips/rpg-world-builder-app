@@ -82,6 +82,24 @@ export const classProficienciesSchema = z.object({
 export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 
 // ---------------------------------------------------------------------------
+// Class resources — generic per-level numeric progression
+// (Sorcery Points, Rage count, Ki Points, Channel Divinity uses, etc.)
+// ---------------------------------------------------------------------------
+
+export const classResourceEntrySchema = z.object({
+  level: levelSchema,
+  value: z.number().int().min(0),
+})
+
+export const classResourceSchema = z.object({
+  /** Display name shown as a column header: "Sorcery Points", "Rage", etc. */
+  name: z.string().min(1),
+  entries: z.array(classResourceEntrySchema).min(1),
+})
+
+export type ClassResource = z.infer<typeof classResourceSchema>
+
+// ---------------------------------------------------------------------------
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
@@ -94,6 +112,7 @@ export const classBodySchema = contentBodyBaseSchema.extend({
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
   features: z.array(classFeatureSchema),
+  resources: z.array(classResourceSchema).optional(),
 })
 
 export type ClassBody = z.infer<typeof classBodySchema>

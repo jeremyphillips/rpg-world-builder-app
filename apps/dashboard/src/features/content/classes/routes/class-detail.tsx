@@ -70,7 +70,7 @@ function ClassStatsSection({ characterClass }: { characterClass: CharacterClass 
 
   const primaryAbilitiesLabel = primaryAbilities.map((a) => ABILITIES[a]).join(', ')
   const savingThrowsLabel = proficiencies.savingThrows.map((a) => ABILITIES[a]).join(', ')
-  const skillsLabel = `Choose ${proficiencies.skills.choose} from: ${proficiencies.skills.from.map((s) => SKILLS[s]).join(', ')}`
+  const skillsLabel = `Choose ${proficiencies.skills.choose}: ${proficiencies.skills.from.map((s) => SKILLS[s]).join(', ')}`
   const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
   const armorLabel =
     proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'
@@ -120,10 +120,6 @@ function ClassDetailContent({
           {characterClass.description && (
             <p className="text-muted-foreground">{characterClass.description}</p>
           )}
-          <ContentStatRow
-            label="Ability Score Improvement"
-            value={characterClass.asiLevels.join(', ')}
-          />
         </div>
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />
