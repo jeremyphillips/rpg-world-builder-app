@@ -31,3 +31,10 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listSkillProficiencies,
 )
+
+contentRouter.get(
+  '/equipment',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listEquipment,
+)

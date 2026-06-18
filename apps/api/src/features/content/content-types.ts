@@ -1,5 +1,6 @@
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { classContentConfig } from './classes/classes.config'
+import { equipmentContentConfig } from './equipment/equipment.config'
 import { skillProficiencyContentConfig } from './skill-proficiencies/skill-proficiencies.config'
 
 /**
@@ -9,6 +10,7 @@ import { skillProficiencyContentConfig } from './skill-proficiencies/skill-profi
  */
 const CONTENT_TYPES = {
   classes: classContentConfig,
+  equipment: equipmentContentConfig,
   'skill-proficiencies': skillProficiencyContentConfig,
 } as const satisfies Record<string, ContentTypeConfig>
 
