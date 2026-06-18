@@ -23,3 +23,10 @@ export async function listSubclasses(req: Request, res: Response): Promise<void>
   const subclasses = loadSubclassesByClassId(campaign.rulesetId, classId)
   res.status(200).json({ subclasses })
 }
+
+export async function listSkillProficiencies(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('skill-proficiencies')
+  const skillProficiencies = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ skillProficiencies })
+}

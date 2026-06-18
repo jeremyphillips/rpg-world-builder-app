@@ -9,7 +9,12 @@ import {
   CampaignSessions,
   CampaignSettings,
 } from '@/features/campaign'
-import { ClassesOverview, ClassDetail } from '@/features/content'
+import {
+  ClassesOverview,
+  ClassDetail,
+  SkillProficienciesOverview,
+  SkillProficiencyDetail,
+} from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
@@ -104,6 +109,28 @@ const router = createBrowserRouter(
                     {
                       path: ':classId',
                       element: <ClassDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
+                  path: 'skill-proficiencies',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Skill Proficiencies',
+                      href: ROUTES.content.skillProficiencies.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <SkillProficienciesOverview /> },
+                    {
+                      path: ':skillId',
+                      element: <SkillProficiencyDetail />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',

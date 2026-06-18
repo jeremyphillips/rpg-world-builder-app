@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
-import { ABILITIES, SKILLS } from '@rpg/contracts'
+import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -70,7 +70,7 @@ function ClassStatsSection({ characterClass }: { characterClass: CharacterClass 
 
   const primaryAbilitiesLabel = primaryAbilities.map((a) => ABILITIES[a]).join(', ')
   const savingThrowsLabel = proficiencies.savingThrows.map((a) => ABILITIES[a]).join(', ')
-  const skillsLabel = `Choose ${proficiencies.skills.choose}: ${proficiencies.skills.from.map((s) => SKILLS[s]).join(', ')}`
+  const skillsLabel = `Choose ${proficiencies.skills.choose}: ${proficiencies.skills.from.map((s) => getSkillName(s)).join(', ')}`
   const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
   const armorLabel =
     proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'

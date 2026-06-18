@@ -24,3 +24,10 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listSubclasses,
 )
+
+contentRouter.get(
+  '/skill-proficiencies',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listSkillProficiencies,
+)
