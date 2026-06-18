@@ -109,8 +109,9 @@ export type GameTermEntry = {
 }
 ```
 
-Pattern (see `WEAPON_PROPERTY_ENTRIES`, `WEAPON_MASTERY_ENTRIES`, and
-`ARMOR_CATEGORY_ENTRIES` in `weapon.ts` / `armor.ts`):
+Pattern (see `ALIGNMENT_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`,
+`WEAPON_MASTERY_ENTRIES`, and `ARMOR_CATEGORY_ENTRIES` in `alignment.ts`,
+`weapon.ts` / `armor.ts`):
 
 ```typescript
 import type { GameTermEntry } from './vocab/types'

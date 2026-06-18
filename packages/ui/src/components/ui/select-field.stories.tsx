@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SelectField } from './select-field'
 
 const options = [
-  { label: 'Lawful Good', value: 'lawful-good' },
-  { label: 'True Neutral', value: 'true-neutral' },
-  { label: 'Chaotic Evil', value: 'chaotic-evil' },
+  { label: 'Lawful Good', value: 'lg' },
+  { label: 'Neutral', value: 'n' },
+  { label: 'Chaotic Evil', value: 'ce' },
 ]
 
 const meta = {
@@ -32,4 +32,4 @@ export const WithError: Story = {
   args: { error: 'Pick an alignment to continue.' },
 }
 
-export const Disabled: Story = { args: { disabled: true, defaultValue: 'true-neutral' } }
+export const Disabled: Story = { args: { disabled: true, defaultValue: 'n' } }

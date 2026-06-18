@@ -12,7 +12,7 @@ function renderSelect(props: Record<string, unknown> = {}) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="lg">Lawful Good</SelectItem>
-        <SelectItem value="tn">True Neutral</SelectItem>
+        <SelectItem value="n">Neutral</SelectItem>
       </SelectContent>
     </Select>,
   )
@@ -26,8 +26,8 @@ describe('Select', () => {
   })
 
   it('shows the selected value when controlled', () => {
-    renderSelect({ value: 'tn' })
-    expect(screen.getByLabelText('Alignment')).toHaveTextContent('True Neutral')
+    renderSelect({ value: 'n' })
+    expect(screen.getByLabelText('Alignment')).toHaveTextContent('Neutral')
   })
 
   it('has no axe accessibility violations (closed)', async () => {

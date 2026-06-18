@@ -5,8 +5,8 @@ import axe from 'axe-core'
 import { SelectField } from './select-field'
 
 const options = [
-  { label: 'Lawful Good', value: 'lawful-good' },
-  { label: 'True Neutral', value: 'true-neutral' },
+  { label: 'Lawful Good', value: 'lg' },
+  { label: 'Neutral', value: 'n' },
 ]
 
 describe('SelectField', () => {

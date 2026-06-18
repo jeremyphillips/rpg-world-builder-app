@@ -1,4 +1,5 @@
 export * from './ability'
+export * from './alignment'
 export * from './armor'
 export * from './assets'
 export * from './campaign'
