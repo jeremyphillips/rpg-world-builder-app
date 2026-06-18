@@ -377,11 +377,33 @@
     "spellcasting": {
       "progression": "full",
       "ability": "cha",
-      "preparation": "known",
+      "preparation": "prepared",
       "cantrips": [
         { "level": 1, "known": 4 },
         { "level": 4, "known": 5 },
         { "level": 10, "known": 6 }
+      ],
+      "spellsPrepared": [
+        { "level": 1, "prepared": 2 },
+        { "level": 2, "prepared": 4 },
+        { "level": 3, "prepared": 6 },
+        { "level": 4, "prepared": 7 },
+        { "level": 5, "prepared": 9 },
+        { "level": 6, "prepared": 10 },
+        { "level": 7, "prepared": 11 },
+        { "level": 8, "prepared": 12 },
+        { "level": 9, "prepared": 14 },
+        { "level": 10, "prepared": 15 },
+        { "level": 11, "prepared": 16 },
+        { "level": 12, "prepared": 16 },
+        { "level": 13, "prepared": 17 },
+        { "level": 14, "prepared": 17 },
+        { "level": 15, "prepared": 18 },
+        { "level": 16, "prepared": 18 },
+        { "level": 17, "prepared": 19 },
+        { "level": 18, "prepared": 20 },
+        { "level": 19, "prepared": 21 },
+        { "level": 20, "prepared": 22 }
       ]
     },
     "proficiencies": {
@@ -396,6 +418,32 @@
     "features": [
       { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
       { "id": "font-of-magic", "name": "Font of Magic", "level": 2, "description": "" }
+    ],
+    "resources": [
+      {
+        "name": "Sorcery Points",
+        "entries": [
+          { "level": 2, "value": 2 },
+          { "level": 3, "value": 3 },
+          { "level": 4, "value": 4 },
+          { "level": 5, "value": 5 },
+          { "level": 6, "value": 6 },
+          { "level": 7, "value": 7 },
+          { "level": 8, "value": 8 },
+          { "level": 9, "value": 9 },
+          { "level": 10, "value": 10 },
+          { "level": 11, "value": 11 },
+          { "level": 12, "value": 12 },
+          { "level": 13, "value": 13 },
+          { "level": 14, "value": 14 },
+          { "level": 15, "value": 15 },
+          { "level": 16, "value": 16 },
+          { "level": 17, "value": 17 },
+          { "level": 18, "value": 18 },
+          { "level": 19, "value": 19 },
+          { "level": 20, "value": 20 }
+        ]
+      }
     ]
   },
   {

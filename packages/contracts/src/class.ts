@@ -17,6 +17,8 @@ import { skillSchema } from './skill'
 // ---------------------------------------------------------------------------
 
 export const SPELLCASTING_PROGRESSIONS = ['full', 'half', 'pact'] as const
+export type SpellcastingProgression = (typeof SPELLCASTING_PROGRESSIONS)[number]
+
 export const SPELL_PREPARATION = ['prepared', 'known'] as const
 
 /**
@@ -33,11 +35,19 @@ export const cantripsKnownEntrySchema = z.object({
 
 export const cantripsProgressionSchema = z.array(cantripsKnownEntrySchema)
 
+export const spellsPreparedEntrySchema = z.object({
+  level: levelSchema,
+  prepared: z.number().int().min(0),
+})
+
+export const spellsPreparedProgressionSchema = z.array(spellsPreparedEntrySchema)
+
 export const spellcastingSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
   preparation: z.enum(SPELL_PREPARATION),
   cantrips: cantripsProgressionSchema.optional(),
+  spellsPrepared: spellsPreparedProgressionSchema.optional(),
 })
 
 export type Spellcasting = z.infer<typeof spellcastingSchema>
@@ -72,6 +82,24 @@ export const classProficienciesSchema = z.object({
 export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 
 // ---------------------------------------------------------------------------
+// Class resources — generic per-level numeric progression
+// (Sorcery Points, Rage count, Ki Points, Channel Divinity uses, etc.)
+// ---------------------------------------------------------------------------
+
+export const classResourceEntrySchema = z.object({
+  level: levelSchema,
+  value: z.number().int().min(0),
+})
+
+export const classResourceSchema = z.object({
+  /** Display name shown as a column header: "Sorcery Points", "Rage", etc. */
+  name: z.string().min(1),
+  entries: z.array(classResourceEntrySchema).min(1),
+})
+
+export type ClassResource = z.infer<typeof classResourceSchema>
+
+// ---------------------------------------------------------------------------
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
@@ -84,6 +112,7 @@ export const classBodySchema = contentBodyBaseSchema.extend({
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
   features: z.array(classFeatureSchema),
+  resources: z.array(classResourceSchema).optional(),
 })
 
 export type ClassBody = z.infer<typeof classBodySchema>
