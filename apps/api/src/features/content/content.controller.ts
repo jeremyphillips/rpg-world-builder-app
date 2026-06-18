@@ -51,3 +51,10 @@ export async function listArmor(req: Request, res: Response): Promise<void> {
   const armor = await resolveCatalogForCampaign(config, campaignId)
   res.status(200).json({ armor })
 }
+
+export async function listSpecies(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('species')
+  const species = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ species })
+}

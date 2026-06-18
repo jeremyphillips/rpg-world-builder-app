@@ -4,6 +4,7 @@ import { equipmentContentConfig } from './equipment/equipment.config'
 import { skillProficiencyContentConfig } from './skill-proficiencies/skill-proficiencies.config'
 import { weaponsContentConfig } from './weapons/weapons.config'
 import { armorContentConfig } from './armor/armor.config'
+import { speciesContentConfig } from './species/species.config'
 
 /**
  * The registry of content types. This is the single extension point: adding a
@@ -16,6 +17,7 @@ const CONTENT_TYPES = {
   'skill-proficiencies': skillProficiencyContentConfig,
   weapons: weaponsContentConfig,
   armor: armorContentConfig,
+  species: speciesContentConfig,
 } as const satisfies Record<string, ContentTypeConfig>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES

@@ -52,3 +52,10 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listArmor,
 )
+
+contentRouter.get(
+  '/species',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listSpecies,
+)

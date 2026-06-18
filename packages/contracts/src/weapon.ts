@@ -6,6 +6,7 @@ import {
   slugSchema,
 } from './content'
 import { averageDiceRoll, dieFaceSchema } from './dice'
+import { PHYSICAL_DAMAGE_TYPE_IDS } from './damage-type'
 import { moneySchema, weightSchema } from './units'
 import type { GameTermEntry } from './vocab/types'
 
@@ -31,12 +32,11 @@ export const weaponModeSchema = z.enum(WEAPON_MODES)
 export type WeaponMode = z.infer<typeof weaponModeSchema>
 
 // ---------------------------------------------------------------------------
-// Damage types
+// Damage types — weapons deal only physical damage. Derived from the shared
+// `damage-type` vocab (single source of truth) so the two never drift.
 // ---------------------------------------------------------------------------
 
-export const WEAPON_DAMAGE_TYPES = ['bludgeoning', 'piercing', 'slashing'] as const
-
-export const weaponDamageTypeSchema = z.enum(WEAPON_DAMAGE_TYPES)
+export const weaponDamageTypeSchema = z.enum(PHYSICAL_DAMAGE_TYPE_IDS)
 
 export type WeaponDamageType = z.infer<typeof weaponDamageTypeSchema>
 
