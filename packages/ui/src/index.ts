@@ -175,6 +175,16 @@ export {
 } from './components/ui/collapsible.client'
 
 export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from './components/ui/breadcrumb.client'
+
+export {
   BooleanCell,
   DataTable,
   RowActionsMenu,
