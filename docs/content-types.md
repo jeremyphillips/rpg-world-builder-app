@@ -106,6 +106,37 @@ export function getThingName(id: string): string {
 
 See `SKILLS`/`getSkillName` in `skill-proficiency.ts` and `CLASS_NAMES`/`getClassName` in `class.ts` as canonical examples.
 
+#### Discriminated-union content types (variant pattern)
+
+Most content types are a single object shape and use the one-liner DTOs above
+(`<body>.extend({ slug })`, `.partial()`). Some types instead cover several
+sub-kinds whose fields genuinely differ (only a few fields are universal). Model
+those as a Zod **discriminated union** on a `kind` field — one content type, one
+registry entry, scales by adding a union variant instead of a new content type.
+`equipment.ts` (gear, ammunition, focus, tool, mount, vehicle, ship, misc) is
+the reference implementation.
+
+Rules specific to union-shaped types:
+
+- Define one body schema per `kind` from a shared base
+  (`<base>.extend({ kind: z.literal('<kind>'), ...fields })`); put only that
+  kind's real fields on each variant.
+- The four derived schemas (`<type>Schema`, `create*`, `update*`, `*Patch`) must
+  be written as **explicit array literals** of the variants — do NOT build them
+  by `.map()`-ing a transform over a variant tuple. Mapping collapses the
+  variants through `.extend`/`.partial` and loses per-kind narrowing.
+- `z.discriminatedUnion` (Zod v4) takes `(discriminator, [variantA, variantB, ...])`
+  and requires a non-empty tuple of object schemas, each carrying the literal
+  discriminator.
+- Stored shape: union of `contentMetaSchema.extend(<variant>.shape)`.
+- `create*`: union of `<variant>.extend({ slug: slugSchema })`.
+- `update*` / `*Patch` bodies: union of `<variant>.partial().extend({ kind: <variant>.shape.kind })`
+  — `.partial()` makes everything optional, so re-pin `kind` (the discriminant)
+  as required. `create`-derived updates may keep `slug` optional; patch bodies
+  omit `slug` (slugs are not patchable).
+- Keep a `KIND_LABELS` map + `getXKindLabel(kind)` helper (the NAME_MAP pattern)
+  for kind display names and filter options.
+
 ### 2. API seed data (`apps/api/src/features/content/<type>/data/srd-cc-5.2.1/`)
 
 Create `<type>.json` with an array of objects that satisfy `<type>Schema`. Every record must include all `contentMetaSchema` fields:
