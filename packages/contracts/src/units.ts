@@ -75,3 +75,33 @@ export type Weight = z.infer<typeof weightSchema>
 export function weightToLb(w: Weight): number {
   return w.value
 }
+
+/**
+ * Human-readable money string with uppercase currency abbreviation.
+ *
+ * @example formatMoney({ amount: 5, currency: 'gp' }) // → "5 GP"
+ * @example formatMoney({ amount: 1, currency: 'cp' }) // → "1 CP"
+ */
+export function formatMoney(m: Money): string {
+  return `${m.amount} ${m.currency.toUpperCase()}`
+}
+
+/**
+ * Human-readable weight string. Handles the two SRD fraction values (0.5 and
+ * n.5) specially so they render as "1/2 lb" and "1½ lb" respectively.
+ *
+ * @example formatWeight({ value: 1, unit: 'lb' })   // → "1 lb"
+ * @example formatWeight({ value: 0.5, unit: 'lb' }) // → "1/2 lb"
+ * @example formatWeight({ value: 1.5, unit: 'lb' }) // → "1½ lb"
+ */
+export function formatWeight(w: Weight): string {
+  const { value } = w
+  const whole = Math.floor(value)
+  const frac = value - whole
+  if (frac === 0) return `${whole} lb`
+  if (frac === 0.5) {
+    if (whole === 0) return '1/2 lb'
+    return `${whole}½ lb`
+  }
+  return `${value} lb`
+}

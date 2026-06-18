@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   CURRENCIES,
   currencySchema,
+  formatMoney,
+  formatWeight,
   getCurrencyLabel,
   moneySchema,
   moneyToCp,
@@ -69,5 +71,34 @@ describe('weightSchema', () => {
 describe('weightToLb', () => {
   it('returns the pound value', () => {
     expect(weightToLb({ value: 1.5, unit: 'lb' })).toBe(1.5)
+  })
+})
+
+describe('formatMoney', () => {
+  it('renders whole-number amounts with uppercased currency', () => {
+    expect(formatMoney({ amount: 5, currency: 'gp' })).toBe('5 GP')
+    expect(formatMoney({ amount: 1, currency: 'cp' })).toBe('1 CP')
+    expect(formatMoney({ amount: 10, currency: 'sp' })).toBe('10 SP')
+    expect(formatMoney({ amount: 2, currency: 'pp' })).toBe('2 PP')
+  })
+
+  it('renders a zero amount', () => {
+    expect(formatMoney({ amount: 0, currency: 'gp' })).toBe('0 GP')
+  })
+})
+
+describe('formatWeight', () => {
+  it('renders whole-pound weights', () => {
+    expect(formatWeight({ value: 1, unit: 'lb' })).toBe('1 lb')
+    expect(formatWeight({ value: 10, unit: 'lb' })).toBe('10 lb')
+  })
+
+  it('renders 0.5 as "1/2 lb"', () => {
+    expect(formatWeight({ value: 0.5, unit: 'lb' })).toBe('1/2 lb')
+  })
+
+  it('renders n.5 as "n½ lb"', () => {
+    expect(formatWeight({ value: 1.5, unit: 'lb' })).toBe('1½ lb')
+    expect(formatWeight({ value: 2.5, unit: 'lb' })).toBe('2½ lb')
   })
 })

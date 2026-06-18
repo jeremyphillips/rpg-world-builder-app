@@ -12,6 +12,8 @@ import {
 import {
   ClassesOverview,
   ClassDetail,
+  EquipmentOverview,
+  EquipmentDetail,
   SkillProficienciesOverview,
   SkillProficiencyDetail,
 } from '@/features/content'
@@ -109,6 +111,28 @@ const router = createBrowserRouter(
                     {
                       path: ':classId',
                       element: <ClassDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
+                  path: 'equipment',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Equipment',
+                      href: ROUTES.content.equipment.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <EquipmentOverview /> },
+                    {
+                      path: ':equipmentId',
+                      element: <EquipmentDetail />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
