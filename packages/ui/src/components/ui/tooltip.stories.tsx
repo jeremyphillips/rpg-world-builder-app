@@ -51,7 +51,7 @@ export const InFieldLabel: StoryObj = {
         </InfoTooltip>
       </Field.Label>
       <Field.Control>
-        <Input placeholder="True Neutral" />
+        <Input placeholder="Neutral" />
       </Field.Control>
     </Field.Root>
   ),

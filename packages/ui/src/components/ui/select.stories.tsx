@@ -11,9 +11,9 @@ const meta = {
         <SelectValue placeholder="Choose…" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="lawful-good">Lawful Good</SelectItem>
-        <SelectItem value="true-neutral">True Neutral</SelectItem>
-        <SelectItem value="chaotic-evil">Chaotic Evil</SelectItem>
+        <SelectItem value="lg">Lawful Good</SelectItem>
+        <SelectItem value="n">Neutral</SelectItem>
+        <SelectItem value="ce">Chaotic Evil</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -24,6 +24,6 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const WithSelection: Story = { args: { defaultValue: 'true-neutral' } }
+export const WithSelection: Story = { args: { defaultValue: 'n' } }
 
 export const Disabled: Story = { args: { disabled: true } }
