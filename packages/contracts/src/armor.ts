@@ -6,6 +6,7 @@ import {
   slugSchema,
 } from './content'
 import { moneySchema, weightSchema } from './units'
+import type { GameTermEntry } from './vocab/types'
 
 // ---------------------------------------------------------------------------
 // Armor taxonomy — the closed SRD 5.2.1 category set. Used by both class
@@ -18,16 +19,33 @@ export const armorCategorySchema = z.enum(ARMOR_CATEGORIES)
 
 export type ArmorCategory = z.infer<typeof armorCategorySchema>
 
-export const ARMOR_CATEGORY_LABELS: Record<ArmorCategory, string> = {
-  light: 'Light Armor',
-  medium: 'Medium Armor',
-  heavy: 'Heavy Armor',
-  shields: 'Shield',
+export const ARMOR_CATEGORY_ENTRIES = {
+  light: {
+    label: 'Light Armor',
+    description: '1 minute to don or doff.',
+  },
+  medium: {
+    label: 'Medium Armor',
+    description: '5 minutes to don and 1 minute to doff.',
+  },
+  heavy: {
+    label: 'Heavy Armor',
+    description: '10 minutes to don and 5 minutes to doff.',
+  },
+  shields: {
+    label: 'Shield',
+    description: 'Utilize action to don or doff.',
+  },
+} as const satisfies Record<ArmorCategory, GameTermEntry>
+
+/** Returns the reference entry for an armor category, if known. */
+export function getArmorCategoryEntry(c: string): GameTermEntry | undefined {
+  return ARMOR_CATEGORY_ENTRIES[c as ArmorCategory]
 }
 
 /** Returns the display label for an armor category. Falls back to the raw value. */
 export function getArmorCategoryLabel(c: string): string {
-  return ARMOR_CATEGORY_LABELS[c as ArmorCategory] ?? c
+  return getArmorCategoryEntry(c)?.label ?? c
 }
 
 // ---------------------------------------------------------------------------

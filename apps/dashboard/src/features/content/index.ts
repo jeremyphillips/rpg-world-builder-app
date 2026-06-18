@@ -6,3 +6,5 @@ export {
   useSkillProficiencies,
   skillProficienciesQueryKey,
 } from './skillProficiencies'
+export { WeaponsOverview, WeaponDetail, useWeapons, weaponsQueryKey } from './weapons'
+export { ArmorOverview, ArmorDetail, useArmor, armorQueryKey } from './armor'

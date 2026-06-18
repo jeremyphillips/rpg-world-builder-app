@@ -46,3 +46,14 @@ export type Dice = z.infer<typeof diceSchema>
 export function formatDice(d: Dice): string {
   return `${d.count}d${d.faces}`
 }
+
+/**
+ * Returns the average result of rolling a dice expression.
+ * Uses the standard formula: count × (faces + 1) / 2.
+ *
+ * @example averageDiceRoll({ count: 1, faces: 8 }) // 4.5
+ * @example averageDiceRoll({ count: 2, faces: 6 }) // 7
+ */
+export function averageDiceRoll(d: Dice): number {
+  return (d.count * (d.faces + 1)) / 2
+}

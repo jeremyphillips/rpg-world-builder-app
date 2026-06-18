@@ -2,8 +2,17 @@ import { describe, expect, it } from 'vitest'
 import {
   WEAPON_CATEGORIES,
   WEAPON_MASTERIES,
+  WEAPON_MASTERY_ENTRIES,
   WEAPON_PROPERTIES,
+  WEAPON_PROPERTY_ENTRIES,
+  averageWeaponDamage,
   formatWeaponDamage,
+  formatWeaponProperties,
+  formatWeaponRange,
+  getWeaponMasteryEntry,
+  getWeaponMasteryLabel,
+  getWeaponPropertyEntry,
+  getWeaponPropertyLabel,
   weaponCategorySchema,
   weaponMasterySchema,
   weaponPropertySchema,
@@ -144,6 +153,68 @@ describe('weaponPropertySchema', () => {
   })
 })
 
+describe('weapon property vocabulary', () => {
+  it('exposes every property in WEAPON_PROPERTIES', () => {
+    expect([...WEAPON_PROPERTIES].sort()).toEqual(Object.keys(WEAPON_PROPERTY_ENTRIES).sort())
+  })
+
+  it('has a label and description for every property', () => {
+    for (const prop of WEAPON_PROPERTIES) {
+      const entry = getWeaponPropertyEntry(prop)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown properties', () => {
+    expect(getWeaponPropertyLabel('finesse')).toBe('Finesse')
+    expect(getWeaponPropertyLabel('custom')).toBe('custom')
+  })
+})
+
+describe('weapon mastery vocabulary', () => {
+  it('exposes every mastery in WEAPON_MASTERIES', () => {
+    expect([...WEAPON_MASTERIES].sort()).toEqual(Object.keys(WEAPON_MASTERY_ENTRIES).sort())
+  })
+
+  it('has a label and description for every mastery', () => {
+    for (const mastery of WEAPON_MASTERIES) {
+      const entry = getWeaponMasteryEntry(mastery)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown masteries', () => {
+    expect(getWeaponMasteryLabel('cleave')).toBe('Cleave')
+    expect(getWeaponMasteryLabel('custom')).toBe('custom')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// formatWeaponProperties / formatWeaponRange
+// ---------------------------------------------------------------------------
+
+describe('formatWeaponProperties', () => {
+  it('joins property labels', () => {
+    expect(formatWeaponProperties(['versatile', 'finesse'])).toBe('Versatile, Finesse')
+  })
+
+  it('returns em dash when empty', () => {
+    expect(formatWeaponProperties([])).toBe('—')
+  })
+})
+
+describe('formatWeaponRange', () => {
+  it('formats normal and long range', () => {
+    expect(formatWeaponRange({ normal: 80, long: 320 })).toBe('80/320 ft.')
+  })
+
+  it('formats normal range only', () => {
+    expect(formatWeaponRange({ normal: 5 })).toBe('5 ft.')
+  })
+})
+
 // ---------------------------------------------------------------------------
 // formatWeaponDamage
 // ---------------------------------------------------------------------------
@@ -247,6 +318,16 @@ describe('updateWeaponInputSchema', () => {
     expect(updateWeaponInputSchema.parse({ name: 'Longsword +1' })).toMatchObject({
       name: 'Longsword +1',
     })
+  })
+})
+
+describe('averageWeaponDamage', () => {
+  it('returns average roll for dice damage', () => {
+    expect(averageWeaponDamage({ kind: 'dice', count: 1, faces: 8 })).toBe(4.5)
+  })
+
+  it('returns flat amount for flat damage', () => {
+    expect(averageWeaponDamage({ kind: 'flat', amount: 1 })).toBe(1)
   })
 })
 

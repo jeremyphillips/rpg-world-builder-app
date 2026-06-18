@@ -20,6 +20,8 @@ export function CampaignNavSection() {
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
           <NavItem to={ROUTES.content.classes.overview(activeCampaignId)} label="Classes" />
           <NavItem to={ROUTES.content.equipment.overview(activeCampaignId)} label="Equipment" />
+          <NavItem to={ROUTES.content.weapons.overview(activeCampaignId)} label="Weapons" />
+          <NavItem to={ROUTES.content.armor.overview(activeCampaignId)} label="Armor" />
           <NavItem
             to={ROUTES.content.skillProficiencies.overview(activeCampaignId)}
             label="Skill Proficiencies"

@@ -17,12 +17,14 @@ const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
     header: ({ column }) => <SortableHeader column={column}>Kind</SortableHeader>,
     cell: ({ row }) => getEquipmentKindLabel(row.getValue<string>('kind')),
     filterFn: 'equalsString',
+    meta: { label: 'Kind' },
   },
   {
     id: 'cost',
     accessorFn: (row) => moneyToCp(row.cost),
     header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
     cell: ({ row }) => formatMoney(row.original.cost),
+    meta: { label: 'Cost' },
   },
 ]
 

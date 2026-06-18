@@ -38,5 +38,20 @@ export const ROUTES = {
         `/campaigns/${campaignId}/skill-proficiencies/${skillId}/edit`,
       create: (campaignId: string) => `/campaigns/${campaignId}/skill-proficiencies/new`,
     },
+    weapons: {
+      overview: (campaignId: string) => `/campaigns/${campaignId}/weapons`,
+      detail: (campaignId: string, weaponId: string) =>
+        `/campaigns/${campaignId}/weapons/${weaponId}`,
+      edit: (campaignId: string, weaponId: string) =>
+        `/campaigns/${campaignId}/weapons/${weaponId}/edit`,
+      create: (campaignId: string) => `/campaigns/${campaignId}/weapons/new`,
+    },
+    armor: {
+      overview: (campaignId: string) => `/campaigns/${campaignId}/armor`,
+      detail: (campaignId: string, armorId: string) => `/campaigns/${campaignId}/armor/${armorId}`,
+      edit: (campaignId: string, armorId: string) =>
+        `/campaigns/${campaignId}/armor/${armorId}/edit`,
+      create: (campaignId: string) => `/campaigns/${campaignId}/armor/new`,
+    },
   },
 } as const

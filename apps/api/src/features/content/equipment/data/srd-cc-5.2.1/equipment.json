@@ -55,7 +55,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "kind": "gear",
     "name": "Lantern, Hooded",
-    "description": "A hooded lantern casts bright light in a 30-foot radius and dim light for an additional 30 feet. Closing the hood reduces it to dim light in a 5-foot radius.",
+    "description": "A Hooded Lantern burns Oil as fuel to cast Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. As a Bonus Action, you can lower the hood, reducing the light to Dim Light in a 5-foot radius, or raise it again.",
     "cost": { "amount": 5, "currency": "gp" },
     "weight": { "value": 2, "unit": "lb" },
     "gearCategory": "lighting"
