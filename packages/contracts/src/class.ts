@@ -35,11 +35,19 @@ export const cantripsKnownEntrySchema = z.object({
 
 export const cantripsProgressionSchema = z.array(cantripsKnownEntrySchema)
 
+export const spellsPreparedEntrySchema = z.object({
+  level: levelSchema,
+  prepared: z.number().int().min(0),
+})
+
+export const spellsPreparedProgressionSchema = z.array(spellsPreparedEntrySchema)
+
 export const spellcastingSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
   preparation: z.enum(SPELL_PREPARATION),
   cantrips: cantripsProgressionSchema.optional(),
+  spellsPrepared: spellsPreparedProgressionSchema.optional(),
 })
 
 export type Spellcasting = z.infer<typeof spellcastingSchema>
