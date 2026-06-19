@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { getErrorMessage, registerInputSchema, type RegisterInput } from '@rpg/contracts'
-import { CardFooter, FormCard, SubmitButton, formCardContentClass } from '@rpg/ui'
+import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
 import { Form, type FormItem } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
@@ -60,7 +60,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Creating account…">
               Create account
             </SubmitButton>
-            <p className="text-center text-sm text-muted-foreground">
+            <Text variant="small" className="text-center">
               Already have an account?{' '}
               <Link
                 href={ROUTES.login}
@@ -68,7 +68,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
               >
                 Log in
               </Link>
-            </p>
+            </Text>
           </CardFooter>
         )}
       />
