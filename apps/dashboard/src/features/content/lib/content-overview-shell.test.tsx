@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
@@ -7,7 +8,7 @@ describe('ContentOverviewShell', () => {
   it('renders the loading state', () => {
     render(
       <ContentOverviewShell heading="Equipment" isPending={true} isError={false}>
-        <p>Ready content</p>
+        <Text>Ready content</Text>
       </ContentOverviewShell>,
     )
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()
@@ -22,7 +23,7 @@ describe('ContentOverviewShell', () => {
   it('renders the error state with role="alert"', () => {
     render(
       <ContentOverviewShell heading="Equipment" isPending={false} isError={true}>
-        <p>Ready content</p>
+        <Text>Ready content</Text>
       </ContentOverviewShell>,
     )
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()
@@ -38,7 +39,7 @@ describe('ContentOverviewShell', () => {
         isError={true}
         errorLabel="Something went wrong."
       >
-        <p>Ready content</p>
+        <Text>Ready content</Text>
       </ContentOverviewShell>,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
@@ -47,7 +48,7 @@ describe('ContentOverviewShell', () => {
   it('renders the ready state with children', () => {
     render(
       <ContentOverviewShell heading="Equipment" isPending={false} isError={false}>
-        <p>Ready content</p>
+        <Text>Ready content</Text>
       </ContentOverviewShell>,
     )
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()

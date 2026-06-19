@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
@@ -21,7 +22,7 @@ describe('ContentDetailResolver', () => {
         loadErrorLabel="Could not load items."
         notFoundLabel="Item not found."
       >
-        {(item) => <p>{item.name}</p>}
+        {(item) => <Text>{item.name}</Text>}
       </ContentDetailResolver>,
     )
     expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
@@ -38,7 +39,7 @@ describe('ContentDetailResolver', () => {
         loadErrorLabel="Could not load items."
         notFoundLabel="Item not found."
       >
-        {(item) => <p>{item.name}</p>}
+        {(item) => <Text>{item.name}</Text>}
       </ContentDetailResolver>,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load items.')
@@ -55,7 +56,7 @@ describe('ContentDetailResolver', () => {
         loadErrorLabel="Could not load items."
         notFoundLabel="Item not found."
       >
-        {(item) => <p>{item.name}</p>}
+        {(item) => <Text>{item.name}</Text>}
       </ContentDetailResolver>,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Item not found.')
@@ -72,7 +73,7 @@ describe('ContentDetailResolver', () => {
         loadErrorLabel="Could not load items."
         notFoundLabel="Item not found."
       >
-        {(item) => <p>{item.name}</p>}
+        {(item) => <Text>{item.name}</Text>}
       </ContentDetailResolver>,
     )
     expect(screen.getByText('First')).toBeInTheDocument()

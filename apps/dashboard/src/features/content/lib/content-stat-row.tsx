@@ -1,3 +1,5 @@
+import { Text } from '@rpg/ui'
+
 export type ContentStatRowProps = {
   label: string
   value: string
@@ -12,9 +14,11 @@ export type ContentStatRowProps = {
  */
 export function ContentStatRow({ label, value }: ContentStatRowProps) {
   return (
-    <p className="text-sm">
-      <span className="font-medium">{label}: </span>
-      <span className="text-muted-foreground">{value}</span>
-    </p>
+    <Text variant="emphasis" as="p">
+      {label}:{' '}
+      <Text variant="muted" as="span">
+        {value}
+      </Text>
+    </Text>
   )
 }
