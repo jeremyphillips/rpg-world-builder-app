@@ -34,3 +34,23 @@ src/features/<feature>/
 
 Nested folders (e.g. `content/spells/`) are part of their parent feature, not
 separate boundary elements, so imports within a feature are unrestricted.
+
+## Typography
+
+Content catalog detail routes (`src/features/content/**/routes/*-detail.tsx`)
+and their co-located stories must use `@rpg/ui` typography exports — `Heading`,
+`Text`, and `RichTextContent` — rather than hand-rolled `text-*` classes.
+
+Standard pattern:
+
+```tsx
+import { Heading, Text, RichTextContent } from '@rpg/ui'
+
+<Heading variant="display" as="h2">{item.name}</Heading>
+<Text variant="muted">{item.description}</Text>
+<Heading variant="section" as="h3" id="traits-heading">Traits</Heading>
+<RichTextContent html={trait.description} size="sm" tone="muted" />
+```
+
+Preserve semantic `as` values and section `id`s used by `aria-labelledby`. Full
+hierarchy and prose rules: [`packages/ui/docs/typography.md`](../../../packages/ui/docs/typography.md).

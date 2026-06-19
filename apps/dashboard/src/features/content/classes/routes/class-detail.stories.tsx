@@ -60,9 +60,9 @@ export const Default: Story = {
   render: () => (
     <div className="space-y-6">
       <nav>
-        <a href="#" className="text-sm text-muted-foreground hover:underline">
+        <Text as="a" variant="small" href="#" className="hover:underline">
           ← Classes
-        </a>
+        </Text>
       </nav>
       <ContentDetailLayout
         imageUrl={PLACEHOLDER_IMAGE}

@@ -78,67 +78,19 @@ If an app loads neither, the tokens fall back to system stacks.
 
 ## Typography
 
-Copy is split into two layers:
+Copy uses two layers: **`Heading` / `Text`** for app chrome, **`RichTextContent`**
+for sanitized HTML. Do not wrap whole pages in `prose`.
 
-| Layer          | Use                                                               | Component         |
-| -------------- | ----------------------------------------------------------------- | ----------------- |
-| **App chrome** | Page titles, section headings, plain descriptions, errors         | `Heading`, `Text` |
-| **Rich HTML**  | TipTap / CMS output (paragraphs, lists, links inside stored HTML) | `RichTextContent` |
-
-Do **not** wrap whole pages in `prose` — it resets margins and link styles on all
-descendants and fights layout utilities (`space-y-*`, grids, toolbars).
-
-### `Heading`
-
-Polymorphic via `as` (`h1`–`h6`, `p`, …). Variants map to the dashboard's
-existing scale:
-
-| Variant   | Typical `as` | Use                                                  |
-| --------- | ------------ | ---------------------------------------------------- |
-| `page`    | `h2`         | Route titles (`Account Settings`, overview shells)   |
-| `display` | `h2`         | Content detail titles (species, class, weapon names) |
-| `section` | `h3`         | In-page sections (`Traits`, `Commonly Taken By`)     |
-| `label`   | `p`          | Inline labels (trait names, feature titles)          |
+Full guide — hierarchy table, `RichTextContent` contract, dark mode, and internal
+primitive rules: **[docs/typography.md](docs/typography.md)**.
 
 ```tsx
-import { Heading } from '@rpg/ui'
+import { Heading, Text, RichTextContent } from '@rpg/ui'
 
-<Heading variant="display" as="h2">{species.name}</Heading>
-<Heading variant="section" as="h3" id="traits-heading">Traits</Heading>
+<Heading variant="display" as="h2">{item.name}</Heading>
+<Text variant="muted">{item.description}</Text>
+<RichTextContent html={trait.description} size="sm" tone="muted" />
 ```
-
-### `Text`
-
-Polymorphic body copy. Prefer `variant="muted"` for plain descriptions;
-`variant="destructive"` with `role="alert"` for inline errors.
-
-```tsx
-import { Text } from '@rpg/ui'
-
-<Text variant="muted">{species.description}</Text>
-<Text variant="destructive" role="alert">Could not load species.</Text>
-```
-
-### `RichTextContent`
-
-Always use this (not raw `dangerouslySetInnerHTML`) for stored HTML. Sanitization
-is built in. Defaults: `size="base"`, `tone="default"`. Catalog detail rich text
-typically uses `size="sm"` and `tone="muted"`.
-
-```tsx
-import { RichTextContent } from '@rpg/ui'
-
-;<RichTextContent html={trait.description} size="sm" tone="muted" />
-```
-
-Prose colors come from the shared `@utility prose` theme in `styles.css` and
-follow light/dark tokens automatically.
-
-### When to use `CardDescription` instead
-
-`CardDescription` remains the card-header secondary line (`text-sm
-text-muted-foreground`). Use `Text variant="small"` for the same tone outside a
-card, or migrate card internals to shared `textVariants` in a later pass.
 
 ## Importing components
 

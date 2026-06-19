@@ -1,4 +1,4 @@
-import { cn } from '@rpg/ui'
+import { cn, Heading } from '@rpg/ui'
 
 import { SidebarNav } from './sidebar-nav'
 
@@ -26,7 +26,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         <div className="flex h-16 items-center px-6">
-          <span className="text-lg font-semibold tracking-tight">RPG World Builder</span>
+          <Heading variant="brand" as="span">
+            RPG World Builder
+          </Heading>
         </div>
         <SidebarNav />
       </aside>
