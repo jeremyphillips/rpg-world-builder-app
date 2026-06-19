@@ -1,14 +1,17 @@
 name: Storybook A11y
 
 on:
-  push:
-    branches:
-      - feat/**
-      - fix/**
-      - chore/**
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+concurrency:
+  group: storybook-a11y-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   storybook-a11y:
