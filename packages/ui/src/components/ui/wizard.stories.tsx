@@ -2,6 +2,9 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Wizard, WizardFooter, useWizard, type WizardStepDef } from './wizard.client'
+import { cn } from '../../lib/utils'
+import { Text } from './text'
+import { fieldLabelVariants } from './field.variants'
 
 const meta = {
   title: 'Primitives/Wizard',
@@ -32,7 +35,7 @@ function NameStep() {
         completeStep({ name: value })
       }}
     >
-      <label htmlFor="wiz-name" className="block text-sm font-medium">
+      <label htmlFor="wiz-name" className={fieldLabelVariants({ size: 'md' })}>
         Your name
       </label>
       <input
@@ -57,7 +60,7 @@ function RoleStep() {
         completeStep({ role: value })
       }}
     >
-      <label htmlFor="wiz-role" className="block text-sm font-medium">
+      <label htmlFor="wiz-role" className={fieldLabelVariants({ size: 'md' })}>
         Your role
       </label>
       <input
@@ -84,7 +87,11 @@ function ReviewStep() {
       <dl className="space-y-2 text-sm">
         {Object.entries(accumulatedValues).map(([key, val]) => (
           <div key={key} className="flex gap-2">
-            <dt className="font-medium capitalize text-muted-foreground">{key}:</dt>
+            <dt
+              className={cn(fieldLabelVariants({ size: 'md' }), 'capitalize text-muted-foreground')}
+            >
+              {key}:
+            </dt>
             <dd>{String(val)}</dd>
           </div>
         ))}
@@ -110,7 +117,7 @@ export const Default: StoryObj = {
     const [completed, setCompleted] = useState<Record<string, unknown> | null>(null)
 
     if (completed) {
-      return <p className="text-sm text-muted-foreground">Submitted: {JSON.stringify(completed)}</p>
+      return <Text variant="small">Submitted: {JSON.stringify(completed)}</Text>
     }
 
     return (
@@ -133,7 +140,7 @@ export const Midway: StoryObj = {
     const [completed, setCompleted] = useState<Record<string, unknown> | null>(null)
     // Render a pre-initialised Wizard at step 2 using a controlled key trick
     return completed ? (
-      <p className="text-sm text-muted-foreground">Done</p>
+      <Text variant="small">Done</Text>
     ) : (
       <Wizard steps={THREE_STEPS} onComplete={setCompleted}>
         <NameStep />

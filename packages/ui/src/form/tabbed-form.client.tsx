@@ -11,6 +11,7 @@ import {
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
+import { Text } from '../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FormItems } from './form-items.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
@@ -123,9 +124,9 @@ export function TabbedForm<TFieldValues extends FieldValues>({
           </Tabs>
 
           {formError ? (
-            <p role="alert" className="text-sm text-destructive">
+            <Text variant="destructive" role="alert">
               {formError}
-            </p>
+            </Text>
           ) : null}
 
           {typeof footer === 'function' ? footer(form) : footer}

@@ -55,3 +55,11 @@ export const removeButtonVariants = cva([
   'hover:opacity-100 hover:text-destructive',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
 ])
+
+export const dropzonePromptVariants = cva('text-sm font-medium')
+
+export const dropzoneHintVariants = cva('text-xs text-muted-foreground')
+
+export const fileNameVariants = cva('truncate text-sm font-medium')
+
+export const fileMetaVariants = cva('text-xs text-muted-foreground')

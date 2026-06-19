@@ -7,12 +7,17 @@ import { cn } from '../../lib/utils'
 import {
   dropzoneVariants,
   dropzoneIconVariants,
+  dropzonePromptVariants,
+  dropzoneHintVariants,
+  fileNameVariants,
+  fileMetaVariants,
   fileListVariants,
   fileItemVariants,
   fileThumbnailVariants,
   fileIconVariants,
   removeButtonVariants,
 } from './file-dropzone.variants'
+import { Text } from './text'
 
 /** Default accepted MIME types when `accept` is not specified. */
 export const DEFAULT_ACCEPT = ['image/*']
@@ -211,7 +216,7 @@ function DropZoneContent({ isDragOver, state }: { isDragOver: boolean; state: Dr
   return (
     <>
       <Icon className={cn('size-8', dropzoneIconVariants({ state }))} aria-hidden="true" />
-      <p className="text-sm font-medium">
+      <p className={dropzonePromptVariants()}>
         {isDragOver ? 'Drop to upload' : 'Drag & drop or click to browse'}
       </p>
     </>
@@ -221,11 +226,9 @@ function DropZoneContent({ isDragOver, state }: { isDragOver: boolean; state: Dr
 function DropZoneHints({ accept, maxSize }: { accept: string[]; maxSize?: number }) {
   return (
     <>
-      {accept !== DEFAULT_ACCEPT && (
-        <p className="text-xs text-muted-foreground">{accept.join(', ')}</p>
-      )}
+      {accept !== DEFAULT_ACCEPT && <p className={dropzoneHintVariants()}>{accept.join(', ')}</p>}
       {maxSize !== undefined && (
-        <p className="text-xs text-muted-foreground">
+        <p className={dropzoneHintVariants()}>
           Max {(maxSize / 1024 / 1024).toFixed(0)} MB per file
         </p>
       )}
@@ -314,8 +317,8 @@ function ExistingImageRow({ url, label, disabled, onRemove }: ExistingImageRowPr
     <li className={fileItemVariants()}>
       <img src={url} alt={label} className={fileThumbnailVariants()} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">Saved</p>
+        <p className={fileNameVariants()}>{label}</p>
+        <p className={fileMetaVariants()}>Saved</p>
       </div>
       {onRemove ? (
         <button
@@ -347,8 +350,8 @@ function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</p>
+              <p className={fileNameVariants()}>{file.name}</p>
+              <p className={fileMetaVariants()}>{(file.size / 1024).toFixed(1)} KB</p>
             </div>
             <button
               type="button"
@@ -447,9 +450,9 @@ export function FileDropzone({
       />
 
       {errorMsg ? (
-        <p role="alert" className="text-sm text-destructive">
+        <Text variant="destructive" role="alert">
           {errorMsg}
-        </p>
+        </Text>
       ) : null}
 
       {showFileList ? (

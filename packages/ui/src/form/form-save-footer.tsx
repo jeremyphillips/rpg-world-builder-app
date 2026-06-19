@@ -1,4 +1,5 @@
 import { cn } from '../lib/utils'
+import { Text } from '../components/ui/text'
 import { SubmitButton } from '../components/ui/submit-button'
 
 export interface FormSaveFooterProps {
@@ -42,9 +43,9 @@ export function FormSaveFooter({
   return (
     <div className={cn('flex items-center justify-end gap-3 pt-2', className)}>
       {isSuccess && successMessage ? (
-        <p role="status" className="text-sm text-muted-foreground">
+        <Text variant="small" role="status">
           {successMessage}
-        </p>
+        </Text>
       ) : null}
       <SubmitButton pending={pending} pendingLabel={pendingLabel}>
         {submitLabel}

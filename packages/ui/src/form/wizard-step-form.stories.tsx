@@ -3,6 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
 import { Wizard, WizardFooter, useWizard, type WizardStepDef } from '../components/ui/wizard.client'
+import { cn } from '../lib/utils'
+import { Text } from '../components/ui/text'
+import { fieldLabelVariants } from '../components/ui/field.variants'
 import { WizardStepForm } from './wizard-step-form.client'
 import type { FormItem } from './field-config'
 
@@ -60,7 +63,11 @@ function ReviewStep() {
       <dl className="space-y-2 text-sm">
         {Object.entries(accumulatedValues).map(([key, val]) => (
           <div key={key} className="flex gap-2">
-            <dt className="font-medium capitalize text-muted-foreground">{key}:</dt>
+            <dt
+              className={cn(fieldLabelVariants({ size: 'md' }), 'capitalize text-muted-foreground')}
+            >
+              {key}:
+            </dt>
             <dd>{String(val)}</dd>
           </div>
         ))}
@@ -85,7 +92,7 @@ export const Default: StoryObj = {
     const [completed, setCompleted] = useState<Record<string, unknown> | null>(null)
 
     if (completed) {
-      return <p className="text-sm text-muted-foreground">Submitted: {JSON.stringify(completed)}</p>
+      return <Text variant="small">Submitted: {JSON.stringify(completed)}</Text>
     }
 
     return (

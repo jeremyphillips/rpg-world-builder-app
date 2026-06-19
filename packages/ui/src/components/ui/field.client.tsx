@@ -8,6 +8,8 @@ import {
   type FieldControlVariantProps,
   type FieldWidth,
 } from './field-control.variants'
+import { fieldLabelVariants } from './field.variants'
+import { Text } from './text'
 
 type FieldSize = NonNullable<FieldControlVariantProps['size']>
 
@@ -104,12 +106,6 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
 )
 FieldRoot.displayName = 'Field.Root'
 
-const labelSizeClasses: Record<FieldSize, string> = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-sm',
-}
-
 export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
 
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
@@ -120,12 +116,7 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
         ref={ref}
         htmlFor={controlId}
         data-required={required || undefined}
-        className={cn(
-          'flex items-center gap-1.5 font-medium leading-none',
-          "data-[required]:after:content-['*'] data-[required]:after:text-destructive",
-          labelSizeClasses[size],
-          className,
-        )}
+        className={cn(fieldLabelVariants({ size }), className)}
         {...props}
       >
         {children}
@@ -162,9 +153,9 @@ function FieldHint({ className, children, ...props }: FieldHintProps) {
   const { hintId, hasError, hasHint, hint } = useFieldContext('Field.Hint')
   if (hasError || !hasHint) return null
   return (
-    <p id={hintId} className={cn('text-sm text-muted-foreground', className)} {...props}>
+    <Text id={hintId} variant="small" className={className} {...props}>
       {children ?? hint}
-    </p>
+    </Text>
   )
 }
 FieldHint.displayName = 'Field.Hint'
@@ -175,15 +166,16 @@ function FieldError({ className, children, ...props }: FieldErrorProps) {
   const { errorId, hasError, error } = useFieldContext('Field.Error')
   if (!hasError) return null
   return (
-    <p
+    <Text
       id={errorId}
+      variant="destructive"
       role="alert"
       aria-live="polite"
-      className={cn('text-sm text-destructive', className)}
+      className={className}
       {...props}
     >
       {children ?? error}
-    </p>
+    </Text>
   )
 }
 FieldError.displayName = 'Field.Error'

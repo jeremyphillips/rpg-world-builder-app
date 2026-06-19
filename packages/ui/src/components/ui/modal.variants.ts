@@ -31,5 +31,7 @@ export const modalContentVariants = cva(
   },
 )
 
+export const modalBodyVariants = cva('overflow-y-auto p-6 pt-0 text-sm')
+
 export type ModalContentVariantProps = VariantProps<typeof modalContentVariants>
 export type ModalSize = NonNullable<ModalContentVariantProps['size']>

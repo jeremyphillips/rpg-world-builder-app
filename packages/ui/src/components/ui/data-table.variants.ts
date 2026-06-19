@@ -60,3 +60,24 @@ export const dataTableColumnItemVariants = cva(
 export const dataTableColumnDragHandleVariants = cva(
   'flex cursor-grab items-center rounded p-0.5 text-muted-foreground hover:text-foreground active:cursor-grabbing',
 )
+
+/** Empty table body cell copy. */
+export const dataTableEmptyStateVariants = cva('h-24 text-center text-muted-foreground')
+
+/** Empty column panel search result. */
+export const dataTableEmptyPanelVariants = cva('px-3 py-2 text-sm text-muted-foreground')
+
+/** Locked (always-visible) column row in the panel. */
+export const dataTableLockedColumnVariants = cva(
+  'flex cursor-default items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground',
+)
+
+/** Reset column order control in the panel footer. */
+export const dataTableResetColumnVariants = cva(
+  'flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+)
+
+/** Active filter chip dismiss control in the toolbar. */
+export const dataTableFilterChipVariants = cva(
+  'inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground',
+)

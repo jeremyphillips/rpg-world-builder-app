@@ -5,7 +5,9 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 
 import { cn } from '../../lib/utils'
 import { Button, type ButtonProps } from './button.client'
+import { headingVariants } from './heading.variants'
 import { modalContentVariants, modalOverlayVariants } from './modal.variants'
+import { textVariants } from './text.variants'
 
 export interface ConfirmDialogProps {
   /** Whether the dialog is open (controlled). */
@@ -54,11 +56,11 @@ export function ConfirmDialog({
           className={cn(modalContentVariants({ size: 'sm' }), 'z-[60] gap-4 p-6')}
         >
           <div className="flex flex-col space-y-1.5">
-            <AlertDialogPrimitive.Title className="font-semibold leading-none tracking-tight">
+            <AlertDialogPrimitive.Title className={headingVariants({ variant: 'alert' })}>
               {headline}
             </AlertDialogPrimitive.Title>
             {description ? (
-              <AlertDialogPrimitive.Description className="text-sm text-muted-foreground">
+              <AlertDialogPrimitive.Description className={textVariants({ variant: 'small' })}>
                 {description}
               </AlertDialogPrimitive.Description>
             ) : null}

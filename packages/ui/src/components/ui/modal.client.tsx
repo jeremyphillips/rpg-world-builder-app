@@ -5,7 +5,14 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
+import { headingVariants } from './heading.variants'
+import {
+  modalContentVariants,
+  modalBodyVariants,
+  modalOverlayVariants,
+  type ModalSize,
+} from './modal.variants'
+import { textVariants } from './text.variants'
 
 const ModalRoot = DialogPrimitive.Root
 
@@ -90,11 +97,11 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, headline, description, children, ...props }, ref) => (
     <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      <DialogPrimitive.Title className="font-display text-lg font-semibold leading-none tracking-tight">
+      <DialogPrimitive.Title className={headingVariants({ variant: 'card' })}>
         {headline}
       </DialogPrimitive.Title>
       {description ? (
-        <DialogPrimitive.Description className="text-sm text-muted-foreground">
+        <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
           {description}
         </DialogPrimitive.Description>
       ) : null}
@@ -106,7 +113,7 @@ ModalHeader.displayName = 'Modal.Header'
 
 const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('overflow-y-auto p-6 pt-0 text-sm', className)} {...props} />
+    <div ref={ref} className={cn(modalBodyVariants(), className)} {...props} />
   ),
 )
 ModalBody.displayName = 'Modal.Body'

@@ -116,9 +116,14 @@ import {
   dataTableColumnDragHandleVariants,
   dataTableColumnItemVariants,
   dataTableColumnPanelVariants,
+  dataTableEmptyPanelVariants,
+  dataTableEmptyStateVariants,
+  dataTableFilterChipVariants,
   dataTableFilterControlVariants,
   dataTableFilterGroupVariants,
   dataTablePaginationVariants,
+  dataTableResetColumnVariants,
+  dataTableLockedColumnVariants,
   dataTableRootVariants,
   dataTableTableWrapVariants,
   dataTableToolbarVariants,
@@ -300,7 +305,7 @@ function ColumnPanelItem<TData>({ col, colName }: ColumnPanelItemProps<TData>) {
 function LockedColumnItem<TData>({ colName }: Pick<ColumnPanelItemProps<TData>, 'colName'>) {
   return (
     <div
-      className="flex cursor-default items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground"
+      className={dataTableLockedColumnVariants()}
       aria-label={`${colName} column (always visible)`}
     >
       <span className="flex shrink-0 items-center justify-center rounded p-0.5">
@@ -436,7 +441,7 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
                       <ColumnPanelItem key={col.id} col={col} colName={getColName(col)} />
                     ))
                   ) : filteredLockedCols.length === 0 ? (
-                    <p className="px-3 py-2 text-sm text-muted-foreground">No columns found.</p>
+                    <p className={dataTableEmptyPanelVariants()}>No columns found.</p>
                   ) : null}
                 </div>
               </SortableContext>
@@ -445,11 +450,7 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
 
           {/* Reset */}
           <div className="border-t border-border px-1 py-1.5">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
+            <button type="button" onClick={handleReset} className={dataTableResetColumnVariants()}>
               <RotateCcw className="size-3.5" />
               Reset Column Order
             </button>
@@ -568,11 +569,7 @@ function DataTableAdvancedFilters<TData>({
           </div>
           {hasActiveFilters && (
             <div className="flex items-center justify-end border-t border-border px-4 py-2">
-              <button
-                type="button"
-                onClick={onClearAll}
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-              >
+              <button type="button" onClick={onClearAll} className={dataTableFilterChipVariants()}>
                 <X className="size-3" />
                 Clear all filters
               </button>
@@ -987,7 +984,7 @@ export function DataTable<TData>({
               <TableRow>
                 <TableCell
                   colSpan={resolvedColumns.length}
-                  className="h-24 text-center text-muted-foreground"
+                  className={dataTableEmptyStateVariants()}
                 >
                   No results.
                 </TableCell>

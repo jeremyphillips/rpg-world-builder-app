@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '../../lib/utils'
 import { Field } from './field.client'
+import { fieldLabelVariants } from './field.variants'
+import { textVariants } from './text.variants'
 import { RadioGroup, RadioGroupItem } from './radio-group.client'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldWidth } from './field-control.variants'
@@ -53,7 +54,7 @@ export function RadioGroupField({
   const labelId = `${id}-label`
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
-      <span id={labelId} className="flex items-center gap-1.5 text-sm font-medium leading-none">
+      <span id={labelId} className={fieldLabelVariants({ size: 'md' })}>
         {label}
         {required ? (
           <span aria-hidden="true" className="text-destructive">
@@ -77,7 +78,7 @@ export function RadioGroupField({
             return (
               <div key={option.value} className="flex items-center gap-2">
                 <RadioGroupItem id={optionId} value={option.value} disabled={option.disabled} />
-                <label htmlFor={optionId} className={cn('text-sm font-normal leading-none')}>
+                <label htmlFor={optionId} className={textVariants({ variant: 'option' })}>
                   {option.label}
                 </label>
               </div>

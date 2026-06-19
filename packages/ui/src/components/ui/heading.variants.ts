@@ -6,6 +6,8 @@ export const headingVariants = cva('tracking-tight', {
       page: 'text-2xl font-semibold',
       display: 'text-3xl font-bold',
       section: 'text-xl font-semibold',
+      card: 'font-display text-lg font-semibold leading-none',
+      alert: 'font-semibold leading-none',
       label: 'font-medium',
     },
   },

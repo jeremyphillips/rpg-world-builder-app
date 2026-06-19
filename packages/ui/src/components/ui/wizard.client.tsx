@@ -5,6 +5,7 @@ import { CheckIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { Text } from './text'
 import {
   wizardStepBubbleVariants,
   wizardStepLabelVariants,
@@ -291,7 +292,7 @@ export function Wizard({ steps, onComplete, hint, className, children }: WizardP
     <WizardContext.Provider value={ctxValue}>
       <div className={cn('space-y-6', className)}>
         <WizardStepNav />
-        {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+        {hint && <Text variant="small">{hint}</Text>}
         <div>{activeChild}</div>
       </div>
     </WizardContext.Provider>
