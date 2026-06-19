@@ -31,3 +31,7 @@ through [`createContentListApi`](./lib/create-content-list.ts) and
 `api/*-api.ts` and `hooks/use-*.ts` pair delegates to those factories. Nested
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
+
+Class and subclass feature headings (`Level N: Name`) are composed at render
+time by [`formatFeatureHtml`](./lib/format-feature-html.ts); stored feature
+descriptions are body-only SRD HTML.

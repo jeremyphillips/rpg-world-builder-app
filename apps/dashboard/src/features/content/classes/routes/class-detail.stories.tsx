@@ -38,3 +38,17 @@ export const RichTextFeatures: Story = {
     )
   },
 }
+
+export const BardWithSubclassFeatures: Story = {
+  render: () => {
+    const bard = pickClass('bard')
+    return (
+      <ClassDetailContent
+        characterClass={bard}
+        campaignId={STORY_CAMPAIGN_ID}
+        classId={bard.id}
+        subclasses={pickSubclassesForClass('bard')}
+      />
+    )
+  },
+}
