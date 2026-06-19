@@ -12,6 +12,7 @@ import { creatureSizeSchema } from './creature-size'
 import { creatureTypeSchema } from './creature-type'
 import { damageTypeSchema } from './damage-type'
 import { levelSchema } from './level'
+import { speedSchema } from './movement-mode'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -50,22 +51,6 @@ export const senseSchema = z.object({
 })
 
 export type Sense = z.infer<typeof senseSchema>
-
-// --- Speed -----------------------------------------------------------------
-
-/**
- * Movement speeds in feet. `walk` is always present; the other modes appear
- * only when a species has them. Reused (as a partial) for lineage overrides.
- */
-export const speedSchema = z.object({
-  walk: z.number().int().min(0),
-  fly: z.number().int().min(0).optional(),
-  swim: z.number().int().min(0).optional(),
-  climb: z.number().int().min(0).optional(),
-  burrow: z.number().int().min(0).optional(),
-})
-
-export type Speed = z.infer<typeof speedSchema>
 
 // --- Innate spellcasting ----------------------------------------------------
 
