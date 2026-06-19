@@ -97,12 +97,16 @@ Column story pattern — use `STORY_CAMPAIGN_ID` and a fixture list:
 ```tsx
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPECIES_LIST } from '../fixtures'
-
 ;<DataTable columns={speciesColumns(STORY_CAMPAIGN_ID)} data={[...SPECIES_LIST]} />
 ```
 
 Use `pickClass()` / `pickSubclassesForClass()` from `lib/fixtures/pick` for
 one-off catalog slugs not worth a named fixture export.
+
+Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
+for loading, error, and not-found states (parallel to
+[`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
+on list pages).
 
 For route shells that need TanStack Query (loading, error, not-found), add
 `withDashboardProviders` from

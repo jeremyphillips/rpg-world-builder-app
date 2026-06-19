@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 import { ABILITIES, getClassName } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
@@ -7,6 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -87,35 +88,20 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   )
 }
 
-function findById(list: SkillProficiency[], id: string): SkillProficiency | undefined {
-  return list.find((item) => item.id === id)
-}
-
 export function SkillProficiencyDetail() {
   const { campaignId = '', skillId = '' } = useParams<{ campaignId: string; skillId: string }>()
   const { data: skillProficiencies = [], isPending, isError } = useSkillProficiencies(campaignId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load skill proficiency.
-      </Text>
-    )
-  }
-
-  const skill = findById(skillProficiencies, skillId)
-
-  if (!skill) {
-    return (
-      <Text variant="destructive" role="alert">
-        Skill proficiency not found.
-      </Text>
-    )
-  }
-
-  return <SkillDetailContent skill={skill} campaignId={campaignId} skillId={skillId} />
+  return (
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={skillProficiencies}
+      itemId={skillId}
+      loadErrorLabel="Could not load skill proficiency."
+      notFoundLabel="Skill proficiency not found."
+    >
+      {(skill) => <SkillDetailContent skill={skill} campaignId={campaignId} skillId={skillId} />}
+    </ContentDetailResolver>
+  )
 }

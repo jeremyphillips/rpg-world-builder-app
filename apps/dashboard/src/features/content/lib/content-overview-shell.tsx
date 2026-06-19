@@ -25,7 +25,9 @@ export function ContentOverviewShell({
         <Heading variant="page" as="h2">
           {heading}
         </Heading>
-        <Spinner />
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       </div>
     )
   }

@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom'
 import type { Armor } from '@rpg/contracts'
-import { Spinner, Heading, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useArmor } from '../hooks/use-armor'
 import { getArmorStatRows } from '../lib/armor-stat-rows'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -32,10 +33,6 @@ export function ArmorDetailContent({ item }: ArmorDetailContentProps) {
   )
 }
 
-function findById(list: Armor[], id: string): Armor | undefined {
-  return list.find((a) => a.id === id)
-}
-
 export function ArmorDetail() {
   const { campaignId = '', armorId = '' } = useParams<{
     campaignId: string
@@ -43,27 +40,16 @@ export function ArmorDetail() {
   }>()
   const { data: armor = [], isPending, isError } = useArmor(campaignId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load armor.
-      </Text>
-    )
-  }
-
-  const item = findById(armor, armorId)
-
-  if (!item) {
-    return (
-      <Text variant="destructive" role="alert">
-        Armor not found.
-      </Text>
-    )
-  }
-
-  return <ArmorDetailContent item={item} />
+  return (
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={armor}
+      itemId={armorId}
+      loadErrorLabel="Could not load armor."
+      notFoundLabel="Armor not found."
+    >
+      {(item) => <ArmorDetailContent item={item} />}
+    </ContentDetailResolver>
+  )
 }

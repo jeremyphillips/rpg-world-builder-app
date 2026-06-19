@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Equipment } from '@rpg/contracts'
-import { Spinner, Heading, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 import {
   formatMoney,
   formatWeight,
@@ -14,6 +14,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -153,10 +154,6 @@ export function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
   )
 }
 
-function findById(list: Equipment[], id: string): Equipment | undefined {
-  return list.find((item) => item.id === id)
-}
-
 export function EquipmentDetail() {
   const { campaignId = '', equipmentId = '' } = useParams<{
     campaignId: string
@@ -164,27 +161,16 @@ export function EquipmentDetail() {
   }>()
   const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load equipment.
-      </Text>
-    )
-  }
-
-  const item = findById(equipment, equipmentId)
-
-  if (!item) {
-    return (
-      <Text variant="destructive" role="alert">
-        Equipment not found.
-      </Text>
-    )
-  }
-
-  return <EquipmentDetailContent item={item} />
+  return (
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={equipment}
+      itemId={equipmentId}
+      loadErrorLabel="Could not load equipment."
+      notFoundLabel="Equipment not found."
+    >
+      {(item) => <EquipmentDetailContent item={item} />}
+    </ContentDetailResolver>
+  )
 }

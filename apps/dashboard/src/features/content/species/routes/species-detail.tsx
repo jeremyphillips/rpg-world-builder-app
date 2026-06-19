@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom'
-import { Heading, RichTextContent, Spinner, Text } from '@rpg/ui'
+import { Heading, RichTextContent, Text } from '@rpg/ui'
 import { getCreatureTypeLabel, getCreatureSizeLabel, getSenseLabel } from '@rpg/contracts'
 import type { Species, Speed, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -143,10 +144,6 @@ export function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
   )
 }
 
-function findById(list: Species[], id: string): Species | undefined {
-  return list.find((s) => s.id === id)
-}
-
 export function SpeciesDetail() {
   const { campaignId = '', speciesId = '' } = useParams<{
     campaignId: string
@@ -154,27 +151,16 @@ export function SpeciesDetail() {
   }>()
   const { data: species = [], isPending, isError } = useSpecies(campaignId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load species.
-      </Text>
-    )
-  }
-
-  const item = findById(species, speciesId)
-
-  if (!item) {
-    return (
-      <Text variant="destructive" role="alert">
-        Species not found.
-      </Text>
-    )
-  }
-
-  return <SpeciesDetailContent species={item} />
+  return (
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={species}
+      itemId={speciesId}
+      loadErrorLabel="Could not load species."
+      notFoundLabel="Species not found."
+    >
+      {(item) => <SpeciesDetailContent species={item} />}
+    </ContentDetailResolver>
+  )
 }

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
@@ -8,6 +8,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
@@ -135,43 +136,28 @@ export function ClassDetailContent({
   )
 }
 
-function findById(list: CharacterClass[], id: string): CharacterClass | undefined {
-  return list.find((item) => item.id === id)
-}
-
 export function ClassDetail() {
   const { campaignId = '', classId = '' } = useParams<{ campaignId: string; classId: string }>()
   const { data: classes = [], isPending, isError } = useClasses(campaignId)
   const { data: subclasses = [] } = useSubclasses(campaignId, classId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load class.
-      </Text>
-    )
-  }
-
-  const characterClass = findById(classes, classId)
-
-  if (!characterClass) {
-    return (
-      <Text variant="destructive" role="alert">
-        Class not found.
-      </Text>
-    )
-  }
-
   return (
-    <ClassDetailContent
-      characterClass={characterClass}
-      campaignId={campaignId}
-      classId={classId}
-      subclasses={subclasses}
-    />
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={classes}
+      itemId={classId}
+      loadErrorLabel="Could not load class."
+      notFoundLabel="Class not found."
+    >
+      {(characterClass) => (
+        <ClassDetailContent
+          characterClass={characterClass}
+          campaignId={campaignId}
+          classId={classId}
+          subclasses={subclasses}
+        />
+      )}
+    </ContentDetailResolver>
   )
 }
