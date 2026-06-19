@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { loadSeedSpecies, seedSpeciesSlugs } from './seed'
+import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
 

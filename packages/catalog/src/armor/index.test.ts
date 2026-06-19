@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { loadSeedArmor, seedArmorSlugs } from './seed'
+import { loadSeedArmor, seedArmorSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
 

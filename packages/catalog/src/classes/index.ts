@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { classSchema, subclassSchema } from '@rpg/contracts'
 import type { CharacterClass, Subclass, SystemRulesetId } from '@rpg/contracts'
 
+import { getBySlug } from '../lib/get-by-slug'
 import classesRaw from './data/srd-cc-5.2.1/classes.json'
 import subclassesRaw from './data/srd-cc-5.2.1/subclasses.json'
 
@@ -37,4 +38,12 @@ export function loadSubclassesByClassId(rulesetId: SystemRulesetId, classId: str
 /** System class slugs for a ruleset — used by the homebrew slug guard. */
 export function seedClassSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return new Set(loadSeedClasses(rulesetId).map((c) => c.slug))
+}
+
+export function getClassBySlug(rulesetId: SystemRulesetId, slug: string): CharacterClass {
+  return getBySlug(loadSeedClasses, rulesetId, slug, 'Class')
+}
+
+export function getSubclassBySlug(rulesetId: SystemRulesetId, slug: string): Subclass {
+  return getBySlug(loadSeedSubclasses, rulesetId, slug, 'Subclass')
 }

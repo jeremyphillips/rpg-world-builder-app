@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { EQUIPMENT_KINDS } from '@rpg/contracts'
 
-import { loadSeedEquipment, seedEquipmentSlugs } from './seed'
+import { loadSeedEquipment, seedEquipmentSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
 

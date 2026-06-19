@@ -3,7 +3,7 @@ import type { Species } from '@rpg/contracts'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { SpeciesPatchModel } from './species-patch.model'
-import { loadSeedSpecies, seedSpeciesSlugs } from './seed'
+import { loadSeedSpecies, seedSpeciesSlugs } from '@rpg/catalog/species'
 
 interface SpeciesPatchRecord {
   targetId: string

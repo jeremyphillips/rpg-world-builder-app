@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { armorSchema } from '@rpg/contracts'
 import type { Armor, SystemRulesetId } from '@rpg/contracts'
 
+import { getBySlug } from '../lib/get-by-slug'
 import armorRaw from './data/srd-cc-5.2.1/armor.json'
 
 // Validate the shipped catalog against the contract at module load so malformed
@@ -19,4 +20,8 @@ export function loadSeedArmor(rulesetId: SystemRulesetId): Armor[] {
 /** System armor slugs for a ruleset — used by the homebrew slug guard. */
 export function seedArmorSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return new Set(loadSeedArmor(rulesetId).map((a) => a.slug))
+}
+
+export function getArmorBySlug(rulesetId: SystemRulesetId, slug: string): Armor {
+  return getBySlug(loadSeedArmor, rulesetId, slug, 'Armor')
 }

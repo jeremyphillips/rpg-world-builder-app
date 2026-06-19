@@ -129,7 +129,7 @@ type EquipmentDetailContentProps = {
   item: Equipment
 }
 
-function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
+export function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
 
   const kindRows = getKindStatRows(item)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { loadSeedSkillProficiencies, seedSkillProficiencySlugs } from './seed'
+import { loadSeedSkillProficiencies, seedSkillProficiencySlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
 

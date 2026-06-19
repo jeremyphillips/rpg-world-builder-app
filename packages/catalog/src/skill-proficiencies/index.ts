@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { skillProficiencySchema } from '@rpg/contracts'
 import type { SkillProficiency, SystemRulesetId } from '@rpg/contracts'
 
+import { getBySlug } from '../lib/get-by-slug'
 import skillProficienciesRaw from './data/srd-cc-5.2.1/skill-proficiencies.json'
 
 // Validate the shipped catalog against the contract at module load, so malformed
@@ -21,4 +22,11 @@ export function loadSeedSkillProficiencies(rulesetId: SystemRulesetId): SkillPro
 /** System skill proficiency slugs for a ruleset — used by the homebrew slug guard. */
 export function seedSkillProficiencySlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return new Set(loadSeedSkillProficiencies(rulesetId).map((s) => s.slug))
+}
+
+export function getSkillProficiencyBySlug(
+  rulesetId: SystemRulesetId,
+  slug: string,
+): SkillProficiency {
+  return getBySlug(loadSeedSkillProficiencies, rulesetId, slug, 'Skill proficiency')
 }

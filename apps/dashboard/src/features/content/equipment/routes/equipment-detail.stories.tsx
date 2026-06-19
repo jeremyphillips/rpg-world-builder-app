@@ -1,127 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { Equipment } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
 
-import { ContentDetailLayout } from '../../lib/content-detail-layout'
-import { ContentStatRow } from '../../lib/content-stat-row'
-import { getContentImageUrl } from '../../lib/content-image-url'
-
-const TORCH: Equipment = {
-  id: 'srd-cc-5.2.1:torch',
-  slug: 'torch',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  kind: 'gear',
-  name: 'Torch',
-  description: 'A torch burns for 1 hour, shedding bright light in a 20-foot radius.',
-  cost: { amount: 1, currency: 'cp' },
-  weight: { value: 1, unit: 'lb' },
-  gearCategory: 'lighting',
-}
-
-const ROWBOAT: Equipment = {
-  id: 'srd-cc-5.2.1:rowboat',
-  slug: 'rowboat',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  kind: 'ship',
-  name: 'Rowboat',
-  description: 'A small open boat propelled by oars.',
-  cost: { amount: 50, currency: 'gp' },
-  speed: '1½ mph',
-  crew: 1,
-  passengers: 3,
-  ac: 11,
-  hp: 50,
-}
-
-const RIDING_HORSE: Equipment = {
-  id: 'srd-cc-5.2.1:riding-horse',
-  slug: 'riding-horse',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  kind: 'mount',
-  name: 'Horse, Riding',
-  description: 'A common riding horse suited for travel on roads and open terrain.',
-  cost: { amount: 75, currency: 'gp' },
-  carryingCapacity: { value: 480, unit: 'lb' },
-  speed: '60 ft.',
-}
+import { RIDING_HORSE, ROWBOAT, TORCH } from '../fixtures'
+import { EquipmentDetailContent } from './equipment-detail'
 
 const meta = {
   title: 'Content/Equipment/EquipmentDetail',
-  component: ContentDetailLayout,
+  component: EquipmentDetailContent,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof ContentDetailLayout>
+} satisfies Meta<typeof EquipmentDetailContent>
 
 export default meta
 type Story = StoryObj
 
 export const GearItem: Story = {
-  render: () => (
-    <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={TORCH.name}>
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {TORCH.name}
-        </Heading>
-        <div className="space-y-3">
-          <ContentStatRow label="Kind" value="Adventuring Gear" />
-          <ContentStatRow label="Cost" value="1 CP" />
-          <ContentStatRow label="Weight" value="1 lb" />
-          <ContentStatRow label="Category" value="Lighting" />
-        </div>
-        <Text variant="muted">{TORCH.description}</Text>
-      </div>
-    </ContentDetailLayout>
-  ),
+  render: () => <EquipmentDetailContent item={TORCH} />,
 }
 
 export const ShipItem: Story = {
-  render: () => (
-    <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={ROWBOAT.name}>
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {ROWBOAT.name}
-        </Heading>
-        <div className="space-y-3">
-          <ContentStatRow label="Kind" value="Ship" />
-          <ContentStatRow label="Cost" value="50 GP" />
-          <ContentStatRow label="Speed" value="1½ mph" />
-          <ContentStatRow label="Crew" value="1" />
-          <ContentStatRow label="Passengers" value="3" />
-          <ContentStatRow label="AC" value="11" />
-          <ContentStatRow label="HP" value="50" />
-        </div>
-        <Text variant="muted">{ROWBOAT.description}</Text>
-      </div>
-    </ContentDetailLayout>
-  ),
+  render: () => <EquipmentDetailContent item={ROWBOAT} />,
 }
 
 export const MountItem: Story = {
-  render: () => (
-    <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={RIDING_HORSE.name}>
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {RIDING_HORSE.name}
-        </Heading>
-        <div className="space-y-3">
-          <ContentStatRow label="Kind" value="Mount" />
-          <ContentStatRow label="Cost" value="75 GP" />
-          <ContentStatRow label="Carrying Capacity" value="480 lb" />
-          <ContentStatRow label="Speed" value="60 ft." />
-        </div>
-        <Text variant="muted">{RIDING_HORSE.description}</Text>
-      </div>
-    </ContentDetailLayout>
-  ),
+  render: () => <EquipmentDetailContent item={RIDING_HORSE} />,
 }

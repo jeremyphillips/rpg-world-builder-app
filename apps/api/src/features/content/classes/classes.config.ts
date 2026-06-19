@@ -4,7 +4,7 @@ import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { ClassPatchModel } from './class-patch.model'
 import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
-import { loadSeedClasses, seedClassSlugs } from './seed'
+import { loadSeedClasses, seedClassSlugs } from '@rpg/catalog/classes'
 
 // InferSchemaType gives wider primitives (string, number, string[]) for
 // enum-constrained fields; Mixed fields become any. The single `as CharacterClass`

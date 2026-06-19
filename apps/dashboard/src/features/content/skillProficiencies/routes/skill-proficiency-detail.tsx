@@ -53,7 +53,7 @@ type SkillDetailContentProps = {
   skillId: string
 }
 
-function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
+export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
   const editHref = ROUTES.content.skillProficiencies.edit(campaignId, skillId)
 

@@ -11,7 +11,7 @@ import { getContentImageUrl } from '../../lib/content-image-url'
 
 type ArmorDetailContentProps = { item: Armor }
 
-function ArmorDetailContent({ item }: ArmorDetailContentProps) {
+export function ArmorDetailContent({ item }: ArmorDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
   const statRows = getArmorStatRows(item)
 

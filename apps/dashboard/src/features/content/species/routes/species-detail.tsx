@@ -125,7 +125,7 @@ function SpeciesStatsSection({ species }: { species: Species }) {
 
 type SpeciesDetailContentProps = { species: Species }
 
-function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
+export function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
   useSetBreadcrumbLabel(species.name)
 
   return (
