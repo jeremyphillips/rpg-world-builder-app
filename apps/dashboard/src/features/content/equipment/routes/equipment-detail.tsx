@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Equipment } from '@rpg/contracts'
+import { Spinner } from '@rpg/ui'
 import {
   formatMoney,
   formatWeight,
@@ -162,7 +163,7 @@ export function EquipmentDetail() {
   const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

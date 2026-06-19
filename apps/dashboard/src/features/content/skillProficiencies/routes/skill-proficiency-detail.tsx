@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { buttonVariants, Spinner } from '@rpg/ui'
 import { ABILITIES, getClassName } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
@@ -94,7 +94,7 @@ export function SkillProficiencyDetail() {
   const { data: skillProficiencies = [], isPending, isError } = useSkillProficiencies(campaignId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Weapon } from '@rpg/contracts'
+import { Spinner } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useWeapons } from '../hooks/use-weapons'
@@ -41,7 +42,7 @@ export function WeaponDetail() {
   const { data: weapons = [], isPending, isError } = useWeapons(campaignId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

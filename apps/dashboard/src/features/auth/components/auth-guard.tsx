@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
+import { Spinner } from '@rpg/ui'
 
 import { LOGIN_PATH } from '../api/auth-client'
 import { useSession } from '../hooks/use-session'
@@ -26,7 +27,11 @@ export function AuthGuard() {
   }, [isError])
 
   if (isPending) {
-    return <FullScreenMessage>Loading…</FullScreenMessage>
+    return (
+      <FullScreenMessage>
+        <Spinner />
+      </FullScreenMessage>
+    )
   }
 
   if (isError || !user) {

@@ -1,8 +1,9 @@
+import { Spinner } from '@rpg/ui'
+
 type ContentOverviewShellProps = {
   heading: string
   isPending: boolean
   isError: boolean
-  loadingLabel?: string
   errorLabel?: string
   children: React.ReactNode
 }
@@ -15,7 +16,6 @@ export function ContentOverviewShell({
   heading,
   isPending,
   isError,
-  loadingLabel,
   errorLabel,
   children,
 }: ContentOverviewShellProps) {
@@ -23,9 +23,7 @@ export function ContentOverviewShell({
     return (
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-        <p className="text-sm text-muted-foreground">
-          {loadingLabel ?? `Loading ${heading.toLowerCase()}…`}
-        </p>
+        <Spinner />
       </div>
     )
   }

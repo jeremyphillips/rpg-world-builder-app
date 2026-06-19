@@ -71,18 +71,12 @@ export function resolveTargetPathOnSwitch(pathname: string, fromId: string, toId
 }
 
 interface SwitcherLabelState {
-  isPending: boolean
   isError: boolean
   activeName?: string
 }
 
 /** Label shown in the campaign switcher trigger for a given query state. */
-export function getCampaignSwitcherLabel({
-  isPending,
-  isError,
-  activeName,
-}: SwitcherLabelState): string {
-  if (isPending) return 'Loading campaigns…'
+export function getCampaignSwitcherLabel({ isError, activeName }: SwitcherLabelState): string {
   if (isError) return 'Couldn’t load campaigns'
   return activeName ?? 'Select campaign'
 }

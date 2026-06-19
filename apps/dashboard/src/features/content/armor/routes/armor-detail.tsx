@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Armor } from '@rpg/contracts'
+import { Spinner } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useArmor } from '../hooks/use-armor'
@@ -41,7 +42,7 @@ export function ArmorDetail() {
   const { data: armor = [], isPending, isError } = useArmor(campaignId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

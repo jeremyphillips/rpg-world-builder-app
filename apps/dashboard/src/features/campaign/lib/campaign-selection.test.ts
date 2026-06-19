@@ -74,23 +74,17 @@ describe('resolveTargetPathOnSwitch', () => {
 })
 
 describe('getCampaignSwitcherLabel', () => {
-  it('shows a loading label while pending', () => {
-    expect(getCampaignSwitcherLabel({ isPending: true, isError: false })).toBe('Loading campaigns…')
-  })
-
   it('shows an error label on failure', () => {
-    expect(getCampaignSwitcherLabel({ isPending: false, isError: true })).toBe(
-      'Couldn’t load campaigns',
-    )
+    expect(getCampaignSwitcherLabel({ isError: true })).toBe('Couldn’t load campaigns')
   })
 
   it('shows the active campaign name when available', () => {
-    expect(
-      getCampaignSwitcherLabel({ isPending: false, isError: false, activeName: 'Sunless Citadel' }),
-    ).toBe('Sunless Citadel')
+    expect(getCampaignSwitcherLabel({ isError: false, activeName: 'Sunless Citadel' })).toBe(
+      'Sunless Citadel',
+    )
   })
 
   it('falls back to a prompt when no campaign is active', () => {
-    expect(getCampaignSwitcherLabel({ isPending: false, isError: false })).toBe('Select campaign')
+    expect(getCampaignSwitcherLabel({ isError: false })).toBe('Select campaign')
   })
 })

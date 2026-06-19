@@ -11,22 +11,8 @@ describe('ContentOverviewShell', () => {
       </ContentOverviewShell>,
     )
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()
-    expect(screen.getByText('Loading equipment…')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
     expect(screen.queryByText('Ready content')).not.toBeInTheDocument()
-  })
-
-  it('renders a custom loading label', () => {
-    render(
-      <ContentOverviewShell
-        heading="Classes"
-        isPending={true}
-        isError={false}
-        loadingLabel="Fetching classes…"
-      >
-        <p>Ready content</p>
-      </ContentOverviewShell>,
-    )
-    expect(screen.getByText('Fetching classes…')).toBeInTheDocument()
   })
 
   it('renders the error state with role="alert"', () => {
