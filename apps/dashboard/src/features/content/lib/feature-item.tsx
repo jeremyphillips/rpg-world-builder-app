@@ -1,6 +1,6 @@
-import { RichTextContent } from '@rpg/ui'
+import { Heading, RichTextContent } from '@rpg/ui'
 
-import { formatFeatureHtml } from './format-feature-html'
+import { formatFeatureDescriptionHtml } from './format-feature-description-html'
 
 type FeatureItemProps = {
   feature: {
@@ -11,10 +11,14 @@ type FeatureItemProps = {
 }
 
 export function FeatureItem({ feature }: FeatureItemProps) {
-  const html = formatFeatureHtml(feature.level, feature.name, feature.description)
+  const bodyHtml = formatFeatureDescriptionHtml(feature.description)
+
   return (
-    <li>
-      <RichTextContent html={html} size="sm" tone="muted" />
+    <li className="space-y-1">
+      <Heading variant="label" as="h3">
+        Level {feature.level}: {feature.name}
+      </Heading>
+      {bodyHtml && <RichTextContent html={bodyHtml} size="sm" tone="muted" />}
     </li>
   )
 }

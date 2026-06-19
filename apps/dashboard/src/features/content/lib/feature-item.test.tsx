@@ -14,7 +14,9 @@ describe('FeatureItem', () => {
         }}
       />,
     )
-    expect(screen.getByText(/Level 3: Bonus Proficiencies/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Level 3: Bonus Proficiencies' }),
+    ).toBeInTheDocument()
     expect(screen.getByText(/three skills of your choice/)).toBeInTheDocument()
   })
 })
