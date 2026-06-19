@@ -48,8 +48,36 @@ Run a single workspace with a pnpm filter:
 pnpm --filter @rpg/api dev          # API only (tsx watch on :5001)
 pnpm --filter @rpg/public dev       # Next only (:3000)
 pnpm --filter @rpg/dashboard dev    # Vite only (:5173)
-pnpm --filter @rpg/ui storybook     # Storybook on :6006
 ```
+
+### Storybook
+
+Root shorthands (from the repo root):
+
+```bash
+pnpm storybook:ui         # UI primitives (:6006)
+pnpm storybook:dashboard  # Dashboard composition (:6007)
+pnpm storybook            # both concurrently
+```
+
+Equivalent filter commands:
+
+```bash
+pnpm --filter @rpg/ui storybook
+pnpm --filter @rpg/dashboard storybook
+```
+
+| Port | Package          | Stories                                            |
+| ---- | ---------------- | -------------------------------------------------- |
+| 6006 | `@rpg/ui`        | Shared primitives, forms, recipes in `packages/ui` |
+| 6007 | `@rpg/dashboard` | Co-located `*.stories.tsx` under `apps/dashboard`  |
+
+Use `:6006` for design-system work; use `:6007` for content catalog and layout
+composition stories that depend on dashboard paths and providers.
+
+CI runs axe against both Storybooks on PRs via the
+[Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
+`dashboard` matrix jobs).
 
 ## Quality gates (Turbo, all workspaces)
 

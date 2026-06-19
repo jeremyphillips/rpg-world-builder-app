@@ -7,6 +7,6 @@
     },
     "types": ["node", "vite/client", "vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "src/**/*.stories.tsx"]
+  "include": ["src", ".storybook"],
+  "exclude": ["node_modules", "dist"]
 }

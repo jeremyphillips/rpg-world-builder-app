@@ -10,7 +10,7 @@ const meta = {
 } satisfies Meta<typeof ContentDetailLayout>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/400x500/1e293b/94a3b8?text=Class+Art'
 

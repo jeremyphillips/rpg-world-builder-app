@@ -10,10 +10,22 @@
     "./vitest/base": "./src/vitest/base.js",
     "./tsconfig/base.json": "./tsconfig/base.json",
     "./tsconfig/react.json": "./tsconfig/react.json",
-    "./tsconfig/node.json": "./tsconfig/node.json"
+    "./tsconfig/node.json": "./tsconfig/node.json",
+    "./storybook/main-base": "./src/storybook/main-base.ts",
+    "./storybook/preview-base": "./src/storybook/preview-base.ts"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "@storybook/addon-a11y": "^10.4.2",
+    "@storybook/addon-themes": "^10.4.2",
+    "@storybook/react-vite": "^10.4.2",
+    "@tailwindcss/vite": "^4.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "storybook": "^10.4.2"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",
@@ -25,5 +37,17 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "typescript-eslint": "^8.60.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.4.2",
+    "@storybook/addon-themes": "^10.4.2",
+    "@storybook/react-vite": "^10.4.2",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "storybook": "^10.4.2",
+    "typescript": "^6.0.3"
   }
 }
