@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { buttonVariants, Heading, RichTextContent, Text } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
-import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
+import type { CharacterClass, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -10,22 +10,18 @@ import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
+import { FeatureItem } from '../../lib/feature-item'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
 
-function FeatureItem({ feature }: { feature: ClassFeature }) {
-  return (
-    <li className="space-y-1">
-      <Heading variant="label" as="p">
-        Level {feature.level}: {feature.name}
-      </Heading>
-      {feature.description && <RichTextContent html={feature.description} size="sm" tone="muted" />}
-    </li>
-  )
-}
-
-function FeaturesList({ className, features }: { className: string; features: ClassFeature[] }) {
-  const sorted = [...features].sort((a, b) => a.level - b.level)
+function FeaturesList({
+  className,
+  features,
+}: {
+  className: string
+  features: CharacterClass['features']
+}) {
+  const sorted = [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
   return (
     <section aria-labelledby="features-heading">
       <Heading variant="section" as="h3" id="features-heading" className="mb-4">
@@ -40,6 +36,18 @@ function FeaturesList({ className, features }: { className: string; features: Cl
   )
 }
 
+function SubclassFeaturesList({ features }: { features: Subclass['features'] }) {
+  if (features.length === 0) return null
+  const sorted = [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+  return (
+    <ul className="mt-4 space-y-4" role="list">
+      {sorted.map((feature) => (
+        <FeatureItem key={feature.id} feature={feature} />
+      ))}
+    </ul>
+  )
+}
+
 function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   if (subclasses.length === 0) return null
   return (
@@ -47,9 +55,9 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
       <Heading variant="section" as="h3" id="subclasses-heading" className="mb-4">
         Subclasses
       </Heading>
-      <ul className="space-y-2" role="list">
+      <ul className="space-y-6" role="list">
         {subclasses.map((sub) => (
-          <li key={sub.id}>
+          <li key={sub.id} className="space-y-2">
             <Heading variant="label" as="p">
               {sub.name}
             </Heading>
@@ -59,6 +67,7 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
               </Text>
             )}
             {sub.description && <RichTextContent html={sub.description} size="sm" tone="muted" />}
+            <SubclassFeaturesList features={sub.features} />
           </li>
         ))}
       </ul>

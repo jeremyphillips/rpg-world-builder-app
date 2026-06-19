@@ -67,6 +67,33 @@ describe('classSchema', () => {
   it('rejects a hit die outside the class range', () => {
     expect(classSchema.safeParse({ ...fighter, hitDie: 4 }).success).toBe(false)
   })
+
+  it('parses class features with optional grants', () => {
+    const withGrants = {
+      ...fighter,
+      features: [
+        {
+          id: 'words-of-creation',
+          name: 'Words of Creation',
+          level: 20,
+          description: '<p>You always have Power Word Heal and Power Word Kill prepared.</p>',
+          grants: {
+            innateSpells: {
+              ability: 'cha',
+              entries: [
+                {
+                  level: 20,
+                  kind: 'always_prepared',
+                  spellIds: ['power-word-heal', 'power-word-kill'],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    }
+    expect(classSchema.parse(withGrants)).toEqual(withGrants)
+  })
 })
 
 describe('createClassInputSchema', () => {
@@ -140,7 +167,30 @@ describe('subclassSchema', () => {
       description:
         '<p>Fighters who pursue physical excellence and devastating critical strikes.</p>',
     }
-    expect(subclassSchema.parse(champion)).toEqual(champion)
+    expect(subclassSchema.parse(champion)).toEqual({ ...champion, features: [] })
+  })
+
+  it('parses subclass features with optional grants', () => {
+    const lore = {
+      id: 'srd-cc-5.2.1:college-of-lore',
+      slug: 'college-of-lore',
+      rulesetId: 'srd-cc-5.2.1',
+      source: 'system',
+      campaignId: null,
+      ...timestamps,
+      classId: 'srd-cc-5.2.1:bard',
+      name: 'College of Lore',
+      description: '<p>Bards who collect knowledge.</p>',
+      features: [
+        {
+          id: 'bonus-proficiencies',
+          name: 'Bonus Proficiencies',
+          level: 3,
+          description: '<p>You gain proficiency with three skills of your choice.</p>',
+        },
+      ],
+    }
+    expect(subclassSchema.parse(lore)).toEqual(lore)
   })
 
   it('requires a classId', () => {

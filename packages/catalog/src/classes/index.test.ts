@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
-import { loadSeedClasses, loadSeedSubclasses, seedClassSlugs } from './index'
+import {
+  getClassBySlug,
+  getSubclassBySlug,
+  loadSeedClasses,
+  loadSeedSubclasses,
+  seedClassSlugs,
+} from './index'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -45,6 +51,43 @@ describe('SRD 5.2.1 class seed', () => {
     }
     for (const sub of subclasses) {
       expectRichTextHtml(sub.description)
+      for (const feature of sub.features) {
+        expectRichTextHtml(feature.description)
+      }
     }
+  })
+
+  it('Bard ships full feature prose, prepared spells, and Bardic Die resource', () => {
+    const bard = getClassBySlug(RULESET, 'bard')
+    expect(bard.features).toHaveLength(11)
+    expect(bard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(bard.asiLevels).toEqual([4, 8, 12, 16])
+    expect(bard.spellcasting?.spellsPrepared?.find((e) => e.level === 1)?.prepared).toBe(4)
+    expect(bard.spellcasting?.spellsPrepared?.find((e) => e.level === 20)?.prepared).toBe(22)
+    const bardicDie = bard.resources?.find((r) => r.name === 'Bardic Die')
+    expect(bardicDie?.entries).toEqual([
+      { level: 1, value: 6 },
+      { level: 5, value: 8 },
+      { level: 10, value: 10 },
+      { level: 15, value: 12 },
+    ])
+    const words = bard.features.find((f) => f.id === 'words-of-creation')
+    expect(words?.grants?.innateSpells?.entries[0]).toEqual({
+      level: 20,
+      kind: 'always_prepared',
+      spellIds: ['power-word-heal', 'power-word-kill'],
+    })
+  })
+
+  it('College of Lore ships four subclass features with rich-text HTML', () => {
+    const lore = getSubclassBySlug(RULESET, 'college-of-lore')
+    expect(lore.features).toHaveLength(4)
+    expect(lore.features.map((f) => f.id)).toEqual([
+      'bonus-proficiencies',
+      'cutting-words',
+      'magical-discoveries',
+      'peerless-skill',
+    ])
+    expect(lore.description).toContain('libraries and universities')
   })
 })

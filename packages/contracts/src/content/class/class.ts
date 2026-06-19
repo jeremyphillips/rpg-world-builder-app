@@ -11,6 +11,7 @@ import {
   contentPatchBaseSchema,
   slugSchema,
 } from '../envelope'
+import { contentTraitSchema } from '../grants'
 import { skillSchema } from '../skill-proficiency'
 
 import { spellcastingSchema } from './spellcasting'
@@ -23,15 +24,16 @@ import { spellcastingSchema } from './spellcasting'
 
 // --- Class features + proficiencies ----------------------------------------
 
-export const classFeatureSchema = z.object({
-  id: z.string().min(1), // unique within the class — enforced at the service layer
-  name: z.string().min(1),
+export const classFeatureSchema = contentTraitSchema.extend({
   level: levelSchema,
-  /** Rich-text HTML faithful to the SRD wording. */
-  description: z.string().optional(),
 })
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>
+
+/** Subclass features share the class feature shape (level + optional grants). */
+export const subclassFeatureSchema = classFeatureSchema
+
+export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
 export const classProficienciesSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
@@ -117,6 +119,7 @@ export const subclassBodySchema = contentBodyBaseSchema.extend({
   classId: z.string().min(1),
   /** Short italic lead-in matching the SRD's em-formatted tagline (e.g. "Channel Rage into Violent Fury"). */
   tagline: z.string().optional(),
+  features: z.array(subclassFeatureSchema).default([]),
 })
 
 export type SubclassBody = z.infer<typeof subclassBodySchema>
@@ -173,8 +176,7 @@ export function getClassName(slug: string): string {
 //
 // - extraAttacks: [{ level, attacks }] — structured Extra Attack progression
 //   (Fighter 5/11/20). For now Extra Attack is a `features[]` row only.
-// - Subclass features + the feature effects engine
-//   (formula/condition/modifier/aura).
+// - Feature effects engine (formula/condition/modifier/aura).
 // - Warlock mysticArcanum; spell-slot / spells-known tables.
 // - Skill governing-ability and full weapon/armor/skill content types (built in
 //   their feature folders; schemas added to their contract modules).

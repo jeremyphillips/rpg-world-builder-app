@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { CharacterClass } from '@rpg/contracts'
 
+import { pickClass } from '../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
 const meta = {
@@ -56,47 +57,7 @@ const BARBARIAN: CharacterClass = {
   ],
 }
 
-const BARD: CharacterClass = {
-  ...BASE,
-  id: 'srd-cc-5.2.1:bard',
-  slug: 'bard',
-  name: 'Bard',
-  hitDie: 8,
-  primaryAbilities: ['cha'],
-  asiLevels: [4, 8, 12, 16, 19],
-  subclassLevels: [3],
-  spellcasting: {
-    progression: 'full',
-    ability: 'cha',
-    preparation: 'prepared',
-    cantrips: [
-      { level: 1, known: 2 },
-      { level: 4, known: 3 },
-      { level: 10, known: 4 },
-    ],
-  },
-  proficiencies: {
-    savingThrows: ['dex', 'cha'],
-    armor: ['light'],
-    weapons: { categories: ['simple'] },
-    skills: {
-      choose: 3,
-      from: [
-        'acrobatics',
-        'deception',
-        'insight',
-        'intimidation',
-        'perception',
-        'performance',
-        'persuasion',
-      ],
-    },
-  },
-  features: [
-    { id: 'spellcasting', name: 'Spellcasting', level: 1 },
-    { id: 'bardic-inspiration', name: 'Bardic Inspiration', level: 1 },
-  ],
-}
+const BARD = pickClass('bard')
 
 const SORCERER: CharacterClass = {
   ...BASE,
