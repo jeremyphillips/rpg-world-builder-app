@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Route, Routes } from 'react-router-dom'
 
@@ -15,7 +16,7 @@ export const Default: Story = {
   render: () => (
     <Routes>
       <Route element={<ConcentrationShell />}>
-        <Route index element={<p>Concentration content</p>} />
+        <Route index element={<Text>Concentration content</Text>} />
       </Route>
     </Routes>
   ),
