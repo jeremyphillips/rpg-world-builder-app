@@ -16,13 +16,18 @@ import { skillSchema } from '../skill-proficiency'
 import { spellcastingSchema } from './spellcasting'
 
 // ---------------------------------------------------------------------------
-// Class features + proficiencies
+// Class — SRD-faithful prose lives in rich-text HTML on `description` and
+// `features[].description`; structured fields (proficiencies, spellcasting, etc.)
+// are data the character builder reads, not a rules engine.
 // ---------------------------------------------------------------------------
+
+// --- Class features + proficiencies ----------------------------------------
 
 export const classFeatureSchema = z.object({
   id: z.string().min(1), // unique within the class — enforced at the service layer
   name: z.string().min(1),
   level: levelSchema,
+  /** Rich-text HTML faithful to the SRD wording. */
   description: z.string().optional(),
 })
 
@@ -103,7 +108,9 @@ export const classPatchSchema = contentPatchBaseSchema.extend({
 export type ClassPatch = z.infer<typeof classPatchSchema>
 
 // ---------------------------------------------------------------------------
-// Subclass — references its parent class by the opaque `id` (not slug)
+// Subclass — references its parent class by the opaque `id` (not slug).
+// `description` (from contentBodyBaseSchema) is rich-text HTML; `tagline` is
+// plain italic lead-in copy.
 // ---------------------------------------------------------------------------
 
 export const subclassBodySchema = contentBodyBaseSchema.extend({

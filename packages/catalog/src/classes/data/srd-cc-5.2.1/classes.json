@@ -8,7 +8,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Barbarian",
-    "description": "A fierce warrior who can enter a battle rage.",
+    "description": "<p>A fierce warrior who can enter a battle rage.</p>",
     "primaryAbilities": ["str"],
     "hitDie": 12,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -16,19 +16,26 @@
     "proficiencies": {
       "savingThrows": ["str", "con"],
       "armor": ["light", "medium", "shields"],
-      "weapons": { "categories": ["simple", "martial"] },
+      "weapons": {
+        "categories": ["simple", "martial"]
+      },
       "skills": {
         "choose": 2,
         "from": ["animal-handling", "athletics", "intimidation", "nature", "perception", "survival"]
       }
     },
     "features": [
-      { "id": "rage", "name": "Rage", "level": 1, "description": "" },
+      {
+        "id": "rage",
+        "name": "Rage",
+        "level": 1,
+        "description": ""
+      },
       {
         "id": "unarmored-defense",
         "name": "Unarmored Defense",
         "level": 1,
-        "description": "While you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit."
+        "description": "<p>While you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit.</p>"
       }
     ]
   },
@@ -41,7 +48,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Bard",
-    "description": "An inspiring magician whose power echoes the music of creation.",
+    "description": "<p>An inspiring magician whose power echoes the music of creation.</p>",
     "primaryAbilities": ["cha"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -51,15 +58,26 @@
       "ability": "cha",
       "preparation": "prepared",
       "cantrips": [
-        { "level": 1, "known": 2 },
-        { "level": 4, "known": 3 },
-        { "level": 10, "known": 4 }
+        {
+          "level": 1,
+          "known": 2
+        },
+        {
+          "level": 4,
+          "known": 3
+        },
+        {
+          "level": 10,
+          "known": 4
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["dex", "cha"],
       "armor": ["light"],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 3,
         "from": [
@@ -85,8 +103,18 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "bardic-inspiration", "name": "Bardic Inspiration", "level": 1, "description": "" }
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "bardic-inspiration",
+        "name": "Bardic Inspiration",
+        "level": 1,
+        "description": ""
+      }
     ]
   },
   {
@@ -98,7 +126,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Cleric",
-    "description": "A priestly champion who wields divine magic in service of a higher power.",
+    "description": "<p>A priestly champion who wields divine magic in service of a higher power.</p>",
     "primaryAbilities": ["wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -108,23 +136,44 @@
       "ability": "wis",
       "preparation": "prepared",
       "cantrips": [
-        { "level": 1, "known": 3 },
-        { "level": 4, "known": 4 },
-        { "level": 10, "known": 5 }
+        {
+          "level": 1,
+          "known": 3
+        },
+        {
+          "level": 4,
+          "known": 4
+        },
+        {
+          "level": 10,
+          "known": 5
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
       "armor": ["light", "medium", "shields"],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": ["history", "insight", "medicine", "persuasion", "religion"]
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "channel-divinity", "name": "Channel Divinity", "level": 2, "description": "" }
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "channel-divinity",
+        "name": "Channel Divinity",
+        "level": 2,
+        "description": ""
+      }
     ]
   },
   {
@@ -136,7 +185,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Druid",
-    "description": "A priest of the Old Faith, wielding the powers of nature.",
+    "description": "<p>A priest of the Old Faith, wielding the powers of nature.</p>",
     "primaryAbilities": ["wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -146,15 +195,26 @@
       "ability": "wis",
       "preparation": "prepared",
       "cantrips": [
-        { "level": 1, "known": 2 },
-        { "level": 4, "known": 3 },
-        { "level": 10, "known": 4 }
+        {
+          "level": 1,
+          "known": 2
+        },
+        {
+          "level": 4,
+          "known": 3
+        },
+        {
+          "level": 10,
+          "known": 4
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
       "armor": ["light", "medium", "shields"],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": [
@@ -170,8 +230,18 @@
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "wild-shape", "name": "Wild Shape", "level": 2, "description": "" }
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "wild-shape",
+        "name": "Wild Shape",
+        "level": 2,
+        "description": ""
+      }
     ]
   },
   {
@@ -183,7 +253,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Fighter",
-    "description": "A master of martial combat, skilled with a variety of weapons and armor.",
+    "description": "<p>A master of martial combat, skilled with a variety of weapons and armor.</p>",
     "primaryAbilities": ["str", "dex"],
     "hitDie": 10,
     "asiLevels": [4, 6, 8, 12, 14, 16, 19],
@@ -191,7 +261,9 @@
     "proficiencies": {
       "savingThrows": ["str", "con"],
       "armor": ["light", "medium", "heavy", "shields"],
-      "weapons": { "categories": ["simple", "martial"] },
+      "weapons": {
+        "categories": ["simple", "martial"]
+      },
       "skills": {
         "choose": 2,
         "from": [
@@ -208,9 +280,24 @@
       }
     },
     "features": [
-      { "id": "fighting-style", "name": "Fighting Style", "level": 1, "description": "" },
-      { "id": "second-wind", "name": "Second Wind", "level": 1, "description": "" },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
+      {
+        "id": "fighting-style",
+        "name": "Fighting Style",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "second-wind",
+        "name": "Second Wind",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "extra-attack",
+        "name": "Extra Attack",
+        "level": 5,
+        "description": ""
+      }
     ]
   },
   {
@@ -222,7 +309,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Monk",
-    "description": "A master of martial arts, harnessing the power of the body in pursuit of perfection.",
+    "description": "<p>A master of martial arts, harnessing the power of the body in pursuit of perfection.</p>",
     "primaryAbilities": ["dex", "wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -230,16 +317,33 @@
     "proficiencies": {
       "savingThrows": ["str", "dex"],
       "armor": [],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"]
       }
     },
     "features": [
-      { "id": "martial-arts", "name": "Martial Arts", "level": 1, "description": "" },
-      { "id": "unarmored-defense", "name": "Unarmored Defense", "level": 1, "description": "" },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
+      {
+        "id": "martial-arts",
+        "name": "Martial Arts",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "unarmored-defense",
+        "name": "Unarmored Defense",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "extra-attack",
+        "name": "Extra Attack",
+        "level": 5,
+        "description": ""
+      }
     ]
   },
   {
@@ -251,7 +355,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Paladin",
-    "description": "A holy warrior bound to a sacred oath.",
+    "description": "<p>A holy warrior bound to a sacred oath.</p>",
     "primaryAbilities": ["str", "cha"],
     "hitDie": 10,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -264,16 +368,33 @@
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
       "armor": ["light", "medium", "heavy", "shields"],
-      "weapons": { "categories": ["simple", "martial"] },
+      "weapons": {
+        "categories": ["simple", "martial"]
+      },
       "skills": {
         "choose": 2,
         "from": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"]
       }
     },
     "features": [
-      { "id": "lay-on-hands", "name": "Lay On Hands", "level": 1, "description": "" },
-      { "id": "spellcasting", "name": "Spellcasting", "level": 2, "description": "" },
-      { "id": "divine-smite", "name": "Divine Smite", "level": 2, "description": "" }
+      {
+        "id": "lay-on-hands",
+        "name": "Lay On Hands",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 2,
+        "description": ""
+      },
+      {
+        "id": "divine-smite",
+        "name": "Divine Smite",
+        "level": 2,
+        "description": ""
+      }
     ]
   },
   {
@@ -285,7 +406,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Ranger",
-    "description": "A warrior who combats threats on the edges of civilization.",
+    "description": "<p>A warrior who combats threats on the edges of civilization.</p>",
     "primaryAbilities": ["dex", "wis"],
     "hitDie": 10,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -298,7 +419,9 @@
     "proficiencies": {
       "savingThrows": ["str", "dex"],
       "armor": ["light", "medium", "shields"],
-      "weapons": { "categories": ["simple", "martial"] },
+      "weapons": {
+        "categories": ["simple", "martial"]
+      },
       "skills": {
         "choose": 3,
         "from": [
@@ -314,9 +437,24 @@
       }
     },
     "features": [
-      { "id": "favored-enemy", "name": "Favored Enemy", "level": 1, "description": "" },
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "extra-attack", "name": "Extra Attack", "level": 5, "description": "" }
+      {
+        "id": "favored-enemy",
+        "name": "Favored Enemy",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "extra-attack",
+        "name": "Extra Attack",
+        "level": 5,
+        "description": ""
+      }
     ]
   },
   {
@@ -328,7 +466,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Rogue",
-    "description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies.",
+    "description": "<p>A scoundrel who uses stealth and trickery to overcome obstacles and enemies.</p>",
     "primaryAbilities": ["dex"],
     "hitDie": 8,
     "asiLevels": [4, 8, 10, 12, 16, 19],
@@ -336,7 +474,9 @@
     "proficiencies": {
       "savingThrows": ["dex", "int"],
       "armor": ["light"],
-      "weapons": { "categories": ["simple", "martial"] },
+      "weapons": {
+        "categories": ["simple", "martial"]
+      },
       "skills": {
         "choose": 4,
         "from": [
@@ -355,9 +495,24 @@
       }
     },
     "features": [
-      { "id": "expertise", "name": "Expertise", "level": 1, "description": "" },
-      { "id": "sneak-attack", "name": "Sneak Attack", "level": 1, "description": "" },
-      { "id": "thieves-cant", "name": "Thieves' Cant", "level": 1, "description": "" }
+      {
+        "id": "expertise",
+        "name": "Expertise",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "sneak-attack",
+        "name": "Sneak Attack",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "thieves-cant",
+        "name": "Thieves' Cant",
+        "level": 1,
+        "description": ""
+      }
     ]
   },
   {
@@ -369,7 +524,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Sorcerer",
-    "description": "A spellcaster who draws on inherent magic from a gift or bloodline.",
+    "description": "<p>A spellcaster who draws on inherent magic from a gift or bloodline.</p>",
     "primaryAbilities": ["cha"],
     "hitDie": 6,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -379,69 +534,207 @@
       "ability": "cha",
       "preparation": "prepared",
       "cantrips": [
-        { "level": 1, "known": 4 },
-        { "level": 4, "known": 5 },
-        { "level": 10, "known": 6 }
+        {
+          "level": 1,
+          "known": 4
+        },
+        {
+          "level": 4,
+          "known": 5
+        },
+        {
+          "level": 10,
+          "known": 6
+        }
       ],
       "spellsPrepared": [
-        { "level": 1, "prepared": 2 },
-        { "level": 2, "prepared": 4 },
-        { "level": 3, "prepared": 6 },
-        { "level": 4, "prepared": 7 },
-        { "level": 5, "prepared": 9 },
-        { "level": 6, "prepared": 10 },
-        { "level": 7, "prepared": 11 },
-        { "level": 8, "prepared": 12 },
-        { "level": 9, "prepared": 14 },
-        { "level": 10, "prepared": 15 },
-        { "level": 11, "prepared": 16 },
-        { "level": 12, "prepared": 16 },
-        { "level": 13, "prepared": 17 },
-        { "level": 14, "prepared": 17 },
-        { "level": 15, "prepared": 18 },
-        { "level": 16, "prepared": 18 },
-        { "level": 17, "prepared": 19 },
-        { "level": 18, "prepared": 20 },
-        { "level": 19, "prepared": 21 },
-        { "level": 20, "prepared": 22 }
+        {
+          "level": 1,
+          "prepared": 2
+        },
+        {
+          "level": 2,
+          "prepared": 4
+        },
+        {
+          "level": 3,
+          "prepared": 6
+        },
+        {
+          "level": 4,
+          "prepared": 7
+        },
+        {
+          "level": 5,
+          "prepared": 9
+        },
+        {
+          "level": 6,
+          "prepared": 10
+        },
+        {
+          "level": 7,
+          "prepared": 11
+        },
+        {
+          "level": 8,
+          "prepared": 12
+        },
+        {
+          "level": 9,
+          "prepared": 14
+        },
+        {
+          "level": 10,
+          "prepared": 15
+        },
+        {
+          "level": 11,
+          "prepared": 16
+        },
+        {
+          "level": 12,
+          "prepared": 16
+        },
+        {
+          "level": 13,
+          "prepared": 17
+        },
+        {
+          "level": 14,
+          "prepared": 17
+        },
+        {
+          "level": 15,
+          "prepared": 18
+        },
+        {
+          "level": 16,
+          "prepared": 18
+        },
+        {
+          "level": 17,
+          "prepared": 19
+        },
+        {
+          "level": 18,
+          "prepared": 20
+        },
+        {
+          "level": 19,
+          "prepared": 21
+        },
+        {
+          "level": 20,
+          "prepared": 22
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["con", "cha"],
       "armor": [],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "font-of-magic", "name": "Font of Magic", "level": 2, "description": "" }
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "font-of-magic",
+        "name": "Font of Magic",
+        "level": 2,
+        "description": ""
+      }
     ],
     "resources": [
       {
         "name": "Sorcery Points",
         "entries": [
-          { "level": 2, "value": 2 },
-          { "level": 3, "value": 3 },
-          { "level": 4, "value": 4 },
-          { "level": 5, "value": 5 },
-          { "level": 6, "value": 6 },
-          { "level": 7, "value": 7 },
-          { "level": 8, "value": 8 },
-          { "level": 9, "value": 9 },
-          { "level": 10, "value": 10 },
-          { "level": 11, "value": 11 },
-          { "level": 12, "value": 12 },
-          { "level": 13, "value": 13 },
-          { "level": 14, "value": 14 },
-          { "level": 15, "value": 15 },
-          { "level": 16, "value": 16 },
-          { "level": 17, "value": 17 },
-          { "level": 18, "value": 18 },
-          { "level": 19, "value": 19 },
-          { "level": 20, "value": 20 }
+          {
+            "level": 2,
+            "value": 2
+          },
+          {
+            "level": 3,
+            "value": 3
+          },
+          {
+            "level": 4,
+            "value": 4
+          },
+          {
+            "level": 5,
+            "value": 5
+          },
+          {
+            "level": 6,
+            "value": 6
+          },
+          {
+            "level": 7,
+            "value": 7
+          },
+          {
+            "level": 8,
+            "value": 8
+          },
+          {
+            "level": 9,
+            "value": 9
+          },
+          {
+            "level": 10,
+            "value": 10
+          },
+          {
+            "level": 11,
+            "value": 11
+          },
+          {
+            "level": 12,
+            "value": 12
+          },
+          {
+            "level": 13,
+            "value": 13
+          },
+          {
+            "level": 14,
+            "value": 14
+          },
+          {
+            "level": 15,
+            "value": 15
+          },
+          {
+            "level": 16,
+            "value": 16
+          },
+          {
+            "level": 17,
+            "value": 17
+          },
+          {
+            "level": 18,
+            "value": 18
+          },
+          {
+            "level": 19,
+            "value": 19
+          },
+          {
+            "level": 20,
+            "value": 20
+          }
         ]
       }
     ]
@@ -455,7 +748,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Warlock",
-    "description": "A wielder of magic that is derived from a bargain with an extraplanar entity.",
+    "description": "<p>A wielder of magic that is derived from a bargain with an extraplanar entity.</p>",
     "primaryAbilities": ["cha"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -465,15 +758,26 @@
       "ability": "cha",
       "preparation": "known",
       "cantrips": [
-        { "level": 1, "known": 2 },
-        { "level": 4, "known": 3 },
-        { "level": 10, "known": 4 }
+        {
+          "level": 1,
+          "known": 2
+        },
+        {
+          "level": 4,
+          "known": 3
+        },
+        {
+          "level": 10,
+          "known": 4
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
       "armor": ["light"],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": [
@@ -488,7 +792,12 @@
       }
     },
     "features": [
-      { "id": "pact-magic", "name": "Pact Magic", "level": 1, "description": "" },
+      {
+        "id": "pact-magic",
+        "name": "Pact Magic",
+        "level": 1,
+        "description": ""
+      },
       {
         "id": "eldritch-invocations",
         "name": "Eldritch Invocations",
@@ -506,7 +815,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Wizard",
-    "description": "A scholarly magic-user capable of manipulating the structures of reality.",
+    "description": "<p>A scholarly magic-user capable of manipulating the structures of reality.</p>",
     "primaryAbilities": ["int"],
     "hitDie": 6,
     "asiLevels": [4, 8, 12, 16, 19],
@@ -516,23 +825,44 @@
       "ability": "int",
       "preparation": "prepared",
       "cantrips": [
-        { "level": 1, "known": 3 },
-        { "level": 4, "known": 4 },
-        { "level": 10, "known": 5 }
+        {
+          "level": 1,
+          "known": 3
+        },
+        {
+          "level": 4,
+          "known": 4
+        },
+        {
+          "level": 10,
+          "known": 5
+        }
       ]
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
       "armor": [],
-      "weapons": { "categories": ["simple"] },
+      "weapons": {
+        "categories": ["simple"]
+      },
       "skills": {
         "choose": 2,
         "from": ["arcana", "history", "insight", "investigation", "medicine", "nature", "religion"]
       }
     },
     "features": [
-      { "id": "spellcasting", "name": "Spellcasting", "level": 1, "description": "" },
-      { "id": "arcane-recovery", "name": "Arcane Recovery", "level": 1, "description": "" }
+      {
+        "id": "spellcasting",
+        "name": "Spellcasting",
+        "level": 1,
+        "description": ""
+      },
+      {
+        "id": "arcane-recovery",
+        "name": "Arcane Recovery",
+        "level": 1,
+        "description": ""
+      }
     ]
   }
 ]

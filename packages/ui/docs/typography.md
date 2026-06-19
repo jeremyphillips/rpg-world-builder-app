@@ -22,12 +22,12 @@ styles, and list behavior on all descendants and fights layout utilities
 | `Heading` `nav` / `brand`     | `h1`, `span`    | Topbar title, sidebar product name                      |
 | `Heading` `label`             | `p`, `span`     | Inline labels (feature names, trait titles)             |
 | `Text` `body`                 | `p`             | Default foreground copy                                 |
-| `Text` `muted`                | `p`             | Plain descriptions (no size change)                     |
+| `Text` `muted`                | `p`             | Non-catalog plain copy (hints, errors)                  |
 | `Text` `small`                | `p`             | Helper text, captions (`text-sm text-muted-foreground`) |
 | `Text` `caption`              | `p`             | Extra-small muted copy (`text-xs`)                      |
 | `Text` `lead`                 | `p`             | Marketing subheads                                      |
 | `Text` `destructive`          | `p`             | Inline errors — pair with `role="alert"` when live      |
-| `RichTextContent` `size="sm"` | `div`           | Catalog trait / feature HTML                            |
+| `RichTextContent` `size="sm"` | `div`           | Catalog descriptions (top-level, traits, features)      |
 | `CardDescription`             | `div`           | Card header secondary line (uses shared `textVariants`) |
 
 Preserve semantic headings and existing `id`s when migrating — content detail
@@ -53,7 +53,7 @@ Polymorphic via `as`. All Tailwind lives in `text.variants.ts`.
 ```tsx
 import { Text } from '@rpg/ui'
 
-<Text variant="muted">{species.description}</Text>
+<RichTextContent html={species.description} size="sm" tone="muted" />
 <Text variant="destructive" role="alert">
   Could not load species.
 </Text>
