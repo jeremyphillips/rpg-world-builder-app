@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { abilitySchema } from '../vocab/ability'
-import { armorCategorySchema } from '../vocab/armor/category'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -10,92 +8,45 @@ import {
 } from './envelope'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { damageTypeSchema } from '../vocab/damage-type'
-import { levelSchema } from '../primitives/level'
 import { speedSchema } from '../vocab/movement-mode'
-import { senseSchema } from '../vocab/sense'
-import { usageFrequencySchema } from '../vocab/usage-frequency'
-import { skillSchema } from './skill-proficiency'
+import {
+  contentGrantsSchema,
+  contentTraitSchema,
+  innateSpellEntrySchema,
+  innateSpellsSchema,
+  speciesGrantsSchema,
+  speciesProficienciesSchema,
+} from './grants'
 
 // ---------------------------------------------------------------------------
-// Species — a playable people/ancestry. Modeled like `class.ts`: SRD-faithful
-// prose lives in rich-text trait descriptions (HTML strings), while the few
-// mechanical bits a character builder needs are kept structured in a reusable
-// `grants` bag. There is no rules engine: `grants` is data the builder reads,
-// not behavior. Lineages/ancestries are embedded `choiceGroups` (one record per
+// Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
+// trait descriptions (HTML strings), while mechanical bits live in shared
+// `grants`. Lineages/ancestries are embedded `choiceGroups` (one record per
 // species), not a separate content type.
 // ---------------------------------------------------------------------------
 
-// --- Innate spellcasting ----------------------------------------------------
+// Re-export shared grant types for backward compatibility.
+export {
+  contentGrantsSchema,
+  contentTraitSchema,
+  innateSpellEntrySchema,
+  innateSpellsSchema,
+  speciesGrantsSchema,
+  speciesProficienciesSchema,
+}
+export type {
+  ContentGrants,
+  ContentTrait,
+  InnateSpellEntry,
+  InnateSpells,
+  InnateSpellKind,
+  SpeciesGrants,
+  SpeciesProficiencies,
+} from './grants'
 
-/**
- * Spells gained at a character level. `spellIds` are opaque spell slugs for now
- * (no Spell content type yet); wire to real references when spells land. Player
- * *choices* (e.g. "choose one Wizard cantrip") are intentionally NOT modeled
- * here — that prose stays in the trait's rich-text description.
- */
-export const innateSpellEntrySchema = z.object({
-  level: levelSchema,
-  spellIds: z.array(z.string().min(1)).min(1),
-  frequency: usageFrequencySchema.optional(),
-})
-
-export const innateSpellsSchema = z.object({
-  ability: abilitySchema,
-  entries: z.array(innateSpellEntrySchema).min(1),
-})
-
-export type InnateSpells = z.infer<typeof innateSpellsSchema>
-
-// --- Proficiencies ----------------------------------------------------------
-
-/** Proficiencies a trait or lineage option grants. All optional. */
-export const speciesProficienciesSchema = z.object({
-  skills: z.array(skillSchema).optional(),
-  tools: z.array(z.string()).optional(),
-  weapons: z.array(z.string()).optional(),
-  armor: z.array(armorCategorySchema).optional(),
-})
-
-export type SpeciesProficiencies = z.infer<typeof speciesProficienciesSchema>
-
-// --- Grants -----------------------------------------------------------------
-
-/**
- * The structured, character-builder-facing payload a trait or lineage option
- * confers. Every field is optional; a purely flavorful trait omits `grants`
- * entirely and carries only its rich-text description.
- */
-export const speciesGrantsSchema = z.object({
-  senses: z.array(senseSchema).optional(),
-  /** Replaces or adds movement modes (e.g. Wood Elf walk 35). Partial of `speedSchema`. */
-  speedOverride: speedSchema.partial().optional(),
-  /** Chosen damage type(s), e.g. a Dragonborn's breath or a Goliath's ancestry. */
-  damageType: z.array(damageTypeSchema).optional(),
-  resistances: z.array(damageTypeSchema).optional(),
-  proficiencies: speciesProficienciesSchema.optional(),
-  languages: z.array(z.string()).optional(),
-  innateSpells: innateSpellsSchema.optional(),
-})
-
-export type SpeciesGrants = z.infer<typeof speciesGrantsSchema>
-
-// --- Traits + choice groups -------------------------------------------------
-
-/**
- * The universal building block: SRD-worded rich text plus optional structured
- * grants. Used both for a species' fixed traits and for each option inside a
- * lineage/ancestry choice group.
- */
-export const speciesTraitSchema = z.object({
-  id: z.string().min(1), // unique within the species — enforced at the service layer
-  name: z.string().min(1),
-  /** Rich-text HTML faithful to the SRD wording. */
-  description: z.string().optional(),
-  grants: speciesGrantsSchema.optional(),
-})
-
-export type SpeciesTrait = z.infer<typeof speciesTraitSchema>
+/** @deprecated Prefer `contentTraitSchema`. */
+export const speciesTraitSchema = contentTraitSchema
+export type SpeciesTrait = z.infer<typeof contentTraitSchema>
 
 /** The kinds of level-1 choice a species can present. */
 export const SPECIES_CHOICE_KINDS = ['lineage', 'ancestry'] as const
