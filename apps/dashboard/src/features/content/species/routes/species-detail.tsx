@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { Heading, RichTextContent, Text } from '@rpg/ui'
+import { Heading, RichTextContent } from '@rpg/ui'
 import {
   formatSpeed,
   getCreatureTypeLabel,
@@ -127,7 +127,9 @@ export function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
           {species.name}
         </Heading>
         <SpeciesStatsSection species={species} />
-        {species.description && <Text variant="muted">{species.description}</Text>}
+        {species.description && (
+          <RichTextContent html={species.description} size="sm" tone="muted" />
+        )}
       </div>
       <TraitsList traits={species.traits} />
       <ChoiceGroupsList groups={species.choiceGroups ?? []} />

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
@@ -120,5 +121,20 @@ describe('SRD 5.2.1 species seed', () => {
     const dwarf = species.find((s) => s.slug === 'dwarf')!
     const resilience = dwarf.traits.find((t) => t.id === 'dwarven-resilience')
     expect(resilience?.grants?.resistances).toContain('poison')
+  })
+
+  it('stores non-empty descriptions as rich-text HTML', () => {
+    for (const s of species) {
+      expectRichTextHtml(s.description)
+      for (const trait of s.traits) {
+        expectRichTextHtml(trait.description)
+      }
+      for (const group of s.choiceGroups ?? []) {
+        expectRichTextHtml(group.description)
+        for (const option of group.options) {
+          expectRichTextHtml(option.description)
+        }
+      }
+    }
   })
 })

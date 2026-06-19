@@ -25,7 +25,7 @@ export const Default: Story = {
   ),
 }
 
-export const NoImage: Story = {
+export const RichTextFeatures: Story = {
   render: () => {
     const barbarian = pickClass('barbarian')
     return (

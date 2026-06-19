@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { buttonVariants, Heading, RichTextContent, Text } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
@@ -19,7 +19,7 @@ function FeatureItem({ feature }: { feature: ClassFeature }) {
       <Heading variant="label" as="p">
         Level {feature.level}: {feature.name}
       </Heading>
-      {feature.description && <Text variant="small">{feature.description}</Text>}
+      {feature.description && <RichTextContent html={feature.description} size="sm" tone="muted" />}
     </li>
   )
 }
@@ -58,7 +58,7 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
                 {sub.tagline}
               </Text>
             )}
-            {sub.description && <Text variant="small">{sub.description}</Text>}
+            {sub.description && <RichTextContent html={sub.description} size="sm" tone="muted" />}
           </li>
         ))}
       </ul>
@@ -124,7 +124,9 @@ export function ClassDetailContent({
             {characterClass.name}
           </Heading>
           <ClassStatsSection characterClass={characterClass} />
-          {characterClass.description && <Text variant="muted">{characterClass.description}</Text>}
+          {characterClass.description && (
+            <RichTextContent html={characterClass.description} size="sm" tone="muted" />
+          )}
         </div>
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />

@@ -9,7 +9,7 @@ import {
 
 const ELF_BODY = {
   name: 'Elf',
-  description: 'A race of graceful and elegant beings.',
+  description: '<p>A race of graceful and elegant beings.</p>',
   imageKey: '/assets/system/species/elf.webp',
   creatureType: 'humanoid',
   sizes: ['medium'],

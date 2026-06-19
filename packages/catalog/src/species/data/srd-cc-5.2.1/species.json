@@ -8,10 +8,12 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Dragonborn",
-    "description": "Your lineage stems from a dragon progenitor whose essence fuels your magical gifts.",
+    "description": "<p>Your lineage stems from a dragon progenitor whose essence fuels your magical gifts.</p>",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "breath-weapon",
@@ -28,7 +30,12 @@
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 60 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 60 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 60
+            }
+          ]
         }
       },
       {
@@ -48,61 +55,91 @@
             "id": "black",
             "name": "Black (Acid)",
             "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-            "grants": { "damageType": ["acid"], "resistances": ["acid"] }
+            "grants": {
+              "damageType": ["acid"],
+              "resistances": ["acid"]
+            }
           },
           {
             "id": "blue",
             "name": "Blue (Lightning)",
             "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-            "grants": { "damageType": ["lightning"], "resistances": ["lightning"] }
+            "grants": {
+              "damageType": ["lightning"],
+              "resistances": ["lightning"]
+            }
           },
           {
             "id": "brass",
             "name": "Brass (Fire)",
             "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": { "damageType": ["fire"], "resistances": ["fire"] }
+            "grants": {
+              "damageType": ["fire"],
+              "resistances": ["fire"]
+            }
           },
           {
             "id": "bronze",
             "name": "Bronze (Lightning)",
             "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-            "grants": { "damageType": ["lightning"], "resistances": ["lightning"] }
+            "grants": {
+              "damageType": ["lightning"],
+              "resistances": ["lightning"]
+            }
           },
           {
             "id": "copper",
             "name": "Copper (Acid)",
             "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-            "grants": { "damageType": ["acid"], "resistances": ["acid"] }
+            "grants": {
+              "damageType": ["acid"],
+              "resistances": ["acid"]
+            }
           },
           {
             "id": "gold",
             "name": "Gold (Fire)",
             "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": { "damageType": ["fire"], "resistances": ["fire"] }
+            "grants": {
+              "damageType": ["fire"],
+              "resistances": ["fire"]
+            }
           },
           {
             "id": "green",
             "name": "Green (Poison)",
             "description": "<p>Your breath weapon and damage resistance are linked to Poison damage.</p>",
-            "grants": { "damageType": ["poison"], "resistances": ["poison"] }
+            "grants": {
+              "damageType": ["poison"],
+              "resistances": ["poison"]
+            }
           },
           {
             "id": "red",
             "name": "Red (Fire)",
             "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": { "damageType": ["fire"], "resistances": ["fire"] }
+            "grants": {
+              "damageType": ["fire"],
+              "resistances": ["fire"]
+            }
           },
           {
             "id": "silver",
             "name": "Silver (Cold)",
             "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-            "grants": { "damageType": ["cold"], "resistances": ["cold"] }
+            "grants": {
+              "damageType": ["cold"],
+              "resistances": ["cold"]
+            }
           },
           {
             "id": "white",
             "name": "White (Cold)",
             "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-            "grants": { "damageType": ["cold"], "resistances": ["cold"] }
+            "grants": {
+              "damageType": ["cold"],
+              "resistances": ["cold"]
+            }
           }
         ]
       }
@@ -119,21 +156,30 @@
     "name": "Dwarf",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "darkvision",
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 120 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 120 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 120
+            }
+          ]
         }
       },
       {
         "id": "dwarven-resilience",
         "name": "Dwarven Resilience",
         "description": "<p>You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition.</p>",
-        "grants": { "resistances": ["poison"] }
+        "grants": {
+          "resistances": ["poison"]
+        }
       },
       {
         "id": "dwarven-toughness",
@@ -158,14 +204,21 @@
     "name": "Elf",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "darkvision",
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 60 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 60 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 60
+            }
+          ]
         }
       },
       {
@@ -196,13 +249,30 @@
             "name": "Drow",
             "description": "<p>The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip. At character level 3 you gain Faerie Fire; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
             "grants": {
-              "senses": [{ "type": "darkvision", "range": 120 }],
+              "senses": [
+                {
+                  "type": "darkvision",
+                  "range": 120
+                }
+              ],
               "innateSpells": {
                 "ability": "cha",
                 "entries": [
-                  { "level": 1, "spellIds": ["dancing-lights"], "frequency": "at_will" },
-                  { "level": 3, "spellIds": ["faerie-fire"], "frequency": "once_per_long_rest" },
-                  { "level": 5, "spellIds": ["darkness"], "frequency": "once_per_long_rest" }
+                  {
+                    "level": 1,
+                    "spellIds": ["dancing-lights"],
+                    "frequency": "at_will"
+                  },
+                  {
+                    "level": 3,
+                    "spellIds": ["faerie-fire"],
+                    "frequency": "once_per_long_rest"
+                  },
+                  {
+                    "level": 5,
+                    "spellIds": ["darkness"],
+                    "frequency": "once_per_long_rest"
+                  }
                 ]
               }
             }
@@ -215,8 +285,16 @@
               "innateSpells": {
                 "ability": "int",
                 "entries": [
-                  { "level": 3, "spellIds": ["detect-magic"], "frequency": "once_per_long_rest" },
-                  { "level": 5, "spellIds": ["misty-step"], "frequency": "once_per_long_rest" }
+                  {
+                    "level": 3,
+                    "spellIds": ["detect-magic"],
+                    "frequency": "once_per_long_rest"
+                  },
+                  {
+                    "level": 5,
+                    "spellIds": ["misty-step"],
+                    "frequency": "once_per_long_rest"
+                  }
                 ]
               }
             }
@@ -226,12 +304,22 @@
             "name": "Wood Elf",
             "description": "<p>Your Speed increases to 35 feet. You also know the Druidcraft cantrip. At character level 3 you gain Longstrider; at level 5 you gain Pass without Trace (each castable once per Long Rest without a spell slot).</p>",
             "grants": {
-              "speedOverride": { "walk": 35 },
+              "speedOverride": {
+                "walk": 35
+              },
               "innateSpells": {
                 "ability": "wis",
                 "entries": [
-                  { "level": 1, "spellIds": ["druidcraft"], "frequency": "at_will" },
-                  { "level": 3, "spellIds": ["longstrider"], "frequency": "once_per_long_rest" },
+                  {
+                    "level": 1,
+                    "spellIds": ["druidcraft"],
+                    "frequency": "at_will"
+                  },
+                  {
+                    "level": 3,
+                    "spellIds": ["longstrider"],
+                    "frequency": "once_per_long_rest"
+                  },
                   {
                     "level": 5,
                     "spellIds": ["pass-without-trace"],
@@ -256,14 +344,21 @@
     "name": "Gnome",
     "creatureType": "humanoid",
     "sizes": ["small"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "darkvision",
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 60 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 60 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 60
+            }
+          ]
         }
       },
       {
@@ -287,7 +382,11 @@
               "innateSpells": {
                 "ability": "wis",
                 "entries": [
-                  { "level": 1, "spellIds": ["minor-illusion"], "frequency": "at_will" },
+                  {
+                    "level": 1,
+                    "spellIds": ["minor-illusion"],
+                    "frequency": "at_will"
+                  },
                   {
                     "level": 1,
                     "spellIds": ["speak-with-animals"],
@@ -329,7 +428,9 @@
     "name": "Goliath",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": { "walk": 35 },
+    "speed": {
+      "walk": 35
+    },
     "traits": [
       {
         "id": "large-form",
@@ -358,13 +459,17 @@
             "id": "fires-burn",
             "name": "Fire's Burn (Fire Giant)",
             "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.</p>",
-            "grants": { "damageType": ["fire"] }
+            "grants": {
+              "damageType": ["fire"]
+            }
           },
           {
             "id": "frosts-chill",
             "name": "Frost's Chill (Frost Giant)",
             "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.</p>",
-            "grants": { "damageType": ["cold"] }
+            "grants": {
+              "damageType": ["cold"]
+            }
           },
           {
             "id": "hills-tumble",
@@ -380,7 +485,9 @@
             "id": "storms-thunder",
             "name": "Storm's Thunder (Storm Giant)",
             "description": "<p>When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.</p>",
-            "grants": { "damageType": ["thunder"] }
+            "grants": {
+              "damageType": ["thunder"]
+            }
           }
         ]
       }
@@ -397,7 +504,9 @@
     "name": "Halfling",
     "creatureType": "humanoid",
     "sizes": ["small"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "brave",
@@ -432,7 +541,9 @@
     "name": "Human",
     "creatureType": "humanoid",
     "sizes": ["medium", "small"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "resourceful",
@@ -462,7 +573,9 @@
     "name": "Orc",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "adrenaline-rush",
@@ -474,7 +587,12 @@
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 120 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 120 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 120
+            }
+          ]
         }
       },
       {
@@ -495,14 +613,21 @@
     "name": "Tiefling",
     "creatureType": "humanoid",
     "sizes": ["medium", "small"],
-    "speed": { "walk": 30 },
+    "speed": {
+      "walk": 30
+    },
     "traits": [
       {
         "id": "darkvision",
         "name": "Darkvision",
         "description": "<p>You have Darkvision with a range of 60 feet.</p>",
         "grants": {
-          "senses": [{ "type": "darkvision", "range": 60 }]
+          "senses": [
+            {
+              "type": "darkvision",
+              "range": 60
+            }
+          ]
         }
       },
       {
@@ -512,7 +637,13 @@
         "grants": {
           "innateSpells": {
             "ability": "cha",
-            "entries": [{ "level": 1, "spellIds": ["thaumaturgy"], "frequency": "at_will" }]
+            "entries": [
+              {
+                "level": 1,
+                "spellIds": ["thaumaturgy"],
+                "frequency": "at_will"
+              }
+            ]
           }
         }
       }
@@ -533,13 +664,21 @@
               "innateSpells": {
                 "ability": "cha",
                 "entries": [
-                  { "level": 1, "spellIds": ["poison-spray"], "frequency": "at_will" },
+                  {
+                    "level": 1,
+                    "spellIds": ["poison-spray"],
+                    "frequency": "at_will"
+                  },
                   {
                     "level": 3,
                     "spellIds": ["ray-of-sickness"],
                     "frequency": "once_per_long_rest"
                   },
-                  { "level": 5, "spellIds": ["hold-person"], "frequency": "once_per_long_rest" }
+                  {
+                    "level": 5,
+                    "spellIds": ["hold-person"],
+                    "frequency": "once_per_long_rest"
+                  }
                 ]
               }
             }
@@ -553,8 +692,16 @@
               "innateSpells": {
                 "ability": "cha",
                 "entries": [
-                  { "level": 1, "spellIds": ["chill-touch"], "frequency": "at_will" },
-                  { "level": 3, "spellIds": ["false-life"], "frequency": "once_per_long_rest" },
+                  {
+                    "level": 1,
+                    "spellIds": ["chill-touch"],
+                    "frequency": "at_will"
+                  },
+                  {
+                    "level": 3,
+                    "spellIds": ["false-life"],
+                    "frequency": "once_per_long_rest"
+                  },
                   {
                     "level": 5,
                     "spellIds": ["ray-of-enfeeblement"],
@@ -573,9 +720,21 @@
               "innateSpells": {
                 "ability": "cha",
                 "entries": [
-                  { "level": 1, "spellIds": ["fire-bolt"], "frequency": "at_will" },
-                  { "level": 3, "spellIds": ["hellish-rebuke"], "frequency": "once_per_long_rest" },
-                  { "level": 5, "spellIds": ["darkness"], "frequency": "once_per_long_rest" }
+                  {
+                    "level": 1,
+                    "spellIds": ["fire-bolt"],
+                    "frequency": "at_will"
+                  },
+                  {
+                    "level": 3,
+                    "spellIds": ["hellish-rebuke"],
+                    "frequency": "once_per_long_rest"
+                  },
+                  {
+                    "level": 5,
+                    "spellIds": ["darkness"],
+                    "frequency": "once_per_long_rest"
+                  }
                 ]
               }
             }

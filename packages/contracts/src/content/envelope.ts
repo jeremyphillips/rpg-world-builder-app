@@ -72,6 +72,7 @@ export const contentBodyBaseSchema = z.object({
   /** Storage key for the content item's artwork. Resolve to a URL with `getAssetUrl`. */
   imageKey: z.string().optional(),
   name: z.string().min(1),
+  /** Rich-text HTML (TipTap / SRD prose). Render with `RichTextContent`. */
   description: z.string().optional(),
 })
 

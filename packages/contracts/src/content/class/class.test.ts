@@ -10,7 +10,7 @@ import {
 
 const fighterBody = {
   name: 'Fighter',
-  description: 'A master of martial combat.',
+  description: '<p>A master of martial combat.</p>',
   primaryAbilities: ['str'],
   hitDie: 10,
   asiLevels: [4, 6, 8, 12, 14, 16, 19],
@@ -137,6 +137,8 @@ describe('subclassSchema', () => {
       ...timestamps,
       classId: fighter.id,
       name: 'Champion',
+      description:
+        '<p>Fighters who pursue physical excellence and devastating critical strikes.</p>',
     }
     expect(subclassSchema.parse(champion)).toEqual(champion)
   })

@@ -10,7 +10,7 @@
     "classId": "srd-cc-5.2.1:barbarian",
     "name": "Path of the Berserker",
     "tagline": "Channel Rage into Violent Fury",
-    "description": "A path of untrammeled fury, channeling rage into a violent frenzy."
+    "description": "<p>A path of untrammeled fury, channeling rage into a violent frenzy.</p>"
   },
   {
     "id": "srd-cc-5.2.1:college-of-lore",
@@ -23,7 +23,7 @@
     "classId": "srd-cc-5.2.1:bard",
     "name": "College of Lore",
     "tagline": "Plumb the Depths of Magical Knowledge",
-    "description": "Bards who collect knowledge and turn it to cutting words and versatile magic."
+    "description": "<p>Bards who collect knowledge and turn it to cutting words and versatile magic.</p>"
   },
   {
     "id": "srd-cc-5.2.1:life-domain",
@@ -36,7 +36,7 @@
     "classId": "srd-cc-5.2.1:cleric",
     "name": "Life Domain",
     "tagline": "Preserve and Heal Those in Need",
-    "description": "Clerics devoted to the life force that sustains all things; potent healers."
+    "description": "<p>Clerics devoted to the life force that sustains all things; potent healers.</p>"
   },
   {
     "id": "srd-cc-5.2.1:circle-of-the-land",
@@ -49,7 +49,7 @@
     "classId": "srd-cc-5.2.1:druid",
     "name": "Circle of the Land",
     "tagline": "Draw on the Magic of the Natural World",
-    "description": "Druids who draw magic from a particular landscape, mystical lore, and folk ritual."
+    "description": "<p>Druids who draw magic from a particular landscape, mystical lore, and folk ritual.</p>"
   },
   {
     "id": "srd-cc-5.2.1:champion",
@@ -62,7 +62,7 @@
     "classId": "srd-cc-5.2.1:fighter",
     "name": "Champion",
     "tagline": "Pursue Physical Excellence in Combat",
-    "description": "Fighters who pursue physical excellence and devastating critical strikes."
+    "description": "<p>Fighters who pursue physical excellence and devastating critical strikes.</p>"
   },
   {
     "id": "srd-cc-5.2.1:warrior-of-the-open-hand",
@@ -75,7 +75,7 @@
     "classId": "srd-cc-5.2.1:monk",
     "name": "Warrior of the Open Hand",
     "tagline": "Master the Martial Arts",
-    "description": "Monks who master unarmed combat, manipulating an enemy's ki and body."
+    "description": "<p>Monks who master unarmed combat, manipulating an enemy's ki and body.</p>"
   },
   {
     "id": "srd-cc-5.2.1:oath-of-devotion",
@@ -88,7 +88,7 @@
     "classId": "srd-cc-5.2.1:paladin",
     "name": "Oath of Devotion",
     "tagline": "Uphold Lofty Ideals of Justice and Order",
-    "description": "Paladins bound to the ideals of justice, virtue, and order."
+    "description": "<p>Paladins bound to the ideals of justice, virtue, and order.</p>"
   },
   {
     "id": "srd-cc-5.2.1:hunter",
@@ -101,7 +101,7 @@
     "classId": "srd-cc-5.2.1:ranger",
     "name": "Hunter",
     "tagline": "Hunt the Monsters That Threaten Civilization",
-    "description": "Rangers who specialize in hunting the monsters that threaten the world."
+    "description": "<p>Rangers who specialize in hunting the monsters that threaten the world.</p>"
   },
   {
     "id": "srd-cc-5.2.1:thief",
@@ -114,7 +114,7 @@
     "classId": "srd-cc-5.2.1:rogue",
     "name": "Thief",
     "tagline": "Hunt for Fun and Profit",
-    "description": "Rogues who hone the skills of stealth, agility, and quick reflexes."
+    "description": "<p>Rogues who hone the skills of stealth, agility, and quick reflexes.</p>"
   },
   {
     "id": "srd-cc-5.2.1:draconic-sorcery",
@@ -127,7 +127,7 @@
     "classId": "srd-cc-5.2.1:sorcerer",
     "name": "Draconic Sorcery",
     "tagline": "Breathe the Magic of Dragons",
-    "description": "Sorcerers whose innate magic springs from a draconic bloodline."
+    "description": "<p>Sorcerers whose innate magic springs from a draconic bloodline.</p>"
   },
   {
     "id": "srd-cc-5.2.1:fiend-patron",
@@ -140,7 +140,7 @@
     "classId": "srd-cc-5.2.1:warlock",
     "name": "Fiend Patron",
     "tagline": "Bargain with the Lower Planes for Fell Powers",
-    "description": "Warlocks who bargain with a powerful fiend of the Lower Planes."
+    "description": "<p>Warlocks who bargain with a powerful fiend of the Lower Planes.</p>"
   },
   {
     "id": "srd-cc-5.2.1:school-of-evocation",
@@ -153,6 +153,6 @@
     "classId": "srd-cc-5.2.1:wizard",
     "name": "School of Evocation",
     "tagline": "Sculpt Spells of Explosive Energy",
-    "description": "Wizards who focus on the energetic magic of evocation spells."
+    "description": "<p>Wizards who focus on the energetic magic of evocation spells.</p>"
   }
 ]
