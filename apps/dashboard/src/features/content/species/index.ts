@@ -1,3 +1,3 @@
-// fallow-ignore-file unused-file
-// content/species — scaffold only. Export the public surface here as it's built.
-export {}
+export { SpeciesOverview } from './routes/species-overview'
+export { SpeciesDetail } from './routes/species-detail'
+export { useSpecies, speciesQueryKey } from './hooks/use-species'

@@ -20,6 +20,8 @@ import {
   WeaponDetail,
   ArmorOverview,
   ArmorDetail,
+  SpeciesOverview,
+  SpeciesDetail,
 } from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
@@ -115,6 +117,28 @@ const router = createBrowserRouter(
                     {
                       path: ':classId',
                       element: <ClassDetail />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
+                  path: 'species',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Species',
+                      href: ROUTES.content.species.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <SpeciesOverview /> },
+                    {
+                      path: ':speciesId',
+                      element: <SpeciesDetail />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
