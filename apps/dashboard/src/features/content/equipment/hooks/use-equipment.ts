@@ -1,14 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
+import { createContentQueryHook } from '../../lib/create-content-list'
 import { listEquipment } from '../api/equipment-api'
 
-export const equipmentQueryKey = (campaignId: string) =>
-  ['campaigns', campaignId, 'content', 'equipment'] as const
+const equipmentContentList = createContentQueryHook(
+  {
+    routeKey: 'equipment',
+    responseKey: 'equipment',
+    errorMessage: 'Could not load equipment.',
+  },
+  listEquipment,
+)
+
+export const equipmentQueryKey = equipmentContentList.queryKey
 
 /** Load all equipment available in the given campaign (system seed + homebrew). */
-export function useEquipment(campaignId: string | undefined) {
-  return useQuery({
-    queryKey: campaignId ? equipmentQueryKey(campaignId) : [],
-    queryFn: () => listEquipment(campaignId!),
-    enabled: Boolean(campaignId),
-  })
-}
+export const useEquipment = equipmentContentList.useQuery

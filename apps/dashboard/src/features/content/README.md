@@ -21,3 +21,13 @@ through this folder's `index.ts`.
 
 Folder layout and the feature-boundary rule are documented in
 [feature-conventions](../../../docs/feature-conventions.md).
+
+## `lib/`
+
+Shared content UI and data helpers live under [`lib/`](./lib/). Catalog list
+fetching for top-level content types (classes, species, weapons, etc.) is wired
+through [`createContentListApi`](./lib/create-content-list.ts) and
+[`createContentQueryHook`](./lib/create-content-list.ts) — each sub-area's
+`api/*-api.ts` and `hooks/use-*.ts` pair delegates to those factories. Nested
+resources (e.g. subclasses under a class) stay hand-written until a second
+nested list pattern appears.

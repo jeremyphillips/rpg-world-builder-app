@@ -1,14 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
+import { createContentQueryHook } from '../../lib/create-content-list'
 import { listSpecies } from '../api/species-api'
 
-export const speciesQueryKey = (campaignId: string) =>
-  ['campaigns', campaignId, 'content', 'species'] as const
+const speciesContentList = createContentQueryHook(
+  {
+    routeKey: 'species',
+    responseKey: 'species',
+    errorMessage: 'Could not load species.',
+  },
+  listSpecies,
+)
+
+export const speciesQueryKey = speciesContentList.queryKey
 
 /** Load all species available in the given campaign (system seed + homebrew). */
-export function useSpecies(campaignId: string | undefined) {
-  return useQuery({
-    queryKey: campaignId ? speciesQueryKey(campaignId) : [],
-    queryFn: () => listSpecies(campaignId!),
-    enabled: Boolean(campaignId),
-  })
-}
+export const useSpecies = speciesContentList.useQuery

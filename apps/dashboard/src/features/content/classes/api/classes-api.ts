@@ -1,12 +1,10 @@
 import type { CharacterClass } from '@rpg/contracts'
-import { request } from '@/lib/api-client'
+
+import { createContentListApi } from '../../lib/create-content-list'
 
 /** List all classes (system + homebrew) available in a campaign's ruleset. */
-export async function listClasses(campaignId: string): Promise<CharacterClass[]> {
-  const { classes } = await request<{ classes: CharacterClass[] }>(
-    `/api/campaigns/${campaignId}/content/classes`,
-    undefined,
-    'Could not load classes.',
-  )
-  return classes
-}
+export const listClasses = createContentListApi<CharacterClass>({
+  routeKey: 'classes',
+  responseKey: 'classes',
+  errorMessage: 'Could not load classes.',
+})

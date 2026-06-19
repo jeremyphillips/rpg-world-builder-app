@@ -1,14 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
+import { createContentQueryHook } from '../../lib/create-content-list'
 import { listSkillProficiencies } from '../api/skill-proficiencies-api'
 
-export const skillProficienciesQueryKey = (campaignId: string) =>
-  ['campaigns', campaignId, 'content', 'skill-proficiencies'] as const
+const skillProficienciesContentList = createContentQueryHook(
+  {
+    routeKey: 'skill-proficiencies',
+    responseKey: 'skillProficiencies',
+    errorMessage: 'Could not load skill proficiencies.',
+  },
+  listSkillProficiencies,
+)
+
+export const skillProficienciesQueryKey = skillProficienciesContentList.queryKey
 
 /** Load all skill proficiencies available in the given campaign (system seed + homebrew). */
-export function useSkillProficiencies(campaignId: string | undefined) {
-  return useQuery({
-    queryKey: campaignId ? skillProficienciesQueryKey(campaignId) : [],
-    queryFn: () => listSkillProficiencies(campaignId!),
-    enabled: Boolean(campaignId),
-  })
-}
+export const useSkillProficiencies = skillProficienciesContentList.useQuery

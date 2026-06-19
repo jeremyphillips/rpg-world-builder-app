@@ -1,12 +1,10 @@
 import type { Species } from '@rpg/contracts'
-import { request } from '@/lib/api-client'
+
+import { createContentListApi } from '../../lib/create-content-list'
 
 /** List all species (system + homebrew) available in a campaign's ruleset. */
-export async function listSpecies(campaignId: string): Promise<Species[]> {
-  const { species } = await request<{ species: Species[] }>(
-    `/api/campaigns/${campaignId}/content/species`,
-    undefined,
-    'Could not load species.',
-  )
-  return species
-}
+export const listSpecies = createContentListApi<Species>({
+  routeKey: 'species',
+  responseKey: 'species',
+  errorMessage: 'Could not load species.',
+})
