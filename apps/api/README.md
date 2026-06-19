@@ -3,7 +3,9 @@
 The Express 5 + Mongoose API and authentication backbone. It owns the session
 model (JWT in an httpOnly cookie), CSRF protection, and role-based guards. It
 validates every request against the shared [`@rpg/contracts`](../../packages/contracts)
-Zod schemas, so types and validation never drift from the apps.
+Zod schemas, so types and validation never drift from the apps. System SRD seed
+JSON and loaders live in [`@rpg/catalog`](../../packages/catalog/README.md);
+the content kernel imports `loadSeed*` from there — not co-located API files.
 
 ## Single-origin assumption
 

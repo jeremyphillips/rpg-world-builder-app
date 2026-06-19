@@ -66,12 +66,50 @@ in `@rpg/ui` Storybook (`:6006`) instead.
 | `Content/*`        | Catalog feature stories (detail routes, tables) |
 | `Layout/*`         | Shell/layout stories (e.g. concentration mode)  |
 
-Use CSF3 with `satisfies Meta<typeof Component>` (or `StoryObj` for custom
-`render` stories). Prefer inline mock data over live API hooks until a story
-needs TanStack Query — then add `withDashboardProviders` from
+Use CSF3 with `satisfies Meta<typeof Component>` and `StoryObj` (not
+`StoryObj<typeof meta>`) for custom `render` stories.
+
+### Catalog fixtures
+
+System SRD data lives in [`@rpg/catalog`](../../../packages/catalog/README.md).
+Dashboard stories import **catalog picks**, not hand-copied JSON or `apps/api`
+seed paths.
+
+| Location                                                                      | Purpose                                                              |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [`src/features/content/lib/fixtures/`](../src/features/content/lib/fixtures/) | `STORY_CAMPAIGN_ID`, `STORY_RULESET_ID`, `pick*()` helpers           |
+| `src/features/content/<type>/fixtures.ts`                                     | Named exports (`ORC`, `SPECIES_LIST`, …) for detail + column stories |
+
+Detail story pattern — render the exported `*DetailContent` from the route
+file with a fixture:
+
+```tsx
+import { ELF, ORC } from '../fixtures'
+import { SpeciesDetailContent } from './species-detail'
+
+export const NoChoiceGroups: Story = {
+  render: () => <SpeciesDetailContent species={ORC} />,
+}
+```
+
+Column story pattern — use `STORY_CAMPAIGN_ID` and a fixture list:
+
+```tsx
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import { SPECIES_LIST } from '../fixtures'
+
+;<DataTable columns={speciesColumns(STORY_CAMPAIGN_ID)} data={[...SPECIES_LIST]} />
+```
+
+Use `pickClass()` / `pickSubclassesForClass()` from `lib/fixtures/pick` for
+one-off catalog slugs not worth a named fixture export.
+
+For route shells that need TanStack Query (loading, error, not-found), add
+`withDashboardProviders` from
 [`apps/dashboard/.storybook/decorators.tsx`](../.storybook/decorators.tsx) per
-story, not globally.
+story, not globally. MSW remains deferred until those stories are authored.
 
 The dashboard preview wraps every story in `MemoryRouter` so column tables with
-`<Link>` name cells render correctly. Layout stories that use `<Outlet />` still
-need their own `Routes`/`Route` tree in the story `render` function.
+`<Link>` name cells and detail `Edit` links render correctly. Layout stories
+that use `<Outlet />` still need their own `Routes`/`Route` tree in the story
+`render` function.
