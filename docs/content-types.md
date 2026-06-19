@@ -2,7 +2,7 @@
 
 This guide covers the end-to-end steps for adding a fully wired catalog content type to RPG World Builder. The pattern is contracts-first: the Zod schema is the single source of truth, and every layer derives from it.
 
-**Reference implementations**: `classes` (full Mongoose homebrew/patch support) and `skillProficiencies` (patch support via shared factory, homebrew deferred).
+**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skillProficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded choice-groups for lineages/ancestries, structured `grants` bag on traits).
 
 ---
 
@@ -15,6 +15,8 @@ Add a new content type when the domain entity:
 - Can be customized per-campaign via patches or homebrew (even if that isn't built yet).
 
 If the entity is always embedded inside another (e.g. class features, spell components), model it as a nested schema on the parent type instead.
+
+When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as **choice groups** on the parent body rather than a separate content type. See `species.ts` (`choiceGroups` of `speciesTraitSchema` options with optional `grants`).
 
 ---
 
@@ -42,7 +44,7 @@ apps/dashboard/src/features/content/<camelCasePlural>/
   index.ts                         ← Sub-area barrel
 apps/dashboard/src/
   features/content/index.ts        ← Content feature barrel
-  app/routes.ts                    ← ROUTES constant
+  app/routes.ts                    ← ROUTES constant (content paths in content-routes.ts)
   app/router.tsx                   ← React Router wiring
   components/layout/sidebar/campaign-nav-section.tsx  ← Sidebar NavItem
 ```
@@ -109,9 +111,11 @@ export type GameTermEntry = {
 }
 ```
 
-Pattern (see `ALIGNMENT_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`,
+Pattern (see `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
+`CREATURE_TYPE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`,
 `WEAPON_MASTERY_ENTRIES`, and `ARMOR_CATEGORY_ENTRIES` in `alignment.ts`,
-`weapon.ts` / `armor.ts`):
+`creature-size.ts`, `creature-type.ts`, `damage-type.ts`, `weapon.ts` /
+`armor.ts`):
 
 ```typescript
 import type { GameTermEntry } from './vocab/types'
@@ -485,7 +489,7 @@ Import the two route components from `@/features/content`, then add under `campa
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                   |
 | **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                   |
-| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed.                                                                                                 |
+| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as `choiceGroups` on the species body (`species.ts`).       |
 | **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                               |
 | **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                      |
 | **Dual-ownership fields?**       | If another type references this type's entities (e.g. `suggestedClasses` on skills), keep the authoritative list on the owning type and add the reverse as an optional convenience field. Document which is authoritative. |
