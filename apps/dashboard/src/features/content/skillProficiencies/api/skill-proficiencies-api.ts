@@ -1,12 +1,10 @@
 import type { SkillProficiency } from '@rpg/contracts'
-import { request } from '@/lib/api-client'
+
+import { createContentListApi } from '../../lib/create-content-list'
 
 /** List all skill proficiencies (system + homebrew) available in a campaign's ruleset. */
-export async function listSkillProficiencies(campaignId: string): Promise<SkillProficiency[]> {
-  const { skillProficiencies } = await request<{ skillProficiencies: SkillProficiency[] }>(
-    `/api/campaigns/${campaignId}/content/skill-proficiencies`,
-    undefined,
-    'Could not load skill proficiencies.',
-  )
-  return skillProficiencies
-}
+export const listSkillProficiencies = createContentListApi<SkillProficiency>({
+  routeKey: 'skill-proficiencies',
+  responseKey: 'skillProficiencies',
+  errorMessage: 'Could not load skill proficiencies.',
+})

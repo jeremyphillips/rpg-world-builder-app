@@ -1,14 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
+import { createContentQueryHook } from '../../lib/create-content-list'
 import { listClasses } from '../api/classes-api'
 
-export const classesQueryKey = (campaignId: string) =>
-  ['campaigns', campaignId, 'content', 'classes'] as const
+const classesContentList = createContentQueryHook(
+  {
+    routeKey: 'classes',
+    responseKey: 'classes',
+    errorMessage: 'Could not load classes.',
+  },
+  listClasses,
+)
+
+export const classesQueryKey = classesContentList.queryKey
 
 /** Load all classes available in the given campaign (system seed + homebrew). */
-export function useClasses(campaignId: string | undefined) {
-  return useQuery({
-    queryKey: campaignId ? classesQueryKey(campaignId) : [],
-    queryFn: () => listClasses(campaignId!),
-    enabled: Boolean(campaignId),
-  })
-}
+export const useClasses = classesContentList.useQuery
