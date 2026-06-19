@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { abilitySchema } from './ability'
+import { abilitySchema } from '../vocab/ability'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './content'
+} from './envelope'
 
 // ---------------------------------------------------------------------------
 // Skill taxonomy — the SRD 5.2 skills as id -> display label. Previously in

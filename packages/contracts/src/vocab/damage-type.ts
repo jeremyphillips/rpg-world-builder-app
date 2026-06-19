@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from './vocab/types'
+import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Damage types — the closed SRD 5.2.1 set, shared by weapons, spells, monster

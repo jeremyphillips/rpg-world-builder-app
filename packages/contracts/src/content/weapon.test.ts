@@ -1,21 +1,10 @@
 import { describe, expect, it } from 'vitest'
+
 import {
-  WEAPON_CATEGORIES,
-  WEAPON_MASTERIES,
-  WEAPON_MASTERY_ENTRIES,
-  WEAPON_PROPERTIES,
-  WEAPON_PROPERTY_ENTRIES,
   averageWeaponDamage,
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
-  getWeaponMasteryEntry,
-  getWeaponMasteryLabel,
-  getWeaponPropertyEntry,
-  getWeaponPropertyLabel,
-  weaponCategorySchema,
-  weaponMasterySchema,
-  weaponPropertySchema,
   weaponSchema,
   createWeaponInputSchema,
   updateWeaponInputSchema,
@@ -113,88 +102,6 @@ const BLOWGUN_STORED = {
   range: { normal: 25, long: 100 },
 }
 
-// ---------------------------------------------------------------------------
-// Enum schemas
-// ---------------------------------------------------------------------------
-
-describe('weaponCategorySchema', () => {
-  it('accepts every known weapon category', () => {
-    for (const category of WEAPON_CATEGORIES) {
-      expect(weaponCategorySchema.parse(category)).toBe(category)
-    }
-  })
-
-  it('rejects unknown categories', () => {
-    expect(weaponCategorySchema.safeParse('exotic').success).toBe(false)
-  })
-})
-
-describe('weaponMasterySchema', () => {
-  it('accepts every known mastery', () => {
-    for (const mastery of WEAPON_MASTERIES) {
-      expect(weaponMasterySchema.parse(mastery)).toBe(mastery)
-    }
-  })
-
-  it('rejects unknown masteries', () => {
-    expect(weaponMasterySchema.safeParse('parry').success).toBe(false)
-  })
-})
-
-describe('weaponPropertySchema', () => {
-  it('accepts every known property', () => {
-    for (const prop of WEAPON_PROPERTIES) {
-      expect(weaponPropertySchema.parse(prop)).toBe(prop)
-    }
-  })
-
-  it('rejects unknown properties', () => {
-    expect(weaponPropertySchema.safeParse('silent').success).toBe(false)
-  })
-})
-
-describe('weapon property vocabulary', () => {
-  it('exposes every property in WEAPON_PROPERTIES', () => {
-    expect([...WEAPON_PROPERTIES].sort()).toEqual(Object.keys(WEAPON_PROPERTY_ENTRIES).sort())
-  })
-
-  it('has a label and description for every property', () => {
-    for (const prop of WEAPON_PROPERTIES) {
-      const entry = getWeaponPropertyEntry(prop)
-      expect(entry?.label).toBeTruthy()
-      expect(entry?.description).toBeTruthy()
-    }
-  })
-
-  it('returns labels and falls back for unknown properties', () => {
-    expect(getWeaponPropertyLabel('finesse')).toBe('Finesse')
-    expect(getWeaponPropertyLabel('custom')).toBe('custom')
-  })
-})
-
-describe('weapon mastery vocabulary', () => {
-  it('exposes every mastery in WEAPON_MASTERIES', () => {
-    expect([...WEAPON_MASTERIES].sort()).toEqual(Object.keys(WEAPON_MASTERY_ENTRIES).sort())
-  })
-
-  it('has a label and description for every mastery', () => {
-    for (const mastery of WEAPON_MASTERIES) {
-      const entry = getWeaponMasteryEntry(mastery)
-      expect(entry?.label).toBeTruthy()
-      expect(entry?.description).toBeTruthy()
-    }
-  })
-
-  it('returns labels and falls back for unknown masteries', () => {
-    expect(getWeaponMasteryLabel('cleave')).toBe('Cleave')
-    expect(getWeaponMasteryLabel('custom')).toBe('custom')
-  })
-})
-
-// ---------------------------------------------------------------------------
-// formatWeaponProperties / formatWeaponRange
-// ---------------------------------------------------------------------------
-
 describe('formatWeaponProperties', () => {
   it('joins property labels', () => {
     expect(formatWeaponProperties(['versatile', 'finesse'])).toBe('Versatile, Finesse')
@@ -215,10 +122,6 @@ describe('formatWeaponRange', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// formatWeaponDamage
-// ---------------------------------------------------------------------------
-
 describe('formatWeaponDamage', () => {
   it('formats dice damage', () => {
     expect(formatWeaponDamage({ kind: 'dice', count: 2, faces: 6 })).toBe('2d6')
@@ -228,10 +131,6 @@ describe('formatWeaponDamage', () => {
     expect(formatWeaponDamage({ kind: 'flat', amount: 1 })).toBe('1')
   })
 })
-
-// ---------------------------------------------------------------------------
-// weaponSchema — stored shape
-// ---------------------------------------------------------------------------
 
 describe('weaponSchema', () => {
   it('parses a well-formed melee weapon', () => {
@@ -296,10 +195,6 @@ describe('weaponSchema', () => {
     expect(weaponSchema.parse(homebrew)).toMatchObject({ source: 'homebrew' })
   })
 })
-
-// ---------------------------------------------------------------------------
-// Authoring DTOs
-// ---------------------------------------------------------------------------
 
 describe('createWeaponInputSchema', () => {
   it('accepts a valid create payload', () => {

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
-import { systemRulesetIdSchema } from './ruleset'
+import { systemRulesetIdSchema } from '../primitives/ruleset'
 
 // ---------------------------------------------------------------------------
 // Campaign identity

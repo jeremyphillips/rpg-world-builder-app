@@ -1,56 +1,19 @@
 import { z } from 'zod'
-import { abilitySchema } from './ability'
-import { hitDieSchema } from './dice'
-import { levelSchema } from './level'
+
+import { abilitySchema } from '../../vocab/ability'
+import { armorCategorySchema } from '../../vocab/armor/category'
+import { weaponCategorySchema } from '../../vocab/weapon/category'
+import { hitDieSchema } from '../../primitives/dice'
+import { levelSchema } from '../../primitives/level'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './content'
-import { weaponCategorySchema } from './weapon'
-import { armorCategorySchema } from './armor'
-import { skillSchema } from './skill-proficiency'
+} from '../envelope'
+import { skillSchema } from '../skill-proficiency'
 
-// ---------------------------------------------------------------------------
-// Spellcasting
-// ---------------------------------------------------------------------------
-
-export const SPELLCASTING_PROGRESSIONS = ['full', 'half', 'pact'] as const
-export type SpellcastingProgression = (typeof SPELLCASTING_PROGRESSIONS)[number]
-
-export const SPELL_PREPARATION = ['prepared', 'known'] as const
-
-/**
- * Cantrips known is tabular data, not a closed taxonomy, so the schema stores an
- * inline, self-contained progression. This stays open to homebrew/patches:
- * authoring a class just means editing the array (no closed enum, no shared
- * registry, no id collisions). Heuristic: `z.enum` for mechanics the engine
- * branches on; inline data for lookup tables like this one.
- */
-export const cantripsKnownEntrySchema = z.object({
-  level: levelSchema,
-  known: z.number().int().min(0),
-})
-
-export const cantripsProgressionSchema = z.array(cantripsKnownEntrySchema)
-
-export const spellsPreparedEntrySchema = z.object({
-  level: levelSchema,
-  prepared: z.number().int().min(0),
-})
-
-export const spellsPreparedProgressionSchema = z.array(spellsPreparedEntrySchema)
-
-export const spellcastingSchema = z.object({
-  progression: z.enum(SPELLCASTING_PROGRESSIONS),
-  ability: abilitySchema,
-  preparation: z.enum(SPELL_PREPARATION),
-  cantrips: cantripsProgressionSchema.optional(),
-  spellsPrepared: spellsPreparedProgressionSchema.optional(),
-})
-
-export type Spellcasting = z.infer<typeof spellcastingSchema>
+import { spellcastingSchema } from './spellcasting'
 
 // ---------------------------------------------------------------------------
 // Class features + proficiencies

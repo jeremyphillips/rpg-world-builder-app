@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from './vocab/types'
+import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Creature sizes — the closed SRD 5.2.1 size categories, shared by species,

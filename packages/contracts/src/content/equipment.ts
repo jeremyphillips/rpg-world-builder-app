@@ -1,12 +1,12 @@
 import { z } from 'zod'
-import { abilitySchema } from './ability'
+import { abilitySchema } from '../vocab/ability'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './content'
-import { moneySchema, weightSchema } from './units'
+} from './envelope'
+import { moneySchema, weightSchema } from '../primitives/units'
 
 // ---------------------------------------------------------------------------
 // Equipment — the consolidated "long tail" content type. Armor, weapons, and

@@ -1,4 +1,4 @@
-import type { SpellcastingProgression } from './class'
+import type { SpellcastingProgression } from './class/spellcasting'
 
 // ---------------------------------------------------------------------------
 // Spell slot tables — 20-row arrays, one entry per character level.
