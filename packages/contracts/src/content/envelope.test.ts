@@ -5,7 +5,7 @@ import {
   contentPatchBaseSchema,
   contentSourceSchema,
   slugSchema,
-} from './content'
+} from './envelope'
 
 const systemMeta = {
   id: 'srd-cc-5.2.1:fighter',

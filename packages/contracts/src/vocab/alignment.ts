@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from './vocab/types'
+import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Alignments — the closed SRD 5.2.1 moral compass set. Shared by characters,

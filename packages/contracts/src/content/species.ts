@@ -1,18 +1,20 @@
 import { z } from 'zod'
 
-import { abilitySchema } from './ability'
-import { armorCategorySchema } from './armor'
+import { abilitySchema } from '../vocab/ability'
+import { armorCategorySchema } from '../vocab/armor/category'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './content'
-import { creatureSizeSchema } from './creature-size'
-import { creatureTypeSchema } from './creature-type'
-import { damageTypeSchema } from './damage-type'
-import { levelSchema } from './level'
-import { speedSchema } from './movement-mode'
+} from './envelope'
+import { creatureSizeSchema } from '../vocab/creature-size'
+import { creatureTypeSchema } from '../vocab/creature-type'
+import { damageTypeSchema } from '../vocab/damage-type'
+import { levelSchema } from '../primitives/level'
+import { speedSchema } from '../vocab/movement-mode'
+import { senseSchema } from '../vocab/sense'
+import { usageFrequencySchema } from '../vocab/usage-frequency'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -24,46 +26,7 @@ import { skillSchema } from './skill-proficiency'
 // species), not a separate content type.
 // ---------------------------------------------------------------------------
 
-// --- Senses ----------------------------------------------------------------
-
-export const SENSE_TYPES = ['darkvision', 'blindsight', 'tremorsense', 'truesight'] as const
-
-export const senseTypeSchema = z.enum(SENSE_TYPES)
-
-export type SenseType = (typeof SENSE_TYPES)[number]
-
-export const SENSE_LABELS: Record<SenseType, string> = {
-  darkvision: 'Darkvision',
-  blindsight: 'Blindsight',
-  tremorsense: 'Tremorsense',
-  truesight: 'Truesight',
-}
-
-/** Returns the display label for a sense type. Falls back to the raw value. */
-export function getSenseLabel(type: string): string {
-  return SENSE_LABELS[type as SenseType] ?? type
-}
-
-/** A special sense and its range in feet (e.g. Darkvision 60 ft). */
-export const senseSchema = z.object({
-  type: senseTypeSchema,
-  range: z.number().int().min(0),
-})
-
-export type Sense = z.infer<typeof senseSchema>
-
 // --- Innate spellcasting ----------------------------------------------------
-
-/** How often a granted spell can be cast for free. */
-export const SPELL_FREQUENCIES = [
-  'at_will',
-  'prof_bonus_per_long_rest',
-  'once_per_long_rest',
-] as const
-
-export const spellFrequencySchema = z.enum(SPELL_FREQUENCIES)
-
-export type SpellFrequency = (typeof SPELL_FREQUENCIES)[number]
 
 /**
  * Spells gained at a character level. `spellIds` are opaque spell slugs for now
@@ -74,7 +37,7 @@ export type SpellFrequency = (typeof SPELL_FREQUENCIES)[number]
 export const innateSpellEntrySchema = z.object({
   level: levelSchema,
   spellIds: z.array(z.string().min(1)).min(1),
-  frequency: spellFrequencySchema.optional(),
+  frequency: usageFrequencySchema.optional(),
 })
 
 export const innateSpellsSchema = z.object({

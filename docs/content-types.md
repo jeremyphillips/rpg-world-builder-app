@@ -16,14 +16,15 @@ Add a new content type when the domain entity:
 
 If the entity is always embedded inside another (e.g. class features, spell components), model it as a nested schema on the parent type instead.
 
-When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as **choice groups** on the parent body rather than a separate content type. See `species.ts` (`choiceGroups` of `speciesTraitSchema` options with optional `grants`).
+When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as **choice groups** on the parent body rather than a separate content type. See `content/species.ts` (`choiceGroups` of `speciesTraitSchema` options with optional `grants`).
 
 ---
 
 ## Layer overview
 
 ```
-packages/contracts/src/<type>.ts   ← Zod schemas, TypeScript types, DTOs
+packages/contracts/src/content/<type>.ts   ← Zod schemas, TypeScript types, DTOs
+packages/contracts/src/vocab/            ← closed-set reference terms (when needed)
 apps/api/src/features/content/
   <type>/
     data/srd-cc-5.2.1/<type>.json  ← System seed data
@@ -53,13 +54,18 @@ apps/dashboard/src/
 
 ## Step-by-step checklist
 
-### 1. Contracts (`packages/contracts/src/`)
+### 1. Contracts (`packages/contracts/src/content/`)
 
-Create `<type>.ts` following this pattern:
+Create `<type>.ts` under `content/` following this pattern:
 
 ```typescript
 import { z } from 'zod'
-import { contentBodyBaseSchema, contentMetaSchema, contentPatchBaseSchema, slugSchema } from './content'
+import {
+  contentBodyBaseSchema,
+  contentMetaSchema,
+  contentPatchBaseSchema,
+  slugSchema,
+} from './envelope'
 
 export const <type>BodySchema = contentBodyBaseSchema.extend({
   // type-specific fields
@@ -79,7 +85,8 @@ Rules:
 - Avoid `z.enum` for open lists (items, feature names). Use `z.string()` unless the engine branches on the value.
 - Name the stored type to avoid reserved words or collisions (e.g. `CharacterClass` not `Class`).
 
-Re-export from `packages/contracts/src/index.ts`:
+Re-export from `packages/contracts/src/content/index.ts` (the root barrel
+re-exports the content layer automatically):
 
 ```typescript
 export * from './<type>'
@@ -96,13 +103,17 @@ Add a co-located `<type>.test.ts` covering:
 - `*PatchSchema` requires `campaignId` and `targetId`.
 
 If the type has a **closed set of ids** used as enums (weapon properties, armor
-categories, skill slugs, etc.), export reference vocabulary from `@rpg/contracts`
-and derive the Zod enum from the map keys.
+categories, skill slugs, etc.), add reference vocabulary under
+`packages/contracts/src/vocab/` and derive the Zod enum from the map keys. Import
+the schema into your content module — do not define vocab maps on the entity
+file. See [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
 
 #### Reference vocabulary (`GameTermEntry`)
 
 Use this when a closed id set needs both a display label and SRD rule text
-(tooltips, detail pages, form help). Shared shape in `vocab/types.ts`:
+(tooltips, detail pages, form help). Shared shape in `vocab/types.ts`; modules
+live under `packages/contracts/src/vocab/` (nested folders OK, e.g.
+`vocab/weapon/property.ts`):
 
 ```typescript
 export type GameTermEntry = {
@@ -111,14 +122,15 @@ export type GameTermEntry = {
 }
 ```
 
-Pattern (see `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
+Pattern (see `SENSE_ENTRIES`, `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
 `CREATURE_TYPE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`,
-`WEAPON_MASTERY_ENTRIES`, and `ARMOR_CATEGORY_ENTRIES` in `alignment.ts`,
-`creature-size.ts`, `creature-type.ts`, `damage-type.ts`, `weapon.ts` /
-`armor.ts`):
+`WEAPON_MASTERY_ENTRIES`, and `ARMOR_CATEGORY_ENTRIES` in `vocab/sense.ts`,
+`vocab/alignment.ts`, `vocab/creature-size.ts`, `vocab/creature-type.ts`,
+`vocab/damage-type.ts`, `vocab/weapon/property.ts`, `vocab/weapon/mastery.ts`,
+and `vocab/armor/category.ts`):
 
 ```typescript
-import type { GameTermEntry } from './vocab/types'
+import type { GameTermEntry } from '../vocab/types' // adjust relative path from content/
 
 export const THING_ENTRIES = {
   'slug-a': {
@@ -164,8 +176,9 @@ export function getThingName(id: string): string {
 }
 ```
 
-See `SKILLS`/`getSkillName` in `skill-proficiency.ts` and `CLASS_NAMES`/`getClassName`
-in `class.ts`. Prefer `*_ENTRIES` when rule text is available or likely soon.
+See `SKILLS`/`getSkillName` in `content/skill-proficiency.ts` and
+`CLASS_NAMES`/`getClassName` in `content/class/class.ts`. Prefer `*_ENTRIES`
+when rule text is available or likely soon.
 
 #### Discriminated-union content types (variant pattern)
 
@@ -174,7 +187,7 @@ Most content types are a single object shape and use the one-liner DTOs above
 sub-kinds whose fields genuinely differ (only a few fields are universal). Model
 those as a Zod **discriminated union** on a `kind` field — one content type, one
 registry entry, scales by adding a union variant instead of a new content type.
-`equipment.ts` (gear, ammunition, focus, tool, mount, vehicle, ship, misc) is
+`content/equipment.ts` (gear, ammunition, focus, tool, mount, vehicle, ship, misc) is
 the reference implementation.
 
 Rules specific to union-shaped types:
@@ -485,11 +498,11 @@ Import the two route components from `@/features/content`, then add under `campa
 
 ## Design decisions to make for each new type
 
-| Decision                         | Guidance                                                                                                                                                                                                                   |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                   |
-| **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                   |
-| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as `choiceGroups` on the species body (`species.ts`).       |
-| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                               |
-| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                      |
-| **Dual-ownership fields?**       | If another type references this type's entities (e.g. `suggestedClasses` on skills), keep the authoritative list on the owning type and add the reverse as an optional convenience field. Document which is authoritative. |
+| Decision                         | Guidance                                                                                                                                                                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                     |
+| **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                     |
+| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as `choiceGroups` on the species body (`content/species.ts`). |
+| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                 |
+| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                        |
+| **Dual-ownership fields?**       | If another type references this type's entities (e.g. `suggestedClasses` on skills), keep the authoritative list on the owning type and add the reverse as an optional convenience field. Document which is authoritative.   |
