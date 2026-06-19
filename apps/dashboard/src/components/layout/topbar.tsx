@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Heading,
   SidebarTrigger,
   ThemeSwitch,
 } from '@rpg/ui'
@@ -31,7 +32,9 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
     <header className="flex h-16 items-center justify-between border-b border-border px-6">
       <div className="flex items-center gap-2">
         <SidebarTrigger isOpen={sidebarOpen} onClick={onToggleSidebar} className="md:hidden" />
-        <h1 className="text-base font-semibold tracking-tight">Dashboard</h1>
+        <Heading variant="label" as="h1" className="text-base font-semibold tracking-tight">
+          Dashboard
+        </Heading>
       </div>
 
       {user ? (

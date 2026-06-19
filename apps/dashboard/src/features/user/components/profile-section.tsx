@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { Heading, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 import type { UpdateProfileInput } from '@rpg/contracts'
 
@@ -32,12 +33,10 @@ export function ProfileSection() {
   return (
     <section aria-labelledby="profile-heading" className="space-y-4">
       <div className="space-y-1">
-        <h3 id="profile-heading" className="text-lg font-semibold">
+        <Heading variant="section" as="h3" id="profile-heading" className="text-lg">
           Profile
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Your public display name, email address, and avatar.
-        </p>
+        </Heading>
+        <Text variant="small">Your public display name, email address, and avatar.</Text>
       </div>
       {/* key forces a remount once the session loads so RHF initialises with the correct defaults */}
       <Form<AccountFormValues>

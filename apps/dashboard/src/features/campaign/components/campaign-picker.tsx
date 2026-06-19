@@ -1,6 +1,6 @@
 import type { Campaign } from '@rpg/contracts'
 
-import { Button } from '@rpg/ui'
+import { Button, Heading } from '@rpg/ui'
 
 interface CampaignPickerProps {
   campaigns: Campaign[]
@@ -11,7 +11,9 @@ interface CampaignPickerProps {
 export function CampaignPicker({ campaigns, onSelect }: CampaignPickerProps) {
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-medium text-muted-foreground">Your campaigns</h3>
+      <Heading variant="label" as="h3" className="text-sm text-muted-foreground">
+        Your campaigns
+      </Heading>
       <ul className="flex flex-col gap-2">
         {campaigns.map((campaign) => (
           <li key={campaign.id}>

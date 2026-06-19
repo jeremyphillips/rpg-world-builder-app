@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { Heading, Text } from '@rpg/ui'
 
 import { useCampaigns } from '../hooks/use-campaigns'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
@@ -15,10 +16,10 @@ export function CampaignDetail() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-2">
-      <h2 className="text-2xl font-semibold tracking-tight">
+      <Heading variant="page" as="h2">
         {campaign?.identity.name ?? 'Campaign'}
-      </h2>
-      <p className="text-muted-foreground">Overview</p>
+      </Heading>
+      <Text variant="muted">Overview</Text>
     </div>
   )
 }

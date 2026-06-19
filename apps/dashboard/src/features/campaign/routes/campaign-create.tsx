@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { getErrorMessage } from '@rpg/contracts'
-import { Wizard, type WizardStepDef } from '@rpg/ui'
+import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
@@ -55,7 +55,9 @@ export function CampaignCreate() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-2">
-      <h2 className="text-2xl font-semibold tracking-tight">New campaign</h2>
+      <Heading variant="page" as="h2">
+        New campaign
+      </Heading>
       <Wizard
         steps={STEPS}
         onComplete={onComplete}
