@@ -98,7 +98,7 @@ type ClassDetailContentProps = {
   subclasses: Subclass[]
 }
 
-function ClassDetailContent({
+export function ClassDetailContent({
   characterClass,
   campaignId,
   classId,
