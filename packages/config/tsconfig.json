@@ -1,0 +1,7 @@
+{
+  "extends": "@rpg/config/tsconfig/react.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src"]
+}

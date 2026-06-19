@@ -18,6 +18,10 @@
     "./form": {
       "types": "./src/form/index.ts",
       "default": "./src/form/index.ts"
+    },
+    "./storybook/with-theme-context": {
+      "types": "./src/storybook/with-theme-context.tsx",
+      "default": "./src/storybook/with-theme-context.tsx"
     }
   },
   "scripts": {
