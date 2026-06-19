@@ -1,6 +1,8 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { headingVariants } from './heading.variants'
+import { textVariants } from './text.variants'
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
@@ -22,18 +24,14 @@ CardHeader.displayName = 'CardHeader'
 
 const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('font-display text-lg font-semibold leading-none tracking-tight', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn(headingVariants({ variant: 'card' }), className)} {...props} />
   ),
 )
 CardTitle.displayName = 'CardTitle'
 
 const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+    <div ref={ref} className={cn(textVariants({ variant: 'small' }), className)} {...props} />
   ),
 )
 CardDescription.displayName = 'CardDescription'

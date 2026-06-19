@@ -29,6 +29,7 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `useModal`                                   | hook       | Modal open/close state + promise-based `confirm()` + guarded-close helpers                                                                  |
 | `ConfirmDialog`                              | component  | Radix AlertDialog "are you sure?"; pairs with `useModal`'s guarded close                                                                    |
 | `RichTextEditor`, `sanitizeHtml`             | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                             |
+| `Heading`, `Text`, `RichTextContent`         | component  | App copy primitives + sanitized HTML prose; see [Typography](#typography) below                                                             |
 | `FormCard`, `formCardContentClass`           | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                  |
 | `SubmitButton`, `SubmitButtonProps`          | component  | `type="submit"` button with pending state + label                                                                                           |
 | `Spinner`, `SpinnerProps`, `spinnerVariants` | component  | Accessible loading indicator; `variant` (`muted` default, `foreground`); `size` (`sm` … `xl`)                                               |
@@ -74,6 +75,22 @@ Apps provide the actual faces:
   `@fontsource-variable/lora`; their family names match the tokens' fallbacks.
 
 If an app loads neither, the tokens fall back to system stacks.
+
+## Typography
+
+Copy uses two layers: **`Heading` / `Text`** for app chrome, **`RichTextContent`**
+for sanitized HTML. Do not wrap whole pages in `prose`.
+
+Full guide — hierarchy table, `RichTextContent` contract, dark mode, and internal
+primitive rules: **[docs/typography.md](docs/typography.md)**.
+
+```tsx
+import { Heading, Text, RichTextContent } from '@rpg/ui'
+
+<Heading variant="display" as="h2">{item.name}</Heading>
+<Text variant="muted">{item.description}</Text>
+<RichTextContent html={trait.description} size="sm" tone="muted" />
+```
 
 ## Importing components
 

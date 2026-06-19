@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { Text } from './text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs.client'
 
 const meta = {
@@ -21,13 +22,13 @@ export const Line: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <p className="text-sm text-muted-foreground">Identity tab content.</p>
+        <Text variant="small">Identity tab content.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <p className="text-sm text-muted-foreground">Rules tab content.</p>
+        <Text variant="small">Rules tab content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <p className="text-sm text-muted-foreground">Flavor tab content.</p>
+        <Text variant="small">Flavor tab content.</Text>
       </TabsContent>
     </Tabs>
   ),
@@ -43,13 +44,13 @@ export const Pill: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <p className="text-sm text-muted-foreground">Identity tab content.</p>
+        <Text variant="small">Identity tab content.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <p className="text-sm text-muted-foreground">Rules tab content.</p>
+        <Text variant="small">Rules tab content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <p className="text-sm text-muted-foreground">Flavor tab content.</p>
+        <Text variant="small">Flavor tab content.</Text>
       </TabsContent>
     </Tabs>
   ),
@@ -67,13 +68,13 @@ export const Disabled: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <p className="text-sm text-muted-foreground">Only identity is accessible.</p>
+        <Text variant="small">Only identity is accessible.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <p className="text-sm text-muted-foreground">Rules content.</p>
+        <Text variant="small">Rules content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <p className="text-sm text-muted-foreground">Flavor content.</p>
+        <Text variant="small">Flavor content.</Text>
       </TabsContent>
     </Tabs>
   ),

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { FieldRow, NumberField, SelectField } from '../index'
+import { FieldRow, NumberField, SelectField, Text } from '../index'
 
 const DIE_FACES = [4, 6, 8, 10, 12, 20, 100] as const
 
@@ -36,9 +36,9 @@ function DiceNotation() {
           options={DIE_FACES.map((face) => ({ label: `d${face}`, value: String(face) }))}
         />
       </FieldRow>
-      <p className="text-sm text-muted-foreground">
+      <Text variant="small">
         Rolls <span className="font-mono font-medium text-foreground">{notation}</span>
-      </p>
+      </Text>
     </div>
   )
 }

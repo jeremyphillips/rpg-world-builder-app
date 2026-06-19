@@ -9,6 +9,15 @@ export { ThemeSwitch } from './components/ui/theme-switch.client'
 
 export { cn } from './lib/utils'
 export { sanitizeHtml } from './lib/sanitize-html'
+export { Heading, type HeadingProps } from './components/ui/heading'
+export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
+export { Text, type TextProps } from './components/ui/text'
+export { textVariants, type TextVariantProps } from './components/ui/text.variants'
+export { RichTextContent, type RichTextContentProps } from './components/ui/rich-text-content'
+export {
+  richTextContentVariants,
+  type RichTextContentVariantProps,
+} from './components/ui/rich-text-content.variants'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'

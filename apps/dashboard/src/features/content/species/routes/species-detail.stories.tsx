@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Species } from '@rpg/contracts'
+import { Heading, RichTextContent } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -116,7 +117,9 @@ export const NoChoiceGroups: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={ORC.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{ORC.name}</h2>
+        <Heading variant="display" as="h2">
+          {ORC.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Creature Type" value="Humanoid" />
           <ContentStatRow label="Size" value="Medium" />
@@ -125,19 +128,16 @@ export const NoChoiceGroups: Story = {
         </div>
       </div>
       <section aria-labelledby="traits-heading">
-        <h3 id="traits-heading" className="mb-4 text-xl font-semibold tracking-tight">
+        <Heading variant="section" as="h3" id="traits-heading" className="mb-4">
           Traits
-        </h3>
+        </Heading>
         <ul className="space-y-4" role="list">
           {ORC.traits.map((t) => (
             <li key={t.id} className="space-y-1">
-              <p className="font-medium">{t.name}</p>
-              {t.description && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: t.description }}
-                />
-              )}
+              <Heading variant="label" as="p">
+                {t.name}
+              </Heading>
+              {t.description && <RichTextContent html={t.description} size="sm" tone="muted" />}
             </li>
           ))}
         </ul>
@@ -150,7 +150,9 @@ export const WithLineageChoiceGroup: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={ELF.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{ELF.name}</h2>
+        <Heading variant="display" as="h2">
+          {ELF.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Creature Type" value="Humanoid" />
           <ContentStatRow label="Size" value="Medium" />
@@ -159,46 +161,36 @@ export const WithLineageChoiceGroup: Story = {
         </div>
       </div>
       <section aria-labelledby="traits-heading">
-        <h3 id="traits-heading" className="mb-4 text-xl font-semibold tracking-tight">
+        <Heading variant="section" as="h3" id="traits-heading" className="mb-4">
           Traits
-        </h3>
+        </Heading>
         <ul className="space-y-4" role="list">
           {ELF.traits.map((t) => (
             <li key={t.id} className="space-y-1">
-              <p className="font-medium">{t.name}</p>
-              {t.description && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: t.description }}
-                />
-              )}
+              <Heading variant="label" as="p">
+                {t.name}
+              </Heading>
+              {t.description && <RichTextContent html={t.description} size="sm" tone="muted" />}
             </li>
           ))}
         </ul>
       </section>
       {ELF.choiceGroups?.map((group) => (
         <section key={group.id} aria-labelledby={`${group.id}-heading`}>
-          <h3
-            id={`${group.id}-heading`}
-            className="mb-2 text-xl font-semibold tracking-tight capitalize"
-          >
+          <Heading variant="section" as="h3" id={`${group.id}-heading`} className="mb-2 capitalize">
             {group.name}
-          </h3>
+          </Heading>
           {group.description && (
-            <p
-              className="mb-4 text-sm text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: group.description }}
-            />
+            <RichTextContent html={group.description} size="sm" tone="muted" className="mb-4" />
           )}
           <ul className="space-y-4" role="list">
             {group.options.map((opt) => (
               <li key={opt.id} className="space-y-1">
-                <p className="font-medium">{opt.name}</p>
+                <Heading variant="label" as="p">
+                  {opt.name}
+                </Heading>
                 {opt.description && (
-                  <p
-                    className="text-sm text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: opt.description }}
-                  />
+                  <RichTextContent html={opt.description} size="sm" tone="muted" />
                 )}
               </li>
             ))}

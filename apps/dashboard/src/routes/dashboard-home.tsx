@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, Spinner } from '@rpg/ui'
+import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
 import { CampaignPicker, useCampaigns, useSelectCampaign } from '@/features/campaign'
@@ -24,14 +24,14 @@ export function DashboardHome() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
+          <Heading variant="page" as="h2">
             Welcome{user ? `, ${user.displayName}` : ''}
-          </h2>
-          <p className="text-muted-foreground">
+          </Heading>
+          <Text variant="muted">
             {hasCampaigns
               ? 'Choose a campaign to continue, or start a new one.'
               : 'Create your first campaign to get started.'}
-          </p>
+          </Text>
         </div>
         <Link to={ROUTES.campaign.create} className={buttonVariants({ variant: 'default' })}>
           New campaign

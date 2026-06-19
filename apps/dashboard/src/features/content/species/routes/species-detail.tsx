@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { sanitizeHtml, Spinner } from '@rpg/ui'
+import { Heading, RichTextContent, Spinner, Text } from '@rpg/ui'
 import { getCreatureTypeLabel, getCreatureSizeLabel, getSenseLabel } from '@rpg/contracts'
 import type { Species, Speed, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
 
@@ -40,13 +40,10 @@ function collectSenses(traits: SpeciesTrait[]): string {
 function TraitItem({ trait }: { trait: SpeciesTrait }) {
   return (
     <li className="space-y-1">
-      <p className="font-medium">{trait.name}</p>
-      {trait.description && (
-        <div
-          className="prose prose-sm max-w-none text-muted-foreground [&>p]:my-0"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(trait.description) }}
-        />
-      )}
+      <Heading variant="label" as="p">
+        {trait.name}
+      </Heading>
+      {trait.description && <RichTextContent html={trait.description} size="sm" tone="muted" />}
     </li>
   )
 }
@@ -55,9 +52,9 @@ function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
   if (traits.length === 0) return null
   return (
     <section aria-labelledby="traits-heading">
-      <h3 id="traits-heading" className="mb-4 text-xl font-semibold tracking-tight">
+      <Heading variant="section" as="h3" id="traits-heading" className="mb-4">
         Traits
-      </h3>
+      </Heading>
       <ul className="space-y-4" role="list">
         {traits.map((trait) => (
           <TraitItem key={trait.id} trait={trait} />
@@ -70,27 +67,25 @@ function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
 function ChoiceGroupSection({ group }: { group: SpeciesChoiceGroup }) {
   return (
     <section aria-labelledby={`choice-group-${group.id}-heading`}>
-      <h3
+      <Heading
+        variant="section"
+        as="h3"
         id={`choice-group-${group.id}-heading`}
-        className="mb-2 text-xl font-semibold tracking-tight capitalize"
+        className="mb-2 capitalize"
       >
         {group.name}
-      </h3>
+      </Heading>
       {group.description && (
-        <div
-          className="prose prose-sm mb-4 max-w-none text-muted-foreground [&>p]:my-0"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(group.description) }}
-        />
+        <RichTextContent html={group.description} size="sm" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
         {group.options.map((option) => (
           <li key={option.id} className="space-y-1">
-            <p className="font-medium">{option.name}</p>
+            <Heading variant="label" as="p">
+              {option.name}
+            </Heading>
             {option.description && (
-              <div
-                className="prose prose-sm max-w-none text-muted-foreground [&>p]:my-0"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(option.description) }}
-              />
+              <RichTextContent html={option.description} size="sm" tone="muted" />
             )}
           </li>
         ))}
@@ -136,9 +131,11 @@ function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
   return (
     <ContentDetailLayout imageUrl={getContentImageUrl(species.imageKey)} imageName={species.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{species.name}</h2>
+        <Heading variant="display" as="h2">
+          {species.name}
+        </Heading>
         <SpeciesStatsSection species={species} />
-        {species.description && <p className="text-muted-foreground">{species.description}</p>}
+        {species.description && <Text variant="muted">{species.description}</Text>}
       </div>
       <TraitsList traits={species.traits} />
       <ChoiceGroupsList groups={species.choiceGroups ?? []} />
@@ -163,9 +160,9 @@ export function SpeciesDetail() {
 
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Could not load species.
-      </p>
+      </Text>
     )
   }
 
@@ -173,9 +170,9 @@ export function SpeciesDetail() {
 
   if (!item) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Species not found.
-      </p>
+      </Text>
     )
   }
 

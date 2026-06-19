@@ -4,6 +4,8 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field } from './field.client'
+import { fieldLabelVariants } from './field.variants'
+import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
@@ -81,7 +83,7 @@ export function ChipsField({
       className={cn('space-y-2', width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}
     >
-      <legend id={legendId} className="flex items-center gap-1.5 text-sm font-medium leading-none">
+      <legend id={legendId} className={fieldLabelVariants({ size: 'md' })}>
         {label}
         {required ? (
           <span aria-hidden="true" className="text-destructive">
@@ -120,13 +122,13 @@ export function ChipsField({
       </div>
 
       {error ? (
-        <p id={errorId} role="alert" aria-live="polite" className="text-sm text-destructive">
+        <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
           {error}
-        </p>
+        </Text>
       ) : hint ? (
-        <p id={hintId} className="text-sm text-muted-foreground">
+        <Text id={hintId} variant="small">
           {hint}
-        </p>
+        </Text>
       ) : null}
     </fieldset>
   )

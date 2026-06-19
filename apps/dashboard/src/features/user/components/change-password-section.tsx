@@ -1,3 +1,4 @@
+import { Heading, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 import type { ChangePasswordInput } from '@rpg/contracts'
 
@@ -21,12 +22,10 @@ export function ChangePasswordSection() {
   return (
     <section aria-labelledby="password-heading" className="space-y-4">
       <div className="space-y-1">
-        <h3 id="password-heading" className="text-lg font-semibold">
+        <Heading variant="section" as="h3" id="password-heading" className="text-lg">
           Change password
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          You must enter your current password to set a new one.
-        </p>
+        </Heading>
+        <Text variant="small">You must enter your current password to set a new one.</Text>
       </div>
       <Form<ChangePasswordFormValues>
         schema={changePasswordFormSchema}

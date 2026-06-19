@@ -1,4 +1,4 @@
-import { WizardFooter, useWizard } from '@rpg/ui'
+import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
 
 import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
 import {
@@ -65,9 +65,9 @@ export function ReviewStep({ error }: ReviewStepProps) {
         </ReviewSection>
 
         {error && (
-          <p role="alert" className="text-sm text-destructive">
+          <Text variant="destructive" role="alert">
             {error}
-          </p>
+          </Text>
         )}
       </div>
 
@@ -87,12 +87,9 @@ function ReviewSection({
 }) {
   return (
     <section aria-labelledby={id}>
-      <h3
-        id={id}
-        className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-      >
+      <Text variant="small" as="h3" id={id} className="mb-3 font-semibold uppercase tracking-wide">
         {heading}
-      </h3>
+      </Text>
       <dl className="space-y-2 text-sm">{children}</dl>
     </section>
   )
@@ -101,8 +98,12 @@ function ReviewSection({
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-2">
-      <dt className="w-40 shrink-0 text-muted-foreground">{label}</dt>
-      <dd className="font-medium">{value}</dd>
+      <Text variant="muted" as="dt" className="w-40 shrink-0">
+        {label}
+      </Text>
+      <Heading variant="label" as="dd">
+        {value}
+      </Heading>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { Spinner } from '@rpg/ui'
+import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -20,6 +20,14 @@ const tabs: TabbedFormTab[] = [
   { id: 'rules', label: 'Rules', fields: rulesFields },
   { id: 'flavor', label: 'Flavor', fields: flavorFields },
 ]
+
+function CampaignSettingsHeading() {
+  return (
+    <Heading variant="page" as="h2">
+      Campaign Settings
+    </Heading>
+  )
+}
 
 export function CampaignSettings() {
   const { campaignId } = useParams<{ campaignId: string }>()
@@ -45,7 +53,7 @@ export function CampaignSettings() {
   if (isLoadingCampaigns) {
     return (
       <div className="mx-auto max-w-3xl space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">Campaign Settings</h2>
+        <CampaignSettingsHeading />
         <Spinner />
       </div>
     )
@@ -54,17 +62,17 @@ export function CampaignSettings() {
   if (isError || !campaign) {
     return (
       <div className="mx-auto max-w-3xl space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">Campaign Settings</h2>
-        <p role="alert" className="text-sm text-destructive">
+        <CampaignSettingsHeading />
+        <Text variant="destructive" role="alert">
           {isError ? 'Could not load campaign.' : 'Campaign not found.'}
-        </p>
+        </Text>
       </div>
     )
   }
 
   return (
     <div className="mx-auto max-w-3xl space-y-2">
-      <h2 className="text-2xl font-semibold tracking-tight">Campaign Settings</h2>
+      <CampaignSettingsHeading />
       {/* key forces a remount once the campaign loads so RHF initialises with the correct defaults */}
       <TabbedForm<CampaignSettingsValues>
         key={campaign.id}

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Armor } from '@rpg/contracts'
-import { Spinner } from '@rpg/ui'
+import { Spinner, Heading, Text } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useArmor } from '../hooks/use-armor'
@@ -18,13 +18,15 @@ function ArmorDetailContent({ item }: ArmorDetailContentProps) {
   return (
     <ContentDetailLayout imageUrl={getContentImageUrl(item.imageKey)} imageName={item.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{item.name}</h2>
+        <Heading variant="display" as="h2">
+          {item.name}
+        </Heading>
         <div className="space-y-3">
           {statRows.map(({ label, value }) => (
             <ContentStatRow key={label} label={label} value={value} />
           ))}
         </div>
-        {item.description && <p className="text-muted-foreground">{item.description}</p>}
+        {item.description && <Text variant="muted">{item.description}</Text>}
       </div>
     </ContentDetailLayout>
   )
@@ -47,9 +49,9 @@ export function ArmorDetail() {
 
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Could not load armor.
-      </p>
+      </Text>
     )
   }
 
@@ -57,9 +59,9 @@ export function ArmorDetail() {
 
   if (!item) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Armor not found.
-      </p>
+      </Text>
     )
   }
 

@@ -86,6 +86,7 @@
     "@storybook/addon-themes": "^10.4.2",
     "@storybook/react-vite": "^10.4.2",
     "@storybook/test-runner": "^0.24.4",
+    "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.0",
     "@testing-library/react": "^16.3.2",

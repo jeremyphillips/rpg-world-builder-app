@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { RichTextEditor } from './rich-text-editor.client'
-import { sanitizeHtml } from '../../lib/sanitize-html'
+import { RichTextContent } from './rich-text-content'
 
 const meta = {
   title: 'Forms/Controls/RichTextEditor',
@@ -37,17 +37,16 @@ export const Disabled: Story = {
   parameters: { a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } } },
 }
 
-/** Round-trips edits and renders the stored HTML via the `sanitizeHtml` helper. */
+/** Round-trips edits and renders the stored HTML via `RichTextContent`. */
 export const WithSanitizedPreview: StoryObj = {
   render: () => {
     const [html, setHtml] = useState('<p>Edit me, then see the sanitized preview below.</p>')
     return (
       <div className="space-y-4">
         <RichTextEditor aria-label="Biography" value={html} onChange={setHtml} />
-        <div
-          className="rounded-md border border-border p-3 text-sm"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
-        />
+        <div className="rounded-md border border-border p-3">
+          <RichTextContent html={html} size="sm" />
+        </div>
       </div>
     )
   },

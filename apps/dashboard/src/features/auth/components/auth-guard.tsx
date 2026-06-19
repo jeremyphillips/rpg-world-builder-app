@@ -1,16 +1,12 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Spinner } from '@rpg/ui'
+import { Spinner, Text } from '@rpg/ui'
 
 import { LOGIN_PATH } from '../api/auth-client'
 import { useSession } from '../hooks/use-session'
 
-function FullScreenMessage({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-dvh items-center justify-center text-sm text-muted-foreground">
-      {children}
-    </div>
-  )
+function FullScreenCenter({ children }: { children: React.ReactNode }) {
+  return <div className="flex min-h-dvh items-center justify-center">{children}</div>
 }
 
 /**
@@ -28,15 +24,19 @@ export function AuthGuard() {
 
   if (isPending) {
     return (
-      <FullScreenMessage>
+      <FullScreenCenter>
         <Spinner />
-      </FullScreenMessage>
+      </FullScreenCenter>
     )
   }
 
   if (isError || !user) {
     // Redirect is in-flight; render nothing meaningful in the meantime.
-    return <FullScreenMessage>Redirecting to login…</FullScreenMessage>
+    return (
+      <FullScreenCenter>
+        <Text variant="small">Redirecting to login…</Text>
+      </FullScreenCenter>
+    )
   }
 
   return <Outlet />

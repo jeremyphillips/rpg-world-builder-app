@@ -11,6 +11,7 @@ import {
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
+import { Text } from '../components/ui/text'
 import { FormItems } from './form-items.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
@@ -104,9 +105,9 @@ export function Form<TFieldValues extends FieldValues>({
         >
           <div className={cn('space-y-4', contentClassName)}>
             {formError ? (
-              <p role="alert" className="text-sm text-destructive">
+              <Text variant="destructive" role="alert">
                 {formError}
-              </p>
+              </Text>
             ) : null}
             <FormItems items={fields} idPrefix={formId} />
           </div>

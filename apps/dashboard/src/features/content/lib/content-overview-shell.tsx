@@ -1,4 +1,4 @@
-import { Spinner } from '@rpg/ui'
+import { Heading, Spinner, Text } from '@rpg/ui'
 
 type ContentOverviewShellProps = {
   heading: string
@@ -22,7 +22,9 @@ export function ContentOverviewShell({
   if (isPending) {
     return (
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
+        <Heading variant="page" as="h2">
+          {heading}
+        </Heading>
         <Spinner />
       </div>
     )
@@ -31,17 +33,21 @@ export function ContentOverviewShell({
   if (isError) {
     return (
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-        <p role="alert" className="text-sm text-destructive">
+        <Heading variant="page" as="h2">
+          {heading}
+        </Heading>
+        <Text variant="destructive" role="alert">
           {errorLabel ?? `Could not load ${heading.toLowerCase()}.`}
-        </p>
+        </Text>
       </div>
     )
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
+      <Heading variant="page" as="h2">
+        {heading}
+      </Heading>
       {children}
     </div>
   )

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Spinner } from '@rpg/ui'
+import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 import { ABILITIES, getClassName } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
@@ -22,9 +22,9 @@ function SuggestedClassesList({
   if (suggestedClasses.length === 0) return null
   return (
     <section aria-labelledby="suggested-classes-heading">
-      <h3 id="suggested-classes-heading" className="mb-3 text-xl font-semibold tracking-tight">
+      <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
         Commonly Taken By
-      </h3>
+      </Heading>
       <ul className="flex flex-wrap gap-2" role="list">
         {suggestedClasses.map((slug) => (
           <li key={slug}>
@@ -68,11 +68,13 @@ function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentPr
       }
     >
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{skill.name}</h2>
+        <Heading variant="display" as="h2">
+          {skill.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Governing Ability" value={ABILITIES[skill.ability]} />
         </div>
-        {skill.description && <p className="text-muted-foreground">{skill.description}</p>}
+        {skill.description && <Text variant="muted">{skill.description}</Text>}
       </div>
       {skill.suggestedClasses && skill.suggestedClasses.length > 0 && (
         <SuggestedClassesList
@@ -99,9 +101,9 @@ export function SkillProficiencyDetail() {
 
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Could not load skill proficiency.
-      </p>
+      </Text>
     )
   }
 
@@ -109,9 +111,9 @@ export function SkillProficiencyDetail() {
 
   if (!skill) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Skill proficiency not found.
-      </p>
+      </Text>
     )
   }
 

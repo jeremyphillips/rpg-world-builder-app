@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Weapon } from '@rpg/contracts'
+import { Heading } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -58,7 +59,9 @@ export const MeleeWeapon: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={LONGSWORD.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{LONGSWORD.name}</h2>
+        <Heading variant="display" as="h2">
+          {LONGSWORD.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Category" value="Martial" />
           <ContentStatRow label="Mode" value="Melee" />
@@ -78,7 +81,9 @@ export const RangedWeapon: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={SHORTBOW.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{SHORTBOW.name}</h2>
+        <Heading variant="display" as="h2">
+          {SHORTBOW.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Category" value="Simple" />
           <ContentStatRow label="Mode" value="Ranged" />
