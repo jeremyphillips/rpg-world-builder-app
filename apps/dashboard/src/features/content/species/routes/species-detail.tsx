@@ -1,7 +1,12 @@
 import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { getCreatureTypeLabel, getCreatureSizeLabel, getSenseLabel } from '@rpg/contracts'
-import type { Species, Speed, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
+import {
+  formatSpeed,
+  getCreatureTypeLabel,
+  getCreatureSizeLabel,
+  getSenseLabel,
+} from '@rpg/contracts'
+import type { Species, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSpecies } from '../hooks/use-species'
@@ -13,20 +18,6 @@ import { getContentImageUrl } from '../../lib/content-image-url'
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-const EXTRA_SPEED_MODES: Array<{ key: keyof Omit<Speed, 'walk'>; label: string }> = [
-  { key: 'fly', label: 'fly' },
-  { key: 'swim', label: 'swim' },
-  { key: 'climb', label: 'climb' },
-  { key: 'burrow', label: 'burrow' },
-]
-
-function formatSpeed(speed: Speed): string {
-  const extras = EXTRA_SPEED_MODES.filter(({ key }) => speed[key] !== undefined).map(
-    ({ key, label }) => `${label} ${speed[key]} ft.`,
-  )
-  return [`${speed.walk} ft.`, ...extras].join(', ')
-}
 
 function collectSenses(traits: SpeciesTrait[]): string {
   const senses = traits.flatMap((t) => t.grants?.senses ?? [])
