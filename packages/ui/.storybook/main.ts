@@ -1,18 +1,5 @@
-import type { StorybookConfig } from '@storybook/react-vite'
-import tailwindcss from '@tailwindcss/vite'
+import { createStorybookMainConfig } from '@rpg/config/storybook/main-base'
 
-const config: StorybookConfig = {
+export default createStorybookMainConfig({
   stories: ['../src/**/*.stories.@(ts|tsx)'],
-  addons: ['@storybook/addon-a11y', '@storybook/addon-themes'],
-  framework: {
-    name: '@storybook/react-vite',
-    options: {},
-  },
-  viteFinal: async (viteConfig) => {
-    viteConfig.plugins ??= []
-    viteConfig.plugins.push(tailwindcss())
-    return viteConfig
-  },
-}
-
-export default config
+})

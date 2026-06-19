@@ -10,7 +10,7 @@ const meta = {
 } satisfies Meta<typeof ClassProgressionTable>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj
 
 const BASE: Omit<
   CharacterClass,

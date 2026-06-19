@@ -64,7 +64,7 @@ const meta = {
 } satisfies Meta<typeof ContentDetailLayout>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj
 
 export const GearItem: Story = {
   render: () => (
