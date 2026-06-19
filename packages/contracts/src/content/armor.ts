@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { armorCategorySchema } from '../vocab/armor/category'
+import { armorMaterialSchema } from '../vocab/armor/material'
 import { moneySchema, weightSchema } from '../primitives/units'
 import {
   contentBodyBaseSchema,
@@ -9,15 +10,13 @@ import {
   slugSchema,
 } from './envelope'
 
-// ---------------------------------------------------------------------------
-// Material — drives the druid non-metal rule and flavor display
-// ---------------------------------------------------------------------------
-
-export const ARMOR_MATERIALS = ['organic', 'metal'] as const
-
-export const armorMaterialSchema = z.enum(ARMOR_MATERIALS)
-
-export type ArmorMaterial = z.infer<typeof armorMaterialSchema>
+export {
+  ARMOR_MATERIALS,
+  armorMaterialSchema,
+  getArmorMaterialEntry,
+  getArmorMaterialLabel,
+  type ArmorMaterial,
+} from '../vocab/armor/material'
 
 // ---------------------------------------------------------------------------
 // Body — the fields every armor record has. Unexported so `.shape` survives

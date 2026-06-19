@@ -29,6 +29,11 @@ export const hitDieSchema = z.union(
   ],
 )
 
+/** Formats a class hit die as a human-readable string (e.g. `8` → `"d8"`). */
+export function formatHitDie(face: ClassHitDie): string {
+  return `d${face}`
+}
+
 // ---------------------------------------------------------------------------
 // Dice expression — a structured count+faces pair, the canonical way to store
 // weapon damage and other roll expressions (as opposed to a raw string like

@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  ARMOR_MATERIALS,
   getArmorAcDisplay,
-  armorMaterialSchema,
   armorSchema,
   createArmorInputSchema,
   updateArmorInputSchema,
@@ -94,20 +92,8 @@ const SHIELD_WOOD_STORED = {
 }
 
 // ---------------------------------------------------------------------------
-// Enum schemas
+// Enum schemas (re-exported from vocab — see vocab/armor/material.test.ts)
 // ---------------------------------------------------------------------------
-
-describe('armorMaterialSchema', () => {
-  it('accepts every known material', () => {
-    for (const material of ARMOR_MATERIALS) {
-      expect(armorMaterialSchema.parse(material)).toBe(material)
-    }
-  })
-
-  it('rejects unknown materials', () => {
-    expect(armorMaterialSchema.safeParse('cloth').success).toBe(false)
-  })
-})
 
 // ---------------------------------------------------------------------------
 // getArmorAcDisplay
