@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom'
 import type { Weapon } from '@rpg/contracts'
-import { Spinner, Heading, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useWeapons } from '../hooks/use-weapons'
 import { getWeaponStatRows } from '../lib/weapon-stat-rows'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -32,10 +33,6 @@ export function WeaponDetailContent({ item }: WeaponDetailContentProps) {
   )
 }
 
-function findById(list: Weapon[], id: string): Weapon | undefined {
-  return list.find((w) => w.id === id)
-}
-
 export function WeaponDetail() {
   const { campaignId = '', weaponId = '' } = useParams<{
     campaignId: string
@@ -43,27 +40,16 @@ export function WeaponDetail() {
   }>()
   const { data: weapons = [], isPending, isError } = useWeapons(campaignId)
 
-  if (isPending) {
-    return <Spinner />
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load weapons.
-      </Text>
-    )
-  }
-
-  const item = findById(weapons, weaponId)
-
-  if (!item) {
-    return (
-      <Text variant="destructive" role="alert">
-        Weapon not found.
-      </Text>
-    )
-  }
-
-  return <WeaponDetailContent item={item} />
+  return (
+    <ContentDetailResolver
+      isPending={isPending}
+      isError={isError}
+      items={weapons}
+      itemId={weaponId}
+      loadErrorLabel="Could not load weapons."
+      notFoundLabel="Weapon not found."
+    >
+      {(item) => <WeaponDetailContent item={item} />}
+    </ContentDetailResolver>
+  )
 }
