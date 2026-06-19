@@ -32,7 +32,6 @@ through [`createContentListApi`](./lib/create-content-list.ts) and
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
 
-Class and subclass feature headings (`Level N: Name`) render via `Heading`
-(`variant="label"`, `as="h3"`) in [`FeatureItem`](./lib/feature-item.tsx); stored
-feature descriptions are body-only SRD HTML normalized by
-[`formatFeatureDescriptionHtml`](./lib/format-feature-description-html.ts).
+Class and subclass [`FeatureItem`](./lib/feature-item.tsx) rows compose SRD-style
+headings at render time via [`formatFeatureHtml`](./lib/format-feature-html.ts);
+stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).

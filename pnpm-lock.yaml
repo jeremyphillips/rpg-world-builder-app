@@ -202,6 +202,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.8
         version: 4.1.8(vitest@4.1.8)
+      axe-core:
+        specifier: ^4.12.0
+        version: 4.12.0
       concurrently:
         specifier: ^10.0.3
         version: 10.0.3

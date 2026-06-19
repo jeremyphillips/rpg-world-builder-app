@@ -7,6 +7,13 @@ const meta = {
   title: 'Content/FeatureItem',
   component: FeatureItem,
   parameters: { layout: 'padded' },
+  decorators: [
+    (Story) => (
+      <ul>
+        <Story />
+      </ul>
+    ),
+  ],
 } satisfies Meta<typeof FeatureItem>
 
 export default meta
