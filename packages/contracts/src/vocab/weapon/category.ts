@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import type { GameTermEntry } from '../types'
+
 // ---------------------------------------------------------------------------
 // Weapon categories — simple/martial taxonomy consumed by class proficiencies
 // and the full weapon content type.
@@ -10,3 +12,26 @@ export const WEAPON_CATEGORIES = ['simple', 'martial'] as const
 export const weaponCategorySchema = z.enum(WEAPON_CATEGORIES)
 
 export type WeaponCategory = z.infer<typeof weaponCategorySchema>
+
+export const WEAPON_CATEGORY_ENTRIES = {
+  simple: {
+    label: 'Simple Weapon',
+    description:
+      'Simple weapons are easy to use. Most creatures can wield a simple weapon even without training.',
+  },
+  martial: {
+    label: 'Martial Weapon',
+    description:
+      'Martial weapons require training to use effectively. Most warriors use martial weapons because of their superior damage and versatility.',
+  },
+} as const satisfies Record<WeaponCategory, GameTermEntry>
+
+/** Returns the reference entry for a weapon category, if known. */
+export function getWeaponCategoryEntry(c: string): GameTermEntry | undefined {
+  return WEAPON_CATEGORY_ENTRIES[c as WeaponCategory]
+}
+
+/** Returns the display label for a weapon category. Falls back to the raw value. */
+export function getWeaponCategoryLabel(c: string): string {
+  return getWeaponCategoryEntry(c)?.label ?? c
+}

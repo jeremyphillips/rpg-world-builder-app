@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { CLASS_HIT_DICE, DIE_FACES, averageDiceRoll, dieFaceSchema, hitDieSchema } from './dice'
+import {
+  CLASS_HIT_DICE,
+  DIE_FACES,
+  averageDiceRoll,
+  dieFaceSchema,
+  formatHitDie,
+  hitDieSchema,
+} from './dice'
 
 describe('dieFaceSchema', () => {
   it('accepts every standard die face', () => {
@@ -24,6 +31,14 @@ describe('hitDieSchema', () => {
   it('rejects die faces outside the class range', () => {
     expect(hitDieSchema.safeParse(4).success).toBe(false)
     expect(hitDieSchema.safeParse(20).success).toBe(false)
+  })
+})
+
+describe('formatHitDie', () => {
+  it('formats every class hit die', () => {
+    for (const face of CLASS_HIT_DICE) {
+      expect(formatHitDie(face)).toBe(`d${face}`)
+    }
   })
 })
 
