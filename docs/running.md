@@ -75,6 +75,10 @@ pnpm --filter @rpg/dashboard storybook
 Use `:6006` for design-system work; use `:6007` for content catalog and layout
 composition stories that depend on dashboard paths and providers.
 
+CI runs axe against both Storybooks on PRs via the
+[Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
+`dashboard` matrix jobs).
+
 ## Quality gates (Turbo, all workspaces)
 
 ```bash

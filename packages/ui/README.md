@@ -366,13 +366,25 @@ directly; pass `mode="onChange"` to a hand-wired step `<Form>` so
 
 ## Running Storybook
 
+This package owns the **design-system** Storybook (`:6006`). Dashboard
+composition stories (content detail routes, data-table columns, layout shells)
+live in `@rpg/dashboard` Storybook (`:6007`) — see
+[docs/running.md](../../docs/running.md#storybook).
+
+Shared main/preview config comes from
+[`@rpg/config/storybook`](../config/README.md#storybook). UI-specific preview
+wiring adds `@rpg/ui/storybook/with-theme-context` so `useTheme()` and the
+theme-switch story match the Storybook toolbar.
+
 ```sh
-pnpm --filter @rpg/ui storybook         # dev server on :6006
-pnpm --filter @rpg/ui build-storybook   # static build (verification)
+pnpm storybook:ui              # from repo root
+pnpm --filter @rpg/ui storybook # equivalent filter command
+pnpm --filter @rpg/ui build-storybook
 ```
 
-The a11y addon runs axe against every story; `preview.ts` sets it to `error`,
-so violations surface as failures.
+The a11y addon runs axe against every story; shared preview sets `a11y.test` to
+`error`, so violations surface as CI failures (see
+[Storybook A11y workflow](../../.github/workflows/storybook-a11y.yml)).
 
 ## Scripts
 

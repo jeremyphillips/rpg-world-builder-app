@@ -54,3 +54,24 @@ import { Heading, Text, RichTextContent } from '@rpg/ui'
 
 Preserve semantic `as` values and section `id`s used by `aria-labelledby`. Full
 hierarchy and prose rules: [`packages/ui/docs/typography.md`](../../../packages/ui/docs/typography.md).
+
+## Storybook
+
+Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
+(`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
+in `@rpg/ui` Storybook (`:6006`) instead.
+
+| Story title prefix | Use for                                         |
+| ------------------ | ----------------------------------------------- |
+| `Content/*`        | Catalog feature stories (detail routes, tables) |
+| `Layout/*`         | Shell/layout stories (e.g. concentration mode)  |
+
+Use CSF3 with `satisfies Meta<typeof Component>` (or `StoryObj` for custom
+`render` stories). Prefer inline mock data over live API hooks until a story
+needs TanStack Query — then add `withDashboardProviders` from
+[`apps/dashboard/.storybook/decorators.tsx`](../.storybook/decorators.tsx) per
+story, not globally.
+
+The dashboard preview wraps every story in `MemoryRouter` so column tables with
+`<Link>` name cells render correctly. Layout stories that use `<Outlet />` still
+need their own `Routes`/`Route` tree in the story `render` function.

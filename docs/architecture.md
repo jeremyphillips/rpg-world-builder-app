@@ -10,11 +10,13 @@ README and `docs/`.
 apps/
   public/      # Next.js (App Router): landing + login/signup   -> served at /
   dashboard/   # Vite + React SPA: authenticated DM workspace    -> served at /app
+               # Storybook (:6007) for co-located composition stories
   api/         # Express 5 + Mongoose: auth + domain API          -> served at /api
 packages/
-  config/      # shared tsconfig / eslint / prettier / vitest presets
+  config/      # shared tsconfig / eslint / prettier / vitest / storybook presets
   contracts/   # Zod schemas + inferred TS types (single source of truth)
-  ui/          # shadcn primitives, Tailwind v4 preset, design tokens, Storybook
+  ui/          # shadcn primitives, Tailwind v4 preset, design tokens
+               # Storybook (:6006) for primitives, forms, recipes
 tools/
   proxy/       # single-origin dev reverse proxy
 docs/          # this folder — cross-cutting architecture/env/run guides
@@ -103,7 +105,10 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
   `RegisterInput`). The API validates against them; the public app's forms reuse
   the same schemas with `@hookform/resolvers/zod`.
 - **`@rpg/ui`** ships shadcn primitives, the Tailwind v4 preset, and design
-  tokens (`@rpg/ui/styles.css`) consumed by both apps.
+  tokens (`@rpg/ui/styles.css`) consumed by both apps. Storybook is split:
+  `@rpg/ui` on `:6006` for the design system; `@rpg/dashboard` on `:6007` for
+  app composition stories. Shared Storybook factories live in
+  [`@rpg/config/storybook`](../packages/config/README.md#storybook).
 
 ## Feature-first organization
 
