@@ -5,45 +5,57 @@ import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
+const SUGGESTED_CLASS_CHIP_CLASS =
+  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
+
 function SuggestedClassesList({
   campaignId,
-  rulesetId,
   suggestedClasses,
 }: {
   campaignId: string
-  rulesetId: string
   suggestedClasses: string[]
 }) {
+  const { data: classes = [], isPending } = useClasses(campaignId)
+
   if (suggestedClasses.length === 0) return null
+
+  const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
+
   return (
     <section aria-labelledby="suggested-classes-heading">
       <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
         Commonly Taken By
       </Heading>
-      <ul className="flex flex-wrap gap-2" role="list">
-        {suggestedClasses.map((slug) => (
-          <li key={slug}>
-            {/*
-             * System class ids are deterministic: `${rulesetId}:${slug}`.
-             * This breaks for homebrew classes, which use a Mongo-generated id.
-             * Fix: load the classes list and look up by slug when homebrew
-             * classes need to appear in suggestedClasses.
-             */}
-            <Link
-              to={ROUTES.content.classes.detail(campaignId, `${rulesetId}:${slug}`)}
-              className="rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline"
-            >
-              {getClassName(slug)}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {isPending ? (
+        <Text variant="muted">Loading…</Text>
+      ) : (
+        <ul className="flex flex-wrap gap-2" role="list">
+          {suggestedClasses.map((slug) => {
+            const cls = classesBySlug.get(slug)
+            return (
+              <li key={slug}>
+                {cls ? (
+                  <Link
+                    to={ROUTES.content.classes.detail(campaignId, cls.id)}
+                    className={SUGGESTED_CLASS_CHIP_CLASS}
+                  >
+                    {cls.name}
+                  </Link>
+                ) : (
+                  <span className={SUGGESTED_CLASS_CHIP_CLASS}>{getClassName(slug)}</span>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </section>
   )
 }
@@ -78,11 +90,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         {skill.description && <Text variant="muted">{skill.description}</Text>}
       </div>
       {skill.suggestedClasses && skill.suggestedClasses.length > 0 && (
-        <SuggestedClassesList
-          campaignId={campaignId}
-          rulesetId={skill.rulesetId}
-          suggestedClasses={skill.suggestedClasses}
-        />
+        <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
       )}
     </ContentDetailLayout>
   )
