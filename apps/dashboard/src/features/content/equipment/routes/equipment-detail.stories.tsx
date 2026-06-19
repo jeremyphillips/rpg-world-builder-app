@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Equipment } from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -69,14 +70,16 @@ export const GearItem: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={TORCH.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{TORCH.name}</h2>
+        <Heading variant="display" as="h2">
+          {TORCH.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Kind" value="Adventuring Gear" />
           <ContentStatRow label="Cost" value="1 CP" />
           <ContentStatRow label="Weight" value="1 lb" />
           <ContentStatRow label="Category" value="Lighting" />
         </div>
-        <p className="text-muted-foreground">{TORCH.description}</p>
+        <Text variant="muted">{TORCH.description}</Text>
       </div>
     </ContentDetailLayout>
   ),
@@ -86,7 +89,9 @@ export const ShipItem: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={ROWBOAT.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{ROWBOAT.name}</h2>
+        <Heading variant="display" as="h2">
+          {ROWBOAT.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Kind" value="Ship" />
           <ContentStatRow label="Cost" value="50 GP" />
@@ -96,7 +101,7 @@ export const ShipItem: Story = {
           <ContentStatRow label="AC" value="11" />
           <ContentStatRow label="HP" value="50" />
         </div>
-        <p className="text-muted-foreground">{ROWBOAT.description}</p>
+        <Text variant="muted">{ROWBOAT.description}</Text>
       </div>
     </ContentDetailLayout>
   ),
@@ -106,14 +111,16 @@ export const MountItem: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={RIDING_HORSE.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{RIDING_HORSE.name}</h2>
+        <Heading variant="display" as="h2">
+          {RIDING_HORSE.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Kind" value="Mount" />
           <ContentStatRow label="Cost" value="75 GP" />
           <ContentStatRow label="Carrying Capacity" value="480 lb" />
           <ContentStatRow label="Speed" value="60 ft." />
         </div>
-        <p className="text-muted-foreground">{RIDING_HORSE.description}</p>
+        <Text variant="muted">{RIDING_HORSE.description}</Text>
       </div>
     </ContentDetailLayout>
   ),

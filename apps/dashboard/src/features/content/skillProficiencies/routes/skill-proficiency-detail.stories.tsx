@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { SkillProficiency } from '@rpg/contracts'
-import { buttonVariants } from '@rpg/ui'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -61,16 +61,18 @@ export const Default: Story = {
         }
       >
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight">{ATHLETICS.name}</h2>
+          <Heading variant="display" as="h2">
+            {ATHLETICS.name}
+          </Heading>
           <div className="space-y-3">
             <ContentStatRow label="Governing Ability" value="Strength" />
           </div>
-          <p className="text-muted-foreground">{ATHLETICS.description}</p>
+          <Text variant="muted">{ATHLETICS.description}</Text>
         </div>
         <section aria-labelledby="suggested-classes-heading">
-          <h3 id="suggested-classes-heading" className="mb-3 text-xl font-semibold tracking-tight">
+          <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
             Commonly Taken By
-          </h3>
+          </Heading>
           <ul className="flex flex-wrap gap-2" role="list">
             {(ATHLETICS.suggestedClasses ?? []).map((slug) => (
               <li key={slug}>
@@ -89,11 +91,13 @@ export const WithStealthSkill: Story = {
     <div className="space-y-6">
       <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={STEALTH.name}>
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight">{STEALTH.name}</h2>
+          <Heading variant="display" as="h2">
+            {STEALTH.name}
+          </Heading>
           <div className="space-y-3">
             <ContentStatRow label="Governing Ability" value="Dexterity" />
           </div>
-          <p className="text-muted-foreground">{STEALTH.description}</p>
+          <Text variant="muted">{STEALTH.description}</Text>
         </div>
       </ContentDetailLayout>
     </div>
@@ -104,10 +108,12 @@ export const NoImage: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName="Perception">
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Perception</h2>
-        <p className="text-muted-foreground">
+        <Heading variant="display" as="h2">
+          Perception
+        </Heading>
+        <Text variant="muted">
           Lets you spot, hear, or otherwise detect the presence of something.
-        </p>
+        </Text>
       </div>
     </ContentDetailLayout>
   ),

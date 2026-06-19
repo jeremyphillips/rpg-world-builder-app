@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Armor } from '@rpg/contracts'
+import { Heading } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -73,7 +74,9 @@ export const LightArmor: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={LEATHER.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{LEATHER.name}</h2>
+        <Heading variant="display" as="h2">
+          {LEATHER.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Category" value="Light Armor" />
           <ContentStatRow label="AC" value="11 + Dex" />
@@ -91,7 +94,9 @@ export const HeavyArmor: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={CHAIN_MAIL.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{CHAIN_MAIL.name}</h2>
+        <Heading variant="display" as="h2">
+          {CHAIN_MAIL.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Category" value="Heavy Armor" />
           <ContentStatRow label="AC" value="16" />
@@ -110,7 +115,9 @@ export const Shield: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName={SHIELD.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{SHIELD.name}</h2>
+        <Heading variant="display" as="h2">
+          {SHIELD.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Category" value="Shield" />
           <ContentStatRow label="AC" value="+2" />

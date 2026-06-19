@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '@rpg/ui'
+import { Button, Heading, Text } from '@rpg/ui'
 
 import { ContentDetailLayout } from './content-detail-layout'
 
@@ -20,10 +20,12 @@ export const Default: Story = {
     imageName: 'Fighter',
     children: (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Fighter</h2>
-        <p className="text-muted-foreground">
+        <Heading variant="page" as="h2">
+          Fighter
+        </Heading>
+        <Text variant="muted">
           A master of martial combat, skilled with a variety of weapons and armor.
-        </p>
+        </Text>
       </div>
     ),
   },
@@ -40,10 +42,12 @@ export const WithActions: Story = {
     ),
     children: (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Wizard</h2>
-        <p className="text-muted-foreground">
+        <Heading variant="page" as="h2">
+          Wizard
+        </Heading>
+        <Text variant="muted">
           A scholarly magic-user capable of manipulating the structures of reality.
-        </p>
+        </Text>
       </div>
     ),
   },

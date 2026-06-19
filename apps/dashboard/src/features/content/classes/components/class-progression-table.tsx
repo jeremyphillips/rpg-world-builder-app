@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@rpg/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Heading } from '@rpg/ui'
 import { proficiencyBonus, SLOT_TABLES, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import type { CharacterClass } from '@rpg/contracts'
 
@@ -181,9 +181,9 @@ export function ClassProgressionTable({ characterClass }: ClassProgressionTableP
 
   return (
     <section aria-labelledby="progression-heading">
-      <h3 id="progression-heading" className="mb-4 text-xl font-semibold tracking-tight">
+      <Heading variant="section" as="h3" id="progression-heading" className="mb-4">
         Class Progression
-      </h3>
+      </Heading>
       <Table>
         <ProgressionTableHeader {...flags} />
         <TableBody>

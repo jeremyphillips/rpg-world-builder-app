@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import type { Equipment } from '@rpg/contracts'
-import { Spinner } from '@rpg/ui'
+import { Spinner, Heading, Text } from '@rpg/ui'
 import {
   formatMoney,
   formatWeight,
@@ -137,7 +137,9 @@ function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
   return (
     <ContentDetailLayout imageUrl={getContentImageUrl(item.imageKey)} imageName={item.name}>
       <div className="space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight">{item.name}</h2>
+        <Heading variant="display" as="h2">
+          {item.name}
+        </Heading>
         <div className="space-y-3">
           <ContentStatRow label="Kind" value={getEquipmentKindLabel(item.kind)} />
           <ContentStatRow label="Cost" value={formatMoney(item.cost)} />
@@ -145,7 +147,7 @@ function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
             <ContentStatRow key={label} label={label} value={value} />
           ))}
         </div>
-        {item.description && <p className="text-muted-foreground">{item.description}</p>}
+        {item.description && <Text variant="muted">{item.description}</Text>}
       </div>
     </ContentDetailLayout>
   )
@@ -168,9 +170,9 @@ export function EquipmentDetail() {
 
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Could not load equipment.
-      </p>
+      </Text>
     )
   }
 
@@ -178,9 +180,9 @@ export function EquipmentDetail() {
 
   if (!item) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Equipment not found.
-      </p>
+      </Text>
     )
   }
 

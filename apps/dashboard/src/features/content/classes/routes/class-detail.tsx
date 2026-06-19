@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Spinner } from '@rpg/ui'
+import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
@@ -15,12 +15,10 @@ import { ClassProgressionTable } from '../components/class-progression-table'
 function FeatureItem({ feature }: { feature: ClassFeature }) {
   return (
     <li className="space-y-1">
-      <p className="font-medium">
+      <Heading variant="label" as="p">
         Level {feature.level}: {feature.name}
-      </p>
-      {feature.description && (
-        <p className="text-sm text-muted-foreground">{feature.description}</p>
-      )}
+      </Heading>
+      {feature.description && <Text variant="small">{feature.description}</Text>}
     </li>
   )
 }
@@ -29,9 +27,9 @@ function FeaturesList({ className, features }: { className: string; features: Cl
   const sorted = [...features].sort((a, b) => a.level - b.level)
   return (
     <section aria-labelledby="features-heading">
-      <h3 id="features-heading" className="mb-4 text-xl font-semibold tracking-tight">
+      <Heading variant="section" as="h3" id="features-heading" className="mb-4">
         {className} Class Features
-      </h3>
+      </Heading>
       <ul className="space-y-4" role="list">
         {sorted.map((feature) => (
           <FeatureItem key={feature.id} feature={feature} />
@@ -45,15 +43,21 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   if (subclasses.length === 0) return null
   return (
     <section aria-labelledby="subclasses-heading">
-      <h3 id="subclasses-heading" className="mb-4 text-xl font-semibold tracking-tight">
+      <Heading variant="section" as="h3" id="subclasses-heading" className="mb-4">
         Subclasses
-      </h3>
+      </Heading>
       <ul className="space-y-2" role="list">
         {subclasses.map((sub) => (
           <li key={sub.id}>
-            <p className="font-medium">{sub.name}</p>
-            {sub.tagline && <p className="text-sm italic text-muted-foreground">{sub.tagline}</p>}
-            {sub.description && <p className="text-sm text-muted-foreground">{sub.description}</p>}
+            <Heading variant="label" as="p">
+              {sub.name}
+            </Heading>
+            {sub.tagline && (
+              <Text variant="small" className="italic">
+                {sub.tagline}
+              </Text>
+            )}
+            {sub.description && <Text variant="small">{sub.description}</Text>}
           </li>
         ))}
       </ul>
@@ -115,11 +119,11 @@ function ClassDetailContent({
         }
       >
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight">{characterClass.name}</h2>
+          <Heading variant="display" as="h2">
+            {characterClass.name}
+          </Heading>
           <ClassStatsSection characterClass={characterClass} />
-          {characterClass.description && (
-            <p className="text-muted-foreground">{characterClass.description}</p>
-          )}
+          {characterClass.description && <Text variant="muted">{characterClass.description}</Text>}
         </div>
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />
@@ -146,9 +150,9 @@ export function ClassDetail() {
 
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Could not load class.
-      </p>
+      </Text>
     )
   }
 
@@ -156,9 +160,9 @@ export function ClassDetail() {
 
   if (!characterClass) {
     return (
-      <p role="alert" className="text-sm text-destructive">
+      <Text variant="destructive" role="alert">
         Class not found.
-      </p>
+      </Text>
     )
   }
 

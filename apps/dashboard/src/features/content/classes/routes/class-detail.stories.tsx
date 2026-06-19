@@ -3,7 +3,7 @@ import type { CharacterClass, Subclass } from '@rpg/contracts'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { getContentImageUrl } from '../../lib/content-image-url'
-import { buttonVariants } from '@rpg/ui'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/400x500/1e293b/94a3b8?text=Class+Art'
 
@@ -74,30 +74,36 @@ export const Default: Story = {
         }
       >
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">{FIGHTER.name}</h2>
-          <p className="text-muted-foreground">{FIGHTER.description}</p>
+          <Heading variant="display" as="h2">
+            {FIGHTER.name}
+          </Heading>
+          <Text variant="muted">{FIGHTER.description}</Text>
         </div>
         <section>
-          <h3 className="mb-4 text-xl font-semibold tracking-tight">
+          <Heading variant="section" as="h3" className="mb-4">
             {FIGHTER.name} Class Features
-          </h3>
+          </Heading>
           <ul className="space-y-4">
             {FIGHTER.features.map((f) => (
               <li key={f.id}>
-                <p className="font-medium">
+                <Heading variant="label" as="p">
                   Level {f.level}: {f.name}
-                </p>
+                </Heading>
               </li>
             ))}
           </ul>
         </section>
       </ContentDetailLayout>
       <section>
-        <h3 className="mb-4 text-xl font-semibold tracking-tight">Subclasses</h3>
+        <Heading variant="section" as="h3" className="mb-4">
+          Subclasses
+        </Heading>
         <ul className="space-y-2">
           <li>
-            <p className="font-medium">{CHAMPION.name}</p>
-            <p className="text-sm text-muted-foreground">{CHAMPION.description}</p>
+            <Heading variant="label" as="p">
+              {CHAMPION.name}
+            </Heading>
+            <Text variant="small">{CHAMPION.description}</Text>
           </li>
         </ul>
       </section>
@@ -109,8 +115,10 @@ export const NoImage: Story = {
   render: () => (
     <ContentDetailLayout imageUrl={getContentImageUrl(undefined)} imageName="Barbarian">
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Barbarian</h2>
-        <p className="text-muted-foreground">A fierce warrior who can enter a battle rage.</p>
+        <Heading variant="display" as="h2">
+          Barbarian
+        </Heading>
+        <Text variant="muted">A fierce warrior who can enter a battle rage.</Text>
       </div>
     </ContentDetailLayout>
   ),
