@@ -14,6 +14,7 @@ import { damageTypeSchema } from '../vocab/damage-type'
 import { levelSchema } from '../primitives/level'
 import { speedSchema } from '../vocab/movement-mode'
 import { senseSchema } from '../vocab/sense'
+import { usageFrequencySchema } from '../vocab/usage-frequency'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -27,17 +28,6 @@ import { skillSchema } from './skill-proficiency'
 
 // --- Innate spellcasting ----------------------------------------------------
 
-/** How often a granted spell can be cast for free. */
-export const SPELL_FREQUENCIES = [
-  'at_will',
-  'prof_bonus_per_long_rest',
-  'once_per_long_rest',
-] as const
-
-export const spellFrequencySchema = z.enum(SPELL_FREQUENCIES)
-
-export type SpellFrequency = (typeof SPELL_FREQUENCIES)[number]
-
 /**
  * Spells gained at a character level. `spellIds` are opaque spell slugs for now
  * (no Spell content type yet); wire to real references when spells land. Player
@@ -47,7 +37,7 @@ export type SpellFrequency = (typeof SPELL_FREQUENCIES)[number]
 export const innateSpellEntrySchema = z.object({
   level: levelSchema,
   spellIds: z.array(z.string().min(1)).min(1),
-  frequency: spellFrequencySchema.optional(),
+  frequency: usageFrequencySchema.optional(),
 })
 
 export const innateSpellsSchema = z.object({
