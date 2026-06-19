@@ -13,6 +13,15 @@ on:
 jobs:
   storybook-a11y:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [ui, dashboard]
+        include:
+          - package: ui
+            static_path: packages/ui/storybook-static
+          - package: dashboard
+            static_path: apps/dashboard/storybook-static
 
     steps:
       - uses: actions/checkout@v4
@@ -31,14 +40,14 @@ jobs:
         run: pnpm --filter @rpg/ui playwright:install
 
       - name: Build Storybook
-        run: pnpm --filter @rpg/ui build-storybook --quiet
+        run: pnpm --filter @rpg/${{ matrix.package }} build-storybook --quiet
 
       - name: Upload Storybook build on failure
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: storybook-static
-          path: packages/ui/storybook-static
+          name: storybook-static-${{ matrix.package }}
+          path: ${{ matrix.static_path }}
 
       - name: Run Storybook a11y tests
-        run: pnpm --filter @rpg/ui test-storybook:ci
+        run: pnpm --filter @rpg/${{ matrix.package }} test-storybook:ci
