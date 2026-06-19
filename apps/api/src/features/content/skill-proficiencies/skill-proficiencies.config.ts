@@ -2,7 +2,10 @@ import type { SkillProficiency } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
-import { loadSeedSkillProficiencies, seedSkillProficiencySlugs } from './seed'
+import {
+  loadSeedSkillProficiencies,
+  seedSkillProficiencySlugs,
+} from '@rpg/catalog/skill-proficiencies'
 import { SkillProficiencyPatchModel } from './skill-proficiency-patch.model'
 
 interface SkillProficiencyPatchRecord {

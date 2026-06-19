@@ -15,6 +15,7 @@ apps/
 packages/
   config/      # shared tsconfig / eslint / prettier / vitest / storybook presets
   contracts/   # Zod schemas + inferred TS types (single source of truth)
+  catalog/     # system SRD seed JSON + validated loaders (shared catalog data)
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
 tools/
@@ -29,6 +30,7 @@ docs/          # this folder — cross-cutting architecture/env/run guides
 | `@rpg/api`       | [apps/api/README.md](../apps/api/README.md)                     |
 | `@rpg/config`    | [packages/config/README.md](../packages/config/README.md)       |
 | `@rpg/contracts` | [packages/contracts/README.md](../packages/contracts/README.md) |
+| `@rpg/catalog`   | [packages/catalog/README.md](../packages/catalog/README.md)     |
 | `@rpg/ui`        | [packages/ui/README.md](../packages/ui/README.md)               |
 
 ## Single-origin topology

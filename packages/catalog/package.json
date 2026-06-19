@@ -1,0 +1,47 @@
+{
+  "name": "@rpg/catalog",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./species": {
+      "types": "./src/species/index.ts",
+      "default": "./src/species/index.ts"
+    },
+    "./armor": {
+      "types": "./src/armor/index.ts",
+      "default": "./src/armor/index.ts"
+    },
+    "./weapons": {
+      "types": "./src/weapons/index.ts",
+      "default": "./src/weapons/index.ts"
+    },
+    "./equipment": {
+      "types": "./src/equipment/index.ts",
+      "default": "./src/equipment/index.ts"
+    },
+    "./classes": {
+      "types": "./src/classes/index.ts",
+      "default": "./src/classes/index.ts"
+    },
+    "./skill-proficiencies": {
+      "types": "./src/skill-proficiencies/index.ts",
+      "default": "./src/skill-proficiencies/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@rpg/contracts": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@rpg/config": "workspace:*",
+    "eslint": "^10.4.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}

@@ -1,7 +1,7 @@
 import type { Equipment } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
-import { loadSeedEquipment, seedEquipmentSlugs } from './seed'
+import { loadSeedEquipment, seedEquipmentSlugs } from '@rpg/catalog/equipment'
 
 export const equipmentContentConfig: ContentTypeConfig<Equipment> = {
   type: 'equipment',

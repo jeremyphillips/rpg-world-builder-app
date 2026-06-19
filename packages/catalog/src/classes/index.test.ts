@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { loadSeedClasses, loadSeedSubclasses, seedClassSlugs } from './seed'
+import { loadSeedClasses, loadSeedSubclasses, seedClassSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
 

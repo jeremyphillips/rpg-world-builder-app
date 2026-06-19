@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { equipmentSchema } from '@rpg/contracts'
 import type { Equipment, SystemRulesetId } from '@rpg/contracts'
 
+import { getBySlug } from '../lib/get-by-slug'
 import equipmentRaw from './data/srd-cc-5.2.1/equipment.json'
 
 // Validate the shipped catalog against the contract at module load, so malformed
@@ -19,4 +20,8 @@ export function loadSeedEquipment(rulesetId: SystemRulesetId): Equipment[] {
 /** System equipment slugs for a ruleset — used by the homebrew slug guard. */
 export function seedEquipmentSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return new Set(loadSeedEquipment(rulesetId).map((e) => e.slug))
+}
+
+export function getEquipmentBySlug(rulesetId: SystemRulesetId, slug: string): Equipment {
+  return getBySlug(loadSeedEquipment, rulesetId, slug, 'Equipment')
 }

@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 
 import { getContentTypeConfig } from './content-types'
 import { resolveCatalogForCampaign } from './content.service'
-import { loadSubclassesByClassId } from './classes/seed'
+import { loadSubclassesByClassId } from '@rpg/catalog/classes'
 import { findCampaignById } from '../campaign'
 import { HttpError } from '../../lib/http-error'
 
