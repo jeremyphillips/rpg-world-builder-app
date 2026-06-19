@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { sanitizeHtml, Spinner } from '@rpg/ui'
+import { RichTextContent, Spinner } from '@rpg/ui'
 import { getCreatureTypeLabel, getCreatureSizeLabel, getSenseLabel } from '@rpg/contracts'
 import type { Species, Speed, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
 
@@ -41,12 +41,7 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
   return (
     <li className="space-y-1">
       <p className="font-medium">{trait.name}</p>
-      {trait.description && (
-        <div
-          className="prose prose-sm max-w-none text-muted-foreground [&>p]:my-0"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(trait.description) }}
-        />
-      )}
+      {trait.description && <RichTextContent html={trait.description} size="sm" tone="muted" />}
     </li>
   )
 }
@@ -77,20 +72,14 @@ function ChoiceGroupSection({ group }: { group: SpeciesChoiceGroup }) {
         {group.name}
       </h3>
       {group.description && (
-        <div
-          className="prose prose-sm mb-4 max-w-none text-muted-foreground [&>p]:my-0"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(group.description) }}
-        />
+        <RichTextContent html={group.description} size="sm" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
         {group.options.map((option) => (
           <li key={option.id} className="space-y-1">
             <p className="font-medium">{option.name}</p>
             {option.description && (
-              <div
-                className="prose prose-sm max-w-none text-muted-foreground [&>p]:my-0"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(option.description) }}
-              />
+              <RichTextContent html={option.description} size="sm" tone="muted" />
             )}
           </li>
         ))}

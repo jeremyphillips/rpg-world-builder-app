@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { RichTextContent } from '../components/ui/rich-text-content'
+
 const SAMPLE_HTML = `
 <p>Your <strong>Darkvision</strong> lets you see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.</p>
 <p>You discern colors in that darkness only as shades of gray. This trait is common among subterranean ancestries.</p>
@@ -15,44 +17,47 @@ const SAMPLE_HTML = `
 
 const meta = {
   title: 'Typography/Prose',
+  component: RichTextContent,
   parameters: {
     layout: 'padded',
   },
-} satisfies Meta
+  args: {
+    html: SAMPLE_HTML,
+  },
+} satisfies Meta<typeof RichTextContent>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 /** Default prose sizing for catalog rich-text (e.g. species trait descriptions). */
 export const Default: Story = {
-  render: () => (
-    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: SAMPLE_HTML }} />
-  ),
+  args: {
+    size: 'base',
+    tone: 'default',
+  },
 }
 
 /** Smaller prose for nested or secondary rich-text blocks. */
 export const Small: Story = {
-  render: () => (
-    <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: SAMPLE_HTML }} />
-  ),
+  args: {
+    size: 'sm',
+    tone: 'default',
+  },
 }
 
 /** Muted tone for supplementary rich-text under section headings. */
 export const Muted: Story = {
-  render: () => (
-    <div
-      className="prose prose-sm max-w-none text-muted-foreground [--tw-prose-body:var(--color-muted-foreground)] [--tw-prose-headings:var(--color-muted-foreground)] [--tw-prose-bold:var(--color-muted-foreground)]"
-      dangerouslySetInnerHTML={{ __html: SAMPLE_HTML }}
-    />
-  ),
+  args: {
+    size: 'sm',
+    tone: 'muted',
+  },
 }
 
 /** Larger prose for marketing or hero copy on the public app. */
 export const Large: Story = {
-  render: () => (
-    <div
-      className="prose lg:prose-xl max-w-none"
-      dangerouslySetInnerHTML={{ __html: SAMPLE_HTML }}
-    />
-  ),
+  args: {
+    size: 'base',
+    tone: 'default',
+    className: 'lg:prose-xl',
+  },
 }

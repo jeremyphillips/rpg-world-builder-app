@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Species } from '@rpg/contracts'
+import { RichTextContent } from '@rpg/ui'
 
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentStatRow } from '../../lib/content-stat-row'
@@ -132,12 +133,7 @@ export const NoChoiceGroups: Story = {
           {ORC.traits.map((t) => (
             <li key={t.id} className="space-y-1">
               <p className="font-medium">{t.name}</p>
-              {t.description && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: t.description }}
-                />
-              )}
+              {t.description && <RichTextContent html={t.description} size="sm" tone="muted" />}
             </li>
           ))}
         </ul>
@@ -166,12 +162,7 @@ export const WithLineageChoiceGroup: Story = {
           {ELF.traits.map((t) => (
             <li key={t.id} className="space-y-1">
               <p className="font-medium">{t.name}</p>
-              {t.description && (
-                <p
-                  className="text-sm text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: t.description }}
-                />
-              )}
+              {t.description && <RichTextContent html={t.description} size="sm" tone="muted" />}
             </li>
           ))}
         </ul>
@@ -185,20 +176,14 @@ export const WithLineageChoiceGroup: Story = {
             {group.name}
           </h3>
           {group.description && (
-            <p
-              className="mb-4 text-sm text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: group.description }}
-            />
+            <RichTextContent html={group.description} size="sm" tone="muted" className="mb-4" />
           )}
           <ul className="space-y-4" role="list">
             {group.options.map((opt) => (
               <li key={opt.id} className="space-y-1">
                 <p className="font-medium">{opt.name}</p>
                 {opt.description && (
-                  <p
-                    className="text-sm text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: opt.description }}
-                  />
+                  <RichTextContent html={opt.description} size="sm" tone="muted" />
                 )}
               </li>
             ))}
