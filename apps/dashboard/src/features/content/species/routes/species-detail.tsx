@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { sanitizeHtml } from '@rpg/ui'
+import { sanitizeHtml, Spinner } from '@rpg/ui'
 import { getCreatureTypeLabel, getCreatureSizeLabel, getSenseLabel } from '@rpg/contracts'
 import type { Species, Speed, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
 
@@ -158,7 +158,7 @@ export function SpeciesDetail() {
   const { data: species = [], isPending, isError } = useSpecies(campaignId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

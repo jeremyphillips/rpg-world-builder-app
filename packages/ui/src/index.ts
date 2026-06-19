@@ -168,6 +168,8 @@ export {
   TableCaption,
 } from './components/ui/table'
 export { Badge, badgeVariants, type BadgeProps } from './components/ui/badge'
+export { Spinner, type SpinnerProps } from './components/ui/spinner'
+export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export {
   Collapsible,
   CollapsibleTrigger,

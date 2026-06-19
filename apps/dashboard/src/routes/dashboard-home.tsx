@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { buttonVariants, Spinner } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
 import { CampaignPicker, useCampaigns, useSelectCampaign } from '@/features/campaign'
@@ -15,7 +15,7 @@ export function DashboardHome() {
 
   // Hold the picker back while the one-shot landing redirect is being decided.
   if (redirecting) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   const hasCampaigns = campaigns !== undefined && campaigns.length > 0

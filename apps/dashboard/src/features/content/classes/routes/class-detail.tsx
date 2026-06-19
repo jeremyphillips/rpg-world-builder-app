@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { buttonVariants, Spinner } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { ClassFeature, CharacterClass, Subclass } from '@rpg/contracts'
 
@@ -141,7 +141,7 @@ export function ClassDetail() {
   const { data: subclasses = [] } = useSubclasses(campaignId, classId)
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <Spinner />
   }
 
   if (isError) {

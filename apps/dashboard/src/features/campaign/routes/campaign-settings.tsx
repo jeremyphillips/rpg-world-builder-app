@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { Spinner } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -45,7 +46,7 @@ export function CampaignSettings() {
     return (
       <div className="mx-auto max-w-3xl space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Campaign Settings</h2>
-        <p className="text-sm text-muted-foreground">Loading campaign…</p>
+        <Spinner />
       </div>
     )
   }

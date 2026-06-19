@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Eyebrow,
+  Spinner,
 } from '@rpg/ui'
 
 import { useCampaigns } from '../hooks/use-campaigns'
@@ -68,7 +69,6 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
 
   const active = campaigns?.find((campaign) => campaign.id === activeCampaignId)
   const triggerLabel = getCampaignSwitcherLabel({
-    isPending,
     isError,
     activeName: active?.identity.name,
   })
@@ -86,7 +86,11 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
       >
         <span className="flex min-w-0 flex-col">
           {showLabel && <Eyebrow>Campaign</Eyebrow>}
-          <span className="truncate text-sm font-semibold">{triggerLabel}</span>
+          {isPending ? (
+            <Spinner />
+          ) : (
+            <span className="truncate text-sm font-semibold">{triggerLabel}</span>
+          )}
         </span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
