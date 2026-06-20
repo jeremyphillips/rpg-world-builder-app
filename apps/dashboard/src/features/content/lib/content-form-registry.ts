@@ -56,7 +56,7 @@ export interface ContentFormDef<
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyContentFormDef = ContentFormDef<{ id: string; name: string }, FieldValues, unknown>
+export type AnyContentFormDef = ContentFormDef<{ id: string; name: string }, FieldValues, unknown>
 
 /**
  * The global content form registry. Each content type that supports create/edit

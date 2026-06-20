@@ -5,6 +5,7 @@ import { Form, FormSaveFooter } from '@rpg/ui/form'
 
 import { updateContent } from './content-client'
 import { contentFormRegistry } from './content-form-registry'
+import type { AnyContentFormDef } from './content-form-registry'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -22,82 +23,50 @@ export interface ContentEditShellProps {
   backHref: string
 }
 
+interface ContentEditFormProps {
+  def: AnyContentFormDef
+  campaignId: string
+  entityId: string
+  notFoundLabel?: string
+  heading?: (name: string) => string
+  backHref: string
+}
+
 /**
- * Generic shell for editing an existing content item. Resolves the entity from
- * the cached list query via `ContentDetailResolver`-style logic, seeds the
- * `<Form>` with `toFormValues(entity)`, and submits via the stubbed update API.
- *
- * Rendered entirely within the normal AppShell so breadcrumbs etc. work. The
- * entity is read from the list cache (same as the detail view), avoiding an
- * extra network round-trip.
+ * Inner form component. Rendered only when `def` is guaranteed to exist,
+ * keeping all hook calls unconditional and the complexity low.
  */
-export function ContentEditShell({
-  contentType,
+function ContentEditForm({
+  def,
   campaignId,
   entityId,
-  isPending,
-  isError,
-  loadErrorLabel,
-  notFoundLabel,
+  notFoundLabel = 'Item not found.',
   heading: headingFn = (name) => `Edit ${name}`,
   backHref,
-}: ContentEditShellProps) {
-  const def = contentFormRegistry[contentType]
+}: ContentEditFormProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
 
   const mutation = useMutation({
-    mutationFn: (input: unknown) => updateContent(campaignId, def!.routeKey, entityId, input),
+    mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: def!.queryKey(campaignId) })
+      void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
     },
   })
-
-  if (isPending) {
-    return (
-      <div className="flex justify-center py-8">
-        <Spinner />
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        {loadErrorLabel ?? 'Could not load item.'}
-      </Text>
-    )
-  }
-
-  if (!def) {
-    return (
-      <div className="space-y-4">
-        <Heading variant="page" as="h2">
-          Edit
-        </Heading>
-        <div className="rounded-lg border border-dashed border-border p-8 text-center">
-          <Text variant="muted">Form coming soon.</Text>
-        </div>
-      </div>
-    )
-  }
-
-  const entity = def.useListQuery(campaignId).data?.find((e) => e.id === entityId)
 
   if (!entity) {
     return (
       <Text variant="destructive" role="alert">
-        {notFoundLabel ?? 'Item not found.'}
+        {notFoundLabel}
       </Text>
     )
   }
 
-  const heading = headingFn(entity.name)
-
   return (
     <div className="space-y-6 pb-10">
       <Heading variant="page" as="h2">
-        {heading}
+        {headingFn(entity.name)}
       </Heading>
 
       <div className="max-w-2xl">
@@ -125,5 +94,68 @@ export function ContentEditShell({
         />
       </div>
     </div>
+  )
+}
+
+/**
+ * Generic shell for editing an existing content item. Resolves the entity from
+ * the cached list query via `ContentDetailResolver`-style logic, seeds the
+ * `<Form>` with `toFormValues(entity)`, and submits via the stubbed update API.
+ *
+ * Rendered entirely within the normal AppShell so breadcrumbs etc. work. The
+ * entity is read from the list cache (same as the detail view), avoiding an
+ * extra network round-trip.
+ */
+export function ContentEditShell({
+  contentType,
+  campaignId,
+  entityId,
+  isPending,
+  isError,
+  loadErrorLabel = 'Could not load item.',
+  notFoundLabel,
+  heading,
+  backHref,
+}: ContentEditShellProps) {
+  if (isPending) {
+    return (
+      <div className="flex justify-center py-8">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Text variant="destructive" role="alert">
+        {loadErrorLabel}
+      </Text>
+    )
+  }
+
+  const def = contentFormRegistry[contentType]
+
+  if (!def) {
+    return (
+      <div className="space-y-4">
+        <Heading variant="page" as="h2">
+          Edit
+        </Heading>
+        <div className="rounded-lg border border-dashed border-border p-8 text-center">
+          <Text variant="muted">Form coming soon.</Text>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <ContentEditForm
+      def={def}
+      campaignId={campaignId}
+      entityId={entityId}
+      notFoundLabel={notFoundLabel}
+      heading={heading}
+      backHref={backHref}
+    />
   )
 }
