@@ -307,6 +307,50 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
+### Editable grid (`editableGrid` / `EditableGrid`)
+
+A fixed-row, multi-column table for dense per-level authoring (e.g. cantrips known
+and spells prepared at character levels 1–20). Values are a **composite object**
+keyed by column (`Record<columnKey, (number | null)[]>`); `null` means blank/unset.
+
+```ts
+{
+  type: 'editableGrid',
+  name: 'spellcasting.progressionTable',
+  label: 'Spell progression', // rendered as the grid legend
+  rowCount: 20,
+  columns: [
+    { key: 'cantrips', label: 'Cantrips', control: 'select', min: 1, max: 6 },
+    {
+      key: 'spellsAvailable',
+      label: (values) => (values['spellcasting.preparation'] === 'known' ? 'Spells known' : 'Spells prepared'),
+      control: 'number',
+      min: 0,
+      labelDependsOn: ['spellcasting.preparation'],
+      visibility: {
+        dependsOn: ['spellcasting.preparation'],
+        visibleWhen: (values) =>
+          values['spellcasting.preparation'] === 'prepared' ||
+          values['spellcasting.preparation'] === 'known',
+      },
+    },
+  ],
+  templates: {
+    cantrips: [{ name: 'Full caster', values: [4, 4, /* … */] }],
+  },
+}
+```
+
+- Renders the RHF-agnostic `EditableGrid` primitive; the adapter watches column
+  `dependsOn` paths via `useWatch` and filters/resolves columns before render.
+- Per-column `visibility` hides a column in the UI but **retains** its values in
+  the composite object (unlike field-level `visibility`, which unregisters the whole
+  field when hidden).
+- Optional `templates` per column key surface a **Load template** menu with
+  confirm-replace.
+- Default value: a null-filled grid for every configured column (`fieldDefaultValue`).
+  Override with an explicit `defaultValue` when seeding from existing data.
+
 ## Collapsible sections
 
 By default, top-level `kind: 'group'` and `kind: 'array'` sections render inside
