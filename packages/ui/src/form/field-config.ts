@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react'
 
+import type {
+  EditableGridTemplates,
+  EditableGridValue,
+} from '../components/ui/editable-grid.client'
 import type { FieldSize } from '../components/ui/field.client'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 
@@ -16,6 +20,7 @@ export type FieldType =
   | 'richtext'
   | 'file'
   | 'chips'
+  | 'editableGrid'
 
 /** Option for the `select` and `radio` field types. */
 export interface FieldOption {
@@ -179,6 +184,31 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   defaultValue?: string | string[]
 }
 
+/** Column definition for `editableGrid` fields (may carry per-column conditionals). */
+export interface EditableGridColumnConfig {
+  key: string
+  /** Static label, or a function of watched `dependsOn` values when the header is dynamic. */
+  label: string | ((watched: Record<string, unknown>) => string)
+  control: 'select' | 'number'
+  min?: number
+  max?: number
+  /** Hide the column when the predicate is false; the underlying value is retained. */
+  visibility?: FieldVisibility
+  /**
+   * Field names the dynamic `label` reads. Defaults to `visibility.dependsOn` when
+   * omitted.
+   */
+  labelDependsOn?: string[]
+}
+
+export interface EditableGridFieldConfig extends BaseFieldConfig {
+  type: 'editableGrid'
+  rowCount: number
+  columns: EditableGridColumnConfig[]
+  templates?: EditableGridTemplates
+  defaultValue?: EditableGridValue
+}
+
 /** Discriminated union of every leaf field, keyed by `type`. */
 export type FieldConfig =
   | TextFieldConfig
@@ -192,6 +222,7 @@ export type FieldConfig =
   | RichTextFieldConfig
   | FileFieldConfig
   | ChipsFieldConfig
+  | EditableGridFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
 export interface RowConfig {
@@ -297,6 +328,29 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   richtext: '',
   file: [],
   chips: [],
+  editableGrid: {},
+}
+
+function emptyEditableGridValue(
+  columns: EditableGridColumnConfig[],
+  rowCount: number,
+): EditableGridValue {
+  return Object.fromEntries(
+    columns.map((column) => [column.key, Array.from({ length: rowCount }, () => null)]),
+  )
+}
+
+/** Names every column-level `useWatch` subscription for an editable grid field. */
+export function editableGridDependsOn(columns: EditableGridColumnConfig[]): string[] {
+  const deps = new Set<string>()
+  for (const column of columns) {
+    column.visibility?.dependsOn.forEach((name) => deps.add(name))
+    if (typeof column.label === 'function') {
+      const labelDeps = column.labelDependsOn ?? column.visibility?.dependsOn ?? []
+      labelDeps.forEach((name) => deps.add(name))
+    }
+  }
+  return [...deps]
 }
 
 /** Type-appropriate default for a single field; an explicit `defaultValue` wins. */
@@ -305,6 +359,10 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   if (explicit !== undefined) return explicit
   if (field.type === 'chips') {
     return (field as ChipsFieldConfig).multiple === false ? '' : []
+  }
+  if (field.type === 'editableGrid') {
+    const gridField = field as EditableGridFieldConfig
+    return emptyEditableGridValue(gridField.columns, gridField.rowCount)
   }
   return TYPE_DEFAULTS[field.type]
 }

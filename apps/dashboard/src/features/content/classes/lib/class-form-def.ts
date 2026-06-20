@@ -9,7 +9,8 @@ import {
   SKILL_IDS,
   SKILLS,
   SPELLCASTING_PROGRESSIONS,
-  SPELL_PREPARATION,
+  SPELL_PREPARATION_MODES,
+  SPELL_PREPARATION_MODE_LABELS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   abilitySchema,
@@ -39,6 +40,13 @@ import {
 } from '../../lib/grant-form-helpers'
 import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
 import { titleCase } from '../../lib/title-case'
+import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
+import {
+  emptyProgressionTable,
+  progressionTableFromFormValues,
+  progressionTableToFormValues,
+  type ProgressionTableFormValue,
+} from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 
 // ---------------------------------------------------------------------------
@@ -83,34 +91,22 @@ const spellcastingProgressionOptions = toOptions(
   >,
 )
 
-const spellPreparationOptions = toOptions(
-  SPELL_PREPARATION,
-  Object.fromEntries(SPELL_PREPARATION.map((p) => [p, titleCase(p)])) as Record<
-    (typeof SPELL_PREPARATION)[number],
-    string
-  >,
-)
+const spellPreparationOptions = toOptions(SPELL_PREPARATION_MODES, SPELL_PREPARATION_MODE_LABELS)
 
 // ---------------------------------------------------------------------------
 // Form schema
 // ---------------------------------------------------------------------------
 
-const cantripEntryFormSchema = z.object({
-  level: z.coerce.number().pipe(levelSchema),
-  known: z.coerce.number().int().min(0),
-})
-
-const spellsPreparedEntryFormSchema = z.object({
-  level: z.coerce.number().pipe(levelSchema),
-  prepared: z.coerce.number().int().min(0),
+const progressionTableFormSchema = z.object({
+  cantrips: z.array(z.number().int().min(0).nullable()),
+  spellsAvailable: z.array(z.number().int().min(0).nullable()),
 })
 
 const spellcastingFormSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
   ability: abilitySchema.optional(),
-  preparation: z.enum(SPELL_PREPARATION).optional(),
-  cantrips: z.array(cantripEntryFormSchema).optional(),
-  spellsPrepared: z.array(spellsPreparedEntryFormSchema).optional(),
+  preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
+  progressionTable: progressionTableFormSchema.optional(),
 })
 
 const proficienciesFormSchema = z.object({
@@ -175,50 +171,44 @@ function visibleWhenSpellcasting(): FieldVisibility {
   }
 }
 
-function visibleWhenPrepared(): FieldVisibility {
-  return {
-    dependsOn: ['hasSpellcasting', 'spellcasting.preparation'],
-    visibleWhen: (watched) =>
-      watched['hasSpellcasting'] === true && watched['spellcasting.preparation'] === 'prepared',
-  }
+const spellProgressionGridField: FormItem = {
+  type: 'editableGrid',
+  name: 'spellcasting.progressionTable',
+  label: 'Spell progression',
+  rowCount: MAX_CHARACTER_LEVEL,
+  visibility: visibleWhenSpellcasting(),
+  columns: [
+    {
+      key: 'cantrips',
+      label: 'Cantrips known',
+      control: 'select',
+      min: 1,
+      max: 6,
+    },
+    {
+      key: 'spellsAvailable',
+      label: (watched) =>
+        watched['spellcasting.preparation'] === 'known' ? 'Spells known' : 'Spells prepared',
+      control: 'number',
+      min: 0,
+      labelDependsOn: ['spellcasting.preparation'],
+      visibility: {
+        dependsOn: ['spellcasting.preparation'],
+        visibleWhen: (watched) => {
+          const mode = watched['spellcasting.preparation']
+          return mode === 'prepared' || mode === 'known'
+        },
+      },
+    },
+  ],
+  templates: {
+    cantrips: CANTRIPS_KNOWN_PROFILES,
+  },
 }
 
 // ---------------------------------------------------------------------------
 // Field builders
 // ---------------------------------------------------------------------------
-
-function progressionTableFields(
-  name: 'cantrips' | 'spellsPrepared',
-  legend: string,
-  valueLabel: string,
-  valueField: 'known' | 'prepared',
-): FormItem {
-  return {
-    kind: 'array',
-    name: `spellcasting.${name}`,
-    legend,
-    addLabel: 'Add row',
-    visibility: name === 'spellsPrepared' ? visibleWhenPrepared() : visibleWhenSpellcasting(),
-    itemTitle: (values, index) =>
-      values['level'] ? `Level ${values['level']}` : `Row ${index + 1}`,
-    fields: [
-      {
-        type: 'select',
-        name: 'level',
-        label: 'Character level',
-        options: levelOptions,
-        required: true,
-      },
-      {
-        type: 'number',
-        name: valueField,
-        label: valueLabel,
-        min: 0,
-        required: true,
-      },
-    ],
-  }
-}
 
 function featureItemFields(): FormItem[] {
   return [
@@ -360,8 +350,7 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
       progression: undefined,
       ability: undefined,
       preparation: undefined,
-      cantrips: [],
-      spellsPrepared: [],
+      progressionTable: emptyProgressionTable(),
     }
   }
 
@@ -369,8 +358,10 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
     progression: spellcasting.progression,
     ability: spellcasting.ability,
     preparation: spellcasting.preparation,
-    cantrips: spellcasting.cantrips ?? [],
-    spellsPrepared: spellcasting.spellsPrepared ?? [],
+    progressionTable: progressionTableToFormValues(
+      spellcasting.cantrips,
+      spellcasting.spellsAvailable,
+    ),
   }
 }
 
@@ -388,10 +379,11 @@ function hasCompleteSpellcastingCore(
 
 function appendOptionalProgressionTables(
   result: Spellcasting,
-  spellcasting: NonNullable<ClassFormValues['spellcasting']>,
+  progressionTable: ProgressionTableFormValue | undefined,
 ): void {
-  if (spellcasting.cantrips?.length) result.cantrips = spellcasting.cantrips
-  if (spellcasting.spellsPrepared?.length) result.spellsPrepared = spellcasting.spellsPrepared
+  const { cantrips, spellsAvailable } = progressionTableFromFormValues(progressionTable)
+  if (cantrips) result.cantrips = cantrips
+  if (spellsAvailable) result.spellsAvailable = spellsAvailable
 }
 
 function spellcastingFromFormValues(
@@ -407,7 +399,7 @@ function spellcastingFromFormValues(
     ability: spellcasting.ability!,
     preparation: spellcasting.preparation!,
   }
-  appendOptionalProgressionTables(result, spellcasting)
+  appendOptionalProgressionTables(result, spellcasting.progressionTable)
   return result
 }
 
@@ -425,8 +417,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
     progression: 'full',
     ability: 'int',
     preparation: 'prepared',
-    cantrips: [],
-    spellsPrepared: [],
+    progressionTable: emptyProgressionTable(),
   },
   proficiencies: {
     savingThrows: ['str'],
@@ -554,10 +545,9 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
             },
           ],
         },
+        spellProgressionGridField,
       ],
     },
-    progressionTableFields('cantrips', 'Cantrips known', 'Cantrips known', 'known'),
-    progressionTableFields('spellsPrepared', 'Spells prepared', 'Spells prepared', 'prepared'),
     {
       kind: 'group',
       legend: 'Proficiencies',
