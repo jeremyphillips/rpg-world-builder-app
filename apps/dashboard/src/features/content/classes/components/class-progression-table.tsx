@@ -75,10 +75,14 @@ function resourceNamesFrom(characterClass: CharacterClass): string[] {
   return characterClass.resources?.map((r) => r.name) ?? []
 }
 
-function buildRows(characterClass: CharacterClass): ProgressionRow[] {
-  const slotTable = characterClass.spellcasting
+function slotTableFor(characterClass: CharacterClass): number[][] | undefined {
+  return characterClass.spellcasting
     ? SLOT_TABLES[characterClass.spellcasting.progression]
     : undefined
+}
+
+function buildRows(characterClass: CharacterClass): ProgressionRow[] {
+  const slotTable = slotTableFor(characterClass)
   return Array.from({ length: MAX_CHARACTER_LEVEL }, (_, i) =>
     buildRow(i + 1, characterClass, slotTable),
   )
@@ -88,12 +92,41 @@ function spellsAvailableColumnLabel(preparation: Spellcasting['preparation']): s
   return preparation === 'known' ? 'Spells Known' : 'Spells Prepared'
 }
 
+function hasCantripProgression(rows: ProgressionRow[]): boolean {
+  return rows.some((r) => r.cantrips !== undefined)
+}
+
+function hasSpellsAvailableProgression(
+  preparation: Spellcasting['preparation'] | undefined,
+  rows: ProgressionRow[],
+): boolean {
+  return preparation !== 'always_prepared' && rows.some((r) => r.spellsAvailable !== undefined)
+}
+
+function slotLevelRange(characterClass: CharacterClass): number[] {
+  const maxSlotCols =
+    slotTableFor(characterClass)?.reduce((max, row) => Math.max(max, row.length), 0) ?? 0
+  return Array.from({ length: maxSlotCols }, (_, i) => i + 1)
+}
+
 type ColumnFlags = {
   resourceNames: string[]
   showCantrips: boolean
   showSpellsAvailable: boolean
   spellsAvailableLabel: string
   slotLevels: number[]
+}
+
+function buildColumnFlags(characterClass: CharacterClass, rows: ProgressionRow[]): ColumnFlags {
+  const preparation = characterClass.spellcasting?.preparation
+
+  return {
+    resourceNames: resourceNamesFrom(characterClass),
+    showCantrips: hasCantripProgression(rows),
+    showSpellsAvailable: hasSpellsAvailableProgression(preparation, rows),
+    spellsAvailableLabel: preparation ? spellsAvailableColumnLabel(preparation) : 'Spells Prepared',
+    slotLevels: slotLevelRange(characterClass),
+  }
 }
 
 function ResourceCell({ resources, name }: { resources?: Record<string, number>; name: string }) {
@@ -177,19 +210,7 @@ type ClassProgressionTableProps = {
 
 export function ClassProgressionTable({ characterClass }: ClassProgressionTableProps) {
   const rows = buildRows(characterClass)
-  const slotTable = characterClass.spellcasting
-    ? SLOT_TABLES[characterClass.spellcasting.progression]
-    : undefined
-  const maxSlotCols = slotTable ? Math.max(...slotTable.map((r) => r.length)) : 0
-  const preparation = characterClass.spellcasting?.preparation
-  const flags: ColumnFlags = {
-    resourceNames: resourceNamesFrom(characterClass),
-    showCantrips: rows.some((r) => r.cantrips !== undefined),
-    showSpellsAvailable:
-      preparation !== 'always_prepared' && rows.some((r) => r.spellsAvailable !== undefined),
-    spellsAvailableLabel: preparation ? spellsAvailableColumnLabel(preparation) : 'Spells Prepared',
-    slotLevels: Array.from({ length: maxSlotCols }, (_, i) => i + 1),
-  }
+  const flags = buildColumnFlags(characterClass, rows)
 
   return (
     <section aria-labelledby="progression-heading">

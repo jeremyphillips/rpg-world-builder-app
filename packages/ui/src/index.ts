@@ -167,6 +167,16 @@ export {
 export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'
 
 export {
+  EditableGrid,
+  createEditableGridValue,
+  type EditableGridProps,
+  type EditableGridColumn,
+  type EditableGridTemplate,
+  type EditableGridTemplates,
+  type EditableGridValue,
+} from './components/ui/editable-grid.client'
+
+export {
   Table,
   TableHeader,
   TableBody,
