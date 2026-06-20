@@ -160,7 +160,7 @@ function FormAccordionBatch({ batchKey, sections, idPrefix, namePrefix }: FormAc
       value={openValues}
       onValueChange={handleValueChange}
       variant="section"
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-6"
     >
       {sections.map(({ item, index }) => (
         <CollapsibleFormSection

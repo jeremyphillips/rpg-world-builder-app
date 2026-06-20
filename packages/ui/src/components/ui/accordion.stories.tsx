@@ -38,7 +38,7 @@ export const SectionVariantMultipleOpen: Story = {
       type="multiple"
       defaultValue={['identity', 'traits']}
       variant="section"
-      className="flex max-w-lg flex-col gap-4"
+      className="flex max-w-lg flex-col gap-6"
     >
       <AccordionItem value="identity" variant="section">
         <AccordionTrigger variant="section">Identity</AccordionTrigger>

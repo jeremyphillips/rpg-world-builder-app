@@ -23,7 +23,7 @@ export const accordionTriggerVariants = cva(
       variant: {
         default: 'py-4 font-medium hover:underline',
         section:
-          'w-full font-display text-lg font-semibold leading-none text-foreground hover:text-foreground/80',
+          'w-full py-2 font-sans text-lg font-semibold leading-none text-foreground hover:text-foreground/80',
       },
     },
     defaultVariants: {
@@ -44,7 +44,7 @@ export const accordionContentInnerVariants = cva('', {
   variants: {
     variant: {
       default: 'px-4 pb-4 pt-0',
-      section: 'pb-4 pt-0',
+      section: 'pb-4 pt-4',
     },
   },
   defaultVariants: {
