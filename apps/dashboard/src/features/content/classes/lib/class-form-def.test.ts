@@ -6,6 +6,10 @@ import { loadSeedClasses } from '@rpg/catalog/classes'
 import { createClassInputSchema, type CreateClassInput } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
+import {
+  cantripProgressionsEquivalent,
+  spellsAvailableProgressionsEquivalent,
+} from './progression-table-helpers'
 
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
 
@@ -58,7 +62,26 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     expect(input.spellcasting?.progression).toBe('full')
+    expect(
+      cantripProgressionsEquivalent(input.spellcasting?.cantrips, sorcerer.spellcasting?.cantrips),
+    ).toBe(true)
     expect(input.resources?.[0]?.name).toBe('Sorcery Points')
+  })
+
+  it('bard: cantrips and spells available round-trip through progressionTable', () => {
+    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    expect(formValues.spellcasting?.progressionTable?.cantrips?.[0]).toBe(2)
+    const input = classFormDef.toInput(formValues)
+    expect(
+      cantripProgressionsEquivalent(input.spellcasting?.cantrips, bard.spellcasting?.cantrips),
+    ).toBe(true)
+    expect(
+      spellsAvailableProgressionsEquivalent(
+        input.spellcasting?.spellsAvailable,
+        bard.spellcasting?.spellsAvailable,
+      ),
+    ).toBe(true)
   })
 
   it('fighter: ASI and subclass levels round-trip', () => {
