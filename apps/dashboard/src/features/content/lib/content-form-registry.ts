@@ -55,8 +55,8 @@ export interface ContentFormDef<
   coverage?: 'structural' | 'roundtrip-only'
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyContentFormDef = ContentFormDef<{ id: string; name: string }, FieldValues, unknown>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all three params are erased at the registry boundary; each def is strongly typed internally
+export type AnyContentFormDef = ContentFormDef<any, any, any>
 
 /**
  * The global content form registry. Each content type that supports create/edit

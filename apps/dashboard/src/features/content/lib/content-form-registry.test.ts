@@ -20,6 +20,8 @@ import { describe, expect, it } from 'vitest'
 import { flattenFields } from '@rpg/ui/form'
 
 import { contentFormRegistry, type ContentFormDef } from './content-form-registry'
+// Populate the registry — each import registers its def as a side effect.
+import '../species/lib/species-form-def'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 
