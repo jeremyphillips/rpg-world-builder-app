@@ -507,3 +507,45 @@ Import the two route components from `@/features/content`, then add under `campa
 | **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                    |
 | **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                           |
 | **Dual-ownership fields?**       | If another type references this type's entities (e.g. `suggestedClasses` on skills), keep the authoritative list on the owning type and add the reverse as an optional convenience field. Document which is authoritative.      |
+
+---
+
+## Class spellcasting (reference)
+
+The `classes` type embeds an optional `spellcasting` block (`content/class/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` by progression (`full` / `half` / `pact`); they are not stored on the class record.
+
+### Preparation modes
+
+`preparation` is a closed enum (`SPELL_PREPARATION_MODES`):
+
+| Mode              | Meaning                                     | Spells-available column            |
+| ----------------- | ------------------------------------------- | ---------------------------------- |
+| `prepared`        | Caster prepares a subset each day           | Shown — header **Spells Prepared** |
+| `known`           | Caster knows a fixed spell list             | Shown — header **Spells Known**    |
+| `always_prepared` | Domain/oath/etc. spells are always prepared | Hidden                             |
+
+### Progression tables (contract storage)
+
+Both optional tables use **sparse fill-forward** storage: an array of `{ level, value }` rows where each row applies from that character level onward until superseded.
+
+| Field             | Entry shape        | Value field                                                                  |
+| ----------------- | ------------------ | ---------------------------------------------------------------------------- |
+| `cantrips`        | `{ level, known }` | Cantrips known at that level                                                 |
+| `spellsAvailable` | `{ level, count }` | Spells prepared or known (renamed from legacy `spellsPrepared` / `prepared`) |
+
+Authoring expands sparse rows to a dense level 1–20 grid for editing, then compresses on save (emit only when a level's value changes from the prior emitted value). Helpers live in `apps/dashboard/.../classes/lib/progression-table-helpers.ts`.
+
+### Dashboard authoring UI
+
+The class form (`class-form-def.ts`) binds a form-only composite `spellcasting.progressionTable` to the schema-driven `editableGrid` field type (`@rpg/ui/form`). Columns:
+
+- **Cantrips known** — select (blank or 1–6); optional **Load template** presets from `cantrips-profiles.ts` (`CANTRIPS_KNOWN_PROFILES`, seed-only, not in the contract).
+- **Spells available** — number input; visible when `preparation` is `prepared` or `known`; dynamic column label.
+
+See [packages/ui/docs/forms.md](../packages/ui/docs/forms.md) for the `editableGrid` field config shape.
+
+### Read-only detail view
+
+`ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows resource columns from `resources[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+
+---
