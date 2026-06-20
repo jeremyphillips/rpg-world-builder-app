@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 import {
   editableGridColumnHeaderVariants,
+  editableGridControlVariants,
   editableGridDataCellVariants,
   editableGridHeaderCellVariants,
   editableGridStickyCellVariants,
@@ -147,7 +148,7 @@ function EditableGridSelectCell({
     >
       <SelectTrigger
         size="sm"
-        className="w-full"
+        className={editableGridControlVariants()}
         aria-label={cellAriaLabel(column.label, rowIndex)}
       >
         <SelectValue />
@@ -183,7 +184,7 @@ function EditableGridNumberCell({
       type="number"
       inputMode="numeric"
       size="sm"
-      className="w-full"
+      className={editableGridControlVariants()}
       min={column.min}
       max={column.max}
       value={formatNumberCell(cell)}
@@ -215,7 +216,13 @@ function EditableGridColumnHeader({
       {hasTemplates ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="button" variant="ghost" size="sm" disabled={disabled}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto px-1 py-0 text-xs"
+              disabled={disabled}
+            >
               Load template
             </Button>
           </DropdownMenuTrigger>
