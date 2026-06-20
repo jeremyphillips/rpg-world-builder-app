@@ -9,7 +9,8 @@ import {
   SKILL_IDS,
   SKILLS,
   SPELLCASTING_PROGRESSIONS,
-  SPELL_PREPARATION,
+  SPELL_PREPARATION_MODES,
+  SPELL_PREPARATION_MODE_LABELS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   abilitySchema,
@@ -83,13 +84,7 @@ const spellcastingProgressionOptions = toOptions(
   >,
 )
 
-const spellPreparationOptions = toOptions(
-  SPELL_PREPARATION,
-  Object.fromEntries(SPELL_PREPARATION.map((p) => [p, titleCase(p)])) as Record<
-    (typeof SPELL_PREPARATION)[number],
-    string
-  >,
-)
+const spellPreparationOptions = toOptions(SPELL_PREPARATION_MODES, SPELL_PREPARATION_MODE_LABELS)
 
 // ---------------------------------------------------------------------------
 // Form schema
@@ -100,17 +95,17 @@ const cantripEntryFormSchema = z.object({
   known: z.coerce.number().int().min(0),
 })
 
-const spellsPreparedEntryFormSchema = z.object({
+const spellsAvailableEntryFormSchema = z.object({
   level: z.coerce.number().pipe(levelSchema),
-  prepared: z.coerce.number().int().min(0),
+  count: z.coerce.number().int().min(0),
 })
 
 const spellcastingFormSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
   ability: abilitySchema.optional(),
-  preparation: z.enum(SPELL_PREPARATION).optional(),
+  preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
   cantrips: z.array(cantripEntryFormSchema).optional(),
-  spellsPrepared: z.array(spellsPreparedEntryFormSchema).optional(),
+  spellsAvailable: z.array(spellsAvailableEntryFormSchema).optional(),
 })
 
 const proficienciesFormSchema = z.object({
@@ -188,17 +183,17 @@ function visibleWhenPrepared(): FieldVisibility {
 // ---------------------------------------------------------------------------
 
 function progressionTableFields(
-  name: 'cantrips' | 'spellsPrepared',
+  name: 'cantrips' | 'spellsAvailable',
   legend: string,
   valueLabel: string,
-  valueField: 'known' | 'prepared',
+  valueField: 'known' | 'count',
 ): FormItem {
   return {
     kind: 'array',
     name: `spellcasting.${name}`,
     legend,
     addLabel: 'Add row',
-    visibility: name === 'spellsPrepared' ? visibleWhenPrepared() : visibleWhenSpellcasting(),
+    visibility: name === 'spellsAvailable' ? visibleWhenPrepared() : visibleWhenSpellcasting(),
     itemTitle: (values, index) =>
       values['level'] ? `Level ${values['level']}` : `Row ${index + 1}`,
     fields: [
@@ -361,7 +356,7 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
       ability: undefined,
       preparation: undefined,
       cantrips: [],
-      spellsPrepared: [],
+      spellsAvailable: [],
     }
   }
 
@@ -370,7 +365,7 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
     ability: spellcasting.ability,
     preparation: spellcasting.preparation,
     cantrips: spellcasting.cantrips ?? [],
-    spellsPrepared: spellcasting.spellsPrepared ?? [],
+    spellsAvailable: spellcasting.spellsAvailable ?? [],
   }
 }
 
@@ -391,7 +386,7 @@ function appendOptionalProgressionTables(
   spellcasting: NonNullable<ClassFormValues['spellcasting']>,
 ): void {
   if (spellcasting.cantrips?.length) result.cantrips = spellcasting.cantrips
-  if (spellcasting.spellsPrepared?.length) result.spellsPrepared = spellcasting.spellsPrepared
+  if (spellcasting.spellsAvailable?.length) result.spellsAvailable = spellcasting.spellsAvailable
 }
 
 function spellcastingFromFormValues(
@@ -426,7 +421,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
     ability: 'int',
     preparation: 'prepared',
     cantrips: [],
-    spellsPrepared: [],
+    spellsAvailable: [],
   },
   proficiencies: {
     savingThrows: ['str'],
@@ -557,7 +552,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
       ],
     },
     progressionTableFields('cantrips', 'Cantrips known', 'Cantrips known', 'known'),
-    progressionTableFields('spellsPrepared', 'Spells prepared', 'Spells prepared', 'prepared'),
+    progressionTableFields('spellsAvailable', 'Spells prepared', 'Spells prepared', 'count'),
     {
       kind: 'group',
       legend: 'Proficiencies',

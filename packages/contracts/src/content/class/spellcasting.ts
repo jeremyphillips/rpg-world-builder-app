@@ -11,7 +11,18 @@ import { levelSchema } from '../../primitives/level'
 export const SPELLCASTING_PROGRESSIONS = ['full', 'half', 'pact'] as const
 export type SpellcastingProgression = (typeof SPELLCASTING_PROGRESSIONS)[number]
 
-export const SPELL_PREPARATION = ['prepared', 'known'] as const
+export const SPELL_PREPARATION_MODE_LABELS = {
+  prepared: 'Prepared',
+  known: 'Known',
+  always_prepared: 'Always prepared',
+} as const
+
+export type SpellPreparationMode = keyof typeof SPELL_PREPARATION_MODE_LABELS
+
+export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_LABELS) as [
+  SpellPreparationMode,
+  ...SpellPreparationMode[],
+]
 
 /**
  * Cantrips known is tabular data, not a closed taxonomy, so the schema stores an
@@ -27,19 +38,19 @@ export const cantripsKnownEntrySchema = z.object({
 
 export const cantripsProgressionSchema = z.array(cantripsKnownEntrySchema)
 
-export const spellsPreparedEntrySchema = z.object({
+export const spellsAvailableEntrySchema = z.object({
   level: levelSchema,
-  prepared: z.number().int().min(0),
+  count: z.number().int().min(0),
 })
 
-export const spellsPreparedProgressionSchema = z.array(spellsPreparedEntrySchema)
+export const spellsAvailableProgressionSchema = z.array(spellsAvailableEntrySchema)
 
 export const spellcastingSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
-  preparation: z.enum(SPELL_PREPARATION),
+  preparation: z.enum(SPELL_PREPARATION_MODES),
   cantrips: cantripsProgressionSchema.optional(),
-  spellsPrepared: spellsPreparedProgressionSchema.optional(),
+  spellsAvailable: spellsAvailableProgressionSchema.optional(),
 })
 
 export type Spellcasting = z.infer<typeof spellcastingSchema>

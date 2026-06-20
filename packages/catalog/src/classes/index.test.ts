@@ -62,8 +62,8 @@ describe('SRD 5.2.1 class seed', () => {
     expect(bard.features).toHaveLength(11)
     expect(bard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
     expect(bard.asiLevels).toEqual([4, 8, 12, 16])
-    expect(bard.spellcasting?.spellsPrepared?.find((e) => e.level === 1)?.prepared).toBe(4)
-    expect(bard.spellcasting?.spellsPrepared?.find((e) => e.level === 20)?.prepared).toBe(22)
+    expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
+    expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
     const bardicDie = bard.resources?.find((r) => r.name === 'Bardic Die')
     expect(bardicDie?.entries).toEqual([
       { level: 1, value: 6 },
