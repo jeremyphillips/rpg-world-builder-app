@@ -19,6 +19,13 @@ interface OmittableSchema {
  * a `required` field is only required while visible. Object schemas also strip
  * the hidden keys from their output, so the submitted payload omits them too.
  * Non-object (e.g. refined) schemas are returned unchanged (documented limit).
+ *
+ * **Array item fields**: hidden fields inside array items (e.g. `traits.0.name`)
+ * are _not_ stripped by this function — Zod's `.omit` only works on top-level
+ * object keys. Item-scoped conditional visibility is instead handled at the RHF
+ * level via `shouldUnregister: true`: when the field unmounts, RHF clears the
+ * value and omits the key from the submitted payload automatically. The schema
+ * for array items should therefore treat conditionally-shown fields as optional.
  */
 function omitHidden(schema: ZodType, hidden: string[]): ZodType {
   if (hidden.length === 0) return schema

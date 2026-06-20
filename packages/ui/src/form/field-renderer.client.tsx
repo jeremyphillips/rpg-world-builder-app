@@ -243,6 +243,12 @@ export interface FieldRendererProps {
   config: FieldConfig
   /** Per-`<Form>` id prefix; the control id becomes `${idPrefix}-${name}`. */
   idPrefix: string
+  /**
+   * Dotted path prefix for array item fields (e.g. `"traits.0"`). When set, the
+   * full RHF field name is `${namePrefix}.${config.name}` and the control id
+   * becomes `${idPrefix}-${namePrefix}-${config.name}` (dots replaced with `-`).
+   */
+  namePrefix?: string
 }
 
 /**
@@ -250,9 +256,10 @@ export interface FieldRendererProps {
  * field re-renders on its own value/error change) and dispatches to the matching
  * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
-export function FieldRenderer({ config, idPrefix }: FieldRendererProps) {
-  const { field, fieldState } = useController({ name: config.name })
-  const id = `${idPrefix}-${config.name}`
+export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
+  const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
+  const { field, fieldState } = useController({ name: fullName })
+  const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
