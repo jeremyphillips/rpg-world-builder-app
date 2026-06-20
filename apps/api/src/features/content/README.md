@@ -44,10 +44,13 @@ which seed version is loaded and which content homebrew/patches validate against
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
 `*.config.ts` wiring its seed loader and Mongo models, registered in
-`content-types.ts` (one entry, the single extension point). Authoring / patching
-**write** endpoints are a later phase; the contracts (`createClassInput`,
-`updateClassInput`, `classPatchSchema`) and the slug guard they will use already
-exist here.
+`content-types.ts` (one entry, the single extension point). Write endpoints:
+
+- `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew
+- `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update
+  homebrew or upsert a system overlay patch (owner/co-owner only)
+
+See `lib/content-write.service.ts` and each type's `*WriteConfig` in `*.config.ts`.
 
 ## Attribution
 

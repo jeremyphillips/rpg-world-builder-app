@@ -117,6 +117,51 @@ describe('ChipsField', () => {
     expect(onChange).toHaveBeenCalledWith('')
   })
 
+  it('coerces numeric values to match string option values', () => {
+    render(
+      <ChipsField
+        id="levels"
+        label="ASI levels"
+        options={[
+          { value: '4', label: 'Level 4' },
+          { value: '8', label: 'Level 8' },
+        ]}
+        multiple
+        value={[4, 8]}
+      />,
+    )
+    expect(screen.getByRole('checkbox', { name: 'Level 4' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    expect(screen.getByRole('checkbox', { name: 'Level 8' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+  })
+
+  it('does not add selections beyond max', async () => {
+    const onChange = vi.fn()
+    render(
+      <ChipsField
+        id="abilities"
+        label="Primary abilities"
+        options={[
+          { value: 'str', label: 'Strength' },
+          { value: 'dex', label: 'Dexterity' },
+          { value: 'con', label: 'Constitution' },
+        ]}
+        multiple
+        max={2}
+        value={['str', 'dex']}
+        onChange={onChange}
+      />,
+    )
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Constitution' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('checkbox', { name: 'Constitution' })).toBeDisabled()
+  })
+
   it('renders error message', () => {
     render(
       <ChipsField

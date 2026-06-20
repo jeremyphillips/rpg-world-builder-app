@@ -10,6 +10,7 @@ export {
   flattenFields,
   fieldDefaultValue,
   buildDefaultValues,
+  buildItemDefaultValues,
   isContainer,
   toOptions,
   type FieldType,
@@ -31,5 +32,6 @@ export {
   type FieldConfig,
   type RowConfig,
   type GroupConfig,
+  type ArrayConfig,
   type FormItem,
 } from './field-config'

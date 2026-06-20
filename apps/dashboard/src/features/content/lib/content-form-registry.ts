@@ -1,0 +1,72 @@
+import type { FieldValues } from 'react-hook-form'
+import type { ZodType } from 'zod'
+import type { FormItem } from '@rpg/ui/form'
+
+import type { ContentListQueryResult } from './content-client'
+
+/**
+ * Context object passed to `buildFields`. Reserved for future campaign-specific
+ * options (e.g. available spell sources, custom vocab). Currently empty.
+ */
+export type ContentFormCtx = Record<string, never>
+
+/**
+ * The per-type definition that the content form registry holds. Each entry
+ * describes how to:
+ * - Render fields (`buildFields`)
+ * - Seed the edit form from a stored entity (`toFormValues`)
+ * - Map validated form values to the create API input (`toInput`)
+ *
+ * `toFormValues` and `toInput` are **pure functions** (no side effects, no
+ * rendering) so the drift test suite can exercise them without mounting anything.
+ */
+export interface ContentFormDef<
+  TEntity extends { id: string; name: string },
+  TFormValues extends FieldValues,
+  TCreateInput,
+> {
+  /** Kebab-case route key used in URLs and API paths (e.g. `'species'`). */
+  routeKey: string
+  /** Zod schema validated on submit. Must match `TFormValues`. */
+  schema: ZodType<TFormValues>
+  /** Returns the ordered `FormItem[]` for this type. */
+  buildFields: (ctx: ContentFormCtx) => FormItem[]
+  /**
+   * Maps a stored entity to form defaults for the edit shell.
+   * Partial so optional fields don't need explicit `undefined`.
+   */
+  toFormValues: (entity: TEntity) => Partial<TFormValues>
+  /**
+   * Initial values for the create shell. Merged over synthesized field defaults
+   * from `buildFields` (e.g. nested `speed.walk` needs `{ speed: { walk } }`).
+   */
+  createDefaultValues?: Partial<TFormValues>
+  /**
+   * Maps validated form values to the API create-input shape.
+   * The type-level drift test asserts this matches the contract DTO.
+   */
+  toInput: (formValues: TFormValues) => TCreateInput
+  /** List query hook; the edit shell uses it to seed the form from cache. */
+  useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
+  /** Query key factory; used to invalidate the list after a successful mutation. */
+  queryKey: (campaignId: string) => readonly unknown[]
+  /**
+   * Coverage mode for the drift test suite:
+   * - `'roundtrip-only'` (default): verifies `toFormValues` → `toInput` →
+   *   `schema.parse` round-trips against `@rpg/catalog` fixtures.
+   * - `'structural'`: additionally compares Zod shape paths to
+   *   `flattenFields(buildFields({}))` paths for flat types.
+   */
+  coverage?: 'structural' | 'roundtrip-only'
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all three params are erased at the registry boundary; each def is strongly typed internally
+export type AnyContentFormDef = ContentFormDef<any, any, any>
+
+/**
+ * The global content form registry. Each content type that supports create/edit
+ * registers one entry here. The key is the `routeKey`.
+ *
+ * Phase 3 registers `species`; subsequent phases register the remaining types.
+ */
+export const contentFormRegistry: Record<string, AnyContentFormDef> = {}

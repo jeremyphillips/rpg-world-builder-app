@@ -1,0 +1,671 @@
+import { z } from 'zod'
+import {
+  ABILITIES,
+  ABILITY_IDS,
+  ARMOR_CATEGORIES,
+  ARMOR_CATEGORY_ENTRIES,
+  CLASS_HIT_DICE,
+  MAX_CHARACTER_LEVEL,
+  SKILL_IDS,
+  SKILLS,
+  SPELLCASTING_PROGRESSIONS,
+  SPELL_PREPARATION,
+  WEAPON_CATEGORIES,
+  WEAPON_CATEGORY_ENTRIES,
+  abilitySchema,
+  armorCategorySchema,
+  formatHitDie,
+  hitDieSchema,
+  levelSchema,
+  skillSchema,
+  slugSchema,
+  weaponCategorySchema,
+  type CharacterClass,
+  type ClassFeature,
+  type ClassProficiencies,
+  type ClassResource,
+  type CreateClassInput,
+  type Spellcasting,
+} from '@rpg/contracts'
+import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+
+import {
+  CLASS_GRANT_TYPES,
+  CLASS_GRANT_TYPE_LABELS,
+  formRowsToGrants,
+  grantArrayFields,
+  grantRowFormSchema,
+  grantsToFormRows,
+} from '../../lib/grant-form-helpers'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import { titleCase } from '../../lib/title-case'
+import { classesQueryKey, useClasses } from '../hooks/use-classes'
+
+// ---------------------------------------------------------------------------
+// Vocab option lists
+// ---------------------------------------------------------------------------
+
+const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
+
+const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
+  value: String(face),
+  label: formatHitDie(face),
+}))
+
+const levelOptions: FieldOption[] = Array.from({ length: MAX_CHARACTER_LEVEL }, (_, index) => {
+  const level = index + 1
+  return { value: String(level), label: `Level ${level}` }
+})
+
+const armorCategoryOptions = toOptions(
+  ARMOR_CATEGORIES,
+  Object.fromEntries(ARMOR_CATEGORIES.map((c) => [c, ARMOR_CATEGORY_ENTRIES[c].label])) as Record<
+    (typeof ARMOR_CATEGORIES)[number],
+    string
+  >,
+)
+
+const weaponCategoryOptions = toOptions(
+  WEAPON_CATEGORIES,
+  Object.fromEntries(WEAPON_CATEGORIES.map((c) => [c, WEAPON_CATEGORY_ENTRIES[c].label])) as Record<
+    (typeof WEAPON_CATEGORIES)[number],
+    string
+  >,
+)
+
+const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
+
+const spellcastingProgressionOptions = toOptions(
+  SPELLCASTING_PROGRESSIONS,
+  Object.fromEntries(SPELLCASTING_PROGRESSIONS.map((p) => [p, `${titleCase(p)} caster`])) as Record<
+    (typeof SPELLCASTING_PROGRESSIONS)[number],
+    string
+  >,
+)
+
+const spellPreparationOptions = toOptions(
+  SPELL_PREPARATION,
+  Object.fromEntries(SPELL_PREPARATION.map((p) => [p, titleCase(p)])) as Record<
+    (typeof SPELL_PREPARATION)[number],
+    string
+  >,
+)
+
+// ---------------------------------------------------------------------------
+// Form schema
+// ---------------------------------------------------------------------------
+
+const cantripEntryFormSchema = z.object({
+  level: z.coerce.number().pipe(levelSchema),
+  known: z.coerce.number().int().min(0),
+})
+
+const spellsPreparedEntryFormSchema = z.object({
+  level: z.coerce.number().pipe(levelSchema),
+  prepared: z.coerce.number().int().min(0),
+})
+
+const spellcastingFormSchema = z.object({
+  progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
+  ability: abilitySchema.optional(),
+  preparation: z.enum(SPELL_PREPARATION).optional(),
+  cantrips: z.array(cantripEntryFormSchema).optional(),
+  spellsPrepared: z.array(spellsPreparedEntryFormSchema).optional(),
+})
+
+const proficienciesFormSchema = z.object({
+  savingThrows: z.array(abilitySchema).min(1).max(2),
+  armor: z.array(armorCategorySchema),
+  weapons: z.object({
+    categories: z.array(weaponCategorySchema),
+    items: z.string().optional(),
+  }),
+  tools: z.string().optional(),
+  skills: z.object({
+    choose: z.coerce.number().int().min(0),
+    from: z.array(skillSchema),
+  }),
+})
+
+const featureRowFormSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  level: z.coerce.number().pipe(levelSchema),
+  grants: z.array(grantRowFormSchema),
+})
+
+const resourceEntryFormSchema = z.object({
+  level: z.coerce.number().pipe(levelSchema),
+  value: z.coerce.number().int().min(0),
+})
+
+const resourceRowFormSchema = z.object({
+  name: z.string().min(1),
+  entries: z.array(resourceEntryFormSchema).min(1),
+})
+
+const classFormSchema = z.object({
+  name: z.string().min(1),
+  slug: slugSchema,
+  description: z.string().optional(),
+  primaryAbilities: z.array(abilitySchema).min(1).max(2),
+  hitDie: z.coerce.number().pipe(hitDieSchema),
+  asiLevels: z.array(z.coerce.number().pipe(levelSchema)),
+  subclassLevels: z.array(z.coerce.number().pipe(levelSchema)).min(1),
+  hasSpellcasting: z.boolean(),
+  spellcasting: spellcastingFormSchema.optional(),
+  proficiencies: proficienciesFormSchema,
+  features: z.array(featureRowFormSchema),
+  resources: z.array(resourceRowFormSchema).optional(),
+})
+
+type ClassFormValues = z.infer<typeof classFormSchema>
+type FeatureRowForm = z.infer<typeof featureRowFormSchema>
+type ResourceRowForm = z.infer<typeof resourceRowFormSchema>
+
+// ---------------------------------------------------------------------------
+// Conditional visibility
+// ---------------------------------------------------------------------------
+
+function visibleWhenSpellcasting(): FieldVisibility {
+  return {
+    dependsOn: ['hasSpellcasting'],
+    visibleWhen: (watched) => watched['hasSpellcasting'] === true,
+  }
+}
+
+function visibleWhenPrepared(): FieldVisibility {
+  return {
+    dependsOn: ['hasSpellcasting', 'spellcasting.preparation'],
+    visibleWhen: (watched) =>
+      watched['hasSpellcasting'] === true && watched['spellcasting.preparation'] === 'prepared',
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Field builders
+// ---------------------------------------------------------------------------
+
+function progressionTableFields(
+  name: 'cantrips' | 'spellsPrepared',
+  legend: string,
+  valueLabel: string,
+  valueField: 'known' | 'prepared',
+): FormItem {
+  return {
+    kind: 'array',
+    name: `spellcasting.${name}`,
+    legend,
+    addLabel: 'Add row',
+    visibility: name === 'spellsPrepared' ? visibleWhenPrepared() : visibleWhenSpellcasting(),
+    itemTitle: (values, index) =>
+      values['level'] ? `Level ${values['level']}` : `Row ${index + 1}`,
+    fields: [
+      {
+        type: 'select',
+        name: 'level',
+        label: 'Character level',
+        options: levelOptions,
+        required: true,
+      },
+      {
+        type: 'number',
+        name: valueField,
+        label: valueLabel,
+        min: 0,
+        required: true,
+      },
+    ],
+  }
+}
+
+function featureItemFields(): FormItem[] {
+  return [
+    {
+      kind: 'row',
+      fields: [
+        {
+          type: 'select',
+          name: 'level',
+          label: 'Level',
+          options: levelOptions,
+          required: true,
+        },
+        {
+          type: 'text',
+          name: 'id',
+          label: 'ID',
+          hint: 'Unique slug (e.g. rage)',
+          required: true,
+        },
+      ],
+    },
+    { type: 'text', name: 'name', label: 'Name', required: true },
+    { type: 'richtext', name: 'description', label: 'Description' },
+    ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS),
+  ]
+}
+
+function resourceItemFields(): FormItem[] {
+  return [
+    { type: 'text', name: 'name', label: 'Name', required: true },
+    {
+      kind: 'array',
+      name: 'entries',
+      legend: 'Level values',
+      addLabel: 'Add level value',
+      min: 1,
+      itemTitle: (values, index) =>
+        values['level'] ? `Level ${values['level']}` : `Entry ${index + 1}`,
+      fields: [
+        {
+          type: 'select',
+          name: 'level',
+          label: 'Character level',
+          options: levelOptions,
+          required: true,
+        },
+        {
+          type: 'number',
+          name: 'value',
+          label: 'Value',
+          min: 0,
+          required: true,
+        },
+      ],
+    },
+  ]
+}
+
+// ---------------------------------------------------------------------------
+// Conversion helpers
+// ---------------------------------------------------------------------------
+
+function splitComma(value: string): string[] {
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+function featureToFormRow(feature: ClassFeature): FeatureRowForm {
+  return {
+    id: feature.id,
+    name: feature.name,
+    description: feature.description,
+    level: feature.level,
+    grants: grantsToFormRows(feature.grants),
+  }
+}
+
+function featureFromFormRow(row: FeatureRowForm): ClassFeature {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description || undefined,
+    level: row.level,
+    grants: formRowsToGrants(row.grants),
+  }
+}
+
+function resourceToFormRow(resource: ClassResource): ResourceRowForm {
+  return {
+    name: resource.name,
+    entries: resource.entries,
+  }
+}
+
+function resourceFromFormRow(row: ResourceRowForm): ClassResource {
+  return {
+    name: row.name,
+    entries: row.entries,
+  }
+}
+
+function proficienciesToFormValues(proficiencies: ClassProficiencies) {
+  return {
+    savingThrows: proficiencies.savingThrows,
+    armor: proficiencies.armor,
+    weapons: {
+      categories: proficiencies.weapons.categories,
+      items: proficiencies.weapons.items?.join(', ') ?? '',
+    },
+    tools: proficiencies.tools?.join(', ') ?? '',
+    skills: proficiencies.skills,
+  }
+}
+
+function proficienciesFromFormValues(
+  proficiencies: ClassFormValues['proficiencies'],
+): ClassProficiencies {
+  const tools = splitComma(proficiencies.tools ?? '')
+  const weaponItems = splitComma(proficiencies.weapons.items ?? '')
+
+  return {
+    savingThrows: proficiencies.savingThrows,
+    armor: proficiencies.armor,
+    weapons: {
+      categories: proficiencies.weapons.categories,
+      ...(weaponItems.length ? { items: weaponItems } : {}),
+    },
+    ...(tools.length ? { tools } : {}),
+    skills: proficiencies.skills,
+  }
+}
+
+function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
+  if (!spellcasting) {
+    return {
+      progression: undefined,
+      ability: undefined,
+      preparation: undefined,
+      cantrips: [],
+      spellsPrepared: [],
+    }
+  }
+
+  return {
+    progression: spellcasting.progression,
+    ability: spellcasting.ability,
+    preparation: spellcasting.preparation,
+    cantrips: spellcasting.cantrips ?? [],
+    spellsPrepared: spellcasting.spellsPrepared ?? [],
+  }
+}
+
+function hasCompleteSpellcastingCore(
+  hasSpellcasting: boolean,
+  spellcasting: ClassFormValues['spellcasting'],
+): boolean {
+  return Boolean(
+    hasSpellcasting &&
+    spellcasting?.progression &&
+    spellcasting?.ability &&
+    spellcasting?.preparation,
+  )
+}
+
+function appendOptionalProgressionTables(
+  result: Spellcasting,
+  spellcasting: NonNullable<ClassFormValues['spellcasting']>,
+): void {
+  if (spellcasting.cantrips?.length) result.cantrips = spellcasting.cantrips
+  if (spellcasting.spellsPrepared?.length) result.spellsPrepared = spellcasting.spellsPrepared
+}
+
+function spellcastingFromFormValues(
+  hasSpellcasting: boolean,
+  spellcasting: ClassFormValues['spellcasting'],
+): Spellcasting | undefined {
+  if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
+    return undefined
+  }
+
+  const result: Spellcasting = {
+    progression: spellcasting.progression!,
+    ability: spellcasting.ability!,
+    preparation: spellcasting.preparation!,
+  }
+  appendOptionalProgressionTables(result, spellcasting)
+  return result
+}
+
+// ---------------------------------------------------------------------------
+// Create-form defaults
+// ---------------------------------------------------------------------------
+
+const classCreateDefaultValues: Partial<ClassFormValues> = {
+  primaryAbilities: ['str'],
+  hitDie: 8,
+  asiLevels: [4, 8, 12, 16, 19],
+  subclassLevels: [3],
+  hasSpellcasting: false,
+  spellcasting: {
+    progression: 'full',
+    ability: 'int',
+    preparation: 'prepared',
+    cantrips: [],
+    spellsPrepared: [],
+  },
+  proficiencies: {
+    savingThrows: ['str'],
+    armor: [],
+    weapons: { categories: [], items: '' },
+    tools: '',
+    skills: { choose: 2, from: [] },
+  },
+  features: [],
+  resources: [],
+}
+
+// ---------------------------------------------------------------------------
+// Class ContentFormDef
+// ---------------------------------------------------------------------------
+
+const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
+  routeKey: 'classes',
+
+  schema: classFormSchema,
+  createDefaultValues: classCreateDefaultValues,
+
+  buildFields: (_ctx) => [
+    {
+      kind: 'group',
+      legend: 'Identity',
+      fields: [
+        {
+          kind: 'row',
+          fields: [
+            { type: 'text', name: 'name', label: 'Name', required: true },
+            {
+              type: 'text',
+              name: 'slug',
+              label: 'Slug',
+              hint: 'Lowercase letters, numbers, hyphens',
+              required: true,
+            },
+          ],
+        },
+        { type: 'richtext', name: 'description', label: 'Description' },
+      ],
+    },
+    {
+      kind: 'group',
+      legend: 'Core attributes',
+      fields: [
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'chips',
+              name: 'primaryAbilities',
+              label: 'Primary abilities',
+              options: abilityOptions,
+              max: 2,
+              required: true,
+            },
+            {
+              type: 'select',
+              name: 'hitDie',
+              label: 'Hit die',
+              options: hitDieOptions,
+              required: true,
+            },
+          ],
+        },
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'chips',
+              name: 'asiLevels',
+              label: 'ASI levels',
+              options: levelOptions,
+              hint: 'Levels that grant an ability score improvement',
+            },
+            {
+              type: 'chips',
+              name: 'subclassLevels',
+              label: 'Subclass levels',
+              options: levelOptions,
+              required: true,
+              hint: 'Levels that grant a subclass feature',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'group',
+      legend: 'Spellcasting',
+      fields: [
+        {
+          type: 'switch',
+          name: 'hasSpellcasting',
+          label: 'Has spellcasting',
+        },
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'select',
+              name: 'spellcasting.progression',
+              label: 'Progression',
+              options: spellcastingProgressionOptions,
+              visibility: visibleWhenSpellcasting(),
+              required: true,
+            },
+            {
+              type: 'select',
+              name: 'spellcasting.ability',
+              label: 'Spellcasting ability',
+              options: abilityOptions,
+              visibility: visibleWhenSpellcasting(),
+              required: true,
+            },
+            {
+              type: 'select',
+              name: 'spellcasting.preparation',
+              label: 'Preparation',
+              options: spellPreparationOptions,
+              visibility: visibleWhenSpellcasting(),
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
+    progressionTableFields('cantrips', 'Cantrips known', 'Cantrips known', 'known'),
+    progressionTableFields('spellsPrepared', 'Spells prepared', 'Spells prepared', 'prepared'),
+    {
+      kind: 'group',
+      legend: 'Proficiencies',
+      fields: [
+        {
+          type: 'chips',
+          name: 'proficiencies.savingThrows',
+          label: 'Saving throws',
+          options: abilityOptions,
+          max: 2,
+          required: true,
+        },
+        {
+          type: 'chips',
+          name: 'proficiencies.armor',
+          label: 'Armor',
+          options: armorCategoryOptions,
+        },
+        {
+          type: 'chips',
+          name: 'proficiencies.weapons.categories',
+          label: 'Weapon categories',
+          options: weaponCategoryOptions,
+        },
+        {
+          type: 'text',
+          name: 'proficiencies.weapons.items',
+          label: 'Specific weapons',
+          hint: 'Comma-separated weapon IDs',
+        },
+        {
+          type: 'text',
+          name: 'proficiencies.tools',
+          label: 'Tools',
+          hint: 'Comma-separated tool names',
+        },
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'number',
+              name: 'proficiencies.skills.choose',
+              label: 'Skill choices',
+              min: 0,
+              required: true,
+            },
+            {
+              type: 'chips',
+              name: 'proficiencies.skills.from',
+              label: 'Skill options',
+              options: skillOptions,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'array',
+      name: 'features',
+      legend: 'Features',
+      addLabel: 'Add feature',
+      itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
+      fields: featureItemFields(),
+    },
+    {
+      kind: 'array',
+      name: 'resources',
+      legend: 'Resources',
+      addLabel: 'Add resource',
+      itemTitle: (values, index) => (values['name'] as string) || `Resource ${index + 1}`,
+      fields: resourceItemFields(),
+    },
+  ],
+
+  toFormValues: (entity) => ({
+    name: entity.name,
+    slug: entity.slug,
+    description: entity.description,
+    primaryAbilities: entity.primaryAbilities,
+    hitDie: entity.hitDie,
+    asiLevels: entity.asiLevels,
+    subclassLevels: entity.subclassLevels,
+    hasSpellcasting: entity.spellcasting !== undefined,
+    spellcasting: spellcastingToFormValues(entity.spellcasting),
+    proficiencies: proficienciesToFormValues(entity.proficiencies),
+    features: entity.features.map(featureToFormRow),
+    resources: entity.resources?.map(resourceToFormRow) ?? [],
+  }),
+
+  toInput: (values) => ({
+    name: values.name,
+    slug: values.slug,
+    description: values.description || undefined,
+    primaryAbilities: values.primaryAbilities,
+    hitDie: values.hitDie,
+    asiLevels: values.asiLevels,
+    subclassLevels: values.subclassLevels,
+    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+    proficiencies: proficienciesFromFormValues(values.proficiencies),
+    features: values.features.map(featureFromFormRow),
+    resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
+  }),
+
+  useListQuery: useClasses,
+  queryKey: classesQueryKey,
+}
+
+contentFormRegistry['classes'] = classFormDef
+
+export { classFormDef }
+export type { ClassFormValues }

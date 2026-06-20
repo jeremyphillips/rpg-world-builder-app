@@ -59,3 +59,19 @@ contentRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listSpecies,
 )
+
+// Authoring — owner/co-owner only. Body validation happens in the write service
+// per content type so each route can use its contract DTO schema.
+contentRouter.post(
+  '/:contentType',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.createContentItem,
+)
+
+contentRouter.patch(
+  '/:contentType/:entityId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.updateContentItem,
+)

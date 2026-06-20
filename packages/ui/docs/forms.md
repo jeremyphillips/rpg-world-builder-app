@@ -307,7 +307,106 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
+## Collapsible sections
+
+By default, top-level `kind: 'group'` and `kind: 'array'` sections render inside
+accordions that **start open** (`collapsibleSections` defaults to `true` on
+`<Form>` and `<TabbedForm>`). Pass `collapsibleSections={false}` for a flat
+fieldset layout.
+
+Per-section opt-out: set `collapsible: false` on a `GroupConfig` or
+`ArrayConfig`. Section legends use the shared `fieldGroupLegendVariants` styling
+(`font-display`, `text-lg`, `mb-4`).
+
+Fields stay mounted while a section is collapsed, so react-hook-form values are
+preserved (`shouldUnregister` only applies to conditional visibility, not
+accordion state).
+
+## Array fields
+
+Use `ArrayConfig` (`kind: 'array'`) in the `fields` array to create a
+repeatable section backed by RHF's `useFieldArray`. Each item renders as an
+inlined `<fieldset>` with the item's fields plus Add / Remove / Move (↑↓)
+controls.
+
+```ts
+import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+
+const fields: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits', // top-level RHF name
+    legend: 'Traits', // rendered as the outer <legend>
+    fields: [
+      // item fields — names are relative to each item
+      { type: 'text', name: 'name', label: 'Trait name', required: true },
+      { type: 'textarea', name: 'description', label: 'Description' },
+    ],
+    addLabel: 'Add trait', // label on the Add button
+    min: 0, // floor — Remove is disabled below this count
+    max: 10, // ceiling — Add button disappears at this count
+    itemTitle: (_v, i) => `Trait ${i + 1}`, // optional per-item heading
+  },
+]
+```
+
+### Zod schema
+
+The Zod schema should wrap item fields in `z.array(z.object({...}))`:
+
+```ts
+const schema = z.object({
+  traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
+})
+```
+
+### `buildItemDefaultValues`
+
+When `useFieldArray.append()` is called, the renderer uses
+`buildItemDefaultValues(config.fields)` to seed a blank item. The function
+is also exported so callers can compose their own defaults:
+
+```ts
+import { buildItemDefaultValues } from '@rpg/ui/form'
+const blank = buildItemDefaultValues(traitFields) // { name: '', description: '' }
+```
+
+### Conditional fields inside array items
+
+Item-level `visibility` predicates work the same way as top-level ones but
+are **item-scoped**: `dependsOn` names are relative to the item, and the
+renderer resolves them to the full dotted path (e.g. `traits.0.type`) before
+calling `useWatch`. The `visibleWhen` predicate therefore uses simple relative
+names:
+
+```ts
+{
+  type: 'number',
+  name: 'range',
+  label: 'Range (ft)',
+  visibility: {
+    dependsOn: ['type'],                    // relative — means `traits.N.type`
+    visibleWhen: (v) => v.type === 'sense', // v uses the relative key
+  },
+}
+```
+
+> **Caveat**: the resolver's `.omit` hidden-field strip works on top-level Zod
+> object keys only. Hidden item fields are instead cleared by RHF's
+> `shouldUnregister: true` — the value is removed from the RHF store when the
+> control unmounts, so the submitted payload naturally omits it. Mark
+> conditionally-visible item fields as `z.optional()` in the item schema.
+
+### Nesting
+
+`ArrayConfig.fields` can itself contain a nested `ArrayConfig`, producing
+arrays-of-arrays. Name scoping cascades correctly at each level
+(`root.0.subarray.1.name`). Deeply-nested arrays (three or more levels) should
+be avoided for UX reasons.
+
 ## Conditional fields
+
+A field becomes conditional via a `visibility` object:
 
 A field becomes conditional via a `visibility` object:
 

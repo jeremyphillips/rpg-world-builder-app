@@ -14,6 +14,7 @@ import { cn } from '../lib/utils'
 import { Text } from '../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FormItems } from './form-items.client'
+import { FormSectionContext } from './form-section-context.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
@@ -54,6 +55,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
+  /** When true (default), top-level groups/arrays render in collapsible accordions. */
+  collapsibleSections?: boolean
 }
 
 /**
@@ -72,6 +75,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   fileFieldProps,
   className,
   mode,
+  collapsibleSections = true,
 }: TabbedFormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -93,6 +97,11 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     defaultValues: resolvedDefaults,
     mode,
   })
+
+  const sectionContext = React.useMemo(
+    () => ({ collapsibleSections, depth: 0 }),
+    [collapsibleSections],
+  )
 
   return (
     <FormProvider {...form}>
@@ -117,7 +126,9 @@ export function TabbedForm<TFieldValues extends FieldValues>({
               // by Radix via the HTML `hidden` attribute.
               <TabsContent key={tab.id} value={tab.id} forceMount>
                 <div className="space-y-4">
-                  <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+                  <FormSectionContext.Provider value={sectionContext}>
+                    <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+                  </FormSectionContext.Provider>
                 </div>
               </TabsContent>
             ))}

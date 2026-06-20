@@ -12,16 +12,28 @@ import {
 import {
   ClassesOverview,
   ClassDetail,
+  ClassCreate,
+  ClassEdit,
   EquipmentOverview,
   EquipmentDetail,
+  EquipmentCreate,
+  EquipmentEdit,
   SkillProficienciesOverview,
   SkillProficiencyDetail,
+  SkillProficiencyCreate,
+  SkillProficiencyEdit,
   WeaponsOverview,
   WeaponDetail,
+  WeaponCreate,
+  WeaponEdit,
   ArmorOverview,
   ArmorDetail,
+  ArmorCreate,
+  ArmorEdit,
   SpeciesOverview,
   SpeciesDetail,
+  SpeciesCreate,
+  SpeciesEdit,
 } from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
@@ -115,13 +127,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <ClassesOverview /> },
                     {
+                      path: 'new',
+                      element: <ClassCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':classId',
-                      element: <ClassDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <ClassDetail /> },
+                        {
+                          path: 'edit',
+                          element: <ClassEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -137,13 +162,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <SpeciesOverview /> },
                     {
+                      path: 'new',
+                      element: <SpeciesCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':speciesId',
-                      element: <SpeciesDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <SpeciesDetail /> },
+                        {
+                          path: 'edit',
+                          element: <SpeciesEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -159,13 +197,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <EquipmentOverview /> },
                     {
+                      path: 'new',
+                      element: <EquipmentCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':equipmentId',
-                      element: <EquipmentDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <EquipmentDetail /> },
+                        {
+                          path: 'edit',
+                          element: <EquipmentEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -181,13 +232,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <SkillProficienciesOverview /> },
                     {
+                      path: 'new',
+                      element: <SkillProficiencyCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':skillId',
-                      element: <SkillProficiencyDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <SkillProficiencyDetail /> },
+                        {
+                          path: 'edit',
+                          element: <SkillProficiencyEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -203,13 +267,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <WeaponsOverview /> },
                     {
+                      path: 'new',
+                      element: <WeaponCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':weaponId',
-                      element: <WeaponDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <WeaponDetail /> },
+                        {
+                          path: 'edit',
+                          element: <WeaponEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -225,13 +302,26 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <ArmorOverview /> },
                     {
+                      path: 'new',
+                      element: <ArmorCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':armorId',
-                      element: <ArmorDetail />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <ArmorDetail /> },
+                        {
+                          path: 'edit',
+                          element: <ArmorEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },

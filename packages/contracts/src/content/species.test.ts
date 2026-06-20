@@ -28,7 +28,7 @@ const ELF_BODY = {
         '<p>You have Advantage on saving throws to avoid or end the Charmed condition.</p>',
     },
   ],
-  choiceGroups: [
+  heritageChoices: [
     {
       id: 'elven-lineage',
       name: 'Elven Lineage',
@@ -103,7 +103,7 @@ describe('speciesSchema', () => {
       ...ELF_SYSTEM,
       description: undefined,
       imageKey: undefined,
-      choiceGroups: undefined,
+      heritageChoices: undefined,
     }
     expect(speciesSchema.safeParse(minimal).success).toBe(true)
   })

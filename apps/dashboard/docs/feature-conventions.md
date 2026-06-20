@@ -87,7 +87,7 @@ file with a fixture:
 import { ELF, ORC } from '../fixtures'
 import { SpeciesDetailContent } from './species-detail'
 
-export const NoChoiceGroups: Story = {
+export const NoHeritageChoices: Story = {
   render: () => <SpeciesDetailContent species={ORC} />,
 }
 ```

@@ -33,7 +33,7 @@ export const Default: Story = {
   },
 }
 
-/** Default for catalog rich-text (species traits, choice group descriptions). */
+/** Default for catalog rich-text (species traits, heritage choice descriptions). */
 export const SmallMuted: Story = {
   args: {
     size: 'sm',

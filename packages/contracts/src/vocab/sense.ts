@@ -47,6 +47,13 @@ export function getSenseLabel(type: string): string {
   return getSenseEntry(type)?.label ?? type
 }
 
+/**
+ * Preset sense ranges (in feet) shown as a select in authoring UIs. The
+ * underlying schema stays numeric — these presets are a UI affordance only.
+ */
+export const SENSE_RANGES = [10, 30, 60, 90, 120] as const
+export type StandardSenseRange = (typeof SENSE_RANGES)[number]
+
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */
 export const senseSchema = z.object({
   type: senseTypeSchema,

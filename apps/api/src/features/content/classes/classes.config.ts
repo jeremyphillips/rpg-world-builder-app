@@ -1,6 +1,13 @@
 import type { CharacterClass } from '@rpg/contracts'
+import {
+  classBodySchema,
+  classSchema,
+  createClassInputSchema,
+  updateClassInputSchema,
+} from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
+import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { ClassPatchModel } from './class-patch.model'
 import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
@@ -16,7 +23,7 @@ interface ClassPatchRecord {
   patch: Record<string, unknown>
 }
 
-function toHomebrewClass(doc: HomebrewClassRecord): CharacterClass {
+function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass {
   return {
     id: String(doc._id),
     slug: doc.slug,
@@ -38,6 +45,11 @@ function toHomebrewClass(doc: HomebrewClassRecord): CharacterClass {
   } as CharacterClass
 }
 
+function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
+  const { slug: _slug, ...body } = input
+  return body
+}
+
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
   loadSystem: loadSeedClasses,
@@ -52,4 +64,18 @@ export const classContentConfig: ContentTypeConfig<CharacterClass> = {
     >()
     return docs.map(toHomebrewClass)
   },
+}
+
+export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
+  typeName: 'classes',
+  readConfig: classContentConfig,
+  responseKey: 'classes',
+  createInputSchema: createClassInputSchema,
+  updateInputSchema: updateClassInputSchema,
+  storedSchema: classSchema,
+  bodySchema: classBodySchema,
+  homebrewModel: HomebrewClassModel,
+  patchModel: ClassPatchModel,
+  toHomebrewEntity: toHomebrewClass,
+  bodyFromCreateInput,
 }

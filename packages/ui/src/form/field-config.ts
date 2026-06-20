@@ -174,6 +174,8 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
    */
   multiple?: boolean
+  /** Maximum selections when `multiple` is true. */
+  max?: number
   defaultValue?: string | string[]
 }
 
@@ -205,30 +207,77 @@ export interface GroupConfig {
   description?: string
   fields: Array<FieldConfig | RowConfig>
   className?: string
+  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  collapsible?: boolean
+}
+
+/**
+ * A repeatable field array backed by `useFieldArray`. Item `fields` use
+ * **relative** names (`name`, `description`) — the renderer prefixes them with
+ * the array name and item index at render time (e.g. `traits.0.name`).
+ */
+export interface ArrayConfig {
+  kind: 'array'
+  /** Top-level field name that holds the array value (e.g. `'traits'`). */
+  name: string
+  /** Heading rendered as the `<fieldset>` legend for the whole array. */
+  legend: string
+  /** Field configs for each item; names are relative to the item, not the root. */
+  fields: FormItem[]
+  /** Label for the "Add" button. Defaults to `"Add item"`. */
+  addLabel?: string
+  /** Minimum item count; removes the "Remove" button while at the floor. */
+  min?: number
+  /** Maximum item count; hides the "Add" button once reached. */
+  max?: number
+  /**
+   * Optional heading per item row. Receives the item's current values (keyed
+   * by relative field names) and the 0-based index.
+   */
+  itemTitle?: (values: Record<string, unknown>, index: number) => string
+  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  collapsible?: boolean
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */
-export type FormItem = FieldConfig | RowConfig | GroupConfig
+export type FormItem = FieldConfig | RowConfig | GroupConfig | ArrayConfig
 
-/** Narrows a `FormItem` to a container (row/group) vs. a leaf field. */
-export function isContainer(item: FormItem): item is RowConfig | GroupConfig {
+/** Narrows a `FormItem` to a container (row/group/array) vs. a leaf field. */
+export function isContainer(item: FormItem): item is RowConfig | GroupConfig | ArrayConfig {
   return 'kind' in item
 }
 
 /**
  * Flattens groups/rows into the ordered list of leaf fields, so callers can
  * iterate fields without re-walking the container tree.
+ *
+ * `ArrayConfig` items are **skipped** — their item fields are managed at
+ * runtime by `useFieldArray` and have dynamic dotted paths (`traits.0.name`).
  */
 export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[] {
   const fields: FieldConfig[] = []
   for (const item of items) {
-    if (isContainer(item)) {
-      fields.push(...flattenFields(item.fields))
-    } else {
+    if (!('kind' in item)) {
       fields.push(item)
+    } else if (item.kind === 'array') {
+      // Intentionally skipped — see JSDoc above.
+    } else {
+      fields.push(...flattenFields(item.fields as Array<FormItem | RowConfig>))
     }
   }
   return fields
+}
+
+/**
+ * Builds the default values for one array item from its field configs.
+ * Pass the result to `useFieldArray`'s `append()` when adding a new row.
+ */
+export function buildItemDefaultValues(itemFields: FormItem[]): Record<string, unknown> {
+  const values: Record<string, unknown> = {}
+  for (const field of flattenFields(itemFields)) {
+    values[field.name] = fieldDefaultValue(field)
+  }
+  return values
 }
 
 /**
@@ -263,8 +312,18 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
 /** Builds the `defaultValues` object RHF needs from a form's items. */
 export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
   const values: Record<string, unknown> = {}
-  for (const field of flattenFields(items)) {
-    values[field.name] = fieldDefaultValue(field)
+  for (const item of items) {
+    if (!('kind' in item)) {
+      values[item.name] = fieldDefaultValue(item)
+    } else if (item.kind === 'row') {
+      for (const field of item.fields) {
+        values[field.name] = fieldDefaultValue(field)
+      }
+    } else if (item.kind === 'group') {
+      Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
+    } else if (item.kind === 'array') {
+      values[item.name] = []
+    }
   }
   return values
 }

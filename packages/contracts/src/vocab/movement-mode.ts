@@ -88,6 +88,13 @@ export const speedSchema = z.object({
 export type Speed = z.infer<typeof speedSchema>
 
 /**
+ * Preset walk-speed values (in feet) shown as a select in authoring UIs. The
+ * underlying schema stays numeric — these presets are a UI affordance only.
+ */
+export const STANDARD_SPEEDS = [20, 25, 30, 35, 40] as const
+export type StandardSpeed = (typeof STANDARD_SPEEDS)[number]
+
+/**
  * Human-readable speed string (e.g. "30 ft." or "30 ft., Fly 60 ft.").
  *
  * @example formatSpeed({ walk: 30 }) // → "30 ft."

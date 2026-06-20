@@ -10,6 +10,55 @@ import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 
+interface ChipOptionButtonProps {
+  id: string
+  option: FieldOption
+  role: 'checkbox' | 'radio'
+  isActive: boolean
+  isDisabled: boolean
+  onToggle: (value: string) => void
+}
+
+function ChipOptionButton({
+  id,
+  option,
+  role,
+  isActive,
+  isDisabled,
+  onToggle,
+}: ChipOptionButtonProps) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role={role}
+      aria-checked={isActive}
+      aria-disabled={isDisabled || undefined}
+      disabled={isDisabled}
+      onClick={() => onToggle(option.value)}
+      className={cn(
+        'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'disabled:pointer-events-none disabled:opacity-50',
+        isActive
+          ? 'border-foreground bg-foreground text-background'
+          : 'border-border bg-transparent text-foreground hover:bg-muted',
+      )}
+    >
+      {option.label}
+    </button>
+  )
+}
+
+function nextMultiSelection(
+  selected: string[],
+  optionValue: string,
+  max: number | undefined,
+): string[] {
+  if (selected.includes(optionValue)) return selected.filter((v) => v !== optionValue)
+  if (max !== undefined && selected.length >= max) return selected
+  return [...selected, optionValue]
+}
+
 export interface ChipsFieldProps {
   id: string
   label: string
@@ -19,7 +68,9 @@ export interface ChipsFieldProps {
    * `false` — value is `string`; selecting one deselects the others.
    */
   multiple?: boolean
-  value?: string | string[]
+  /** Maximum selections when `multiple` is true. */
+  max?: number
+  value?: string | number | Array<string | number>
   onChange?: (value: string | string[]) => void
   onBlur?: () => void
   error?: string
@@ -39,6 +90,7 @@ export function ChipsField({
   label,
   options,
   multiple = true,
+  max,
   value,
   onChange,
   onBlur,
@@ -56,23 +108,22 @@ export function ChipsField({
 
   const selected: string[] = React.useMemo(() => {
     if (multiple) {
-      return Array.isArray(value) ? value : []
+      return Array.isArray(value) ? value.map(String) : []
     }
-    return typeof value === 'string' && value !== '' ? [value] : []
+    return value != null && value !== '' ? [String(value)] : []
   }, [multiple, value])
 
   function toggle(optionValue: string) {
     if (disabled) return
     if (multiple) {
-      const next = selected.includes(optionValue)
-        ? selected.filter((v) => v !== optionValue)
-        : [...selected, optionValue]
-      onChange?.(next)
-    } else {
-      const next = selected[0] === optionValue ? '' : optionValue
-      onChange?.(next)
+      onChange?.(nextMultiSelection(selected, optionValue, max))
+      return
     }
+    onChange?.(selected[0] === optionValue ? '' : optionValue)
   }
+
+  const selectionRole = multiple ? 'checkbox' : 'radio'
+  const atMax = max !== undefined && selected.length >= max
 
   return (
     <fieldset
@@ -96,27 +147,17 @@ export function ChipsField({
       <div className="flex flex-wrap gap-2" role="group" aria-labelledby={legendId}>
         {options.map((option) => {
           const isActive = selected.includes(option.value)
-          const optionId = `${id}-${option.value}`
+          const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
           return (
-            <button
+            <ChipOptionButton
               key={option.value}
-              id={optionId}
-              type="button"
-              role={multiple ? 'checkbox' : 'radio'}
-              aria-checked={isActive}
-              aria-disabled={option.disabled || disabled || undefined}
-              disabled={option.disabled || disabled}
-              onClick={() => toggle(option.value)}
-              className={cn(
-                'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                'disabled:pointer-events-none disabled:opacity-50',
-                isActive
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border bg-transparent text-foreground hover:bg-muted',
-              )}
-            >
-              {option.label}
-            </button>
+              id={`${id}-${option.value}`}
+              option={option}
+              role={selectionRole}
+              isActive={isActive}
+              isDisabled={isDisabled}
+              onToggle={toggle}
+            />
           )
         })}
       </div>
