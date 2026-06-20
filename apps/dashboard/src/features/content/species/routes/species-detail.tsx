@@ -6,7 +6,7 @@ import {
   getCreatureSizeLabel,
   getSenseLabel,
 } from '@rpg/contracts'
-import type { Species, SpeciesTrait, SpeciesChoiceGroup } from '@rpg/contracts'
+import type { Species, SpeciesTrait, SpeciesHeritageChoice } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSpecies } from '../hooks/use-species'
@@ -56,22 +56,22 @@ function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
   )
 }
 
-function ChoiceGroupSection({ group }: { group: SpeciesChoiceGroup }) {
+function HeritageChoiceSection({ choice }: { choice: SpeciesHeritageChoice }) {
   return (
-    <section aria-labelledby={`choice-group-${group.id}-heading`}>
+    <section aria-labelledby={`heritage-choice-${choice.id}-heading`}>
       <Heading
         variant="section"
         as="h3"
-        id={`choice-group-${group.id}-heading`}
+        id={`heritage-choice-${choice.id}-heading`}
         className="mb-2 capitalize"
       >
-        {group.name}
+        {choice.name}
       </Heading>
-      {group.description && (
-        <RichTextContent html={group.description} size="sm" tone="muted" className="mb-4" />
+      {choice.description && (
+        <RichTextContent html={choice.description} size="sm" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
-        {group.options.map((option) => (
+        {choice.options.map((option) => (
           <li key={option.id} className="space-y-1">
             <Heading variant="label" as="p">
               {option.name}
@@ -86,12 +86,12 @@ function ChoiceGroupSection({ group }: { group: SpeciesChoiceGroup }) {
   )
 }
 
-function ChoiceGroupsList({ groups }: { groups: SpeciesChoiceGroup[] }) {
-  if (groups.length === 0) return null
+function HeritageChoicesList({ choices }: { choices: SpeciesHeritageChoice[] }) {
+  if (choices.length === 0) return null
   return (
     <div className="space-y-8">
-      {groups.map((group) => (
-        <ChoiceGroupSection key={group.id} group={group} />
+      {choices.map((choice) => (
+        <HeritageChoiceSection key={choice.id} choice={choice} />
       ))}
     </div>
   )
@@ -132,7 +132,7 @@ export function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
         )}
       </div>
       <TraitsList traits={species.traits} />
-      <ChoiceGroupsList groups={species.choiceGroups ?? []} />
+      <HeritageChoicesList choices={species.heritageChoices ?? []} />
     </ContentDetailLayout>
   )
 }

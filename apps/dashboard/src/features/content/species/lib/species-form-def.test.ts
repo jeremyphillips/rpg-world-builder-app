@@ -71,14 +71,14 @@ describe('speciesFormDef round-trips', () => {
     })
   }
 
-  it('dragonborn: choiceGroup draconic ancestry is preserved', () => {
+  it('dragonborn: draconic ancestry heritage choice is preserved', () => {
     const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
-    const group = input.choiceGroups?.[0]
-    expect(group?.id).toBe('draconic-ancestry')
-    expect(group?.kind).toBe('ancestry')
-    expect(group?.options.length).toBeGreaterThan(0)
+    const choice = input.heritageChoices?.[0]
+    expect(choice?.id).toBe('draconic-ancestry')
+    expect(choice?.kind).toBe('ancestry')
+    expect(choice?.options.length).toBeGreaterThan(0)
   })
 
   it('dragonborn: ancestry option resistances are preserved', () => {
@@ -86,7 +86,7 @@ describe('speciesFormDef round-trips', () => {
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     // The first ancestry option (Black/Acid) has both damageType and resistances
-    const firstOption = input.choiceGroups?.[0]?.options[0]
+    const firstOption = input.heritageChoices?.[0]?.options[0]
     expect(firstOption?.grants?.resistances).toEqual(['acid'])
     expect(firstOption?.grants?.damageType).toEqual(['acid'])
   })

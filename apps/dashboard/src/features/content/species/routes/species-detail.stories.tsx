@@ -12,10 +12,10 @@ const meta = {
 export default meta
 type Story = StoryObj
 
-export const NoChoiceGroups: Story = {
+export const NoHeritageChoices: Story = {
   render: () => <SpeciesDetailContent species={ORC} />,
 }
 
-export const WithLineageChoiceGroup: Story = {
+export const WithLineageHeritageChoice: Story = {
   render: () => <SpeciesDetailContent species={ELF} />,
 }

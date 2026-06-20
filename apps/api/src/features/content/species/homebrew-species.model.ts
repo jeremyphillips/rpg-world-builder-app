@@ -16,7 +16,7 @@ const homebrewSpeciesSchema = new Schema(
     sizes: [{ type: String, enum: [...CREATURE_SIZES] }],
     speed: { type: Schema.Types.Mixed, required: true },
     traits: { type: [Schema.Types.Mixed], default: [] },
-    choiceGroups: { type: [Schema.Types.Mixed] },
+    heritageChoices: { type: [Schema.Types.Mixed] },
   },
   { timestamps: true },
 )

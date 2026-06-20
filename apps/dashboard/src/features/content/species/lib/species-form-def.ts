@@ -14,7 +14,7 @@ import {
   type ContentTrait,
   type CreateSpeciesInput,
   type Species,
-  type SpeciesChoiceGroup,
+  type SpeciesHeritageChoice,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
@@ -68,14 +68,14 @@ const traitRowFormSchema = z.object({
 })
 type TraitRowForm = z.infer<typeof traitRowFormSchema>
 
-const choiceGroupRowFormSchema = z.object({
+const heritageChoiceRowFormSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   kind: speciesChoiceKindSchema,
   description: z.string().optional(),
   options: z.array(traitRowFormSchema).min(1),
 })
-type ChoiceGroupRowForm = z.infer<typeof choiceGroupRowFormSchema>
+type HeritageChoiceRowForm = z.infer<typeof heritageChoiceRowFormSchema>
 
 const speciesFormSchema = z.object({
   name: z.string().min(1),
@@ -87,7 +87,7 @@ const speciesFormSchema = z.object({
     walk: z.coerce.number().int().min(0),
   }),
   traits: z.array(traitRowFormSchema),
-  choiceGroups: z.array(choiceGroupRowFormSchema).optional(),
+  heritageChoices: z.array(heritageChoiceRowFormSchema).optional(),
 })
 type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
@@ -115,7 +115,7 @@ function traitItemFields(): FormItem[] {
   ]
 }
 
-function choiceGroupItemFields(): FormItem[] {
+function heritageChoiceItemFields(): FormItem[] {
   return [
     {
       kind: 'row',
@@ -166,17 +166,17 @@ function traitFromFormRow(row: TraitRowForm): ContentTrait {
   }
 }
 
-function choiceGroupToFormRow(group: SpeciesChoiceGroup): ChoiceGroupRowForm {
+function heritageChoiceToFormRow(choice: SpeciesHeritageChoice): HeritageChoiceRowForm {
   return {
-    id: group.id,
-    name: group.name,
-    kind: group.kind,
-    description: group.description,
-    options: group.options.map(traitToFormRow),
+    id: choice.id,
+    name: choice.name,
+    kind: choice.kind,
+    description: choice.description,
+    options: choice.options.map(traitToFormRow),
   }
 }
 
-function choiceGroupFromFormRow(row: ChoiceGroupRowForm): SpeciesChoiceGroup {
+function heritageChoiceFromFormRow(row: HeritageChoiceRowForm): SpeciesHeritageChoice {
   return {
     id: row.id,
     name: row.name,
@@ -270,11 +270,11 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     },
     {
       kind: 'array',
-      name: 'choiceGroups',
-      legend: 'Choice groups',
-      addLabel: 'Add choice group',
-      itemTitle: (values, index) => (values['name'] as string) || `Choice group ${index + 1}`,
-      fields: choiceGroupItemFields(),
+      name: 'heritageChoices',
+      legend: 'Heritage choices',
+      addLabel: 'Add heritage choice',
+      itemTitle: (values, index) => (values['name'] as string) || `Heritage choice ${index + 1}`,
+      fields: heritageChoiceItemFields(),
     },
   ],
 
@@ -286,7 +286,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     sizes: entity.sizes,
     speed: { walk: entity.speed.walk },
     traits: entity.traits.map(traitToFormRow),
-    choiceGroups: entity.choiceGroups?.map(choiceGroupToFormRow) ?? [],
+    heritageChoices: entity.heritageChoices?.map(heritageChoiceToFormRow) ?? [],
   }),
 
   toInput: (values) => ({
@@ -297,8 +297,8 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     sizes: values.sizes,
     speed: { walk: values.speed.walk },
     traits: values.traits.map(traitFromFormRow),
-    choiceGroups: values.choiceGroups?.length
-      ? values.choiceGroups.map(choiceGroupFromFormRow)
+    heritageChoices: values.heritageChoices?.length
+      ? values.heritageChoices.map(heritageChoiceFromFormRow)
       : undefined,
   }),
 
