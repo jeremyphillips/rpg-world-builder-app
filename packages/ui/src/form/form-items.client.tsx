@@ -199,16 +199,25 @@ function NestedFormItems({ items, idPrefix, namePrefix, depth }: NestedFormItems
   )
 }
 
+function prefixFormItemKey(namePrefix: string | undefined, key: string): string {
+  return namePrefix ? `${namePrefix}.${key}` : key
+}
+
 function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: string): string {
   if ('name' in item && typeof item.name === 'string') {
-    return namePrefix ? `${namePrefix}.${item.name}` : item.name
+    return prefixFormItemKey(namePrefix, item.name)
   }
-  if ('kind' in item) {
-    if (item.kind === 'array') return namePrefix ? `${namePrefix}.${item.name}` : item.name
-    if (item.kind === 'group') return namePrefix ? `${namePrefix}.group-${index}` : `group-${index}`
-    if (item.kind === 'row') return namePrefix ? `${namePrefix}.row-${index}` : `row-${index}`
+
+  if (!('kind' in item)) return String(index)
+
+  switch (item.kind) {
+    case 'group':
+      return prefixFormItemKey(namePrefix, `group-${index}`)
+    case 'row':
+      return prefixFormItemKey(namePrefix, `row-${index}`)
+    default:
+      return String(index)
   }
-  return String(index)
 }
 
 interface FormItemNodeProps {
