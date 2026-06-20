@@ -19,7 +19,7 @@ export interface ContentCreateShellProps {
 /**
  * Generic shell for creating a new content item. Looks up the `ContentFormDef`
  * for `contentType` in the registry, renders the schema-driven `<Form>`, and
- * calls the stubbed content API on submit.
+ * calls the content API on submit.
  *
  * If no form is registered for the type yet, it renders a "coming soon" notice
  * so the route is still navigable.

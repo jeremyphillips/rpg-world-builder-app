@@ -7,7 +7,7 @@ import { createContent, updateContent } from './content-client'
  * given content type. Call it once at module level to produce stable hook
  * references — never call it inside a component.
  *
- * Both hooks hit the stubbed endpoints (`POST`/`PATCH
+ * Both hooks hit the content write endpoints (`POST`/`PATCH
  * `/api/campaigns/:id/content/:routeKey`) and invalidate the list query on
  * success.
  *

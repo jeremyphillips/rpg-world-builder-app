@@ -23,6 +23,10 @@ import { contentFormRegistry, type ContentFormDef } from './content-form-registr
 // Populate the registry — each import registers its def as a side effect.
 import '../species/lib/species-form-def'
 import '../classes/lib/class-form-def'
+import '../armor/lib/armor-form-def'
+import '../weapons/lib/weapon-form-def'
+import '../skillProficiencies/lib/skill-proficiency-form-def'
+import '../equipment/lib/equipment-form-def'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 

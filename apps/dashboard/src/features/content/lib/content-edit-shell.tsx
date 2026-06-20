@@ -100,7 +100,7 @@ function ContentEditForm({
 /**
  * Generic shell for editing an existing content item. Resolves the entity from
  * the cached list query via `ContentDetailResolver`-style logic, seeds the
- * `<Form>` with `toFormValues(entity)`, and submits via the stubbed update API.
+ * `<Form>` with `toFormValues(entity)`, and submits via the update API.
  *
  * Rendered entirely within the normal AppShell so breadcrumbs etc. work. The
  * entity is read from the list cache (same as the detail view), avoiding an

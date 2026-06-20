@@ -4,10 +4,10 @@ import { patchJson, postJson } from '@/lib/api-client'
 
 /**
  * POST to `/api/campaigns/:campaignId/content/:routeKey`.
+ * PATCH to `/api/campaigns/:campaignId/content/:routeKey/:entityId`.
  *
- * The backend endpoint is **stubbed/deferred** — it returns a 501 for now.
- * The client sends the correct shape so wiring real persistence in Phase 5
- * only requires the backend, not the frontend.
+ * Creates homebrew records or upserts overlay patches on system content.
+ * Requires owner/co-owner campaign role.
  */
 export async function createContent<T>(
   campaignId: string,
@@ -27,7 +27,7 @@ export async function createContent<T>(
 /**
  * PATCH to `/api/campaigns/:campaignId/content/:routeKey/:entityId`.
  *
- * Also **stubbed/deferred** — see `createContent` for the same caveat.
+ * Updates homebrew records or upserts overlay patches on system content.
  */
 export async function updateContent<T>(
   campaignId: string,

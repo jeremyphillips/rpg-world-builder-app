@@ -10,6 +10,55 @@ import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 
+interface ChipOptionButtonProps {
+  id: string
+  option: FieldOption
+  role: 'checkbox' | 'radio'
+  isActive: boolean
+  isDisabled: boolean
+  onToggle: (value: string) => void
+}
+
+function ChipOptionButton({
+  id,
+  option,
+  role,
+  isActive,
+  isDisabled,
+  onToggle,
+}: ChipOptionButtonProps) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role={role}
+      aria-checked={isActive}
+      aria-disabled={isDisabled || undefined}
+      disabled={isDisabled}
+      onClick={() => onToggle(option.value)}
+      className={cn(
+        'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'disabled:pointer-events-none disabled:opacity-50',
+        isActive
+          ? 'border-foreground bg-foreground text-background'
+          : 'border-border bg-transparent text-foreground hover:bg-muted',
+      )}
+    >
+      {option.label}
+    </button>
+  )
+}
+
+function nextMultiSelection(
+  selected: string[],
+  optionValue: string,
+  max: number | undefined,
+): string[] {
+  if (selected.includes(optionValue)) return selected.filter((v) => v !== optionValue)
+  if (max !== undefined && selected.length >= max) return selected
+  return [...selected, optionValue]
+}
+
 export interface ChipsFieldProps {
   id: string
   label: string
@@ -67,17 +116,14 @@ export function ChipsField({
   function toggle(optionValue: string) {
     if (disabled) return
     if (multiple) {
-      const next = selected.includes(optionValue)
-        ? selected.filter((v) => v !== optionValue)
-        : max !== undefined && selected.length >= max
-          ? selected
-          : [...selected, optionValue]
-      onChange?.(next)
-    } else {
-      const next = selected[0] === optionValue ? '' : optionValue
-      onChange?.(next)
+      onChange?.(nextMultiSelection(selected, optionValue, max))
+      return
     }
+    onChange?.(selected[0] === optionValue ? '' : optionValue)
   }
+
+  const selectionRole = multiple ? 'checkbox' : 'radio'
+  const atMax = max !== undefined && selected.length >= max
 
   return (
     <fieldset
@@ -101,28 +147,17 @@ export function ChipsField({
       <div className="flex flex-wrap gap-2" role="group" aria-labelledby={legendId}>
         {options.map((option) => {
           const isActive = selected.includes(option.value)
-          const atMax = max !== undefined && selected.length >= max
-          const optionId = `${id}-${option.value}`
+          const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
           return (
-            <button
+            <ChipOptionButton
               key={option.value}
-              id={optionId}
-              type="button"
-              role={multiple ? 'checkbox' : 'radio'}
-              aria-checked={isActive}
-              aria-disabled={option.disabled || disabled || (atMax && !isActive) || undefined}
-              disabled={option.disabled || disabled || (atMax && !isActive)}
-              onClick={() => toggle(option.value)}
-              className={cn(
-                'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                'disabled:pointer-events-none disabled:opacity-50',
-                isActive
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border bg-transparent text-foreground hover:bg-muted',
-              )}
-            >
-              {option.label}
-            </button>
+              id={`${id}-${option.value}`}
+              option={option}
+              role={selectionRole}
+              isActive={isActive}
+              isDisabled={isDisabled}
+              onToggle={toggle}
+            />
           )
         })}
       </div>
