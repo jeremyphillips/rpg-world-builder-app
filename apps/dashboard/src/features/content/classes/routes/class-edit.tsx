@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 import { ContentEditShell } from '../../lib/content-edit-shell'
 import { useClasses } from '../hooks/use-classes'
+// Registers the class form def into the content form registry on module load.
+import '../lib/class-form-def'
 
 export function ClassEdit() {
   const { campaignId = '', classId = '' } = useParams<{

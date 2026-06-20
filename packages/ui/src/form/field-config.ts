@@ -174,6 +174,8 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
    */
   multiple?: boolean
+  /** Maximum selections when `multiple` is true. */
+  max?: number
   defaultValue?: string | string[]
 }
 

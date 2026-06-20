@@ -1,47 +1,36 @@
 import { z } from 'zod'
 import {
-  ARMOR_CATEGORIES,
-  ARMOR_CATEGORY_ENTRIES,
   CREATURE_SIZES,
   CREATURE_SIZE_ENTRIES,
   CREATURE_TYPES,
   CREATURE_TYPE_ENTRIES,
-  DAMAGE_TYPE_IDS,
-  DAMAGE_TYPE_ENTRIES,
-  SENSE_RANGES,
-  SENSE_TYPES,
-  SENSE_ENTRIES,
-  SKILL_IDS,
-  SKILLS,
   SPECIES_CHOICE_KINDS,
   SPECIES_CHOICE_KIND_LABELS,
   STANDARD_SPEEDS,
-  armorCategorySchema,
   creatureSizeSchema,
   creatureTypeSchema,
-  damageTypeSchema,
-  senseTypeSchema,
-  skillSchema,
   speciesChoiceKindSchema,
   slugSchema,
-  type ArmorCategory,
-  type ContentGrants,
-  type ContentProficiencies,
   type ContentTrait,
   type CreateSpeciesInput,
-  type DamageType,
-  type SenseType,
-  type SkillId,
   type Species,
   type SpeciesChoiceGroup,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
-import { useSpecies, speciesQueryKey } from '../hooks/use-species'
+import {
+  SPECIES_GRANT_TYPES,
+  SPECIES_GRANT_TYPE_LABELS,
+  formRowsToGrants,
+  grantArrayFields,
+  grantRowFormSchema,
+  grantsToFormRows,
+} from '../../lib/grant-form-helpers'
 import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 
 // ---------------------------------------------------------------------------
-// Vocab option lists — derived once, reused in buildFields and conditionals
+// Vocab option lists
 // ---------------------------------------------------------------------------
 
 const creatureTypeOptions = toOptions(
@@ -65,97 +54,11 @@ const speedWalkOptions: FieldOption[] = STANDARD_SPEEDS.map((s) => ({
   label: `${s} ft.`,
 }))
 
-const senseTypeOptions = toOptions(
-  SENSE_TYPES,
-  Object.fromEntries(SENSE_TYPES.map((t) => [t, SENSE_ENTRIES[t].label])) as Record<
-    (typeof SENSE_TYPES)[number],
-    string
-  >,
-)
-
-const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
-  value: String(r),
-  label: `${r} ft.`,
-}))
-
-const damageTypeOptions = toOptions(
-  DAMAGE_TYPE_IDS,
-  Object.fromEntries(DAMAGE_TYPE_IDS.map((t) => [t, DAMAGE_TYPE_ENTRIES[t].label])) as Record<
-    (typeof DAMAGE_TYPE_IDS)[number],
-    string
-  >,
-)
-
-const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
-
-const armorCategoryOptions = toOptions(
-  ARMOR_CATEGORIES,
-  Object.fromEntries(ARMOR_CATEGORIES.map((c) => [c, ARMOR_CATEGORY_ENTRIES[c].label])) as Record<
-    (typeof ARMOR_CATEGORIES)[number],
-    string
-  >,
-)
-
-// ---------------------------------------------------------------------------
-// Grant type select options
-// ---------------------------------------------------------------------------
-
-const GRANT_TYPES = [
-  'resistances',
-  'senses',
-  'damageType',
-  'speedOverride',
-  'proficiencies',
-  'languages',
-] as const
-type GrantType = (typeof GRANT_TYPES)[number]
-
-const GRANT_TYPE_LABELS: Record<GrantType, string> = {
-  resistances: 'Damage resistances',
-  senses: 'Special sense',
-  damageType: 'Damage type',
-  speedOverride: 'Speed override',
-  proficiencies: 'Proficiencies',
-  languages: 'Language',
-}
-
-const grantTypeOptions: FieldOption[] = GRANT_TYPES.map((t) => ({
-  value: t,
-  label: GRANT_TYPE_LABELS[t],
-}))
-
 const choiceKindOptions = toOptions(SPECIES_CHOICE_KINDS, SPECIES_CHOICE_KIND_LABELS)
 
 // ---------------------------------------------------------------------------
 // Form schema
-//
-// NOTE on conditional grant fields: they are all `optional()` because the
-// form uses `shouldUnregister: true`. When a conditional field unmounts,
-// RHF clears it from the payload, so Zod only sees `undefined` — which the
-// `.optional()` accepts. The resolver's `omitHidden` only strips top-level
-// keys; nested optionals handle item-scoped conditional visibility.
 // ---------------------------------------------------------------------------
-
-const grantRowFormSchema = z.object({
-  grantType: z.enum(GRANT_TYPES),
-  // 'resistances'
-  resistances: z.array(damageTypeSchema).optional(),
-  // 'damageType'
-  damageType: z.array(damageTypeSchema).optional(),
-  // 'senses' — one sense per grant row
-  senseType: senseTypeSchema.optional(),
-  senseRange: z.coerce.number().int().min(0).optional(),
-  // 'speedOverride'
-  speedWalkOverride: z.coerce.number().int().min(0).optional(),
-  // 'languages' — one language string per grant row
-  language: z.string().optional(),
-  // 'proficiencies'
-  proficiencySkills: z.array(skillSchema).optional(),
-  proficiencyArmor: z.array(armorCategorySchema).optional(),
-  proficiencyTools: z.string().optional(),
-  proficiencyWeapons: z.string().optional(),
-})
-type GrantRowForm = z.infer<typeof grantRowFormSchema>
 
 const traitRowFormSchema = z.object({
   id: z.string().min(1),
@@ -189,107 +92,8 @@ const speciesFormSchema = z.object({
 type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
 // ---------------------------------------------------------------------------
-// Conditional visibility helper
-// ---------------------------------------------------------------------------
-
-function visibleFor(value: GrantType): FieldVisibility {
-  return {
-    dependsOn: ['grantType'],
-    visibleWhen: (watched) => watched['grantType'] === value,
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Field builders
 // ---------------------------------------------------------------------------
-
-function grantItemFields(): FormItem[] {
-  return [
-    {
-      type: 'select',
-      name: 'grantType',
-      label: 'Grant type',
-      options: grantTypeOptions,
-      required: true,
-    },
-    // resistances
-    {
-      type: 'chips',
-      name: 'resistances',
-      label: 'Damage types',
-      options: damageTypeOptions,
-      visibility: visibleFor('resistances'),
-    },
-    // damageType
-    {
-      type: 'chips',
-      name: 'damageType',
-      label: 'Damage types',
-      options: damageTypeOptions,
-      visibility: visibleFor('damageType'),
-    },
-    // senses — one sense per grant row
-    {
-      type: 'select',
-      name: 'senseType',
-      label: 'Sense type',
-      options: senseTypeOptions,
-      visibility: visibleFor('senses'),
-    },
-    {
-      type: 'select',
-      name: 'senseRange',
-      label: 'Range',
-      options: senseRangeOptions,
-      visibility: visibleFor('senses'),
-    },
-    // speedOverride
-    {
-      type: 'select',
-      name: 'speedWalkOverride',
-      label: 'Walk speed (ft.)',
-      options: speedWalkOptions,
-      visibility: visibleFor('speedOverride'),
-    },
-    // languages — one per row
-    {
-      type: 'text',
-      name: 'language',
-      label: 'Language',
-      placeholder: 'e.g. Common',
-      visibility: visibleFor('languages'),
-    },
-    // proficiencies
-    {
-      type: 'chips',
-      name: 'proficiencySkills',
-      label: 'Skills',
-      options: skillOptions,
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'chips',
-      name: 'proficiencyArmor',
-      label: 'Armor',
-      options: armorCategoryOptions,
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'text',
-      name: 'proficiencyTools',
-      label: 'Tools',
-      hint: 'Comma-separated',
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'text',
-      name: 'proficiencyWeapons',
-      label: 'Weapons',
-      hint: 'Comma-separated',
-      visibility: visibleFor('proficiencies'),
-    },
-  ]
-}
 
 function traitItemFields(): FormItem[] {
   return [
@@ -307,17 +111,7 @@ function traitItemFields(): FormItem[] {
       ],
     },
     { type: 'richtext', name: 'description', label: 'Description' },
-    {
-      kind: 'array',
-      name: 'grants',
-      legend: 'Grants',
-      addLabel: 'Add grant',
-      itemTitle: (values, index) => {
-        const type = values['grantType'] as GrantType | undefined
-        return type ? GRANT_TYPE_LABELS[type] : `Grant ${index + 1}`
-      },
-      fields: grantItemFields(),
-    },
+    ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS),
   ]
 }
 
@@ -351,176 +145,7 @@ function choiceGroupItemFields(): FormItem[] {
 }
 
 // ---------------------------------------------------------------------------
-// Grant conversion helpers (ContentGrants ↔ GrantRowForm[])
-// ---------------------------------------------------------------------------
-
-function emptyGrantRow(grantType: GrantType): GrantRowForm {
-  return {
-    grantType,
-    resistances: [],
-    damageType: [],
-    senseType: undefined,
-    senseRange: undefined,
-    speedWalkOverride: undefined,
-    language: '',
-    proficiencySkills: [],
-    proficiencyArmor: [],
-    proficiencyTools: '',
-    proficiencyWeapons: '',
-  }
-}
-
-function splitComma(s: string): string[] {
-  return s
-    .split(',')
-    .map((v) => v.trim())
-    .filter(Boolean)
-}
-
-function optionalGrantRow(row: GrantRowForm | undefined): GrantRowForm[] {
-  return row ? [row] : []
-}
-
-function senseGrantsToRows(senses: ContentGrants['senses']): GrantRowForm[] {
-  return (senses ?? []).map((sense) => ({
-    ...emptyGrantRow('senses'),
-    senseType: sense.type,
-    senseRange: sense.range,
-  }))
-}
-
-function resistancesToRow(resistances: ContentGrants['resistances']): GrantRowForm | undefined {
-  if (!resistances?.length) return undefined
-  return { ...emptyGrantRow('resistances'), resistances }
-}
-
-function damageTypesToRow(damageType: ContentGrants['damageType']): GrantRowForm | undefined {
-  if (!damageType?.length) return undefined
-  return { ...emptyGrantRow('damageType'), damageType }
-}
-
-function speedOverrideToRow(
-  speedOverride: ContentGrants['speedOverride'],
-): GrantRowForm | undefined {
-  if (speedOverride?.walk === undefined) return undefined
-  return { ...emptyGrantRow('speedOverride'), speedWalkOverride: speedOverride.walk }
-}
-
-function languageGrantsToRows(languages: ContentGrants['languages']): GrantRowForm[] {
-  return (languages ?? []).map((language) => ({ ...emptyGrantRow('languages'), language }))
-}
-
-function proficienciesToRow(
-  proficiencies: ContentGrants['proficiencies'],
-): GrantRowForm | undefined {
-  if (!proficiencies) return undefined
-  const { skills, armor, tools, weapons } = proficiencies
-  return {
-    ...emptyGrantRow('proficiencies'),
-    proficiencySkills: skills ?? [],
-    proficiencyArmor: armor ?? [],
-    proficiencyTools: tools?.join(', ') ?? '',
-    proficiencyWeapons: weapons?.join(', ') ?? '',
-  }
-}
-
-/**
- * Converts a `ContentGrants` object into an array of flat grant-row form
- * values. Each sense becomes its own row; each language becomes its own row;
- * all resistances/damageTypes collapse into one row each.
- */
-function grantsToFormRows(grants: ContentGrants | undefined): GrantRowForm[] {
-  if (!grants) return []
-  return [
-    ...senseGrantsToRows(grants.senses),
-    ...optionalGrantRow(resistancesToRow(grants.resistances)),
-    ...optionalGrantRow(damageTypesToRow(grants.damageType)),
-    ...optionalGrantRow(speedOverrideToRow(grants.speedOverride)),
-    ...languageGrantsToRows(grants.languages),
-    ...optionalGrantRow(proficienciesToRow(grants.proficiencies)),
-  ]
-}
-
-function applySensesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const senseRows = rows.filter((r) => r.grantType === 'senses' && r.senseType)
-  if (!senseRows.length) return
-  result.senses = senseRows.map((r) => ({
-    type: r.senseType as SenseType,
-    range: r.senseRange ?? 60,
-  }))
-}
-
-function applyResistancesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'resistances')
-  if (!row?.resistances?.length) return
-  result.resistances = row.resistances as DamageType[]
-}
-
-function applyDamageTypesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'damageType')
-  if (!row?.damageType?.length) return
-  result.damageType = row.damageType as DamageType[]
-}
-
-function applySpeedOverrideFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'speedOverride')
-  if (row?.speedWalkOverride === undefined) return
-  result.speedOverride = { walk: row.speedWalkOverride }
-}
-
-function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language?.trim())
-  if (!languageRows.length) return
-  result.languages = languageRows.map((r) => r.language!.trim())
-}
-
-function skillArmorProficiencies(row: GrantRowForm): ContentProficiencies {
-  return Object.assign(
-    {},
-    row.proficiencySkills?.length ? { skills: row.proficiencySkills as SkillId[] } : {},
-    row.proficiencyArmor?.length ? { armor: row.proficiencyArmor as ArmorCategory[] } : {},
-  )
-}
-
-function toolWeaponProficiencies(row: GrantRowForm): ContentProficiencies {
-  const tools = splitComma(row.proficiencyTools ?? '')
-  const weapons = splitComma(row.proficiencyWeapons ?? '')
-  return Object.assign({}, tools.length ? { tools } : {}, weapons.length ? { weapons } : {})
-}
-
-function proficienciesFromRow(row: GrantRowForm): ContentProficiencies | undefined {
-  const prof = { ...skillArmorProficiencies(row), ...toolWeaponProficiencies(row) }
-  return Object.keys(prof).length ? prof : undefined
-}
-
-function applyProficienciesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'proficiencies')
-  if (!row) return
-
-  const prof = proficienciesFromRow(row)
-  if (prof) result.proficiencies = prof
-}
-
-/**
- * Folds an array of grant-row form values back into a `ContentGrants` object.
- * Multiple 'senses'/'languages' rows are merged into their respective arrays.
- */
-function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefined {
-  if (!rows.length) return undefined
-
-  const result: ContentGrants = {}
-  applySensesFromRows(result, rows)
-  applyResistancesFromRows(result, rows)
-  applyDamageTypesFromRows(result, rows)
-  applySpeedOverrideFromRows(result, rows)
-  applyLanguagesFromRows(result, rows)
-  applyProficienciesFromRows(result, rows)
-
-  return Object.keys(result).length ? result : undefined
-}
-
-// ---------------------------------------------------------------------------
-// Trait conversion helpers (ContentTrait ↔ TraitRowForm)
+// Trait conversion helpers
 // ---------------------------------------------------------------------------
 
 function traitToFormRow(trait: ContentTrait): TraitRowForm {
@@ -540,10 +165,6 @@ function traitFromFormRow(row: TraitRowForm): ContentTrait {
     grants: formRowsToGrants(row.grants),
   }
 }
-
-// ---------------------------------------------------------------------------
-// Choice group conversion helpers
-// ---------------------------------------------------------------------------
 
 function choiceGroupToFormRow(group: SpeciesChoiceGroup): ChoiceGroupRowForm {
   return {
@@ -685,7 +306,6 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   queryKey: speciesQueryKey,
 }
 
-// Register into the global content form registry (side effect on module load).
 contentFormRegistry['species'] = speciesFormDef
 
 export { speciesFormDef }

@@ -19,7 +19,9 @@ export interface ChipsFieldProps {
    * `false` — value is `string`; selecting one deselects the others.
    */
   multiple?: boolean
-  value?: string | string[]
+  /** Maximum selections when `multiple` is true. */
+  max?: number
+  value?: string | number | Array<string | number>
   onChange?: (value: string | string[]) => void
   onBlur?: () => void
   error?: string
@@ -39,6 +41,7 @@ export function ChipsField({
   label,
   options,
   multiple = true,
+  max,
   value,
   onChange,
   onBlur,
@@ -56,9 +59,9 @@ export function ChipsField({
 
   const selected: string[] = React.useMemo(() => {
     if (multiple) {
-      return Array.isArray(value) ? value : []
+      return Array.isArray(value) ? value.map(String) : []
     }
-    return typeof value === 'string' && value !== '' ? [value] : []
+    return value != null && value !== '' ? [String(value)] : []
   }, [multiple, value])
 
   function toggle(optionValue: string) {
@@ -66,7 +69,9 @@ export function ChipsField({
     if (multiple) {
       const next = selected.includes(optionValue)
         ? selected.filter((v) => v !== optionValue)
-        : [...selected, optionValue]
+        : max !== undefined && selected.length >= max
+          ? selected
+          : [...selected, optionValue]
       onChange?.(next)
     } else {
       const next = selected[0] === optionValue ? '' : optionValue
@@ -96,6 +101,7 @@ export function ChipsField({
       <div className="flex flex-wrap gap-2" role="group" aria-labelledby={legendId}>
         {options.map((option) => {
           const isActive = selected.includes(option.value)
+          const atMax = max !== undefined && selected.length >= max
           const optionId = `${id}-${option.value}`
           return (
             <button
@@ -104,8 +110,8 @@ export function ChipsField({
               type="button"
               role={multiple ? 'checkbox' : 'radio'}
               aria-checked={isActive}
-              aria-disabled={option.disabled || disabled || undefined}
-              disabled={option.disabled || disabled}
+              aria-disabled={option.disabled || disabled || (atMax && !isActive) || undefined}
+              disabled={option.disabled || disabled || (atMax && !isActive)}
               onClick={() => toggle(option.value)}
               className={cn(
                 'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',

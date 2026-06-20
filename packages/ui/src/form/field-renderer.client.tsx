@@ -226,6 +226,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       label={config.label}
       options={config.options}
       multiple={config.multiple}
+      max={config.max}
       error={error}
       hint={config.hint}
       info={config.info}
