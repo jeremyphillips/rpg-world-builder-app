@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
@@ -41,6 +42,8 @@ export function ContentCreateShell({
     },
   })
 
+  const fields = useMemo(() => (def ? def.buildFields({}) : []), [def])
+
   return (
     <div className="space-y-6 pb-10">
       <div className="flex items-center gap-4">
@@ -53,7 +56,7 @@ export function ContentCreateShell({
         <div className="max-w-2xl">
           <Form
             schema={def.schema}
-            fields={def.buildFields({})}
+            fields={fields}
             defaultValues={def.createDefaultValues}
             onSubmit={async (values) => {
               await mutation.mutateAsync(def.toInput(values))

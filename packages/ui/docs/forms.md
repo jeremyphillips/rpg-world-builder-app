@@ -307,6 +307,21 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
+## Collapsible sections
+
+By default, top-level `kind: 'group'` and `kind: 'array'` sections render inside
+accordions that **start open** (`collapsibleSections` defaults to `true` on
+`<Form>` and `<TabbedForm>`). Pass `collapsibleSections={false}` for a flat
+fieldset layout.
+
+Per-section opt-out: set `collapsible: false` on a `GroupConfig` or
+`ArrayConfig`. Section legends use the shared `fieldGroupLegendVariants` styling
+(`font-display`, `text-lg`, `mb-4`).
+
+Fields stay mounted while a section is collapsed, so react-hook-form values are
+preserved (`shouldUnregister` only applies to conditional visibility, not
+accordion state).
+
 ## Array fields
 
 Use `ArrayConfig` (`kind: 'array'`) in the `fields` array to create a

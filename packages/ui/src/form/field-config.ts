@@ -207,6 +207,8 @@ export interface GroupConfig {
   description?: string
   fields: Array<FieldConfig | RowConfig>
   className?: string
+  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  collapsible?: boolean
 }
 
 /**
@@ -233,6 +235,8 @@ export interface ArrayConfig {
    * by relative field names) and the 0-based index.
    */
   itemTitle?: (values: Record<string, unknown>, index: number) => string
+  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  collapsible?: boolean
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */

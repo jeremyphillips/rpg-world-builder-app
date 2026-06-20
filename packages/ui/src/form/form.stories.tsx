@@ -87,3 +87,11 @@ export const Default: Story = {
     ),
   },
 }
+
+/** Flat fieldsets — no accordion wrappers on top-level groups. */
+export const FlatSections: Story = {
+  args: {
+    ...Default.args,
+    collapsibleSections: false,
+  },
+}

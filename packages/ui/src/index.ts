@@ -184,6 +184,19 @@ export {
   CollapsibleTrigger,
   CollapsibleContent,
 } from './components/ui/collapsible.client'
+export {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  type AccordionProps,
+} from './components/ui/accordion.client'
+export {
+  accordionItemVariants,
+  accordionTriggerVariants,
+  accordionContentVariants,
+  type AccordionVariant,
+} from './components/ui/accordion.variants'
 
 export {
   Breadcrumb,

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
@@ -55,6 +56,8 @@ function ContentEditForm({
     },
   })
 
+  const fields = useMemo(() => def.buildFields({}), [def])
+
   if (!entity) {
     return (
       <Text variant="destructive" role="alert">
@@ -73,7 +76,7 @@ function ContentEditForm({
         <Form
           key={entity.id}
           schema={def.schema}
-          fields={def.buildFields({})}
+          fields={fields}
           defaultValues={def.toFormValues(entity)}
           onSubmit={async (values) => {
             await mutation.mutateAsync(def.toInput(values))

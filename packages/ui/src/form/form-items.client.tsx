@@ -1,19 +1,35 @@
 'use client'
 
+import * as React from 'react'
 import { useFieldArray, useWatch } from 'react-hook-form'
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../components/ui/accordion.client'
 import { Button } from '../components/ui/button.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
+import { fieldGroupLegendVariants } from '../components/ui/field.variants'
+import { Text } from '../components/ui/text'
 import { FieldRenderer } from './field-renderer.client'
+import { FormSectionContext } from './form-section-context.client'
 import {
   buildItemDefaultValues,
   isContainer,
   type ArrayConfig,
-  type FieldConfig,
   type FormItem,
+  type GroupConfig,
   type RowConfig,
+  type FieldConfig,
 } from './field-config'
+import {
+  buildAccordionBatchKey,
+  readAccordionBatchOpen,
+  writeAccordionBatchOpen,
+} from './form-accordion-state'
 
 export interface FormItemsProps {
   items: Array<FormItem | RowConfig>
@@ -25,59 +41,287 @@ export interface FormItemsProps {
   namePrefix?: string
 }
 
+function isSectionItem(item: FormItem): item is GroupConfig | ArrayConfig {
+  return 'kind' in item && (item.kind === 'group' || item.kind === 'array')
+}
+
+function getSectionValue(item: GroupConfig | ArrayConfig, index: number): string {
+  return item.kind === 'array' ? `array-${item.name}` : `group-${index}`
+}
+
+function isCollapsibleSection(
+  item: FormItem,
+  collapsibleSections: boolean,
+): item is GroupConfig | ArrayConfig {
+  if (!collapsibleSections || !isSectionItem(item)) return false
+  return item.collapsible !== false
+}
+
 /** Renders an ordered list of fields/rows/groups/arrays, recursing into containers. */
 export function FormItems({ items, idPrefix, namePrefix }: FormItemsProps) {
+  const { collapsibleSections, depth } = React.useContext(FormSectionContext)
+
+  if (depth === 0) {
+    return (
+      <TopLevelFormItems
+        items={items}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        collapsibleSections={collapsibleSections}
+      />
+    )
+  }
+
+  return <NestedFormItems items={items} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+}
+
+interface TopLevelFormItemsProps {
+  items: Array<FormItem | RowConfig>
+  idPrefix: string
+  namePrefix?: string
+  collapsibleSections: boolean
+}
+
+function TopLevelFormItems({
+  items,
+  idPrefix,
+  namePrefix,
+  collapsibleSections,
+}: TopLevelFormItemsProps) {
+  const nodes: React.ReactNode[] = []
+  let accordionBatch: Array<{ item: GroupConfig | ArrayConfig; index: number }> = []
+
+  const flushAccordion = () => {
+    if (accordionBatch.length === 0) return
+    const batchKey = buildAccordionBatchKey(idPrefix, accordionBatch, getSectionValue)
+    nodes.push(
+      <FormAccordionBatch
+        key={batchKey}
+        batchKey={batchKey}
+        sections={accordionBatch}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+      />,
+    )
+    accordionBatch = []
+  }
+
+  items.forEach((item, index) => {
+    if (isCollapsibleSection(item, collapsibleSections)) {
+      accordionBatch.push({ item, index })
+      return
+    }
+    flushAccordion()
+    nodes.push(
+      <FormItemNode
+        key={formItemKey(item, index, namePrefix)}
+        item={item}
+        index={index}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        depth={0}
+      />,
+    )
+  })
+  flushAccordion()
+
+  return <>{nodes}</>
+}
+
+interface FormAccordionBatchProps {
+  batchKey: string
+  sections: Array<{ item: GroupConfig | ArrayConfig; index: number }>
+  idPrefix: string
+  namePrefix?: string
+}
+
+/** Accordion batch; open state is controlled and persisted to survive remounts. */
+function FormAccordionBatch({ batchKey, sections, idPrefix, namePrefix }: FormAccordionBatchProps) {
+  const defaultOpen = React.useMemo(
+    () => sections.map(({ item, index }) => getSectionValue(item, index)),
+    [sections],
+  )
+
+  const [openValues, setOpenValues] = React.useState(() =>
+    readAccordionBatchOpen(batchKey, defaultOpen),
+  )
+
+  const handleValueChange = React.useCallback(
+    (next: string[]) => {
+      writeAccordionBatchOpen(batchKey, next)
+      setOpenValues(next)
+    },
+    [batchKey],
+  )
+
+  return (
+    <Accordion
+      type="multiple"
+      value={openValues}
+      onValueChange={handleValueChange}
+      variant="section"
+      className="flex flex-col gap-4"
+    >
+      {sections.map(({ item, index }) => (
+        <CollapsibleFormSection
+          key={getSectionValue(item, index)}
+          item={item}
+          index={index}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+        />
+      ))}
+    </Accordion>
+  )
+}
+
+interface NestedFormItemsProps {
+  items: Array<FormItem | RowConfig>
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+function NestedFormItems({ items, idPrefix, namePrefix, depth }: NestedFormItemsProps) {
   return (
     <>
-      {items.map((item, index) => {
-        if (!isContainer(item)) {
-          return (
-            <FieldNode
-              key={namePrefix ? `${namePrefix}.${item.name}` : item.name}
-              config={item}
-              idPrefix={idPrefix}
-              namePrefix={namePrefix}
-            />
-          )
-        }
-        if (item.kind === 'row') {
-          return (
-            <FieldRow key={`row-${index}`} className={item.className}>
-              {item.fields.map((field) => (
-                <FieldNode
-                  key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-                  config={field}
+      {items.map((item, index) => (
+        <FormItemNode
+          key={formItemKey(item, index, namePrefix)}
+          item={item}
+          index={index}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+          depth={depth}
+        />
+      ))}
+    </>
+  )
+}
+
+function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: string): string {
+  if ('name' in item && typeof item.name === 'string') {
+    return namePrefix ? `${namePrefix}.${item.name}` : item.name
+  }
+  if ('kind' in item) {
+    if (item.kind === 'array') return namePrefix ? `${namePrefix}.${item.name}` : item.name
+    if (item.kind === 'group') return namePrefix ? `${namePrefix}.group-${index}` : `group-${index}`
+    if (item.kind === 'row') return namePrefix ? `${namePrefix}.row-${index}` : `row-${index}`
+  }
+  return String(index)
+}
+
+interface FormItemNodeProps {
+  item: FormItem | RowConfig
+  index: number
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNodeProps) {
+  const childContext = React.useMemo(
+    () => ({ collapsibleSections: false, depth: depth + 1 }),
+    [depth],
+  )
+
+  if (!isContainer(item)) {
+    return <FieldNode config={item} idPrefix={idPrefix} namePrefix={namePrefix} />
+  }
+
+  if (item.kind === 'row') {
+    return (
+      <FieldRow key={`row-${index}`} className={item.className}>
+        {item.fields.map((field) => (
+          <FieldNode
+            key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+            config={field}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+          />
+        ))}
+      </FieldRow>
+    )
+  }
+
+  if (item.kind === 'group') {
+    return (
+      <FieldGroup legend={item.legend} description={item.description} className={item.className}>
+        <FormSectionContext.Provider value={childContext}>
+          <NestedFormItems
+            items={item.fields}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+            depth={depth + 1}
+          />
+        </FormSectionContext.Provider>
+      </FieldGroup>
+    )
+  }
+
+  const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
+  return (
+    <FormSectionContext.Provider value={childContext}>
+      <ArrayFieldRenderer config={item} idPrefix={idPrefix} fullName={fullArrayName} />
+    </FormSectionContext.Provider>
+  )
+}
+
+interface CollapsibleFormSectionProps {
+  item: GroupConfig | ArrayConfig
+  index: number
+  idPrefix: string
+  namePrefix?: string
+}
+
+function CollapsibleFormSection({
+  item,
+  index,
+  idPrefix,
+  namePrefix,
+}: CollapsibleFormSectionProps) {
+  const sectionValue = getSectionValue(item, index)
+  const triggerId = `${idPrefix}-${sectionValue}-trigger`
+  const childContext = React.useMemo(() => ({ collapsibleSections: false, depth: 1 }), [])
+
+  return (
+    <AccordionItem value={sectionValue} variant="section">
+      <AccordionTrigger id={triggerId} variant="section">
+        {item.legend}
+      </AccordionTrigger>
+      <AccordionContent forceMount>
+        {'description' in item && item.description ? (
+          <Text variant="small" className="mb-3">
+            {item.description}
+          </Text>
+        ) : null}
+        {item.kind === 'group' ? (
+          <fieldset aria-labelledby={triggerId} className="min-w-0 border-0 p-0">
+            <legend className="sr-only">{item.legend}</legend>
+            <div className="space-y-4">
+              <FormSectionContext.Provider value={childContext}>
+                <NestedFormItems
+                  items={item.fields}
                   idPrefix={idPrefix}
                   namePrefix={namePrefix}
+                  depth={1}
                 />
-              ))}
-            </FieldRow>
-          )
-        }
-        if (item.kind === 'group') {
-          return (
-            <FieldGroup
-              key={`group-${index}`}
-              legend={item.legend}
-              description={item.description}
-              className={item.className}
-            >
-              <FormItems items={item.fields} idPrefix={idPrefix} namePrefix={namePrefix} />
-            </FieldGroup>
-          )
-        }
-        // kind === 'array' — resolve full RHF name when nested inside an item
-        const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
-        return (
-          <ArrayFieldRenderer
-            key={`array-${fullArrayName}`}
-            config={item}
-            idPrefix={idPrefix}
-            fullName={fullArrayName}
-          />
-        )
-      })}
-    </>
+              </FormSectionContext.Provider>
+            </div>
+          </fieldset>
+        ) : (
+          <FormSectionContext.Provider value={childContext}>
+            <ArrayFieldRenderer
+              config={item}
+              idPrefix={idPrefix}
+              fullName={namePrefix ? `${namePrefix}.${item.name}` : item.name}
+              labelledBy={triggerId}
+              hideLegend
+            />
+          </FormSectionContext.Provider>
+        )}
+      </AccordionContent>
+    </AccordionItem>
   )
 }
 
@@ -121,6 +365,10 @@ export interface ArrayFieldRendererProps {
   idPrefix: string
   /** Resolved full RHF field name for the array (e.g. `"traits"` or `"root.0.traits"`). */
   fullName: string
+  /** When set, the visible legend is omitted (e.g. accordion trigger labels the section). */
+  hideLegend?: boolean
+  /** Associates the fieldset with an external heading when `hideLegend` is true. */
+  labelledBy?: string
 }
 
 /**
@@ -130,7 +378,13 @@ export interface ArrayFieldRendererProps {
  *
  * Must be rendered inside a `FormProvider`.
  */
-export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRendererProps) {
+export function ArrayFieldRenderer({
+  config,
+  idPrefix,
+  fullName,
+  hideLegend = false,
+  labelledBy,
+}: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
   const { addLabel = 'Add item', min = 0, max, legend, itemTitle } = config
 
@@ -140,8 +394,15 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const itemDefaults = buildItemDefaultValues(config.fields)
 
   return (
-    <fieldset className="min-w-0 border-0 p-0">
-      <legend className="mb-1 text-sm font-semibold leading-none">{legend}</legend>
+    <fieldset
+      className="min-w-0 border-0 p-0"
+      aria-labelledby={hideLegend ? labelledBy : undefined}
+    >
+      {hideLegend ? (
+        <legend className="sr-only">{legend}</legend>
+      ) : (
+        <legend className={fieldGroupLegendVariants()}>{legend}</legend>
+      )}
       <div className="space-y-3">
         {fields.map((rhfField, index) => {
           const itemPrefix = `${fullName}.${index}`

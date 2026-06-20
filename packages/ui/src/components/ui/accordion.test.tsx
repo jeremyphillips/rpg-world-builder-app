@@ -1,0 +1,79 @@
+import { describe, expect, it } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import axe from 'axe-core'
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion.client'
+
+describe('Accordion', () => {
+  it('renders triggers and panel content', () => {
+    render(
+      <Accordion type="single" collapsible defaultValue="one">
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent>Panel one</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="two">
+          <AccordionTrigger>Section two</AccordionTrigger>
+          <AccordionContent>Panel two</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Section one' })).toBeInTheDocument()
+    expect(screen.getByText('Panel one')).toBeInTheDocument()
+  })
+
+  it('toggles panel visibility when the trigger is clicked', async () => {
+    const user = userEvent.setup()
+    render(
+      <Accordion type="single" collapsible defaultValue="one">
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent>Panel one</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Section one' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    await user.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('keeps forceMount content visually collapsed after closing', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <Accordion type="single" collapsible defaultValue="one">
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent forceMount>
+            <p>Panel one</p>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Section one' })
+    const content = container.querySelector('[data-state]') as HTMLElement | null
+    expect(content).not.toBeNull()
+
+    await user.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(content).toHaveAttribute('data-state', 'closed')
+    expect(content?.offsetHeight).toBe(0)
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <Accordion type="multiple" defaultValue={['one']}>
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent>Panel one</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+})

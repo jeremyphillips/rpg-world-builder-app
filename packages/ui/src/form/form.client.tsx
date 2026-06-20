@@ -13,6 +13,7 @@ import type { ZodType } from 'zod'
 import { cn } from '../lib/utils'
 import { Text } from '../components/ui/text'
 import { FormItems } from './form-items.client'
+import { FormSectionContext } from './form-section-context.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
@@ -54,6 +55,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * and can drive a disabled Next button.
    */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
+  /**
+   * When true (default), top-level groups and array sections render inside
+   * collapsible accordions that start open. Set false for a flat layout.
+   */
+  collapsibleSections?: boolean
 }
 
 /**
@@ -75,6 +81,7 @@ export function Form<TFieldValues extends FieldValues>({
   id,
   fileFieldProps,
   mode,
+  collapsibleSections = true,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -94,6 +101,11 @@ export function Form<TFieldValues extends FieldValues>({
     mode,
   })
 
+  const sectionContext = React.useMemo(
+    () => ({ collapsibleSections, depth: 0 }),
+    [collapsibleSections],
+  )
+
   return (
     <FormProvider {...form}>
       <FileFieldPropsProvider value={fileFieldProps ?? {}}>
@@ -109,7 +121,9 @@ export function Form<TFieldValues extends FieldValues>({
                 {formError}
               </Text>
             ) : null}
-            <FormItems items={fields} idPrefix={formId} />
+            <FormSectionContext.Provider value={sectionContext}>
+              <FormItems items={fields} idPrefix={formId} />
+            </FormSectionContext.Provider>
           </div>
           {typeof footer === 'function' ? footer(form) : footer}
         </form>

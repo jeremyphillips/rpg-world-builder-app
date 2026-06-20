@@ -19,4 +19,6 @@ export const fieldLabelVariants = cva(
   },
 )
 
-export const fieldGroupLegendVariants = cva('mb-1 text-sm font-semibold leading-none')
+export const fieldGroupLegendVariants = cva(
+  'mb-4 font-display text-lg font-semibold leading-none text-foreground',
+)
