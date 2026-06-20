@@ -1,10 +1,15 @@
-import { Heading, Spinner, Text } from '@rpg/ui'
+import { Link } from 'react-router-dom'
+import { Heading, Spinner, Text, buttonVariants } from '@rpg/ui'
 
 type ContentOverviewShellProps = {
   heading: string
   isPending: boolean
   isError: boolean
   errorLabel?: string
+  /** When provided, renders a "New" button linked to this href. */
+  newHref?: string
+  /** Label for the "New" button. Defaults to `"New"`. */
+  newLabel?: string
   children: React.ReactNode
 }
 
@@ -17,6 +22,8 @@ export function ContentOverviewShell({
   isPending,
   isError,
   errorLabel,
+  newHref,
+  newLabel = 'New',
   children,
 }: ContentOverviewShellProps) {
   if (isPending) {
@@ -47,9 +54,16 @@ export function ContentOverviewShell({
 
   return (
     <div className="space-y-4">
-      <Heading variant="page" as="h2">
-        {heading}
-      </Heading>
+      <div className="flex items-center justify-between">
+        <Heading variant="page" as="h2">
+          {heading}
+        </Heading>
+        {newHref ? (
+          <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
+            {newLabel}
+          </Link>
+        ) : null}
+      </div>
       {children}
     </div>
   )

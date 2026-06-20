@@ -2,27 +2,39 @@ import { useParams } from 'react-router-dom'
 import { DataTable, RowActionsMenu } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
+import { ROUTES } from '@/app/routes'
 import { useEquipment } from '../hooks/use-equipment'
 import { equipmentColumns, equipmentFilters } from '../components/equipment-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 
-function EquipmentRowActions(_: { row: Equipment }) {
+function EquipmentRowActions({ row, campaignId }: { row: Equipment; campaignId: string }) {
   return (
-    <RowActionsMenu editHref="#" enabled={true} onToggleEnabled={() => {}} itemLabel="equipment" />
+    <RowActionsMenu
+      editHref={ROUTES.content.equipment.edit(campaignId, row.id)}
+      enabled={true}
+      onToggleEnabled={() => {}}
+      itemLabel="equipment"
+    />
   )
 }
 
 export function EquipmentOverview() {
-  const { campaignId } = useParams<{ campaignId: string }>()
+  const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
 
   return (
-    <ContentOverviewShell heading="Equipment" isPending={isPending} isError={isError}>
+    <ContentOverviewShell
+      heading="Equipment"
+      isPending={isPending}
+      isError={isError}
+      newHref={ROUTES.content.equipment.create(campaignId)}
+      newLabel="New Equipment"
+    >
       <DataTable
-        columns={equipmentColumns(campaignId ?? '')}
+        columns={equipmentColumns(campaignId)}
         data={equipment}
         filters={equipmentFilters}
-        rowActions={(row) => <EquipmentRowActions row={row} />}
+        rowActions={(row) => <EquipmentRowActions row={row} campaignId={campaignId} />}
         caption="Equipment available in this campaign"
       />
     </ContentOverviewShell>

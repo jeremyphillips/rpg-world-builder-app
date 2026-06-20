@@ -1,0 +1,16 @@
+import { useParams } from 'react-router-dom'
+
+import { ROUTES } from '@/app/routes'
+import { ContentCreateShell } from '../../lib/content-create-shell'
+
+export function ClassCreate() {
+  const { campaignId = '' } = useParams<{ campaignId: string }>()
+  return (
+    <ContentCreateShell
+      contentType="classes"
+      campaignId={campaignId}
+      heading="New Class"
+      backHref={ROUTES.content.classes.overview(campaignId)}
+    />
+  )
+}
