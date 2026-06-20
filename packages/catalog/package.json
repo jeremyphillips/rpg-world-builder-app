@@ -27,6 +27,10 @@
     "./skill-proficiencies": {
       "types": "./src/skill-proficiencies/index.ts",
       "default": "./src/skill-proficiencies/index.ts"
+    },
+    "./spells": {
+      "types": "./src/spells/index.ts",
+      "default": "./src/spells/index.ts"
     }
   },
   "scripts": {
