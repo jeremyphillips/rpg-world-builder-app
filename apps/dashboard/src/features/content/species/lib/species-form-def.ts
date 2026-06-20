@@ -370,6 +370,60 @@ function emptyGrantRow(grantType: GrantType): GrantRowForm {
   }
 }
 
+function splitComma(s: string): string[] {
+  return s
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
+}
+
+function optionalGrantRow(row: GrantRowForm | undefined): GrantRowForm[] {
+  return row ? [row] : []
+}
+
+function senseGrantsToRows(senses: ContentGrants['senses']): GrantRowForm[] {
+  return (senses ?? []).map((sense) => ({
+    ...emptyGrantRow('senses'),
+    senseType: sense.type,
+    senseRange: sense.range,
+  }))
+}
+
+function resistancesToRow(resistances: ContentGrants['resistances']): GrantRowForm | undefined {
+  if (!resistances?.length) return undefined
+  return { ...emptyGrantRow('resistances'), resistances }
+}
+
+function damageTypesToRow(damageType: ContentGrants['damageType']): GrantRowForm | undefined {
+  if (!damageType?.length) return undefined
+  return { ...emptyGrantRow('damageType'), damageType }
+}
+
+function speedOverrideToRow(
+  speedOverride: ContentGrants['speedOverride'],
+): GrantRowForm | undefined {
+  if (speedOverride?.walk === undefined) return undefined
+  return { ...emptyGrantRow('speedOverride'), speedWalkOverride: speedOverride.walk }
+}
+
+function languageGrantsToRows(languages: ContentGrants['languages']): GrantRowForm[] {
+  return (languages ?? []).map((language) => ({ ...emptyGrantRow('languages'), language }))
+}
+
+function proficienciesToRow(
+  proficiencies: ContentGrants['proficiencies'],
+): GrantRowForm | undefined {
+  if (!proficiencies) return undefined
+  const { skills, armor, tools, weapons } = proficiencies
+  return {
+    ...emptyGrantRow('proficiencies'),
+    proficiencySkills: skills ?? [],
+    proficiencyArmor: armor ?? [],
+    proficiencyTools: tools?.join(', ') ?? '',
+    proficiencyWeapons: weapons?.join(', ') ?? '',
+  }
+}
+
 /**
  * Converts a `ContentGrants` object into an array of flat grant-row form
  * values. Each sense becomes its own row; each language becomes its own row;
@@ -377,57 +431,74 @@ function emptyGrantRow(grantType: GrantType): GrantRowForm {
  */
 function grantsToFormRows(grants: ContentGrants | undefined): GrantRowForm[] {
   if (!grants) return []
-  const rows: GrantRowForm[] = []
-
-  // One row per sense
-  for (const sense of grants.senses ?? []) {
-    rows.push({
-      ...emptyGrantRow('senses'),
-      senseType: sense.type,
-      senseRange: sense.range,
-    })
-  }
-
-  // One row for all resistances
-  if (grants.resistances?.length) {
-    rows.push({ ...emptyGrantRow('resistances'), resistances: grants.resistances })
-  }
-
-  // One row for all damage types
-  if (grants.damageType?.length) {
-    rows.push({ ...emptyGrantRow('damageType'), damageType: grants.damageType })
-  }
-
-  // One row for speed override (walk only for now)
-  if (grants.speedOverride?.walk !== undefined) {
-    rows.push({ ...emptyGrantRow('speedOverride'), speedWalkOverride: grants.speedOverride.walk })
-  }
-
-  // One row per language
-  for (const lang of grants.languages ?? []) {
-    rows.push({ ...emptyGrantRow('languages'), language: lang })
-  }
-
-  // One row for proficiencies
-  if (grants.proficiencies) {
-    const { skills, armor, tools, weapons } = grants.proficiencies
-    rows.push({
-      ...emptyGrantRow('proficiencies'),
-      proficiencySkills: skills ?? [],
-      proficiencyArmor: armor ?? [],
-      proficiencyTools: tools?.join(', ') ?? '',
-      proficiencyWeapons: weapons?.join(', ') ?? '',
-    })
-  }
-
-  return rows
+  return [
+    ...senseGrantsToRows(grants.senses),
+    ...optionalGrantRow(resistancesToRow(grants.resistances)),
+    ...optionalGrantRow(damageTypesToRow(grants.damageType)),
+    ...optionalGrantRow(speedOverrideToRow(grants.speedOverride)),
+    ...languageGrantsToRows(grants.languages),
+    ...optionalGrantRow(proficienciesToRow(grants.proficiencies)),
+  ]
 }
 
-function splitComma(s: string): string[] {
-  return s
-    .split(',')
-    .map((v) => v.trim())
-    .filter(Boolean)
+function applySensesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const senseRows = rows.filter((r) => r.grantType === 'senses' && r.senseType)
+  if (!senseRows.length) return
+  result.senses = senseRows.map((r) => ({
+    type: r.senseType as SenseType,
+    range: r.senseRange ?? 60,
+  }))
+}
+
+function applyResistancesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'resistances')
+  if (!row?.resistances?.length) return
+  result.resistances = row.resistances as DamageType[]
+}
+
+function applyDamageTypesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'damageType')
+  if (!row?.damageType?.length) return
+  result.damageType = row.damageType as DamageType[]
+}
+
+function applySpeedOverrideFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'speedOverride')
+  if (row?.speedWalkOverride === undefined) return
+  result.speedOverride = { walk: row.speedWalkOverride }
+}
+
+function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language?.trim())
+  if (!languageRows.length) return
+  result.languages = languageRows.map((r) => r.language!.trim())
+}
+
+function skillArmorProficiencies(row: GrantRowForm): ContentProficiencies {
+  return Object.assign(
+    {},
+    row.proficiencySkills?.length ? { skills: row.proficiencySkills as SkillId[] } : {},
+    row.proficiencyArmor?.length ? { armor: row.proficiencyArmor as ArmorCategory[] } : {},
+  )
+}
+
+function toolWeaponProficiencies(row: GrantRowForm): ContentProficiencies {
+  const tools = splitComma(row.proficiencyTools ?? '')
+  const weapons = splitComma(row.proficiencyWeapons ?? '')
+  return Object.assign({}, tools.length ? { tools } : {}, weapons.length ? { weapons } : {})
+}
+
+function proficienciesFromRow(row: GrantRowForm): ContentProficiencies | undefined {
+  const prof = { ...skillArmorProficiencies(row), ...toolWeaponProficiencies(row) }
+  return Object.keys(prof).length ? prof : undefined
+}
+
+function applyProficienciesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'proficiencies')
+  if (!row) return
+
+  const prof = proficienciesFromRow(row)
+  if (prof) result.proficiencies = prof
 }
 
 /**
@@ -436,47 +507,14 @@ function splitComma(s: string): string[] {
  */
 function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefined {
   if (!rows.length) return undefined
+
   const result: ContentGrants = {}
-
-  const senseRows = rows.filter((r) => r.grantType === 'senses' && r.senseType)
-  if (senseRows.length) {
-    result.senses = senseRows.map((r) => ({
-      type: r.senseType as SenseType,
-      range: r.senseRange ?? 60,
-    }))
-  }
-
-  const resistanceRow = rows.find((r) => r.grantType === 'resistances')
-  if (resistanceRow?.resistances?.length) {
-    result.resistances = resistanceRow.resistances as DamageType[]
-  }
-
-  const damageTypeRow = rows.find((r) => r.grantType === 'damageType')
-  if (damageTypeRow?.damageType?.length) {
-    result.damageType = damageTypeRow.damageType as DamageType[]
-  }
-
-  const speedRow = rows.find((r) => r.grantType === 'speedOverride')
-  if (speedRow?.speedWalkOverride !== undefined) {
-    result.speedOverride = { walk: speedRow.speedWalkOverride }
-  }
-
-  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language?.trim())
-  if (languageRows.length) {
-    result.languages = languageRows.map((r) => r.language!.trim())
-  }
-
-  const profRow = rows.find((r) => r.grantType === 'proficiencies')
-  if (profRow) {
-    const prof: ContentProficiencies = {}
-    if (profRow.proficiencySkills?.length) prof.skills = profRow.proficiencySkills as SkillId[]
-    if (profRow.proficiencyArmor?.length) prof.armor = profRow.proficiencyArmor as ArmorCategory[]
-    const tools = splitComma(profRow.proficiencyTools ?? '')
-    if (tools.length) prof.tools = tools
-    const weapons = splitComma(profRow.proficiencyWeapons ?? '')
-    if (weapons.length) prof.weapons = weapons
-    if (Object.keys(prof).length) result.proficiencies = prof
-  }
+  applySensesFromRows(result, rows)
+  applyResistancesFromRows(result, rows)
+  applyDamageTypesFromRows(result, rows)
+  applySpeedOverrideFromRows(result, rows)
+  applyLanguagesFromRows(result, rows)
+  applyProficienciesFromRows(result, rows)
 
   return Object.keys(result).length ? result : undefined
 }
@@ -528,6 +566,17 @@ function choiceGroupFromFormRow(row: ChoiceGroupRowForm): SpeciesChoiceGroup {
 }
 
 // ---------------------------------------------------------------------------
+// Create-form defaults
+// ---------------------------------------------------------------------------
+
+const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
+  creatureType: 'humanoid',
+  sizes: ['medium'],
+  speed: { walk: 30 },
+  traits: [],
+}
+
+// ---------------------------------------------------------------------------
 // Species ContentFormDef
 // ---------------------------------------------------------------------------
 
@@ -535,6 +584,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   routeKey: 'species',
 
   schema: speciesFormSchema,
+  createDefaultValues: speciesCreateDefaultValues,
 
   buildFields: (_ctx) => [
     {
@@ -583,7 +633,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
         {
           type: 'chips',
           name: 'sizes',
-          label: 'Sizes',
+          label: 'Size',
           options: creatureSizeOptions,
           required: true,
         },

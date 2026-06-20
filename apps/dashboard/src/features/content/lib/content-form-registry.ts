@@ -37,6 +37,11 @@ export interface ContentFormDef<
    */
   toFormValues: (entity: TEntity) => Partial<TFormValues>
   /**
+   * Initial values for the create shell. Merged over synthesized field defaults
+   * from `buildFields` (e.g. nested `speed.walk` needs `{ speed: { walk } }`).
+   */
+  createDefaultValues?: Partial<TFormValues>
+  /**
    * Maps validated form values to the API create-input shape.
    * The type-level drift test asserts this matches the contract DTO.
    */

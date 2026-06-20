@@ -114,7 +114,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       size={config.size}
       placeholder={config.placeholder}
       disabled={config.disabled}
-      value={field.value ?? ''}
+      value={field.value != null && field.value !== '' ? String(field.value) : ''}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
     />

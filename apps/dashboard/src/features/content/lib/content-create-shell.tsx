@@ -54,6 +54,7 @@ export function ContentCreateShell({
           <Form
             schema={def.schema}
             fields={def.buildFields({})}
+            defaultValues={def.createDefaultValues}
             onSubmit={async (values) => {
               await mutation.mutateAsync(def.toInput(values))
               navigate(backHref)
