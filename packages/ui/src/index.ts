@@ -165,6 +165,11 @@ export {
 } from './components/ui/tabs.variants'
 
 export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'
+export {
+  ComboboxField,
+  type ComboboxFieldProps,
+  type ComboboxFieldOption,
+} from './components/ui/combobox-field.client'
 
 export {
   EditableGrid,
@@ -186,7 +191,17 @@ export {
   TableCell,
   TableCaption,
 } from './components/ui/table'
-export { Badge, badgeVariants, type BadgeProps } from './components/ui/badge'
+export {
+  Badge,
+  badgeVariants,
+  dismissibleBadgeVariants,
+  badgeDismissButtonVariants,
+  type BadgeProps,
+} from './components/ui/badge'
+export {
+  DismissibleBadge,
+  type DismissibleBadgeProps,
+} from './components/ui/dismissible-badge.client'
 export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export {
