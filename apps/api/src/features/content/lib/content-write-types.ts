@@ -3,6 +3,7 @@ import { classWriteConfig } from '../classes/classes.config'
 import { equipmentWriteConfig } from '../equipment/equipment.config'
 import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-proficiencies.config'
 import { speciesWriteConfig } from '../species/species.config'
+import { spellWriteConfig } from '../spells/spells.config'
 import { weaponsWriteConfig } from '../weapons/weapons.config'
 import type { ContentWriteConfig } from './content-write-config'
 import type { ContentTypeName } from '../content-types'
@@ -14,6 +15,7 @@ const CONTENT_WRITE_CONFIGS = {
   weapons: weaponsWriteConfig,
   armor: armorWriteConfig,
   species: speciesWriteConfig,
+  spells: spellWriteConfig,
 } as const satisfies Record<
   ContentTypeName,
   ContentWriteConfig<{

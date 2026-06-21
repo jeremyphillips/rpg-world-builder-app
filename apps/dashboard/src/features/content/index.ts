@@ -21,6 +21,7 @@ export { ArmorEdit } from './armor/routes/armor-edit'
 export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
 export { SpeciesCreate } from './species/routes/species-create'
 export { SpeciesEdit } from './species/routes/species-edit'
+export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { ContentCreateShell, ContentFormShellResolver } from './lib/content-create-shell'
 export { ContentEditShell } from './lib/content-edit-shell'
 export {

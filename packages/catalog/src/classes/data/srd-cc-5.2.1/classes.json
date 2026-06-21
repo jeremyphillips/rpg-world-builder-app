@@ -648,6 +648,7 @@
       "weapons": {
         "categories": ["simple", "martial"]
       },
+      "tools": ["thieves-tools"],
       "skills": {
         "choose": 4,
         "from": [
@@ -805,7 +806,8 @@
       "savingThrows": ["con", "cha"],
       "armor": [],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [],
+        "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
       },
       "skills": {
         "choose": 2,

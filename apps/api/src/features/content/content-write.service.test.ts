@@ -4,6 +4,7 @@ import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createUser } from '../user'
 import { createCampaign } from '../campaign'
 import { armorWriteConfig } from './armor/armor.config'
+import { spellWriteConfig } from './spells/spells.config'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { resolveCatalogForCampaign } from './content.service'
 
@@ -60,6 +61,45 @@ describe('createHomebrewContent (armor)', () => {
     })
 
     expect(updated.baseAc).toBe(12)
+    expect(updated.source).toBe('system')
+  })
+})
+
+describe('createHomebrewContent (spells)', () => {
+  it('creates homebrew spell and returns it in the resolved catalog', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(spellWriteConfig, campaign.id, {
+      slug: 'custom-bolt',
+      name: 'Custom Bolt',
+      description: '<p>A custom cantrip.</p>',
+      school: 'evocation',
+      level: 0,
+      classIds: ['wizard'],
+      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+      range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
+      duration: { kind: 'instantaneous' },
+      components: { verbal: true, somatic: true },
+    })
+
+    expect(created.source).toBe('homebrew')
+    expect(created.slug).toBe('custom-bolt')
+    expect(created.level).toBe(0)
+
+    const spells = await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    expect(spells.some((s) => s.slug === 'custom-bolt')).toBe(true)
+  })
+
+  it('patches a system spell record', async () => {
+    const campaign = await makeCampaign()
+    const fireBolt = (
+      await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    ).find((s) => s.slug === 'fire-bolt')!
+
+    const updated = await updateContentEntity(spellWriteConfig, campaign.id, fireBolt.id, {
+      name: 'Enhanced Fire Bolt',
+    })
+
+    expect(updated.name).toBe('Enhanced Fire Bolt')
     expect(updated.source).toBe('system')
   })
 })
