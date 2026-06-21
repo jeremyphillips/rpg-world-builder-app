@@ -15,6 +15,11 @@ export type ContentFormCtx = {
   options?: Partial<ContentFormOptionSets>
 }
 
+/** Optional context for `toInput` — present on edit, omitted on create. */
+export type ContentFormInputCtx<TEntity> = {
+  entity?: TEntity
+}
+
 /**
  * The per-type definition that the content form registry holds. Each entry
  * describes how to:
@@ -47,10 +52,11 @@ export interface ContentFormDef<
    */
   createDefaultValues?: Partial<TFormValues>
   /**
-   * Maps validated form values to the API create-input shape.
+   * Maps validated form values to the API input shape.
+   * Pass `{ entity }` on edit so slug and nested ids stay locked after create.
    * The type-level drift test asserts this matches the contract DTO.
    */
-  toInput: (formValues: TFormValues) => TCreateInput
+  toInput: (formValues: TFormValues, ctx?: ContentFormInputCtx<TEntity>) => TCreateInput
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */

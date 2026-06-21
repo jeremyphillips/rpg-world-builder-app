@@ -8,22 +8,10 @@ const currencyOptions = toOptions(
   Object.fromEntries(CURRENCY_IDS.map((c) => [c, CURRENCIES[c].label])) as Record<Currency, string>,
 )
 
-/** Identity fields shared by every catalog content type. */
+/** Identity fields shared by every catalog content type (slug is derived, not authored). */
 export function identityFields(): GroupField[] {
   return [
-    {
-      kind: 'row',
-      fields: [
-        { type: 'text', name: 'name', label: 'Name', required: true },
-        {
-          type: 'text',
-          name: 'slug',
-          label: 'Slug',
-          hint: 'Lowercase letters, numbers, hyphens',
-          required: true,
-        },
-      ],
-    },
+    { type: 'text', name: 'name', label: 'Name', required: true },
     { type: 'richtext', name: 'description', label: 'Description' },
   ]
 }
