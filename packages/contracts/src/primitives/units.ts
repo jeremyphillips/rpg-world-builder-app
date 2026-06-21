@@ -77,6 +77,17 @@ export function weightToLb(w: Weight): number {
 }
 
 /**
+ * A distance. `unit` is a field (not a bare number) to mirror `Weight` and leave
+ * room for future units; SRD spell ranges use feet only for now.
+ */
+export const distanceSchema = z.object({
+  value: z.number().min(0),
+  unit: z.literal('ft'),
+})
+
+export type Distance = z.infer<typeof distanceSchema>
+
+/**
  * Human-readable money string with uppercase currency abbreviation.
  *
  * @example formatMoney({ amount: 5, currency: 'gp' }) // → "5 GP"

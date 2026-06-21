@@ -1,0 +1,114 @@
+[
+  {
+    "id": "srd-cc-5.2.1:darkness",
+    "slug": "darkness",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Darkness",
+    "description": "<p>For the duration, magical Darkness spreads from a point within range and fills a 15-foot-radius Sphere. Darkvision can't see through it, and nonmagical light can't illuminate it. Alternatively, cast on object for 15-foot Emanation. If area overlaps Bright/Dim Light from spell level 2 or lower, that spell is dispelled.</p>",
+    "school": "evocation",
+    "level": 2,
+    "classIds": ["sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["control", "debuff"],
+      "functions": ["environment"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "material": { "description": "bat fur and a piece of coal" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:misty-step",
+    "slug": "misty-step",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Misty Step",
+    "description": "<p>Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space you can see. You don't provoke opportunity attacks from this movement.</p>",
+    "school": "conjuration",
+    "level": 2,
+    "classIds": ["sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["movement"],
+      "functions": ["teleportation"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "self" },
+    "duration": { "kind": "instantaneous" },
+    "components": { "verbal": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:pass-without-trace",
+    "slug": "pass-without-trace",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Pass without Trace",
+    "description": "<p>You radiate a concealing aura in a 30-foot Emanation for the duration. While in the aura, you and each creature you choose have a +10 bonus to Dexterity (Stealth) checks and leave no tracks.</p>",
+    "school": "abjuration",
+    "level": 2,
+    "classIds": ["druid", "ranger"],
+    "tags": {
+      "roles": ["buff"],
+      "functions": ["deception", "utility"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "self" },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "ashes from burned mistletoe" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:ray-of-enfeeblement",
+    "slug": "ray-of-enfeeblement",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ray of Enfeeblement",
+    "description": "<p>A beam of enervating energy shoots from you toward a creature within range. The target must make a Constitution saving throw. On a successful save, the target has Disadvantage on the next attack roll it makes until the start of your next turn. On a failed save, the target has Disadvantage on Strength-based D20 Tests for the duration. During that time, it also subtracts 1d8 from all its damage rolls. The target repeats the save at the end of each of its turns, ending the spell on a success.</p>",
+    "school": "necromancy",
+    "level": 2,
+    "classIds": ["warlock", "wizard"],
+    "tags": {
+      "roles": ["debuff"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": { "verbal": true, "somatic": true }
+  }
+]

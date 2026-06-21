@@ -1,0 +1,155 @@
+[
+  {
+    "id": "srd-cc-5.2.1:detect-magic",
+    "slug": "detect-magic",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Detect Magic",
+    "description": "<p>For the duration, you sense the presence of magical effects within 30 feet of yourself. If you sense such effects, you can take the Magic action to see a faint aura around any visible creature or object in the area that bears the magic, and if an effect was created by a spell, you learn the spell's school of magic. The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.</p>",
+    "school": "divination",
+    "level": 1,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "warlock", "wizard"],
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": true },
+    "range": { "kind": "self" },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": { "verbal": true, "somatic": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:faerie-fire",
+    "slug": "faerie-fire",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Faerie Fire",
+    "description": "<p>Objects in a 20-foot Cube within range are outlined in blue, green, or violet light (your choice). Each creature in the Cube is also outlined if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed Dim Light in a 10-foot radius and can't benefit from the Invisible condition. Attack rolls against an affected creature or object have Advantage if the attacker can see it.</p>",
+    "school": "evocation",
+    "level": 1,
+    "classIds": ["bard", "druid"],
+    "tags": {
+      "conditions": ["invisible"],
+      "roles": ["debuff", "control"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": { "verbal": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:false-life",
+    "slug": "false-life",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "False Life",
+    "description": "<p>You gain 2d4 + 4 Temporary Hit Points.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>",
+    "school": "necromancy",
+    "level": 1,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "self" },
+    "duration": { "kind": "instantaneous" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "a drop of alcohol" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hellish-rebuke",
+    "slug": "hellish-rebuke",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hellish Rebuke",
+    "description": "<p>The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking 2d10 Fire damage on a failed save or half as much damage on a successful one.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "school": "evocation",
+    "level": 1,
+    "classIds": ["warlock"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "reaction",
+        "trigger": "in response to taking damage from a creature that you can see within 60 feet of yourself"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": { "kind": "instantaneous" },
+    "components": { "verbal": true, "somatic": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:longstrider",
+    "slug": "longstrider",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Longstrider",
+    "description": "<p>You touch a creature. The target's Speed increases by 10 feet until the spell ends.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You can target one additional creature for each spell slot level above 1.</p>",
+    "school": "transmutation",
+    "level": 1,
+    "classIds": ["bard", "druid", "ranger", "wizard"],
+    "tags": {
+      "roles": ["buff", "movement"],
+      "functions": ["utility"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "touch" },
+    "duration": { "kind": "timed", "value": 1, "unit": "hour" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "a pinch of dirt" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:speak-with-animals",
+    "slug": "speak-with-animals",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Speak with Animals",
+    "description": "<p>For the duration, you can comprehend and verbally communicate with Beasts, and you can use any of the Influence action's skill options with them. Most Beasts have little to say about topics that don't pertain to survival or companionship, but at minimum, a Beast can give you information about nearby locations and monsters, including whatever it has perceived within the past day.</p>",
+    "school": "divination",
+    "level": 1,
+    "classIds": ["bard", "druid", "ranger", "warlock"],
+    "tags": {
+      "functions": ["communication", "social"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": true },
+    "range": { "kind": "self" },
+    "duration": { "kind": "timed", "value": 10, "unit": "minute" },
+    "components": { "verbal": true, "somatic": true }
+  }
+]

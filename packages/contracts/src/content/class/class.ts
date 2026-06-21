@@ -159,7 +159,10 @@ export const CLASS_NAMES = {
   wizard: 'Wizard',
 } as const
 
-export type ClassSlug = keyof typeof CLASS_NAMES
+export type ClassSlug = keyof typeof CLASS_NAMES | (string & {})
+
+/** Class slug reference — SRD keys from `CLASS_NAMES` or any homebrew slug. */
+export const classSlugSchema = z.string().min(1)
 
 /**
  * Returns the display name for a class slug.
@@ -168,7 +171,7 @@ export type ClassSlug = keyof typeof CLASS_NAMES
  * @example getClassName('paladin') // → 'Paladin'
  */
 export function getClassName(slug: string): string {
-  return CLASS_NAMES[slug as ClassSlug] ?? slug
+  return slug in CLASS_NAMES ? CLASS_NAMES[slug as keyof typeof CLASS_NAMES] : slug
 }
 
 // ---------------------------------------------------------------------------

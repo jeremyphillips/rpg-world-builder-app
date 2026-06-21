@@ -84,3 +84,10 @@ export async function listSpecies(req: Request, res: Response): Promise<void> {
   const species = await resolveCatalogForCampaign(config, campaignId)
   res.status(200).json({ species })
 }
+
+export async function listSpells(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const config = getContentTypeConfig('spells')
+  const spells = await resolveCatalogForCampaign(config, campaignId)
+  res.status(200).json({ spells })
+}
