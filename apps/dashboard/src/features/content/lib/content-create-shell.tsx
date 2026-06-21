@@ -1,12 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Heading, Spinner, Text } from '@rpg/ui'
-import { Form, FormSaveFooter } from '@rpg/ui/form'
+import { Heading } from '@rpg/ui'
 
 import { createContent } from './content-client'
-import { useContentFormOptions } from './content-form-options'
-import { contentFormRegistry } from './content-form-registry'
+import {
+  ContentFormComingSoon,
+  ContentFormOptionsGate,
+  ContentSchemaForm,
+} from './content-form-shell-parts'
+import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -16,6 +18,47 @@ export interface ContentCreateShellProps {
   heading: string
   /** Href for the "Cancel" link and post-submit navigation (typically the overview). */
   backHref: string
+}
+
+interface ContentCreateFormProps {
+  def: AnyContentFormDef
+  campaignId: string
+  backHref: string
+}
+
+function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps) {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: (input: unknown) => createContent(campaignId, def.routeKey, input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
+    },
+  })
+
+  return (
+    <ContentFormOptionsGate campaignId={campaignId}>
+      {(ctx) => {
+        const fields = def.buildFields(ctx)
+        return (
+          <ContentSchemaForm
+            schema={def.schema}
+            fields={fields}
+            defaultValues={def.createDefaultValues}
+            backHref={backHref}
+            submitLabel="Create"
+            submitPending={mutation.isPending}
+            formError={mutation.isError ? String(mutation.error) : null}
+            onSubmit={async (values) => {
+              await mutation.mutateAsync(def.toInput(values))
+              navigate(backHref)
+            }}
+          />
+        )
+      }}
+    </ContentFormOptionsGate>
+  )
 }
 
 /**
@@ -33,22 +76,6 @@ export function ContentCreateShell({
   backHref,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const {
-    ctx,
-    isPending: isOptionsPending,
-    isError: isOptionsError,
-  } = useContentFormOptions(campaignId)
-
-  const mutation = useMutation({
-    mutationFn: (input: unknown) => createContent(campaignId, def!.routeKey, input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: def!.queryKey(campaignId) })
-    },
-  })
-
-  const fields = useMemo(() => (def ? def.buildFields(ctx) : []), [def, ctx])
 
   return (
     <div className="space-y-6 pb-10">
@@ -59,39 +86,7 @@ export function ContentCreateShell({
       </div>
 
       {def ? (
-        isOptionsPending ? (
-          <div className="flex justify-center py-8">
-            <Spinner />
-          </div>
-        ) : isOptionsError ? (
-          <Text variant="destructive" role="alert">
-            Could not load catalog options.
-          </Text>
-        ) : (
-          <div className="max-w-2xl">
-            <Form
-              schema={def.schema}
-              fields={fields}
-              defaultValues={def.createDefaultValues}
-              onSubmit={async (values) => {
-                await mutation.mutateAsync(def.toInput(values))
-                navigate(backHref)
-              }}
-              formError={mutation.isError ? String(mutation.error) : null}
-              footer={(form) => (
-                <div className="flex items-center gap-3 pt-4">
-                  <FormSaveFooter
-                    pending={mutation.isPending || form.formState.isSubmitting}
-                    submitLabel="Create"
-                  />
-                  <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-                    Cancel
-                  </Link>
-                </div>
-              )}
-            />
-          </div>
-        )
+        <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
       ) : (
         <ContentFormComingSoon />
       )}
@@ -99,45 +94,7 @@ export function ContentCreateShell({
   )
 }
 
-function ContentFormComingSoon() {
-  return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
-      <Text variant="muted">Form coming soon.</Text>
-    </div>
-  )
-}
-
-/**
- * Handles the loading/error/ready pattern for the create shell's parent data
- * (e.g. campaign context). Renders a `<Spinner>` while pending and a
- * destructive alert on error.
- */
-export interface ContentFormShellResolverProps {
-  isPending: boolean
-  isError: boolean
-  errorLabel?: string
-  children: React.ReactNode
-}
-
-export function ContentFormShellResolver({
-  isPending,
-  isError,
-  errorLabel,
-  children,
-}: ContentFormShellResolverProps) {
-  if (isPending) {
-    return (
-      <div className="flex justify-center py-8">
-        <Spinner />
-      </div>
-    )
-  }
-  if (isError) {
-    return (
-      <Text variant="destructive" role="alert">
-        {errorLabel ?? 'Could not load page data.'}
-      </Text>
-    )
-  }
-  return children
-}
+export {
+  ContentFormShellResolver,
+  type ContentFormShellResolverProps,
+} from './content-form-shell-parts'

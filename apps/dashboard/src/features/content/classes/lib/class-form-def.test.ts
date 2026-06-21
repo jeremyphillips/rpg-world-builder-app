@@ -57,6 +57,39 @@ describe('classFormDef round-trips', () => {
     ])
   })
 
+  it('rogue: tool proficiencies round-trip as slug arrays', () => {
+    const rogue = SRD_CLASSES.find((c) => c.slug === 'rogue')!
+    const formValues = classFormDef.toFormValues(rogue) as ClassFormValues
+    expect(formValues.proficiencies.tools).toEqual(['thieves-tools'])
+    expect(formValues.proficiencies.weapons.items).toEqual([])
+    const input = classFormDef.toInput(formValues)
+    expect(input.proficiencies.tools).toEqual(rogue.proficiencies.tools)
+  })
+
+  it('sorcerer: specific weapon proficiencies round-trip as slug arrays', () => {
+    const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
+    const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
+    expect(formValues.proficiencies.weapons.items).toEqual([
+      'dagger',
+      'dart',
+      'sling',
+      'quarterstaff',
+      'light-crossbow',
+    ])
+    const input = classFormDef.toInput(formValues)
+    expect(input.proficiencies.weapons.items).toEqual(sorcerer.proficiencies.weapons.items)
+  })
+
+  it('bard: innate spell entries use spell slug arrays in form values', () => {
+    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    const wordsOfCreation = formValues.features.find((f) => f.id === 'words-of-creation')
+    expect(wordsOfCreation?.grants?.[0]?.innateSpellEntries?.[0]?.spellIds).toEqual([
+      'power-word-heal',
+      'power-word-kill',
+    ])
+  })
+
   it('sorcerer: spellcasting and resources round-trip', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues

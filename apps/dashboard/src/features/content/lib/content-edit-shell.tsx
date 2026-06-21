@@ -1,13 +1,15 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { Form, FormSaveFooter } from '@rpg/ui/form'
 
 import { updateContent } from './content-client'
-import { useContentFormOptions } from './content-form-options'
-import { contentFormRegistry } from './content-form-registry'
-import type { AnyContentFormDef } from './content-form-registry'
+import type { ContentFormCtx } from './content-form-registry'
+import {
+  ContentFormNotRegistered,
+  ContentFormOptionsGate,
+  ContentSchemaForm,
+} from './content-form-shell-parts'
+import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -34,26 +36,23 @@ interface ContentEditFormProps {
   backHref: string
 }
 
-/**
- * Inner form component. Rendered only when `def` is guaranteed to exist,
- * keeping all hook calls unconditional and the complexity low.
- */
-function ContentEditForm({
+interface ContentEditFormReadyProps extends ContentEditFormProps {
+  ctx: ContentFormCtx
+}
+
+function ContentEditFormReady({
   def,
   campaignId,
   entityId,
   notFoundLabel = 'Item not found.',
   heading: headingFn = (name) => `Edit ${name}`,
   backHref,
-}: ContentEditFormProps) {
+  ctx,
+}: ContentEditFormReadyProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const {
-    ctx,
-    isPending: isOptionsPending,
-    isError: isOptionsError,
-  } = useContentFormOptions(campaignId)
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
+  const fields = def.buildFields(ctx)
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
@@ -61,24 +60,6 @@ function ContentEditForm({
       void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
     },
   })
-
-  const fields = useMemo(() => def.buildFields(ctx), [def, ctx])
-
-  if (isOptionsPending) {
-    return (
-      <div className="flex justify-center py-8">
-        <Spinner />
-      </div>
-    )
-  }
-
-  if (isOptionsError) {
-    return (
-      <Text variant="destructive" role="alert">
-        Could not load catalog options.
-      </Text>
-    )
-  }
 
   if (!entity) {
     return (
@@ -94,31 +75,29 @@ function ContentEditForm({
         {headingFn(entity.name)}
       </Heading>
 
-      <div className="max-w-2xl">
-        <Form
-          key={entity.id}
-          schema={def.schema}
-          fields={fields}
-          defaultValues={def.toFormValues(entity)}
-          onSubmit={async (values) => {
-            await mutation.mutateAsync(def.toInput(values))
-            navigate(backHref)
-          }}
-          formError={mutation.isError ? String(mutation.error) : null}
-          footer={(form) => (
-            <div className="flex items-center gap-3 pt-4">
-              <FormSaveFooter
-                pending={mutation.isPending || form.formState.isSubmitting}
-                submitLabel="Save changes"
-              />
-              <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-                Cancel
-              </Link>
-            </div>
-          )}
-        />
-      </div>
+      <ContentSchemaForm
+        formKey={entity.id}
+        schema={def.schema}
+        fields={fields}
+        defaultValues={def.toFormValues(entity)}
+        backHref={backHref}
+        submitLabel="Save changes"
+        submitPending={mutation.isPending}
+        formError={mutation.isError ? String(mutation.error) : null}
+        onSubmit={async (values) => {
+          await mutation.mutateAsync(def.toInput(values))
+          navigate(backHref)
+        }}
+      />
     </div>
+  )
+}
+
+function ContentEditForm(props: ContentEditFormProps) {
+  return (
+    <ContentFormOptionsGate campaignId={props.campaignId}>
+      {(ctx) => <ContentEditFormReady {...props} ctx={ctx} />}
+    </ContentFormOptionsGate>
   )
 }
 
@@ -161,16 +140,7 @@ export function ContentEditShell({
   const def = contentFormRegistry[contentType]
 
   if (!def) {
-    return (
-      <div className="space-y-4">
-        <Heading variant="page" as="h2">
-          Edit
-        </Heading>
-        <div className="rounded-lg border border-dashed border-border p-8 text-center">
-          <Text variant="muted">Form coming soon.</Text>
-        </div>
-      </div>
-    )
+    return <ContentFormNotRegistered />
   }
 
   return (

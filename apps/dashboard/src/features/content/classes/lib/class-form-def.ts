@@ -38,7 +38,11 @@ import {
   grantRowFormSchema,
   grantsToFormRows,
 } from '../../lib/grant-form-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormCtx,
+  type ContentFormDef,
+} from '../../lib/content-form-registry'
 import { titleCase } from '../../lib/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 import {
@@ -114,9 +118,9 @@ const proficienciesFormSchema = z.object({
   armor: z.array(armorCategorySchema),
   weapons: z.object({
     categories: z.array(weaponCategorySchema),
-    items: z.string().optional(),
+    items: z.array(z.string()).optional(),
   }),
-  tools: z.string().optional(),
+  tools: z.array(z.string()).optional(),
   skills: z.object({
     choose: z.coerce.number().int().min(0),
     from: z.array(skillSchema),
@@ -210,7 +214,7 @@ const spellProgressionGridField: FormItem = {
 // Field builders
 // ---------------------------------------------------------------------------
 
-function featureItemFields(): FormItem[] {
+function featureItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'row',
@@ -233,7 +237,7 @@ function featureItemFields(): FormItem[] {
     },
     { type: 'text', name: 'name', label: 'Name', required: true },
     { type: 'richtext', name: 'description', label: 'Description' },
-    ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS),
+    ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS, ctx),
   ]
 }
 
@@ -272,11 +276,35 @@ function resourceItemFields(): FormItem[] {
 // Conversion helpers
 // ---------------------------------------------------------------------------
 
-function splitComma(value: string): string[] {
-  return value
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean)
+function proficienciesToFormValues(proficiencies: ClassProficiencies) {
+  return {
+    savingThrows: proficiencies.savingThrows,
+    armor: proficiencies.armor,
+    weapons: {
+      categories: proficiencies.weapons.categories,
+      items: proficiencies.weapons.items ?? [],
+    },
+    tools: proficiencies.tools ?? [],
+    skills: proficiencies.skills,
+  }
+}
+
+function proficienciesFromFormValues(
+  proficiencies: ClassFormValues['proficiencies'],
+): ClassProficiencies {
+  const weaponItems = proficiencies.weapons.items ?? []
+  const tools = proficiencies.tools ?? []
+
+  return {
+    savingThrows: proficiencies.savingThrows,
+    armor: proficiencies.armor,
+    weapons: {
+      categories: proficiencies.weapons.categories,
+      ...(weaponItems.length ? { items: weaponItems } : {}),
+    },
+    ...(tools.length ? { tools } : {}),
+    skills: proficiencies.skills,
+  }
 }
 
 function featureToFormRow(feature: ClassFeature): FeatureRowForm {
@@ -310,37 +338,6 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   return {
     name: row.name,
     entries: row.entries,
-  }
-}
-
-function proficienciesToFormValues(proficiencies: ClassProficiencies) {
-  return {
-    savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor,
-    weapons: {
-      categories: proficiencies.weapons.categories,
-      items: proficiencies.weapons.items?.join(', ') ?? '',
-    },
-    tools: proficiencies.tools?.join(', ') ?? '',
-    skills: proficiencies.skills,
-  }
-}
-
-function proficienciesFromFormValues(
-  proficiencies: ClassFormValues['proficiencies'],
-): ClassProficiencies {
-  const tools = splitComma(proficiencies.tools ?? '')
-  const weaponItems = splitComma(proficiencies.weapons.items ?? '')
-
-  return {
-    savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor,
-    weapons: {
-      categories: proficiencies.weapons.categories,
-      ...(weaponItems.length ? { items: weaponItems } : {}),
-    },
-    ...(tools.length ? { tools } : {}),
-    skills: proficiencies.skills,
   }
 }
 
@@ -422,8 +419,8 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
   proficiencies: {
     savingThrows: ['str'],
     armor: [],
-    weapons: { categories: [], items: '' },
-    tools: '',
+    weapons: { categories: [], items: [] },
+    tools: [],
     skills: { choose: 2, from: [] },
   },
   features: [],
@@ -440,7 +437,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   schema: classFormSchema,
   createDefaultValues: classCreateDefaultValues,
 
-  buildFields: (_ctx) => [
+  buildFields: (ctx) => [
     {
       kind: 'group',
       legend: 'Identity',
@@ -573,16 +570,20 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
           options: weaponCategoryOptions,
         },
         {
-          type: 'text',
+          type: 'combobox',
           name: 'proficiencies.weapons.items',
           label: 'Specific weapons',
-          hint: 'Comma-separated weapon IDs',
+          multiple: true,
+          options: ctx.options?.weapons ?? [],
+          placeholder: 'Choose weapons…',
         },
         {
-          type: 'text',
+          type: 'combobox',
           name: 'proficiencies.tools',
           label: 'Tools',
-          hint: 'Comma-separated tool names',
+          multiple: true,
+          options: ctx.options?.tools ?? [],
+          placeholder: 'Choose tools…',
         },
         {
           kind: 'row',
@@ -610,7 +611,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
       legend: 'Features',
       addLabel: 'Add feature',
       itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
-      fields: featureItemFields(),
+      fields: featureItemFields(ctx),
     },
     {
       kind: 'array',
