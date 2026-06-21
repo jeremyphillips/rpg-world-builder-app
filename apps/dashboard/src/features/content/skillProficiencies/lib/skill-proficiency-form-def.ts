@@ -16,7 +16,7 @@ import {
   type ContentFormDef,
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 
 const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
@@ -83,7 +83,7 @@ const skillProficiencyFormDef: ContentFormDef<
   }),
   toInput: (values, ctx?: ContentFormInputCtx<SkillProficiency>) => {
     const input = createSkillProficiencyInputSchema.parse({
-      ...envelopeSlugFields(values.name, ctx),
+      slug: slugForInputParse(values.name, ctx),
       name: values.name,
       description: values.description || undefined,
       ability: values.ability,

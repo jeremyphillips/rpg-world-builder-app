@@ -5,6 +5,7 @@ import {
   deriveSlugForCreate,
   envelopeSlugFields,
   finalizeContentInput,
+  slugForInputParse,
   stripSlugFromInput,
 } from './content-form-key-helpers'
 
@@ -32,6 +33,18 @@ describe('stripSlugFromInput', () => {
       name: 'Elf',
       description: 'x',
     })
+  })
+})
+
+describe('slugForInputParse', () => {
+  it('uses entity slug on update for schema parse', () => {
+    expect(slugForInputParse('Renamed', { entity: { slug: 'original-slug' } })).toBe(
+      'original-slug',
+    )
+  })
+
+  it('derives slug on create', () => {
+    expect(slugForInputParse('Wood Elf')).toBe('wood-elf')
   })
 })
 

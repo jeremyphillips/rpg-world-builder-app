@@ -20,6 +20,31 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 ---
 
+## Content key mutability
+
+Catalog records carry three distinct identifier layers. Authors edit **display names** only; keys are derived on create and locked afterward (no slug/id fields in dashboard forms).
+
+| Layer               | Example                                 | Assigned                               | Mutable after create?                 |
+| ------------------- | --------------------------------------- | -------------------------------------- | ------------------------------------- |
+| Envelope **`id`**   | `srd-cc-5.2.1:fighter` or Mongo `_id`   | System seed / Mongo                    | **Never** — opaque FK for references  |
+| Envelope **`slug`** | `fighter`, `wood-elf`                   | `deriveContentKey(name)` on first POST | **No** — homebrew and system patches  |
+| Nested **`id`**     | `rage`, `darkvision` on traits/features | Same helper, scoped to parent          | **No** — rename display `name` freely |
+
+Shared helpers: `packages/contracts/src/content/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
+
+**Today:** “publish” means the first successful homebrew **POST**. There is no draft workflow yet; records created under this rule remain locked.
+
+### Known gaps (revisit later)
+
+- **Cross-catalog slug references** — Some fields still store class **slugs**, not opaque ids (e.g. `spell.classIds`, `skillProficiency.suggestedClasses`). Locking a target’s slug does not break these while the slug stays unchanged; deleting and re-creating content under a new slug **will** break slug-based refs. No cascade migration exists.
+- **Character model** — Not built yet. When added, characters should reference catalog records by envelope **`id`**, not slug or nested trait id, unless tracking per-feature state requires `(classId, featureId)`.
+- **Delete + re-add** — Removing a nested trait/feature and adding a “new” row with the same display name gets a fresh derived id. Any future character state keyed by nested ids would not carry over.
+- **Draft → publish** — A future draft state may defer slug assignment until publish. Existing homebrew created today is already published/locked; migration should not be required.
+- **Sibling uniqueness errors** — Duplicate derived slugs within a campaign surface as API `409 slug_conflict`. Nested id collisions within a parent are deduped (`darkvision-2`); friendly form validation is not yet surfaced.
+- **Manual slug override** — Intentionally unsupported. Re-enabling would need an explicit admin/rename flow with reference counts, not silent PATCH.
+
+---
+
 ## Layer overview
 
 ```
@@ -99,8 +124,8 @@ Add a co-located `<type>.test.ts` covering:
 - A homebrew record (with `campaignId`) parses correctly.
 - Required fields are validated.
 - Optional fields can be omitted.
-- `create*InputSchema` requires a slug and validates it.
-- `update*InputSchema` allows partial updates.
+- `create*InputSchema` requires a slug in the contract DTO (the API derives it from `name` on POST; dashboard forms do not author slug).
+- `update*InputSchema` allows partial updates; slug is omitted on PATCH (immutable after create).
 - `*PatchSchema` requires `campaignId` and `targetId`.
 
 If the type has a **closed set of ids** used as enums (weapon properties, armor
@@ -207,8 +232,7 @@ Rules specific to union-shaped types:
 - `create*`: union of `<variant>.extend({ slug: slugSchema })`.
 - `update*` / `*Patch` bodies: union of `<variant>.partial().extend({ kind: <variant>.shape.kind })`
   — `.partial()` makes everything optional, so re-pin `kind` (the discriminant)
-  as required. `create`-derived updates may keep `slug` optional; patch bodies
-  omit `slug` (slugs are not patchable).
+  as required. `create`-derived updates omit `slug` (immutable after create); system patch bodies also omit `slug`.
 - Keep a `KIND_ENTRIES` map (the `GameTermEntry` pattern) or `KIND_LABELS` map +
   `getXKindLabel(kind)` helper for kind display names and filter options.
 

@@ -37,7 +37,7 @@ import {
   type ContentFormDef,
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useWeapons, weaponsQueryKey } from '../hooks/use-weapons'
 
 const weaponCategoryOptions = toOptions(
@@ -220,7 +220,7 @@ function optionalWeaponRange(values: WeaponFormValues): Partial<CreateWeaponInpu
 function toInput(values: WeaponFormValues, ctx?: ContentFormInputCtx<Weapon>): CreateWeaponInput {
   const weight = weightFromForm(values.weight?.value)
   const input = createWeaponInputSchema.parse({
-    ...envelopeSlugFields(values.name, ctx),
+    slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
     category: values.category,

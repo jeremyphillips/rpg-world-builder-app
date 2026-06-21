@@ -26,7 +26,7 @@ import {
   type ContentFormDef,
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useArmor, armorQueryKey } from '../hooks/use-armor'
 
 const armorCategoryOptions = toOptions(
@@ -181,7 +181,7 @@ function optionalAcFields(values: ArmorFormValues): Partial<CreateArmorInput> {
 function toInput(values: ArmorFormValues, ctx?: ContentFormInputCtx<Armor>): CreateArmorInput {
   const weight = weightFromForm(values.weight?.value)
   const input = createArmorInputSchema.parse({
-    ...envelopeSlugFields(values.name, ctx),
+    slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
     category: values.category,

@@ -32,7 +32,7 @@ import {
   type ContentFormDef,
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 
 const equipmentKindSchema = z.enum(EQUIPMENT_KINDS)
@@ -119,9 +119,9 @@ type EquipmentInputBase = Pick<EquipmentFormValues, 'name' | 'description' | 'co
 function inputBase(
   values: EquipmentFormValues,
   ctx?: ContentFormInputCtx<Equipment>,
-): EquipmentInputBase & { description?: string; slug?: string } {
+): EquipmentInputBase & { description?: string; slug: string } {
   return {
-    ...envelopeSlugFields(values.name, ctx),
+    slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
     cost: values.cost,

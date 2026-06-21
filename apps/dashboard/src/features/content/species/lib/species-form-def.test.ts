@@ -14,7 +14,7 @@
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpecies } from '@rpg/catalog/species'
-import { createSpeciesInputSchema, type CreateSpeciesInput } from '@rpg/contracts'
+import { createSpeciesInputSchema, deriveContentKey, type CreateSpeciesInput } from '@rpg/contracts'
 
 import { speciesFormDef, type SpeciesFormValues } from './species-form-def'
 
@@ -102,6 +102,39 @@ describe('speciesFormDef round-trips', () => {
     expect(darkvisionTrait).toBeDefined()
     expect(darkvisionTrait?.grants?.senses?.[0]?.type).toBe('darkvision')
     expect(darkvisionTrait?.grants?.senses?.[0]?.range).toBe(60)
+  })
+})
+
+describe('speciesFormDef create vs update modes', () => {
+  it('create: derives slug and assigns trait ids for new rows', () => {
+    const formValues = {
+      ...speciesFormDef.createDefaultValues,
+      name: 'Custom Species',
+      traits: [{ name: 'Darkvision', grants: [] }],
+    } as SpeciesFormValues
+    const input = speciesFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Species'))
+    expect(input.traits[0]?.id).toBe('darkvision')
+  })
+
+  it('update: omits slug and preserves trait ids when names change', () => {
+    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
+    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
+    formValues.name = 'Renamed Elf'
+    const traitId = elf.traits[0]!.id
+    formValues.traits[0]!.name = 'Renamed Trait'
+    const input = speciesFormDef.toInput(formValues, { entity: elf })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.traits[0]?.id).toBe(traitId)
+  })
+
+  it('update: preserves heritage choice option ids when names change', () => {
+    const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
+    const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
+    const optionId = dragonborn.heritageChoices?.[0]?.options[0]?.id
+    formValues.heritageChoices![0]!.options[0]!.name = 'Renamed Ancestry'
+    const input = speciesFormDef.toInput(formValues, { entity: dragonborn })
+    expect(input.heritageChoices?.[0]?.options[0]?.id).toBe(optionId)
   })
 })
 

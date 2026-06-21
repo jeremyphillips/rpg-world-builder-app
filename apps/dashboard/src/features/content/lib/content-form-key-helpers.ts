@@ -24,6 +24,14 @@ export function stripSlugFromInput<T extends { slug?: string }>(input: T): Omit<
   return rest
 }
 
+/** Slug for Zod create-schema parse; stripped from update payloads by finalizeContentInput. */
+export function slugForInputParse(
+  name: string,
+  ctx?: ContentFormInputCtx<{ slug: string }>,
+): string {
+  return ctx?.entity?.slug ?? deriveSlugForCreate(name)
+}
+
 /** Slug fields for create; omitted on update after first publish. */
 export function envelopeSlugFields(
   name: string,

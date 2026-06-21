@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedWeapons } from '@rpg/catalog/weapons'
-import { createWeaponInputSchema, type CreateWeaponInput } from '@rpg/contracts'
+import { createWeaponInputSchema, deriveContentKey, type CreateWeaponInput } from '@rpg/contracts'
 
 import { weaponFormDef, type WeaponFormValues } from './weapon-form-def'
 
@@ -25,4 +25,24 @@ describe('weaponFormDef round-trips', () => {
       expect(input.category).toBe(weapon.category)
     })
   }
+})
+
+describe('weaponFormDef create vs update modes', () => {
+  it('create: derives slug from name when slug is omitted', () => {
+    const formValues = {
+      ...weaponFormDef.createDefaultValues,
+      name: 'Custom Longsword',
+    } as WeaponFormValues
+    const input = weaponFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Longsword'))
+  })
+
+  it('update: omits slug when entity context is present', () => {
+    const weapon = SRD_WEAPONS[0]!
+    const formValues = weaponFormDef.toFormValues(weapon) as WeaponFormValues
+    formValues.name = 'Renamed Weapon'
+    const input = weaponFormDef.toInput(formValues, { entity: weapon })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.name).toBe('Renamed Weapon')
+  })
 })
