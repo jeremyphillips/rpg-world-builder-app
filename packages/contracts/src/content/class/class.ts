@@ -11,7 +11,7 @@ import {
   contentPatchBaseSchema,
   slugSchema,
 } from '../envelope'
-import { contentTraitSchema } from '../grants'
+import { customContentTraitSchema, normalizeContentTrait } from '../grants'
 import { skillSchema } from '../skill-proficiency'
 
 import { spellcastingSchema } from './spellcasting'
@@ -24,9 +24,12 @@ import { spellcastingSchema } from './spellcasting'
 
 // --- Class features + proficiencies ----------------------------------------
 
-export const classFeatureSchema = contentTraitSchema.extend({
-  level: levelSchema,
-})
+export const classFeatureSchema = z.preprocess(
+  normalizeContentTrait,
+  customContentTraitSchema.extend({
+    level: levelSchema,
+  }),
+)
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>
 

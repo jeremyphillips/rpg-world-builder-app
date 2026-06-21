@@ -16,7 +16,28 @@ Add a new content type when the domain entity:
 
 If the entity is always embedded inside another (e.g. class features, spell components), model it as a nested schema on the parent type instead.
 
-When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as **heritage choices** on the parent body rather than a separate content type. See `content/species.ts` (`heritageChoices` of `speciesTraitSchema` options with optional `grants`).
+When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as **heritage choices** on the parent body rather than a separate content type. See `content/species.ts` (`heritageChoices` of `contentTraitSchema` options with optional `grants`).
+
+---
+
+## Content traits (`custom` vs `grant`)
+
+Species traits and heritage options share `contentTraitSchema` — a discriminated union on `kind`:
+
+| Kind     | Stored fields                                                        | Rendering                                                      |
+| -------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `custom` | `name`, optional `description`, optional `grants`                    | Use stored prose; grants supplement mechanics                  |
+| `grant`  | `grants` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
+
+**Class and subclass features are always `custom`** (`classFeatureSchema` extends the custom variant + `level`). Progression UI requires a stored feature name.
+
+Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a single atomic grant: one sense, one resistance, walk speed override, or one language. Hybrids (Drow: senses + innate spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
+
+- **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
+- **Aggregate** mechanics (e.g. species stat-row senses) with `getTraitGrants(trait)` — read raw grants, not derived prose.
+- **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
+
+Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
 
 ---
 

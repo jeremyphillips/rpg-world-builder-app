@@ -21,7 +21,7 @@ const fighterBody = {
     weapons: { categories: ['simple', 'martial'] },
     skills: { choose: 2, from: ['acrobatics', 'athletics', 'history'] },
   },
-  features: [{ id: 'second-wind', name: 'Second Wind', level: 1 }],
+  features: [{ kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 }],
 } as const
 
 const timestamps = {
@@ -73,6 +73,7 @@ describe('classSchema', () => {
       ...fighter,
       features: [
         {
+          kind: 'custom',
           id: 'words-of-creation',
           name: 'Words of Creation',
           level: 20,
@@ -183,6 +184,7 @@ describe('subclassSchema', () => {
       description: '<p>Bards who collect knowledge.</p>',
       features: [
         {
+          kind: 'custom',
           id: 'bonus-proficiencies',
           name: 'Bonus Proficiencies',
           level: 3,

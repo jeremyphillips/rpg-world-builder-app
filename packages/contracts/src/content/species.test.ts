@@ -16,12 +16,12 @@ const ELF_BODY = {
   speed: { walk: 30 },
   traits: [
     {
+      kind: 'grant' as const,
       id: 'darkvision',
-      name: 'Darkvision',
-      description: '<p>You have Darkvision with a range of 60 feet.</p>',
       grants: { senses: [{ type: 'darkvision', range: 60 }] },
     },
     {
+      kind: 'custom' as const,
       id: 'fey-ancestry',
       name: 'Fey Ancestry',
       description:
@@ -36,6 +36,7 @@ const ELF_BODY = {
       description: '<p>Your lineage shapes your connection to elven magic.</p>',
       options: [
         {
+          kind: 'custom' as const,
           id: 'drow',
           name: 'Drow',
           description: '<p>Drow trace their lineage to the Underdark.</p>',
@@ -51,6 +52,7 @@ const ELF_BODY = {
           },
         },
         {
+          kind: 'custom' as const,
           id: 'wood-elf',
           name: 'Wood Elf',
           description: '<p>Your Speed is 35 feet.</p>',

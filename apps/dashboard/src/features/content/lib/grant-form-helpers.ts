@@ -51,8 +51,9 @@ const BASE_GRANT_TYPES = [
   'languages',
 ] as const
 
-export const SPECIES_GRANT_TYPES = [...BASE_GRANT_TYPES] as const
 export const CLASS_GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells'] as const
+
+export const SPECIES_GRANT_TYPES = [...CLASS_GRANT_TYPES] as const
 
 type BaseGrantType = (typeof BASE_GRANT_TYPES)[number]
 type ClassGrantType = (typeof CLASS_GRANT_TYPES)[number]
@@ -565,4 +566,4 @@ export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefine
   return Object.keys(result).length ? result : undefined
 }
 
-export { BASE_GRANT_TYPE_LABELS as SPECIES_GRANT_TYPE_LABELS, CLASS_GRANT_TYPE_LABELS }
+export { CLASS_GRANT_TYPE_LABELS as SPECIES_GRANT_TYPE_LABELS, CLASS_GRANT_TYPE_LABELS }
