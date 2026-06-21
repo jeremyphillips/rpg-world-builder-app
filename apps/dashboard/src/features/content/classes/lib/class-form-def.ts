@@ -351,6 +351,7 @@ function featureToFormRow(feature: ClassFeature): FeatureRowForm {
 
 function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
   return {
+    kind: 'custom',
     id: row.id,
     name: row.name,
     description: row.description || undefined,

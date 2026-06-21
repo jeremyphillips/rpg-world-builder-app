@@ -88,13 +88,58 @@ export const contentGrantsSchema = z.object({
 
 export type ContentGrants = z.infer<typeof contentGrantsSchema>
 
-// --- Trait building block ---------------------------------------------------
+/** Returns grant bag keys that carry a non-empty value. */
+function definedGrantKeys(grants: ContentGrants): (keyof ContentGrants)[] {
+  return (Object.keys(grants) as (keyof ContentGrants)[]).filter((key) => {
+    const value = grants[key]
+    if (value === undefined) return false
+    if (Array.isArray(value) && value.length === 0) return false
+    return true
+  })
+}
 
 /**
- * Universal building block: SRD-worded rich text plus optional structured grants.
- * Extended with `level` for class/subclass features; used as-is for species traits.
+ * Phase-1 eligibility: grants fully described by a single atomic template
+ * (one sense, one resistance, walk speed override, or one language).
  */
-export const contentTraitSchema = z.object({
+export function isGrantEligibleGrants(grants: ContentGrants): boolean {
+  const keys = definedGrantKeys(grants)
+  if (keys.length !== 1) return false
+
+  const key = keys[0]!
+  switch (key) {
+    case 'senses':
+      return grants.senses!.length === 1
+    case 'resistances':
+      return grants.resistances!.length === 1
+    case 'speedOverride': {
+      const override = grants.speedOverride!
+      const modes = (Object.keys(override) as (keyof typeof override)[]).filter(
+        (mode) => override[mode] !== undefined,
+      )
+      return modes.length === 1 && modes[0] === 'walk' && override.walk !== undefined
+    }
+    case 'languages':
+      return grants.languages!.length === 1
+    default:
+      return false
+  }
+}
+
+// --- Trait building block ---------------------------------------------------
+
+export const CONTENT_TRAIT_KINDS = ['custom', 'grant'] as const
+
+export const contentTraitKindSchema = z.enum(CONTENT_TRAIT_KINDS)
+
+export type ContentTraitKind = z.infer<typeof contentTraitKindSchema>
+
+/**
+ * Named trait or feature: SRD prose plus optional structured grants (hybrids).
+ * Class/subclass features always use this variant.
+ */
+export const customContentTraitSchema = z.object({
+  kind: z.literal('custom'),
   id: z.string().min(1), // unique within the parent record — enforced at the service layer
   name: z.string().min(1),
   /** Rich-text HTML faithful to the SRD wording (body only — no "Level N:" prefix). */
@@ -102,7 +147,56 @@ export const contentTraitSchema = z.object({
   grants: contentGrantsSchema.optional(),
 })
 
+export type CustomContentTrait = z.infer<typeof customContentTraitSchema>
+
+/**
+ * Mechanics-only trait: display name and description are derived from `grants`
+ * unless overridden. `grants` must pass {@link isGrantEligibleGrants}.
+ */
+export const grantContentTraitSchema = z
+  .object({
+    kind: z.literal('grant'),
+    id: z.string().min(1),
+    grants: contentGrantsSchema,
+    nameOverride: z.string().min(1).optional(),
+    descriptionOverride: z.string().optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (!isGrantEligibleGrants(val.grants)) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'grant traits require a single atomic grant (one sense, resistance, walk speed, or language)',
+        path: ['grants'],
+      })
+    }
+  })
+
+export type GrantContentTrait = z.infer<typeof grantContentTraitSchema>
+
+const contentTraitUnionSchema = z.discriminatedUnion('kind', [
+  customContentTraitSchema,
+  grantContentTraitSchema,
+])
+
+/** Defaults missing `kind` to `custom` for legacy homebrew records. */
+export function normalizeContentTrait(input: unknown): unknown {
+  if (typeof input !== 'object' || input === null) return input
+  const record = input as Record<string, unknown>
+  if (record['kind'] !== undefined) return input
+  return { ...record, kind: 'custom' }
+}
+
+/**
+ * Universal building block for species traits and heritage options.
+ * Class features extend {@link customContentTraitSchema} only.
+ */
+export const contentTraitSchema = z.preprocess(normalizeContentTrait, contentTraitUnionSchema)
+
 export type ContentTrait = z.infer<typeof contentTraitSchema>
+
+/** @deprecated Prefer `customContentTraitSchema`. */
+export const speciesCustomTraitSchema = customContentTraitSchema
 
 // --- Backward-compatible aliases (species module re-exports these too) ------
 

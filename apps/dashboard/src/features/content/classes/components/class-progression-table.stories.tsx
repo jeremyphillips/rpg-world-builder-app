@@ -16,8 +16,8 @@ type Story = StoryObj
 const BARBARIAN: CharacterClass = {
   ...pickClass('barbarian'),
   features: [
-    { id: 'rage', name: 'Rage', level: 1 },
-    { id: 'unarmored-defense', name: 'Unarmored Defense', level: 1 },
+    { kind: 'custom', id: 'rage', name: 'Rage', level: 1 },
+    { kind: 'custom', id: 'unarmored-defense', name: 'Unarmored Defense', level: 1 },
   ],
 }
 

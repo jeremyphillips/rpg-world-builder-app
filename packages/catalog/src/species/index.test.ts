@@ -1,9 +1,30 @@
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
+import type { ContentTrait } from '@rpg/contracts'
+import { getTraitGrants, resolveTraitDisplay } from '@rpg/contracts'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
+
+type SeedSpecies = ReturnType<typeof loadSeedSpecies>[number]
+
+function traitDescriptionHtml(trait: ContentTrait): string | undefined {
+  return resolveTraitDisplay(trait).descriptionHtml
+}
+
+function expectSpeciesRichTextDescriptions(entry: SeedSpecies): void {
+  expectRichTextHtml(entry.description)
+  for (const trait of entry.traits) {
+    expectRichTextHtml(traitDescriptionHtml(trait))
+  }
+  for (const group of entry.heritageChoices ?? []) {
+    expectRichTextHtml(group.description)
+    for (const option of group.options) {
+      expectRichTextHtml(traitDescriptionHtml(option))
+    }
+  }
+}
 
 describe('SRD 5.2.1 species seed', () => {
   const species = loadSeedSpecies(RULESET)
@@ -73,8 +94,17 @@ describe('SRD 5.2.1 species seed', () => {
     const drow = elf
       .heritageChoices!.find((g) => g.id === 'elven-lineage')!
       .options.find((o) => o.id === 'drow')!
-    expect(drow.grants?.senses?.[0]).toEqual({ type: 'darkvision', range: 120 })
-    expect(drow.grants?.innateSpells?.entries.length).toBeGreaterThanOrEqual(3)
+    expect(getTraitGrants(drow)?.senses?.[0]).toEqual({ type: 'darkvision', range: 120 })
+    expect(getTraitGrants(drow)?.innateSpells?.entries.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('grant darkvision traits derive display name and description', () => {
+    const elf = species.find((s) => s.slug === 'elf')!
+    const darkvision = elf.traits.find((t) => t.id === 'darkvision')!
+    expect(darkvision.kind).toBe('grant')
+    const display = resolveTraitDisplay(darkvision)
+    expect(display.name).toBe('Darkvision')
+    expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
   })
 
   it('Wood Elf grants a speed override of walk 35', () => {
@@ -120,21 +150,12 @@ describe('SRD 5.2.1 species seed', () => {
   it('Dwarf grants poison resistance', () => {
     const dwarf = species.find((s) => s.slug === 'dwarf')!
     const resilience = dwarf.traits.find((t) => t.id === 'dwarven-resilience')
-    expect(resilience?.grants?.resistances).toContain('poison')
+    expect(getTraitGrants(resilience!)?.resistances).toContain('poison')
   })
 
   it('stores non-empty descriptions as rich-text HTML', () => {
     for (const s of species) {
-      expectRichTextHtml(s.description)
-      for (const trait of s.traits) {
-        expectRichTextHtml(trait.description)
-      }
-      for (const group of s.heritageChoices ?? []) {
-        expectRichTextHtml(group.description)
-        for (const option of group.options) {
-          expectRichTextHtml(option.description)
-        }
-      }
+      expectSpeciesRichTextDescriptions(s)
     }
   })
 })

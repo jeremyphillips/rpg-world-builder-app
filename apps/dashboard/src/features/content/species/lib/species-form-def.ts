@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  CONTENT_TRAIT_KINDS,
   CREATURE_SIZES,
   CREATURE_SIZE_ENTRIES,
   CREATURE_TYPES,
@@ -7,8 +8,12 @@ import {
   SPECIES_CHOICE_KINDS,
   SPECIES_CHOICE_KIND_LABELS,
   STANDARD_SPEEDS,
+  contentTraitKindSchema,
   creatureSizeSchema,
   creatureTypeSchema,
+  getTraitGrants,
+  isGrantEligibleGrants,
+  resolveTraitName,
   speciesChoiceKindSchema,
   slugSchema,
   type ContentTrait,
@@ -16,7 +21,7 @@ import {
   type Species,
   type SpeciesHeritageChoice,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   SPECIES_GRANT_TYPES,
@@ -71,12 +76,53 @@ const choiceKindOptions = toOptions(SPECIES_CHOICE_KINDS, SPECIES_CHOICE_KIND_LA
 // Form schema
 // ---------------------------------------------------------------------------
 
-const traitRowFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  grants: z.array(grantRowFormSchema),
-})
+const traitKindOptions = toOptions(CONTENT_TRAIT_KINDS, {
+  custom: 'Custom',
+  grant: 'From grants',
+} as Record<(typeof CONTENT_TRAIT_KINDS)[number], string>)
+
+function visibleForTraitKind(kind: (typeof CONTENT_TRAIT_KINDS)[number]): FieldVisibility {
+  return {
+    dependsOn: ['kind'],
+    visibleWhen: (watched) => watched['kind'] === kind,
+  }
+}
+
+/** Form-only: reveals name/description override fields for grant traits. */
+function visibleForGrantOverrides(): FieldVisibility {
+  return {
+    dependsOn: ['kind', 'overrideDisplay'],
+    visibleWhen: (watched) => watched['kind'] === 'grant' && watched['overrideDisplay'] === true,
+  }
+}
+
+const traitRowFormSchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    kind: contentTraitKindSchema.default('custom'),
+    /** Form-only — not persisted; derived from stored overrides on load. */
+    overrideDisplay: z.boolean().default(false),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    nameOverride: z.string().optional(),
+    descriptionOverride: z.string().optional(),
+    grants: z.array(grantRowFormSchema),
+  })
+  .superRefine((row, ctx) => {
+    if (row.kind === 'custom' && !row.name?.trim()) {
+      ctx.addIssue({ code: 'custom', message: 'Name is required', path: ['name'] })
+    }
+    if (row.kind === 'grant') {
+      const grants = formRowsToGrants(row.grants)
+      if (!grants || !isGrantEligibleGrants(grants)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Grant traits require one eligible grant row',
+          path: ['grants'],
+        })
+      }
+    }
+  })
 type TraitRowForm = z.infer<typeof traitRowFormSchema>
 
 const heritageChoiceRowFormSchema = z.object({
@@ -108,10 +154,67 @@ type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
 function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    { type: 'text', name: 'name', label: 'Name', required: true },
-    { type: 'richtext', name: 'description', label: 'Description' },
+    {
+      type: 'select',
+      name: 'kind',
+      label: 'Trait kind',
+      options: traitKindOptions,
+      required: true,
+      defaultValue: 'custom',
+    },
+    {
+      type: 'text',
+      name: 'name',
+      label: 'Name',
+      required: true,
+      visibility: visibleForTraitKind('custom'),
+    },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      visibility: visibleForTraitKind('custom'),
+    },
+    {
+      type: 'switch',
+      name: 'overrideDisplay',
+      label: 'Custom name and description',
+      visibility: visibleForTraitKind('grant'),
+    },
+    {
+      type: 'text',
+      name: 'nameOverride',
+      label: 'Custom name',
+      placeholder: 'Leave blank to use the default',
+      visibility: visibleForGrantOverrides(),
+    },
+    {
+      type: 'richtext',
+      name: 'descriptionOverride',
+      label: 'Custom description',
+      hint: 'Leave blank to use the default',
+      visibility: visibleForGrantOverrides(),
+    },
     ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS, ctx),
   ]
+}
+
+function traitItemTitle(values: Record<string, unknown>, index: number): string {
+  const row = values as TraitRowForm
+  if (row.kind === 'grant') {
+    const grants = formRowsToGrants(row.grants)
+    if (grants && isGrantEligibleGrants(grants)) {
+      return resolveTraitName({
+        kind: 'grant',
+        id: row.id ?? `trait-${index}`,
+        grants,
+        nameOverride: row.nameOverride,
+        descriptionOverride: row.descriptionOverride,
+      })
+    }
+    return `Grant trait ${index + 1}`
+  }
+  return row.name || `Trait ${index + 1}`
 }
 
 function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
@@ -130,7 +233,7 @@ function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Options',
       addLabel: 'Add option',
       min: 1,
-      itemTitle: (values, index) => (values['name'] as string) || `Option ${index + 1}`,
+      itemTitle: traitItemTitle,
       fields: traitItemFields(ctx),
     },
   ]
@@ -141,37 +244,81 @@ function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
 // ---------------------------------------------------------------------------
 
 function traitToFormRow(trait: ContentTrait): TraitRowForm {
+  const grants = grantsToFormRows(getTraitGrants(trait))
+  if (trait.kind === 'grant') {
+    const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
+    return {
+      id: trait.id,
+      kind: 'grant',
+      overrideDisplay: hasOverrides,
+      nameOverride: trait.nameOverride,
+      descriptionOverride: trait.descriptionOverride,
+      grants,
+    }
+  }
   return {
     id: trait.id,
+    kind: 'custom',
+    overrideDisplay: false,
     name: trait.name,
     description: trait.description,
-    grants: grantsToFormRows(trait.grants),
+    grants,
   }
 }
 
 function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
-  return {
-    id: row.id,
-    name: row.name,
-    description: row.description || undefined,
-    grants: formRowsToGrants(row.grants),
+  const grants = formRowsToGrants(row.grants)
+  if (row.kind === 'grant') {
+    return {
+      kind: 'grant',
+      id: row.id,
+      grants: grants!,
+      nameOverride: row.nameOverride || undefined,
+      descriptionOverride: row.descriptionOverride || undefined,
+    }
   }
+  return {
+    kind: 'custom',
+    id: row.id,
+    name: row.name!,
+    description: row.description || undefined,
+    grants,
+  }
+}
+
+function traitRowNameForIdAssignment(row: TraitRowForm, index: number): string {
+  if (row.kind === 'grant') {
+    return row.nameOverride?.trim() || traitItemTitle(row, index)
+  }
+  return row.name?.trim() || `Trait ${index + 1}`
+}
+
+function traitRowsWithNamesForIdAssignment(
+  rows: TraitRowForm[],
+): Array<TraitRowForm & { name: string }> {
+  return rows.map((row, index) => ({
+    ...row,
+    name: traitRowNameForIdAssignment(row, index),
+  }))
 }
 
 function traitsFromFormValues(
   rows: TraitRowForm[],
   existing?: readonly ContentTrait[],
 ): ContentTrait[] {
-  return applyStableIdsForUpdate(rows, existing).map(traitFromFormRow)
+  return applyStableIdsForUpdate(traitRowsWithNamesForIdAssignment(rows), existing).map(
+    traitFromFormRow,
+  )
 }
 
 function heritageChoiceFromFormRow(
   row: HeritageChoiceRowForm & { id: string },
   existingChoice?: SpeciesHeritageChoice,
 ): SpeciesHeritageChoice {
-  const options = applyStableIdsForUpdate(row.options, existingChoice?.options).map(
-    traitFromFormRow,
-  )
+  const options = applyStableIdsForUpdate(
+    traitRowsWithNamesForIdAssignment(row.options),
+    existingChoice?.options,
+  ).map(traitFromFormRow)
   return {
     id: row.id,
     name: row.name,
@@ -267,7 +414,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       name: 'traits',
       legend: 'Traits',
       addLabel: 'Add trait',
-      itemTitle: (values, index) => (values['name'] as string) || `Trait ${index + 1}`,
+      itemTitle: traitItemTitle,
       fields: traitItemFields(ctx),
     },
     {

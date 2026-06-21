@@ -14,7 +14,13 @@
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpecies } from '@rpg/catalog/species'
-import { createSpeciesInputSchema, deriveContentKey, type CreateSpeciesInput } from '@rpg/contracts'
+import {
+  createSpeciesInputSchema,
+  deriveContentKey,
+  getTraitGrants,
+  resolveTraitName,
+  type CreateSpeciesInput,
+} from '@rpg/contracts'
 
 import { speciesFormDef, type SpeciesFormValues } from './species-form-def'
 
@@ -61,12 +67,12 @@ describe('speciesFormDef round-trips', () => {
       expect(input.traits).toHaveLength(species.traits.length)
     })
 
-    it(`${species.slug}: trait ids and names are preserved`, () => {
+    it(`${species.slug}: trait ids and resolved names are preserved`, () => {
       const formValues = speciesFormDef.toFormValues(species) as SpeciesFormValues
-      const input = speciesFormDef.toInput(formValues)
+      const input = speciesFormDef.toInput(formValues, { entity: species })
       for (let i = 0; i < species.traits.length; i++) {
         expect(input.traits[i]?.id).toBe(species.traits[i]?.id)
-        expect(input.traits[i]?.name).toBe(species.traits[i]?.name)
+        expect(resolveTraitName(input.traits[i]!)).toBe(resolveTraitName(species.traits[i]!))
       }
     })
   }
@@ -97,11 +103,12 @@ describe('speciesFormDef round-trips', () => {
     const input = speciesFormDef.toInput(formValues)
     // Find the trait with a darkvision grant
     const darkvisionTrait = input.traits.find((t) =>
-      t.grants?.senses?.some((s) => s.type === 'darkvision'),
+      getTraitGrants(t)?.senses?.some((s) => s.type === 'darkvision'),
     )
     expect(darkvisionTrait).toBeDefined()
-    expect(darkvisionTrait?.grants?.senses?.[0]?.type).toBe('darkvision')
-    expect(darkvisionTrait?.grants?.senses?.[0]?.range).toBe(60)
+    expect(darkvisionTrait?.kind).toBe('grant')
+    expect(getTraitGrants(darkvisionTrait!)?.senses?.[0]?.type).toBe('darkvision')
+    expect(getTraitGrants(darkvisionTrait!)?.senses?.[0]?.range).toBe(60)
   })
 })
 
@@ -110,7 +117,7 @@ describe('speciesFormDef create vs update modes', () => {
     const formValues = {
       ...speciesFormDef.createDefaultValues,
       name: 'Custom Species',
-      traits: [{ name: 'Darkvision', grants: [] }],
+      traits: [{ kind: 'custom', name: 'Darkvision', overrideDisplay: false, grants: [] }],
     } as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Species'))
@@ -121,11 +128,12 @@ describe('speciesFormDef create vs update modes', () => {
     const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
     const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
     formValues.name = 'Renamed Elf'
-    const traitId = elf.traits[0]!.id
-    formValues.traits[0]!.name = 'Renamed Trait'
+    const customTrait = formValues.traits.find((t) => t.kind === 'custom')
+    const customTraitId = elf.traits.find((t) => t.kind === 'custom')!.id
+    customTrait!.name = 'Renamed Trait'
     const input = speciesFormDef.toInput(formValues, { entity: elf })
     expect(input).not.toHaveProperty('slug')
-    expect(input.traits[0]?.id).toBe(traitId)
+    expect(input.traits.find((t) => t.id === customTraitId)?.id).toBe(customTraitId)
   })
 
   it('update: preserves heritage choice option ids when names change', () => {
@@ -135,6 +143,30 @@ describe('speciesFormDef create vs update modes', () => {
     formValues.heritageChoices![0]!.options[0]!.name = 'Renamed Ancestry'
     const input = speciesFormDef.toInput(formValues, { entity: dragonborn })
     expect(input.heritageChoices?.[0]?.options[0]?.id).toBe(optionId)
+  })
+
+  it('grant trait with overrides sets overrideDisplay on load', () => {
+    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
+    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
+    const darkvision = formValues.traits.find((t) => t.id === 'darkvision')
+    expect(darkvision?.kind).toBe('grant')
+    expect(darkvision?.overrideDisplay).toBe(false)
+  })
+
+  it('round-trips grant trait display overrides when overrideDisplay is enabled', () => {
+    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
+    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
+    const darkvision = formValues.traits.find((t) => t.id === 'darkvision')!
+    darkvision.overrideDisplay = true
+    darkvision.nameOverride = 'Superior Darkvision'
+    darkvision.descriptionOverride = '<p>Custom homebrew wording.</p>'
+    const input = speciesFormDef.toInput(formValues, { entity: elf })
+    const trait = input.traits.find((t) => t.id === 'darkvision')
+    expect(trait?.kind).toBe('grant')
+    expect(trait?.kind === 'grant' && trait.nameOverride).toBe('Superior Darkvision')
+    expect(trait?.kind === 'grant' && trait.descriptionOverride).toBe(
+      '<p>Custom homebrew wording.</p>',
+    )
   })
 })
 

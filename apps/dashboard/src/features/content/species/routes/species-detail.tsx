@@ -5,6 +5,8 @@ import {
   getCreatureTypeLabel,
   getCreatureSizeLabel,
   getSenseLabel,
+  getTraitGrants,
+  resolveTraitDisplay,
 } from '@rpg/contracts'
 import type { Species, SpeciesTrait, SpeciesHeritageChoice } from '@rpg/contracts'
 
@@ -20,7 +22,7 @@ import { getContentImageUrl } from '../../lib/content-image-url'
 // ---------------------------------------------------------------------------
 
 function collectSenses(traits: SpeciesTrait[]): string {
-  const senses = traits.flatMap((t) => t.grants?.senses ?? [])
+  const senses = traits.flatMap((t) => getTraitGrants(t)?.senses ?? [])
   if (senses.length === 0) return 'None'
   return senses.map((s) => `${getSenseLabel(s.type)} ${s.range} ft.`).join(', ')
 }
@@ -30,12 +32,15 @@ function collectSenses(traits: SpeciesTrait[]): string {
 // ---------------------------------------------------------------------------
 
 function TraitItem({ trait }: { trait: SpeciesTrait }) {
+  const display = resolveTraitDisplay(trait)
   return (
     <li className="space-y-1">
       <Heading variant="label" as="p">
-        {trait.name}
+        {display.name}
       </Heading>
-      {trait.description && <RichTextContent html={trait.description} size="sm" tone="muted" />}
+      {display.descriptionHtml && (
+        <RichTextContent html={display.descriptionHtml} size="sm" tone="muted" />
+      )}
     </li>
   )
 }
@@ -71,16 +76,19 @@ function HeritageChoiceSection({ choice }: { choice: SpeciesHeritageChoice }) {
         <RichTextContent html={choice.description} size="sm" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
-        {choice.options.map((option) => (
-          <li key={option.id} className="space-y-1">
-            <Heading variant="label" as="p">
-              {option.name}
-            </Heading>
-            {option.description && (
-              <RichTextContent html={option.description} size="sm" tone="muted" />
-            )}
-          </li>
-        ))}
+        {choice.options.map((option) => {
+          const display = resolveTraitDisplay(option)
+          return (
+            <li key={option.id} className="space-y-1">
+              <Heading variant="label" as="p">
+                {display.name}
+              </Heading>
+              {display.descriptionHtml && (
+                <RichTextContent html={display.descriptionHtml} size="sm" tone="muted" />
+              )}
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

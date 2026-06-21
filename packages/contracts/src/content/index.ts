@@ -1,6 +1,7 @@
 export * from './envelope'
 export * from './content-key'
 export * from './grants'
+export * from './trait-display'
 export * from './class'
 export * from './species'
 export * from './weapon'
