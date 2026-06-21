@@ -1,15 +1,27 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+
 /**
- * Form layout spacing — three levels, single source of truth.
+ * Form layout spacing — single source of truth.
  *
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldGroupStackClasses` — sibling fields within a group or form column
  * - `formSectionStackClasses` — top-level accordion sections
+ * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
+ * - `fieldChipWrapGapClasses` — gap between chip pills inside `ChipsField`
+ * - `fieldGroupDescriptionClasses` — space below a group/section description
+ * - `fieldGroupLegendSpacingClasses` — space below a group legend
+ * - `fieldArrayItemActionsClasses` — space above array item action buttons
  */
 export const fieldAnatomyStackClasses = 'space-y-3'
 export const fieldGroupStackClasses = 'space-y-6'
 export const formSectionStackClasses = 'flex flex-col gap-7'
+export const fieldRowGapClasses = 'gap-6'
+export const fieldChipWrapGapClasses = 'gap-2'
+export const fieldGroupDescriptionClasses = 'mb-3'
+export const fieldGroupLegendSpacingClasses = 'mb-4'
+export const fieldArrayItemActionsClasses = 'mt-3'
 
 export const fieldLabelVariants = cva(
   [
@@ -31,5 +43,8 @@ export const fieldLabelVariants = cva(
 )
 
 export const fieldGroupLegendVariants = cva(
-  'mb-4 font-display text-lg font-semibold leading-none text-foreground',
+  cn(
+    fieldGroupLegendSpacingClasses,
+    'font-display text-lg font-semibold leading-none text-foreground',
+  ),
 )

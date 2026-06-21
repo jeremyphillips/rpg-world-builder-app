@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useFieldArray, useWatch } from 'react-hook-form'
 
+import { cn } from '../lib/utils'
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +14,8 @@ import { Button } from '../components/ui/button.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import {
+  fieldArrayItemActionsClasses,
+  fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
   formSectionStackClasses,
@@ -304,7 +307,7 @@ function CollapsibleFormSection({
       </AccordionTrigger>
       <AccordionContent forceMount>
         {'description' in item && item.description ? (
-          <Text variant="small" className="mb-3">
+          <Text variant="small" className={fieldGroupDescriptionClasses}>
             {item.description}
           </Text>
         ) : null}
@@ -435,7 +438,7 @@ export function ArrayFieldRenderer({
               <div className={fieldGroupStackClasses}>
                 <FormItems items={config.fields} idPrefix={idPrefix} namePrefix={itemPrefix} />
               </div>
-              <div className="mt-3 flex items-center gap-2">
+              <div className={cn('flex items-center gap-2', fieldArrayItemActionsClasses)}>
                 <Button
                   variant="outline"
                   size="sm"
