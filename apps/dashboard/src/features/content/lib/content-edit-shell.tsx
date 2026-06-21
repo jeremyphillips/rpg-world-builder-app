@@ -5,6 +5,7 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
 import { updateContent } from './content-client'
+import { useContentFormOptions } from './content-form-options'
 import { contentFormRegistry } from './content-form-registry'
 import type { AnyContentFormDef } from './content-form-registry'
 
@@ -47,6 +48,11 @@ function ContentEditForm({
 }: ContentEditFormProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const {
+    ctx,
+    isPending: isOptionsPending,
+    isError: isOptionsError,
+  } = useContentFormOptions(campaignId)
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
 
   const mutation = useMutation({
@@ -56,7 +62,23 @@ function ContentEditForm({
     },
   })
 
-  const fields = useMemo(() => def.buildFields({}), [def])
+  const fields = useMemo(() => def.buildFields(ctx), [def, ctx])
+
+  if (isOptionsPending) {
+    return (
+      <div className="flex justify-center py-8">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (isOptionsError) {
+    return (
+      <Text variant="destructive" role="alert">
+        Could not load catalog options.
+      </Text>
+    )
+  }
 
   if (!entity) {
     return (

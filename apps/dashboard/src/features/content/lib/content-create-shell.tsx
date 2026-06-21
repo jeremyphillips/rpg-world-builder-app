@@ -5,6 +5,7 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
 import { createContent } from './content-client'
+import { useContentFormOptions } from './content-form-options'
 import { contentFormRegistry } from './content-form-registry'
 
 export interface ContentCreateShellProps {
@@ -34,6 +35,11 @@ export function ContentCreateShell({
   const def = contentFormRegistry[contentType]
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const {
+    ctx,
+    isPending: isOptionsPending,
+    isError: isOptionsError,
+  } = useContentFormOptions(campaignId)
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => createContent(campaignId, def!.routeKey, input),
@@ -42,7 +48,7 @@ export function ContentCreateShell({
     },
   })
 
-  const fields = useMemo(() => (def ? def.buildFields({}) : []), [def])
+  const fields = useMemo(() => (def ? def.buildFields(ctx) : []), [def, ctx])
 
   return (
     <div className="space-y-6 pb-10">
@@ -53,29 +59,39 @@ export function ContentCreateShell({
       </div>
 
       {def ? (
-        <div className="max-w-2xl">
-          <Form
-            schema={def.schema}
-            fields={fields}
-            defaultValues={def.createDefaultValues}
-            onSubmit={async (values) => {
-              await mutation.mutateAsync(def.toInput(values))
-              navigate(backHref)
-            }}
-            formError={mutation.isError ? String(mutation.error) : null}
-            footer={(form) => (
-              <div className="flex items-center gap-3 pt-4">
-                <FormSaveFooter
-                  pending={mutation.isPending || form.formState.isSubmitting}
-                  submitLabel="Create"
-                />
-                <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-                  Cancel
-                </Link>
-              </div>
-            )}
-          />
-        </div>
+        isOptionsPending ? (
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
+        ) : isOptionsError ? (
+          <Text variant="destructive" role="alert">
+            Could not load catalog options.
+          </Text>
+        ) : (
+          <div className="max-w-2xl">
+            <Form
+              schema={def.schema}
+              fields={fields}
+              defaultValues={def.createDefaultValues}
+              onSubmit={async (values) => {
+                await mutation.mutateAsync(def.toInput(values))
+                navigate(backHref)
+              }}
+              formError={mutation.isError ? String(mutation.error) : null}
+              footer={(form) => (
+                <div className="flex items-center gap-3 pt-4">
+                  <FormSaveFooter
+                    pending={mutation.isPending || form.formState.isSubmitting}
+                    submitLabel="Create"
+                  />
+                  <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
+                    Cancel
+                  </Link>
+                </div>
+              )}
+            />
+          </div>
+        )
       ) : (
         <ContentFormComingSoon />
       )}

@@ -3,12 +3,17 @@ import type { ZodType } from 'zod'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentListQueryResult } from './content-client'
+import type { ContentFormOptionSets } from './content-form-options'
 
 /**
- * Context object passed to `buildFields`. Reserved for future campaign-specific
- * options (e.g. available spell sources, custom vocab). Currently empty.
+ * Context passed to `buildFields`. Carries campaign-scoped catalog options for
+ * combobox fields (weapons, spells, tools). `buildFields({})` remains valid in
+ * drift tests — combobox fields should fall back to `ctx.options?.weapons ?? []`.
  */
-export type ContentFormCtx = Record<string, never>
+export type ContentFormCtx = {
+  campaignId?: string
+  options?: Partial<ContentFormOptionSets>
+}
 
 /**
  * The per-type definition that the content form registry holds. Each entry
