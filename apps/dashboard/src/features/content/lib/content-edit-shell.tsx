@@ -85,7 +85,7 @@ function ContentEditFormReady({
         submitPending={mutation.isPending}
         formError={mutation.isError ? String(mutation.error) : null}
         onSubmit={async (values) => {
-          await mutation.mutateAsync(def.toInput(values))
+          await mutation.mutateAsync(def.toInput(values, { entity }))
           navigate(backHref)
         }}
       />

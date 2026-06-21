@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedArmor } from '@rpg/catalog/armor'
-import { createArmorInputSchema, type CreateArmorInput } from '@rpg/contracts'
+import { createArmorInputSchema, deriveContentKey, type CreateArmorInput } from '@rpg/contracts'
 
 import { armorFormDef, type ArmorFormValues } from './armor-form-def'
 
@@ -25,4 +25,25 @@ describe('armorFormDef round-trips', () => {
       expect(input.category).toBe(armor.category)
     })
   }
+})
+
+describe('armorFormDef create vs update modes', () => {
+  it('create: derives slug from name when slug is omitted', () => {
+    const formValues = {
+      ...armorFormDef.createDefaultValues,
+      name: 'Custom Plate',
+      baseAc: 18,
+    } as ArmorFormValues
+    const input = armorFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Plate'))
+  })
+
+  it('update: omits slug when entity context is present', () => {
+    const armor = SRD_ARMOR[0]!
+    const formValues = armorFormDef.toFormValues(armor) as ArmorFormValues
+    formValues.name = 'Renamed Armor'
+    const input = armorFormDef.toInput(formValues, { entity: armor })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.name).toBe('Renamed Armor')
+  })
 })

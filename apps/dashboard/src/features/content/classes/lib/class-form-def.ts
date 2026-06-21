@@ -42,7 +42,14 @@ import {
   contentFormRegistry,
   type ContentFormCtx,
   type ContentFormDef,
+  type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
+import { identityFields } from '../../lib/content-form-field-helpers'
+import {
+  applyStableIdsForUpdate,
+  envelopeSlugFields,
+  finalizeContentInput,
+} from '../../lib/content-form-key-helpers'
 import { titleCase } from '../../lib/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 import {
@@ -128,7 +135,7 @@ const proficienciesFormSchema = z.object({
 })
 
 const featureRowFormSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().optional(),
   level: z.coerce.number().pipe(levelSchema),
@@ -147,7 +154,7 @@ const resourceRowFormSchema = z.object({
 
 const classFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   primaryAbilities: z.array(abilitySchema).min(1).max(2),
   hitDie: z.coerce.number().pipe(hitDieSchema),
@@ -226,16 +233,9 @@ function featureItemFields(ctx: ContentFormCtx): FormItem[] {
           options: levelOptions,
           required: true,
         },
-        {
-          type: 'text',
-          name: 'id',
-          label: 'ID',
-          hint: 'Unique slug (e.g. rage)',
-          required: true,
-        },
+        { type: 'text', name: 'name', label: 'Name', required: true },
       ],
     },
-    { type: 'text', name: 'name', label: 'Name', required: true },
     { type: 'richtext', name: 'description', label: 'Description' },
     ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS, ctx),
   ]
@@ -317,7 +317,7 @@ function featureToFormRow(feature: ClassFeature): FeatureRowForm {
   }
 }
 
-function featureFromFormRow(row: FeatureRowForm): ClassFeature {
+function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
   return {
     id: row.id,
     name: row.name,
@@ -325,6 +325,13 @@ function featureFromFormRow(row: FeatureRowForm): ClassFeature {
     level: row.level,
     grants: formRowsToGrants(row.grants),
   }
+}
+
+function featuresFromFormValues(
+  rows: FeatureRowForm[],
+  existing?: readonly ClassFeature[],
+): ClassFeature[] {
+  return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
 }
 
 function resourceToFormRow(resource: ClassResource): ResourceRowForm {
@@ -441,22 +448,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     {
       kind: 'group',
       legend: 'Identity',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            { type: 'text', name: 'name', label: 'Name', required: true },
-            {
-              type: 'text',
-              name: 'slug',
-              label: 'Slug',
-              hint: 'Lowercase letters, numbers, hyphens',
-              required: true,
-            },
-          ],
-        },
-        { type: 'richtext', name: 'description', label: 'Description' },
-      ],
+      fields: identityFields(),
     },
     {
       kind: 'group',
@@ -638,19 +630,23 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     resources: entity.resources?.map(resourceToFormRow) ?? [],
   }),
 
-  toInput: (values) => ({
-    name: values.name,
-    slug: values.slug,
-    description: values.description || undefined,
-    primaryAbilities: values.primaryAbilities,
-    hitDie: values.hitDie,
-    asiLevels: values.asiLevels,
-    subclassLevels: values.subclassLevels,
-    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-    proficiencies: proficienciesFromFormValues(values.proficiencies),
-    features: values.features.map(featureFromFormRow),
-    resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
-  }),
+  toInput: (values, ctx?: ContentFormInputCtx<CharacterClass>) =>
+    finalizeContentInput(
+      {
+        ...envelopeSlugFields(values.name, ctx),
+        name: values.name,
+        description: values.description || undefined,
+        primaryAbilities: values.primaryAbilities,
+        hitDie: values.hitDie,
+        asiLevels: values.asiLevels,
+        subclassLevels: values.subclassLevels,
+        spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+        proficiencies: proficienciesFromFormValues(values.proficiencies),
+        features: featuresFromFormValues(values.features, ctx?.entity?.features),
+        resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
+      },
+      ctx,
+    ) as CreateClassInput,
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,

@@ -24,6 +24,9 @@ export type ContentSource = z.infer<typeof contentSourceSchema>
  * Unique within a scope: system content is unique per `rulesetId`; homebrew is
  * unique per `(campaignId, rulesetId)` and must not collide with a system slug
  * (enforced at the service layer, not by this schema).
+ *
+ * Assigned from `name` on homebrew create via `deriveContentKey`; immutable
+ * after first POST. See [Content key mutability](../../../../docs/content-types.md#content-key-mutability).
  */
 export const slugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
 

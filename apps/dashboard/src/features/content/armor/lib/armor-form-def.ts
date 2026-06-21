@@ -21,7 +21,12 @@ import {
   optionalWeightFields,
   weightFromForm,
 } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+  type ContentFormInputCtx,
+} from '../../lib/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useArmor, armorQueryKey } from '../hooks/use-armor'
 
 const armorCategoryOptions = toOptions(
@@ -63,7 +68,7 @@ function visibleWhenDexCap(): FieldVisibility {
 
 const armorFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   category: armorCategorySchema,
   cost: z.object({
@@ -173,11 +178,11 @@ function optionalAcFields(values: ArmorFormValues): Partial<CreateArmorInput> {
   return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
 }
 
-function toInput(values: ArmorFormValues): CreateArmorInput {
+function toInput(values: ArmorFormValues, ctx?: ContentFormInputCtx<Armor>): CreateArmorInput {
   const weight = weightFromForm(values.weight?.value)
-  return createArmorInputSchema.parse({
+  const input = createArmorInputSchema.parse({
+    slug: slugForInputParse(values.name, ctx),
     name: values.name,
-    slug: values.slug,
     description: values.description || undefined,
     category: values.category,
     cost: values.cost,
@@ -191,6 +196,7 @@ function toInput(values: ArmorFormValues): CreateArmorInput {
       strengthRequirement: values.strengthRequirement,
     }),
   })
+  return finalizeContentInput(input, ctx) as CreateArmorInput
 }
 
 const armorFormDef: ContentFormDef<Armor, ArmorFormValues, CreateArmorInput> = {

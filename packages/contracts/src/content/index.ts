@@ -1,4 +1,5 @@
 export * from './envelope'
+export * from './content-key'
 export * from './grants'
 export * from './class'
 export * from './species'

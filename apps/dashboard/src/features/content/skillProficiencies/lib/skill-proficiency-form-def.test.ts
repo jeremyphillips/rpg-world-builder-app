@@ -1,6 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSkillProficiencies } from '@rpg/catalog/skill-proficiencies'
-import { createSkillProficiencyInputSchema, type CreateSkillProficiencyInput } from '@rpg/contracts'
+import {
+  createSkillProficiencyInputSchema,
+  deriveContentKey,
+  type CreateSkillProficiencyInput,
+} from '@rpg/contracts'
 
 import {
   skillProficiencyFormDef,
@@ -28,4 +32,24 @@ describe('skillProficiencyFormDef round-trips', () => {
       expect(input.ability).toBe(skill.ability)
     })
   }
+})
+
+describe('skillProficiencyFormDef create vs update modes', () => {
+  it('create: derives slug from name when slug is omitted', () => {
+    const formValues: SkillProficiencyFormValues = {
+      name: 'Custom Skill',
+      ability: 'dex',
+    }
+    const input = skillProficiencyFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Skill'))
+  })
+
+  it('update: omits slug when entity context is present', () => {
+    const skill = SRD_SKILLS[0]!
+    const formValues = skillProficiencyFormDef.toFormValues(skill) as SkillProficiencyFormValues
+    formValues.name = 'Renamed Skill'
+    const input = skillProficiencyFormDef.toInput(formValues, { entity: skill })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.name).toBe('Renamed Skill')
+  })
 })

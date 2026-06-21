@@ -1,8 +1,10 @@
 import type { ContentSource } from '@rpg/contracts'
+import { ContentKeyError } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { resolveCatalogForCampaign } from '../content.service'
+import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, HomebrewDoc } from './content-write-config'
@@ -41,28 +43,31 @@ async function loadCampaignSlugs<T extends StoredEntity>(
   return new Set(homebrew.map((record) => record.slug))
 }
 
-function assertSlugChangeAllowed<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
-  rulesetId: Parameters<ContentWriteConfig<T>['readConfig']['systemSlugs']>[0],
-  campaignSlugs: Set<string>,
-  nextSlug: string,
-  currentSlug: string,
-): void {
-  if (nextSlug === currentSlug) return
-  const otherSlugs = new Set([...campaignSlugs].filter((slug) => slug !== currentSlug))
-  assertSlugAvailable({
-    slug: nextSlug,
-    systemSlugs: config.readConfig.systemSlugs(rulesetId),
-    campaignSlugs: otherSlugs,
-  })
+function wrapContentKeyError(err: unknown): never {
+  if (err instanceof ContentKeyError) {
+    throw new HttpError(400, 'stable_id_conflict', err.message)
+  }
+  throw err
+}
+
+function normalizeWriteInput(
+  raw: unknown,
+  existingBody?: Record<string, unknown>,
+  mode: 'create' | 'update' = 'create',
+): Record<string, unknown> {
+  try {
+    return normalizeHomebrewWriteInput(raw, existingBody, mode) as Record<string, unknown>
+  } catch (err) {
+    wrapContentKeyError(err)
+  }
 }
 
 async function updateHomebrewRecord<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
-  rulesetId: Parameters<ContentWriteConfig<T>['readConfig']['loadHomebrew']>[1],
+  _rulesetId: Parameters<ContentWriteConfig<T>['readConfig']['loadHomebrew']>[1],
   entityId: string,
-  existing: T,
+  _existing: T,
   update: Record<string, unknown>,
 ): Promise<T> {
   const doc = await config.homebrewModel.findOne({ _id: entityId, campaignId }).lean<HomebrewDoc>()
@@ -70,13 +75,12 @@ async function updateHomebrewRecord<T extends StoredEntity>(
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
   }
 
-  const nextSlug = typeof update.slug === 'string' ? update.slug : existing.slug
-  const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
-  assertSlugChangeAllowed(config, rulesetId, campaignSlugs, nextSlug, existing.slug)
+  delete update.slug
 
   const patch = config.prepareHomebrewUpdate
     ? config.prepareHomebrewUpdate(doc, update)
     : stripUndefined(update)
+
   const updated = await config.homebrewModel
     .findOneAndUpdate({ _id: entityId, campaignId }, { $set: patch }, { new: true })
     .lean<HomebrewDoc>()
@@ -101,7 +105,6 @@ async function updateSystemPatch<T extends StoredEntity>(
   }
 
   const patchBody = stripUndefined(update)
-  delete patchBody.slug
 
   const existingPatchDoc = await config.patchModel
     .findOne({ campaignId, targetId: entityId })
@@ -139,16 +142,19 @@ export async function createHomebrewContent<T extends StoredEntity>(
   campaignId: string,
   rawInput: unknown,
 ): Promise<T> {
-  const input = config.createInputSchema.parse(rawInput) as Record<string, unknown>
+  const input = config.createInputSchema.parse(
+    normalizeWriteInput(rawInput, undefined, 'create'),
+  ) as Record<string, unknown>
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
   const { rulesetId } = campaign
+  const slug = input.slug as string
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
-    slug: input.slug as string,
+    slug,
     systemSlugs: config.readConfig.systemSlugs(rulesetId),
     campaignSlugs,
   })
@@ -157,7 +163,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
   const created = await config.homebrewModel.create({
     campaignId,
     rulesetId,
-    slug: input.slug,
+    slug,
     ...body,
   })
 
@@ -172,7 +178,6 @@ export async function updateContentEntity<T extends StoredEntity>(
   entityId: string,
   rawInput: unknown,
 ): Promise<T> {
-  const update = config.updateInputSchema.parse(rawInput) as Record<string, unknown>
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
@@ -183,6 +188,11 @@ export async function updateContentEntity<T extends StoredEntity>(
   if (!existing) {
     throw new HttpError(404, 'not_found', 'Content record not found.')
   }
+
+  const existingBody = entityBody(existing as unknown as Record<string, unknown>)
+  const update = config.updateInputSchema.parse(
+    normalizeWriteInput(rawInput, existingBody, 'update'),
+  ) as Record<string, unknown>
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {

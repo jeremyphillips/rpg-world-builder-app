@@ -3,7 +3,7 @@
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import { createClassInputSchema, type CreateClassInput } from '@rpg/contracts'
+import { createClassInputSchema, deriveContentKey, type CreateClassInput } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
@@ -135,6 +135,30 @@ describe('classFormDef round-trips', () => {
     expect(formValues.hasSpellcasting).toBe(false)
     const input = classFormDef.toInput(formValues)
     expect(input.spellcasting).toBeUndefined()
+  })
+})
+
+describe('classFormDef create vs update modes', () => {
+  it('create: derives slug and assigns feature ids for new rows', () => {
+    const formValues = {
+      ...classFormDef.createDefaultValues,
+      name: 'Custom Class',
+      features: [{ name: 'Second Wind', level: 1, grants: [] }],
+    } as ClassFormValues
+    const input = classFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Class'))
+    expect(input.features[0]?.id).toBe('second-wind')
+  })
+
+  it('update: omits slug and preserves feature ids when names change', () => {
+    const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
+    const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
+    formValues.name = 'Renamed Fighter'
+    const featureId = fighter.features[0]!.id
+    formValues.features[0]!.name = 'Renamed Feature'
+    const input = classFormDef.toInput(formValues, { entity: fighter })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.features[0]?.id).toBe(featureId)
   })
 })
 

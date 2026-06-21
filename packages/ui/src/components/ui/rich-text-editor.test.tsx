@@ -18,6 +18,12 @@ describe('RichTextEditor', () => {
     expect(screen.getByRole('button', { name: 'Link' })).toBeInTheDocument()
   })
 
+  it('applies prose classes to the editable surface', async () => {
+    render(<RichTextEditor aria-label="Biography" />)
+    const surface = await screen.findByRole('textbox')
+    expect(surface).toHaveClass('prose', 'prose-sm', 'max-w-none')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RichTextEditor aria-label="Biography" />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

@@ -70,8 +70,8 @@ describe.each(entries)('ContentFormDef[%s] — registration contract', (_key, de
     expect(def.toFormValues).toBeTypeOf('function')
   })
 
-  it('toInput is a function', () => {
-    expect(def.toInput).toBeTypeOf('function')
+  it('toInput accepts an optional edit context', () => {
+    expect(def.toInput.length).toBeGreaterThanOrEqual(1)
   })
 
   it('useListQuery is a function', () => {

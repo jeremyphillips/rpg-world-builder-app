@@ -13,6 +13,14 @@ describe('RichTextContent', () => {
     expect(container.firstChild).toHaveClass('prose', 'prose-sm', 'max-w-none')
   })
 
+  it('renders multiple paragraphs inside prose', () => {
+    const { container } = render(
+      <RichTextContent html="<p>First paragraph.</p><p>Second paragraph.</p>" size="sm" />,
+    )
+    expect(container.querySelectorAll('p')).toHaveLength(2)
+    expect(container.firstChild).toHaveClass('prose')
+  })
+
   it('returns null for empty html', () => {
     const { container } = render(<RichTextContent html="" />)
     expect(container.firstChild).toBeNull()

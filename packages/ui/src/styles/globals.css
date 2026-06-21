@@ -131,6 +131,19 @@
   :where(h1, h2, h3, h4) {
     font-family: var(--font-display);
   }
+
+  :where(p) {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+  }
+
+  :where(p:first-child) {
+    margin-top: 0;
+  }
+
+  :where(p:last-child) {
+    margin-bottom: 0;
+  }
 }
 
 @keyframes accordion-down {

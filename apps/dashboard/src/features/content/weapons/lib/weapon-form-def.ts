@@ -32,7 +32,12 @@ import {
   optionalWeightFields,
   weightFromForm,
 } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+  type ContentFormInputCtx,
+} from '../../lib/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useWeapons, weaponsQueryKey } from '../hooks/use-weapons'
 
 const weaponCategoryOptions = toOptions(
@@ -119,7 +124,7 @@ function visibleWhenRanged(): FieldVisibility {
 
 const weaponFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   category: weaponCategorySchema,
   mode: weaponModeSchema,
@@ -212,11 +217,11 @@ function optionalWeaponRange(values: WeaponFormValues): Partial<CreateWeaponInpu
   }
 }
 
-function toInput(values: WeaponFormValues): CreateWeaponInput {
+function toInput(values: WeaponFormValues, ctx?: ContentFormInputCtx<Weapon>): CreateWeaponInput {
   const weight = weightFromForm(values.weight?.value)
-  return createWeaponInputSchema.parse({
+  const input = createWeaponInputSchema.parse({
+    slug: slugForInputParse(values.name, ctx),
     name: values.name,
-    slug: values.slug,
     description: values.description || undefined,
     category: values.category,
     mode: values.mode,
@@ -229,6 +234,7 @@ function toInput(values: WeaponFormValues): CreateWeaponInput {
     ...optionalWeaponRange(values),
     ...(values.specialRules && { specialRules: values.specialRules }),
   })
+  return finalizeContentInput(input, ctx) as CreateWeaponInput
 }
 
 const weaponFormDef: ContentFormDef<Weapon, WeaponFormValues, CreateWeaponInput> = {

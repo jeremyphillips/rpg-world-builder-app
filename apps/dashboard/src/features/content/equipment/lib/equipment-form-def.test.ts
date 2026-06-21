@@ -1,6 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
-import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  deriveContentKey,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
 import { equipmentFormDef, type EquipmentFormValues } from './equipment-form-def'
 
@@ -25,4 +29,24 @@ describe('equipmentFormDef round-trips', () => {
       expect(input.kind).toBe(item.kind)
     })
   }
+})
+
+describe('equipmentFormDef create vs update modes', () => {
+  it('create: derives slug from name when slug is omitted', () => {
+    const formValues = {
+      ...equipmentFormDef.createDefaultValues,
+      name: 'Custom Rope',
+    } as EquipmentFormValues
+    const input = equipmentFormDef.toInput(formValues)
+    expect(input.slug).toBe(deriveContentKey('Custom Rope'))
+  })
+
+  it('update: omits slug when entity context is present', () => {
+    const item = SRD_EQUIPMENT[0]!
+    const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
+    formValues.name = 'Renamed Equipment'
+    const input = equipmentFormDef.toInput(formValues, { entity: item })
+    expect(input).not.toHaveProperty('slug')
+    expect(input.name).toBe('Renamed Equipment')
+  })
 })
