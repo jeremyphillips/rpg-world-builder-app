@@ -4,9 +4,11 @@ import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createUser } from '../user'
 import { createCampaign } from '../campaign'
 import { armorWriteConfig } from './armor/armor.config'
+import { classWriteConfig } from './classes/classes.config'
 import { spellWriteConfig } from './spells/spells.config'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { resolveCatalogForCampaign } from './content.service'
+import { HttpError } from '../../lib/http-error'
 
 beforeAll(async () => {
   await startTestDb()
@@ -50,6 +52,42 @@ describe('createHomebrewContent (armor)', () => {
     expect(armor.some((a) => a.slug === 'custom-leather')).toBe(true)
   })
 
+  it('derives slug from name and ignores client-provided slug', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(armorWriteConfig, campaign.id, {
+      slug: 'wrong-slug',
+      name: 'Custom Leather',
+      category: 'light',
+      cost: { amount: 15, currency: 'gp' },
+      baseAc: 12,
+      addDexModifier: true,
+      stealthDisadvantage: false,
+    })
+
+    expect(created.slug).toBe('custom-leather')
+  })
+
+  it('ignores slug changes on homebrew update', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(armorWriteConfig, campaign.id, {
+      slug: 'custom-leather',
+      name: 'Custom Leather',
+      category: 'light',
+      cost: { amount: 15, currency: 'gp' },
+      baseAc: 12,
+      addDexModifier: true,
+      stealthDisadvantage: false,
+    })
+
+    const updated = await updateContentEntity(armorWriteConfig, campaign.id, created.id, {
+      slug: 'renamed-slug',
+      name: 'Renamed Leather',
+    })
+
+    expect(updated.slug).toBe('custom-leather')
+    expect(updated.name).toBe('Renamed Leather')
+  })
+
   it('patches a system armor record', async () => {
     const campaign = await makeCampaign()
     const fighter = (
@@ -62,6 +100,55 @@ describe('createHomebrewContent (armor)', () => {
 
     expect(updated.baseAc).toBe(12)
     expect(updated.source).toBe('system')
+  })
+})
+
+const minimalClassInput = {
+  slug: 'ignored-slug',
+  name: 'Berserker',
+  primaryAbilities: ['str'],
+  hitDie: 12,
+  asiLevels: [4],
+  subclassLevels: [3],
+  proficiencies: {
+    savingThrows: ['str', 'con'],
+    armor: [] as const,
+    weapons: { categories: ['simple'] as const },
+    skills: { choose: 2, from: ['athletics'] as const },
+  },
+  features: [{ name: 'Rage', level: 1 }],
+}
+
+describe('createHomebrewContent (classes)', () => {
+  it('derives slug and feature ids on create', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
+
+    expect(created.slug).toBe('berserker')
+    expect(created.features[0]?.id).toBe('rage')
+  })
+
+  it('preserves feature ids when the display name changes', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
+
+    const updated = await updateContentEntity(classWriteConfig, campaign.id, created.id, {
+      features: [{ id: 'rage', name: 'Battle Rage', level: 1 }],
+    })
+
+    expect(updated.features[0]?.id).toBe('rage')
+    expect(updated.features[0]?.name).toBe('Battle Rage')
+  })
+
+  it('rejects nested feature id rename on update', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
+
+    await expect(
+      updateContentEntity(classWriteConfig, campaign.id, created.id, {
+        features: [{ id: 'battle-rage', name: 'Rage', level: 1 }],
+      }),
+    ).rejects.toBeInstanceOf(HttpError)
   })
 })
 
