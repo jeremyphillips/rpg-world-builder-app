@@ -27,7 +27,12 @@ import {
   optionalWeightFields,
   weightFromForm,
 } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+  type ContentFormInputCtx,
+} from '../../lib/content-form-registry'
+import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 
 const equipmentKindSchema = z.enum(EQUIPMENT_KINDS)
@@ -66,7 +71,7 @@ function visibleWhenKind(...kinds: EquipmentKind[]): FieldVisibility {
 
 const equipmentFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   kind: equipmentKindSchema,
   cost: z.object({
@@ -109,20 +114,27 @@ function formatProperties(items: string[] | undefined): string | undefined {
   return items?.length ? items.join('\n') : undefined
 }
 
-type EquipmentInputBase = Pick<EquipmentFormValues, 'name' | 'slug' | 'description' | 'cost'>
+type EquipmentInputBase = Pick<EquipmentFormValues, 'name' | 'description' | 'cost'>
 
-function inputBase(values: EquipmentFormValues): EquipmentInputBase & { description?: string } {
+function inputBase(
+  values: EquipmentFormValues,
+  ctx?: ContentFormInputCtx<Equipment>,
+): EquipmentInputBase & { description?: string; slug?: string } {
   return {
+    ...envelopeSlugFields(values.name, ctx),
     name: values.name,
-    slug: values.slug,
     description: values.description || undefined,
     cost: values.cost,
   }
 }
 
-function gearInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function gearInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'gear',
     ...(weight && { weight }),
     ...(values.gearCategory && { gearCategory: values.gearCategory }),
@@ -133,9 +145,13 @@ function gearInput(values: EquipmentFormValues, weight: ReturnType<typeof weight
   })
 }
 
-function ammunitionInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function ammunitionInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'ammunition',
     ...(weight && { weight }),
     bundleSize: values.bundleSize ?? 1,
@@ -143,18 +159,26 @@ function ammunitionInput(values: EquipmentFormValues, weight: ReturnType<typeof 
   })
 }
 
-function focusInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function focusInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'focus',
     ...(weight && { weight }),
     focusType: values.focusType ?? 'arcane',
   })
 }
 
-function toolInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function toolInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'tool',
     ...(weight && { weight }),
     toolCategory: values.toolCategory ?? 'other',
@@ -162,18 +186,22 @@ function toolInput(values: EquipmentFormValues, weight: ReturnType<typeof weight
   })
 }
 
-function mountInput(values: EquipmentFormValues) {
+function mountInput(values: EquipmentFormValues, ctx?: ContentFormInputCtx<Equipment>) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'mount',
     carryingCapacity: { value: values.carryingCapacity ?? 0, unit: 'lb' },
     ...(values.speed && { speed: values.speed }),
   })
 }
 
-function vehicleInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function vehicleInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'vehicle',
     ...(weight && { weight }),
     ...(values.vehicleCapacity !== undefined && {
@@ -182,9 +210,9 @@ function vehicleInput(values: EquipmentFormValues, weight: ReturnType<typeof wei
   })
 }
 
-function shipInput(values: EquipmentFormValues) {
+function shipInput(values: EquipmentFormValues, ctx?: ContentFormInputCtx<Equipment>) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'ship',
     ...(values.speed && { speed: values.speed }),
     ...(values.crew !== undefined && { crew: values.crew }),
@@ -196,9 +224,13 @@ function shipInput(values: EquipmentFormValues) {
   })
 }
 
-function miscInput(values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) {
+function miscInput(
+  values: EquipmentFormValues,
+  weight: ReturnType<typeof weightFromForm>,
+  ctx?: ContentFormInputCtx<Equipment>,
+) {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values),
+    ...inputBase(values, ctx),
     kind: 'misc',
     ...(weight && { weight }),
     ...(values.notes && { notes: values.notes }),
@@ -207,21 +239,29 @@ function miscInput(values: EquipmentFormValues, weight: ReturnType<typeof weight
 
 const kindInputBuilders: Record<
   EquipmentKind,
-  (values: EquipmentFormValues, weight: ReturnType<typeof weightFromForm>) => CreateEquipmentInput
+  (
+    values: EquipmentFormValues,
+    weight: ReturnType<typeof weightFromForm>,
+    ctx?: ContentFormInputCtx<Equipment>,
+  ) => CreateEquipmentInput
 > = {
   gear: gearInput,
   ammunition: ammunitionInput,
   focus: focusInput,
   tool: toolInput,
-  mount: (values) => mountInput(values),
+  mount: (values, _weight, ctx) => mountInput(values, ctx),
   vehicle: vehicleInput,
-  ship: (values) => shipInput(values),
+  ship: (values, _weight, ctx) => shipInput(values, ctx),
   misc: miscInput,
 }
 
-function toInput(values: EquipmentFormValues): CreateEquipmentInput {
+function toInput(
+  values: EquipmentFormValues,
+  ctx?: ContentFormInputCtx<Equipment>,
+): CreateEquipmentInput {
   const weight = weightFromForm(values.weight?.value)
-  return kindInputBuilders[values.kind](values, weight)
+  const input = kindInputBuilders[values.kind](values, weight, ctx)
+  return finalizeContentInput(input, ctx) as CreateEquipmentInput
 }
 
 function sharedFormValues(

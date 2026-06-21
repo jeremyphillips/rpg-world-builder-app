@@ -26,10 +26,17 @@ import {
   grantRowFormSchema,
   grantsToFormRows,
 } from '../../lib/grant-form-helpers'
+import { identityFields } from '../../lib/content-form-field-helpers'
+import {
+  applyStableIdsForUpdate,
+  envelopeSlugFields,
+  finalizeContentInput,
+} from '../../lib/content-form-key-helpers'
 import {
   contentFormRegistry,
   type ContentFormCtx,
   type ContentFormDef,
+  type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 
@@ -65,7 +72,7 @@ const choiceKindOptions = toOptions(SPECIES_CHOICE_KINDS, SPECIES_CHOICE_KIND_LA
 // ---------------------------------------------------------------------------
 
 const traitRowFormSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().optional(),
   grants: z.array(grantRowFormSchema),
@@ -73,7 +80,7 @@ const traitRowFormSchema = z.object({
 type TraitRowForm = z.infer<typeof traitRowFormSchema>
 
 const heritageChoiceRowFormSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).optional(),
   name: z.string().min(1),
   kind: speciesChoiceKindSchema,
   description: z.string().optional(),
@@ -83,7 +90,7 @@ type HeritageChoiceRowForm = z.infer<typeof heritageChoiceRowFormSchema>
 
 const speciesFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   creatureType: creatureTypeSchema,
   sizes: z.array(creatureSizeSchema).min(1),
@@ -101,19 +108,7 @@ type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
 function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'text',
-          name: 'id',
-          label: 'ID',
-          hint: 'Unique slug (e.g. darkvision)',
-          required: true,
-        },
-        { type: 'text', name: 'name', label: 'Name', required: true },
-      ],
-    },
+    { type: 'text', name: 'name', label: 'Name', required: true },
     { type: 'richtext', name: 'description', label: 'Description' },
     ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS, ctx),
   ]
@@ -124,13 +119,6 @@ function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'row',
       fields: [
-        {
-          type: 'text',
-          name: 'id',
-          label: 'ID',
-          hint: 'Unique slug (e.g. draconic-ancestry)',
-          required: true,
-        },
         { type: 'text', name: 'name', label: 'Name', required: true },
         { type: 'select', name: 'kind', label: 'Kind', options: choiceKindOptions, required: true },
       ],
@@ -161,13 +149,48 @@ function traitToFormRow(trait: ContentTrait): TraitRowForm {
   }
 }
 
-function traitFromFormRow(row: TraitRowForm): ContentTrait {
+function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
   return {
     id: row.id,
     name: row.name,
     description: row.description || undefined,
     grants: formRowsToGrants(row.grants),
   }
+}
+
+function traitsFromFormValues(
+  rows: TraitRowForm[],
+  existing?: readonly ContentTrait[],
+): ContentTrait[] {
+  return applyStableIdsForUpdate(rows, existing).map(traitFromFormRow)
+}
+
+function heritageChoiceFromFormRow(
+  row: HeritageChoiceRowForm & { id: string },
+  existingChoice?: SpeciesHeritageChoice,
+): SpeciesHeritageChoice {
+  const options = applyStableIdsForUpdate(row.options, existingChoice?.options).map(
+    traitFromFormRow,
+  )
+  return {
+    id: row.id,
+    name: row.name,
+    kind: row.kind,
+    description: row.description || undefined,
+    options,
+  }
+}
+
+function heritageChoicesFromFormValues(
+  rows: HeritageChoiceRowForm[] | undefined,
+  existing?: Species['heritageChoices'],
+): SpeciesHeritageChoice[] | undefined {
+  if (!rows?.length) return undefined
+
+  return applyStableIdsForUpdate(rows, existing).map((row) => {
+    const existingChoice = existing?.find((choice) => choice.id === row.id)
+    return heritageChoiceFromFormRow(row, existingChoice)
+  })
 }
 
 function heritageChoiceToFormRow(choice: SpeciesHeritageChoice): HeritageChoiceRowForm {
@@ -177,16 +200,6 @@ function heritageChoiceToFormRow(choice: SpeciesHeritageChoice): HeritageChoiceR
     kind: choice.kind,
     description: choice.description,
     options: choice.options.map(traitToFormRow),
-  }
-}
-
-function heritageChoiceFromFormRow(row: HeritageChoiceRowForm): SpeciesHeritageChoice {
-  return {
-    id: row.id,
-    name: row.name,
-    kind: row.kind,
-    description: row.description || undefined,
-    options: row.options.map(traitFromFormRow),
   }
 }
 
@@ -215,22 +228,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     {
       kind: 'group',
       legend: 'Identity',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            { type: 'text', name: 'name', label: 'Name', required: true },
-            {
-              type: 'text',
-              name: 'slug',
-              label: 'Slug',
-              hint: 'Lowercase letters, numbers, hyphens',
-              required: true,
-            },
-          ],
-        },
-        { type: 'richtext', name: 'description', label: 'Description' },
-      ],
+      fields: identityFields(),
     },
     {
       kind: 'group',
@@ -293,18 +291,23 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     heritageChoices: entity.heritageChoices?.map(heritageChoiceToFormRow) ?? [],
   }),
 
-  toInput: (values) => ({
-    name: values.name,
-    slug: values.slug,
-    description: values.description || undefined,
-    creatureType: values.creatureType,
-    sizes: values.sizes,
-    speed: { walk: values.speed.walk },
-    traits: values.traits.map(traitFromFormRow),
-    heritageChoices: values.heritageChoices?.length
-      ? values.heritageChoices.map(heritageChoiceFromFormRow)
-      : undefined,
-  }),
+  toInput: (values, ctx?: ContentFormInputCtx<Species>) =>
+    finalizeContentInput(
+      {
+        ...envelopeSlugFields(values.name, ctx),
+        name: values.name,
+        description: values.description || undefined,
+        creatureType: values.creatureType,
+        sizes: values.sizes,
+        speed: { walk: values.speed.walk },
+        traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
+        heritageChoices: heritageChoicesFromFormValues(
+          values.heritageChoices,
+          ctx?.entity?.heritageChoices,
+        ),
+      },
+      ctx,
+    ) as CreateSpeciesInput,
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,

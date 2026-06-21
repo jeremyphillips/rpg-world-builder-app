@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   applyStableIdsForUpdate,
   deriveSlugForCreate,
+  envelopeSlugFields,
+  finalizeContentInput,
   stripSlugFromInput,
 } from './content-form-key-helpers'
 
@@ -30,5 +32,27 @@ describe('stripSlugFromInput', () => {
       name: 'Elf',
       description: 'x',
     })
+  })
+})
+
+describe('envelopeSlugFields', () => {
+  it('includes slug on create', () => {
+    expect(envelopeSlugFields('Wood Elf')).toEqual({ slug: 'wood-elf' })
+  })
+
+  it('omits slug on update', () => {
+    expect(envelopeSlugFields('Wood Elf', { entity: { slug: 'wood-elf' } })).toEqual({})
+  })
+})
+
+describe('finalizeContentInput', () => {
+  it('strips slug when editing', () => {
+    const input = { name: 'Elf', slug: 'wood-elf' as string | undefined }
+    expect(finalizeContentInput(input, { entity: { slug: 'wood-elf' } })).toEqual({ name: 'Elf' })
+  })
+
+  it('keeps slug on create', () => {
+    const input = { name: 'Elf', slug: 'wood-elf' }
+    expect(finalizeContentInput(input)).toEqual(input)
   })
 })

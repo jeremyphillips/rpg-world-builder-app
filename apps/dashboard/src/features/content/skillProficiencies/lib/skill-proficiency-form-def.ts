@@ -11,14 +11,19 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { identityFields } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+  type ContentFormInputCtx,
+} from '../../lib/content-form-registry'
+import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 
 const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
 
 const skillProficiencyFormSchema = z.object({
   name: z.string().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   description: z.string().optional(),
   ability: abilitySchema,
   suggestedClassesText: z.string().optional(),
@@ -76,14 +81,16 @@ const skillProficiencyFormDef: ContentFormDef<
     ability: entity.ability,
     suggestedClassesText: formatSlugList(entity.suggestedClasses),
   }),
-  toInput: (values) =>
-    createSkillProficiencyInputSchema.parse({
+  toInput: (values, ctx?: ContentFormInputCtx<SkillProficiency>) => {
+    const input = createSkillProficiencyInputSchema.parse({
+      ...envelopeSlugFields(values.name, ctx),
       name: values.name,
-      slug: values.slug,
       description: values.description || undefined,
       ability: values.ability,
       suggestedClasses: parseSlugList(values.suggestedClassesText),
-    }),
+    })
+    return finalizeContentInput(input, ctx) as CreateSkillProficiencyInput
+  },
   useListQuery: useSkillProficiencies,
   queryKey: skillProficienciesQueryKey,
 }
