@@ -17,6 +17,7 @@ import { FormSectionContext } from './form-section-context.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
+import { fieldGroupStackClasses } from '../components/ui/field.variants'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -115,7 +116,7 @@ export function Form<TFieldValues extends FieldValues>({
           onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
           className={className}
         >
-          <div className={cn('space-y-4', contentClassName)}>
+          <div className={cn(fieldGroupStackClasses, contentClassName)}>
             {formError ? (
               <Text variant="destructive" role="alert">
                 {formError}

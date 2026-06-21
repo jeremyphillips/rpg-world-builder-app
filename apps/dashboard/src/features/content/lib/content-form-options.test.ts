@@ -40,6 +40,10 @@ describe('buildContentFormOptionSets', () => {
       { value: 'dagger', label: dagger.name },
       { value: 'longsword', label: longsword.name },
     ])
+    expect(options.weaponCategoryBySlug).toEqual({
+      dagger: 'simple',
+      longsword: 'martial',
+    })
     expect(options.spells).toEqual([{ value: 'fire-bolt', label: fireBolt.name }])
     expect(options.tools).toEqual([{ value: 'thieves-tools', label: thievesTools.name }])
   })

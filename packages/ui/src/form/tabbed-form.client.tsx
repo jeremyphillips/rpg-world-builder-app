@@ -11,6 +11,7 @@ import {
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
+import { fieldGroupStackClasses } from '../components/ui/field.variants'
 import { Text } from '../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FormItems } from './form-items.client'
@@ -125,7 +126,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
               // with RHF and validated on global save; inactive panels are hidden
               // by Radix via the HTML `hidden` attribute.
               <TabsContent key={tab.id} value={tab.id} forceMount>
-                <div className="space-y-4">
+                <div className={fieldGroupStackClasses}>
                   <FormSectionContext.Provider value={sectionContext}>
                     <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
                   </FormSectionContext.Provider>

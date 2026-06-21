@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { ContentSource, Equipment, Spell, Weapon } from '@rpg/contracts'
+import type { ContentSource, Equipment, Spell, Weapon, WeaponCategory } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { useEquipment } from '../equipment/hooks/use-equipment'
@@ -11,6 +11,7 @@ export interface ContentFormOptionSets {
   weapons: FieldOption[]
   spells: FieldOption[]
   tools: FieldOption[]
+  weaponCategoryBySlug: Readonly<Partial<Record<string, WeaponCategory>>>
 }
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
@@ -34,6 +35,12 @@ function sortFieldOptions(options: FieldOption[]): FieldOption[] {
   return [...options].sort((a, b) => a.label.localeCompare(b.label))
 }
 
+function buildWeaponCategoryBySlug(
+  weapons: Weapon[] | undefined,
+): ContentFormOptionSets['weaponCategoryBySlug'] {
+  return Object.fromEntries(weapons?.map((weapon) => [weapon.slug, weapon.category]) ?? [])
+}
+
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   weapons?: Weapon[]
@@ -42,6 +49,7 @@ export function buildContentFormOptionSets(input: {
 }): ContentFormOptionSets {
   return {
     weapons: sortFieldOptions(input.weapons?.map(toContentFieldOption) ?? []),
+    weaponCategoryBySlug: buildWeaponCategoryBySlug(input.weapons),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
       input.equipment?.filter((item) => item.kind === 'tool').map(toContentFieldOption) ?? [],

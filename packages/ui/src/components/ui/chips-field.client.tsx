@@ -4,7 +4,11 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field } from './field.client'
-import { fieldLabelVariants } from './field.variants'
+import {
+  fieldAnatomyStackClasses,
+  fieldChipWrapGapClasses,
+  fieldLabelVariants,
+} from './field.variants'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
@@ -131,7 +135,7 @@ export function ChipsField({
       aria-describedby={describedBy}
       aria-invalid={error ? true : undefined}
       disabled={disabled}
-      className={cn('space-y-2', width === 'auto' ? 'w-auto' : 'w-full')}
+      className={cn(fieldAnatomyStackClasses, width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}
     >
       <legend id={legendId} className={fieldLabelVariants({ size: 'md' })}>
@@ -144,7 +148,11 @@ export function ChipsField({
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </legend>
 
-      <div className="flex flex-wrap gap-2" role="group" aria-labelledby={legendId}>
+      <div
+        className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
+        role="group"
+        aria-labelledby={legendId}
+      >
         {options.map((option) => {
           const isActive = selected.includes(option.value)
           const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))

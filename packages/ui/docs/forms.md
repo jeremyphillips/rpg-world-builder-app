@@ -75,6 +75,27 @@ keyboard focus.
 validation message. They share the describedby slot — the error replaces the hint
 while present — so never encode required-ness or validation rules as a hint.
 
+## Field spacing
+
+Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/field.variants.ts):
+
+| Token                            | Class                 | Use                                                                             |
+| -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
+| `fieldAnatomyStackClasses`       | `space-y-3`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
+| `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
+| `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
+| `fieldRowGapClasses`             | `gap-4`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
+| `fieldChipWrapGapClasses`        | `gap-2`               | Gap between chip pills inside `ChipsField`                                      |
+| `fieldGroupDescriptionClasses`   | `mb-3`                | Space below a group or accordion section description                            |
+| `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
+| `fieldArrayItemActionsClasses`   | `mt-3`                | Space above array item move/remove controls                                     |
+
+Do not sprinkle ad-hoc `space-y-*` or margin utilities on field wrappers in apps — adjust the shared
+tokens in `@rpg/ui` so chips, text inputs, and combobox fields stay aligned.
+
+Dense chip fields (many options) should stack as full-width siblings, not share a `FieldRow` — rows
+are for short combinations (e.g. a small chip set beside a select).
+
 **Requirement:** every field must pass axe. All wrappers and the compound `Field`
 already do; if you compose `Field.*` by hand, keep a `Field.Label` wired to the
 control and don't suppress axe rules. See [AGENTS.md](../../../AGENTS.md) for the

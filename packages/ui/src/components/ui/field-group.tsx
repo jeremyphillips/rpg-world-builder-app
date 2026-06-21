@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupLegendVariants } from './field.variants'
+import {
+  fieldGroupDescriptionClasses,
+  fieldGroupLegendVariants,
+  fieldGroupStackClasses,
+} from './field.variants'
 import { Text } from './text'
 
 export interface FieldGroupProps {
@@ -21,11 +25,11 @@ export function FieldGroup({ legend, description, className, children }: FieldGr
     <fieldset className={cn('min-w-0 border-0 p-0', className)}>
       <legend className={fieldGroupLegendVariants()}>{legend}</legend>
       {description ? (
-        <Text variant="small" className="mb-3">
+        <Text variant="small" className={fieldGroupDescriptionClasses}>
           {description}
         </Text>
       ) : null}
-      <div className="space-y-4">{children}</div>
+      <div className={fieldGroupStackClasses}>{children}</div>
     </fieldset>
   )
 }

@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 
 import { cn } from '../../lib/utils'
+import { fieldRowGapClasses } from './field.variants'
 
 export type FieldRowProps = HTMLAttributes<HTMLDivElement>
 
@@ -10,5 +11,7 @@ export type FieldRowProps = HTMLAttributes<HTMLDivElement>
  * share the remaining space (equal split by default). Wraps on narrow widths.
  */
 export function FieldRow({ className, ...props }: FieldRowProps) {
-  return <div className={cn('flex flex-wrap items-start gap-4', className)} {...props} />
+  return (
+    <div className={cn('flex flex-wrap items-start', fieldRowGapClasses, className)} {...props} />
+  )
 }

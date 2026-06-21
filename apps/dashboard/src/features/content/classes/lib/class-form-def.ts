@@ -59,6 +59,16 @@ import {
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
+import {
+  normalizeClassWeaponProficiencies,
+  specificWeaponFieldsAllowed,
+} from './class-weapon-proficiency-helpers'
+
+const SPECIFIC_WEAPONS_TOGGLE_HINT =
+  'Grant individual weapon proficiencies instead of (or when not using) whole categories — e.g. Sorcerer (dagger, dart, sling).'
+
+const WEAPON_CATEGORIES_HINT =
+  'Selecting a category grants all weapons in it. Use specific weapons only for picks outside those categories.'
 
 // ---------------------------------------------------------------------------
 // Vocab option lists
@@ -161,6 +171,7 @@ const classFormSchema = z.object({
   asiLevels: z.array(z.coerce.number().pipe(levelSchema)),
   subclassLevels: z.array(z.coerce.number().pipe(levelSchema)).min(1),
   hasSpellcasting: z.boolean(),
+  hasSpecificWeapons: z.boolean(),
   spellcasting: spellcastingFormSchema.optional(),
   proficiencies: proficienciesFormSchema,
   features: z.array(featureRowFormSchema),
@@ -179,6 +190,23 @@ function visibleWhenSpellcasting(): FieldVisibility {
   return {
     dependsOn: ['hasSpellcasting'],
     visibleWhen: (watched) => watched['hasSpellcasting'] === true,
+  }
+}
+
+function visibleWhenSpecificWeaponsToggle(): FieldVisibility {
+  return {
+    dependsOn: ['proficiencies.weapons.categories'],
+    visibleWhen: (watched) =>
+      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
+  }
+}
+
+function visibleWhenSpecificWeaponsCombobox(): FieldVisibility {
+  return {
+    dependsOn: ['hasSpecificWeapons', 'proficiencies.weapons.categories'],
+    visibleWhen: (watched) =>
+      watched['hasSpecificWeapons'] === true &&
+      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
   }
 }
 
@@ -291,17 +319,21 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
 
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
+  hasSpecificWeapons: boolean,
+  weaponCategoryBySlug?: ContentFormInputCtx<CharacterClass>['weaponCategoryBySlug'],
 ): ClassProficiencies {
-  const weaponItems = proficiencies.weapons.items ?? []
   const tools = proficiencies.tools ?? []
+  const weapons = normalizeClassWeaponProficiencies({
+    categories: proficiencies.weapons.categories,
+    items: proficiencies.weapons.items,
+    hasSpecificWeapons,
+    categoryBySlug: weaponCategoryBySlug,
+  })
 
   return {
     savingThrows: proficiencies.savingThrows,
     armor: proficiencies.armor,
-    weapons: {
-      categories: proficiencies.weapons.categories,
-      ...(weaponItems.length ? { items: weaponItems } : {}),
-    },
+    weapons,
     ...(tools.length ? { tools } : {}),
     skills: proficiencies.skills,
   }
@@ -417,6 +449,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
   asiLevels: [4, 8, 12, 16, 19],
   subclassLevels: [3],
   hasSpellcasting: false,
+  hasSpecificWeapons: false,
   spellcasting: {
     progression: 'full',
     ability: 'int',
@@ -475,24 +508,19 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
           ],
         },
         {
-          kind: 'row',
-          fields: [
-            {
-              type: 'chips',
-              name: 'asiLevels',
-              label: 'ASI levels',
-              options: levelOptions,
-              hint: 'Levels that grant an ability score improvement',
-            },
-            {
-              type: 'chips',
-              name: 'subclassLevels',
-              label: 'Subclass levels',
-              options: levelOptions,
-              required: true,
-              hint: 'Levels that grant a subclass feature',
-            },
-          ],
+          type: 'chips',
+          name: 'asiLevels',
+          label: 'ASI levels',
+          options: levelOptions,
+          hint: 'Levels that grant an ability score improvement',
+        },
+        {
+          type: 'chips',
+          name: 'subclassLevels',
+          label: 'Subclass levels',
+          options: levelOptions,
+          required: true,
+          hint: 'Levels that grant a subclass feature',
         },
       ],
     },
@@ -560,14 +588,23 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
           name: 'proficiencies.weapons.categories',
           label: 'Weapon categories',
           options: weaponCategoryOptions,
+          hint: WEAPON_CATEGORIES_HINT,
+        },
+        {
+          type: 'switch',
+          name: 'hasSpecificWeapons',
+          label: 'Specific weapons',
+          hint: SPECIFIC_WEAPONS_TOGGLE_HINT,
+          visibility: visibleWhenSpecificWeaponsToggle(),
         },
         {
           type: 'combobox',
           name: 'proficiencies.weapons.items',
-          label: 'Specific weapons',
+          label: 'Weapon choices',
           multiple: true,
           options: ctx.options?.weapons ?? [],
           placeholder: 'Choose weapons…',
+          visibility: visibleWhenSpecificWeaponsCombobox(),
         },
         {
           type: 'combobox',
@@ -624,6 +661,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     asiLevels: entity.asiLevels,
     subclassLevels: entity.subclassLevels,
     hasSpellcasting: entity.spellcasting !== undefined,
+    hasSpecificWeapons: (entity.proficiencies.weapons.items?.length ?? 0) > 0,
     spellcasting: spellcastingToFormValues(entity.spellcasting),
     proficiencies: proficienciesToFormValues(entity.proficiencies),
     features: entity.features.map(featureToFormRow),
@@ -641,7 +679,11 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         asiLevels: values.asiLevels,
         subclassLevels: values.subclassLevels,
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-        proficiencies: proficienciesFromFormValues(values.proficiencies),
+        proficiencies: proficienciesFromFormValues(
+          values.proficiencies,
+          values.hasSpecificWeapons ?? false,
+          ctx?.weaponCategoryBySlug,
+        ),
         features: featuresFromFormValues(values.features, ctx?.entity?.features),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },
