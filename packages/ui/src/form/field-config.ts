@@ -20,13 +20,16 @@ export type FieldType =
   | 'richtext'
   | 'file'
   | 'chips'
+  | 'combobox'
   | 'editableGrid'
 
-/** Option for the `select` and `radio` field types. */
+/** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
 export interface FieldOption {
   label: string
   value: string
   disabled?: boolean
+  /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
+  description?: string
 }
 
 /**
@@ -184,6 +187,21 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   defaultValue?: string | string[]
 }
 
+/**
+ * Searchable dropdown for picking one or many values from a large option list.
+ * `multiple: true` (default) → value is `string[]`; selected values render as removable chips.
+ * `multiple: false` → value is `string`; picking an option closes the panel.
+ */
+export interface ComboboxFieldConfig extends BaseFieldConfig {
+  type: 'combobox'
+  options: FieldOption[]
+  multiple?: boolean
+  /** Maximum selections when `multiple` is true. */
+  max?: number
+  placeholder?: string
+  defaultValue?: string | string[]
+}
+
 /** Column definition for `editableGrid` fields (may carry per-column conditionals). */
 export interface EditableGridColumnConfig {
   key: string
@@ -222,6 +240,7 @@ export type FieldConfig =
   | RichTextFieldConfig
   | FileFieldConfig
   | ChipsFieldConfig
+  | ComboboxFieldConfig
   | EditableGridFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
@@ -328,6 +347,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   richtext: '',
   file: [],
   chips: [],
+  combobox: [],
   editableGrid: {},
 }
 
@@ -357,8 +377,9 @@ export function editableGridDependsOn(columns: EditableGridColumnConfig[]): stri
 export function fieldDefaultValue(field: FieldConfig): unknown {
   const explicit = (field as { defaultValue?: unknown }).defaultValue
   if (explicit !== undefined) return explicit
-  if (field.type === 'chips') {
-    return (field as ChipsFieldConfig).multiple === false ? '' : []
+  if (field.type === 'chips' || field.type === 'combobox') {
+    const multiField = field as ChipsFieldConfig | ComboboxFieldConfig
+    return multiField.multiple === false ? '' : []
   }
   if (field.type === 'editableGrid') {
     const gridField = field as EditableGridFieldConfig

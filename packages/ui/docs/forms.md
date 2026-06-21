@@ -307,6 +307,28 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
+### Combobox (`combobox` / `ComboboxField`)
+
+A searchable popover dropdown for picking one or many values from a large option
+list — suitable for campaign-scoped catalog references (weapons, spells, tools)
+where a plain `select` or `chips` field would not scale.
+
+```ts
+// Multi-select (default): value is string[]
+{ type: 'combobox', name: 'proficiencyWeapons', label: 'Weapon proficiencies',
+  multiple: true, options: ctx.options?.weapons ?? [], placeholder: 'Choose weapons…' }
+
+// Single-select: value is string; picking closes the panel
+{ type: 'combobox', name: 'primaryWeapon', label: 'Primary weapon', multiple: false,
+  options: weaponOptions }
+```
+
+- Client-side filter matches `label`, optional `description`, and `value`.
+- Multi mode renders selected values as removable chips below the trigger.
+- Already-selected values stay visible even when they are missing from the current
+  `options` list (stale slug handling).
+- Default value: `[]` when `multiple` is true (default), `''` when `multiple: false`.
+
 ### Editable grid (`editableGrid` / `EditableGrid`)
 
 A fixed-row, multi-column table for dense per-level authoring (e.g. cantrips known

@@ -164,7 +164,7 @@ import { Form } from '@rpg/ui/form'
 See **[docs/forms.md](docs/forms.md)** for the full guide: when to use which layer,
 the field anatomy + a11y contract, the `size`/`width` token scales (with the XdY
 recipe), contracts-first validation, the RHF boundary, rich-text/JSON handling,
-and conditional fields.
+combobox/chips field types, and conditional fields.
 
 ## File uploads
 
