@@ -30,6 +30,7 @@ export {
   type FileFieldRemotePreview,
   type FileFieldPropsMap,
   type ChipsFieldConfig,
+  type ComboboxFieldConfig,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
   type FieldConfig,

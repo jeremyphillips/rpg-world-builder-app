@@ -35,6 +35,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import type { ContentFormCtx } from './content-form-registry'
 import { titleCase } from './title-case'
 
 // ---------------------------------------------------------------------------
@@ -133,7 +134,7 @@ const usageFrequencyOptions = toOptions(
 
 const innateSpellEntryFormSchema = z.object({
   level: z.coerce.number().pipe(levelSchema),
-  spellIds: z.string().min(1),
+  spellIds: z.array(z.string()).min(1),
   kind: innateSpellKindSchema.optional(),
   frequency: usageFrequencySchema.optional(),
 })
@@ -148,8 +149,8 @@ export const grantRowFormSchema = z.object({
   language: z.string().optional(),
   proficiencySkills: z.array(skillSchema).optional(),
   proficiencyArmor: z.array(armorCategorySchema).optional(),
-  proficiencyTools: z.string().optional(),
-  proficiencyWeapons: z.string().optional(),
+  proficiencyTools: z.array(z.string()).optional(),
+  proficiencyWeapons: z.array(z.string()).optional(),
   innateSpellAbility: abilitySchema.optional(),
   innateSpellEntries: z.array(innateSpellEntryFormSchema).optional(),
 })
@@ -178,10 +179,27 @@ function grantTypeOptionsFor<T extends string>(
 // Field builders
 // ---------------------------------------------------------------------------
 
+export function formatInnateSpellEntryTitle(
+  spellIds: string[] | undefined,
+  spellOptions: FieldOption[],
+  index: number,
+): string {
+  if (!spellIds?.length) return `Entry ${index + 1}`
+  const labels = spellIds.map(
+    (id) => spellOptions.find((option) => option.value === id)?.label ?? id,
+  )
+  return labels.length <= 2 ? labels.join(', ') : `${labels.length} spells`
+}
+
 export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
   labels: Record<T, string>,
+  ctx: ContentFormCtx,
 ): FormItem[] {
+  const spellOptions = ctx.options?.spells ?? []
+  const toolOptions = ctx.options?.tools ?? []
+  const weaponOptions = ctx.options?.weapons ?? []
+
   return [
     {
       type: 'select',
@@ -247,17 +265,21 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('proficiencies'),
     },
     {
-      type: 'text',
+      type: 'combobox',
       name: 'proficiencyTools',
       label: 'Tools',
-      hint: 'Comma-separated',
+      multiple: true,
+      options: toolOptions,
+      placeholder: 'Choose tools…',
       visibility: visibleFor('proficiencies'),
     },
     {
-      type: 'text',
+      type: 'combobox',
       name: 'proficiencyWeapons',
       label: 'Weapons',
-      hint: 'Comma-separated',
+      multiple: true,
+      options: weaponOptions,
+      placeholder: 'Choose weapons…',
       visibility: visibleFor('proficiencies'),
     },
     {
@@ -273,7 +295,12 @@ export function grantItemFields<T extends string>(
       legend: 'Innate spell entries',
       addLabel: 'Add entry',
       visibility: visibleFor('innateSpells'),
-      itemTitle: (values, index) => (values['spellIds'] as string) || `Entry ${index + 1}`,
+      itemTitle: (values, index) =>
+        formatInnateSpellEntryTitle(
+          values['spellIds'] as string[] | undefined,
+          spellOptions,
+          index,
+        ),
       fields: [
         {
           type: 'select',
@@ -283,10 +310,12 @@ export function grantItemFields<T extends string>(
           required: true,
         },
         {
-          type: 'text',
+          type: 'combobox',
           name: 'spellIds',
-          label: 'Spell IDs',
-          hint: 'Comma-separated slugs',
+          label: 'Spells',
+          multiple: true,
+          options: spellOptions,
+          placeholder: 'Choose spells…',
           required: true,
         },
         {
@@ -315,6 +344,7 @@ export function grantItemFields<T extends string>(
 export function grantArrayFields<T extends string>(
   grantTypes: readonly T[],
   labels: Record<T, string>,
+  ctx: ContentFormCtx,
 ): FormItem[] {
   return [
     {
@@ -326,7 +356,7 @@ export function grantArrayFields<T extends string>(
         const type = values['grantType'] as T | undefined
         return type ? labels[type] : `Grant ${index + 1}`
       },
-      fields: grantItemFields(grantTypes, labels),
+      fields: grantItemFields(grantTypes, labels, ctx),
     },
   ]
 }
@@ -353,18 +383,11 @@ function emptyGrantRow(grantType: ClassGrantType): GrantRowForm {
     language: '',
     proficiencySkills: [],
     proficiencyArmor: [],
-    proficiencyTools: '',
-    proficiencyWeapons: '',
+    proficiencyTools: [],
+    proficiencyWeapons: [],
     innateSpellAbility: undefined,
     innateSpellEntries: [],
   }
-}
-
-function splitComma(value: string): string[] {
-  return value
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean)
 }
 
 function optionalGrantRow(row: GrantRowForm | undefined): GrantRowForm[] {
@@ -409,8 +432,8 @@ function proficienciesToRow(
     ...emptyGrantRow('proficiencies'),
     proficiencySkills: skills ?? [],
     proficiencyArmor: armor ?? [],
-    proficiencyTools: tools?.join(', ') ?? '',
-    proficiencyWeapons: weapons?.join(', ') ?? '',
+    proficiencyTools: tools ?? [],
+    proficiencyWeapons: weapons ?? [],
   }
 }
 
@@ -421,7 +444,7 @@ function innateSpellsToRow(innateSpells: ContentGrants['innateSpells']): GrantRo
     innateSpellAbility: innateSpells.ability,
     innateSpellEntries: innateSpells.entries.map((entry) => ({
       level: entry.level,
-      spellIds: entry.spellIds.join(', '),
+      spellIds: entry.spellIds,
       kind: entry.kind,
       frequency: entry.frequency,
     })),
@@ -484,9 +507,11 @@ function skillArmorProficiencies(row: GrantRowForm): ContentProficiencies {
 }
 
 function toolWeaponProficiencies(row: GrantRowForm): ContentProficiencies {
-  const tools = splitComma(row.proficiencyTools ?? '')
-  const weapons = splitComma(row.proficiencyWeapons ?? '')
-  return Object.assign({}, tools.length ? { tools } : {}, weapons.length ? { weapons } : {})
+  return Object.assign(
+    {},
+    row.proficiencyTools?.length ? { tools: row.proficiencyTools } : {},
+    row.proficiencyWeapons?.length ? { weapons: row.proficiencyWeapons } : {},
+  )
 }
 
 function proficienciesFromRow(row: GrantRowForm): ContentProficiencies | undefined {
@@ -507,11 +532,10 @@ function applyInnateSpellsFromRows(result: ContentGrants, rows: GrantRowForm[]):
 
   const entries = row.innateSpellEntries
     .map((entry) => {
-      const spellIds = splitComma(entry.spellIds)
-      if (!spellIds.length) return undefined
+      if (!entry.spellIds.length) return undefined
       return {
         level: entry.level,
-        spellIds,
+        spellIds: entry.spellIds,
         kind: (entry.kind ?? 'free_cast') as InnateSpellKind,
         frequency: entry.kind === 'always_prepared' ? undefined : entry.frequency,
       }

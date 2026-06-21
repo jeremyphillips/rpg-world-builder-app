@@ -29,4 +29,10 @@ export {
   type ContentFormDef,
   type ContentFormCtx,
 } from './lib/content-form-registry'
+export {
+  buildContentFormOptionSets,
+  toContentFieldOption,
+  useContentFormOptions,
+  type ContentFormOptionSets,
+} from './lib/content-form-options'
 export { createContentMutationHooks } from './lib/use-content-mutations'

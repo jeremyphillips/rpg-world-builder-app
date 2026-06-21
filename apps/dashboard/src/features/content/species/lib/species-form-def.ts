@@ -26,7 +26,11 @@ import {
   grantRowFormSchema,
   grantsToFormRows,
 } from '../../lib/grant-form-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormCtx,
+  type ContentFormDef,
+} from '../../lib/content-form-registry'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 
 // ---------------------------------------------------------------------------
@@ -95,7 +99,7 @@ type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 // Field builders
 // ---------------------------------------------------------------------------
 
-function traitItemFields(): FormItem[] {
+function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'row',
@@ -111,11 +115,11 @@ function traitItemFields(): FormItem[] {
       ],
     },
     { type: 'richtext', name: 'description', label: 'Description' },
-    ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS),
+    ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS, ctx),
   ]
 }
 
-function heritageChoiceItemFields(): FormItem[] {
+function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'row',
@@ -139,7 +143,7 @@ function heritageChoiceItemFields(): FormItem[] {
       addLabel: 'Add option',
       min: 1,
       itemTitle: (values, index) => (values['name'] as string) || `Option ${index + 1}`,
-      fields: traitItemFields(),
+      fields: traitItemFields(ctx),
     },
   ]
 }
@@ -207,7 +211,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   schema: speciesFormSchema,
   createDefaultValues: speciesCreateDefaultValues,
 
-  buildFields: (_ctx) => [
+  buildFields: (ctx) => [
     {
       kind: 'group',
       legend: 'Identity',
@@ -266,7 +270,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       legend: 'Traits',
       addLabel: 'Add trait',
       itemTitle: (values, index) => (values['name'] as string) || `Trait ${index + 1}`,
-      fields: traitItemFields(),
+      fields: traitItemFields(ctx),
     },
     {
       kind: 'array',
@@ -274,7 +278,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       legend: 'Heritage choices',
       addLabel: 'Add heritage choice',
       itemTitle: (values, index) => (values['name'] as string) || `Heritage choice ${index + 1}`,
-      fields: heritageChoiceItemFields(),
+      fields: heritageChoiceItemFields(ctx),
     },
   ],
 

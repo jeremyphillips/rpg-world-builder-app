@@ -5,6 +5,7 @@ import { useController, type ControllerRenderProps } from 'react-hook-form'
 
 import { CheckboxField } from '../components/ui/checkbox-field'
 import { ChipsField } from '../components/ui/chips-field.client'
+import { ComboboxField } from '../components/ui/combobox-field.client'
 import { FileField } from '../components/ui/file-field.client'
 import { JsonField } from '../components/ui/json-field.client'
 import { NumberField } from '../components/ui/number-field'
@@ -234,6 +235,26 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       info={config.info}
       required={config.required}
       width={config.width}
+      disabled={config.disabled}
+      value={field.value ?? (config.multiple === false ? '' : [])}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+    />
+  ),
+  combobox: ({ config, field, id, error }) => (
+    <ComboboxField
+      id={id}
+      label={config.label}
+      options={config.options}
+      multiple={config.multiple}
+      max={config.max}
+      placeholder={config.placeholder}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      size={config.size}
       disabled={config.disabled}
       value={field.value ?? (config.multiple === false ? '' : [])}
       onChange={field.onChange}

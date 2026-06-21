@@ -12,31 +12,32 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 
 ## What's inside
 
-| Export                                       | Kind       | Notes                                                                                                                                       |
-| -------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cn`                                         | util       | `clsx` + `tailwind-merge` class composer                                                                                                    |
-| `Button`, `buttonVariants`, `ButtonProps`    | component  | 6 variants (`default` … `link`), 4 sizes                                                                                                    |
-| `Input`                                      | component  | Styled text input                                                                                                                           |
-| `Card` + subcomponents                       | component  | `CardHeader/Title/Description/Content/Footer`                                                                                               |
-| `Field` (compound)                           | component  | `Field.Root/Label/Control/Hint/Error`; centralizes id + aria wiring                                                                         |
-| `FormField`                                  | component  | Label + control slot + inline error/hint (+ optional `[i]` info)                                                                            |
-| Field wrappers                               | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField` |
-| `FileDropzone`                               | component  | Drag-and-drop / click-to-browse file primitive; controlled (`value`/`onChange: File[]`); MIME validation, previews, remove                  |
-| `FileField`                                  | component  | `FormField`-shim wrapper around `FileDropzone` — adds label, hint, error, `[i]` info                                                        |
-| `FieldGroup`, `FieldRow`                     | component  | Layout: semantic fieldset/legend group; responsive token-width row                                                                          |
-| `Tooltip` + `InfoTooltip`                    | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                      |
-| `Modal` (compound)                           | component  | `Modal.Root/Trigger/Content/Header/Body/Footer/Close` on Radix Dialog; `size`, `closeOnOutsideClick`, `closeOnEscape`                       |
-| `useModal`                                   | hook       | Modal open/close state + promise-based `confirm()` + guarded-close helpers                                                                  |
-| `ConfirmDialog`                              | component  | Radix AlertDialog "are you sure?"; pairs with `useModal`'s guarded close                                                                    |
-| `RichTextEditor`, `sanitizeHtml`             | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                             |
-| `Heading`, `Text`, `RichTextContent`         | component  | App copy primitives + sanitized HTML prose; see [Typography](#typography) below                                                             |
-| `FormCard`, `formCardContentClass`           | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                  |
-| `SubmitButton`, `SubmitButtonProps`          | component  | `type="submit"` button with pending state + label                                                                                           |
-| `Spinner`, `SpinnerProps`, `spinnerVariants` | component  | Accessible loading indicator; `variant` (`muted` default, `foreground`); `size` (`sm` … `xl`)                                               |
-| `Wizard`, `WizardFooter`, `useWizard`        | component  | Multi-step form wizard; schema-agnostic; per-step `<Form>` pattern; see [Wizard pattern](#wizard-pattern) below                             |
-| `@rpg/ui/form`                               | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer)                                                                    |
-| `@rpg/ui/styles.css`                         | stylesheet | Tailwind + design tokens (the shared "preset")                                                                                              |
-| `@rpg/ui/lib/utils`                          | util       | Direct path to `cn` for shadcn's CLI alias                                                                                                  |
+| Export                                       | Kind       | Notes                                                                                                                                                        |
+| -------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `cn`                                         | util       | `clsx` + `tailwind-merge` class composer                                                                                                                     |
+| `Button`, `buttonVariants`, `ButtonProps`    | component  | 6 variants (`default` … `link`), 4 sizes                                                                                                                     |
+| `Badge`, `DismissibleBadge`                  | component  | Static label chip; dismissible variant with remove control for tags/filters                                                                                  |
+| `Input`                                      | component  | Styled text input                                                                                                                                            |
+| `Card` + subcomponents                       | component  | `CardHeader/Title/Description/Content/Footer`                                                                                                                |
+| `Field` (compound)                           | component  | `Field.Root/Label/Control/Hint/Error`; centralizes id + aria wiring                                                                                          |
+| `FormField`                                  | component  | Label + control slot + inline error/hint (+ optional `[i]` info)                                                                                             |
+| Field wrappers                               | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `ComboboxField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField` |
+| `FileDropzone`                               | component  | Drag-and-drop / click-to-browse file primitive; controlled (`value`/`onChange: File[]`); MIME validation, previews, remove                                   |
+| `FileField`                                  | component  | `FormField`-shim wrapper around `FileDropzone` — adds label, hint, error, `[i]` info                                                                         |
+| `FieldGroup`, `FieldRow`                     | component  | Layout: semantic fieldset/legend group; responsive token-width row                                                                                           |
+| `Tooltip` + `InfoTooltip`                    | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                                       |
+| `Modal` (compound)                           | component  | `Modal.Root/Trigger/Content/Header/Body/Footer/Close` on Radix Dialog; `size`, `closeOnOutsideClick`, `closeOnEscape`                                        |
+| `useModal`                                   | hook       | Modal open/close state + promise-based `confirm()` + guarded-close helpers                                                                                   |
+| `ConfirmDialog`                              | component  | Radix AlertDialog "are you sure?"; pairs with `useModal`'s guarded close                                                                                     |
+| `RichTextEditor`, `sanitizeHtml`             | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                                              |
+| `Heading`, `Text`, `RichTextContent`         | component  | App copy primitives + sanitized HTML prose; see [Typography](#typography) below                                                                              |
+| `FormCard`, `formCardContentClass`           | component  | Card chrome (header + body slot, no `<form>`); render a `<Form>` inside it                                                                                   |
+| `SubmitButton`, `SubmitButtonProps`          | component  | `type="submit"` button with pending state + label                                                                                                            |
+| `Spinner`, `SpinnerProps`, `spinnerVariants` | component  | Accessible loading indicator; `variant` (`muted` default, `foreground`); `size` (`sm` … `xl`)                                                                |
+| `Wizard`, `WizardFooter`, `useWizard`        | component  | Multi-step form wizard; schema-agnostic; per-step `<Form>` pattern; see [Wizard pattern](#wizard-pattern) below                                              |
+| `@rpg/ui/form`                               | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer)                                                                                     |
+| `@rpg/ui/styles.css`                         | stylesheet | Tailwind + design tokens (the shared "preset")                                                                                                               |
+| `@rpg/ui/lib/utils`                          | util       | Direct path to `cn` for shadcn's CLI alias                                                                                                                   |
 
 Interactive primitives (`Button`, `Input`) carry `"use client"` so they work
 inside Next.js Server Components.
@@ -163,7 +164,7 @@ import { Form } from '@rpg/ui/form'
 See **[docs/forms.md](docs/forms.md)** for the full guide: when to use which layer,
 the field anatomy + a11y contract, the `size`/`width` token scales (with the XdY
 recipe), contracts-first validation, the RHF boundary, rich-text/JSON handling,
-and conditional fields.
+combobox/chips field types, and conditional fields.
 
 ## File uploads
 
