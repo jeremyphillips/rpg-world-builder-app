@@ -20,8 +20,19 @@ export function optionMatchesQuery(option: ComboboxFieldOption, query: string): 
 export function filterOptions(
   options: ComboboxFieldOption[],
   query: string,
+  selected: string[] = [],
 ): ComboboxFieldOption[] {
-  return options.filter((option) => optionMatchesQuery(option, query))
+  const selectedSet = new Set(selected)
+  const visible = options.filter(
+    (option) => selectedSet.has(option.value) || optionMatchesQuery(option, query),
+  )
+  const visibleValues = new Set(visible.map((option) => option.value))
+  for (const value of selected) {
+    if (!visibleValues.has(value)) {
+      visible.push(resolveOption(value, options))
+    }
+  }
+  return visible
 }
 
 export function resolveOption(value: string, options: ComboboxFieldOption[]): ComboboxFieldOption {

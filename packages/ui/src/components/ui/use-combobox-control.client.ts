@@ -38,7 +38,10 @@ export function useComboboxControl({
   const isInteractionDisabled = Boolean(disabled || loading)
   const atMax = max !== undefined && selected.length >= max
 
-  const filteredOptions = React.useMemo(() => filterOptions(options, query), [options, query])
+  const filteredOptions = React.useMemo(
+    () => filterOptions(options, query, selected),
+    [options, query, selected],
+  )
   const highlightedIndex = clampHighlightedIndex(activeIndex, filteredOptions.length)
   const selectedOptions = React.useMemo(
     () => selected.map((value) => resolveOption(value, options)),

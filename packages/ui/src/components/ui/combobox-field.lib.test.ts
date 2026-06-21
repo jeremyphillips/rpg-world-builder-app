@@ -30,6 +30,16 @@ describe('combobox-field.lib', () => {
     expect(filterOptions(options, 'bolt')).toHaveLength(1)
   })
 
+  it('keeps selected values visible even when they do not match the query', () => {
+    expect(filterOptions(options, 'fire', ['dagger'])).toEqual([options[0], options[1]])
+  })
+
+  it('includes stale selected values that are missing from options', () => {
+    expect(filterOptions(options, 'xyz', ['missing-weapon'])).toEqual([
+      { value: 'missing-weapon', label: 'missing-weapon' },
+    ])
+  })
+
   it('builds trigger labels', () => {
     expect(resolveTriggerLabel(true, [], 'Choose…', options)).toBe('Choose…')
     expect(resolveTriggerLabel(true, ['a', 'b'], 'Choose…', options)).toBe('2 selected')

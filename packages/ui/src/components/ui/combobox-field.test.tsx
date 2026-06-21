@@ -108,6 +108,26 @@ describe('ComboboxField', () => {
     expect(screen.queryByRole('option', { name: /Fire Bolt/i })).not.toBeInTheDocument()
   })
 
+  it('keeps selected options visible while searching', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={['dagger']}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search Specific weapons' }), 'long')
+
+    expect(screen.getByRole('option', { name: 'Dagger' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Longsword' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Dart' })).not.toBeInTheDocument()
+  })
+
   it('adds a selection in multi mode', async () => {
     const onChange = vi.fn()
     const user = userEvent.setup()
