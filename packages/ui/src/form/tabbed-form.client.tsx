@@ -25,6 +25,11 @@ export interface TabbedFormTab {
   id: string
   label: string
   fields: FormItem[]
+  /**
+   * Optional non-field UI rendered above this tab's fields (intro copy, links,
+   * placeholders). Omit fields for a panel that is entirely non-input content.
+   */
+  header?: React.ReactNode
 }
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
@@ -127,9 +132,12 @@ export function TabbedForm<TFieldValues extends FieldValues>({
               // by Radix via the HTML `hidden` attribute.
               <TabsContent key={tab.id} value={tab.id} forceMount>
                 <div className={fieldGroupStackClasses}>
-                  <FormSectionContext.Provider value={sectionContext}>
-                    <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-                  </FormSectionContext.Provider>
+                  {tab.header}
+                  {tab.fields.length > 0 ? (
+                    <FormSectionContext.Provider value={sectionContext}>
+                      <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+                    </FormSectionContext.Provider>
+                  ) : null}
                 </div>
               </TabsContent>
             ))}

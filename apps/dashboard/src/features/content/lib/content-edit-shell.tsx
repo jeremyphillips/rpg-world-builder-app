@@ -7,7 +7,7 @@ import type { ContentFormCtx } from './content-form-registry'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
-  ContentSchemaForm,
+  ContentFormLayout,
 } from './content-form-shell-parts'
 import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
@@ -52,7 +52,7 @@ function ContentEditFormReady({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
-  const fields = def.buildFields(ctx)
+  const formCtx: ContentFormCtx = { ...ctx, campaignId, entityId, mode: 'edit' }
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
@@ -75,10 +75,11 @@ function ContentEditFormReady({
         {headingFn(entity.name)}
       </Heading>
 
-      <ContentSchemaForm
+      <ContentFormLayout
+        def={def}
+        ctx={formCtx}
         formKey={entity.id}
         schema={def.schema}
-        fields={fields}
         defaultValues={def.toFormValues(entity)}
         backHref={backHref}
         submitLabel="Save changes"

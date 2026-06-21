@@ -190,3 +190,11 @@ describe('speciesFormDef.buildFields', () => {
     expect(key.length).toBeGreaterThan(0)
   })
 })
+
+describe('speciesFormDef.buildTabs', () => {
+  it('returns three tabs with expected ids', () => {
+    const tabs = speciesFormDef.buildTabs!({})
+    expect(tabs).toHaveLength(3)
+    expect(tabs.map((tab) => tab.id)).toEqual(['basics', 'traits', 'heritage-choices'])
+  })
+})

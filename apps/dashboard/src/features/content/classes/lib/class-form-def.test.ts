@@ -243,3 +243,17 @@ describe('classFormDef.buildFields', () => {
     expect(key.length).toBeGreaterThan(0)
   })
 })
+
+describe('classFormDef.buildTabs', () => {
+  it('returns five tabs with expected ids', () => {
+    const tabs = classFormDef.buildTabs!({})
+    expect(tabs).toHaveLength(5)
+    expect(tabs.map((tab) => tab.id)).toEqual([
+      'basics',
+      'proficiencies',
+      'spellcasting',
+      'features',
+      'subclasses',
+    ])
+  })
+})

@@ -1,6 +1,6 @@
 import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import type { FormItem } from '@rpg/ui/form'
+import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 
 import type { WeaponCategory } from '@rpg/contracts'
 
@@ -8,12 +8,14 @@ import type { ContentListQueryResult } from './content-client'
 import type { ContentFormOptionSets } from './content-form-options'
 
 /**
- * Context passed to `buildFields`. Carries campaign-scoped catalog options for
- * combobox fields (weapons, spells, tools). `buildFields({})` remains valid in
- * drift tests — combobox fields should fall back to `ctx.options?.weapons ?? []`.
+ * Context passed to `buildFields` / `buildTabs`. Carries campaign-scoped catalog
+ * options for combobox fields (weapons, spells, tools). `buildFields({})` remains
+ * valid in drift tests — combobox fields should fall back to `ctx.options?.weapons ?? []`.
  */
 export type ContentFormCtx = {
   campaignId?: string
+  entityId?: string
+  mode?: 'create' | 'edit'
   options?: Partial<ContentFormOptionSets>
 }
 
@@ -44,6 +46,12 @@ export interface ContentFormDef<
   schema: ZodType<TFormValues>
   /** Returns the ordered `FormItem[]` for this type. */
   buildFields: (ctx: ContentFormCtx) => FormItem[]
+  /**
+   * When set, create/edit shells render a `<TabbedForm>` instead of `<Form>`.
+   * Tab field lists are the source of truth; `buildFields` should delegate to
+   * `contentFormFields(this, ctx)` for drift tests.
+   */
+  buildTabs?: (ctx: ContentFormCtx) => TabbedFormTab[]
   /**
    * Maps a stored entity to form defaults for the edit shell.
    * Partial so optional fields don't need explicit `undefined`.
@@ -84,3 +92,14 @@ export type AnyContentFormDef = ContentFormDef<any, any, any>
  * Phase 3 registers `species`; subsequent phases register the remaining types.
  */
 export const contentFormRegistry: Record<string, AnyContentFormDef> = {}
+
+/** Flat field list for drift tests — tabs when present, else `buildFields`. */
+export function contentFormFields(
+  def: Pick<AnyContentFormDef, 'buildFields' | 'buildTabs'>,
+  ctx: ContentFormCtx,
+): FormItem[] {
+  if (def.buildTabs) {
+    return def.buildTabs(ctx).flatMap((tab) => tab.fields)
+  }
+  return def.buildFields(ctx)
+}

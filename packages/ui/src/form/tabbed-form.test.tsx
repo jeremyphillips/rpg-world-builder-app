@@ -107,6 +107,21 @@ describe('TabbedForm', () => {
     expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ name: 'The Sunless Citadel' })
   })
 
+  it('renders tab header content above fields', async () => {
+    const tabsWithHeader: TabbedFormTab[] = [
+      ...tabs,
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [],
+        header: <p>Notes are managed elsewhere.</p>,
+      },
+    ]
+    render(<TabbedForm<TestValues> schema={schema} tabs={tabsWithHeader} onSubmit={vi.fn()} />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Notes' }))
+    expect(screen.getByText('Notes are managed elsewhere.')).toBeInTheDocument()
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TabbedForm<TestValues>

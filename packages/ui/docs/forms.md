@@ -31,6 +31,25 @@ naturally tabbed structure (e.g. settings pages). Drop a layer only when you hit
 something it can't express — and consider whether the missing capability belongs
 in the renderer instead.
 
+### `<TabbedForm>` validation behavior
+
+All tab panels stay mounted (`forceMount` on each `TabsContent`) so every field
+registers with react-hook-form and the global Save button validates the **merged**
+schema across tabs in one pass.
+
+**Known gap (first pass):** field-level errors on an **inactive** tab are not
+surfaced on the tab trigger. A failed submit can look like a no-op until the
+author switches to the tab that holds the invalid field.
+
+**Workaround:** if Save does nothing and no error is visible, check other tabs.
+
+**Future improvement (out of scope today):** tab error badges and/or auto-switch
+to the first tab with a validation error on failed submit.
+
+Optional non-field UI (intro copy, links, placeholders) belongs on
+`TabbedFormTab.header` — rendered above that tab's fields, outside the Zod
+schema. Omit `fields` for a panel that is entirely non-input content.
+
 ## Field anatomy & the a11y contract
 
 Every field — whether composed by hand or emitted by `<Form>` — resolves to the
