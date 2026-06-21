@@ -8,7 +8,7 @@ import {
   type FieldControlVariantProps,
   type FieldWidth,
 } from './field-control.variants'
-import { fieldLabelVariants } from './field.variants'
+import { fieldAnatomyStackClasses, fieldLabelVariants } from './field.variants'
 import { Text } from './text'
 
 type FieldSize = NonNullable<FieldControlVariantProps['size']>
@@ -95,7 +95,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         <div
           ref={ref}
           data-field={name}
-          className={cn('space-y-2', fieldWidthVariants({ width }), className)}
+          className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }), className)}
           {...props}
         >
           {children}

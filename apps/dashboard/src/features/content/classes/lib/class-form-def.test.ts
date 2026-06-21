@@ -2,6 +2,7 @@
  * Class form def — round-trip and type-level drift guard.
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
+import { loadSeedWeapons } from '@rpg/catalog/weapons'
 import { loadSeedClasses } from '@rpg/catalog/classes'
 import { createClassInputSchema, deriveContentKey, type CreateClassInput } from '@rpg/contracts'
 
@@ -12,6 +13,16 @@ import {
 } from './progression-table-helpers'
 
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
+const WEAPON_CATEGORY_BY_SLUG = Object.fromEntries(
+  loadSeedWeapons('srd-cc-5.2.1').map((weapon) => [weapon.slug, weapon.category]),
+)
+
+function toInputWithWeaponMap(formValues: ClassFormValues, entity?: (typeof SRD_CLASSES)[number]) {
+  return classFormDef.toInput(formValues, {
+    ...(entity ? { entity } : {}),
+    weaponCategoryBySlug: WEAPON_CATEGORY_BY_SLUG,
+  })
+}
 
 it('type: toInput return type matches CreateClassInput', () => {
   expectTypeOf(classFormDef.toInput).returns.toEqualTypeOf<CreateClassInput>()
@@ -69,6 +80,7 @@ describe('classFormDef round-trips', () => {
   it('sorcerer: specific weapon proficiencies round-trip as slug arrays', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
+    expect(formValues.hasSpecificWeapons).toBe(true)
     expect(formValues.proficiencies.weapons.items).toEqual([
       'dagger',
       'dart',
@@ -76,8 +88,60 @@ describe('classFormDef round-trips', () => {
       'quarterstaff',
       'light-crossbow',
     ])
-    const input = classFormDef.toInput(formValues)
+    const input = toInputWithWeaponMap(formValues)
     expect(input.proficiencies.weapons.items).toEqual(sorcerer.proficiencies.weapons.items)
+  })
+
+  it('fighter: hasSpecificWeapons is false when only categories are granted', () => {
+    const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
+    const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
+    expect(formValues.hasSpecificWeapons).toBe(false)
+    const input = toInputWithWeaponMap(formValues)
+    expect(input.proficiencies.weapons.items).toBeUndefined()
+  })
+
+  it('toInput strips redundant simple items when simple category is selected', () => {
+    const formValues = {
+      ...classFormDef.createDefaultValues,
+      name: 'Custom Class',
+      hasSpecificWeapons: true,
+      proficiencies: {
+        ...classFormDef.createDefaultValues!.proficiencies!,
+        weapons: {
+          categories: ['simple'],
+          items: ['dagger', 'longsword'],
+        },
+      },
+      features: [],
+    } as ClassFormValues
+
+    const input = toInputWithWeaponMap(formValues)
+    expect(input.proficiencies.weapons).toEqual({
+      categories: ['simple'],
+      items: ['longsword'],
+    })
+  })
+
+  it('toInput drops simple category when only specific simple weapons remain', () => {
+    const formValues = {
+      ...classFormDef.createDefaultValues,
+      name: 'Custom Class',
+      hasSpecificWeapons: true,
+      proficiencies: {
+        ...classFormDef.createDefaultValues!.proficiencies!,
+        weapons: {
+          categories: ['simple'],
+          items: ['dagger'],
+        },
+      },
+      features: [],
+    } as ClassFormValues
+
+    const input = toInputWithWeaponMap(formValues)
+    expect(input.proficiencies.weapons).toEqual({
+      categories: [],
+      items: ['dagger'],
+    })
   })
 
   it('bard: innate spell entries use spell slug arrays in form values', () => {
@@ -125,8 +189,9 @@ describe('classFormDef round-trips', () => {
     expect(input.subclassLevels).toEqual(fighter.subclassLevels)
   })
 
-  it('create defaults include subclass level 3', () => {
+  it('create defaults include subclass level 3 and specific-weapons toggle off', () => {
     expect(classFormDef.createDefaultValues?.subclassLevels).toEqual([3])
+    expect(classFormDef.createDefaultValues?.hasSpecificWeapons).toBe(false)
   })
 
   it('fighter: hasSpellcasting is false when no spellcasting block', () => {

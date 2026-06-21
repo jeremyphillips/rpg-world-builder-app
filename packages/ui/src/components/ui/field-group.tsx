@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupLegendVariants } from './field.variants'
+import { fieldGroupLegendVariants, fieldGroupStackClasses } from './field.variants'
 import { Text } from './text'
 
 export interface FieldGroupProps {
@@ -25,7 +25,7 @@ export function FieldGroup({ legend, description, className, children }: FieldGr
           {description}
         </Text>
       ) : null}
-      <div className="space-y-4">{children}</div>
+      <div className={fieldGroupStackClasses}>{children}</div>
     </fieldset>
   )
 }

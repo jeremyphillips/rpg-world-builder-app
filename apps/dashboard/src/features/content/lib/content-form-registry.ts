@@ -2,6 +2,8 @@ import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import type { FormItem } from '@rpg/ui/form'
 
+import type { WeaponCategory } from '@rpg/contracts'
+
 import type { ContentListQueryResult } from './content-client'
 import type { ContentFormOptionSets } from './content-form-options'
 
@@ -18,6 +20,7 @@ export type ContentFormCtx = {
 /** Optional context for `toInput` — present on edit, omitted on create. */
 export type ContentFormInputCtx<TEntity> = {
   entity?: TEntity
+  weaponCategoryBySlug?: Readonly<Partial<Record<string, WeaponCategory>>>
 }
 
 /**

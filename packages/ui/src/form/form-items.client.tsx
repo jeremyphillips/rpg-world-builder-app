@@ -12,7 +12,11 @@ import {
 import { Button } from '../components/ui/button.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
-import { fieldGroupLegendVariants } from '../components/ui/field.variants'
+import {
+  fieldGroupLegendVariants,
+  fieldGroupStackClasses,
+  formSectionStackClasses,
+} from '../components/ui/field.variants'
 import { Text } from '../components/ui/text'
 import { FieldRenderer } from './field-renderer.client'
 import { FormSectionContext } from './form-section-context.client'
@@ -160,7 +164,7 @@ function FormAccordionBatch({ batchKey, sections, idPrefix, namePrefix }: FormAc
       value={openValues}
       onValueChange={handleValueChange}
       variant="section"
-      className="flex flex-col gap-6"
+      className={formSectionStackClasses}
     >
       {sections.map(({ item, index }) => (
         <CollapsibleFormSection
@@ -307,7 +311,7 @@ function CollapsibleFormSection({
         {item.kind === 'group' ? (
           <fieldset aria-labelledby={triggerId} className="min-w-0 border-0 p-0">
             <legend className="sr-only">{item.legend}</legend>
-            <div className="space-y-4">
+            <div className={fieldGroupStackClasses}>
               <FormSectionContext.Provider value={childContext}>
                 <NestedFormItems
                   items={item.fields}
@@ -412,7 +416,7 @@ export function ArrayFieldRenderer({
       ) : (
         <legend className={fieldGroupLegendVariants()}>{legend}</legend>
       )}
-      <div className="space-y-3">
+      <div className={fieldGroupStackClasses}>
         {fields.map((rhfField, index) => {
           const itemPrefix = `${fullName}.${index}`
           const title = itemTitle
@@ -428,7 +432,7 @@ export function ArrayFieldRenderer({
               {title ? (
                 <legend className="px-1 text-xs text-muted-foreground">{title}</legend>
               ) : null}
-              <div className="space-y-4">
+              <div className={fieldGroupStackClasses}>
                 <FormItems items={config.fields} idPrefix={idPrefix} namePrefix={itemPrefix} />
               </div>
               <div className="mt-3 flex items-center gap-2">
