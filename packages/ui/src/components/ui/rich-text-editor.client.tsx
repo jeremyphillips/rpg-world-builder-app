@@ -7,6 +7,7 @@ import { Bold, Italic, Link as LinkIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { richTextEditorProseClasses } from './rich-text-content.variants'
 
 export interface RichTextEditorProps {
   /** Current value as an HTML string. */
@@ -23,9 +24,6 @@ export interface RichTextEditorProps {
   'aria-describedby'?: string
   'aria-invalid'?: boolean
 }
-
-const editableClass =
-  'min-h-20 w-full px-3 py-2 text-sm focus:outline-none [&_a]:text-primary [&_a]:underline [&_p]:leading-relaxed'
 
 /**
  * A simple visual editor built on Tiptap: bold, italic, and line breaks, with an
@@ -55,7 +53,11 @@ export function RichTextEditor({
       onUpdate: ({ editor: instance }) => onChange?.(instance.getHTML()),
       onBlur: () => onBlur?.(),
       editorProps: {
-        attributes: { role: 'textbox', 'aria-multiline': 'true', class: editableClass },
+        attributes: {
+          role: 'textbox',
+          'aria-multiline': 'true',
+          class: richTextEditorProseClasses,
+        },
       },
     },
     [linkable],
@@ -87,7 +89,7 @@ export function RichTextEditor({
         attributes: {
           role: 'textbox',
           'aria-multiline': 'true',
-          class: editableClass,
+          class: richTextEditorProseClasses,
           ...(id ? { id } : {}),
           ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
           ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
