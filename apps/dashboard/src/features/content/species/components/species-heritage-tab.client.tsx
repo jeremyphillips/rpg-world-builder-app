@@ -19,6 +19,9 @@ import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import {
   ADD_HERITAGE_LABEL,
+  ADD_HERITAGE_OPTION_LABEL,
+  HERITAGE_EMPTY_MESSAGE,
+  HERITAGE_OPTION_NOUN,
   heritageDefaultValues,
   heritageScalarFields,
   type HeritageForm,
@@ -32,8 +35,6 @@ import {
 
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
-const OPTION_NOUN = 'option'
-const ADD_OPTION_LABEL = 'Add option'
 
 export interface SpeciesHeritageTabProps {
   formCtx: ContentFormCtx
@@ -62,7 +63,7 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   return (
     <div className="space-y-3">
       <Text variant="muted" className="text-sm">
-        No lineage or ancestry yet. Add one to define player choices at character creation.
+        {HERITAGE_EMPTY_MESSAGE}
       </Text>
       <Button
         type="button"
@@ -176,7 +177,7 @@ function HeritageOptionsSection({
           items={items}
           selectedIndex={editor.selectedIndex}
           ariaLabel="Heritage options"
-          addLabel={ADD_OPTION_LABEL}
+          addLabel={ADD_HERITAGE_OPTION_LABEL}
           emptyLabel="No options yet. Add one to get started."
           onAdd={editor.handleAdd}
           onSelect={editor.select}
@@ -194,7 +195,7 @@ function HeritageOptionsSection({
 
       <MasterDetailDeleteDialog
         open={editor.deleteIndex !== null}
-        itemNoun={OPTION_NOUN}
+        itemNoun={HERITAGE_OPTION_NOUN}
         itemName={deleteName}
         onOpenChange={(open) => {
           if (!open) editor.cancelRemove()

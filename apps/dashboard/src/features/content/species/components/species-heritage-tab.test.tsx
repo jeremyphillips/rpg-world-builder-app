@@ -55,7 +55,7 @@ const draconicHeritage: Heritage = {
 describe('SpeciesHeritageTab', () => {
   it('shows the empty state when there is no heritage', () => {
     render(<TabShell />)
-    expect(screen.getByText(/No lineage or ancestry yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/No heritage yet/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add heritage/i })).toBeInTheDocument()
   })
 
@@ -118,7 +118,7 @@ describe('SpeciesHeritageTab', () => {
     await user.click(screen.getByRole('button', { name: /Remove heritage/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No lineage or ancestry yet/i)).toBeInTheDocument()
+      expect(screen.getByText(/No heritage yet/i)).toBeInTheDocument()
     })
   })
 

@@ -14,6 +14,12 @@ import {
 } from './species-trait-form-fields'
 
 export const ADD_HERITAGE_LABEL = 'Add heritage'
+export const HERITAGE_OPTION_NOUN = 'option'
+export const ADD_HERITAGE_OPTION_LABEL = 'Add option'
+export const HERITAGE_EMPTY_MESSAGE =
+  'No heritage yet. Add one to define player choices at character creation.'
+export const HERITAGE_NAME_HINT =
+  'The name of this heritage option group, e.g. “Draconic Ancestry” or “Elven Lineage.”'
 
 export const heritageFormSchema = z.object({
   id: z.string().min(1).optional(),
@@ -26,7 +32,13 @@ export type HeritageForm = z.infer<typeof heritageFormSchema>
 
 export function heritageScalarFields(_ctx: ContentFormCtx): FormItem[] {
   return [
-    { type: 'text', name: 'name', label: 'Name', required: true },
+    {
+      type: 'text',
+      name: 'name',
+      label: 'Name',
+      required: true,
+      hint: HERITAGE_NAME_HINT,
+    },
     { type: 'richtext', name: 'description', label: 'Description' },
   ]
 }
@@ -79,9 +91,4 @@ export function heritageDefaultValues(ctx: ContentFormCtx): HeritageForm {
     >),
     options: [buildItemDefaultValues(traitItemFields(ctx)) as TraitRowForm],
   }
-}
-
-/** @deprecated Use {@link ADD_HERITAGE_LABEL}. */
-export function addHeritageLabel(): string {
-  return ADD_HERITAGE_LABEL
 }
