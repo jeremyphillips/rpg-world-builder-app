@@ -3,7 +3,8 @@ export const formStickyTabsClasses =
   'sticky top-0 z-20 bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
 /** Bottom padding on tab panels so the last field clears the sticky actions bar. */
-export const formTabPanelsBottomPaddingClasses = 'pb-24'
+/** removed pb-24 as it did not seem to be necessary */
+export const formTabPanelsBottomPaddingClasses = ''
 
 /** Sticky actions bar — save/cancel and form-level errors stay reachable on long forms. */
 export const formStickyActionsBarClasses =
