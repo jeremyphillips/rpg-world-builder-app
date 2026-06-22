@@ -74,7 +74,7 @@ export function SubclassListPanel({
                 <div
                   className={cn(
                     'flex items-center gap-1 rounded-md border border-transparent',
-                    !active && 'opacity-60',
+                    !active && 'border-dashed border-border/60',
                     isSelected && 'border-border bg-muted/40',
                   )}
                 >
@@ -84,7 +84,12 @@ export function SubclassListPanel({
                     onClick={() => onSelect(item.id)}
                     className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
                   >
-                    <span className="block truncate font-medium">
+                    <span
+                      className={cn(
+                        'block truncate font-medium',
+                        !active && 'text-muted-foreground',
+                      )}
+                    >
                       {item.name || UNTITLED_SUBCLASS_LABEL}
                     </span>
                     <span className="mt-1 flex flex-wrap gap-1">
