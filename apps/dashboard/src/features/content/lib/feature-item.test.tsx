@@ -15,14 +15,32 @@ function renderFeatureItem(feature: Parameters<typeof FeatureItem>[0]['feature']
 }
 
 describe('FeatureItem', () => {
-  it('renders composed feature HTML with level heading', () => {
+  it('renders an h4 heading and body on separate blocks for a single-paragraph feature', () => {
     renderFeatureItem({
-      level: 3,
-      name: 'Bonus Proficiencies',
-      description: '<p>You gain proficiency with three skills of your choice.</p>',
+      level: 5,
+      name: 'Extra Attack',
+      description: '<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>',
     })
-    expect(screen.getByText(/Level 3: Bonus Proficiencies/)).toBeInTheDocument()
-    expect(screen.getByText(/three skills of your choice/)).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Level 5: Extra Attack' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/twice instead of once/)).toBeInTheDocument()
+  })
+
+  it('renders an h4 heading and multiple body paragraphs', () => {
+    renderFeatureItem({
+      level: 2,
+      name: 'Fighting Style',
+      description:
+        '<p>You gain a Fighting Style feat of your choice (see "Feats").</p><p><strong>Druidic Warrior.</strong> You learn two Druid cantrips of your choice.</p>',
+    })
+
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Level 2: Fighting Style' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Fighting Style feat/)).toBeInTheDocument()
+    expect(screen.getByText(/Druidic Warrior/)).toBeInTheDocument()
   })
 
   it('renders heading-only features without a body', () => {
@@ -30,7 +48,9 @@ describe('FeatureItem', () => {
       level: 19,
       name: 'Epic Boon',
     })
-    expect(screen.getByText(/Level 19: Epic Boon/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Level 19: Epic Boon' }),
+    ).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations for a single-paragraph feature', async () => {

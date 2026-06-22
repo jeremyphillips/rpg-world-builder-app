@@ -1,6 +1,4 @@
-import { RichTextContent } from '@rpg/ui'
-
-import { formatFeatureHtml } from './format-feature-html'
+import { Heading, RichTextContent } from '@rpg/ui'
 
 type FeatureItemProps = {
   feature: {
@@ -10,14 +8,25 @@ type FeatureItemProps = {
   }
 }
 
+function featureHeading(level: number, name: string): string {
+  return `Level ${level}: ${name}`
+}
+
+function hasFeatureDescription(description: string | undefined): description is string {
+  return description !== undefined && description.trim() !== ''
+}
+
 export function FeatureItem({ feature }: FeatureItemProps) {
+  const heading = featureHeading(feature.level, feature.name)
+
   return (
-    <li>
-      <RichTextContent
-        html={formatFeatureHtml(feature.level, feature.name, feature.description)}
-        size="sm"
-        tone="muted"
-      />
+    <li className="space-y-2">
+      <Heading variant="label" as="h4">
+        {heading}
+      </Heading>
+      {hasFeatureDescription(feature.description) && (
+        <RichTextContent html={feature.description} size="sm" tone="muted" />
+      )}
     </li>
   )
 }
