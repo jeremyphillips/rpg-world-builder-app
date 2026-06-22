@@ -55,10 +55,10 @@ import {
 } from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
+import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import {
-  classFeatureItemFields,
   featureRowFormSchema,
   featuresFromFormValues,
   featureToFormRow,
@@ -564,17 +564,6 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-function featuresArrayField(ctx: ContentFormCtx): FormItem {
-  return {
-    kind: 'array',
-    name: 'features',
-    legend: 'Features',
-    addLabel: 'Add feature',
-    itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
-    fields: classFeatureItemFields(ctx),
-  }
-}
-
 function resourcesArrayField(): FormItem {
   return {
     kind: 'array',
@@ -606,7 +595,8 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'features',
       label: 'Features',
-      fields: [featuresArrayField(ctx), resourcesArrayField()],
+      fields: [resourcesArrayField()],
+      header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
       id: 'subclasses',
