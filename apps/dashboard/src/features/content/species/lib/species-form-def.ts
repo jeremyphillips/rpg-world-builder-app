@@ -5,25 +5,17 @@ import {
   CREATURE_SIZE_ENTRIES,
   CREATURE_TYPES,
   CREATURE_TYPE_ENTRIES,
-  SPECIES_CHOICE_KINDS,
-  SPECIES_CHOICE_KIND_LABELS,
   STANDARD_SPEEDS,
   creatureSizeSchema,
   creatureTypeSchema,
-  speciesChoiceKindSchema,
   slugSchema,
   type CreateSpeciesInput,
   type Species,
-  type SpeciesHeritageChoice,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 import { identityFields } from '../../lib/content-form-field-helpers'
-import {
-  applyStableIdsForUpdate,
-  envelopeSlugFields,
-  finalizeContentInput,
-} from '../../lib/content-form-key-helpers'
+import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import {
   contentFormRegistry,
   contentFormFields,
@@ -34,12 +26,15 @@ import {
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
-  traitItemFields,
-  traitItemTitle,
+  heritageChoiceItemFields,
+  heritageChoiceItemTitle,
+  heritageChoiceRowFormSchema,
+  heritageChoicesFromFormValues,
+  heritageChoiceToFormRow,
+} from './species-heritage-choice-form-fields'
+import {
   traitRowFormSchema,
-  traitRowsWithNamesForIdAssignment,
   traitToFormRow,
-  traitFromFormRow,
   traitsFromFormValues,
 } from './species-trait-form-fields'
 
@@ -68,20 +63,9 @@ const speedWalkOptions: FieldOption[] = STANDARD_SPEEDS.map((s) => ({
   label: `${s} ft.`,
 }))
 
-const choiceKindOptions = toOptions(SPECIES_CHOICE_KINDS, SPECIES_CHOICE_KIND_LABELS)
-
 // ---------------------------------------------------------------------------
 // Form schema
 // ---------------------------------------------------------------------------
-
-const heritageChoiceRowFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  kind: speciesChoiceKindSchema,
-  description: z.string().optional(),
-  options: z.array(traitRowFormSchema).min(1),
-})
-type HeritageChoiceRowForm = z.infer<typeof heritageChoiceRowFormSchema>
 
 const speciesFormSchema = z.object({
   name: z.string().min(1),
@@ -96,71 +80,6 @@ const speciesFormSchema = z.object({
   heritageChoices: z.array(heritageChoiceRowFormSchema).optional(),
 })
 type SpeciesFormValues = z.infer<typeof speciesFormSchema>
-
-// ---------------------------------------------------------------------------
-// Field builders
-// ---------------------------------------------------------------------------
-
-function heritageChoiceItemFields(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'row',
-      fields: [
-        { type: 'text', name: 'name', label: 'Name', required: true },
-        { type: 'select', name: 'kind', label: 'Kind', options: choiceKindOptions, required: true },
-      ],
-    },
-    { type: 'richtext', name: 'description', label: 'Description' },
-    {
-      kind: 'array',
-      name: 'options',
-      legend: 'Options',
-      addLabel: 'Add option',
-      min: 1,
-      itemTitle: traitItemTitle,
-      fields: traitItemFields(ctx),
-    },
-  ]
-}
-
-function heritageChoiceFromFormRow(
-  row: HeritageChoiceRowForm & { id: string },
-  existingChoice?: SpeciesHeritageChoice,
-): SpeciesHeritageChoice {
-  const options = applyStableIdsForUpdate(
-    traitRowsWithNamesForIdAssignment(row.options),
-    existingChoice?.options,
-  ).map(traitFromFormRow)
-  return {
-    id: row.id,
-    name: row.name,
-    kind: row.kind,
-    description: row.description || undefined,
-    options,
-  }
-}
-
-function heritageChoicesFromFormValues(
-  rows: HeritageChoiceRowForm[] | undefined,
-  existing?: Species['heritageChoices'],
-): SpeciesHeritageChoice[] | undefined {
-  if (!rows?.length) return undefined
-
-  return applyStableIdsForUpdate(rows, existing).map((row) => {
-    const existingChoice = existing?.find((choice) => choice.id === row.id)
-    return heritageChoiceFromFormRow(row, existingChoice)
-  })
-}
-
-function heritageChoiceToFormRow(choice: SpeciesHeritageChoice): HeritageChoiceRowForm {
-  return {
-    id: choice.id,
-    name: choice.name,
-    kind: choice.kind,
-    description: choice.description,
-    options: choice.options.map(traitToFormRow),
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Create-form defaults
@@ -214,7 +133,7 @@ function heritageChoicesArrayField(ctx: ContentFormCtx): FormItem {
     name: 'heritageChoices',
     legend: 'Heritage choices',
     addLabel: 'Add heritage choice',
-    itemTitle: (values, index) => (values['name'] as string) || `Heritage choice ${index + 1}`,
+    itemTitle: heritageChoiceItemTitle,
     fields: heritageChoiceItemFields(ctx),
   }
 }

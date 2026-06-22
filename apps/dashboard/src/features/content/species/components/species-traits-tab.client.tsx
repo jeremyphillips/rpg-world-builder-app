@@ -14,6 +14,7 @@ import {
 } from '../../components/master-detail-list-panel.client'
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
+import { isSpeciesRowSystemLocked } from '../lib/species-master-detail-helpers'
 import {
   traitItemFields,
   traitItemTitle,
@@ -26,19 +27,6 @@ const TRAIT_NOUN = 'trait'
 function traitEyebrow(row: TraitRowForm | undefined): string | undefined {
   if (!row?.kind) return undefined
   return row.kind === 'grant' ? 'Grant' : 'Custom'
-}
-
-/**
- * A trait is delete-locked only when it is system content: an existing row
- * (already has an `id`) on a species whose `source` is `'system'`. Newly added
- * rows (no id yet) and homebrew species are always removable. Species traits
- * have no per-trait `source` in the contract, so it is derived here.
- */
-function isSystemLocked(
-  row: TraitRowForm | undefined,
-  entitySource: ContentFormCtx['entitySource'],
-) {
-  return entitySource === 'system' && typeof row?.id === 'string' && row.id.length > 0
 }
 
 export interface SpeciesTraitsTabProps {
@@ -63,7 +51,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
 
   const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
     const row = watched?.[index]
-    const locked = isSystemLocked(row, formCtx.entitySource)
+    const locked = isSpeciesRowSystemLocked(row, formCtx.entitySource)
     return {
       id: field.id,
       title: traitItemTitle(row ?? {}, index),
