@@ -67,6 +67,9 @@ import {
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
+const CLASS_SKILL_OPTIONS_HINT =
+  'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
+
 const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
   'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
 
@@ -558,6 +561,7 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           name: 'proficiencies.skills.from',
           label: 'Skill options',
           options: skillOptions,
+          hint: CLASS_SKILL_OPTIONS_HINT,
         },
       ],
     },

@@ -8,6 +8,10 @@ import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, HomebrewDoc } from './content-write-config'
+import {
+  extractSkillsFromFromUpdate,
+  syncSuggestedClassesFromClass,
+} from './sync-suggested-classes-from-class'
 
 type StoredEntity = {
   id: string
@@ -136,6 +140,18 @@ async function updateSystemPatch<T extends StoredEntity>(
   return config.storedSchema.parse(entity)
 }
 
+async function syncClassSkillEdgesIfNeeded<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  classSlug: string,
+  rawInput: Record<string, unknown>,
+): Promise<void> {
+  if (config.typeName !== 'classes') return
+  const nextSkillSlugs = extractSkillsFromFromUpdate(rawInput)
+  if (!nextSkillSlugs) return
+  await syncSuggestedClassesFromClass(campaignId, classSlug, nextSkillSlugs)
+}
+
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -168,7 +184,9 @@ export async function createHomebrewContent<T extends StoredEntity>(
   })
 
   const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
-  return config.storedSchema.parse(entity)
+  const parsed = config.storedSchema.parse(entity)
+  await syncClassSkillEdgesIfNeeded(config, campaignId, parsed.slug, input)
+  return parsed
 }
 
 /** Update a homebrew record or upsert a system overlay patch. */
@@ -198,8 +216,26 @@ export async function updateContentEntity<T extends StoredEntity>(
     if (existing.campaignId !== campaignId) {
       throw new HttpError(403, 'forbidden', 'Cannot edit homebrew from another campaign.')
     }
-    return updateHomebrewRecord(config, campaignId, campaign.rulesetId, entityId, existing, update)
+    const updated = await updateHomebrewRecord(
+      config,
+      campaignId,
+      campaign.rulesetId,
+      entityId,
+      existing,
+      update,
+    )
+    await syncClassSkillEdgesIfNeeded(config, campaignId, updated.slug, update)
+    return updated
   }
 
-  return updateSystemPatch(config, campaignId, campaign.rulesetId, entityId, existing, update)
+  const patched = await updateSystemPatch(
+    config,
+    campaignId,
+    campaign.rulesetId,
+    entityId,
+    existing,
+    update,
+  )
+  await syncClassSkillEdgesIfNeeded(config, campaignId, patched.slug, update)
+  return patched
 }

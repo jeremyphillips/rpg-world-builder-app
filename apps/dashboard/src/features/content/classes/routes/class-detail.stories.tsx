@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { loadSeedSkillProficiencies } from '@rpg/catalog/skill-proficiencies'
 
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { pickClass, pickSubclassesForClass } from '../../lib/fixtures/pick'
 import { FIGHTER, SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassDetailContent } from './class-detail'
+
+const SRD_SKILLS = loadSeedSkillProficiencies('srd-cc-5.2.1')
 
 const meta = {
   title: 'Content/ClassDetail',
@@ -16,6 +19,11 @@ const meta = {
 export default meta
 type Story = StoryObj
 
+const defaultSkillProps = {
+  skillProficiencies: [...SRD_SKILLS],
+  skillsPending: false,
+}
+
 export const Default: Story = {
   render: () => (
     <ClassDetailContent
@@ -23,6 +31,7 @@ export const Default: Story = {
       campaignId={STORY_CAMPAIGN_ID}
       classId={FIGHTER.id}
       subclasses={SUBCLASSES_FOR_FIGHTER}
+      {...defaultSkillProps}
     />
   ),
 }
@@ -36,6 +45,7 @@ export const RichTextFeatures: Story = {
         campaignId={STORY_CAMPAIGN_ID}
         classId={barbarian.id}
         subclasses={pickSubclassesForClass('barbarian')}
+        {...defaultSkillProps}
       />
     )
   },
@@ -50,6 +60,7 @@ export const BardWithSubclassFeatures: Story = {
         campaignId={STORY_CAMPAIGN_ID}
         classId={bard.id}
         subclasses={pickSubclassesForClass('bard')}
+        {...defaultSkillProps}
       />
     )
   },

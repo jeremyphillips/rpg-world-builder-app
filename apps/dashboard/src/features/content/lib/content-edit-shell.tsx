@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
 
 import { updateContent } from './content-client'
+import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
 import type { ContentFormCtx } from './content-form-registry'
 import {
   ContentFormNotRegistered,
@@ -65,6 +66,9 @@ function ContentEditFormReady({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
+      if (def.routeKey === 'classes') {
+        void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
+      }
     },
   })
 

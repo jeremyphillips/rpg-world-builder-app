@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
 import { createContent } from './content-client'
+import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,
@@ -35,6 +36,9 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
     mutationFn: (input: unknown) => createContent(campaignId, def.routeKey, input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
+      if (def.routeKey === 'classes') {
+        void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
+      }
     },
   })
 
