@@ -131,6 +131,8 @@ const progressionTableFormSchema = z.object({
 })
 
 const spellcastingFormSchema = z.object({
+  level: z.coerce.number().pipe(levelSchema).optional(),
+  description: z.string().optional(),
   progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
   ability: abilitySchema.optional(),
   preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
@@ -329,6 +331,8 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
 function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
   if (!spellcasting) {
     return {
+      level: 1,
+      description: undefined,
       progression: undefined,
       ability: undefined,
       preparation: undefined,
@@ -337,6 +341,8 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
   }
 
   return {
+    level: spellcasting.level,
+    description: spellcasting.description,
     progression: spellcasting.progression,
     ability: spellcasting.ability,
     preparation: spellcasting.preparation,
@@ -377,9 +383,13 @@ function spellcastingFromFormValues(
   }
 
   const result: Spellcasting = {
+    level: spellcasting.level ?? 1,
     progression: spellcasting.progression!,
     ability: spellcasting.ability!,
     preparation: spellcasting.preparation!,
+  }
+  if (spellcasting.description?.trim()) {
+    result.description = spellcasting.description.trim()
   }
   appendOptionalProgressionTables(result, spellcasting.progressionTable)
   return result
@@ -397,6 +407,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
   hasSpecificWeapons: false,
   spellcasting: {
+    level: 1,
     progression: 'full',
     ability: 'int',
     preparation: 'prepared',
@@ -467,6 +478,16 @@ function spellcastingFields(): FormItem[] {
       label: 'Has spellcasting',
     },
     {
+      type: 'select',
+      name: 'spellcasting.level',
+      label: 'Spellcasting level',
+      options: levelOptions,
+      visibility: visibleWhenSpellcasting(),
+      required: true,
+      hint: 'First class level at which this class gains spellcasting',
+      width: 'sm-md',
+    },
+    {
       kind: 'row',
       fields: [
         {
@@ -494,6 +515,13 @@ function spellcastingFields(): FormItem[] {
           required: true,
         },
       ],
+    },
+    {
+      type: 'richtext',
+      name: 'spellcasting.description',
+      label: 'Rules description',
+      visibility: visibleWhenSpellcasting(),
+      hint: 'SRD spellcasting feature prose (shown on the class detail view)',
     },
     spellProgressionGridField,
   ]

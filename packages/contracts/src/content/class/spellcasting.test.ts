@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   SPELL_PREPARATION_MODE_LABELS,
   SPELL_PREPARATION_MODES,
+  isSpellcastingActiveAtLevel,
+  spellcastingFeatureLabel,
   spellcastingSchema,
   spellsAvailableEntrySchema,
 } from './spellcasting'
@@ -28,6 +30,25 @@ describe('spellcastingSchema', () => {
     }
   })
 
+  it('parses optional level and description', () => {
+    const withDefaults = spellcastingSchema.parse({
+      progression: 'half',
+      ability: 'cha',
+      preparation: 'prepared',
+    })
+    expect(withDefaults.level).toBe(1)
+
+    const withLevel = spellcastingSchema.parse({
+      level: 2,
+      progression: 'half',
+      ability: 'cha',
+      preparation: 'prepared',
+      description: '<p>Delayed caster.</p>',
+    })
+    expect(withLevel.level).toBe(2)
+    expect(withLevel.description).toBe('<p>Delayed caster.</p>')
+  })
+
   it('parses spellsAvailable with count instead of prepared', () => {
     const spellcasting = spellcastingSchema.parse({
       progression: 'full',
@@ -49,6 +70,26 @@ describe('spellcastingSchema', () => {
 
     expect(result.spellsAvailable).toBeUndefined()
     expect('spellsPrepared' in result).toBe(false)
+  })
+})
+
+describe('spellcastingFeatureLabel', () => {
+  it('returns Pact Magic for pact progression', () => {
+    expect(spellcastingFeatureLabel('pact')).toBe('Pact Magic')
+    expect(spellcastingFeatureLabel('full')).toBe('Spellcasting')
+  })
+})
+
+describe('isSpellcastingActiveAtLevel', () => {
+  it('respects unlock level', () => {
+    const half = spellcastingSchema.parse({
+      level: 2,
+      progression: 'half',
+      ability: 'cha',
+      preparation: 'prepared',
+    })
+    expect(isSpellcastingActiveAtLevel(half, 1)).toBe(false)
+    expect(isSpellcastingActiveAtLevel(half, 2)).toBe(true)
   })
 })
 

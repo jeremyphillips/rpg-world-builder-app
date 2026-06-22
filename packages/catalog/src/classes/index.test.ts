@@ -61,8 +61,9 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Bard ships full feature prose, prepared spells, and Bardic Die resource', () => {
     const bard = getClassBySlug(RULESET, 'bard')
-    expect(bard.features).toHaveLength(10)
+    expect(bard.features).toHaveLength(9)
     expect(bard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(bard.spellcasting?.description).toContain('cast spells through your bardic arts')
     expect(bard.asiLevels).toEqual([4, 8, 12, 16])
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
@@ -91,6 +92,43 @@ describe('SRD 5.2.1 class seed', () => {
       'peerless-skill',
     ])
     expect(lore.description).toContain('libraries and universities')
+  })
+
+  it('Ranger ships spellcasting prose, prepared spells, and Favored Enemy resource', () => {
+    const ranger = getClassBySlug(RULESET, 'ranger')
+    expect(ranger.features).toHaveLength(14)
+    expect(ranger.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(ranger.asiLevels).toEqual([4, 8, 12, 16])
+    expect(ranger.spellcasting?.description).toContain('channel the magical essence of nature')
+    expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
+    expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 19)?.count).toBe(15)
+    const favoredEnemy = ranger.features.find((f) => f.id === 'favored-enemy')
+    expect(favoredEnemy?.grants?.innateSpells?.entries[0]).toEqual({
+      level: 1,
+      kind: 'always_prepared',
+      spellIds: ['hunters-mark'],
+    })
+    expect(ranger.resources?.find((r) => r.name === 'Favored Enemy')?.entries).toEqual([
+      { level: 1, value: 2 },
+      { level: 5, value: 3 },
+      { level: 9, value: 4 },
+      { level: 13, value: 5 },
+      { level: 17, value: 6 },
+    ])
+  })
+
+  it('Hunter ships five subclass features with rich-text HTML', () => {
+    const hunter = getSubclassBySlug(RULESET, 'hunter')
+    expect(hunter.tagline).toBe('Protect Nature and People from Destruction')
+    expect(hunter.features).toHaveLength(5)
+    expect(hunter.features.map((f) => f.id)).toEqual([
+      'hunters-lore',
+      'hunters-prey',
+      'defensive-tactics',
+      'superior-hunters-prey',
+      'superior-hunters-defense',
+    ])
+    expect(hunter.description).toContain('protect nature and people')
   })
 
   it('derives class skill options from skill suggestedClasses SSOT', () => {
