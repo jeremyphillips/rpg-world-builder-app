@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { DETECT_MAGIC, FIRE_BOLT } from '../fixtures'
 import { SpellDetailContent } from './spells-detail'
 
@@ -7,6 +8,7 @@ const meta = {
   title: 'Content/Spells/SpellDetail',
   component: SpellDetailContent,
   parameters: { layout: 'padded' },
+  decorators: [withDashboardProviders],
 } satisfies Meta<typeof SpellDetailContent>
 
 export default meta

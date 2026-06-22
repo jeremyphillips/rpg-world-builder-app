@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { pickClass, pickSubclassesForClass } from '../../lib/fixtures/pick'
 import { FIGHTER, SUBCLASSES_FOR_FIGHTER } from '../fixtures'
@@ -9,6 +10,7 @@ const meta = {
   title: 'Content/ClassDetail',
   component: ClassDetailContent,
   parameters: { layout: 'padded' },
+  decorators: [withDashboardProviders],
 } satisfies Meta<typeof ClassDetailContent>
 
 export default meta

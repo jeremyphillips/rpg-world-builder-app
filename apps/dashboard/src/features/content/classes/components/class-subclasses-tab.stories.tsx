@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassSubclassesTab } from './class-subclasses-tab.client'
 
@@ -8,6 +9,7 @@ const meta = {
   title: 'Content/Classes/ClassSubclassesTab',
   component: ClassSubclassesTab,
   parameters: { layout: 'padded' },
+  decorators: [withDashboardProviders],
 } satisfies Meta<typeof ClassSubclassesTab>
 
 export default meta
