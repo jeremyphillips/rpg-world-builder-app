@@ -50,8 +50,20 @@ function resolveSelectedIndexAfterMove(
   return current
 }
 
+function resolveValueAtPath(root: unknown, path: string): unknown {
+  if (!path) return root
+
+  let current: unknown = root
+  for (const segment of path.split('.')) {
+    if (current == null || typeof current !== 'object') return undefined
+    current = (current as Record<string, unknown>)[segment]
+  }
+
+  return current
+}
+
 function rowHasError(errors: FieldErrors, name: string, index: number): boolean {
-  const arrayErrors = errors[name]
+  const arrayErrors = resolveValueAtPath(errors, name)
   if (arrayErrors == null) return false
 
   if (Array.isArray(arrayErrors)) {
@@ -69,7 +81,7 @@ function rowHasError(errors: FieldErrors, name: string, index: number): boolean 
 
 /** Returns the first array index with row-level errors, or `null` when none. */
 export function findFirstInvalidRowIndex(errors: FieldErrors, name: string): number | null {
-  const arrayErrors = errors[name]
+  const arrayErrors = resolveValueAtPath(errors, name)
   if (arrayErrors == null) return null
 
   if (Array.isArray(arrayErrors)) {

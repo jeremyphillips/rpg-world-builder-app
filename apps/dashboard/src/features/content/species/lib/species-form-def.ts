@@ -23,15 +23,14 @@ import {
   type ContentFormDef,
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
+import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
-  heritageChoiceItemFields,
-  heritageChoiceItemTitle,
-  heritageChoiceRowFormSchema,
-  heritageChoicesFromFormValues,
-  heritageChoiceToFormRow,
-} from './species-heritage-choice-form-fields'
+  heritageFormSchema,
+  heritageFromFormValues,
+  heritageToFormRow,
+} from './species-heritage-form-fields'
 import {
   traitRowFormSchema,
   traitToFormRow,
@@ -77,7 +76,7 @@ const speciesFormSchema = z.object({
     walk: z.coerce.number().int().min(0),
   }),
   traits: z.array(traitRowFormSchema),
-  heritageChoices: z.array(heritageChoiceRowFormSchema).optional(),
+  heritage: heritageFormSchema.optional(),
 })
 type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
@@ -127,17 +126,6 @@ function attributesFields(): FormItem[] {
   ]
 }
 
-function heritageChoicesArrayField(ctx: ContentFormCtx): FormItem {
-  return {
-    kind: 'array',
-    name: 'heritageChoices',
-    legend: 'Heritage choices',
-    addLabel: 'Add heritage choice',
-    itemTitle: heritageChoiceItemTitle,
-    fields: heritageChoiceItemFields(ctx),
-  }
-}
-
 function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     {
@@ -152,9 +140,10 @@ function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       header: createElement(SpeciesTraitsTab, { formCtx: ctx }),
     },
     {
-      id: 'heritage-choices',
-      label: 'Heritage choices',
-      fields: [heritageChoicesArrayField(ctx)],
+      id: 'heritage',
+      label: 'Heritage',
+      fields: [],
+      header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },
   ]
 }
@@ -180,7 +169,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     sizes: entity.sizes,
     speed: { walk: entity.speed.walk },
     traits: entity.traits.map(traitToFormRow),
-    heritageChoices: entity.heritageChoices?.map(heritageChoiceToFormRow) ?? [],
+    heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
   }),
 
   toInput: (values, ctx?: ContentFormInputCtx<Species>) =>
@@ -193,10 +182,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
         sizes: values.sizes,
         speed: { walk: values.speed.walk },
         traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
-        heritageChoices: heritageChoicesFromFormValues(
-          values.heritageChoices,
-          ctx?.entity?.heritageChoices,
-        ),
+        heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
       },
       ctx,
     ) as CreateSpeciesInput,

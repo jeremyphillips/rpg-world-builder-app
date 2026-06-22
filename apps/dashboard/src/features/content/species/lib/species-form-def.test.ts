@@ -77,22 +77,20 @@ describe('speciesFormDef round-trips', () => {
     })
   }
 
-  it('dragonborn: draconic ancestry heritage choice is preserved', () => {
+  it('dragonborn: draconic ancestry heritage is preserved', () => {
     const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
-    const choice = input.heritageChoices?.[0]
-    expect(choice?.id).toBe('draconic-ancestry')
-    expect(choice?.kind).toBe('ancestry')
-    expect(choice?.options.length).toBeGreaterThan(0)
+    expect(input.heritage?.id).toBe('draconic-ancestry')
+    expect(input.heritage?.kind).toBe('ancestry')
+    expect(input.heritage?.options.length).toBeGreaterThan(0)
   })
 
   it('dragonborn: ancestry option resistances are preserved', () => {
     const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
-    // The first ancestry option (Black/Acid) has both damageType and resistances
-    const firstOption = input.heritageChoices?.[0]?.options[0]
+    const firstOption = input.heritage?.options[0]
     expect(firstOption?.grants?.resistances).toEqual(['acid'])
     expect(firstOption?.grants?.damageType).toEqual(['acid'])
   })
@@ -136,13 +134,13 @@ describe('speciesFormDef create vs update modes', () => {
     expect(input.traits.find((t) => t.id === customTraitId)?.id).toBe(customTraitId)
   })
 
-  it('update: preserves heritage choice option ids when names change', () => {
+  it('update: preserves heritage option ids when names change', () => {
     const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
-    const optionId = dragonborn.heritageChoices?.[0]?.options[0]?.id
-    formValues.heritageChoices![0]!.options[0]!.name = 'Renamed Ancestry'
+    const optionId = dragonborn.heritage?.options[0]?.id
+    formValues.heritage!.options[0]!.name = 'Renamed Ancestry'
     const input = speciesFormDef.toInput(formValues, { entity: dragonborn })
-    expect(input.heritageChoices?.[0]?.options[0]?.id).toBe(optionId)
+    expect(input.heritage?.options[0]?.id).toBe(optionId)
   })
 
   it('grant trait with overrides sets overrideDisplay on load', () => {
@@ -195,6 +193,6 @@ describe('speciesFormDef.buildTabs', () => {
   it('returns three tabs with expected ids', () => {
     const tabs = speciesFormDef.buildTabs!({})
     expect(tabs).toHaveLength(3)
-    expect(tabs.map((tab) => tab.id)).toEqual(['basics', 'traits', 'heritage-choices'])
+    expect(tabs.map((tab) => tab.id)).toEqual(['basics', 'traits', 'heritage'])
   })
 })

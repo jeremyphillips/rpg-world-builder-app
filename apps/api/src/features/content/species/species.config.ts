@@ -37,8 +37,8 @@ function toHomebrewSpecies(doc: HomebrewDoc): Species {
     sizes: record.sizes ?? [],
     speed: record.speed as Species['speed'],
     traits: (record.traits ?? []) as Species['traits'],
-    ...(record.heritageChoices != null && {
-      heritageChoices: record.heritageChoices as Species['heritageChoices'],
+    ...(record.heritage != null && {
+      heritage: record.heritage as Species['heritage'],
     }),
   } as Species
 }

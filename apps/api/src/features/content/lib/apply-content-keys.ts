@@ -5,7 +5,7 @@ import {
   deriveContentKey,
 } from '@rpg/contracts'
 
-const STABLE_ID_ARRAY_KEYS = ['features', 'traits', 'heritageChoices'] as const
+const STABLE_ID_ARRAY_KEYS = ['features', 'traits'] as const
 
 type IdentifiedRow = { id?: string; name: string; options?: unknown[] }
 
@@ -48,6 +48,15 @@ function stableIdentifiedArray(
   })
 }
 
+function stableHeritageObject(incoming: unknown, existing?: unknown): unknown | undefined {
+  if (incoming === undefined) return undefined
+  if (!hasName(incoming)) return incoming
+
+  const existingArray = existing !== undefined && hasName(existing) ? [existing] : undefined
+  const stabilized = stableIdentifiedArray([incoming], existingArray)
+  return stabilized?.[0] ?? incoming
+}
+
 /**
  * Derives and assigns envelope slugs and nested trait/feature ids on create,
  * or preserves them on update. Only keys present in `body` are processed.
@@ -63,6 +72,11 @@ export function applyStableNestedContentKeys(
     const existing = existingBody?.[key]
     const existingArray = Array.isArray(existing) ? existing : undefined
     result[key] = stableIdentifiedArray(result[key] as unknown[], existingArray)
+  }
+
+  if ('heritage' in result) {
+    const existing = existingBody?.heritage
+    result.heritage = stableHeritageObject(result.heritage, existing)
   }
 
   return result

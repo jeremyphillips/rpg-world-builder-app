@@ -46,116 +46,114 @@
         "description": "<p>When you reach character level 5, you can channel draconic magic to give yourself temporary flight. As a Bonus Action, you sprout spectral wings on your back that last for 10 minutes or until you retract the wings (no action required) or have the Incapacitated condition. During that time, you have a Fly Speed equal to your Speed. Your wings appear to be made of the same energy as your Breath Weapon. Once you use this trait, you can't use it again until you finish a Long Rest.</p>"
       }
     ],
-    "heritageChoices": [
-      {
-        "id": "draconic-ancestry",
-        "name": "Draconic Ancestry",
-        "kind": "ancestry",
-        "description": "<p>Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance.</p>",
-        "options": [
-          {
-            "kind": "custom",
-            "id": "black",
-            "name": "Black (Acid)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-            "grants": {
-              "damageType": ["acid"],
-              "resistances": ["acid"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "blue",
-            "name": "Blue (Lightning)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-            "grants": {
-              "damageType": ["lightning"],
-              "resistances": ["lightning"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "brass",
-            "name": "Brass (Fire)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": {
-              "damageType": ["fire"],
-              "resistances": ["fire"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "bronze",
-            "name": "Bronze (Lightning)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-            "grants": {
-              "damageType": ["lightning"],
-              "resistances": ["lightning"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "copper",
-            "name": "Copper (Acid)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-            "grants": {
-              "damageType": ["acid"],
-              "resistances": ["acid"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "gold",
-            "name": "Gold (Fire)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": {
-              "damageType": ["fire"],
-              "resistances": ["fire"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "green",
-            "name": "Green (Poison)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Poison damage.</p>",
-            "grants": {
-              "damageType": ["poison"],
-              "resistances": ["poison"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "red",
-            "name": "Red (Fire)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-            "grants": {
-              "damageType": ["fire"],
-              "resistances": ["fire"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "silver",
-            "name": "Silver (Cold)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-            "grants": {
-              "damageType": ["cold"],
-              "resistances": ["cold"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "white",
-            "name": "White (Cold)",
-            "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-            "grants": {
-              "damageType": ["cold"],
-              "resistances": ["cold"]
-            }
+    "heritage": {
+      "id": "draconic-ancestry",
+      "name": "Draconic Ancestry",
+      "kind": "ancestry",
+      "description": "<p>Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance.</p>",
+      "options": [
+        {
+          "kind": "custom",
+          "id": "black",
+          "name": "Black (Acid)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
+          "grants": {
+            "damageType": ["acid"],
+            "resistances": ["acid"]
           }
-        ]
-      }
-    ]
+        },
+        {
+          "kind": "custom",
+          "id": "blue",
+          "name": "Blue (Lightning)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
+          "grants": {
+            "damageType": ["lightning"],
+            "resistances": ["lightning"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "brass",
+          "name": "Brass (Fire)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
+          "grants": {
+            "damageType": ["fire"],
+            "resistances": ["fire"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "bronze",
+          "name": "Bronze (Lightning)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
+          "grants": {
+            "damageType": ["lightning"],
+            "resistances": ["lightning"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "copper",
+          "name": "Copper (Acid)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
+          "grants": {
+            "damageType": ["acid"],
+            "resistances": ["acid"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "gold",
+          "name": "Gold (Fire)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
+          "grants": {
+            "damageType": ["fire"],
+            "resistances": ["fire"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "green",
+          "name": "Green (Poison)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Poison damage.</p>",
+          "grants": {
+            "damageType": ["poison"],
+            "resistances": ["poison"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "red",
+          "name": "Red (Fire)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
+          "grants": {
+            "damageType": ["fire"],
+            "resistances": ["fire"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "silver",
+          "name": "Silver (Cold)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
+          "grants": {
+            "damageType": ["cold"],
+            "resistances": ["cold"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "white",
+          "name": "White (Cold)",
+          "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
+          "grants": {
+            "damageType": ["cold"],
+            "resistances": ["cold"]
+          }
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:dwarf",
@@ -253,104 +251,102 @@
         "description": "<p>You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.</p>"
       }
     ],
-    "heritageChoices": [
-      {
-        "id": "elven-lineage",
-        "name": "Elven Lineage",
-        "kind": "lineage",
-        "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose a lineage. You gain the level 1 benefit of that lineage. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the lineage).</p>",
-        "options": [
-          {
-            "kind": "custom",
-            "id": "drow",
-            "name": "Drow",
-            "description": "<p>The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip. At character level 3 you gain Faerie Fire; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "senses": [
+    "heritage": {
+      "id": "elven-lineage",
+      "name": "Elven Lineage",
+      "kind": "lineage",
+      "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose a lineage. You gain the level 1 benefit of that lineage. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the lineage).</p>",
+      "options": [
+        {
+          "kind": "custom",
+          "id": "drow",
+          "name": "Drow",
+          "description": "<p>The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip. At character level 3 you gain Faerie Fire; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "senses": [
+              {
+                "type": "darkvision",
+                "range": 120
+              }
+            ],
+            "innateSpells": {
+              "ability": "cha",
+              "entries": [
                 {
-                  "type": "darkvision",
-                  "range": 120
+                  "level": 1,
+                  "spellIds": ["dancing-lights"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 3,
+                  "spellIds": ["faerie-fire"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["darkness"],
+                  "frequency": "once_per_long_rest"
                 }
-              ],
-              "innateSpells": {
-                "ability": "cha",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["dancing-lights"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 3,
-                    "spellIds": ["faerie-fire"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["darkness"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "high-elf",
-            "name": "High Elf",
-            "description": "<p>You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list. At character level 3 you gain Detect Magic; at level 5 you gain Misty Step (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "innateSpells": {
-                "ability": "int",
-                "entries": [
-                  {
-                    "level": 3,
-                    "spellIds": ["detect-magic"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["misty-step"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "wood-elf",
-            "name": "Wood Elf",
-            "description": "<p>Your Speed increases to 35 feet. You also know the Druidcraft cantrip. At character level 3 you gain Longstrider; at level 5 you gain Pass without Trace (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "speedOverride": {
-                "walk": 35
-              },
-              "innateSpells": {
-                "ability": "wis",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["druidcraft"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 3,
-                    "spellIds": ["longstrider"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["pass-without-trace"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
+              ]
             }
           }
-        ]
-      }
-    ]
+        },
+        {
+          "kind": "custom",
+          "id": "high-elf",
+          "name": "High Elf",
+          "description": "<p>You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list. At character level 3 you gain Detect Magic; at level 5 you gain Misty Step (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "innateSpells": {
+              "ability": "int",
+              "entries": [
+                {
+                  "level": 3,
+                  "spellIds": ["detect-magic"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["misty-step"],
+                  "frequency": "once_per_long_rest"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "wood-elf",
+          "name": "Wood Elf",
+          "description": "<p>Your Speed increases to 35 feet. You also know the Druidcraft cantrip. At character level 3 you gain Longstrider; at level 5 you gain Pass without Trace (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "speedOverride": {
+              "walk": 35
+            },
+            "innateSpells": {
+              "ability": "wis",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["druidcraft"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 3,
+                  "spellIds": ["longstrider"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["pass-without-trace"],
+                  "frequency": "once_per_long_rest"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:gnome",
@@ -386,57 +382,55 @@
         "description": "<p>You have Advantage on Intelligence, Wisdom, and Charisma saving throws.</p>"
       }
     ],
-    "heritageChoices": [
-      {
-        "id": "gnomish-lineage",
-        "name": "Gnomish Lineage",
-        "kind": "lineage",
-        "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose one of the following options. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage).</p>",
-        "options": [
-          {
-            "kind": "custom",
-            "id": "forest-gnome",
-            "name": "Forest Gnome",
-            "description": "<p>You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell.</p>",
-            "grants": {
-              "innateSpells": {
-                "ability": "wis",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["minor-illusion"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 1,
-                    "spellIds": ["speak-with-animals"],
-                    "frequency": "prof_bonus_per_long_rest"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "rock-gnome",
-            "name": "Rock Gnome",
-            "description": "<p>You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it as a Utilize action.</p>",
-            "grants": {
-              "innateSpells": {
-                "ability": "int",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["mending", "prestidigitation"],
-                    "frequency": "at_will"
-                  }
-                ]
-              }
+    "heritage": {
+      "id": "gnomish-lineage",
+      "name": "Gnomish Lineage",
+      "kind": "lineage",
+      "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose one of the following options. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage).</p>",
+      "options": [
+        {
+          "kind": "custom",
+          "id": "forest-gnome",
+          "name": "Forest Gnome",
+          "description": "<p>You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell.</p>",
+          "grants": {
+            "innateSpells": {
+              "ability": "wis",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["minor-illusion"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 1,
+                  "spellIds": ["speak-with-animals"],
+                  "frequency": "prof_bonus_per_long_rest"
+                }
+              ]
             }
           }
-        ]
-      }
-    ]
+        },
+        {
+          "kind": "custom",
+          "id": "rock-gnome",
+          "name": "Rock Gnome",
+          "description": "<p>You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it as a Utilize action.</p>",
+          "grants": {
+            "innateSpells": {
+              "ability": "int",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["mending", "prestidigitation"],
+                  "frequency": "at_will"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:goliath",
@@ -466,61 +460,59 @@
         "description": "<p>You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.</p>"
       }
     ],
-    "heritageChoices": [
-      {
-        "id": "giant-ancestry",
-        "name": "Giant Ancestry",
-        "kind": "ancestry",
-        "description": "<p>You are descended from Giants. Choose one of the following benefits—a supernatural boon from your ancestry; you can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.</p>",
-        "options": [
-          {
-            "kind": "custom",
-            "id": "clouds-jaunt",
-            "name": "Cloud's Jaunt (Cloud Giant)",
-            "description": "<p>As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see.</p>"
-          },
-          {
-            "kind": "custom",
-            "id": "fires-burn",
-            "name": "Fire's Burn (Fire Giant)",
-            "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.</p>",
-            "grants": {
-              "damageType": ["fire"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "frosts-chill",
-            "name": "Frost's Chill (Frost Giant)",
-            "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.</p>",
-            "grants": {
-              "damageType": ["cold"]
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "hills-tumble",
-            "name": "Hill's Tumble (Hill Giant)",
-            "description": "<p>When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition.</p>"
-          },
-          {
-            "kind": "custom",
-            "id": "stones-endurance",
-            "name": "Stone's Endurance (Stone Giant)",
-            "description": "<p>When you take damage, you can take a Reaction to roll 1d12. Add your Constitution modifier to the number rolled and reduce the damage by that total.</p>"
-          },
-          {
-            "kind": "custom",
-            "id": "storms-thunder",
-            "name": "Storm's Thunder (Storm Giant)",
-            "description": "<p>When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.</p>",
-            "grants": {
-              "damageType": ["thunder"]
-            }
+    "heritage": {
+      "id": "giant-ancestry",
+      "name": "Giant Ancestry",
+      "kind": "ancestry",
+      "description": "<p>You are descended from Giants. Choose one of the following benefits—a supernatural boon from your ancestry; you can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.</p>",
+      "options": [
+        {
+          "kind": "custom",
+          "id": "clouds-jaunt",
+          "name": "Cloud's Jaunt (Cloud Giant)",
+          "description": "<p>As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see.</p>"
+        },
+        {
+          "kind": "custom",
+          "id": "fires-burn",
+          "name": "Fire's Burn (Fire Giant)",
+          "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.</p>",
+          "grants": {
+            "damageType": ["fire"]
           }
-        ]
-      }
-    ]
+        },
+        {
+          "kind": "custom",
+          "id": "frosts-chill",
+          "name": "Frost's Chill (Frost Giant)",
+          "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.</p>",
+          "grants": {
+            "damageType": ["cold"]
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "hills-tumble",
+          "name": "Hill's Tumble (Hill Giant)",
+          "description": "<p>When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition.</p>"
+        },
+        {
+          "kind": "custom",
+          "id": "stones-endurance",
+          "name": "Stone's Endurance (Stone Giant)",
+          "description": "<p>When you take damage, you can take a Reaction to roll 1d12. Add your Constitution modifier to the number rolled and reduce the damage by that total.</p>"
+        },
+        {
+          "kind": "custom",
+          "id": "storms-thunder",
+          "name": "Storm's Thunder (Storm Giant)",
+          "description": "<p>When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.</p>",
+          "grants": {
+            "damageType": ["thunder"]
+          }
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:halfling",
@@ -685,102 +677,100 @@
         }
       }
     ],
-    "heritageChoices": [
-      {
-        "id": "fiendish-legacy",
-        "name": "Fiendish Legacy",
-        "kind": "lineage",
-        "description": "<p>You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the legacy).</p>",
-        "options": [
-          {
-            "kind": "custom",
-            "id": "abyssal",
-            "name": "Abyssal",
-            "description": "<p>You have Resistance to Poison damage. You also know the Poison Spray cantrip. At character level 3 you gain Ray of Sickness; at level 5 you gain Hold Person (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "resistances": ["poison"],
-              "innateSpells": {
-                "ability": "cha",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["poison-spray"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 3,
-                    "spellIds": ["ray-of-sickness"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["hold-person"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "chthonic",
-            "name": "Chthonic",
-            "description": "<p>You have Resistance to Necrotic damage. You also know the Chill Touch cantrip. At character level 3 you gain False Life; at level 5 you gain Ray of Enfeeblement (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "resistances": ["necrotic"],
-              "innateSpells": {
-                "ability": "cha",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["chill-touch"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 3,
-                    "spellIds": ["false-life"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["ray-of-enfeeblement"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "kind": "custom",
-            "id": "infernal",
-            "name": "Infernal",
-            "description": "<p>You have Resistance to Fire damage. You also know the Fire Bolt cantrip. At character level 3 you gain Hellish Rebuke; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
-            "grants": {
-              "resistances": ["fire"],
-              "innateSpells": {
-                "ability": "cha",
-                "entries": [
-                  {
-                    "level": 1,
-                    "spellIds": ["fire-bolt"],
-                    "frequency": "at_will"
-                  },
-                  {
-                    "level": 3,
-                    "spellIds": ["hellish-rebuke"],
-                    "frequency": "once_per_long_rest"
-                  },
-                  {
-                    "level": 5,
-                    "spellIds": ["darkness"],
-                    "frequency": "once_per_long_rest"
-                  }
-                ]
-              }
+    "heritage": {
+      "id": "fiendish-legacy",
+      "name": "Fiendish Legacy",
+      "kind": "lineage",
+      "description": "<p>You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the legacy).</p>",
+      "options": [
+        {
+          "kind": "custom",
+          "id": "abyssal",
+          "name": "Abyssal",
+          "description": "<p>You have Resistance to Poison damage. You also know the Poison Spray cantrip. At character level 3 you gain Ray of Sickness; at level 5 you gain Hold Person (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "resistances": ["poison"],
+            "innateSpells": {
+              "ability": "cha",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["poison-spray"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 3,
+                  "spellIds": ["ray-of-sickness"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["hold-person"],
+                  "frequency": "once_per_long_rest"
+                }
+              ]
             }
           }
-        ]
-      }
-    ]
+        },
+        {
+          "kind": "custom",
+          "id": "chthonic",
+          "name": "Chthonic",
+          "description": "<p>You have Resistance to Necrotic damage. You also know the Chill Touch cantrip. At character level 3 you gain False Life; at level 5 you gain Ray of Enfeeblement (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "resistances": ["necrotic"],
+            "innateSpells": {
+              "ability": "cha",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["chill-touch"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 3,
+                  "spellIds": ["false-life"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["ray-of-enfeeblement"],
+                  "frequency": "once_per_long_rest"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "kind": "custom",
+          "id": "infernal",
+          "name": "Infernal",
+          "description": "<p>You have Resistance to Fire damage. You also know the Fire Bolt cantrip. At character level 3 you gain Hellish Rebuke; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
+          "grants": {
+            "resistances": ["fire"],
+            "innateSpells": {
+              "ability": "cha",
+              "entries": [
+                {
+                  "level": 1,
+                  "spellIds": ["fire-bolt"],
+                  "frequency": "at_will"
+                },
+                {
+                  "level": 3,
+                  "spellIds": ["hellish-rebuke"],
+                  "frequency": "once_per_long_rest"
+                },
+                {
+                  "level": 5,
+                  "spellIds": ["darkness"],
+                  "frequency": "once_per_long_rest"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
   }
 ]

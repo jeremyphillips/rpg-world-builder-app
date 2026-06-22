@@ -28,39 +28,37 @@ const ELF_BODY = {
         '<p>You have Advantage on saving throws to avoid or end the Charmed condition.</p>',
     },
   ],
-  heritageChoices: [
-    {
-      id: 'elven-lineage',
-      name: 'Elven Lineage',
-      kind: 'lineage' as const,
-      description: '<p>Your lineage shapes your connection to elven magic.</p>',
-      options: [
-        {
-          kind: 'custom' as const,
-          id: 'drow',
-          name: 'Drow',
-          description: '<p>Drow trace their lineage to the Underdark.</p>',
-          grants: {
-            senses: [{ type: 'darkvision' as const, range: 120 }],
-            innateSpells: {
-              ability: 'cha' as const,
-              entries: [
-                { level: 1, spellIds: ['dancing-lights'], frequency: 'at_will' as const },
-                { level: 3, spellIds: ['faerie-fire'], frequency: 'once_per_long_rest' as const },
-              ],
-            },
+  heritage: {
+    id: 'elven-lineage',
+    name: 'Elven Lineage',
+    kind: 'lineage' as const,
+    description: '<p>Your lineage shapes your connection to elven magic.</p>',
+    options: [
+      {
+        kind: 'custom' as const,
+        id: 'drow',
+        name: 'Drow',
+        description: '<p>Drow trace their lineage to the Underdark.</p>',
+        grants: {
+          senses: [{ type: 'darkvision' as const, range: 120 }],
+          innateSpells: {
+            ability: 'cha' as const,
+            entries: [
+              { level: 1, spellIds: ['dancing-lights'], frequency: 'at_will' as const },
+              { level: 3, spellIds: ['faerie-fire'], frequency: 'once_per_long_rest' as const },
+            ],
           },
         },
-        {
-          kind: 'custom' as const,
-          id: 'wood-elf',
-          name: 'Wood Elf',
-          description: '<p>Your Speed is 35 feet.</p>',
-          grants: { speedOverride: { walk: 35 } },
-        },
-      ],
-    },
-  ],
+      },
+      {
+        kind: 'custom' as const,
+        id: 'wood-elf',
+        name: 'Wood Elf',
+        description: '<p>Your Speed is 35 feet.</p>',
+        grants: { speedOverride: { walk: 35 } },
+      },
+    ],
+  },
 }
 
 const ELF_SYSTEM = {
@@ -105,7 +103,7 @@ describe('speciesSchema', () => {
       ...ELF_SYSTEM,
       description: undefined,
       imageKey: undefined,
-      heritageChoices: undefined,
+      heritage: undefined,
     }
     expect(speciesSchema.safeParse(minimal).success).toBe(true)
   })
