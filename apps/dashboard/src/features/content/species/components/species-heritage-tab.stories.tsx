@@ -44,14 +44,12 @@ export const HomebrewWithHeritage: Story = {
         options: [
           {
             id: 'o1',
-            kind: 'custom',
             name: 'Breath Weapon',
             description: '<p>Exhale destructive energy.</p>',
             grants: [],
           },
           {
             id: 'o2',
-            kind: 'custom',
             name: 'Damage Resistance',
             description: '',
             grants: [],
@@ -71,8 +69,8 @@ export const SystemSpeciesLockedHeritage: Story = {
         name: 'Draconic Ancestry',
         description: '',
         options: [
-          { id: 'o1', kind: 'custom', name: 'Breath Weapon', description: '', grants: [] },
-          { id: 'o2', kind: 'custom', name: 'Damage Resistance', description: '', grants: [] },
+          { id: 'o1', name: 'Breath Weapon', description: '', grants: [] },
+          { id: 'o2', name: 'Damage Resistance', description: '', grants: [] },
         ],
       }}
     />

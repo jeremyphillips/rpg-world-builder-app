@@ -22,7 +22,6 @@ type Heritage = {
   description?: string
   options: Array<{
     id?: string
-    kind: 'custom' | 'grant'
     name?: string
     description?: string
     overrideDisplay?: boolean
@@ -49,7 +48,7 @@ const draconicHeritage: Heritage = {
   id: 'hc1',
   name: 'Draconic Ancestry',
   description: '',
-  options: [{ id: 'o1', kind: 'custom', name: 'Breath Weapon', description: '', grants: [] }],
+  options: [{ id: 'o1', name: 'Breath Weapon', description: '', grants: [] }],
 }
 
 describe('SpeciesHeritageTab', () => {
