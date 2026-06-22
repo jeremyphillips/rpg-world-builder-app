@@ -69,10 +69,11 @@ export async function findSessionUserById(id: string): Promise<SessionUser | nul
 /**
  * Persist the user's most recently selected campaign. Membership is validated
  * by the caller; this only writes the preference and returns the updated user.
+ * Pass `null` to clear a stale or revoked selection.
  */
 export async function updateLastSelectedCampaign(
   userId: string,
-  campaignId: string,
+  campaignId: string | null,
 ): Promise<SessionUser | null> {
   if (!isValidObjectId(userId)) return null
   const doc = await UserModel.findByIdAndUpdate(

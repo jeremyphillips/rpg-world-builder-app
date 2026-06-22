@@ -5,6 +5,7 @@ import type { Express } from 'express'
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { updateLastSelectedCampaign } from '../user'
 
 let app: Express
 
@@ -87,7 +88,10 @@ describe('auth flow', () => {
     )
 
     const meRes = await agent.get('/api/auth/me').expect(200)
-    expect(meRes.body.user.email).toBe(credentials.email)
+    expect(meRes.body).toMatchObject({
+      user: { email: credentials.email },
+      activeCampaign: null,
+    })
 
     const logoutToken = loginRes.body.csrfToken as string
     await agent.post('/api/auth/logout').set(CSRF_HEADER, logoutToken).expect(200)
@@ -156,5 +160,64 @@ describe('session reuse', () => {
   it('keeps the session across requests via the cookie jar', async () => {
     const { agent } = await registerAndLogin()
     await agent.get('/api/auth/me').expect(200)
+  })
+})
+
+describe('GET /api/auth/me activeCampaign', () => {
+  it('returns activeCampaign null for a user with no campaigns', async () => {
+    const { agent } = await registerAndLogin()
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    expect(meRes.body.activeCampaign).toBeNull()
+  })
+
+  it('returns the selected campaign when lastSelectedCampaignId is valid', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+
+    const createRes = await agent
+      .post('/api/campaigns')
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Sunless Citadel' })
+      .expect(201)
+    const campaignId = createRes.body.campaign.id as string
+
+    await agent
+      .put('/api/campaigns/selection')
+      .set(CSRF_HEADER, csrfToken)
+      .send({ campaignId })
+      .expect(200)
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    expect(meRes.body.activeCampaign).toStrictEqual({
+      id: campaignId,
+      name: 'Sunless Citadel',
+    })
+  })
+
+  it('lazy-clears a stale lastSelectedCampaignId over HTTP', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+
+    await agent
+      .post('/api/campaigns')
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Alpha' })
+      .expect(201)
+    await agent
+      .post('/api/campaigns')
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Beta' })
+      .expect(201)
+
+    const staleId = '507f1f77bcf86cd799439011'
+    const meBefore = await agent.get('/api/auth/me').expect(200)
+    const userId = meBefore.body.user.id as string
+
+    await updateLastSelectedCampaign(userId, staleId)
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    expect(meRes.body.activeCampaign).toBeNull()
+    expect(meRes.body.user.lastSelectedCampaignId).toBeNull()
+
+    const meAgain = await agent.get('/api/auth/me').expect(200)
+    expect(meAgain.body.user.lastSelectedCampaignId).toBeNull()
   })
 })

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@rpg/api-client": "workspace:*",
     "@rpg/contracts": "workspace:*",
     "@rpg/ui": "workspace:*",
     "next": "^16.2.7",
