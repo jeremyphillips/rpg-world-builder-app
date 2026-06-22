@@ -5,6 +5,8 @@ import {
   classSchema,
   createClassInputSchema,
   subclassChoiceFeatureLabel,
+  subclassPatchSchema,
+  subclassCampaignAvailabilitySchema,
   subclassSchema,
   updateClassInputSchema,
 } from './class'
@@ -219,6 +221,32 @@ describe('subclassSchema', () => {
 describe('subclassChoiceFeatureLabel', () => {
   it('formats the class name with a Subclass suffix', () => {
     expect(subclassChoiceFeatureLabel('Bard')).toBe('Bard Subclass')
+  })
+})
+
+describe('subclassPatchSchema', () => {
+  it('accepts an overlay with a partial patch body', () => {
+    const patch = {
+      id: 'patch_1',
+      campaignId: 'camp_1',
+      targetId: 'srd-cc-5.2.1:champion',
+      createdAt: timestamps.createdAt,
+      updatedAt: timestamps.updatedAt,
+      patch: { name: 'Champion (Custom)' },
+    }
+    expect(subclassPatchSchema.safeParse(patch).success).toBe(true)
+    expect(subclassPatchSchema.parse(patch).patch).toEqual({ name: 'Champion (Custom)' })
+  })
+})
+
+describe('subclassCampaignAvailabilitySchema', () => {
+  it('parses campaign-scoped active flag', () => {
+    const availability = {
+      campaignId: 'camp_1',
+      targetId: 'srd-cc-5.2.1:champion',
+      activeInCampaign: false,
+    }
+    expect(subclassCampaignAvailabilitySchema.parse(availability)).toEqual(availability)
   })
 })
 

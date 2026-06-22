@@ -124,10 +124,16 @@ export type ClassPatch = z.infer<typeof classPatchSchema>
 // plain italic lead-in copy.
 // ---------------------------------------------------------------------------
 
-export const subclassBodySchema = contentBodyBaseSchema.extend({
+export const subclassPatchableBodySchema = contentBodyBaseSchema.extend({
   classId: z.string().min(1),
   /** Short italic lead-in matching the SRD's em-formatted tagline (e.g. "Channel Rage into Violent Fury"). */
   tagline: z.string().optional(),
+  /** Optional on patch/update payloads; full records default to `[]` via `subclassBodySchema`. */
+  features: z.array(subclassFeatureSchema).optional(),
+})
+
+/** The editable shape: what a form authors and what a patch overrides. */
+export const subclassBodySchema = subclassPatchableBodySchema.extend({
   features: z.array(subclassFeatureSchema).default([]),
 })
 
@@ -139,8 +145,30 @@ export type Subclass = z.infer<typeof subclassSchema>
 export const createSubclassInputSchema = subclassBodySchema.extend({ slug: slugSchema })
 export type CreateSubclassInput = z.infer<typeof createSubclassInputSchema>
 
-export const updateSubclassInputSchema = createSubclassInputSchema.partial()
+export const updateSubclassInputSchema = subclassPatchableBodySchema
+  .extend({ slug: slugSchema })
+  .partial()
 export type UpdateSubclassInput = z.infer<typeof updateSubclassInputSchema>
+
+/**
+ * System-patch overlay for subclass body fields. Deep-merge semantics match
+ * `classPatchSchema` — arrays replace wholesale at read time.
+ */
+export const subclassPatchSchema = contentPatchBaseSchema.extend({
+  patch: subclassPatchableBodySchema.partial(),
+})
+export type SubclassPatch = z.infer<typeof subclassPatchSchema>
+
+/**
+ * Campaign-scoped availability for a subclass record. Separate from body patches:
+ * deactivating hides the subclass in one campaign without deleting the record.
+ */
+export const subclassCampaignAvailabilitySchema = z.object({
+  campaignId: z.string().min(1),
+  targetId: z.string().min(1),
+  activeInCampaign: z.boolean(),
+})
+export type SubclassCampaignAvailability = z.infer<typeof subclassCampaignAvailabilitySchema>
 
 // ---------------------------------------------------------------------------
 // Class taxonomy — SRD 5.2 class slugs -> display names, mirroring the SKILLS
