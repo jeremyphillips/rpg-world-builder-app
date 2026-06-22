@@ -16,6 +16,7 @@ import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import { isEmbeddedRowSystemLocked } from '../../lib/is-embedded-row-system-locked'
 import {
+  traitItemEyebrow,
   traitItemFields,
   traitItemTitle,
   type TraitRowForm,
@@ -23,11 +24,6 @@ import {
 
 const TRAITS_FIELD_NAME = 'traits'
 const TRAIT_NOUN = 'trait'
-
-function traitEyebrow(row: TraitRowForm | undefined): string | undefined {
-  if (!row?.kind) return undefined
-  return row.kind === 'grant' ? 'Grant' : 'Custom'
-}
 
 export interface SpeciesTraitsTabProps {
   formCtx: ContentFormCtx
@@ -55,7 +51,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
     return {
       id: field.id,
       title: traitItemTitle(row ?? {}, index),
-      eyebrow: traitEyebrow(row),
+      eyebrow: traitItemEyebrow(row),
       deletable: !locked,
       hasError: editor.hasRowError(index),
       ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),

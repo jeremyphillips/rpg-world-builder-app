@@ -135,6 +135,11 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
   return row.name || `Trait ${index + 1}`
 }
 
+export function traitItemEyebrow(row: TraitRowForm | undefined): string | undefined {
+  if (!row?.kind) return undefined
+  return row.kind === 'grant' ? 'Grant' : 'Custom'
+}
+
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {
   const grants = grantsToFormRows(getTraitGrants(trait))
   if (trait.kind === 'grant') {

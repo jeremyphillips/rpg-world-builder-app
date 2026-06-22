@@ -15,22 +15,15 @@ import {
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import { isEmbeddedRowSystemLocked } from '../../lib/is-embedded-row-system-locked'
-import { classFeatureItemFields } from '../lib/class-feature-form-fields'
+import {
+  classFeatureItemFields,
+  featureItemEyebrow,
+  featureItemTitle,
+  type FeatureRowForm,
+} from '../lib/class-feature-form-fields'
 
 const FEATURES_FIELD_NAME = 'features'
 const FEATURE_NOUN = 'feature'
-
-type FeatureRow = { id?: string; name?: string; level?: number | string }
-
-function featureTitle(row: FeatureRow | undefined, index: number): string {
-  return (typeof row?.name === 'string' && row.name.trim()) || `Feature ${index + 1}`
-}
-
-function featureEyebrow(row: FeatureRow | undefined): string | undefined {
-  const level = row?.level
-  if (level === undefined || level === null || level === '') return undefined
-  return `Level ${level}`
-}
 
 export interface ClassFeaturesTabProps {
   formCtx: ContentFormCtx
@@ -55,15 +48,15 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const makeItemDefaults = useCallback(() => buildItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
 
-  const watched = useWatch({ name: FEATURES_FIELD_NAME }) as Array<FeatureRow> | undefined
+  const watched = useWatch({ name: FEATURES_FIELD_NAME }) as Array<FeatureRowForm> | undefined
 
   const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
     const row = watched?.[index]
     const locked = isEmbeddedRowSystemLocked(row, formCtx.entitySource)
     return {
       id: field.id,
-      title: featureTitle(row, index),
-      eyebrow: featureEyebrow(row),
+      title: featureItemTitle(row, index),
+      eyebrow: featureItemEyebrow(row),
       deletable: !locked,
       hasError: editor.hasRowError(index),
       ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),
@@ -77,7 +70,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
 
   const deleteName =
     editor.deleteIndex !== null
-      ? featureTitle(watched?.[editor.deleteIndex], editor.deleteIndex)
+      ? featureItemTitle(watched?.[editor.deleteIndex], editor.deleteIndex)
       : ''
 
   return (
