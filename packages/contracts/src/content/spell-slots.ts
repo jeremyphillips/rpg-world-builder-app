@@ -34,10 +34,10 @@ export const FULL_CASTER_SLOTS: number[][] = [
 
 /**
  * Half-caster progression (Paladin, Ranger).
- * Spell slots begin at class level 2; level 1 has no slots.
+ * Rows 0–19 correspond to character levels 1–20.
  */
 export const HALF_CASTER_SLOTS: number[][] = [
-  [], // L1
+  [2], // L1
   [2], // L2
   [3], // L3
   [3], // L4

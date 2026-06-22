@@ -5,6 +5,9 @@ import {
   SLOT_TABLES,
   MAX_CHARACTER_LEVEL,
   subclassChoiceFeatureLabel,
+  isSpellcastingActiveAtLevel,
+  spellcastingFeatureLabel,
+  spellcastingUnlockLevel,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
@@ -30,14 +33,32 @@ function fillForward(
   return result
 }
 
+function isLegacySpellcastingFeature(
+  feature: CharacterClass['features'][number],
+  spellcasting: CharacterClass['spellcasting'],
+): boolean {
+  if (feature.id === 'spellcasting') return true
+  return feature.id === 'pact-magic' && spellcasting?.progression === 'pact'
+}
+
 function featuresAtLevel(
   features: CharacterClass['features'],
+  spellcasting: CharacterClass['spellcasting'],
   asiLevels: number[],
   subclassChoiceLevel: number | undefined,
   className: string,
   level: number,
 ): string[] {
-  const names = features.filter((f) => f.level === level).map((f) => f.name)
+  const names = features
+    .filter((f) => f.level === level && !isLegacySpellcastingFeature(f, spellcasting))
+    .map((f) => f.name)
+
+  const unlockLevel = spellcastingUnlockLevel(spellcasting)
+  if (spellcasting && unlockLevel === level) {
+    const label = spellcastingFeatureLabel(spellcasting.progression)
+    if (!names.includes(label)) names.push(label)
+  }
+
   if (asiLevels.includes(level)) names.push('Ability Score Improvement')
   if (subclassChoiceLevel === level) {
     const choiceLabel = subclassChoiceFeatureLabel(className)
@@ -60,6 +81,7 @@ function buildRow(
   slotTable: number[][] | undefined,
 ): ProgressionRow {
   const { features, asiLevels, subclassChoiceLevel, spellcasting, name } = characterClass
+  const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
   const cantripsNorm = spellcasting?.cantrips?.map((c) => ({ level: c.level, value: c.known }))
   const spellsAvailableNorm = spellcasting?.spellsAvailable?.map((s) => ({
     level: s.level,
@@ -68,11 +90,12 @@ function buildRow(
   return {
     level,
     profBonus: proficiencyBonus(level),
-    features: featuresAtLevel(features, asiLevels, subclassChoiceLevel, name, level),
+    features: featuresAtLevel(features, spellcasting, asiLevels, subclassChoiceLevel, name, level),
     resources: buildResourceRow(characterClass.resources, level),
-    cantrips: cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
-    spellsAvailable: spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,
-    slots: slotTable?.[level - 1],
+    cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
+    spellsAvailable:
+      castingActive && spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,
+    slots: castingActive ? slotTable?.[level - 1] : undefined,
   }
 }
 

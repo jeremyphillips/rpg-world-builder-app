@@ -45,7 +45,13 @@ export const spellsAvailableEntrySchema = z.object({
 
 export const spellsAvailableProgressionSchema = z.array(spellsAvailableEntrySchema)
 
+export const DEFAULT_SPELLCASTING_LEVEL = 1 as const
+
 export const spellcastingSchema = z.object({
+  /** First class level at which this class's spellcasting block is active. Defaults to 1. */
+  level: levelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
+  /** SRD rules prose for the class's spellcasting feature (body HTML only). */
+  description: z.string().optional(),
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
   preparation: z.enum(SPELL_PREPARATION_MODES),
@@ -54,3 +60,23 @@ export const spellcastingSchema = z.object({
 })
 
 export type Spellcasting = z.infer<typeof spellcastingSchema>
+
+/** Class level at which spellcasting unlocks; undefined when the class is not a caster. */
+export function spellcastingUnlockLevel(
+  spellcasting: Spellcasting | undefined,
+): number | undefined {
+  return spellcasting?.level
+}
+
+export function isSpellcastingActiveAtLevel(
+  spellcasting: Spellcasting | undefined,
+  classLevel: number,
+): boolean {
+  const unlock = spellcastingUnlockLevel(spellcasting)
+  return unlock !== undefined && classLevel >= unlock
+}
+
+/** Progression-table label derived from progression type (Pact Magic vs Spellcasting). */
+export function spellcastingFeatureLabel(progression: SpellcastingProgression): string {
+  return progression === 'pact' ? 'Pact Magic' : 'Spellcasting'
+}

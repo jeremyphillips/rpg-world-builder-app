@@ -72,6 +72,36 @@ describe('ClassProgressionTable', () => {
     expect(level3Row?.textContent).toContain('Bard Subclass')
   })
 
+  it('derives Spellcasting in the features column from the spellcasting block', () => {
+    render(<ClassProgressionTable characterClass={pickClass('paladin')} />)
+
+    const level1Row = screen.getAllByRole('row')[1]
+    expect(level1Row?.textContent).toContain('Spellcasting')
+    expect(level1Row?.textContent).toContain('Lay On Hands')
+  })
+
+  it('derives Pact Magic for warlock pact progression', () => {
+    render(<ClassProgressionTable characterClass={pickClass('warlock')} />)
+
+    const level1Row = screen.getAllByRole('row')[1]
+    expect(level1Row?.textContent).toContain('Pact Magic')
+  })
+
+  it('gates spell slots before spellcasting unlock level', () => {
+    const paladin = pickClass('paladin')
+    const delayed: CharacterClass = {
+      ...paladin,
+      spellcasting: paladin.spellcasting ? { ...paladin.spellcasting, level: 2 } : undefined,
+    }
+
+    render(<ClassProgressionTable characterClass={delayed} />)
+
+    const level1Row = screen.getAllByRole('row')[1]
+    expect(level1Row?.textContent).not.toContain('Spellcasting')
+    const level2Row = screen.getAllByRole('row')[2]
+    expect(level2Row?.textContent).toContain('Spellcasting')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ClassProgressionTable characterClass={pickClass('bard')} />)
     const results = await axe.run(container, axeOptions)

@@ -559,6 +559,15 @@ Import the two route components from `@/features/content`, then add under `campa
 
 The `classes` type embeds an optional `spellcasting` block (`content/class/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` by progression (`full` / `half` / `pact`); they are not stored on the class record.
 
+### Unlock level and feature label
+
+| Field         | Role                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `level`       | First class level at which spellcasting is active (defaults to **1**). Gates slot/cantrip columns and character-builder eligibility. |
+| `description` | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).                      |
+
+The progression table injects **Spellcasting** (or **Pact Magic** for `progression: pact`) at `spellcasting.level` — do not duplicate those rows in `features[]`.
+
 ### Preparation modes
 
 `preparation` is a closed enum (`SPELL_PREPARATION_MODES`):

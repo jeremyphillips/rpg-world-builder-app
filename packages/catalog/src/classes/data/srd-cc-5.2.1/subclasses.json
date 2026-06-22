@@ -10,7 +10,33 @@
     "classId": "srd-cc-5.2.1:barbarian",
     "name": "Path of the Berserker",
     "tagline": "Channel Rage into Violent Fury",
-    "description": "<p>A path of untrammeled fury, channeling rage into a violent frenzy.</p>"
+    "description": "<p>Barbarians who walk the Path of the Berserker direct their Rage primarily toward violence. Their path is one of untrammeled fury, and they thrill in the chaos of battle as they allow their Rage to seize and empower them.</p>",
+    "features": [
+      {
+        "id": "frenzy",
+        "name": "Frenzy",
+        "level": 3,
+        "description": "<p>If you use Reckless Attack while your Rage is active, you deal extra damage to the first target you hit on your turn with a Strength-based attack. To determine the extra damage, roll a number of d6s equal to your Rage Damage bonus, and add them together. The damage has the same type as the weapon or Unarmed Strike used for the attack.</p>"
+      },
+      {
+        "id": "mindless-rage",
+        "name": "Mindless Rage",
+        "level": 6,
+        "description": "<p>You have Immunity to the Charmed and Frightened conditions while your Rage is active. If you're Charmed or Frightened when you enter your Rage, the condition ends on you.</p>"
+      },
+      {
+        "id": "retaliation",
+        "name": "Retaliation",
+        "level": 10,
+        "description": "<p>When you take damage from a creature that is within 5 feet of you, you can take a Reaction to make one melee attack against that creature, using a weapon or an Unarmed Strike.</p>"
+      },
+      {
+        "id": "intimidating-presence",
+        "name": "Intimidating Presence",
+        "level": 14,
+        "description": "<p>As a Bonus Action, you can strike terror into others with your menacing presence and primal power. When you do so, each creature of your choice in a 30-foot Emanation originating from you must make a Wisdom saving throw (DC 8 plus your Strength modifier and Proficiency Bonus). On a failed save, a creature has the Frightened condition for 1 minute. At the end of each of the Frightened creature's turns, the creature repeats the save, ending the effect on itself on a success.</p><p>Once you use this feature, you can't use it again until you finish a Long Rest unless you expend a use of your Rage (no action required) to restore your use of it.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:college-of-lore",
@@ -62,7 +88,66 @@
     "classId": "srd-cc-5.2.1:cleric",
     "name": "Life Domain",
     "tagline": "Preserve and Heal Those in Need",
-    "description": "<p>Clerics devoted to the life force that sustains all things; potent healers.</p>"
+    "description": "<p>The Life Domain focuses on the positive energy that helps sustain all life in the multiverse. Clerics who tap into this domain are masters of healing, using that life force to cure many hurts.</p><p>Existence itself relies on the positive energy associated with this domain, so a Cleric of almost any religious tradition might choose it. This domain is particularly associated with agricultural deities, gods of healing or endurance, and gods of home and community. Religious orders of healing also seek the magic of this domain.</p>",
+    "features": [
+      {
+        "id": "disciple-of-life",
+        "name": "Disciple of Life",
+        "level": 3,
+        "description": "<p>When a spell you cast with a spell slot restores Hit Points to a creature, that creature regains additional Hit Points on the turn you cast the spell. The additional Hit Points equal 2 plus the spell slot's level.</p>"
+      },
+      {
+        "id": "life-domain-spells",
+        "name": "Life Domain Spells",
+        "level": 3,
+        "description": "<p>Your connection to this divine domain ensures you always have certain spells ready. When you reach a Cleric level specified in the Life Domain Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Life Domain Spells.</strong> Level 3: <em>Aid</em>, <em>Bless</em>, <em>Cure Wounds</em>, <em>Lesser Restoration</em>. Level 5: <em>Mass Healing Word</em>, <em>Revivify</em>. Level 7: <em>Aura of Life</em>, <em>Death Ward</em>. Level 9: <em>Greater Restoration</em>, <em>Mass Cure Wounds</em>.</p>",
+        "grants": {
+          "innateSpells": {
+            "ability": "wis",
+            "entries": [
+              {
+                "level": 3,
+                "kind": "always_prepared",
+                "spellIds": ["aid", "bless", "cure-wounds", "lesser-restoration"]
+              },
+              {
+                "level": 5,
+                "kind": "always_prepared",
+                "spellIds": ["mass-healing-word", "revivify"]
+              },
+              {
+                "level": 7,
+                "kind": "always_prepared",
+                "spellIds": ["aura-of-life", "death-ward"]
+              },
+              {
+                "level": 9,
+                "kind": "always_prepared",
+                "spellIds": ["greater-restoration", "mass-cure-wounds"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "preserve-life",
+        "name": "Preserve Life",
+        "level": 3,
+        "description": "<p>As a Magic action, you present your Holy Symbol and expend a use of your Channel Divinity to evoke healing energy that can restore a number of Hit Points equal to five times your Cleric level. Choose Bloodied creatures within 30 feet of yourself (which can include you), and divide those Hit Points among them. This feature can restore a creature to no more than half its Hit Point maximum.</p>"
+      },
+      {
+        "id": "blessed-healer",
+        "name": "Blessed Healer",
+        "level": 6,
+        "description": "<p>The healing spells you cast on others heal you as well. Immediately after you cast a spell with a spell slot that restores Hit Points to one or more creatures other than yourself, you regain Hit Points equal to 2 plus the spell slot's level.</p>"
+      },
+      {
+        "id": "supreme-healing",
+        "name": "Supreme Healing",
+        "level": 17,
+        "description": "<p>When you would normally roll one or more dice to restore Hit Points to a creature with a spell or Channel Divinity, don't roll those dice for the healing; instead use the highest number possible for each die. For example, instead of restoring 2d6 Hit Points to a creature with a spell, you restore 12.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:circle-of-the-land",
@@ -74,8 +159,40 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:druid",
     "name": "Circle of the Land",
-    "tagline": "Draw on the Magic of the Natural World",
-    "description": "<p>Druids who draw magic from a particular landscape, mystical lore, and folk ritual.</p>"
+    "tagline": "Celebrate Connection to the Natural World",
+    "description": "<p>The Circle of the Land comprises mystics and sages who safeguard ancient knowledge and rites. These Druids meet within sacred circles of trees or standing stones to whisper primal secrets in Druidic. The circle's wisest members preside as the chief priests of their communities.</p>",
+    "features": [
+      {
+        "id": "circle-of-the-land-spells",
+        "name": "Circle of the Land Spells",
+        "level": 3,
+        "description": "<p>Whenever you finish a Long Rest, choose one type of land: arid, polar, temperate, or tropical. Consult the table below that corresponds to the chosen type; you have the spells listed for your Druid level and lower prepared.</p><p><strong>Arid Land.</strong> Level 3: <em>Blur</em>, <em>Burning Hands</em>, <em>Fire Bolt</em>. Level 5: <em>Fireball</em>. Level 7: <em>Blight</em>. Level 9: <em>Wall of Stone</em>.</p><p><strong>Polar Land.</strong> Level 3: <em>Fog Cloud</em>, <em>Hold Person</em>, <em>Ray of Frost</em>. Level 5: <em>Sleet Storm</em>. Level 7: <em>Ice Storm</em>. Level 9: <em>Cone of Cold</em>.</p><p><strong>Temperate Land.</strong> Level 3: <em>Misty Step</em>, <em>Shocking Grasp</em>, <em>Sleep</em>. Level 5: <em>Lightning Bolt</em>. Level 7: <em>Freedom of Movement</em>. Level 9: <em>Tree Stride</em>.</p><p><strong>Tropical Land.</strong> Level 3: <em>Acid Splash</em>, <em>Ray of Sickness</em>, <em>Web</em>. Level 5: <em>Stinking Cloud</em>. Level 7: <em>Polymorph</em>. Level 9: <em>Insect Plague</em>.</p>"
+      },
+      {
+        "id": "lands-aid",
+        "name": "Land's Aid",
+        "level": 3,
+        "description": "<p>As a Magic action, you can expend a use of your Wild Shape and choose a point within 60 feet of yourself. Vitality-giving flowers and life-draining thorns appear for a moment in a 10-foot-radius Sphere centered on that point. Each creature of your choice in the Sphere must make a Constitution saving throw against your spell save DC, taking 2d6 Necrotic damage on a failed save or half as much damage on a successful one. One creature of your choice in that area regains 2d6 Hit Points.</p><p>The damage and healing increase by 1d6 when you reach Druid levels 10 (3d6) and 14 (4d6).</p>"
+      },
+      {
+        "id": "natural-recovery",
+        "name": "Natural Recovery",
+        "level": 6,
+        "description": "<p>You can cast one of the level 1+ spells that you have prepared from your Circle Spells feature without expending a spell slot, and you must finish a Long Rest before you do so again.</p><p>In addition, when you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your Druid level (round up), and none of them can be level 6+. For example, if you're a level 6 Druid, you can recover up to three levels' worth of spell slots. You can recover a level 3 spell slot, a level 2 and a level 1 spell slot, or three level 1 spell slots.</p><p>Once you recover spell slots with this feature, you can't do so again until you finish a Long Rest.</p>"
+      },
+      {
+        "id": "natures-ward",
+        "name": "Nature's Ward",
+        "level": 10,
+        "description": "<p>You are immune to the Poisoned condition, and you have Resistance to a damage type associated with your current land choice in the Circle Spells feature, as shown in the Nature's Ward table.</p><p><strong>Nature's Ward.</strong> Arid: Fire. Polar: Cold. Temperate: Lightning. Tropical: Poison.</p>"
+      },
+      {
+        "id": "natures-sanctuary",
+        "name": "Nature's Sanctuary",
+        "level": 14,
+        "description": "<p>As a Magic action, you can expend a use of your Wild Shape and cause spectral trees and vines to appear in a 15-foot Cube on the ground within 120 feet of yourself. They last there for 1 minute or until you have the Incapacitated condition or die. You and your allies have Half Cover while in that area, and your allies gain the current Resistance of your Nature's Ward while there.</p><p>As a Bonus Action, you can move the Cube up to 60 feet to ground within 120 feet of yourself.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:champion",
@@ -88,7 +205,45 @@
     "classId": "srd-cc-5.2.1:fighter",
     "name": "Champion",
     "tagline": "Pursue Physical Excellence in Combat",
-    "description": "<p>Fighters who pursue physical excellence and devastating critical strikes.</p>"
+    "description": "<p>A Champion focuses on the development of martial prowess in a relentless pursuit of victory. Champions combine rigorous training with physical excellence to deal devastating blows, withstand peril, and garner glory. Whether in athletic contests or bloody battle, Champions strive for the crown of the victor.</p>",
+    "features": [
+      {
+        "id": "improved-critical",
+        "name": "Improved Critical",
+        "level": 3,
+        "description": "<p>Your attack rolls with weapons and Unarmed Strikes can score a Critical Hit on a roll of 19 or 20 on the d20.</p>"
+      },
+      {
+        "id": "remarkable-athlete",
+        "name": "Remarkable Athlete",
+        "level": 3,
+        "description": "<p>Thanks to your athleticism, you have Advantage on Initiative rolls and Strength (Athletics) checks.</p><p>In addition, immediately after you score a Critical Hit, you can move up to half your Speed without provoking Opportunity Attacks.</p>"
+      },
+      {
+        "id": "additional-fighting-style",
+        "name": "Additional Fighting Style",
+        "level": 7,
+        "description": "<p>You gain another Fighting Style feat of your choice.</p>"
+      },
+      {
+        "id": "heroic-warrior",
+        "name": "Heroic Warrior",
+        "level": 10,
+        "description": "<p>The thrill of battle drives you toward victory. During combat, you can give yourself Heroic Inspiration whenever you start your turn without it.</p>"
+      },
+      {
+        "id": "superior-critical",
+        "name": "Superior Critical",
+        "level": 15,
+        "description": "<p>Your attack rolls with weapons and Unarmed Strikes can now score a Critical Hit on a roll of 18–20 on the d20.</p>"
+      },
+      {
+        "id": "survivor",
+        "name": "Survivor",
+        "level": 18,
+        "description": "<p>You attain the pinnacle of resilience in battle, giving you these benefits.</p><p><strong>Defy Death.</strong> You have Advantage on Death Saving Throws. Moreover, when you roll 18–20 on a Death Saving Throw, you gain the benefit of rolling a 20 on it.</p><p><strong>Heroic Rally.</strong> At the start of each of your turns, you regain Hit Points equal to 5 plus your Constitution modifier if you are Bloodied and have at least 1 Hit Point.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:warrior-of-the-open-hand",
@@ -100,8 +255,34 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:monk",
     "name": "Warrior of the Open Hand",
-    "tagline": "Master the Martial Arts",
-    "description": "<p>Monks who master unarmed combat, manipulating an enemy's ki and body.</p>"
+    "tagline": "Master Unarmed Combat Techniques",
+    "description": "<p>Warriors of the Open Hand are masters of unarmed combat. They learn techniques to push and trip their opponents and manipulate their own energy to protect themselves from harm.</p>",
+    "features": [
+      {
+        "id": "open-hand-technique",
+        "name": "Open Hand Technique",
+        "level": 3,
+        "description": "<p>Whenever you hit a creature with an attack granted by your Flurry of Blows, you can impose one of the following effects on that target.</p><p><strong>Addle.</strong> The target can't make Opportunity Attacks until the start of its next turn.</p><p><strong>Push.</strong> The target must succeed on a Strength saving throw or be pushed up to 15 feet away from you.</p><p><strong>Topple.</strong> The target must succeed on a Dexterity saving throw or have the Prone condition.</p>"
+      },
+      {
+        "id": "wholeness-of-body",
+        "name": "Wholeness of Body",
+        "level": 6,
+        "description": "<p>You gain the ability to heal yourself. As a Bonus Action, you can roll your Martial Arts die. You regain a number of Hit Points equal to the number rolled plus your Wisdom modifier (minimum of 1 Hit Point regained).</p><p>You can use this feature a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest.</p>"
+      },
+      {
+        "id": "fleet-step",
+        "name": "Fleet Step",
+        "level": 11,
+        "description": "<p>When you take a Bonus Action other than Step of the Wind, you can also use Step of the Wind immediately after that Bonus Action.</p>"
+      },
+      {
+        "id": "quivering-palm",
+        "name": "Quivering Palm",
+        "level": 17,
+        "description": "<p>You gain the ability to set up lethal vibrations in someone's body. When you hit a creature with an Unarmed Strike, you can expend 4 Focus Points to start these imperceptible vibrations, which last for a number of days equal to your Monk level. The vibrations are harmless unless you take an action to end them. Alternatively, when you take the Attack action on your turn, you can forgo one of the attacks to end the vibrations. To end them, you and the target must be on the same plane of existence. When you end them, the target must make a Constitution saving throw, taking 10d12 Force damage on a failed save or half as much damage on a successful one.</p><p>You can have only one creature under the effect of this feature at a time. You can end the vibrations harmlessly (no action required).</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:oath-of-devotion",
@@ -113,8 +294,72 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:paladin",
     "name": "Oath of Devotion",
-    "tagline": "Uphold Lofty Ideals of Justice and Order",
-    "description": "<p>Paladins bound to the ideals of justice, virtue, and order.</p>"
+    "tagline": "Uphold the Ideals of Justice and Order",
+    "description": "<p>The Oath of Devotion binds Paladins to the ideals of justice and order. These Paladins meet the archetype of the knight in shining armor. They hold themselves to the highest standards of conduct, and some—for better or worse—hold the rest of the world to the same standards.</p><p>Many who swear this oath are devoted to gods of law and good and use their gods' tenets as the measure of personal devotion. Others hold angels as their ideals and incorporate images of angelic wings into their helmets or coats of arms.</p><p>These paladins share the following tenets:</p><p>Let your word be your promise.</p><p>Protect the weak and never fear to act.</p><p>Let your honorable deeds be an example.</p>",
+    "features": [
+      {
+        "id": "oath-of-devotion-spells",
+        "name": "Oath of Devotion Spells",
+        "level": 3,
+        "description": "<p>The magic of your oath ensures you always have certain spells ready; when you reach a Paladin level specified in the Oath of Devotion Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Oath of Devotion Spells.</strong> Level 3: <em>Protection from Evil and Good</em>, <em>Shield of Faith</em>. Level 5: <em>Aid</em>, <em>Zone of Truth</em>. Level 9: <em>Beacon of Hope</em>, <em>Dispel Magic</em>. Level 13: <em>Freedom of Movement</em>, <em>Guardian of Faith</em>. Level 17: <em>Commune</em>, <em>Flame Strike</em>.</p>",
+        "grants": {
+          "innateSpells": {
+            "ability": "cha",
+            "entries": [
+              {
+                "level": 3,
+                "kind": "always_prepared",
+                "spellIds": ["protection-from-evil-and-good", "shield-of-faith"]
+              },
+              {
+                "level": 5,
+                "kind": "always_prepared",
+                "spellIds": ["aid", "zone-of-truth"]
+              },
+              {
+                "level": 9,
+                "kind": "always_prepared",
+                "spellIds": ["beacon-of-hope", "dispel-magic"]
+              },
+              {
+                "level": 13,
+                "kind": "always_prepared",
+                "spellIds": ["freedom-of-movement", "guardian-of-faith"]
+              },
+              {
+                "level": 17,
+                "kind": "always_prepared",
+                "spellIds": ["commune", "flame-strike"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "sacred-weapon",
+        "name": "Sacred Weapon",
+        "level": 3,
+        "description": "<p>When you take the Attack action, you can expend one use of your Channel Divinity to imbue one Melee weapon that you are holding with positive energy. For 10 minutes or until you use this feature again, you add your Charisma modifier to attack rolls you make with that weapon (minimum bonus of +1), and each time you hit with it, you cause it to deal its normal damage type or Radiant damage.</p><p>The weapon also emits Bright Light in a 20-foot radius and Dim Light 20 feet beyond that.</p><p>You can end this effect early (no action required). This effect also ends if you aren't carrying the weapon.</p>"
+      },
+      {
+        "id": "aura-of-devotion",
+        "name": "Aura of Devotion",
+        "level": 7,
+        "description": "<p>You and your allies have Immunity to the Charmed condition while in your Aura of Protection. If a Charmed ally enters the aura, that condition has no effect on that ally while there.</p>"
+      },
+      {
+        "id": "smite-of-protection",
+        "name": "Smite of Protection",
+        "level": 15,
+        "description": "<p>Your magical smite now radiates protective energy. Whenever you cast <em>Divine Smite</em>, you and your allies have Half Cover while in your Aura of Protection. The aura has this benefit until the start of your next turn.</p>"
+      },
+      {
+        "id": "holy-nimbus",
+        "name": "Holy Nimbus",
+        "level": 20,
+        "description": "<p>As a Bonus Action, you can imbue your Aura of Protection with holy power, granting the benefits below for 10 minutes or until you end them (no action required). Once you use this feature, you can't use it again until you finish a Long Rest. You can also restore your use of it by expending a level 5 spell slot (no action required).</p><p><strong>Holy Ward.</strong> You have Advantage on any saving throw you are forced to make by a Fiend or an Undead.</p><p><strong>Radiant Damage.</strong> Whenever an enemy starts its turn in the aura, that creature takes Radiant damage equal to your Charisma modifier plus your Proficiency Bonus.</p><p><strong>Sunlight.</strong> The aura is filled with Bright Light that is sunlight.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:hunter",
@@ -126,8 +371,40 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:ranger",
     "name": "Hunter",
-    "tagline": "Hunt the Monsters That Threaten Civilization",
-    "description": "<p>Rangers who specialize in hunting the monsters that threaten the world.</p>"
+    "tagline": "Protect Nature and People from Destruction",
+    "description": "<p>You stalk prey in the wilds and elsewhere, using your abilities as a Hunter to protect nature and people everywhere from forces that would destroy them.</p>",
+    "features": [
+      {
+        "id": "hunters-lore",
+        "name": "Hunter's Lore",
+        "level": 3,
+        "description": "<p>You can call on the forces of nature to reveal certain strengths and weaknesses of your prey. While a creature is marked by your <em>Hunter's Mark</em>, you know whether that creature has any Immunities, Resistances, or Vulnerabilities, and if the creature has any, you know what they are.</p>"
+      },
+      {
+        "id": "hunters-prey",
+        "name": "Hunter's Prey",
+        "level": 3,
+        "description": "<p>You gain one of the following feature options of your choice. Whenever you finish a Short or Long Rest, you can replace the chosen option with the other one.</p><p><strong>Colossus Slayer.</strong> Your tenacity can wear down even the most resilient foes. When you hit a creature with a weapon, the weapon deals an extra 1d8 damage to the target if it's missing any of its Hit Points. You can deal this extra damage only once per turn.</p><p><strong>Horde Breaker.</strong> Once on each of your turns when you make an attack with a weapon, you can make another attack with the same weapon against a different creature that is within 5 feet of the original target, that is within the weapon's range, and that you haven't attacked this turn.</p>"
+      },
+      {
+        "id": "defensive-tactics",
+        "name": "Defensive Tactics",
+        "level": 7,
+        "description": "<p>You gain one of the following feature options of your choice. Whenever you finish a Short or Long Rest, you can replace the chosen option with the other one.</p><p><strong>Escape the Horde.</strong> Opportunity Attacks have Disadvantage against you.</p><p><strong>Multiattack Defense.</strong> When a creature hits you with an attack roll, that creature has Disadvantage on all other attack rolls against you this turn.</p>"
+      },
+      {
+        "id": "superior-hunters-prey",
+        "name": "Superior Hunter's Prey",
+        "level": 11,
+        "description": "<p>Once per turn when you deal damage to a creature marked by your <em>Hunter's Mark</em>, you can also deal that spell's extra damage to a different creature that you can see within 30 feet of the first creature.</p>"
+      },
+      {
+        "id": "superior-hunters-defense",
+        "name": "Superior Hunter's Defense",
+        "level": 15,
+        "description": "<p>When you take damage, you can take a Reaction to give yourself Resistance to that damage and any other damage of the same type until the end of the current turn.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:thief",
@@ -139,8 +416,40 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:rogue",
     "name": "Thief",
-    "tagline": "Hunt for Fun and Profit",
-    "description": "<p>Rogues who hone the skills of stealth, agility, and quick reflexes.</p>"
+    "tagline": "Hunt for Treasure as a Classic Adventurer",
+    "description": "<p>A mix of burglar, treasure hunter, and explorer, you are the epitome of an adventurer. In addition to improving your agility and stealth, you gain abilities useful for delving into ruins and getting maximum benefit from the magic items you find there.</p>",
+    "features": [
+      {
+        "id": "fast-hands",
+        "name": "Fast Hands",
+        "level": 3,
+        "description": "<p>As a Bonus Action, you can do one of the following.</p><p><strong>Sleight of Hand.</strong> Make a Dexterity (Sleight of Hand) check to pick a lock or disarm a trap with Thieves' Tools or to pick a pocket.</p><p><strong>Use an Object.</strong> Take the Utilize action, or take the Magic action to use a magic item that requires that action.</p>"
+      },
+      {
+        "id": "second-story-work",
+        "name": "Second-Story Work",
+        "level": 3,
+        "description": "<p>You've trained to get into especially hard-to-reach places, granting you these benefits.</p><p><strong>Climber.</strong> You gain a Climb Speed equal to your Speed.</p><p><strong>Jumper.</strong> You can determine your jump distance using your Dexterity rather than your Strength.</p>"
+      },
+      {
+        "id": "supreme-sneak",
+        "name": "Supreme Sneak",
+        "level": 9,
+        "description": "<p>You gain the following Cunning Strike option.</p><p><strong>Stealth Attack (Cost: 1d6).</strong> If you have the Hide action's Invisible condition, this attack doesn't end that condition on you if you end the turn behind Three-Quarters Cover or Total Cover.</p>"
+      },
+      {
+        "id": "use-magic-device",
+        "name": "Use Magic Device",
+        "level": 13,
+        "description": "<p>You've learned how to maximize use of magic items, granting you the following benefits.</p><p><strong>Attunement.</strong> You can attune to up to four magic items at once.</p><p><strong>Charges.</strong> Whenever you use a magic item property that expends charges, roll 1d6. On a roll of 6, you use the property without expending the charges.</p><p><strong>Scrolls.</strong> You can use any <em>Spell Scroll</em>, using Intelligence as your spellcasting ability for the spell. If the spell is a cantrip or a level 1 spell, you can cast it reliably. If the scroll contains a higher-level spell, you must first succeed on an Intelligence (Arcana) check (DC 10 plus the spell's level). On a successful check, you cast the spell from the scroll. On a failed check, the scroll disintegrates.</p>"
+      },
+      {
+        "id": "thiefs-reflexes",
+        "name": "Thief's Reflexes",
+        "level": 17,
+        "description": "<p>You are adept at laying ambushes and quickly escaping danger. You can take two turns during the first round of any combat. You take your first turn at your normal Initiative and your second turn at your Initiative minus 10.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:draconic-sorcery",
@@ -153,7 +462,79 @@
     "classId": "srd-cc-5.2.1:sorcerer",
     "name": "Draconic Sorcery",
     "tagline": "Breathe the Magic of Dragons",
-    "description": "<p>Sorcerers whose innate magic springs from a draconic bloodline.</p>"
+    "description": "<p>Your innate magic comes from the gift of a dragon. Perhaps an ancient dragon facing death bequeathed some of its magical power to you or your ancestor. You might have absorbed magic from a site infused with dragons' power. Or perhaps you handled a treasure taken from a dragon's hoard that was steeped in draconic power. Or you might have a dragon for an ancestor.</p>",
+    "features": [
+      {
+        "id": "draconic-resilience",
+        "name": "Draconic Resilience",
+        "level": 3,
+        "description": "<p>The magic in your body manifests physical traits of your draconic gift. Your Hit Point maximum increases by 3, and it increases by 1 whenever you gain another Sorcerer level.</p><p>Parts of you are also covered by dragon-like scales. While you aren't wearing armor, your base Armor Class equals 10 plus your Dexterity and Charisma modifiers.</p>"
+      },
+      {
+        "id": "draconic-spells",
+        "name": "Draconic Spells",
+        "level": 3,
+        "description": "<p>When you reach a Sorcerer level specified in the Draconic Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Draconic Spells.</strong> Level 3: <em>Alter Self</em>, <em>Chromatic Orb</em>, <em>Command</em>, <em>Dragon's Breath</em>. Level 5: <em>Fear</em>, <em>Fly</em>. Level 7: <em>Arcane Eye</em>, <em>Charm Monster</em>. Level 9: <em>Legend Lore</em>, <em>Summon Dragon</em>.</p>",
+        "grants": {
+          "innateSpells": {
+            "ability": "cha",
+            "entries": [
+              {
+                "level": 3,
+                "kind": "always_prepared",
+                "spellIds": ["alter-self", "chromatic-orb", "command", "dragons-breath"]
+              },
+              {
+                "level": 5,
+                "kind": "always_prepared",
+                "spellIds": ["fear", "fly"]
+              },
+              {
+                "level": 7,
+                "kind": "always_prepared",
+                "spellIds": ["arcane-eye", "charm-monster"]
+              },
+              {
+                "level": 9,
+                "kind": "always_prepared",
+                "spellIds": ["legend-lore", "summon-dragon"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "elemental-affinity",
+        "name": "Elemental Affinity",
+        "level": 6,
+        "description": "<p>Your draconic magic has an affinity with a damage type associated with dragons. Choose one of those types: Acid, Cold, Fire, Lightning, or Poison.</p><p>You have Resistance to that damage type, and when you cast a spell that deals damage of that type, you can add your Charisma modifier to one damage roll of that spell.</p>"
+      },
+      {
+        "id": "dragon-wings",
+        "name": "Dragon Wings",
+        "level": 14,
+        "description": "<p>As a Bonus Action, you can cause draconic wings to appear on your back. The wings last for 1 hour or until you dismiss them (no action required). For the duration, you have a Fly Speed of 60 feet.</p><p>Once you use this feature, you can't use it again until you finish a Long Rest unless you spend 3 Sorcery Points (no action required) to restore your use of it.</p>"
+      },
+      {
+        "id": "dragon-companion",
+        "name": "Dragon Companion",
+        "level": 18,
+        "description": "<p>You can cast <em>Summon Dragon</em> without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it in this way when you finish a Long Rest.</p><p>Whenever you start casting the spell, you can modify it so that it doesn't require Concentration. If you do so, the spell's duration becomes 1 minute for that casting.</p>",
+        "grants": {
+          "innateSpells": {
+            "ability": "cha",
+            "entries": [
+              {
+                "level": 18,
+                "kind": "free_cast",
+                "frequency": "once_per_long_rest",
+                "spellIds": ["summon-dragon"]
+              }
+            ]
+          }
+        }
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:fiend-patron",
@@ -165,8 +546,67 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:warlock",
     "name": "Fiend Patron",
-    "tagline": "Bargain with the Lower Planes for Fell Powers",
-    "description": "<p>Warlocks who bargain with a powerful fiend of the Lower Planes.</p>"
+    "tagline": "Make a Deal with the Lower Planes",
+    "description": "<p>Your pact draws on the Lower Planes, the realms of perdition. You might forge a bargain with a demon lord, an archdevil, or another fiend that is especially mighty. That patron's aims are evil—the corruption or destruction of all things, ultimately including you—and your path is defined by the extent to which you strive against those aims.</p>",
+    "features": [
+      {
+        "id": "dark-ones-blessing",
+        "name": "Dark One's Blessing",
+        "level": 3,
+        "description": "<p>When you reduce an enemy to 0 Hit Points, you gain Temporary Hit Points equal to your Charisma modifier plus your Warlock level (minimum of 1 Temporary Hit Point). You also gain this benefit if someone else reduces an enemy within 10 feet of you to 0 Hit Points.</p>"
+      },
+      {
+        "id": "fiend-spells",
+        "name": "Fiend Spells",
+        "level": 3,
+        "description": "<p>The magic of your patron ensures you always have certain spells ready; when you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Fiend Spells.</strong> Level 3: <em>Burning Hands</em>, <em>Command</em>, <em>Scorching Ray</em>, <em>Suggestion</em>. Level 5: <em>Fireball</em>, <em>Stinking Cloud</em>. Level 7: <em>Fire Shield</em>, <em>Wall of Fire</em>. Level 9: <em>Geas</em>, <em>Insect Plague</em>.</p>",
+        "grants": {
+          "innateSpells": {
+            "ability": "cha",
+            "entries": [
+              {
+                "level": 3,
+                "kind": "always_prepared",
+                "spellIds": ["burning-hands", "command", "scorching-ray", "suggestion"]
+              },
+              {
+                "level": 5,
+                "kind": "always_prepared",
+                "spellIds": ["fireball", "stinking-cloud"]
+              },
+              {
+                "level": 7,
+                "kind": "always_prepared",
+                "spellIds": ["fire-shield", "wall-of-fire"]
+              },
+              {
+                "level": 9,
+                "kind": "always_prepared",
+                "spellIds": ["geas", "insect-plague"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "dark-ones-own-luck",
+        "name": "Dark One's Own Luck",
+        "level": 6,
+        "description": "<p>You can call on your fiendish patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add 1d10 to your roll. You can do so after seeing the roll but before any of the roll's effects occur.</p><p>You can use this feature a number of times equal to your Charisma modifier (minimum of once), but you can use it no more than once per roll. You regain all expended uses when you finish a Long Rest.</p>"
+      },
+      {
+        "id": "fiendish-resilience",
+        "name": "Fiendish Resilience",
+        "level": 10,
+        "description": "<p>Choose one damage type, other than Force, whenever you finish a Short or Long Rest. You have Resistance to that damage type until you choose a different one with this feature.</p>"
+      },
+      {
+        "id": "hurl-through-hell",
+        "name": "Hurl Through Hell",
+        "level": 14,
+        "description": "<p>Once per turn when you hit a creature with an attack roll, you can try to instantly transport the target through the Lower Planes. The target must succeed on a Charisma saving throw against your spell save DC, or the target disappears and hurtles through a nightmare landscape. The target takes 8d10 Psychic damage if it isn't a Fiend, and it has the Incapacitated condition until the end of your next turn, when it returns to the space it previously occupied or the nearest unoccupied space.</p><p>Once you use this feature, you can't use it again until you finish a Long Rest unless you expend a Pact Magic spell slot (no action required) to restore your use of it.</p>"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:school-of-evocation",
@@ -178,7 +618,39 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "classId": "srd-cc-5.2.1:wizard",
     "name": "School of Evocation",
-    "tagline": "Sculpt Spells of Explosive Energy",
-    "description": "<p>Wizards who focus on the energetic magic of evocation spells.</p>"
+    "tagline": "Create Explosive Elemental Effects",
+    "description": "<p>Your studies focus on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some Evokers find employment in military forces, serving as artillery to blast armies from afar. Others use their power to protect others, while some seek their own gain.</p>",
+    "features": [
+      {
+        "id": "evocation-savant",
+        "name": "Evocation Savant",
+        "level": 3,
+        "description": "<p>Choose two Wizard spells from the Evocation school, each of which must be no higher than level 2, and add them to your spellbook for free.</p><p>In addition, whenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free. The chosen spell must be of a level for which you have spell slots.</p>"
+      },
+      {
+        "id": "potent-cantrip",
+        "name": "Potent Cantrip",
+        "level": 3,
+        "description": "<p>Your damaging cantrips affect even creatures that avoid the brunt of the effect. When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on a saving throw against the cantrip, the target takes half the cantrip's damage (if any) but suffers no additional effect from the cantrip.</p>"
+      },
+      {
+        "id": "sculpt-spells",
+        "name": "Sculpt Spells",
+        "level": 6,
+        "description": "<p>You can create pockets of relative safety within the effects of your evocations. When you cast an Evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 plus the spell's level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save.</p>"
+      },
+      {
+        "id": "empowered-evocation",
+        "name": "Empowered Evocation",
+        "level": 10,
+        "description": "<p>Whenever you cast a Wizard spell from the Evocation school, you can add your Intelligence modifier to one damage roll of that spell.</p>"
+      },
+      {
+        "id": "overchannel",
+        "name": "Overchannel",
+        "level": 14,
+        "description": "<p>You can increase the power of your spells. When you cast a Wizard spell with a spell slot of levels 1–5 that deals damage, you can deal maximum damage with that spell on the turn you cast it.</p><p>The first time you do so, you suffer no adverse effect. If you use this feature again before you finish a Long Rest, you take 2d12 Necrotic damage for each level of the spell slot immediately after you cast it. This damage ignores Resistance and Immunity.</p><p>Each time you use this feature again before finishing a Long Rest, the Necrotic damage per spell level increases by 1d12.</p>"
+      }
+    ]
   }
 ]

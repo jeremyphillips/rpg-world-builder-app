@@ -17,6 +17,31 @@ import {
 
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
 
+function roundTripFormInput(slug: string) {
+  const characterClass = SRD_CLASSES.find((c) => c.slug === slug)
+  if (!characterClass) throw new Error(`missing seed class: ${slug}`)
+  const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+  const input = classFormDef.toInput(formValues)
+  return { characterClass, formValues, input }
+}
+
+function expectBardSpellcastingRoundTrip(): void {
+  const { characterClass, formValues, input } = roundTripFormInput('bard')
+  const expected = characterClass.spellcasting!
+  const fromForm = formValues.spellcasting!
+  const fromInput = input.spellcasting!
+
+  expect(fromForm.description).toContain('cast spells through your bardic arts')
+  expect(fromForm.level).toBe(1)
+  expect(fromForm.progressionTable!.cantrips![0]).toBe(2)
+  expect(fromInput.description).toContain('cast spells through your bardic arts')
+  expect(fromInput.level).toBe(1)
+  expect(cantripProgressionsEquivalent(fromInput.cantrips, expected.cantrips)).toBe(true)
+  expect(
+    spellsAvailableProgressionsEquivalent(fromInput.spellsAvailable, expected.spellsAvailable),
+  ).toBe(true)
+}
+
 it('type: stripped toInput validates as CreateClassInput', () => {
   const fighter = SRD_CLASSES[0]!
   const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
@@ -160,20 +185,8 @@ describe('classFormDef round-trips', () => {
     expect(input.resources?.[0]?.name).toBe('Sorcery Points')
   })
 
-  it('bard: cantrips and spells available round-trip through progressionTable', () => {
-    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
-    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
-    expect(formValues.spellcasting?.progressionTable?.cantrips?.[0]).toBe(2)
-    const input = classFormDef.toInput(formValues)
-    expect(
-      cantripProgressionsEquivalent(input.spellcasting?.cantrips, bard.spellcasting?.cantrips),
-    ).toBe(true)
-    expect(
-      spellsAvailableProgressionsEquivalent(
-        input.spellcasting?.spellsAvailable,
-        bard.spellcasting?.spellsAvailable,
-      ),
-    ).toBe(true)
+  it('bard: spellcasting description and cantrips round-trip through progressionTable', () => {
+    expectBardSpellcastingRoundTrip()
   })
 
   it('fighter: ASI and subclass choice level round-trip', () => {
