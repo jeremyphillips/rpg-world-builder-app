@@ -61,8 +61,9 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 
 It is presentation-only over the parent form, so global save and validation are
 unchanged. The detail panel is caller-owned (typically `FormItems` for the
-selected row). First consumer: the classes **Features** tab. Species
-traits/heritage are the next intended consumers.
+selected row). Consumers: the classes **Features** tab and the species **Traits**
+tab. Species heritage choices remain on the inline array renderer (two-level
+nesting is deferred).
 
 Scope notes:
 
@@ -77,4 +78,6 @@ Scope notes:
 
 `ContentFormCtx.entitySource` (set by the create/edit shells) lets a consumer
 derive per-row delete-locking when the embedded element has no own `source`
-(e.g. protecting a system class's saved features).
+(e.g. protecting a system class's saved features or a system species's saved
+traits). The same policy applies to subclasses via `isSubclassDeletable`
+(`source === 'homebrew' || isDraftId`).
