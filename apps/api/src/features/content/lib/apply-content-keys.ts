@@ -52,33 +52,9 @@ function stableHeritageObject(incoming: unknown, existing?: unknown): unknown | 
   if (incoming === undefined) return undefined
   if (!hasName(incoming)) return incoming
 
-  const existingHeritage = hasStableId(existing) ? existing : undefined
-  if (existingHeritage) {
-    assertStableContentIds(
-      [incoming].filter(hasStableId),
-      existingHeritage ? [existingHeritage] : [],
-    )
-  }
-
-  const assigned = assignStableContentIds(
-    [incoming],
-    existingHeritage ? [existingHeritage] : [],
-  ) as IdentifiedRow[]
-
-  const withId = assigned[0]
-  if (!withId) return incoming
-
-  if (!Array.isArray(withId.options)) return withId
-
-  const existingOptions =
-    existingHeritage && 'options' in existingHeritage && Array.isArray(existingHeritage.options)
-      ? existingHeritage.options
-      : undefined
-
-  return {
-    ...withId,
-    options: stableIdentifiedArray(withId.options, existingOptions) ?? withId.options,
-  }
+  const existingArray = existing !== undefined && hasName(existing) ? [existing] : undefined
+  const stabilized = stableIdentifiedArray([incoming], existingArray)
+  return stabilized?.[0] ?? incoming
 }
 
 /**

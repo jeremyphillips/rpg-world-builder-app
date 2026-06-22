@@ -63,4 +63,33 @@ describe('applyStableNestedContentKeys', () => {
       options: [{ name: 'Black Dragon', id: 'black-dragon' }],
     })
   })
+
+  it('preserves existing heritage ids on update', () => {
+    const existing = {
+      heritage: {
+        id: 'draconic-ancestry',
+        name: 'Draconic Ancestry',
+        kind: 'ancestry',
+        options: [{ id: 'black-dragon', name: 'Black Dragon' }],
+      },
+    }
+    const body = applyStableNestedContentKeys(
+      {
+        heritage: {
+          id: 'draconic-ancestry',
+          name: 'Draconic Legacy',
+          kind: 'ancestry',
+          options: [{ id: 'black-dragon', name: 'Black Dragon' }],
+        },
+      },
+      existing,
+    )
+
+    expect(body.heritage).toEqual({
+      id: 'draconic-ancestry',
+      name: 'Draconic Legacy',
+      kind: 'ancestry',
+      options: [{ id: 'black-dragon', name: 'Black Dragon' }],
+    })
+  })
 })

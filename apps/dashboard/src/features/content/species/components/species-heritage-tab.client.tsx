@@ -3,11 +3,14 @@
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, Text } from '@rpg/ui'
-import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
+import { buildItemDefaultValues, FormItems, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail-validation'
-import { useMasterDetailArray } from '../../lib/use-master-detail-array'
+import {
+  useMasterDetailArray,
+  type UseMasterDetailArrayResult,
+} from '../../lib/use-master-detail-array'
 import {
   MasterDetailListPanel,
   type MasterDetailListItem,
@@ -35,6 +38,23 @@ export interface SpeciesHeritageTabProps {
   formCtx: ContentFormCtx
 }
 
+function heritageOptionListItem(
+  field: { id: string },
+  index: number,
+  row: TraitRowForm | undefined,
+  entitySource: ContentFormCtx['entitySource'],
+  hasRowError: (index: number) => boolean,
+): MasterDetailListItem {
+  const locked = isSpeciesRowSystemLocked(row, entitySource)
+  return {
+    id: field.id,
+    title: traitItemTitle(row ?? {}, index),
+    deletable: !locked,
+    hasError: hasRowError(index),
+    ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),
+  }
+}
+
 function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
 
@@ -57,43 +77,93 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   )
 }
 
-function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
+function HeritageScalarSection({
+  formCtx,
+  heritage,
+  onRemove,
+}: {
+  formCtx: ContentFormCtx
+  heritage: HeritageForm | undefined
+  onRemove: () => void
+}) {
+  const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
+  const heritageLocked = isSpeciesRowSystemLocked(heritage, formCtx.entitySource)
+
+  return (
+    <div className="space-y-3">
+      <FormItems
+        items={scalarFields}
+        idPrefix="species-heritage"
+        namePrefix={HERITAGE_FIELD_NAME}
+      />
+      {!heritageLocked ? (
+        <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+          Remove heritage
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
+function HeritageOptionEditorPanel({
+  editor,
+  traitFields,
+  showValidationBanner,
+}: {
+  editor: UseMasterDetailArrayResult
+  traitFields: FormItem[]
+  showValidationBanner: boolean
+}) {
+  const selectedFieldId =
+    editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
+
+  return (
+    <div className="space-y-3 md:col-span-2">
+      <MasterDetailValidationBanner visible={showValidationBanner} />
+      {editor.selectedIndex !== null && selectedFieldId ? (
+        <FormItems
+          key={selectedFieldId}
+          items={traitFields}
+          idPrefix={`species-heritage-option-${selectedFieldId}`}
+          namePrefix={`${OPTIONS_FIELD_NAME}.${editor.selectedIndex}`}
+        />
+      ) : !showValidationBanner ? (
+        <Text variant="muted" className="text-sm">
+          Select an option to edit, or add one to get started.
+        </Text>
+      ) : null}
+    </div>
+  )
+}
+
+function HeritageOptionsSection({
+  formCtx,
+  heritageKind,
+  traitFields,
+  editor,
+}: {
+  formCtx: ContentFormCtx
+  heritageKind: HeritageForm['kind'] | undefined
+  traitFields: FormItem[]
+  editor: UseMasterDetailArrayResult
+}) {
   const {
-    setValue,
     formState: { submitCount },
   } = useFormContext()
 
-  const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
-  const traitFields = useMemo(() => traitItemFields(formCtx), [formCtx])
-  const makeOptionDefaults = useCallback(() => buildItemDefaultValues(traitFields), [traitFields])
-  const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
-
-  const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
   const watchedOptions = useWatch({ name: OPTIONS_FIELD_NAME }) as Array<TraitRowForm> | undefined
 
-  const heritageLocked = isSpeciesRowSystemLocked(heritage, formCtx.entitySource)
-
-  const handleRemoveHeritage = () => {
-    setValue(HERITAGE_FIELD_NAME, undefined, { shouldDirty: true })
-    editor.cancelRemove()
-  }
-
-  const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
-    const row = watchedOptions?.[index]
-    const locked = isSpeciesRowSystemLocked(row, formCtx.entitySource)
-    return {
-      id: field.id,
-      title: traitItemTitle(row ?? {}, index),
-      deletable: !locked,
-      hasError: editor.hasRowError(index),
-      ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),
-    }
-  })
+  const items: MasterDetailListItem[] = editor.fields.map((field, index) =>
+    heritageOptionListItem(
+      field,
+      index,
+      watchedOptions?.[index],
+      formCtx.entitySource,
+      editor.hasRowError,
+    ),
+  )
 
   const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
-
-  const selectedFieldId =
-    editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
 
   const deleteName =
     editor.deleteIndex !== null
@@ -102,50 +172,25 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <FormItems
-            items={scalarFields}
-            idPrefix="species-heritage"
-            namePrefix={HERITAGE_FIELD_NAME}
-          />
-          {!heritageLocked ? (
-            <Button type="button" variant="ghost" size="sm" onClick={handleRemoveHeritage}>
-              Remove heritage
-            </Button>
-          ) : null}
-        </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <MasterDetailListPanel
+          items={items}
+          selectedIndex={editor.selectedIndex}
+          ariaLabel="Heritage options"
+          addLabel={`Add ${heritageKind ?? 'option'}`}
+          emptyLabel="No options yet. Add one to get started."
+          onAdd={editor.handleAdd}
+          onSelect={editor.select}
+          onRemove={editor.requestRemove}
+          onMoveUp={editor.moveUp}
+          onMoveDown={editor.moveDown}
+        />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <MasterDetailListPanel
-            items={items}
-            selectedIndex={editor.selectedIndex}
-            ariaLabel="Heritage options"
-            addLabel={`Add ${heritage?.kind ?? 'option'}`}
-            emptyLabel="No options yet. Add one to get started."
-            onAdd={editor.handleAdd}
-            onSelect={editor.select}
-            onRemove={editor.requestRemove}
-            onMoveUp={editor.moveUp}
-            onMoveDown={editor.moveDown}
-          />
-
-          <div className="space-y-3 md:col-span-2">
-            <MasterDetailValidationBanner visible={showValidationBanner} />
-            {editor.selectedIndex !== null && selectedFieldId ? (
-              <FormItems
-                key={selectedFieldId}
-                items={traitFields}
-                idPrefix={`species-heritage-option-${selectedFieldId}`}
-                namePrefix={`${OPTIONS_FIELD_NAME}.${editor.selectedIndex}`}
-              />
-            ) : !showValidationBanner ? (
-              <Text variant="muted" className="text-sm">
-                Select an option to edit, or add one to get started.
-              </Text>
-            ) : null}
-          </div>
-        </div>
+        <HeritageOptionEditorPanel
+          editor={editor}
+          traitFields={traitFields}
+          showValidationBanner={showValidationBanner}
+        />
       </div>
 
       <MasterDetailDeleteDialog
@@ -158,6 +203,35 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
         onConfirm={editor.confirmRemove}
       />
     </>
+  )
+}
+
+function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
+  const { setValue } = useFormContext()
+  const traitFields = useMemo(() => traitItemFields(formCtx), [formCtx])
+  const makeOptionDefaults = useCallback(() => buildItemDefaultValues(traitFields), [traitFields])
+  const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
+  const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
+
+  const handleRemoveHeritage = () => {
+    setValue(HERITAGE_FIELD_NAME, undefined, { shouldDirty: true })
+    editor.cancelRemove()
+  }
+
+  return (
+    <div className="space-y-6">
+      <HeritageScalarSection
+        formCtx={formCtx}
+        heritage={heritage}
+        onRemove={handleRemoveHeritage}
+      />
+      <HeritageOptionsSection
+        formCtx={formCtx}
+        heritageKind={heritage?.kind}
+        traitFields={traitFields}
+        editor={editor}
+      />
+    </div>
   )
 }
 
