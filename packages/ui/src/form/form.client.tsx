@@ -12,12 +12,14 @@ import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
 import { Text } from '../components/ui/text'
+import { fieldGroupStackClasses } from '../components/ui/field.variants'
 import { FormItems } from './form-items.client'
 import { FormSectionContext } from './form-section-context.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
-import { fieldGroupStackClasses } from '../components/ui/field.variants'
+import { FormActionsBar } from './form-actions-bar'
+import { formFooterSpacingClasses } from './form-chrome.variants'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -61,6 +63,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * collapsible accordions that start open. Set false for a flat layout.
    */
   collapsibleSections?: boolean
+  /** When true, the footer sticks to the bottom while field content scrolls. */
+  stickyFooter?: boolean
 }
 
 /**
@@ -83,6 +87,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   collapsibleSections = true,
+  stickyFooter = false,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -107,6 +112,8 @@ export function Form<TFieldValues extends FieldValues>({
     [collapsibleSections],
   )
 
+  const resolvedFooter = typeof footer === 'function' ? footer(form) : footer
+
   return (
     <FormProvider {...form}>
       <FileFieldPropsProvider value={fileFieldProps ?? {}}>
@@ -117,7 +124,7 @@ export function Form<TFieldValues extends FieldValues>({
           className={className}
         >
           <div className={cn(fieldGroupStackClasses, contentClassName)}>
-            {formError ? (
+            {!stickyFooter && formError ? (
               <Text variant="destructive" role="alert">
                 {formError}
               </Text>
@@ -126,7 +133,11 @@ export function Form<TFieldValues extends FieldValues>({
               <FormItems items={fields} idPrefix={formId} />
             </FormSectionContext.Provider>
           </div>
-          {typeof footer === 'function' ? footer(form) : footer}
+          {stickyFooter ? (
+            <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+          ) : resolvedFooter ? (
+            <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
+          ) : null}
         </form>
       </FileFieldPropsProvider>
     </FormProvider>

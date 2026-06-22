@@ -41,7 +41,7 @@ export function ContentFormCancelFooter({
   pending,
 }: ContentFormCancelFooterProps) {
   return (
-    <div className="flex items-center gap-3 pt-4">
+    <div className="flex items-center gap-3">
       <FormSaveFooter pending={pending} submitLabel={submitLabel} />
       <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
         Cancel
@@ -82,6 +82,7 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
         defaultValues={defaultValues}
         onSubmit={onSubmit}
         formError={formError}
+        stickyFooter
         footer={(form) => (
           <ContentFormCancelFooter
             backHref={backHref}

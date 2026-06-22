@@ -50,6 +50,21 @@ Optional non-field UI (intro copy, links, placeholders) belongs on
 `TabbedFormTab.header` — rendered above that tab's fields, outside the Zod
 schema. Omit `fields` for a panel that is entirely non-input content.
 
+### `<TabbedForm>` sticky chrome
+
+By default (`stickyChrome`, default `true`), `<TabbedForm>` keeps two regions
+fixed while the page scrolls:
+
+- **Tab list** — `sticky top-0` with a solid background so section tabs stay visible.
+- **Actions bar** — `FormActionsBar` wraps the `footer` (and any `formError`) in a
+  `sticky bottom-0` toolbar so Save/Cancel stay reachable on long panels.
+
+Tab panels get extra bottom padding so the last field is not hidden under the
+actions bar. Pass `stickyChrome={false}` to restore the flat layout.
+
+Single-page `<Form>` layouts can opt into the same sticky footer with
+`stickyFooter`.
+
 ## Field anatomy & the a11y contract
 
 Every field — whether composed by hand or emitted by `<Form>` — resolves to the
@@ -233,7 +248,9 @@ const PLAY_STYLE_LABELS: Record<PlayStyle, string> = { dungeon_crawl: 'Dungeon C
 
 The standard actions row for save-style forms (settings, profile): an optional
 success confirmation (`role="status"`) plus a pending-aware `SubmitButton`. Use
-it in the `footer` render prop instead of hand-wiring the same row per form:
+it in the `footer` render prop instead of hand-wiring the same row per form.
+On long forms, `<TabbedForm>` (default) and `<Form stickyFooter>` wrap the footer
+in `<FormActionsBar>` so actions stay visible while content scrolls:
 
 ```tsx
 footer={(form) => (

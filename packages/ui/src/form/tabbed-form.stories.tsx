@@ -4,8 +4,7 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
-import { CardFooter } from '../components/ui/card'
-import { SubmitButton } from '../components/ui/submit-button'
+import { FormSaveFooter } from './form-save-footer'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -93,12 +92,51 @@ export const Default: Story = {
     tabs,
     onSubmit: action('submit'),
     className: 'max-w-2xl',
-    footer: (
-      <CardFooter className="justify-end px-0">
-        <SubmitButton>Save changes</SubmitButton>
-      </CardFooter>
-    ),
+    footer: <FormSaveFooter submitLabel="Save changes" />,
   },
+}
+
+const longSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().max(500).optional(),
+  startingLevel: z.number().int().min(1).max(25),
+  playStyle: z.array(z.string()).optional(),
+  difficulty: z.string().optional(),
+  ...Object.fromEntries(
+    Array.from({ length: 12 }, (_, index) => [`extra-${index}`, z.string().optional()]),
+  ),
+})
+
+type LongCampaignForm = z.infer<typeof longSchema>
+
+const longTabs: TabbedFormTab[] = [
+  {
+    id: 'identity',
+    label: 'Identity',
+    fields: Array.from({ length: 12 }, (_, index) => ({
+      type: 'text' as const,
+      name: `extra-${index}`,
+      label: `Field ${index + 1}`,
+    })),
+  },
+  ...tabs.slice(1),
+]
+
+export const LongContent: StoryObj = {
+  parameters: {
+    layout: 'fullscreen',
+  },
+  render: () => (
+    <div className="mx-auto max-w-2xl px-6 py-8">
+      <TabbedForm<LongCampaignForm>
+        schema={longSchema}
+        tabs={longTabs}
+        onSubmit={action('submit')}
+        className="max-w-2xl"
+        footer={<FormSaveFooter submitLabel="Save changes" />}
+      />
+    </div>
+  ),
 }
 
 export const WithFormError: Story = {
