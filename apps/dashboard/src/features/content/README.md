@@ -53,18 +53,23 @@ co-owner membership from `GET /api/campaigns`. Create/edit routes use
 Long embedded arrays (where each row is itself a heavy form) can render as a
 list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 
-| Piece                                                                                     | Role                                                                                                                                                  |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`useMasterDetailArray`](./lib/use-master-detail-array.ts)                                | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing. |
-| [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)               | Sidebar: add button + selectable rows with optional eyebrow, status badge, and per-row delete control.                                                |
-| [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx)         | Shared `ConfirmDialog` wrapper for row removal.                                                                                                       |
-| [`MasterDetailValidationBanner`](./components/master-detail-validation-banner.client.tsx) | Post-submit alert when unselected list rows have validation errors.                                                                                   |
+| Piece                                                                                          | Role                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`useMasterDetailArray`](./lib/use-master-detail-array.ts)                                     | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing. |
+| [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)                    | Sidebar: add button + selectable rows with optional eyebrow, status badge, and per-row delete control.                                                |
+| [`MasterDetailEditorPanel`](./components/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, selected row `FormItems`, or empty-selection hint.                                                                  |
+| [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx)              | Shared `ConfirmDialog` wrapper for row removal.                                                                                                       |
+| [`MasterDetailValidationBanner`](./components/master-detail-validation-banner.client.tsx)      | Post-submit alert when unselected list rows have validation errors.                                                                                   |
+| [`buildEmbeddedMasterDetailListItem`](./lib/build-embedded-master-detail-list-item.ts)         | Builds a list row with derived system-lock badge and `deletable` flag.                                                                                |
+| [`isEmbeddedRowSystemLocked`](./lib/is-embedded-row-system-locked.ts)                          | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                |
+| [`FormEmbeddedMasterDetailEditor`](./components/form-embedded-master-detail-editor.client.tsx) | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form.                                                        |
 
 It is presentation-only over the parent form, so global save and validation are
-unchanged. The detail panel is caller-owned (typically `FormItems` for the
-selected row). Consumers: the classes **Features** tab, the species **Traits**
-tab, and the species **Heritage** tab (scalar header + master-detail over
-`heritage.options`).
+unchanged. Use `FormEmbeddedMasterDetailEditor` for the standard traits/features
+pattern, or compose the lower-level pieces when a tab needs extra chrome (e.g.
+species **Heritage** scalar header + `heritage.options`). Consumers: the classes
+**Features** tab, the species **Traits** tab, and the species **Heritage** tab
+(scalar header + master-detail over `heritage.options`).
 
 `useMasterDetailArray` resolves validation errors for nested dot paths (e.g.
 `heritage.options`) so error badges and auto-select work on inner lists.
