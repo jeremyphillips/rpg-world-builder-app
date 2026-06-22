@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { ClassFeaturesTab } from './class-features-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
@@ -15,13 +16,30 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
   }
 })
 
-function TabShell({ features = [] as Array<Record<string, unknown>> }) {
+type Feature = { id?: string; name: string; level: number; description: string; grants: never[] }
+
+function TabShell({
+  features = [] as Feature[],
+  entitySource,
+}: {
+  features?: Feature[]
+  entitySource?: ContentFormCtx['entitySource']
+}) {
   const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
-      <ClassFeaturesTab formCtx={{}} />
+      <ClassFeaturesTab formCtx={{ entitySource }} />
     </FormProvider>
   )
+}
+
+const rage: Feature = { id: 'f1', name: 'Rage', level: 1, description: '', grants: [] }
+const unarmored: Feature = {
+  id: 'f2',
+  name: 'Unarmored Defense',
+  level: 1,
+  description: '',
+  grants: [],
 }
 
 describe('ClassFeaturesTab', () => {
@@ -41,44 +59,46 @@ describe('ClassFeaturesTab', () => {
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
   })
 
-  it('seeds the list from existing features and selects the first', () => {
-    render(
-      <TabShell
-        features={[
-          { level: 1, name: 'Rage', description: '', grants: [] },
-          { level: 1, name: 'Unarmored Defense', description: '', grants: [] },
-        ]}
-      />,
-    )
-
-    expect(screen.getByRole('button', { name: 'Rage' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Unarmored Defense' })).toBeInTheDocument()
-    expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
+  it('renders a level eyebrow for each row', () => {
+    render(<TabShell features={[rage]} />)
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
   })
 
   it('selects another feature when its row is clicked', async () => {
     const user = userEvent.setup()
-    render(
-      <TabShell
-        features={[
-          { level: 1, name: 'Rage', description: '', grants: [] },
-          { level: 1, name: 'Unarmored Defense', description: '', grants: [] },
-        ]}
-      />,
-    )
+    render(<TabShell features={[rage, unarmored]} />)
 
-    await user.click(screen.getByRole('button', { name: 'Unarmored Defense' }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove).*Unarmored Defense/ }))
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.1')
   })
 
-  it('removes a feature and returns to the empty state', async () => {
+  it('confirms deletion through the dialog and removes the row', async () => {
     const user = userEvent.setup()
-    render(<TabShell features={[{ level: 1, name: 'Rage', description: '', grants: [] }]} />)
+    render(<TabShell features={[rage]} entitySource="homebrew" />)
 
     await user.click(screen.getByRole('button', { name: /Remove Rage/i }))
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete feature?')
+
+    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
       expect(screen.getByText(/No features yet/i)).toBeInTheDocument()
     })
+  })
+
+  it('locks system features on a system class (no remove control, System badge)', () => {
+    render(<TabShell features={[rage]} entitySource="system" />)
+
+    expect(screen.getByText('System')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Remove Rage/i })).not.toBeInTheDocument()
+  })
+
+  it('allows deleting newly added rows even on a system class', async () => {
+    const user = userEvent.setup()
+    render(<TabShell features={[rage]} entitySource="system" />)
+
+    await user.click(screen.getByRole('button', { name: /Add feature/i }))
+
+    expect(screen.getByRole('button', { name: /Remove Feature 2/i })).toBeInTheDocument()
   })
 })

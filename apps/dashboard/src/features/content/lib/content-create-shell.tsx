@@ -41,7 +41,12 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
       {(optionsCtx) => {
-        const ctx = { ...optionsCtx, campaignId, mode: 'create' as const }
+        const ctx = {
+          ...optionsCtx,
+          campaignId,
+          mode: 'create' as const,
+          entitySource: 'homebrew' as const,
+        }
         return (
           <ContentFormLayout
             def={def}

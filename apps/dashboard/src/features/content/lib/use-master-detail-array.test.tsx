@@ -12,19 +12,19 @@ function Wrapper({ children }: { children: ReactNode }) {
 
 const makeDefaults = () => ({ name: '' })
 
+function setup() {
+  return renderHook(() => useMasterDetailArray('features', makeDefaults), { wrapper: Wrapper })
+}
+
 describe('useMasterDetailArray', () => {
   it('starts empty with no selection', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+    const { result } = setup()
     expect(result.current.fields).toHaveLength(0)
     expect(result.current.selectedIndex).toBeNull()
   })
 
   it('appends a row and selects it', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+    const { result } = setup()
 
     act(() => result.current.handleAdd())
     expect(result.current.fields).toHaveLength(1)
@@ -36,9 +36,7 @@ describe('useMasterDetailArray', () => {
   })
 
   it('selects a given index', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+    const { result } = setup()
     act(() => result.current.handleAdd())
     act(() => result.current.handleAdd())
 
@@ -46,39 +44,49 @@ describe('useMasterDetailArray', () => {
     expect(result.current.selectedIndex).toBe(0)
   })
 
-  it('clamps selection when the selected row is removed', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+  it('opens and dismisses the delete-confirmation flow without removing', () => {
+    const { result } = setup()
+    act(() => result.current.handleAdd())
+
+    act(() => result.current.requestRemove(0))
+    expect(result.current.deleteIndex).toBe(0)
+
+    act(() => result.current.cancelRemove())
+    expect(result.current.deleteIndex).toBeNull()
+    expect(result.current.fields).toHaveLength(1)
+  })
+
+  it('clamps selection when the selected row is confirmed for removal', () => {
+    const { result } = setup()
     act(() => result.current.handleAdd())
     act(() => result.current.handleAdd())
     act(() => result.current.handleAdd())
     act(() => result.current.select(2))
 
-    act(() => result.current.handleRemove(2))
+    act(() => result.current.requestRemove(2))
+    act(() => result.current.confirmRemove())
     expect(result.current.fields).toHaveLength(2)
     expect(result.current.selectedIndex).toBe(1)
+    expect(result.current.deleteIndex).toBeNull()
   })
 
   it('shifts selection down when an earlier row is removed', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+    const { result } = setup()
     act(() => result.current.handleAdd())
     act(() => result.current.handleAdd())
     act(() => result.current.select(1))
 
-    act(() => result.current.handleRemove(0))
+    act(() => result.current.requestRemove(0))
+    act(() => result.current.confirmRemove())
     expect(result.current.selectedIndex).toBe(0)
   })
 
   it('clears selection when the last row is removed', () => {
-    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
-      wrapper: Wrapper,
-    })
+    const { result } = setup()
     act(() => result.current.handleAdd())
 
-    act(() => result.current.handleRemove(0))
+    act(() => result.current.requestRemove(0))
+    act(() => result.current.confirmRemove())
     expect(result.current.fields).toHaveLength(0)
     expect(result.current.selectedIndex).toBeNull()
   })

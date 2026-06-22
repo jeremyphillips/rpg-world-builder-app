@@ -2,7 +2,7 @@ import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 
-import type { WeaponCategory } from '@rpg/contracts'
+import type { ContentSource, WeaponCategory } from '@rpg/contracts'
 
 import type { ContentListQueryResult } from './content-client'
 import type { ContentFormOptionSets } from './content-form-options'
@@ -16,6 +16,13 @@ export type ContentFormCtx = {
   campaignId?: string
   entityId?: string
   mode?: 'create' | 'edit'
+  /**
+   * Ownership of the entity being authored: `'homebrew'` on create, the saved
+   * entity's `source` on edit. Lets embedded master-detail editors derive
+   * per-row delete-locking (system rows are protected) without a per-row
+   * `source` field on the embedded element.
+   */
+  entitySource?: ContentSource
   options?: Partial<ContentFormOptionSets>
 }
 
