@@ -31,7 +31,6 @@ const ELF_BODY = {
   heritage: {
     id: 'elven-lineage',
     name: 'Elven Lineage',
-    kind: 'lineage' as const,
     description: '<p>Your lineage shapes your connection to elven magic.</p>',
     options: [
       {

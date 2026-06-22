@@ -18,7 +18,7 @@ import {
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import {
-  addHeritageLabel,
+  ADD_HERITAGE_LABEL,
   heritageDefaultValues,
   heritageScalarFields,
   type HeritageForm,
@@ -33,6 +33,7 @@ import {
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
 const OPTION_NOUN = 'option'
+const ADD_OPTION_LABEL = 'Add option'
 
 export interface SpeciesHeritageTabProps {
   formCtx: ContentFormCtx
@@ -71,7 +72,7 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
           setValue(HERITAGE_FIELD_NAME, heritageDefaultValues(formCtx), { shouldDirty: true })
         }}
       >
-        {addHeritageLabel()}
+        {ADD_HERITAGE_LABEL}
       </Button>
     </div>
   )
@@ -138,12 +139,10 @@ function HeritageOptionEditorPanel({
 
 function HeritageOptionsSection({
   formCtx,
-  heritageKind,
   traitFields,
   editor,
 }: {
   formCtx: ContentFormCtx
-  heritageKind: HeritageForm['kind'] | undefined
   traitFields: FormItem[]
   editor: UseMasterDetailArrayResult
 }) {
@@ -177,7 +176,7 @@ function HeritageOptionsSection({
           items={items}
           selectedIndex={editor.selectedIndex}
           ariaLabel="Heritage options"
-          addLabel={`Add ${heritageKind ?? 'option'}`}
+          addLabel={ADD_OPTION_LABEL}
           emptyLabel="No options yet. Add one to get started."
           onAdd={editor.handleAdd}
           onSelect={editor.select}
@@ -225,19 +224,14 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
         heritage={heritage}
         onRemove={handleRemoveHeritage}
       />
-      <HeritageOptionsSection
-        formCtx={formCtx}
-        heritageKind={heritage?.kind}
-        traitFields={traitFields}
-        editor={editor}
-      />
+      <HeritageOptionsSection formCtx={formCtx} traitFields={traitFields} editor={editor} />
     </div>
   )
 }
 
 /**
- * Heritage tab: scalar name/kind/description at the top, master-detail over
- * `heritage.options` below. Empty state offers a single "Add lineage/ancestry"
+ * Heritage tab: scalar name/description at the top, master-detail over
+ * `heritage.options` below. Empty state offers a single "Add heritage"
  * control; once present, options use the same trait editor as the Traits tab.
  */
 export function SpeciesHeritageTab({ formCtx }: SpeciesHeritageTabProps) {

@@ -82,7 +82,7 @@ describe('speciesFormDef round-trips', () => {
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     expect(input.heritage?.id).toBe('draconic-ancestry')
-    expect(input.heritage?.kind).toBe('ancestry')
+    expect(input.heritage?.name).toBe('Draconic Ancestry')
     expect(input.heritage?.options.length).toBeGreaterThan(0)
   })
 

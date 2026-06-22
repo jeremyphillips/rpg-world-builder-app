@@ -19,7 +19,6 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
 type Heritage = {
   id?: string
   name: string
-  kind: 'lineage' | 'ancestry'
   description?: string
   options: Array<{
     id?: string
@@ -49,7 +48,6 @@ function TabShell({
 const draconicHeritage: Heritage = {
   id: 'hc1',
   name: 'Draconic Ancestry',
-  kind: 'ancestry',
   description: '',
   options: [{ id: 'o1', kind: 'custom', name: 'Breath Weapon', description: '', grants: [] }],
 }
@@ -58,14 +56,14 @@ describe('SpeciesHeritageTab', () => {
   it('shows the empty state when there is no heritage', () => {
     render(<TabShell />)
     expect(screen.getByText(/No lineage or ancestry yet/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Add lineage\/ancestry/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add heritage/i })).toBeInTheDocument()
   })
 
   it('adds heritage and shows scalar fields plus options master-detail', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
-    await user.click(screen.getByRole('button', { name: /Add lineage\/ancestry/i }))
+    await user.click(screen.getByRole('button', { name: /Add heritage/i }))
 
     await waitFor(() => {
       expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
@@ -76,7 +74,7 @@ describe('SpeciesHeritageTab', () => {
   it('renders heritage scalar fields and options list when pre-filled', () => {
     render(<TabShell heritage={draconicHeritage} />)
     expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
-    expect(screen.getByRole('button', { name: /Add ancestry/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add option/i })).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Move).*Breath Weapon/ }),
     ).toBeInTheDocument()
@@ -108,7 +106,7 @@ describe('SpeciesHeritageTab', () => {
     const user = userEvent.setup()
     render(<TabShell heritage={draconicHeritage} entitySource="system" />)
 
-    await user.click(screen.getByRole('button', { name: /Add ancestry/i }))
+    await user.click(screen.getByRole('button', { name: /Add option/i }))
 
     expect(screen.getByRole('button', { name: /Remove Trait 2/i })).toBeInTheDocument()
   })
@@ -128,7 +126,7 @@ describe('SpeciesHeritageTab', () => {
     const user = userEvent.setup()
     render(<TabShell heritage={draconicHeritage} />)
 
-    await user.click(screen.getByRole('button', { name: /Add ancestry/i }))
+    await user.click(screen.getByRole('button', { name: /Add option/i }))
 
     expect(screen.getByTestId('detail-heritage-options-1')).toHaveTextContent('heritage.options.1')
   })

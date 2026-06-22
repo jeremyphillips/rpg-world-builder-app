@@ -40,7 +40,6 @@ export const HomebrewWithHeritage: Story = {
       heritage={{
         id: 'hc1',
         name: 'Draconic Ancestry',
-        kind: 'ancestry',
         description: '<p>Choose your draconic heritage.</p>',
         options: [
           {
@@ -70,7 +69,6 @@ export const SystemSpeciesLockedHeritage: Story = {
       heritage={{
         id: 'hc1',
         name: 'Draconic Ancestry',
-        kind: 'ancestry',
         description: '',
         options: [
           { id: 'o1', kind: 'custom', name: 'Breath Weapon', description: '', grants: [] },
