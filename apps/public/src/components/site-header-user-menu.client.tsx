@@ -2,12 +2,19 @@
 
 import { ChevronDown } from 'lucide-react'
 
-import { CROSS_APP_PATHS, getAssetUrl, type SessionUser } from '@rpg/contracts'
+import {
+  CROSS_APP_PATHS,
+  crossAppCampaignDetailPath,
+  getAssetUrl,
+  type ActiveCampaign,
+  type SessionUser,
+} from '@rpg/contracts'
 import {
   Avatar,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@rpg/ui'
@@ -16,9 +23,10 @@ import { useLogout } from '@/features/auth'
 
 interface SiteHeaderUserMenuProps {
   user: SessionUser
+  activeCampaign: ActiveCampaign | null
 }
 
-export function SiteHeaderUserMenu({ user }: SiteHeaderUserMenuProps) {
+export function SiteHeaderUserMenu({ user, activeCampaign }: SiteHeaderUserMenuProps) {
   const logout = useLogout()
 
   return (
@@ -33,6 +41,15 @@ export function SiteHeaderUserMenu({ user }: SiteHeaderUserMenuProps) {
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        {activeCampaign ? (
+          <>
+            <DropdownMenuLabel>Active campaign</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <a href={crossAppCampaignDetailPath(activeCampaign.id)}>{activeCampaign.name}</a>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuItem asChild>
           <a href={CROSS_APP_PATHS.dashboard}>Dashboard</a>
         </DropdownMenuItem>

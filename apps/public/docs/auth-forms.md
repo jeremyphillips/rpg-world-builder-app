@@ -41,7 +41,8 @@ auth pages.
 
 - **`SiteHeaderNav`** — while the session query is pending, shows a neutral
   pulse skeleton; when unauthenticated, login/signup links; when authenticated,
-  an avatar dropdown (Dashboard, Profile, Account Settings, Sign out).
+  an avatar dropdown (active campaign when set, Dashboard, Profile, Account
+  Settings, Sign out).
 - **`AuthRedirect`** — wraps login/signup form content. While pending (or when
   already authenticated), shows the same skeleton; when `data.user` is present,
   assigns `CROSS_APP_PATHS.dashboard` so signed-in users cannot stay on

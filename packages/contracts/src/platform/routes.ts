@@ -12,3 +12,8 @@ export const CROSS_APP_PATHS = {
 } as const
 
 export type CrossAppPath = (typeof CROSS_APP_PATHS)[keyof typeof CROSS_APP_PATHS]
+
+/** Dashboard SPA campaign overview — full origin path (Vite base `/app/` + `/campaigns/:id`). */
+export function crossAppCampaignDetailPath(campaignId: string): string {
+  return `/app/campaigns/${campaignId}`
+}

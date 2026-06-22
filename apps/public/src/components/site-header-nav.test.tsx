@@ -52,7 +52,7 @@ describe('SiteHeaderNav', () => {
           role: 'user',
           lastSelectedCampaignId: null,
         },
-        activeCampaign: null,
+        activeCampaign: { id: 'c1', name: 'Sunless Citadel' },
       },
     })
 

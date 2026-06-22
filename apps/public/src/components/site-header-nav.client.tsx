@@ -19,7 +19,7 @@ export function SiteHeaderNav() {
   }
 
   if (user) {
-    return <SiteHeaderUserMenu user={user} />
+    return <SiteHeaderUserMenu user={user} activeCampaign={session.activeCampaign ?? null} />
   }
 
   return (

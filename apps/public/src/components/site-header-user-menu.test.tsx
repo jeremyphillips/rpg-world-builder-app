@@ -19,15 +19,40 @@ const user = {
 
 describe('SiteHeaderUserMenu', () => {
   it('has no axe violations when the menu is open', async () => {
-    const view = render(<SiteHeaderUserMenu user={user} />)
+    const view = render(
+      <SiteHeaderUserMenu user={user} activeCampaign={{ id: 'c1', name: 'Sunless Citadel' }} />,
+    )
     await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
 
     const { violations } = await axe.run(view.container)
     expect(violations).toHaveLength(0)
   })
 
+  it('shows the active campaign when one is set', async () => {
+    render(
+      <SiteHeaderUserMenu
+        user={user}
+        activeCampaign={{ id: 'c1', name: 'Sunless Citadel' }}
+      />,
+    )
+    await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
+
+    expect(screen.getByText('Active campaign')).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /sunless citadel/i })).toHaveAttribute(
+      'href',
+      '/app/campaigns/c1',
+    )
+  })
+
+  it('omits the active campaign block when none is set', async () => {
+    render(<SiteHeaderUserMenu user={user} activeCampaign={null} />)
+    await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
+
+    expect(screen.queryByText('Active campaign')).not.toBeInTheDocument()
+  })
+
   it('links to dashboard routes for navigation items', async () => {
-    render(<SiteHeaderUserMenu user={user} />)
+    render(<SiteHeaderUserMenu user={user} activeCampaign={null} />)
     await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
 
     expect(screen.getByRole('menuitem', { name: /dashboard/i })).toHaveAttribute('href', '/app/')

@@ -31,7 +31,21 @@ export const Default: Story = {
       email: 'dm@example.com',
       displayName: 'Dungeon Master',
       role: 'user',
-      lastSelectedCampaignId: null,
+      lastSelectedCampaignId: 'c1',
     },
+    activeCampaign: null,
+  },
+}
+
+export const WithActiveCampaign: Story = {
+  args: {
+    user: {
+      id: 'u1',
+      email: 'dm@example.com',
+      displayName: 'Dungeon Master',
+      role: 'user',
+      lastSelectedCampaignId: 'c1',
+    },
+    activeCampaign: { id: 'c1', name: 'Sunless Citadel' },
   },
 }
