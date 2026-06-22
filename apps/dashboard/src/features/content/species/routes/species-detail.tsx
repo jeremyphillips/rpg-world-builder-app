@@ -8,7 +8,7 @@ import {
   getTraitGrants,
   resolveTraitDisplay,
 } from '@rpg/contracts'
-import type { Species, SpeciesTrait, SpeciesHeritageChoice } from '@rpg/contracts'
+import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSpecies } from '../hooks/use-species'
@@ -62,22 +62,22 @@ function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
   )
 }
 
-function HeritageChoiceSection({ choice }: { choice: SpeciesHeritageChoice }) {
+function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
   return (
-    <section aria-labelledby={`heritage-choice-${choice.id}-heading`}>
+    <section aria-labelledby={`heritage-${heritage.id}-heading`}>
       <Heading
         variant="section"
         as="h3"
-        id={`heritage-choice-${choice.id}-heading`}
+        id={`heritage-${heritage.id}-heading`}
         className="mb-2 capitalize"
       >
-        {choice.name}
+        {heritage.name}
       </Heading>
-      {choice.description && (
-        <RichTextContent html={choice.description} size="sm" tone="muted" className="mb-4" />
+      {heritage.description && (
+        <RichTextContent html={heritage.description} size="sm" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
-        {choice.options.map((option) => {
+        {heritage.options.map((option) => {
           const display = resolveTraitDisplay(option)
           return (
             <li key={option.id} className="space-y-1">
@@ -92,17 +92,6 @@ function HeritageChoiceSection({ choice }: { choice: SpeciesHeritageChoice }) {
         })}
       </ul>
     </section>
-  )
-}
-
-function HeritageChoicesList({ choices }: { choices: SpeciesHeritageChoice[] }) {
-  if (choices.length === 0) return null
-  return (
-    <div className="space-y-8">
-      {choices.map((choice) => (
-        <HeritageChoiceSection key={choice.id} choice={choice} />
-      ))}
-    </div>
   )
 }
 
@@ -146,7 +135,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         )}
       </div>
       <TraitsList traits={species.traits} />
-      <HeritageChoicesList choices={species.heritageChoices ?? []} />
+      {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
     </ContentDetailLayout>
   )
 }

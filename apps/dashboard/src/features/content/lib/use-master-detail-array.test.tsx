@@ -55,13 +55,12 @@ describe('findFirstInvalidRowIndex', () => {
 
   it('returns the first invalid index for nested dot paths', () => {
     const errors = {
-      heritageChoices: [
-        undefined,
-        { options: [undefined, { name: { message: 'Required', type: 'required' } }] },
-      ],
+      heritage: {
+        options: [undefined, { name: { message: 'Required', type: 'required' } }],
+      },
     } as unknown as FieldErrors
 
-    expect(findFirstInvalidRowIndex(errors, 'heritageChoices.1.options')).toBe(1)
+    expect(findFirstInvalidRowIndex(errors, 'heritage.options')).toBe(1)
   })
 })
 
@@ -264,7 +263,7 @@ describe('useMasterDetailArray', () => {
 
   it('reports row validation errors for nested dot paths via hasRowError', () => {
     type HeritageForm = {
-      heritageChoices: Array<{ options: FeatureRow[] }>
+      heritage: { options: FeatureRow[] }
     }
 
     let formRef: UseFormReturn<HeritageForm> | null = null
@@ -272,21 +271,20 @@ describe('useMasterDetailArray', () => {
     function NestedWrapper({ children }: { children: ReactNode }) {
       const form = useForm<HeritageForm>({
         defaultValues: {
-          heritageChoices: [{ options: [{ name: 'A' }, { name: '' }] }],
+          heritage: { options: [{ name: 'A' }, { name: '' }] },
         },
       })
       formRef = form
       return <FormProvider {...form}>{children}</FormProvider>
     }
 
-    const { result } = renderHook(
-      () => useMasterDetailArray('heritageChoices.0.options', makeDefaults),
-      { wrapper: NestedWrapper },
-    )
+    const { result } = renderHook(() => useMasterDetailArray('heritage.options', makeDefaults), {
+      wrapper: NestedWrapper,
+    })
 
     act(() => {
       if (!formRef) throw new Error('Form not initialized')
-      formRef.setError('heritageChoices.0.options.1.name', {
+      formRef.setError('heritage.options.1.name', {
         type: 'required',
         message: 'Required',
       })

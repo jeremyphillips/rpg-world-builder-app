@@ -21,8 +21,8 @@ import {
 // ---------------------------------------------------------------------------
 // Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
 // trait descriptions (HTML strings), while mechanical bits live in shared
-// `grants`. Lineages/ancestries are embedded `heritageChoices` (one record per
-// species), not a separate content type.
+// `grants`. Lineages/ancestries are embedded as optional `heritage` on the
+// species body, not a separate content type.
 // ---------------------------------------------------------------------------
 
 // Re-export shared grant types for backward compatibility.
@@ -60,7 +60,7 @@ export const SPECIES_CHOICE_KIND_LABELS: Record<SpeciesChoiceKind, string> = {
   ancestry: 'Ancestry',
 }
 
-/** Returns the display label for a heritage-choice kind. Falls back to the raw value. */
+/** Returns the display label for a heritage kind. Falls back to the raw value. */
 export function getSpeciesChoiceKindLabel(kind: string): string {
   return SPECIES_CHOICE_KIND_LABELS[kind as SpeciesChoiceKind] ?? kind
 }
@@ -69,7 +69,7 @@ export function getSpeciesChoiceKindLabel(kind: string): string {
  * A player choice made at character creation (e.g. Elven Lineage, Draconic
  * Ancestry). Each option is a trait — prose plus the grants that option confers.
  */
-export const speciesHeritageChoiceSchema = z.object({
+export const speciesHeritageSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   kind: speciesChoiceKindSchema,
@@ -77,7 +77,7 @@ export const speciesHeritageChoiceSchema = z.object({
   options: z.array(speciesTraitSchema).min(1),
 })
 
-export type SpeciesHeritageChoice = z.infer<typeof speciesHeritageChoiceSchema>
+export type SpeciesHeritage = z.infer<typeof speciesHeritageSchema>
 
 // --- Species — editable body + stored shape ---------------------------------
 
@@ -88,7 +88,7 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   sizes: z.array(creatureSizeSchema).min(1),
   speed: speedSchema,
   traits: z.array(speciesTraitSchema),
-  heritageChoices: z.array(speciesHeritageChoiceSchema).optional(),
+  heritage: speciesHeritageSchema.optional(),
 })
 
 export type SpeciesBody = z.infer<typeof speciesBodySchema>

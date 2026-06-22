@@ -47,24 +47,20 @@ describe('applyStableNestedContentKeys', () => {
     ).toThrow(ContentKeyError)
   })
 
-  it('assigns stable ids to nested heritage choice options', () => {
+  it('assigns stable ids to nested heritage options', () => {
     const body = applyStableNestedContentKeys({
-      heritageChoices: [
-        {
-          name: 'Draconic Ancestry',
-          kind: 'ancestry',
-          options: [{ name: 'Black Dragon' }],
-        },
-      ],
-    })
-
-    expect(body.heritageChoices).toEqual([
-      {
+      heritage: {
         name: 'Draconic Ancestry',
         kind: 'ancestry',
-        id: 'draconic-ancestry',
-        options: [{ name: 'Black Dragon', id: 'black-dragon' }],
+        options: [{ name: 'Black Dragon' }],
       },
-    ])
+    })
+
+    expect(body.heritage).toEqual({
+      name: 'Draconic Ancestry',
+      kind: 'ancestry',
+      id: 'draconic-ancestry',
+      options: [{ name: 'Black Dragon', id: 'black-dragon' }],
+    })
   })
 })

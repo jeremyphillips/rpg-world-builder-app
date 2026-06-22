@@ -18,9 +18,9 @@ function expectSpeciesRichTextDescriptions(entry: SeedSpecies): void {
   for (const trait of entry.traits) {
     expectRichTextHtml(traitDescriptionHtml(trait))
   }
-  for (const group of entry.heritageChoices ?? []) {
-    expectRichTextHtml(group.description)
-    for (const option of group.options) {
+  if (entry.heritage) {
+    expectRichTextHtml(entry.heritage.description)
+    for (const option of entry.heritage.options) {
       expectRichTextHtml(traitDescriptionHtml(option))
     }
   }
@@ -71,29 +71,25 @@ describe('SRD 5.2.1 species seed', () => {
   it('Dragonborn has 10 draconic ancestry options with damageType and resistances grants', () => {
     const dragonborn = species.find((s) => s.slug === 'dragonborn')
     expect(dragonborn).toBeDefined()
-    const ancestry = dragonborn!.heritageChoices?.find((g) => g.id === 'draconic-ancestry')
-    expect(ancestry).toBeDefined()
-    expect(ancestry!.options).toHaveLength(10)
-    for (const option of ancestry!.options) {
+    expect(dragonborn!.heritage?.id).toBe('draconic-ancestry')
+    expect(dragonborn!.heritage!.options).toHaveLength(10)
+    for (const option of dragonborn!.heritage!.options) {
       expect(option.grants?.damageType?.length).toBeGreaterThanOrEqual(1)
       expect(option.grants?.resistances?.length).toBeGreaterThanOrEqual(1)
     }
   })
 
-  it('Elf has an elven-lineage heritage choice with 3 options', () => {
+  it('Elf has elven-lineage heritage with 3 options', () => {
     const elf = species.find((s) => s.slug === 'elf')
     expect(elf).toBeDefined()
-    const lineage = elf!.heritageChoices?.find((g) => g.id === 'elven-lineage')
-    expect(lineage).toBeDefined()
-    expect(lineage!.kind).toBe('lineage')
-    expect(lineage!.options).toHaveLength(3)
+    expect(elf!.heritage?.id).toBe('elven-lineage')
+    expect(elf!.heritage!.kind).toBe('lineage')
+    expect(elf!.heritage!.options).toHaveLength(3)
   })
 
   it('Drow lineage grants darkvision 120 and innate spells', () => {
     const elf = species.find((s) => s.slug === 'elf')!
-    const drow = elf
-      .heritageChoices!.find((g) => g.id === 'elven-lineage')!
-      .options.find((o) => o.id === 'drow')!
+    const drow = elf.heritage!.options.find((o) => o.id === 'drow')!
     expect(getTraitGrants(drow)?.senses?.[0]).toEqual({ type: 'darkvision', range: 120 })
     expect(getTraitGrants(drow)?.innateSpells?.entries.length).toBeGreaterThanOrEqual(3)
   })
@@ -109,24 +105,21 @@ describe('SRD 5.2.1 species seed', () => {
 
   it('Wood Elf grants a speed override of walk 35', () => {
     const elf = species.find((s) => s.slug === 'elf')!
-    const woodElf = elf
-      .heritageChoices!.find((g) => g.id === 'elven-lineage')!
-      .options.find((o) => o.id === 'wood-elf')!
+    const woodElf = elf.heritage!.options.find((o) => o.id === 'wood-elf')!
     expect(woodElf.grants?.speedOverride?.walk).toBe(35)
   })
 
-  it('Tiefling has a fiendish-legacy lineage heritage choice with 3 options', () => {
+  it('Tiefling has fiendish-legacy heritage with 3 options', () => {
     const tiefling = species.find((s) => s.slug === 'tiefling')
     expect(tiefling).toBeDefined()
-    const legacy = tiefling!.heritageChoices?.find((g) => g.id === 'fiendish-legacy')
-    expect(legacy).toBeDefined()
-    expect(legacy!.kind).toBe('lineage')
-    expect(legacy!.options).toHaveLength(3)
+    expect(tiefling!.heritage?.id).toBe('fiendish-legacy')
+    expect(tiefling!.heritage!.kind).toBe('lineage')
+    expect(tiefling!.heritage!.options).toHaveLength(3)
   })
 
   it('Tiefling fiendish legacy options each grant a resistance and innate spells', () => {
     const tiefling = species.find((s) => s.slug === 'tiefling')!
-    const options = tiefling.heritageChoices!.find((g) => g.id === 'fiendish-legacy')!.options
+    const options = tiefling.heritage!.options
     for (const option of options) {
       expect(option.grants?.resistances?.length).toBeGreaterThanOrEqual(1)
       expect(option.grants?.innateSpells?.entries.length).toBeGreaterThanOrEqual(3)
