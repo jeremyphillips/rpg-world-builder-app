@@ -83,7 +83,6 @@ describe('SRD 5.2.1 species seed', () => {
     const elf = species.find((s) => s.slug === 'elf')
     expect(elf).toBeDefined()
     expect(elf!.heritage?.id).toBe('elven-lineage')
-    expect(elf!.heritage!.kind).toBe('lineage')
     expect(elf!.heritage!.options).toHaveLength(3)
   })
 
@@ -113,7 +112,6 @@ describe('SRD 5.2.1 species seed', () => {
     const tiefling = species.find((s) => s.slug === 'tiefling')
     expect(tiefling).toBeDefined()
     expect(tiefling!.heritage?.id).toBe('fiendish-legacy')
-    expect(tiefling!.heritage!.kind).toBe('lineage')
     expect(tiefling!.heritage!.options).toHaveLength(3)
   })
 

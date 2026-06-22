@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { distanceSchema } from '../../primitives/units'
-
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -38,7 +36,10 @@ const spellRangeSightSchema = z.object({ kind: z.literal('sight') })
 const spellRangeUnlimitedSchema = z.object({ kind: z.literal('unlimited') })
 const spellRangeDistanceSchema = z.object({
   kind: z.literal('distance'),
-  value: distanceSchema,
+  value: z.object({
+    value: z.number().min(0),
+    unit: z.literal('ft'),
+  }),
 })
 const spellRangeSpecialSchema = z.object({
   kind: z.literal('special'),

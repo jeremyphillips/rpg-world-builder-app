@@ -51,14 +51,12 @@ describe('applyStableNestedContentKeys', () => {
     const body = applyStableNestedContentKeys({
       heritage: {
         name: 'Draconic Ancestry',
-        kind: 'ancestry',
         options: [{ name: 'Black Dragon' }],
       },
     })
 
     expect(body.heritage).toEqual({
       name: 'Draconic Ancestry',
-      kind: 'ancestry',
       id: 'draconic-ancestry',
       options: [{ name: 'Black Dragon', id: 'black-dragon' }],
     })
@@ -69,7 +67,6 @@ describe('applyStableNestedContentKeys', () => {
       heritage: {
         id: 'draconic-ancestry',
         name: 'Draconic Ancestry',
-        kind: 'ancestry',
         options: [{ id: 'black-dragon', name: 'Black Dragon' }],
       },
     }
@@ -78,7 +75,6 @@ describe('applyStableNestedContentKeys', () => {
         heritage: {
           id: 'draconic-ancestry',
           name: 'Draconic Legacy',
-          kind: 'ancestry',
           options: [{ id: 'black-dragon', name: 'Black Dragon' }],
         },
       },
@@ -88,7 +84,6 @@ describe('applyStableNestedContentKeys', () => {
     expect(body.heritage).toEqual({
       id: 'draconic-ancestry',
       name: 'Draconic Legacy',
-      kind: 'ancestry',
       options: [{ id: 'black-dragon', name: 'Black Dragon' }],
     })
   })

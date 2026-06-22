@@ -48,31 +48,14 @@ export type {
 export const speciesTraitSchema = contentTraitSchema
 export type SpeciesTrait = z.infer<typeof contentTraitSchema>
 
-/** The kinds of level-1 choice a species can present. */
-export const SPECIES_CHOICE_KINDS = ['lineage', 'ancestry'] as const
-
-export const speciesChoiceKindSchema = z.enum(SPECIES_CHOICE_KINDS)
-
-export type SpeciesChoiceKind = (typeof SPECIES_CHOICE_KINDS)[number]
-
-export const SPECIES_CHOICE_KIND_LABELS: Record<SpeciesChoiceKind, string> = {
-  lineage: 'Lineage',
-  ancestry: 'Ancestry',
-}
-
-/** Returns the display label for a heritage kind. Falls back to the raw value. */
-export function getSpeciesChoiceKindLabel(kind: string): string {
-  return SPECIES_CHOICE_KIND_LABELS[kind as SpeciesChoiceKind] ?? kind
-}
-
 /**
  * A player choice made at character creation (e.g. Elven Lineage, Draconic
  * Ancestry). Each option is a trait — prose plus the grants that option confers.
+ * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
 export const speciesHeritageSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  kind: speciesChoiceKindSchema,
   description: z.string().optional(),
   options: z.array(speciesTraitSchema).min(1),
 })

@@ -16,7 +16,7 @@ Add a new content type when the domain entity:
 
 If the entity is always embedded inside another (e.g. class features, spell components), model it as a nested schema on the parent type instead.
 
-When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as optional **heritage** on the parent body rather than a separate content type. See `content/species.ts` (`heritage` with `contentTraitSchema` options and optional `grants`).
+When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as optional **heritage** on the parent body rather than a separate content type. See `content/species.ts` — `{ id, name, description?, options }` where `name` carries lineage/ancestry wording (e.g. "Draconic Ancestry", "Elven Lineage") and `options` are `contentTraitSchema` rows with optional `grants`.
 
 ---
 

@@ -1,6 +1,13 @@
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { FormProvider, useForm, type FieldErrors, type UseFormReturn } from 'react-hook-form'
+import { useEffect } from 'react'
+import {
+  FormProvider,
+  useForm,
+  type FieldErrors,
+  type FieldValues,
+  type UseFormReturn,
+} from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -11,20 +18,22 @@ import {
 
 type FeatureRow = { name: string }
 
-function createFormWrapper(defaultValues: { features: FeatureRow[] }) {
-  let formRef: UseFormReturn<{ features: FeatureRow[] }> | null = null
+function createFormWrapper<T extends FieldValues>(defaultValues: T) {
+  const holder: { form?: UseFormReturn<T> } = {}
 
   function Wrapper({ children }: { children: ReactNode }) {
-    const form = useForm({ defaultValues })
-    formRef = form
+    const form = useForm<T>({ defaultValues })
+    useEffect(() => {
+      holder.form = form
+    }, [form])
     return <FormProvider {...form}>{children}</FormProvider>
   }
 
   return {
     Wrapper,
     getForm: () => {
-      if (!formRef) throw new Error('Form not initialized')
-      return formRef
+      if (!holder.form) throw new Error('Form not initialized')
+      return holder.form
     },
   }
 }
@@ -266,25 +275,16 @@ describe('useMasterDetailArray', () => {
       heritage: { options: FeatureRow[] }
     }
 
-    let formRef: UseFormReturn<HeritageForm> | null = null
-
-    function NestedWrapper({ children }: { children: ReactNode }) {
-      const form = useForm<HeritageForm>({
-        defaultValues: {
-          heritage: { options: [{ name: 'A' }, { name: '' }] },
-        },
-      })
-      formRef = form
-      return <FormProvider {...form}>{children}</FormProvider>
-    }
+    const { Wrapper, getForm } = createFormWrapper<HeritageForm>({
+      heritage: { options: [{ name: 'A' }, { name: '' }] },
+    })
 
     const { result } = renderHook(() => useMasterDetailArray('heritage.options', makeDefaults), {
-      wrapper: NestedWrapper,
+      wrapper: Wrapper,
     })
 
     act(() => {
-      if (!formRef) throw new Error('Form not initialized')
-      formRef.setError('heritage.options.1.name', {
+      getForm().setError('heritage.options.1.name', {
         type: 'required',
         message: 'Required',
       })

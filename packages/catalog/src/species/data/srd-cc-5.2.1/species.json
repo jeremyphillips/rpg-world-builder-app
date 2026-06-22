@@ -49,7 +49,6 @@
     "heritage": {
       "id": "draconic-ancestry",
       "name": "Draconic Ancestry",
-      "kind": "ancestry",
       "description": "<p>Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance.</p>",
       "options": [
         {
@@ -254,7 +253,6 @@
     "heritage": {
       "id": "elven-lineage",
       "name": "Elven Lineage",
-      "kind": "lineage",
       "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose a lineage. You gain the level 1 benefit of that lineage. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the lineage).</p>",
       "options": [
         {
@@ -385,7 +383,6 @@
     "heritage": {
       "id": "gnomish-lineage",
       "name": "Gnomish Lineage",
-      "kind": "lineage",
       "description": "<p>You are part of a lineage that grants you supernatural abilities. Choose one of the following options. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage).</p>",
       "options": [
         {
@@ -463,7 +460,6 @@
     "heritage": {
       "id": "giant-ancestry",
       "name": "Giant Ancestry",
-      "kind": "ancestry",
       "description": "<p>You are descended from Giants. Choose one of the following benefits—a supernatural boon from your ancestry; you can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.</p>",
       "options": [
         {
@@ -680,7 +676,6 @@
     "heritage": {
       "id": "fiendish-legacy",
       "name": "Fiendish Legacy",
-      "kind": "lineage",
       "description": "<p>You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell—you always have it prepared, and you can cast it once without a spell slot (regained on a Long Rest). Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose when you select the legacy).</p>",
       "options": [
         {

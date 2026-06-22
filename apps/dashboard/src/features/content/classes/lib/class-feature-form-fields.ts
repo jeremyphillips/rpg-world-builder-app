@@ -31,6 +31,21 @@ export const featureRowFormSchema = z.object({
 
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 
+export function featureItemTitle(
+  row: Pick<FeatureRowForm, 'name'> | undefined,
+  index: number,
+): string {
+  return (typeof row?.name === 'string' && row.name.trim()) || `Feature ${index + 1}`
+}
+
+export function featureItemEyebrow(
+  row: { level?: number | string } | undefined,
+): string | undefined {
+  const level = row?.level
+  if (level === undefined || level === null || level === '') return undefined
+  return `Level ${level}`
+}
+
 export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
