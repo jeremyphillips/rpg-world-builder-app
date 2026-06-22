@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import {
   FormProvider,
   useForm,
+  type DefaultValues,
   type FieldErrors,
   type FieldValues,
   type UseFormReturn,
@@ -18,8 +19,8 @@ import {
 
 type FeatureRow = { name: string }
 
-function createFormWrapper<T extends FieldValues>(defaultValues: T) {
-  const holder: { form?: UseFormReturn<T> } = {}
+function createFormWrapper<T extends FieldValues>(defaultValues: DefaultValues<T>) {
+  const holder: { form?: UseFormReturn<T, unknown, T> } = {}
 
   function Wrapper({ children }: { children: ReactNode }) {
     const form = useForm<T>({ defaultValues })
