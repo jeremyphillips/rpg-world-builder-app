@@ -8,7 +8,8 @@ import { useCampaigns } from './use-campaigns'
  * co-owner membership (matches API content write guards).
  */
 export function useCanManageCampaign(campaignId: string | undefined): boolean {
-  const { data: user } = useSession()
+  const { data: session } = useSession()
+  const user = session?.user
   const { data: campaigns } = useCampaigns()
 
   if (!campaignId || !user) return false

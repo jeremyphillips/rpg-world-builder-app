@@ -16,6 +16,7 @@
     "@rpg/api-client": "workspace:*",
     "@rpg/contracts": "workspace:*",
     "@rpg/ui": "workspace:*",
+    "@tanstack/react-query": "^5.101.0",
     "next": "^16.2.7",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

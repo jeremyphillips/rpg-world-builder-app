@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import type { CampaignListItem, SessionUser } from '@rpg/contracts'
+import type { AuthMeResponse, CampaignListItem, SessionUser } from '@rpg/contracts'
 
 import { makeQueryWrapper } from '@/test/make-wrapper'
 
@@ -13,6 +13,10 @@ import { useCanManageCampaign } from './use-can-manage-campaign'
 
 const useSession = vi.mocked(useSessionFn)
 const listCampaigns = vi.mocked(listCampaignsFn)
+
+function authMe(user: SessionUser): AuthMeResponse {
+  return { user, activeCampaign: null }
+}
 
 function makeUser(overrides?: Partial<SessionUser>): SessionUser {
   return {
@@ -50,7 +54,7 @@ describe('useCanManageCampaign', () => {
   })
 
   it('returns false when no campaignId is provided', async () => {
-    useSession.mockReturnValue({ data: makeUser() } as ReturnType<typeof useSessionFn>)
+    useSession.mockReturnValue({ data: authMe(makeUser()) } as ReturnType<typeof useSessionFn>)
     listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
 
     const { result } = renderHook(() => useCanManageCampaign(undefined), {
@@ -72,7 +76,9 @@ describe('useCanManageCampaign', () => {
   })
 
   it('returns false when the user is a player', async () => {
-    useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
+    useSession.mockReturnValue({ data: authMe(makeUser({ id: 'u1' })) } as ReturnType<
+      typeof useSessionFn
+    >)
     listCampaigns.mockResolvedValue([makeCampaign('c1', 'pc')])
 
     const { result } = renderHook(() => useCanManageCampaign('c1'), {
@@ -83,7 +89,9 @@ describe('useCanManageCampaign', () => {
   })
 
   it('returns true when the user is the campaign owner', async () => {
-    useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
+    useSession.mockReturnValue({ data: authMe(makeUser({ id: 'u1' })) } as ReturnType<
+      typeof useSessionFn
+    >)
     listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
 
     const { result } = renderHook(() => useCanManageCampaign('c1'), {
@@ -94,7 +102,9 @@ describe('useCanManageCampaign', () => {
   })
 
   it('returns true when the user is a co-owner', async () => {
-    useSession.mockReturnValue({ data: makeUser({ id: 'u2' }) } as ReturnType<typeof useSessionFn>)
+    useSession.mockReturnValue({ data: authMe(makeUser({ id: 'u2' })) } as ReturnType<
+      typeof useSessionFn
+    >)
     listCampaigns.mockResolvedValue([makeCampaign('c1', 'co-owner')])
 
     const { result } = renderHook(() => useCanManageCampaign('c1'), {
@@ -105,7 +115,9 @@ describe('useCanManageCampaign', () => {
   })
 
   it('returns false when the campaignId matches no campaign in the list', async () => {
-    useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
+    useSession.mockReturnValue({ data: authMe(makeUser({ id: 'u1' })) } as ReturnType<
+      typeof useSessionFn
+    >)
     listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
 
     const { result } = renderHook(() => useCanManageCampaign('c-unknown'), {

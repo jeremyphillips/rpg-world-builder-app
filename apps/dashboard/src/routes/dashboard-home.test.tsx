@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
-import type { CampaignListItem, SessionUser } from '@rpg/contracts'
+import type { AuthMeResponse, CampaignListItem, SessionUser } from '@rpg/contracts'
 
 vi.mock('@/features/auth/api/auth-client')
 vi.mock('@/features/campaign/api/campaign-client')
@@ -21,6 +21,8 @@ const user: SessionUser = {
   role: 'user',
   lastSelectedCampaignId: null,
 }
+
+const authSession: AuthMeResponse = { user, activeCampaign: null }
 
 function campaign(id: string, name: string): CampaignListItem {
   return {
@@ -53,7 +55,7 @@ describe('DashboardHome', () => {
     fetchSession.mockReset()
     listCampaigns.mockReset()
     localStorage.clear()
-    fetchSession.mockResolvedValue(user)
+    fetchSession.mockResolvedValue(authSession)
   })
 
   afterEach(() => {

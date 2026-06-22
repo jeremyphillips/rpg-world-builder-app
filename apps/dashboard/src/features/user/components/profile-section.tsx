@@ -12,11 +12,12 @@ import { accountFormSchema, accountFields, type AccountFormValues } from '../lib
 
 export function ProfileSection() {
   const { data: session } = useSession()
+  const user = session?.user
   const { mutateAsync, isPending, isSuccess } = useUpdateProfile()
 
   const avatarField = useExistingImageField({
     fieldName: 'avatar',
-    currentKey: session?.avatarKey,
+    currentKey: user?.avatarKey,
     label: 'Current avatar',
     uploadErrorMessage: 'Could not upload avatar.',
   })
@@ -46,13 +47,13 @@ export function ProfileSection() {
       </div>
       {/* key forces a remount once the session loads so RHF initialises with the correct defaults */}
       <Form<AccountFormValues>
-        key={session?.id ?? 'loading'}
+        key={user?.id ?? 'loading'}
         schema={accountFormSchema}
         fields={accountFields}
         fileFieldProps={avatarField.fileFieldProps}
         defaultValues={
-          session
-            ? ({ displayName: session.displayName, email: session.email } as Partial<
+          user
+            ? ({ displayName: user.displayName, email: user.email } as Partial<
                 z.infer<typeof accountFormSchema>
               >)
             : undefined

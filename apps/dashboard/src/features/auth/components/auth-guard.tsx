@@ -14,7 +14,8 @@ function FullScreenCenter({ children }: { children: React.ReactNode }) {
  * session error) it redirects to the public app's `/login` (same origin).
  */
 export function AuthGuard() {
-  const { data: user, isPending, isError } = useSession()
+  const { data: session, isPending, isError } = useSession()
+  const user = session?.user
 
   useEffect(() => {
     if (isError) {

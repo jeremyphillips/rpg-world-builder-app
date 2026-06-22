@@ -9,7 +9,8 @@ import { useLandingRedirect } from './use-landing-redirect'
 
 export function DashboardHome() {
   const redirecting = useLandingRedirect()
-  const { data: user } = useSession()
+  const { data: session } = useSession()
+  const user = session?.user
   const { data: campaigns } = useCampaigns()
   const selectCampaign = useSelectCampaign()
 

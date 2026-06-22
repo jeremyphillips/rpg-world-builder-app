@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import type { SessionUser } from '@rpg/contracts'
 
 import { sessionQueryKey } from '@/features/auth'
 
@@ -33,8 +32,8 @@ export function useSelectCampaign() {
 
   const { mutate } = useMutation({
     mutationFn: rememberSelectedCampaign,
-    onSuccess: (user: SessionUser) => {
-      queryClient.setQueryData(sessionQueryKey, user)
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: sessionQueryKey })
     },
   })
 

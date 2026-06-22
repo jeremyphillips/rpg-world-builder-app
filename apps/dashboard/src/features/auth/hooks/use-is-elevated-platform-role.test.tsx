@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import type { SessionUser } from '@rpg/contracts'
+import type { AuthMeResponse, SessionUser } from '@rpg/contracts'
 
 import { makeQueryWrapper } from '@/test/make-wrapper'
 
@@ -10,6 +10,10 @@ import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
 import { useIsElevatedPlatformRole } from './use-is-elevated-platform-role'
 
 const fetchSession = vi.mocked(fetchSessionFn)
+
+function authMe(user: SessionUser): AuthMeResponse {
+  return { user, activeCampaign: null }
+}
 
 function makeUser(role: SessionUser['role']): SessionUser {
   return {
@@ -37,7 +41,7 @@ describe('useIsElevatedPlatformRole', () => {
   })
 
   it('returns false for a standard user role', async () => {
-    fetchSession.mockResolvedValue(makeUser('user'))
+    fetchSession.mockResolvedValue(authMe(makeUser('user')))
 
     const { result } = renderHook(() => useIsElevatedPlatformRole(), {
       wrapper: makeQueryWrapper(),
@@ -47,7 +51,7 @@ describe('useIsElevatedPlatformRole', () => {
   })
 
   it.each(['admin', 'superadmin'] as const)('returns true for %s role', async (role) => {
-    fetchSession.mockResolvedValue(makeUser(role))
+    fetchSession.mockResolvedValue(authMe(makeUser(role)))
 
     const { result } = renderHook(() => useIsElevatedPlatformRole(), {
       wrapper: makeQueryWrapper(),

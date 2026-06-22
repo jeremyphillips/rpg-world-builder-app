@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 // TODO: install axe-core in apps/dashboard (it lives in packages/ui only)
 // import axe from 'axe-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { SessionUser } from '@rpg/contracts'
+import type { AuthMeResponse, SessionUser } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
 
@@ -20,7 +20,8 @@ const useSession = vi.mocked(useSessionFn)
 const updateProfile = vi.mocked(updateProfileFn)
 
 function mockSession(data: SessionUser) {
-  useSession.mockReturnValue({ data } as ReturnType<typeof useSessionFn>)
+  const session: AuthMeResponse = { user: data, activeCampaign: null }
+  useSession.mockReturnValue({ data: session } as ReturnType<typeof useSessionFn>)
 }
 
 const session: SessionUser = {

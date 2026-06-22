@@ -1,2 +1,4 @@
 export { LoginForm } from './components/login-form'
 export { SignupForm } from './components/signup-form'
+export { useSession, sessionQueryKey } from './hooks/use-session'
+export { useLogout } from './hooks/use-logout'
