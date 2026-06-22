@@ -14,7 +14,7 @@ import {
 } from '../../components/master-detail-list-panel.client'
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
-import { isSpeciesRowSystemLocked } from '../lib/species-master-detail-helpers'
+import { isEmbeddedRowSystemLocked } from '../../lib/is-embedded-row-system-locked'
 import {
   traitItemFields,
   traitItemTitle,
@@ -51,7 +51,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
 
   const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
     const row = watched?.[index]
-    const locked = isSpeciesRowSystemLocked(row, formCtx.entitySource)
+    const locked = isEmbeddedRowSystemLocked(row, formCtx.entitySource)
     return {
       id: field.id,
       title: traitItemTitle(row ?? {}, index),

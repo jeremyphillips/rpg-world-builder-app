@@ -26,7 +26,7 @@ import {
   heritageScalarFields,
   type HeritageForm,
 } from '../lib/species-heritage-form-fields'
-import { isSpeciesRowSystemLocked } from '../lib/species-master-detail-helpers'
+import { isEmbeddedRowSystemLocked } from '../../lib/is-embedded-row-system-locked'
 import {
   traitItemFields,
   traitItemTitle,
@@ -47,7 +47,7 @@ function heritageOptionListItem(
   entitySource: ContentFormCtx['entitySource'],
   hasRowError: (index: number) => boolean,
 ): MasterDetailListItem {
-  const locked = isSpeciesRowSystemLocked(row, entitySource)
+  const locked = isEmbeddedRowSystemLocked(row, entitySource)
   return {
     id: field.id,
     title: traitItemTitle(row ?? {}, index),
@@ -89,7 +89,7 @@ function HeritageScalarSection({
   onRemove: () => void
 }) {
   const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
-  const heritageLocked = isSpeciesRowSystemLocked(heritage, formCtx.entitySource)
+  const heritageLocked = isEmbeddedRowSystemLocked(heritage, formCtx.entitySource)
 
   return (
     <div className="space-y-3">

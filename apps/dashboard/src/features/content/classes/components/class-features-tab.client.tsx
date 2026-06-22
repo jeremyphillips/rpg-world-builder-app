@@ -14,6 +14,7 @@ import {
 } from '../../components/master-detail-list-panel.client'
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
 import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
+import { isEmbeddedRowSystemLocked } from '../../lib/is-embedded-row-system-locked'
 import { classFeatureItemFields } from '../lib/class-feature-form-fields'
 
 const FEATURES_FIELD_NAME = 'features'
@@ -29,16 +30,6 @@ function featureEyebrow(row: FeatureRow | undefined): string | undefined {
   const level = row?.level
   if (level === undefined || level === null || level === '') return undefined
   return `Level ${level}`
-}
-
-/**
- * A feature is delete-locked only when it is system content: an existing row
- * (already has an `id`) on a class whose `source` is `'system'`. Newly added
- * rows (no id yet) and homebrew classes are always removable. Class features
- * have no per-feature `source` in the contract, so it is derived here.
- */
-function isSystemLocked(row: FeatureRow | undefined, entitySource: ContentFormCtx['entitySource']) {
-  return entitySource === 'system' && typeof row?.id === 'string' && row.id.length > 0
 }
 
 export interface ClassFeaturesTabProps {
@@ -68,7 +59,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
 
   const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
     const row = watched?.[index]
-    const locked = isSystemLocked(row, formCtx.entitySource)
+    const locked = isEmbeddedRowSystemLocked(row, formCtx.entitySource)
     return {
       id: field.id,
       title: featureTitle(row, index),
