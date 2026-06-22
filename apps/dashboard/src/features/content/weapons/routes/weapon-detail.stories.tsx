@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { LONGSWORD, SHORTBOW } from '../fixtures'
 import { WeaponDetailContent } from './weapon-detail'
 
@@ -13,9 +14,9 @@ export default meta
 type Story = StoryObj
 
 export const MeleeWeapon: Story = {
-  render: () => <WeaponDetailContent item={LONGSWORD} />,
+  render: () => <WeaponDetailContent item={LONGSWORD} campaignId={STORY_CAMPAIGN_ID} />,
 }
 
 export const RangedWeapon: Story = {
-  render: () => <WeaponDetailContent item={SHORTBOW} />,
+  render: () => <WeaponDetailContent item={SHORTBOW} campaignId={STORY_CAMPAIGN_ID} />,
 }

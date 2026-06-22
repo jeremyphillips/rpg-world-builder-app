@@ -3,10 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
 import { createContent } from './content-client'
+import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,
   ContentFormOptionsGate,
-  ContentSchemaForm,
+  ContentFormLayout,
 } from './content-form-shell-parts'
 import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
@@ -39,21 +40,23 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
 
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
-      {(ctx) => {
-        const fields = def.buildFields(ctx)
+      {(optionsCtx) => {
+        const ctx = { ...optionsCtx, campaignId, mode: 'create' as const }
         return (
-          <ContentSchemaForm
+          <ContentFormLayout
+            def={def}
+            ctx={ctx}
             schema={def.schema}
-            fields={fields}
             defaultValues={def.createDefaultValues}
             backHref={backHref}
             submitLabel="Create"
             submitPending={mutation.isPending}
             formError={mutation.isError ? String(mutation.error) : null}
-            onSubmit={async (values) => {
+            onSubmit={async (values, form) => {
               await mutation.mutateAsync(
                 def.toInput(values, { weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug }),
               )
+              form.reset(values)
               navigate(backHref)
             }}
           />
@@ -88,7 +91,9 @@ export function ContentCreateShell({
       </div>
 
       {def ? (
-        <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+        <ContentAuthoringGate campaignId={campaignId}>
+          <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+        </ContentAuthoringGate>
       ) : (
         <ContentFormComingSoon />
       )}

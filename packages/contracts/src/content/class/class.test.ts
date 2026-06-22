@@ -4,6 +4,7 @@ import {
   classPatchSchema,
   classSchema,
   createClassInputSchema,
+  subclassChoiceFeatureLabel,
   subclassSchema,
   updateClassInputSchema,
 } from './class'
@@ -14,7 +15,7 @@ const fighterBody = {
   primaryAbilities: ['str'],
   hitDie: 10,
   asiLevels: [4, 6, 8, 12, 14, 16, 19],
-  subclassLevels: [3],
+  subclassChoiceLevel: 3,
   proficiencies: {
     savingThrows: ['str', 'con'],
     armor: ['light', 'medium', 'heavy', 'shields'],
@@ -60,8 +61,13 @@ describe('classSchema', () => {
     expect(classSchema.safeParse(withSaves(['str', 'con', 'dex', 'wis'])).success).toBe(false)
   })
 
-  it('requires at least one subclass level', () => {
-    expect(classSchema.safeParse({ ...fighter, subclassLevels: [] }).success).toBe(false)
+  it('allows omitting subclassChoiceLevel', () => {
+    const { subclassChoiceLevel: _, ...withoutChoice } = fighter
+    expect(classSchema.safeParse(withoutChoice).success).toBe(true)
+  })
+
+  it('rejects an invalid subclassChoiceLevel', () => {
+    expect(classSchema.safeParse({ ...fighter, subclassChoiceLevel: 0 }).success).toBe(false)
   })
 
   it('rejects a hit die outside the class range', () => {
@@ -207,6 +213,12 @@ describe('subclassSchema', () => {
         name: 'Champion',
       }).success,
     ).toBe(false)
+  })
+})
+
+describe('subclassChoiceFeatureLabel', () => {
+  it('formats the class name with a Subclass suffix', () => {
+    expect(subclassChoiceFeatureLabel('Bard')).toBe('Bard Subclass')
   })
 })
 

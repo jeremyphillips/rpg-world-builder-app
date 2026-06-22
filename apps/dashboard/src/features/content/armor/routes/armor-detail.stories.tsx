@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CHAIN_MAIL, LEATHER, SHIELD } from '../fixtures'
 import { ArmorDetailContent } from './armor-detail'
 
@@ -13,13 +14,13 @@ export default meta
 type Story = StoryObj
 
 export const LightArmor: Story = {
-  render: () => <ArmorDetailContent item={LEATHER} />,
+  render: () => <ArmorDetailContent item={LEATHER} campaignId={STORY_CAMPAIGN_ID} />,
 }
 
 export const HeavyArmor: Story = {
-  render: () => <ArmorDetailContent item={CHAIN_MAIL} />,
+  render: () => <ArmorDetailContent item={CHAIN_MAIL} campaignId={STORY_CAMPAIGN_ID} />,
 }
 
 export const Shield: Story = {
-  render: () => <ArmorDetailContent item={SHIELD} />,
+  render: () => <ArmorDetailContent item={SHIELD} campaignId={STORY_CAMPAIGN_ID} />,
 }

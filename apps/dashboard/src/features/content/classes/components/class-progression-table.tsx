@@ -4,6 +4,7 @@ import {
   proficiencyBonus,
   SLOT_TABLES,
   MAX_CHARACTER_LEVEL,
+  subclassChoiceFeatureLabel,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
@@ -32,12 +33,16 @@ function fillForward(
 function featuresAtLevel(
   features: CharacterClass['features'],
   asiLevels: number[],
-  subclassLevels: number[],
+  subclassChoiceLevel: number | undefined,
+  className: string,
   level: number,
 ): string[] {
   const names = features.filter((f) => f.level === level).map((f) => f.name)
   if (asiLevels.includes(level)) names.push('Ability Score Improvement')
-  if (subclassLevels.includes(level)) names.push('Subclass Feature')
+  if (subclassChoiceLevel === level) {
+    const choiceLabel = subclassChoiceFeatureLabel(className)
+    if (!names.includes(choiceLabel)) names.push(choiceLabel)
+  }
   return names
 }
 
@@ -54,7 +59,7 @@ function buildRow(
   characterClass: CharacterClass,
   slotTable: number[][] | undefined,
 ): ProgressionRow {
-  const { features, asiLevels, subclassLevels, spellcasting } = characterClass
+  const { features, asiLevels, subclassChoiceLevel, spellcasting, name } = characterClass
   const cantripsNorm = spellcasting?.cantrips?.map((c) => ({ level: c.level, value: c.known }))
   const spellsAvailableNorm = spellcasting?.spellsAvailable?.map((s) => ({
     level: s.level,
@@ -63,7 +68,7 @@ function buildRow(
   return {
     level,
     profBonus: proficiencyBonus(level),
-    features: featuresAtLevel(features, asiLevels, subclassLevels, level),
+    features: featuresAtLevel(features, asiLevels, subclassChoiceLevel, name, level),
     resources: buildResourceRow(characterClass.resources, level),
     cantrips: cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable: spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,

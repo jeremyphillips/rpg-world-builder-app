@@ -7,17 +7,23 @@ import { useWeapons } from '../hooks/use-weapons'
 import { getWeaponStatRows } from '../lib/weapon-stat-rows'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
-type WeaponDetailContentProps = { item: Weapon }
+type WeaponDetailContentProps = { item: Weapon; campaignId: string }
 
-export function WeaponDetailContent({ item }: WeaponDetailContentProps) {
+export function WeaponDetailContent({ item, campaignId }: WeaponDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
   const statRows = getWeaponStatRows(item)
 
   return (
-    <ContentDetailLayout imageUrl={getContentImageUrl(item.imageKey)} imageName={item.name}>
+    <ContentDetailLayout
+      imageUrl={getContentImageUrl(item.imageKey)}
+      imageName={item.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('weapons', campaignId, item.id)}
+    >
       <div className="space-y-4">
         <Heading variant="display" as="h2">
           {item.name}
@@ -49,7 +55,7 @@ export function WeaponDetail() {
       loadErrorLabel="Could not load weapons."
       notFoundLabel="Weapon not found."
     >
-      {(item) => <WeaponDetailContent item={item} />}
+      {(item) => <WeaponDetailContent item={item} campaignId={campaignId} />}
     </ContentDetailResolver>
   )
 }

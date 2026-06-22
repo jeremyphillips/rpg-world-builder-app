@@ -1,15 +1,17 @@
 import { useParams } from 'react-router-dom'
-import { DataTable, RowActionsMenu } from '@rpg/ui'
+import { DataTable } from '@rpg/ui'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../hooks/use-classes'
 import { classColumns, classFilters } from '../components/classes-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 
 function ClassRowActions({ row, campaignId }: { row: CharacterClass; campaignId: string }) {
   return (
-    <RowActionsMenu
+    <ContentOverviewRowActions
+      campaignId={campaignId}
       editHref={ROUTES.content.classes.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
@@ -25,6 +27,7 @@ export function ClassesOverview() {
   return (
     <ContentOverviewShell
       heading="Classes"
+      campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.classes.create(campaignId)}

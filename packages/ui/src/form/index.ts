@@ -4,6 +4,7 @@
 export { Form, type FormProps } from './form.client'
 export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
+export { FormActionsBar, type FormActionsBarProps } from './form-actions-bar'
 export { WizardStepForm, type WizardStepFormProps } from './wizard-step-form.client'
 
 export {

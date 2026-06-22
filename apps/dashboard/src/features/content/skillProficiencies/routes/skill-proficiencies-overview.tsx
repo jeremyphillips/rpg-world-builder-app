@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { DataTable, RowActionsMenu } from '@rpg/ui'
+import { DataTable } from '@rpg/ui'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -9,10 +9,12 @@ import {
   skillProficienciesFilters,
 } from '../components/skill-proficiencies-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 
 function SkillRowActions({ row, campaignId }: { row: SkillProficiency; campaignId: string }) {
   return (
-    <RowActionsMenu
+    <ContentOverviewRowActions
+      campaignId={campaignId}
       editHref={ROUTES.content.skillProficiencies.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
@@ -28,6 +30,7 @@ export function SkillProficienciesOverview() {
   return (
     <ContentOverviewShell
       heading="Skill Proficiencies"
+      campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.skillProficiencies.create(campaignId)}

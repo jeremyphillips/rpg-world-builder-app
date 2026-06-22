@@ -28,3 +28,6 @@ export const tabsTriggerVariants = cva(
 )
 
 export type TabsVariant = 'line' | 'pill'
+
+/** Space between the tab list and panel content. */
+export const tabsContentSpacingClasses = 'mt-6'

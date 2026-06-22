@@ -4,7 +4,12 @@ import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 
 import { cn } from '../../lib/utils'
-import { tabsListVariants, tabsTriggerVariants, type TabsVariant } from './tabs.variants'
+import {
+  tabsListVariants,
+  tabsTriggerVariants,
+  tabsContentSpacingClasses,
+  type TabsVariant,
+} from './tabs.variants'
 
 const TabsVariantContext = React.createContext<TabsVariant>('line')
 
@@ -69,7 +74,8 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=inactive]:hidden',
+      tabsContentSpacingClasses,
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=inactive]:hidden',
       className,
     )}
     {...props}

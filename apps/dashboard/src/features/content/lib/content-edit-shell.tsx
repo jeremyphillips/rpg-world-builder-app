@@ -7,8 +7,9 @@ import type { ContentFormCtx } from './content-form-registry'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
-  ContentSchemaForm,
+  ContentFormLayout,
 } from './content-form-shell-parts'
+import { ContentAuthoringGate } from './content-authoring-gate'
 import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
 export interface ContentEditShellProps {
@@ -52,7 +53,7 @@ function ContentEditFormReady({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
-  const fields = def.buildFields(ctx)
+  const formCtx: ContentFormCtx = { ...ctx, campaignId, entityId, mode: 'edit' }
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
@@ -70,31 +71,35 @@ function ContentEditFormReady({
   }
 
   return (
-    <div className="space-y-6 pb-10">
-      <Heading variant="page" as="h2">
-        {headingFn(entity.name)}
-      </Heading>
+    <ContentAuthoringGate campaignId={campaignId}>
+      <div className="space-y-6 pb-10">
+        <Heading variant="page" as="h2">
+          {headingFn(entity.name)}
+        </Heading>
 
-      <ContentSchemaForm
-        formKey={entity.id}
-        schema={def.schema}
-        fields={fields}
-        defaultValues={def.toFormValues(entity)}
-        backHref={backHref}
-        submitLabel="Save changes"
-        submitPending={mutation.isPending}
-        formError={mutation.isError ? String(mutation.error) : null}
-        onSubmit={async (values) => {
-          await mutation.mutateAsync(
-            def.toInput(values, {
-              entity,
-              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            }),
-          )
-          navigate(backHref)
-        }}
-      />
-    </div>
+        <ContentFormLayout
+          def={def}
+          ctx={formCtx}
+          formKey={entity.id}
+          schema={def.schema}
+          defaultValues={def.toFormValues(entity)}
+          backHref={backHref}
+          submitLabel="Save changes"
+          submitPending={mutation.isPending}
+          formError={mutation.isError ? String(mutation.error) : null}
+          onSubmit={async (values, form) => {
+            await mutation.mutateAsync(
+              def.toInput(values, {
+                entity,
+                weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+              }),
+            )
+            form.reset(values)
+            navigate(backHref)
+          }}
+        />
+      </div>
+    </ContentAuthoringGate>
   )
 }
 

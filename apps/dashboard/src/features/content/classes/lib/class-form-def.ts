@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   ABILITIES,
   ABILITY_IDS,
@@ -28,7 +29,13 @@ import {
   type CreateClassInput,
   type Spellcasting,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldOption,
+  type FieldVisibility,
+  type FormItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 import {
   CLASS_GRANT_TYPES,
@@ -40,6 +47,7 @@ import {
 } from '../../lib/grant-form-helpers'
 import {
   contentFormRegistry,
+  contentFormFields,
   type ContentFormCtx,
   type ContentFormDef,
   type ContentFormInputCtx,
@@ -59,16 +67,19 @@ import {
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
-import {
-  normalizeClassWeaponProficiencies,
-  specificWeaponFieldsAllowed,
-} from './class-weapon-proficiency-helpers'
+import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
+import { ClassSubclassesTabStub } from '../components/class-subclasses-tab-stub'
 
-const SPECIFIC_WEAPONS_TOGGLE_HINT =
-  'Grant individual weapon proficiencies instead of (or when not using) whole categories — e.g. Sorcerer (dagger, dart, sling).'
+const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
-const WEAPON_CATEGORIES_HINT =
-  'Selecting a category grants all weapons in it. Use specific weapons only for picks outside those categories.'
+/** Radix Select rejects empty-string item values; use this for "no subclass choice level". */
+const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
+
+const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
+  'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
+
+const WEAPON_PROFICIENCIES_HINT =
+  'Each selected category grants proficiency with every weapon in it.'
 
 // ---------------------------------------------------------------------------
 // Vocab option lists
@@ -85,6 +96,11 @@ const levelOptions: FieldOption[] = Array.from({ length: MAX_CHARACTER_LEVEL }, 
   const level = index + 1
   return { value: String(level), label: `Level ${level}` }
 })
+
+const subclassChoiceLevelOptions: FieldOption[] = [
+  { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
+  ...levelOptions,
+]
 
 const armorCategoryOptions = toOptions(
   ARMOR_CATEGORIES,
@@ -169,7 +185,7 @@ const classFormSchema = z.object({
   primaryAbilities: z.array(abilitySchema).min(1).max(2),
   hitDie: z.coerce.number().pipe(hitDieSchema),
   asiLevels: z.array(z.coerce.number().pipe(levelSchema)),
-  subclassLevels: z.array(z.coerce.number().pipe(levelSchema)).min(1),
+  subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
   hasSpellcasting: z.boolean(),
   hasSpecificWeapons: z.boolean(),
   spellcasting: spellcastingFormSchema.optional(),
@@ -193,20 +209,17 @@ function visibleWhenSpellcasting(): FieldVisibility {
   }
 }
 
-function visibleWhenSpecificWeaponsToggle(): FieldVisibility {
+function visibleWhenWeaponCategories(): FieldVisibility {
   return {
-    dependsOn: ['proficiencies.weapons.categories'],
-    visibleWhen: (watched) =>
-      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
+    dependsOn: ['hasSpecificWeapons'],
+    visibleWhen: (watched) => watched['hasSpecificWeapons'] !== true,
   }
 }
 
-function visibleWhenSpecificWeaponsCombobox(): FieldVisibility {
+function visibleWhenIndividualWeapons(): FieldVisibility {
   return {
-    dependsOn: ['hasSpecificWeapons', 'proficiencies.weapons.categories'],
-    visibleWhen: (watched) =>
-      watched['hasSpecificWeapons'] === true &&
-      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
+    dependsOn: ['hasSpecificWeapons'],
+    visibleWhen: (watched) => watched['hasSpecificWeapons'] === true,
   }
 }
 
@@ -320,14 +333,12 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-  weaponCategoryBySlug?: ContentFormInputCtx<CharacterClass>['weaponCategoryBySlug'],
 ): ClassProficiencies {
   const tools = proficiencies.tools ?? []
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
     hasSpecificWeapons,
-    categoryBySlug: weaponCategoryBySlug,
   })
 
   return {
@@ -448,7 +459,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
   primaryAbilities: ['str'],
   hitDie: 8,
   asiLevels: [4, 8, 12, 16, 19],
-  subclassLevels: [3],
+  subclassChoiceLevel: '3',
   hasSpellcasting: false,
   hasSpecificWeapons: false,
   spellcasting: {
@@ -469,6 +480,218 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
 }
 
 // ---------------------------------------------------------------------------
+// Tab field builders
+// ---------------------------------------------------------------------------
+
+function coreAttributesFields(): FormItem[] {
+  return [
+    {
+      kind: 'row',
+      fields: [
+        {
+          type: 'chips',
+          name: 'primaryAbilities',
+          label: 'Primary abilities',
+          options: abilityOptions,
+          max: 2,
+          required: true,
+          hint: 'Select up to 2 abilities',
+        },
+        {
+          type: 'select',
+          name: 'hitDie',
+          label: 'Hit die',
+          options: hitDieOptions,
+          required: true,
+          width: 'sm',
+        },
+      ],
+    },
+    {
+      type: 'chips',
+      name: 'asiLevels',
+      label: 'ASI levels',
+      options: levelOptions,
+      hint: 'Levels that grant an ability score improvement',
+    },
+    {
+      type: 'select',
+      name: 'subclassChoiceLevel',
+      label: 'Subclass choice level',
+      options: subclassChoiceLevelOptions,
+      hint: 'Level at which a character chooses their subclass',
+      width: 'sm-md',
+    },
+  ]
+}
+
+function spellcastingFields(): FormItem[] {
+  return [
+    {
+      type: 'switch',
+      name: 'hasSpellcasting',
+      label: 'Has spellcasting',
+    },
+    {
+      kind: 'row',
+      fields: [
+        {
+          type: 'select',
+          name: 'spellcasting.progression',
+          label: 'Progression',
+          options: spellcastingProgressionOptions,
+          visibility: visibleWhenSpellcasting(),
+          required: true,
+        },
+        {
+          type: 'select',
+          name: 'spellcasting.ability',
+          label: 'Spellcasting ability',
+          options: abilityOptions,
+          visibility: visibleWhenSpellcasting(),
+          required: true,
+        },
+        {
+          type: 'select',
+          name: 'spellcasting.preparation',
+          label: 'Preparation',
+          options: spellPreparationOptions,
+          visibility: visibleWhenSpellcasting(),
+          required: true,
+        },
+      ],
+    },
+    spellProgressionGridField,
+  ]
+}
+
+function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      type: 'chips',
+      name: 'proficiencies.savingThrows',
+      label: 'Saving throws',
+      options: abilityOptions,
+      max: 2,
+      required: true,
+      hint: SAVING_THROWS_HINT,
+    },
+    {
+      type: 'chips',
+      name: 'proficiencies.armor',
+      label: 'Armor training',
+      options: armorCategoryOptions,
+    },
+    {
+      type: 'switch',
+      name: 'hasSpecificWeapons',
+      label: 'Individual weapons',
+      hint: INDIVIDUAL_WEAPONS_TOGGLE_HINT,
+    },
+    {
+      type: 'chips',
+      name: 'proficiencies.weapons.categories',
+      label: 'Weapon proficiencies',
+      options: weaponCategoryOptions,
+      hint: WEAPON_PROFICIENCIES_HINT,
+      visibility: visibleWhenWeaponCategories(),
+    },
+    {
+      type: 'combobox',
+      name: 'proficiencies.weapons.items',
+      label: 'Weapon choices',
+      multiple: true,
+      options: ctx.options?.weapons ?? [],
+      placeholder: 'Choose weapons…',
+      visibility: visibleWhenIndividualWeapons(),
+    },
+    {
+      type: 'combobox',
+      name: 'proficiencies.tools',
+      label: 'Tool proficiencies',
+      multiple: true,
+      options: ctx.options?.tools ?? [],
+      placeholder: 'Choose tools…',
+    },
+    {
+      kind: 'row',
+      fields: [
+        {
+          type: 'number',
+          name: 'proficiencies.skills.choose',
+          label: 'Skill choices',
+          min: 0,
+          required: true,
+        },
+        {
+          type: 'chips',
+          name: 'proficiencies.skills.from',
+          label: 'Skill options',
+          options: skillOptions,
+        },
+      ],
+    },
+  ]
+}
+
+function featuresArrayField(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'array',
+    name: 'features',
+    legend: 'Features',
+    addLabel: 'Add feature',
+    itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
+    fields: featureItemFields(ctx),
+  }
+}
+
+function resourcesArrayField(): FormItem {
+  return {
+    kind: 'array',
+    name: 'resources',
+    legend: 'Resources',
+    addLabel: 'Add resource',
+    itemTitle: (values, index) => (values['name'] as string) || `Resource ${index + 1}`,
+    fields: resourceItemFields(),
+  }
+}
+
+function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
+  return [
+    {
+      id: 'basics',
+      label: 'Basics',
+      fields: [...identityFields(), ...coreAttributesFields()],
+    },
+    {
+      id: 'proficiencies',
+      label: 'Proficiencies',
+      fields: proficienciesFields(ctx),
+    },
+    {
+      id: 'spellcasting',
+      label: 'Spellcasting',
+      fields: spellcastingFields(),
+    },
+    {
+      id: 'features',
+      label: 'Features',
+      fields: [featuresArrayField(ctx), resourcesArrayField()],
+    },
+    {
+      id: 'subclasses',
+      label: 'Subclasses',
+      fields: [],
+      header: createElement(ClassSubclassesTabStub, {
+        campaignId: ctx.campaignId,
+        entityId: ctx.entityId,
+        mode: ctx.mode,
+      }),
+    },
+  ]
+}
+
+// ---------------------------------------------------------------------------
 // Class ContentFormDef
 // ---------------------------------------------------------------------------
 
@@ -478,180 +701,8 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   schema: classFormSchema,
   createDefaultValues: classCreateDefaultValues,
 
-  buildFields: (ctx) => [
-    {
-      kind: 'group',
-      legend: 'Identity',
-      fields: identityFields(),
-    },
-    {
-      kind: 'group',
-      legend: 'Core attributes',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'chips',
-              name: 'primaryAbilities',
-              label: 'Primary abilities',
-              options: abilityOptions,
-              max: 2,
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'hitDie',
-              label: 'Hit die',
-              options: hitDieOptions,
-              required: true,
-            },
-          ],
-        },
-        {
-          type: 'chips',
-          name: 'asiLevels',
-          label: 'ASI levels',
-          options: levelOptions,
-          hint: 'Levels that grant an ability score improvement',
-        },
-        {
-          type: 'chips',
-          name: 'subclassLevels',
-          label: 'Subclass levels',
-          options: levelOptions,
-          required: true,
-          hint: 'Levels that grant a subclass feature',
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Spellcasting',
-      fields: [
-        {
-          type: 'switch',
-          name: 'hasSpellcasting',
-          label: 'Has spellcasting',
-        },
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'select',
-              name: 'spellcasting.progression',
-              label: 'Progression',
-              options: spellcastingProgressionOptions,
-              visibility: visibleWhenSpellcasting(),
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'spellcasting.ability',
-              label: 'Spellcasting ability',
-              options: abilityOptions,
-              visibility: visibleWhenSpellcasting(),
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'spellcasting.preparation',
-              label: 'Preparation',
-              options: spellPreparationOptions,
-              visibility: visibleWhenSpellcasting(),
-              required: true,
-            },
-          ],
-        },
-        spellProgressionGridField,
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Proficiencies',
-      fields: [
-        {
-          type: 'chips',
-          name: 'proficiencies.savingThrows',
-          label: 'Saving throws',
-          options: abilityOptions,
-          max: 2,
-          required: true,
-        },
-        {
-          type: 'chips',
-          name: 'proficiencies.armor',
-          label: 'Armor',
-          options: armorCategoryOptions,
-        },
-        {
-          type: 'chips',
-          name: 'proficiencies.weapons.categories',
-          label: 'Weapon categories',
-          options: weaponCategoryOptions,
-          hint: WEAPON_CATEGORIES_HINT,
-        },
-        {
-          type: 'switch',
-          name: 'hasSpecificWeapons',
-          label: 'Specific weapons',
-          hint: SPECIFIC_WEAPONS_TOGGLE_HINT,
-          visibility: visibleWhenSpecificWeaponsToggle(),
-        },
-        {
-          type: 'combobox',
-          name: 'proficiencies.weapons.items',
-          label: 'Weapon choices',
-          multiple: true,
-          options: ctx.options?.weapons ?? [],
-          placeholder: 'Choose weapons…',
-          visibility: visibleWhenSpecificWeaponsCombobox(),
-        },
-        {
-          type: 'combobox',
-          name: 'proficiencies.tools',
-          label: 'Tools',
-          multiple: true,
-          options: ctx.options?.tools ?? [],
-          placeholder: 'Choose tools…',
-        },
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'number',
-              name: 'proficiencies.skills.choose',
-              label: 'Skill choices',
-              min: 0,
-              required: true,
-            },
-            {
-              type: 'chips',
-              name: 'proficiencies.skills.from',
-              label: 'Skill options',
-              options: skillOptions,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      kind: 'array',
-      name: 'features',
-      legend: 'Features',
-      addLabel: 'Add feature',
-      itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
-      fields: featureItemFields(ctx),
-    },
-    {
-      kind: 'array',
-      name: 'resources',
-      legend: 'Resources',
-      addLabel: 'Add resource',
-      itemTitle: (values, index) => (values['name'] as string) || `Resource ${index + 1}`,
-      fields: resourceItemFields(),
-    },
-  ],
+  buildTabs: buildClassTabs,
+  buildFields: (ctx) => contentFormFields(classFormDef, ctx),
 
   toFormValues: (entity) => ({
     name: entity.name,
@@ -660,7 +711,10 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
     asiLevels: entity.asiLevels,
-    subclassLevels: entity.subclassLevels,
+    subclassChoiceLevel:
+      entity.subclassChoiceLevel !== undefined
+        ? String(entity.subclassChoiceLevel)
+        : SUBCLASS_CHOICE_LEVEL_NONE,
     hasSpellcasting: entity.spellcasting !== undefined,
     hasSpecificWeapons: (entity.proficiencies.weapons.items?.length ?? 0) > 0,
     spellcasting: spellcastingToFormValues(entity.spellcasting),
@@ -678,12 +732,14 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         primaryAbilities: values.primaryAbilities,
         hitDie: values.hitDie,
         asiLevels: values.asiLevels,
-        subclassLevels: values.subclassLevels,
+        subclassChoiceLevel:
+          values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
+            ? undefined
+            : levelSchema.parse(Number(values.subclassChoiceLevel)),
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
         proficiencies: proficienciesFromFormValues(
           values.proficiencies,
           values.hasSpecificWeapons ?? false,
-          ctx?.weaponCategoryBySlug,
         ),
         features: featuresFromFormValues(values.features, ctx?.entity?.features),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,

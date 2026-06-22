@@ -19,12 +19,23 @@ import { FormSectionContext } from './form-section-context.client'
 import { FileFieldPropsProvider } from './file-field-props.context'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
+import { FormActionsBar } from './form-actions-bar'
+import {
+  formFooterSpacingClasses,
+  formStickyTabsClasses,
+  formTabPanelsBottomPaddingClasses,
+} from './form-chrome.variants'
 
 /** A single tab definition: an id, a display label, and its ordered fields. */
 export interface TabbedFormTab {
   id: string
   label: string
   fields: FormItem[]
+  /**
+   * Optional non-field UI rendered above this tab's fields (intro copy, links,
+   * placeholders). Omit fields for a panel that is entirely non-input content.
+   */
+  header?: React.ReactNode
 }
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
@@ -39,7 +50,7 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>
   /** Pre-populate fields; merged on top of per-type synthesized defaults. */
   defaultValues?: DefaultValues<TFieldValues>
-  /** Form-level error shown below the tabs. */
+  /** Form-level error shown in the sticky actions bar (or below tabs when sticky is off). */
   formError?: string | null
   /**
    * Content rendered after the tabs (typically a save button). Pass a function
@@ -58,12 +69,17 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /** When true (default), top-level groups/arrays render in collapsible accordions. */
   collapsibleSections?: boolean
+  /**
+   * When true (default), the tab list sticks to the top and the footer sticks to
+   * the bottom while scrolling long panels.
+   */
+  stickyChrome?: boolean
 }
 
 /**
  * A schema-driven form with a tabbed layout. All tabs share a single
  * `useForm` instance over a merged schema; the save button and any form-level
- * error are rendered outside the tab panels so they remain always visible.
+ * error are rendered outside the tab panels in a sticky actions bar by default.
  */
 export function TabbedForm<TFieldValues extends FieldValues>({
   schema,
@@ -77,6 +93,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   className,
   mode,
   collapsibleSections = true,
+  stickyChrome = true,
 }: TabbedFormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -104,6 +121,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     [collapsibleSections],
   )
 
+  const resolvedFooter = typeof footer === 'function' ? footer(form) : footer
+
   return (
     <FormProvider {...form}>
       <FileFieldPropsProvider value={fileFieldProps ?? {}}>
@@ -111,37 +130,54 @@ export function TabbedForm<TFieldValues extends FieldValues>({
           id={formId}
           noValidate
           onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
-          className={cn('space-y-6', className)}
+          className={cn(stickyChrome ? undefined : 'space-y-6', className)}
         >
           <Tabs defaultValue={tabs[0]?.id} variant="line">
-            <TabsList>
-              {tabs.map((tab) => (
-                <TabsTrigger key={tab.id} value={tab.id}>
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className={cn(stickyChrome ? formStickyTabsClasses : undefined)}>
+              <TabsList>
+                {tabs.map((tab) => (
+                  <TabsTrigger key={tab.id} value={tab.id}>
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
             {tabs.map((tab) => (
               // forceMount keeps all panels mounted so every field is registered
               // with RHF and validated on global save; inactive panels are hidden
               // by Radix via the HTML `hidden` attribute.
               <TabsContent key={tab.id} value={tab.id} forceMount>
-                <div className={fieldGroupStackClasses}>
-                  <FormSectionContext.Provider value={sectionContext}>
-                    <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-                  </FormSectionContext.Provider>
+                <div
+                  className={cn(
+                    fieldGroupStackClasses,
+                    stickyChrome ? formTabPanelsBottomPaddingClasses : undefined,
+                  )}
+                >
+                  {tab.header}
+                  {tab.fields.length > 0 ? (
+                    <FormSectionContext.Provider value={sectionContext}>
+                      <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+                    </FormSectionContext.Provider>
+                  ) : null}
                 </div>
               </TabsContent>
             ))}
           </Tabs>
 
-          {formError ? (
-            <Text variant="destructive" role="alert">
-              {formError}
-            </Text>
-          ) : null}
-
-          {typeof footer === 'function' ? footer(form) : footer}
+          {stickyChrome ? (
+            <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+          ) : (
+            <>
+              {formError ? (
+                <Text variant="destructive" role="alert">
+                  {formError}
+                </Text>
+              ) : null}
+              {resolvedFooter ? (
+                <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
+              ) : null}
+            </>
+          )}
         </form>
       </FileFieldPropsProvider>
     </FormProvider>

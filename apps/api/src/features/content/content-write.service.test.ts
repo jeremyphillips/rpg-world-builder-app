@@ -109,7 +109,7 @@ const minimalClassInput = {
   primaryAbilities: ['str'],
   hitDie: 12,
   asiLevels: [4],
-  subclassLevels: [3],
+  subclassChoiceLevel: 3,
   proficiencies: {
     savingThrows: ['str', 'con'],
     armor: [] as const,

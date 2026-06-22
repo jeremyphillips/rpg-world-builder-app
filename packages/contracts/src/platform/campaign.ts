@@ -143,6 +143,16 @@ export const campaignSchema = z.object({
 
 export type Campaign = z.infer<typeof campaignSchema>
 
+/**
+ * Campaign returned from `GET /api/campaigns` — includes the caller's membership
+ * role in that campaign.
+ */
+export const campaignListItemSchema = campaignSchema.extend({
+  campaignRole: campaignRoleSchema,
+})
+
+export type CampaignListItem = z.infer<typeof campaignListItemSchema>
+
 // ---------------------------------------------------------------------------
 // Create campaign input
 // ---------------------------------------------------------------------------

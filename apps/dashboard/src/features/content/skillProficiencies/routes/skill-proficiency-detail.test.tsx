@@ -10,6 +10,9 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('../../classes/hooks/use-classes')
+vi.mock('@/features/campaign', () => ({
+  useCanManageCampaign: vi.fn(() => false),
+}))
 
 import { useClasses as useClassesFn } from '../../classes/hooks/use-classes'
 import { FIGHTER } from '../../classes/fixtures'

@@ -1,5 +1,6 @@
 import type {
   Campaign,
+  CampaignListItem,
   CreateCampaignInput,
   UpdateCampaignInput,
   SessionUser,
@@ -31,8 +32,8 @@ export async function updateCampaign(
 }
 
 /** List every campaign the current user owns or belongs to. */
-export async function listCampaigns(): Promise<Campaign[]> {
-  const { campaigns } = await request<{ campaigns: Campaign[] }>(
+export async function listCampaigns(): Promise<CampaignListItem[]> {
+  const { campaigns } = await request<{ campaigns: CampaignListItem[] }>(
     '/api/campaigns',
     undefined,
     'Could not load campaigns.',

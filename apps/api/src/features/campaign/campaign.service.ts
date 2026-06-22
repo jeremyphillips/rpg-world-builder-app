@@ -4,6 +4,8 @@ import type {
   Campaign,
   CampaignConfiguration,
   CampaignIdentity,
+  CampaignListItem,
+  CampaignRole,
   CampaignStatus,
   CampaignVisibility,
   CreateCampaignInput,
@@ -91,16 +93,28 @@ export async function findCampaignById(id: string): Promise<Campaign | null> {
  * given an `owner` membership on create, this covers both campaigns they own and
  * campaigns they merely belong to. Sorted by name for a stable switcher order.
  */
-export async function listCampaignsForUser(userId: string): Promise<Campaign[]> {
+export async function listCampaignsForUser(userId: string): Promise<CampaignListItem[]> {
   const memberships = await CampaignMembershipModel.find({ userId })
-    .select('campaignId')
-    .lean<{ campaignId: string }[]>()
+    .select('campaignId campaignRole')
+    .lean<{ campaignId: string; campaignRole: string }[]>()
+
+  const roleByCampaignId = new Map(
+    memberships.map((membership) => [membership.campaignId, membership.campaignRole]),
+  )
 
   const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
   if (campaignIds.length === 0) return []
 
   const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
-  return docs.map(toCampaign).sort((a, b) => a.identity.name.localeCompare(b.identity.name))
+  return docs
+    .map((doc) => {
+      const campaign = toCampaign(doc)
+      return {
+        ...campaign,
+        campaignRole: roleByCampaignId.get(campaign.id) as CampaignRole,
+      }
+    })
+    .sort((a, b) => a.identity.name.localeCompare(b.identity.name))
 }
 
 function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {

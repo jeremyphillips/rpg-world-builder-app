@@ -43,8 +43,5 @@ export const fieldLabelVariants = cva(
 )
 
 export const fieldGroupLegendVariants = cva(
-  cn(
-    fieldGroupLegendSpacingClasses,
-    'font-display text-lg font-semibold leading-none text-foreground',
-  ),
+  cn(fieldGroupLegendSpacingClasses, 'text-lg font-semibold leading-none text-foreground'),
 )

@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 // TODO: install axe-core in apps/dashboard (it lives in packages/ui only)
 // import axe from 'axe-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { SessionUser } from '@rpg/contracts'
+
+import { renderWithDataRouter } from '@/lib/test-router'
 
 vi.mock('@/features/auth')
 vi.mock('@/features/user/api/user-client')
@@ -33,11 +35,16 @@ function renderSection() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <ProfileSection />
-    </QueryClientProvider>,
-  )
+  return renderWithDataRouter([
+    {
+      path: '/',
+      element: (
+        <QueryClientProvider client={queryClient}>
+          <ProfileSection />
+        </QueryClientProvider>
+      ),
+    },
+  ])
 }
 
 describe('ProfileSection', () => {

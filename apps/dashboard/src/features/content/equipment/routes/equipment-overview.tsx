@@ -1,15 +1,17 @@
 import { useParams } from 'react-router-dom'
-import { DataTable, RowActionsMenu } from '@rpg/ui'
+import { DataTable } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useEquipment } from '../hooks/use-equipment'
 import { equipmentColumns, equipmentFilters } from '../components/equipment-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 
 function EquipmentRowActions({ row, campaignId }: { row: Equipment; campaignId: string }) {
   return (
-    <RowActionsMenu
+    <ContentOverviewRowActions
+      campaignId={campaignId}
       editHref={ROUTES.content.equipment.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
@@ -25,6 +27,7 @@ export function EquipmentOverview() {
   return (
     <ContentOverviewShell
       heading="Equipment"
+      campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.equipment.create(campaignId)}

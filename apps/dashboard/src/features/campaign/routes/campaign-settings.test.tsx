@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import type { Campaign } from '@rpg/contracts'
+import type { CampaignListItem } from '@rpg/contracts'
+
+import { renderWithDataRouter } from '@/lib/test-router'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
@@ -20,7 +21,7 @@ import { CampaignSettings } from './campaign-settings'
 const listCampaigns = vi.mocked(listCampaignsFn)
 const updateCampaign = vi.mocked(updateCampaignFn)
 
-const campaign: Campaign = {
+const campaign: CampaignListItem = {
   id: 'c1',
   identity: { name: 'Sunless Citadel', description: 'A dungeon delve.' },
   configuration: {
@@ -35,6 +36,7 @@ const campaign: Campaign = {
   visibility: 'private',
   rulesetId: 'srd-cc-5.2.1',
   createdBy: 'u1',
+  campaignRole: 'owner',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
@@ -44,14 +46,18 @@ function renderSettings(campaignId = 'c1') {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[`/campaigns/${campaignId}/settings`]}>
-        <Routes>
-          <Route path="/campaigns/:campaignId/settings" element={<CampaignSettings />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithDataRouter(
+    [
+      {
+        path: '/campaigns/:campaignId/settings',
+        element: (
+          <QueryClientProvider client={queryClient}>
+            <CampaignSettings />
+          </QueryClientProvider>
+        ),
+      },
+    ],
+    { initialEntries: [`/campaigns/${campaignId}/settings`] },
   )
 }
 

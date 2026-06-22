@@ -10,7 +10,12 @@ export function SpellsOverview() {
   const { data: spells = [], isPending, isError } = useSpells(campaignId)
 
   return (
-    <ContentOverviewShell heading="Spells" isPending={isPending} isError={isError}>
+    <ContentOverviewShell
+      heading="Spells"
+      campaignId={campaignId}
+      isPending={isPending}
+      isError={isError}
+    >
       <DataTable
         columns={spellsColumns(campaignId)}
         data={spells}

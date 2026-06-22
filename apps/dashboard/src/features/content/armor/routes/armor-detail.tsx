@@ -7,17 +7,23 @@ import { useArmor } from '../hooks/use-armor'
 import { getArmorStatRows } from '../lib/armor-stat-rows'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
-type ArmorDetailContentProps = { item: Armor }
+type ArmorDetailContentProps = { item: Armor; campaignId: string }
 
-export function ArmorDetailContent({ item }: ArmorDetailContentProps) {
+export function ArmorDetailContent({ item, campaignId }: ArmorDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
   const statRows = getArmorStatRows(item)
 
   return (
-    <ContentDetailLayout imageUrl={getContentImageUrl(item.imageKey)} imageName={item.name}>
+    <ContentDetailLayout
+      imageUrl={getContentImageUrl(item.imageKey)}
+      imageName={item.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('armor', campaignId, item.id)}
+    >
       <div className="space-y-4">
         <Heading variant="display" as="h2">
           {item.name}
@@ -49,7 +55,7 @@ export function ArmorDetail() {
       loadErrorLabel="Could not load armor."
       notFoundLabel="Armor not found."
     >
-      {(item) => <ArmorDetailContent item={item} />}
+      {(item) => <ArmorDetailContent item={item} campaignId={campaignId} />}
     </ContentDetailResolver>
   )
 }

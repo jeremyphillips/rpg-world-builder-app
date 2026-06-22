@@ -1,14 +1,14 @@
-import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Heading, RichTextContent, Text } from '@rpg/ui'
+import { useParams } from 'react-router-dom'
+import { Heading, RichTextContent, Text } from '@rpg/ui'
 import { ABILITIES, getSkillName } from '@rpg/contracts'
 import type { CharacterClass, Subclass } from '@rpg/contracts'
 
-import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { FeatureItem } from '../../lib/feature-item'
 import { getContentImageUrl } from '../../lib/content-image-url'
@@ -115,18 +115,14 @@ export function ClassDetailContent({
   subclasses,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
-  const editHref = ROUTES.content.classes.edit(campaignId, classId)
 
   return (
     <div className="space-y-6">
       <ContentDetailLayout
         imageUrl={getContentImageUrl(characterClass.imageKey)}
         imageName={characterClass.name}
-        actions={
-          <Link to={editHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-            Edit
-          </Link>
-        }
+        campaignId={campaignId}
+        editHref={contentEditHref('classes', campaignId, classId)}
       >
         <div className="space-y-4">
           <Heading variant="display" as="h2">

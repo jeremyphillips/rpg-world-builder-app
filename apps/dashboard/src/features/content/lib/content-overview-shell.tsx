@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
 import { Heading, Spinner, Text, buttonVariants } from '@rpg/ui'
 
+import { useCanManageCampaign } from '@/features/campaign'
+
 type ContentOverviewShellProps = {
   heading: string
   isPending: boolean
   isError: boolean
   errorLabel?: string
-  /** When provided, renders a "New" button linked to this href. */
+  campaignId: string
+  /** When provided, renders a "New" button linked to this href for campaign managers. */
   newHref?: string
   /** Label for the "New" button. Defaults to `"New"`. */
   newLabel?: string
@@ -22,10 +25,14 @@ export function ContentOverviewShell({
   isPending,
   isError,
   errorLabel,
+  campaignId,
   newHref,
   newLabel = 'New',
   children,
 }: ContentOverviewShellProps) {
+  const canManage = useCanManageCampaign(campaignId)
+  const showNew = canManage && newHref
+
   if (isPending) {
     return (
       <div className="space-y-2">
@@ -58,7 +65,7 @@ export function ContentOverviewShell({
         <Heading variant="page" as="h2">
           {heading}
         </Heading>
-        {newHref ? (
+        {showNew ? (
           <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
             {newLabel}
           </Link>

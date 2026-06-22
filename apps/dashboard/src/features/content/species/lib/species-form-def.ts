@@ -21,7 +21,13 @@ import {
   type Species,
   type SpeciesHeritageChoice,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldOption,
+  type FieldVisibility,
+  type FormItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 import {
   SPECIES_GRANT_TYPES,
@@ -39,6 +45,7 @@ import {
 } from '../../lib/content-form-key-helpers'
 import {
   contentFormRegistry,
+  contentFormFields,
   type ContentFormCtx,
   type ContentFormDef,
   type ContentFormInputCtx,
@@ -362,6 +369,83 @@ const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
 }
 
 // ---------------------------------------------------------------------------
+// Tab field builders
+// ---------------------------------------------------------------------------
+
+function attributesFields(): FormItem[] {
+  return [
+    {
+      kind: 'row',
+      fields: [
+        {
+          type: 'select',
+          name: 'creatureType',
+          label: 'Creature type',
+          options: creatureTypeOptions,
+          required: true,
+        },
+        {
+          type: 'select',
+          name: 'speed.walk',
+          label: 'Walk speed',
+          options: speedWalkOptions,
+          required: true,
+        },
+      ],
+    },
+    {
+      type: 'chips',
+      name: 'sizes',
+      label: 'Size',
+      options: creatureSizeOptions,
+      required: true,
+    },
+  ]
+}
+
+function traitsArrayField(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    addLabel: 'Add trait',
+    itemTitle: traitItemTitle,
+    fields: traitItemFields(ctx),
+  }
+}
+
+function heritageChoicesArrayField(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'array',
+    name: 'heritageChoices',
+    legend: 'Heritage choices',
+    addLabel: 'Add heritage choice',
+    itemTitle: (values, index) => (values['name'] as string) || `Heritage choice ${index + 1}`,
+    fields: heritageChoiceItemFields(ctx),
+  }
+}
+
+function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
+  return [
+    {
+      id: 'basics',
+      label: 'Basics',
+      fields: [...identityFields(), ...attributesFields()],
+    },
+    {
+      id: 'traits',
+      label: 'Traits',
+      fields: [traitsArrayField(ctx)],
+    },
+    {
+      id: 'heritage-choices',
+      label: 'Heritage choices',
+      fields: [heritageChoicesArrayField(ctx)],
+    },
+  ]
+}
+
+// ---------------------------------------------------------------------------
 // Species ContentFormDef
 // ---------------------------------------------------------------------------
 
@@ -371,61 +455,8 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   schema: speciesFormSchema,
   createDefaultValues: speciesCreateDefaultValues,
 
-  buildFields: (ctx) => [
-    {
-      kind: 'group',
-      legend: 'Identity',
-      fields: identityFields(),
-    },
-    {
-      kind: 'group',
-      legend: 'Attributes',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'select',
-              name: 'creatureType',
-              label: 'Creature type',
-              options: creatureTypeOptions,
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'speed.walk',
-              label: 'Walk speed',
-              options: speedWalkOptions,
-              required: true,
-            },
-          ],
-        },
-        {
-          type: 'chips',
-          name: 'sizes',
-          label: 'Size',
-          options: creatureSizeOptions,
-          required: true,
-        },
-      ],
-    },
-    {
-      kind: 'array',
-      name: 'traits',
-      legend: 'Traits',
-      addLabel: 'Add trait',
-      itemTitle: traitItemTitle,
-      fields: traitItemFields(ctx),
-    },
-    {
-      kind: 'array',
-      name: 'heritageChoices',
-      legend: 'Heritage choices',
-      addLabel: 'Add heritage choice',
-      itemTitle: (values, index) => (values['name'] as string) || `Heritage choice ${index + 1}`,
-      fields: heritageChoiceItemFields(ctx),
-    },
-  ],
+  buildTabs: buildSpeciesTabs,
+  buildFields: (ctx) => contentFormFields(speciesFormDef, ctx),
 
   toFormValues: (entity) => ({
     name: entity.name,

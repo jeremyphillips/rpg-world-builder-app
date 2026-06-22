@@ -31,6 +31,40 @@ naturally tabbed structure (e.g. settings pages). Drop a layer only when you hit
 something it can't express — and consider whether the missing capability belongs
 in the renderer instead.
 
+### `<TabbedForm>` validation behavior
+
+All tab panels stay mounted (`forceMount` on each `TabsContent`) so every field
+registers with react-hook-form and the global Save button validates the **merged**
+schema across tabs in one pass.
+
+**Known gap (first pass):** field-level errors on an **inactive** tab are not
+surfaced on the tab trigger. A failed submit can look like a no-op until the
+author switches to the tab that holds the invalid field.
+
+**Workaround:** if Save does nothing and no error is visible, check other tabs.
+
+**Future improvement (out of scope today):** tab error badges and/or auto-switch
+to the first tab with a validation error on failed submit.
+
+Optional non-field UI (intro copy, links, placeholders) belongs on
+`TabbedFormTab.header` — rendered above that tab's fields, outside the Zod
+schema. Omit `fields` for a panel that is entirely non-input content.
+
+### `<TabbedForm>` sticky chrome
+
+By default (`stickyChrome`, default `true`), `<TabbedForm>` keeps two regions
+fixed while the page scrolls:
+
+- **Tab list** — `sticky top-0` with a solid background so section tabs stay visible.
+- **Actions bar** — `FormActionsBar` wraps the `footer` (and any `formError`) in a
+  `sticky bottom-0` toolbar so Save/Cancel stay reachable on long panels.
+
+Tab panels get extra bottom padding so the last field is not hidden under the
+actions bar. Pass `stickyChrome={false}` to restore the flat layout.
+
+Single-page `<Form>` layouts can opt into the same sticky footer with
+`stickyFooter`.
+
 ## Field anatomy & the a11y contract
 
 Every field — whether composed by hand or emitted by `<Form>` — resolves to the
@@ -119,9 +153,10 @@ shared by every control.
 
 One union, two intents:
 
-- **Intrinsic** (`xs`, `sm`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
+- **Intrinsic** (`xs`, `sm`, `sm-md`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
   `flex-none`, so the field keeps its own width and never grows. `xs` (~64px)
-  suits 1–2 character inputs like a die count.
+  suits 1–2 character inputs like a die count; `sm-md` (~128px) suits compact
+  selects like level pickers.
 - **Proportional** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): these flex within
   a `FieldRow`. `full` (the default) fills remaining space; fractions distribute
   space by **grow weight** (a base-12 scale), so mixed denominators compose and
@@ -214,7 +249,9 @@ const PLAY_STYLE_LABELS: Record<PlayStyle, string> = { dungeon_crawl: 'Dungeon C
 
 The standard actions row for save-style forms (settings, profile): an optional
 success confirmation (`role="status"`) plus a pending-aware `SubmitButton`. Use
-it in the `footer` render prop instead of hand-wiring the same row per form:
+it in the `footer` render prop instead of hand-wiring the same row per form.
+On long forms, `<TabbedForm>` (default) and `<Form stickyFooter>` wrap the footer
+in `<FormActionsBar>` so actions stay visible while content scrolls:
 
 ```tsx
 footer={(form) => (

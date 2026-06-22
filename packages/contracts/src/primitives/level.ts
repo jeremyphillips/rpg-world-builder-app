@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
 // Character level — the shared 1–20 bound for class progression fields
-// (ASI levels, subclass levels, feature levels, ...).
+// (ASI levels, subclass choice level, feature levels, ...).
 // ---------------------------------------------------------------------------
 
 export const MAX_CHARACTER_LEVEL = 20

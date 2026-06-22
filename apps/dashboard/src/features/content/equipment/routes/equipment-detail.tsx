@@ -15,6 +15,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -128,15 +129,21 @@ function getKindStatRows(item: Equipment): StatRow[] {
 
 type EquipmentDetailContentProps = {
   item: Equipment
+  campaignId: string
 }
 
-export function EquipmentDetailContent({ item }: EquipmentDetailContentProps) {
+export function EquipmentDetailContent({ item, campaignId }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
 
   const kindRows = getKindStatRows(item)
 
   return (
-    <ContentDetailLayout imageUrl={getContentImageUrl(item.imageKey)} imageName={item.name}>
+    <ContentDetailLayout
+      imageUrl={getContentImageUrl(item.imageKey)}
+      imageName={item.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('equipment', campaignId, item.id)}
+    >
       <div className="space-y-4">
         <Heading variant="display" as="h2">
           {item.name}
@@ -170,7 +177,7 @@ export function EquipmentDetail() {
       loadErrorLabel="Could not load equipment."
       notFoundLabel="Equipment not found."
     >
-      {(item) => <EquipmentDetailContent item={item} />}
+      {(item) => <EquipmentDetailContent item={item} campaignId={campaignId} />}
     </ContentDetailResolver>
   )
 }

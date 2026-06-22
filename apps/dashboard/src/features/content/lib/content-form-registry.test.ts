@@ -19,7 +19,11 @@
 import { describe, expect, it } from 'vitest'
 import { flattenFields } from '@rpg/ui/form'
 
-import { contentFormRegistry, type ContentFormDef } from './content-form-registry'
+import {
+  contentFormRegistry,
+  contentFormFields,
+  type ContentFormDef,
+} from './content-form-registry'
 // Populate the registry — each import registers its def as a side effect.
 import '../species/lib/species-form-def'
 import '../classes/lib/class-form-def'
@@ -55,16 +59,24 @@ describe.each(entries)('ContentFormDef[%s] — registration contract', (_key, de
   })
 
   it('buildFields({}) returns a non-empty FormItem array', () => {
-    const fields = def.buildFields({})
+    const fields = contentFormFields(def, {})
     expect(Array.isArray(fields)).toBe(true)
     expect(fields.length).toBeGreaterThan(0)
   })
 
-  it('flattenFields(buildFields({})) contains at least one leaf field', () => {
-    const fields = def.buildFields({})
+  it('flattenFields(contentFormFields({}, ctx)) contains at least one leaf field', () => {
+    const fields = contentFormFields(def, {})
     const leaves = flattenFields(fields)
     expect(leaves.length).toBeGreaterThan(0)
   })
+
+  if (def.buildTabs) {
+    it('buildTabs({}) returns a non-empty tab array', () => {
+      const tabs = def.buildTabs!({})
+      expect(Array.isArray(tabs)).toBe(true)
+      expect(tabs.length).toBeGreaterThan(0)
+    })
+  }
 
   it('toFormValues is a function', () => {
     expect(def.toFormValues).toBeTypeOf('function')

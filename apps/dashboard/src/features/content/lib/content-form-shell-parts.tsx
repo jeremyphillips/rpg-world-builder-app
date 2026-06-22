@@ -1,11 +1,13 @@
-import { Link } from 'react-router-dom'
-import type { DefaultValues, FieldValues } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { Form, FormSaveFooter, type FormItem } from '@rpg/ui/form'
+import { Form, FormSaveFooter, TabbedForm, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useContentFormOptions } from './content-form-options'
-import type { ContentFormCtx } from './content-form-registry'
+import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
+import { contentFormFields } from './content-form-registry'
 
 export const CONTENT_CATALOG_OPTIONS_ERROR = 'Could not load catalog options.'
 
@@ -39,13 +41,22 @@ export function ContentFormCancelFooter({
   submitLabel,
   pending,
 }: ContentFormCancelFooterProps) {
+  const navigate = useNavigate()
+
   return (
-    <div className="flex items-center gap-3 pt-4">
-      <FormSaveFooter pending={pending} submitLabel={submitLabel} />
-      <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-        Cancel
-      </Link>
-    </div>
+    <>
+      <FormUnsavedChangesGuard />
+      <div className="flex items-center gap-3">
+        <FormSaveFooter pending={pending} submitLabel={submitLabel} />
+        <button
+          type="button"
+          onClick={() => navigate(backHref)}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          Cancel
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -58,7 +69,7 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   submitLabel: string
   submitPending: boolean
   formError: string | null
-  onSubmit: (values: TFormValues) => Promise<void>
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
 }
 
 export function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -81,6 +92,7 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
         defaultValues={defaultValues}
         onSubmit={onSubmit}
         formError={formError}
+        stickyFooter
         footer={(form) => (
           <ContentFormCancelFooter
             backHref={backHref}
@@ -91,6 +103,94 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
       />
     </div>
   )
+}
+
+interface ContentTabbedSchemaFormProps<TFormValues extends FieldValues> {
+  schema: ZodType<TFormValues>
+  tabs: TabbedFormTab[]
+  defaultValues?: DefaultValues<TFormValues>
+  formKey?: string
+  backHref: string
+  submitLabel: string
+  submitPending: boolean
+  formError: string | null
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+}
+
+export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
+  schema,
+  tabs,
+  defaultValues,
+  formKey,
+  backHref,
+  submitLabel,
+  submitPending,
+  formError,
+  onSubmit,
+}: ContentTabbedSchemaFormProps<TFormValues>) {
+  return (
+    <div className="max-w-2xl">
+      <TabbedForm<TFormValues>
+        key={formKey}
+        schema={schema}
+        tabs={tabs}
+        defaultValues={defaultValues}
+        collapsibleSections={false}
+        onSubmit={(values, form) => onSubmit(values, form)}
+        formError={formError}
+        footer={(form) => (
+          <ContentFormCancelFooter
+            backHref={backHref}
+            submitLabel={submitLabel}
+            pending={submitPending || form.formState.isSubmitting}
+          />
+        )}
+      />
+    </div>
+  )
+}
+
+interface ContentFormLayoutProps<TFormValues extends FieldValues> {
+  def: AnyContentFormDef
+  ctx: ContentFormCtx
+  schema: ZodType<TFormValues>
+  defaultValues?: DefaultValues<TFormValues>
+  formKey?: string
+  backHref: string
+  submitLabel: string
+  submitPending: boolean
+  formError: string | null
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+}
+
+export function ContentFormLayout<TFormValues extends FieldValues>({
+  def,
+  ctx,
+  schema,
+  defaultValues,
+  formKey,
+  backHref,
+  submitLabel,
+  submitPending,
+  formError,
+  onSubmit,
+}: ContentFormLayoutProps<TFormValues>) {
+  const sharedProps = {
+    schema,
+    defaultValues,
+    formKey,
+    backHref,
+    submitLabel,
+    submitPending,
+    formError,
+    onSubmit,
+  }
+
+  if (def.buildTabs) {
+    return <ContentTabbedSchemaForm tabs={def.buildTabs(ctx)} {...sharedProps} />
+  }
+
+  return <ContentSchemaForm fields={contentFormFields(def, ctx)} {...sharedProps} />
 }
 
 interface ContentFormOptionsGateProps {

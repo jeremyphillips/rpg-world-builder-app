@@ -5,6 +5,7 @@ import type { UpdateProfileInput } from '@rpg/contracts'
 
 import { useSession } from '@/features/auth'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { useUpdateProfile } from '../hooks/use-update-profile'
 import { accountFormSchema, accountFields, type AccountFormValues } from '../lib/account-fields'
@@ -20,7 +21,7 @@ export function ProfileSection() {
     uploadErrorMessage: 'Could not upload avatar.',
   })
 
-  const { onSubmit, formError } = useSubmitHandler<AccountFormValues>(async (values) => {
+  const { onSubmit, formError } = useSubmitHandler<AccountFormValues>(async (values, form) => {
     const input: UpdateProfileInput = {
       displayName: values.displayName,
       email: values.email,
@@ -28,6 +29,11 @@ export function ProfileSection() {
     const avatarKey = await avatarField.resolveImageKey(values.avatar)
     if (avatarKey !== undefined) input.avatarKey = avatarKey
     await mutateAsync(input)
+    form.reset({
+      displayName: values.displayName,
+      email: values.email,
+      avatar: [],
+    })
   }, 'Could not save profile.')
 
   return (
@@ -54,12 +60,15 @@ export function ProfileSection() {
         onSubmit={onSubmit}
         formError={formError}
         footer={(form) => (
-          <FormSaveFooter
-            pending={isPending || form.formState.isSubmitting}
-            isSuccess={isSuccess}
-            submitLabel="Save profile"
-            successMessage="Profile saved."
-          />
+          <>
+            <FormUnsavedChangesGuard />
+            <FormSaveFooter
+              pending={isPending || form.formState.isSubmitting}
+              isSuccess={isSuccess}
+              submitLabel="Save profile"
+              successMessage="Profile saved."
+            />
+          </>
         )}
       />
     </section>

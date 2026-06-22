@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
-import type { Campaign, SessionUser } from '@rpg/contracts'
+import type { CampaignListItem, SessionUser } from '@rpg/contracts'
 
 vi.mock('@/features/auth/api/auth-client')
 vi.mock('@/features/campaign/api/campaign-client')
@@ -22,7 +22,7 @@ const user: SessionUser = {
   lastSelectedCampaignId: null,
 }
 
-function campaign(id: string, name: string): Campaign {
+function campaign(id: string, name: string): CampaignListItem {
   return {
     id,
     identity: { name },
@@ -31,6 +31,7 @@ function campaign(id: string, name: string): Campaign {
     visibility: 'private',
     rulesetId: 'srd-cc-5.2.1',
     createdBy: 'u1',
+    campaignRole: 'owner',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
   }

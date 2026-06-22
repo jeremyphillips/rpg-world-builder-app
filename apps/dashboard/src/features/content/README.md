@@ -35,3 +35,15 @@ nested list pattern appears.
 Class and subclass [`FeatureItem`](./lib/feature-item.tsx) rows compose SRD-style
 headings at render time via [`formatFeatureHtml`](./lib/format-feature-html.ts);
 stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).
+
+## Tabbed create/edit forms
+
+Class and species create/edit shells use [`TabbedForm`](../../../packages/ui/docs/forms.md)
+when a `ContentFormDef` exposes `buildTabs`. Other content types still use a
+single-page `<Form>`. See the TabbedForm validation note in `forms.md` if Save
+fails without a visible error — check inactive tabs.
+
+Detail and overview authoring controls (Edit, New, row actions) are gated by
+[`useCanManageCampaign`](./campaign/hooks/use-can-manage-campaign.ts) — owner or
+co-owner membership from `GET /api/campaigns`. Create/edit routes use
+[`ContentAuthoringGate`](./lib/content-authoring-gate.tsx) for the same check.

@@ -65,7 +65,7 @@ describe('TabbedForm', () => {
     expect(screen.getByLabelText('Starting level')).toBeInTheDocument()
   })
 
-  it('renders a form-level error below the tabs', () => {
+  it('renders a form-level error in the sticky actions bar', () => {
     render(
       <TabbedForm<TestValues>
         schema={schema}
@@ -75,6 +75,7 @@ describe('TabbedForm', () => {
       />,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toBeInTheDocument()
   })
 
   it('renders a custom footer', () => {
@@ -105,6 +106,54 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
     expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ name: 'The Sunless Citadel' })
+  })
+
+  it('renders tab header content above fields', async () => {
+    const tabsWithHeader: TabbedFormTab[] = [
+      ...tabs,
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [],
+        header: <p>Notes are managed elsewhere.</p>,
+      },
+    ]
+    render(<TabbedForm<TestValues> schema={schema} tabs={tabsWithHeader} onSubmit={vi.fn()} />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Notes' }))
+    expect(screen.getByText('Notes are managed elsewhere.')).toBeInTheDocument()
+  })
+
+  it('applies sticky chrome when enabled', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save changes</button>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    expect(tablist.parentElement).toHaveClass('sticky')
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('sticky')
+  })
+
+  it('renders a flat layout when stickyChrome is false', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        stickyChrome={false}
+        formError="Something went wrong."
+        footer={<button type="submit">Save changes</button>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    expect(tablist.parentElement).not.toHaveClass('sticky')
+    expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
   })
 
   it('has no accessibility violations', async () => {
