@@ -12,5 +12,5 @@
     "types": ["node", "vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["next-env.d.ts", "src", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "dist"]
+  "exclude": ["node_modules", ".next", "dist", "**/*.stories.tsx"]
 }

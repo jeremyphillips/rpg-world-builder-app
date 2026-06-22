@@ -262,6 +262,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.101.0
         version: 5.101.0(react@19.2.7)
+      lucide-react:
+        specifier: ^1.17.0
+        version: 1.17.0(react@19.2.7)
       next:
         specifier: ^16.2.7
         version: 16.2.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -305,6 +308,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.0.2
         version: 6.0.2(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+      axe-core:
+        specifier: ^4.12.0
+        version: 4.12.0
       eslint:
         specifier: ^10.4.1
         version: 10.4.1(jiti@2.6.1)

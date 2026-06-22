@@ -15,6 +15,7 @@ apps/
 packages/
   config/      # shared tsconfig / eslint / prettier / vitest / storybook presets
   contracts/   # Zod schemas + inferred TS types (single source of truth)
+  api-client/  # same-origin fetch + CSRF + auth helpers (fetchSession, logout)
   catalog/     # system SRD seed JSON + validated loaders (shared catalog data)
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
@@ -30,6 +31,7 @@ docs/          # this folder — cross-cutting architecture/env/run guides
 | `@rpg/api`       | [apps/api/README.md](../apps/api/README.md)                     |
 | `@rpg/config`    | [packages/config/README.md](../packages/config/README.md)       |
 | `@rpg/contracts` | [packages/contracts/README.md](../packages/contracts/README.md) |
+| `@rpg/api-client` | [packages/api-client/README.md](../packages/api-client/README.md) |
 | `@rpg/catalog`   | [packages/catalog/README.md](../packages/catalog/README.md)     |
 | `@rpg/ui`        | [packages/ui/README.md](../packages/ui/README.md)               |
 
@@ -48,6 +50,7 @@ flowchart LR
   mongo[("MongoDB / Mongoose")]
   ui["packages/ui"]
   contracts["packages/contracts"]
+  apiClient["packages/api-client"]
 
   proxy -->|"/"| publicApp
   proxy -->|"/app"| dashboard
@@ -56,7 +59,9 @@ flowchart LR
   publicApp --- ui
   dashboard --- ui
   publicApp --- contracts
+  publicApp --- apiClient
   dashboard --- contracts
+  dashboard --- apiClient
   api --- contracts
 ```
 
@@ -92,9 +97,14 @@ sequenceDiagram
   P-->>U: redirect to /app/
   U->>D: open /app/
   D->>A: GET /api/auth/me (cookie auto-sent)
-  A-->>D: { user } or 401
+  A-->>D: { user, activeCampaign } or 401
   D-->>U: render workspace, or redirect to /login
 ```
+
+The public app uses the same `GET /api/auth/me` contract for its header and to
+redirect signed-in users away from `/login` and `/signup`. Cross-app navigation
+paths (`/app/`, `/login`, `/app/profile`, …) are centralized as
+`CROSS_APP_PATHS` in `@rpg/contracts`.
 
 Details: [public auth forms](../apps/public/docs/auth-forms.md),
 [dashboard auth guard](../apps/dashboard/docs/auth-guard.md),
@@ -103,9 +113,13 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
 ## Shared contracts & UI
 
 - **`@rpg/contracts`** is the single source of truth for domain/DTO shapes:
-  Zod schemas with `z.infer` types (`Role`, `User`, `SessionUser`, `LoginInput`,
-  `RegisterInput`). The API validates against them; the public app's forms reuse
-  the same schemas with `@hookform/resolvers/zod`.
+  Zod schemas with `z.infer` types (`Role`, `User`, `SessionUser`, `AuthMeResponse`,
+  `LoginInput`, `RegisterInput`) and cross-app route constants (`CROSS_APP_PATHS`).
+  The API validates against them; the public app's forms reuse the same schemas
+  with `@hookform/resolvers/zod`.
+- **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,
+  `ApiError`, `fetchSession`, `logout`) shared by the public and dashboard apps.
+  No React dependency — apps wire it through TanStack Query hooks locally.
 - **`@rpg/ui`** ships shadcn primitives, the Tailwind v4 preset, and design
   tokens (`@rpg/ui/styles.css`) consumed by both apps. Storybook is split:
   `@rpg/ui` on `:6006` for the design system; `@rpg/dashboard` on `:6007` for

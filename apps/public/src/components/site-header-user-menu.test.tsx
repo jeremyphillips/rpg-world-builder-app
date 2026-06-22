@@ -1,0 +1,43 @@
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import axe from 'axe-core'
+
+import { SiteHeaderUserMenu } from './site-header-user-menu.client'
+
+vi.mock('@/features/auth', () => ({
+  useLogout: () => ({ mutate: vi.fn(), isPending: false }),
+}))
+
+const user = {
+  id: 'u1',
+  email: 'dm@example.com',
+  displayName: 'Dungeon Master',
+  role: 'user' as const,
+  lastSelectedCampaignId: null,
+}
+
+describe('SiteHeaderUserMenu', () => {
+  it('has no axe violations when the menu is open', async () => {
+    const view = render(<SiteHeaderUserMenu user={user} />)
+    await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
+
+    const { violations } = await axe.run(view.container)
+    expect(violations).toHaveLength(0)
+  })
+
+  it('links to dashboard routes for navigation items', async () => {
+    render(<SiteHeaderUserMenu user={user} />)
+    await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
+
+    expect(screen.getByRole('menuitem', { name: /dashboard/i })).toHaveAttribute('href', '/app/')
+    expect(screen.getByRole('menuitem', { name: /profile/i })).toHaveAttribute(
+      'href',
+      '/app/profile',
+    )
+    expect(screen.getByRole('menuitem', { name: /account settings/i })).toHaveAttribute(
+      'href',
+      '/app/account',
+    )
+  })
+})
