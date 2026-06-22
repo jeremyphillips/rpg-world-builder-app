@@ -1,17 +1,19 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail-validation'
 import { useMasterDetailArray } from '../../lib/use-master-detail-array'
 import {
   MasterDetailListPanel,
   type MasterDetailListItem,
 } from '../../components/master-detail-list-panel.client'
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
+import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import { classFeatureItemFields } from '../lib/class-feature-form-fields'
 
 const FEATURES_FIELD_NAME = 'features'
@@ -55,6 +57,9 @@ export interface ClassFeaturesTabProps {
  * panel below and an "Inactive" badge surfaces via the list item's `badge`.
  */
 export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
+  const {
+    formState: { submitCount },
+  } = useFormContext()
   const fields = useMemo(() => classFeatureItemFields(formCtx), [formCtx])
   const makeItemDefaults = useCallback(() => buildItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
@@ -69,9 +74,12 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       title: featureTitle(row, index),
       eyebrow: featureEyebrow(row),
       deletable: !locked,
+      hasError: editor.hasRowError(index),
       ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),
     }
   })
+
+  const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
   const selectedFieldId =
     editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
@@ -95,7 +103,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
           onRemove={editor.requestRemove}
         />
 
-        <div className="md:col-span-2">
+        <div className="space-y-3 md:col-span-2">
+          <MasterDetailValidationBanner visible={showValidationBanner} />
           {editor.selectedIndex !== null && selectedFieldId ? (
             <FormItems
               key={selectedFieldId}
@@ -103,11 +112,11 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
               idPrefix={`class-feature-${selectedFieldId}`}
               namePrefix={`${FEATURES_FIELD_NAME}.${editor.selectedIndex}`}
             />
-          ) : (
+          ) : !showValidationBanner ? (
             <Text variant="muted" className="text-sm">
               Select a feature to edit, or add one to get started.
             </Text>
-          )}
+          ) : null}
         </div>
       </div>
 

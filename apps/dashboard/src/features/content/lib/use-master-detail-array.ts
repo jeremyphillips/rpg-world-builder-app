@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useCallback, useEffect, useState } from 'react'
+import { useFieldArray, useFormContext, type FieldErrors } from 'react-hook-form'
 
 export interface UseMasterDetailArrayResult {
   /** Field-array rows from RHF; each carries a stable `id` for React keys. */
@@ -17,6 +17,10 @@ export interface UseMasterDetailArrayResult {
   cancelRemove: () => void
   /** Removes the row pending confirmation and clamps the selection. */
   confirmRemove: () => void
+  /** Whether the row at `index` has validation errors in the parent form. */
+  hasRowError: (index: number) => boolean
+  /** Selects the first row with validation errors for `name`, if any. */
+  autoSelectFirstInvalid: () => void
 }
 
 /** Resolves the effective selection: null when empty, else clamped in range. */
@@ -25,6 +29,59 @@ function resolveSelectedIndex(selected: number | null, length: number): number |
   if (selected === null || selected < 0) return 0
   if (selected > length - 1) return length - 1
   return selected
+}
+
+function rowHasError(errors: FieldErrors, name: string, index: number): boolean {
+  const arrayErrors = errors[name]
+  if (arrayErrors == null) return false
+
+  if (Array.isArray(arrayErrors)) {
+    const rowError = arrayErrors[index]
+    return rowError != null && typeof rowError === 'object'
+  }
+
+  if (typeof arrayErrors === 'object') {
+    const rowError = (arrayErrors as Record<number, unknown>)[index]
+    return rowError != null && typeof rowError === 'object'
+  }
+
+  return false
+}
+
+/** Returns the first array index with row-level errors, or `null` when none. */
+export function findFirstInvalidRowIndex(errors: FieldErrors, name: string): number | null {
+  const arrayErrors = errors[name]
+  if (arrayErrors == null) return null
+
+  if (Array.isArray(arrayErrors)) {
+    const index = arrayErrors.findIndex(
+      (rowError) => rowError != null && typeof rowError === 'object',
+    )
+    return index >= 0 ? index : null
+  }
+
+  if (typeof arrayErrors === 'object') {
+    const indices = Object.keys(arrayErrors)
+      .map(Number)
+      .filter((n) => !Number.isNaN(n))
+      .sort((a, b) => a - b)
+
+    for (const index of indices) {
+      const rowError = (arrayErrors as Record<number, unknown>)[index]
+      if (rowError != null && typeof rowError === 'object') return index
+    }
+  }
+
+  return null
+}
+
+export function autoSelectFirstInvalid(
+  errors: FieldErrors,
+  name: string,
+  select: (index: number) => void,
+): void {
+  const index = findFirstInvalidRowIndex(errors, name)
+  if (index !== null) select(index)
 }
 
 /**
@@ -41,7 +98,10 @@ export function useMasterDetailArray(
   name: string,
   makeItemDefaults: () => Record<string, unknown>,
 ): UseMasterDetailArrayResult {
-  const { control } = useFormContext()
+  const {
+    control,
+    formState: { errors, submitCount },
+  } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
   const [rawSelected, setRawSelected] = useState<number | null>(null)
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
@@ -49,6 +109,20 @@ export function useMasterDetailArray(
   const selectedIndex = resolveSelectedIndex(rawSelected, fields.length)
 
   const select = useCallback((index: number) => setRawSelected(index), [])
+
+  const hasRowError = useCallback(
+    (index: number) => rowHasError(errors, name, index),
+    [errors, name],
+  )
+
+  const autoSelectFirstInvalidForField = useCallback(() => {
+    autoSelectFirstInvalid(errors, name, setRawSelected)
+  }, [errors, name])
+
+  useEffect(() => {
+    if (submitCount === 0) return
+    autoSelectFirstInvalid(errors, name, setRawSelected)
+  }, [errors, name, submitCount])
 
   const handleAdd = useCallback(() => {
     append(makeItemDefaults())
@@ -78,5 +152,7 @@ export function useMasterDetailArray(
     requestRemove,
     cancelRemove,
     confirmRemove,
+    hasRowError,
+    autoSelectFirstInvalid: autoSelectFirstInvalidForField,
   }
 }

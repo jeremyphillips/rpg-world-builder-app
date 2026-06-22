@@ -1,17 +1,19 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail-validation'
 import { useMasterDetailArray } from '../../lib/use-master-detail-array'
 import {
   MasterDetailListPanel,
   type MasterDetailListItem,
 } from '../../components/master-detail-list-panel.client'
 import { MasterDetailDeleteDialog } from '../../components/master-detail-delete-dialog.client'
+import { MasterDetailValidationBanner } from '../../components/master-detail-validation-banner.client'
 import {
   traitItemFields,
   traitItemTitle,
@@ -50,6 +52,9 @@ export interface SpeciesTraitsTabProps {
  * unchanged from the previous inline array.
  */
 export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
+  const {
+    formState: { submitCount },
+  } = useFormContext()
   const fields = useMemo(() => traitItemFields(formCtx), [formCtx])
   const makeItemDefaults = useCallback(() => buildItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(TRAITS_FIELD_NAME, makeItemDefaults)
@@ -64,9 +69,12 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       title: traitItemTitle(row ?? {}, index),
       eyebrow: traitEyebrow(row),
       deletable: !locked,
+      hasError: editor.hasRowError(index),
       ...(locked ? { badge: { label: 'System', variant: 'secondary' as const } } : {}),
     }
   })
+
+  const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
   const selectedFieldId =
     editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
@@ -90,7 +98,8 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
           onRemove={editor.requestRemove}
         />
 
-        <div className="md:col-span-2">
+        <div className="space-y-3 md:col-span-2">
+          <MasterDetailValidationBanner visible={showValidationBanner} />
           {editor.selectedIndex !== null && selectedFieldId ? (
             <FormItems
               key={selectedFieldId}
@@ -98,11 +107,11 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
               idPrefix={`species-trait-${selectedFieldId}`}
               namePrefix={`${TRAITS_FIELD_NAME}.${editor.selectedIndex}`}
             />
-          ) : (
+          ) : !showValidationBanner ? (
             <Text variant="muted" className="text-sm">
               Select a trait to edit, or add one to get started.
             </Text>
-          )}
+          ) : null}
         </div>
       </div>
 

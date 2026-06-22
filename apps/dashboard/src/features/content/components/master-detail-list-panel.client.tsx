@@ -1,5 +1,5 @@
 import { cn, Badge, Button, Text } from '@rpg/ui'
-import { Trash2 } from 'lucide-react'
+import { AlertCircle, Trash2 } from 'lucide-react'
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -10,6 +10,8 @@ export interface MasterDetailListItem {
   eyebrow?: string
   /** Optional status badge (e.g. ownership). */
   badge?: { label: string; variant?: 'secondary' | 'outline' }
+  /** When true, surfaces a validation error indicator on the row. */
+  hasError?: boolean
   /**
    * Whether the row shows a remove control. Defaults to `true`; pass `false`
    * for protected rows (e.g. system content).
@@ -77,6 +79,7 @@ export function MasterDetailListPanel({
                   <button
                     type="button"
                     aria-current={isSelected ? 'true' : undefined}
+                    aria-invalid={item.hasError ? true : undefined}
                     onClick={() => onSelect(index)}
                     className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
                   >
@@ -86,11 +89,22 @@ export function MasterDetailListPanel({
                       </span>
                     ) : null}
                     <span className="block truncate font-medium">{item.title}</span>
-                    {item.badge ? (
-                      <span className="mt-1 flex flex-wrap gap-1">
-                        <Badge variant={item.badge.variant ?? 'outline'} className="text-[10px]">
-                          {item.badge.label}
-                        </Badge>
+                    {item.hasError || item.badge ? (
+                      <span className="mt-1 flex flex-wrap items-center gap-1">
+                        {item.hasError ? (
+                          <>
+                            <AlertCircle
+                              className="size-3.5 shrink-0 text-destructive"
+                              aria-hidden
+                            />
+                            <span className="sr-only">Has validation errors</span>
+                          </>
+                        ) : null}
+                        {item.badge ? (
+                          <Badge variant={item.badge.variant ?? 'outline'} className="text-[10px]">
+                            {item.badge.label}
+                          </Badge>
+                        ) : null}
                       </span>
                     ) : null}
                   </button>

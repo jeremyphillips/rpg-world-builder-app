@@ -69,6 +69,18 @@ describe('MasterDetailListPanel', () => {
     expect(screen.getByText(/No features yet/i)).toBeInTheDocument()
   })
 
+  it('renders a validation error indicator for rows with hasError', () => {
+    const errorItems: MasterDetailListItem[] = [
+      { id: 'a', title: 'Rage', eyebrow: 'Level 1', hasError: true },
+    ]
+    render(<MasterDetailListPanel {...baseProps()} items={errorItems} />)
+
+    expect(screen.getByText('Has validation errors')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /^(?!Remove).*Has validation errors/ }),
+    ).toHaveAttribute('aria-invalid', 'true')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<MasterDetailListPanel {...baseProps()} />)
     const results = await axe.run(container, axeOptions)

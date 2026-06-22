@@ -53,11 +53,12 @@ co-owner membership from `GET /api/campaigns`. Create/edit routes use
 Long embedded arrays (where each row is itself a heavy form) can render as a
 list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 
-| Piece                                                                             | Role                                                                                                                  |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`useMasterDetailArray`](./lib/use-master-detail-array.ts)                        | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped) and the delete-confirm flow. |
-| [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)       | Sidebar: add button + selectable rows with optional eyebrow, status badge, and per-row delete control.                |
-| [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx) | Shared `ConfirmDialog` wrapper for row removal.                                                                       |
+| Piece                                                                                     | Role                                                                                                                  |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`useMasterDetailArray`](./lib/use-master-detail-array.ts)                                | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped) and the delete-confirm flow. |
+| [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)               | Sidebar: add button + selectable rows with optional eyebrow, status badge, and per-row delete control.                |
+| [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx)         | Shared `ConfirmDialog` wrapper for row removal.                                                                       |
+| [`MasterDetailValidationBanner`](./components/master-detail-validation-banner.client.tsx) | Post-submit alert when unselected list rows have validation errors.                                                   |
 
 It is presentation-only over the parent form, so global save and validation are
 unchanged. The detail panel is caller-owned (typically `FormItems` for the
