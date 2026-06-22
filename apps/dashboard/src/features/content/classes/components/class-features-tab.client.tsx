@@ -101,6 +101,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
           onAdd={editor.handleAdd}
           onSelect={editor.select}
           onRemove={editor.requestRemove}
+          onMoveUp={editor.moveUp}
+          onMoveDown={editor.moveDown}
         />
 
         <div className="space-y-3 md:col-span-2">

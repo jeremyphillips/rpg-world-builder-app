@@ -197,4 +197,57 @@ describe('useMasterDetailArray', () => {
 
     expect(result.current.selectedIndex).toBe(1)
   })
+
+  it('moves a row and keeps the selection on the moved row', () => {
+    const { Wrapper, getForm } = createFormWrapper({
+      features: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
+    })
+    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
+      wrapper: Wrapper,
+    })
+
+    act(() => result.current.select(0))
+    act(() => result.current.moveDown(0))
+
+    expect(
+      getForm()
+        .getValues('features')
+        .map((row) => row.name),
+    ).toEqual(['B', 'A', 'C'])
+    expect(result.current.selectedIndex).toBe(1)
+  })
+
+  it('does not move up the first row', () => {
+    const { Wrapper, getForm } = createFormWrapper({
+      features: [{ name: 'A' }, { name: 'B' }],
+    })
+    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
+      wrapper: Wrapper,
+    })
+
+    act(() => result.current.moveUp(0))
+
+    expect(
+      getForm()
+        .getValues('features')
+        .map((row) => row.name),
+    ).toEqual(['A', 'B'])
+  })
+
+  it('does not move down the last row', () => {
+    const { Wrapper, getForm } = createFormWrapper({
+      features: [{ name: 'A' }, { name: 'B' }],
+    })
+    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
+      wrapper: Wrapper,
+    })
+
+    act(() => result.current.moveDown(1))
+
+    expect(
+      getForm()
+        .getValues('features')
+        .map((row) => row.name),
+    ).toEqual(['A', 'B'])
+  })
 })

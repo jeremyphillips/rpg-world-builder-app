@@ -40,7 +40,7 @@ describe('MasterDetailListPanel', () => {
     const props = baseProps()
     render(<MasterDetailListPanel {...props} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove).*Unarmored Defense/ }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove|Move).*Unarmored Defense/ }))
     expect(props.onSelect).toHaveBeenCalledWith(1)
   })
 
@@ -79,6 +79,22 @@ describe('MasterDetailListPanel', () => {
     expect(
       screen.getByRole('button', { name: /^(?!Remove).*Has validation errors/ }),
     ).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('renders reorder controls and disables them at the list boundaries', async () => {
+    const user = userEvent.setup()
+    const onMoveUp = vi.fn()
+    const onMoveDown = vi.fn()
+    render(<MasterDetailListPanel {...baseProps()} onMoveUp={onMoveUp} onMoveDown={onMoveDown} />)
+
+    expect(screen.getByRole('button', { name: /Move Rage up/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /Move Unarmored Defense down/i })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: /Move Unarmored Defense up/i }))
+    expect(onMoveUp).toHaveBeenCalledWith(1)
+
+    await user.click(screen.getByRole('button', { name: /Move Rage down/i }))
+    expect(onMoveDown).toHaveBeenCalledWith(0)
   })
 
   it('has no axe accessibility violations', async () => {

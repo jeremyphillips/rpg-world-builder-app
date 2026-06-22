@@ -1,5 +1,5 @@
 import { cn, Badge, Button, Text } from '@rpg/ui'
-import { AlertCircle, Trash2 } from 'lucide-react'
+import { AlertCircle, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -30,6 +30,150 @@ export interface MasterDetailListPanelProps {
   onSelect: (index: number) => void
   /** Invoked when a deletable row's remove control is activated. */
   onRemove: (index: number) => void
+  /** When provided, renders per-row move-up controls (disabled on the first row). */
+  onMoveUp?: (index: number) => void
+  /** When provided, renders per-row move-down controls (disabled on the last row). */
+  onMoveDown?: (index: number) => void
+}
+
+interface MasterDetailListRowProps {
+  item: MasterDetailListItem
+  index: number
+  itemCount: number
+  isSelected: boolean
+  onSelect: (index: number) => void
+  onRemove: (index: number) => void
+  onMoveUp?: (index: number) => void
+  onMoveDown?: (index: number) => void
+}
+
+function MasterDetailListRowStatus({
+  hasError,
+  badge,
+}: Pick<MasterDetailListItem, 'hasError' | 'badge'>) {
+  if (!hasError && !badge) return null
+
+  return (
+    <span className="mt-1 flex flex-wrap items-center gap-1">
+      {hasError ? (
+        <>
+          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
+          <span className="sr-only">Has validation errors</span>
+        </>
+      ) : null}
+      {badge ? (
+        <Badge variant={badge.variant ?? 'outline'} className="text-[10px]">
+          {badge.label}
+        </Badge>
+      ) : null}
+    </span>
+  )
+}
+
+function MasterDetailListRowReorder({
+  title,
+  index,
+  itemCount,
+  onMoveUp,
+  onMoveDown,
+}: {
+  title: string
+  index: number
+  itemCount: number
+  onMoveUp?: (index: number) => void
+  onMoveDown?: (index: number) => void
+}) {
+  if (!onMoveUp && !onMoveDown) return null
+
+  return (
+    <div className="flex shrink-0 flex-col">
+      {onMoveUp ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="size-8 p-0"
+          disabled={index === 0}
+          aria-label={`Move ${title} up`}
+          onClick={() => onMoveUp(index)}
+        >
+          <ChevronUp className="size-4" aria-hidden />
+        </Button>
+      ) : null}
+      {onMoveDown ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="size-8 p-0"
+          disabled={index === itemCount - 1}
+          aria-label={`Move ${title} down`}
+          onClick={() => onMoveDown(index)}
+        >
+          <ChevronDown className="size-4" aria-hidden />
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
+function MasterDetailListRow({
+  item,
+  index,
+  itemCount,
+  isSelected,
+  onSelect,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: MasterDetailListRowProps) {
+  const deletable = item.deletable !== false
+
+  return (
+    <li>
+      <div
+        className={cn(
+          'flex items-center gap-1 rounded-md border border-transparent',
+          isSelected && 'border-border bg-muted/40',
+        )}
+      >
+        <button
+          type="button"
+          aria-current={isSelected ? 'true' : undefined}
+          aria-invalid={item.hasError ? true : undefined}
+          onClick={() => onSelect(index)}
+          className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
+        >
+          {item.eyebrow ? (
+            <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {item.eyebrow}
+            </span>
+          ) : null}
+          <span className="block truncate font-medium">{item.title}</span>
+          <MasterDetailListRowStatus hasError={item.hasError} badge={item.badge} />
+        </button>
+        <MasterDetailListRowReorder
+          title={item.title}
+          index={index}
+          itemCount={itemCount}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
+        />
+        {deletable ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mr-1 size-8 shrink-0 p-0"
+            aria-label={`Remove ${item.title}`}
+            onClick={() => onRemove(index)}
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </Button>
+        ) : null}
+      </div>
+    </li>
+  )
 }
 
 /**
@@ -51,6 +195,8 @@ export function MasterDetailListPanel({
   onAdd,
   onSelect,
   onRemove,
+  onMoveUp,
+  onMoveDown,
 }: MasterDetailListPanelProps) {
   return (
     <nav aria-label={ariaLabel} className="flex flex-col gap-3">
@@ -64,66 +210,19 @@ export function MasterDetailListPanel({
         </Text>
       ) : (
         <ul className="space-y-1" role="list">
-          {items.map((item, index) => {
-            const isSelected = index === selectedIndex
-            const deletable = item.deletable !== false
-
-            return (
-              <li key={item.id}>
-                <div
-                  className={cn(
-                    'flex items-center gap-1 rounded-md border border-transparent',
-                    isSelected && 'border-border bg-muted/40',
-                  )}
-                >
-                  <button
-                    type="button"
-                    aria-current={isSelected ? 'true' : undefined}
-                    aria-invalid={item.hasError ? true : undefined}
-                    onClick={() => onSelect(index)}
-                    className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
-                  >
-                    {item.eyebrow ? (
-                      <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        {item.eyebrow}
-                      </span>
-                    ) : null}
-                    <span className="block truncate font-medium">{item.title}</span>
-                    {item.hasError || item.badge ? (
-                      <span className="mt-1 flex flex-wrap items-center gap-1">
-                        {item.hasError ? (
-                          <>
-                            <AlertCircle
-                              className="size-3.5 shrink-0 text-destructive"
-                              aria-hidden
-                            />
-                            <span className="sr-only">Has validation errors</span>
-                          </>
-                        ) : null}
-                        {item.badge ? (
-                          <Badge variant={item.badge.variant ?? 'outline'} className="text-[10px]">
-                            {item.badge.label}
-                          </Badge>
-                        ) : null}
-                      </span>
-                    ) : null}
-                  </button>
-                  {deletable ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="mr-1 size-8 shrink-0 p-0"
-                      aria-label={`Remove ${item.title}`}
-                      onClick={() => onRemove(index)}
-                    >
-                      <Trash2 className="size-4" aria-hidden />
-                    </Button>
-                  ) : null}
-                </div>
-              </li>
-            )
-          })}
+          {items.map((item, index) => (
+            <MasterDetailListRow
+              key={item.id}
+              item={item}
+              index={index}
+              itemCount={items.length}
+              isSelected={index === selectedIndex}
+              onSelect={onSelect}
+              onRemove={onRemove}
+              onMoveUp={onMoveUp}
+              onMoveDown={onMoveDown}
+            />
+          ))}
         </ul>
       )}
     </nav>

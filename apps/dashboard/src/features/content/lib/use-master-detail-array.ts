@@ -21,6 +21,12 @@ export interface UseMasterDetailArrayResult {
   hasRowError: (index: number) => boolean
   /** Selects the first row with validation errors for `name`, if any. */
   autoSelectFirstInvalid: () => void
+  /** Moves a row from one index to another via `useFieldArray().move`. */
+  move: (from: number, to: number) => void
+  /** Moves a row up one position; no-op at the first row. */
+  moveUp: (index: number) => void
+  /** Moves a row down one position; no-op at the last row. */
+  moveDown: (index: number) => void
 }
 
 /** Resolves the effective selection: null when empty, else clamped in range. */
@@ -29,6 +35,19 @@ function resolveSelectedIndex(selected: number | null, length: number): number |
   if (selected === null || selected < 0) return 0
   if (selected > length - 1) return length - 1
   return selected
+}
+
+/** Adjusts the tracked selection after `useFieldArray().move(from, to)`. */
+function resolveSelectedIndexAfterMove(
+  current: number | null,
+  from: number,
+  to: number,
+): number | null {
+  if (current === null) return null
+  if (current === from) return to
+  if (from < current && current <= to) return current - 1
+  if (to <= current && current < from) return current + 1
+  return current
 }
 
 function rowHasError(errors: FieldErrors, name: string, index: number): boolean {
@@ -102,7 +121,7 @@ export function useMasterDetailArray(
     control,
     formState: { errors, submitCount },
   } = useFormContext()
-  const { fields, append, remove } = useFieldArray({ control, name })
+  const { fields, append, remove, move: fieldArrayMove } = useFieldArray({ control, name })
   const [rawSelected, setRawSelected] = useState<number | null>(null)
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
 
@@ -143,6 +162,30 @@ export function useMasterDetailArray(
     setDeleteIndex(null)
   }, [deleteIndex, remove])
 
+  const move = useCallback(
+    (from: number, to: number) => {
+      if (from === to) return
+      if (from < 0 || to < 0 || from >= fields.length || to >= fields.length) return
+      fieldArrayMove(from, to)
+      setRawSelected((current) => resolveSelectedIndexAfterMove(current, from, to))
+    },
+    [fieldArrayMove, fields.length],
+  )
+
+  const moveUp = useCallback(
+    (index: number) => {
+      if (index > 0) move(index, index - 1)
+    },
+    [move],
+  )
+
+  const moveDown = useCallback(
+    (index: number) => {
+      if (index < fields.length - 1) move(index, index + 1)
+    },
+    [fields.length, move],
+  )
+
   return {
     fields,
     selectedIndex,
@@ -154,5 +197,8 @@ export function useMasterDetailArray(
     confirmRemove,
     hasRowError,
     autoSelectFirstInvalid: autoSelectFirstInvalidForField,
+    move,
+    moveUp,
+    moveDown,
   }
 }
