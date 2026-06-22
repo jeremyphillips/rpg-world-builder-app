@@ -72,7 +72,7 @@ export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
   /**
    * Class slugs that suggest this skill for starting proficiency selection.
    * Authoritative write surface for the class↔skill association; class
-   * `proficiencies.skills.from` is derived from this field at read time (Phase 3).
+   * `proficiencies.skills.from` is derived from this field at read time.
    * Stores slugs (not class ids) — see `docs/content-types.md` known gaps.
    */
   suggestedClasses: suggestedClassesSchema,

@@ -24,6 +24,7 @@ import {
   weaponCategorySchema,
   type CharacterClass,
   type ClassProficiencies,
+  type ClassProficienciesWrite,
   type ClassResource,
   type CreateClassInput,
   type Spellcasting,
@@ -294,7 +295,7 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-): ClassProficiencies {
+): ClassProficienciesWrite {
   const tools = proficiencies.tools ?? []
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
@@ -307,7 +308,7 @@ function proficienciesFromFormValues(
     armor: proficiencies.armor,
     weapons,
     ...(tools.length ? { tools } : {}),
-    skills: proficiencies.skills,
+    skills: { choose: proficiencies.skills.choose },
   }
 }
 
@@ -662,10 +663,13 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
             ? undefined
             : levelSchema.parse(Number(values.subclassChoiceLevel)),
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-        proficiencies: proficienciesFromFormValues(
-          values.proficiencies,
-          values.hasSpecificWeapons ?? false,
-        ),
+        proficiencies: {
+          ...proficienciesFromFormValues(values.proficiencies, values.hasSpecificWeapons ?? false),
+          skills: {
+            choose: values.proficiencies.skills.choose,
+            from: values.proficiencies.skills.from,
+          },
+        },
         features: featuresFromFormValues(values.features, ctx?.entity?.features),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },

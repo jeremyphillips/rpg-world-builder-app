@@ -6,6 +6,7 @@ import { createCampaign } from '../campaign'
 import { ClassPatchModel } from './classes/class-patch.model'
 import { HomebrewClassModel } from './classes/homebrew-class.model'
 import { classContentConfig } from './classes/classes.config'
+import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from './content.service'
 
 beforeAll(async () => {
@@ -32,11 +33,14 @@ async function makeCampaign() {
 describe('resolveCatalogForCampaign (classes)', () => {
   it('returns the unmodified system catalog when a campaign has no patches or homebrew', async () => {
     const campaign = await makeCampaign()
-    const classes = await resolveCatalogForCampaign(classContentConfig, campaign.id)
+    const classes = await resolveClassesForCampaign(campaign.id)
 
     expect(classes).toHaveLength(12)
     expect(classes.find((c) => c.id === 'srd-cc-5.2.1:fighter')?.hitDie).toBe(10)
     expect(classes.every((c) => c.source === 'system')).toBe(true)
+    expect(
+      classes.find((c) => c.slug === 'fighter')?.proficiencies.skills.from.length,
+    ).toBeGreaterThan(0)
   })
 
   it('deep-merges a campaign overlay patch onto the system class', async () => {
@@ -71,7 +75,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
         savingThrows: ['str', 'con'],
         armor: ['light', 'medium'],
         weapons: { categories: ['simple', 'martial'] },
-        skills: { choose: 2, from: ['athletics', 'survival'] },
+        skills: { choose: 2 },
       },
       features: [],
     })

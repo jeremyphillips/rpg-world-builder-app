@@ -8,6 +8,8 @@ import {
   loadSeedSubclasses,
   seedClassSlugs,
 } from './index'
+import { loadSeedSkillProficiencies } from '../skill-proficiencies'
+import { skillSlugsSuggestingClass } from '@rpg/contracts'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -89,5 +91,12 @@ describe('SRD 5.2.1 class seed', () => {
       'peerless-skill',
     ])
     expect(lore.description).toContain('libraries and universities')
+  })
+
+  it('derives class skill options from skill suggestedClasses SSOT', () => {
+    const skills = loadSeedSkillProficiencies(RULESET)
+    for (const cls of classes) {
+      expect(cls.proficiencies.skills.from).toEqual(skillSlugsSuggestingClass(cls.slug, skills))
+    }
   })
 })

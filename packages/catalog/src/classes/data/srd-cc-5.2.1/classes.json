@@ -20,8 +20,7 @@
         "categories": ["simple", "martial"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["animal-handling", "athletics", "intimidation", "nature", "perception", "survival"]
+        "choose": 2
       }
     },
     "features": [
@@ -161,27 +160,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 3,
-        "from": [
-          "acrobatics",
-          "animal-handling",
-          "arcana",
-          "athletics",
-          "deception",
-          "history",
-          "insight",
-          "intimidation",
-          "investigation",
-          "medicine",
-          "nature",
-          "perception",
-          "performance",
-          "persuasion",
-          "religion",
-          "sleight-of-hand",
-          "stealth",
-          "survival"
-        ]
+        "choose": 3
       }
     },
     "features": [
@@ -322,8 +301,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["history", "insight", "medicine", "persuasion", "religion"]
+        "choose": 2
       }
     },
     "features": [
@@ -381,17 +359,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 2,
-        "from": [
-          "arcana",
-          "animal-handling",
-          "insight",
-          "medicine",
-          "nature",
-          "perception",
-          "religion",
-          "survival"
-        ]
+        "choose": 2
       }
     },
     "features": [
@@ -430,18 +398,7 @@
         "categories": ["simple", "martial"]
       },
       "skills": {
-        "choose": 2,
-        "from": [
-          "acrobatics",
-          "animal-handling",
-          "athletics",
-          "history",
-          "insight",
-          "intimidation",
-          "perception",
-          "persuasion",
-          "survival"
-        ]
+        "choose": 2
       }
     },
     "features": [
@@ -486,8 +443,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"]
+        "choose": 2
       }
     },
     "features": [
@@ -537,8 +493,7 @@
         "categories": ["simple", "martial"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"]
+        "choose": 2
       }
     },
     "features": [
@@ -588,17 +543,7 @@
         "categories": ["simple", "martial"]
       },
       "skills": {
-        "choose": 3,
-        "from": [
-          "animal-handling",
-          "athletics",
-          "insight",
-          "investigation",
-          "nature",
-          "perception",
-          "stealth",
-          "survival"
-        ]
+        "choose": 3
       }
     },
     "features": [
@@ -644,20 +589,7 @@
       },
       "tools": ["thieves-tools"],
       "skills": {
-        "choose": 4,
-        "from": [
-          "acrobatics",
-          "athletics",
-          "deception",
-          "insight",
-          "intimidation",
-          "investigation",
-          "perception",
-          "performance",
-          "persuasion",
-          "sleight-of-hand",
-          "stealth"
-        ]
+        "choose": 4
       }
     },
     "features": [
@@ -804,8 +736,7 @@
         "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]
+        "choose": 2
       }
     },
     "features": [
@@ -946,16 +877,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 2,
-        "from": [
-          "arcana",
-          "deception",
-          "history",
-          "intimidation",
-          "investigation",
-          "nature",
-          "religion"
-        ]
+        "choose": 2
       }
     },
     "features": [
@@ -1013,8 +935,7 @@
         "categories": ["simple"]
       },
       "skills": {
-        "choose": 2,
-        "from": ["arcana", "history", "insight", "investigation", "medicine", "nature", "religion"]
+        "choose": 2
       }
     },
     "features": [

@@ -1,9 +1,13 @@
 /**
  * Class form def — round-trip and type-level drift guard.
  */
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import { createClassInputSchema, deriveContentKey, type CreateClassInput } from '@rpg/contracts'
+import {
+  createClassInputSchema,
+  deriveContentKey,
+  stripClassSkillFromFromInput,
+} from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
@@ -13,8 +17,11 @@ import {
 
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
 
-it('type: toInput return type matches CreateClassInput', () => {
-  expectTypeOf(classFormDef.toInput).returns.toEqualTypeOf<CreateClassInput>()
+it('type: stripped toInput validates as CreateClassInput', () => {
+  const fighter = SRD_CLASSES[0]!
+  const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
+  const input = classFormDef.toInput(formValues)
+  expect(createClassInputSchema.safeParse(stripClassSkillFromFromInput(input)).success).toBe(true)
 })
 
 describe('classFormDef round-trips', () => {
@@ -22,7 +29,7 @@ describe('classFormDef round-trips', () => {
     it(`${characterClass.slug}: toFormValues → toInput → schema.parse`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues)
-      expect(() => createClassInputSchema.parse(input)).not.toThrow()
+      expect(() => createClassInputSchema.parse(stripClassSkillFromFromInput(input))).not.toThrow()
     })
 
     it(`${characterClass.slug}: name and slug are preserved`, () => {

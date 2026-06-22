@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { diffClassSkillEdges, skillSlugsSuggestingClass } from './skill-class-association'
+import {
+  diffClassSkillEdges,
+  skillSlugsSuggestingClass,
+  stripClassSkillFromFromInput,
+  withDerivedClassSkillFrom,
+} from './skill-class-association'
 import type { SkillClassAssociationSkill } from './skill-class-association'
+import type { ClassStored } from './class/class'
 
 const skills: SkillClassAssociationSkill[] = [
   { slug: 'athletics', suggestedClasses: ['barbarian', 'fighter'] },
@@ -42,5 +48,43 @@ describe('diffClassSkillEdges', () => {
       added: [],
       removed: [],
     })
+  })
+})
+
+const storedFighter: ClassStored = {
+  id: 'srd-cc-5.2.1:fighter',
+  slug: 'fighter',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Fighter',
+  primaryAbilities: ['str'],
+  hitDie: 10,
+  asiLevels: [4],
+  proficiencies: {
+    savingThrows: ['str', 'con'],
+    armor: ['light'],
+    weapons: { categories: ['simple'] },
+    skills: { choose: 2 },
+  },
+  features: [],
+}
+
+describe('withDerivedClassSkillFrom', () => {
+  it('attaches sorted skill slugs from the skill-side SSOT', () => {
+    const read = withDerivedClassSkillFrom(storedFighter, skills)
+    expect(read.proficiencies.skills.from).toEqual(['athletics'])
+  })
+})
+
+describe('stripClassSkillFromFromInput', () => {
+  it('removes skills.from before persistence validation', () => {
+    expect(
+      stripClassSkillFromFromInput({
+        proficiencies: { skills: { choose: 2, from: ['athletics'] } },
+      }),
+    ).toEqual({ proficiencies: { skills: { choose: 2 } } })
   })
 })
