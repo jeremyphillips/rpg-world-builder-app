@@ -1,0 +1,102 @@
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { FormProvider, useForm } from 'react-hook-form'
+import { describe, expect, it, vi } from 'vitest'
+
+import { makeQueryWrapper } from '@/test/make-wrapper'
+import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
+import { ClassSubclassesTab } from './class-subclasses-tab.client'
+
+vi.mock('./subclass-editor-panel.client', () => ({
+  SubclassEditorPanel: ({
+    onActiveChange,
+    onDeleteRequest,
+  }: {
+    onActiveChange: (active: boolean) => void
+    onDeleteRequest: () => void
+  }) => (
+    <div>
+      <button type="button" onClick={() => onActiveChange(false)}>
+        Mock deactivate
+      </button>
+      <button type="button" onClick={onDeleteRequest}>
+        Mock delete subclass
+      </button>
+    </div>
+  ),
+}))
+
+const QueryWrapper = makeQueryWrapper()
+
+function ClassFormShell({
+  subclassChoiceLevel = '3',
+  mode = 'edit' as const,
+}: {
+  subclassChoiceLevel?: string
+  mode?: 'create' | 'edit'
+}) {
+  const form = useForm({ defaultValues: { subclassChoiceLevel } })
+  return (
+    <QueryWrapper>
+      <FormProvider {...form}>
+        <ClassSubclassesTab
+          campaignId="camp_1"
+          classId="srd-cc-5.2.1:fighter"
+          mode={mode}
+          formCtx={{}}
+          subclassesOverride={mode === 'edit' ? SUBCLASSES_FOR_FIGHTER : undefined}
+        />
+      </FormProvider>
+    </QueryWrapper>
+  )
+}
+
+describe('ClassSubclassesTab', () => {
+  it('shows create-mode message when class is not saved', () => {
+    render(<ClassFormShell mode="create" />)
+    expect(screen.getByText(/Save this class first/i)).toBeInTheDocument()
+  })
+
+  it('gates authoring when subclass choice level is none', () => {
+    render(<ClassFormShell subclassChoiceLevel="none" />)
+    expect(screen.getByText(/Basics/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Add subclass/i })).not.toBeInTheDocument()
+  })
+
+  it('adds a draft subclass and selects it in the editor', async () => {
+    const user = userEvent.setup()
+    render(<ClassFormShell />)
+
+    await user.click(screen.getByRole('button', { name: /Add subclass/i }))
+
+    expect(screen.getByText('Untitled subclass')).toBeInTheDocument()
+    expect(screen.getByText('Unsaved')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Mock deactivate/i })).toBeInTheDocument()
+  })
+
+  it('marks a subclass inactive from the editor toggle', async () => {
+    const user = userEvent.setup()
+    render(<ClassFormShell />)
+
+    await user.click(screen.getByRole('button', { name: /Champion/i }))
+    await user.click(screen.getByRole('button', { name: /Mock deactivate/i }))
+
+    expect(screen.getByText('Inactive')).toBeInTheDocument()
+  })
+
+  it('opens ConfirmDialog and removes a draft on confirm', async () => {
+    const user = userEvent.setup()
+    render(<ClassFormShell />)
+
+    await user.click(screen.getByRole('button', { name: /Add subclass/i }))
+    await user.click(screen.getByRole('button', { name: /Delete Untitled subclass/i }))
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
+
+    await waitFor(() => {
+      expect(screen.queryByText('Untitled subclass')).not.toBeInTheDocument()
+    })
+  })
+})

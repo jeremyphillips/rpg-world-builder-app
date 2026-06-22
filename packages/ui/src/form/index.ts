@@ -2,6 +2,7 @@
 // form layer — the `<Form>` renderer plus the config types + pure helpers.
 
 export { Form, type FormProps } from './form.client'
+export { FormItems, type FormItemsProps } from './form-items.client'
 export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
 export { FormActionsBar, type FormActionsBarProps } from './form-actions-bar'

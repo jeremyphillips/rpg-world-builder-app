@@ -53,7 +53,13 @@ function ContentEditFormReady({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
-  const formCtx: ContentFormCtx = { ...ctx, campaignId, entityId, mode: 'edit' }
+  const formCtx: ContentFormCtx = {
+    ...ctx,
+    campaignId,
+    entityId,
+    mode: 'edit',
+    entitySource: entity?.source,
+  }
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),

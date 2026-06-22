@@ -23,7 +23,6 @@ import {
   slugSchema,
   weaponCategorySchema,
   type CharacterClass,
-  type ClassFeature,
   type ClassProficiencies,
   type ClassResource,
   type CreateClassInput,
@@ -38,14 +37,6 @@ import {
 } from '@rpg/ui/form'
 
 import {
-  CLASS_GRANT_TYPES,
-  CLASS_GRANT_TYPE_LABELS,
-  formRowsToGrants,
-  grantArrayFields,
-  grantRowFormSchema,
-  grantsToFormRows,
-} from '../../lib/grant-form-helpers'
-import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormCtx,
@@ -53,11 +44,7 @@ import {
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
 import { identityFields } from '../../lib/content-form-field-helpers'
-import {
-  applyStableIdsForUpdate,
-  envelopeSlugFields,
-  finalizeContentInput,
-} from '../../lib/content-form-key-helpers'
+import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import { titleCase } from '../../lib/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 import {
@@ -68,12 +55,17 @@ import {
 } from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
-import { ClassSubclassesTabStub } from '../components/class-subclasses-tab-stub'
+import { ClassFeaturesTab } from '../components/class-features-tab.client'
+import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
+import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
+import {
+  featureRowFormSchema,
+  featuresFromFormValues,
+  featureToFormRow,
+  levelOptions,
+} from './class-feature-form-fields'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
-
-/** Radix Select rejects empty-string item values; use this for "no subclass choice level". */
-const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
 
 const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
   'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
@@ -91,11 +83,6 @@ const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   value: String(face),
   label: formatHitDie(face),
 }))
-
-const levelOptions: FieldOption[] = Array.from({ length: MAX_CHARACTER_LEVEL }, (_, index) => {
-  const level = index + 1
-  return { value: String(level), label: `Level ${level}` }
-})
 
 const subclassChoiceLevelOptions: FieldOption[] = [
   { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
@@ -160,14 +147,6 @@ const proficienciesFormSchema = z.object({
   }),
 })
 
-const featureRowFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  level: z.coerce.number().pipe(levelSchema),
-  grants: z.array(grantRowFormSchema),
-})
-
 const resourceEntryFormSchema = z.object({
   level: z.coerce.number().pipe(levelSchema),
   value: z.coerce.number().int().min(0),
@@ -195,7 +174,6 @@ const classFormSchema = z.object({
 })
 
 type ClassFormValues = z.infer<typeof classFormSchema>
-type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 type ResourceRowForm = z.infer<typeof resourceRowFormSchema>
 
 // ---------------------------------------------------------------------------
@@ -261,26 +239,6 @@ const spellProgressionGridField: FormItem = {
 // ---------------------------------------------------------------------------
 // Field builders
 // ---------------------------------------------------------------------------
-
-function featureItemFields(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'level',
-          label: 'Level',
-          options: levelOptions,
-          required: true,
-        },
-        { type: 'text', name: 'name', label: 'Name', required: true },
-      ],
-    },
-    { type: 'richtext', name: 'description', label: 'Description' },
-    ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS, ctx),
-  ]
-}
 
 function resourceItemFields(): FormItem[] {
   return [
@@ -348,34 +306,6 @@ function proficienciesFromFormValues(
     ...(tools.length ? { tools } : {}),
     skills: proficiencies.skills,
   }
-}
-
-function featureToFormRow(feature: ClassFeature): FeatureRowForm {
-  return {
-    id: feature.id,
-    name: feature.name,
-    description: feature.description,
-    level: feature.level,
-    grants: grantsToFormRows(feature.grants),
-  }
-}
-
-function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
-  return {
-    kind: 'custom',
-    id: row.id,
-    name: row.name,
-    description: row.description || undefined,
-    level: row.level,
-    grants: formRowsToGrants(row.grants),
-  }
-}
-
-function featuresFromFormValues(
-  rows: FeatureRowForm[],
-  existing?: readonly ClassFeature[],
-): ClassFeature[] {
-  return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
 }
 
 function resourceToFormRow(resource: ClassResource): ResourceRowForm {
@@ -634,17 +564,6 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-function featuresArrayField(ctx: ContentFormCtx): FormItem {
-  return {
-    kind: 'array',
-    name: 'features',
-    legend: 'Features',
-    addLabel: 'Add feature',
-    itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
-    fields: featureItemFields(ctx),
-  }
-}
-
 function resourcesArrayField(): FormItem {
   return {
     kind: 'array',
@@ -676,16 +595,18 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'features',
       label: 'Features',
-      fields: [featuresArrayField(ctx), resourcesArrayField()],
+      fields: [resourcesArrayField()],
+      header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
       id: 'subclasses',
       label: 'Subclasses',
       fields: [],
-      header: createElement(ClassSubclassesTabStub, {
+      header: createElement(ClassSubclassesTab, {
         campaignId: ctx.campaignId,
-        entityId: ctx.entityId,
+        classId: ctx.entityId,
         mode: ctx.mode,
+        formCtx: ctx,
       }),
     },
   ]
@@ -755,3 +676,4 @@ contentFormRegistry['classes'] = classFormDef
 
 export { classFormDef }
 export type { ClassFormValues }
+export { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
