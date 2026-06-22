@@ -1,21 +1,17 @@
 // fallow-ignore-file code-duplication
-import { ApiError, fetchCsrfToken } from '@rpg/contracts'
+import { ApiError, CROSS_APP_PATHS, fetchCsrfToken } from '@rpg/contracts'
 import type { LoginInput, RegisterInput, SessionUser } from '@rpg/contracts'
 
 export { ApiError }
 
-const CSRF_HEADER = 'x-csrf-token'
-
-/**
- * Where to land after a successful auth handshake (the dashboard, same origin).
- * Trailing slash matters: the dashboard is served under a `/app/` base, so
- * `/app` (no slash) would hit the dev server's base-mismatch hint page.
- */
-export const DASHBOARD_PATH = '/app/'
+/** @deprecated Prefer `CROSS_APP_PATHS.dashboard` from `@rpg/contracts`. */
+export const DASHBOARD_PATH = CROSS_APP_PATHS.dashboard
 
 interface ErrorBody {
   error?: { code?: string; message?: string }
 }
+
+const CSRF_HEADER = 'x-csrf-token'
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
   const csrfToken = await fetchCsrfToken()

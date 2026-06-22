@@ -12,6 +12,7 @@ export { useUpdateCampaign } from './hooks/use-update-campaign'
 export { useCampaignStore } from './store/campaign-store'
 export { readStoredCampaignId } from './lib/selected-campaign-storage'
 export {
+  resolveActiveCampaignSummary,
   resolveLandingCampaignId,
   resolveLandingPath,
   resolveTargetPathOnSwitch,

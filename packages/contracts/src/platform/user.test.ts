@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sessionUserSchema, userSchema } from './user'
+import { authMeResponseSchema, sessionUserSchema, userSchema } from './user'
 
 const validUser = {
   id: 'u_1',
@@ -34,5 +34,25 @@ describe('sessionUserSchema', () => {
       role: 'user',
       lastSelectedCampaignId: null,
     })
+  })
+})
+
+describe('authMeResponseSchema', () => {
+  it('accepts a session user with a resolved active campaign', () => {
+    expect(
+      authMeResponseSchema.safeParse({
+        user: sessionUserSchema.parse(validUser),
+        activeCampaign: { id: 'c_1', name: 'Sunless Citadel' },
+      }).success,
+    ).toBe(true)
+  })
+
+  it('accepts null when no campaign resolves', () => {
+    expect(
+      authMeResponseSchema.safeParse({
+        user: sessionUserSchema.parse(validUser),
+        activeCampaign: null,
+      }).success,
+    ).toBe(true)
   })
 })

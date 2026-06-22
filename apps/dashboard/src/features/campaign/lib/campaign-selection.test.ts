@@ -2,30 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getCampaignSwitcherLabel,
-  resolveLandingCampaignId,
   resolveLandingPath,
   resolveTargetPathOnSwitch,
 } from './campaign-selection'
 
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
-
-describe('resolveLandingCampaignId', () => {
-  it('returns the first candidate that is a known campaign', () => {
-    expect(resolveLandingCampaignId(campaigns, ['b', 'a'])).toBe('b')
-  })
-
-  it('skips invalid/empty candidates and honors priority order', () => {
-    expect(resolveLandingCampaignId(campaigns, [null, undefined, 'unknown', 'c'])).toBe('c')
-  })
-
-  it('returns null when no candidate matches a campaign', () => {
-    expect(resolveLandingCampaignId(campaigns, ['x', null])).toBeNull()
-  })
-
-  it('returns null when there are no campaigns', () => {
-    expect(resolveLandingCampaignId([], ['a'])).toBeNull()
-  })
-})
 
 describe('resolveLandingPath', () => {
   it('prefers the stored id over the server preference', () => {

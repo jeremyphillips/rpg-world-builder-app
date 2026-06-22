@@ -1,34 +1,22 @@
 /**
- * Pure helpers for resolving which campaign is "active"/"landing". Kept free of
- * React and I/O so they are cheap to unit test (callers supply the candidates,
- * e.g. localStorage and the session preference).
+ * Dashboard-specific campaign path helpers. Id resolution lives in
+ * `@rpg/contracts` (`resolveLandingCampaignId`, `resolveActiveCampaignSummary`).
  */
+
+import { resolveLandingCampaignId } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-/** Minimal shape needed to validate a campaign id; satisfied by `Campaign`. */
-interface CampaignIdentity {
-  id: string
-}
-
-/**
- * Return the first candidate id that refers to a campaign the user can reach,
- * or null when none match. Candidates are tried in priority order.
- */
-export function resolveLandingCampaignId(
-  campaigns: readonly CampaignIdentity[],
-  candidates: readonly (string | null | undefined)[],
-): string | null {
-  const validIds = new Set(campaigns.map((campaign) => campaign.id))
-  for (const id of candidates) {
-    if (id && validIds.has(id)) return id
-  }
-  return null
-}
+export { resolveActiveCampaignSummary, resolveLandingCampaignId } from '@rpg/contracts'
 
 /** Just the campaign-selection preference fields read during resolution. */
 interface CampaignPreference {
   lastSelectedCampaignId?: string | null
+}
+
+/** Minimal shape needed to validate a campaign id; satisfied by `Campaign`. */
+interface CampaignIdentity {
+  id: string
 }
 
 /**
