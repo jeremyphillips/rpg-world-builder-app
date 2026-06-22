@@ -81,7 +81,8 @@ export const classBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   asiLevels: z.array(levelSchema),
-  subclassLevels: z.array(levelSchema).min(1), // relaxed for homebrew (SRD = single level)
+  /** Level at which a character chooses their subclass; omit when the class has none. */
+  subclassChoiceLevel: levelSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
   features: z.array(classFeatureSchema),
@@ -89,6 +90,11 @@ export const classBodySchema = contentBodyBaseSchema.extend({
 })
 
 export type ClassBody = z.infer<typeof classBodySchema>
+
+/** Display label for the subclass choice milestone on class progression tables. */
+export function subclassChoiceFeatureLabel(className: string): string {
+  return `${className} Subclass`
+}
 
 /** Stored shape = ownership envelope + body. */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)

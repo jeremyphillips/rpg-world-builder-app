@@ -12,7 +12,7 @@
     "primaryAbilities": ["str"],
     "hitDie": 12,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "proficiencies": {
       "savingThrows": ["str", "con"],
       "armor": ["light", "medium", "shields"],
@@ -52,7 +52,7 @@
     "primaryAbilities": ["cha"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "cha",
@@ -210,12 +210,6 @@
         "description": "<p>You can add half your Proficiency Bonus (round down) to any ability check you make that uses a skill proficiency you lack and that doesn't otherwise use your Proficiency Bonus.</p><p>For example, if you make a Strength (Athletics) check and lack Athletics proficiency, you can add half your Proficiency Bonus to the check.</p>"
       },
       {
-        "id": "bard-subclass",
-        "name": "Bard Subclass",
-        "level": 3,
-        "description": "<p>You gain a Bard subclass of your choice. The College of Lore subclass is detailed after this class's description. A subclass is a specialization that grants you features at certain Bard levels. For the rest of your career, you gain each of your subclass's features that are of your Bard level or lower.</p>"
-      },
-      {
         "id": "font-of-inspiration",
         "name": "Font of Inspiration",
         "level": 5,
@@ -301,7 +295,7 @@
     "primaryAbilities": ["wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "wis",
@@ -360,7 +354,7 @@
     "primaryAbilities": ["wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "wis",
@@ -428,7 +422,7 @@
     "primaryAbilities": ["str", "dex"],
     "hitDie": 10,
     "asiLevels": [4, 6, 8, 12, 14, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "proficiencies": {
       "savingThrows": ["str", "con"],
       "armor": ["light", "medium", "heavy", "shields"],
@@ -484,7 +478,7 @@
     "primaryAbilities": ["dex", "wis"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "proficiencies": {
       "savingThrows": ["str", "dex"],
       "armor": [],
@@ -530,7 +524,7 @@
     "primaryAbilities": ["str", "cha"],
     "hitDie": 10,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "half",
       "ability": "cha",
@@ -581,7 +575,7 @@
     "primaryAbilities": ["dex", "wis"],
     "hitDie": 10,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "half",
       "ability": "wis",
@@ -641,7 +635,7 @@
     "primaryAbilities": ["dex"],
     "hitDie": 8,
     "asiLevels": [4, 8, 10, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "proficiencies": {
       "savingThrows": ["dex", "int"],
       "armor": ["light"],
@@ -700,7 +694,7 @@
     "primaryAbilities": ["cha"],
     "hitDie": 6,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "cha",
@@ -925,7 +919,7 @@
     "primaryAbilities": ["cha"],
     "hitDie": 8,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "pact",
       "ability": "cha",
@@ -992,7 +986,7 @@
     "primaryAbilities": ["int"],
     "hitDie": 6,
     "asiLevels": [4, 8, 12, 16, 19],
-    "subclassLevels": [3],
+    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "int",

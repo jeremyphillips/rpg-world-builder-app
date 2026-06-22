@@ -72,6 +72,9 @@ import { ClassSubclassesTabStub } from '../components/class-subclasses-tab-stub'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
+/** Radix Select rejects empty-string item values; use this for "no subclass choice level". */
+const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
+
 const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
   'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
 
@@ -93,6 +96,11 @@ const levelOptions: FieldOption[] = Array.from({ length: MAX_CHARACTER_LEVEL }, 
   const level = index + 1
   return { value: String(level), label: `Level ${level}` }
 })
+
+const subclassChoiceLevelOptions: FieldOption[] = [
+  { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
+  ...levelOptions,
+]
 
 const armorCategoryOptions = toOptions(
   ARMOR_CATEGORIES,
@@ -177,7 +185,7 @@ const classFormSchema = z.object({
   primaryAbilities: z.array(abilitySchema).min(1).max(2),
   hitDie: z.coerce.number().pipe(hitDieSchema),
   asiLevels: z.array(z.coerce.number().pipe(levelSchema)),
-  subclassLevels: z.array(z.coerce.number().pipe(levelSchema)).min(1),
+  subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
   hasSpellcasting: z.boolean(),
   hasSpecificWeapons: z.boolean(),
   spellcasting: spellcastingFormSchema.optional(),
@@ -451,7 +459,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
   primaryAbilities: ['str'],
   hitDie: 8,
   asiLevels: [4, 8, 12, 16, 19],
-  subclassLevels: [3],
+  subclassChoiceLevel: '3',
   hasSpellcasting: false,
   hasSpecificWeapons: false,
   spellcasting: {
@@ -487,6 +495,7 @@ function coreAttributesFields(): FormItem[] {
           options: abilityOptions,
           max: 2,
           required: true,
+          hint: 'Select up to 2 abilities',
         },
         {
           type: 'select',
@@ -494,6 +503,7 @@ function coreAttributesFields(): FormItem[] {
           label: 'Hit die',
           options: hitDieOptions,
           required: true,
+          width: 'sm',
         },
       ],
     },
@@ -505,12 +515,12 @@ function coreAttributesFields(): FormItem[] {
       hint: 'Levels that grant an ability score improvement',
     },
     {
-      type: 'chips',
-      name: 'subclassLevels',
-      label: 'Subclass levels',
-      options: levelOptions,
-      required: true,
-      hint: 'Levels that grant a subclass feature',
+      type: 'select',
+      name: 'subclassChoiceLevel',
+      label: 'Subclass choice level',
+      options: subclassChoiceLevelOptions,
+      hint: 'Level at which a character chooses their subclass',
+      width: 'sm-md',
     },
   ]
 }
@@ -701,7 +711,10 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
     asiLevels: entity.asiLevels,
-    subclassLevels: entity.subclassLevels,
+    subclassChoiceLevel:
+      entity.subclassChoiceLevel !== undefined
+        ? String(entity.subclassChoiceLevel)
+        : SUBCLASS_CHOICE_LEVEL_NONE,
     hasSpellcasting: entity.spellcasting !== undefined,
     hasSpecificWeapons: (entity.proficiencies.weapons.items?.length ?? 0) > 0,
     spellcasting: spellcastingToFormValues(entity.spellcasting),
@@ -719,7 +732,10 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         primaryAbilities: values.primaryAbilities,
         hitDie: values.hitDie,
         asiLevels: values.asiLevels,
-        subclassLevels: values.subclassLevels,
+        subclassChoiceLevel:
+          values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
+            ? undefined
+            : levelSchema.parse(Number(values.subclassChoiceLevel)),
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
         proficiencies: proficienciesFromFormValues(
           values.proficiencies,

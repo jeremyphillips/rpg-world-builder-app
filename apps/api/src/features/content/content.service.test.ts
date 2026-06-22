@@ -66,7 +66,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
       primaryAbilities: ['str'],
       hitDie: 10,
       asiLevels: [4, 8, 12, 16, 19],
-      subclassLevels: [3],
+      subclassChoiceLevel: 3,
       proficiencies: {
         savingThrows: ['str', 'con'],
         armor: ['light', 'medium'],

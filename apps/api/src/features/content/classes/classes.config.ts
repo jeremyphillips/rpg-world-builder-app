@@ -38,7 +38,7 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     primaryAbilities: doc.primaryAbilities,
     hitDie: doc.hitDie,
     asiLevels: doc.asiLevels,
-    subclassLevels: doc.subclassLevels,
+    subclassChoiceLevel: doc.subclassChoiceLevel,
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
     proficiencies: doc.proficiencies,
     features: doc.features ?? [],

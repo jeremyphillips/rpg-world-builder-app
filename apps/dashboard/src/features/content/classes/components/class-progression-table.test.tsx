@@ -65,6 +65,13 @@ describe('ClassProgressionTable', () => {
     expect(screen.getByRole('columnheader', { name: '9th-level Slots' })).toBeInTheDocument()
   })
 
+  it('shows the subclass choice label at subclassChoiceLevel', () => {
+    render(<ClassProgressionTable characterClass={pickClass('bard')} />)
+
+    const level3Row = screen.getAllByRole('row')[3]
+    expect(level3Row?.textContent).toContain('Bard Subclass')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ClassProgressionTable characterClass={pickClass('bard')} />)
     const results = await axe.run(container, axeOptions)

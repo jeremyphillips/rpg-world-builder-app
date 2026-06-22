@@ -59,7 +59,7 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Bard ships full feature prose, prepared spells, and Bardic Die resource', () => {
     const bard = getClassBySlug(RULESET, 'bard')
-    expect(bard.features).toHaveLength(11)
+    expect(bard.features).toHaveLength(10)
     expect(bard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
     expect(bard.asiLevels).toEqual([4, 8, 12, 16])
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)

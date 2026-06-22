@@ -169,16 +169,16 @@ describe('classFormDef round-trips', () => {
     ).toBe(true)
   })
 
-  it('fighter: ASI and subclass levels round-trip', () => {
+  it('fighter: ASI and subclass choice level round-trip', () => {
     const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     expect(input.asiLevels).toEqual(fighter.asiLevels)
-    expect(input.subclassLevels).toEqual(fighter.subclassLevels)
+    expect(input.subclassChoiceLevel).toEqual(fighter.subclassChoiceLevel)
   })
 
-  it('create defaults include subclass level 3 and specific-weapons toggle off', () => {
-    expect(classFormDef.createDefaultValues?.subclassLevels).toEqual([3])
+  it('create defaults include subclass choice level 3 and specific-weapons toggle off', () => {
+    expect(classFormDef.createDefaultValues?.subclassChoiceLevel).toEqual('3')
     expect(classFormDef.createDefaultValues?.hasSpecificWeapons).toBe(false)
   })
 
