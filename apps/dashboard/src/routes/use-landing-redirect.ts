@@ -17,7 +17,8 @@ let initialRedirectHandled = false
  */
 export function useLandingRedirect(): boolean {
   const navigate = useNavigate()
-  const { data: user, isPending: sessionPending } = useSession()
+  const { data: session, isPending: sessionPending } = useSession()
+  const user = session?.user
   const { data: campaigns, isPending: campaignsPending } = useCampaigns()
 
   const loading = sessionPending || campaignsPending

@@ -16,7 +16,7 @@ sequenceDiagram
   U->>D: open /app
   D->>A: GET /api/auth/me (cookie auto-sent, credentials: include)
   alt session valid (200)
-    A-->>D: { user: SessionUser }
+    A-->>D: { user, activeCampaign }
     D-->>U: render app shell + routes
   else unauthenticated (401)
     A-->>D: 401
@@ -26,19 +26,25 @@ sequenceDiagram
 
 ## Pieces
 
-- **`api/auth-client.ts`** — same-origin fetch wrappers:
-  - `fetchSession()` → `GET /api/auth/me`, returns `SessionUser` or throws
+- **`@rpg/api-client`** — shared same-origin fetch helpers used by both apps:
+  - `fetchSession()` → `GET /api/auth/me`, returns `AuthMeResponse` or throws
     `ApiError` (401 when unauthenticated).
   - `logout()` → fetches a CSRF token from `GET /api/auth/csrf`, then
     `POST /api/auth/logout` with the `x-csrf-token` header.
-  - `LOGIN_PATH = "/login"` — the same-origin public login route.
+  - `request`, `postJson`, etc. for other API calls.
+- **`api/auth-client.ts`** — thin dashboard wrappers and path constants; re-exports
+  from `@rpg/api-client` where shared.
 - **`hooks/use-session.ts`** — `useSession()` wraps `fetchSession` in a
   TanStack Query (`["auth", "session"]`, `retry: false`) so a 401 surfaces
-  immediately instead of being retried.
+  immediately instead of being retried. Query data is `AuthMeResponse`; use
+  `data?.user` at call sites.
 - **`hooks/use-logout.ts`** — `useLogout()` mutation; on success redirects to
-  `LOGIN_PATH`.
+  `CROSS_APP_PATHS.login`.
 - **`components/auth-guard.tsx`** — layout route element. Loading → spinner
   text; error → redirect to `/login`; success → `<Outlet />`.
+
+Cross-app paths (`/login`, `/app/`, etc.) are defined in `CROSS_APP_PATHS` from
+`@rpg/contracts` — import those instead of string literals.
 
 ## Why a hard redirect (not a React Router navigation)
 
@@ -53,3 +59,10 @@ State-changing requests (logout) use the double-submit pattern shared with the
 public app: fetch a token from `GET /api/auth/csrf` (which also sets the
 readable `rpg_csrf` cookie) and echo it in the `x-csrf-token` header. `GET`
 requests like `/auth/me` are safe methods and need no token.
+
+## Active campaign on `/me`
+
+The API resolves `activeCampaign` server-side (including lazy-clear of a stale
+`lastSelectedCampaignId`). Dashboard hooks that change campaign selection should
+`invalidateQueries` on the session key so `activeCampaign` stays in sync — see
+`use-select-campaign.ts`.

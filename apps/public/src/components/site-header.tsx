@@ -1,8 +1,10 @@
 import Link from 'next/link'
 
-import { buttonVariants, Heading } from '@rpg/ui'
+import { Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/lib/routes'
+
+import { SiteHeaderNav } from './site-header-nav.client'
 
 export function SiteHeader() {
   return (
@@ -13,13 +15,8 @@ export function SiteHeader() {
             RPG World Builder
           </Heading>
         </Link>
-        <nav className="flex items-center gap-2">
-          <Link href={ROUTES.login} className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-            Log in
-          </Link>
-          <Link href={ROUTES.signup} className={buttonVariants({ size: 'sm' })}>
-            Sign up
-          </Link>
+        <nav className="flex items-center gap-2" aria-label="Account">
+          <SiteHeaderNav />
         </nav>
       </div>
     </header>

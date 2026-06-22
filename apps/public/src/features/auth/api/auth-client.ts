@@ -1,41 +1,12 @@
-// fallow-ignore-file code-duplication
-import { ApiError, fetchCsrfToken } from '@rpg/contracts'
+import { postJson } from '@rpg/api-client'
+import { CROSS_APP_PATHS } from '@rpg/contracts'
 import type { LoginInput, RegisterInput, SessionUser } from '@rpg/contracts'
 
-export { ApiError }
+export { ApiError } from '@rpg/contracts'
+export { fetchSession, logout } from '@rpg/api-client'
 
-const CSRF_HEADER = 'x-csrf-token'
-
-/**
- * Where to land after a successful auth handshake (the dashboard, same origin).
- * Trailing slash matters: the dashboard is served under a `/app/` base, so
- * `/app` (no slash) would hit the dev server's base-mismatch hint page.
- */
-export const DASHBOARD_PATH = '/app/'
-
-interface ErrorBody {
-  error?: { code?: string; message?: string }
-}
-
-async function postJson<T>(path: string, body: unknown): Promise<T> {
-  const csrfToken = await fetchCsrfToken()
-  const res = await fetch(path, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'content-type': 'application/json', [CSRF_HEADER]: csrfToken },
-    body: JSON.stringify(body),
-  })
-
-  const data = (await res.json().catch(() => null)) as (ErrorBody & T) | null
-  if (!res.ok) {
-    throw new ApiError(
-      res.status,
-      data?.error?.code ?? 'request_error',
-      data?.error?.message ?? 'Something went wrong. Please try again.',
-    )
-  }
-  return data as T
-}
+/** @deprecated Prefer `CROSS_APP_PATHS.dashboard` from `@rpg/contracts`. */
+export const DASHBOARD_PATH = CROSS_APP_PATHS.dashboard
 
 export function login(input: LoginInput): Promise<{ user: SessionUser }> {
   return postJson<{ user: SessionUser }>('/api/auth/login', input)

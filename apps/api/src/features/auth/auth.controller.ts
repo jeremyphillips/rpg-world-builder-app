@@ -3,8 +3,9 @@ import type { LoginInput, RegisterInput } from '@rpg/contracts'
 
 import { setCsrfCookie, setSessionCookie, clearSessionCookie } from '../../lib/cookies'
 import { generateCsrfToken } from '../../lib/csrf'
+import { HttpError } from '../../lib/http-error'
 import { signSessionToken } from '../../lib/jwt'
-import { toSessionUser } from '../user'
+import { toSessionUser, resolveActiveCampaignForUser } from '../user'
 import { authenticateUser, registerUser } from './auth.service'
 
 export async function register(req: Request, res: Response): Promise<void> {
@@ -29,8 +30,12 @@ export function logout(_req: Request, res: Response): void {
   res.status(200).json({ ok: true })
 }
 
-export function me(req: Request, res: Response): void {
-  res.status(200).json({ user: req.user })
+export async function me(req: Request, res: Response): Promise<void> {
+  const session = await resolveActiveCampaignForUser(req.user!.id)
+  if (!session) {
+    throw HttpError.unauthorized()
+  }
+  res.status(200).json(session)
 }
 
 export function csrf(_req: Request, res: Response): void {

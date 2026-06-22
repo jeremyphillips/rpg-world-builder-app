@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
 
+import { AppProviders } from './providers.client'
 import './globals.css'
 
 // Exposed as CSS variables consumed by the @rpg/ui --font-sans / --font-display tokens.
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable}`}>
-      <body className="min-h-dvh bg-background text-foreground antialiased">{children}</body>
+      <body className="min-h-dvh bg-background text-foreground antialiased">
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   )
 }

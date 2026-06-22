@@ -28,6 +28,22 @@ export const sessionUserSchema = userSchema.pick({
 
 export type SessionUser = z.infer<typeof sessionUserSchema>
 
+/** Resolved active campaign returned from `GET /api/auth/me`. */
+export const activeCampaignSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+})
+
+export type ActiveCampaign = z.infer<typeof activeCampaignSchema>
+
+/** Full payload from `GET /api/auth/me`. Login/register return `{ user }` only. */
+export const authMeResponseSchema = z.object({
+  user: sessionUserSchema,
+  activeCampaign: activeCampaignSchema.nullable(),
+})
+
+export type AuthMeResponse = z.infer<typeof authMeResponseSchema>
+
 /**
  * Input for `PATCH /api/users/me`. All fields are optional; the server merges
  * the patch. Email changes take effect immediately — see docs/security.md for

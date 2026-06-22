@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import type { AuthMeResponse } from '@rpg/contracts'
 
 vi.mock('../api/auth-client')
 
@@ -9,6 +10,10 @@ import { fetchSession as fetchSessionFn } from '../api/auth-client'
 import { AuthGuard } from './auth-guard'
 
 const fetchSession = vi.mocked(fetchSessionFn)
+
+function authMe(user: AuthMeResponse['user']): AuthMeResponse {
+  return { user, activeCampaign: null }
+}
 
 function renderGuard() {
   const queryClient = new QueryClient({
@@ -61,13 +66,15 @@ describe('AuthGuard', () => {
   })
 
   it('renders the protected content for an authenticated session', async () => {
-    fetchSession.mockResolvedValueOnce({
-      id: '1',
-      email: 'dm@example.com',
-      displayName: 'Dungeon Master',
-      role: 'user',
-      lastSelectedCampaignId: null,
-    })
+    fetchSession.mockResolvedValueOnce(
+      authMe({
+        id: '1',
+        email: 'dm@example.com',
+        displayName: 'Dungeon Master',
+        role: 'user',
+        lastSelectedCampaignId: null,
+      }),
+    )
 
     renderGuard()
 
