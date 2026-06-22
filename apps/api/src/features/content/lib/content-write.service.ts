@@ -1,13 +1,18 @@
-import type { ContentSource } from '@rpg/contracts'
-import { ContentKeyError } from '@rpg/contracts'
+import type { ClassStored, ContentSource } from '@rpg/contracts'
+import { ContentKeyError, stripClassSkillFromFromInput } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
+import { enrichClassWithDerivedSkills } from '../classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from '../content.service'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, HomebrewDoc } from './content-write-config'
+import {
+  extractSkillsFromFromUpdate,
+  syncSuggestedClassesFromClass,
+} from './sync-suggested-classes-from-class'
 
 type StoredEntity = {
   id: string
@@ -62,6 +67,53 @@ function normalizeWriteInput(
   }
 }
 
+function stripPersistedClassPatch<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  input: Record<string, unknown>,
+): Record<string, unknown> {
+  return config.typeName === 'classes' ? stripClassSkillFromFromInput(input) : input
+}
+
+function prepareSystemPatchMerge<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  existing: T,
+  existingPatch: Record<string, unknown> | undefined,
+  update: Record<string, unknown>,
+): { mergedBody: Record<string, unknown>; cumulativePatch: Record<string, unknown> } {
+  const patchBody = stripUndefined(stripPersistedClassPatch(config, stripUndefined(update)))
+  const existingPatchStripped = stripPersistedClassPatch(config, existingPatch ?? {})
+  const mergedBodyRaw = deepMerge(
+    deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped),
+    patchBody,
+  )
+  return {
+    mergedBody: stripPersistedClassPatch(config, mergedBodyRaw),
+    cumulativePatch: deepMerge(existingPatchStripped, patchBody),
+  }
+}
+
+function parsePersistedWriteInput<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  normalized: Record<string, unknown>,
+  mode: 'create' | 'update',
+): Record<string, unknown> {
+  const forParse = stripPersistedClassPatch(config, normalized)
+  const schema = mode === 'create' ? config.createInputSchema : config.updateInputSchema
+  return schema.parse(forParse) as Record<string, unknown>
+}
+
+async function finalizeWriteResult<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  stored: T,
+): Promise<T> {
+  if (config.typeName !== 'classes') return stored
+  return (await enrichClassWithDerivedSkills(
+    campaignId,
+    stored as unknown as ClassStored,
+  )) as unknown as T
+}
+
 async function updateHomebrewRecord<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
@@ -104,24 +156,18 @@ async function updateSystemPatch<T extends StoredEntity>(
     throw new HttpError(400, 'not_patchable', 'This content type does not support system patches.')
   }
 
-  const patchBody = stripUndefined(update)
-
   const existingPatchDoc = await config.patchModel
     .findOne({ campaignId, targetId: entityId })
-    .lean<{
-      patch: Record<string, unknown>
-    }>()
+    .lean<{ patch: Record<string, unknown> }>()
 
-  const mergedBody = deepMerge(
-    deepMerge(
-      entityBody(existing as unknown as Record<string, unknown>),
-      existingPatchDoc?.patch ?? {},
-    ),
-    patchBody,
+  const { mergedBody, cumulativePatch } = prepareSystemPatchMerge(
+    config,
+    existing,
+    existingPatchDoc?.patch,
+    update,
   )
   config.bodySchema.parse(mergedBody)
 
-  const cumulativePatch = deepMerge(existingPatchDoc?.patch ?? {}, patchBody)
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
     { $set: { patch: cumulativePatch } },
@@ -136,15 +182,26 @@ async function updateSystemPatch<T extends StoredEntity>(
   return config.storedSchema.parse(entity)
 }
 
+async function syncClassSkillEdgesIfNeeded<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  classSlug: string,
+  rawInput: Record<string, unknown>,
+): Promise<void> {
+  if (config.typeName !== 'classes') return
+  const nextSkillSlugs = extractSkillsFromFromUpdate(rawInput)
+  if (!nextSkillSlugs) return
+  await syncSuggestedClassesFromClass(campaignId, classSlug, nextSkillSlugs)
+}
+
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   rawInput: unknown,
 ): Promise<T> {
-  const input = config.createInputSchema.parse(
-    normalizeWriteInput(rawInput, undefined, 'create'),
-  ) as Record<string, unknown>
+  const normalized = normalizeWriteInput(rawInput, undefined, 'create')
+  const input = parsePersistedWriteInput(config, normalized, 'create')
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
@@ -168,7 +225,9 @@ export async function createHomebrewContent<T extends StoredEntity>(
   })
 
   const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
-  return config.storedSchema.parse(entity)
+  const parsed = config.storedSchema.parse(entity)
+  await syncClassSkillEdgesIfNeeded(config, campaignId, parsed.slug, normalized)
+  return finalizeWriteResult(config, campaignId, parsed)
 }
 
 /** Update a homebrew record or upsert a system overlay patch. */
@@ -190,16 +249,32 @@ export async function updateContentEntity<T extends StoredEntity>(
   }
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
-  const update = config.updateInputSchema.parse(
-    normalizeWriteInput(rawInput, existingBody, 'update'),
-  ) as Record<string, unknown>
+  const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
+  await syncClassSkillEdgesIfNeeded(config, campaignId, existing.slug, normalized)
+  const update = parsePersistedWriteInput(config, normalized, 'update')
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {
       throw new HttpError(403, 'forbidden', 'Cannot edit homebrew from another campaign.')
     }
-    return updateHomebrewRecord(config, campaignId, campaign.rulesetId, entityId, existing, update)
+    const updated = await updateHomebrewRecord(
+      config,
+      campaignId,
+      campaign.rulesetId,
+      entityId,
+      existing,
+      update,
+    )
+    return finalizeWriteResult(config, campaignId, updated)
   }
 
-  return updateSystemPatch(config, campaignId, campaign.rulesetId, entityId, existing, update)
+  const patched = await updateSystemPatch(
+    config,
+    campaignId,
+    campaign.rulesetId,
+    entityId,
+    existing,
+    update,
+  )
+  return finalizeWriteResult(config, campaignId, patched)
 }

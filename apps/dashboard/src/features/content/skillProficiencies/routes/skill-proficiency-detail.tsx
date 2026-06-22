@@ -32,7 +32,7 @@ function SuggestedClassesList({
   return (
     <section aria-labelledby="suggested-classes-heading">
       <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
-        Commonly Taken By
+        Suggested classes
       </Heading>
       {isPending ? (
         <Text variant="muted">Loading…</Text>
@@ -86,7 +86,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         </div>
         {skill.description && <Text variant="muted">{skill.description}</Text>}
       </div>
-      {skill.suggestedClasses && skill.suggestedClasses.length > 0 && (
+      {skill.suggestedClasses.length > 0 && (
         <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
       )}
     </ContentDetailLayout>

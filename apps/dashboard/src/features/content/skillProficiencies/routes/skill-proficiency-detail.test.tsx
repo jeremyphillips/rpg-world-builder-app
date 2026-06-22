@@ -49,6 +49,14 @@ describe('SkillDetailContent suggested classes', () => {
     useClasses.mockReset()
   })
 
+  it('renders the suggested classes section heading', () => {
+    mockClassesQuery({ data: [FIGHTER] })
+
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByRole('heading', { name: 'Suggested classes' })).toBeInTheDocument()
+  })
+
   it('links to the catalog class id for a known slug', () => {
     mockClassesQuery({ data: [FIGHTER] })
 

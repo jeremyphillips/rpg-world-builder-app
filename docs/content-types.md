@@ -551,7 +551,7 @@ Import the two route components from `@/features/content`, then add under `campa
 | **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as optional `heritage` on the species body (`content/species.ts`). |
 | **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                      |
 | **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                             |
-| **Dual-ownership fields?**       | If another type references this type's entities (e.g. `suggestedClasses` on skills), keep the authoritative list on the owning type and add the reverse as an optional convenience field. Document which is authoritative.        |
+| **Dual-ownership fields?**       | If another type references this type's entities, keep the authoritative list on the owning type. Derive reverse views at read time when possible (see [Skill ↔ class association](#skill-class-association)).                     |
 
 ---
 
@@ -592,5 +592,36 @@ See [packages/ui/docs/forms.md](../packages/ui/docs/forms.md) for the `editableG
 ### Read-only detail view
 
 `ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows resource columns from `resources[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+
+---
+
+## Skill ↔ class association
+
+The class↔skill proficiency edge is **single-writer** on the skill record:
+
+| Field                             | Location                 | Role                                                                                                                                                                                            |
+| --------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`suggestedClasses`**            | `skill-proficiency` body | **Authoritative** — class slugs that suggest this skill for starting proficiency selection (required on create).                                                                                |
+| **`proficiencies.skills.choose`** | `class` stored body      | How many skills the player picks at class creation (persisted).                                                                                                                                 |
+| **`proficiencies.skills.from`**   | `class` read model only  | **Derived** at API/catalog read time via `skillSlugsSuggestingClass()` in `@rpg/contracts` (`content/skill-class-association.ts`). Not stored in seed JSON, Mongo homebrew, or overlay patches. |
+
+### Write paths
+
+- **Skill form** — edits `suggestedClasses` directly (chips over campaign classes).
+- **Class form** — skill option chips bind to derived `from` in form state; on save the dashboard sends a transient `from` array for API fan-out only. The API strips `from` before persistence and runs `syncSuggestedClassesFromClass()` to patch affected skill records.
+
+### Read paths
+
+- **Skill detail** — **Suggested classes** (links from `suggestedClasses`).
+- **Class detail** — **Suggested proficiencies** (derived from skills; `Choose N:` from `skills.choose`).
+- **`GET …/content/classes`** — merges stored classes with derived `skills.from` per campaign skills list.
+
+Helpers: `skillSlugsSuggestingClass`, `diffClassSkillEdges`, `deriveClassesSkillFrom`, `stripClassSkillFromFromInput`.
+
+### Known gaps (revisit later)
+
+- **`suggestedClasses` uses class slugs**, not opaque class ids — same cross-catalog slug-ref risk as `spell.classIds` (see [Known gaps](#known-gaps-revisit-later)).
+- **Character-builder gating** will read `suggestedClasses`; not built yet.
+- **DM “allow any skill” override** — deferred.
 
 ---

@@ -6,8 +6,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { SubclassListPanel } from './subclass-list-panel.client'
 
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
-
 describe('SubclassListPanel', () => {
   const items = SUBCLASSES_FOR_FIGHTER.map((subclass) => ({
     id: subclass.id,
@@ -47,7 +45,7 @@ describe('SubclassListPanel', () => {
         onDeleteRequest={vi.fn()}
       />,
     )
-    const results = await axe.run(container, axeOptions)
+    const results = await axe.run(container)
     expect(results.violations).toEqual([])
   })
 })

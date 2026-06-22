@@ -3,6 +3,8 @@ import {
   classBodySchema,
   classPatchSchema,
   classSchema,
+  classStoredBodySchema,
+  classStoredSchema,
   createClassInputSchema,
   subclassChoiceFeatureLabel,
   subclassPatchSchema,
@@ -11,7 +13,7 @@ import {
   updateClassInputSchema,
 } from './class'
 
-const fighterBody = {
+const fighterStoredBody = {
   name: 'Fighter',
   description: '<p>A master of martial combat.</p>',
   primaryAbilities: ['str'],
@@ -22,9 +24,17 @@ const fighterBody = {
     savingThrows: ['str', 'con'],
     armor: ['light', 'medium', 'heavy', 'shields'],
     weapons: { categories: ['simple', 'martial'] },
-    skills: { choose: 2, from: ['acrobatics', 'athletics', 'history'] },
+    skills: { choose: 2 },
   },
   features: [{ kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 }],
+} as const
+
+const fighterBody = {
+  ...fighterStoredBody,
+  proficiencies: {
+    ...fighterStoredBody.proficiencies,
+    skills: { choose: 2, from: ['acrobatics', 'athletics', 'history'] },
+  },
 } as const
 
 const timestamps = {
@@ -106,16 +116,24 @@ describe('classSchema', () => {
 })
 
 describe('createClassInputSchema', () => {
-  it('accepts a body plus a slug', () => {
-    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'fighter' }).success).toBe(true)
+  it('accepts a stored body plus a slug', () => {
+    expect(
+      createClassInputSchema.safeParse({ ...fighterStoredBody, slug: 'fighter' }).success,
+    ).toBe(true)
   })
 
   it('requires a slug', () => {
-    expect(createClassInputSchema.safeParse(fighterBody).success).toBe(false)
+    expect(createClassInputSchema.safeParse(fighterStoredBody).success).toBe(false)
   })
 
   it('rejects an invalid slug', () => {
-    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'Fighter' }).success).toBe(
+    expect(
+      createClassInputSchema.safeParse({ ...fighterStoredBody, slug: 'Fighter' }).success,
+    ).toBe(false)
+  })
+
+  it('rejects persisted skills.from on create', () => {
+    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'fighter' }).success).toBe(
       false,
     )
   })
@@ -251,8 +269,39 @@ describe('subclassCampaignAvailabilitySchema', () => {
 })
 
 describe('classBodySchema', () => {
-  it('is the editable surface (no envelope fields)', () => {
+  it('is the read surface (no envelope fields)', () => {
     expect(classBodySchema.safeParse(fighterBody).success).toBe(true)
     expect('id' in classBodySchema.shape).toBe(false)
+  })
+})
+
+describe('classStoredBodySchema', () => {
+  it('is the persisted surface without derived skills.from', () => {
+    expect(classStoredBodySchema.safeParse(fighterStoredBody).success).toBe(true)
+    expect(
+      classStoredBodySchema.safeParse({
+        ...fighterStoredBody,
+        proficiencies: {
+          ...fighterStoredBody.proficiencies,
+          skills: { choose: 2, from: ['athletics'] },
+        },
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('classStoredSchema', () => {
+  it('parses seed/homebrew records without skills.from', () => {
+    expect(
+      classStoredSchema.safeParse({
+        id: 'srd-cc-5.2.1:fighter',
+        slug: 'fighter',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'system',
+        campaignId: null,
+        ...timestamps,
+        ...fighterStoredBody,
+      }).success,
+    ).toBe(true)
   })
 })

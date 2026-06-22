@@ -1,11 +1,13 @@
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { ABILITIES, getSkillName } from '@rpg/contracts'
-import type { CharacterClass, Subclass } from '@rpg/contracts'
+import { ABILITIES, skillSlugsSuggestingClass } from '@rpg/contracts'
+import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
+import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
+import { useSkillProficiencies } from '../../skillProficiencies/hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { contentEditHref } from '../../lib/content-edit-href'
@@ -13,6 +15,9 @@ import { ContentStatRow } from '../../lib/content-stat-row'
 import { FeatureItem } from '../../lib/feature-item'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
+
+const SUGGESTED_SKILL_CHIP_CLASS =
+  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
 
 function FeaturesList({
   className,
@@ -79,12 +84,64 @@ function titleCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+function SuggestedProficienciesList({
+  campaignId,
+  classSlug,
+  choose,
+  skillProficiencies,
+  isPending,
+}: {
+  campaignId: string
+  classSlug: string
+  choose: number
+  skillProficiencies: SkillProficiency[]
+  isPending: boolean
+}) {
+  const suggestedSkillSlugs = skillSlugsSuggestingClass(classSlug, skillProficiencies)
+  if (!isPending && suggestedSkillSlugs.length === 0) return null
+
+  const skillsBySlug = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
+
+  return (
+    <section aria-labelledby="suggested-proficiencies-heading">
+      <Heading variant="section" as="h3" id="suggested-proficiencies-heading" className="mb-3">
+        Suggested proficiencies
+      </Heading>
+      <Text variant="muted" className="mb-3">
+        Choose {choose}
+      </Text>
+      {isPending ? (
+        <Text variant="muted">Loading…</Text>
+      ) : (
+        <ul className="flex flex-wrap gap-2" role="list">
+          {suggestedSkillSlugs.map((slug) => {
+            const skill = skillsBySlug.get(slug)
+            return (
+              <li key={slug}>
+                {skill ? (
+                  <Link
+                    to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}
+                    className={SUGGESTED_SKILL_CHIP_CLASS}
+                  >
+                    {skill.name}
+                  </Link>
+                ) : (
+                  <span className={SUGGESTED_SKILL_CHIP_CLASS}>{slug}</span>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 function ClassStatsSection({ characterClass }: { characterClass: CharacterClass }) {
   const { hitDie, primaryAbilities, proficiencies } = characterClass
 
   const primaryAbilitiesLabel = primaryAbilities.map((a) => ABILITIES[a]).join(', ')
   const savingThrowsLabel = proficiencies.savingThrows.map((a) => ABILITIES[a]).join(', ')
-  const skillsLabel = `Choose ${proficiencies.skills.choose}: ${proficiencies.skills.from.map((s) => getSkillName(s)).join(', ')}`
   const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
   const armorLabel =
     proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'
@@ -94,7 +151,6 @@ function ClassStatsSection({ characterClass }: { characterClass: CharacterClass 
       <ContentStatRow label="Hit Die" value={`d${hitDie} per level`} />
       <ContentStatRow label="Primary Abilities" value={primaryAbilitiesLabel} />
       <ContentStatRow label="Saving Throws" value={savingThrowsLabel} />
-      <ContentStatRow label="Skills" value={skillsLabel} />
       <ContentStatRow label="Weapons" value={weaponsLabel} />
       <ContentStatRow label="Armor" value={armorLabel} />
     </div>
@@ -106,6 +162,8 @@ type ClassDetailContentProps = {
   campaignId: string
   classId: string
   subclasses: Subclass[]
+  skillProficiencies: SkillProficiency[]
+  skillsPending: boolean
 }
 
 export function ClassDetailContent({
@@ -113,6 +171,8 @@ export function ClassDetailContent({
   campaignId,
   classId,
   subclasses,
+  skillProficiencies,
+  skillsPending,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
 
@@ -133,6 +193,13 @@ export function ClassDetailContent({
             <RichTextContent html={characterClass.description} size="sm" tone="muted" />
           )}
         </div>
+        <SuggestedProficienciesList
+          campaignId={campaignId}
+          classSlug={characterClass.slug}
+          choose={characterClass.proficiencies.skills.choose}
+          skillProficiencies={skillProficiencies}
+          isPending={skillsPending}
+        />
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />
         )}
@@ -147,6 +214,8 @@ export function ClassDetail() {
   const { campaignId = '', classId = '' } = useParams<{ campaignId: string; classId: string }>()
   const { data: classes = [], isPending, isError } = useClasses(campaignId)
   const { data: subclasses = [] } = useSubclasses(campaignId, classId)
+  const { data: skillProficiencies = [], isPending: skillsPending } =
+    useSkillProficiencies(campaignId)
 
   return (
     <ContentDetailResolver
@@ -163,6 +232,8 @@ export function ClassDetail() {
           campaignId={campaignId}
           classId={classId}
           subclasses={subclasses}
+          skillProficiencies={skillProficiencies}
+          skillsPending={skillsPending}
         />
       )}
     </ContentDetailResolver>

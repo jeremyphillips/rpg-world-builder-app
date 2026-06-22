@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickEquipment, pickSpell, pickWeapon } from './fixtures/pick'
+import { pickClass, pickEquipment, pickSpell, pickWeapon } from './fixtures/pick'
 import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
 
 describe('toContentFieldOption', () => {
@@ -23,7 +23,9 @@ describe('toContentFieldOption', () => {
 })
 
 describe('buildContentFormOptionSets', () => {
-  it('maps weapons and spells and filters equipment to tools only', () => {
+  it('maps classes, weapons, and spells and filters equipment to tools only', () => {
+    const barbarian = pickClass('barbarian')
+    const fighter = pickClass('fighter')
     const dagger = pickWeapon('dagger')
     const longsword = pickWeapon('longsword')
     const fireBolt = pickSpell('fire-bolt')
@@ -31,11 +33,16 @@ describe('buildContentFormOptionSets', () => {
     const torch = pickEquipment('torch')
 
     const options = buildContentFormOptionSets({
+      classes: [fighter, barbarian],
       weapons: [longsword, dagger],
       spells: [fireBolt],
       equipment: [thievesTools, torch],
     })
 
+    expect(options.classes).toEqual([
+      { value: 'barbarian', label: barbarian.name },
+      { value: 'fighter', label: fighter.name },
+    ])
     expect(options.weapons).toEqual([
       { value: 'dagger', label: dagger.name },
       { value: 'longsword', label: longsword.name },

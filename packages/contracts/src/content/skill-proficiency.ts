@@ -56,24 +56,26 @@ export function getSkillName(id: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Skill Proficiency — a single SRD skill as a first-class catalog content type.
+// Skill Proficiency — a single skill as a first-class catalog content type.
 // Extends the shared content envelope with a governing ability (the stat used
-// when rolling checks) and an optional list of class slugs that commonly take
-// this proficiency (convenience field for the detail page; `classes.json`
-// remains the authoritative source for character-creation proficiency menus).
+// when rolling checks) and class slugs that suggest this skill for starting
+// proficiency selection.
 // ---------------------------------------------------------------------------
+
+/** Class slugs that suggest this skill (min 1). Authoritative for the class↔skill edge. */
+export const suggestedClassesSchema = z.array(z.string()).min(1)
 
 /** The editable shape: what a form authors and what a patch overrides. */
 export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
   /** The ability score used when making this skill check (e.g. `str` for Athletics). */
   ability: abilitySchema,
   /**
-   * Class slugs that commonly offer this skill as a starting proficiency choice.
-   * Informational/display only — `classProficienciesSchema.skills.from` in
-   * `class.ts` is the authoritative character-creation list. Kept in sync with
-   * seed data manually.
+   * Class slugs that suggest this skill for starting proficiency selection.
+   * Authoritative write surface for the class↔skill association; class
+   * `proficiencies.skills.from` is derived from this field at read time.
+   * Stores slugs (not class ids) — see `docs/content-types.md` known gaps.
    */
-  suggestedClasses: z.array(z.string()).optional(),
+  suggestedClasses: suggestedClassesSchema,
 })
 
 export type SkillProficiencyBody = z.infer<typeof skillProficiencyBodySchema>

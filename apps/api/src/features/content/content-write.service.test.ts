@@ -5,6 +5,9 @@ import { createUser } from '../user'
 import { createCampaign } from '../campaign'
 import { armorWriteConfig } from './armor/armor.config'
 import { classWriteConfig } from './classes/classes.config'
+import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
+import { HomebrewClassModel } from './classes/homebrew-class.model'
+import { skillProficiencyWriteConfig } from './skill-proficiencies/skill-proficiencies.config'
 import { spellWriteConfig } from './spells/spells.config'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { resolveCatalogForCampaign } from './content.service'
@@ -149,6 +152,92 @@ describe('createHomebrewContent (classes)', () => {
         features: [{ id: 'battle-rage', name: 'Rage', level: 1 }],
       }),
     ).rejects.toBeInstanceOf(HttpError)
+  })
+
+  it('syncs suggestedClasses when homebrew class skill options are set on create', async () => {
+    const campaign = await makeCampaign()
+    await createHomebrewContent(classWriteConfig, campaign.id, {
+      ...minimalClassInput,
+      proficiencies: {
+        ...minimalClassInput.proficiencies,
+        skills: { choose: 2, from: ['athletics', 'stealth'] },
+      },
+    })
+
+    const skills = await resolveCatalogForCampaign(
+      skillProficiencyWriteConfig.readConfig,
+      campaign.id,
+    )
+    const athletics = skills.find((skill) => skill.slug === 'athletics')!
+    const stealth = skills.find((skill) => skill.slug === 'stealth')!
+
+    expect(athletics.suggestedClasses).toContain('berserker')
+    expect(stealth.suggestedClasses).toContain('berserker')
+  })
+
+  it('syncs suggestedClasses when homebrew class skill options change on update', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, {
+      ...minimalClassInput,
+      proficiencies: {
+        ...minimalClassInput.proficiencies,
+        skills: { choose: 2, from: ['athletics'] },
+      },
+    })
+
+    await updateContentEntity(classWriteConfig, campaign.id, created.id, {
+      proficiencies: {
+        ...minimalClassInput.proficiencies,
+        skills: { choose: 2, from: ['athletics', 'arcana'] },
+      },
+    })
+
+    const skills = await resolveCatalogForCampaign(
+      skillProficiencyWriteConfig.readConfig,
+      campaign.id,
+    )
+    const arcana = skills.find((skill) => skill.slug === 'arcana')!
+    expect(arcana.suggestedClasses).toContain('berserker')
+  })
+
+  it('patches system skill suggestedClasses when a system class skill options change', async () => {
+    const campaign = await makeCampaign()
+    const rogue = (await resolveClassesForCampaign(campaign.id)).find(
+      (cls) => cls.slug === 'rogue',
+    )!
+
+    await updateContentEntity(classWriteConfig, campaign.id, rogue.id, {
+      proficiencies: {
+        ...rogue.proficiencies,
+        skills: {
+          ...rogue.proficiencies.skills,
+          from: [...rogue.proficiencies.skills.from, 'medicine'],
+        },
+      },
+    })
+
+    const skills = await resolveCatalogForCampaign(
+      skillProficiencyWriteConfig.readConfig,
+      campaign.id,
+    )
+    const medicine = skills.find((skill) => skill.slug === 'medicine')!
+    expect(medicine.suggestedClasses).toContain('rogue')
+  })
+
+  it('does not persist skills.from on homebrew create', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, {
+      ...minimalClassInput,
+      proficiencies: {
+        ...minimalClassInput.proficiencies,
+        skills: { choose: 2, from: ['athletics', 'stealth'] },
+      },
+    })
+
+    expect(created.proficiencies.skills.from).toEqual(['athletics', 'stealth'])
+
+    const stored = await HomebrewClassModel.findById(created.id).lean()
+    expect(stored?.proficiencies.skills.from).toBeUndefined()
   })
 })
 

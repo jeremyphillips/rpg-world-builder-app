@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { getContentTypeConfig } from './content-types'
+import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from './content.service'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { getContentWriteConfig, isContentWriteType } from './lib/content-write-types'
@@ -35,8 +36,7 @@ export async function updateContentItem(req: Request, res: Response): Promise<vo
 export async function listClasses(req: Request, res: Response): Promise<void> {
   // `campaignId` is validated by `requireCampaignRole` (membership) upstream.
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('classes')
-  const classes = await resolveCatalogForCampaign(config, campaignId)
+  const classes = await resolveClassesForCampaign(campaignId)
   res.status(200).json({ classes })
 }
 

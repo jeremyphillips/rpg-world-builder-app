@@ -38,7 +38,23 @@ export const subclassFeatureSchema = classFeatureSchema
 
 export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
-export const classProficienciesSchema = z.object({
+/** Persisted / write surface — `from` is not stored; API derives it at read time. */
+export const classSkillProficienciesWriteSchema = z
+  .object({
+    choose: z.number().int().min(0),
+  })
+  .strict()
+
+export type ClassSkillProficienciesWrite = z.infer<typeof classSkillProficienciesWriteSchema>
+
+/** Read surface — `from` is derived from `skill.suggestedClasses` (see skill-class-association). */
+export const classSkillProficienciesReadSchema = classSkillProficienciesWriteSchema.extend({
+  from: z.array(skillSchema),
+})
+
+export type ClassSkillProficienciesRead = z.infer<typeof classSkillProficienciesReadSchema>
+
+export const classProficienciesWriteSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
   armor: z.array(armorCategorySchema),
   weapons: z.object({
@@ -46,10 +62,14 @@ export const classProficienciesSchema = z.object({
     items: z.array(z.string()).optional(), // weapon ids (future weapon content)
   }),
   tools: z.array(z.string()).optional(),
-  skills: z.object({
-    choose: z.number().int().min(0),
-    from: z.array(skillSchema),
-  }),
+  skills: classSkillProficienciesWriteSchema,
+})
+
+export type ClassProficienciesWrite = z.infer<typeof classProficienciesWriteSchema>
+
+/** Read model for class proficiencies (includes derived skill options). */
+export const classProficienciesSchema = classProficienciesWriteSchema.extend({
+  skills: classSkillProficienciesReadSchema,
 })
 
 export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
@@ -76,17 +96,24 @@ export type ClassResource = z.infer<typeof classResourceSchema>
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
-/** The editable shape: what a form authors and what a patch overrides. */
-export const classBodySchema = contentBodyBaseSchema.extend({
+/** Persisted body — seed, homebrew Mongo, and overlay patches (no derived `skills.from`). */
+export const classStoredBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   asiLevels: z.array(levelSchema),
   /** Level at which a character chooses their subclass; omit when the class has none. */
   subclassChoiceLevel: levelSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
-  proficiencies: classProficienciesSchema,
+  proficiencies: classProficienciesWriteSchema,
   features: z.array(classFeatureSchema),
   resources: z.array(classResourceSchema).optional(),
+})
+
+export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
+
+/** Read body — API responses and dashboard catalog picks (derived `skills.from`). */
+export const classBodySchema = classStoredBodySchema.extend({
+  proficiencies: classProficienciesSchema,
 })
 
 export type ClassBody = z.infer<typeof classBodySchema>
@@ -96,12 +123,16 @@ export function subclassChoiceFeatureLabel(className: string): string {
   return `${className} Subclass`
 }
 
-/** Stored shape = ownership envelope + body. */
+/** Stored record = envelope + persisted body (seed JSON, Mongo, patch merge target). */
+export const classStoredSchema = contentMetaSchema.extend(classStoredBodySchema.shape)
+export type ClassStored = z.infer<typeof classStoredSchema>
+
+/** Read record = envelope + read body (`proficiencies.skills.from` is API-derived). */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)
 export type CharacterClass = z.infer<typeof classSchema>
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
-export const createClassInputSchema = classBodySchema.extend({ slug: slugSchema })
+export const createClassInputSchema = classStoredBodySchema.extend({ slug: slugSchema })
 export type CreateClassInput = z.infer<typeof createClassInputSchema>
 
 export const updateClassInputSchema = createClassInputSchema.partial()
@@ -114,7 +145,7 @@ export type UpdateClassInput = z.infer<typeof updateClassInputSchema>
  * Deferred block).
  */
 export const classPatchSchema = contentPatchBaseSchema.extend({
-  patch: classBodySchema.partial(),
+  patch: classStoredBodySchema.partial(),
 })
 export type ClassPatch = z.infer<typeof classPatchSchema>
 

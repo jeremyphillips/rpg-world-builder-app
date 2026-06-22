@@ -24,6 +24,7 @@ import {
   weaponCategorySchema,
   type CharacterClass,
   type ClassProficiencies,
+  type ClassProficienciesWrite,
   type ClassResource,
   type CreateClassInput,
   type Spellcasting,
@@ -66,6 +67,9 @@ import {
 } from './class-feature-form-fields'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
+
+const CLASS_SKILL_OPTIONS_HINT =
+  'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
 
 const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
   'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
@@ -291,7 +295,7 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-): ClassProficiencies {
+): ClassProficienciesWrite {
   const tools = proficiencies.tools ?? []
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
@@ -304,7 +308,7 @@ function proficienciesFromFormValues(
     armor: proficiencies.armor,
     weapons,
     ...(tools.length ? { tools } : {}),
-    skills: proficiencies.skills,
+    skills: { choose: proficiencies.skills.choose },
   }
 }
 
@@ -558,6 +562,7 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           name: 'proficiencies.skills.from',
           label: 'Skill options',
           options: skillOptions,
+          hint: CLASS_SKILL_OPTIONS_HINT,
         },
       ],
     },
@@ -658,10 +663,13 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
             ? undefined
             : levelSchema.parse(Number(values.subclassChoiceLevel)),
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-        proficiencies: proficienciesFromFormValues(
-          values.proficiencies,
-          values.hasSpecificWeapons ?? false,
-        ),
+        proficiencies: {
+          ...proficienciesFromFormValues(values.proficiencies, values.hasSpecificWeapons ?? false),
+          skills: {
+            choose: values.proficiencies.skills.choose,
+            from: values.proficiencies.skills.from,
+          },
+        },
         features: featuresFromFormValues(values.features, ctx?.entity?.features),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },

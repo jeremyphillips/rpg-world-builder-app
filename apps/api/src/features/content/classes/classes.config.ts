@@ -1,17 +1,20 @@
 import type { CharacterClass } from '@rpg/contracts'
 import {
-  classBodySchema,
-  classSchema,
+  classStoredBodySchema,
+  classStoredSchema,
   createClassInputSchema,
+  stripClassSkillFromFromInput,
   updateClassInputSchema,
 } from '@rpg/contracts'
+
+import type { ZodType } from 'zod'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { ClassPatchModel } from './class-patch.model'
 import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
-import { loadSeedClasses, seedClassSlugs } from '@rpg/catalog/classes'
+import { loadSeedClassesStored, seedClassSlugs } from '@rpg/catalog/classes'
 
 // InferSchemaType gives wider primitives (string, number, string[]) for
 // enum-constrained fields; Mixed fields become any. The single `as CharacterClass`
@@ -24,6 +27,10 @@ interface ClassPatchRecord {
 }
 
 function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass {
+  const proficiencies = stripClassSkillFromFromInput({
+    proficiencies: doc.proficiencies,
+  }).proficiencies as CharacterClass['proficiencies']
+
   return {
     id: String(doc._id),
     slug: doc.slug,
@@ -40,19 +47,26 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     asiLevels: doc.asiLevels,
     subclassChoiceLevel: doc.subclassChoiceLevel,
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
-    proficiencies: doc.proficiencies,
+    proficiencies,
     features: doc.features ?? [],
   } as CharacterClass
 }
 
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
-  const { slug: _slug, ...body } = input
+  const { slug: _slug, ...body } = stripClassSkillFromFromInput(input)
   return body
+}
+
+function prepareHomebrewUpdate(
+  _doc: HomebrewDoc,
+  update: Record<string, unknown>,
+): Record<string, unknown> {
+  return stripClassSkillFromFromInput(update)
 }
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
-  loadSystem: loadSeedClasses,
+  loadSystem: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
   systemSlugs: seedClassSlugs,
   loadPatches: async (campaignId) => {
     const docs = await ClassPatchModel.find({ campaignId }).lean<ClassPatchRecord[]>()
@@ -72,10 +86,11 @@ export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
   responseKey: 'classes',
   createInputSchema: createClassInputSchema,
   updateInputSchema: updateClassInputSchema,
-  storedSchema: classSchema,
-  bodySchema: classBodySchema,
+  storedSchema: classStoredSchema as unknown as ZodType<CharacterClass>,
+  bodySchema: classStoredBodySchema,
   homebrewModel: HomebrewClassModel,
   patchModel: ClassPatchModel,
   toHomebrewEntity: toHomebrewClass,
   bodyFromCreateInput,
+  prepareHomebrewUpdate,
 }

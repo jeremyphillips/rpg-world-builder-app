@@ -21,28 +21,18 @@ import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-
 
 const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
 
+const SUGGESTED_CLASSES_HINT =
+  'Classes that suggest this skill for starting proficiency selection. Used by the character builder to restrict skill picks.'
+
 const skillProficiencyFormSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
   description: z.string().optional(),
   ability: abilitySchema,
-  suggestedClassesText: z.string().optional(),
+  suggestedClasses: z.array(z.string()).min(1),
 })
 
 type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>
-
-function parseSlugList(text: string | undefined): string[] | undefined {
-  if (!text?.trim()) return undefined
-  const slugs = text
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  return slugs.length > 0 ? slugs : undefined
-}
-
-function formatSlugList(slugs: string[] | undefined): string | undefined {
-  return slugs?.length ? slugs.join(', ') : undefined
-}
 
 const skillProficiencyFormDef: ContentFormDef<
   SkillProficiency,
@@ -52,24 +42,30 @@ const skillProficiencyFormDef: ContentFormDef<
   routeKey: 'skill-proficiencies',
   schema: skillProficiencyFormSchema,
   coverage: 'structural',
-  buildFields: (_ctx): FormItem[] => [
+  createDefaultValues: {
+    ability: 'str',
+  },
+  buildFields: (ctx): FormItem[] => [
     { kind: 'group', legend: 'Identity', fields: identityFields() },
     {
       kind: 'group',
       legend: 'Mechanics',
       fields: [
         {
-          type: 'select',
+          type: 'chips',
           name: 'ability',
           label: 'Governing ability',
           options: abilityOptions,
+          multiple: false,
           required: true,
         },
         {
-          type: 'text',
-          name: 'suggestedClassesText',
+          type: 'chips',
+          name: 'suggestedClasses',
           label: 'Suggested classes',
-          hint: 'Comma-separated class slugs (optional)',
+          options: ctx.options?.classes ?? [],
+          required: true,
+          hint: SUGGESTED_CLASSES_HINT,
         },
       ],
     },
@@ -79,7 +75,7 @@ const skillProficiencyFormDef: ContentFormDef<
     slug: entity.slug,
     description: entity.description,
     ability: entity.ability,
-    suggestedClassesText: formatSlugList(entity.suggestedClasses),
+    suggestedClasses: entity.suggestedClasses,
   }),
   toInput: (values, ctx?: ContentFormInputCtx<SkillProficiency>) => {
     const input = createSkillProficiencyInputSchema.parse({
@@ -87,7 +83,7 @@ const skillProficiencyFormDef: ContentFormDef<
       name: values.name,
       description: values.description || undefined,
       ability: values.ability,
-      suggestedClasses: parseSlugList(values.suggestedClassesText),
+      suggestedClasses: values.suggestedClasses,
     })
     return finalizeContentInput(input, ctx) as CreateSkillProficiencyInput
   },
