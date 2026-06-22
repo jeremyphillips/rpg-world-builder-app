@@ -3,6 +3,7 @@ import { Form, FormSaveFooter } from '@rpg/ui/form'
 import type { ChangePasswordInput } from '@rpg/contracts'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useChangePassword } from '../hooks/use-change-password'
 import {
   changePasswordFormSchema,
@@ -13,11 +14,19 @@ import {
 export function ChangePasswordSection() {
   const { mutateAsync, isPending, isSuccess } = useChangePassword()
 
-  const { onSubmit, formError } = useSubmitHandler<ChangePasswordFormValues>(async (values) => {
-    // confirmNewPassword is client-side only; strip it before the API call.
-    const { confirmNewPassword: _confirm, ...input } = values
-    await mutateAsync(input as ChangePasswordInput)
-  }, 'Could not change password.')
+  const { onSubmit, formError } = useSubmitHandler<ChangePasswordFormValues>(
+    async (values, form) => {
+      // confirmNewPassword is client-side only; strip it before the API call.
+      const { confirmNewPassword: _confirm, ...input } = values
+      await mutateAsync(input as ChangePasswordInput)
+      form.reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+      })
+    },
+    'Could not change password.',
+  )
 
   return (
     <section aria-labelledby="password-heading" className="space-y-4">
@@ -33,12 +42,15 @@ export function ChangePasswordSection() {
         onSubmit={onSubmit}
         formError={formError}
         footer={(form) => (
-          <FormSaveFooter
-            pending={isPending || form.formState.isSubmitting}
-            isSuccess={isSuccess}
-            submitLabel="Change password"
-            successMessage="Password changed."
-          />
+          <>
+            <FormUnsavedChangesGuard />
+            <FormSaveFooter
+              pending={isPending || form.formState.isSubmitting}
+              isSuccess={isSuccess}
+              submitLabel="Change password"
+              successMessage="Password changed."
+            />
+          </>
         )}
       />
     </section>

@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom'
-import type { DefaultValues, FieldValues } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter, TabbedForm, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useContentFormOptions } from './content-form-options'
 import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
 import { contentFormFields } from './content-form-registry'
@@ -40,13 +41,22 @@ export function ContentFormCancelFooter({
   submitLabel,
   pending,
 }: ContentFormCancelFooterProps) {
+  const navigate = useNavigate()
+
   return (
-    <div className="flex items-center gap-3">
-      <FormSaveFooter pending={pending} submitLabel={submitLabel} />
-      <Link to={backHref} className="text-sm text-muted-foreground hover:underline">
-        Cancel
-      </Link>
-    </div>
+    <>
+      <FormUnsavedChangesGuard />
+      <div className="flex items-center gap-3">
+        <FormSaveFooter pending={pending} submitLabel={submitLabel} />
+        <button
+          type="button"
+          onClick={() => navigate(backHref)}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          Cancel
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -59,7 +69,7 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   submitLabel: string
   submitPending: boolean
   formError: string | null
-  onSubmit: (values: TFormValues) => Promise<void>
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
 }
 
 export function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -104,7 +114,7 @@ interface ContentTabbedSchemaFormProps<TFormValues extends FieldValues> {
   submitLabel: string
   submitPending: boolean
   formError: string | null
-  onSubmit: (values: TFormValues) => Promise<void>
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
 }
 
 export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
@@ -126,7 +136,7 @@ export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         tabs={tabs}
         defaultValues={defaultValues}
         collapsibleSections={false}
-        onSubmit={(values) => onSubmit(values)}
+        onSubmit={(values, form) => onSubmit(values, form)}
         formError={formError}
         footer={(form) => (
           <ContentFormCancelFooter
@@ -150,7 +160,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   submitLabel: string
   submitPending: boolean
   formError: string | null
-  onSubmit: (values: TFormValues) => Promise<void>
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({

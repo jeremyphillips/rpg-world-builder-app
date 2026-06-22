@@ -3,6 +3,7 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { identityFields, rulesFields, flavorFields } from '../lib/campaign-fields'
 import {
@@ -45,9 +46,10 @@ export function CampaignSettings() {
     uploadErrorMessage: 'Could not upload campaign image.',
   })
 
-  const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values) => {
+  const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
     const imageKey = await bannerField.resolveImageKey(values.banner)
     await mutateAsync(buildUpdateCampaignInput(values, imageKey))
+    form.reset(values)
   }, 'Could not save campaign.')
 
   if (isLoadingCampaigns) {
@@ -83,12 +85,15 @@ export function CampaignSettings() {
         onSubmit={onSubmit}
         formError={formError}
         footer={(form) => (
-          <FormSaveFooter
-            pending={isPending || form.formState.isSubmitting}
-            isSuccess={isSuccess}
-            submitLabel="Save changes"
-            successMessage="Changes saved."
-          />
+          <>
+            <FormUnsavedChangesGuard />
+            <FormSaveFooter
+              pending={isPending || form.formState.isSubmitting}
+              isSuccess={isSuccess}
+              submitLabel="Save changes"
+              successMessage="Changes saved."
+            />
+          </>
         )}
       />
     </div>

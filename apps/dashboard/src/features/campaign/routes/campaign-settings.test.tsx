@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { CampaignListItem } from '@rpg/contracts'
+
+import { renderWithDataRouter } from '@/lib/test-router'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
@@ -45,14 +46,18 @@ function renderSettings(campaignId = 'c1') {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[`/campaigns/${campaignId}/settings`]}>
-        <Routes>
-          <Route path="/campaigns/:campaignId/settings" element={<CampaignSettings />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithDataRouter(
+    [
+      {
+        path: '/campaigns/:campaignId/settings',
+        element: (
+          <QueryClientProvider client={queryClient}>
+            <CampaignSettings />
+          </QueryClientProvider>
+        ),
+      },
+    ],
+    { initialEntries: [`/campaigns/${campaignId}/settings`] },
   )
 }
 

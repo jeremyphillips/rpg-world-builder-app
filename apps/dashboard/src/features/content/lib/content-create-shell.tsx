@@ -52,10 +52,11 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
             submitLabel="Create"
             submitPending={mutation.isPending}
             formError={mutation.isError ? String(mutation.error) : null}
-            onSubmit={async (values) => {
+            onSubmit={async (values, form) => {
               await mutation.mutateAsync(
                 def.toInput(values, { weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug }),
               )
+              form.reset(values)
               navigate(backHref)
             }}
           />

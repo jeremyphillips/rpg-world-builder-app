@@ -87,13 +87,14 @@ function ContentEditFormReady({
           submitLabel="Save changes"
           submitPending={mutation.isPending}
           formError={mutation.isError ? String(mutation.error) : null}
-          onSubmit={async (values) => {
+          onSubmit={async (values, form) => {
             await mutation.mutateAsync(
               def.toInput(values, {
                 entity,
                 weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
               }),
             )
+            form.reset(values)
             navigate(backHref)
           }}
         />
