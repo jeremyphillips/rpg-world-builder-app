@@ -1,68 +1,35 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  normalizeClassWeaponProficiencies,
-  specificWeaponFieldsAllowed,
-} from './class-weapon-proficiency-helpers'
-
-describe('specificWeaponFieldsAllowed', () => {
-  it('allows specific weapons when fewer than all categories are selected', () => {
-    expect(specificWeaponFieldsAllowed([])).toBe(true)
-    expect(specificWeaponFieldsAllowed(['simple'])).toBe(true)
-  })
-
-  it('disallows specific weapons when both categories are selected', () => {
-    expect(specificWeaponFieldsAllowed(['simple', 'martial'])).toBe(false)
-  })
-})
+import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
 
 describe('normalizeClassWeaponProficiencies', () => {
-  const categoryBySlug = {
-    dagger: 'simple',
-    longsword: 'martial',
-  } as const
-
-  it('omits items when the toggle is off', () => {
-    expect(
-      normalizeClassWeaponProficiencies({
-        categories: [],
-        items: ['dagger'],
-        hasSpecificWeapons: false,
-        categoryBySlug,
-      }),
-    ).toEqual({ categories: [] })
-  })
-
-  it('omits items when both categories are granted', () => {
+  it('returns categories only when the toggle is off', () => {
     expect(
       normalizeClassWeaponProficiencies({
         categories: ['simple', 'martial'],
         items: ['dagger'],
-        hasSpecificWeapons: true,
-        categoryBySlug,
+        hasSpecificWeapons: false,
       }),
     ).toEqual({ categories: ['simple', 'martial'] })
   })
 
-  it('strips items covered by a selected category', () => {
+  it('returns named weapons only when the toggle is on', () => {
     expect(
       normalizeClassWeaponProficiencies({
         categories: ['simple'],
         items: ['dagger', 'longsword'],
         hasSpecificWeapons: true,
-        categoryBySlug,
       }),
-    ).toEqual({ categories: ['simple'], items: ['longsword'] })
+    ).toEqual({ categories: [], items: ['dagger', 'longsword'] })
   })
 
-  it('prefers specific weapons when every selected item would be covered by a category', () => {
+  it('returns empty categories when individual mode is on with no items selected', () => {
     expect(
       normalizeClassWeaponProficiencies({
         categories: ['simple'],
-        items: ['dagger'],
+        items: [],
         hasSpecificWeapons: true,
-        categoryBySlug,
       }),
-    ).toEqual({ categories: [], items: ['dagger'] })
+    ).toEqual({ categories: [] })
   })
 })

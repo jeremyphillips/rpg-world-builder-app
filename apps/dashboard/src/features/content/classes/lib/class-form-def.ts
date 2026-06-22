@@ -67,17 +67,16 @@ import {
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
-import {
-  normalizeClassWeaponProficiencies,
-  specificWeaponFieldsAllowed,
-} from './class-weapon-proficiency-helpers'
+import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
 import { ClassSubclassesTabStub } from '../components/class-subclasses-tab-stub'
 
-const SPECIFIC_WEAPONS_TOGGLE_HINT =
-  'Grant individual weapon proficiencies instead of (or when not using) whole categories — e.g. Sorcerer (dagger, dart, sling).'
+const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
-const WEAPON_CATEGORIES_HINT =
-  'Selecting a category grants all weapons in it. Use specific weapons only for picks outside those categories.'
+const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
+  'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
+
+const WEAPON_PROFICIENCIES_HINT =
+  'Each selected category grants proficiency with every weapon in it.'
 
 // ---------------------------------------------------------------------------
 // Vocab option lists
@@ -202,20 +201,17 @@ function visibleWhenSpellcasting(): FieldVisibility {
   }
 }
 
-function visibleWhenSpecificWeaponsToggle(): FieldVisibility {
+function visibleWhenWeaponCategories(): FieldVisibility {
   return {
-    dependsOn: ['proficiencies.weapons.categories'],
-    visibleWhen: (watched) =>
-      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
+    dependsOn: ['hasSpecificWeapons'],
+    visibleWhen: (watched) => watched['hasSpecificWeapons'] !== true,
   }
 }
 
-function visibleWhenSpecificWeaponsCombobox(): FieldVisibility {
+function visibleWhenIndividualWeapons(): FieldVisibility {
   return {
-    dependsOn: ['hasSpecificWeapons', 'proficiencies.weapons.categories'],
-    visibleWhen: (watched) =>
-      watched['hasSpecificWeapons'] === true &&
-      specificWeaponFieldsAllowed(watched['proficiencies.weapons.categories']),
+    dependsOn: ['hasSpecificWeapons'],
+    visibleWhen: (watched) => watched['hasSpecificWeapons'] === true,
   }
 }
 
@@ -329,14 +325,12 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-  weaponCategoryBySlug?: ContentFormInputCtx<CharacterClass>['weaponCategoryBySlug'],
 ): ClassProficiencies {
   const tools = proficiencies.tools ?? []
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
     hasSpecificWeapons,
-    categoryBySlug: weaponCategoryBySlug,
   })
 
   return {
@@ -570,26 +564,27 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       options: abilityOptions,
       max: 2,
       required: true,
+      hint: SAVING_THROWS_HINT,
     },
     {
       type: 'chips',
       name: 'proficiencies.armor',
-      label: 'Armor',
+      label: 'Armor training',
       options: armorCategoryOptions,
-    },
-    {
-      type: 'chips',
-      name: 'proficiencies.weapons.categories',
-      label: 'Weapon categories',
-      options: weaponCategoryOptions,
-      hint: WEAPON_CATEGORIES_HINT,
     },
     {
       type: 'switch',
       name: 'hasSpecificWeapons',
-      label: 'Specific weapons',
-      hint: SPECIFIC_WEAPONS_TOGGLE_HINT,
-      visibility: visibleWhenSpecificWeaponsToggle(),
+      label: 'Individual weapons',
+      hint: INDIVIDUAL_WEAPONS_TOGGLE_HINT,
+    },
+    {
+      type: 'chips',
+      name: 'proficiencies.weapons.categories',
+      label: 'Weapon proficiencies',
+      options: weaponCategoryOptions,
+      hint: WEAPON_PROFICIENCIES_HINT,
+      visibility: visibleWhenWeaponCategories(),
     },
     {
       type: 'combobox',
@@ -598,12 +593,12 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       multiple: true,
       options: ctx.options?.weapons ?? [],
       placeholder: 'Choose weapons…',
-      visibility: visibleWhenSpecificWeaponsCombobox(),
+      visibility: visibleWhenIndividualWeapons(),
     },
     {
       type: 'combobox',
       name: 'proficiencies.tools',
-      label: 'Tools',
+      label: 'Tool proficiencies',
       multiple: true,
       options: ctx.options?.tools ?? [],
       placeholder: 'Choose tools…',
@@ -729,7 +724,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         proficiencies: proficienciesFromFormValues(
           values.proficiencies,
           values.hasSpecificWeapons ?? false,
-          ctx?.weaponCategoryBySlug,
         ),
         features: featuresFromFormValues(values.features, ctx?.entity?.features),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
