@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ELF, ORC } from '../fixtures'
 import { SpeciesDetailContent } from './species-detail'
 
@@ -13,9 +14,9 @@ export default meta
 type Story = StoryObj
 
 export const NoHeritageChoices: Story = {
-  render: () => <SpeciesDetailContent species={ORC} />,
+  render: () => <SpeciesDetailContent species={ORC} campaignId={STORY_CAMPAIGN_ID} />,
 }
 
 export const WithLineageHeritageChoice: Story = {
-  render: () => <SpeciesDetailContent species={ELF} />,
+  render: () => <SpeciesDetailContent species={ELF} campaignId={STORY_CAMPAIGN_ID} />,
 }

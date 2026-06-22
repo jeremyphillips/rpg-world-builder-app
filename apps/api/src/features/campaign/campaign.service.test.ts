@@ -75,6 +75,7 @@ describe('listCampaignsForUser', () => {
 
     expect(campaigns.map((c) => c.id)).toEqual([arden.id, zelda.id])
     expect(campaigns.map((c) => c.identity.name)).toEqual(['Arden', 'Zelda'])
+    expect(campaigns.every((c) => c.campaignRole === 'owner')).toBe(true)
   })
 
   it('includes campaigns the user joined but did not create', async () => {
@@ -93,6 +94,26 @@ describe('listCampaignsForUser', () => {
 
     const campaigns = await listCampaignsForUser(member.id)
     expect(campaigns.map((c) => c.id)).toEqual([campaign.id])
+    expect(campaigns[0]?.campaignRole).toBe('pc')
+  })
+
+  it('returns co-owner role for co-owner memberships', async () => {
+    const owner = await makeUser('owner@example.com')
+    const coOwner = await makeUser('co@example.com')
+    const campaign = await createCampaign({ name: 'Shared', createdBy: owner.id })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: coOwner.id,
+      campaignRole: 'co-owner',
+      characterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const campaigns = await listCampaignsForUser(coOwner.id)
+    expect(campaigns.map((c) => c.id)).toEqual([campaign.id])
+    expect(campaigns[0]?.campaignRole).toBe('co-owner')
   })
 
   it('excludes campaigns the user has no membership in', async () => {

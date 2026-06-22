@@ -1,20 +1,22 @@
+import { CAMPAIGN_MANAGE_ROLES } from '@rpg/contracts'
+
 import { useSession } from '@/features/auth'
 import { useCampaigns } from './use-campaigns'
 
 /**
- * Returns true when the current user has manage-level access to the given
- * campaign (i.e. they are the campaign owner).
- *
- * TODO: expand to co-owner when a membership endpoint is available.
+ * Returns true when the current user can manage the given campaign — owner or
+ * co-owner membership (matches API content write guards).
  */
 export function useCanManageCampaign(campaignId: string | undefined): boolean {
   const { data: user } = useSession()
   const { data: campaigns } = useCampaigns()
 
-  if (!campaignId) return false
+  if (!campaignId || !user) return false
 
   const campaign = campaigns?.find((c) => c.id === campaignId)
-  if (!campaign || !user) return false
+  if (!campaign) return false
 
-  return campaign.createdBy === user.id
+  return CAMPAIGN_MANAGE_ROLES.includes(
+    campaign.campaignRole as (typeof CAMPAIGN_MANAGE_ROLES)[number],
+  )
 }

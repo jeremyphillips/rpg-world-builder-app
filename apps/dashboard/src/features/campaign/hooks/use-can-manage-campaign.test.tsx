@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import type { Campaign, SessionUser } from '@rpg/contracts'
+import type { CampaignListItem, SessionUser } from '@rpg/contracts'
 
 import { makeQueryWrapper } from '@/test/make-wrapper'
 
@@ -25,7 +25,10 @@ function makeUser(overrides?: Partial<SessionUser>): SessionUser {
   }
 }
 
-function makeCampaign(id: string, createdBy: string): Campaign {
+function makeCampaign(
+  id: string,
+  campaignRole: CampaignListItem['campaignRole'],
+): CampaignListItem {
   return {
     id,
     identity: { name: 'Test Campaign' },
@@ -33,7 +36,8 @@ function makeCampaign(id: string, createdBy: string): Campaign {
     status: 'active',
     visibility: 'private',
     rulesetId: 'srd-cc-5.2.1',
-    createdBy,
+    createdBy: 'u1',
+    campaignRole,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
   }
@@ -47,7 +51,7 @@ describe('useCanManageCampaign', () => {
 
   it('returns false when no campaignId is provided', async () => {
     useSession.mockReturnValue({ data: makeUser() } as ReturnType<typeof useSessionFn>)
-    listCampaigns.mockResolvedValue([makeCampaign('c1', 'u1')])
+    listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
 
     const { result } = renderHook(() => useCanManageCampaign(undefined), {
       wrapper: makeQueryWrapper(),
@@ -67,9 +71,9 @@ describe('useCanManageCampaign', () => {
     await waitFor(() => expect(result.current).toBe(false))
   })
 
-  it('returns false when the user is not the campaign owner', async () => {
+  it('returns false when the user is a player', async () => {
     useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
-    listCampaigns.mockResolvedValue([makeCampaign('c1', 'u2')])
+    listCampaigns.mockResolvedValue([makeCampaign('c1', 'pc')])
 
     const { result } = renderHook(() => useCanManageCampaign('c1'), {
       wrapper: makeQueryWrapper(),
@@ -80,7 +84,18 @@ describe('useCanManageCampaign', () => {
 
   it('returns true when the user is the campaign owner', async () => {
     useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
-    listCampaigns.mockResolvedValue([makeCampaign('c1', 'u1')])
+    listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
+
+    const { result } = renderHook(() => useCanManageCampaign('c1'), {
+      wrapper: makeQueryWrapper(),
+    })
+
+    await waitFor(() => expect(result.current).toBe(true))
+  })
+
+  it('returns true when the user is a co-owner', async () => {
+    useSession.mockReturnValue({ data: makeUser({ id: 'u2' }) } as ReturnType<typeof useSessionFn>)
+    listCampaigns.mockResolvedValue([makeCampaign('c1', 'co-owner')])
 
     const { result } = renderHook(() => useCanManageCampaign('c1'), {
       wrapper: makeQueryWrapper(),
@@ -91,7 +106,7 @@ describe('useCanManageCampaign', () => {
 
   it('returns false when the campaignId matches no campaign in the list', async () => {
     useSession.mockReturnValue({ data: makeUser({ id: 'u1' }) } as ReturnType<typeof useSessionFn>)
-    listCampaigns.mockResolvedValue([makeCampaign('c1', 'u1')])
+    listCampaigns.mockResolvedValue([makeCampaign('c1', 'owner')])
 
     const { result } = renderHook(() => useCanManageCampaign('c-unknown'), {
       wrapper: makeQueryWrapper(),

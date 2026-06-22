@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 import { ABILITIES, getClassName } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
@@ -9,6 +9,7 @@ import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -68,17 +69,13 @@ type SkillDetailContentProps = {
 
 export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
-  const editHref = ROUTES.content.skillProficiencies.edit(campaignId, skillId)
 
   return (
     <ContentDetailLayout
       imageUrl={getContentImageUrl(skill.imageKey)}
       imageName={skill.name}
-      actions={
-        <Link to={editHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-          Edit
-        </Link>
-      }
+      campaignId={campaignId}
+      editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
     >
       <div className="space-y-4">
         <Heading variant="display" as="h2">

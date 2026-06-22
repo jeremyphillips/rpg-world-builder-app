@@ -14,6 +14,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { contentEditHref } from '../../lib/content-edit-href'
 import { ContentStatRow } from '../../lib/content-stat-row'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
@@ -123,13 +124,18 @@ function SpeciesStatsSection({ species }: { species: Species }) {
 // Main detail component
 // ---------------------------------------------------------------------------
 
-type SpeciesDetailContentProps = { species: Species }
+type SpeciesDetailContentProps = { species: Species; campaignId: string }
 
-export function SpeciesDetailContent({ species }: SpeciesDetailContentProps) {
+export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailContentProps) {
   useSetBreadcrumbLabel(species.name)
 
   return (
-    <ContentDetailLayout imageUrl={getContentImageUrl(species.imageKey)} imageName={species.name}>
+    <ContentDetailLayout
+      imageUrl={getContentImageUrl(species.imageKey)}
+      imageName={species.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('species', campaignId, species.id)}
+    >
       <div className="space-y-4">
         <Heading variant="display" as="h2">
           {species.name}
@@ -161,7 +167,7 @@ export function SpeciesDetail() {
       loadErrorLabel="Could not load species."
       notFoundLabel="Species not found."
     >
-      {(item) => <SpeciesDetailContent species={item} />}
+      {(item) => <SpeciesDetailContent species={item} campaignId={campaignId} />}
     </ContentDetailResolver>
   )
 }

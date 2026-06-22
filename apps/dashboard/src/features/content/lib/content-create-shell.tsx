@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
 import { createContent } from './content-client'
+import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,
   ContentFormOptionsGate,
@@ -89,7 +90,9 @@ export function ContentCreateShell({
       </div>
 
       {def ? (
-        <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+        <ContentAuthoringGate campaignId={campaignId}>
+          <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+        </ContentAuthoringGate>
       ) : (
         <ContentFormComingSoon />
       )}

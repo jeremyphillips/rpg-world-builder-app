@@ -9,6 +9,7 @@ import {
   ContentFormOptionsGate,
   ContentFormLayout,
 } from './content-form-shell-parts'
+import { ContentAuthoringGate } from './content-authoring-gate'
 import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
 
 export interface ContentEditShellProps {
@@ -70,32 +71,34 @@ function ContentEditFormReady({
   }
 
   return (
-    <div className="space-y-6 pb-10">
-      <Heading variant="page" as="h2">
-        {headingFn(entity.name)}
-      </Heading>
+    <ContentAuthoringGate campaignId={campaignId}>
+      <div className="space-y-6 pb-10">
+        <Heading variant="page" as="h2">
+          {headingFn(entity.name)}
+        </Heading>
 
-      <ContentFormLayout
-        def={def}
-        ctx={formCtx}
-        formKey={entity.id}
-        schema={def.schema}
-        defaultValues={def.toFormValues(entity)}
-        backHref={backHref}
-        submitLabel="Save changes"
-        submitPending={mutation.isPending}
-        formError={mutation.isError ? String(mutation.error) : null}
-        onSubmit={async (values) => {
-          await mutation.mutateAsync(
-            def.toInput(values, {
-              entity,
-              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            }),
-          )
-          navigate(backHref)
-        }}
-      />
-    </div>
+        <ContentFormLayout
+          def={def}
+          ctx={formCtx}
+          formKey={entity.id}
+          schema={def.schema}
+          defaultValues={def.toFormValues(entity)}
+          backHref={backHref}
+          submitLabel="Save changes"
+          submitPending={mutation.isPending}
+          formError={mutation.isError ? String(mutation.error) : null}
+          onSubmit={async (values) => {
+            await mutation.mutateAsync(
+              def.toInput(values, {
+                entity,
+                weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+              }),
+            )
+            navigate(backHref)
+          }}
+        />
+      </div>
+    </ContentAuthoringGate>
   )
 }
 

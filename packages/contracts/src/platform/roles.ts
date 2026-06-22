@@ -33,3 +33,11 @@ export const CAMPAIGN_ROLES = ['owner', 'co-owner', 'pc', 'observer'] as const
 export const campaignRoleSchema = z.enum(CAMPAIGN_ROLES)
 
 export type CampaignRole = z.infer<typeof campaignRoleSchema>
+
+/** Roles that can manage campaign settings and author content (matches API write guards). */
+export const CAMPAIGN_MANAGE_ROLES = [
+  'owner',
+  'co-owner',
+] as const satisfies readonly CampaignRole[]
+
+export type CampaignManageRole = (typeof CAMPAIGN_MANAGE_ROLES)[number]
