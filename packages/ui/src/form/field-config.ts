@@ -287,6 +287,11 @@ export interface ArrayConfig {
   itemTitle?: (values: Record<string, unknown>, index: number) => string
   /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
   collapsible?: boolean
+  /**
+   * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
+   * the array unmounts and RHF clears its value via `shouldUnregister`.
+   */
+  visibility?: FieldVisibility
 }
 
 /**

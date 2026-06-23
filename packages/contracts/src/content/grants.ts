@@ -7,11 +7,12 @@ import { levelSchema } from '../primitives/level'
 import { speedSchema } from '../vocab/movement-mode'
 import { senseSchema } from '../vocab/sense'
 import { usageFrequencySchema } from '../vocab/usage-frequency'
+import { featCategorySchema } from '../vocab/feat'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
-// subclass features, and (future) feats. Optional fields only; no rules engine.
+// subclass features, and feat-choice features. Optional fields only; no rules engine.
 // Player choices (e.g. "choose two skills") stay in rich-text descriptions.
 // ---------------------------------------------------------------------------
 
@@ -68,6 +69,35 @@ export const contentProficienciesSchema = z.object({
 
 export type ContentProficiencies = z.infer<typeof contentProficienciesSchema>
 
+// --- Feat choices -----------------------------------------------------------
+
+/**
+ * A feat pick granted by a class feature, subclass feature, or species trait.
+ * Pool is filtered by `category`; Epic Boon features may expand via `allowAnyQualifying`.
+ */
+export const featChoiceGrantSchema = z
+  .object({
+    category: featCategorySchema,
+    choose: z.number().int().min(1).default(1),
+    /** Epic Boon / ASI: category default **or** any feat the character qualifies for. */
+    allowAnyQualifying: z.boolean().optional(),
+    /** Fighter Fighting Style: may replace on later class levels. */
+    replaceable: z.boolean().optional(),
+    /** Feat slugs surfaced as recommendations in the character builder (not prose). */
+    recommendedFeatIds: z.array(z.string().min(1)).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'allowAnyQualifying is only allowed when category is epic-boon or general',
+        path: ['allowAnyQualifying'],
+      })
+    }
+  })
+
+export type FeatChoiceGrant = z.infer<typeof featChoiceGrantSchema>
+
 // --- Grants -----------------------------------------------------------------
 
 /**
@@ -84,6 +114,7 @@ export const contentGrantsSchema = z.object({
   proficiencies: contentProficienciesSchema.optional(),
   languages: z.array(z.string()).optional(),
   innateSpells: innateSpellsSchema.optional(),
+  featChoice: featChoiceGrantSchema.optional(),
 })
 
 export type ContentGrants = z.infer<typeof contentGrantsSchema>

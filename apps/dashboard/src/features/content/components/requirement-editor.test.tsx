@@ -10,6 +10,7 @@ import {
   ADD_CONDITION_SET_LABEL,
   CONDITION_SETS_HEADING,
   CONDITION_TYPE_LABEL,
+  CONDITION_TYPE_PLACEHOLDER,
 } from '../lib/requirement-editor-constants'
 import {
   formatRequirementEditorPreview,
@@ -52,7 +53,7 @@ describe('RequirementEditor', () => {
     expect(preview.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('adds a condition set with a default condition row', async () => {
+  it('adds a condition set with an empty condition row', async () => {
     const user = userEvent.setup()
     render(<EditorShell />)
 
@@ -61,7 +62,10 @@ describe('RequirementEditor', () => {
     await waitFor(() => {
       expect(screen.getByRole('region', { name: 'Condition set 1' })).toBeInTheDocument()
     })
-    expect(screen.getByLabelText(/Minimum level/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(CONDITION_TYPE_LABEL)).toHaveTextContent(
+      CONDITION_TYPE_PLACEHOLDER,
+    )
+    expect(screen.queryByLabelText(/Minimum level/i)).not.toBeInTheDocument()
   })
 
   it('adds another condition within a set', async () => {

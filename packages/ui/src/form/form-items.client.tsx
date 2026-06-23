@@ -32,6 +32,7 @@ import {
   type RowConfig,
   type FieldConfig,
   type SlotConfig,
+  type FieldVisibility,
 } from './field-config'
 import {
   buildAccordionBatchKey,
@@ -286,6 +287,17 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     )
   }
 
+  if (item.visibility) {
+    return (
+      <ConditionalArrayField
+        config={item}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        depth={depth}
+      />
+    )
+  }
+
   const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
   return (
     <FormSectionContext.Provider value={childContext}>
@@ -358,12 +370,58 @@ interface FieldNodeProps {
   namePrefix?: string
 }
 
+/** Watches `dependsOn` fields and returns a map keyed by relative field names. */
+function useVisibilityValues(
+  visibility: FieldVisibility,
+  namePrefix?: string,
+): Record<string, unknown> {
+  const { dependsOn } = visibility
+  const prefixedDeps = namePrefix ? dependsOn.map((dep) => `${namePrefix}.${dep}`) : dependsOn
+  const watched = useWatch({ name: prefixedDeps }) as unknown[]
+  const values: Record<string, unknown> = {}
+  dependsOn.forEach((name, index) => {
+    values[name] = watched[index]
+  })
+  return values
+}
+
 /** Routes a field to the conditional wrapper when it declares `visibility`. */
 function FieldNode({ config, idPrefix, namePrefix }: FieldNodeProps) {
   if (config.visibility) {
     return <ConditionalField config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
   return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+}
+
+interface ConditionalArrayFieldProps {
+  config: ArrayConfig
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+/** Hides a nested array when its `visibility` predicate is false. */
+function ConditionalArrayField({
+  config,
+  idPrefix,
+  namePrefix,
+  depth,
+}: ConditionalArrayFieldProps) {
+  const values = useVisibilityValues(config.visibility!, namePrefix)
+  const childContext = React.useMemo(
+    () => ({ collapsibleSections: false, depth: depth + 1 }),
+    [depth],
+  )
+
+  if (!config.visibility!.visibleWhen(values)) return null
+
+  const fullArrayName = namePrefix ? `${namePrefix}.${config.name}` : config.name
+
+  return (
+    <FormSectionContext.Provider value={childContext}>
+      <ArrayFieldRenderer config={config} idPrefix={idPrefix} fullName={fullArrayName} />
+    </FormSectionContext.Provider>
+  )
 }
 
 /**
@@ -376,14 +434,8 @@ function FieldNode({ config, idPrefix, namePrefix }: FieldNodeProps) {
  * `visibleWhen` predicate still uses simple relative names like `values.type`.
  */
 function ConditionalField({ config, idPrefix, namePrefix }: FieldNodeProps) {
-  const { dependsOn, visibleWhen } = config.visibility!
-  const prefixedDeps = namePrefix ? dependsOn.map((dep) => `${namePrefix}.${dep}`) : dependsOn
-  const watched = useWatch({ name: prefixedDeps }) as unknown[]
-  const values: Record<string, unknown> = {}
-  dependsOn.forEach((name, index) => {
-    values[name] = watched[index]
-  })
-  if (!visibleWhen(values)) return null
+  const values = useVisibilityValues(config.visibility!, namePrefix)
+  if (!config.visibility!.visibleWhen(values)) return null
   return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
 }
 

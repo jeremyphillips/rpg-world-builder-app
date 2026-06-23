@@ -34,9 +34,12 @@ describe('Form collapsible sections', () => {
   })
 
   it('wraps top-level groups and arrays in accordion triggers by default', () => {
-    render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
+    const { container } = render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
     expect(screen.getByRole('button', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tags' })).toBeInTheDocument()
+
+    const openContent = container.querySelector('[role="region"][data-state="open"]')
+    expect(openContent?.className).toContain('data-[state=open]:overflow-visible')
   })
 
   it('renders plain fieldsets when collapsibleSections is false', () => {

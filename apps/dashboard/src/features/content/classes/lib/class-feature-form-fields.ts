@@ -17,7 +17,7 @@ export const levelOptions: FieldOption[] = Array.from(
   { length: MAX_CHARACTER_LEVEL },
   (_, index) => {
     const level = index + 1
-    return { value: String(level), label: `Level ${level}` }
+    return { value: String(level), label: String(level) }
   },
 )
 
@@ -60,6 +60,7 @@ export function classFeatureItemFields(
           label: 'Level',
           options: levelOptions,
           required: true,
+          width: 'sm',
           ...(options?.defaultFeatureLevel !== undefined
             ? { defaultValue: String(options.defaultFeatureLevel) }
             : {}),

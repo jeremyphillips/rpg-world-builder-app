@@ -4,6 +4,7 @@ import {
   contentGrantsSchema,
   contentTraitSchema,
   customContentTraitSchema,
+  featChoiceGrantSchema,
   grantContentTraitSchema,
   innateSpellEntrySchema,
   isGrantEligibleGrants,
@@ -87,6 +88,68 @@ describe('innateSpellEntrySchema', () => {
   })
 })
 
+describe('featChoiceGrantSchema', () => {
+  it('parses a fighting-style feat choice', () => {
+    expect(
+      featChoiceGrantSchema.parse({
+        category: 'fighting-style',
+        choose: 1,
+        replaceable: true,
+      }),
+    ).toEqual({
+      category: 'fighting-style',
+      choose: 1,
+      replaceable: true,
+    })
+  })
+
+  it('defaults choose to 1', () => {
+    expect(featChoiceGrantSchema.parse({ category: 'origin' })).toEqual({
+      category: 'origin',
+      choose: 1,
+    })
+  })
+
+  it('parses epic boon with allowAnyQualifying', () => {
+    expect(
+      featChoiceGrantSchema.parse({
+        category: 'epic-boon',
+        choose: 1,
+        allowAnyQualifying: true,
+      }),
+    ).toEqual({
+      category: 'epic-boon',
+      choose: 1,
+      allowAnyQualifying: true,
+    })
+  })
+
+  it('rejects allowAnyQualifying on non-epic-boon/non-general categories', () => {
+    expect(
+      featChoiceGrantSchema.safeParse({
+        category: 'fighting-style',
+        allowAnyQualifying: true,
+      }).success,
+    ).toBe(false)
+  })
+
+  it('parses general ASI with allowAnyQualifying and recommendedFeatIds', () => {
+    expect(
+      featChoiceGrantSchema.parse({
+        category: 'general',
+        choose: 1,
+        allowAnyQualifying: true,
+        recommendedFeatIds: ['ability-score-improvement'],
+      }),
+    ).toEqual({
+      category: 'general',
+      choose: 1,
+      allowAnyQualifying: true,
+      recommendedFeatIds: ['ability-score-improvement'],
+    })
+  })
+})
+
 describe('contentGrantsSchema', () => {
   it('parses a grants bag with innateSpells', () => {
     const grants = {
@@ -99,6 +162,16 @@ describe('contentGrantsSchema', () => {
             spellIds: ['power-word-heal', 'power-word-kill'],
           },
         ],
+      },
+    }
+    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
+  })
+
+  it('parses a grants bag with featChoice', () => {
+    const grants = {
+      featChoice: {
+        category: 'origin' as const,
+        choose: 1,
       },
     }
     expect(contentGrantsSchema.parse(grants)).toEqual(grants)

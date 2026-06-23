@@ -65,6 +65,7 @@ import {
   featureToFormRow,
   levelOptions,
 } from './class-feature-form-fields'
+import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
@@ -265,18 +266,24 @@ function resourceItemFields(): FormItem[] {
         values['level'] ? `Level ${values['level']}` : `Entry ${index + 1}`,
       fields: [
         {
-          type: 'select',
-          name: 'level',
-          label: 'Character level',
-          options: levelOptions,
-          required: true,
-        },
-        {
-          type: 'number',
-          name: 'value',
-          label: 'Value',
-          min: 0,
-          required: true,
+          kind: 'row',
+          fields: [
+            {
+              type: 'select',
+              name: 'level',
+              label: 'Character level',
+              options: levelOptions,
+              required: true,
+            },
+            {
+              type: 'number',
+              name: 'value',
+              label: 'Value',
+              min: 0,
+              required: true,
+              width: 'sm',
+            },
+          ],
         },
       ],
     },
@@ -670,7 +677,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     description: entity.description,
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
-    asiLevels: entity.asiLevels,
+    asiLevels: deriveAsiLevels(entity.features),
     subclassChoiceLevel:
       entity.subclassChoiceLevel !== undefined
         ? String(entity.subclassChoiceLevel)
@@ -691,7 +698,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         description: values.description || undefined,
         primaryAbilities: values.primaryAbilities,
         hitDie: values.hitDie,
-        asiLevels: values.asiLevels,
         subclassChoiceLevel:
           values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
             ? undefined
@@ -704,7 +710,10 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
             from: values.proficiencies.skills.from,
           },
         },
-        features: featuresFromFormValues(values.features, ctx?.entity?.features),
+        features: syncAsiFeatures(
+          values.asiLevels,
+          featuresFromFormValues(values.features, ctx?.entity?.features),
+        ),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },
       ctx,

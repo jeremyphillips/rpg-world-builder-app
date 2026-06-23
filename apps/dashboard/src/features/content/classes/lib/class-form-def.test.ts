@@ -10,6 +10,7 @@ import {
 } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
+import { deriveAsiLevels } from './class-asi-features'
 import {
   cantripProgressionsEquivalent,
   spellsAvailableProgressionsEquivalent,
@@ -189,12 +190,36 @@ describe('classFormDef round-trips', () => {
     expectBardSpellcastingRoundTrip()
   })
 
-  it('fighter: ASI and subclass choice level round-trip', () => {
+  it('fighter: ASI picker and generated features round-trip', () => {
     const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
-    const input = classFormDef.toInput(formValues)
-    expect(input.asiLevels).toEqual(fighter.asiLevels)
+    const input = classFormDef.toInput(formValues, { entity: fighter })
+
+    expect(formValues.asiLevels).toEqual(deriveAsiLevels(fighter.features))
+    expect(input).not.toHaveProperty('asiLevels')
+    expect(deriveAsiLevels(input.features)).toEqual(formValues.asiLevels)
     expect(input.subclassChoiceLevel).toEqual(fighter.subclassChoiceLevel)
+  })
+
+  it('fighter: changing ASI levels regenerates feature rows on save', () => {
+    const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
+    const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
+    formValues.asiLevels = [4, 8]
+    const input = classFormDef.toInput(formValues, { entity: fighter })
+
+    expect(deriveAsiLevels(input.features)).toEqual([4, 8])
+    expect(input.features.find((f) => f.id === 'ability-score-improvement-4')).toMatchObject({
+      name: 'Ability Score Improvement',
+      grants: {
+        featChoice: {
+          category: 'general',
+          choose: 1,
+          allowAnyQualifying: true,
+          recommendedFeatIds: ['ability-score-improvement'],
+        },
+      },
+    })
+    expect(input.features.find((f) => f.id === 'ability-score-improvement-6')).toBeUndefined()
   })
 
   it('create defaults include subclass choice level 3 and specific-weapons toggle off', () => {

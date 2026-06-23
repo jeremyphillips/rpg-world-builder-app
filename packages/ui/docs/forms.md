@@ -446,6 +446,9 @@ Fields stay mounted while a section is collapsed, so react-hook-form values are
 preserved (`shouldUnregister` only applies to conditional visibility, not
 accordion state).
 
+Open accordion panels use `overflow-visible` plus inner horizontal inset so
+control focus rings (`ring-2` + `ring-offset-2`) are not clipped during expand.
+
 ## Array fields
 
 Use `ArrayConfig` (`kind: 'array'`) in the `fields` array to create a
@@ -520,6 +523,11 @@ names:
 > `shouldUnregister: true` — the value is removed from the RHF store when the
 > control unmounts, so the submitted payload naturally omits it. Mark
 > conditionally-visible item fields as `z.optional()` in the item schema.
+
+Nested `ArrayConfig` items (e.g. `innateSpellEntries` inside a grant row) may
+also declare `visibility` with the same item-scoped `dependsOn` contract. When
+hidden, the whole nested array unmounts and its values are cleared via
+`shouldUnregister`.
 
 ### Nesting
 

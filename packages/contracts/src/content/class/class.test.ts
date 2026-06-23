@@ -19,7 +19,6 @@ const fighterStoredBody = {
   description: '<p>A master of martial combat.</p>',
   primaryAbilities: ['str'],
   hitDie: 10,
-  asiLevels: [4, 6, 8, 12, 14, 16, 19],
   subclassChoiceLevel: 3,
   proficiencies: {
     savingThrows: ['str', 'con'],

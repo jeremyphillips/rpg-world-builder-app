@@ -44,7 +44,6 @@ function isLegacySpellcastingFeature(
 function featuresAtLevel(
   features: CharacterClass['features'],
   spellcasting: CharacterClass['spellcasting'],
-  asiLevels: number[],
   subclassChoiceLevel: number | undefined,
   className: string,
   level: number,
@@ -59,7 +58,6 @@ function featuresAtLevel(
     if (!names.includes(label)) names.push(label)
   }
 
-  if (asiLevels.includes(level)) names.push('Ability Score Improvement')
   if (subclassChoiceLevel === level) {
     const choiceLabel = subclassChoiceFeatureLabel(className)
     if (!names.includes(choiceLabel)) names.push(choiceLabel)
@@ -80,7 +78,7 @@ function buildRow(
   characterClass: CharacterClass,
   slotTable: number[][] | undefined,
 ): ProgressionRow {
-  const { features, asiLevels, subclassChoiceLevel, spellcasting, name } = characterClass
+  const { features, subclassChoiceLevel, spellcasting, name } = characterClass
   const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
   const cantripsNorm = spellcasting?.cantrips?.map((c) => ({ level: c.level, value: c.known }))
   const spellsAvailableNorm = spellcasting?.spellsAvailable?.map((s) => ({
@@ -90,7 +88,7 @@ function buildRow(
   return {
     level,
     profBonus: proficiencyBonus(level),
-    features: featuresAtLevel(features, spellcasting, asiLevels, subclassChoiceLevel, name, level),
+    features: featuresAtLevel(features, spellcasting, subclassChoiceLevel, name, level),
     resources: buildResourceRow(characterClass.resources, level),
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:

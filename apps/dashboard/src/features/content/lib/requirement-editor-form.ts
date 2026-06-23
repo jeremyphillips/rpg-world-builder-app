@@ -9,20 +9,20 @@ import {
 } from '@rpg/contracts'
 import type { RefinementCtx } from 'zod'
 
-export const REQUIREMENT_LEAF_TYPES = [
-  'minLevel',
-  'abilityMinimum',
-  'spellcasting',
-  'feature',
-] as const
+export const REQUIREMENT_LEAF_TYPES = ['minLevel', 'abilityMinimum', 'spellcasting'] as const
 
 export type RequirementLeafType = (typeof REQUIREMENT_LEAF_TYPES)[number]
 
-export type RequirementLeafForm =
+export type RequirementLeafDraftForm = {
+  id: string
+}
+
+export type RequirementLeafTypedForm =
   | { id: string; type: 'minLevel'; level: number }
   | { id: string; type: 'abilityMinimum'; ability: z.infer<typeof abilitySchema>; minimum: number }
   | { id: string; type: 'spellcasting' }
-  | { id: string; type: 'feature'; featureId: string }
+
+export type RequirementLeafForm = RequirementLeafDraftForm | RequirementLeafTypedForm
 
 export type RequirementGroupForm = {
   id: string
@@ -52,17 +52,17 @@ const requirementSpellcastingLeafSchema = z.object({
   type: z.literal('spellcasting'),
 })
 
-const requirementFeatureLeafSchema = z.object({
+const requirementDraftLeafSchema = z.object({
   id: z.string().min(1),
-  type: z.literal('feature'),
-  featureId: z.string(),
 })
 
-export const requirementLeafFormSchema = z.discriminatedUnion('type', [
-  requirementMinLevelLeafSchema,
-  requirementAbilityMinimumLeafSchema,
-  requirementSpellcastingLeafSchema,
-  requirementFeatureLeafSchema,
+export const requirementLeafFormSchema = z.union([
+  requirementDraftLeafSchema,
+  z.discriminatedUnion('type', [
+    requirementMinLevelLeafSchema,
+    requirementAbilityMinimumLeafSchema,
+    requirementSpellcastingLeafSchema,
+  ]),
 ])
 
 export const requirementGroupFormSchema = z.object({
@@ -88,8 +88,13 @@ export function requirementEditorDefaultValue(): PrerequisiteEditorValue {
   return { groups: [] }
 }
 
-/** Default leaf row for the requirement editor UI. */
-export function newRequirementLeaf(type: RequirementLeafType = 'minLevel'): RequirementLeafForm {
+/** Untyped leaf row shown until the author picks a condition type. */
+export function newRequirementDraftLeaf(): RequirementLeafDraftForm {
+  return { id: newRequirementLeafId() }
+}
+
+/** Default leaf row for the requirement editor UI once a type is chosen. */
+export function newRequirementLeaf(type: RequirementLeafType): RequirementLeafTypedForm {
   const id = newRequirementLeafId()
   switch (type) {
     case 'minLevel':
@@ -98,8 +103,6 @@ export function newRequirementLeaf(type: RequirementLeafType = 'minLevel'): Requ
       return { id, type, ability: 'str', minimum: ABILITY_SCORE_MIN }
     case 'spellcasting':
       return { id, type }
-    case 'feature':
-      return { id, type, featureId: '' }
   }
 }
 
@@ -110,27 +113,20 @@ export function newRequirementGroup(
   return {
     id: newRequirementGroupId(),
     kind,
-    requirements: [newRequirementLeaf()],
+    requirements: [newRequirementDraftLeaf()],
   }
 }
 
-function isSupportedEditorLeaf(
-  expr: RequirementExpression,
-): expr is Exclude<
+type EditableRequirementLeaf = Exclude<
   RequirementExpression,
-  { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' }
-> {
-  return (
-    expr.kind === 'minLevel' ||
-    expr.kind === 'abilityMinimum' ||
-    expr.kind === 'feature' ||
-    expr.kind === 'spellcasting'
-  )
+  { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' } | { kind: 'feature' }
+>
+
+function isSupportedEditorLeaf(expr: RequirementExpression): expr is EditableRequirementLeaf {
+  return expr.kind === 'minLevel' || expr.kind === 'abilityMinimum' || expr.kind === 'spellcasting'
 }
 
-function leafFromExpression(
-  expr: Exclude<RequirementExpression, { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' }>,
-): RequirementLeafForm {
+function leafFromExpression(expr: EditableRequirementLeaf): RequirementLeafForm {
   const id = newRequirementLeafId()
   switch (expr.kind) {
     case 'minLevel':
@@ -139,8 +135,6 @@ function leafFromExpression(
       return { id, type: 'abilityMinimum', ability: expr.ability, minimum: expr.minimum }
     case 'spellcasting':
       return { id, type: 'spellcasting' }
-    case 'feature':
-      return { id, type: 'feature', featureId: expr.featureId }
   }
 }
 
@@ -212,9 +206,18 @@ export function requirementExpressionToEditor(
   return { groups }
 }
 
-function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafForm {
+function isRequirementLeafDraft(leaf: unknown): leaf is RequirementLeafDraftForm {
   if (!leaf || typeof leaf !== 'object') return false
-  return REQUIREMENT_LEAF_TYPES.includes((leaf as RequirementLeafForm).type)
+  return !('type' in leaf)
+}
+
+function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafTypedForm {
+  if (!leaf || typeof leaf !== 'object') return false
+  return REQUIREMENT_LEAF_TYPES.includes((leaf as RequirementLeafTypedForm).type)
+}
+
+function isRequirementLeafRow(leaf: unknown): leaf is RequirementLeafForm {
+  return isRequirementLeafDraft(leaf) || isRequirementLeafForm(leaf)
 }
 
 function isRequirementGroupForm(group: unknown): group is RequirementGroupForm {
@@ -228,12 +231,12 @@ function normalizeEditorValue(value: PrerequisiteEditorValue | undefined): Prere
   return {
     groups: (value?.groups ?? []).filter(isRequirementGroupForm).map((group) => ({
       ...group,
-      requirements: group.requirements.filter(isRequirementLeafForm),
+      requirements: group.requirements.filter(isRequirementLeafRow),
     })),
   }
 }
 
-function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
+function leafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression {
   switch (leaf.type) {
     case 'minLevel':
       return { kind: 'minLevel', level: levelSchema.parse(leaf.level) }
@@ -245,8 +248,6 @@ function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
       }
     case 'spellcasting':
       return { kind: 'spellcasting' }
-    case 'feature':
-      return { kind: 'feature', featureId: leaf.featureId.trim() }
   }
 }
 
@@ -272,15 +273,8 @@ function tryAbilityMinimumPreview(
   return { kind: 'abilityMinimum', ability: ability.data, minimum: leaf.minimum }
 }
 
-function tryFeaturePreview(
-  leaf: Extract<RequirementLeafForm, { type: 'feature' }>,
-): RequirementExpression | undefined {
-  const featureId = leaf.featureId.trim()
-  return featureId ? { kind: 'feature', featureId } : undefined
-}
-
 /** Best-effort leaf conversion for live preview while the user is still editing. */
-function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression | undefined {
+function tryLeafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression | undefined {
   switch (leaf.type) {
     case 'minLevel':
       return tryMinLevelPreview(leaf.level)
@@ -288,8 +282,6 @@ function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression |
       return tryAbilityMinimumPreview(leaf)
     case 'spellcasting':
       return { kind: 'spellcasting' }
-    case 'feature':
-      return tryFeaturePreview(leaf)
   }
 }
 
@@ -368,6 +360,11 @@ function validateLeaf(
 ): void {
   const path = ['prerequisiteEditor', 'groups', groupIndex, 'requirements', leafIndex]
 
+  if (!isRequirementLeafForm(leaf)) {
+    addCustomIssue(ctx, [...path, 'type'], 'Condition type is required')
+    return
+  }
+
   switch (leaf.type) {
     case 'minLevel':
       if (!levelSchema.safeParse(leaf.level).success) {
@@ -381,11 +378,6 @@ function validateLeaf(
           [...path, 'minimum'],
           `Minimum score must be between ${ABILITY_SCORE_MIN} and ${ABILITY_SCORE_MAX}`,
         )
-      }
-      return
-    case 'feature':
-      if (!leaf.featureId.trim()) {
-        addCustomIssue(ctx, [...path, 'featureId'], 'Feature ID is required')
       }
       return
     case 'spellcasting':

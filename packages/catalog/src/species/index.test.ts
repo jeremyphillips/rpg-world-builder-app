@@ -131,6 +131,12 @@ describe('SRD 5.2.1 species seed', () => {
     expect(human.sizes).toContain('small')
     expect(tiefling.sizes).toContain('medium')
     expect(tiefling.sizes).toContain('small')
+    const versatile = human.traits.find((t) => t.id === 'versatile')
+    expect(versatile?.grants?.featChoice).toEqual({
+      category: 'origin',
+      choose: 1,
+      recommendedFeatIds: ['skilled'],
+    })
   })
 
   it('Goliath has speed 35', () => {

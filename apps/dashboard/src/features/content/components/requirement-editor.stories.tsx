@@ -50,14 +50,3 @@ export const SpellRecall: Story = {
     />
   ),
 }
-
-export const FightingStyleFeature: Story = {
-  render: () => (
-    <EditorStory
-      prerequisiteEditor={requirementExpressionToEditor({
-        kind: 'feature',
-        featureId: 'fighting-style',
-      })}
-    />
-  ),
-}

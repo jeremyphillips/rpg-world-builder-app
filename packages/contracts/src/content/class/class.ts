@@ -100,7 +100,6 @@ export type ClassResource = z.infer<typeof classResourceSchema>
 export const classStoredBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
-  asiLevels: z.array(levelSchema),
   /** Level at which a character chooses their subclass; omit when the class has none. */
   subclassChoiceLevel: levelSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
@@ -257,8 +256,8 @@ export function classHasSpellcasting(cls: CharacterClass): boolean {
 // - Skill governing-ability and full weapon/armor/skill content types (built in
 //   their feature folders; schemas added to their contract modules).
 // - Merge granularity for overlay patches: the read-time merge deep-merges
-//   objects but replaces arrays wholesale (override `features`/`asiLevels`
-//   entirely, not element-wise). Per-element array patching is deferred.
+//   objects but replaces arrays wholesale (override `features` entirely, not
+//   element-wise). Per-element array patching is deferred.
 // - CANTRIPS_KNOWN_PROFILES: a seed-only authoring helper (NOT in the contract)
 //   that expands shared SRD cantrip curves into the inline `cantrips` table.
 // ---------------------------------------------------------------------------

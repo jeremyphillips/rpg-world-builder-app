@@ -62,7 +62,6 @@ const storedFighter: ClassStored = {
   name: 'Fighter',
   primaryAbilities: ['str'],
   hitDie: 10,
-  asiLevels: [4],
   proficiencies: {
     savingThrows: ['str', 'con'],
     armor: ['light'],

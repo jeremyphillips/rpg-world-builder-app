@@ -4,6 +4,7 @@ import {
   type CharacterClass,
   type ContentSource,
   type Equipment,
+  type Feat,
   type Spell,
   type Weapon,
   type WeaponCategory,
@@ -12,6 +13,7 @@ import type { FieldOption } from '@rpg/ui/form'
 
 import { useClasses } from '../classes/hooks/use-classes'
 import { useEquipment } from '../equipment/hooks/use-equipment'
+import { useFeats } from '../feats/hooks/use-feats'
 import { useSpells } from '../spells/hooks/use-spells'
 import { useWeapons } from '../weapons/hooks/use-weapons'
 import type { ContentFormCtx } from './content-form-registry'
@@ -26,6 +28,7 @@ export interface ContentFormOptionSets {
   spellcastingClasses: FieldOption[]
   weapons: FieldOption[]
   spells: FieldOption[]
+  feats: FieldOption[]
   tools: FieldOption[]
   weaponCategoryBySlug: Readonly<Partial<Record<string, WeaponCategory>>>
 }
@@ -62,6 +65,7 @@ export function buildContentFormOptionSets(input: {
   classes?: CharacterClass[]
   weapons?: Weapon[]
   spells?: Spell[]
+  feats?: Feat[]
   equipment?: Equipment[]
 }): ContentFormOptionSets {
   const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
@@ -74,6 +78,7 @@ export function buildContentFormOptionSets(input: {
     weapons: sortFieldOptions(input.weapons?.map(toContentFieldOption) ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.weapons),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
+    feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
       input.equipment?.filter((item) => item.kind === 'tool').map(toContentFieldOption) ?? [],
     ),
@@ -88,6 +93,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const classesQuery = useClasses(campaignId)
   const weaponsQuery = useWeapons(campaignId)
   const spellsQuery = useSpells(campaignId)
+  const featsQuery = useFeats(campaignId)
   const equipmentQuery = useEquipment(campaignId)
 
   const options = useMemo(
@@ -96,9 +102,10 @@ export function useContentFormOptions(campaignId: string | undefined): {
         classes: classesQuery.data,
         weapons: weaponsQuery.data,
         spells: spellsQuery.data,
+        feats: featsQuery.data,
         equipment: equipmentQuery.data,
       }),
-    [classesQuery.data, weaponsQuery.data, spellsQuery.data, equipmentQuery.data],
+    [classesQuery.data, weaponsQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
   )
 
   const ctx = useMemo(
@@ -115,8 +122,13 @@ export function useContentFormOptions(campaignId: string | undefined): {
       classesQuery.isPending ||
       weaponsQuery.isPending ||
       spellsQuery.isPending ||
+      featsQuery.isPending ||
       equipmentQuery.isPending,
     isError:
-      classesQuery.isError || weaponsQuery.isError || spellsQuery.isError || equipmentQuery.isError,
+      classesQuery.isError ||
+      weaponsQuery.isError ||
+      spellsQuery.isError ||
+      featsQuery.isError ||
+      equipmentQuery.isError,
   }
 }

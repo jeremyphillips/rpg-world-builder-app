@@ -39,6 +39,61 @@ Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a singl
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
 
+### `grants.featChoice` (feat picks)
+
+Class features, subclass features, and species traits that grant a feat choice store
+`grants.featChoice` on the **source** record (Fighting Style, Epic Boon, Human Versatile,
+Ability Score Improvement milestones). The character builder filters feats by `category`;
+granted feats do not need a matching `prerequisite` on the feat record.
+
+| Field                | Meaning                                                                 |
+| -------------------- | ----------------------------------------------------------------------- |
+| `category`           | Feat category pool (`origin`, `general`, `fighting-style`, `epic-boon`) |
+| `choose`             | Number of feats the player picks (default 1)                            |
+| `allowAnyQualifying` | Epic Boon or ASI (`general`): category feats **or** any qualifying feat |
+| `replaceable`        | Fighter Fighting Style: may replace on later class levels               |
+| `recommendedFeatIds` | Feat slugs surfaced as recommendations (not duplicated in HTML prose)   |
+
+**Ability Score Improvements** are modeled as class features (`ability-score-improvement-{level}`)
+with `grants.featChoice` (`category: general`, `allowAnyQualifying: true`,
+`recommendedFeatIds: ["ability-score-improvement"]`). The class editor keeps an ASI level
+picker for convenience; on save it generates/replaces those feature rows — there is no
+top-level `asiLevels` field on the class body.
+
+Example (Fighter Fighting Style):
+
+```json
+"grants": {
+  "featChoice": {
+    "category": "fighting-style",
+    "choose": 1,
+    "replaceable": true,
+    "recommendedFeatIds": ["defense"]
+  }
+}
+```
+
+Example (ASI at level 4):
+
+```json
+{
+  "id": "ability-score-improvement-4",
+  "name": "Ability Score Improvement",
+  "level": 4,
+  "grants": {
+    "featChoice": {
+      "category": "general",
+      "choose": 1,
+      "allowAnyQualifying": true,
+      "recommendedFeatIds": ["ability-score-improvement"]
+    }
+  }
+}
+```
+
+Paladin/Ranger Blessed Warrior and Druidic Warrior alternatives stay in feature
+`description` prose — they are not feat grants.
+
 ---
 
 ## Requirement expressions
@@ -112,7 +167,7 @@ wired into `feat-form-def.ts` via a `kind: 'slot'` form field.
 | ----------------------------------------------------- | ------------------------------------------------ |
 | Top-level sibling condition sets combine with **AND** | Matches SRD feats; no top-level OR toggle yet    |
 | Sets contain **leaves only** (no nested groups)       | Grappler's OR block is a sibling set, not nested |
-| Four leaf types only                                  | Covers current SRD feat seed data                |
+| Three leaf types in the editor                        | `minLevel`, `abilityMinimum`, `spellcasting`     |
 | Canonical serialization on save                       | Stable storage + live preview                    |
 | Sentence rows are presentation-only                   | Normalization table below unchanged on save      |
 
@@ -137,8 +192,13 @@ either condition rows in an all-match set or an any-match set (when the child is
 | `minLevel`       | yes    | yes                           | yes         | —         |
 | `abilityMinimum` | yes    | yes                           | yes         | —         |
 | `spellcasting`   | yes    | yes                           | yes         | —         |
-| `feature`        | yes    | yes                           | yes         | —         |
+| `feature`        | yes    | yes                           | no          | —         |
 | `classLevel`     | yes    | yes                           | —           | —         |
+
+The `feature` leaf remains in the schema for legacy/homebrew data and possible future
+invocation or multiclass rules, but is **not** authored in the prerequisite editor.
+Feat eligibility tied to class features (e.g. Fighting Style feats) is modeled via
+`grants.featChoice` on the granting feature instead.
 
 Display prose uses `formatRequirementExpression()`; the hero preview prefixes
 `Requires` via `formatRequirementEditorPreview()` and updates live as conditions

@@ -113,7 +113,6 @@ const minimalClassInput = {
   name: 'Berserker',
   primaryAbilities: ['str'],
   hitDie: 12,
-  asiLevels: [4],
   subclassChoiceLevel: 3,
   proficiencies: {
     savingThrows: ['str', 'con'],
