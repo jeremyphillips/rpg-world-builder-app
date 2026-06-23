@@ -114,8 +114,7 @@ function FormEmbeddedMasterDetailEditorBody({
           onAdd={editor.handleAdd}
           onSelect={editor.select}
           onRemove={editor.requestRemove}
-          onMoveUp={editor.moveUp}
-          onMoveDown={editor.moveDown}
+          onMove={editor.move}
         />
 
         <MasterDetailEditorPanel

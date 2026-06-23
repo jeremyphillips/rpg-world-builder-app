@@ -1,5 +1,34 @@
+'use client'
+
+import type { CSSProperties } from 'react'
+import { useMemo } from 'react'
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { CSS } from '@dnd-kit/utilities'
 import { cn, Badge, Button, Text } from '@rpg/ui'
-import { AlertCircle, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
+import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
+
+import {
+  masterDetailListDragHandleClasses,
+  masterDetailListRowClasses,
+  masterDetailListRowDraggingClasses,
+  masterDetailListRowSelectClasses,
+  masterDetailListRowSelectedClasses,
+} from './master-detail-list-panel.variants'
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -30,21 +59,21 @@ export interface MasterDetailListPanelProps {
   onSelect: (index: number) => void
   /** Invoked when a deletable row's remove control is activated. */
   onRemove: (index: number) => void
-  /** When provided, renders per-row move-up controls (disabled on the first row). */
-  onMoveUp?: (index: number) => void
-  /** When provided, renders per-row move-down controls (disabled on the last row). */
-  onMoveDown?: (index: number) => void
+  /** When provided, rows can be reordered via drag handle (and keyboard). */
+  onMove?: (from: number, to: number) => void
 }
 
-interface MasterDetailListRowProps {
+interface MasterDetailListRowContentProps {
   item: MasterDetailListItem
   index: number
-  itemCount: number
   isSelected: boolean
+  showDragHandle: boolean
+  dragHandleProps?: {
+    attributes: ReturnType<typeof useSortable>['attributes']
+    listeners: ReturnType<typeof useSortable>['listeners']
+  }
   onSelect: (index: number) => void
   onRemove: (index: number) => void
-  onMoveUp?: (index: number) => void
-  onMoveDown?: (index: number) => void
 }
 
 function MasterDetailListRowStatus({
@@ -70,109 +99,205 @@ function MasterDetailListRowStatus({
   )
 }
 
-function MasterDetailListRowReorder({
-  title,
+function MasterDetailListRowContent({
+  item,
   index,
-  itemCount,
-  onMoveUp,
-  onMoveDown,
-}: {
-  title: string
-  index: number
-  itemCount: number
-  onMoveUp?: (index: number) => void
-  onMoveDown?: (index: number) => void
-}) {
-  if (!onMoveUp && !onMoveDown) return null
+  isSelected,
+  showDragHandle,
+  dragHandleProps,
+  onSelect,
+  onRemove,
+}: MasterDetailListRowContentProps) {
+  const deletable = item.deletable !== false
 
   return (
-    <div className="flex shrink-0 flex-col">
-      {onMoveUp ? (
-        <Button
+    <div
+      className={cn(masterDetailListRowClasses, isSelected && masterDetailListRowSelectedClasses)}
+    >
+      {showDragHandle && dragHandleProps ? (
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0"
-          disabled={index === 0}
-          aria-label={`Move ${title} up`}
-          onClick={() => onMoveUp(index)}
+          className={masterDetailListDragHandleClasses}
+          aria-label={`Drag to reorder ${item.title}`}
+          onClick={(event) => event.stopPropagation()}
+          {...dragHandleProps.attributes}
+          {...dragHandleProps.listeners}
         >
-          <ChevronUp className="size-4" aria-hidden />
-        </Button>
+          <GripVertical className="size-4" aria-hidden />
+        </button>
       ) : null}
-      {onMoveDown ? (
+      <button
+        type="button"
+        aria-current={isSelected ? 'true' : undefined}
+        aria-invalid={item.hasError ? true : undefined}
+        onClick={() => onSelect(index)}
+        className={masterDetailListRowSelectClasses}
+      >
+        {item.eyebrow ? (
+          <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {item.eyebrow}
+          </span>
+        ) : null}
+        <span className="block truncate font-medium">{item.title}</span>
+        <MasterDetailListRowStatus hasError={item.hasError} badge={item.badge} />
+      </button>
+      {deletable ? (
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="size-8 p-0"
-          disabled={index === itemCount - 1}
-          aria-label={`Move ${title} down`}
-          onClick={() => onMoveDown(index)}
+          className="mr-1 size-8 shrink-0 p-0"
+          aria-label={`Remove ${item.title}`}
+          onClick={() => onRemove(index)}
         >
-          <ChevronDown className="size-4" aria-hidden />
+          <Trash2 className="size-4" aria-hidden />
         </Button>
       ) : null}
     </div>
   )
 }
 
+interface MasterDetailListRowProps {
+  item: MasterDetailListItem
+  index: number
+  isSelected: boolean
+  showDragHandle: boolean
+  onSelect: (index: number) => void
+  onRemove: (index: number) => void
+}
+
 function MasterDetailListRow({
   item,
   index,
-  itemCount,
   isSelected,
+  showDragHandle,
   onSelect,
   onRemove,
-  onMoveUp,
-  onMoveDown,
 }: MasterDetailListRowProps) {
-  const deletable = item.deletable !== false
-
   return (
     <li>
-      <div
-        className={cn(
-          'flex items-center gap-1 rounded-md border border-transparent',
-          isSelected && 'border-border bg-muted/40',
-        )}
-      >
-        <button
-          type="button"
-          aria-current={isSelected ? 'true' : undefined}
-          aria-invalid={item.hasError ? true : undefined}
-          onClick={() => onSelect(index)}
-          className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
-        >
-          {item.eyebrow ? (
-            <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {item.eyebrow}
-            </span>
-          ) : null}
-          <span className="block truncate font-medium">{item.title}</span>
-          <MasterDetailListRowStatus hasError={item.hasError} badge={item.badge} />
-        </button>
-        <MasterDetailListRowReorder
-          title={item.title}
-          index={index}
-          itemCount={itemCount}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-        />
-        {deletable ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="mr-1 size-8 shrink-0 p-0"
-            aria-label={`Remove ${item.title}`}
-            onClick={() => onRemove(index)}
-          >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
-        ) : null}
-      </div>
+      <MasterDetailListRowContent
+        item={item}
+        index={index}
+        isSelected={isSelected}
+        showDragHandle={showDragHandle}
+        onSelect={onSelect}
+        onRemove={onRemove}
+      />
     </li>
+  )
+}
+
+type SortableMasterDetailListRowProps = MasterDetailListRowProps
+
+function SortableMasterDetailListRow(props: SortableMasterDetailListRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props.item.id,
+  })
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={cn(isDragging && masterDetailListRowDraggingClasses)}
+    >
+      <MasterDetailListRowContent
+        item={props.item}
+        index={props.index}
+        isSelected={props.isSelected}
+        showDragHandle={props.showDragHandle}
+        dragHandleProps={{ attributes, listeners }}
+        onSelect={props.onSelect}
+        onRemove={props.onRemove}
+      />
+    </li>
+  )
+}
+
+/** Resolves drag-end indices and invokes `onMove` when the row order changed. */
+export function resolveMasterDetailListMove(
+  items: MasterDetailListItem[],
+  event: DragEndEvent,
+): { from: number; to: number } | null {
+  const { active, over } = event
+  if (!over || active.id === over.id) return null
+
+  const from = items.findIndex((item) => item.id === active.id)
+  const to = items.findIndex((item) => item.id === over.id)
+  if (from < 0 || to < 0 || from === to) return null
+
+  return { from, to }
+}
+
+interface MasterDetailListItemsProps {
+  items: MasterDetailListItem[]
+  selectedIndex: number | null
+  onMove?: (from: number, to: number) => void
+  onSelect: (index: number) => void
+  onRemove: (index: number) => void
+}
+
+function MasterDetailListItems({
+  items,
+  selectedIndex,
+  onMove,
+  onSelect,
+  onRemove,
+}: MasterDetailListItemsProps) {
+  const sortableEnabled = Boolean(onMove) && items.length > 1
+  const showDragHandle = sortableEnabled
+  const itemIds = useMemo(() => items.map((item) => item.id), [items])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (!onMove) return
+    const move = resolveMasterDetailListMove(items, event)
+    if (move) onMove(move.from, move.to)
+  }
+
+  const rowProps = (item: MasterDetailListItem, index: number) => ({
+    item,
+    index,
+    isSelected: index === selectedIndex,
+    showDragHandle,
+    onSelect,
+    onRemove,
+  })
+
+  const list = (
+    <ul className="space-y-1" role="list">
+      {items.map((item, index) =>
+        sortableEnabled ? (
+          <SortableMasterDetailListRow key={item.id} {...rowProps(item, index)} />
+        ) : (
+          <MasterDetailListRow key={item.id} {...rowProps(item, index)} />
+        ),
+      )}
+    </ul>
+  )
+
+  if (!sortableEnabled) return list
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      modifiers={[restrictToVerticalAxis]}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+        {list}
+      </SortableContext>
+    </DndContext>
   )
 }
 
@@ -195,8 +320,7 @@ export function MasterDetailListPanel({
   onAdd,
   onSelect,
   onRemove,
-  onMoveUp,
-  onMoveDown,
+  onMove,
 }: MasterDetailListPanelProps) {
   return (
     <nav aria-label={ariaLabel} className="flex flex-col gap-3">
@@ -209,21 +333,13 @@ export function MasterDetailListPanel({
           {emptyLabel}
         </Text>
       ) : (
-        <ul className="space-y-1" role="list">
-          {items.map((item, index) => (
-            <MasterDetailListRow
-              key={item.id}
-              item={item}
-              index={index}
-              itemCount={items.length}
-              isSelected={index === selectedIndex}
-              onSelect={onSelect}
-              onRemove={onRemove}
-              onMoveUp={onMoveUp}
-              onMoveDown={onMoveDown}
-            />
-          ))}
-        </ul>
+        <MasterDetailListItems
+          items={items}
+          selectedIndex={selectedIndex}
+          onMove={onMove}
+          onSelect={onSelect}
+          onRemove={onRemove}
+        />
       )}
     </nav>
   )

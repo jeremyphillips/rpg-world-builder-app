@@ -91,7 +91,7 @@ export const Default: Story = {
     schema,
     tabs,
     onSubmit: action('submit'),
-    className: 'max-w-2xl',
+    className: 'max-w-3xl',
     footer: <FormSaveFooter submitLabel="Save changes" />,
   },
 }
@@ -127,12 +127,12 @@ export const LongContent: StoryObj = {
     layout: 'fullscreen',
   },
   render: () => (
-    <div className="mx-auto max-w-2xl px-6 py-8">
+    <div className="mx-auto max-w-3xl px-6 py-8">
       <TabbedForm<LongCampaignForm>
         schema={longSchema}
         tabs={longTabs}
         onSubmit={action('submit')}
-        className="max-w-2xl"
+        className="max-w-3xl"
         footer={<FormSaveFooter submitLabel="Save changes" />}
       />
     </div>

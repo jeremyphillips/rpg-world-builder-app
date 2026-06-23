@@ -3,7 +3,11 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { describe, expect, it, vi } from 'vitest'
 
-import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel.client'
+import {
+  MasterDetailListPanel,
+  resolveMasterDetailListMove,
+  type MasterDetailListItem,
+} from './master-detail-list-panel.client'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
@@ -40,7 +44,7 @@ describe('MasterDetailListPanel', () => {
     const props = baseProps()
     render(<MasterDetailListPanel {...props} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Move).*Unarmored Defense/ }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Unarmored Defense/ }))
     expect(props.onSelect).toHaveBeenCalledWith(1)
   })
 
@@ -77,28 +81,51 @@ describe('MasterDetailListPanel', () => {
 
     expect(screen.getByText('Has validation errors')).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^(?!Remove).*Has validation errors/ }),
+      screen.getByRole('button', { name: /^(?!Remove|Drag).*Has validation errors/ }),
     ).toHaveAttribute('aria-invalid', 'true')
   })
 
-  it('renders reorder controls and disables them at the list boundaries', async () => {
-    const user = userEvent.setup()
-    const onMoveUp = vi.fn()
-    const onMoveDown = vi.fn()
-    render(<MasterDetailListPanel {...baseProps()} onMoveUp={onMoveUp} onMoveDown={onMoveDown} />)
+  it('renders drag handles when onMove is provided and hides them for a single item', () => {
+    const onMove = vi.fn()
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} onMove={onMove} />)
 
-    expect(screen.getByRole('button', { name: /Move Rage up/i })).toBeDisabled()
-    expect(screen.getByRole('button', { name: /Move Unarmored Defense down/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /Drag to reorder Rage/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Drag to reorder Unarmored Defense/i }),
+    ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /Move Unarmored Defense up/i }))
-    expect(onMoveUp).toHaveBeenCalledWith(1)
+    rerender(
+      <MasterDetailListPanel
+        {...baseProps()}
+        items={[{ id: 'a', title: 'Rage', eyebrow: 'Level 1' }]}
+        onMove={onMove}
+      />,
+    )
 
-    await user.click(screen.getByRole('button', { name: /Move Rage down/i }))
-    expect(onMoveDown).toHaveBeenCalledWith(0)
+    expect(screen.queryByRole('button', { name: /Drag to reorder/i })).not.toBeInTheDocument()
+  })
+
+  it('does not render drag handles when onMove is omitted', () => {
+    render(<MasterDetailListPanel {...baseProps()} />)
+    expect(screen.queryByRole('button', { name: /Drag to reorder/i })).not.toBeInTheDocument()
+  })
+
+  it('calls onMove with from/to indices when a drag ends on a new position', () => {
+    const onMove = vi.fn()
+    render(<MasterDetailListPanel {...baseProps()} onMove={onMove} />)
+
+    const move = resolveMasterDetailListMove(items, {
+      active: { id: 'b' },
+      over: { id: 'a' },
+    } as Parameters<typeof resolveMasterDetailListMove>[1])
+
+    expect(move).toEqual({ from: 1, to: 0 })
+    if (move) onMove(move.from, move.to)
+    expect(onMove).toHaveBeenCalledWith(1, 0)
   })
 
   it('has no axe accessibility violations', async () => {
-    const { container } = render(<MasterDetailListPanel {...baseProps()} />)
+    const { container } = render(<MasterDetailListPanel {...baseProps()} onMove={vi.fn()} />)
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
   })
