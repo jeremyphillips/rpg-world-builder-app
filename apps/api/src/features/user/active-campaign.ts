@@ -1,7 +1,7 @@
 import type { AuthMeResponse } from '@rpg/contracts'
 import { resolveActiveCampaignSummary } from '@rpg/contracts'
 
-import { listCampaignsForUser } from '../campaign/campaign.service'
+import { listCampaignsForUser } from '../campaign'
 import { findSessionUserById, updateLastSelectedCampaign } from './user.service'
 
 /**

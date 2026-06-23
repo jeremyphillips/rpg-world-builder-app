@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import mongoose from 'mongoose'
 
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createCampaign } from '../campaign/campaign.service'
+import { createCampaign } from '../campaign'
 import { createUser } from './user.service'
 import { resolveActiveCampaignForUser } from './active-campaign'
 import { updateLastSelectedCampaign } from './user.service'

@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import type { CreateCampaignInput, SelectCampaignInput, UpdateCampaignInput } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { updateLastSelectedCampaign } from '../user/user.service'
+import { updateLastSelectedCampaign } from '../user'
 import {
   createCampaign,
   isCampaignMember,
