@@ -15,7 +15,7 @@ import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { contentEditHref } from '../../lib/content-edit-href'
-import { ContentStatRow } from '../../lib/content-stat-row'
+import { ContentStatRow } from '../../lib/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
 // ---------------------------------------------------------------------------

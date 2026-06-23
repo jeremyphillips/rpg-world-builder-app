@@ -11,7 +11,7 @@ import { useSkillProficiencies } from '../../skillProficiencies/hooks/use-skill-
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { contentEditHref } from '../../lib/content-edit-href'
-import { ContentStatRow } from '../../lib/content-stat-row'
+import { ContentStatRow } from '../../lib/content-stat-row.client'
 import { FeatureItem } from '../../lib/feature-item'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'

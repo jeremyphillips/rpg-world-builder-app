@@ -46,4 +46,22 @@ describe('ContentDetailStatBody', () => {
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
   })
+
+  it('renders stat row info tooltips', () => {
+    render(
+      <ContentDetailStatBody
+        name="Longsword"
+        statRows={[
+          {
+            label: 'Mastery',
+            value: 'Cleave',
+            info: 'Extra attack on hit.',
+            infoAriaLabel: 'About Cleave',
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'About Cleave' })).toBeInTheDocument()
+  })
 })
