@@ -31,6 +31,10 @@
     "./spells": {
       "types": "./src/spells/index.ts",
       "default": "./src/spells/index.ts"
+    },
+    "./feats": {
+      "types": "./src/feats/index.ts",
+      "default": "./src/feats/index.ts"
     }
   },
   "scripts": {
