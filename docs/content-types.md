@@ -87,35 +87,48 @@ Rules:
 
 ### Prerequisite editor (v1)
 
-Dashboard feat authoring uses a composable group editor instead of a fixed
-pattern picker. Shared serialization lives in
+Dashboard feat authoring uses a **sentence-builder** editor instead of a fixed
+pattern picker. A live preview at the top summarizes requirements in player-facing
+prose; below it, **condition sets** (internally `groups`) hold horizontal
+**condition** rows (internally `requirements`) with visible AND/OR connector chips.
+Shared serialization lives in
 `apps/dashboard/src/features/content/lib/requirement-editor-form.ts`; the UI is
 `RequirementEditor` in
 `apps/dashboard/src/features/content/components/requirement-editor.client.tsx`,
 wired into `feat-form-def.ts` via a `kind: 'slot'` form field.
 
+**User-facing terminology:**
+
+| UI label       | Internal form field | Notes                                   |
+| -------------- | ------------------- | --------------------------------------- |
+| Condition set  | `groups[]`          | Bordered card; sibling sets combine AND |
+| Condition      | `requirements[]`    | Sentence row per leaf type              |
+| Match rule     | `kind`              | Radio: all required vs any one          |
+| AND / OR chips | —                   | Decorative; derived from set `kind`     |
+
 **UI constraints (v1):**
 
-| Rule                                              | Rationale                                          |
-| ------------------------------------------------- | -------------------------------------------------- |
-| Top-level sibling groups combine with **AND**     | Matches SRD feats; no top-level OR toggle yet      |
-| Groups contain **leaves only** (no nested groups) | Grappler's OR block is a sibling group, not nested |
-| Four leaf types only                              | Covers current SRD feat seed data                  |
-| Canonical serialization on save                   | Stable storage + live preview                      |
+| Rule                                                  | Rationale                                        |
+| ----------------------------------------------------- | ------------------------------------------------ |
+| Top-level sibling condition sets combine with **AND** | Matches SRD feats; no top-level OR toggle yet    |
+| Sets contain **leaves only** (no nested groups)       | Grappler's OR block is a sibling set, not nested |
+| Four leaf types only                                  | Covers current SRD feat seed data                |
+| Canonical serialization on save                       | Stable storage + live preview                    |
+| Sentence rows are presentation-only                   | Normalization table below unchanged on save      |
 
 **Normalization (editor → stored tree):**
 
-| Editor state              | Stored `RequirementExpression`                         |
-| ------------------------- | ------------------------------------------------------ |
-| Empty / no groups         | `prerequisite: undefined`                              |
-| One AND group, one leaf   | Bare leaf at root                                      |
-| One AND group, 2+ leaves  | `{ kind: "all", requirements: [...] }`                 |
-| One OR group              | `{ kind: "any", requirements: [...] }`                 |
-| Multiple top-level groups | `{ kind: "all", requirements: [group1, group2, ...] }` |
+| Editor state                     | Stored `RequirementExpression`                     |
+| -------------------------------- | -------------------------------------------------- |
+| Empty / no condition sets        | `prerequisite: undefined`                          |
+| One all-match set, one condition | Bare leaf at root                                  |
+| One all-match set, 2+ conditions | `{ kind: "all", requirements: [...] }`             |
+| One any-match set                | `{ kind: "any", requirements: [...] }`             |
+| Multiple top-level sets          | `{ kind: "all", requirements: [set1, set2, ...] }` |
 
 Inverse mapping (`requirementExpressionToEditor`): each root `all` child becomes
-either leaf rows in an AND group or an OR group (when the child is `any`). A
-single root leaf becomes one AND group with one row.
+either condition rows in an all-match set or an any-match set (when the child is
+`any`). A single root leaf becomes one all-match set with one row.
 
 **Leaf capability matrix:**
 
@@ -127,9 +140,13 @@ single root leaf becomes one AND group with one row.
 | `feature`        | yes    | yes                           | yes         | —         |
 | `classLevel`     | yes    | yes                           | —           | —         |
 
-Display prose uses `formatRequirementExpression()`; the editor preview prefixes
-`Requires` via `formatRequirementEditorPreview()`. Character-builder evaluation
+Display prose uses `formatRequirementExpression()`; the hero preview prefixes
+`Requires` via `formatRequirementEditorPreview()` and updates live as conditions
+change (`aria-live="polite"`). Character-builder evaluation
 (`evaluateRequirementExpression()`) is a separate future slice.
+
+See Storybook **Content/RequirementEditor → Grappler** for the canonical
+sentence-builder layout example.
 
 To reuse the editor on another content type: import the shared form module,
 add `prerequisiteEditor: prerequisiteEditorSchema` to the form schema, slot in

@@ -6,9 +6,10 @@ import { describe, expect, it } from 'vitest'
 
 import { GRAPPLER } from '../feats/fixtures'
 import {
-  ADD_REQUIREMENT_GROUP_LABEL,
-  ADD_REQUIREMENT_LABEL,
-  REQUIREMENT_TYPE_LABEL,
+  ADD_CONDITION_LABEL,
+  ADD_CONDITION_SET_LABEL,
+  CONDITION_SETS_HEADING,
+  CONDITION_TYPE_LABEL,
 } from '../lib/requirement-editor-constants'
 import {
   formatRequirementEditorPreview,
@@ -34,36 +35,46 @@ function EditorShell({
 }
 
 describe('RequirementEditor', () => {
-  it('renders an empty state with add group control and preview', () => {
+  it('renders an empty state with add condition set control and preview', () => {
     render(<EditorShell />)
 
-    expect(screen.getByRole('button', { name: ADD_REQUIREMENT_GROUP_LABEL })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: ADD_CONDITION_SET_LABEL })).toBeInTheDocument()
     expect(screen.getByText('No prerequisites')).toBeInTheDocument()
+    expect(screen.getByText(CONDITION_SETS_HEADING)).toBeInTheDocument()
   })
 
-  it('adds a requirement group with a default leaf row', async () => {
+  it('renders preview before condition sets heading in DOM order', () => {
+    const editor = requirementExpressionToEditor(GRAPPLER.prerequisite)
+    render(<EditorShell prerequisiteEditor={editor} />)
+
+    const preview = screen.getByText(formatRequirementEditorPreview(editor))
+    const heading = screen.getByText(CONDITION_SETS_HEADING)
+    expect(preview.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('adds a condition set with a default condition row', async () => {
     const user = userEvent.setup()
     render(<EditorShell />)
 
-    await user.click(screen.getByRole('button', { name: ADD_REQUIREMENT_GROUP_LABEL }))
+    await user.click(screen.getByRole('button', { name: ADD_CONDITION_SET_LABEL }))
 
     await waitFor(() => {
-      expect(screen.getByRole('group', { name: /Requirement group 1/i })).toBeInTheDocument()
+      expect(screen.getByRole('region', { name: 'Condition set 1' })).toBeInTheDocument()
     })
     expect(screen.getByLabelText(/Minimum level/i)).toBeInTheDocument()
   })
 
-  it('adds another requirement within a group', async () => {
+  it('adds another condition within a set', async () => {
     const user = userEvent.setup()
     render(
       <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
     )
 
-    const addRequirementButtons = screen.getAllByRole('button', { name: ADD_REQUIREMENT_LABEL })
-    await user.click(addRequirementButtons[0]!)
+    const addConditionButtons = screen.getAllByRole('button', { name: ADD_CONDITION_LABEL })
+    await user.click(addConditionButtons[0]!)
 
     await waitFor(() => {
-      expect(screen.getAllByLabelText(/Requirement type/i)).toHaveLength(4)
+      expect(screen.getAllByLabelText(CONDITION_TYPE_LABEL)).toHaveLength(4)
     })
   })
 
@@ -74,27 +85,79 @@ describe('RequirementEditor', () => {
     expect(screen.getByText(formatRequirementEditorPreview(editor))).toBeInTheDocument()
   })
 
-  it('populates requirement type selects when editing Grappler', () => {
+  it('populates condition type selects when editing Grappler', () => {
     render(
       <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
     )
 
-    const typeSelects = screen.getAllByLabelText(REQUIREMENT_TYPE_LABEL)
-    expect(typeSelects[0]).toHaveTextContent('Minimum character level')
-    expect(typeSelects[1]).toHaveTextContent('Ability score minimum')
-    expect(typeSelects[2]).toHaveTextContent('Ability score minimum')
+    const typeSelects = screen.getAllByLabelText(CONDITION_TYPE_LABEL)
+    expect(typeSelects[0]).toHaveTextContent('Character level')
+    expect(typeSelects[1]).toHaveTextContent('Ability score')
+    expect(typeSelects[2]).toHaveTextContent('Ability score')
   })
 
-  it('removes a requirement group', async () => {
+  it('shows AND between condition sets and OR between rows in an any set', () => {
+    render(
+      <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
+    )
+
+    expect(screen.getAllByText('AND')).toHaveLength(1)
+    expect(screen.getAllByText('OR')).toHaveLength(1)
+  })
+
+  it('does not show within-set connectors for a single condition', () => {
+    render(
+      <EditorShell
+        prerequisiteEditor={requirementExpressionToEditor({
+          kind: 'minLevel',
+          level: 4,
+        })}
+      />,
+    )
+
+    expect(screen.queryByText('AND')).not.toBeInTheDocument()
+    expect(screen.queryByText('OR')).not.toBeInTheDocument()
+  })
+
+  it('updates preview when match rule radio changes', async () => {
     const user = userEvent.setup()
     render(
       <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
     )
 
-    await user.click(screen.getByRole('button', { name: /Remove requirement group 2/i }))
+    const allRadios = screen.getAllByRole('radio', { name: /All of these must be true/i })
+    await user.click(allRadios[1]!)
 
     await waitFor(() => {
-      expect(screen.queryByRole('group', { name: /Requirement group 2/i })).not.toBeInTheDocument()
+      expect(screen.getByText('Requires Level 4+, Strength 13+, Dexterity 13+')).toBeInTheDocument()
+    })
+  })
+
+  it('removes a condition set', async () => {
+    const user = userEvent.setup()
+    render(
+      <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Remove condition set 2/i }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('region', { name: 'Condition set 2' })).not.toBeInTheDocument()
+    })
+  })
+
+  it('removes a condition row when the set has multiple conditions', async () => {
+    const user = userEvent.setup()
+    render(
+      <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
+    )
+
+    await user.click(
+      screen.getByRole('button', { name: /Remove condition 2 from condition set 2/i }),
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByLabelText(CONDITION_TYPE_LABEL)).toHaveLength(2)
     })
   })
 
