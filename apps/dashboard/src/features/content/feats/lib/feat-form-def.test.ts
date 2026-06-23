@@ -8,11 +8,10 @@ import {
 } from '@rpg/contracts'
 
 import {
-  featFormDef,
-  prerequisiteFromFormValues,
-  prerequisiteToFormValues,
-  type FeatFormValues,
-} from './feat-form-def'
+  requirementEditorToExpression,
+  requirementExpressionToEditor,
+} from '../../lib/requirement-editor-form'
+import { featFormDef, type FeatFormValues } from './feat-form-def'
 
 const SRD_FEATS = loadSeedFeats('srd-cc-5.2.1')
 
@@ -20,29 +19,26 @@ it('type: toInput return type matches CreateFeatInput', () => {
   expectTypeOf(featFormDef.toInput).returns.toEqualTypeOf<CreateFeatInput>()
 })
 
-describe('prerequisite form helpers', () => {
-  it('round-trips Grappler prerequisite pattern', () => {
+describe('prerequisite editor round-trip', () => {
+  it('maps Grappler to level AND group plus ability OR group', () => {
     const grappler = SRD_FEATS.find((feat) => feat.slug === 'grappler')!
-    const formFields = prerequisiteToFormValues(grappler.prerequisite)
-    expect(formFields).toEqual({
-      prerequisitePattern: 'level-and-abilities',
-      prerequisiteMinLevel: 4,
-      prerequisiteAbilities: ['str', 'dex'],
-      prerequisiteAbilityMinimum: 13,
-    })
-    expect(formatRequirementExpression(prerequisiteFromFormValues(formFields)!)).toBe(
-      'Level 4+, Strength or Dexterity 13+',
+    const formValues = featFormDef.toFormValues(grappler) as FeatFormValues
+    expect(formValues.prerequisiteEditor.groups).toHaveLength(2)
+    expect(requirementEditorToExpression(formValues.prerequisiteEditor)).toEqual(
+      grappler.prerequisite,
     )
+    expect(
+      formatRequirementExpression(requirementEditorToExpression(formValues.prerequisiteEditor)!),
+    ).toBe('Level 4+, Strength or Dexterity 13+')
   })
 
-  it('round-trips Boon of Spell Recall prerequisite pattern', () => {
+  it('maps Boon of Spell Recall to one AND group with level and spellcasting', () => {
     const spellRecall = SRD_FEATS.find((feat) => feat.slug === 'boon-of-spell-recall')!
-    const formFields = prerequisiteToFormValues(spellRecall.prerequisite)
-    expect(formFields).toEqual({
-      prerequisitePattern: 'level-and-spellcasting',
-      prerequisiteMinLevel: 19,
-    })
-    expect(prerequisiteFromFormValues(formFields)).toEqual(spellRecall.prerequisite)
+    const formValues = featFormDef.toFormValues(spellRecall) as FeatFormValues
+    expect(formValues.prerequisiteEditor.groups).toHaveLength(1)
+    expect(requirementEditorToExpression(formValues.prerequisiteEditor)).toEqual(
+      spellRecall.prerequisite,
+    )
   })
 })
 
@@ -69,7 +65,7 @@ describe('featFormDef create vs update modes', () => {
     const formValues: FeatFormValues = {
       name: 'Custom Feat',
       category: 'general',
-      prerequisitePattern: 'none',
+      prerequisiteEditor: requirementExpressionToEditor(undefined),
       repeatableAllowed: false,
     }
     const input = featFormDef.toInput(formValues)

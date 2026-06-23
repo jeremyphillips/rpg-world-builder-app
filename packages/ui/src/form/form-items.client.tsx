@@ -31,6 +31,7 @@ import {
   type GroupConfig,
   type RowConfig,
   type FieldConfig,
+  type SlotConfig,
 } from './field-config'
 import {
   buildAccordionBatchKey,
@@ -222,6 +223,8 @@ function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: str
       return prefixFormItemKey(namePrefix, `group-${index}`)
     case 'row':
       return prefixFormItemKey(namePrefix, `row-${index}`)
+    case 'slot':
+      return prefixFormItemKey(namePrefix, item.name)
     default:
       return String(index)
   }
@@ -272,6 +275,14 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
           />
         </FormSectionContext.Provider>
       </FieldGroup>
+    )
+  }
+
+  if (item.kind === 'slot') {
+    return (
+      <FormSectionContext.Provider value={childContext}>
+        <SlotFieldRenderer config={item} />
+      </FormSectionContext.Provider>
     )
   }
 
@@ -374,6 +385,34 @@ function ConditionalField({ config, idPrefix, namePrefix }: FieldNodeProps) {
   })
   if (!visibleWhen(values)) return null
   return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+}
+
+export interface SlotFieldRendererProps {
+  config: SlotConfig
+}
+
+/** Renders custom form UI supplied by the field config inside `FormProvider`. */
+export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
+  const content = config.render()
+
+  if (config.label) {
+    return (
+      <FieldGroup legend={config.label} description={config.hint} className={config.className}>
+        {content}
+      </FieldGroup>
+    )
+  }
+
+  return (
+    <div className={cn(fieldGroupStackClasses, config.className)}>
+      {config.hint ? (
+        <Text variant="small" className={fieldGroupDescriptionClasses}>
+          {config.hint}
+        </Text>
+      ) : null}
+      {content}
+    </div>
+  )
 }
 
 export interface ArrayFieldRendererProps {

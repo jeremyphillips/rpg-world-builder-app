@@ -255,7 +255,7 @@ export interface GroupConfig {
   kind: 'group'
   legend: string
   description?: string
-  fields: Array<FieldConfig | RowConfig>
+  fields: Array<FieldConfig | RowConfig | SlotConfig>
   className?: string
   /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
   collapsible?: boolean
@@ -289,11 +289,29 @@ export interface ArrayConfig {
   collapsible?: boolean
 }
 
-/** Any item allowed at the top level of a form's `fields` array. */
-export type FormItem = FieldConfig | RowConfig | GroupConfig | ArrayConfig
+/**
+ * Custom field region rendered inside `FormProvider`. The slot `name` aligns with
+ * a form value key managed by `render()` (via `useFormContext` / `useFieldArray`);
+ * defaults are supplied through the form's `defaultValues`, not synthesized here.
+ */
+export interface SlotConfig {
+  kind: 'slot'
+  name: string
+  label?: string
+  hint?: string
+  className?: string
+  render: () => ReactNode
+  /** When false, renders inline even when form collapsible sections are enabled. */
+  collapsible?: boolean
+}
 
-/** Narrows a `FormItem` to a container (row/group/array) vs. a leaf field. */
-export function isContainer(item: FormItem): item is RowConfig | GroupConfig | ArrayConfig {
+/** Any item allowed at the top level of a form's `fields` array. */
+export type FormItem = FieldConfig | RowConfig | GroupConfig | ArrayConfig | SlotConfig
+
+/** Narrows a `FormItem` to a container (row/group/array/slot) vs. a leaf field. */
+export function isContainer(
+  item: FormItem,
+): item is RowConfig | GroupConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -301,15 +319,15 @@ export function isContainer(item: FormItem): item is RowConfig | GroupConfig | A
  * Flattens groups/rows into the ordered list of leaf fields, so callers can
  * iterate fields without re-walking the container tree.
  *
- * `ArrayConfig` items are **skipped** — their item fields are managed at
- * runtime by `useFieldArray` and have dynamic dotted paths (`traits.0.name`).
+ * `ArrayConfig` and `SlotConfig` items are **skipped** — arrays are managed at
+ * runtime by `useFieldArray`; slots render custom controls bound to the parent form.
  */
 export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[] {
   const fields: FieldConfig[] = []
   for (const item of items) {
     if (!('kind' in item)) {
       fields.push(item)
-    } else if (item.kind === 'array') {
+    } else if (item.kind === 'array' || item.kind === 'slot') {
       // Intentionally skipped — see JSDoc above.
     } else {
       fields.push(...flattenFields(item.fields as Array<FormItem | RowConfig>))
@@ -402,6 +420,8 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
     } else if (item.kind === 'array') {
       values[item.name] = []
+    } else if (item.kind === 'slot') {
+      // Slot values come from the form's defaultValues.
     }
   }
   return values
