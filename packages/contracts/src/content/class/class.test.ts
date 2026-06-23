@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   classBodySchema,
+  classHasSpellcasting,
   classPatchSchema,
   classSchema,
   classStoredBodySchema,
@@ -51,6 +52,28 @@ const fighter = {
   ...timestamps,
   ...fighterBody,
 } as const
+
+describe('classHasSpellcasting', () => {
+  it('returns false when spellcasting is absent', () => {
+    expect(classHasSpellcasting(classSchema.parse(fighter))).toBe(false)
+  })
+
+  it('returns true when spellcasting is present', () => {
+    expect(
+      classHasSpellcasting(
+        classSchema.parse({
+          ...fighter,
+          spellcasting: {
+            level: 1,
+            progression: 'full',
+            ability: 'int',
+            preparation: 'prepared',
+          },
+        }),
+      ),
+    ).toBe(true)
+  })
+})
 
 describe('classSchema', () => {
   it('parses a well-formed system class', () => {

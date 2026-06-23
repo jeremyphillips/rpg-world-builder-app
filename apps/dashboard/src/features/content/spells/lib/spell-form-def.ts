@@ -303,7 +303,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
       name: 'classIds',
       label: 'Classes',
       multiple: true,
-      options: ctx.options?.classes ?? [],
+      options: ctx.options?.spellcastingClasses ?? [],
       placeholder: 'Choose classes…',
       required: true,
     },
