@@ -35,12 +35,13 @@ which seed version is loaded and which content homebrew/patches validate against
 
 ## Kernel (`lib/`) — type-agnostic, reused by every content type
 
-| Module                     | Responsibility                                                |
-| -------------------------- | ------------------------------------------------------------- |
-| `deep-merge.ts`            | Deep-merge objects; arrays/primitives replace                 |
-| `resolve-catalog.ts`       | Merge system + patches + homebrew into the effective list     |
-| `assert-slug-available.ts` | Homebrew slug guard (no campaign dupes; no system shadowing)  |
-| `content-type-config.ts`   | `ContentTypeConfig` — the per-type wiring the kernel consumes |
+| Module                             | Responsibility                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| `deep-merge.ts`                    | Deep-merge objects; arrays/primitives replace                               |
+| `resolve-catalog.ts`               | Merge system + patches + homebrew into the effective list                   |
+| `assert-slug-available.ts`         | Homebrew slug guard (no campaign dupes; no system shadowing)                |
+| `spells/assert-spell-class-ids.ts` | Spell write guard — `classIds` must reference resolved spellcasting classes |
+| `content-type-config.ts`           | `ContentTypeConfig` — the per-type wiring the kernel consumes               |
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
 `*.config.ts` wiring its seed loader and Mongo models, registered in
