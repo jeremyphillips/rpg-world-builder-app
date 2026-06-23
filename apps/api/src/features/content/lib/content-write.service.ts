@@ -4,7 +4,9 @@ import { ContentKeyError, stripClassSkillFromFromInput } from '@rpg/contracts'
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { enrichClassWithDerivedSkills } from '../classes/derive-classes-catalog'
+import { classContentConfig } from '../classes/classes.config'
 import { resolveCatalogForCampaign } from '../content.service'
+import { assertSpellClassIdsHaveSpellcasting } from '../spells/assert-spell-class-ids'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
@@ -194,6 +196,16 @@ async function syncClassSkillEdgesIfNeeded<T extends StoredEntity>(
   await syncSuggestedClassesFromClass(campaignId, classSlug, nextSkillSlugs)
 }
 
+async function assertSpellClassIdsForCampaign<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  classIds: string[],
+): Promise<void> {
+  if (config.typeName !== 'spells') return
+  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
+  assertSpellClassIdsHaveSpellcasting(classIds, classes)
+}
+
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -209,6 +221,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
 
   const { rulesetId } = campaign
   const slug = input.slug as string
+  await assertSpellClassIdsForCampaign(config, campaignId, input.classIds as string[])
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
@@ -252,6 +265,11 @@ export async function updateContentEntity<T extends StoredEntity>(
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
   await syncClassSkillEdgesIfNeeded(config, campaignId, existing.slug, normalized)
   const update = parsePersistedWriteInput(config, normalized, 'update')
+  if (config.typeName === 'spells') {
+    const effectiveClassIds = (update.classIds ??
+      (existing as unknown as { classIds: string[] }).classIds) as string[]
+    await assertSpellClassIdsForCampaign(config, campaignId, effectiveClassIds)
+  }
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {

@@ -5,6 +5,7 @@ import { createUser } from '../user'
 import { createCampaign } from '../campaign'
 import { armorWriteConfig } from './armor/armor.config'
 import { classWriteConfig } from './classes/classes.config'
+import { ClassPatchModel } from './classes/class-patch.model'
 import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { HomebrewClassModel } from './classes/homebrew-class.model'
 import { skillProficiencyWriteConfig } from './skill-proficiencies/skill-proficiencies.config'
@@ -242,20 +243,22 @@ describe('createHomebrewContent (classes)', () => {
 })
 
 describe('createHomebrewContent (spells)', () => {
+  const minimalSpellInput = {
+    slug: 'custom-bolt',
+    name: 'Custom Bolt',
+    description: '<p>A custom cantrip.</p>',
+    school: 'evocation' as const,
+    level: 0,
+    classIds: ['wizard'],
+    castingTime: { normal: { value: 1, unit: 'action' as const }, canBeCastAsRitual: false },
+    range: { kind: 'distance' as const, value: { value: 60, unit: 'ft' as const } },
+    duration: { kind: 'instantaneous' as const },
+    components: { verbal: true, somatic: true },
+  }
+
   it('creates homebrew spell and returns it in the resolved catalog', async () => {
     const campaign = await makeCampaign()
-    const created = await createHomebrewContent(spellWriteConfig, campaign.id, {
-      slug: 'custom-bolt',
-      name: 'Custom Bolt',
-      description: '<p>A custom cantrip.</p>',
-      school: 'evocation',
-      level: 0,
-      classIds: ['wizard'],
-      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
-      range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
-      duration: { kind: 'instantaneous' },
-      components: { verbal: true, somatic: true },
-    })
+    const created = await createHomebrewContent(spellWriteConfig, campaign.id, minimalSpellInput)
 
     expect(created.source).toBe('homebrew')
     expect(created.slug).toBe('custom-bolt')
@@ -263,6 +266,53 @@ describe('createHomebrewContent (spells)', () => {
 
     const spells = await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
     expect(spells.some((s) => s.slug === 'custom-bolt')).toBe(true)
+  })
+
+  it('rejects classIds for classes without spellcasting', async () => {
+    const campaign = await makeCampaign()
+
+    await expect(
+      createHomebrewContent(spellWriteConfig, campaign.id, {
+        ...minimalSpellInput,
+        slug: 'martial-bolt',
+        classIds: ['fighter'],
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
+  })
+
+  it('accepts a patched class that gained spellcasting', async () => {
+    const campaign = await makeCampaign()
+    await ClassPatchModel.create({
+      campaignId: campaign.id,
+      targetId: 'srd-cc-5.2.1:barbarian',
+      patch: {
+        spellcasting: {
+          level: 1,
+          progression: 'full',
+          ability: 'wis',
+          preparation: 'known',
+        },
+      },
+    })
+
+    const created = await createHomebrewContent(spellWriteConfig, campaign.id, {
+      ...minimalSpellInput,
+      slug: 'barbarian-bolt',
+      classIds: ['barbarian'],
+    })
+
+    expect(created.classIds).toEqual(['barbarian'])
+  })
+
+  it('rejects update that assigns non-caster classIds', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(spellWriteConfig, campaign.id, minimalSpellInput)
+
+    await expect(
+      updateContentEntity(spellWriteConfig, campaign.id, created.id, {
+        classIds: ['fighter'],
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
   })
 
   it('patches a system spell record', async () => {
