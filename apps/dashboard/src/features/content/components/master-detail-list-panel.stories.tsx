@@ -27,8 +27,7 @@ export const Default: Story = {
     onAdd: () => {},
     onSelect: () => {},
     onRemove: () => {},
-    onMoveUp: () => {},
-    onMoveDown: () => {},
+    onMove: () => {},
   },
 }
 
