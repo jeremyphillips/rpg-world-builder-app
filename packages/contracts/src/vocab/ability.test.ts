@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  ABILITIES,
+  ABILITY_ENTRIES,
   ABILITY_IDS,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
@@ -17,8 +17,8 @@ describe('abilitySchema', () => {
     }
   })
 
-  it('derives ids from the ABILITIES map', () => {
-    expect(ABILITY_IDS).toEqual(Object.keys(ABILITIES))
+  it('derives ids from the ABILITY_ENTRIES map', () => {
+    expect(ABILITY_IDS).toEqual(Object.keys(ABILITY_ENTRIES))
   })
 
   it('rejects full names and unknown values', () => {

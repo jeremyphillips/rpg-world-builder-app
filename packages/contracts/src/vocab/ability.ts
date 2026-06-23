@@ -1,28 +1,54 @@
 import { z } from 'zod'
 
+import type { GameTermEntry } from './types'
+
 // ---------------------------------------------------------------------------
 // Abilities — the six creature ability scores (shared by classes, monsters,
 // and characters). `class.ts` references ability *ids* only, not scores.
 // ---------------------------------------------------------------------------
 
-/**
- * Ability id -> full display name. The map doubles as form select options
- * (`value: id`, `label: ABILITIES[id]`).
- */
-export const ABILITIES = {
-  str: 'Strength',
-  dex: 'Dexterity',
-  con: 'Constitution',
-  int: 'Intelligence',
-  wis: 'Wisdom',
-  cha: 'Charisma',
-} as const
+export const ABILITY_ENTRIES = {
+  str: {
+    label: 'Strength',
+    description: 'Physical might',
+  },
+  dex: {
+    label: 'Dexterity',
+    description: 'Agility, reflexes, and balance',
+  },
+  con: {
+    label: 'Constitution',
+    description: 'Health and stamina',
+  },
+  int: {
+    label: 'Intelligence',
+    description: 'Reasoning and memory',
+  },
+  wis: {
+    label: 'Wisdom',
+    description: 'Perceptiveness and mental fortitude',
+  },
+  cha: {
+    label: 'Charisma',
+    description: 'Force of personality',
+  },
+} as const satisfies Record<string, GameTermEntry>
 
-export type Ability = keyof typeof ABILITIES
+export type Ability = keyof typeof ABILITY_ENTRIES
 
-export const ABILITY_IDS = Object.keys(ABILITIES) as [Ability, ...Ability[]]
+export const ABILITY_IDS = Object.keys(ABILITY_ENTRIES) as [Ability, ...Ability[]]
 
 export const abilitySchema = z.enum(ABILITY_IDS)
+
+/** Returns the reference entry for an ability id, if known. */
+export function getAbilityEntry(id: string): GameTermEntry | undefined {
+  return ABILITY_ENTRIES[id as Ability]
+}
+
+/** Returns the display label for an ability id. Falls back to the raw value. */
+export function getAbilityLabel(id: string): string {
+  return getAbilityEntry(id)?.label ?? id
+}
 
 // ---------------------------------------------------------------------------
 // Ability scores — bounds are context-dependent: PCs cap at 20, monsters reach

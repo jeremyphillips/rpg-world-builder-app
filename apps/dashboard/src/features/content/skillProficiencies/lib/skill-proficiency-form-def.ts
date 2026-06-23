@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   abilitySchema,
-  ABILITIES,
+  ABILITY_ENTRIES,
   ABILITY_IDS,
   createSkillProficiencyInputSchema,
   slugSchema,
@@ -19,7 +19,13 @@ import {
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 
-const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
+const abilityOptions = toOptions(
+  ABILITY_IDS,
+  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
+    (typeof ABILITY_IDS)[number],
+    string
+  >,
+)
 
 const SUGGESTED_CLASSES_HINT =
   'Classes that suggest this skill for starting proficiency selection. Used by the character builder to restrict skill picks.'
