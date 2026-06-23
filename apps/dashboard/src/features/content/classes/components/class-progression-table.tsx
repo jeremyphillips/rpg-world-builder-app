@@ -242,7 +242,7 @@ export function ClassProgressionTable({ characterClass }: ClassProgressionTableP
 
   return (
     <section aria-labelledby="progression-heading">
-      <Heading variant="section" as="h3" id="progression-heading" className="mb-4">
+      <Heading variant="section" as="h2" id="progression-heading" className="mb-4">
         Class Progression
       </Heading>
       <Table>

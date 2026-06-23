@@ -1,5 +1,10 @@
 import type { Spell } from '@rpg/contracts'
-import { getClassName, getSpellDeliveryMethodLabel, getSpellSchoolLabel } from '@rpg/contracts'
+import {
+  getClassName,
+  getSpellDeliveryMethodLabel,
+  getSpellSchoolEntry,
+  getSpellSchoolLabel,
+} from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import {
@@ -21,7 +26,12 @@ const SPELL_STAT_CONCENTRATION_INFO =
 export function buildSpellStatRows(spell: Spell): ContentStatRowData[] {
   const rows: ContentStatRowData[] = [
     { label: 'Level', value: formatSpellLevelLabel(spell.level) },
-    { label: 'School', value: getSpellSchoolLabel(spell.school) },
+    {
+      label: 'School',
+      value: getSpellSchoolLabel(spell.school),
+      info: getSpellSchoolEntry(spell.school)?.description,
+      infoAriaLabel: `About ${getSpellSchoolLabel(spell.school)}`,
+    },
     { label: 'Casting Time', value: formatCastingTime(spell.castingTime) },
     { label: 'Range', value: formatSpellRange(spell.range) },
     { label: 'Duration', value: formatSpellDuration(spell.duration) },

@@ -54,8 +54,8 @@ export const MultipleRows: Story = {
       <ContentStatRow label="Hit Die" value="d12 per level" />
       <ContentStatRow label="Primary Abilities" value="Strength" />
       <ContentStatRow label="Saving Throws" value="Strength, Constitution" />
-      <ContentStatRow label="Armor" value="Light, Medium, Shields" />
-      <ContentStatRow label="Weapons" value="Simple, Martial" />
+      <ContentStatRow label="Armor Training" value="Light, Medium, Shields" />
+      <ContentStatRow label="Weapons Proficiencies" value="Simple, Martial" />
       <ContentStatRow
         label="Mastery"
         value={WEAPON_MASTERY_ENTRIES.sap.label}

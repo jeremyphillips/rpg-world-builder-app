@@ -29,7 +29,7 @@ function FeaturesList({
   const sorted = [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
   return (
     <section aria-labelledby="features-heading">
-      <Heading variant="section" as="h3" id="features-heading" className="mb-4">
+      <Heading variant="section" as="h2" id="features-heading" className="mb-4">
         {className} Class Features
       </Heading>
       <ul className="space-y-4" role="list">
@@ -57,7 +57,7 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   if (subclasses.length === 0) return null
   return (
     <section aria-labelledby="subclasses-heading">
-      <Heading variant="section" as="h3" id="subclasses-heading" className="mb-4">
+      <Heading variant="section" as="h2" id="subclasses-heading" className="mb-4">
         Subclasses
       </Heading>
       <ul className="space-y-6" role="list">
@@ -104,7 +104,7 @@ function SuggestedProficienciesList({
 
   return (
     <section aria-labelledby="suggested-proficiencies-heading">
-      <Heading variant="section" as="h3" id="suggested-proficiencies-heading" className="mb-3">
+      <Heading variant="section" as="h2" id="suggested-proficiencies-heading" className="mb-3">
         Suggested proficiencies
       </Heading>
       <Text variant="muted" className="mb-3">
@@ -151,8 +151,8 @@ function ClassStatsSection({ characterClass }: { characterClass: CharacterClass 
       <ContentStatRow label="Hit Die" value={`d${hitDie} per level`} />
       <ContentStatRow label="Primary Abilities" value={primaryAbilitiesLabel} />
       <ContentStatRow label="Saving Throws" value={savingThrowsLabel} />
-      <ContentStatRow label="Weapons" value={weaponsLabel} />
-      <ContentStatRow label="Armor" value={armorLabel} />
+      <ContentStatRow label="Weapon Proficiencies" value={weaponsLabel} />
+      <ContentStatRow label="Armor Training" value={armorLabel} />
     </div>
   )
 }
@@ -185,7 +185,7 @@ export function ClassDetailContent({
         editHref={contentEditHref('classes', campaignId, classId)}
       >
         <div className="space-y-4">
-          <Heading variant="display" as="h2">
+          <Heading variant="display" as="h1">
             {characterClass.name}
           </Heading>
           <ClassStatsSection characterClass={characterClass} />

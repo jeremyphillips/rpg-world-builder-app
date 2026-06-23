@@ -69,6 +69,15 @@ describe('formatSpellComponents', () => {
 })
 
 describe('buildSpellStatRows', () => {
+  it('includes school description info beside the value', () => {
+    const school = buildSpellStatRows(FIRE_BOLT).find((r) => r.label === 'School')
+
+    expect(school?.value).toBe('Evocation')
+    expect(school?.info).toContain('Evocation spells')
+    expect(school?.infoAriaLabel).toBe('About Evocation')
+    expect(school?.infoPlacement).toBeUndefined()
+  })
+
   it('includes ritual and concentration flags for detect magic', () => {
     const rows = buildSpellStatRows(DETECT_MAGIC)
     const ritual = rows.find((r) => r.label === 'Ritual')
