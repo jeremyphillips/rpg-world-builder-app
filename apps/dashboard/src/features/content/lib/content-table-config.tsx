@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { formatMoney, moneyToCp, type Money } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -35,6 +36,19 @@ const BASE_SOURCE_FILTER: FilterDef = {
 export type ContentTableOptions<T> = {
   /** When provided, the name cell renders as a link to this href. */
   nameHref?: (row: T) => string
+}
+
+type WithCost = { cost: Money }
+
+/** Sortable cost column shared by armor, equipment, and weapon overview tables. */
+export function costColumn<T extends WithCost>(): ColumnDef<T> {
+  return {
+    id: 'cost',
+    accessorFn: (row) => moneyToCp(row.cost),
+    header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
+    cell: ({ row }) => formatMoney(row.original.cost),
+    meta: { label: 'Cost' },
+  }
 }
 
 /**

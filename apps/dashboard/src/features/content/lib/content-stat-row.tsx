@@ -7,7 +7,7 @@ export type ContentStatRowProps = {
 
 /**
  * Reusable label/value row for content detail pages.
- * Used by class, species, monster, spell, and equipment detail routes.
+ * Used by content detail routes via {@link ContentDetailStatBody}.
  *
  * @example
  * <ContentStatRow label="Hit Die" value="d12 per level" />

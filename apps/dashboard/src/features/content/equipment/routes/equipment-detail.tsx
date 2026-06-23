@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
 import type { Equipment } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
 import {
   formatMoney,
   formatWeight,
@@ -15,11 +14,12 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
+import { ContentDetailStatBody } from '../../lib/content-detail-stat-body'
 import { contentEditHref } from '../../lib/content-edit-href'
-import { ContentStatRow } from '../../lib/content-stat-row'
+import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
-type StatRow = { label: string; value: string }
+type StatRow = ContentStatRowData
 
 type GearItem = Extract<Equipment, { kind: 'gear' }>
 type AmmunitionItem = Extract<Equipment, { kind: 'ammunition' }>
@@ -135,7 +135,11 @@ type EquipmentDetailContentProps = {
 export function EquipmentDetailContent({ item, campaignId }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
 
-  const kindRows = getKindStatRows(item)
+  const statRows: StatRow[] = [
+    { label: 'Kind', value: getEquipmentKindLabel(item.kind) },
+    { label: 'Cost', value: formatMoney(item.cost) },
+    ...getKindStatRows(item),
+  ]
 
   return (
     <ContentDetailLayout
@@ -144,19 +148,7 @@ export function EquipmentDetailContent({ item, campaignId }: EquipmentDetailCont
       campaignId={campaignId}
       editHref={contentEditHref('equipment', campaignId, item.id)}
     >
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {item.name}
-        </Heading>
-        <div className="space-y-3">
-          <ContentStatRow label="Kind" value={getEquipmentKindLabel(item.kind)} />
-          <ContentStatRow label="Cost" value={formatMoney(item.cost)} />
-          {kindRows.map(({ label, value }) => (
-            <ContentStatRow key={label} label={label} value={value} />
-          ))}
-        </div>
-        {item.description && <Text variant="muted">{item.description}</Text>}
-      </div>
+      <ContentDetailStatBody name={item.name} statRows={statRows} description={item.description} />
     </ContentDetailLayout>
   )
 }
