@@ -150,6 +150,76 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeDisabled()
   })
 
+  it('hides nested arrays when item-scoped visibility is false', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(
+        z.object({
+          grantType: z.string(),
+          detail: z.string().optional(),
+          entries: z.array(z.object({ spell: z.string() })).optional(),
+        }),
+      ),
+    })
+
+    const grantFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        addLabel: 'Add grant',
+        collapsible: false,
+        fields: [
+          {
+            type: 'text',
+            name: 'grantType',
+            label: 'Grant type',
+            required: true,
+          },
+          {
+            type: 'text',
+            name: 'detail',
+            label: 'Sense detail',
+            visibility: {
+              dependsOn: ['grantType'],
+              visibleWhen: (v) => v.grantType === 'senses',
+            },
+          },
+          {
+            kind: 'array',
+            name: 'entries',
+            legend: 'Innate spell entries',
+            addLabel: 'Add entry',
+            visibility: {
+              dependsOn: ['grantType'],
+              visibleWhen: (v) => v.grantType === 'innateSpells',
+            },
+            fields: [{ type: 'text', name: 'spell', label: 'Spell', required: true }],
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={grantSchema}
+        fields={grantFields}
+        defaultValues={{ grants: [{ grantType: 'senses' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByLabelText('Sense detail')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add entry' })).not.toBeInTheDocument()
+
+    await user.clear(screen.getByLabelText('Grant type'))
+    await user.type(screen.getByLabelText('Grant type'), 'innateSpells')
+
+    expect(screen.queryByLabelText('Sense detail')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add entry' })).toBeInTheDocument()
+  })
+
   it('supports item-scoped conditional visibility', async () => {
     const user = userEvent.setup()
     const conditionalSchema = z.object({

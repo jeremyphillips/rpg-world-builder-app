@@ -521,6 +521,11 @@ names:
 > control unmounts, so the submitted payload naturally omits it. Mark
 > conditionally-visible item fields as `z.optional()` in the item schema.
 
+Nested `ArrayConfig` items (e.g. `innateSpellEntries` inside a grant row) may
+also declare `visibility` with the same item-scoped `dependsOn` contract. When
+hidden, the whole nested array unmounts and its values are cleared via
+`shouldUnregister`.
+
 ### Nesting
 
 `ArrayConfig.fields` can itself contain a nested `ArrayConfig`, producing
