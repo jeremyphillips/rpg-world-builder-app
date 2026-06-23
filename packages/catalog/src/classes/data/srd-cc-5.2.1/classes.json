@@ -124,7 +124,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Irresistible Offense is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Irresistible Offense is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "primal-champion",
@@ -368,7 +375,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Spell Recall is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Spell Recall is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "words-of-creation",
@@ -580,7 +594,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Fate is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Fate is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "greater-divine-intervention",
@@ -800,7 +821,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "archdruid",
@@ -858,7 +886,14 @@
         "id": "fighting-style",
         "name": "Fighting Style",
         "level": 1,
-        "description": "<p>You have honed your martial prowess and gain a Fighting Style feat of your choice (see \"Feats\"). Defense is recommended.</p><p>Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat.</p>"
+        "description": "<p>You have honed your martial prowess and gain a Fighting Style feat of your choice (see \"Feats\"). Defense is recommended.</p><p>Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "fighting-style",
+            "choose": 1,
+            "replaceable": true
+          }
+        }
       },
       {
         "id": "second-wind",
@@ -924,7 +959,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Combat Prowess is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Combat Prowess is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "three-extra-attacks",
@@ -1128,7 +1170,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Irresistible Offense is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Irresistible Offense is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "body-and-mind",
@@ -1364,7 +1413,13 @@
         "id": "fighting-style",
         "name": "Fighting Style",
         "level": 2,
-        "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Blessed Warrior.</strong> You learn two Cleric cantrips of your choice (see the Cleric class's section for a list of Cleric spells). Guidance and Sacred Flame are recommended. The chosen cantrips count as Paladin spells for you, and Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of these cantrips with another Cleric cantrip.</p>"
+        "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Blessed Warrior.</strong> You learn two Cleric cantrips of your choice (see the Cleric class's section for a list of Cleric spells). Guidance and Sacred Flame are recommended. The chosen cantrips count as Paladin spells for you, and Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of these cantrips with another Cleric cantrip.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "fighting-style",
+            "choose": 1
+          }
+        }
       },
       {
         "id": "paladins-smite",
@@ -1454,7 +1509,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Truesight is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Truesight is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       }
     ],
     "resources": [
@@ -1588,7 +1650,13 @@
         "id": "fighting-style",
         "name": "Fighting Style",
         "level": 2,
-        "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Druidic Warrior.</strong> You learn two Druid cantrips of your choice (see the Druid class's section for a list of Druid spells). <em>Guidance</em> and <em>Starry Wisp</em> are recommended. The chosen cantrips count as Ranger spells for you, and Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of these cantrips with another Druid cantrip.</p>"
+        "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Druidic Warrior.</strong> You learn two Druid cantrips of your choice (see the Druid class's section for a list of Druid spells). <em>Guidance</em> and <em>Starry Wisp</em> are recommended. The chosen cantrips count as Ranger spells for you, and Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of these cantrips with another Druid cantrip.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "fighting-style",
+            "choose": 1
+          }
+        }
       },
       {
         "id": "extra-attack",
@@ -1650,7 +1718,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "foe-slayer",
@@ -1801,7 +1876,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of the Night Spirit is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of the Night Spirit is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "stroke-of-luck",
@@ -1973,7 +2055,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "arcane-apotheosis",
@@ -2215,7 +2304,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Fate is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Fate is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "eldritch-master",
@@ -2425,7 +2521,14 @@
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
-        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Spell Recall is recommended.</p>"
+        "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Spell Recall is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "epic-boon",
+            "choose": 1,
+            "allowAnyQualifying": true
+          }
+        }
       },
       {
         "id": "signature-spells",

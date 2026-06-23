@@ -44,6 +44,24 @@ describe('grantsToFormRows / formRowsToGrants', () => {
       'power-word-kill',
     ])
   })
+
+  it('round-trips feat choice grants', () => {
+    const fighter = pickClass('fighter')
+    const fightingStyle = fighter.features.find((feature) => feature.id === 'fighting-style')
+    const rows = grantsToFormRows(fightingStyle?.grants)
+    const featRow = rows.find((row) => row.grantType === 'featChoice')
+
+    expect(featRow?.featCategory).toBe('fighting-style')
+    expect(featRow?.featChoose).toBe(1)
+    expect(featRow?.featReplaceable).toBe(true)
+
+    const restored = formRowsToGrants(rows)
+    expect(restored?.featChoice).toEqual({
+      category: 'fighting-style',
+      choose: 1,
+      replaceable: true,
+    })
+  })
 })
 
 describe('formatInnateSpellEntryTitle', () => {

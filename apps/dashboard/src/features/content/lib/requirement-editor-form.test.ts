@@ -222,8 +222,8 @@ describe('formatRequirementEditorPreview', () => {
 
 describe('newRequirementLeaf and newRequirementGroup', () => {
   it('creates leaf and group rows with ids', () => {
-    const leaf = newRequirementLeaf('feature')
-    expect(leaf).toMatchObject({ type: 'feature', featureId: '' })
+    const leaf = newRequirementLeaf('minLevel')
+    expect(leaf).toMatchObject({ type: 'minLevel', level: 1 })
     expect(leaf.id.length).toBeGreaterThan(0)
 
     const group = newRequirementGroup('any')
@@ -251,9 +251,10 @@ describe('prerequisiteEditorSchema', () => {
 })
 
 describe('normalization edge cases', () => {
-  it('round-trips a bare feature leaf', () => {
+  it('maps unsupported feature leaves to empty editor state', () => {
     const tree: RequirementExpression = { kind: 'feature', featureId: 'fighting-style' }
-    expect(requirementEditorToExpression(requirementExpressionToEditor(tree))).toEqual(tree)
+    expect(requirementExpressionToEditor(tree)).toEqual({ groups: [] })
+    expect(requirementEditorToExpression(requirementExpressionToEditor(tree))).toBeUndefined()
   })
 
   it('round-trips a bare any group', () => {

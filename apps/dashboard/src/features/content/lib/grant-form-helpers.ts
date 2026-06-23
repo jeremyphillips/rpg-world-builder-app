@@ -6,6 +6,8 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   DAMAGE_TYPE_IDS,
   DAMAGE_TYPE_ENTRIES,
+  FEAT_CATEGORY_IDS,
+  FEAT_CATEGORY_ENTRIES,
   INNATE_SPELL_KINDS,
   SENSE_RANGES,
   SENSE_TYPES,
@@ -18,6 +20,7 @@ import {
   abilitySchema,
   armorCategorySchema,
   damageTypeSchema,
+  featCategorySchema,
   innateSpellKindSchema,
   levelSchema,
   senseTypeSchema,
@@ -28,6 +31,7 @@ import {
   type ContentGrants,
   type ContentProficiencies,
   type DamageType,
+  type FeatCategory,
   type InnateSpellKind,
   type SenseType,
   type SkillId,
@@ -51,7 +55,7 @@ const BASE_GRANT_TYPES = [
   'languages',
 ] as const
 
-export const CLASS_GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells'] as const
+export const CLASS_GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells', 'featChoice'] as const
 
 export const SPECIES_GRANT_TYPES = [...CLASS_GRANT_TYPES] as const
 
@@ -70,6 +74,7 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
 const CLASS_GRANT_TYPE_LABELS: Record<ClassGrantType, string> = {
   ...BASE_GRANT_TYPE_LABELS,
   innateSpells: 'Innate spells',
+  featChoice: 'Feat choice',
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +140,13 @@ const usageFrequencyOptions = toOptions(
   >,
 )
 
+const featCategoryOptions = toOptions(
+  FEAT_CATEGORY_IDS,
+  Object.fromEntries(
+    FEAT_CATEGORY_IDS.map((id) => [id, FEAT_CATEGORY_ENTRIES[id].label]),
+  ) as Record<FeatCategory, string>,
+)
+
 // ---------------------------------------------------------------------------
 // Form schema
 // ---------------------------------------------------------------------------
@@ -160,6 +172,10 @@ export const grantRowFormSchema = z.object({
   proficiencyWeapons: z.array(z.string()).optional(),
   innateSpellAbility: abilitySchema.optional(),
   innateSpellEntries: z.array(innateSpellEntryFormSchema).optional(),
+  featCategory: featCategorySchema.optional(),
+  featChoose: z.coerce.number().int().min(1).optional(),
+  featAllowAnyQualifying: z.boolean().optional(),
+  featReplaceable: z.boolean().optional(),
 })
 
 export type GrantRowForm = z.infer<typeof grantRowFormSchema>
@@ -345,6 +361,38 @@ export function grantItemFields<T extends string>(
         },
       ],
     },
+    {
+      type: 'select',
+      name: 'featCategory',
+      label: 'Feat category',
+      options: featCategoryOptions,
+      required: true,
+      visibility: visibleFor('featChoice'),
+    },
+    {
+      type: 'number',
+      name: 'featChoose',
+      label: 'Number to choose',
+      min: 1,
+      defaultValue: 1,
+      visibility: visibleFor('featChoice'),
+    },
+    {
+      type: 'checkbox',
+      name: 'featAllowAnyQualifying',
+      label: 'Allow any qualifying feat (Epic Boon or another feat the character qualifies for)',
+      visibility: {
+        dependsOn: ['grantType', 'featCategory'],
+        visibleWhen: (watched) =>
+          watched['grantType'] === 'featChoice' && watched['featCategory'] === 'epic-boon',
+      },
+    },
+    {
+      type: 'checkbox',
+      name: 'featReplaceable',
+      label: 'Replaceable on later class levels',
+      visibility: visibleFor('featChoice'),
+    },
   ]
 }
 
@@ -394,6 +442,10 @@ function emptyGrantRow(grantType: ClassGrantType): GrantRowForm {
     proficiencyWeapons: [],
     innateSpellAbility: undefined,
     innateSpellEntries: [],
+    featCategory: undefined,
+    featChoose: 1,
+    featAllowAnyQualifying: false,
+    featReplaceable: false,
   }
 }
 
@@ -458,6 +510,17 @@ function innateSpellsToRow(innateSpells: ContentGrants['innateSpells']): GrantRo
   }
 }
 
+function featChoiceToRow(featChoice: ContentGrants['featChoice']): GrantRowForm | undefined {
+  if (!featChoice) return undefined
+  return {
+    ...emptyGrantRow('featChoice'),
+    featCategory: featChoice.category,
+    featChoose: featChoice.choose,
+    featAllowAnyQualifying: featChoice.allowAnyQualifying ?? false,
+    featReplaceable: featChoice.replaceable ?? false,
+  }
+}
+
 /** Converts a `ContentGrants` object into flat grant-row form values. */
 export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowForm[] {
   if (!grants) return []
@@ -469,6 +532,7 @@ export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowFor
     ...languageGrantsToRows(grants.languages),
     ...optionalGrantRow(proficienciesToRow(grants.proficiencies)),
     ...optionalGrantRow(innateSpellsToRow(grants.innateSpells)),
+    ...optionalGrantRow(featChoiceToRow(grants.featChoice)),
   ]
 }
 
@@ -556,6 +620,24 @@ function applyInnateSpellsFromRows(result: ContentGrants, rows: GrantRowForm[]):
   }
 }
 
+function applyFeatChoiceFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'featChoice')
+  if (!row?.featCategory) return
+
+  const choose = row.featChoose ?? 1
+  const featChoice: ContentGrants['featChoice'] = {
+    category: row.featCategory as FeatCategory,
+    choose,
+  }
+  if (row.featAllowAnyQualifying) {
+    featChoice.allowAnyQualifying = true
+  }
+  if (row.featReplaceable) {
+    featChoice.replaceable = true
+  }
+  result.featChoice = featChoice
+}
+
 /** Folds grant-row form values back into a `ContentGrants` object. */
 export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefined {
   if (!rows.length) return undefined
@@ -568,6 +650,7 @@ export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefine
   applyLanguagesFromRows(result, rows)
   applyProficienciesFromRows(result, rows)
   applyInnateSpellsFromRows(result, rows)
+  applyFeatChoiceFromRows(result, rows)
 
   return Object.keys(result).length ? result : undefined
 }

@@ -9,12 +9,7 @@ import {
 } from '@rpg/contracts'
 import type { RefinementCtx } from 'zod'
 
-export const REQUIREMENT_LEAF_TYPES = [
-  'minLevel',
-  'abilityMinimum',
-  'spellcasting',
-  'feature',
-] as const
+export const REQUIREMENT_LEAF_TYPES = ['minLevel', 'abilityMinimum', 'spellcasting'] as const
 
 export type RequirementLeafType = (typeof REQUIREMENT_LEAF_TYPES)[number]
 
@@ -22,7 +17,6 @@ export type RequirementLeafForm =
   | { id: string; type: 'minLevel'; level: number }
   | { id: string; type: 'abilityMinimum'; ability: z.infer<typeof abilitySchema>; minimum: number }
   | { id: string; type: 'spellcasting' }
-  | { id: string; type: 'feature'; featureId: string }
 
 export type RequirementGroupForm = {
   id: string
@@ -52,17 +46,10 @@ const requirementSpellcastingLeafSchema = z.object({
   type: z.literal('spellcasting'),
 })
 
-const requirementFeatureLeafSchema = z.object({
-  id: z.string().min(1),
-  type: z.literal('feature'),
-  featureId: z.string(),
-})
-
 export const requirementLeafFormSchema = z.discriminatedUnion('type', [
   requirementMinLevelLeafSchema,
   requirementAbilityMinimumLeafSchema,
   requirementSpellcastingLeafSchema,
-  requirementFeatureLeafSchema,
 ])
 
 export const requirementGroupFormSchema = z.object({
@@ -98,8 +85,6 @@ export function newRequirementLeaf(type: RequirementLeafType = 'minLevel'): Requ
       return { id, type, ability: 'str', minimum: ABILITY_SCORE_MIN }
     case 'spellcasting':
       return { id, type }
-    case 'feature':
-      return { id, type, featureId: '' }
   }
 }
 
@@ -114,23 +99,16 @@ export function newRequirementGroup(
   }
 }
 
-function isSupportedEditorLeaf(
-  expr: RequirementExpression,
-): expr is Exclude<
+type EditableRequirementLeaf = Exclude<
   RequirementExpression,
-  { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' }
-> {
-  return (
-    expr.kind === 'minLevel' ||
-    expr.kind === 'abilityMinimum' ||
-    expr.kind === 'feature' ||
-    expr.kind === 'spellcasting'
-  )
+  { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' } | { kind: 'feature' }
+>
+
+function isSupportedEditorLeaf(expr: RequirementExpression): expr is EditableRequirementLeaf {
+  return expr.kind === 'minLevel' || expr.kind === 'abilityMinimum' || expr.kind === 'spellcasting'
 }
 
-function leafFromExpression(
-  expr: Exclude<RequirementExpression, { kind: 'all' } | { kind: 'any' } | { kind: 'classLevel' }>,
-): RequirementLeafForm {
+function leafFromExpression(expr: EditableRequirementLeaf): RequirementLeafForm {
   const id = newRequirementLeafId()
   switch (expr.kind) {
     case 'minLevel':
@@ -139,8 +117,6 @@ function leafFromExpression(
       return { id, type: 'abilityMinimum', ability: expr.ability, minimum: expr.minimum }
     case 'spellcasting':
       return { id, type: 'spellcasting' }
-    case 'feature':
-      return { id, type: 'feature', featureId: expr.featureId }
   }
 }
 
@@ -245,8 +221,6 @@ function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
       }
     case 'spellcasting':
       return { kind: 'spellcasting' }
-    case 'feature':
-      return { kind: 'feature', featureId: leaf.featureId.trim() }
   }
 }
 
@@ -272,13 +246,6 @@ function tryAbilityMinimumPreview(
   return { kind: 'abilityMinimum', ability: ability.data, minimum: leaf.minimum }
 }
 
-function tryFeaturePreview(
-  leaf: Extract<RequirementLeafForm, { type: 'feature' }>,
-): RequirementExpression | undefined {
-  const featureId = leaf.featureId.trim()
-  return featureId ? { kind: 'feature', featureId } : undefined
-}
-
 /** Best-effort leaf conversion for live preview while the user is still editing. */
 function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression | undefined {
   switch (leaf.type) {
@@ -288,8 +255,6 @@ function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression |
       return tryAbilityMinimumPreview(leaf)
     case 'spellcasting':
       return { kind: 'spellcasting' }
-    case 'feature':
-      return tryFeaturePreview(leaf)
   }
 }
 
@@ -381,11 +346,6 @@ function validateLeaf(
           [...path, 'minimum'],
           `Minimum score must be between ${ABILITY_SCORE_MIN} and ${ABILITY_SCORE_MAX}`,
         )
-      }
-      return
-    case 'feature':
-      if (!leaf.featureId.trim()) {
-        addCustomIssue(ctx, [...path, 'featureId'], 'Feature ID is required')
       }
       return
     case 'spellcasting':

@@ -340,6 +340,18 @@ describe('SRD 5.2.1 class seed', () => {
       { level: 13, value: 2 },
       { level: 17, value: 3 },
     ])
+    const fightingStyle = fighter.features.find((f) => f.id === 'fighting-style')
+    expect(fightingStyle?.grants?.featChoice).toEqual({
+      category: 'fighting-style',
+      choose: 1,
+      replaceable: true,
+    })
+    const epicBoon = fighter.features.find((f) => f.id === 'epic-boon')
+    expect(epicBoon?.grants?.featChoice).toEqual({
+      category: 'epic-boon',
+      choose: 1,
+      allowAnyQualifying: true,
+    })
   })
 
   it('Champion ships six subclass features with rich-text HTML', () => {
@@ -358,6 +370,13 @@ describe('SRD 5.2.1 class seed', () => {
     const survivor = champion.features.find((f) => f.id === 'survivor')
     expect(survivor?.description).toContain('<strong>Defy Death.</strong>')
     expect(survivor?.description).toContain('<strong>Heroic Rally.</strong>')
+    const additionalFightingStyle = champion.features.find(
+      (f) => f.id === 'additional-fighting-style',
+    )
+    expect(additionalFightingStyle?.grants?.featChoice).toEqual({
+      category: 'fighting-style',
+      choose: 1,
+    })
   })
 
   it('Monk ships feature prose and Martial Arts, Focus Points, and Unarmored Movement resources', () => {

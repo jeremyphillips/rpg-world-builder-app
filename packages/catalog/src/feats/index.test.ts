@@ -68,12 +68,9 @@ describe('SRD 5.2.1 feat seed', () => {
       )
     })
 
-    it('stores fighting style feats as fighting-style feature prerequisites', () => {
+    it('omits prerequisites on fighting-style feats (eligibility from featChoice grants)', () => {
       for (const slug of ['archery', 'defense', 'great-weapon-fighting', 'two-weapon-fighting']) {
-        expect(featBySlug(slug).prerequisite).toEqual({
-          kind: 'feature',
-          featureId: 'fighting-style',
-        })
+        expect(featBySlug(slug).prerequisite).toBeUndefined()
       }
     })
 

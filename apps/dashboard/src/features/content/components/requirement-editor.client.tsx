@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
-  TextField,
 } from '@rpg/ui'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
@@ -27,7 +26,6 @@ import {
   CONDITION_SETS_HEADING,
   CONDITION_TYPE_LABEL,
   EMPTY_CONDITION_SETS_HINT,
-  FEATURE_ID_FIELD_LABEL,
   LOGIC_CONNECTOR_LABELS,
   MATCH_RULE_LABEL,
   MATCH_RULE_OPTIONS,
@@ -181,34 +179,6 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
   )
 }
 
-interface FeatureSegmentsProps {
-  idPrefix: string
-  leafPath: string
-}
-
-function FeatureSegments({ idPrefix, leafPath }: FeatureSegmentsProps) {
-  const { field: featureField, fieldState: featureFieldState } = useController({
-    name: `${leafPath}.featureId`,
-  })
-
-  return (
-    <div className="[&_label]:sr-only">
-      <TextField
-        id={`${idPrefix}-feature-id`}
-        label={FEATURE_ID_FIELD_LABEL}
-        required
-        width="md"
-        size="sm"
-        placeholder="fighting-style"
-        value={featureField.value ?? ''}
-        onChange={featureField.onChange}
-        onBlur={featureField.onBlur}
-        error={featureFieldState.error?.message}
-      />
-    </div>
-  )
-}
-
 interface ConditionSentenceRowProps {
   idPrefix: string
   leafPath: string
@@ -269,7 +239,6 @@ function ConditionSentenceRow({
           {SPELLCASTING_SENTENCE_LABEL}
         </Text>
       ) : null}
-      {leafType === 'feature' ? <FeatureSegments idPrefix={idPrefix} leafPath={leafPath} /> : null}
 
       {canRemove ? (
         <Button

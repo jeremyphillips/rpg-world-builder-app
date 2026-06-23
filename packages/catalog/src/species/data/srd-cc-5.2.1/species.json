@@ -582,7 +582,13 @@
         "kind": "custom",
         "id": "versatile",
         "name": "Versatile",
-        "description": "<p>You gain an Origin feat of your choice. Skilled is recommended.</p>"
+        "description": "<p>You gain an Origin feat of your choice. Skilled is recommended.</p>",
+        "grants": {
+          "featChoice": {
+            "category": "origin",
+            "choose": 1
+          }
+        }
       }
     ]
   },

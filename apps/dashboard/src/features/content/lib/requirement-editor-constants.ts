@@ -30,7 +30,6 @@ export const REQUIREMENT_LEAF_TYPE_LABELS: Record<RequirementLeafType, string> =
   minLevel: 'Character level',
   abilityMinimum: 'Ability score',
   spellcasting: 'Spellcasting',
-  feature: 'Class feature',
 }
 
 export const REQUIREMENT_LEAF_TYPE_OPTIONS = REQUIREMENT_LEAF_TYPES.map((type) => ({
@@ -48,7 +47,6 @@ export const EMPTY_CONDITION_SETS_HINT = 'Define requirements by adding a condit
 export const MIN_LEVEL_FIELD_LABEL = 'Minimum level'
 export const ABILITY_FIELD_LABEL = 'Ability'
 export const MINIMUM_SCORE_FIELD_LABEL = 'Minimum score'
-export const FEATURE_ID_FIELD_LABEL = 'Feature ID'
 
 export function conditionSetAriaLabel(index: number): string {
   return `Condition set ${index + 1}`

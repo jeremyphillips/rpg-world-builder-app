@@ -18,6 +18,9 @@ import { classSlugSchema, getClassName } from './class/class'
 // - `all` — every child must be satisfied (AND).
 // - `any` — at least one child must be satisfied (OR).
 // - A single leaf is valid at the root (no forced `all` wrapper).
+//
+// The `feature` leaf may be removed once invocation/multiclass needs are clearer.
+// Feat eligibility tied to class features uses grants.featChoice on the source.
 // ---------------------------------------------------------------------------
 
 export const requirementMinLevelSchema = z.object({
