@@ -6,15 +6,15 @@ import {
   Badge,
   Button,
   Field,
-  NumberField,
+  Input,
   RadioGroupField,
   Select,
   SelectContent,
-  SelectField,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Text,
+  fieldWidthVariants,
 } from '@rpg/ui'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
@@ -25,6 +25,7 @@ import {
   ADD_CONDITION_SET_LABEL,
   CONDITION_SETS_HEADING,
   CONDITION_TYPE_LABEL,
+  CONDITION_TYPE_PLACEHOLDER,
   EMPTY_CONDITION_SETS_HINT,
   LOGIC_CONNECTOR_LABELS,
   MATCH_RULE_LABEL,
@@ -42,17 +43,26 @@ import {
 } from '../lib/requirement-editor-constants'
 import {
   formatRequirementEditorPreview,
+  newRequirementDraftLeaf,
   newRequirementGroup,
   newRequirementLeaf,
   type PrerequisiteEditorValue,
   type RequirementLeafForm,
   type RequirementLeafType,
+  type RequirementLeafTypedForm,
 } from '../lib/requirement-editor-form'
 
 export interface RequirementEditorProps {
   /** Parent form field path, e.g. `prerequisiteEditor`. */
   name: string
 }
+
+/** Flat field stack + shared control row keep sentence operands on one baseline. */
+const SENTENCE_FIELD_STACK = 'space-y-0'
+const SENTENCE_CONTROLS_ROW = 'flex flex-wrap items-center gap-2'
+const SENTENCE_TYPE_LABEL_CLASS =
+  "flex items-center gap-1.5 text-xs font-medium leading-none after:text-destructive data-[required]:after:ml-0.5 data-[required]:after:content-['*']"
+const SENTENCE_OPERATOR_CLASS = 'text-sm text-muted-foreground'
 
 function parseNumberInput(raw: string): number | '' {
   if (raw === '') return ''
@@ -63,14 +73,20 @@ function parseNumberInput(raw: string): number | '' {
 function replaceLeafType(
   current: RequirementLeafForm,
   nextType: RequirementLeafType,
-): RequirementLeafForm {
-  if (current.type === nextType) return current
+): RequirementLeafTypedForm {
+  if ('type' in current && current.type === nextType) return current
   return { ...newRequirementLeaf(nextType), id: current.id }
 }
 
-function LogicConnectorChip({ operator }: { operator: keyof typeof LOGIC_CONNECTOR_LABELS }) {
+function LogicConnectorChip({
+  operator,
+  align = 'center',
+}: {
+  operator: keyof typeof LOGIC_CONNECTOR_LABELS
+  align?: 'center' | 'start'
+}) {
   return (
-    <div className="flex justify-center py-1">
+    <div className={`flex py-1 ${align === 'start' ? 'justify-start' : 'justify-center'}`}>
       <Badge variant="outline" aria-hidden="true">
         {LOGIC_CONNECTOR_LABELS[operator]}
       </Badge>
@@ -90,25 +106,33 @@ function MinLevelSegments({ idPrefix, leafPath }: MinLevelSegmentsProps) {
 
   return (
     <>
-      <Text variant="small" className="self-center text-muted-foreground" aria-hidden="true">
+      <span className={SENTENCE_OPERATOR_CLASS} aria-hidden="true">
         {SENTENCE_OPERATOR_LABELS.minLevel}
-      </Text>
-      <div className="[&_label]:sr-only">
-        <NumberField
-          id={`${idPrefix}-level`}
-          label={MIN_LEVEL_FIELD_LABEL}
-          required
-          width="xs"
-          inputWidth="xs"
-          size="sm"
-          min={1}
-          max={MAX_CHARACTER_LEVEL}
-          value={levelField.value ?? ''}
-          onChange={(event) => levelField.onChange(parseNumberInput(event.target.value))}
-          onBlur={levelField.onBlur}
-          error={levelFieldState.error?.message}
-        />
-      </div>
+      </span>
+      <Field.Root
+        id={`${idPrefix}-level`}
+        width="xs"
+        size="sm"
+        required
+        className={SENTENCE_FIELD_STACK}
+        error={levelFieldState.error?.message}
+      >
+        <Field.Label className="sr-only">{MIN_LEVEL_FIELD_LABEL}</Field.Label>
+        <Field.Control>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={MAX_CHARACTER_LEVEL}
+            size="sm"
+            className={fieldWidthVariants({ width: 'xs' })}
+            value={levelField.value ?? ''}
+            onChange={(event) => levelField.onChange(parseNumberInput(event.target.value))}
+            onBlur={levelField.onBlur}
+          />
+        </Field.Control>
+        <Field.Error />
+      </Field.Root>
     </>
   )
 }
@@ -133,6 +157,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
         width="sm"
         size="sm"
         required
+        className={SENTENCE_FIELD_STACK}
         error={abilityFieldState.error?.message}
       >
         <Field.Label className="sr-only">{ABILITY_FIELD_LABEL}</Field.Label>
@@ -156,25 +181,33 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
         </Select>
         <Field.Error />
       </Field.Root>
-      <Text variant="small" className="self-center text-muted-foreground" aria-hidden="true">
+      <span className={SENTENCE_OPERATOR_CLASS} aria-hidden="true">
         {SENTENCE_OPERATOR_LABELS.abilityMinimum}
-      </Text>
-      <div className="[&_label]:sr-only">
-        <NumberField
-          id={`${idPrefix}-minimum`}
-          label={MINIMUM_SCORE_FIELD_LABEL}
-          required
-          width="xs"
-          inputWidth="xs"
-          size="sm"
-          min={ABILITY_SCORE_MIN}
-          max={ABILITY_SCORE_MAX}
-          value={minimumField.value ?? ''}
-          onChange={(event) => minimumField.onChange(parseNumberInput(event.target.value))}
-          onBlur={minimumField.onBlur}
-          error={minimumFieldState.error?.message}
-        />
-      </div>
+      </span>
+      <Field.Root
+        id={`${idPrefix}-minimum`}
+        width="xs"
+        size="sm"
+        required
+        className={SENTENCE_FIELD_STACK}
+        error={minimumFieldState.error?.message}
+      >
+        <Field.Label className="sr-only">{MINIMUM_SCORE_FIELD_LABEL}</Field.Label>
+        <Field.Control>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={ABILITY_SCORE_MIN}
+            max={ABILITY_SCORE_MAX}
+            size="sm"
+            className={fieldWidthVariants({ width: 'xs' })}
+            value={minimumField.value ?? ''}
+            onChange={(event) => minimumField.onChange(parseNumberInput(event.target.value))}
+            onBlur={minimumField.onBlur}
+          />
+        </Field.Control>
+        <Field.Error />
+      </Field.Root>
     </>
   )
 }
@@ -213,45 +246,73 @@ function ConditionSentenceRow({
     [getValues, leafPath, setValue],
   )
 
+  const typeControlId = `${idPrefix}-type`
+
   return (
-    <div className="flex flex-wrap items-end gap-2">
-      <SelectField
-        id={`${idPrefix}-type`}
-        label={CONDITION_TYPE_LABEL}
-        required
-        width="sm"
-        size="sm"
-        options={REQUIREMENT_LEAF_TYPE_OPTIONS}
-        value={leafType ?? ''}
-        onValueChange={handleTypeChange}
-        onBlur={typeField.onBlur}
-        error={typeFieldState.error?.message}
-      />
+    <div className="space-y-3">
+      <label
+        id={`${typeControlId}-label`}
+        htmlFor={typeControlId}
+        className={SENTENCE_TYPE_LABEL_CLASS}
+        data-required
+      >
+        {CONDITION_TYPE_LABEL}
+      </label>
 
-      {leafType === 'minLevel' ? (
-        <MinLevelSegments idPrefix={idPrefix} leafPath={leafPath} />
-      ) : null}
-      {leafType === 'abilityMinimum' ? (
-        <AbilityMinimumSegments idPrefix={idPrefix} leafPath={leafPath} />
-      ) : null}
-      {leafType === 'spellcasting' ? (
-        <Text variant="small" className="self-center text-muted-foreground">
-          {SPELLCASTING_SENTENCE_LABEL}
-        </Text>
-      ) : null}
-
-      {canRemove ? (
-        <Button
-          type="button"
-          variant="ghost"
+      <div className={SENTENCE_CONTROLS_ROW}>
+        <Field.Root
+          id={typeControlId}
+          width="md"
           size="sm"
-          className="size-8 shrink-0 p-0"
-          aria-label={removeConditionLabel(setIndex, conditionIndex)}
-          onClick={onRemove}
+          required
+          className={SENTENCE_FIELD_STACK}
+          error={typeFieldState.error?.message}
         >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
-      ) : null}
+          <Field.Label className="sr-only">{CONDITION_TYPE_LABEL}</Field.Label>
+          <Select value={leafType} onValueChange={handleTypeChange} name={typeField.name}>
+            <Field.Control>
+              <SelectTrigger
+                size="sm"
+                onBlur={typeField.onBlur}
+                aria-labelledby={`${typeControlId}-label`}
+              >
+                <SelectValue placeholder={CONDITION_TYPE_PLACEHOLDER} />
+              </SelectTrigger>
+            </Field.Control>
+            <SelectContent>
+              {REQUIREMENT_LEAF_TYPE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Field.Error />
+        </Field.Root>
+
+        {leafType === 'minLevel' ? (
+          <MinLevelSegments idPrefix={idPrefix} leafPath={leafPath} />
+        ) : null}
+        {leafType === 'abilityMinimum' ? (
+          <AbilityMinimumSegments idPrefix={idPrefix} leafPath={leafPath} />
+        ) : null}
+        {leafType === 'spellcasting' ? (
+          <span className={SENTENCE_OPERATOR_CLASS}>{SPELLCASTING_SENTENCE_LABEL}</span>
+        ) : null}
+
+        {canRemove ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="size-8 shrink-0 p-0"
+            aria-label={removeConditionLabel(setIndex, conditionIndex)}
+            onClick={onRemove}
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </Button>
+        ) : null}
+      </div>
     </div>
   )
 }
@@ -303,7 +364,7 @@ function ConditionSetEditor({ idPrefix, setPath, setIndex, onRemove }: Condition
         {fields.map((field, conditionIndex) => (
           <Fragment key={field.id}>
             {conditionIndex > 0 ? (
-              <LogicConnectorChip operator={groupKind === 'any' ? 'OR' : 'AND'} />
+              <LogicConnectorChip operator={groupKind === 'any' ? 'OR' : 'AND'} align="start" />
             ) : null}
             <ConditionSentenceRow
               idPrefix={`${idPrefix}-condition-${conditionIndex}`}
@@ -321,7 +382,7 @@ function ConditionSetEditor({ idPrefix, setPath, setIndex, onRemove }: Condition
         type="button"
         variant="outline"
         size="sm"
-        onClick={() => append(newRequirementLeaf())}
+        onClick={() => append(newRequirementDraftLeaf())}
       >
         {ADD_CONDITION_LABEL}
       </Button>

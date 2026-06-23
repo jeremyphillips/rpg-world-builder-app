@@ -64,6 +64,22 @@ describe('Accordion', () => {
     expect(content?.offsetHeight).toBe(0)
   })
 
+  it('applies overflow-visible on open content for focus ring clearance', () => {
+    const { container } = render(
+      <Accordion type="single" collapsible defaultValue="one" variant="section">
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent forceMount>
+            <input aria-label="Field" />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+
+    const openContent = container.querySelector('[role="region"][data-state="open"]')
+    expect(openContent?.className).toContain('data-[state=open]:overflow-visible')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <Accordion type="multiple" defaultValue={['one']}>

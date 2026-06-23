@@ -8,6 +8,7 @@ export const PREVIEW_LABEL = 'Prerequisites preview'
 export const CONDITION_SETS_HEADING = 'Condition sets'
 export const MATCH_RULE_LABEL = 'Match rule'
 export const CONDITION_TYPE_LABEL = 'Condition type'
+export const CONDITION_TYPE_PLACEHOLDER = 'Choose condition'
 
 export const MATCH_RULE_OPTIONS = [
   { value: 'all', label: 'All of these must be true' },

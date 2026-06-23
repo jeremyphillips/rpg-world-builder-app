@@ -446,6 +446,9 @@ Fields stay mounted while a section is collapsed, so react-hook-form values are
 preserved (`shouldUnregister` only applies to conditional visibility, not
 accordion state).
 
+Open accordion panels use `overflow-visible` plus inner horizontal inset so
+control focus rings (`ring-2` + `ring-offset-2`) are not clipped during expand.
+
 ## Array fields
 
 Use `ArrayConfig` (`kind: 'array'`) in the `fields` array to create a

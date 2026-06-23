@@ -34,6 +34,7 @@ export const accordionTriggerVariants = cva(
 
 export const accordionContentVariants = cva([
   'overflow-hidden text-sm',
+  'data-[state=open]:overflow-visible',
   'data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up',
   'data-[state=open]:animate-accordion-down',
   // forceMount keeps RHF fields registered; block interaction/focus when visually closed.
@@ -44,7 +45,8 @@ export const accordionContentInnerVariants = cva('', {
   variants: {
     variant: {
       default: 'px-4 pb-4 pt-0',
-      section: 'pb-4 pt-4',
+      // px-1 inset keeps focus rings (ring-2 + ring-offset-2) inside overflow-hidden content.
+      section: 'px-1 pb-4 pt-4',
     },
   },
   defaultVariants: {

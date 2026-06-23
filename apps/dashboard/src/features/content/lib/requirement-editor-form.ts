@@ -13,10 +13,16 @@ export const REQUIREMENT_LEAF_TYPES = ['minLevel', 'abilityMinimum', 'spellcasti
 
 export type RequirementLeafType = (typeof REQUIREMENT_LEAF_TYPES)[number]
 
-export type RequirementLeafForm =
+export type RequirementLeafDraftForm = {
+  id: string
+}
+
+export type RequirementLeafTypedForm =
   | { id: string; type: 'minLevel'; level: number }
   | { id: string; type: 'abilityMinimum'; ability: z.infer<typeof abilitySchema>; minimum: number }
   | { id: string; type: 'spellcasting' }
+
+export type RequirementLeafForm = RequirementLeafDraftForm | RequirementLeafTypedForm
 
 export type RequirementGroupForm = {
   id: string
@@ -46,10 +52,17 @@ const requirementSpellcastingLeafSchema = z.object({
   type: z.literal('spellcasting'),
 })
 
-export const requirementLeafFormSchema = z.discriminatedUnion('type', [
-  requirementMinLevelLeafSchema,
-  requirementAbilityMinimumLeafSchema,
-  requirementSpellcastingLeafSchema,
+const requirementDraftLeafSchema = z.object({
+  id: z.string().min(1),
+})
+
+export const requirementLeafFormSchema = z.union([
+  requirementDraftLeafSchema,
+  z.discriminatedUnion('type', [
+    requirementMinLevelLeafSchema,
+    requirementAbilityMinimumLeafSchema,
+    requirementSpellcastingLeafSchema,
+  ]),
 ])
 
 export const requirementGroupFormSchema = z.object({
@@ -75,8 +88,13 @@ export function requirementEditorDefaultValue(): PrerequisiteEditorValue {
   return { groups: [] }
 }
 
-/** Default leaf row for the requirement editor UI. */
-export function newRequirementLeaf(type: RequirementLeafType = 'minLevel'): RequirementLeafForm {
+/** Untyped leaf row shown until the author picks a condition type. */
+export function newRequirementDraftLeaf(): RequirementLeafDraftForm {
+  return { id: newRequirementLeafId() }
+}
+
+/** Default leaf row for the requirement editor UI once a type is chosen. */
+export function newRequirementLeaf(type: RequirementLeafType): RequirementLeafTypedForm {
   const id = newRequirementLeafId()
   switch (type) {
     case 'minLevel':
@@ -95,7 +113,7 @@ export function newRequirementGroup(
   return {
     id: newRequirementGroupId(),
     kind,
-    requirements: [newRequirementLeaf()],
+    requirements: [newRequirementDraftLeaf()],
   }
 }
 
@@ -188,9 +206,18 @@ export function requirementExpressionToEditor(
   return { groups }
 }
 
-function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafForm {
+function isRequirementLeafDraft(leaf: unknown): leaf is RequirementLeafDraftForm {
   if (!leaf || typeof leaf !== 'object') return false
-  return REQUIREMENT_LEAF_TYPES.includes((leaf as RequirementLeafForm).type)
+  return !('type' in leaf)
+}
+
+function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafTypedForm {
+  if (!leaf || typeof leaf !== 'object') return false
+  return REQUIREMENT_LEAF_TYPES.includes((leaf as RequirementLeafTypedForm).type)
+}
+
+function isRequirementLeafRow(leaf: unknown): leaf is RequirementLeafForm {
+  return isRequirementLeafDraft(leaf) || isRequirementLeafForm(leaf)
 }
 
 function isRequirementGroupForm(group: unknown): group is RequirementGroupForm {
@@ -204,12 +231,12 @@ function normalizeEditorValue(value: PrerequisiteEditorValue | undefined): Prere
   return {
     groups: (value?.groups ?? []).filter(isRequirementGroupForm).map((group) => ({
       ...group,
-      requirements: group.requirements.filter(isRequirementLeafForm),
+      requirements: group.requirements.filter(isRequirementLeafRow),
     })),
   }
 }
 
-function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
+function leafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression {
   switch (leaf.type) {
     case 'minLevel':
       return { kind: 'minLevel', level: levelSchema.parse(leaf.level) }
@@ -247,7 +274,7 @@ function tryAbilityMinimumPreview(
 }
 
 /** Best-effort leaf conversion for live preview while the user is still editing. */
-function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression | undefined {
+function tryLeafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression | undefined {
   switch (leaf.type) {
     case 'minLevel':
       return tryMinLevelPreview(leaf.level)
@@ -332,6 +359,11 @@ function validateLeaf(
   ctx: RefinementCtx,
 ): void {
   const path = ['prerequisiteEditor', 'groups', groupIndex, 'requirements', leafIndex]
+
+  if (!isRequirementLeafForm(leaf)) {
+    addCustomIssue(ctx, [...path, 'type'], 'Condition type is required')
+    return
+  }
 
   switch (leaf.type) {
     case 'minLevel':
