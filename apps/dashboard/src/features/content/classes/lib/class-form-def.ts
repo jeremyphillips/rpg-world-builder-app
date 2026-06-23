@@ -6,6 +6,7 @@ import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   CLASS_HIT_DICE,
+  campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   SKILL_IDS,
   SKILLS,
@@ -18,7 +19,6 @@ import {
   armorCategorySchema,
   formatHitDie,
   hitDieSchema,
-  levelSchema,
   skillSchema,
   slugSchema,
   weaponCategorySchema,
@@ -60,10 +60,10 @@ import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import {
-  featureRowFormSchema,
+  createFeatureRowFormSchema,
   featuresFromFormValues,
   featureToFormRow,
-  levelOptions,
+  getLevelOptions,
 } from './class-feature-form-fields'
 import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
 
@@ -95,10 +95,14 @@ const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   label: formatHitDie(face),
 }))
 
-const subclassChoiceLevelOptions: FieldOption[] = [
+const subclassChoiceLevelOptions = (maxLevel: number): FieldOption[] => [
   { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
-  ...levelOptions,
+  ...getLevelOptions(maxLevel),
 ]
+
+function maxLevelFromCtx(ctx: ContentFormCtx): number {
+  return ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+}
 
 const armorCategoryOptions = toOptions(
   ARMOR_CATEGORIES,
@@ -137,15 +141,6 @@ const progressionTableFormSchema = z.object({
   spellsAvailable: z.array(z.number().int().min(0).nullable()),
 })
 
-const spellcastingFormSchema = z.object({
-  level: z.coerce.number().pipe(levelSchema).optional(),
-  description: z.string().optional(),
-  progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
-  ability: abilitySchema.optional(),
-  preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
-  progressionTable: progressionTableFormSchema.optional(),
-})
-
 const proficienciesFormSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(2),
   armor: z.array(armorCategorySchema),
@@ -160,34 +155,57 @@ const proficienciesFormSchema = z.object({
   }),
 })
 
-const resourceEntryFormSchema = z.object({
-  level: z.coerce.number().pipe(levelSchema),
-  value: z.coerce.number().int().min(0),
-})
+function campaignLevelField(maxLevel: number) {
+  return z.coerce.number().pipe(campaignLevelSchema(maxLevel))
+}
 
-const resourceRowFormSchema = z.object({
-  name: z.string().min(1),
-  entries: z.array(resourceEntryFormSchema).min(1),
-})
+function createSpellcastingFormSchema(maxLevel: number) {
+  const levelField = campaignLevelField(maxLevel)
+  return z.object({
+    level: levelField.optional(),
+    description: z.string().optional(),
+    progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
+    ability: abilitySchema.optional(),
+    preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
+    progressionTable: progressionTableFormSchema.optional(),
+  })
+}
 
-const classFormSchema = z.object({
-  name: z.string().min(1),
-  slug: slugSchema.optional(),
-  description: z.string().optional(),
-  primaryAbilities: z.array(abilitySchema).min(1).max(2),
-  hitDie: z.coerce.number().pipe(hitDieSchema),
-  asiLevels: z.array(z.coerce.number().pipe(levelSchema)),
-  subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
-  hasSpellcasting: z.boolean(),
-  hasSpecificWeapons: z.boolean(),
-  spellcasting: spellcastingFormSchema.optional(),
-  proficiencies: proficienciesFormSchema,
-  features: z.array(featureRowFormSchema),
-  resources: z.array(resourceRowFormSchema).optional(),
-})
+function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  const levelField = campaignLevelField(maxLevel)
+  const resourceEntryFormSchema = z.object({
+    level: levelField,
+    value: z.coerce.number().int().min(0),
+  })
+  const resourceRowFormSchema = z.object({
+    name: z.string().min(1),
+    entries: z.array(resourceEntryFormSchema).min(1),
+  })
+
+  return z.object({
+    name: z.string().min(1),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    primaryAbilities: z.array(abilitySchema).min(1).max(2),
+    hitDie: z.coerce.number().pipe(hitDieSchema),
+    asiLevels: z.array(levelField),
+    subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
+    hasSpellcasting: z.boolean(),
+    hasSpecificWeapons: z.boolean(),
+    spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
+    proficiencies: proficienciesFormSchema,
+    features: z.array(createFeatureRowFormSchema(maxLevel)),
+    resources: z.array(resourceRowFormSchema).optional(),
+  })
+}
+
+const classFormSchema = createClassFormSchema()
 
 type ClassFormValues = z.infer<typeof classFormSchema>
-type ResourceRowForm = z.infer<typeof resourceRowFormSchema>
+type ResourceRowForm = {
+  name: string
+  entries: { level: number; value: number }[]
+}
 
 // ---------------------------------------------------------------------------
 // Conditional visibility
@@ -214,46 +232,49 @@ function visibleWhenIndividualWeapons(): FieldVisibility {
   }
 }
 
-const spellProgressionGridField: FormItem = {
-  type: 'editableGrid',
-  name: 'spellcasting.progressionTable',
-  label: 'Spell progression',
-  rowCount: MAX_CHARACTER_LEVEL,
-  visibility: visibleWhenSpellcasting(),
-  columns: [
-    {
-      key: 'cantrips',
-      label: 'Cantrips known',
-      control: 'select',
-      min: 1,
-      max: 6,
-    },
-    {
-      key: 'spellsAvailable',
-      label: (watched) =>
-        watched['spellcasting.preparation'] === 'known' ? 'Spells known' : 'Spells prepared',
-      control: 'number',
-      min: 0,
-      labelDependsOn: ['spellcasting.preparation'],
-      visibility: {
-        dependsOn: ['spellcasting.preparation'],
-        visibleWhen: (watched) => {
-          const mode = watched['spellcasting.preparation']
-          return mode === 'prepared' || mode === 'known'
+function buildSpellProgressionGridField(rowCount: number): FormItem {
+  return {
+    type: 'editableGrid',
+    name: 'spellcasting.progressionTable',
+    label: 'Spell progression',
+    rowCount,
+    visibility: visibleWhenSpellcasting(),
+    columns: [
+      {
+        key: 'cantrips',
+        label: 'Cantrips known',
+        control: 'select',
+        min: 1,
+        max: 6,
+      },
+      {
+        key: 'spellsAvailable',
+        label: (watched) =>
+          watched['spellcasting.preparation'] === 'known' ? 'Spells known' : 'Spells prepared',
+        control: 'number',
+        min: 0,
+        labelDependsOn: ['spellcasting.preparation'],
+        visibility: {
+          dependsOn: ['spellcasting.preparation'],
+          visibleWhen: (watched) => {
+            const mode = watched['spellcasting.preparation']
+            return mode === 'prepared' || mode === 'known'
+          },
         },
       },
+    ],
+    templates: {
+      cantrips: CANTRIPS_KNOWN_PROFILES,
     },
-  ],
-  templates: {
-    cantrips: CANTRIPS_KNOWN_PROFILES,
-  },
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Field builders
 // ---------------------------------------------------------------------------
 
-function resourceItemFields(): FormItem[] {
+function resourceItemFields(maxLevel: number): FormItem[] {
+  const levelOptions = getLevelOptions(maxLevel)
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
     {
@@ -341,7 +362,17 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   }
 }
 
+function progressionRowCount(spellcasting?: Spellcasting): number {
+  const levels = [
+    ...(spellcasting?.cantrips?.map((entry) => entry.level) ?? []),
+    ...(spellcasting?.spellsAvailable?.map((entry) => entry.level) ?? []),
+  ]
+  const maxInData = levels.length > 0 ? Math.max(...levels) : 0
+  return Math.max(MAX_CHARACTER_LEVEL, maxInData)
+}
+
 function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
+  const rowCount = progressionRowCount(spellcasting)
   if (!spellcasting) {
     return {
       level: 1,
@@ -349,7 +380,7 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
       progression: undefined,
       ability: undefined,
       preparation: undefined,
-      progressionTable: emptyProgressionTable(),
+      progressionTable: emptyProgressionTable(rowCount),
     }
   }
 
@@ -362,6 +393,7 @@ function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
     progressionTable: progressionTableToFormValues(
       spellcasting.cantrips,
       spellcasting.spellsAvailable,
+      rowCount,
     ),
   }
 }
@@ -441,7 +473,9 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
 // Tab field builders
 // ---------------------------------------------------------------------------
 
-function coreAttributesFields(): FormItem[] {
+function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
+  const maxLevel = maxLevelFromCtx(ctx)
+  const levelOptions = getLevelOptions(maxLevel)
   return [
     {
       kind: 'row',
@@ -476,14 +510,16 @@ function coreAttributesFields(): FormItem[] {
       type: 'select',
       name: 'subclassChoiceLevel',
       label: 'Subclass choice level',
-      options: subclassChoiceLevelOptions,
+      options: subclassChoiceLevelOptions(maxLevel),
       hint: 'Level at which a character chooses their subclass',
       width: 'sm-md',
     },
   ]
 }
 
-function spellcastingFields(): FormItem[] {
+function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
+  const maxLevel = maxLevelFromCtx(ctx)
+  const levelOptions = getLevelOptions(maxLevel)
   return [
     {
       type: 'switch',
@@ -536,7 +572,7 @@ function spellcastingFields(): FormItem[] {
       visibility: visibleWhenSpellcasting(),
       hint: 'SRD spellcasting feature prose (shown on the class detail view)',
     },
-    spellProgressionGridField,
+    buildSpellProgressionGridField(maxLevel),
   ]
 }
 
@@ -610,14 +646,15 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-function resourcesArrayField(): FormItem {
+function resourcesArrayField(ctx: ContentFormCtx): FormItem {
+  const maxLevel = maxLevelFromCtx(ctx)
   return {
     kind: 'array',
     name: 'resources',
     legend: 'Resources',
     addLabel: 'Add resource',
     itemTitle: (values, index) => (values['name'] as string) || `Resource ${index + 1}`,
-    fields: resourceItemFields(),
+    fields: resourceItemFields(maxLevel),
   }
 }
 
@@ -626,7 +663,7 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...identityFields(), ...coreAttributesFields()],
+      fields: [...identityFields(), ...coreAttributesFields(ctx)],
     },
     {
       id: 'proficiencies',
@@ -636,12 +673,12 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'spellcasting',
       label: 'Spellcasting',
-      fields: spellcastingFields(),
+      fields: spellcastingFields(ctx),
     },
     {
       id: 'features',
       label: 'Features',
-      fields: [resourcesArrayField()],
+      fields: [resourcesArrayField(ctx)],
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
@@ -666,6 +703,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   routeKey: 'classes',
 
   schema: classFormSchema,
+  resolveSchema: (ctx) => createClassFormSchema(maxLevelFromCtx(ctx)),
   createDefaultValues: classCreateDefaultValues,
 
   buildTabs: buildClassTabs,
@@ -690,8 +728,9 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     resources: entity.resources?.map(resourceToFormRow) ?? [],
   }),
 
-  toInput: (values, ctx?: ContentFormInputCtx<CharacterClass>) =>
-    finalizeContentInput(
+  toInput: (values, ctx?: ContentFormInputCtx<CharacterClass>) => {
+    const maxLevel = ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+    return finalizeContentInput(
       {
         ...envelopeSlugFields(values.name, ctx),
         name: values.name,
@@ -701,7 +740,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         subclassChoiceLevel:
           values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
             ? undefined
-            : levelSchema.parse(Number(values.subclassChoiceLevel)),
+            : campaignLevelSchema(maxLevel).parse(Number(values.subclassChoiceLevel)),
         spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
         proficiencies: {
           ...proficienciesFromFormValues(values.proficiencies, values.hasSpecificWeapons ?? false),
@@ -717,7 +756,8 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },
       ctx,
-    ) as CreateClassInput,
+    ) as CreateClassInput
+  },
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
@@ -725,6 +765,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
 contentFormRegistry['classes'] = classFormDef
 
-export { classFormDef }
+export { classFormDef, createClassFormSchema }
 export type { ClassFormValues }
 export { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'

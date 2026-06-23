@@ -3,6 +3,7 @@ import type { ZodType } from 'zod'
 import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 
 import type { ContentSource, WeaponCategory } from '@rpg/contracts'
+import type { ResolvedCampaignRules } from '@rpg/contracts'
 
 import type { ContentListQueryResult } from './content-client'
 import type { ContentFormOptionSets } from './content-form-options'
@@ -23,6 +24,8 @@ export type ContentFormCtx = {
    * `source` field on the embedded element.
    */
   entitySource?: ContentSource
+  /** Resolved campaign rule overrides (defaults when absent). */
+  campaignRules?: ResolvedCampaignRules
   options?: Partial<ContentFormOptionSets>
 }
 
@@ -30,6 +33,7 @@ export type ContentFormCtx = {
 export type ContentFormInputCtx<TEntity> = {
   entity?: TEntity
   weaponCategoryBySlug?: Readonly<Partial<Record<string, WeaponCategory>>>
+  campaignRules?: ResolvedCampaignRules
 }
 
 /**
@@ -51,6 +55,8 @@ export interface ContentFormDef<
   routeKey: string
   /** Zod schema validated on submit. Must match `TFormValues`. */
   schema: ZodType<TFormValues>
+  /** Campaign-aware schema when the default `schema` is not sufficient. */
+  resolveSchema?: (ctx: ContentFormCtx) => ZodType<TFormValues>
   /** Returns the ordered `FormItem[]` for this type. */
   buildFields: (ctx: ContentFormCtx) => FormItem[]
   /**

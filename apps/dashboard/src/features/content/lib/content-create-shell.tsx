@@ -10,7 +10,15 @@ import {
   ContentFormOptionsGate,
   ContentFormLayout,
 } from './content-form-shell-parts'
-import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
+import {
+  contentFormRegistry,
+  type AnyContentFormDef,
+  type ContentFormCtx,
+} from './content-form-registry'
+
+function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
+  return def.resolveSchema?.(ctx) ?? def.schema
+}
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -55,7 +63,7 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
           <ContentFormLayout
             def={def}
             ctx={ctx}
-            schema={def.schema}
+            schema={resolveContentFormSchema(def, ctx)}
             defaultValues={def.createDefaultValues}
             backHref={backHref}
             submitLabel="Create"
@@ -63,7 +71,10 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
             formError={mutation.isError ? String(mutation.error) : null}
             onSubmit={async (values, form) => {
               await mutation.mutateAsync(
-                def.toInput(values, { weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug }),
+                def.toInput(values, {
+                  weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+                  campaignRules: ctx.campaignRules,
+                }),
               )
               form.reset(values)
               navigate(backHref)

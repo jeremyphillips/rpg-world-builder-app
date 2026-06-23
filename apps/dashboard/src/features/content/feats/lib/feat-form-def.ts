@@ -5,6 +5,7 @@ import {
   FEAT_CATEGORY_IDS,
   FEAT_PART_ENTRIES,
   createFeatInputSchema,
+  MAX_CHARACTER_LEVEL,
   slugSchema,
   type CreateFeatInput,
   type Feat,
@@ -17,6 +18,7 @@ import {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormInputCtx,
+  type ContentFormCtx,
 } from '../../lib/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import {
@@ -35,26 +37,30 @@ const featCategoryOptions = toOptions(
   ) as Record<(typeof FEAT_CATEGORY_IDS)[number], string>,
 )
 
-const featFormSchema = z
-  .object({
-    name: z.string().min(1),
-    slug: slugSchema.optional(),
-    description: z.string().optional(),
-    category: z.enum(FEAT_CATEGORY_IDS),
-    prerequisiteEditor: prerequisiteEditorSchema,
-    repeatableAllowed: z.boolean(),
-    repeatableNotes: z.string().optional(),
-  })
-  .superRefine((values, ctx) => {
-    refineRequirementEditor(values.prerequisiteEditor, ctx)
-    if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Repeat constraints are only allowed when the feat is repeatable',
-        path: ['repeatableNotes'],
-      })
-    }
-  })
+function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  return z
+    .object({
+      name: z.string().min(1),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      category: z.enum(FEAT_CATEGORY_IDS),
+      prerequisiteEditor: prerequisiteEditorSchema,
+      repeatableAllowed: z.boolean(),
+      repeatableNotes: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+      refineRequirementEditor(values.prerequisiteEditor, ctx, maxLevel)
+      if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Repeat constraints are only allowed when the feat is repeatable',
+          path: ['repeatableNotes'],
+        })
+      }
+    })
+}
+
+const featFormSchema = createFeatFormSchema()
 
 type FeatFormValues = z.infer<typeof featFormSchema>
 
@@ -68,13 +74,15 @@ function visibleWhenRepeatableNotes(): FieldVisibility {
 const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   routeKey: 'feats',
   schema: featFormSchema,
+  resolveSchema: (ctx) =>
+    createFeatFormSchema(ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL),
   coverage: 'structural',
   createDefaultValues: {
     category: 'general',
     prerequisiteEditor: requirementEditorDefaultValue(),
     repeatableAllowed: false,
   },
-  buildFields: (): FormItem[] => [
+  buildFields: (ctx: ContentFormCtx): FormItem[] => [
     { kind: 'group', legend: 'Identity', fields: identityFields() },
     {
       kind: 'group',
@@ -96,7 +104,11 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
       name: 'prerequisiteEditor',
       label: 'Prerequisites',
       hint: FEAT_PART_ENTRIES.prerequisite.description,
-      render: () => createElement(RequirementEditor, { name: 'prerequisiteEditor' }),
+      render: () =>
+        createElement(RequirementEditor, {
+          name: 'prerequisiteEditor',
+          maxCharacterLevel: ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
+        }),
     },
     {
       kind: 'group',
@@ -127,7 +139,8 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
     repeatableNotes: entity.repeatable.notes,
   }),
   toInput: (values, ctx?: ContentFormInputCtx<Feat>) => {
-    const prerequisite = requirementEditorToExpression(values.prerequisiteEditor)
+    const maxLevel = ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+    const prerequisite = requirementEditorToExpression(values.prerequisiteEditor, maxLevel)
     const repeatable = values.repeatableAllowed
       ? {
           allowed: true as const,

@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Heading 
 import {
   formatSpellLevel,
   proficiencyBonus,
+  getSlotRow,
   SLOT_TABLES,
   MAX_CHARACTER_LEVEL,
   subclassChoiceFeatureLabel,
@@ -93,7 +94,7 @@ function buildRow(
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:
       castingActive && spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,
-    slots: castingActive ? slotTable?.[level - 1] : undefined,
+    slots: castingActive ? getSlotRow(slotTable ?? [], level) : undefined,
   }
 }
 
@@ -107,9 +108,9 @@ function slotTableFor(characterClass: CharacterClass): number[][] | undefined {
     : undefined
 }
 
-function buildRows(characterClass: CharacterClass): ProgressionRow[] {
+function buildRows(characterClass: CharacterClass, maxCharacterLevel: number): ProgressionRow[] {
   const slotTable = slotTableFor(characterClass)
-  return Array.from({ length: MAX_CHARACTER_LEVEL }, (_, i) =>
+  return Array.from({ length: maxCharacterLevel }, (_, i) =>
     buildRow(i + 1, characterClass, slotTable),
   )
 }
@@ -232,10 +233,14 @@ function ProgressionBodyRow({
 
 type ClassProgressionTableProps = {
   characterClass: CharacterClass
+  maxCharacterLevel?: number
 }
 
-export function ClassProgressionTable({ characterClass }: ClassProgressionTableProps) {
-  const rows = buildRows(characterClass)
+export function ClassProgressionTable({
+  characterClass,
+  maxCharacterLevel = MAX_CHARACTER_LEVEL,
+}: ClassProgressionTableProps) {
+  const rows = buildRows(characterClass, maxCharacterLevel)
   const flags = buildColumnFlags(characterClass, rows)
 
   return (

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
 import { armorCategorySchema } from '../vocab/armor/category'
 import { damageTypeSchema } from '../vocab/damage-type'
-import { levelSchema } from '../primitives/level'
+import { absoluteLevelSchema } from '../primitives/level'
 import { speedSchema } from '../vocab/movement-mode'
 import { senseSchema } from '../vocab/sense'
 import { usageFrequencySchema } from '../vocab/usage-frequency'
@@ -32,7 +32,7 @@ export type InnateSpellKind = z.infer<typeof innateSpellKindSchema>
  * - `always_prepared` — always on the prepared list; cast with normal slots when used.
  */
 const innateSpellEntryBaseSchema = z.object({
-  level: levelSchema,
+  level: absoluteLevelSchema,
   spellIds: z.array(z.string().min(1)).min(1),
   kind: innateSpellKindSchema.default('free_cast'),
   frequency: usageFrequencySchema.optional(),

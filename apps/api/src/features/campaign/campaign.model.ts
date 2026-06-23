@@ -35,6 +35,9 @@ const campaignSchema = new Schema(
             },
           },
         },
+        ruleOverrides: {
+          maxCharacterLevel: { type: Number },
+        },
       },
       flavor: {
         playStyle: [{ type: String, enum: PLAY_STYLES }],

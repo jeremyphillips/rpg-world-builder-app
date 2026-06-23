@@ -55,6 +55,8 @@ import {
 export interface RequirementEditorProps {
   /** Parent form field path, e.g. `prerequisiteEditor`. */
   name: string
+  /** Campaign max character level for min-level prerequisites. */
+  maxCharacterLevel?: number
 }
 
 /** Flat field stack + shared control row keep sentence operands on one baseline. */
@@ -97,9 +99,10 @@ function LogicConnectorChip({
 interface MinLevelSegmentsProps {
   idPrefix: string
   leafPath: string
+  maxCharacterLevel: number
 }
 
-function MinLevelSegments({ idPrefix, leafPath }: MinLevelSegmentsProps) {
+function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel }: MinLevelSegmentsProps) {
   const { field: levelField, fieldState: levelFieldState } = useController({
     name: `${leafPath}.level`,
   })
@@ -123,7 +126,7 @@ function MinLevelSegments({ idPrefix, leafPath }: MinLevelSegmentsProps) {
             type="number"
             inputMode="numeric"
             min={1}
-            max={MAX_CHARACTER_LEVEL}
+            max={maxCharacterLevel}
             size="sm"
             className={fieldWidthVariants({ width: 'xs' })}
             value={levelField.value ?? ''}
@@ -218,6 +221,7 @@ interface ConditionSentenceRowProps {
   setIndex: number
   conditionIndex: number
   canRemove: boolean
+  maxCharacterLevel: number
   onRemove: () => void
 }
 
@@ -227,6 +231,7 @@ function ConditionSentenceRow({
   setIndex,
   conditionIndex,
   canRemove,
+  maxCharacterLevel,
   onRemove,
 }: ConditionSentenceRowProps) {
   const { setValue, getValues } = useFormContext()
@@ -291,7 +296,11 @@ function ConditionSentenceRow({
         </Field.Root>
 
         {leafType === 'minLevel' ? (
-          <MinLevelSegments idPrefix={idPrefix} leafPath={leafPath} />
+          <MinLevelSegments
+            idPrefix={idPrefix}
+            leafPath={leafPath}
+            maxCharacterLevel={maxCharacterLevel}
+          />
         ) : null}
         {leafType === 'abilityMinimum' ? (
           <AbilityMinimumSegments idPrefix={idPrefix} leafPath={leafPath} />
@@ -321,10 +330,17 @@ interface ConditionSetEditorProps {
   idPrefix: string
   setPath: string
   setIndex: number
+  maxCharacterLevel: number
   onRemove: () => void
 }
 
-function ConditionSetEditor({ idPrefix, setPath, setIndex, onRemove }: ConditionSetEditorProps) {
+function ConditionSetEditor({
+  idPrefix,
+  setPath,
+  setIndex,
+  maxCharacterLevel,
+  onRemove,
+}: ConditionSetEditorProps) {
   const { fields, append, remove } = useFieldArray({ name: `${setPath}.requirements` })
   const { field: kindField, fieldState: kindFieldState } = useController({
     name: `${setPath}.kind`,
@@ -372,6 +388,7 @@ function ConditionSetEditor({ idPrefix, setPath, setIndex, onRemove }: Condition
               setIndex={setIndex}
               conditionIndex={conditionIndex}
               canRemove={fields.length > 1}
+              maxCharacterLevel={maxCharacterLevel}
               onRemove={() => remove(conditionIndex)}
             />
           </Fragment>
@@ -394,7 +411,10 @@ function ConditionSetEditor({ idPrefix, setPath, setIndex, onRemove }: Condition
  * Sentence-builder editor for feat (and future content) prerequisites.
  * Binds to `prerequisiteEditor.groups` on the parent form via nested field arrays.
  */
-export function RequirementEditor({ name }: RequirementEditorProps) {
+export function RequirementEditor({
+  name,
+  maxCharacterLevel = MAX_CHARACTER_LEVEL,
+}: RequirementEditorProps) {
   const groupsPath = `${name}.groups`
   const { fields, append, remove } = useFieldArray({ name: groupsPath })
   const editorValue = useWatch({ name }) as PrerequisiteEditorValue | undefined
@@ -422,6 +442,7 @@ export function RequirementEditor({ name }: RequirementEditorProps) {
                 idPrefix={`requirement-editor-set-${setIndex}`}
                 setPath={`${groupsPath}.${setIndex}`}
                 setIndex={setIndex}
+                maxCharacterLevel={maxCharacterLevel}
                 onRemove={() => remove(setIndex)}
               />
             </Fragment>

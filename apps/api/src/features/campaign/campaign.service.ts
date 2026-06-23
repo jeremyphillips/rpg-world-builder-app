@@ -1,5 +1,5 @@
 import { isValidObjectId } from 'mongoose'
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import type {
   Campaign,
   CampaignConfiguration,
@@ -125,15 +125,26 @@ function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unkn
   return $set
 }
 
-function buildSettingsUpdateSet(
-  settings: NonNullable<UpdateCampaignInput['settings']>,
-): Record<string, unknown> {
-  return {
+function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['settings']>): {
+  $set: Record<string, unknown>
+  $unset: Record<string, 1>
+} {
+  const $set: Record<string, unknown> = {
     'configuration.settings.characterCreation.startingLevel':
       settings.characterCreation.startingLevel,
     'configuration.settings.characterCreation.importedCharacters.policy':
       settings.characterCreation.importedCharacters.policy,
   }
+  const $unset: Record<string, 1> = {}
+
+  const maxCharacterLevel = settings.ruleOverrides?.maxCharacterLevel
+  if (maxCharacterLevel !== undefined && maxCharacterLevel !== MAX_CHARACTER_LEVEL) {
+    $set['configuration.settings.ruleOverrides.maxCharacterLevel'] = maxCharacterLevel
+  } else {
+    $unset['configuration.settings.ruleOverrides.maxCharacterLevel'] = 1
+  }
+
+  return { $set, $unset }
 }
 
 const FLAVOR_PATHS = {
@@ -153,11 +164,18 @@ function buildFlavorUpdateSet(
   return $set
 }
 
-function buildCampaignUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {
+function buildCampaignUpdateSet(input: UpdateCampaignInput): {
+  $set: Record<string, unknown>
+  $unset: Record<string, 1>
+} {
+  const settingsPatch = input.settings ? buildSettingsUpdateSet(input.settings) : null
   return {
-    ...buildIdentityUpdateSet(input),
-    ...(input.settings ? buildSettingsUpdateSet(input.settings) : {}),
-    ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
+    $set: {
+      ...buildIdentityUpdateSet(input),
+      ...(settingsPatch?.$set ?? {}),
+      ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
+    },
+    $unset: settingsPatch?.$unset ?? {},
   }
 }
 
@@ -168,16 +186,18 @@ export async function updateCampaign(
 ): Promise<Campaign | null> {
   if (!isValidObjectId(campaignId)) return null
 
-  const $set = buildCampaignUpdateSet(input)
-  if (Object.keys($set).length === 0) {
+  const { $set, $unset } = buildCampaignUpdateSet(input)
+  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
     return findCampaignById(campaignId)
   }
 
-  const doc = await CampaignModel.findByIdAndUpdate(
-    campaignId,
-    { $set },
-    { new: true },
-  ).lean<CampaignRecord | null>()
+  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
+  if (Object.keys($set).length > 0) update.$set = $set
+  if (Object.keys($unset).length > 0) update.$unset = $unset
+
+  const doc = await CampaignModel.findByIdAndUpdate(campaignId, update, {
+    new: true,
+  }).lean<CampaignRecord | null>()
   if (!doc) return null
   return toCampaign(doc)
 }

@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { levelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
+import {
+  buildLevelOptions,
+  campaignLevelSchema,
+  MAX_CHARACTER_LEVEL,
+  type ClassFeature,
+} from '@rpg/contracts'
 import { type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import {
@@ -7,27 +12,31 @@ import {
   CLASS_GRANT_TYPE_LABELS,
   formRowsToGrants,
   grantArrayFields,
-  grantRowFormSchema,
+  createGrantRowFormSchema,
   grantsToFormRows,
 } from '../../lib/grant-form-helpers'
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 
-export const levelOptions: FieldOption[] = Array.from(
-  { length: MAX_CHARACTER_LEVEL },
-  (_, index) => {
-    const level = index + 1
-    return { value: String(level), label: String(level) }
-  },
-)
+export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL): FieldOption[] {
+  return buildLevelOptions(maxLevel).map((option) => ({
+    value: option.value,
+    label: option.label.replace('Level ', ''),
+  }))
+}
 
-export const featureRowFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  level: z.coerce.number().pipe(levelSchema),
-  grants: z.array(grantRowFormSchema),
-})
+export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
+  return z.object({
+    id: z.string().min(1).optional(),
+    name: z.string().min(1),
+    description: z.string().optional(),
+    level: levelField,
+    grants: z.array(createGrantRowFormSchema(maxLevel)),
+  })
+}
+
+export const featureRowFormSchema = createFeatureRowFormSchema()
 
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 
@@ -50,6 +59,9 @@ export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
+  const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+  const levelOptions = getLevelOptions(maxLevel)
+
   return [
     {
       kind: 'row',

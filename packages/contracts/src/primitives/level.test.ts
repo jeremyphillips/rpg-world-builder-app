@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_CHARACTER_LEVEL, levelSchema } from './level'
+import { absoluteLevelSchema, levelSchema, MAX_CHARACTER_LEVEL } from './level'
 
 describe('levelSchema', () => {
   it('accepts the full 1–20 range', () => {
@@ -11,5 +11,11 @@ describe('levelSchema', () => {
     expect(levelSchema.safeParse(0).success).toBe(false)
     expect(levelSchema.safeParse(MAX_CHARACTER_LEVEL + 1).success).toBe(false)
     expect(levelSchema.safeParse(5.5).success).toBe(false)
+  })
+})
+
+describe('absoluteLevelSchema', () => {
+  it('accepts levels above the default ruleset cap', () => {
+    expect(absoluteLevelSchema.parse(MAX_CHARACTER_LEVEL + 1)).toBe(21)
   })
 })

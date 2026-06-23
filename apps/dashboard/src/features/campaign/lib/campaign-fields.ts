@@ -1,5 +1,12 @@
 import { z } from 'zod'
-import { PLAY_STYLES, MOODS, MAGIC_LEVELS, DIFFICULTIES } from '@rpg/contracts'
+import {
+  ABSOLUTE_MAX_CHARACTER_LEVEL,
+  MAX_CHARACTER_LEVEL,
+  PLAY_STYLES,
+  MOODS,
+  MAGIC_LEVELS,
+  DIFFICULTIES,
+} from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import {
@@ -51,10 +58,26 @@ export const identityFields: FormItem[] = [
 // Rules
 // ---------------------------------------------------------------------------
 
-export const rulesSchema = z.object({
-  startingLevel: z.number().int().min(1).max(25),
-  importedCharactersPolicy: z.enum(['approval_required', 'disabled']),
-})
+export const rulesSchema = z
+  .object({
+    startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
+    maxCharacterLevel: z
+      .number()
+      .int()
+      .min(1)
+      .max(ABSOLUTE_MAX_CHARACTER_LEVEL)
+      .default(MAX_CHARACTER_LEVEL),
+    importedCharactersPolicy: z.enum(['approval_required', 'disabled']),
+  })
+  .superRefine((values, ctx) => {
+    if (values.startingLevel > values.maxCharacterLevel) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Starting level cannot exceed max character level',
+        path: ['startingLevel'],
+      })
+    }
+  })
 
 export type RulesValues = z.infer<typeof rulesSchema>
 
@@ -71,10 +94,10 @@ export const rulesFields: FormItem[] = [
             name: 'startingLevel',
             label: 'Character starting level',
             min: 1,
-            max: 25,
+            max: ABSOLUTE_MAX_CHARACTER_LEVEL,
             defaultValue: 1,
             required: true,
-            hint: 'The level at which new player characters begin (1–25).',
+            hint: 'The level at which new player characters begin.',
             width: '1/2',
             inputWidth: 'sm',
           },
@@ -96,8 +119,20 @@ export const rulesFields: FormItem[] = [
   {
     kind: 'group',
     legend: 'Advanced',
-    description: 'Additional rule configuration coming soon.',
-    fields: [],
+    fields: [
+      {
+        type: 'number',
+        name: 'maxCharacterLevel',
+        label: 'Max character level',
+        min: 1,
+        max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+        defaultValue: MAX_CHARACTER_LEVEL,
+        required: true,
+        hint: `Characters and content levels are capped at this value (default ruleset max is ${MAX_CHARACTER_LEVEL}).`,
+        width: '1/2',
+        inputWidth: 'sm',
+      },
+    ],
   },
 ]
 

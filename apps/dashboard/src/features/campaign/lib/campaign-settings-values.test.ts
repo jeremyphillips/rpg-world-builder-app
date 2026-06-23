@@ -43,6 +43,7 @@ describe('mapCampaignToSettingsValues', () => {
       description: 'A classic dungeon delve.',
       banner: [],
       startingLevel: 3,
+      maxCharacterLevel: 20,
       importedCharactersPolicy: 'approval_required',
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
@@ -59,6 +60,7 @@ describe('mapCampaignToSettingsValues', () => {
 
     expect(mapCampaignToSettingsValues(minimal)).toMatchObject({
       startingLevel: 1,
+      maxCharacterLevel: 20,
       importedCharactersPolicy: 'disabled',
     })
   })

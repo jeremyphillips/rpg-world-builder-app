@@ -85,6 +85,7 @@ export interface TextFieldConfig extends BaseFieldConfig {
 export interface NumberFieldConfig extends BaseFieldConfig {
   type: 'number'
   placeholder?: string
+  /** Bounds for Zod/schema validation — not applied as HTML `min`/`max` (allows in-progress edits). */
   min?: number
   max?: number
   step?: number
