@@ -20,8 +20,10 @@ describe('ContentDetailStatBody', () => {
     )
 
     expect(screen.getByRole('heading', { level: 2, name: 'Longsword' })).toBeInTheDocument()
-    expect(screen.getByText(/Category:/)).toHaveTextContent('Martial')
-    expect(screen.getByText(/Cost:/)).toHaveTextContent('15 gp')
+    expect(screen.getByText('Category')).toBeInTheDocument()
+    expect(screen.getByText('Martial')).toBeInTheDocument()
+    expect(screen.getByText('Cost')).toBeInTheDocument()
+    expect(screen.getByText('15 gp')).toBeInTheDocument()
     expect(screen.getByText('A martial weapon.')).toBeInTheDocument()
   })
 
@@ -47,21 +49,21 @@ describe('ContentDetailStatBody', () => {
     expect(results.violations).toEqual([])
   })
 
-  it('renders stat row info tooltips', () => {
+  it('renders label-placed stat row info tooltips', () => {
     render(
       <ContentDetailStatBody
-        name="Longsword"
+        name="Detect Magic"
         statRows={[
           {
-            label: 'Mastery',
-            value: 'Cleave',
-            info: 'Extra attack on hit.',
-            infoAriaLabel: 'About Cleave',
+            label: 'Ritual',
+            value: 'Yes',
+            info: 'Ritual casting rules.',
+            infoPlacement: 'label',
           },
         ]}
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'About Cleave' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About Ritual' })).toBeInTheDocument()
   })
 })

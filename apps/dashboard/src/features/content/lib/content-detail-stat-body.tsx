@@ -31,12 +31,13 @@ export function ContentDetailStatBody({
         {name}
       </Heading>
       <div className="space-y-3">
-        {statRows.map(({ label, value, info, infoAriaLabel }) => (
+        {statRows.map(({ label, value, info, infoPlacement, infoAriaLabel }) => (
           <ContentStatRow
             key={label}
             label={label}
             value={value}
             info={info}
+            infoPlacement={infoPlacement}
             infoAriaLabel={infoAriaLabel}
           />
         ))}

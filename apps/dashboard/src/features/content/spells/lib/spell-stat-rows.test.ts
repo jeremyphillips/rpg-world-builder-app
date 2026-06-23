@@ -71,8 +71,17 @@ describe('formatSpellComponents', () => {
 describe('buildSpellStatRows', () => {
   it('includes ritual and concentration flags for detect magic', () => {
     const rows = buildSpellStatRows(DETECT_MAGIC)
-    expect(rows.find((r) => r.label === 'Ritual')?.value).toBe('Yes')
-    expect(rows.find((r) => r.label === 'Concentration')?.value).toBe('Yes')
+    const ritual = rows.find((r) => r.label === 'Ritual')
+    const concentration = rows.find((r) => r.label === 'Concentration')
+
+    expect(ritual?.value).toBe('Yes')
+    expect(ritual?.infoPlacement).toBe('label')
+    expect(ritual?.info).toContain('ritual')
+
+    expect(concentration?.value).toBe('Yes')
+    expect(concentration?.infoPlacement).toBe('label')
+    expect(concentration?.info).toContain('Concentration')
+
     expect(rows.find((r) => r.label === 'Level')?.value).toBe('1st')
   })
 

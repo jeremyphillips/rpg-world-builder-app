@@ -28,6 +28,15 @@ export const WithInfo: Story = {
   },
 }
 
+export const WithLabelInfo: Story = {
+  args: {
+    label: 'Ritual',
+    value: 'No',
+    info: 'When a spell can be cast as a ritual, extend its casting time by 10 minutes to cast it without a spell slot.',
+    infoPlacement: 'label',
+  },
+}
+
 export const LongValue: Story = {
   args: {
     label: 'Skills',
