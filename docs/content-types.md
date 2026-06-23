@@ -85,6 +85,58 @@ Rules:
 }
 ```
 
+### Prerequisite editor (v1)
+
+Dashboard feat authoring uses a composable group editor instead of a fixed
+pattern picker. Shared serialization lives in
+`apps/dashboard/src/features/content/lib/requirement-editor-form.ts`; the UI is
+`RequirementEditor` in
+`apps/dashboard/src/features/content/components/requirement-editor.client.tsx`,
+wired into `feat-form-def.ts` via a `kind: 'slot'` form field.
+
+**UI constraints (v1):**
+
+| Rule                                              | Rationale                                          |
+| ------------------------------------------------- | -------------------------------------------------- |
+| Top-level sibling groups combine with **AND**     | Matches SRD feats; no top-level OR toggle yet      |
+| Groups contain **leaves only** (no nested groups) | Grappler's OR block is a sibling group, not nested |
+| Four leaf types only                              | Covers current SRD feat seed data                  |
+| Canonical serialization on save                   | Stable storage + live preview                      |
+
+**Normalization (editor → stored tree):**
+
+| Editor state              | Stored `RequirementExpression`                         |
+| ------------------------- | ------------------------------------------------------ |
+| Empty / no groups         | `prerequisite: undefined`                              |
+| One AND group, one leaf   | Bare leaf at root                                      |
+| One AND group, 2+ leaves  | `{ kind: "all", requirements: [...] }`                 |
+| One OR group              | `{ kind: "any", requirements: [...] }`                 |
+| Multiple top-level groups | `{ kind: "all", requirements: [group1, group2, ...] }` |
+
+Inverse mapping (`requirementExpressionToEditor`): each root `all` child becomes
+either leaf rows in an AND group or an OR group (when the child is `any`). A
+single root leaf becomes one AND group with one row.
+
+**Leaf capability matrix:**
+
+| Leaf             | Schema | `formatRequirementExpression` | Form editor | Evaluator |
+| ---------------- | ------ | ----------------------------- | ----------- | --------- |
+| `minLevel`       | yes    | yes                           | yes         | —         |
+| `abilityMinimum` | yes    | yes                           | yes         | —         |
+| `spellcasting`   | yes    | yes                           | yes         | —         |
+| `feature`        | yes    | yes                           | yes         | —         |
+| `classLevel`     | yes    | yes                           | —           | —         |
+
+Display prose uses `formatRequirementExpression()`; the editor preview prefixes
+`Requires` via `formatRequirementEditorPreview()`. Character-builder evaluation
+(`evaluateRequirementExpression()`) is a separate future slice.
+
+To reuse the editor on another content type: import the shared form module,
+add `prerequisiteEditor: prerequisiteEditorSchema` to the form schema, slot in
+`<RequirementEditor name="prerequisiteEditor" />`, and map
+`toFormValues` / `toInput` through `requirementExpressionToEditor` /
+`requirementEditorToExpression`.
+
 ---
 
 ## Content key mutability

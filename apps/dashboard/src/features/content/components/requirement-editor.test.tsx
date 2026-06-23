@@ -8,6 +8,7 @@ import { GRAPPLER } from '../feats/fixtures'
 import {
   ADD_REQUIREMENT_GROUP_LABEL,
   ADD_REQUIREMENT_LABEL,
+  REQUIREMENT_TYPE_LABEL,
 } from '../lib/requirement-editor-constants'
 import {
   formatRequirementEditorPreview,
@@ -71,6 +72,17 @@ describe('RequirementEditor', () => {
     render(<EditorShell prerequisiteEditor={editor} />)
 
     expect(screen.getByText(formatRequirementEditorPreview(editor))).toBeInTheDocument()
+  })
+
+  it('populates requirement type selects when editing Grappler', () => {
+    render(
+      <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
+    )
+
+    const typeSelects = screen.getAllByLabelText(REQUIREMENT_TYPE_LABEL)
+    expect(typeSelects[0]).toHaveTextContent('Minimum character level')
+    expect(typeSelects[1]).toHaveTextContent('Ability score minimum')
+    expect(typeSelects[2]).toHaveTextContent('Ability score minimum')
   })
 
   it('removes a requirement group', async () => {

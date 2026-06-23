@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { Button, FieldGroup, SelectField, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 import { Trash2 } from 'lucide-react'
@@ -61,7 +61,10 @@ function RequirementLeafRow({
 }: RequirementLeafRowProps) {
   const { setValue, getValues } = useFormContext()
   const leafPath = `${namePrefix}.requirements.${leafIndex}`
-  const leafType = useWatch({ name: `${leafPath}.type` }) as RequirementLeafType | undefined
+  const { field: typeField, fieldState: typeFieldState } = useController({
+    name: `${leafPath}.type`,
+  })
+  const leafType = typeField.value as RequirementLeafType | undefined
 
   const handleTypeChange = useCallback(
     (nextType: string) => {
@@ -87,6 +90,8 @@ function RequirementLeafRow({
             options={REQUIREMENT_LEAF_TYPE_OPTIONS}
             value={leafType ?? ''}
             onValueChange={handleTypeChange}
+            onBlur={typeField.onBlur}
+            error={typeFieldState.error?.message}
           />
           {leafType === 'spellcasting' ? (
             <Text variant="small" className="text-muted-foreground">
