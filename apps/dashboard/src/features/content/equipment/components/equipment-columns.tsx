@@ -1,15 +1,14 @@
 import type { Equipment } from '@rpg/contracts'
-import {
-  EQUIPMENT_KIND_LABELS,
-  getEquipmentKindLabel,
-  formatMoney,
-  moneyToCp,
-} from '@rpg/contracts'
+import { EQUIPMENT_KIND_LABELS, getEquipmentKindLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import {
+  buildContentColumns,
+  buildContentFilters,
+  costColumn,
+} from '../../lib/content-table-config'
 
 const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
   {
@@ -19,13 +18,7 @@ const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
     filterFn: 'equalsString',
     meta: { label: 'Kind' },
   },
-  {
-    id: 'cost',
-    accessorFn: (row) => moneyToCp(row.cost),
-    header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
-    cell: ({ row }) => formatMoney(row.original.cost),
-    meta: { label: 'Cost' },
-  },
+  costColumn<Equipment>(),
 ]
 
 const EQUIPMENT_SPECIFIC_FILTERS: FilterDef[] = [

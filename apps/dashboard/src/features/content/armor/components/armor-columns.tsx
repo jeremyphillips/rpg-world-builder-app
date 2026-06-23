@@ -1,16 +1,14 @@
 import type { Armor } from '@rpg/contracts'
-import {
-  ARMOR_CATEGORIES,
-  getArmorCategoryLabel,
-  getArmorAcDisplay,
-  formatMoney,
-  moneyToCp,
-} from '@rpg/contracts'
+import { ARMOR_CATEGORIES, getArmorCategoryLabel, getArmorAcDisplay } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import {
+  buildContentColumns,
+  buildContentFilters,
+  costColumn,
+} from '../../lib/content-table-config'
 
 function armorAcSortValue(a: Armor): number {
   if (a.category === 'shields') return 999
@@ -38,13 +36,7 @@ const ARMOR_MIDDLE_COLUMNS: ColumnDef<Armor>[] = [
     cell: ({ row }) => (row.original.stealthDisadvantage ? 'Disadvantage' : '—'),
     meta: { label: 'Stealth' },
   },
-  {
-    id: 'cost',
-    accessorFn: (row) => moneyToCp(row.cost),
-    header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
-    cell: ({ row }) => formatMoney(row.original.cost),
-    meta: { label: 'Cost' },
-  },
+  costColumn<Armor>(),
 ]
 
 const ARMOR_SPECIFIC_FILTERS: FilterDef[] = [

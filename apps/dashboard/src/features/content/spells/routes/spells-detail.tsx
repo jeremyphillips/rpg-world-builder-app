@@ -15,7 +15,7 @@ import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
-import { ContentStatRow } from '../../lib/content-stat-row'
+import { ContentDetailStatBody } from '../../lib/content-detail-stat-body'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { buildSpellStatRows } from '../lib/spell-stat-rows'
 
@@ -105,17 +105,15 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
 
   return (
     <ContentDetailLayout imageUrl={getContentImageUrl(spell.imageKey)} imageName={spell.name}>
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {spell.name}
-        </Heading>
-        <div className="space-y-3">
-          {statRows.map((row) => (
-            <ContentStatRow key={row.label} label={row.label} value={row.value} />
-          ))}
-        </div>
-        {spell.description && <RichTextContent html={spell.description} size="sm" tone="muted" />}
-      </div>
+      <ContentDetailStatBody
+        name={spell.name}
+        statRows={statRows}
+        descriptionContent={
+          spell.description ? (
+            <RichTextContent html={spell.description} size="sm" tone="muted" />
+          ) : undefined
+        }
+      />
       <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
       <SpellTagsSection tags={spell.tags} />
     </ContentDetailLayout>

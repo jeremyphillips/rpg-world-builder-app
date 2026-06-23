@@ -5,14 +5,16 @@ import {
   averageWeaponDamage,
   formatWeaponDamage,
   getWeaponMasteryLabel,
-  formatMoney,
-  moneyToCp,
 } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import {
+  buildContentColumns,
+  buildContentFilters,
+  costColumn,
+} from '../../lib/content-table-config'
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -44,13 +46,7 @@ const WEAPONS_MIDDLE_COLUMNS: ColumnDef<Weapon>[] = [
     filterFn: 'equalsString',
     meta: { label: 'Mastery' },
   },
-  {
-    id: 'cost',
-    accessorFn: (row) => moneyToCp(row.cost),
-    header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
-    cell: ({ row }) => formatMoney(row.original.cost),
-    meta: { label: 'Cost' },
-  },
+  costColumn<Weapon>(),
 ]
 
 const WEAPONS_SPECIFIC_FILTERS: FilterDef[] = [
