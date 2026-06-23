@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Heading, Text } from '@rpg/ui'
 
-import { ContentStatRow } from './content-stat-row'
+import { ContentStatRow } from './content-stat-row.client'
 import type { ContentStatRowData } from './content-stat-rows'
 
 export type ContentDetailStatBodyProps = {
@@ -31,8 +31,15 @@ export function ContentDetailStatBody({
         {name}
       </Heading>
       <div className="space-y-3">
-        {statRows.map(({ label, value }) => (
-          <ContentStatRow key={label} label={label} value={value} />
+        {statRows.map(({ label, value, info, infoPlacement, infoAriaLabel }) => (
+          <ContentStatRow
+            key={label}
+            label={label}
+            value={value}
+            info={info}
+            infoPlacement={infoPlacement}
+            infoAriaLabel={infoAriaLabel}
+          />
         ))}
       </div>
       {resolvedDescription}

@@ -31,6 +31,7 @@ import '../armor/lib/armor-form-def'
 import '../weapons/lib/weapon-form-def'
 import '../skillProficiencies/lib/skill-proficiency-form-def'
 import '../equipment/lib/equipment-form-def'
+import '../spells/lib/spell-form-def'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 

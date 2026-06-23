@@ -20,8 +20,10 @@ describe('ContentDetailStatBody', () => {
     )
 
     expect(screen.getByRole('heading', { level: 2, name: 'Longsword' })).toBeInTheDocument()
-    expect(screen.getByText(/Category:/)).toHaveTextContent('Martial')
-    expect(screen.getByText(/Cost:/)).toHaveTextContent('15 gp')
+    expect(screen.getByText('Category')).toBeInTheDocument()
+    expect(screen.getByText('Martial')).toBeInTheDocument()
+    expect(screen.getByText('Cost')).toBeInTheDocument()
+    expect(screen.getByText('15 gp')).toBeInTheDocument()
     expect(screen.getByText('A martial weapon.')).toBeInTheDocument()
   })
 
@@ -45,5 +47,23 @@ describe('ContentDetailStatBody', () => {
 
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
+  })
+
+  it('renders label-placed stat row info tooltips', () => {
+    render(
+      <ContentDetailStatBody
+        name="Detect Magic"
+        statRows={[
+          {
+            label: 'Ritual',
+            value: 'Yes',
+            info: 'Ritual casting rules.',
+            infoPlacement: 'label',
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'About Ritual' })).toBeInTheDocument()
   })
 })

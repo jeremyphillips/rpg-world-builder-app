@@ -1,3 +1,5 @@
 export { SpellsOverview } from './routes/spells-overview'
 export { SpellDetail } from './routes/spells-detail'
+export { SpellCreate } from './routes/spell-create'
+export { SpellEdit } from './routes/spell-edit'
 export { useSpells, spellsQueryKey } from './hooks/use-spells'

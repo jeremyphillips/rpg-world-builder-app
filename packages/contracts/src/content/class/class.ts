@@ -242,6 +242,11 @@ export function getClassName(slug: string): string {
   return slug in CLASS_NAMES ? CLASS_NAMES[slug as keyof typeof CLASS_NAMES] : slug
 }
 
+/** Whether a resolved class record includes a spellcasting block (seed, homebrew, or patch). */
+export function classHasSpellcasting(cls: CharacterClass): boolean {
+  return cls.spellcasting !== undefined
+}
+
 // ---------------------------------------------------------------------------
 // Deferred — documented intentionally, not built in this phase:
 //

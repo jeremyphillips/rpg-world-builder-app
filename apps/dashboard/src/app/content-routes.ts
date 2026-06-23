@@ -52,5 +52,8 @@ export const CONTENT_ROUTES = {
   spells: {
     overview: (campaignId: string) => `/campaigns/${campaignId}/spells`,
     detail: (campaignId: string, spellId: string) => `/campaigns/${campaignId}/spells/${spellId}`,
+    edit: (campaignId: string, spellId: string) =>
+      `/campaigns/${campaignId}/spells/${spellId}/edit`,
+    create: (campaignId: string) => `/campaigns/${campaignId}/spells/new`,
   },
 } as const

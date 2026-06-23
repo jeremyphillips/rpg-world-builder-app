@@ -54,4 +54,28 @@ describe('buildContentFormOptionSets', () => {
     expect(options.spells).toEqual([{ value: 'fire-bolt', label: fireBolt.name }])
     expect(options.tools).toEqual([{ value: 'thieves-tools', label: thievesTools.name }])
   })
+
+  it('filters spellcastingClasses to classes with a spellcasting block', () => {
+    const fighter = pickClass('fighter')
+    const wizard = pickClass('wizard')
+    const patchedBarbarian = {
+      ...pickClass('barbarian'),
+      spellcasting: {
+        level: 1,
+        progression: 'full' as const,
+        ability: 'wis' as const,
+        preparation: 'known' as const,
+      },
+    }
+
+    const options = buildContentFormOptionSets({
+      classes: [fighter, wizard, patchedBarbarian],
+    })
+
+    expect(options.classes).toHaveLength(3)
+    expect(options.spellcastingClasses).toEqual([
+      { value: 'barbarian', label: patchedBarbarian.name },
+      { value: 'wizard', label: wizard.name },
+    ])
+  })
 })

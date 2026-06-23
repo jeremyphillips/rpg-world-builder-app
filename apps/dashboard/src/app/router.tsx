@@ -36,6 +36,8 @@ import {
   SpeciesEdit,
   SpellsOverview,
   SpellDetail,
+  SpellCreate,
+  SpellEdit,
 } from '@/features/content'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
@@ -199,6 +201,11 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <SpellsOverview /> },
                     {
+                      path: 'new',
+                      element: <SpellCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':spellId',
                       element: <Outlet />,
                       handle: {
@@ -206,7 +213,14 @@ const router = createBrowserRouter(
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
-                      children: [{ index: true, element: <SpellDetail /> }],
+                      children: [
+                        { index: true, element: <SpellDetail /> },
+                        {
+                          path: 'edit',
+                          element: <SpellEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },

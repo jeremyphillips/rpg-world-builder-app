@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
-import type {
-  CharacterClass,
-  ContentSource,
-  Equipment,
-  Spell,
-  Weapon,
-  WeaponCategory,
+import {
+  classHasSpellcasting,
+  type CharacterClass,
+  type ContentSource,
+  type Equipment,
+  type Spell,
+  type Weapon,
+  type WeaponCategory,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
@@ -17,6 +18,12 @@ import type { ContentFormCtx } from './content-form-registry'
 
 export interface ContentFormOptionSets {
   classes: FieldOption[]
+  /**
+   * Classes with a `spellcasting` block on the campaign-resolved catalog. Used by
+   * the spell form class combobox. On edit, stale selected slugs that no longer
+   * qualify are not merged here — see spells feature README (orphan union gap).
+   */
+  spellcastingClasses: FieldOption[]
   weapons: FieldOption[]
   spells: FieldOption[]
   tools: FieldOption[]
@@ -57,8 +64,13 @@ export function buildContentFormOptionSets(input: {
   spells?: Spell[]
   equipment?: Equipment[]
 }): ContentFormOptionSets {
+  const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
+
   return {
-    classes: sortFieldOptions(input.classes?.map(toContentFieldOption) ?? []),
+    classes: classOptions,
+    spellcastingClasses: sortFieldOptions(
+      input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
+    ),
     weapons: sortFieldOptions(input.weapons?.map(toContentFieldOption) ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.weapons),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),

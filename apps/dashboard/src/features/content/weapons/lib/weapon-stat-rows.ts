@@ -5,6 +5,7 @@ import {
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
+  getWeaponMasteryEntry,
   getWeaponMasteryLabel,
 } from '@rpg/contracts'
 
@@ -28,7 +29,12 @@ export function getWeaponStatRows(item: Weapon): ContentStatRowData[] {
       ? [{ label: 'Versatile', value: formatWeaponDamage(item.versatileDamage) }]
       : []),
     { label: 'Properties', value: formatWeaponProperties(item.properties) },
-    { label: 'Mastery', value: getWeaponMasteryLabel(item.mastery) },
+    {
+      label: 'Mastery',
+      value: getWeaponMasteryLabel(item.mastery),
+      info: getWeaponMasteryEntry(item.mastery)?.description,
+      infoAriaLabel: `About ${getWeaponMasteryLabel(item.mastery)}`,
+    },
     ...(item.range ? [{ label: 'Range', value: formatWeaponRange(item.range) }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
     { label: 'Cost', value: formatMoney(item.cost) },

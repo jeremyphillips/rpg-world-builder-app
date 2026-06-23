@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Weapon } from '@rpg/contracts'
+import { WEAPON_MASTERY_ENTRIES, type Weapon } from '@rpg/contracts'
 
 import { getWeaponStatRows } from './weapon-stat-rows'
 
@@ -56,5 +56,13 @@ describe('getWeaponStatRows', () => {
   it('includes range for a ranged weapon', () => {
     const rows = getWeaponStatRows(SHORTBOW)
     expect(rows.find((row) => row.label === 'Range')?.value).toBe('80/320 ft.')
+  })
+
+  it('includes mastery description info for tooltip', () => {
+    const mastery = getWeaponStatRows(LONGSWORD).find((row) => row.label === 'Mastery')
+
+    expect(mastery?.value).toBe('Sap')
+    expect(mastery?.info).toBe(WEAPON_MASTERY_ENTRIES.sap.description)
+    expect(mastery?.infoAriaLabel).toBe('About Sap')
   })
 })
