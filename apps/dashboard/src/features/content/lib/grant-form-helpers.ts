@@ -176,6 +176,7 @@ export const grantRowFormSchema = z.object({
   featChoose: z.coerce.number().int().min(1).optional(),
   featAllowAnyQualifying: z.boolean().optional(),
   featReplaceable: z.boolean().optional(),
+  featRecommendedIds: z.array(z.string()).optional(),
 })
 
 export type GrantRowForm = z.infer<typeof grantRowFormSchema>
@@ -222,6 +223,7 @@ export function grantItemFields<T extends string>(
   const spellOptions = ctx.options?.spells ?? []
   const toolOptions = ctx.options?.tools ?? []
   const weaponOptions = ctx.options?.weapons ?? []
+  const featOptions = ctx.options?.feats ?? []
 
   return [
     {
@@ -384,8 +386,18 @@ export function grantItemFields<T extends string>(
       visibility: {
         dependsOn: ['grantType', 'featCategory'],
         visibleWhen: (watched) =>
-          watched['grantType'] === 'featChoice' && watched['featCategory'] === 'epic-boon',
+          watched['grantType'] === 'featChoice' &&
+          (watched['featCategory'] === 'epic-boon' || watched['featCategory'] === 'general'),
       },
+    },
+    {
+      type: 'combobox',
+      name: 'featRecommendedIds',
+      label: 'Recommended feats',
+      multiple: true,
+      options: featOptions,
+      placeholder: 'Choose feats…',
+      visibility: visibleFor('featChoice'),
     },
     {
       type: 'checkbox',
@@ -446,6 +458,7 @@ function emptyGrantRow(grantType: ClassGrantType): GrantRowForm {
     featChoose: 1,
     featAllowAnyQualifying: false,
     featReplaceable: false,
+    featRecommendedIds: [],
   }
 }
 
@@ -518,6 +531,7 @@ function featChoiceToRow(featChoice: ContentGrants['featChoice']): GrantRowForm 
     featChoose: featChoice.choose,
     featAllowAnyQualifying: featChoice.allowAnyQualifying ?? false,
     featReplaceable: featChoice.replaceable ?? false,
+    featRecommendedIds: featChoice.recommendedFeatIds ?? [],
   }
 }
 
@@ -634,6 +648,9 @@ function applyFeatChoiceFromRows(result: ContentGrants, rows: GrantRowForm[]): v
   }
   if (row.featReplaceable) {
     featChoice.replaceable = true
+  }
+  if (row.featRecommendedIds?.length) {
+    featChoice.recommendedFeatIds = row.featRecommendedIds
   }
   result.featChoice = featChoice
 }

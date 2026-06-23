@@ -20,7 +20,6 @@ const homebrewClassSchema = new Schema(
     description: { type: String },
     primaryAbilities: [{ type: String, enum: [...ABILITY_IDS] }],
     hitDie: { type: Number, enum: [...CLASS_HIT_DICE], required: true },
-    asiLevels: [{ type: Number }],
     subclassChoiceLevel: { type: Number, required: false },
     spellcasting: { type: Schema.Types.Mixed },
     proficiencies: { type: Schema.Types.Mixed, required: true },

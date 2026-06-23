@@ -42,22 +42,52 @@ Legacy records without `kind` normalize to `custom` on parse (`normalizeContentT
 ### `grants.featChoice` (feat picks)
 
 Class features, subclass features, and species traits that grant a feat choice store
-`grants.featChoice` on the **source** record (Fighting Style, Epic Boon, Human Versatile).
-The character builder filters feats by `category`; granted feats do not need a matching
-`prerequisite` on the feat record.
+`grants.featChoice` on the **source** record (Fighting Style, Epic Boon, Human Versatile,
+Ability Score Improvement milestones). The character builder filters feats by `category`;
+granted feats do not need a matching `prerequisite` on the feat record.
 
-| Field                | Meaning                                                                     |
-| -------------------- | --------------------------------------------------------------------------- |
-| `category`           | Feat category pool (`origin`, `general`, `fighting-style`, `epic-boon`)     |
-| `choose`             | Number of feats the player picks (default 1)                                |
-| `allowAnyQualifying` | Epic Boon only: epic-boon feats **or** any feat the character qualifies for |
-| `replaceable`        | Fighter Fighting Style: may replace on later class levels                   |
+| Field                | Meaning                                                                 |
+| -------------------- | ----------------------------------------------------------------------- |
+| `category`           | Feat category pool (`origin`, `general`, `fighting-style`, `epic-boon`) |
+| `choose`             | Number of feats the player picks (default 1)                            |
+| `allowAnyQualifying` | Epic Boon or ASI (`general`): category feats **or** any qualifying feat |
+| `replaceable`        | Fighter Fighting Style: may replace on later class levels               |
+| `recommendedFeatIds` | Feat slugs surfaced as recommendations (not duplicated in HTML prose)   |
+
+**Ability Score Improvements** are modeled as class features (`ability-score-improvement-{level}`)
+with `grants.featChoice` (`category: general`, `allowAnyQualifying: true`,
+`recommendedFeatIds: ["ability-score-improvement"]`). The class editor keeps an ASI level
+picker for convenience; on save it generates/replaces those feature rows — there is no
+top-level `asiLevels` field on the class body.
 
 Example (Fighter Fighting Style):
 
 ```json
 "grants": {
-  "featChoice": { "category": "fighting-style", "choose": 1, "replaceable": true }
+  "featChoice": {
+    "category": "fighting-style",
+    "choose": 1,
+    "replaceable": true,
+    "recommendedFeatIds": ["defense"]
+  }
+}
+```
+
+Example (ASI at level 4):
+
+```json
+{
+  "id": "ability-score-improvement-4",
+  "name": "Ability Score Improvement",
+  "level": 4,
+  "grants": {
+    "featChoice": {
+      "category": "general",
+      "choose": 1,
+      "allowAnyQualifying": true,
+      "recommendedFeatIds": ["ability-score-improvement"]
+    }
+  }
 }
 ```
 

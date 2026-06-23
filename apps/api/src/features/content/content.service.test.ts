@@ -69,7 +69,6 @@ describe('resolveCatalogForCampaign (classes)', () => {
       name: 'Blood Hunter',
       primaryAbilities: ['str'],
       hitDie: 10,
-      asiLevels: [4, 8, 12, 16, 19],
       subclassChoiceLevel: 3,
       proficiencies: {
         savingThrows: ['str', 'con'],

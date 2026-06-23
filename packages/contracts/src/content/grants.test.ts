@@ -124,13 +124,29 @@ describe('featChoiceGrantSchema', () => {
     })
   })
 
-  it('rejects allowAnyQualifying on non-epic-boon categories', () => {
+  it('rejects allowAnyQualifying on non-epic-boon/non-general categories', () => {
     expect(
       featChoiceGrantSchema.safeParse({
         category: 'fighting-style',
         allowAnyQualifying: true,
       }).success,
     ).toBe(false)
+  })
+
+  it('parses general ASI with allowAnyQualifying and recommendedFeatIds', () => {
+    expect(
+      featChoiceGrantSchema.parse({
+        category: 'general',
+        choose: 1,
+        allowAnyQualifying: true,
+        recommendedFeatIds: ['ability-score-improvement'],
+      }),
+    ).toEqual({
+      category: 'general',
+      choose: 1,
+      allowAnyQualifying: true,
+      recommendedFeatIds: ['ability-score-improvement'],
+    })
   })
 })
 

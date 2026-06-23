@@ -45,6 +45,23 @@ describe('grantsToFormRows / formRowsToGrants', () => {
     ])
   })
 
+  it('round-trips recommended feat ids on feat choice grants', () => {
+    const fighter = pickClass('fighter')
+    const fightingStyle = fighter.features.find((feature) => feature.id === 'fighting-style')
+    const rows = grantsToFormRows(fightingStyle?.grants)
+    const featRow = rows.find((row) => row.grantType === 'featChoice')
+
+    expect(featRow?.featRecommendedIds).toEqual(['defense'])
+
+    const restored = formRowsToGrants(rows)
+    expect(restored?.featChoice).toEqual({
+      category: 'fighting-style',
+      choose: 1,
+      replaceable: true,
+      recommendedFeatIds: ['defense'],
+    })
+  })
+
   it('round-trips feat choice grants', () => {
     const fighter = pickClass('fighter')
     const fightingStyle = fighter.features.find((feature) => feature.id === 'fighting-style')
@@ -60,6 +77,7 @@ describe('grantsToFormRows / formRowsToGrants', () => {
       category: 'fighting-style',
       choose: 1,
       replaceable: true,
+      recommendedFeatIds: ['defense'],
     })
   })
 })

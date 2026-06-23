@@ -65,6 +65,7 @@ import {
   featureToFormRow,
   levelOptions,
 } from './class-feature-form-fields'
+import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
@@ -670,7 +671,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     description: entity.description,
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
-    asiLevels: entity.asiLevels,
+    asiLevels: deriveAsiLevels(entity.features),
     subclassChoiceLevel:
       entity.subclassChoiceLevel !== undefined
         ? String(entity.subclassChoiceLevel)
@@ -691,7 +692,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
         description: values.description || undefined,
         primaryAbilities: values.primaryAbilities,
         hitDie: values.hitDie,
-        asiLevels: values.asiLevels,
         subclassChoiceLevel:
           values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
             ? undefined
@@ -704,7 +704,10 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
             from: values.proficiencies.skills.from,
           },
         },
-        features: featuresFromFormValues(values.features, ctx?.entity?.features),
+        features: syncAsiFeatures(
+          values.asiLevels,
+          featuresFromFormValues(values.features, ctx?.entity?.features),
+        ),
         resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
       },
       ctx,

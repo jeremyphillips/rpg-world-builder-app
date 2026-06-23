@@ -9,7 +9,7 @@ function isPlainObject(value: unknown): value is PlainObject {
  *
  * - Nested plain objects merge recursively.
  * - Arrays and primitives are **replaced wholesale** (override `features` or
- *   `asiLevels` entirely, not element-wise) — the documented overlay-patch
+ *   `features` entirely, not element-wise) — the documented overlay-patch
  *   granularity. `undefined` patch values are skipped so a partial patch only
  *   touches the fields it provides.
  *

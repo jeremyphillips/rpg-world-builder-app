@@ -79,16 +79,18 @@ export const featChoiceGrantSchema = z
   .object({
     category: featCategorySchema,
     choose: z.number().int().min(1).default(1),
-    /** Epic Boon: "Epic Boon feat or another feat you qualify for". */
+    /** Epic Boon / ASI: category default **or** any feat the character qualifies for. */
     allowAnyQualifying: z.boolean().optional(),
     /** Fighter Fighting Style: may replace on later class levels. */
     replaceable: z.boolean().optional(),
+    /** Feat slugs surfaced as recommendations in the character builder (not prose). */
+    recommendedFeatIds: z.array(z.string().min(1)).optional(),
   })
   .superRefine((val, ctx) => {
-    if (val.allowAnyQualifying && val.category !== 'epic-boon') {
+    if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
       ctx.addIssue({
         code: 'custom',
-        message: 'allowAnyQualifying is only allowed when category is epic-boon',
+        message: 'allowAnyQualifying is only allowed when category is epic-boon or general',
         path: ['allowAnyQualifying'],
       })
     }
