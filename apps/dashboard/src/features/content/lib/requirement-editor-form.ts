@@ -212,6 +212,27 @@ export function requirementExpressionToEditor(
   return { groups }
 }
 
+function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafForm {
+  if (!leaf || typeof leaf !== 'object') return false
+  return REQUIREMENT_LEAF_TYPES.includes((leaf as RequirementLeafForm).type)
+}
+
+function isRequirementGroupForm(group: unknown): group is RequirementGroupForm {
+  if (!group || typeof group !== 'object') return false
+  const record = group as RequirementGroupForm
+  return (record.kind === 'all' || record.kind === 'any') && Array.isArray(record.requirements)
+}
+
+/** Drops transient holes from react-hook-form field arrays before serialization. */
+function normalizeEditorValue(value: PrerequisiteEditorValue | undefined): PrerequisiteEditorValue {
+  return {
+    groups: (value?.groups ?? []).filter(isRequirementGroupForm).map((group) => ({
+      ...group,
+      requirements: group.requirements.filter(isRequirementLeafForm),
+    })),
+  }
+}
+
 function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
   switch (leaf.type) {
     case 'minLevel':
@@ -229,8 +250,51 @@ function leafToExpression(leaf: RequirementLeafForm): RequirementExpression {
   }
 }
 
+function tryMinLevelPreview(level: unknown): RequirementExpression | undefined {
+  const parsed = levelSchema.safeParse(level)
+  return parsed.success ? { kind: 'minLevel', level: parsed.data } : undefined
+}
+
+function isValidAbilityMinimumScore(minimum: unknown): minimum is number {
+  return (
+    typeof minimum === 'number' &&
+    Number.isInteger(minimum) &&
+    minimum >= ABILITY_SCORE_MIN &&
+    minimum <= ABILITY_SCORE_MAX
+  )
+}
+
+function tryAbilityMinimumPreview(
+  leaf: Extract<RequirementLeafForm, { type: 'abilityMinimum' }>,
+): RequirementExpression | undefined {
+  const ability = abilitySchema.safeParse(leaf.ability)
+  if (!ability.success || !isValidAbilityMinimumScore(leaf.minimum)) return undefined
+  return { kind: 'abilityMinimum', ability: ability.data, minimum: leaf.minimum }
+}
+
+function tryFeaturePreview(
+  leaf: Extract<RequirementLeafForm, { type: 'feature' }>,
+): RequirementExpression | undefined {
+  const featureId = leaf.featureId.trim()
+  return featureId ? { kind: 'feature', featureId } : undefined
+}
+
+/** Best-effort leaf conversion for live preview while the user is still editing. */
+function tryLeafToExpression(leaf: RequirementLeafForm): RequirementExpression | undefined {
+  switch (leaf.type) {
+    case 'minLevel':
+      return tryMinLevelPreview(leaf.level)
+    case 'abilityMinimum':
+      return tryAbilityMinimumPreview(leaf)
+    case 'spellcasting':
+      return { kind: 'spellcasting' }
+    case 'feature':
+      return tryFeaturePreview(leaf)
+  }
+}
+
 function groupToExpression(group: RequirementGroupForm): RequirementExpression {
-  const requirements = group.requirements.map(leafToExpression)
+  const requirements = group.requirements.filter(isRequirementLeafForm).map(leafToExpression)
 
   if (group.kind === 'any') {
     return { kind: 'any', requirements }
@@ -243,15 +307,47 @@ function groupToExpression(group: RequirementGroupForm): RequirementExpression {
   return { kind: 'all', requirements }
 }
 
+function groupToPreviewExpression(group: RequirementGroupForm): RequirementExpression | undefined {
+  const requirements = group.requirements
+    .filter(isRequirementLeafForm)
+    .map(tryLeafToExpression)
+    .filter((expr): expr is RequirementExpression => expr != null)
+
+  if (requirements.length === 0) return undefined
+
+  if (group.kind === 'any') {
+    return { kind: 'any', requirements }
+  }
+
+  if (requirements.length === 1) {
+    return requirements[0]
+  }
+
+  return { kind: 'all', requirements }
+}
+
+function requirementEditorToPreviewExpression(
+  value: PrerequisiteEditorValue | undefined,
+): RequirementExpression | undefined {
+  const groupExpressions = normalizeEditorValue(value)
+    .groups.map(groupToPreviewExpression)
+    .filter((expr): expr is RequirementExpression => expr != null)
+
+  if (groupExpressions.length === 0) return undefined
+  if (groupExpressions.length === 1) return groupExpressions[0]
+  return { kind: 'all', requirements: groupExpressions }
+}
+
 /** Maps validated editor state to a canonical RequirementExpression tree. */
 export function requirementEditorToExpression(
   value: PrerequisiteEditorValue,
 ): RequirementExpression | undefined {
-  if (value.groups.length === 0) {
+  const normalized = normalizeEditorValue(value)
+  if (normalized.groups.length === 0) {
     return undefined
   }
 
-  const groupExpressions = value.groups.map(groupToExpression)
+  const groupExpressions = normalized.groups.map(groupToExpression)
 
   if (groupExpressions.length === 1) {
     return groupExpressions[0]
@@ -315,8 +411,8 @@ export function refineRequirementEditor(value: PrerequisiteEditorValue, ctx: Ref
 }
 
 /** Player-facing preview for the requirement editor. */
-export function formatRequirementEditorPreview(value: PrerequisiteEditorValue): string {
-  const expression = requirementEditorToExpression(value)
+export function formatRequirementEditorPreview(value: PrerequisiteEditorValue | undefined): string {
+  const expression = requirementEditorToPreviewExpression(value)
   if (!expression) {
     return 'No prerequisites'
   }

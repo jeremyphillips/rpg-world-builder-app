@@ -1,13 +1,9 @@
+import { createElement } from 'react'
 import { z } from 'zod'
 import {
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
-  ABILITY_SCORE_MAX,
-  ABILITY_SCORE_MIN,
   FEAT_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_PART_ENTRIES,
-  abilitySchema,
   createFeatInputSchema,
   slugSchema,
   type CreateFeatInput,
@@ -15,6 +11,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import { RequirementEditor } from '../../components/requirement-editor.client'
 import { identityFields } from '../../lib/content-form-field-helpers'
 import {
   contentFormRegistry,
@@ -22,20 +19,14 @@ import {
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
-import { useFeats, featsQueryKey } from '../hooks/use-feats'
 import {
-  FEAT_PREREQUISITE_PATTERNS,
-  prerequisiteFromFormValues,
-  prerequisiteToFormValues,
-  refineFeatPrerequisiteFields,
-  type FeatPrerequisitePattern,
-} from './feat-prerequisite-form-helpers'
-
-export { FEAT_PREREQUISITE_PATTERNS, type FeatPrerequisitePattern }
-export {
-  prerequisiteFromFormValues,
-  prerequisiteToFormValues,
-} from './feat-prerequisite-form-helpers'
+  prerequisiteEditorSchema,
+  requirementEditorDefaultValue,
+  requirementEditorToExpression,
+  requirementExpressionToEditor,
+  refineRequirementEditor,
+} from '../../lib/requirement-editor-form'
+import { useFeats, featsQueryKey } from '../hooks/use-feats'
 
 const featCategoryOptions = toOptions(
   FEAT_CATEGORY_IDS,
@@ -44,47 +35,28 @@ const featCategoryOptions = toOptions(
   ) as Record<(typeof FEAT_CATEGORY_IDS)[number], string>,
 )
 
-const abilityOptions = toOptions(
-  ABILITY_IDS,
-  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
-    (typeof ABILITY_IDS)[number],
-    string
-  >,
-)
-
-const prerequisitePatternOptions = [
-  { value: 'none', label: 'No prerequisite' },
-  { value: 'min-level', label: 'Minimum character level' },
-  { value: 'feature', label: 'Class feature' },
-  { value: 'level-and-abilities', label: 'Level + ability scores (OR)' },
-  { value: 'level-and-spellcasting', label: 'Level + spellcasting feature' },
-] as const
-
 const featFormSchema = z
   .object({
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
     category: z.enum(FEAT_CATEGORY_IDS),
-    prerequisitePattern: z.enum(FEAT_PREREQUISITE_PATTERNS),
-    prerequisiteMinLevel: z.coerce.number().int().optional(),
-    prerequisiteFeatureId: z.string().optional(),
-    prerequisiteAbilities: z.array(abilitySchema).optional(),
-    prerequisiteAbilityMinimum: z.coerce.number().int().optional(),
+    prerequisiteEditor: prerequisiteEditorSchema,
     repeatableAllowed: z.boolean(),
     repeatableNotes: z.string().optional(),
   })
-  .superRefine(refineFeatPrerequisiteFields)
+  .superRefine((values, ctx) => {
+    refineRequirementEditor(values.prerequisiteEditor, ctx)
+    if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Repeat constraints are only allowed when the feat is repeatable',
+        path: ['repeatableNotes'],
+      })
+    }
+  })
 
 type FeatFormValues = z.infer<typeof featFormSchema>
-
-function visibleWhenPrerequisite(...patterns: FeatPrerequisitePattern[]): FieldVisibility {
-  return {
-    dependsOn: ['prerequisitePattern'],
-    visibleWhen: (watched) =>
-      patterns.includes(watched['prerequisitePattern'] as FeatPrerequisitePattern),
-  }
-}
 
 function visibleWhenRepeatableNotes(): FieldVisibility {
   return {
@@ -99,7 +71,7 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   coverage: 'structural',
   createDefaultValues: {
     category: 'general',
-    prerequisitePattern: 'none',
+    prerequisiteEditor: requirementEditorDefaultValue(),
     repeatableAllowed: false,
   },
   buildFields: (): FormItem[] => [
@@ -120,57 +92,11 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
       ],
     },
     {
-      kind: 'group',
-      legend: 'Prerequisites',
-      fields: [
-        {
-          type: 'select',
-          name: 'prerequisitePattern',
-          label: 'Prerequisite pattern',
-          options: [...prerequisitePatternOptions],
-          required: true,
-          hint: FEAT_PART_ENTRIES.prerequisite.description,
-        },
-        {
-          type: 'number',
-          name: 'prerequisiteMinLevel',
-          label: 'Minimum character level',
-          min: 1,
-          max: 20,
-          visibility: visibleWhenPrerequisite(
-            'min-level',
-            'level-and-abilities',
-            'level-and-spellcasting',
-          ),
-          required: true,
-        },
-        {
-          type: 'text',
-          name: 'prerequisiteFeatureId',
-          label: 'Feature ID',
-          hint: 'Kebab-case feature id, e.g. fighting-style',
-          visibility: visibleWhenPrerequisite('feature'),
-          required: true,
-        },
-        {
-          type: 'chips',
-          name: 'prerequisiteAbilities',
-          label: 'Ability scores (OR)',
-          options: abilityOptions,
-          multiple: true,
-          visibility: visibleWhenPrerequisite('level-and-abilities'),
-          required: true,
-        },
-        {
-          type: 'number',
-          name: 'prerequisiteAbilityMinimum',
-          label: 'Minimum score',
-          min: ABILITY_SCORE_MIN,
-          max: ABILITY_SCORE_MAX,
-          visibility: visibleWhenPrerequisite('level-and-abilities'),
-          required: true,
-        },
-      ],
+      kind: 'slot',
+      name: 'prerequisiteEditor',
+      label: 'Prerequisites',
+      hint: FEAT_PART_ENTRIES.prerequisite.description,
+      render: () => createElement(RequirementEditor, { name: 'prerequisiteEditor' }),
     },
     {
       kind: 'group',
@@ -196,12 +122,12 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
     slug: entity.slug,
     description: entity.description,
     category: entity.category,
-    ...prerequisiteToFormValues(entity.prerequisite),
+    prerequisiteEditor: requirementExpressionToEditor(entity.prerequisite),
     repeatableAllowed: entity.repeatable.allowed,
     repeatableNotes: entity.repeatable.notes,
   }),
   toInput: (values, ctx?: ContentFormInputCtx<Feat>) => {
-    const prerequisite = prerequisiteFromFormValues(values)
+    const prerequisite = requirementEditorToExpression(values.prerequisiteEditor)
     const repeatable = values.repeatableAllowed
       ? {
           allowed: true as const,

@@ -183,6 +183,41 @@ describe('formatRequirementEditorPreview', () => {
       `Requires ${formatRequirementExpression(expression)}`,
     )
   })
+
+  it('tolerates transient field-array holes while editing', () => {
+    expect(
+      formatRequirementEditorPreview({
+        groups: [
+          {
+            id: 'g1',
+            kind: 'all',
+            requirements: [
+              undefined as unknown as PrerequisiteEditorValue['groups'][number]['requirements'][number],
+              { id: 'l1', type: 'minLevel', level: 4 },
+            ],
+          },
+        ],
+      }),
+    ).toBe('Requires Level 4+')
+  })
+
+  it('skips incomplete leaves instead of throwing during preview', () => {
+    expect(
+      formatRequirementEditorPreview({
+        groups: [
+          {
+            id: 'g1',
+            kind: 'all',
+            requirements: [{ id: 'l1', type: 'minLevel', level: undefined as unknown as number }],
+          },
+        ],
+      }),
+    ).toBe('No prerequisites')
+  })
+
+  it('returns no prerequisites for undefined editor state', () => {
+    expect(formatRequirementEditorPreview(undefined)).toBe('No prerequisites')
+  })
 })
 
 describe('newRequirementLeaf and newRequirementGroup', () => {
