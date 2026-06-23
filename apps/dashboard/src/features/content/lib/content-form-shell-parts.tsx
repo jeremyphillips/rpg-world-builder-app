@@ -84,7 +84,7 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentSchemaFormProps<TFormValues>) {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <Form<TFormValues>
         key={formKey}
         schema={schema}
@@ -129,7 +129,7 @@ export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <TabbedForm<TFormValues>
         key={formKey}
         schema={schema}

@@ -24,7 +24,10 @@ import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
 import {
   masterDetailListDragHandleClasses,
+  masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
+  masterDetailListRowSelectClasses,
+  masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
 
 export interface MasterDetailListItem {
@@ -109,10 +112,7 @@ function MasterDetailListRowContent({
 
   return (
     <div
-      className={cn(
-        'flex items-center gap-1 rounded-md border border-transparent',
-        isSelected && 'border-border bg-muted/40',
-      )}
+      className={cn(masterDetailListRowClasses, isSelected && masterDetailListRowSelectedClasses)}
     >
       {showDragHandle && dragHandleProps ? (
         <button
@@ -131,7 +131,7 @@ function MasterDetailListRowContent({
         aria-current={isSelected ? 'true' : undefined}
         aria-invalid={item.hasError ? true : undefined}
         onClick={() => onSelect(index)}
-        className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
+        className={masterDetailListRowSelectClasses}
       >
         {item.eyebrow ? (
           <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
