@@ -1,9 +1,6 @@
 # content / spells
 
-Spell catalog: overview table, detail pages, and create/edit authoring for system seed
-
-- homebrew spells. Part of the [`content`](../README.md) feature; see
-  [feature-conventions](../../../../docs/feature-conventions.md) for layout.
+Spell catalog: overview table, detail pages, and create/edit authoring for system seed + homebrew spells. Part of the [`content`](../README.md) feature; see [feature-conventions](../../../../docs/feature-conventions.md) for layout.
 
 ## Scope
 
