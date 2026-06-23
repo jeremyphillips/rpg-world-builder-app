@@ -68,7 +68,7 @@ describe('SpeciesTraitsTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 
-    expect(screen.getByRole('button', { name: /^(?!Remove|Move).*Trait 1/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^(?!Remove|Drag).*Trait 1/ })).toBeInTheDocument()
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.0')
   })
 
@@ -81,7 +81,7 @@ describe('SpeciesTraitsTab', () => {
     const user = userEvent.setup()
     render(<TabShell traits={[darkvision, feyAncestry]} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Move).*Fey Ancestry/ }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Fey Ancestry/ }))
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.1')
   })
 

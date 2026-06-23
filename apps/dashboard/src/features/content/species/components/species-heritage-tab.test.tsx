@@ -75,7 +75,7 @@ describe('SpeciesHeritageTab', () => {
     expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
     expect(screen.getByRole('button', { name: /Add option/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^(?!Remove|Move).*Breath Weapon/ }),
+      screen.getByRole('button', { name: /^(?!Remove|Drag).*Breath Weapon/ }),
     ).toBeInTheDocument()
   })
 

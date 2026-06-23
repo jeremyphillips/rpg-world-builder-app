@@ -188,7 +188,7 @@ function MasterDetailListRow({
   )
 }
 
-interface SortableMasterDetailListRowProps extends MasterDetailListRowProps {}
+type SortableMasterDetailListRowProps = MasterDetailListRowProps
 
 function SortableMasterDetailListRow(props: SortableMasterDetailListRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({

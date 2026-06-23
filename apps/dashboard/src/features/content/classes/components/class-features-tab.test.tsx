@@ -68,7 +68,7 @@ describe('ClassFeaturesTab', () => {
     const user = userEvent.setup()
     render(<TabShell features={[rage, unarmored]} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Move).*Unarmored Defense/ }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Unarmored Defense/ }))
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.1')
   })
 
