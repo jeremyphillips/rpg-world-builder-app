@@ -1,0 +1,123 @@
+import { z } from 'zod'
+
+import { levelSchema } from '../primitives/level'
+import {
+  ABILITY_SCORE_MAX,
+  ABILITY_SCORE_MIN,
+  abilitySchema,
+  getAbilityLabel,
+} from '../vocab/ability'
+
+import { classSlugSchema, getClassName } from './class/class'
+
+// ---------------------------------------------------------------------------
+// RequirementExpression — composable AND/OR eligibility trees shared by feats,
+// future invocations, multiclass rules, and the character builder.
+//
+// Semantics:
+// - `all` — every child must be satisfied (AND).
+// - `any` — at least one child must be satisfied (OR).
+// - A single leaf is valid at the root (no forced `all` wrapper).
+// ---------------------------------------------------------------------------
+
+export const requirementMinLevelSchema = z.object({
+  kind: z.literal('minLevel'),
+  level: levelSchema,
+})
+
+export const requirementAbilityMinimumSchema = z.object({
+  kind: z.literal('abilityMinimum'),
+  ability: abilitySchema,
+  minimum: z.number().int().min(ABILITY_SCORE_MIN).max(ABILITY_SCORE_MAX),
+})
+
+export const requirementClassLevelSchema = z.object({
+  kind: z.literal('classLevel'),
+  classSlug: classSlugSchema,
+  minimum: z.number().int().min(1).default(1),
+})
+
+export const requirementFeatureSchema = z.object({
+  kind: z.literal('feature'),
+  featureId: z.string().min(1),
+})
+
+export const requirementSpellcastingSchema = z.object({
+  kind: z.literal('spellcasting'),
+})
+
+export type RequirementMinLevel = z.infer<typeof requirementMinLevelSchema>
+export type RequirementAbilityMinimum = z.infer<typeof requirementAbilityMinimumSchema>
+export type RequirementClassLevel = z.infer<typeof requirementClassLevelSchema>
+export type RequirementFeature = z.infer<typeof requirementFeatureSchema>
+export type RequirementSpellcasting = z.infer<typeof requirementSpellcastingSchema>
+
+export type RequirementExpression =
+  | RequirementMinLevel
+  | RequirementAbilityMinimum
+  | RequirementClassLevel
+  | RequirementFeature
+  | RequirementSpellcasting
+  | { kind: 'all'; requirements: RequirementExpression[] }
+  | { kind: 'any'; requirements: RequirementExpression[] }
+
+export const requirementExpressionSchema: z.ZodType<RequirementExpression> = z.lazy(() =>
+  z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('all'),
+      requirements: z.array(requirementExpressionSchema).min(1),
+    }),
+    z.object({
+      kind: z.literal('any'),
+      requirements: z.array(requirementExpressionSchema).min(1),
+    }),
+    requirementMinLevelSchema,
+    requirementAbilityMinimumSchema,
+    requirementClassLevelSchema,
+    requirementFeatureSchema,
+    requirementSpellcastingSchema,
+  ]),
+)
+
+/** Title-cases a kebab-case feature id for display (e.g. `fighting-style` → `Fighting Style Feature`). */
+export function formatFeatureRequirement(featureId: string): string {
+  const label = featureId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+  return `${label} Feature`
+}
+
+function formatAnyGroup(requirements: RequirementExpression[]): string {
+  const abilityMins = requirements.filter(
+    (req): req is RequirementAbilityMinimum => req.kind === 'abilityMinimum',
+  )
+  if (abilityMins.length === requirements.length && abilityMins.length > 0) {
+    const { minimum } = abilityMins[0]!
+    if (abilityMins.every((req) => req.minimum === minimum)) {
+      const labels = abilityMins.map((req) => getAbilityLabel(req.ability)).join(' or ')
+      return `${labels} ${minimum}+`
+    }
+  }
+  return requirements.map(formatRequirementExpression).join(' or ')
+}
+
+/** Formats a requirement tree as player-facing prerequisite prose. */
+export function formatRequirementExpression(expr: RequirementExpression): string {
+  switch (expr.kind) {
+    case 'all':
+      return expr.requirements.map(formatRequirementExpression).join(', ')
+    case 'any':
+      return formatAnyGroup(expr.requirements)
+    case 'minLevel':
+      return `Level ${expr.level}+`
+    case 'abilityMinimum':
+      return `${getAbilityLabel(expr.ability)} ${expr.minimum}+`
+    case 'classLevel':
+      return `${getClassName(expr.classSlug)} level ${expr.minimum}+`
+    case 'feature':
+      return formatFeatureRequirement(expr.featureId)
+    case 'spellcasting':
+      return 'Spellcasting Feature'
+  }
+}
