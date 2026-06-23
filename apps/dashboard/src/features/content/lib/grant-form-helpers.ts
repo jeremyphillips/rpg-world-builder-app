@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import {
-  ABILITIES,
+  ABILITY_ENTRIES,
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
@@ -112,7 +112,13 @@ const armorCategoryOptions = toOptions(
   >,
 )
 
-const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
+const abilityOptions = toOptions(
+  ABILITY_IDS,
+  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
+    (typeof ABILITY_IDS)[number],
+    string
+  >,
+)
 
 const innateSpellKindOptions = toOptions(
   INNATE_SPELL_KINDS,

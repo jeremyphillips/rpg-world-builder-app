@@ -7,7 +7,7 @@ import {
   FOCUS_TYPE_LABELS,
   GEAR_CATEGORY_LABELS,
   TOOL_CATEGORY_LABELS,
-  ABILITIES,
+  getAbilityLabel,
 } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -62,7 +62,7 @@ function getFocusStatRows(item: FocusItem): StatRow[] {
 function getToolStatRows(item: ToolItem): StatRow[] {
   return [
     { label: 'Category', value: TOOL_CATEGORY_LABELS[item.toolCategory] },
-    ...(item.ability ? [{ label: 'Ability', value: ABILITIES[item.ability] }] : []),
+    ...(item.ability ? [{ label: 'Ability', value: getAbilityLabel(item.ability) }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
   ]
 }

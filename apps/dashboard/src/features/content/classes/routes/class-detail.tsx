@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { ABILITIES, skillSlugsSuggestingClass } from '@rpg/contracts'
+import { getAbilityLabel, skillSlugsSuggestingClass } from '@rpg/contracts'
 import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -140,8 +140,8 @@ function SuggestedProficienciesList({
 function ClassStatsSection({ characterClass }: { characterClass: CharacterClass }) {
   const { hitDie, primaryAbilities, proficiencies } = characterClass
 
-  const primaryAbilitiesLabel = primaryAbilities.map((a) => ABILITIES[a]).join(', ')
-  const savingThrowsLabel = proficiencies.savingThrows.map((a) => ABILITIES[a]).join(', ')
+  const primaryAbilitiesLabel = primaryAbilities.map(getAbilityLabel).join(', ')
+  const savingThrowsLabel = proficiencies.savingThrows.map(getAbilityLabel).join(', ')
   const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
   const armorLabel =
     proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'

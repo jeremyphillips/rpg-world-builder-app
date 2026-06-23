@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   abilitySchema,
-  ABILITIES,
+  ABILITY_ENTRIES,
   ABILITY_IDS,
   createEquipmentInputSchema,
   currencySchema,
@@ -60,7 +60,13 @@ const toolCategoryOptions = toOptions(
   ],
   TOOL_CATEGORY_LABELS,
 )
-const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
+const abilityOptions = toOptions(
+  ABILITY_IDS,
+  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
+    (typeof ABILITY_IDS)[number],
+    string
+  >,
+)
 
 function visibleWhenKind(...kinds: EquipmentKind[]): FieldVisibility {
   return {

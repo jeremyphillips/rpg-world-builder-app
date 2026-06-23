@@ -203,7 +203,7 @@ export type SubclassCampaignAvailability = z.infer<typeof subclassCampaignAvaila
 
 // ---------------------------------------------------------------------------
 // Class taxonomy — SRD 5.2 class slugs -> display names, mirroring the SKILLS
-// and ABILITIES maps. Used for name lookup (e.g. rendering `suggestedClasses`
+// and ABILITY_ENTRIES maps. Used for name lookup (e.g. rendering `suggestedClasses`
 // on skill proficiency detail pages). Homebrew classes are not enumerated here;
 // `getClassName` falls back to the raw slug for unknown values.
 // ---------------------------------------------------------------------------

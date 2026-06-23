@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
-import { ABILITIES, getClassName } from '@rpg/contracts'
+import { getAbilityLabel, getClassName } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -82,7 +82,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
           {skill.name}
         </Heading>
         <div className="space-y-3">
-          <ContentStatRow label="Governing Ability" value={ABILITIES[skill.ability]} />
+          <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
         </div>
         {skill.description && <Text variant="muted">{skill.description}</Text>}
       </div>

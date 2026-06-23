@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
-  ABILITIES,
+  ABILITY_ENTRIES,
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
@@ -81,7 +81,13 @@ const WEAPON_PROFICIENCIES_HINT =
 // Vocab option lists
 // ---------------------------------------------------------------------------
 
-const abilityOptions = toOptions(ABILITY_IDS, ABILITIES)
+const abilityOptions = toOptions(
+  ABILITY_IDS,
+  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
+    (typeof ABILITY_IDS)[number],
+    string
+  >,
+)
 
 const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   value: String(face),

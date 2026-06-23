@@ -1,5 +1,5 @@
 import type { SkillProficiency } from '@rpg/contracts'
-import { ABILITIES } from '@rpg/contracts'
+import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -10,7 +10,7 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
   {
     accessorKey: 'ability',
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
-    cell: ({ row }) => ABILITIES[row.getValue<SkillProficiency['ability']>('ability')],
+    cell: ({ row }) => ABILITY_ENTRIES[row.getValue<SkillProficiency['ability']>('ability')].label,
     filterFn: 'equalsString',
     meta: { label: 'Ability' },
   },
@@ -21,7 +21,7 @@ const SKILL_SPECIFIC_FILTERS: FilterDef[] = [
     type: 'select',
     id: 'ability',
     label: 'Ability',
-    options: Object.entries(ABILITIES).map(([value, label]) => ({ label, value })),
+    options: ABILITY_IDS.map((id) => ({ value: id, label: ABILITY_ENTRIES[id].label })),
   },
 ]
 
