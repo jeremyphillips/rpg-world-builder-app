@@ -49,6 +49,12 @@ export const CONTENT_ROUTES = {
       `/campaigns/${campaignId}/species/${speciesId}/edit`,
     create: (campaignId: string) => `/campaigns/${campaignId}/species/new`,
   },
+  feats: {
+    overview: (campaignId: string) => `/campaigns/${campaignId}/feats`,
+    detail: (campaignId: string, featId: string) => `/campaigns/${campaignId}/feats/${featId}`,
+    edit: (campaignId: string, featId: string) => `/campaigns/${campaignId}/feats/${featId}/edit`,
+    create: (campaignId: string) => `/campaigns/${campaignId}/feats/new`,
+  },
   spells: {
     overview: (campaignId: string) => `/campaigns/${campaignId}/spells`,
     detail: (campaignId: string, spellId: string) => `/campaigns/${campaignId}/spells/${spellId}`,

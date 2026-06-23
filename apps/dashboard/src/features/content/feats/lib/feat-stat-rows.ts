@@ -1,0 +1,45 @@
+import type { Feat } from '@rpg/contracts'
+import {
+  FEAT_PART_ENTRIES,
+  formatRequirementExpression,
+  getFeatCategoryEntry,
+  getFeatCategoryLabel,
+} from '@rpg/contracts'
+
+import type { ContentStatRowData } from '../../lib/content-stat-rows'
+
+/** Builds label/value pairs for the feat detail stat section. */
+export function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
+  const rows: ContentStatRowData[] = [
+    {
+      label: 'Category',
+      value: getFeatCategoryLabel(feat.category),
+      info: getFeatCategoryEntry(feat.category)?.description,
+      infoAriaLabel: `About ${getFeatCategoryLabel(feat.category)}`,
+    },
+  ]
+
+  if (feat.prerequisite) {
+    rows.push({
+      label: 'Prerequisite',
+      value: formatRequirementExpression(feat.prerequisite),
+      info: FEAT_PART_ENTRIES.prerequisite.description,
+      infoPlacement: 'label',
+    })
+  }
+
+  rows.push({
+    label: 'Repeatable',
+    value: feat.repeatable.allowed ? 'Yes' : 'No',
+    info: FEAT_PART_ENTRIES.repeatable.description,
+    infoPlacement: 'label',
+  })
+
+  return rows
+}
+
+/** Short prerequisite label for overview tables. */
+export function formatFeatPrerequisiteSummary(feat: Feat): string {
+  if (!feat.prerequisite) return '—'
+  return formatRequirementExpression(feat.prerequisite)
+}
