@@ -22,6 +22,8 @@ export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './s
 export { SpeciesCreate } from './species/routes/species-create'
 export { SpeciesEdit } from './species/routes/species-edit'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
+export { SpellCreate } from './spells/routes/spell-create'
+export { SpellEdit } from './spells/routes/spell-edit'
 export { ContentCreateShell, ContentFormShellResolver } from './lib/content-create-shell'
 export { ContentEditShell } from './lib/content-edit-shell'
 export {
