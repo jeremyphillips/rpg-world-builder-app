@@ -10,6 +10,7 @@ import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { HomebrewClassModel } from './classes/homebrew-class.model'
 import { skillProficiencyWriteConfig } from './skill-proficiencies/skill-proficiencies.config'
 import { spellWriteConfig } from './spells/spells.config'
+import { featWriteConfig } from './feats/feats.config'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { resolveCatalogForCampaign } from './content.service'
 import { HttpError } from '../../lib/http-error'
@@ -326,6 +327,42 @@ describe('createHomebrewContent (spells)', () => {
     })
 
     expect(updated.name).toBe('Enhanced Fire Bolt')
+    expect(updated.source).toBe('system')
+  })
+})
+
+describe('createHomebrewContent (feats)', () => {
+  const minimalFeatInput = {
+    slug: 'custom-feat',
+    name: 'Custom Feat',
+    description: '<p>A custom origin feat benefit.</p>',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  it('creates homebrew feat and returns it in the resolved catalog', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(featWriteConfig, campaign.id, minimalFeatInput)
+
+    expect(created.source).toBe('homebrew')
+    expect(created.slug).toBe('custom-feat')
+    expect(created.category).toBe('origin')
+
+    const feats = await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)
+    expect(feats.some((f) => f.slug === 'custom-feat')).toBe(true)
+  })
+
+  it('patches a system feat record', async () => {
+    const campaign = await makeCampaign()
+    const alert = (await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)).find(
+      (f) => f.slug === 'alert',
+    )!
+
+    const updated = await updateContentEntity(featWriteConfig, campaign.id, alert.id, {
+      name: 'Enhanced Alert',
+    })
+
+    expect(updated.name).toBe('Enhanced Alert')
     expect(updated.source).toBe('system')
   })
 })
