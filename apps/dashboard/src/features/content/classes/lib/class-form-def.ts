@@ -266,18 +266,24 @@ function resourceItemFields(): FormItem[] {
         values['level'] ? `Level ${values['level']}` : `Entry ${index + 1}`,
       fields: [
         {
-          type: 'select',
-          name: 'level',
-          label: 'Character level',
-          options: levelOptions,
-          required: true,
-        },
-        {
-          type: 'number',
-          name: 'value',
-          label: 'Value',
-          min: 0,
-          required: true,
+          kind: 'row',
+          fields: [
+            {
+              type: 'select',
+              name: 'level',
+              label: 'Character level',
+              options: levelOptions,
+              required: true,
+            },
+            {
+              type: 'number',
+              name: 'value',
+              label: 'Value',
+              min: 0,
+              required: true,
+              width: 'sm',
+            },
+          ],
         },
       ],
     },
