@@ -81,7 +81,7 @@ const SPELL_DURATION_KIND_LABELS: Record<(typeof SPELL_DURATION_KINDS)[number], 
   special: 'Special',
 }
 
-const DELIVERY_NONE = ''
+const SPELL_DELIVERY_METHOD_NONE = 'none'
 
 const schoolOptions = toOptions(
   SPELL_SCHOOLS,
@@ -127,7 +127,7 @@ const durationUnitOptions = toOptions(
 )
 
 const deliveryMethodOptions: FieldOption[] = [
-  { value: DELIVERY_NONE, label: 'None' },
+  { value: SPELL_DELIVERY_METHOD_NONE, label: 'None' },
   ...toOptions(
     SPELL_DELIVERY_METHODS,
     Object.fromEntries(
@@ -273,7 +273,7 @@ const spellCreateDefaultValues: Partial<SpellFormValues> = {
   range: { kind: 'self' },
   duration: { kind: 'instantaneous' },
   components: { verbal: true, somatic: true },
-  deliveryMethod: DELIVERY_NONE,
+  deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
 
 function basicsFields(ctx: ContentFormCtx): FormItem[] {
@@ -355,19 +355,24 @@ function castingFields(): FormItem[] {
       legend: 'Range',
       fields: [
         {
-          type: 'select',
-          name: 'range.kind',
-          label: 'Range kind',
-          options: rangeKindOptions,
-          required: true,
-        },
-        {
-          type: 'number',
-          name: 'range.value.value',
-          label: 'Distance (ft)',
-          min: 0,
-          visibility: visibleWhenRangeDistance(),
-          required: true,
+          kind: 'row',
+          fields: [
+            {
+              type: 'select',
+              name: 'range.kind',
+              label: 'Range kind',
+              options: rangeKindOptions,
+              required: true,
+            },
+            {
+              type: 'number',
+              name: 'range.value.value',
+              label: 'Distance (ft)',
+              min: 0,
+              visibility: visibleWhenRangeDistance(),
+              required: true,
+            },
+          ],
         },
         {
           type: 'text',
@@ -500,7 +505,7 @@ function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
 function toInput(values: SpellFormValues, ctx?: ContentFormInputCtx<Spell>): CreateSpellInput {
   const rawDelivery = values.deliveryMethod?.trim()
   const deliveryMethod =
-    rawDelivery && rawDelivery !== DELIVERY_NONE
+    rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
       ? spellDeliveryMethodSchema.parse(rawDelivery)
       : undefined
 
@@ -541,7 +546,7 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
     duration: spellDurationToFormValues(entity.duration),
     components: spellComponentsToFormValues(entity.components),
     tags: spellTagsToFormValues(entity.tags),
-    deliveryMethod: entity.deliveryMethod ?? DELIVERY_NONE,
+    deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
   }),
   toInput,
   useListQuery: useSpells,
