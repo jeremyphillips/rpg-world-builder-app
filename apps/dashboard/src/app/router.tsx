@@ -36,6 +36,8 @@ import {
   SpeciesEdit,
   FeatsOverview,
   FeatDetail,
+  FeatCreate,
+  FeatEdit,
   SpellsOverview,
   SpellDetail,
   SpellCreate,
@@ -203,6 +205,11 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <FeatsOverview /> },
                     {
+                      path: 'new',
+                      element: <FeatCreate />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
                       path: ':featId',
                       element: <Outlet />,
                       handle: {
@@ -210,7 +217,14 @@ const router = createBrowserRouter(
                           label: entityLabel ?? '…',
                         }),
                       } satisfies CrumbHandle,
-                      children: [{ index: true, element: <FeatDetail /> }],
+                      children: [
+                        { index: true, element: <FeatDetail /> },
+                        {
+                          path: 'edit',
+                          element: <FeatEdit />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                   ],
                 },
