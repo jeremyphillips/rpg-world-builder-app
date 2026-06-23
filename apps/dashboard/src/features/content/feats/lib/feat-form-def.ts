@@ -9,11 +9,9 @@ import {
   FEAT_PART_ENTRIES,
   abilitySchema,
   createFeatInputSchema,
-  levelSchema,
   slugSchema,
   type CreateFeatInput,
   type Feat,
-  type RequirementExpression,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
@@ -25,6 +23,19 @@ import {
 } from '../../lib/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
+import {
+  FEAT_PREREQUISITE_PATTERNS,
+  prerequisiteFromFormValues,
+  prerequisiteToFormValues,
+  refineFeatPrerequisiteFields,
+  type FeatPrerequisitePattern,
+} from './feat-prerequisite-form-helpers'
+
+export { FEAT_PREREQUISITE_PATTERNS, type FeatPrerequisitePattern }
+export {
+  prerequisiteFromFormValues,
+  prerequisiteToFormValues,
+} from './feat-prerequisite-form-helpers'
 
 const featCategoryOptions = toOptions(
   FEAT_CATEGORY_IDS,
@@ -40,16 +51,6 @@ const abilityOptions = toOptions(
     string
   >,
 )
-
-export const FEAT_PREREQUISITE_PATTERNS = [
-  'none',
-  'min-level',
-  'feature',
-  'level-and-abilities',
-  'level-and-spellcasting',
-] as const
-
-export type FeatPrerequisitePattern = (typeof FEAT_PREREQUISITE_PATTERNS)[number]
 
 const prerequisitePatternOptions = [
   { value: 'none', label: 'No prerequisite' },
@@ -73,73 +74,7 @@ const featFormSchema = z
     repeatableAllowed: z.boolean(),
     repeatableNotes: z.string().optional(),
   })
-  .superRefine((values, ctx) => {
-    if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Repeat constraints are only allowed when the feat is repeatable',
-        path: ['repeatableNotes'],
-      })
-    }
-
-    switch (values.prerequisitePattern) {
-      case 'none':
-        return
-      case 'min-level':
-        if (!levelSchema.safeParse(values.prerequisiteMinLevel).success) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Minimum character level is required',
-            path: ['prerequisiteMinLevel'],
-          })
-        }
-        return
-      case 'feature':
-        if (!values.prerequisiteFeatureId?.trim()) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Feature ID is required',
-            path: ['prerequisiteFeatureId'],
-          })
-        }
-        return
-      case 'level-and-abilities':
-        if (!levelSchema.safeParse(values.prerequisiteMinLevel).success) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Minimum character level is required',
-            path: ['prerequisiteMinLevel'],
-          })
-        }
-        if (!values.prerequisiteAbilities?.length) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Select at least one ability score',
-            path: ['prerequisiteAbilities'],
-          })
-        }
-        if (
-          values.prerequisiteAbilityMinimum === undefined ||
-          values.prerequisiteAbilityMinimum < ABILITY_SCORE_MIN ||
-          values.prerequisiteAbilityMinimum > ABILITY_SCORE_MAX
-        ) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `Minimum score must be between ${ABILITY_SCORE_MIN} and ${ABILITY_SCORE_MAX}`,
-            path: ['prerequisiteAbilityMinimum'],
-          })
-        }
-        return
-      case 'level-and-spellcasting':
-        if (!levelSchema.safeParse(values.prerequisiteMinLevel).success) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Minimum character level is required',
-            path: ['prerequisiteMinLevel'],
-          })
-        }
-    }
-  })
+  .superRefine(refineFeatPrerequisiteFields)
 
 type FeatFormValues = z.infer<typeof featFormSchema>
 
@@ -156,108 +91,6 @@ function visibleWhenRepeatableNotes(): FieldVisibility {
     dependsOn: ['repeatableAllowed'],
     visibleWhen: (watched) => watched['repeatableAllowed'] === true,
   }
-}
-
-/** Maps validated form prerequisite fields to a RequirementExpression tree. */
-export function prerequisiteFromFormValues(
-  values: Pick<
-    FeatFormValues,
-    | 'prerequisitePattern'
-    | 'prerequisiteMinLevel'
-    | 'prerequisiteFeatureId'
-    | 'prerequisiteAbilities'
-    | 'prerequisiteAbilityMinimum'
-  >,
-): RequirementExpression | undefined {
-  switch (values.prerequisitePattern) {
-    case 'none':
-      return undefined
-    case 'min-level':
-      return { kind: 'minLevel', level: levelSchema.parse(values.prerequisiteMinLevel) }
-    case 'feature':
-      return { kind: 'feature', featureId: values.prerequisiteFeatureId!.trim() }
-    case 'level-and-abilities':
-      return {
-        kind: 'all',
-        requirements: [
-          { kind: 'minLevel', level: levelSchema.parse(values.prerequisiteMinLevel) },
-          {
-            kind: 'any',
-            requirements: values.prerequisiteAbilities!.map((ability) => ({
-              kind: 'abilityMinimum' as const,
-              ability,
-              minimum: values.prerequisiteAbilityMinimum!,
-            })),
-          },
-        ],
-      }
-    case 'level-and-spellcasting':
-      return {
-        kind: 'all',
-        requirements: [
-          { kind: 'minLevel', level: levelSchema.parse(values.prerequisiteMinLevel) },
-          { kind: 'spellcasting' },
-        ],
-      }
-  }
-}
-
-/** Maps a stored prerequisite tree to form fields for the v1 pattern editor. */
-export function prerequisiteToFormValues(
-  prerequisite?: RequirementExpression,
-): Pick<
-  FeatFormValues,
-  | 'prerequisitePattern'
-  | 'prerequisiteMinLevel'
-  | 'prerequisiteFeatureId'
-  | 'prerequisiteAbilities'
-  | 'prerequisiteAbilityMinimum'
-> {
-  if (!prerequisite) {
-    return { prerequisitePattern: 'none' }
-  }
-
-  if (prerequisite.kind === 'minLevel') {
-    return {
-      prerequisitePattern: 'min-level',
-      prerequisiteMinLevel: prerequisite.level,
-    }
-  }
-
-  if (prerequisite.kind === 'feature') {
-    return {
-      prerequisitePattern: 'feature',
-      prerequisiteFeatureId: prerequisite.featureId,
-    }
-  }
-
-  if (prerequisite.kind === 'all' && prerequisite.requirements.length === 2) {
-    const [first, second] = prerequisite.requirements
-
-    if (first?.kind === 'minLevel' && second?.kind === 'spellcasting') {
-      return {
-        prerequisitePattern: 'level-and-spellcasting',
-        prerequisiteMinLevel: first.level,
-      }
-    }
-
-    if (first?.kind === 'minLevel' && second?.kind === 'any') {
-      const abilityMins = second.requirements.filter((req) => req.kind === 'abilityMinimum')
-      if (abilityMins.length > 0) {
-        const minimum = abilityMins[0]!.minimum
-        if (abilityMins.every((req) => req.minimum === minimum)) {
-          return {
-            prerequisitePattern: 'level-and-abilities',
-            prerequisiteMinLevel: first.level,
-            prerequisiteAbilities: abilityMins.map((req) => req.ability),
-            prerequisiteAbilityMinimum: minimum,
-          }
-        }
-      }
-    }
-  }
-
-  return { prerequisitePattern: 'none' }
 }
 
 const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
