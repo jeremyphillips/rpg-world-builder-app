@@ -4,6 +4,7 @@ import { getEquipmentBySlug } from '@rpg/catalog/equipment'
 import { getSkillProficiencyBySlug } from '@rpg/catalog/skill-proficiencies'
 import { getSpeciesBySlug } from '@rpg/catalog/species'
 import { getSpellBySlug } from '@rpg/catalog/spells'
+import { getFeatBySlug } from '@rpg/catalog/feats'
 import { getWeaponBySlug } from '@rpg/catalog/weapons'
 
 import { STORY_RULESET_ID } from './constants'
@@ -43,4 +44,8 @@ export function pickSubclassesForClass(classSlug: string) {
 
 export function pickSpell(slug: string) {
   return getSpellBySlug(STORY_RULESET_ID, slug)
+}
+
+export function pickFeat(slug: string) {
+  return getFeatBySlug(STORY_RULESET_ID, slug)
 }

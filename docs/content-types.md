@@ -41,6 +41,52 @@ Legacy records without `kind` normalize to `custom` on parse (`normalizeContentT
 
 ---
 
+## Requirement expressions
+
+Composable eligibility trees (`RequirementExpression` in
+`packages/contracts/src/content/requirement-expression.ts`) model prerequisites
+and similar rules as explicit **AND** / **OR** structure. Feats are the first
+consumer; the same module will back invocations, multiclass rules, and the
+character builder.
+
+| Node                                           | Meaning                                       |
+| ---------------------------------------------- | --------------------------------------------- |
+| `{ kind: "all", requirements: [...] }`         | **AND** — every child must be satisfied       |
+| `{ kind: "any", requirements: [...] }`         | **OR** — at least one child must be satisfied |
+| `{ kind: "minLevel", level: N }`               | Character level ≥ N                           |
+| `{ kind: "abilityMinimum", ability, minimum }` | Ability score ≥ minimum                       |
+| `{ kind: "classLevel", classSlug, minimum? }`  | ≥ `minimum` levels in class (default 1)       |
+| `{ kind: "feature", featureId }`               | Has a class feature with this nested id       |
+| `{ kind: "spellcasting" }`                     | Has an active spellcasting block              |
+
+Rules:
+
+- A **single leaf** is valid at the root (no forced `all` wrapper).
+- Compositors require at least one child.
+- Nesting is unlimited (recursive Zod schema via `z.lazy()`).
+- Display prose comes from `formatRequirementExpression()` in `@rpg/contracts`
+  — do not duplicate prerequisite strings on catalog records.
+
+**Example (Grappler):** `Level 4+` AND (`Strength 13+` OR `Dexterity 13+`):
+
+```json
+{
+  "kind": "all",
+  "requirements": [
+    { "kind": "minLevel", "level": 4 },
+    {
+      "kind": "any",
+      "requirements": [
+        { "kind": "abilityMinimum", "ability": "str", "minimum": 13 },
+        { "kind": "abilityMinimum", "ability": "dex", "minimum": 13 }
+      ]
+    }
+  ]
+}
+```
+
+---
+
 ## Content key mutability
 
 Catalog records carry three distinct identifier layers. Authors edit **display names** only; keys are derived on create and locked afterward (no slug/id fields in dashboard forms).
