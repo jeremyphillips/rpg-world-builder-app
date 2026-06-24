@@ -1,5 +1,7 @@
-import { CURRENCIES, CURRENCY_IDS, type Currency } from '@rpg/contracts'
+import { CURRENCIES, CURRENCY_IDS, type Currency, type EquipmentKind } from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FieldOption, type RowConfig } from '@rpg/ui/form'
+
+import { EQUIPMENT_COST_VALUE_DIGITS, costValueDigitsForKind } from './equipment-cost-config'
 
 type GroupField = FieldConfig | RowConfig
 
@@ -16,27 +18,30 @@ export function identityFields(): GroupField[] {
   ]
 }
 
-/** Cost amount + currency row (`cost.amount`, `cost.currency`). */
-export function costFields(required = true): GroupField[] {
+/** Cost amount + currency composite (`cost.amount`, `cost.currency`). */
+export function costFields(
+  options: { kind?: EquipmentKind; required?: boolean } = {},
+): GroupField[] {
+  const { kind, required = true } = options
   return [
     {
-      kind: 'row',
-      fields: [
-        {
-          type: 'number',
-          name: 'cost.amount',
-          label: 'Cost',
-          min: 0,
-          required,
-        },
-        {
-          type: 'select',
-          name: 'cost.currency',
-          label: 'Currency',
-          options: currencyOptions,
-          required,
-        },
-      ],
+      type: 'inputSelect',
+      name: 'cost',
+      label: 'Cost',
+      inputType: 'number',
+      valueKey: 'amount',
+      unitKey: 'currency',
+      options: currencyOptions,
+      min: 0,
+      width: 'auto',
+      required,
+      defaultValue: costToFormDefaults(),
+      ...(kind
+        ? { valueDigits: costValueDigitsForKind(kind) }
+        : {
+            valueDigitsDependsOn: 'kind',
+            valueDigitsLookup: EQUIPMENT_COST_VALUE_DIGITS,
+          }),
     },
   ]
 }

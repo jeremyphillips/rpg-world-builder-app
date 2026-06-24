@@ -383,11 +383,6 @@ export function InputSelectField({
         className={fieldLabelVariants({ size })}
       >
         {label}
-        {required ? (
-          <span aria-hidden className="text-destructive">
-            *
-          </span>
-        ) : null}
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </label>
 

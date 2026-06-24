@@ -242,13 +242,13 @@ function buildUnscopedEquipmentFields(): FormItem[] {
   ]
 }
 
-function identityAndEconomyGroups(): FormItem[] {
+function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
   return [
     { kind: 'group', legend: 'Identity', fields: identityFields() },
     {
       kind: 'group',
       legend: 'Economy',
-      fields: [...costFields(), ...optionalWeightFields()],
+      fields: [...costFields({ kind: ctx.equipmentKind }), ...optionalWeightFields()],
     },
   ]
 }
@@ -257,7 +257,7 @@ function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
   if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
 
   const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind)
-  return [...identityAndEconomyGroups(), ...(registered ?? [])]
+  return [...identityAndEconomyGroups(ctx), ...(registered ?? [])]
 }
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {

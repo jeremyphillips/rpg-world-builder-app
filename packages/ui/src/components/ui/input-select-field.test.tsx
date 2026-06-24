@@ -145,6 +145,13 @@ describe('InputSelectField', () => {
     expect(group).toHaveClass('grid-cols-[1fr_1px_auto]')
   })
 
+  it('shows a single required marker via label styling', () => {
+    render(<ControlledField required />)
+    const label = screen.getByText('Cost').closest('label')
+    expect(label).toHaveAttribute('data-required')
+    expect(label?.querySelector('span.text-destructive')).toBeNull()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledField min={0} />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

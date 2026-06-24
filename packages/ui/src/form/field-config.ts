@@ -12,6 +12,7 @@ import type {
 } from '../components/ui/editable-grid.client'
 import type { FieldSize } from '../components/ui/field.client'
 import type { FieldWidth } from '../components/ui/field-control.variants'
+import type { FieldDigits } from '../components/ui/field-digit-metrics'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -29,6 +30,7 @@ export type FieldType =
   | 'combobox'
   | 'editableGrid'
   | 'diceFormula'
+  | 'inputSelect'
 
 /** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -260,6 +262,29 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   defaultValue?: DiceFormulaValue
 }
 
+/**
+ * Value + unit composite bound to a nested object field (e.g. `{ amount, currency }`).
+ * `valueKey` / `unitKey` name the object properties the control reads and writes.
+ */
+export interface InputSelectFieldConfig extends BaseFieldConfig {
+  type: 'inputSelect'
+  inputType: 'text' | 'number'
+  options: FieldOption[]
+  valueKey?: string
+  unitKey?: string
+  searchable?: boolean
+  unitPlaceholder?: string
+  min?: number
+  max?: number
+  step?: number
+  placeholder?: string
+  valueDigits?: FieldDigits
+  /** Watched field name used to resolve `valueDigits` from `valueDigitsLookup`. */
+  valueDigitsDependsOn?: string
+  valueDigitsLookup?: Record<string, FieldDigits>
+  defaultValue?: Record<string, unknown>
+}
+
 /** Discriminated union of every leaf field, keyed by `type`. */
 export type FieldConfig =
   | TextFieldConfig
@@ -276,6 +301,7 @@ export type FieldConfig =
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
+  | InputSelectFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
 export interface RowConfig {
@@ -410,6 +436,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   combobox: [],
   editableGrid: {},
   diceFormula: defaultDiceFormulaForMode('optional'),
+  inputSelect: {},
 }
 
 function emptyEditableGridValue(

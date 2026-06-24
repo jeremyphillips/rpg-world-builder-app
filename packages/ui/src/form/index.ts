@@ -43,6 +43,8 @@ export {
   type ComboboxFieldConfig,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
+  type DiceFormulaFieldConfig,
+  type InputSelectFieldConfig,
   type FieldConfig,
   type RowConfig,
   type GroupConfig,

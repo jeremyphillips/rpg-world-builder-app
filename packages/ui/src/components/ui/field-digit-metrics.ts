@@ -33,18 +33,21 @@ export const fieldDigitWidthVariants = {
     2: fieldDigitWidthClass('sm', 2),
     3: fieldDigitWidthClass('sm', 3),
     4: fieldDigitWidthClass('sm', 4),
+    5: fieldDigitWidthClass('sm', 5),
   },
   md: {
     1: fieldDigitWidthClass('md', 1),
     2: fieldDigitWidthClass('md', 2),
     3: fieldDigitWidthClass('md', 3),
     4: fieldDigitWidthClass('md', 4),
+    5: fieldDigitWidthClass('md', 5),
   },
   lg: {
     1: fieldDigitWidthClass('lg', 1),
     2: fieldDigitWidthClass('lg', 2),
     3: fieldDigitWidthClass('lg', 3),
     4: fieldDigitWidthClass('lg', 4),
+    5: fieldDigitWidthClass('lg', 5),
   },
 } as const
 
