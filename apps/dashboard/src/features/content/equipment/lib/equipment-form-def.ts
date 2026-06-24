@@ -14,6 +14,7 @@ import {
   massUnitSchema,
   parseSpeedRateString,
   serviceCategorySchema,
+  serviceDurationUnitSchema,
   speedRateUnitSchema,
   slugSchema,
   toolCategorySchema,
@@ -113,7 +114,12 @@ const equipmentFormSchema = z.object({
 
   // service
   serviceCategory: serviceCategorySchema.optional(),
-  duration: z.string().optional(),
+  duration: z
+    .object({
+      value: z.coerce.number().int().min(1).optional(),
+      unit: serviceDurationUnitSchema.optional(),
+    })
+    .optional(),
   notes: z.string().optional(),
 
   // magic item

@@ -1,5 +1,5 @@
 import type { ServiceEquipment } from '@rpg/contracts'
-import { SERVICE_CATEGORIES, getServiceCategoryLabel } from '@rpg/contracts'
+import { SERVICE_CATEGORIES, formatServiceDuration, getServiceCategoryLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -21,7 +21,10 @@ const SERVICE_MIDDLE_COLUMNS: ColumnDef<ServiceEquipment>[] = [
   {
     accessorKey: 'duration',
     header: ({ column }) => <SortableHeader column={column}>Duration</SortableHeader>,
-    cell: ({ row }) => row.getValue<string>('duration') ?? '—',
+    cell: ({ row }) => {
+      const duration = row.getValue<ServiceEquipment['duration']>('duration')
+      return duration ? formatServiceDuration(duration) : '—'
+    },
     meta: { label: 'Duration' },
   },
   costColumn<ServiceEquipment>(),

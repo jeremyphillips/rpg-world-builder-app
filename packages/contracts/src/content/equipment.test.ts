@@ -187,7 +187,7 @@ const SAMPLE_BODIES = {
     name: 'Skilled Hireling',
     cost: { amount: 2, currency: 'gp' },
     serviceCategory: 'hireling',
-    duration: 'per day',
+    duration: { value: 1, unit: 'day' },
   },
   magic_item: {
     kind: 'magic_item',

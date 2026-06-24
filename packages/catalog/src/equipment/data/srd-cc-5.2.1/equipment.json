@@ -1064,7 +1064,7 @@
     },
     "kind": "service",
     "serviceCategory": "travel",
-    "duration": "per mile"
+    "duration": { "value": 1, "unit": "mile" }
   },
   {
     "id": "srd-cc-5.2.1:morningstar",
@@ -1602,7 +1602,7 @@
     },
     "kind": "service",
     "serviceCategory": "hireling",
-    "duration": "per day"
+    "duration": { "value": 1, "unit": "day" }
   },
   {
     "id": "srd-cc-5.2.1:sling",
@@ -1867,7 +1867,7 @@
     },
     "kind": "service",
     "serviceCategory": "hireling",
-    "duration": "per day"
+    "duration": { "value": 1, "unit": "day" }
   },
   {
     "id": "srd-cc-5.2.1:wagon",
