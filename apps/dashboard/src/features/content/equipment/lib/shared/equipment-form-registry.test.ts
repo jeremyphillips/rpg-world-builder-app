@@ -43,6 +43,12 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Vehicle' })
   })
 
+  it('registers armor field group', () => {
+    const groups = fieldGroupsForEquipmentKind('armor')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Armor' })
+  })
+
   it('returns undefined for kinds still in the monolith', () => {
     expect(fieldGroupsForEquipmentKind('weapon')).toBeUndefined()
   })

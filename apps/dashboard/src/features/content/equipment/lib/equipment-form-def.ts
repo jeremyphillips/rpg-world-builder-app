@@ -1,9 +1,5 @@
 import { z } from 'zod'
 import {
-  ARMOR_CATEGORIES,
-  ARMOR_CATEGORY_ENTRIES,
-  ARMOR_MATERIALS,
-  ARMOR_MATERIAL_ENTRIES,
   DIE_FACES,
   EQUIPMENT_KINDS,
   EQUIPMENT_KIND_LABELS,
@@ -60,6 +56,7 @@ import {
 } from '../adventuring-gear/lib/adventuring-gear-form-fields'
 import { magicItemFormValuesFromEntity } from '../magic-items/lib/magic-item-form-fields'
 import { vehicleFormValuesFromEntity } from '../vehicles/lib/vehicle-form-fields'
+import { armorFormValuesFromEntity } from '../armor/lib/armor-form-fields'
 import { equipmentFormToInput } from './equipment-form-input'
 import {
   allRegisteredKindFieldGroups,
@@ -88,8 +85,6 @@ const weaponPropertyOptions = toOptions(
   WEAPON_PROPERTIES,
   labelsFromEntries(WEAPON_PROPERTY_ENTRIES),
 )
-const armorCategoryOptions = toOptions(ARMOR_CATEGORIES, labelsFromEntries(ARMOR_CATEGORY_ENTRIES))
-const armorMaterialOptions = toOptions(ARMOR_MATERIALS, labelsFromEntries(ARMOR_MATERIAL_ENTRIES))
 
 const damageTypeOptions = toOptions(
   PHYSICAL_DAMAGE_TYPE_IDS,
@@ -137,28 +132,6 @@ function visibleWhenWeaponRanged(): FieldVisibility {
   return {
     dependsOn: ['kind', 'mode'],
     visibleWhen: (v) => v.kind === 'weapon' && v.mode === 'ranged',
-  }
-}
-
-function visibleWhenArmorNotShield(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'armorCategory'],
-    visibleWhen: (v) => v.kind === 'armor' && v.armorCategory !== 'shields',
-  }
-}
-
-function visibleWhenArmorShield(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'armorCategory'],
-    visibleWhen: (v) => v.kind === 'armor' && v.armorCategory === 'shields',
-  }
-}
-
-function visibleWhenArmorDexCap(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'armorCategory', 'addDexModifier'],
-    visibleWhen: (v) =>
-      v.kind === 'armor' && v.armorCategory === 'medium' && v.addDexModifier === true,
   }
 }
 
@@ -294,19 +267,7 @@ const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
       specialRules: item.specialRules,
     }
   },
-  armor: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'armor' }>
-    return {
-      armorCategory: item.category,
-      material: item.material,
-      baseAc: item.baseAc,
-      acBonus: item.acBonus,
-      addDexModifier: item.addDexModifier,
-      maxDexBonus: item.maxDexBonus,
-      stealthDisadvantage: item.stealthDisadvantage,
-      strengthRequirement: item.strengthRequirement,
-    }
-  },
+  armor: (entity) => armorFormValuesFromEntity(entity as Extract<Equipment, { kind: 'armor' }>),
   adventuring_gear: (entity) =>
     adventuringGearFormValuesFromEntity(entity as Extract<Equipment, { kind: 'adventuring_gear' }>),
   tool: (entity) => toolFormValuesFromEntity(entity as Extract<Equipment, { kind: 'tool' }>),
@@ -540,75 +501,6 @@ function buildUnscopedEquipmentFields(): FormItem[] {
           label: 'Special rules',
           hint: 'Prose for special properties (lance, net, etc.)',
           visibility: visibleWhenKind('weapon'),
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Armor',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'select',
-              name: 'armorCategory',
-              label: 'Category',
-              options: armorCategoryOptions,
-              visibility: visibleWhenKind('armor'),
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'material',
-              label: 'Material',
-              options: armorMaterialOptions,
-              visibility: visibleWhenKind('armor'),
-            },
-          ],
-        },
-        {
-          type: 'number',
-          name: 'baseAc',
-          label: 'Base AC',
-          min: 0,
-          visibility: visibleWhenArmorNotShield(),
-          required: true,
-        },
-        {
-          type: 'number',
-          name: 'acBonus',
-          label: 'AC bonus',
-          min: 0,
-          visibility: visibleWhenArmorShield(),
-          required: true,
-        },
-        {
-          type: 'switch',
-          name: 'addDexModifier',
-          label: 'Add Dex modifier',
-          visibility: visibleWhenArmorNotShield(),
-        },
-        {
-          type: 'number',
-          name: 'maxDexBonus',
-          label: 'Max Dex bonus',
-          min: 0,
-          visibility: visibleWhenArmorDexCap(),
-        },
-        {
-          type: 'switch',
-          name: 'stealthDisadvantage',
-          label: 'Stealth disadvantage',
-          visibility: visibleWhenKind('armor'),
-        },
-        {
-          type: 'number',
-          name: 'strengthRequirement',
-          label: 'Strength requirement',
-          min: 0,
-          hint: 'Minimum Strength to avoid speed penalty (heavy armor)',
-          visibility: visibleWhenKind('armor'),
         },
       ],
     },

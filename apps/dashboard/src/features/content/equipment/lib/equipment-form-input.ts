@@ -15,11 +15,11 @@ import { buildToolInput } from '../tools/lib/tool-form-input'
 import { buildMagicItemInput } from '../magic-items/lib/magic-item-form-input'
 import { buildAdventuringGearInput } from '../adventuring-gear/lib/adventuring-gear-form-input'
 import { buildVehicleInput } from '../vehicles/lib/vehicle-form-input'
+import { buildArmorInput } from '../armor/lib/armor-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
-type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 
 export type EquipmentInputBuildCtx = {
   values: EquipmentFormValues
@@ -75,13 +75,6 @@ function optionalWeaponRange(values: EquipmentFormValues): Partial<WeaponInput> 
   }
 }
 
-function optionalArmorAc(values: EquipmentFormValues): Partial<ArmorInput> {
-  if (values.armorCategory === 'shields') {
-    return values.acBonus !== undefined ? { acBonus: values.acBonus } : {}
-  }
-  return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
-}
-
 /** Shared identity/cost fields for all equipment kind input builders. */
 export function equipmentInputBase(
   values: EquipmentFormValues,
@@ -108,23 +101,6 @@ function buildWeaponInput({ values, ctx, weight }: EquipmentInputBuildCtx): Crea
     ...optionalVersatileDamage(values),
     ...optionalWeaponRange(values),
     ...(values.specialRules && { specialRules: values.specialRules }),
-  })
-}
-
-function buildArmorInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'armor',
-    category: values.armorCategory,
-    addDexModifier: values.addDexModifier ?? false,
-    stealthDisadvantage: values.stealthDisadvantage ?? false,
-    ...(weight && { weight }),
-    ...(values.material && { material: values.material }),
-    ...optionalArmorAc(values),
-    ...(values.maxDexBonus !== undefined && { maxDexBonus: values.maxDexBonus }),
-    ...(values.strengthRequirement !== undefined && {
-      strengthRequirement: values.strengthRequirement,
-    }),
   })
 }
 
