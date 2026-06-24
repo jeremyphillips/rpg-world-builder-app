@@ -127,14 +127,17 @@ export const vehicleBodySchema = equipmentBaseSchema.extend({
   damageThreshold: z.number().int().min(0).optional(),
 })
 
-export const serviceBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('service'),
-  serviceCategory: serviceCategorySchema,
-  /** Billing cadence, free text (e.g. "per day", "per mile"). */
-  duration: z.string().optional(),
-  /** Free-form notes for pricing or scope. */
-  notes: z.string().optional(),
-})
+export const serviceBodySchema = equipmentBaseSchema
+  .omit({ weight: true })
+  .extend({
+    kind: z.literal('service'),
+    serviceCategory: serviceCategorySchema,
+    /** Billing cadence, free text (e.g. "per day", "per mile"). */
+    duration: z.string().optional(),
+    /** Free-form notes for pricing or scope. */
+    notes: z.string().optional(),
+  })
+  .strict()
 
 export const magicItemBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('magic_item'),

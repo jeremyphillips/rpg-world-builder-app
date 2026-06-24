@@ -44,6 +44,16 @@ export function getCurrencyLabel(c: string): string {
 }
 
 /**
+ * Returns the uppercase coin abbreviation for compact UI (form selects, badges).
+ * Matches the suffix used by `formatMoney`.
+ *
+ * @example getCurrencyAbbrev('gp') // → 'GP'
+ */
+export function getCurrencyAbbrev(c: string): string {
+  return c.toUpperCase()
+}
+
+/**
  * A price. `amount` is always stored in the smallest sensible denomination
  * (e.g. "4 CP" => { amount: 4, currency: 'cp' }), so it is a non-negative
  * integer — never a fraction of a larger coin.
@@ -94,7 +104,7 @@ export type Distance = z.infer<typeof distanceSchema>
  * @example formatMoney({ amount: 1, currency: 'cp' }) // → "1 CP"
  */
 export function formatMoney(m: Money): string {
-  return `${m.amount} ${m.currency.toUpperCase()}`
+  return `${m.amount} ${getCurrencyAbbrev(m.currency)}`
 }
 
 /**

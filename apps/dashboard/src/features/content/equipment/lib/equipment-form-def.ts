@@ -25,10 +25,10 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import {
-  costFields,
   costToFormDefaults,
+  economyFields,
   identityFields,
-  optionalWeightFields,
+  weightToForm,
 } from '../../lib/content-form-field-helpers'
 import {
   contentFormRegistry,
@@ -65,7 +65,9 @@ const equipmentFormSchema = z.object({
     amount: z.coerce.number().int().min(0),
     currency: currencySchema,
   }),
-  weight: z.object({ value: z.coerce.number().min(0).optional() }).optional(),
+  weight: z
+    .object({ value: z.coerce.number().min(0).optional(), unit: z.literal('lb') })
+    .optional(),
 
   // adventuring gear
   gearKind: gearKindSchema.optional(),
@@ -134,6 +136,11 @@ const equipmentFormSchema = z.object({
 
 type EquipmentFormValues = z.infer<typeof equipmentFormSchema>
 
+function sharedWeightToForm(entity: Equipment): EquipmentFormValues['weight'] {
+  if (entity.kind === 'service') return undefined
+  return weightToForm(entity.weight)
+}
+
 function sharedFormValues(
   entity: Equipment,
 ): Pick<EquipmentFormValues, 'name' | 'slug' | 'description' | 'kind' | 'cost' | 'weight'> {
@@ -143,7 +150,7 @@ function sharedFormValues(
     description: entity.description,
     kind: entity.kind,
     cost: entity.cost,
-    weight: entity.weight ? { value: entity.weight.value } : undefined,
+    weight: sharedWeightToForm(entity),
   }
 }
 
@@ -236,7 +243,7 @@ function buildUnscopedEquipmentFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Economy',
-      fields: [...costFields(), ...optionalWeightFields()],
+      fields: economyFields(),
     },
     ...allRegisteredKindFieldGroups(),
   ]
@@ -248,7 +255,7 @@ function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Economy',
-      fields: [...costFields({ kind: ctx.equipmentKind }), ...optionalWeightFields()],
+      fields: economyFields({ kind: ctx.equipmentKind }),
     },
   ]
 }

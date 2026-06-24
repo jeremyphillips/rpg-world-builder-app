@@ -54,6 +54,8 @@ export interface InputSelectFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
+  /** When true, only the unit segment is disabled (value input stays editable). */
+  unitDisabled?: boolean
   size?: FieldSize
   width?: FieldWidth
   min?: number
@@ -359,6 +361,7 @@ export function InputSelectField({
   info,
   required = false,
   disabled = false,
+  unitDisabled = false,
   size = 'md',
   width = 'full',
   min,
@@ -423,7 +426,7 @@ export function InputSelectField({
           options={options}
           searchable={searchable}
           unitPlaceholder={unitPlaceholder}
-          disabled={disabled}
+          disabled={disabled || unitDisabled}
           size={size}
           hasError={hasError}
           describedBy={describedBy}

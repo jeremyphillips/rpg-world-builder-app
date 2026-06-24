@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { CURRENCY_IDS } from '@rpg/contracts/primitives'
+import { CURRENCY_IDS, getCurrencyAbbrev } from '@rpg/contracts/primitives'
 import { CASTING_TIME_UNIT_ENTRIES } from '@rpg/contracts/vocab'
 
 import {
@@ -13,7 +13,7 @@ import {
 
 const currencyOptions: InputSelectOption[] = CURRENCY_IDS.map((id) => ({
   value: id,
-  label: id,
+  label: getCurrencyAbbrev(id),
 }))
 
 const castingTimeOptions: InputSelectOption[] = Object.entries(CASTING_TIME_UNIT_ENTRIES).map(
@@ -172,6 +172,25 @@ export const Disabled: Story = {
     initialUnit: 'gp',
     disabled: true,
     valueDigits: 2,
+  },
+}
+
+const weightUnitOptions: InputSelectOption[] = [{ value: 'lb', label: 'lb.' }]
+
+export const Weight: Story = {
+  args: {
+    id: 'weight',
+    label: 'Weight',
+    inputType: 'number',
+    options: weightUnitOptions,
+    initialValue: 3,
+    initialUnit: 'lb',
+    unitDisabled: true,
+    min: 0,
+    step: 0.5,
+    width: 'auto',
+    valueDigits: 2,
+    hint: 'Leave blank for no weight',
   },
 }
 

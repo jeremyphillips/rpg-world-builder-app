@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 import { fieldControlVariants } from './field-control.variants'
 import { fieldDigitWidthVariants } from './field-digit-metrics'
 
-export const numberInputRootVariants = cva('group relative inline-flex w-full')
+export const numberInputRootVariants = cva('group relative inline-flex')
 
 const groupedNumberInputFieldSizeClasses = {
   sm: 'h-8 pl-2.5 py-1 text-xs pr-6',

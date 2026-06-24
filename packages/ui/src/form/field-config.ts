@@ -282,6 +282,8 @@ export interface InputSelectFieldConfig extends BaseFieldConfig {
   /** Watched field name used to resolve `valueDigits` from `valueDigitsLookup`. */
   valueDigitsDependsOn?: string
   valueDigitsLookup?: Record<string, FieldDigits>
+  /** When true, only the unit segment is disabled (value input stays editable). */
+  unitDisabled?: boolean
   defaultValue?: Record<string, unknown>
 }
 

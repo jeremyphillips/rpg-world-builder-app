@@ -4,6 +4,7 @@ import {
   currencySchema,
   formatMoney,
   formatWeight,
+  getCurrencyAbbrev,
   getCurrencyLabel,
   moneySchema,
   moneyToCp,
@@ -34,6 +35,15 @@ describe('getCurrencyLabel', () => {
 
   it('falls back to the raw id for unknown currencies', () => {
     expect(getCurrencyLabel('gil')).toBe('gil')
+  })
+})
+
+describe('getCurrencyAbbrev', () => {
+  it('returns uppercase coin ids', () => {
+    expect(getCurrencyAbbrev('gp')).toBe('GP')
+    expect(getCurrencyAbbrev('cp')).toBe('CP')
+    expect(getCurrencyAbbrev('sp')).toBe('SP')
+    expect(getCurrencyAbbrev('pp')).toBe('PP')
   })
 })
 

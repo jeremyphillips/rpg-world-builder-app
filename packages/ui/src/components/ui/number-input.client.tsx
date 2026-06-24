@@ -101,11 +101,13 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const incrementDisabled = disabled || isStepDisabled(currentValue, 'up', stepOptions)
     const decrementDisabled = disabled || isStepDisabled(currentValue, 'down', stepOptions)
 
+    const resolvedSize = size ?? 'md'
+
     return (
       <div
         className={cn(
           numberInputRootVariants(),
-          digits && numberInputDigitsVariants[size ?? 'md'][digits],
+          digits ? numberInputDigitsVariants[resolvedSize][digits] : 'w-full',
           rootClassName,
         )}
       >
@@ -120,7 +122,11 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           value={value}
           defaultValue={defaultValue}
           onChange={onChange}
-          className={cn(numberInputFieldVariants({ size, grouped }), className)}
+          className={cn(
+            numberInputFieldVariants({ size, grouped }),
+            digits && 'min-w-0 w-full',
+            className,
+          )}
           {...props}
         />
 

@@ -7,9 +7,9 @@ import axe from 'axe-core'
 import { InputSelectField } from './input-select-field.client'
 
 const options = [
-  { label: 'Gold', value: 'gp' },
-  { label: 'Silver', value: 'sp' },
-  { label: 'Copper', value: 'cp' },
+  { label: 'GP', value: 'gp' },
+  { label: 'SP', value: 'sp' },
+  { label: 'CP', value: 'cp' },
 ]
 
 function ControlledField(
@@ -46,7 +46,7 @@ describe('InputSelectField', () => {
 
   it('shows the selected unit label in the default select', () => {
     render(<ControlledField unit="sp" initialUnit="sp" />)
-    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveTextContent('Silver')
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveTextContent('SP')
   })
 
   it('calls onValueChange when the value input changes', async () => {
@@ -65,7 +65,7 @@ describe('InputSelectField', () => {
     render(<ControlledField searchable onUnitChange={onUnitChange} unit="gp" />)
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Cost unit' }))
-    await userEvent.click(screen.getByRole('option', { name: /Silver/i }))
+    await userEvent.click(screen.getByRole('option', { name: /^SP$/i }))
 
     expect(onUnitChange).toHaveBeenCalledWith('sp')
   })
@@ -76,7 +76,7 @@ describe('InputSelectField', () => {
         searchable
         options={[
           ...options,
-          { label: 'Platinum', value: 'pp' },
+          { label: 'PP', value: 'pp' },
           { label: 'Astral shard', value: 'shard', description: 'Planar currency' },
         ]}
       />,
@@ -85,10 +85,10 @@ describe('InputSelectField', () => {
     await userEvent.click(screen.getByRole('combobox', { name: 'Cost unit' }))
     expect(screen.getByLabelText('Search Cost')).toBeInTheDocument()
 
-    await userEvent.type(screen.getByLabelText('Search Cost'), 'plat')
+    await userEvent.type(screen.getByLabelText('Search Cost'), 'pp')
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Platinum/i })).toBeInTheDocument()
-      expect(screen.queryByRole('option', { name: /Silver/i })).not.toBeInTheDocument()
+      expect(screen.getByRole('option', { name: /^PP$/i })).toBeInTheDocument()
+      expect(screen.queryByRole('option', { name: /^SP$/i })).not.toBeInTheDocument()
     })
   })
 
@@ -123,7 +123,17 @@ describe('InputSelectField', () => {
     expect(group).toHaveClass('grid-cols-[auto_1px_auto]')
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
-    expect(numberInputRoot).toHaveClass('w-[calc(2ch+3.125rem)]')
+    expect(numberInputRoot).toHaveClass('w-[calc(2*1ch+3.125rem)]')
+  })
+
+  it('applies five-digit intrinsic width without w-full on the root', () => {
+    const { container } = render(<ControlledField valueDigits={5} width="auto" />)
+    const numberInputRoot = screen.getByLabelText('Cost value').parentElement
+    expect(numberInputRoot).toHaveClass('w-[calc(5*1ch+3.125rem)]')
+    expect(numberInputRoot).not.toHaveClass('w-full')
+
+    const group = container.querySelector('[role="group"]')
+    expect(group).toHaveClass('w-fit')
   })
 
   it('uses stretch layout for text fields', () => {
@@ -150,6 +160,19 @@ describe('InputSelectField', () => {
     const label = screen.getByText('Cost').closest('label')
     expect(label).toHaveAttribute('data-required')
     expect(label?.querySelector('span.text-destructive')).toBeNull()
+  })
+
+  it('disables only the unit segment when unitDisabled is true', () => {
+    render(
+      <ControlledField
+        unitDisabled
+        options={[{ label: 'lb.', value: 'lb' }]}
+        initialUnit="lb"
+        unit="lb"
+      />,
+    )
+    expect(screen.getByLabelText('Cost value')).not.toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toBeDisabled()
   })
 
   it('has no axe accessibility violations', async () => {

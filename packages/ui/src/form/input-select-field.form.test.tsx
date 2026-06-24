@@ -41,10 +41,10 @@ describe('Form inputSelect field', () => {
         valueKey: 'amount',
         unitKey: 'currency',
         options: [
-          { value: 'cp', label: 'Copper' },
-          { value: 'sp', label: 'Silver' },
-          { value: 'gp', label: 'Gold' },
-          { value: 'pp', label: 'Platinum' },
+          { value: 'cp', label: 'CP' },
+          { value: 'sp', label: 'SP' },
+          { value: 'gp', label: 'GP' },
+          { value: 'pp', label: 'PP' },
         ],
         min: 0,
         defaultValue: { amount: 15, currency: 'gp' },
@@ -69,10 +69,10 @@ describe('Form inputSelect field', () => {
         valueKey: 'amount',
         unitKey: 'currency',
         options: [
-          { value: 'cp', label: 'Copper' },
-          { value: 'sp', label: 'Silver' },
-          { value: 'gp', label: 'Gold' },
-          { value: 'pp', label: 'Platinum' },
+          { value: 'cp', label: 'CP' },
+          { value: 'sp', label: 'SP' },
+          { value: 'gp', label: 'GP' },
+          { value: 'pp', label: 'PP' },
         ],
         min: 0,
         defaultValue: { amount: 0, currency: 'gp' },
@@ -110,7 +110,7 @@ describe('Form inputSelect field', () => {
         inputType: 'number',
         valueKey: 'amount',
         unitKey: 'currency',
-        options: [{ value: 'gp', label: 'Gold' }],
+        options: [{ value: 'gp', label: 'GP' }],
         valueDigitsDependsOn: 'kind',
         valueDigitsLookup: { weapon: 3, vehicle: 5 },
         defaultValue: { amount: 0, currency: 'gp' },
@@ -127,9 +127,38 @@ describe('Form inputSelect field', () => {
     )
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
-    expect(numberInputRoot).toHaveClass('w-[calc(3ch+3.125rem)]')
+    expect(numberInputRoot).toHaveClass('w-[calc(3*1ch+3.125rem)]')
 
     const group = container.querySelector('[role="group"]')
     expect(group).toHaveClass('w-fit')
+  })
+
+  it('disables only the unit segment when unitDisabled is true', () => {
+    const onSubmit = vi.fn()
+    const fields: FormItem[] = [
+      {
+        type: 'inputSelect',
+        name: 'weight',
+        label: 'Weight',
+        inputType: 'number',
+        options: [{ value: 'lb', label: 'lb.' }],
+        unitDisabled: true,
+        defaultValue: { value: 3, unit: 'lb' },
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          weight: z.object({ value: z.coerce.number().optional(), unit: z.literal('lb') }),
+        })}
+        fields={fields}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByLabelText('Weight value')).not.toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Weight unit' })).toBeDisabled()
   })
 })

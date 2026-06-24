@@ -43,7 +43,7 @@ describe('Select', () => {
     )
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('w-[calc(2ch+3.125rem)]')
+    expect(trigger).toHaveClass('w-[calc(2*1ch+3.125rem)]')
     expect(trigger).toHaveClass('pr-7')
     expect(trigger.querySelector('[aria-hidden]')).toHaveClass('w-6')
   })

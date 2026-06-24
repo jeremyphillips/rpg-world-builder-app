@@ -16,40 +16,34 @@ export const fieldDigitSizeVariants = {
   lg: 'pl-4 pr-8',
 } as const satisfies Record<FieldSize, string>
 
-/** Per-size offset (rem) = pl + pr + 0.5rem rendering buffer. */
-const fieldDigitOffsetRem = {
-  sm: '2.625rem',
-  md: '3.125rem',
-  lg: '3.5rem',
-} as const satisfies Record<FieldSize, string>
-
-function fieldDigitWidthClass(size: FieldSize, digits: number): string {
-  return `w-[calc(${digits}ch+${fieldDigitOffsetRem[size]})]`
-}
-
+/**
+ * Digit-based control widths as literal Tailwind classes so the scanner emits every
+ * variant. Uses `N*1ch` (not `Nch`) so digit 5 does not collide with the `w-5`
+ * spacing scale during class detection or merge.
+ */
 export const fieldDigitWidthVariants = {
   sm: {
-    1: fieldDigitWidthClass('sm', 1),
-    2: fieldDigitWidthClass('sm', 2),
-    3: fieldDigitWidthClass('sm', 3),
-    4: fieldDigitWidthClass('sm', 4),
-    5: fieldDigitWidthClass('sm', 5),
+    1: 'w-[calc(1*1ch+2.625rem)]',
+    2: 'w-[calc(2*1ch+2.625rem)]',
+    3: 'w-[calc(3*1ch+2.625rem)]',
+    4: 'w-[calc(4*1ch+2.625rem)]',
+    5: 'w-[calc(5*1ch+2.625rem)]',
   },
   md: {
-    1: fieldDigitWidthClass('md', 1),
-    2: fieldDigitWidthClass('md', 2),
-    3: fieldDigitWidthClass('md', 3),
-    4: fieldDigitWidthClass('md', 4),
-    5: fieldDigitWidthClass('md', 5),
+    1: 'w-[calc(1*1ch+3.125rem)]',
+    2: 'w-[calc(2*1ch+3.125rem)]',
+    3: 'w-[calc(3*1ch+3.125rem)]',
+    4: 'w-[calc(4*1ch+3.125rem)]',
+    5: 'w-[calc(5*1ch+3.125rem)]',
   },
   lg: {
-    1: fieldDigitWidthClass('lg', 1),
-    2: fieldDigitWidthClass('lg', 2),
-    3: fieldDigitWidthClass('lg', 3),
-    4: fieldDigitWidthClass('lg', 4),
-    5: fieldDigitWidthClass('lg', 5),
+    1: 'w-[calc(1*1ch+3.5rem)]',
+    2: 'w-[calc(2*1ch+3.5rem)]',
+    3: 'w-[calc(3*1ch+3.5rem)]',
+    4: 'w-[calc(4*1ch+3.5rem)]',
+    5: 'w-[calc(5*1ch+3.5rem)]',
   },
-} as const
+} as const satisfies Record<FieldSize, Record<1 | 2 | 3 | 4 | 5, string>>
 
 export type FieldDigits = keyof (typeof fieldDigitWidthVariants)['md']
 

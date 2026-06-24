@@ -89,6 +89,7 @@ export function InputSelectFieldRenderer({
       info={config.info}
       required={config.required}
       disabled={config.disabled}
+      unitDisabled={config.unitDisabled}
       size={config.size}
       width={config.width}
       min={config.min}
