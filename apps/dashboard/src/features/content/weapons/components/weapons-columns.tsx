@@ -67,7 +67,7 @@ const WEAPONS_SPECIFIC_FILTERS: FilterDef[] = [
 /** Weapon column definitions with the name cell linked to the detail page. */
 export function weaponsColumns(campaignId: string) {
   return buildContentColumns<Weapon>(WEAPONS_MIDDLE_COLUMNS, {
-    nameHref: (row) => ROUTES.content.weapons.detail(campaignId, row.id),
+    nameHref: (row) => ROUTES.content.equipment.detail(campaignId, row.id),
   })
 }
 

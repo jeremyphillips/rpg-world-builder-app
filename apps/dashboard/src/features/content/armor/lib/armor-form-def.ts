@@ -6,11 +6,11 @@ import {
   ARMOR_MATERIAL_ENTRIES,
   armorCategorySchema,
   armorMaterialSchema,
-  createArmorInputSchema,
+  createEquipmentInputSchema,
   currencySchema,
   slugSchema,
-  type Armor,
-  type CreateArmorInput,
+  type ArmorEquipment,
+  type CreateEquipmentInput,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
@@ -21,11 +21,7 @@ import {
   optionalWeightFields,
   weightFromForm,
 } from '../../lib/content-form-field-helpers'
-import {
-  contentFormRegistry,
-  type ContentFormDef,
-  type ContentFormInputCtx,
-} from '../../lib/content-form-registry'
+import { type ContentFormDef, type ContentFormInputCtx } from '../../lib/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useArmor, armorQueryKey } from '../hooks/use-armor'
 
@@ -90,6 +86,7 @@ const armorFormSchema = z.object({
 })
 
 type ArmorFormValues = z.infer<typeof armorFormSchema>
+type CreateArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 
 function buildFields(): FormItem[] {
   return [
@@ -178,9 +175,13 @@ function optionalAcFields(values: ArmorFormValues): Partial<CreateArmorInput> {
   return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
 }
 
-function toInput(values: ArmorFormValues, ctx?: ContentFormInputCtx<Armor>): CreateArmorInput {
+function toInput(
+  values: ArmorFormValues,
+  ctx?: ContentFormInputCtx<ArmorEquipment>,
+): CreateArmorInput {
   const weight = weightFromForm(values.weight?.value)
-  const input = createArmorInputSchema.parse({
+  const input = createEquipmentInputSchema.parse({
+    kind: 'armor',
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
@@ -199,7 +200,7 @@ function toInput(values: ArmorFormValues, ctx?: ContentFormInputCtx<Armor>): Cre
   return finalizeContentInput(input, ctx) as CreateArmorInput
 }
 
-const armorFormDef: ContentFormDef<Armor, ArmorFormValues, CreateArmorInput> = {
+const armorFormDef: ContentFormDef<ArmorEquipment, ArmorFormValues, CreateArmorInput> = {
   routeKey: 'armor',
   schema: armorFormSchema,
   coverage: 'structural',
@@ -230,7 +231,7 @@ const armorFormDef: ContentFormDef<Armor, ArmorFormValues, CreateArmorInput> = {
   queryKey: armorQueryKey,
 }
 
-contentFormRegistry['armor'] = armorFormDef
+// Armor authoring moved into unified `equipment` form registration.
 
 export { armorFormDef, armorFormSchema }
 export type { ArmorFormValues }

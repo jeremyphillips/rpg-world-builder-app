@@ -5,5 +5,17 @@ export const ARROWS = pickEquipment('arrows')
 export const ORB = pickEquipment('orb')
 export const RIDING_HORSE = pickEquipment('riding-horse')
 export const ROWBOAT = pickEquipment('rowboat')
+export const LONGSWORD = pickEquipment('longsword')
+export const LEATHER = pickEquipment('leather')
+export const BRACERS_OF_DEFENSE = pickEquipment('bracers-of-defense')
 
-export const EQUIPMENT_LIST = [TORCH, ARROWS, ORB, RIDING_HORSE, ROWBOAT] as const
+export const EQUIPMENT_LIST = [
+  TORCH,
+  ARROWS,
+  ORB,
+  RIDING_HORSE,
+  ROWBOAT,
+  LONGSWORD,
+  LEATHER,
+  BRACERS_OF_DEFENSE,
+] as const

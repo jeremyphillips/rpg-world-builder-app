@@ -14,22 +14,17 @@ import {
   ClassDetail,
   ClassCreate,
   ClassEdit,
-  EquipmentOverview,
+  EquipmentHub,
+  EquipmentFamilyOverview,
+  EquipmentFamilyCreate,
   EquipmentDetail,
-  EquipmentCreate,
   EquipmentEdit,
+  EQUIPMENT_FAMILY_PATHS,
+  getEquipmentFamilyLabel,
   SkillProficienciesOverview,
   SkillProficiencyDetail,
   SkillProficiencyCreate,
   SkillProficiencyEdit,
-  WeaponsOverview,
-  WeaponDetail,
-  WeaponCreate,
-  WeaponEdit,
-  ArmorOverview,
-  ArmorDetail,
-  ArmorCreate,
-  ArmorEdit,
   SpeciesOverview,
   SpeciesDetail,
   SpeciesCreate,
@@ -269,16 +264,26 @@ const router = createBrowserRouter(
                   handle: {
                     crumb: (params) => ({
                       label: 'Equipment',
-                      href: ROUTES.content.equipment.overview(params.campaignId!),
+                      href: ROUTES.content.equipment.hub(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <EquipmentOverview /> },
-                    {
-                      path: 'new',
-                      element: <EquipmentCreate />,
-                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
-                    },
+                    { index: true, element: <EquipmentHub /> },
+                    ...EQUIPMENT_FAMILY_PATHS.map((family) => ({
+                      path: family,
+                      element: <Outlet />,
+                      handle: {
+                        crumb: () => ({ label: getEquipmentFamilyLabel(family) }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <EquipmentFamilyOverview family={family} /> },
+                        {
+                          path: 'new',
+                          element: <EquipmentFamilyCreate family={family} />,
+                          handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                        },
+                      ],
+                    })),
                     {
                       path: ':equipmentId',
                       element: <Outlet />,
@@ -327,76 +332,6 @@ const router = createBrowserRouter(
                         {
                           path: 'edit',
                           element: <SkillProficiencyEdit />,
-                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
-                        },
-                      ],
-                    },
-                  ],
-                },
-                {
-                  path: 'weapons',
-                  element: <Outlet />,
-                  handle: {
-                    crumb: (params) => ({
-                      label: 'Weapons',
-                      href: ROUTES.content.weapons.overview(params.campaignId!),
-                    }),
-                  } satisfies CrumbHandle,
-                  children: [
-                    { index: true, element: <WeaponsOverview /> },
-                    {
-                      path: 'new',
-                      element: <WeaponCreate />,
-                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
-                    },
-                    {
-                      path: ':weaponId',
-                      element: <Outlet />,
-                      handle: {
-                        crumb: (_params, { entityLabel }) => ({
-                          label: entityLabel ?? '…',
-                        }),
-                      } satisfies CrumbHandle,
-                      children: [
-                        { index: true, element: <WeaponDetail /> },
-                        {
-                          path: 'edit',
-                          element: <WeaponEdit />,
-                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
-                        },
-                      ],
-                    },
-                  ],
-                },
-                {
-                  path: 'armor',
-                  element: <Outlet />,
-                  handle: {
-                    crumb: (params) => ({
-                      label: 'Armor',
-                      href: ROUTES.content.armor.overview(params.campaignId!),
-                    }),
-                  } satisfies CrumbHandle,
-                  children: [
-                    { index: true, element: <ArmorOverview /> },
-                    {
-                      path: 'new',
-                      element: <ArmorCreate />,
-                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
-                    },
-                    {
-                      path: ':armorId',
-                      element: <Outlet />,
-                      handle: {
-                        crumb: (_params, { entityLabel }) => ({
-                          label: entityLabel ?? '…',
-                        }),
-                      } satisfies CrumbHandle,
-                      children: [
-                        { index: true, element: <ArmorDetail /> },
-                        {
-                          path: 'edit',
-                          element: <ArmorEdit />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],

@@ -1,10 +1,10 @@
-import type { Armor } from '@rpg/contracts'
+import type { ArmorEquipment } from '@rpg/contracts'
 import { formatMoney, formatWeight, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { titleCase } from '../../lib/title-case'
 
-export function getArmorStatRows(item: Armor): ContentStatRowData[] {
+export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: getArmorCategoryLabel(item.category) },
     { label: 'AC', value: getArmorAcDisplay(item) },

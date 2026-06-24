@@ -13,14 +13,14 @@ export function WeaponEdit() {
 
   return (
     <ContentEditShell
-      contentType="weapons"
+      contentType="equipment"
       campaignId={campaignId}
       entityId={weaponId}
       isPending={isPending}
       isError={isError}
       loadErrorLabel="Could not load weapons."
       notFoundLabel="Weapon not found."
-      backHref={ROUTES.content.weapons.detail(campaignId, weaponId)}
+      backHref={ROUTES.content.equipment.detail(campaignId, weaponId)}
     />
   )
 }

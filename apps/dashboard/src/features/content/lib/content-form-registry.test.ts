@@ -27,8 +27,6 @@ import {
 // Populate the registry — each import registers its def as a side effect.
 import '../species/lib/species-form-def'
 import '../classes/lib/class-form-def'
-import '../armor/lib/armor-form-def'
-import '../weapons/lib/weapon-form-def'
 import '../skillProficiencies/lib/skill-proficiency-form-def'
 import '../equipment/lib/equipment-form-def'
 import '../spells/lib/spell-form-def'

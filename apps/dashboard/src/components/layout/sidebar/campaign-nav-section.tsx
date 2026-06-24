@@ -22,9 +22,7 @@ export function CampaignNavSection() {
           <NavItem to={ROUTES.content.spells.overview(activeCampaignId)} label="Spells" />
           <NavItem to={ROUTES.content.species.overview(activeCampaignId)} label="Species" />
           <NavItem to={ROUTES.content.feats.overview(activeCampaignId)} label="Feats" />
-          <NavItem to={ROUTES.content.equipment.overview(activeCampaignId)} label="Equipment" />
-          <NavItem to={ROUTES.content.weapons.overview(activeCampaignId)} label="Weapons" />
-          <NavItem to={ROUTES.content.armor.overview(activeCampaignId)} label="Armor" />
+          <NavItem to={ROUTES.content.equipment.hub(activeCampaignId)} label="Equipment" />
           <NavItem
             to={ROUTES.content.skillProficiencies.overview(activeCampaignId)}
             label="Skill Proficiencies"

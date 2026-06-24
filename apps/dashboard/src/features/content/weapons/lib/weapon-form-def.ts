@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import {
-  createWeaponInputSchema,
+  createEquipmentInputSchema,
   currencySchema,
   DIE_FACES,
   dieFaceSchema,
@@ -19,8 +19,8 @@ import {
   WEAPON_MODE_ENTRIES,
   WEAPON_PROPERTIES,
   WEAPON_PROPERTY_ENTRIES,
-  type CreateWeaponInput,
-  type Weapon,
+  type CreateEquipmentInput,
+  type WeaponEquipment,
   type WeaponDamage,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -32,11 +32,7 @@ import {
   optionalWeightFields,
   weightFromForm,
 } from '../../lib/content-form-field-helpers'
-import {
-  contentFormRegistry,
-  type ContentFormDef,
-  type ContentFormInputCtx,
-} from '../../lib/content-form-registry'
+import { type ContentFormDef, type ContentFormInputCtx } from '../../lib/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import { useWeapons, weaponsQueryKey } from '../hooks/use-weapons'
 
@@ -149,6 +145,7 @@ const weaponFormSchema = z.object({
 })
 
 type WeaponFormValues = z.infer<typeof weaponFormSchema>
+type CreateWeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 function damageToForm(
   damage: WeaponDamage | undefined,
@@ -217,9 +214,13 @@ function optionalWeaponRange(values: WeaponFormValues): Partial<CreateWeaponInpu
   }
 }
 
-function toInput(values: WeaponFormValues, ctx?: ContentFormInputCtx<Weapon>): CreateWeaponInput {
+function toInput(
+  values: WeaponFormValues,
+  ctx?: ContentFormInputCtx<WeaponEquipment>,
+): CreateWeaponInput {
   const weight = weightFromForm(values.weight?.value)
-  const input = createWeaponInputSchema.parse({
+  const input = createEquipmentInputSchema.parse({
+    kind: 'weapon',
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
@@ -237,7 +238,7 @@ function toInput(values: WeaponFormValues, ctx?: ContentFormInputCtx<Weapon>): C
   return finalizeContentInput(input, ctx) as CreateWeaponInput
 }
 
-const weaponFormDef: ContentFormDef<Weapon, WeaponFormValues, CreateWeaponInput> = {
+const weaponFormDef: ContentFormDef<WeaponEquipment, WeaponFormValues, CreateWeaponInput> = {
   routeKey: 'weapons',
   schema: weaponFormSchema,
   coverage: 'roundtrip-only',
@@ -421,7 +422,7 @@ const weaponFormDef: ContentFormDef<Weapon, WeaponFormValues, CreateWeaponInput>
   queryKey: weaponsQueryKey,
 }
 
-contentFormRegistry['weapons'] = weaponFormDef
+// Weapon authoring moved into unified `equipment` form registration.
 
 export { weaponFormDef, weaponFormSchema }
 export type { WeaponFormValues }

@@ -19,20 +19,20 @@ describe('createContentListApi', () => {
   })
 
   it('requests the correct URL and extracts the response key', async () => {
-    mockRequest.mockResolvedValue({ weapons: [{ id: 'w1' }] })
+    mockRequest.mockResolvedValue({ equipment: [{ id: 'w1' }] })
 
-    const listWeapons = createContentListApi<{ id: string }>({
-      routeKey: 'weapons',
-      responseKey: 'weapons',
-      errorMessage: 'Could not load weapons.',
+    const listEquipment = createContentListApi<{ id: string }>({
+      routeKey: 'equipment',
+      responseKey: 'equipment',
+      errorMessage: 'Could not load equipment.',
     })
 
-    const result = await listWeapons('camp-1')
+    const result = await listEquipment('camp-1')
 
     expect(mockRequest).toHaveBeenCalledWith(
-      '/api/campaigns/camp-1/content/weapons',
+      '/api/campaigns/camp-1/content/equipment',
       undefined,
-      'Could not load weapons.',
+      'Could not load equipment.',
     )
     expect(result).toEqual([{ id: 'w1' }])
   })

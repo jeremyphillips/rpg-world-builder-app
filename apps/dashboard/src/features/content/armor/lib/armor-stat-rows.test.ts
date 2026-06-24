@@ -1,45 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import type { Armor } from '@rpg/contracts'
 
+import { isArmorEquipment } from '@rpg/contracts'
+
+import { pickEquipment } from '../../lib/fixtures/pick'
 import { getArmorStatRows } from './armor-stat-rows'
 
-const LEATHER: Armor = {
-  id: 'srd-cc-5.2.1:leather',
-  slug: 'leather',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  name: 'Leather',
-  description: '',
-  category: 'light',
-  cost: { amount: 10, currency: 'gp' },
-  weight: { value: 10, unit: 'lb' },
-  material: 'organic',
-  baseAc: 11,
-  addDexModifier: true,
-  stealthDisadvantage: false,
-}
-
-const PLATE: Armor = {
-  id: 'srd-cc-5.2.1:plate',
-  slug: 'plate',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  name: 'Plate',
-  description: '',
-  category: 'heavy',
-  cost: { amount: 1500, currency: 'gp' },
-  weight: { value: 65, unit: 'lb' },
-  material: 'metal',
-  baseAc: 18,
-  addDexModifier: false,
-  stealthDisadvantage: true,
-  strengthRequirement: 15,
+const LEATHER = pickEquipment('leather')
+const PLATE = pickEquipment('plate')
+if (!isArmorEquipment(LEATHER) || !isArmorEquipment(PLATE)) {
+  throw new Error('Expected armor fixtures')
 }
 
 describe('getArmorStatRows', () => {

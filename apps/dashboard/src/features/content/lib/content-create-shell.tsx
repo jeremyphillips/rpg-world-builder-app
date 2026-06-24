@@ -28,15 +28,18 @@ export interface ContentCreateShellProps {
   heading: string
   /** Href for the "Cancel" link and post-submit navigation (typically the overview). */
   backHref: string
+  /** Merged on top of the form def's `createDefaultValues` (e.g. preset `kind`). */
+  initialValues?: Record<string, unknown>
 }
 
 interface ContentCreateFormProps {
   def: AnyContentFormDef
   campaignId: string
   backHref: string
+  initialValues?: Record<string, unknown>
 }
 
-function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps) {
+function ContentCreateForm({ def, campaignId, backHref, initialValues }: ContentCreateFormProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -64,7 +67,7 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
             def={def}
             ctx={ctx}
             schema={resolveContentFormSchema(def, ctx)}
-            defaultValues={def.createDefaultValues}
+            defaultValues={{ ...def.createDefaultValues, ...initialValues }}
             backHref={backHref}
             submitLabel="Create"
             submitPending={mutation.isPending}
@@ -99,6 +102,7 @@ export function ContentCreateShell({
   campaignId,
   heading,
   backHref,
+  initialValues,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -112,7 +116,12 @@ export function ContentCreateShell({
 
       {def ? (
         <ContentAuthoringGate campaignId={campaignId}>
-          <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+          <ContentCreateForm
+            def={def}
+            campaignId={campaignId}
+            backHref={backHref}
+            initialValues={initialValues}
+          />
         </ContentAuthoringGate>
       ) : (
         <ContentFormComingSoon />

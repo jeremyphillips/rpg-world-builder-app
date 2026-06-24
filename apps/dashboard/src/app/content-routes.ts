@@ -12,12 +12,16 @@ export const CONTENT_ROUTES = {
     create: (campaignId: string) => `/campaigns/${campaignId}/classes/new`,
   },
   equipment: {
+    hub: (campaignId: string) => `/campaigns/${campaignId}/equipment`,
+    /** Alias for the equipment hub route. */
     overview: (campaignId: string) => `/campaigns/${campaignId}/equipment`,
+    family: (campaignId: string, family: string) => `/campaigns/${campaignId}/equipment/${family}`,
     detail: (campaignId: string, equipmentId: string) =>
       `/campaigns/${campaignId}/equipment/${equipmentId}`,
     edit: (campaignId: string, equipmentId: string) =>
       `/campaigns/${campaignId}/equipment/${equipmentId}/edit`,
-    create: (campaignId: string) => `/campaigns/${campaignId}/equipment/new`,
+    create: (campaignId: string, family: string) =>
+      `/campaigns/${campaignId}/equipment/${family}/new`,
   },
   skillProficiencies: {
     overview: (campaignId: string) => `/campaigns/${campaignId}/skill-proficiencies`,
@@ -26,20 +30,6 @@ export const CONTENT_ROUTES = {
     edit: (campaignId: string, skillId: string) =>
       `/campaigns/${campaignId}/skill-proficiencies/${skillId}/edit`,
     create: (campaignId: string) => `/campaigns/${campaignId}/skill-proficiencies/new`,
-  },
-  weapons: {
-    overview: (campaignId: string) => `/campaigns/${campaignId}/weapons`,
-    detail: (campaignId: string, weaponId: string) =>
-      `/campaigns/${campaignId}/weapons/${weaponId}`,
-    edit: (campaignId: string, weaponId: string) =>
-      `/campaigns/${campaignId}/weapons/${weaponId}/edit`,
-    create: (campaignId: string) => `/campaigns/${campaignId}/weapons/new`,
-  },
-  armor: {
-    overview: (campaignId: string) => `/campaigns/${campaignId}/armor`,
-    detail: (campaignId: string, armorId: string) => `/campaigns/${campaignId}/armor/${armorId}`,
-    edit: (campaignId: string, armorId: string) => `/campaigns/${campaignId}/armor/${armorId}/edit`,
-    create: (campaignId: string) => `/campaigns/${campaignId}/armor/new`,
   },
   species: {
     overview: (campaignId: string) => `/campaigns/${campaignId}/species`,

@@ -51,7 +51,7 @@ const ARMOR_SPECIFIC_FILTERS: FilterDef[] = [
 /** Armor column definitions with the name cell linked to the detail page. */
 export function armorColumns(campaignId: string) {
   return buildContentColumns<Armor>(ARMOR_MIDDLE_COLUMNS, {
-    nameHref: (row) => ROUTES.content.armor.detail(campaignId, row.id),
+    nameHref: (row) => ROUTES.content.equipment.detail(campaignId, row.id),
   })
 }
 

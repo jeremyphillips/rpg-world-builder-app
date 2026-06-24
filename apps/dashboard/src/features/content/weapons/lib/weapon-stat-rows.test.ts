@@ -1,48 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { WEAPON_MASTERY_ENTRIES, type Weapon } from '@rpg/contracts'
+import { isWeaponEquipment, WEAPON_MASTERY_ENTRIES } from '@rpg/contracts'
 
+import { pickEquipment } from '../../lib/fixtures/pick'
 import { getWeaponStatRows } from './weapon-stat-rows'
 
-const LONGSWORD: Weapon = {
-  id: 'srd-cc-5.2.1:longsword',
-  slug: 'longsword',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  name: 'Longsword',
-  description: '',
-  category: 'martial',
-  mode: 'melee',
-  cost: { amount: 15, currency: 'gp' },
-  weight: { value: 3, unit: 'lb' },
-  damage: { kind: 'dice', count: 1, faces: 8 },
-  damageType: 'slashing',
-  versatileDamage: { kind: 'dice', count: 1, faces: 10 },
-  properties: ['versatile'],
-  mastery: 'sap',
-}
-
-const SHORTBOW: Weapon = {
-  id: 'srd-cc-5.2.1:shortbow',
-  slug: 'shortbow',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  campaignId: null,
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  name: 'Shortbow',
-  description: '',
-  category: 'simple',
-  mode: 'ranged',
-  cost: { amount: 25, currency: 'gp' },
-  weight: { value: 2, unit: 'lb' },
-  damage: { kind: 'dice', count: 1, faces: 6 },
-  damageType: 'piercing',
-  properties: ['ammunition', 'two-handed'],
-  mastery: 'vex',
-  range: { normal: 80, long: 320 },
+const LONGSWORD = pickEquipment('longsword')
+const SHORTBOW = pickEquipment('shortbow')
+if (!isWeaponEquipment(LONGSWORD) || !isWeaponEquipment(SHORTBOW)) {
+  throw new Error('Expected weapon fixtures')
 }
 
 describe('getWeaponStatRows', () => {

@@ -13,14 +13,14 @@ export function ArmorEdit() {
 
   return (
     <ContentEditShell
-      contentType="armor"
+      contentType="equipment"
       campaignId={campaignId}
       entityId={armorId}
       isPending={isPending}
       isError={isError}
       loadErrorLabel="Could not load armor."
       notFoundLabel="Armor not found."
-      backHref={ROUTES.content.armor.detail(campaignId, armorId)}
+      backHref={ROUTES.content.equipment.detail(campaignId, armorId)}
     />
   )
 }

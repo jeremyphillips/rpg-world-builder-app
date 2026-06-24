@@ -12,7 +12,7 @@ function ArmorRowActions({ row, campaignId }: { row: Armor; campaignId: string }
   return (
     <ContentOverviewRowActions
       campaignId={campaignId}
-      editHref={ROUTES.content.armor.edit(campaignId, row.id)}
+      editHref={ROUTES.content.equipment.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
       itemLabel="armor"
@@ -30,7 +30,7 @@ export function ArmorOverview() {
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
-      newHref={ROUTES.content.armor.create(campaignId)}
+      newHref={ROUTES.content.equipment.create(campaignId, 'armor')}
       newLabel="New Armor"
     >
       <DataTable

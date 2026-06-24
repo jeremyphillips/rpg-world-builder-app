@@ -1,4 +1,4 @@
-import type { Weapon } from '@rpg/contracts'
+import type { WeaponEquipment } from '@rpg/contracts'
 import {
   formatMoney,
   formatWeight,
@@ -13,7 +13,7 @@ import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { titleCase } from '../../lib/title-case'
 
 // fallow-ignore-next-line complexity
-export function getWeaponStatRows(item: Weapon): ContentStatRowData[] {
+export function getWeaponStatRows(item: WeaponEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: titleCase(item.category) },
     { label: 'Mode', value: titleCase(item.mode) },

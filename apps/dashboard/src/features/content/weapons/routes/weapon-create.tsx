@@ -7,10 +7,10 @@ export function WeaponCreate() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   return (
     <ContentCreateShell
-      contentType="weapons"
+      contentType="equipment"
       campaignId={campaignId}
       heading="New Weapon"
-      backHref={ROUTES.content.weapons.overview(campaignId)}
+      backHref={ROUTES.content.equipment.family(campaignId, 'weapons')}
     />
   )
 }

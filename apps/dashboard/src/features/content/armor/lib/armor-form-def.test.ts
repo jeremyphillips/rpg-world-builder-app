@@ -1,10 +1,15 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedArmor } from '@rpg/catalog/equipment'
-import { createArmorInputSchema, deriveContentKey, type CreateArmorInput } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  deriveContentKey,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
 import { armorFormDef, type ArmorFormValues } from './armor-form-def'
 
 const SRD_ARMOR = loadSeedArmor('srd-cc-5.2.1')
+type CreateArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 
 it('type: toInput return type matches CreateArmorInput', () => {
   expectTypeOf(armorFormDef.toInput).returns.toEqualTypeOf<CreateArmorInput>()
@@ -15,7 +20,7 @@ describe('armorFormDef round-trips', () => {
     it(`${armor.slug}: toFormValues → toInput → schema.parse`, () => {
       const formValues = armorFormDef.toFormValues(armor) as ArmorFormValues
       const input = armorFormDef.toInput(formValues)
-      expect(() => createArmorInputSchema.parse(input)).not.toThrow()
+      expect(() => createEquipmentInputSchema.parse(input)).not.toThrow()
     })
 
     it(`${armor.slug}: name and category preserved`, () => {
