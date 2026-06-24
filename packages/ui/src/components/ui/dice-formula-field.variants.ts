@@ -1,10 +1,23 @@
 import { cva } from 'class-variance-authority'
 
+/** Outer row — wider gap before modifier controls and action buttons. */
 export const diceFormulaRowVariants = cva('flex flex-wrap items-center gap-2')
 
-export const diceFormulaSeparatorVariants = cva(
-  'shrink-0 font-mono text-xs font-medium text-foreground',
-)
+/** Tighter cluster for count + d + faces so the separator reads as notation. */
+export const diceFormulaCoreVariants = cva('flex shrink-0 items-center gap-1')
+
+export const diceFormulaSeparatorVariants = cva('shrink-0 font-mono font-medium text-foreground', {
+  variants: {
+    size: {
+      sm: 'text-xs',
+      md: 'text-base',
+      lg: 'text-lg',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+})
 
 export const diceFormulaControlCellVariants = cva('flex shrink-0 items-center')
 

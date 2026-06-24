@@ -19,6 +19,7 @@ import {
 } from './dice-formula-field.lib'
 import {
   diceFormulaControlCellVariants,
+  diceFormulaCoreVariants,
   diceFormulaCountInputVariants,
   diceFormulaModifierInputVariants,
   diceFormulaRowVariants,
@@ -292,32 +293,34 @@ export function DiceFormulaControls({
       role="group"
       aria-labelledby={labelPosition === 'inline' ? inlineLabelId : undefined}
     >
-      <DiceFormulaCountControl
-        id={countId}
-        size={size}
-        resolved={resolved}
-        countMin={countMin}
-        countMax={countMax}
-        disabled={disabled}
-        hasError={hasError}
-        onBlur={onBlur}
-        onUpdate={onUpdate}
-      />
+      <div className={diceFormulaCoreVariants()}>
+        <DiceFormulaCountControl
+          id={countId}
+          size={size}
+          resolved={resolved}
+          countMin={countMin}
+          countMax={countMax}
+          disabled={disabled}
+          hasError={hasError}
+          onBlur={onBlur}
+          onUpdate={onUpdate}
+        />
 
-      <span aria-hidden className={diceFormulaSeparatorVariants()}>
-        d
-      </span>
+        <span aria-hidden className={diceFormulaSeparatorVariants({ size })}>
+          d
+        </span>
 
-      <DiceFormulaFacesControl
-        id={facesId}
-        size={size}
-        resolved={resolved}
-        faces={faces}
-        disabled={disabled}
-        hasError={hasError}
-        onBlur={onBlur}
-        onUpdate={onUpdate}
-      />
+        <DiceFormulaFacesControl
+          id={facesId}
+          size={size}
+          resolved={resolved}
+          faces={faces}
+          disabled={disabled}
+          hasError={hasError}
+          onBlur={onBlur}
+          onUpdate={onUpdate}
+        />
+      </div>
 
       {showModifierFields ? (
         <DiceFormulaModifierControls
