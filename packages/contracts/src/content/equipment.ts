@@ -38,6 +38,13 @@ export {
   type ArmorMaterial,
 } from './equipment/armor-variant'
 
+export {
+  isMagicItemBaseEquipment,
+  isMagicItemBaseEquipmentKind,
+  MAGIC_ITEM_BASE_EQUIPMENT_KINDS,
+  type MagicItemBaseEquipmentKind,
+} from './equipment/magic-item-base-equipment'
+
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
 // ---------------------------------------------------------------------------

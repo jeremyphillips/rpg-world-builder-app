@@ -291,7 +291,7 @@ function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
 function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
   if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
 
-  const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind)
+  const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind, ctx)
   return [...identityAndEconomyGroups(ctx), ...(registered ?? [])]
 }
 

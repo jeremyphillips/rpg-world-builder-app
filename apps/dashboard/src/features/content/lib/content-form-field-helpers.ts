@@ -26,6 +26,8 @@ import {
 
 type GroupField = FieldConfig | RowConfig
 
+const responsiveHalfRowClassName = 'grid w-full grid-cols-1 md:grid-cols-2'
+
 const scalarUnitRowClassName = 'grid w-full grid-cols-2 md:grid-cols-3'
 
 const currencyOptions = toOptions(
@@ -350,6 +352,7 @@ export function speedRateToFormDefaults(unit: SpeedRateUnit): { unit: SpeedRateU
 export {
   currencyOptions,
   MOUNT_CARRYING_CAPACITY_LABEL,
+  responsiveHalfRowClassName,
   scalarUnitRowClassName,
   VEHICLE_CARGO_CAPACITY_LABEL,
   type FieldOption,

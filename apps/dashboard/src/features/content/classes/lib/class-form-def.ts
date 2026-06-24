@@ -154,7 +154,7 @@ const proficienciesFormSchema = z.object({
   }),
   tools: z.array(z.string()).optional(),
   skills: z.object({
-    choose: z.coerce.number().int().min(0),
+    choose: z.coerce.number().int().min(0).max(SKILL_IDS.length),
     from: z.array(skillSchema),
   }),
 })
@@ -634,6 +634,8 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           name: 'proficiencies.skills.choose',
           label: 'Skill choices',
           min: 0,
+          max: SKILL_IDS.length,
+          width: 'xs',
           required: true,
         },
         {

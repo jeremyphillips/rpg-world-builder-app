@@ -46,5 +46,9 @@ On family create/edit routes the Kind field is hidden — the URL family segment
 sets `equipmentKind` in form context. The hub route still exposes Kind plus all
 registered field groups.
 
+Magic item **Base equipment** is a single-select chips field populated from
+campaign equipment whose kinds are listed in `MAGIC_ITEM_BASE_EQUIPMENT_KINDS`
+(`weapon`, `armor`, `adventuring_gear`) in `@rpg/contracts`.
+
 Part of the [`content`](../README.md) feature; see
 [feature-conventions](../../../../docs/feature-conventions.md) for layout.

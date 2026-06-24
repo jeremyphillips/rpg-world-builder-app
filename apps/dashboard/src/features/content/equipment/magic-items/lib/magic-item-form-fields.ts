@@ -7,6 +7,8 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import type { ContentFormCtx } from '../../../lib/content-form-registry'
+import { responsiveHalfRowClassName } from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 function labelsFromEntries<const T extends string>(
@@ -35,7 +37,7 @@ function visibleWhenAttunementRequired(): FieldVisibility {
 }
 
 /** Magic item-specific form field group for the unified equipment form. */
-export function magicItemFormFieldGroup(): FormItem {
+export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
   return {
     kind: 'group',
     legend: 'Magic Item',
@@ -69,9 +71,18 @@ export function magicItemFormFieldGroup(): FormItem {
         visibility: visibleWhenAttunementRequired(),
       },
       {
-        type: 'text',
-        name: 'baseEquipmentId',
-        label: 'Base equipment ID',
+        kind: 'row',
+        className: responsiveHalfRowClassName,
+        fields: [
+          {
+            type: 'chips',
+            name: 'baseEquipmentId',
+            label: 'Base equipment',
+            multiple: false,
+            width: 'full',
+            options: ctx.options?.magicItemBaseEquipment ?? [],
+          },
+        ],
       },
     ],
   }

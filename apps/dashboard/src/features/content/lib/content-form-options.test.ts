@@ -52,6 +52,11 @@ describe('buildContentFormOptionSets', () => {
     })
     expect(options.spells).toEqual([{ value: 'fire-bolt', label: fireBolt.name }])
     expect(options.tools).toEqual([{ value: 'thieves-tools', label: thievesTools.name }])
+    expect(options.magicItemBaseEquipment).toEqual([
+      { value: 'dagger', label: dagger.name },
+      { value: 'longsword', label: longsword.name },
+      { value: 'torch', label: torch.name },
+    ])
   })
 
   it('filters spellcastingClasses to classes with a spellcasting block', () => {
