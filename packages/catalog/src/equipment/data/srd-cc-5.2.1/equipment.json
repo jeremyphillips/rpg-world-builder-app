@@ -1,18 +1,26 @@
 [
   {
-    "id": "srd-cc-5.2.1:torch",
-    "slug": "torch",
+    "id": "srd-cc-5.2.1:arrows",
+    "slug": "arrows",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "gear",
-    "name": "Torch",
-    "description": "A torch burns for 1 hour, shedding bright light in a 20-foot radius and dim light for an additional 20 feet.",
-    "cost": { "amount": 1, "currency": "cp" },
-    "weight": { "value": 1, "unit": "lb" },
-    "gearCategory": "lighting"
+    "name": "Arrows",
+    "description": "Standard arrows for a shortbow or longbow. Sold in bundles of 20.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "ammunition",
+    "bundleSize": 20,
+    "storage": "Quiver"
   },
   {
     "id": "srd-cc-5.2.1:backpack",
@@ -22,183 +30,132 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "gear",
     "name": "Backpack",
     "description": "A backpack can hold 1 cubic foot / 30 pounds of gear.",
-    "cost": { "amount": 2, "currency": "gp" },
-    "weight": { "value": 5, "unit": "lb" },
-    "gearCategory": "container",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "container",
     "capacity": "1 cubic foot / 30 lb of gear"
   },
   {
-    "id": "srd-cc-5.2.1:rope-hempen",
-    "slug": "rope-hempen",
+    "id": "srd-cc-5.2.1:battleaxe",
+    "slug": "battleaxe",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "gear",
-    "name": "Rope",
-    "description": "50-foot coil of rope with 2 hit points and can be burst with a DC 17 Strength check.",
-    "cost": { "amount": 1, "currency": "gp" },
-    "weight": { "value": 5, "unit": "lb" },
-    "gearCategory": "other"
+    "name": "Battleaxe",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "slashing",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "properties": ["versatile"],
+    "mastery": "topple"
   },
   {
-    "id": "srd-cc-5.2.1:lantern-hooded",
-    "slug": "lantern-hooded",
+    "id": "srd-cc-5.2.1:blowgun",
+    "slug": "blowgun",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "gear",
-    "name": "Lantern, Hooded",
-    "description": "A Hooded Lantern burns Oil as fuel to cast Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. As a Bonus Action, you can lower the hood, reducing the light to Dim Light in a 5-foot radius, or raise it again.",
-    "cost": { "amount": 5, "currency": "gp" },
-    "weight": { "value": 2, "unit": "lb" },
-    "gearCategory": "lighting"
+    "name": "Blowgun",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "damage": {
+      "kind": "flat",
+      "amount": 1
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "loading"],
+    "mastery": "vex",
+    "range": {
+      "normal": 25,
+      "long": 100
+    }
   },
   {
-    "id": "srd-cc-5.2.1:arrows",
-    "slug": "arrows",
+    "id": "srd-cc-5.2.1:bracers-of-defense",
+    "slug": "bracers-of-defense",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "ammunition",
-    "name": "Arrows",
-    "description": "Standard arrows for a shortbow or longbow. Sold in bundles of 20.",
-    "cost": { "amount": 1, "currency": "gp" },
-    "weight": { "value": 1, "unit": "lb" },
-    "bundleSize": 20,
-    "storage": "Quiver"
+    "name": "Bracers of Defense",
+    "description": "<p>While wearing these bracers, you gain a +2 bonus to Armor Class if you are wearing no armor and using no shield.</p>",
+    "cost": {
+      "amount": 0,
+      "currency": "gp"
+    },
+    "kind": "magic_item",
+    "rarity": "rare",
+    "requiresAttunement": true,
+    "magicItemCategory": "wondrous_item"
   },
   {
-    "id": "srd-cc-5.2.1:crossbow-bolts",
-    "slug": "crossbow-bolts",
+    "id": "srd-cc-5.2.1:breastplate",
+    "slug": "breastplate",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "ammunition",
-    "name": "Bolts",
-    "description": "Crossbow bolts used with any crossbow. Sold in bundles of 20.",
-    "cost": { "amount": 1, "currency": "gp" },
-    "weight": { "value": 1.5, "unit": "lb" },
-    "bundleSize": 20,
-    "storage": "Case"
-  },
-  {
-    "id": "srd-cc-5.2.1:orb",
-    "slug": "orb",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "focus",
-    "name": "Orb",
-    "description": "A glass or crystal orb used as an arcane focus for spellcasting.",
-    "cost": { "amount": 20, "currency": "gp" },
-    "weight": { "value": 3, "unit": "lb" },
-    "focusType": "arcane"
-  },
-  {
-    "id": "srd-cc-5.2.1:wand",
-    "slug": "wand",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "focus",
-    "name": "Wand",
-    "description": "A slender rod carved from special wood used as an arcane focus for spellcasting.",
-    "cost": { "amount": 10, "currency": "gp" },
-    "weight": { "value": 1, "unit": "lb" },
-    "focusType": "arcane"
-  },
-  {
-    "id": "srd-cc-5.2.1:smiths-tools",
-    "slug": "smiths-tools",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "tool",
-    "name": "Smith's Tools",
-    "description": "Proficiency with these tools lets you add your proficiency bonus to ability checks made to craft or repair metal objects.",
-    "cost": { "amount": 20, "currency": "gp" },
-    "weight": { "value": 8, "unit": "lb" },
-    "toolCategory": "artisan",
-    "ability": "str"
-  },
-  {
-    "id": "srd-cc-5.2.1:thieves-tools",
-    "slug": "thieves-tools",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "tool",
-    "name": "Thieves' Tools",
-    "description": "This set of tools includes a small file, a set of lock picks, a small mirror on a metal handle, a set of narrow-bladed scissors, and a pair of pliers.",
-    "cost": { "amount": 25, "currency": "gp" },
-    "weight": { "value": 1, "unit": "lb" },
-    "toolCategory": "other",
-    "ability": "dex"
-  },
-  {
-    "id": "srd-cc-5.2.1:lute",
-    "slug": "lute",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "tool",
-    "name": "Lute",
-    "description": "A stringed musical instrument. Proficiency allows you to add your bonus to any ability check made to play the instrument.",
-    "cost": { "amount": 35, "currency": "gp" },
-    "weight": { "value": 2, "unit": "lb" },
-    "toolCategory": "musical-instrument",
-    "ability": "cha"
-  },
-  {
-    "id": "srd-cc-5.2.1:riding-horse",
-    "slug": "riding-horse",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "mount",
-    "name": "Horse, Riding",
-    "description": "A common riding horse. Fast and sure-footed, suited for travel on roads and open terrain.",
-    "cost": { "amount": 75, "currency": "gp" },
-    "carryingCapacity": { "value": 480, "unit": "lb" },
-    "speed": "60 ft."
-  },
-  {
-    "id": "srd-cc-5.2.1:mule",
-    "slug": "mule",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "mount",
-    "name": "Mule",
-    "description": "A sturdy pack animal suited to carrying loads over rough terrain.",
-    "cost": { "amount": 8, "currency": "gp" },
-    "carryingCapacity": { "value": 420, "unit": "lb" },
-    "speed": "40 ft."
+    "name": "Breastplate",
+    "description": "",
+    "cost": {
+      "amount": 400,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 20,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
   },
   {
     "id": "srd-cc-5.2.1:cart",
@@ -208,43 +165,221 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "vehicle",
     "name": "Cart",
     "description": "A two-wheeled vehicle drawn by one or more beasts of burden.",
-    "cost": { "amount": 15, "currency": "gp" },
-    "weight": { "value": 200, "unit": "lb" }
-  },
-  {
-    "id": "srd-cc-5.2.1:wagon",
-    "slug": "wagon",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 200,
+      "unit": "lb"
+    },
     "kind": "vehicle",
-    "name": "Wagon",
-    "description": "A four-wheeled vehicle drawn by two or more beasts of burden.",
-    "cost": { "amount": 35, "currency": "gp" },
-    "weight": { "value": 400, "unit": "lb" }
+    "vehicleCategory": "land"
   },
   {
-    "id": "srd-cc-5.2.1:rowboat",
-    "slug": "rowboat",
+    "id": "srd-cc-5.2.1:chain-mail",
+    "slug": "chain-mail",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "ship",
-    "name": "Rowboat",
-    "description": "A small open boat propelled by oars.",
-    "cost": { "amount": 50, "currency": "gp" },
-    "speed": "1½ mph",
-    "crew": 1,
-    "passengers": 3,
-    "ac": 11,
-    "hp": 50
+    "name": "Chain Mail",
+    "description": "",
+    "cost": {
+      "amount": 75,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 55,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 16,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 13
+  },
+  {
+    "id": "srd-cc-5.2.1:chain-shirt",
+    "slug": "chain-shirt",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Chain Shirt",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 20,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 13,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:club",
+    "slug": "club",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Club",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "sp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "bludgeoning",
+    "properties": ["light"],
+    "mastery": "slow"
+  },
+  {
+    "id": "srd-cc-5.2.1:crossbow-bolts",
+    "slug": "crossbow-bolts",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bolts",
+    "description": "Crossbow bolts used with any crossbow. Sold in bundles of 20.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1.5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "ammunition",
+    "bundleSize": 20,
+    "storage": "Case"
+  },
+  {
+    "id": "srd-cc-5.2.1:dagger",
+    "slug": "dagger",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dagger",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "piercing",
+    "properties": ["finesse", "light", "thrown"],
+    "mastery": "nick",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:dart",
+    "slug": "dart",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dart",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "cp"
+    },
+    "weight": {
+      "value": 0.25,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "piercing",
+    "properties": ["finesse", "thrown"],
+    "mastery": "vex",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:flail",
+    "slug": "flail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Flail",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "bludgeoning",
+    "properties": [],
+    "mastery": "sap"
   },
   {
     "id": "srd-cc-5.2.1:galley",
@@ -254,16 +389,1322 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "ship",
     "name": "Galley",
     "description": "A large oared warship capable of carrying substantial cargo.",
-    "cost": { "amount": 30000, "currency": "gp" },
+    "cost": {
+      "amount": 30000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
     "speed": "4 mph",
     "crew": 80,
     "cargoTons": 150,
     "ac": 15,
     "hp": 500,
     "damageThreshold": 20
+  },
+  {
+    "id": "srd-cc-5.2.1:glaive",
+    "slug": "glaive",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Glaive",
+    "description": "",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "damageType": "slashing",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "graze"
+  },
+  {
+    "id": "srd-cc-5.2.1:greataxe",
+    "slug": "greataxe",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Greataxe",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 7,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 12
+    },
+    "damageType": "slashing",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "cleave"
+  },
+  {
+    "id": "srd-cc-5.2.1:greatclub",
+    "slug": "greatclub",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Greatclub",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "sp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "bludgeoning",
+    "properties": ["two-handed"],
+    "mastery": "push"
+  },
+  {
+    "id": "srd-cc-5.2.1:greatsword",
+    "slug": "greatsword",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Greatsword",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 2,
+      "faces": 6
+    },
+    "damageType": "slashing",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "graze"
+  },
+  {
+    "id": "srd-cc-5.2.1:halberd",
+    "slug": "halberd",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Halberd",
+    "description": "",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "damageType": "slashing",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "cleave"
+  },
+  {
+    "id": "srd-cc-5.2.1:half-plate",
+    "slug": "half-plate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Half Plate",
+    "description": "",
+    "cost": {
+      "amount": 750,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 40,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 15,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:hand-crossbow",
+    "slug": "hand-crossbow",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Crossbow, Hand",
+    "description": "",
+    "cost": {
+      "amount": 75,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "light", "loading"],
+    "mastery": "vex",
+    "range": {
+      "normal": 30,
+      "long": 120
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:handaxe",
+    "slug": "handaxe",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Handaxe",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "slashing",
+    "properties": ["light", "thrown"],
+    "mastery": "vex",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:heavy-crossbow",
+    "slug": "heavy-crossbow",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Crossbow, Heavy",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 18,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "heavy", "loading", "two-handed"],
+    "mastery": "push",
+    "range": {
+      "normal": 100,
+      "long": 400
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hide",
+    "slug": "hide",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hide",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 12,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "organic",
+    "baseAc": 12,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:javelin",
+    "slug": "javelin",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Javelin",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "sp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "properties": ["thrown"],
+    "mastery": "slow",
+    "range": {
+      "normal": 30,
+      "long": 120
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:lance",
+    "slug": "lance",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lance",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 12
+    },
+    "damageType": "piercing",
+    "properties": ["reach", "special"],
+    "mastery": "topple",
+    "specialRules": "You have Disadvantage when you use a Lance to attack a target within 5 feet of you. Also, you can use a Lance only if you are mounted."
+  },
+  {
+    "id": "srd-cc-5.2.1:lantern-hooded",
+    "slug": "lantern-hooded",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lantern, Hooded",
+    "description": "A Hooded Lantern burns Oil as fuel to cast Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. As a Bonus Action, you can lower the hood, reducing the light to Dim Light in a 5-foot radius, or raise it again.",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general"
+  },
+  {
+    "id": "srd-cc-5.2.1:leather",
+    "slug": "leather",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Leather",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "light",
+    "material": "organic",
+    "baseAc": 11,
+    "addDexModifier": true,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:light-crossbow",
+    "slug": "light-crossbow",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Crossbow, Light",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "loading", "two-handed"],
+    "mastery": "slow",
+    "range": {
+      "normal": 80,
+      "long": 320
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:light-hammer",
+    "slug": "light-hammer",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Light Hammer",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "bludgeoning",
+    "properties": ["light", "thrown"],
+    "mastery": "nick",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:longbow",
+    "slug": "longbow",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Longbow",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "heavy", "two-handed"],
+    "mastery": "slow",
+    "range": {
+      "normal": 150,
+      "long": 600
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:longsword",
+    "slug": "longsword",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Longsword",
+    "description": "",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "slashing",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "properties": ["versatile"],
+    "mastery": "sap"
+  },
+  {
+    "id": "srd-cc-5.2.1:lute",
+    "slug": "lute",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lute",
+    "description": "A stringed musical instrument. Proficiency allows you to add your bonus to any ability check made to play the instrument.",
+    "cost": {
+      "amount": 35,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha"
+  },
+  {
+    "id": "srd-cc-5.2.1:mace",
+    "slug": "mace",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mace",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "bludgeoning",
+    "properties": [],
+    "mastery": "sap"
+  },
+  {
+    "id": "srd-cc-5.2.1:maul",
+    "slug": "maul",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Maul",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 2,
+      "faces": 6
+    },
+    "damageType": "bludgeoning",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "topple"
+  },
+  {
+    "id": "srd-cc-5.2.1:messenger",
+    "slug": "messenger",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Messenger",
+    "description": "<p>A messenger carries a letter or parcel overland.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "cp"
+    },
+    "kind": "service",
+    "serviceCategory": "travel",
+    "duration": "per mile"
+  },
+  {
+    "id": "srd-cc-5.2.1:morningstar",
+    "slug": "morningstar",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Morningstar",
+    "description": "",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "piercing",
+    "properties": [],
+    "mastery": "sap"
+  },
+  {
+    "id": "srd-cc-5.2.1:mule",
+    "slug": "mule",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mule",
+    "description": "A sturdy pack animal suited to carrying loads over rough terrain.",
+    "cost": {
+      "amount": 8,
+      "currency": "gp"
+    },
+    "kind": "mount",
+    "carryingCapacity": {
+      "value": 420,
+      "unit": "lb"
+    },
+    "speed": "40 ft."
+  },
+  {
+    "id": "srd-cc-5.2.1:net",
+    "slug": "net",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Net",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "properties": ["special", "thrown"],
+    "mastery": "topple",
+    "range": {
+      "normal": 5,
+      "long": 15
+    },
+    "specialRules": "A Large or smaller creature hit by a Net is Restrained until it is freed. A Net has no effect on creatures that are Formless or Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the Net (AC 10) also frees the creature without harming it, ending the effect and destroying the Net."
+  },
+  {
+    "id": "srd-cc-5.2.1:orb",
+    "slug": "orb",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Orb",
+    "description": "A glass or crystal orb used as an arcane focus for spellcasting.",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus"
+  },
+  {
+    "id": "srd-cc-5.2.1:pike",
+    "slug": "pike",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Pike",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 18,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "damageType": "piercing",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "push"
+  },
+  {
+    "id": "srd-cc-5.2.1:plate",
+    "slug": "plate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Plate",
+    "description": "",
+    "cost": {
+      "amount": 1500,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 65,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 18,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 15
+  },
+  {
+    "id": "srd-cc-5.2.1:quarterstaff",
+    "slug": "quarterstaff",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Quarterstaff",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "sp"
+    },
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "bludgeoning",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "properties": ["versatile"],
+    "mastery": "topple"
+  },
+  {
+    "id": "srd-cc-5.2.1:rapier",
+    "slug": "rapier",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rapier",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "piercing",
+    "properties": ["finesse"],
+    "mastery": "vex"
+  },
+  {
+    "id": "srd-cc-5.2.1:riding-horse",
+    "slug": "riding-horse",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Horse, Riding",
+    "description": "A common riding horse. Fast and sure-footed, suited for travel on roads and open terrain.",
+    "cost": {
+      "amount": 75,
+      "currency": "gp"
+    },
+    "kind": "mount",
+    "carryingCapacity": {
+      "value": 480,
+      "unit": "lb"
+    },
+    "speed": "60 ft."
+  },
+  {
+    "id": "srd-cc-5.2.1:ring-mail",
+    "slug": "ring-mail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ring Mail",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 40,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": false,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:rope-hempen",
+    "slug": "rope-hempen",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rope",
+    "description": "50-foot coil of rope with 2 hit points and can be burst with a DC 17 Strength check.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general"
+  },
+  {
+    "id": "srd-cc-5.2.1:rowboat",
+    "slug": "rowboat",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rowboat",
+    "description": "A small open boat propelled by oars.",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": "1½ mph",
+    "crew": 1,
+    "passengers": 3,
+    "ac": 11,
+    "hp": 50
+  },
+  {
+    "id": "srd-cc-5.2.1:scale-mail",
+    "slug": "scale-mail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Scale Mail",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 45,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:scimitar",
+    "slug": "scimitar",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Scimitar",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "slashing",
+    "properties": ["finesse", "light"],
+    "mastery": "nick"
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-steel",
+    "slug": "shield-steel",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield (Steel)",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "shields",
+    "material": "metal",
+    "acBonus": 2,
+    "addDexModifier": false,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-wood",
+    "slug": "shield-wood",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield (Wood)",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "shields",
+    "material": "organic",
+    "acBonus": 2,
+    "addDexModifier": false,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:shortbow",
+    "slug": "shortbow",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shortbow",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "properties": ["ammunition", "two-handed"],
+    "mastery": "vex",
+    "range": {
+      "normal": 80,
+      "long": 320
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:shortsword",
+    "slug": "shortsword",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shortsword",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "properties": ["finesse", "light"],
+    "mastery": "vex"
+  },
+  {
+    "id": "srd-cc-5.2.1:sickle",
+    "slug": "sickle",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sickle",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "slashing",
+    "properties": ["light"],
+    "mastery": "nick"
+  },
+  {
+    "id": "srd-cc-5.2.1:skilled-hireling",
+    "slug": "skilled-hireling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Skilled Hireling",
+    "description": "<p>A skilled hireling performs a service involving a proficiency, such as a mercenary, artisan, or scribe.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "kind": "service",
+    "serviceCategory": "hireling",
+    "duration": "per day"
+  },
+  {
+    "id": "srd-cc-5.2.1:sling",
+    "slug": "sling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sling",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "sp"
+    },
+    "weight": {
+      "value": 0,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "ranged",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "bludgeoning",
+    "properties": ["ammunition"],
+    "mastery": "slow",
+    "range": {
+      "normal": 30,
+      "long": 120
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:smiths-tools",
+    "slug": "smiths-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Smith's Tools",
+    "description": "Proficiency with these tools lets you add your proficiency bonus to ability checks made to craft or repair metal objects.",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "str"
+  },
+  {
+    "id": "srd-cc-5.2.1:spear",
+    "slug": "spear",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Spear",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "simple",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "properties": ["thrown", "versatile"],
+    "mastery": "sap",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:splint",
+    "slug": "splint",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Splint",
+    "description": "",
+    "cost": {
+      "amount": 200,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 60,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 17,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 15
   },
   {
     "id": "srd-cc-5.2.1:stabling",
@@ -273,10 +1714,277 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "kind": "misc",
     "name": "Stabling",
     "description": "Stabling and feed for one mount for one day.",
-    "cost": { "amount": 5, "currency": "sp" },
+    "cost": {
+      "amount": 5,
+      "currency": "sp"
+    },
+    "kind": "service",
+    "serviceCategory": "stable",
     "notes": "Cost per day, per mount."
+  },
+  {
+    "id": "srd-cc-5.2.1:studded-leather",
+    "slug": "studded-leather",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Studded Leather",
+    "description": "",
+    "cost": {
+      "amount": 45,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 13,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "light",
+    "material": "metal",
+    "baseAc": 12,
+    "addDexModifier": true,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:thieves-tools",
+    "slug": "thieves-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Thieves' Tools",
+    "description": "This set of tools includes a small file, a set of lock picks, a small mirror on a metal handle, a set of narrow-bladed scissors, and a pair of pliers.",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "thieves",
+    "ability": "dex"
+  },
+  {
+    "id": "srd-cc-5.2.1:torch",
+    "slug": "torch",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Torch",
+    "description": "A torch burns for 1 hour, shedding bright light in a 20-foot radius and dim light for an additional 20 feet.",
+    "cost": {
+      "amount": 1,
+      "currency": "cp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general",
+    "properties": ["1-hour duration"]
+  },
+  {
+    "id": "srd-cc-5.2.1:trident",
+    "slug": "trident",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Trident",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 6
+    },
+    "damageType": "piercing",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "properties": ["thrown", "versatile"],
+    "mastery": "topple",
+    "range": {
+      "normal": 20,
+      "long": 60
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:untrained-hireling",
+    "slug": "untrained-hireling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Untrained Hireling",
+    "description": "<p>An untrained hireling performs manual labor that requires no particular proficiencies, such as a laborer or porter.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "sp"
+    },
+    "kind": "service",
+    "serviceCategory": "hireling",
+    "duration": "per day"
+  },
+  {
+    "id": "srd-cc-5.2.1:wagon",
+    "slug": "wagon",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wagon",
+    "description": "A four-wheeled vehicle drawn by two or more beasts of burden.",
+    "cost": {
+      "amount": 35,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 400,
+      "unit": "lb"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "land"
+  },
+  {
+    "id": "srd-cc-5.2.1:wand",
+    "slug": "wand",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wand",
+    "description": "A slender rod carved from special wood used as an arcane focus for spellcasting.",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus"
+  },
+  {
+    "id": "srd-cc-5.2.1:war-pick",
+    "slug": "war-pick",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "War Pick",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "piercing",
+    "properties": [],
+    "mastery": "sap"
+  },
+  {
+    "id": "srd-cc-5.2.1:warhammer",
+    "slug": "warhammer",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Warhammer",
+    "description": "",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 8
+    },
+    "damageType": "bludgeoning",
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "properties": ["versatile"],
+    "mastery": "push"
+  },
+  {
+    "id": "srd-cc-5.2.1:whip",
+    "slug": "whip",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Whip",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "melee",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 4
+    },
+    "damageType": "slashing",
+    "properties": ["finesse", "reach"],
+    "mastery": "slow"
   }
 ]

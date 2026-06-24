@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
-import { loadSeedArmor } from '@rpg/catalog/armor'
+import { loadSeedArmor } from '@rpg/catalog/equipment'
 import { createArmorInputSchema, deriveContentKey, type CreateArmorInput } from '@rpg/contracts'
 
 import { armorFormDef, type ArmorFormValues } from './armor-form-def'

@@ -8,14 +8,6 @@
       "types": "./src/species/index.ts",
       "default": "./src/species/index.ts"
     },
-    "./armor": {
-      "types": "./src/armor/index.ts",
-      "default": "./src/armor/index.ts"
-    },
-    "./weapons": {
-      "types": "./src/weapons/index.ts",
-      "default": "./src/weapons/index.ts"
-    },
     "./equipment": {
       "types": "./src/equipment/index.ts",
       "default": "./src/equipment/index.ts"

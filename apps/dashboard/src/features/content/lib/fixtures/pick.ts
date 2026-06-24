@@ -1,11 +1,9 @@
-import { getArmorBySlug } from '@rpg/catalog/armor'
 import { getClassBySlug, getSubclassBySlug, loadSubclassesByClassId } from '@rpg/catalog/classes'
-import { getEquipmentBySlug } from '@rpg/catalog/equipment'
+import { getArmorBySlug, getEquipmentBySlug, getWeaponBySlug } from '@rpg/catalog/equipment'
+import { getFeatBySlug } from '@rpg/catalog/feats'
 import { getSkillProficiencyBySlug } from '@rpg/catalog/skill-proficiencies'
 import { getSpeciesBySlug } from '@rpg/catalog/species'
 import { getSpellBySlug } from '@rpg/catalog/spells'
-import { getFeatBySlug } from '@rpg/catalog/feats'
-import { getWeaponBySlug } from '@rpg/catalog/weapons'
 
 import { STORY_RULESET_ID } from './constants'
 

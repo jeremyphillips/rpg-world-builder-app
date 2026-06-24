@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
-import { loadSeedWeapons } from '@rpg/catalog/weapons'
+import { loadSeedWeapons } from '@rpg/catalog/equipment'
 import { createWeaponInputSchema, deriveContentKey, type CreateWeaponInput } from '@rpg/contracts'
 
 import { weaponFormDef, type WeaponFormValues } from './weapon-form-def'
