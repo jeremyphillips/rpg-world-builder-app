@@ -20,6 +20,7 @@ import { EditableGridFieldRenderer } from './editable-grid-field.client'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
+import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import type { FieldConfig, FieldType } from './field-config'
 
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
@@ -246,6 +247,15 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       value={field.value ?? (config.multiple === false ? '' : [])}
       onChange={field.onChange}
       onBlur={field.onBlur}
+    />
+  ),
+  chooseFromChips: ({ config, field, id, error, namePrefix }) => (
+    <ChooseFromChipsFieldRenderer
+      config={config}
+      field={field}
+      id={id}
+      error={error}
+      namePrefix={namePrefix}
     />
   ),
   combobox: ({ config, field, id, error }) => (

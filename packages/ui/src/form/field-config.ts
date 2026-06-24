@@ -31,6 +31,7 @@ export type FieldType =
   | 'editableGrid'
   | 'diceFormula'
   | 'inputSelect'
+  | 'chooseFromChips'
 
 /** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -217,6 +218,26 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
 }
 
 /**
+ * Inline “Choose [N] … from:” sentence plus chip options — e.g. class skill proficiencies.
+ * `name` is the chip selection path; `chooseName` is the numeric count path.
+ */
+export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
+  type: 'chooseFromChips'
+  chooseName: string
+  options: FieldOption[]
+  chooseMin?: number
+  chooseMax?: number
+  /** Leading sentence fragment before the count input. Defaults to `Choose`. */
+  prefix?: string
+  /** Trailing sentence fragment after the count input. Defaults to `skills from:`. */
+  suffix?: string
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  chipSize?: FieldSize
+  defaultValue?: string[]
+  chooseDefaultValue?: number
+}
+
+/**
  * Searchable dropdown for picking one or many values from a large option list.
  * `multiple: true` (default) → value is `string[]`; selected values render as removable chips.
  * `multiple: false` → value is `string`; picking an option closes the panel.
@@ -308,6 +329,7 @@ export type FieldConfig =
   | RichTextFieldConfig
   | FileFieldConfig
   | ChipsFieldConfig
+  | ChooseFromChipsFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
@@ -447,6 +469,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   editableGrid: {},
   diceFormula: defaultDiceFormulaForMode('optional'),
   inputSelect: {},
+  chooseFromChips: [],
 }
 
 function emptyEditableGridValue(
@@ -490,15 +513,23 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   return TYPE_DEFAULTS[field.type]
 }
 
+function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
+  values[field.name] = fieldDefaultValue(field)
+  if (field.type === 'chooseFromChips') {
+    const chooseField = field as ChooseFromChipsFieldConfig
+    values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
+  }
+}
+
 /** Builds the `defaultValues` object RHF needs from a form's items. */
 export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const item of items) {
     if (!('kind' in item)) {
-      values[item.name] = fieldDefaultValue(item)
+      assignFieldDefaultValues(item, values)
     } else if (item.kind === 'row') {
       for (const field of item.fields) {
-        values[field.name] = fieldDefaultValue(field)
+        assignFieldDefaultValues(field, values)
       }
     } else if (item.kind === 'group') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))

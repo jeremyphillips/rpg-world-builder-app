@@ -65,6 +65,79 @@ function nextMultiSelection(
   return [...selected, optionValue]
 }
 
+export interface ChipsFieldOptionsProps {
+  id: string
+  options: FieldOption[]
+  /** Associates the chip group with an external legend or label id. */
+  labelledBy: string
+  multiple?: boolean
+  max?: number
+  value?: string | number | Array<string | number>
+  onChange?: (value: string | string[]) => void
+  onBlur?: () => void
+  disabled?: boolean
+  chipSize?: ChipSize
+}
+
+/** Chip pill row only — for embedding inside a parent fieldset (e.g. `ChooseFromChipsField`). */
+export function ChipsFieldOptions({
+  id,
+  options,
+  labelledBy,
+  multiple = true,
+  max,
+  value,
+  onChange,
+  onBlur,
+  disabled,
+  chipSize = 'sm',
+}: ChipsFieldOptionsProps) {
+  const selected: string[] = React.useMemo(() => {
+    if (multiple) {
+      return Array.isArray(value) ? value.map(String) : []
+    }
+    return value != null && value !== '' ? [String(value)] : []
+  }, [multiple, value])
+
+  function toggle(optionValue: string) {
+    if (disabled) return
+    if (multiple) {
+      onChange?.(nextMultiSelection(selected, optionValue, max))
+      return
+    }
+    onChange?.(selected[0] === optionValue ? '' : optionValue)
+  }
+
+  const selectionRole = multiple ? 'checkbox' : 'radio'
+  const atMax = max !== undefined && selected.length >= max
+
+  return (
+    <div
+      className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
+      role="group"
+      aria-labelledby={labelledBy}
+      onBlur={onBlur}
+    >
+      {options.map((option) => {
+        const isActive = selected.includes(option.value)
+        const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
+        return (
+          <ChipOptionButton
+            key={option.value}
+            id={`${id}-${option.value}`}
+            option={option}
+            role={selectionRole}
+            isActive={isActive}
+            isDisabled={isDisabled}
+            chipSize={chipSize}
+            onToggle={toggle}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
 export interface ChipsFieldProps {
   id: string
   label: string
@@ -118,25 +191,6 @@ export function ChipsField({
   const errorId = `${id}-error`
   const describedBy = error ? errorId : hint ? hintId : undefined
 
-  const selected: string[] = React.useMemo(() => {
-    if (multiple) {
-      return Array.isArray(value) ? value.map(String) : []
-    }
-    return value != null && value !== '' ? [String(value)] : []
-  }, [multiple, value])
-
-  function toggle(optionValue: string) {
-    if (disabled) return
-    if (multiple) {
-      onChange?.(nextMultiSelection(selected, optionValue, max))
-      return
-    }
-    onChange?.(selected[0] === optionValue ? '' : optionValue)
-  }
-
-  const selectionRole = multiple ? 'checkbox' : 'radio'
-  const atMax = max !== undefined && selected.length >= max
-
   return (
     <fieldset
       id={id}
@@ -146,38 +200,26 @@ export function ChipsField({
       className={cn(fieldAnatomyStackClasses, width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}
     >
-      <legend id={legendId} className={fieldLabelVariants({ size })}>
+      <legend
+        id={legendId}
+        data-required={required || undefined}
+        className={fieldLabelVariants({ size })}
+      >
         {label}
-        {required ? (
-          <span aria-hidden="true" className="text-destructive">
-            *
-          </span>
-        ) : null}
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </legend>
 
-      <div
-        className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
-        role="group"
-        aria-labelledby={legendId}
-      >
-        {options.map((option) => {
-          const isActive = selected.includes(option.value)
-          const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
-          return (
-            <ChipOptionButton
-              key={option.value}
-              id={`${id}-${option.value}`}
-              option={option}
-              role={selectionRole}
-              isActive={isActive}
-              isDisabled={isDisabled}
-              chipSize={chipSize}
-              onToggle={toggle}
-            />
-          )
-        })}
-      </div>
+      <ChipsFieldOptions
+        id={id}
+        options={options}
+        labelledBy={legendId}
+        multiple={multiple}
+        max={max}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        chipSize={chipSize}
+      />
 
       {error ? (
         <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
