@@ -11,10 +11,8 @@ import { contentEditHref } from '../../lib/content-edit-href'
 import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { getEquipmentKindStatRows } from '../lib/shared/equipment-detail-stat-rows'
-import {
-  EquipmentFamilyMismatchAlert,
-  shouldShowEquipmentFamilyMismatch,
-} from '../lib/shared/equipment-family-route-guard'
+import { EquipmentFamilyMismatchAlert } from '../lib/shared/equipment-family-mismatch-alert'
+import { shouldShowEquipmentFamilyMismatch } from '../lib/shared/equipment-family-route-guard'
 import {
   familyPathToEquipmentKind,
   type EquipmentFamilyPath,

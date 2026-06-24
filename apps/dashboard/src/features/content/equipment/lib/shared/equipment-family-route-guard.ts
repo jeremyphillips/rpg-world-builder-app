@@ -1,5 +1,4 @@
 import type { Equipment, EquipmentKind } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
 export const EQUIPMENT_FAMILY_MISMATCH_MESSAGE =
   'This item does not belong to this equipment family.'
@@ -12,12 +11,4 @@ export function shouldShowEquipmentFamilyMismatch(
   isError: boolean,
 ): boolean {
   return !isPending && !isError && !!item && !!expectedKind && item.kind !== expectedKind
-}
-
-export function EquipmentFamilyMismatchAlert() {
-  return (
-    <Text variant="destructive" role="alert">
-      {EQUIPMENT_FAMILY_MISMATCH_MESSAGE}
-    </Text>
-  )
 }
