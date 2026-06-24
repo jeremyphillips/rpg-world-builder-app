@@ -58,6 +58,23 @@ export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export { NumberField, type NumberFieldProps } from './components/ui/number-field'
 export {
+  DiceFormulaField,
+  type DiceFormulaFieldProps,
+} from './components/ui/dice-formula-field.client'
+export {
+  DEFAULT_DICE_FORMULA_VALUE,
+  DEFAULT_DICE_FORMULA_WITH_MODIFIER,
+  DICE_FORMULA_OPERATORS,
+  defaultDiceFormulaForMode,
+  formatDiceFormula,
+  resolveDiceFormulaValue,
+  type DiceFormulaLabelPosition,
+  type DiceFormulaModifier,
+  type DiceFormulaModifierMode,
+  type DiceFormulaOperator,
+  type DiceFormulaValue,
+} from './components/ui/dice-formula-field.lib'
+export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,

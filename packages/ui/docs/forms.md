@@ -572,9 +572,11 @@ validating and drops their errors, and the submitted payload omits them — so a
 
 The runnable versions live in Storybook; copy from there.
 
-- **XdY dice notation** — `Recipes/DiceNotation`
-  ([dice-notation.stories.tsx](../src/stories/dice-notation.stories.tsx)): a
-  `FieldRow` with a narrow `NumberField` (count) + `SelectField` (die face).
+- **XdY dice notation** — `Recipes/DiceNotation` and `Forms/DiceFormulaField`
+  ([dice-notation.stories.tsx](../src/stories/dice-notation.stories.tsx),
+  [dice-formula-field.stories.tsx](../src/components/ui/dice-formula-field.stories.tsx)):
+  the `DiceFormulaField` composite (`type: 'diceFormula'` in `<Form>`) with
+  `none` / `optional` / `required` modifier modes.
 - **Multi-group schema form** — `Forms/Form`
   ([form.stories.tsx](../src/form/form.stories.tsx)): a `<Form>` combining a group,
   a row, a conditional field, and a rich-text field. The shape of a real form:

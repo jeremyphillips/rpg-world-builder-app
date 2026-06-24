@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react'
 
 import type {
+  DiceFormulaLabelPosition,
+  DiceFormulaModifierMode,
+  DiceFormulaValue,
+} from '../components/ui/dice-formula-field.lib'
+import { defaultDiceFormulaForMode } from '../components/ui/dice-formula-field.lib'
+import type {
   EditableGridTemplates,
   EditableGridValue,
 } from '../components/ui/editable-grid.client'
@@ -22,6 +28,7 @@ export type FieldType =
   | 'chips'
   | 'combobox'
   | 'editableGrid'
+  | 'diceFormula'
 
 /** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -241,6 +248,18 @@ export interface EditableGridFieldConfig extends BaseFieldConfig {
   defaultValue?: EditableGridValue
 }
 
+export interface DiceFormulaFieldConfig extends BaseFieldConfig {
+  type: 'diceFormula'
+  labelPosition?: DiceFormulaLabelPosition
+  modifierMode?: DiceFormulaModifierMode
+  faces?: readonly number[]
+  countMin?: number
+  countMax?: number
+  modifierMin?: number
+  modifierMax?: number
+  defaultValue?: DiceFormulaValue
+}
+
 /** Discriminated union of every leaf field, keyed by `type`. */
 export type FieldConfig =
   | TextFieldConfig
@@ -256,6 +275,7 @@ export type FieldConfig =
   | ChipsFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
+  | DiceFormulaFieldConfig
 
 /** A responsive row of fields, mapped to `FieldRow` by the renderer. */
 export interface RowConfig {
@@ -389,6 +409,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   chips: [],
   combobox: [],
   editableGrid: {},
+  diceFormula: defaultDiceFormulaForMode('optional'),
 }
 
 function emptyEditableGridValue(
@@ -424,6 +445,10 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   if (field.type === 'editableGrid') {
     const gridField = field as EditableGridFieldConfig
     return emptyEditableGridValue(gridField.columns, gridField.rowCount)
+  }
+  if (field.type === 'diceFormula') {
+    const diceField = field as DiceFormulaFieldConfig
+    return defaultDiceFormulaForMode(diceField.modifierMode ?? 'optional')
   }
   return TYPE_DEFAULTS[field.type]
 }
