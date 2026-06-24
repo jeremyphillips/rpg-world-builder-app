@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
-import { formatGroupedNumber } from './number-format'
+import {
+  formatFractionalNumber,
+  formatGroupedNumber,
+  normalizeUnicodeFractions,
+  parseFractionalNumber,
+} from './number-format'
 
 // ---------------------------------------------------------------------------
 // Shared value objects — Money and Weight. Both are tiny, reusable primitives
@@ -155,6 +160,75 @@ export const distanceSchema = z.object({
 export type Distance = z.infer<typeof distanceSchema>
 
 /**
+ * Speed units for mount/vehicle travel rates. Mounts typically use feet per round;
+ * vehicles use miles per hour.
+ */
+export const SPEED_RATE_UNITS = {
+  ft: { label: 'Feet', abbrev: 'ft.' },
+  mph: { label: 'Miles per hour', abbrev: 'mph' },
+} as const
+
+export type SpeedRateUnit = keyof typeof SPEED_RATE_UNITS
+
+export const SPEED_RATE_UNIT_IDS = Object.keys(SPEED_RATE_UNITS) as [
+  SpeedRateUnit,
+  ...SpeedRateUnit[],
+]
+
+export const speedRateUnitSchema = z.enum(SPEED_RATE_UNIT_IDS)
+
+export const speedRateSchema = z.object({
+  value: z.number().min(0),
+  unit: speedRateUnitSchema,
+})
+
+export type SpeedRate = z.infer<typeof speedRateSchema>
+
+/** Returns the display name for a speed rate unit id. */
+export function getSpeedRateUnitLabel(u: string): string {
+  return SPEED_RATE_UNITS[u as SpeedRateUnit]?.label ?? u
+}
+
+/** Returns the compact unit label for form selects and stat display. */
+export function getSpeedRateUnitAbbrev(u: string): string {
+  return SPEED_RATE_UNITS[u as SpeedRateUnit]?.abbrev ?? u
+}
+
+const SPEED_RATE_STRING_PATTERN = /^(.+?)\s+(ft\.?|mph)\.?$/i
+
+/**
+ * Parses legacy/catalog speed strings (e.g. "60 ft.", "1½ mph") into a speed rate.
+ * Returns `undefined` for empty or unrecognised input.
+ */
+export function parseSpeedRateString(raw: string): SpeedRate | undefined {
+  const trimmed = normalizeUnicodeFractions(raw.trim())
+  if (trimmed === '') return undefined
+
+  const match = trimmed.match(SPEED_RATE_STRING_PATTERN)
+  if (!match) return undefined
+
+  const value = parseFractionalNumber(match[1] ?? '')
+  if (value === undefined) return undefined
+
+  const unitToken = (match[2] ?? '').toLowerCase().replace(/\.$/, '')
+  const unit = unitToken === 'ft' ? 'ft' : unitToken === 'mph' ? 'mph' : undefined
+  if (!unit) return undefined
+
+  return { value, unit }
+}
+
+/**
+ * Human-readable speed rate string. Handles SRD fraction values (0.5 and n.5)
+ * and grouped whole numbers when >= 1,000.
+ *
+ * @example formatSpeedRate({ value: 60, unit: 'ft' }) // → "60 ft."
+ * @example formatSpeedRate({ value: 1.5, unit: 'mph' }) // → "1½ mph"
+ */
+export function formatSpeedRate(rate: SpeedRate): string {
+  return `${formatFractionalNumber(rate.value)} ${getSpeedRateUnitAbbrev(rate.unit)}`
+}
+
+/**
  * Human-readable money string with uppercase currency abbreviation.
  *
  * @example formatMoney({ amount: 5, currency: 'gp' }) // → "5 GP"
@@ -173,13 +247,5 @@ export function formatMoney(m: Money): string {
  * @example formatWeight({ value: 1.5, unit: 'lb' }) // → "1½ lb"
  */
 export function formatWeight(w: Weight): string {
-  const { value } = w
-  const whole = Math.floor(value)
-  const frac = value - whole
-  if (frac === 0) return `${formatGroupedNumber(whole)} lb`
-  if (frac === 0.5) {
-    if (whole === 0) return '1/2 lb'
-    return `${formatGroupedNumber(whole)}½ lb`
-  }
-  return `${formatGroupedNumber(value)} lb`
+  return `${formatFractionalNumber(w.value)} lb`
 }

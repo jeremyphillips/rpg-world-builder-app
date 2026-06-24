@@ -34,7 +34,7 @@ describe('vehicle form round-trips', () => {
       if (item.kind !== 'vehicle') return
       const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
       expect(formValues.vehicleCategory).toBe(item.vehicleCategory)
-      expect(formValues.speed).toBe(item.speed)
+      expect(formValues.speed).toEqual(item.speed)
       expect(formValues.crew).toBe(item.crew)
       expect(formValues.passengers).toBe(item.passengers)
       expect(formValues.cargoCapacity).toEqual(item.cargoCapacity)

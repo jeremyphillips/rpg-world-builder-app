@@ -121,6 +121,7 @@ describe('InputSelectField', () => {
     const group = container.querySelector('[role="group"]')
     expect(group).toHaveClass('w-fit')
     expect(group).toHaveClass('grid-cols-[auto_1px_auto]')
+    expect(group).toHaveClass('items-center')
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
     expect(numberInputRoot).toHaveClass('w-[calc(2*1ch+3.125rem)]')

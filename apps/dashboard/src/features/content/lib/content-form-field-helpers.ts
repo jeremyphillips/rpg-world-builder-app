@@ -2,12 +2,16 @@ import {
   CURRENCY_IDS,
   getCurrencyAbbrev,
   getMassUnitAbbrev,
+  getSpeedRateUnitAbbrev,
   MASS_UNIT_IDS,
   MOUNT_CARRYING_CAPACITY_LABEL,
+  SPEED_RATE_UNIT_IDS,
   type Currency,
   type EquipmentKind,
   type Mass,
   type MassUnit,
+  type SpeedRate,
+  type SpeedRateUnit,
   VEHICLE_CARGO_CAPACITY_LABEL,
 } from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FieldOption, type RowConfig } from '@rpg/ui/form'
@@ -21,6 +25,8 @@ import {
 } from './equipment-weight-config'
 
 type GroupField = FieldConfig | RowConfig
+
+const scalarUnitRowClassName = 'grid w-full grid-cols-2 md:grid-cols-3'
 
 const currencyOptions = toOptions(
   CURRENCY_IDS,
@@ -116,7 +122,7 @@ export function economyFields(
     ...optionalWeightFields({ kind: options.kind, width: 'full' }),
   ]
 
-  return [{ kind: 'row', className: 'grid w-full grid-cols-1 md:grid-cols-3', fields }]
+  return [{ kind: 'row', className: scalarUnitRowClassName, fields }]
 }
 
 export function weightFromForm(
@@ -148,6 +154,61 @@ const massUnitOptions = toOptions(
   >,
 )
 
+const speedRateUnitOptions = toOptions(
+  SPEED_RATE_UNIT_IDS,
+  Object.fromEntries(SPEED_RATE_UNIT_IDS.map((u) => [u, getSpeedRateUnitAbbrev(u)])) as Record<
+    SpeedRateUnit,
+    string
+  >,
+)
+
+/** Shared value + unit inputSelect builder for scalar unit enums (mass, speed rate, …). */
+function scalarUnitInputSelectField<TUnit extends string>(options: {
+  name: string
+  label: string
+  required?: boolean
+  defaultUnit: TUnit
+  unitOptions: FieldOption[]
+  min?: number
+  step?: number
+  formatGrouped?: boolean
+  unitDisabled?: boolean
+  valueDigits?: NumberInputDigits
+  width?: FieldConfig['width']
+}): FieldConfig {
+  const {
+    name,
+    label,
+    required,
+    defaultUnit,
+    unitOptions,
+    min = 0,
+    step = 1,
+    formatGrouped = false,
+    unitDisabled = false,
+    valueDigits,
+    width = 'full',
+  } = options
+
+  return {
+    type: 'inputSelect',
+    name,
+    label,
+    inputType: 'number',
+    valueKey: 'value',
+    unitKey: 'unit',
+    options: unitOptions,
+    min,
+    step,
+    width,
+    required,
+    formatGrouped,
+    unitDisabled,
+    valueDigits,
+    defaultValue: { unit: defaultUnit },
+  }
+}
+
 /** Mass amount + unit composite for mount/vehicle carry limits. */
 export function massInputSelectField(options: {
   name: string
@@ -158,22 +219,98 @@ export function massInputSelectField(options: {
   width?: FieldConfig['width']
 }): FieldConfig {
   const { name, label, required, defaultUnit, valueDigits, width = 'full' } = options
-  return {
-    type: 'inputSelect',
+  return scalarUnitInputSelectField({
     name,
     label,
-    inputType: 'number',
-    valueKey: 'value',
-    unitKey: 'unit',
-    options: massUnitOptions,
-    min: 0,
-    step: defaultUnit === 'lb' ? 0.5 : 1,
-    width,
     required,
+    defaultUnit,
+    unitOptions: massUnitOptions,
+    step: defaultUnit === 'lb' ? 0.5 : 1,
     formatGrouped: true,
     valueDigits,
-    defaultValue: massToFormDefaults(defaultUnit),
-  }
+    width,
+  })
+}
+
+/** Speed rate amount + unit composite for mounts and vehicles. */
+export function speedInputSelectField(options: {
+  name?: string
+  label?: string
+  required?: boolean
+  defaultUnit: SpeedRateUnit
+  valueDigits?: NumberInputDigits
+  width?: FieldConfig['width']
+}): FieldConfig {
+  const {
+    name = 'speed',
+    label = 'Speed',
+    required = true,
+    defaultUnit,
+    valueDigits = 3,
+    width = 'full',
+  } = options
+
+  return scalarUnitInputSelectField({
+    name,
+    label,
+    required,
+    defaultUnit,
+    unitOptions: speedRateUnitOptions,
+    step: 0.5,
+    valueDigits,
+    width,
+  })
+}
+
+/** Carrying capacity and speed side-by-side in the Mount group (one-third row each). */
+export function mountCapacitySpeedFields(): GroupField[] {
+  return [
+    {
+      kind: 'row',
+      className: scalarUnitRowClassName,
+      fields: [
+        massInputSelectField({
+          name: 'carryingCapacity',
+          label: MOUNT_CARRYING_CAPACITY_LABEL,
+          required: true,
+          defaultUnit: 'lb',
+          valueDigits: 3,
+          width: 'full',
+        }),
+        speedInputSelectField({
+          defaultUnit: 'ft',
+          required: true,
+          valueDigits: 3,
+          width: 'full',
+        }),
+      ],
+    },
+  ]
+}
+
+/** Cargo and speed side-by-side in the Vehicle group (one-third row each). */
+export function vehicleCargoSpeedFields(): GroupField[] {
+  return [
+    {
+      kind: 'row',
+      className: scalarUnitRowClassName,
+      fields: [
+        massInputSelectField({
+          name: 'cargoCapacity',
+          label: VEHICLE_CARGO_CAPACITY_LABEL,
+          defaultUnit: 'ton',
+          valueDigits: 3,
+          width: 'full',
+        }),
+        speedInputSelectField({
+          defaultUnit: 'mph',
+          required: true,
+          valueDigits: 3,
+          width: 'full',
+        }),
+      ],
+    },
+  ]
 }
 
 export function massFromForm(
@@ -193,9 +330,27 @@ export function massToFormDefaults(unit: MassUnit): { unit: MassUnit } {
   return { unit }
 }
 
+export function speedRateFromForm(
+  speed: { value?: number; unit?: SpeedRateUnit } | undefined,
+): SpeedRate | undefined {
+  const value = speed?.value
+  const unit = speed?.unit
+  if (value === undefined || Number.isNaN(value) || !unit) return undefined
+  return { value, unit }
+}
+
+export function speedRateToForm(speed: SpeedRate | undefined): SpeedRate | undefined {
+  return speed ? { value: speed.value, unit: speed.unit } : undefined
+}
+
+export function speedRateToFormDefaults(unit: SpeedRateUnit): { unit: SpeedRateUnit } {
+  return { unit }
+}
+
 export {
   currencyOptions,
   MOUNT_CARRYING_CAPACITY_LABEL,
+  scalarUnitRowClassName,
   VEHICLE_CARGO_CAPACITY_LABEL,
   type FieldOption,
 }

@@ -59,7 +59,7 @@ const homebrewEquipmentSchema = new Schema(
     ability: { type: String, enum: [...ABILITY_IDS] },
     // mount
     carryingCapacity: { type: Schema.Types.Mixed },
-    speed: { type: String },
+    speed: { type: Schema.Types.Mixed },
     // vehicle
     vehicleCategory: { type: String, enum: [...VEHICLE_CATEGORIES] },
     crew: { type: Number },

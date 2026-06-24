@@ -2,7 +2,12 @@
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { CURRENCY_IDS, getCurrencyAbbrev } from '@rpg/contracts/primitives'
+import {
+  CURRENCY_IDS,
+  getCurrencyAbbrev,
+  SPEED_RATE_UNIT_IDS,
+  getSpeedRateUnitAbbrev,
+} from '@rpg/contracts/primitives'
 import { CASTING_TIME_UNIT_ENTRIES } from '@rpg/contracts/vocab'
 
 import {
@@ -14,6 +19,11 @@ import {
 const currencyOptions: InputSelectOption[] = CURRENCY_IDS.map((id) => ({
   value: id,
   label: getCurrencyAbbrev(id),
+}))
+
+const speedRateUnitOptions: InputSelectOption[] = SPEED_RATE_UNIT_IDS.map((id) => ({
+  value: id,
+  label: getSpeedRateUnitAbbrev(id),
 }))
 
 const castingTimeOptions: InputSelectOption[] = Object.entries(CASTING_TIME_UNIT_ENTRIES).map(
@@ -100,6 +110,22 @@ export const CostGrouped: Story = {
     width: 'auto',
     valueDigits: 5,
     formatGrouped: true,
+  },
+}
+
+export const SpeedRate: Story = {
+  args: {
+    id: 'speed-rate',
+    label: 'Speed',
+    inputType: 'number',
+    options: speedRateUnitOptions,
+    initialValue: 60,
+    initialUnit: 'ft',
+    required: true,
+    min: 0,
+    step: 0.5,
+    width: 'auto',
+    valueDigits: 3,
   },
 }
 

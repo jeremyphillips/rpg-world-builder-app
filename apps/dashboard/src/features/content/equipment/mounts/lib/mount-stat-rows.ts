@@ -1,4 +1,9 @@
-import { formatMass, MOUNT_CARRYING_CAPACITY_LABEL, type MountEquipment } from '@rpg/contracts'
+import {
+  formatMass,
+  formatSpeedRate,
+  MOUNT_CARRYING_CAPACITY_LABEL,
+  type MountEquipment,
+} from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 
@@ -6,6 +11,6 @@ import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 export function getMountStatRows(item: MountEquipment): ContentStatRowData[] {
   return [
     { label: MOUNT_CARRYING_CAPACITY_LABEL, value: formatMass(item.carryingCapacity) },
-    ...(item.speed ? [{ label: 'Speed', value: item.speed }] : []),
+    { label: 'Speed', value: formatSpeedRate(item.speed) },
   ]
 }

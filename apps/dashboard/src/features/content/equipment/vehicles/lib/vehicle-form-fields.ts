@@ -2,9 +2,9 @@ import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES, type VehicleEquipment } f
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import {
-  massInputSelectField,
   massToForm,
-  VEHICLE_CARGO_CAPACITY_LABEL,
+  scalarUnitRowClassName,
+  vehicleCargoSpeedFields,
 } from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
@@ -34,31 +34,24 @@ export function vehicleFormFieldGroup(): FormItem {
         options: vehicleCategoryOptions,
         required: true,
       },
-      {
-        type: 'text',
-        name: 'speed',
-        label: 'Speed',
-      },
-      massInputSelectField({
-        name: 'cargoCapacity',
-        label: VEHICLE_CARGO_CAPACITY_LABEL,
-        defaultUnit: 'ton',
-        valueDigits: 3,
-      }),
+      ...vehicleCargoSpeedFields(),
       {
         kind: 'row',
+        className: scalarUnitRowClassName,
         fields: [
           {
             type: 'number',
             name: 'crew',
             label: 'Crew',
             min: 0,
+            width: 'full',
           },
           {
             type: 'number',
             name: 'passengers',
             label: 'Passengers',
             min: 0,
+            width: 'full',
           },
         ],
       },

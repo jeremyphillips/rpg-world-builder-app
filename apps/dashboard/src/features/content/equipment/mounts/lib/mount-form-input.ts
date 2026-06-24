@@ -1,6 +1,6 @@
 import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
 
-import { massFromForm } from '../../../lib/content-form-field-helpers'
+import { massFromForm, speedRateFromForm } from '../../../lib/content-form-field-helpers'
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
@@ -13,11 +13,12 @@ export function buildMountInput({
   weight,
 }: EquipmentInputBuildCtx): CreateEquipmentInput {
   const carryingCapacity = massFromForm(values.carryingCapacity)
+  const speed = speedRateFromForm(values.speed)
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'mount',
     carryingCapacity: carryingCapacity ?? { value: 0, unit: 'lb' },
+    speed,
     ...(weight && { weight }),
-    ...(values.speed && { speed: values.speed }),
   })
 }
