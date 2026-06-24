@@ -2,8 +2,6 @@ import type { ContentTypeConfig } from './lib/content-type-config'
 import { classContentConfig } from './classes/classes.config'
 import { equipmentContentConfig } from './equipment/equipment.config'
 import { skillProficiencyContentConfig } from './skill-proficiencies/skill-proficiencies.config'
-import { weaponsContentConfig } from './weapons/weapons.config'
-import { armorContentConfig } from './armor/armor.config'
 import { speciesContentConfig } from './species/species.config'
 import { spellContentConfig } from './spells/spells.config'
 import { featContentConfig } from './feats/feats.config'
@@ -17,8 +15,6 @@ const CONTENT_TYPES = {
   classes: classContentConfig,
   equipment: equipmentContentConfig,
   'skill-proficiencies': skillProficiencyContentConfig,
-  weapons: weaponsContentConfig,
-  armor: armorContentConfig,
   species: speciesContentConfig,
   spells: spellContentConfig,
   feats: featContentConfig,

@@ -40,20 +40,6 @@ contentRouter.get(
 )
 
 contentRouter.get(
-  '/weapons',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listWeapons,
-)
-
-contentRouter.get(
-  '/armor',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listArmor,
-)
-
-contentRouter.get(
   '/species',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),

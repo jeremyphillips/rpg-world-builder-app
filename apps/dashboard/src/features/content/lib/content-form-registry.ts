@@ -2,7 +2,7 @@ import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 
-import type { ContentSource, WeaponCategory } from '@rpg/contracts'
+import type { ContentSource, EquipmentKind, WeaponCategory } from '@rpg/contracts'
 import type { ResolvedCampaignRules } from '@rpg/contracts'
 
 import type { ContentListQueryResult } from './content-client'
@@ -27,6 +27,10 @@ export type ContentFormCtx = {
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   options?: Partial<ContentFormOptionSets>
+  /** Authoritative equipment kind on family create/edit routes (from route or entity). */
+  equipmentKind?: EquipmentKind
+  /** Equipment family URL segment for breadcrumbs and back links. */
+  equipmentFamily?: string
 }
 
 /** Optional context for `toInput` — present on edit, omitted on create. */
@@ -34,6 +38,8 @@ export type ContentFormInputCtx<TEntity> = {
   entity?: TEntity
   weaponCategoryBySlug?: Readonly<Partial<Record<string, WeaponCategory>>>
   campaignRules?: ResolvedCampaignRules
+  /** Injected on family routes when the Kind field is omitted from the form. */
+  equipmentKind?: EquipmentKind
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   buildContentFilters,
   costColumn,
 } from '../../lib/content-table-config'
+import { equipmentKindToFamilyPath } from '../lib/shared/equipment-family-paths'
 
 const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
   {
@@ -33,7 +34,8 @@ const EQUIPMENT_SPECIFIC_FILTERS: FilterDef[] = [
 /** Equipment column definitions with the name cell linked to the detail page. */
 export function equipmentColumns(campaignId: string) {
   return buildContentColumns<Equipment>(EQUIPMENT_MIDDLE_COLUMNS, {
-    nameHref: (row) => ROUTES.content.equipment.detail(campaignId, row.id),
+    nameHref: (row) =>
+      ROUTES.content.equipment.detail(campaignId, equipmentKindToFamilyPath(row.kind), row.id),
   })
 }
 

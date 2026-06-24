@@ -70,6 +70,7 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  collapsibleSections?: boolean
 }
 
 export function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -82,6 +83,7 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
   submitPending,
   formError,
   onSubmit,
+  collapsibleSections,
 }: ContentSchemaFormProps<TFormValues>) {
   return (
     <div className="max-w-3xl">
@@ -92,6 +94,7 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
         defaultValues={defaultValues}
         onSubmit={onSubmit}
         formError={formError}
+        collapsibleSections={collapsibleSections}
         stickyFooter
         footer={(form) => (
           <ContentFormCancelFooter
@@ -190,7 +193,13 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     return <ContentTabbedSchemaForm tabs={def.buildTabs(ctx)} {...sharedProps} />
   }
 
-  return <ContentSchemaForm fields={contentFormFields(def, ctx)} {...sharedProps} />
+  return (
+    <ContentSchemaForm
+      fields={contentFormFields(def, ctx)}
+      collapsibleSections={def.routeKey === 'equipment' ? false : undefined}
+      {...sharedProps}
+    />
+  )
 }
 
 interface ContentFormOptionsGateProps {

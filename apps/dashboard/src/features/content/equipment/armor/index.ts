@@ -1,3 +1,5 @@
-// fallow-ignore-file unused-file
-// content/equipment/armor — scaffold only. Export the public surface here as it's built.
-export {}
+export { armorColumns, armorFilters } from './components/armor-columns'
+export { ARMOR_LIST, LEATHER, PLATE, SHIELD } from './fixtures'
+export { armorFormFieldGroup, armorFormValuesFromEntity } from './lib/armor-form-fields'
+export { buildArmorInput } from './lib/armor-form-input'
+export { getArmorStatRows } from './lib/armor-stat-rows'

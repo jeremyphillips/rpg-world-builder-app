@@ -28,15 +28,27 @@ export interface ContentCreateShellProps {
   heading: string
   /** Href for the "Cancel" link and post-submit navigation (typically the overview). */
   backHref: string
+  /** Merged on top of the form def's `createDefaultValues` (e.g. preset `kind`). */
+  initialValues?: Record<string, unknown>
+  /** Merged into the form layout context (e.g. family-scoped equipment kind). */
+  formCtx?: Partial<ContentFormCtx>
 }
 
 interface ContentCreateFormProps {
   def: AnyContentFormDef
   campaignId: string
   backHref: string
+  initialValues?: Record<string, unknown>
+  formCtx?: Partial<ContentFormCtx>
 }
 
-function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps) {
+function ContentCreateForm({
+  def,
+  campaignId,
+  backHref,
+  initialValues,
+  formCtx,
+}: ContentCreateFormProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -55,6 +67,7 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
       {(optionsCtx) => {
         const ctx = {
           ...optionsCtx,
+          ...formCtx,
           campaignId,
           mode: 'create' as const,
           entitySource: 'homebrew' as const,
@@ -64,7 +77,7 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
             def={def}
             ctx={ctx}
             schema={resolveContentFormSchema(def, ctx)}
-            defaultValues={def.createDefaultValues}
+            defaultValues={{ ...def.createDefaultValues, ...initialValues }}
             backHref={backHref}
             submitLabel="Create"
             submitPending={mutation.isPending}
@@ -74,6 +87,7 @@ function ContentCreateForm({ def, campaignId, backHref }: ContentCreateFormProps
                 def.toInput(values, {
                   weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
                   campaignRules: ctx.campaignRules,
+                  equipmentKind: ctx.equipmentKind,
                 }),
               )
               form.reset(values)
@@ -99,6 +113,8 @@ export function ContentCreateShell({
   campaignId,
   heading,
   backHref,
+  initialValues,
+  formCtx,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -112,7 +128,13 @@ export function ContentCreateShell({
 
       {def ? (
         <ContentAuthoringGate campaignId={campaignId}>
-          <ContentCreateForm def={def} campaignId={campaignId} backHref={backHref} />
+          <ContentCreateForm
+            def={def}
+            campaignId={campaignId}
+            backHref={backHref}
+            initialValues={initialValues}
+            formCtx={formCtx}
+          />
         </ContentAuthoringGate>
       ) : (
         <ContentFormComingSoon />

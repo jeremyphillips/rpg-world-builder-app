@@ -1,3 +1,5 @@
-// fallow-ignore-file unused-file
-// content/equipment/weapons — scaffold only. Export the public surface here as it's built.
-export {}
+export { weaponColumns, weaponFilters } from './components/weapon-columns'
+export { DAGGER, LONGSWORD, SHORTBOW, WEAPON_LIST } from './fixtures'
+export { damageToForm, weaponFormFieldGroup, weaponFormValuesFromEntity } from './lib/weapon-form-fields'
+export { buildWeaponInput } from './lib/weapon-form-input'
+export { getWeaponStatRows } from './lib/weapon-stat-rows'

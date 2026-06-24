@@ -67,7 +67,8 @@ Beyond the implemented `auth` feature, `src/features/` holds documented
 scaffolds (`README.md` + placeholder `index.ts`) for the workspace's domain
 areas: `user`, `campaign`, `character`, `notification`, `message`, and `content`
 (with `species`, `classes`, `spells`, `skillProficiencies`,
-`equipment/{weapons,armor,gear,magicItems}`, `locations`, `monsters`). Each is
+`equipment` (family modules: weapons, armor, adventuring-gear, magic-items, tools,
+mounts, vehicles, services), `locations`, `monsters`). Each is
 built out in a later phase. See
 [`docs/feature-conventions.md`](./docs/feature-conventions.md) for the folder
 layout and the ESLint feature-boundary rule.

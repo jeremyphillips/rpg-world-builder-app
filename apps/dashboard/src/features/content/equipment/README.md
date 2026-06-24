@@ -1,15 +1,50 @@
 # content / equipment
 
-> Scaffold only — no implementation yet.
+Unified equipment catalog in the dashboard. One content type (`equipment` in
+`@rpg/contracts`) discriminated by `kind`; each kind has a family module with
+form fields, stat rows, and overview columns.
 
-Equipment content, grouped by type:
+## Family modules
 
-| Group                        | Responsibility           |
-| ---------------------------- | ------------------------ |
-| [`weapons`](./weapons)       | Weapons                  |
-| [`armor`](./armor)           | Armor and shields        |
-| [`gear`](./gear)             | Adventuring gear / items |
-| [`magicItems`](./magicItems) | Magic items              |
+| Family path                              | `EquipmentKind`    | Responsibility    |
+| ---------------------------------------- | ------------------ | ----------------- |
+| [`weapons`](./weapons)                   | `weapon`           | Weapons           |
+| [`armor`](./armor)                       | `armor`            | Armor and shields |
+| [`adventuring-gear`](./adventuring-gear) | `adventuring_gear` | Adventuring gear  |
+| [`magic-items`](./magic-items)           | `magic_item`       | Magic items       |
+| [`tools`](./tools)                       | `tool`             | Tools             |
+| [`mounts`](./mounts)                     | `mount`            | Mounts            |
+| [`vehicles`](./vehicles)                 | `vehicle`          | Vehicles          |
+| [`services`](./services)                 | `service`          | Services          |
+
+Shared wiring lives under [`lib/`](./lib/):
+
+- [`equipment-form-def.ts`](./lib/equipment-form-def.ts) — schema, hub vs family compose
+- [`equipment-form-input.ts`](./lib/equipment-form-input.ts) — kind-aware `toInput` dispatch
+- [`lib/shared/equipment-form-registry.ts`](./lib/shared/equipment-form-registry.ts) — `kindFieldGroups` registry
+- [`lib/shared/equipment-family-paths.ts`](./lib/shared/equipment-family-paths.ts) — URL segment ↔ kind mapping
+- [`lib/shared/equipment-family-columns.ts`](./lib/shared/equipment-family-columns.ts) — family overview tables
+- [`lib/shared/equipment-detail-stat-rows.ts`](./lib/shared/equipment-detail-stat-rows.ts) — detail stat rows by kind
+
+## Dashboard URLs
+
+Family path segments are kebab-case (`EQUIPMENT_FAMILY_PATHS` in
+`equipment-family-paths.ts`):
+
+```text
+/campaigns/:campaignId/equipment                          hub (all kinds)
+/campaigns/:campaignId/equipment/:family                  family overview
+/campaigns/:campaignId/equipment/:family/new              create (kind fixed)
+/campaigns/:campaignId/equipment/:family/:equipmentId     detail
+/campaigns/:campaignId/equipment/:family/:equipmentId/edit
+```
+
+Route helpers: `ROUTES.content.equipment` in
+[`apps/dashboard/src/app/content-routes.ts`](../../../app/content-routes.ts).
+
+On family create/edit routes the Kind field is hidden — the URL family segment
+sets `equipmentKind` in form context. The hub route still exposes Kind plus all
+registered field groups.
 
 Part of the [`content`](../README.md) feature; see
 [feature-conventions](../../../../docs/feature-conventions.md) for layout.

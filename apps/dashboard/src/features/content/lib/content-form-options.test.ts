@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass, pickEquipment, pickSpell, pickWeapon } from './fixtures/pick'
+import { pickClass, pickEquipment, pickSpell } from './fixtures/pick'
 import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
 
 describe('toContentFieldOption', () => {
   it('maps slug and name for system content', () => {
-    const dagger = pickWeapon('dagger')
+    const dagger = pickEquipment('dagger')
     expect(toContentFieldOption(dagger)).toEqual({
       value: 'dagger',
       label: dagger.name,
@@ -13,7 +13,7 @@ describe('toContentFieldOption', () => {
   })
 
   it('adds a Homebrew description for homebrew content', () => {
-    const entity = { ...pickWeapon('dagger'), source: 'homebrew' as const }
+    const entity = { ...pickEquipment('dagger'), source: 'homebrew' as const }
     expect(toContentFieldOption(entity)).toEqual({
       value: 'dagger',
       label: entity.name,
@@ -26,17 +26,16 @@ describe('buildContentFormOptionSets', () => {
   it('maps classes, weapons, and spells and filters equipment to tools only', () => {
     const barbarian = pickClass('barbarian')
     const fighter = pickClass('fighter')
-    const dagger = pickWeapon('dagger')
-    const longsword = pickWeapon('longsword')
+    const dagger = pickEquipment('dagger')
+    const longsword = pickEquipment('longsword')
     const fireBolt = pickSpell('fire-bolt')
     const thievesTools = pickEquipment('thieves-tools')
     const torch = pickEquipment('torch')
 
     const options = buildContentFormOptionSets({
       classes: [fighter, barbarian],
-      weapons: [longsword, dagger],
+      equipment: [longsword, dagger, thievesTools, torch],
       spells: [fireBolt],
-      equipment: [thievesTools, torch],
     })
 
     expect(options.classes).toEqual([

@@ -409,8 +409,16 @@ Most content types are a single object shape and use the one-liner DTOs above
 sub-kinds whose fields genuinely differ (only a few fields are universal). Model
 those as a Zod **discriminated union** on a `kind` field — one content type, one
 registry entry, scales by adding a union variant instead of a new content type.
-`content/equipment.ts` (gear, ammunition, focus, tool, mount, vehicle, ship, misc) is
-the reference implementation.
+`content/equipment.ts` (weapon, armor, adventuring_gear, tool, mount, vehicle,
+service, magic_item) is the reference implementation.
+
+**Dashboard routing:** Equipment uses one API list (`GET …/equipment`) and
+family-scoped URLs under `/campaigns/:id/equipment/:family/…`. Family path
+segments map to `EquipmentKind` via
+`equipment/lib/shared/equipment-family-paths.ts` (`weapons`, `armor`,
+`adventuring-gear`, `magic-items`, `tools`, `mounts`, `vehicles`, `services`).
+Create/edit on a family route omit the Kind field — the URL fixes the kind. See
+[`apps/dashboard/src/features/content/equipment/README.md`](../apps/dashboard/src/features/content/equipment/README.md).
 
 Rules specific to union-shaped types:
 

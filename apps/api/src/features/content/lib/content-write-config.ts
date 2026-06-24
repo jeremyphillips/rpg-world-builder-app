@@ -41,8 +41,7 @@ export interface ContentWriteConfig<
   /** Maps validated create input to Mongo document fields (excludes envelope). */
   bodyFromCreateInput: (input: Record<string, unknown>) => Record<string, unknown>
   /**
-   * Optional hook to shape a homebrew `$set` payload. Equipment stores
-   * kind-specific fields in a nested `body` blob; default passes update through.
+   * Optional hook to shape a homebrew `$set` payload. Default passes update through.
    */
   prepareHomebrewUpdate?: (
     doc: HomebrewDoc,

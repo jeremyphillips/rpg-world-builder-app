@@ -5,8 +5,8 @@ import {
   type ContentSource,
   type Equipment,
   type Feat,
+  isWeaponEquipment,
   type Spell,
-  type Weapon,
   type WeaponCategory,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
@@ -17,7 +17,6 @@ import { useClasses } from '../classes/hooks/use-classes'
 import { useEquipment } from '../equipment/hooks/use-equipment'
 import { useFeats } from '../feats/hooks/use-feats'
 import { useSpells } from '../spells/hooks/use-spells'
-import { useWeapons } from '../weapons/hooks/use-weapons'
 import type { ContentFormCtx } from './content-form-registry'
 
 export interface ContentFormOptionSets {
@@ -57,28 +56,30 @@ function sortFieldOptions(options: FieldOption[]): FieldOption[] {
 }
 
 function buildWeaponCategoryBySlug(
-  weapons: Weapon[] | undefined,
+  equipment: Equipment[] | undefined,
 ): ContentFormOptionSets['weaponCategoryBySlug'] {
-  return Object.fromEntries(weapons?.map((weapon) => [weapon.slug, weapon.category]) ?? [])
+  return Object.fromEntries(
+    equipment?.filter(isWeaponEquipment).map((weapon) => [weapon.slug, weapon.category]) ?? [],
+  )
 }
 
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   classes?: CharacterClass[]
-  weapons?: Weapon[]
   spells?: Spell[]
   feats?: Feat[]
   equipment?: Equipment[]
 }): ContentFormOptionSets {
   const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
+  const weapons = input.equipment?.filter(isWeaponEquipment)
 
   return {
     classes: classOptions,
     spellcastingClasses: sortFieldOptions(
       input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
     ),
-    weapons: sortFieldOptions(input.weapons?.map(toContentFieldOption) ?? []),
-    weaponCategoryBySlug: buildWeaponCategoryBySlug(input.weapons),
+    weapons: sortFieldOptions(weapons?.map(toContentFieldOption) ?? []),
+    weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
@@ -93,7 +94,6 @@ export function useContentFormOptions(campaignId: string | undefined): {
   isError: boolean
 } {
   const classesQuery = useClasses(campaignId)
-  const weaponsQuery = useWeapons(campaignId)
   const spellsQuery = useSpells(campaignId)
   const featsQuery = useFeats(campaignId)
   const equipmentQuery = useEquipment(campaignId)
@@ -103,12 +103,11 @@ export function useContentFormOptions(campaignId: string | undefined): {
     () =>
       buildContentFormOptionSets({
         classes: classesQuery.data,
-        weapons: weaponsQuery.data,
         spells: spellsQuery.data,
         feats: featsQuery.data,
         equipment: equipmentQuery.data,
       }),
-    [classesQuery.data, weaponsQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
+    [classesQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
   )
 
   const ctx = useMemo(
@@ -124,15 +123,10 @@ export function useContentFormOptions(campaignId: string | undefined): {
     ctx,
     isPending:
       classesQuery.isPending ||
-      weaponsQuery.isPending ||
       spellsQuery.isPending ||
       featsQuery.isPending ||
       equipmentQuery.isPending,
     isError:
-      classesQuery.isError ||
-      weaponsQuery.isError ||
-      spellsQuery.isError ||
-      featsQuery.isError ||
-      equipmentQuery.isError,
+      classesQuery.isError || spellsQuery.isError || featsQuery.isError || equipmentQuery.isError,
   }
 }
