@@ -22,7 +22,7 @@ export const numberInputFieldVariants = cva(
 )
 
 export const numberInputStepperVariants = cva(
-  'absolute inset-y-px right-px flex flex-col overflow-hidden rounded-r-[calc(var(--radius-md)-1px)] border-l border-input bg-background/80',
+  'absolute inset-y-px right-px flex flex-col overflow-hidden border-l border-input bg-background/80',
   {
     variants: {
       size: {
@@ -30,9 +30,14 @@ export const numberInputStepperVariants = cva(
         md: 'w-6',
         lg: 'w-7',
       },
+      grouped: {
+        true: 'rounded-none',
+        false: 'rounded-r-[calc(var(--radius-md)-1px)]',
+      },
     },
     defaultVariants: {
       size: 'md',
+      grouped: false,
     },
   },
 )

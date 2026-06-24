@@ -37,6 +37,9 @@ export interface NumberInputProps
    */
   stepperMin?: number
   stepperMax?: number
+  /** When true, styles for embedding inside a grouped control such as InputSelectField. */
+  grouped?: boolean
+  rootClassName?: string
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -50,6 +53,8 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       step = 1,
       stepperMin,
       stepperMax,
+      grouped = false,
+      rootClassName,
       value,
       defaultValue,
       onChange,
@@ -88,7 +93,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const decrementDisabled = disabled || isStepDisabled(currentValue, 'down', stepOptions)
 
     return (
-      <div className={numberInputRootVariants()}>
+      <div className={cn(numberInputRootVariants(), rootClassName)}>
         <input
           type="number"
           inputMode="numeric"
@@ -106,7 +111,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
         <div
           className={cn(
-            numberInputStepperVariants({ size }),
+            numberInputStepperVariants({ size, grouped }),
             'pointer-events-none opacity-0 transition-opacity',
             'group-hover:pointer-events-auto group-hover:opacity-100',
             'group-focus-within:pointer-events-auto group-focus-within:opacity-100',
