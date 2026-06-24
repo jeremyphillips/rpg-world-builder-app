@@ -24,6 +24,7 @@ export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
 export { Input, type InputProps } from './components/ui/input.client'
+export { NumberInput, type NumberInputProps } from './components/ui/number-input.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
   Card,
@@ -57,6 +58,23 @@ export { FormField } from './components/ui/form-field'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export { NumberField, type NumberFieldProps } from './components/ui/number-field'
+export {
+  DiceFormulaField,
+  type DiceFormulaFieldProps,
+} from './components/ui/dice-formula-field.client'
+export {
+  DEFAULT_DICE_FORMULA_VALUE,
+  DEFAULT_DICE_FORMULA_WITH_MODIFIER,
+  DICE_FORMULA_OPERATORS,
+  defaultDiceFormulaForMode,
+  formatDiceFormula,
+  resolveDiceFormulaValue,
+  type DiceFormulaLabelPosition,
+  type DiceFormulaModifier,
+  type DiceFormulaModifierMode,
+  type DiceFormulaOperator,
+  type DiceFormulaValue,
+} from './components/ui/dice-formula-field.lib'
 export {
   SelectField,
   type SelectFieldProps,

@@ -17,6 +17,8 @@ import { TextareaField } from '../components/ui/textarea-field'
 import { TextField } from '../components/ui/text-field'
 import { useFileFieldRemotePreview } from './file-field-props.context'
 import { EditableGridFieldRenderer } from './editable-grid-field.client'
+import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
+import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import type { FieldConfig, FieldType } from './field-config'
 
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
@@ -76,6 +78,9 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       size={config.size}
       placeholder={config.placeholder}
       disabled={config.disabled}
+      step={config.step}
+      stepperMin={config.min}
+      stepperMax={config.max}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={(event) => field.onChange(parseNumber(event.target.value))}
@@ -265,6 +270,28 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       id={id}
       error={error}
       namePrefix={namePrefix}
+    />
+  ),
+  diceFormula: ({ config, field, id, error }) => (
+    <DiceFormulaField
+      id={id}
+      label={config.label}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      size={config.size}
+      disabled={config.disabled}
+      labelPosition={config.labelPosition}
+      modifierMode={config.modifierMode}
+      faces={config.faces}
+      countMin={config.countMin}
+      countMax={config.countMax}
+      modifierMin={config.modifierMin}
+      modifierMax={config.modifierMax}
+      value={(field.value as DiceFormulaValue | undefined) ?? undefined}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
     />
   ),
 }
