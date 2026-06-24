@@ -1,4 +1,4 @@
-import type { Equipment, EquipmentKind } from '@rpg/contracts'
+import type { Equipment } from '@rpg/contracts'
 import {
   createEquipmentInputSchema,
   equipmentBodySchema,
@@ -9,7 +9,6 @@ import {
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
-import { deepMerge } from '../lib/deep-merge'
 import { loadSeedEquipment, seedEquipmentSlugs } from '@rpg/catalog/equipment'
 import { EquipmentPatchModel } from './equipment-patch.model'
 import {
@@ -24,9 +23,21 @@ interface EquipmentPatchRecord {
   patch: Record<string, unknown>
 }
 
+const HOMEBREW_DOC_ENVELOPE_KEYS = new Set([
+  '_id',
+  'campaignId',
+  'rulesetId',
+  'slug',
+  'createdAt',
+  'updatedAt',
+  '__v',
+])
+
 function toHomebrewEquipment(doc: HomebrewDoc): Equipment {
   const record = doc as HomebrewEquipmentRecord
-  const body = (record.body ?? {}) as Record<string, unknown>
+  const body = Object.fromEntries(
+    Object.entries(record).filter(([key]) => !HOMEBREW_DOC_ENVELOPE_KEYS.has(key)),
+  )
   return {
     id: String(record._id),
     slug: record.slug,
@@ -35,38 +46,13 @@ function toHomebrewEquipment(doc: HomebrewDoc): Equipment {
     campaignId: record.campaignId,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
-    name: record.name,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
-    ...(record.description !== undefined && { description: record.description }),
-    kind: record.kind as EquipmentKind,
-    cost: record.cost as Equipment['cost'],
     ...body,
   } as Equipment
 }
 
-function kindSpecificBody(input: Record<string, unknown>): Record<string, unknown> {
-  const {
-    slug: _slug,
-    name: _name,
-    description: _description,
-    imageKey: _imageKey,
-    kind: _kind,
-    cost: _cost,
-    ...rest
-  } = input
-  return rest
-}
-
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
-  const { slug: _slug, kind, name, description, imageKey, cost, ...rest } = input
-  return {
-    name,
-    ...(description !== undefined && { description }),
-    ...(imageKey !== undefined && { imageKey }),
-    kind,
-    cost,
-    body: kindSpecificBody({ slug: _slug, kind, name, description, imageKey, cost, ...rest }),
-  }
+  const { slug: _slug, ...body } = input
+  return body
 }
 
 export const equipmentContentConfig: ContentTypeConfig<Equipment> = {
@@ -97,19 +83,4 @@ export const equipmentWriteConfig: ContentWriteConfig<Equipment> = {
   patchModel: EquipmentPatchModel,
   toHomebrewEntity: toHomebrewEquipment,
   bodyFromCreateInput,
-  prepareHomebrewUpdate: (doc, update) => {
-    const mergedBody = deepMerge(
-      (doc.body as Record<string, unknown>) ?? {},
-      kindSpecificBody({ ...doc, ...update }),
-    )
-    const patch: Record<string, unknown> = {}
-    if (update.slug !== undefined) patch.slug = update.slug
-    if (update.name !== undefined) patch.name = update.name
-    if (update.description !== undefined) patch.description = update.description
-    if (update.imageKey !== undefined) patch.imageKey = update.imageKey
-    if (update.kind !== undefined) patch.kind = update.kind
-    if (update.cost !== undefined) patch.cost = update.cost
-    patch.body = mergedBody
-    return patch
-  },
 }

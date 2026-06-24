@@ -1,10 +1,12 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
+import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
+
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createUser } from '../user'
 import { createCampaign } from '../campaign'
-import { armorWriteConfig } from './armor/armor.config'
 import { classWriteConfig } from './classes/classes.config'
+import { equipmentWriteConfig } from './equipment/equipment.config'
 import { ClassPatchModel } from './classes/class-patch.model'
 import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { HomebrewClassModel } from './classes/homebrew-class.model'
@@ -36,37 +38,78 @@ async function makeCampaign() {
   return createCampaign({ name: 'Catalog', createdBy: owner.id })
 }
 
-describe('createHomebrewContent (armor)', () => {
+describe('createHomebrewContent (equipment)', () => {
+  const minimalArmorInput = {
+    kind: 'armor' as const,
+    slug: 'custom-leather',
+    name: 'Custom Leather',
+    category: 'light' as const,
+    cost: { amount: 15, currency: 'gp' as const },
+    baseAc: 12,
+    addDexModifier: true,
+    stealthDisadvantage: false,
+  }
+
+  const minimalWeaponInput = {
+    kind: 'weapon' as const,
+    slug: 'custom-blade',
+    name: 'Custom Blade',
+    category: 'martial' as const,
+    mode: 'melee' as const,
+    cost: { amount: 25, currency: 'gp' as const },
+    damage: { kind: 'dice' as const, count: 1, faces: 8 },
+    damageType: 'slashing' as const,
+    properties: [] as const,
+    mastery: 'sap' as const,
+  }
+
+  it('returns the merged system catalog including weapons and armor', async () => {
+    const campaign = await makeCampaign()
+    const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+
+    expect(equipment.some((item) => item.kind === 'weapon' && item.slug === 'longsword')).toBe(true)
+    expect(equipment.some((item) => item.kind === 'armor' && item.slug === 'leather')).toBe(true)
+    expect(
+      equipment.some((item) => item.kind === 'magic_item' && item.slug === 'bracers-of-defense'),
+    ).toBe(true)
+  })
+
   it('creates homebrew armor and returns it in the resolved catalog', async () => {
     const campaign = await makeCampaign()
-    const created = await createHomebrewContent(armorWriteConfig, campaign.id, {
-      slug: 'custom-leather',
-      name: 'Custom Leather',
-      category: 'light',
-      cost: { amount: 15, currency: 'gp' },
-      baseAc: 12,
-      addDexModifier: true,
-      stealthDisadvantage: false,
-    })
+    const created = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      minimalArmorInput,
+    )
 
     expect(created.source).toBe('homebrew')
-    expect(created.slug).toBe('custom-leather')
+    expect(created.kind).toBe('armor')
+    if (!isArmorEquipment(created)) throw new Error('expected armor')
     expect(created.baseAc).toBe(12)
 
-    const armor = await resolveCatalogForCampaign(armorWriteConfig.readConfig, campaign.id)
-    expect(armor.some((a) => a.slug === 'custom-leather')).toBe(true)
+    const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    expect(equipment.some((item) => item.slug === 'custom-leather')).toBe(true)
+  })
+
+  it('creates homebrew weapon with flat storage (no nested body)', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      minimalWeaponInput,
+    )
+
+    expect(created.kind).toBe('weapon')
+    expect(created.slug).toBe('custom-blade')
+    if (!isWeaponEquipment(created)) throw new Error('expected weapon')
+    expect(created.damage).toEqual({ kind: 'dice', count: 1, faces: 8 })
   })
 
   it('derives slug from name and ignores client-provided slug', async () => {
     const campaign = await makeCampaign()
-    const created = await createHomebrewContent(armorWriteConfig, campaign.id, {
+    const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, {
+      ...minimalArmorInput,
       slug: 'wrong-slug',
-      name: 'Custom Leather',
-      category: 'light',
-      cost: { amount: 15, currency: 'gp' },
-      baseAc: 12,
-      addDexModifier: true,
-      stealthDisadvantage: false,
     })
 
     expect(created.slug).toBe('custom-leather')
@@ -74,17 +117,14 @@ describe('createHomebrewContent (armor)', () => {
 
   it('ignores slug changes on homebrew update', async () => {
     const campaign = await makeCampaign()
-    const created = await createHomebrewContent(armorWriteConfig, campaign.id, {
-      slug: 'custom-leather',
-      name: 'Custom Leather',
-      category: 'light',
-      cost: { amount: 15, currency: 'gp' },
-      baseAc: 12,
-      addDexModifier: true,
-      stealthDisadvantage: false,
-    })
+    const created = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      minimalArmorInput,
+    )
 
-    const updated = await updateContentEntity(armorWriteConfig, campaign.id, created.id, {
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, created.id, {
+      kind: 'armor',
       slug: 'renamed-slug',
       name: 'Renamed Leather',
     })
@@ -95,15 +135,48 @@ describe('createHomebrewContent (armor)', () => {
 
   it('patches a system armor record', async () => {
     const campaign = await makeCampaign()
-    const fighter = (
-      await resolveCatalogForCampaign(armorWriteConfig.readConfig, campaign.id)
-    ).find((a) => a.slug === 'leather')!
+    const leather = (
+      await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    ).find((item) => item.slug === 'leather' && item.kind === 'armor')!
 
-    const updated = await updateContentEntity(armorWriteConfig, campaign.id, fighter.id, {
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, leather.id, {
+      kind: 'armor',
       baseAc: 12,
     })
 
+    if (!isArmorEquipment(updated)) throw new Error('expected armor')
     expect(updated.baseAc).toBe(12)
+    expect(updated.source).toBe('system')
+  })
+
+  it('patches a system weapon record', async () => {
+    const campaign = await makeCampaign()
+    const longsword = (
+      await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    ).find((item) => item.slug === 'longsword' && item.kind === 'weapon')!
+
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, longsword.id, {
+      kind: 'weapon',
+      name: 'Enhanced Longsword',
+    })
+
+    expect(updated.name).toBe('Enhanced Longsword')
+    expect(updated.source).toBe('system')
+  })
+
+  it('patches a system magic item record', async () => {
+    const campaign = await makeCampaign()
+    const bracers = (
+      await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    ).find((item) => item.slug === 'bracers-of-defense' && item.kind === 'magic_item')!
+
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, bracers.id, {
+      kind: 'magic_item',
+      rarity: 'very_rare',
+    })
+
+    if (updated.kind !== 'magic_item') throw new Error('expected magic item')
+    expect(updated.rarity).toBe('very_rare')
     expect(updated.source).toBe('system')
   })
 })
