@@ -64,7 +64,7 @@ const homebrewEquipmentSchema = new Schema(
     vehicleCategory: { type: String, enum: [...VEHICLE_CATEGORIES] },
     crew: { type: Number },
     passengers: { type: Number },
-    cargoTons: { type: Number },
+    cargoCapacity: { type: Schema.Types.Mixed },
     ac: { type: Number },
     hp: { type: Number },
     damageThreshold: { type: Number },

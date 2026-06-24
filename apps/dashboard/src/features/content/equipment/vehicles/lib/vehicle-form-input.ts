@@ -1,5 +1,6 @@
 import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
 
+import { massFromForm } from '../../../lib/content-form-field-helpers'
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
@@ -8,14 +9,12 @@ import {
 type VehicleInput = Extract<CreateEquipmentInput, { kind: 'vehicle' }>
 
 function optionalVehicleFields(values: EquipmentInputBuildCtx['values']): Partial<VehicleInput> {
+  const cargoCapacity = massFromForm(values.cargoCapacity)
   return {
     ...(values.speed && { speed: values.speed }),
-    ...(values.vehicleCapacity !== undefined && {
-      capacity: { value: values.vehicleCapacity, unit: 'lb' },
-    }),
+    ...(cargoCapacity && { cargoCapacity }),
     ...(values.crew !== undefined && { crew: values.crew }),
     ...(values.passengers !== undefined && { passengers: values.passengers }),
-    ...(values.cargoTons !== undefined && { cargoTons: values.cargoTons }),
     ...(values.ac !== undefined && { ac: values.ac }),
     ...(values.hp !== undefined && { hp: values.hp }),
     ...(values.damageThreshold !== undefined && { damageThreshold: values.damageThreshold }),

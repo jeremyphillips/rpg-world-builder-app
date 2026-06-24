@@ -1,6 +1,11 @@
 import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES, type VehicleEquipment } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
+import {
+  massInputSelectField,
+  massToForm,
+  VEHICLE_CARGO_CAPACITY_LABEL,
+} from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 function labelsFromEntries<const T extends string>(
@@ -34,12 +39,12 @@ export function vehicleFormFieldGroup(): FormItem {
         name: 'speed',
         label: 'Speed',
       },
-      {
-        type: 'number',
-        name: 'vehicleCapacity',
-        label: 'Cargo capacity (lb)',
-        min: 0,
-      },
+      massInputSelectField({
+        name: 'cargoCapacity',
+        label: VEHICLE_CARGO_CAPACITY_LABEL,
+        defaultUnit: 'ton',
+        valueDigits: 3,
+      }),
       {
         kind: 'row',
         fields: [
@@ -53,12 +58,6 @@ export function vehicleFormFieldGroup(): FormItem {
             type: 'number',
             name: 'passengers',
             label: 'Passengers',
-            min: 0,
-          },
-          {
-            type: 'number',
-            name: 'cargoTons',
-            label: 'Cargo (tons)',
             min: 0,
           },
         ],
@@ -96,10 +95,9 @@ export function vehicleFormValuesFromEntity(
   EquipmentFormValues,
   | 'vehicleCategory'
   | 'speed'
-  | 'vehicleCapacity'
+  | 'cargoCapacity'
   | 'crew'
   | 'passengers'
-  | 'cargoTons'
   | 'ac'
   | 'hp'
   | 'damageThreshold'
@@ -107,10 +105,9 @@ export function vehicleFormValuesFromEntity(
   return {
     vehicleCategory: item.vehicleCategory,
     speed: item.speed,
-    vehicleCapacity: item.capacity?.value,
+    cargoCapacity: massToForm(item.cargoCapacity),
     crew: item.crew,
     passengers: item.passengers,
-    cargoTons: item.cargoTons,
     ac: item.ac,
     hp: item.hp,
     damageThreshold: item.damageThreshold,

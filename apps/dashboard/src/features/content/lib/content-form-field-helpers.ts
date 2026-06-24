@@ -1,5 +1,17 @@
-import { CURRENCY_IDS, getCurrencyAbbrev, type Currency, type EquipmentKind } from '@rpg/contracts'
+import {
+  CURRENCY_IDS,
+  getCurrencyAbbrev,
+  getMassUnitAbbrev,
+  MASS_UNIT_IDS,
+  MOUNT_CARRYING_CAPACITY_LABEL,
+  type Currency,
+  type EquipmentKind,
+  type Mass,
+  type MassUnit,
+  VEHICLE_CARGO_CAPACITY_LABEL,
+} from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FieldOption, type RowConfig } from '@rpg/ui/form'
+import type { NumberInputDigits } from '@rpg/ui'
 
 import { EQUIPMENT_COST_VALUE_DIGITS, costValueDigitsForKind } from './equipment-cost-config'
 import {
@@ -126,4 +138,61 @@ export function costToFormDefaults(): { amount: number; currency: Currency } {
   return { amount: 0, currency: 'gp' }
 }
 
-export { currencyOptions, type FieldOption }
+const massUnitOptions = toOptions(
+  MASS_UNIT_IDS,
+  Object.fromEntries(MASS_UNIT_IDS.map((u) => [u, getMassUnitAbbrev(u)])) as Record<
+    MassUnit,
+    string
+  >,
+)
+
+/** Mass amount + unit composite for mount/vehicle carry limits. */
+export function massInputSelectField(options: {
+  name: string
+  label: string
+  required?: boolean
+  defaultUnit: MassUnit
+  valueDigits?: NumberInputDigits
+  width?: FieldConfig['width']
+}): FieldConfig {
+  const { name, label, required, defaultUnit, valueDigits, width = 'full' } = options
+  return {
+    type: 'inputSelect',
+    name,
+    label,
+    inputType: 'number',
+    valueKey: 'value',
+    unitKey: 'unit',
+    options: massUnitOptions,
+    min: 0,
+    step: defaultUnit === 'lb' ? 0.5 : 1,
+    width,
+    required,
+    valueDigits,
+    defaultValue: massToFormDefaults(defaultUnit),
+  }
+}
+
+export function massFromForm(
+  mass: { value?: number; unit?: MassUnit } | undefined,
+): Mass | undefined {
+  const value = mass?.value
+  const unit = mass?.unit
+  if (value === undefined || Number.isNaN(value) || !unit) return undefined
+  return { value, unit }
+}
+
+export function massToForm(mass: Mass | undefined): Mass | undefined {
+  return mass ? { value: mass.value, unit: mass.unit } : undefined
+}
+
+export function massToFormDefaults(unit: MassUnit): { unit: MassUnit } {
+  return { unit }
+}
+
+export {
+  currencyOptions,
+  MOUNT_CARRYING_CAPACITY_LABEL,
+  VEHICLE_CARGO_CAPACITY_LABEL,
+  type FieldOption,
+}

@@ -1,5 +1,4 @@
-import type { MountEquipment } from '@rpg/contracts'
-import { formatWeight } from '@rpg/contracts'
+import { formatMass, type MountEquipment } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 
@@ -15,7 +14,7 @@ const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
     id: 'carryingCapacity',
     accessorFn: (row) => row.carryingCapacity.value,
     header: ({ column }) => <SortableHeader column={column}>Carrying capacity</SortableHeader>,
-    cell: ({ row }) => formatWeight(row.original.carryingCapacity),
+    cell: ({ row }) => formatMass(row.original.carryingCapacity),
     meta: { label: 'Carrying capacity' },
   },
   {

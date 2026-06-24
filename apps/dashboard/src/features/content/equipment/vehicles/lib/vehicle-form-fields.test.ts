@@ -37,7 +37,7 @@ describe('vehicle form round-trips', () => {
       expect(formValues.speed).toBe(item.speed)
       expect(formValues.crew).toBe(item.crew)
       expect(formValues.passengers).toBe(item.passengers)
-      expect(formValues.cargoTons).toBe(item.cargoTons)
+      expect(formValues.cargoCapacity).toEqual(item.cargoCapacity)
       expect(formValues.ac).toBe(item.ac)
       expect(formValues.hp).toBe(item.hp)
       expect(formValues.damageThreshold).toBe(item.damageThreshold)

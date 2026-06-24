@@ -33,7 +33,7 @@ describe('mount form round-trips', () => {
     it(`${item.slug}: preserves mount fields`, () => {
       if (item.kind !== 'mount') return
       const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
-      expect(formValues.carryingCapacity).toBe(item.carryingCapacity.value)
+      expect(formValues.carryingCapacity).toEqual(item.carryingCapacity)
       expect(formValues.speed).toBe(item.speed)
     })
   }

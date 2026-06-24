@@ -87,6 +87,61 @@ export function weightToLb(w: Weight): number {
 }
 
 /**
+ * Mass units for carry/cargo limits (mounts, vehicles). Item weight stays on
+ * {@link weightSchema} (lb only). Uses US short tons: 1 ton = 2000 lb.
+ */
+export const MASS_UNITS = {
+  lb: { label: 'Pounds', abbrev: 'lb.', lbFactor: 1 },
+  ton: { label: 'Tons', abbrev: 'ton', lbFactor: 2000 },
+} as const
+
+export type MassUnit = keyof typeof MASS_UNITS
+
+export const MASS_UNIT_IDS = Object.keys(MASS_UNITS) as [MassUnit, ...MassUnit[]]
+
+export const massUnitSchema = z.enum(MASS_UNIT_IDS)
+
+export const massSchema = z.object({
+  value: z.number().min(0),
+  unit: massUnitSchema,
+})
+
+export type Mass = z.infer<typeof massSchema>
+
+/** SRD-facing labels for mount/vehicle capacity fields and stat rows. */
+export const MOUNT_CARRYING_CAPACITY_LABEL = 'Carrying capacity'
+export const VEHICLE_CARGO_CAPACITY_LABEL = 'Cargo'
+
+/** Returns the display name for a mass unit id. */
+export function getMassUnitLabel(u: string): string {
+  return MASS_UNITS[u as MassUnit]?.label ?? u
+}
+
+/** Returns the compact unit label for form selects and stat display. */
+export function getMassUnitAbbrev(u: string): string {
+  return MASS_UNITS[u as MassUnit]?.abbrev ?? u
+}
+
+/** Normalizes a mass to pounds — the canonical sort/compare key. */
+export function massToLb(m: Mass): number {
+  return m.value * MASS_UNITS[m.unit].lbFactor
+}
+
+/**
+ * Human-readable mass string. Delegates to {@link formatWeight} for pounds;
+ * renders whole tons as "1 ton" / "150 tons".
+ */
+export function formatMass(m: Mass): string {
+  if (m.unit === 'lb') {
+    return formatWeight({ value: m.value, unit: 'lb' })
+  }
+  const whole = m.value
+  if (whole === 1) return '1 ton'
+  if (whole === Math.floor(whole)) return `${whole} tons`
+  return `${m.value} tons`
+}
+
+/**
  * A distance. `unit` is a field (not a bare number) to mirror `Weight` and leave
  * room for future units; SRD spell ranges use feet only for now.
  */

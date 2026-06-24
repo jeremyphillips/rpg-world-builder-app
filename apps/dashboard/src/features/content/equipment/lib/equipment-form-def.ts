@@ -9,6 +9,7 @@ import {
   gearKindSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
+  massUnitSchema,
   serviceCategorySchema,
   slugSchema,
   toolCategorySchema,
@@ -81,15 +82,24 @@ const equipmentFormSchema = z.object({
   ability: abilitySchema.optional(),
 
   // mount
-  carryingCapacity: z.coerce.number().min(0).optional(),
+  carryingCapacity: z
+    .object({
+      value: z.coerce.number().min(0),
+      unit: massUnitSchema,
+    })
+    .optional(),
   speed: z.string().optional(),
 
   // vehicle
   vehicleCategory: vehicleCategorySchema.optional(),
-  vehicleCapacity: z.coerce.number().min(0).optional(),
+  cargoCapacity: z
+    .object({
+      value: z.coerce.number().min(0).optional(),
+      unit: massUnitSchema,
+    })
+    .optional(),
   crew: z.coerce.number().int().min(0).optional(),
   passengers: z.coerce.number().int().min(0).optional(),
-  cargoTons: z.coerce.number().min(0).optional(),
   ac: z.coerce.number().int().min(0).optional(),
   hp: z.coerce.number().int().min(0).optional(),
   damageThreshold: z.coerce.number().int().min(0).optional(),
@@ -209,7 +219,12 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
       speed: (legacy as { speed?: string }).speed,
       crew: (legacy as { crew?: number }).crew,
       passengers: (legacy as { passengers?: number }).passengers,
-      cargoTons: (legacy as { cargoTons?: number }).cargoTons,
+      cargoCapacity: (() => {
+        const cargoTons = (legacy as Record<string, unknown>).cargoTons
+        return typeof cargoTons === 'number'
+          ? { value: cargoTons, unit: 'ton' as const }
+          : undefined
+      })(),
       ac: (legacy as { ac?: number }).ac,
       hp: (legacy as { hp?: number }).hp,
       damageThreshold: (legacy as { damageThreshold?: number }).damageThreshold,

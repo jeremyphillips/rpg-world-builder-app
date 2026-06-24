@@ -85,12 +85,12 @@ describe('optionalWeightFields', () => {
 
 describe('economyFields', () => {
   it('places cost and weight in a three-column row', () => {
-    const [row] = economyFields({ kind: 'weapon' })
+    const row = economyFields({ kind: 'weapon' })[0]
     expect(row).toMatchObject({
       kind: 'row',
       className: 'grid w-full grid-cols-1 md:grid-cols-3',
     })
-    if (row && row.kind === 'row') {
+    if (row && 'kind' in row && row.kind === 'row') {
       expect(row.fields).toHaveLength(2)
       expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'full' })
       expect(row.fields[1]).toMatchObject({ name: 'weight', width: 'full' })
@@ -98,9 +98,9 @@ describe('economyFields', () => {
   })
 
   it('returns a row with only cost for service', () => {
-    const [row] = economyFields({ kind: 'service' })
+    const row = economyFields({ kind: 'service' })[0]
     expect(row).toMatchObject({ kind: 'row' })
-    if (row && row.kind === 'row') {
+    if (row && 'kind' in row && row.kind === 'row') {
       expect(row.fields).toHaveLength(1)
       expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'full' })
     }

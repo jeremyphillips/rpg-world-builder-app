@@ -177,7 +177,7 @@ const SAMPLE_BODIES = {
     vehicleCategory: 'water',
     speed: '4 mph',
     crew: 80,
-    cargoTons: 150,
+    cargoCapacity: { value: 150, unit: 'ton' },
     ac: 15,
     hp: 500,
     damageThreshold: 20,
