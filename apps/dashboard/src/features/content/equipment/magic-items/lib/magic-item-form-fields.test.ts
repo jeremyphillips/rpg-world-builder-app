@@ -3,7 +3,6 @@ import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { createEquipmentInputSchema } from '@rpg/contracts'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
-import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-registry'
 
 const MAGIC_ITEM_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter(
   (item) => item.kind === 'magic_item',
@@ -20,7 +19,7 @@ describe('magic item kindFieldGroups', () => {
       .map((field) => field.legend)
 
     expect(legends).toEqual(['Identity', 'Economy', 'Magic Item'])
-    expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('magic_item')?.[0])
+    expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Magic Item' })
   })
 })
 

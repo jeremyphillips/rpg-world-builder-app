@@ -19,9 +19,10 @@ export function buildMagicItemInput({
     ...(values.requiresAttunement !== undefined && {
       requiresAttunement: values.requiresAttunement,
     }),
-    ...(values.attunementRequirement && {
-      attunementRequirement: values.attunementRequirement,
-    }),
+    ...(values.requiresAttunement === true &&
+      values.attunementRequirement && {
+        attunementRequirement: values.attunementRequirement,
+      }),
     ...(values.magicItemCategory && { magicItemCategory: values.magicItemCategory }),
     ...(values.baseEquipmentId && { baseEquipmentId: values.baseEquipmentId }),
   })

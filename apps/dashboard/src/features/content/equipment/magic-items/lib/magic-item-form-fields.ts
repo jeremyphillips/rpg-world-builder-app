@@ -5,7 +5,7 @@ import {
   MAGIC_ITEM_RARITY_ENTRIES,
   type MagicItemEquipment,
 } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
@@ -26,6 +26,13 @@ const magicItemCategoryOptions = toOptions(
   MAGIC_ITEM_CATEGORIES,
   labelsFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES),
 )
+
+function visibleWhenAttunementRequired(): FieldVisibility {
+  return {
+    dependsOn: ['requiresAttunement'],
+    visibleWhen: (v) => v.requiresAttunement === true,
+  }
+}
 
 /** Magic item-specific form field group for the unified equipment form. */
 export function magicItemFormFieldGroup(): FormItem {
@@ -59,6 +66,7 @@ export function magicItemFormFieldGroup(): FormItem {
         type: 'text',
         name: 'attunementRequirement',
         label: 'Attunement requirement',
+        visibility: visibleWhenAttunementRequired(),
       },
       {
         type: 'text',

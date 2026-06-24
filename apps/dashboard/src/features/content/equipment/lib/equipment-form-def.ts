@@ -2,6 +2,8 @@ import { z } from 'zod'
 import {
   EQUIPMENT_KINDS,
   EQUIPMENT_KIND_LABELS,
+  ABILITY_SCORE_MAX,
+  ABILITY_SCORE_MIN,
   abilitySchema,
   armorCategorySchema,
   armorMaterialSchema,
@@ -146,7 +148,12 @@ const equipmentFormSchema = z.object({
   addDexModifier: z.boolean().optional(),
   maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
-  strengthRequirement: z.coerce.number().int().optional(),
+  strengthRequirement: z.coerce
+    .number()
+    .int()
+    .min(ABILITY_SCORE_MIN)
+    .max(ABILITY_SCORE_MAX)
+    .optional(),
 })
 
 type EquipmentFormValues = z.infer<typeof equipmentFormSchema>
