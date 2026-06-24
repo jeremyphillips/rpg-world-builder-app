@@ -1,5 +1,5 @@
 import { getClassBySlug, getSubclassBySlug, loadSubclassesByClassId } from '@rpg/catalog/classes'
-import { getArmorBySlug, getEquipmentBySlug, getWeaponBySlug } from '@rpg/catalog/equipment'
+import { getEquipmentBySlug } from '@rpg/catalog/equipment'
 import { getFeatBySlug } from '@rpg/catalog/feats'
 import { getSkillProficiencyBySlug } from '@rpg/catalog/skill-proficiencies'
 import { getSpeciesBySlug } from '@rpg/catalog/species'
@@ -9,14 +9,6 @@ import { STORY_RULESET_ID } from './constants'
 
 export function pickSpecies(slug: string) {
   return getSpeciesBySlug(STORY_RULESET_ID, slug)
-}
-
-export function pickArmor(slug: string) {
-  return getArmorBySlug(STORY_RULESET_ID, slug)
-}
-
-export function pickWeapon(slug: string) {
-  return getWeaponBySlug(STORY_RULESET_ID, slug)
 }
 
 export function pickEquipment(slug: string) {

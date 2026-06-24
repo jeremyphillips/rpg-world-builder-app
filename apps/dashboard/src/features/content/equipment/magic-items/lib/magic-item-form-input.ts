@@ -1,6 +1,9 @@
 import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
 
-import { equipmentInputBase, type EquipmentInputBuildCtx } from '../../lib/equipment-form-input'
+import {
+  equipmentInputBase,
+  type EquipmentInputBuildCtx,
+} from '../../lib/equipment-form-input-base'
 
 /** Maps magic item form values to a create/update API input fragment. */
 export function buildMagicItemInput({

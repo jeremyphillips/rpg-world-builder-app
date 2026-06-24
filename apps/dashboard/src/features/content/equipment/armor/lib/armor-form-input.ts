@@ -1,6 +1,9 @@
 import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
 
-import { equipmentInputBase, type EquipmentInputBuildCtx } from '../../lib/equipment-form-input'
+import {
+  equipmentInputBase,
+  type EquipmentInputBuildCtx,
+} from '../../lib/equipment-form-input-base'
 
 type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 

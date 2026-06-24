@@ -1,6 +1,13 @@
-import { createEquipmentInputSchema, dieFaceSchema, type CreateEquipmentInput } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  dieFaceSchema,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
-import { equipmentInputBase, type EquipmentInputBuildCtx } from '../../lib/equipment-form-input'
+import {
+  equipmentInputBase,
+  type EquipmentInputBuildCtx,
+} from '../../lib/equipment-form-input-base'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
@@ -53,7 +60,11 @@ function optionalWeaponRange(values: EquipmentInputBuildCtx['values']): Partial<
 }
 
 /** Maps weapon form values to a create/update API input fragment. */
-export function buildWeaponInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
+export function buildWeaponInput({
+  values,
+  ctx,
+  weight,
+}: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'weapon',

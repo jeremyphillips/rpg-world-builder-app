@@ -23,53 +23,41 @@ function genericFamilyColumns(campaignId: string): ColumnDef<Equipment>[] {
 
 const genericFamilyFilters = equipmentFilters.filter((filter) => filter.id !== 'kind')
 
+/** Per-family overview table columns registered by URL path segment. */
+const familyColumns: Partial<
+  Record<EquipmentFamilyPath, (campaignId: string) => ColumnDef<Equipment>[]>
+> = {
+  services: (campaignId) => serviceColumns(campaignId) as ColumnDef<Equipment>[],
+  mounts: (campaignId) => mountColumns(campaignId) as ColumnDef<Equipment>[],
+  tools: (campaignId) => toolColumns(campaignId) as ColumnDef<Equipment>[],
+  'magic-items': (campaignId) => magicItemColumns(campaignId) as ColumnDef<Equipment>[],
+  'adventuring-gear': (campaignId) => adventuringGearColumns(campaignId) as ColumnDef<Equipment>[],
+  vehicles: (campaignId) => vehicleColumns(campaignId) as ColumnDef<Equipment>[],
+  armor: (campaignId) => armorColumns(campaignId) as ColumnDef<Equipment>[],
+  weapons: (campaignId) => weaponColumns(campaignId) as ColumnDef<Equipment>[],
+}
+
+/** Per-family overview table filters registered by URL path segment. */
+const familyFilters: Partial<Record<EquipmentFamilyPath, FilterDef[]>> = {
+  services: serviceFilters,
+  mounts: mountFilters,
+  tools: toolFilters,
+  'magic-items': magicItemFilters,
+  'adventuring-gear': adventuringGearFilters,
+  vehicles: vehicleFilters,
+  armor: armorFilters,
+  weapons: weaponFilters,
+}
+
 /** Overview table columns for an equipment family path segment. */
 export function getFamilyColumns(
   campaignId: string,
   family: EquipmentFamilyPath,
 ): ColumnDef<Equipment>[] {
-  switch (family) {
-    case 'services':
-      return serviceColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'mounts':
-      return mountColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'tools':
-      return toolColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'magic-items':
-      return magicItemColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'adventuring-gear':
-      return adventuringGearColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'vehicles':
-      return vehicleColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'armor':
-      return armorColumns(campaignId) as ColumnDef<Equipment>[]
-    case 'weapons':
-      return weaponColumns(campaignId) as ColumnDef<Equipment>[]
-    default:
-      return genericFamilyColumns(campaignId)
-  }
+  return familyColumns[family]?.(campaignId) ?? genericFamilyColumns(campaignId)
 }
 
 /** Overview table filters for an equipment family path segment. */
 export function getFamilyFilters(family: EquipmentFamilyPath): FilterDef[] {
-  switch (family) {
-    case 'services':
-      return serviceFilters
-    case 'mounts':
-      return mountFilters
-    case 'tools':
-      return toolFilters
-    case 'magic-items':
-      return magicItemFilters
-    case 'adventuring-gear':
-      return adventuringGearFilters
-    case 'vehicles':
-      return vehicleFilters
-    case 'armor':
-      return armorFilters
-    case 'weapons':
-      return weaponFilters
-    default:
-      return genericFamilyFilters
-  }
+  return familyFilters[family] ?? genericFamilyFilters
 }

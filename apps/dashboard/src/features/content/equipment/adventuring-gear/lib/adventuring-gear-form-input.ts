@@ -1,6 +1,9 @@
 import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
 
-import { equipmentInputBase, type EquipmentInputBuildCtx } from '../../lib/equipment-form-input'
+import {
+  equipmentInputBase,
+  type EquipmentInputBuildCtx,
+} from '../../lib/equipment-form-input-base'
 
 function parseProperties(text: string | undefined): string[] | undefined {
   if (!text?.trim()) return undefined

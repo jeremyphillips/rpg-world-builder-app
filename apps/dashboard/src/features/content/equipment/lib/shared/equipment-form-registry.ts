@@ -10,9 +10,7 @@ import { vehicleFormFieldGroup } from '../../vehicles/lib/vehicle-form-fields'
 import { armorFormFieldGroup } from '../../armor/lib/armor-form-fields'
 import { weaponFormFieldGroup } from '../../weapons/lib/weapon-form-fields'
 
-export { visibleWhenKind } from './visible-when-kind'
-
-/** Extracted per-family form groups — monolith groups are removed as each kind registers here. */
+/** Per-family form groups registered by kind. */
 export const kindFieldGroups: Partial<Record<EquipmentKind, () => FormItem[]>> = {
   service: () => [serviceFormFieldGroup()],
   mount: () => [mountFormFieldGroup()],
@@ -24,7 +22,7 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, () => FormItem[]>> =
   weapon: () => [weaponFormFieldGroup()],
 }
 
-/** Returns registered field groups for a kind, or `undefined` when still in the monolith. */
+/** Returns registered field groups for a kind. */
 export function fieldGroupsForEquipmentKind(kind: EquipmentKind): FormItem[] | undefined {
   return kindFieldGroups[kind]?.()
 }

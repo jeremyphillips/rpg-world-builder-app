@@ -1,11 +1,7 @@
-import {
-  type CreateEquipmentInput,
-  type Equipment,
-  type EquipmentKind,
-} from '@rpg/contracts'
+import { type CreateEquipmentInput, type Equipment, type EquipmentKind } from '@rpg/contracts'
 
 import { weightFromForm } from '../../lib/content-form-field-helpers'
-import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
+import { finalizeContentInput } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
 import { buildArmorInput } from '../armor/lib/armor-form-input'
 import { buildAdventuringGearInput } from '../adventuring-gear/lib/adventuring-gear-form-input'
@@ -17,25 +13,7 @@ import { buildVehicleInput } from '../vehicles/lib/vehicle-form-input'
 import { buildWeaponInput } from '../weapons/lib/weapon-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
-
-export type EquipmentInputBuildCtx = {
-  values: EquipmentFormValues
-  ctx?: ContentFormInputCtx<Equipment>
-  weight: ReturnType<typeof weightFromForm>
-}
-
-/** Shared identity/cost fields for all equipment kind input builders. */
-export function equipmentInputBase(
-  values: EquipmentFormValues,
-  ctx?: ContentFormInputCtx<Equipment>,
-): Pick<EquipmentFormValues, 'name' | 'cost'> & { description?: string; slug: string } {
-  return {
-    slug: slugForInputParse(values.name, ctx),
-    name: values.name,
-    description: values.description || undefined,
-    cost: values.cost,
-  }
-}
+import type { EquipmentInputBuildCtx } from './equipment-form-input-base'
 
 const kindInputBuilders: Record<
   EquipmentKind,
