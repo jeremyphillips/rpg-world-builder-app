@@ -27,6 +27,7 @@ describe('ChooseFromChipsField', () => {
     expect(screen.getByText('Choose')).toBeInTheDocument()
     expect(screen.getByText('skills from:')).toBeInTheDocument()
     expect(screen.getByRole('spinbutton')).toHaveValue(2)
+    expect(screen.getByRole('spinbutton').parentElement).toHaveClass('w-[calc(1*1ch+3.125rem)]')
     expect(screen.getByRole('checkbox', { name: 'Athletics' })).toHaveAttribute(
       'aria-checked',
       'true',

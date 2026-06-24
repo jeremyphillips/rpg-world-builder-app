@@ -95,7 +95,6 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
           options: featCategoryOptions,
           multiple: false,
           required: true,
-          hint: FEAT_PART_ENTRIES.category.description,
         },
       ],
     },
@@ -103,7 +102,6 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
       kind: 'slot',
       name: 'prerequisiteEditor',
       label: 'Prerequisites',
-      hint: FEAT_PART_ENTRIES.prerequisite.description,
       render: () =>
         createElement(RequirementEditor, {
           name: 'prerequisiteEditor',

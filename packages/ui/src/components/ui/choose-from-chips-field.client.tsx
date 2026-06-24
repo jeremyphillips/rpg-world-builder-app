@@ -111,7 +111,7 @@ export function ChooseFromChipsField({
         <NumberInput
           id={chooseId}
           size={size}
-          digits={2}
+          digits={1}
           stepperMin={chooseMin}
           stepperMax={chooseMax}
           min={chooseMin}
