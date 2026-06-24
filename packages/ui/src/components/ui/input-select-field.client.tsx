@@ -25,6 +25,7 @@ import {
   inputSelectDividerVariants,
   inputSelectGroupVariants,
   inputSelectSearchablePanelVariants,
+  inputSelectSegmentResetClassNames,
   inputSelectUnitSegmentVariants,
   inputSelectValueSegmentVariants,
   inputSelectValueWrapperVariants,
@@ -84,19 +85,14 @@ function RadixUnitSelect({
   unitPlaceholder,
   disabled,
   size,
-  hasError,
-  describedBy,
   onUnitChange,
   onBlur,
-}: Omit<UnitSelectSegmentProps, 'searchable' | 'label'>) {
+}: Omit<UnitSelectSegmentProps, 'searchable' | 'label' | 'hasError' | 'describedBy'>) {
   return (
     <Select value={unit} onValueChange={onUnitChange} disabled={disabled}>
       <SelectTrigger
         id={id}
         size={size}
-        data-input-select-segment
-        aria-invalid={hasError || undefined}
-        aria-describedby={describedBy}
         onBlur={onBlur}
         className={inputSelectUnitSegmentVariants({ size, searchable: false })}
       >
@@ -121,11 +117,10 @@ function SearchableUnitSelect({
   unitPlaceholder,
   disabled,
   size,
-  hasError,
   describedBy,
   onUnitChange,
   onBlur,
-}: Omit<UnitSelectSegmentProps, 'searchable'>) {
+}: Omit<UnitSelectSegmentProps, 'searchable' | 'hasError'>) {
   const listboxId = `${id}-listbox`
   const searchId = `${id}-search`
   const [open, setOpen] = React.useState(false)
@@ -155,11 +150,9 @@ function SearchableUnitSelect({
           type="button"
           id={id}
           role="combobox"
-          data-input-select-segment
           aria-expanded={open}
           aria-controls={listboxId}
           aria-haspopup="listbox"
-          aria-invalid={hasError || undefined}
           aria-describedby={describedBy}
           disabled={disabled}
           onBlur={onBlur}
@@ -238,11 +231,12 @@ function SearchableUnitSelect({
   )
 }
 
-function UnitSelectSegment(props: UnitSelectSegmentProps) {
-  if (props.searchable) {
-    return <SearchableUnitSelect {...props} />
+function UnitSelectSegment({ searchable, hasError: _hasError, ...rest }: UnitSelectSegmentProps) {
+  if (searchable) {
+    return <SearchableUnitSelect {...rest} />
   }
-  return <RadixUnitSelect {...props} />
+  const { describedBy: _describedBy, label: _label, ...radixProps } = rest
+  return <RadixUnitSelect {...radixProps} />
 }
 
 function parseNumberValue(raw: string): number | undefined {
@@ -296,7 +290,7 @@ function ValueSegment({
 
   if (inputType === 'number') {
     return (
-      <div data-input-select-segment className={inputSelectValueWrapperVariants()}>
+      <div data-input-select-value className={inputSelectValueWrapperVariants()}>
         <NumberInput
           id={id}
           grouped
@@ -312,7 +306,7 @@ function ValueSegment({
           aria-describedby={describedBy}
           onChange={handleValueChange}
           onBlur={onBlur}
-          className={segmentClassName}
+          className={inputSelectSegmentResetClassNames}
         />
       </div>
     )
@@ -321,7 +315,7 @@ function ValueSegment({
   return (
     <Input
       id={id}
-      data-input-select-segment
+      data-input-select-value
       type="text"
       size={size}
       disabled={disabled}

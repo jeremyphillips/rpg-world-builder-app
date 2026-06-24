@@ -98,25 +98,22 @@ describe('InputSelectField', () => {
     expect(screen.getByLabelText('Decrement')).toBeInTheDocument()
   })
 
-  it('marks both segments invalid when error is set', () => {
+  it('marks only the value segment invalid when error is set', () => {
     const { container } = render(<ControlledField error="Too low." />)
     const group = container.querySelector('[role="group"]')
     expect(group).toHaveClass('border-destructive')
 
-    const segments = container.querySelectorAll('[data-input-select-segment]')
-    expect(segments).toHaveLength(2)
+    const valueSegments = container.querySelectorAll('[data-input-select-value]')
+    expect(valueSegments).toHaveLength(1)
 
     expect(screen.getByLabelText('Cost value')).toHaveAttribute('aria-invalid', 'true')
-    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveAttribute(
-      'aria-invalid',
-      'true',
-    )
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).not.toHaveAttribute('aria-invalid')
     expect(screen.getByRole('alert')).toHaveTextContent('Too low.')
   })
 
   it('uses a wider unit trigger when searchable', () => {
     render(<ControlledField searchable />)
-    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-40')
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-48')
   })
 
   it('has no axe accessibility violations', async () => {
