@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import { useCampaignRules } from '@/features/campaign/hooks/use-campaign-rules'
+import { useCampaignRules } from '@/features/campaign'
 
 import { useClasses } from '../classes/hooks/use-classes'
 import { useEquipment } from '../equipment/hooks/use-equipment'

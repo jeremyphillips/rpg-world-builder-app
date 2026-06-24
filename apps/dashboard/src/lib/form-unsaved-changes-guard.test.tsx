@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { FormUnsavedChangesGuard } from './form-unsaved-changes-guard'
@@ -35,7 +35,7 @@ function ConditionalHiddenFieldForm() {
     defaultValues: { name: 'Original', showNotes: false, notes: 'seed' },
     shouldUnregister: true,
   })
-  const showNotes = form.watch('showNotes')
+  const showNotes = useWatch({ control: form.control, name: 'showNotes' })
 
   return (
     <FormProvider {...form}>

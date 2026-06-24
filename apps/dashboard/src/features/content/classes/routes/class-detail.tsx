@@ -4,7 +4,7 @@ import { getAbilityLabel, skillSlugsSuggestingClass } from '@rpg/contracts'
 import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { useCampaignRules } from '@/features/campaign/hooks/use-campaign-rules'
+import { useCampaignRules } from '@/features/campaign'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'

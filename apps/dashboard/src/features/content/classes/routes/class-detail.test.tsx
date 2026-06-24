@@ -10,8 +10,6 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 }))
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
-}))
-vi.mock('@/features/campaign/hooks/use-campaign-rules', () => ({
   useCampaignRules: vi.fn(() => ({
     maxCharacterLevel: 20,
     standardMaxCharacterLevel: 20,
