@@ -76,7 +76,7 @@ export function DiceFormulaField({
   info,
   required = false,
   disabled = false,
-  size = 'md',
+  size = 'sm',
   labelPosition = 'above',
   modifierMode = 'optional',
   faces = DIE_FACES,
@@ -140,8 +140,8 @@ export function DiceFormulaField({
       )}
 
       {labelPosition === 'inline' ? (
-        <div className="flex flex-wrap items-end gap-3">
-          <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0 pb-2.5')}>
+        <div className="flex flex-wrap items-center gap-3">
+          <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
             <DiceFormulaFieldLabelContent label={label} required={required} info={info} />
           </span>
           {controls}

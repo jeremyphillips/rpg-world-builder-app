@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { fieldWidthVariants } from './field-control.variants'
@@ -17,6 +19,7 @@ import {
   type DiceFormulaValue,
 } from './dice-formula-field.lib'
 import {
+  diceFormulaControlCellVariants,
   diceFormulaCountInputVariants,
   diceFormulaFacesTriggerVariants,
   diceFormulaModifierInputVariants,
@@ -27,6 +30,27 @@ import {
 
 const ADD_MODIFIER_LABEL = 'Add modifier'
 const REMOVE_MODIFIER_LABEL = 'Remove modifier'
+
+function DiceFormulaControlCell({
+  id,
+  label,
+  width,
+  children,
+}: {
+  id: string
+  label: string
+  width: 'xs' | 'sm'
+  children: ReactNode
+}) {
+  return (
+    <div className={cn(diceFormulaControlCellVariants(), fieldWidthVariants({ width }))}>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      {children}
+    </div>
+  )
+}
 
 interface DiceFormulaControlsProps {
   id: string
@@ -70,10 +94,7 @@ function DiceFormulaCountControl({
   | 'onUpdate'
 >) {
   return (
-    <div className={cn('space-y-1', fieldWidthVariants({ width: 'xs' }))}>
-      <label htmlFor={id} className="sr-only">
-        Count
-      </label>
+    <DiceFormulaControlCell id={id} label="Count" width="xs">
       <Input
         id={id}
         type="number"
@@ -90,7 +111,7 @@ function DiceFormulaCountControl({
         }}
         onBlur={onBlur}
       />
-    </div>
+    </DiceFormulaControlCell>
   )
 }
 
@@ -108,10 +129,7 @@ function DiceFormulaFacesControl({
   'id' | 'size' | 'resolved' | 'faces' | 'disabled' | 'hasError' | 'onBlur' | 'onUpdate'
 >) {
   return (
-    <div className={cn('space-y-1', fieldWidthVariants({ width: 'sm' }))}>
-      <label htmlFor={id} className="sr-only">
-        Die faces
-      </label>
+    <DiceFormulaControlCell id={id} label="Die faces" width="xs">
       <Select
         value={String(resolved.faces)}
         onValueChange={(next) => onUpdate({ faces: Number(next) })}
@@ -134,7 +152,7 @@ function DiceFormulaFacesControl({
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </DiceFormulaControlCell>
   )
 }
 
@@ -167,10 +185,7 @@ function DiceFormulaModifierControls({
 }) {
   return (
     <>
-      <div className={cn('space-y-1', fieldWidthVariants({ width: 'xs' }))}>
-        <label htmlFor={operatorId} className="sr-only">
-          Operator
-        </label>
+      <DiceFormulaControlCell id={operatorId} label="Operator" width="xs">
         <Select
           value={resolved.modifier?.operator ?? '+'}
           onValueChange={(next) =>
@@ -200,12 +215,9 @@ function DiceFormulaModifierControls({
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </DiceFormulaControlCell>
 
-      <div className={cn('space-y-1', fieldWidthVariants({ width: 'xs' }))}>
-        <label htmlFor={modifierId} className="sr-only">
-          Modifier
-        </label>
+      <DiceFormulaControlCell id={modifierId} label="Modifier" width="xs">
         <Input
           id={modifierId}
           type="number"
@@ -232,14 +244,14 @@ function DiceFormulaModifierControls({
           }}
           onBlur={onBlur}
         />
-      </div>
+      </DiceFormulaControlCell>
 
       {modifierMode === 'optional' ? (
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="h-10 shrink-0 px-2 text-xs"
+          className="shrink-0 px-2"
           disabled={disabled}
           onClick={onRemoveModifier}
         >
@@ -326,7 +338,7 @@ export function DiceFormulaControls({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-10 shrink-0 px-2 text-xs"
+          className="shrink-0 px-2"
           disabled={disabled}
           onClick={() => onUpdate({ modifier: { ...DEFAULT_DICE_FORMULA_MODIFIER } })}
         >
