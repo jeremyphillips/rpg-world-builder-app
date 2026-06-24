@@ -418,7 +418,7 @@ export function RequirementEditor({
   const groupsPath = `${name}.groups`
   const { fields, append, remove } = useFieldArray({ name: groupsPath })
   const editorValue = useWatch({ name }) as PrerequisiteEditorValue | undefined
-  const preview = formatRequirementEditorPreview(editorValue ?? { groups: [] })
+  const preview = formatRequirementEditorPreview(editorValue ?? { groups: [] }, maxCharacterLevel)
 
   return (
     <div className="space-y-6">

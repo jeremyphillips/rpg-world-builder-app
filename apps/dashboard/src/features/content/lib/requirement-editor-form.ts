@@ -308,10 +308,13 @@ function groupToExpression(
   return { kind: 'all', requirements }
 }
 
-function groupToPreviewExpression(group: RequirementGroupForm): RequirementExpression | undefined {
+function groupToPreviewExpression(
+  group: RequirementGroupForm,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): RequirementExpression | undefined {
   const requirements = group.requirements
     .filter(isRequirementLeafForm)
-    .map((leaf) => tryLeafToExpression(leaf))
+    .map((leaf) => tryLeafToExpression(leaf, maxLevel))
     .filter((expr): expr is RequirementExpression => expr != null)
 
   if (requirements.length === 0) return undefined
@@ -329,9 +332,10 @@ function groupToPreviewExpression(group: RequirementGroupForm): RequirementExpre
 
 function requirementEditorToPreviewExpression(
   value: PrerequisiteEditorValue | undefined,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
 ): RequirementExpression | undefined {
   const groupExpressions = normalizeEditorValue(value)
-    .groups.map(groupToPreviewExpression)
+    .groups.map((group) => groupToPreviewExpression(group, maxLevel))
     .filter((expr): expr is RequirementExpression => expr != null)
 
   if (groupExpressions.length === 0) return undefined
@@ -418,8 +422,11 @@ export function refineRequirementEditor(
 }
 
 /** Player-facing preview for the requirement editor. */
-export function formatRequirementEditorPreview(value: PrerequisiteEditorValue | undefined): string {
-  const expression = requirementEditorToPreviewExpression(value)
+export function formatRequirementEditorPreview(
+  value: PrerequisiteEditorValue | undefined,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): string {
+  const expression = requirementEditorToPreviewExpression(value, maxLevel)
   if (!expression) {
     return 'No prerequisites'
   }
