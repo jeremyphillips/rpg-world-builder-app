@@ -12,7 +12,7 @@ function ArmorRowActions({ row, campaignId }: { row: Armor; campaignId: string }
   return (
     <ContentOverviewRowActions
       campaignId={campaignId}
-      editHref={ROUTES.content.equipment.edit(campaignId, row.id)}
+      editHref={ROUTES.content.equipment.edit(campaignId, 'armor', row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
       itemLabel="armor"

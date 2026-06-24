@@ -30,6 +30,8 @@ export interface ContentCreateShellProps {
   backHref: string
   /** Merged on top of the form def's `createDefaultValues` (e.g. preset `kind`). */
   initialValues?: Record<string, unknown>
+  /** Merged into the form layout context (e.g. family-scoped equipment kind). */
+  formCtx?: Partial<ContentFormCtx>
 }
 
 interface ContentCreateFormProps {
@@ -37,9 +39,16 @@ interface ContentCreateFormProps {
   campaignId: string
   backHref: string
   initialValues?: Record<string, unknown>
+  formCtx?: Partial<ContentFormCtx>
 }
 
-function ContentCreateForm({ def, campaignId, backHref, initialValues }: ContentCreateFormProps) {
+function ContentCreateForm({
+  def,
+  campaignId,
+  backHref,
+  initialValues,
+  formCtx,
+}: ContentCreateFormProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -58,6 +67,7 @@ function ContentCreateForm({ def, campaignId, backHref, initialValues }: Content
       {(optionsCtx) => {
         const ctx = {
           ...optionsCtx,
+          ...formCtx,
           campaignId,
           mode: 'create' as const,
           entitySource: 'homebrew' as const,
@@ -77,6 +87,7 @@ function ContentCreateForm({ def, campaignId, backHref, initialValues }: Content
                 def.toInput(values, {
                   weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
                   campaignRules: ctx.campaignRules,
+                  equipmentKind: ctx.equipmentKind,
                 }),
               )
               form.reset(values)
@@ -103,6 +114,7 @@ export function ContentCreateShell({
   heading,
   backHref,
   initialValues,
+  formCtx,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -121,6 +133,7 @@ export function ContentCreateShell({
             campaignId={campaignId}
             backHref={backHref}
             initialValues={initialValues}
+            formCtx={formCtx}
           />
         </ContentAuthoringGate>
       ) : (

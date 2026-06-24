@@ -4,7 +4,7 @@ import type { Equipment } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useEquipment } from '../hooks/use-equipment'
-import { equipmentColumns, equipmentFilters } from '../components/equipment-columns'
+import { getFamilyColumns, getFamilyFilters } from '../lib/shared/equipment-family-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 import {
@@ -13,11 +13,19 @@ import {
   type EquipmentFamilyPath,
 } from '../lib/shared/equipment-family-paths'
 
-function EquipmentRowActions({ row, campaignId }: { row: Equipment; campaignId: string }) {
+function EquipmentRowActions({
+  row,
+  campaignId,
+  family,
+}: {
+  row: Equipment
+  campaignId: string
+  family: EquipmentFamilyPath
+}) {
   return (
     <ContentOverviewRowActions
       campaignId={campaignId}
-      editHref={ROUTES.content.equipment.edit(campaignId, row.id)}
+      editHref={ROUTES.content.equipment.edit(campaignId, family, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
       itemLabel="equipment"
@@ -49,12 +57,12 @@ export function EquipmentFamilyOverviewContent({
       newLabel={`New ${heading.replace(/s$/, '')}`}
     >
       <DataTable
-        columns={equipmentColumns(campaignId).filter(
-          (column) => 'accessorKey' in column && column.accessorKey !== 'kind',
-        )}
+        columns={getFamilyColumns(campaignId, family)}
         data={filtered}
-        filters={equipmentFilters.filter((filter) => filter.id !== 'kind')}
-        rowActions={(row) => <EquipmentRowActions row={row} campaignId={campaignId} />}
+        filters={getFamilyFilters(family)}
+        rowActions={(row) => (
+          <EquipmentRowActions row={row} campaignId={campaignId} family={family} />
+        )}
         caption={`${heading} available in this campaign`}
       />
     </ContentOverviewShell>

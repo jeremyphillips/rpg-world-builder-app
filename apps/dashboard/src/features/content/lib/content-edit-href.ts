@@ -7,10 +7,16 @@ export function contentEditHref(
   section: ContentRouteSection,
   campaignId: string,
   entityId: string,
+  family?: string,
 ): string | undefined {
   const routes = CONTENT_ROUTES[section]
   if (!('edit' in routes) || typeof routes.edit !== 'function') {
     return undefined
   }
-  return routes.edit(campaignId, entityId)
+  if (section === 'equipment') {
+    if (!family) return undefined
+    return routes.edit(campaignId, family, entityId)
+  }
+  const edit = routes.edit as (campaignId: string, entityId: string) => string
+  return edit(campaignId, entityId)
 }

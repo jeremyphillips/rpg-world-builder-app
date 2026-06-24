@@ -16,8 +16,6 @@ import {
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
   PHYSICAL_DAMAGE_TYPE_IDS,
-  SERVICE_CATEGORIES,
-  SERVICE_CATEGORY_ENTRIES,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   VEHICLE_CATEGORIES,
@@ -59,9 +57,16 @@ import {
   identityFields,
   optionalWeightFields,
 } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormCtx,
+  type ContentFormDef,
+} from '../../lib/content-form-registry'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
+import { serviceFormValuesFromEntity } from '../services/lib/service-form-fields'
 import { equipmentFormToInput } from './equipment-form-input'
+import { buildRegisteredKindFieldGroups } from './shared/equipment-form-registry'
+import { visibleWhenKind } from './shared/visible-when-kind'
 
 const equipmentKindSchema = z.enum(EQUIPMENT_KINDS)
 
@@ -79,10 +84,6 @@ const toolCategoryOptions = toOptions(TOOL_CATEGORIES, labelsFromEntries(TOOL_CA
 const vehicleCategoryOptions = toOptions(
   VEHICLE_CATEGORIES,
   labelsFromEntries(VEHICLE_CATEGORY_ENTRIES),
-)
-const serviceCategoryOptions = toOptions(
-  SERVICE_CATEGORIES,
-  labelsFromEntries(SERVICE_CATEGORY_ENTRIES),
 )
 const magicItemRarityOptions = toOptions(
   MAGIC_ITEM_RARITIES,
@@ -124,13 +125,6 @@ const damageKindOptions = [
   { value: 'dice', label: 'Dice' },
   { value: 'flat', label: 'Flat amount' },
 ]
-
-function visibleWhenKind(...kinds: EquipmentKind[]): FieldVisibility {
-  return {
-    dependsOn: ['kind'],
-    visibleWhen: (v) => kinds.includes(v.kind as EquipmentKind),
-  }
-}
 
 function visibleWhenWeaponDamage(): FieldVisibility {
   return {
@@ -371,14 +365,8 @@ const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
       damageThreshold: item.damageThreshold,
     }
   },
-  service: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'service' }>
-    return {
-      serviceCategory: item.serviceCategory,
-      duration: item.duration,
-      notes: item.notes,
-    }
-  },
+  service: (entity) =>
+    serviceFormValuesFromEntity(entity as Extract<Equipment, { kind: 'service' }>),
   magic_item: (entity) => {
     const item = entity as Extract<Equipment, { kind: 'magic_item' }>
     return {
@@ -450,16 +438,19 @@ function kindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
   return extractor ? extractor(entity) : legacyKindFormValues(entity)
 }
 
-const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
-  routeKey: 'equipment',
-  schema: equipmentFormSchema,
-  coverage: 'roundtrip-only',
-  createDefaultValues: {
-    kind: 'adventuring_gear',
-    gearKind: 'general',
-    cost: costToFormDefaults(),
-  },
-  buildFields: (): FormItem[] => [
+const EQUIPMENT_KIND_GROUP_LEGEND: Record<EquipmentKind, string> = {
+  weapon: 'Weapon',
+  armor: 'Armor',
+  adventuring_gear: 'Adventuring Gear',
+  tool: 'Tool',
+  mount: 'Mount',
+  vehicle: 'Vehicle',
+  service: 'Service',
+  magic_item: 'Magic Item',
+}
+
+function buildUnscopedEquipmentFields(): FormItem[] {
+  return [
     { kind: 'group', legend: 'Identity', fields: identityFields() },
     {
       type: 'select',
@@ -846,32 +837,7 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
         },
       ],
     },
-    {
-      kind: 'group',
-      legend: 'Service',
-      fields: [
-        {
-          type: 'select',
-          name: 'serviceCategory',
-          label: 'Service category',
-          options: serviceCategoryOptions,
-          visibility: visibleWhenKind('service'),
-          required: true,
-        },
-        {
-          type: 'text',
-          name: 'duration',
-          label: 'Duration',
-          visibility: visibleWhenKind('service'),
-        },
-        {
-          type: 'textarea',
-          name: 'notes',
-          label: 'Notes',
-          visibility: visibleWhenKind('service'),
-        },
-      ],
-    },
+    ...buildRegisteredKindFieldGroups(),
     {
       kind: 'group',
       legend: 'Magic Item',
@@ -915,7 +881,37 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
         },
       ],
     },
-  ],
+  ]
+}
+
+function isEquipmentGroupField(item: FormItem): item is Extract<FormItem, { kind: 'group' }> {
+  return 'kind' in item && item.kind === 'group'
+}
+
+function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
+  const fields = buildUnscopedEquipmentFields()
+  if (!ctx.equipmentKind) return fields
+
+  const activeLegend = EQUIPMENT_KIND_GROUP_LEGEND[ctx.equipmentKind]
+  return fields.filter((item) => {
+    if ('name' in item && item.name === 'kind') return false
+    if (isEquipmentGroupField(item) && item.legend !== 'Identity' && item.legend !== 'Economy') {
+      return item.legend === activeLegend
+    }
+    return true
+  })
+}
+
+const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
+  routeKey: 'equipment',
+  schema: equipmentFormSchema,
+  coverage: 'roundtrip-only',
+  createDefaultValues: {
+    kind: 'adventuring_gear',
+    gearKind: 'general',
+    cost: costToFormDefaults(),
+  },
+  buildFields: buildEquipmentFields,
   toFormValues: (entity) => ({
     ...sharedFormValues(entity),
     ...kindFormValues(entity),

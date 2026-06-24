@@ -20,7 +20,8 @@ export function WeaponEdit() {
       isError={isError}
       loadErrorLabel="Could not load weapons."
       notFoundLabel="Weapon not found."
-      backHref={ROUTES.content.equipment.detail(campaignId, weaponId)}
+      backHref={ROUTES.content.equipment.detail(campaignId, 'weapons', weaponId)}
+      formCtx={{ equipmentKind: 'weapon', equipmentFamily: 'weapons' }}
     />
   )
 }

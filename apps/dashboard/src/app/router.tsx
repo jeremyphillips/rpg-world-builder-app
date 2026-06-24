@@ -273,7 +273,10 @@ const router = createBrowserRouter(
                       path: family,
                       element: <Outlet />,
                       handle: {
-                        crumb: () => ({ label: getEquipmentFamilyLabel(family) }),
+                        crumb: (params) => ({
+                          label: getEquipmentFamilyLabel(family),
+                          href: ROUTES.content.equipment.family(params.campaignId!, family),
+                        }),
                       } satisfies CrumbHandle,
                       children: [
                         { index: true, element: <EquipmentFamilyOverview family={family} /> },
@@ -282,25 +285,25 @@ const router = createBrowserRouter(
                           element: <EquipmentFamilyCreate family={family} />,
                           handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                         },
-                      ],
-                    })),
-                    {
-                      path: ':equipmentId',
-                      element: <Outlet />,
-                      handle: {
-                        crumb: (_params, { entityLabel }) => ({
-                          label: entityLabel ?? '…',
-                        }),
-                      } satisfies CrumbHandle,
-                      children: [
-                        { index: true, element: <EquipmentDetail /> },
                         {
-                          path: 'edit',
-                          element: <EquipmentEdit />,
-                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                          path: ':equipmentId',
+                          element: <Outlet />,
+                          handle: {
+                            crumb: (_params, { entityLabel }) => ({
+                              label: entityLabel ?? '…',
+                            }),
+                          } satisfies CrumbHandle,
+                          children: [
+                            { index: true, element: <EquipmentDetail family={family} /> },
+                            {
+                              path: 'edit',
+                              element: <EquipmentEdit family={family} />,
+                              handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                            },
+                          ],
                         },
                       ],
-                    },
+                    })),
                   ],
                 },
                 {

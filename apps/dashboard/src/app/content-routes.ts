@@ -16,10 +16,10 @@ export const CONTENT_ROUTES = {
     /** Alias for the equipment hub route. */
     overview: (campaignId: string) => `/campaigns/${campaignId}/equipment`,
     family: (campaignId: string, family: string) => `/campaigns/${campaignId}/equipment/${family}`,
-    detail: (campaignId: string, equipmentId: string) =>
-      `/campaigns/${campaignId}/equipment/${equipmentId}`,
-    edit: (campaignId: string, equipmentId: string) =>
-      `/campaigns/${campaignId}/equipment/${equipmentId}/edit`,
+    detail: (campaignId: string, family: string, equipmentId: string) =>
+      `/campaigns/${campaignId}/equipment/${family}/${equipmentId}`,
+    edit: (campaignId: string, family: string, equipmentId: string) =>
+      `/campaigns/${campaignId}/equipment/${family}/${equipmentId}/edit`,
     create: (campaignId: string, family: string) =>
       `/campaigns/${campaignId}/equipment/${family}/new`,
   },

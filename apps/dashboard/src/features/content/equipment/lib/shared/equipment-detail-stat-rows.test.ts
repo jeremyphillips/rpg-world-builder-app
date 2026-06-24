@@ -34,4 +34,11 @@ describe('getEquipmentKindStatRows', () => {
     const rows = getEquipmentKindStatRows(bracers)
     expect(rows.some((row) => row.label === 'Rarity')).toBe(true)
   })
+
+  it('returns service stat rows for skilled hireling', () => {
+    const hireling = pickEquipment('skilled-hireling')
+    const rows = getEquipmentKindStatRows(hireling)
+    expect(rows.some((row) => row.label === 'Category' && row.value === 'Hireling')).toBe(true)
+    expect(rows.some((row) => row.label === 'Duration' && row.value === 'per day')).toBe(true)
+  })
 })

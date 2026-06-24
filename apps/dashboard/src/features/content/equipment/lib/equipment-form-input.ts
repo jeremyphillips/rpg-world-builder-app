@@ -9,6 +9,7 @@ import {
 import { weightFromForm } from '../../lib/content-form-field-helpers'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
+import { buildServiceInput } from '../services/lib/service-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
 
@@ -16,7 +17,7 @@ type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 type VehicleInput = Extract<CreateEquipmentInput, { kind: 'vehicle' }>
 
-type InputBuildCtx = {
+export type EquipmentInputBuildCtx = {
   values: EquipmentFormValues
   ctx?: ContentFormInputCtx<Equipment>
   weight: ReturnType<typeof weightFromForm>
@@ -86,7 +87,8 @@ function optionalArmorAc(values: EquipmentFormValues): Partial<ArmorInput> {
   return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
 }
 
-function inputBase(
+/** Shared identity/cost fields for all equipment kind input builders. */
+export function equipmentInputBase(
   values: EquipmentFormValues,
   ctx?: ContentFormInputCtx<Equipment>,
 ): Pick<EquipmentFormValues, 'name' | 'cost'> & { description?: string; slug: string } {
@@ -98,9 +100,9 @@ function inputBase(
   }
 }
 
-function buildWeaponInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildWeaponInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'weapon',
     category: values.category,
     mode: values.mode,
@@ -114,9 +116,9 @@ function buildWeaponInput({ values, ctx, weight }: InputBuildCtx): CreateEquipme
   })
 }
 
-function buildArmorInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildArmorInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'armor',
     category: values.armorCategory,
     addDexModifier: values.addDexModifier ?? false,
@@ -131,9 +133,13 @@ function buildArmorInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmen
   })
 }
 
-function buildAdventuringGearInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildAdventuringGearInput({
+  values,
+  ctx,
+  weight,
+}: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'adventuring_gear',
     gearKind: values.gearKind ?? 'general',
     ...(weight && { weight }),
@@ -146,9 +152,9 @@ function buildAdventuringGearInput({ values, ctx, weight }: InputBuildCtx): Crea
   })
 }
 
-function buildToolInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildToolInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'tool',
     toolCategory: values.toolCategory ?? 'other',
     ...(weight && { weight }),
@@ -156,9 +162,9 @@ function buildToolInput({ values, ctx, weight }: InputBuildCtx): CreateEquipment
   })
 }
 
-function buildMountInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildMountInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'mount',
     carryingCapacity: { value: values.carryingCapacity ?? 0, unit: 'lb' },
     ...(weight && { weight }),
@@ -181,9 +187,9 @@ function optionalVehicleFields(values: EquipmentFormValues): Partial<VehicleInpu
   }
 }
 
-function buildVehicleInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
+function buildVehicleInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'vehicle',
     vehicleCategory: values.vehicleCategory ?? 'other',
     ...(weight && { weight }),
@@ -191,19 +197,13 @@ function buildVehicleInput({ values, ctx, weight }: InputBuildCtx): CreateEquipm
   })
 }
 
-function buildServiceInput({ values, ctx }: InputBuildCtx): CreateEquipmentInput {
+function buildMagicItemInput({
+  values,
+  ctx,
+  weight,
+}: EquipmentInputBuildCtx): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
-    kind: 'service',
-    serviceCategory: values.serviceCategory ?? 'other',
-    ...(values.duration && { duration: values.duration }),
-    ...(values.notes && { notes: values.notes }),
-  })
-}
-
-function buildMagicItemInput({ values, ctx, weight }: InputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...inputBase(values, ctx),
+    ...equipmentInputBase(values, ctx),
     kind: 'magic_item',
     ...(weight && { weight }),
     ...(values.rarity && { rarity: values.rarity }),
@@ -218,7 +218,10 @@ function buildMagicItemInput({ values, ctx, weight }: InputBuildCtx): CreateEqui
   })
 }
 
-const kindInputBuilders: Record<EquipmentKind, (ctx: InputBuildCtx) => CreateEquipmentInput> = {
+const kindInputBuilders: Record<
+  EquipmentKind,
+  (ctx: EquipmentInputBuildCtx) => CreateEquipmentInput
+> = {
   weapon: buildWeaponInput,
   armor: buildArmorInput,
   adventuring_gear: buildAdventuringGearInput,
@@ -234,7 +237,8 @@ export function equipmentFormToInput(
   values: EquipmentFormValues,
   ctx?: ContentFormInputCtx<Equipment>,
 ): CreateEquipmentInput {
+  const kind = ctx?.equipmentKind ?? values.kind
   const weight = weightFromForm(values.weight?.value)
-  const input = kindInputBuilders[values.kind]({ values, ctx, weight })
+  const input = kindInputBuilders[kind]({ values: { ...values, kind }, ctx, weight })
   return finalizeContentInput(input, ctx) as CreateEquipmentInput
 }

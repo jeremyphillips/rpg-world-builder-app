@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
+import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
+import type { ZodType } from 'zod'
 
 import { updateContent } from './content-client'
 import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
@@ -9,6 +11,7 @@ import {
   type AnyContentFormDef,
   type ContentFormCtx,
 } from './content-form-registry'
+import { mergeEditLayoutCtx } from './content-edit-form-ctx'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
@@ -18,6 +21,17 @@ import { ContentAuthoringGate } from './content-authoring-gate'
 
 function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
   return def.resolveSchema?.(ctx) ?? def.schema
+}
+
+function invalidateContentQueries(
+  queryClient: QueryClient,
+  def: AnyContentFormDef,
+  campaignId: string,
+) {
+  void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
+  if (def.routeKey === 'classes') {
+    void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
+  }
 }
 
 export interface ContentEditShellProps {
@@ -34,6 +48,8 @@ export interface ContentEditShellProps {
   heading?: (name: string) => string
   /** Href for "Cancel" and post-submit navigation (typically the detail page). */
   backHref: string
+  /** Merged into the form layout context (e.g. family-scoped equipment kind). */
+  formCtx?: Partial<ContentFormCtx>
 }
 
 interface ContentEditFormProps {
@@ -43,10 +59,62 @@ interface ContentEditFormProps {
   notFoundLabel?: string
   heading?: (name: string) => string
   backHref: string
+  formCtx?: Partial<ContentFormCtx>
 }
 
 interface ContentEditFormReadyProps extends ContentEditFormProps {
   ctx: ContentFormCtx
+}
+
+interface ContentEditEntityFormProps<TEntity extends { id: string; name: string }> {
+  def: AnyContentFormDef
+  entity: TEntity
+  campaignId: string
+  backHref: string
+  headingFn: (name: string) => string
+  layoutCtx: ContentFormCtx
+  schema: ZodType<FieldValues>
+  defaultValues: DefaultValues<FieldValues>
+  submitPending: boolean
+  formError: string | null
+  onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
+}
+
+function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
+  entity,
+  campaignId,
+  backHref,
+  headingFn,
+  def,
+  layoutCtx,
+  schema,
+  defaultValues,
+  submitPending,
+  formError,
+  onSubmit,
+}: ContentEditEntityFormProps<TEntity>) {
+  return (
+    <ContentAuthoringGate campaignId={campaignId}>
+      <div className="space-y-6 pb-10">
+        <Heading variant="page" as="h2">
+          {headingFn(entity.name)}
+        </Heading>
+
+        <ContentFormLayout
+          def={def}
+          ctx={layoutCtx}
+          formKey={entity.id}
+          schema={schema}
+          defaultValues={defaultValues}
+          backHref={backHref}
+          submitLabel="Save changes"
+          submitPending={submitPending}
+          formError={formError}
+          onSubmit={onSubmit}
+        />
+      </div>
+    </ContentAuthoringGate>
+  )
 }
 
 function ContentEditFormReady({
@@ -56,27 +124,16 @@ function ContentEditFormReady({
   notFoundLabel = 'Item not found.',
   heading: headingFn = (name) => `Edit ${name}`,
   backHref,
+  formCtx,
   ctx,
 }: ContentEditFormReadyProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
-  const formCtx: ContentFormCtx = {
-    ...ctx,
-    campaignId,
-    entityId,
-    mode: 'edit',
-    entitySource: entity?.source,
-  }
 
   const mutation = useMutation({
     mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
-      if (def.routeKey === 'classes') {
-        void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
-      }
-    },
+    onSuccess: () => invalidateContentQueries(queryClient, def, campaignId),
   })
 
   if (!entity) {
@@ -87,37 +144,33 @@ function ContentEditFormReady({
     )
   }
 
-  return (
-    <ContentAuthoringGate campaignId={campaignId}>
-      <div className="space-y-6 pb-10">
-        <Heading variant="page" as="h2">
-          {headingFn(entity.name)}
-        </Heading>
+  const layoutCtx = mergeEditLayoutCtx(ctx, formCtx, campaignId, entityId, entity)
 
-        <ContentFormLayout
-          def={def}
-          ctx={formCtx}
-          formKey={entity.id}
-          schema={resolveContentFormSchema(def, formCtx)}
-          defaultValues={def.toFormValues(entity)}
-          backHref={backHref}
-          submitLabel="Save changes"
-          submitPending={mutation.isPending}
-          formError={mutation.isError ? String(mutation.error) : null}
-          onSubmit={async (values, form) => {
-            await mutation.mutateAsync(
-              def.toInput(values, {
-                entity,
-                weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-                campaignRules: formCtx.campaignRules,
-              }),
-            )
-            form.reset(values)
-            navigate(backHref)
-          }}
-        />
-      </div>
-    </ContentAuthoringGate>
+  return (
+    <ContentEditEntityForm
+      def={def}
+      entity={entity}
+      campaignId={campaignId}
+      backHref={backHref}
+      headingFn={headingFn}
+      layoutCtx={layoutCtx}
+      schema={resolveContentFormSchema(def, layoutCtx)}
+      defaultValues={def.toFormValues(entity)}
+      submitPending={mutation.isPending}
+      formError={mutation.isError ? String(mutation.error) : null}
+      onSubmit={async (values, form) => {
+        await mutation.mutateAsync(
+          def.toInput(values, {
+            entity,
+            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+            campaignRules: layoutCtx.campaignRules,
+            equipmentKind: layoutCtx.equipmentKind,
+          }),
+        )
+        form.reset(values)
+        navigate(backHref)
+      }}
+    />
   )
 }
 
@@ -148,6 +201,7 @@ export function ContentEditShell({
   notFoundLabel,
   heading,
   backHref,
+  formCtx,
 }: ContentEditShellProps) {
   if (isPending) {
     return (
@@ -179,6 +233,7 @@ export function ContentEditShell({
       notFoundLabel={notFoundLabel}
       heading={heading}
       backHref={backHref}
+      formCtx={formCtx}
     />
   )
 }

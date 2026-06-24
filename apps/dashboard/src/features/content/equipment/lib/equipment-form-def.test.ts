@@ -31,6 +31,37 @@ describe('equipmentFormDef round-trips', () => {
   }
 })
 
+describe('equipmentFormDef kind-scoped fields', () => {
+  function groupLegends(fields: ReturnType<typeof equipmentFormDef.buildFields>): string[] {
+    return fields.filter(isGroupField).map((field) => field.legend)
+  }
+
+  function isGroupField(
+    field: ReturnType<typeof equipmentFormDef.buildFields>[number],
+  ): field is Extract<typeof field, { kind: 'group' }> {
+    return 'kind' in field && field.kind === 'group'
+  }
+
+  it('service route shows Identity, Economy, and Service only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'service' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Service',
+    ])
+  })
+
+  it('service route omits the Kind select', () => {
+    const fields = equipmentFormDef.buildFields({ equipmentKind: 'service' })
+    expect(fields.some((field) => 'name' in field && field.name === 'kind')).toBe(false)
+  })
+
+  it('service route omits cross-family groups', () => {
+    const legends = groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'service' }))
+    expect(legends).not.toContain('Weapon')
+    expect(legends).not.toContain('Armor')
+  })
+})
+
 describe('equipmentFormDef create vs update modes', () => {
   it('create: derives slug from name when slug is omitted', () => {
     const formValues = {

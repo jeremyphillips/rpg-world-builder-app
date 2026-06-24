@@ -21,7 +21,7 @@ export function WeaponDetailContent({ item, campaignId }: WeaponDetailContentPro
       imageUrl={getContentImageUrl(item.imageKey)}
       imageName={item.name}
       campaignId={campaignId}
-      editHref={contentEditHref('equipment', campaignId, item.id)}
+      editHref={contentEditHref('equipment', campaignId, item.id, 'weapons')}
     >
       <ContentDetailStatBody name={item.name} statRows={statRows} description={item.description} />
     </ContentDetailLayout>

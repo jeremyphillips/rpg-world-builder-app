@@ -5,7 +5,6 @@ import {
   getGearKindLabel,
   getMagicItemCategoryLabel,
   getMagicItemRarityLabel,
-  getServiceCategoryLabel,
   getToolCategoryLabel,
   getVehicleCategoryLabel,
   isArmorEquipment,
@@ -15,6 +14,7 @@ import {
 import { getArmorStatRows } from '../../../armor/lib/armor-stat-rows'
 import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 import { getWeaponStatRows } from '../../../weapons/lib/weapon-stat-rows'
+import { getServiceStatRows } from '../../services/lib/service-stat-rows'
 
 type StatRow = ContentStatRowData
 
@@ -65,14 +65,6 @@ function getVehicleStatRows(item: Extract<Equipment, { kind: 'vehicle' }>): Stat
     ...(item.damageThreshold !== undefined
       ? [{ label: 'Damage threshold', value: String(item.damageThreshold) }]
       : []),
-  ]
-}
-
-function getServiceStatRows(item: Extract<Equipment, { kind: 'service' }>): StatRow[] {
-  return [
-    { label: 'Category', value: getServiceCategoryLabel(item.serviceCategory) },
-    ...(item.duration ? [{ label: 'Duration', value: item.duration }] : []),
-    ...(item.notes ? [{ label: 'Notes', value: item.notes }] : []),
   ]
 }
 

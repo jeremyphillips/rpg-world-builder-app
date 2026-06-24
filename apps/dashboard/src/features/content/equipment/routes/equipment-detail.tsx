@@ -11,15 +11,24 @@ import { contentEditHref } from '../../lib/content-edit-href'
 import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { getEquipmentKindStatRows } from '../lib/shared/equipment-detail-stat-rows'
+import {
+  EquipmentFamilyMismatchAlert,
+  shouldShowEquipmentFamilyMismatch,
+} from '../lib/shared/equipment-family-route-guard'
+import {
+  familyPathToEquipmentKind,
+  type EquipmentFamilyPath,
+} from '../lib/shared/equipment-family-paths'
 
 type StatRow = ContentStatRowData
 
 type EquipmentDetailContentProps = {
   item: Equipment
   campaignId: string
+  family: EquipmentFamilyPath
 }
 
-export function EquipmentDetailContent({ item, campaignId }: EquipmentDetailContentProps) {
+export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
 
   const statRows: StatRow[] = [
@@ -33,19 +42,24 @@ export function EquipmentDetailContent({ item, campaignId }: EquipmentDetailCont
       imageUrl={getContentImageUrl(item.imageKey)}
       imageName={item.name}
       campaignId={campaignId}
-      editHref={contentEditHref('equipment', campaignId, item.id)}
+      editHref={contentEditHref('equipment', campaignId, item.id, family)}
     >
       <ContentDetailStatBody name={item.name} statRows={statRows} description={item.description} />
     </ContentDetailLayout>
   )
 }
 
-export function EquipmentDetail() {
+type EquipmentDetailProps = {
+  family: EquipmentFamilyPath
+}
+
+export function EquipmentDetail({ family }: EquipmentDetailProps) {
   const { campaignId = '', equipmentId = '' } = useParams<{
     campaignId: string
     equipmentId: string
   }>()
   const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
+  const expectedKind = familyPathToEquipmentKind(family)
 
   return (
     <ContentDetailResolver
@@ -56,7 +70,13 @@ export function EquipmentDetail() {
       loadErrorLabel="Could not load equipment."
       notFoundLabel="Equipment not found."
     >
-      {(item) => <EquipmentDetailContent item={item} campaignId={campaignId} />}
+      {(item) =>
+        shouldShowEquipmentFamilyMismatch(item, expectedKind, false, false) ? (
+          <EquipmentFamilyMismatchAlert />
+        ) : (
+          <EquipmentDetailContent item={item} campaignId={campaignId} family={family} />
+        )
+      }
     </ContentDetailResolver>
   )
 }

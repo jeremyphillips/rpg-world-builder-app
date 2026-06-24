@@ -20,7 +20,8 @@ export function ArmorEdit() {
       isError={isError}
       loadErrorLabel="Could not load armor."
       notFoundLabel="Armor not found."
-      backHref={ROUTES.content.equipment.detail(campaignId, armorId)}
+      backHref={ROUTES.content.equipment.detail(campaignId, 'armor', armorId)}
+      formCtx={{ equipmentKind: 'armor', equipmentFamily: 'armor' }}
     />
   )
 }

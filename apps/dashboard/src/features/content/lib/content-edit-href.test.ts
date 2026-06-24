@@ -7,5 +7,8 @@ describe('contentEditHref', () => {
     expect(contentEditHref('species', 'c1', 's1')).toBe('/campaigns/c1/species/s1/edit')
     expect(contentEditHref('classes', 'c1', 'cl1')).toBe('/campaigns/c1/classes/cl1/edit')
     expect(contentEditHref('spells', 'c1', 'sp1')).toBe('/campaigns/c1/spells/sp1/edit')
+    expect(contentEditHref('equipment', 'c1', 'eq1', 'services')).toBe(
+      '/campaigns/c1/equipment/services/eq1/edit',
+    )
   })
 })
