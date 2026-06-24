@@ -13,22 +13,22 @@ styles, and list behavior on all descendants and fights layout utilities
 
 ## Hierarchy
 
-| Variant / component           | Typical element | Use case                                                |
-| ----------------------------- | --------------- | ------------------------------------------------------- |
-| `Heading` `page`              | `h1`–`h2`       | Route titles, overview shells                           |
-| `Heading` `display`           | `h2`            | Content detail titles (species, class, weapon names)    |
-| `Heading` `section`           | `h3`            | In-page sections (`Traits`, `Commonly Taken By`)        |
-| `Heading` `card`              | Radix title     | `CardTitle`, `Modal.Header` headline                    |
-| `Heading` `nav` / `brand`     | `h1`, `span`    | Topbar title, sidebar product name                      |
-| `Heading` `label`             | `p`, `span`     | Inline labels (feature names, trait titles)             |
-| `Text` `body`                 | `p`             | Default foreground copy                                 |
-| `Text` `muted`                | `p`             | Non-catalog plain copy (hints, errors)                  |
-| `Text` `small`                | `p`             | Helper text, captions (`text-sm text-muted-foreground`) |
-| `Text` `caption`              | `p`             | Extra-small muted copy (`text-xs`)                      |
-| `Text` `lead`                 | `p`             | Marketing subheads                                      |
-| `Text` `destructive`          | `p`             | Inline errors — pair with `role="alert"` when live      |
-| `RichTextContent` `size="sm"` | `div`           | Catalog descriptions (top-level, traits, features)      |
-| `CardDescription`             | `div`           | Card header secondary line (uses shared `textVariants`) |
+| Variant / component           | Typical element | Use case                                                          |
+| ----------------------------- | --------------- | ----------------------------------------------------------------- |
+| `Heading` `page`              | `h1`–`h2`       | Route titles, overview shells                                     |
+| `Heading` `display`           | `h2`            | Content detail titles (species, class, weapon names)              |
+| `Heading` `section`           | `h3`            | In-page sections (`Traits`, `Commonly Taken By`)                  |
+| `Heading` `card`              | Radix title     | `CardTitle`, `Modal.Header` headline                              |
+| `Heading` `nav` / `brand`     | `h1`, `span`    | Topbar title, sidebar product name                                |
+| `Heading` `label`             | `p`, `span`     | Inline labels (feature names, trait titles)                       |
+| `Text` `body`                 | `p`             | Default foreground copy                                           |
+| `Text` `muted`                | `p`             | Non-catalog plain copy (hints, errors)                            |
+| `Text` `small`                | `p`             | Helper text, secondary metadata (`text-sm text-muted-foreground`) |
+| `Text` `caption`              | `p`             | Extra-small muted copy (`text-xs`); used for form field hints     |
+| `Text` `lead`                 | `p`             | Marketing subheads                                                |
+| `Text` `destructive`          | `p`             | Inline errors — pair with `role="alert"` when live                |
+| `RichTextContent` `size="sm"` | `div`           | Catalog descriptions (top-level, traits, features)                |
+| `CardDescription`             | `div`           | Card header secondary line (uses shared `textVariants`)           |
 
 Preserve semantic headings and existing `id`s when migrating — content detail
 routes use `aria-labelledby` on trait sections.

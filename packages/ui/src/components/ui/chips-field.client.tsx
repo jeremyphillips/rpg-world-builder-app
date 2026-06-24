@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import {
   fieldAnatomyStackClasses,
   fieldChipWrapGapClasses,
@@ -13,6 +13,7 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
+import { chipPillVariants } from './chips-field.variants'
 
 interface ChipOptionButtonProps {
   id: string
@@ -20,6 +21,7 @@ interface ChipOptionButtonProps {
   role: 'checkbox' | 'radio'
   isActive: boolean
   isDisabled: boolean
+  size: FieldSize
   onToggle: (value: string) => void
 }
 
@@ -29,6 +31,7 @@ function ChipOptionButton({
   role,
   isActive,
   isDisabled,
+  size,
   onToggle,
 }: ChipOptionButtonProps) {
   return (
@@ -41,8 +44,7 @@ function ChipOptionButton({
       disabled={isDisabled}
       onClick={() => onToggle(option.value)}
       className={cn(
-        'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
+        chipPillVariants({ size }),
         isActive
           ? 'border-foreground bg-foreground text-background'
           : 'border-border bg-transparent text-foreground hover:bg-muted',
@@ -82,6 +84,7 @@ export interface ChipsFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
+  size?: FieldSize
   width?: FieldWidth
 }
 
@@ -103,6 +106,7 @@ export function ChipsField({
   info,
   required,
   disabled,
+  size = 'sm',
   width,
 }: ChipsFieldProps) {
   const legendId = `${id}-legend`
@@ -138,7 +142,7 @@ export function ChipsField({
       className={cn(fieldAnatomyStackClasses, width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}
     >
-      <legend id={legendId} className={fieldLabelVariants({ size: 'md' })}>
+      <legend id={legendId} className={fieldLabelVariants({ size })}>
         {label}
         {required ? (
           <span aria-hidden="true" className="text-destructive">
@@ -164,6 +168,7 @@ export function ChipsField({
               role={selectionRole}
               isActive={isActive}
               isDisabled={isDisabled}
+              size={size}
               onToggle={toggle}
             />
           )
@@ -175,7 +180,7 @@ export function ChipsField({
           {error}
         </Text>
       ) : hint ? (
-        <Text id={hintId} variant="small">
+        <Text id={hintId} variant="caption">
           {hint}
         </Text>
       ) : null}
@@ -193,6 +198,7 @@ export function ChipsFormField(props: ChipsFieldProps) {
       hint={props.hint}
       required={props.required}
       width={props.width}
+      size={props.size}
     >
       <ChipsField {...props} />
     </Field.Root>

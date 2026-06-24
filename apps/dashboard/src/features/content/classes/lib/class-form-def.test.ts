@@ -102,7 +102,7 @@ describe('classFormDef round-trips', () => {
   it('sorcerer: specific weapon proficiencies round-trip as slug arrays', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
-    expect(formValues.hasSpecificWeapons).toBe(true)
+    expect(formValues.weaponProficiencyMode).toBe('individual')
     expect(formValues.proficiencies.weapons.items).toEqual([
       'dagger',
       'dart',
@@ -114,10 +114,10 @@ describe('classFormDef round-trips', () => {
     expect(input.proficiencies.weapons.items).toEqual(sorcerer.proficiencies.weapons.items)
   })
 
-  it('fighter: hasSpecificWeapons is false when only categories are granted', () => {
+  it('fighter: weaponProficiencyMode is categories when only categories are granted', () => {
     const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
-    expect(formValues.hasSpecificWeapons).toBe(false)
+    expect(formValues.weaponProficiencyMode).toBe('categories')
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.weapons.items).toBeUndefined()
   })
@@ -126,7 +126,7 @@ describe('classFormDef round-trips', () => {
     const formValues = {
       ...classFormDef.createDefaultValues,
       name: 'Custom Class',
-      hasSpecificWeapons: true,
+      weaponProficiencyMode: 'individual',
       proficiencies: {
         ...classFormDef.createDefaultValues!.proficiencies!,
         weapons: {
@@ -148,7 +148,7 @@ describe('classFormDef round-trips', () => {
     const formValues = {
       ...classFormDef.createDefaultValues,
       name: 'Custom Class',
-      hasSpecificWeapons: false,
+      weaponProficiencyMode: 'categories',
       proficiencies: {
         ...classFormDef.createDefaultValues!.proficiencies!,
         weapons: {
@@ -224,7 +224,7 @@ describe('classFormDef round-trips', () => {
 
   it('create defaults include subclass choice level 3 and specific-weapons toggle off', () => {
     expect(classFormDef.createDefaultValues?.subclassChoiceLevel).toEqual('3')
-    expect(classFormDef.createDefaultValues?.hasSpecificWeapons).toBe(false)
+    expect(classFormDef.createDefaultValues?.weaponProficiencyMode).toBe('categories')
   })
 
   it('fighter: hasSpellcasting is false when no spellcasting block', () => {

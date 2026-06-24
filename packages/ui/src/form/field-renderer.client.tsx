@@ -136,6 +136,8 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       required={config.required}
       width={config.width}
       disabled={config.disabled}
+      orientation={config.orientation}
+      labelHidden={config.labelHidden}
       value={field.value ?? ''}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
@@ -237,6 +239,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       hint={config.hint}
       info={config.info}
       required={config.required}
+      size={config.size ?? 'sm'}
       width={config.width}
       disabled={config.disabled}
       value={field.value ?? (config.multiple === false ? '' : [])}

@@ -362,6 +362,7 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 ```
 
 - Renders as a `<fieldset>` / `<legend>` (a11y group labelling).
+- `size` — `sm` (default), `md`, or `lg`; scales pill padding/type and the legend.
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 

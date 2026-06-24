@@ -190,6 +190,21 @@ describe('ChipsField', () => {
     expect(screen.getByText('Pick as many as apply.')).toBeInTheDocument()
   })
 
+  it('applies md pill classes when size is md', () => {
+    render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        size="md"
+      />,
+    )
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-3')
+  })
+
   it('disables all options when disabled', () => {
     render(
       <ChipsField

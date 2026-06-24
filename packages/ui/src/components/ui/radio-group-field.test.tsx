@@ -34,6 +34,24 @@ describe('RadioGroupField', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
   })
 
+  it('lays options out horizontally when orientation is horizontal', () => {
+    render(
+      <RadioGroupField
+        id="weapon-mode"
+        label="Weapon proficiency mode"
+        labelHidden
+        orientation="horizontal"
+        options={[
+          { label: 'Categories', value: 'categories' },
+          { label: 'Individual weapons', value: 'individual' },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('radiogroup', { name: 'Weapon proficiency mode' })).toHaveClass('flex')
+    expect(screen.getByLabelText('Categories')).toBeInTheDocument()
+    expect(screen.getByLabelText('Individual weapons')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <RadioGroupField id="difficulty" label="Difficulty" options={options} />,

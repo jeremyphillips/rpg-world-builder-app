@@ -137,6 +137,10 @@ export interface RadioFieldConfig extends BaseFieldConfig {
   type: 'radio'
   options: FieldOption[]
   defaultValue?: string
+  /** When `'horizontal'`, options lay out in a row (default `'vertical'`). */
+  orientation?: 'horizontal' | 'vertical'
+  /** Visually hide the label while keeping it available to screen readers. */
+  labelHidden?: boolean
 }
 
 export interface CheckboxFieldConfig extends BaseFieldConfig {
