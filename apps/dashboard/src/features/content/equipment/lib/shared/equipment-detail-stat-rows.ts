@@ -1,11 +1,5 @@
 import type { Equipment } from '@rpg/contracts'
-import {
-  formatWeight,
-  getGearKindLabel,
-  getVehicleCategoryLabel,
-  isArmorEquipment,
-  isWeaponEquipment,
-} from '@rpg/contracts'
+import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 
 import { getArmorStatRows } from '../../../armor/lib/armor-stat-rows'
 import type { ContentStatRowData } from '../../../lib/content-stat-rows'
@@ -14,43 +8,10 @@ import { getServiceStatRows } from '../../services/lib/service-stat-rows'
 import { getMountStatRows } from '../../mounts/lib/mount-stat-rows'
 import { getToolStatRows } from '../../tools/lib/tool-stat-rows'
 import { getMagicItemStatRows } from '../../magic-items/lib/magic-item-stat-rows'
+import { getAdventuringGearStatRows } from '../../adventuring-gear/lib/adventuring-gear-stat-rows'
+import { getVehicleStatRows } from '../../vehicles/lib/vehicle-stat-rows'
 
 type StatRow = ContentStatRowData
-
-function getAdventuringGearStatRows(
-  item: Extract<Equipment, { kind: 'adventuring_gear' }>,
-): StatRow[] {
-  return [
-    { label: 'Gear kind', value: getGearKindLabel(item.gearKind) },
-    ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
-    ...(item.bundleSize !== undefined
-      ? [{ label: 'Bundle size', value: String(item.bundleSize) }]
-      : []),
-    ...(item.storage ? [{ label: 'Storage', value: item.storage }] : []),
-    ...(item.capacity ? [{ label: 'Capacity', value: String(item.capacity) }] : []),
-    ...(item.properties?.length
-      ? [{ label: 'Properties', value: item.properties.join(', ') }]
-      : []),
-  ]
-}
-
-function getVehicleStatRows(item: Extract<Equipment, { kind: 'vehicle' }>): StatRow[] {
-  return [
-    { label: 'Category', value: getVehicleCategoryLabel(item.vehicleCategory) },
-    ...(item.speed ? [{ label: 'Speed', value: item.speed }] : []),
-    ...(item.capacity ? [{ label: 'Cargo capacity', value: formatWeight(item.capacity) }] : []),
-    ...(item.crew !== undefined ? [{ label: 'Crew', value: String(item.crew) }] : []),
-    ...(item.passengers !== undefined
-      ? [{ label: 'Passengers', value: String(item.passengers) }]
-      : []),
-    ...(item.cargoTons !== undefined ? [{ label: 'Cargo', value: `${item.cargoTons} tons` }] : []),
-    ...(item.ac !== undefined ? [{ label: 'AC', value: String(item.ac) }] : []),
-    ...(item.hp !== undefined ? [{ label: 'HP', value: String(item.hp) }] : []),
-    ...(item.damageThreshold !== undefined
-      ? [{ label: 'Damage threshold', value: String(item.damageThreshold) }]
-      : []),
-  ]
-}
 
 /** Kind-specific stat rows for unified equipment detail (excludes kind and cost). */
 export function getEquipmentKindStatRows(item: Equipment): StatRow[] {

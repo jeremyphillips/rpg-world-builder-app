@@ -13,26 +13,18 @@ import { buildServiceInput } from '../services/lib/service-form-input'
 import { buildMountInput } from '../mounts/lib/mount-form-input'
 import { buildToolInput } from '../tools/lib/tool-form-input'
 import { buildMagicItemInput } from '../magic-items/lib/magic-item-form-input'
+import { buildAdventuringGearInput } from '../adventuring-gear/lib/adventuring-gear-form-input'
+import { buildVehicleInput } from '../vehicles/lib/vehicle-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
-type VehicleInput = Extract<CreateEquipmentInput, { kind: 'vehicle' }>
 
 export type EquipmentInputBuildCtx = {
   values: EquipmentFormValues
   ctx?: ContentFormInputCtx<Equipment>
   weight: ReturnType<typeof weightFromForm>
-}
-
-function parseProperties(text: string | undefined): string[] | undefined {
-  if (!text?.trim()) return undefined
-  const items = text
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  return items.length > 0 ? items : undefined
 }
 
 function damageFromForm(values: EquipmentFormValues): WeaponInput['damage'] {
@@ -133,50 +125,6 @@ function buildArmorInput({ values, ctx, weight }: EquipmentInputBuildCtx): Creat
     ...(values.strengthRequirement !== undefined && {
       strengthRequirement: values.strengthRequirement,
     }),
-  })
-}
-
-function buildAdventuringGearInput({
-  values,
-  ctx,
-  weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'adventuring_gear',
-    gearKind: values.gearKind ?? 'general',
-    ...(weight && { weight }),
-    ...(values.bundleSize !== undefined && { bundleSize: values.bundleSize }),
-    ...(values.storage && { storage: values.storage }),
-    ...(parseProperties(values.propertiesText) && {
-      properties: parseProperties(values.propertiesText),
-    }),
-    ...(values.capacity && { capacity: values.capacity }),
-  })
-}
-
-function optionalVehicleFields(values: EquipmentFormValues): Partial<VehicleInput> {
-  return {
-    ...(values.speed && { speed: values.speed }),
-    ...(values.vehicleCapacity !== undefined && {
-      capacity: { value: values.vehicleCapacity, unit: 'lb' },
-    }),
-    ...(values.crew !== undefined && { crew: values.crew }),
-    ...(values.passengers !== undefined && { passengers: values.passengers }),
-    ...(values.cargoTons !== undefined && { cargoTons: values.cargoTons }),
-    ...(values.ac !== undefined && { ac: values.ac }),
-    ...(values.hp !== undefined && { hp: values.hp }),
-    ...(values.damageThreshold !== undefined && { damageThreshold: values.damageThreshold }),
-  }
-}
-
-function buildVehicleInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'vehicle',
-    vehicleCategory: values.vehicleCategory ?? 'other',
-    ...(weight && { weight }),
-    ...optionalVehicleFields(values),
   })
 }
 

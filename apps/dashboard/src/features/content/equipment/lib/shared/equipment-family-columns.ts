@@ -6,6 +6,11 @@ import { serviceColumns, serviceFilters } from '../../services/components/servic
 import { mountColumns, mountFilters } from '../../mounts/components/mount-columns'
 import { toolColumns, toolFilters } from '../../tools/components/tool-columns'
 import { magicItemColumns, magicItemFilters } from '../../magic-items/components/magic-item-columns'
+import {
+  adventuringGearColumns,
+  adventuringGearFilters,
+} from '../../adventuring-gear/components/adventuring-gear-columns'
+import { vehicleColumns, vehicleFilters } from '../../vehicles/components/vehicle-columns'
 import type { EquipmentFamilyPath } from './equipment-family-paths'
 
 function genericFamilyColumns(campaignId: string): ColumnDef<Equipment>[] {
@@ -30,6 +35,10 @@ export function getFamilyColumns(
       return toolColumns(campaignId) as ColumnDef<Equipment>[]
     case 'magic-items':
       return magicItemColumns(campaignId) as ColumnDef<Equipment>[]
+    case 'adventuring-gear':
+      return adventuringGearColumns(campaignId) as ColumnDef<Equipment>[]
+    case 'vehicles':
+      return vehicleColumns(campaignId) as ColumnDef<Equipment>[]
     default:
       return genericFamilyColumns(campaignId)
   }
@@ -46,6 +55,10 @@ export function getFamilyFilters(family: EquipmentFamilyPath): FilterDef[] {
       return toolFilters
     case 'magic-items':
       return magicItemFilters
+    case 'adventuring-gear':
+      return adventuringGearFilters
+    case 'vehicles':
+      return vehicleFilters
     default:
       return genericFamilyFilters
   }

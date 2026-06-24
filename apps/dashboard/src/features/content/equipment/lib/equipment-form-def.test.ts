@@ -84,6 +84,20 @@ describe('equipmentFormDef kind-scoped fields', () => {
       'Magic Item',
     ])
   })
+
+  it('adventuring gear route shows Identity, Economy, and Adventuring Gear only', () => {
+    expect(
+      groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'adventuring_gear' })),
+    ).toEqual(['Identity', 'Economy', 'Adventuring Gear'])
+  })
+
+  it('vehicle route shows Identity, Economy, and Vehicle only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'vehicle' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Vehicle',
+    ])
+  })
 })
 
 describe('equipmentFormDef create vs update modes', () => {

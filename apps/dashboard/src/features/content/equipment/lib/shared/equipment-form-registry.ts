@@ -5,6 +5,8 @@ import { serviceFormFieldGroup } from '../../services/lib/service-form-fields'
 import { mountFormFieldGroup } from '../../mounts/lib/mount-form-fields'
 import { toolFormFieldGroup } from '../../tools/lib/tool-form-fields'
 import { magicItemFormFieldGroup } from '../../magic-items/lib/magic-item-form-fields'
+import { adventuringGearFormFieldGroup } from '../../adventuring-gear/lib/adventuring-gear-form-fields'
+import { vehicleFormFieldGroup } from '../../vehicles/lib/vehicle-form-fields'
 
 export { visibleWhenKind } from './visible-when-kind'
 
@@ -14,6 +16,8 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, () => FormItem[]>> =
   mount: () => [mountFormFieldGroup()],
   tool: () => [toolFormFieldGroup()],
   magic_item: () => [magicItemFormFieldGroup()],
+  adventuring_gear: () => [adventuringGearFormFieldGroup()],
+  vehicle: () => [vehicleFormFieldGroup()],
 }
 
 /** Returns registered field groups for a kind, or `undefined` when still in the monolith. */

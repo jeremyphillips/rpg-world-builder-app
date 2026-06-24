@@ -7,11 +7,7 @@ import {
   DIE_FACES,
   EQUIPMENT_KINDS,
   EQUIPMENT_KIND_LABELS,
-  GEAR_KINDS,
-  GEAR_KIND_ENTRIES,
   PHYSICAL_DAMAGE_TYPE_IDS,
-  VEHICLE_CATEGORIES,
-  VEHICLE_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   WEAPON_MASTERIES,
@@ -58,7 +54,12 @@ import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { serviceFormValuesFromEntity } from '../services/lib/service-form-fields'
 import { mountFormValuesFromEntity } from '../mounts/lib/mount-form-fields'
 import { toolFormValuesFromEntity } from '../tools/lib/tool-form-fields'
+import {
+  adventuringGearFormValuesFromEntity,
+  formatPropertiesText,
+} from '../adventuring-gear/lib/adventuring-gear-form-fields'
 import { magicItemFormValuesFromEntity } from '../magic-items/lib/magic-item-form-fields'
+import { vehicleFormValuesFromEntity } from '../vehicles/lib/vehicle-form-fields'
 import { equipmentFormToInput } from './equipment-form-input'
 import {
   allRegisteredKindFieldGroups,
@@ -77,11 +78,6 @@ function labelsFromEntries<const T extends string>(
 }
 
 const equipmentKindOptions = toOptions(EQUIPMENT_KINDS, EQUIPMENT_KIND_LABELS)
-const gearKindOptions = toOptions(GEAR_KINDS, labelsFromEntries(GEAR_KIND_ENTRIES))
-const vehicleCategoryOptions = toOptions(
-  VEHICLE_CATEGORIES,
-  labelsFromEntries(VEHICLE_CATEGORY_ENTRIES),
-)
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
   labelsFromEntries(WEAPON_CATEGORY_ENTRIES),
@@ -244,10 +240,6 @@ const equipmentFormSchema = z.object({
 
 type EquipmentFormValues = z.infer<typeof equipmentFormSchema>
 
-function formatProperties(items: string[] | undefined): string | undefined {
-  return items?.length ? items.join('\n') : undefined
-}
-
 function damageToForm(
   damage: WeaponDamage | undefined,
 ): Pick<
@@ -315,32 +307,12 @@ const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
       strengthRequirement: item.strengthRequirement,
     }
   },
-  adventuring_gear: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'adventuring_gear' }>
-    return {
-      gearKind: item.gearKind,
-      bundleSize: item.bundleSize,
-      storage: item.storage,
-      propertiesText: formatProperties(item.properties),
-      capacity: item.capacity,
-    }
-  },
+  adventuring_gear: (entity) =>
+    adventuringGearFormValuesFromEntity(entity as Extract<Equipment, { kind: 'adventuring_gear' }>),
   tool: (entity) => toolFormValuesFromEntity(entity as Extract<Equipment, { kind: 'tool' }>),
   mount: (entity) => mountFormValuesFromEntity(entity as Extract<Equipment, { kind: 'mount' }>),
-  vehicle: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'vehicle' }>
-    return {
-      vehicleCategory: item.vehicleCategory,
-      speed: item.speed,
-      vehicleCapacity: item.capacity?.value,
-      crew: item.crew,
-      passengers: item.passengers,
-      cargoTons: item.cargoTons,
-      ac: item.ac,
-      hp: item.hp,
-      damageThreshold: item.damageThreshold,
-    }
-  },
+  vehicle: (entity) =>
+    vehicleFormValuesFromEntity(entity as Extract<Equipment, { kind: 'vehicle' }>),
   service: (entity) =>
     serviceFormValuesFromEntity(entity as Extract<Equipment, { kind: 'service' }>),
   magic_item: (entity) =>
@@ -354,7 +326,7 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
     return {
       kind: 'adventuring_gear',
       gearKind: 'general',
-      propertiesText: formatProperties((legacy as { properties?: string[] }).properties),
+      propertiesText: formatPropertiesText((legacy as { properties?: string[] }).properties),
       capacity: (legacy as { capacity?: string }).capacity,
     }
   }
@@ -637,130 +609,6 @@ function buildUnscopedEquipmentFields(): FormItem[] {
           min: 0,
           hint: 'Minimum Strength to avoid speed penalty (heavy armor)',
           visibility: visibleWhenKind('armor'),
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Adventuring Gear',
-      fields: [
-        {
-          type: 'select',
-          name: 'gearKind',
-          label: 'Gear kind',
-          options: gearKindOptions,
-          visibility: visibleWhenKind('adventuring_gear'),
-          required: true,
-        },
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'number',
-              name: 'bundleSize',
-              label: 'Bundle size',
-              min: 1,
-              visibility: visibleWhenKind('adventuring_gear'),
-            },
-            {
-              type: 'text',
-              name: 'storage',
-              label: 'Storage',
-              visibility: visibleWhenKind('adventuring_gear'),
-            },
-          ],
-        },
-        {
-          type: 'textarea',
-          name: 'propertiesText',
-          label: 'Properties',
-          hint: 'One mechanical note per line',
-          visibility: visibleWhenKind('adventuring_gear'),
-        },
-        {
-          type: 'text',
-          name: 'capacity',
-          label: 'Capacity',
-          visibility: visibleWhenKind('adventuring_gear'),
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Vehicle',
-      fields: [
-        {
-          type: 'select',
-          name: 'vehicleCategory',
-          label: 'Vehicle category',
-          options: vehicleCategoryOptions,
-          visibility: visibleWhenKind('vehicle'),
-          required: true,
-        },
-        {
-          type: 'text',
-          name: 'speed',
-          label: 'Speed',
-          visibility: visibleWhenKind('vehicle'),
-        },
-        {
-          type: 'number',
-          name: 'vehicleCapacity',
-          label: 'Cargo capacity (lb)',
-          min: 0,
-          visibility: visibleWhenKind('vehicle'),
-        },
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'number',
-              name: 'crew',
-              label: 'Crew',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-            {
-              type: 'number',
-              name: 'passengers',
-              label: 'Passengers',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-            {
-              type: 'number',
-              name: 'cargoTons',
-              label: 'Cargo (tons)',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-          ],
-        },
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'number',
-              name: 'ac',
-              label: 'AC',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-            {
-              type: 'number',
-              name: 'hp',
-              label: 'HP',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-            {
-              type: 'number',
-              name: 'damageThreshold',
-              label: 'Damage threshold',
-              min: 0,
-              visibility: visibleWhenKind('vehicle'),
-            },
-          ],
         },
       ],
     },

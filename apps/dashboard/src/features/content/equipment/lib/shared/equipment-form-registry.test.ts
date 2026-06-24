@@ -31,6 +31,18 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Magic Item' })
   })
 
+  it('registers adventuring gear field group', () => {
+    const groups = fieldGroupsForEquipmentKind('adventuring_gear')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Adventuring Gear' })
+  })
+
+  it('registers vehicle field group', () => {
+    const groups = fieldGroupsForEquipmentKind('vehicle')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Vehicle' })
+  })
+
   it('returns undefined for kinds still in the monolith', () => {
     expect(fieldGroupsForEquipmentKind('weapon')).toBeUndefined()
   })
