@@ -32,6 +32,19 @@ export interface FieldOption {
   description?: string
 }
 
+/** Labeled option group for `select` fields (rendered as `<optgroup>`-style sections). */
+export interface FieldOptionGroup {
+  kind: 'group'
+  label: string
+  options: FieldOption[]
+}
+
+export type SelectFieldOptionListItem = FieldOption | FieldOptionGroup
+
+export function isFieldOptionGroup(item: SelectFieldOptionListItem): item is FieldOptionGroup {
+  return 'kind' in item && item.kind === 'group'
+}
+
 /**
  * Builds `FieldOption[]` from a value list (typically a contract enum constant)
  * and a label map. Keying the labels by the value union makes a missing or
@@ -85,6 +98,7 @@ export interface TextFieldConfig extends BaseFieldConfig {
 export interface NumberFieldConfig extends BaseFieldConfig {
   type: 'number'
   placeholder?: string
+  /** Bounds for Zod/schema validation — not applied as HTML `min`/`max` (allows in-progress edits). */
   min?: number
   max?: number
   step?: number
@@ -105,7 +119,7 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
 
 export interface SelectFieldConfig extends BaseFieldConfig {
   type: 'select'
-  options: FieldOption[]
+  options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
 }
@@ -250,12 +264,15 @@ export interface RowConfig {
   className?: string
 }
 
+/** Fields allowed inside a `group` — groups may nest one level or more. */
+export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig
+
 /** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
 export interface GroupConfig {
   kind: 'group'
   legend: string
   description?: string
-  fields: Array<FieldConfig | RowConfig | SlotConfig>
+  fields: GroupFieldItem[]
   className?: string
   /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
   collapsible?: boolean

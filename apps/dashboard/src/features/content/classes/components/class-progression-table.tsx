@@ -2,12 +2,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Heading 
 import {
   formatSpellLevel,
   proficiencyBonus,
+  getSlotRow,
   SLOT_TABLES,
   MAX_CHARACTER_LEVEL,
   subclassChoiceFeatureLabel,
   isSpellcastingActiveAtLevel,
   spellcastingFeatureLabel,
   spellcastingUnlockLevel,
+  type ResolvedCampaignRules,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
@@ -93,7 +95,7 @@ function buildRow(
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:
       castingActive && spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,
-    slots: castingActive ? slotTable?.[level - 1] : undefined,
+    slots: castingActive ? getSlotRow(slotTable ?? [], level) : undefined,
   }
 }
 
@@ -107,9 +109,9 @@ function slotTableFor(characterClass: CharacterClass): number[][] | undefined {
     : undefined
 }
 
-function buildRows(characterClass: CharacterClass): ProgressionRow[] {
+function buildRows(characterClass: CharacterClass, maxCharacterLevel: number): ProgressionRow[] {
   const slotTable = slotTableFor(characterClass)
-  return Array.from({ length: MAX_CHARACTER_LEVEL }, (_, i) =>
+  return Array.from({ length: maxCharacterLevel }, (_, i) =>
     buildRow(i + 1, characterClass, slotTable),
   )
 }
@@ -153,6 +155,16 @@ function buildColumnFlags(characterClass: CharacterClass, rows: ProgressionRow[]
     spellsAvailableLabel: preparation ? spellsAvailableColumnLabel(preparation) : 'Spells Prepared',
     slotLevels: slotLevelRange(characterClass),
   }
+}
+
+function columnCount(flags: ColumnFlags): number {
+  return (
+    3 +
+    flags.resourceNames.length +
+    (flags.showCantrips ? 1 : 0) +
+    (flags.showSpellsAvailable ? 1 : 0) +
+    flags.slotLevels.length
+  )
 }
 
 function ResourceCell({ resources, name }: { resources?: Record<string, number>; name: string }) {
@@ -230,13 +242,44 @@ function ProgressionBodyRow({
   )
 }
 
-type ClassProgressionTableProps = {
-  characterClass: CharacterClass
+function TierSeparatorRow({ tierName, colSpan }: { tierName: string; colSpan: number }) {
+  return (
+    <TableRow>
+      <TableCell
+        colSpan={colSpan}
+        className="border-border border-y bg-muted/30 py-2 text-center text-sm font-medium"
+      >
+        {tierName}
+      </TableCell>
+    </TableRow>
+  )
 }
 
-export function ClassProgressionTable({ characterClass }: ClassProgressionTableProps) {
-  const rows = buildRows(characterClass)
+type ClassProgressionTableProps = {
+  characterClass: CharacterClass
+  campaignRules?: ResolvedCampaignRules
+  /** @deprecated Prefer `campaignRules`. */
+  maxCharacterLevel?: number
+}
+
+const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
+  maxCharacterLevel: MAX_CHARACTER_LEVEL,
+  standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
+}
+
+export function ClassProgressionTable({
+  characterClass,
+  campaignRules,
+  maxCharacterLevel,
+}: ClassProgressionTableProps) {
+  const rules = campaignRules ?? {
+    ...DEFAULT_CAMPAIGN_RULES,
+    maxCharacterLevel: maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
+  }
+  const rows = buildRows(characterClass, rules.maxCharacterLevel)
   const flags = buildColumnFlags(characterClass, rows)
+  const colSpan = columnCount(flags)
+  const extended = rules.extendedProgression
 
   return (
     <section aria-labelledby="progression-heading">
@@ -246,9 +289,20 @@ export function ClassProgressionTable({ characterClass }: ClassProgressionTableP
       <Table>
         <ProgressionTableHeader {...flags} />
         <TableBody>
-          {rows.map((row) => (
-            <ProgressionBodyRow key={row.level} row={row} {...flags} />
-          ))}
+          {rows.flatMap((row) => {
+            const bodyRow = <ProgressionBodyRow key={`level-${row.level}`} row={row} {...flags} />
+            if (extended && row.level === rules.standardMaxCharacterLevel) {
+              return [
+                bodyRow,
+                <TierSeparatorRow
+                  key={`tier-separator-${extended.tierName}`}
+                  tierName={`${extended.tierName} Tier`}
+                  colSpan={colSpan}
+                />,
+              ]
+            }
+            return [bodyRow]
+          })}
         </TableBody>
       </Table>
     </section>

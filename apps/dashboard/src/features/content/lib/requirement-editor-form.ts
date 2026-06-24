@@ -3,8 +3,9 @@ import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   abilitySchema,
+  campaignLevelSchema,
   formatRequirementExpression,
-  levelSchema,
+  MAX_CHARACTER_LEVEL,
   type RequirementExpression,
 } from '@rpg/contracts'
 import type { RefinementCtx } from 'zod'
@@ -236,10 +237,10 @@ function normalizeEditorValue(value: PrerequisiteEditorValue | undefined): Prere
   }
 }
 
-function leafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression {
+function leafToExpression(leaf: RequirementLeafTypedForm, maxLevel: number): RequirementExpression {
   switch (leaf.type) {
     case 'minLevel':
-      return { kind: 'minLevel', level: levelSchema.parse(leaf.level) }
+      return { kind: 'minLevel', level: campaignLevelSchema(maxLevel).parse(leaf.level) }
     case 'abilityMinimum':
       return {
         kind: 'abilityMinimum',
@@ -251,8 +252,8 @@ function leafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression
   }
 }
 
-function tryMinLevelPreview(level: unknown): RequirementExpression | undefined {
-  const parsed = levelSchema.safeParse(level)
+function tryMinLevelPreview(level: unknown, maxLevel: number): RequirementExpression | undefined {
+  const parsed = campaignLevelSchema(maxLevel).safeParse(level)
   return parsed.success ? { kind: 'minLevel', level: parsed.data } : undefined
 }
 
@@ -274,10 +275,13 @@ function tryAbilityMinimumPreview(
 }
 
 /** Best-effort leaf conversion for live preview while the user is still editing. */
-function tryLeafToExpression(leaf: RequirementLeafTypedForm): RequirementExpression | undefined {
+function tryLeafToExpression(
+  leaf: RequirementLeafTypedForm,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): RequirementExpression | undefined {
   switch (leaf.type) {
     case 'minLevel':
-      return tryMinLevelPreview(leaf.level)
+      return tryMinLevelPreview(leaf.level, maxLevel)
     case 'abilityMinimum':
       return tryAbilityMinimumPreview(leaf)
     case 'spellcasting':
@@ -285,8 +289,13 @@ function tryLeafToExpression(leaf: RequirementLeafTypedForm): RequirementExpress
   }
 }
 
-function groupToExpression(group: RequirementGroupForm): RequirementExpression {
-  const requirements = group.requirements.filter(isRequirementLeafForm).map(leafToExpression)
+function groupToExpression(
+  group: RequirementGroupForm,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): RequirementExpression {
+  const requirements = group.requirements
+    .filter(isRequirementLeafForm)
+    .map((leaf) => leafToExpression(leaf, maxLevel))
 
   if (group.kind === 'any') {
     return { kind: 'any', requirements }
@@ -299,10 +308,13 @@ function groupToExpression(group: RequirementGroupForm): RequirementExpression {
   return { kind: 'all', requirements }
 }
 
-function groupToPreviewExpression(group: RequirementGroupForm): RequirementExpression | undefined {
+function groupToPreviewExpression(
+  group: RequirementGroupForm,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): RequirementExpression | undefined {
   const requirements = group.requirements
     .filter(isRequirementLeafForm)
-    .map(tryLeafToExpression)
+    .map((leaf) => tryLeafToExpression(leaf, maxLevel))
     .filter((expr): expr is RequirementExpression => expr != null)
 
   if (requirements.length === 0) return undefined
@@ -320,9 +332,10 @@ function groupToPreviewExpression(group: RequirementGroupForm): RequirementExpre
 
 function requirementEditorToPreviewExpression(
   value: PrerequisiteEditorValue | undefined,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
 ): RequirementExpression | undefined {
   const groupExpressions = normalizeEditorValue(value)
-    .groups.map(groupToPreviewExpression)
+    .groups.map((group) => groupToPreviewExpression(group, maxLevel))
     .filter((expr): expr is RequirementExpression => expr != null)
 
   if (groupExpressions.length === 0) return undefined
@@ -333,13 +346,14 @@ function requirementEditorToPreviewExpression(
 /** Maps validated editor state to a canonical RequirementExpression tree. */
 export function requirementEditorToExpression(
   value: PrerequisiteEditorValue,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
 ): RequirementExpression | undefined {
   const normalized = normalizeEditorValue(value)
   if (normalized.groups.length === 0) {
     return undefined
   }
 
-  const groupExpressions = normalized.groups.map(groupToExpression)
+  const groupExpressions = normalized.groups.map((group) => groupToExpression(group, maxLevel))
 
   if (groupExpressions.length === 1) {
     return groupExpressions[0]
@@ -357,6 +371,7 @@ function validateLeaf(
   groupIndex: number,
   leafIndex: number,
   ctx: RefinementCtx,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
 ): void {
   const path = ['prerequisiteEditor', 'groups', groupIndex, 'requirements', leafIndex]
 
@@ -367,7 +382,7 @@ function validateLeaf(
 
   switch (leaf.type) {
     case 'minLevel':
-      if (!levelSchema.safeParse(leaf.level).success) {
+      if (!campaignLevelSchema(maxLevel).safeParse(leaf.level).success) {
         addCustomIssue(ctx, [...path, 'level'], 'Minimum character level is required')
       }
       return
@@ -386,7 +401,11 @@ function validateLeaf(
 }
 
 /** Zod superRefine hook for prerequisite editor groups and leaf rows. */
-export function refineRequirementEditor(value: PrerequisiteEditorValue, ctx: RefinementCtx): void {
+export function refineRequirementEditor(
+  value: PrerequisiteEditorValue,
+  ctx: RefinementCtx,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): void {
   value.groups.forEach((group, groupIndex) => {
     if (group.requirements.length === 0) {
       addCustomIssue(
@@ -397,14 +416,17 @@ export function refineRequirementEditor(value: PrerequisiteEditorValue, ctx: Ref
     }
 
     group.requirements.forEach((leaf, leafIndex) => {
-      validateLeaf(leaf, groupIndex, leafIndex, ctx)
+      validateLeaf(leaf, groupIndex, leafIndex, ctx, maxLevel)
     })
   })
 }
 
 /** Player-facing preview for the requirement editor. */
-export function formatRequirementEditorPreview(value: PrerequisiteEditorValue | undefined): string {
-  const expression = requirementEditorToPreviewExpression(value)
+export function formatRequirementEditorPreview(
+  value: PrerequisiteEditorValue | undefined,
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+): string {
+  const expression = requirementEditorToPreviewExpression(value, maxLevel)
   if (!expression) {
     return 'No prerequisites'
   }

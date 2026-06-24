@@ -43,6 +43,10 @@ describe('mapCampaignToSettingsValues', () => {
       description: 'A classic dungeon delve.',
       banner: [],
       startingLevel: 3,
+      maxCharacterLevel: 20,
+      extendedProgressionEnabled: false,
+      extendedTierName: '',
+      extendedMaxLevel: undefined,
       importedCharactersPolicy: 'approval_required',
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
@@ -59,7 +63,34 @@ describe('mapCampaignToSettingsValues', () => {
 
     expect(mapCampaignToSettingsValues(minimal)).toMatchObject({
       startingLevel: 1,
+      maxCharacterLevel: 20,
+      extendedProgressionEnabled: false,
       importedCharactersPolicy: 'disabled',
+    })
+  })
+
+  it('maps extended progression from stored rule overrides', () => {
+    const withExtended: Campaign = {
+      ...campaign,
+      configuration: {
+        ...campaign.configuration,
+        settings: {
+          characterCreation: {
+            startingLevel: 1,
+            importedCharacters: { policy: 'disabled' },
+          },
+          ruleOverrides: {
+            extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+          },
+        },
+      },
+    }
+
+    expect(mapCampaignToSettingsValues(withExtended)).toMatchObject({
+      maxCharacterLevel: 20,
+      extendedProgressionEnabled: true,
+      extendedTierName: 'Epic Destiny',
+      extendedMaxLevel: 30,
     })
   })
 })
@@ -91,6 +122,30 @@ describe('buildCreateCampaignInput', () => {
     const values = mapCampaignToSettingsValues(campaign)
 
     expect(buildCreateCampaignInput(values)).not.toHaveProperty('imageKey')
+  })
+
+  it('includes extended progression in rule overrides when enabled', () => {
+    const values = {
+      ...mapCampaignToSettingsValues(campaign),
+      extendedProgressionEnabled: true,
+      extendedTierName: 'Epic Destiny',
+      extendedMaxLevel: 30,
+    }
+
+    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({
+      extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+    })
+  })
+
+  it('omits extended progression when disabled even if stale fields remain', () => {
+    const values = {
+      ...mapCampaignToSettingsValues(campaign),
+      extendedProgressionEnabled: false,
+      extendedTierName: 'Epic Destiny',
+      extendedMaxLevel: 30,
+    }
+
+    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toBeUndefined()
   })
 })
 

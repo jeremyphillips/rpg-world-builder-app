@@ -11,6 +11,8 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import { useCampaignRules } from '@/features/campaign'
+
 import { useClasses } from '../classes/hooks/use-classes'
 import { useEquipment } from '../equipment/hooks/use-equipment'
 import { useFeats } from '../feats/hooks/use-feats'
@@ -95,6 +97,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const spellsQuery = useSpells(campaignId)
   const featsQuery = useFeats(campaignId)
   const equipmentQuery = useEquipment(campaignId)
+  const campaignRules = useCampaignRules(campaignId)
 
   const options = useMemo(
     () =>
@@ -111,9 +114,10 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const ctx = useMemo(
     (): ContentFormCtx => ({
       campaignId,
+      campaignRules,
       options,
     }),
-    [campaignId, options],
+    [campaignId, campaignRules, options],
   )
 
   return {

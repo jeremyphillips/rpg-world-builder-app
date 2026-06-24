@@ -10,6 +10,10 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 }))
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
+  useCampaignRules: vi.fn(() => ({
+    maxCharacterLevel: 20,
+    standardMaxCharacterLevel: 20,
+  })),
 }))
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'

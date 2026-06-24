@@ -4,6 +4,7 @@ import { getAbilityLabel, skillSlugsSuggestingClass } from '@rpg/contracts'
 import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { useCampaignRules } from '@/features/campaign'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
@@ -175,6 +176,7 @@ export function ClassDetailContent({
   skillsPending,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
+  const campaignRules = useCampaignRules(campaignId)
 
   return (
     <div className="space-y-6">
@@ -204,7 +206,7 @@ export function ClassDetailContent({
           <FeaturesList className={characterClass.name} features={characterClass.features} />
         )}
       </ContentDetailLayout>
-      <ClassProgressionTable characterClass={characterClass} />
+      <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
       <SubclassesList subclasses={subclasses} />
     </div>
   )

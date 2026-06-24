@@ -29,6 +29,7 @@ import {
   masterDetailListRowSelectClasses,
   masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
+import { resolveMasterDetailListMove } from './master-detail-list-move'
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -217,21 +218,6 @@ function SortableMasterDetailListRow(props: SortableMasterDetailListRowProps) {
       />
     </li>
   )
-}
-
-/** Resolves drag-end indices and invokes `onMove` when the row order changed. */
-export function resolveMasterDetailListMove(
-  items: MasterDetailListItem[],
-  event: DragEndEvent,
-): { from: number; to: number } | null {
-  const { active, over } = event
-  if (!over || active.id === over.id) return null
-
-  const from = items.findIndex((item) => item.id === active.id)
-  const to = items.findIndex((item) => item.id === over.id)
-  if (from < 0 || to < 0 || from === to) return null
-
-  return { from, to }
 }
 
 interface MasterDetailListItemsProps {

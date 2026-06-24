@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { levelSchema } from '../primitives/level'
+import { absoluteLevelSchema } from '../primitives/level'
 import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
@@ -25,7 +25,7 @@ import { classSlugSchema, getClassName } from './class/class'
 
 export const requirementMinLevelSchema = z.object({
   kind: z.literal('minLevel'),
-  level: levelSchema,
+  level: absoluteLevelSchema,
 })
 
 export const requirementAbilityMinimumSchema = z.object({

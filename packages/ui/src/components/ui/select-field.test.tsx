@@ -9,6 +9,22 @@ const options = [
   { label: 'Neutral', value: 'n' },
 ]
 
+const groupedOptions = [
+  {
+    kind: 'group' as const,
+    label: 'Standard levels',
+    options: [
+      { label: '1', value: '1' },
+      { label: '2', value: '2' },
+    ],
+  },
+  {
+    kind: 'group' as const,
+    label: 'Epic Destiny Tier',
+    options: [{ label: '21', value: '21' }],
+  },
+]
+
 describe('SelectField', () => {
   it('labels the trigger and shows the placeholder', () => {
     render(<SelectField id="alignment" label="Alignment" placeholder="Choose…" options={options} />)
@@ -37,5 +53,10 @@ describe('SelectField', () => {
     )
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('renders grouped options with section labels', () => {
+    render(<SelectField id="level" label="Level" placeholder="Choose…" options={groupedOptions} />)
+    expect(screen.getByLabelText('Level')).toBeInTheDocument()
   })
 })

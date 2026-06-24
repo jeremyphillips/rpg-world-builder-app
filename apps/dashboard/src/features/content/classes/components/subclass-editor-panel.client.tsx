@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef } from 'react'
-import { FormProvider, useForm, type Resolver } from 'react-hook-form'
+import { FormProvider, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge, Button, InfoTooltip, Switch, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
@@ -52,7 +52,10 @@ export function SubclassEditorPanel({
     [formCtx, defaultFeatureLevel],
   )
   const onValuesChangeRef = useRef(onValuesChange)
-  onValuesChangeRef.current = onValuesChange
+
+  useEffect(() => {
+    onValuesChangeRef.current = onValuesChange
+  }, [onValuesChange])
 
   const form = useForm<SubclassFormValues>({
     resolver: zodResolver(subclassFormDef.schema) as Resolver<SubclassFormValues>,
@@ -60,14 +63,13 @@ export function SubclassEditorPanel({
     mode: 'onSubmit',
   })
 
+  const watchedValues = useWatch({ control: form.control }) as SubclassFormValues
+
   // Remount via `key={subclassId}` on the parent handles selection changes — do not
   // reset when parent re-renders from local edit state (that caused an update loop).
   useEffect(() => {
-    const subscription = form.watch((values) => {
-      onValuesChangeRef.current(values as SubclassFormValues)
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
+    onValuesChangeRef.current(watchedValues)
+  }, [watchedValues])
 
   const handleSaveStub = () => {
     void form.handleSubmit((values: SubclassFormValues) => {

@@ -1,33 +1,31 @@
 import { z } from 'zod'
-import { levelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
-import { type FieldOption, type FormItem } from '@rpg/ui/form'
+import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
+import { type FormItem } from '@rpg/ui/form'
 
 import {
   CLASS_GRANT_TYPES,
   CLASS_GRANT_TYPE_LABELS,
   formRowsToGrants,
   grantArrayFields,
-  grantRowFormSchema,
+  createGrantRowFormSchema,
   grantsToFormRows,
 } from '../../lib/grant-form-helpers'
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { effectiveMaxFromCtx, getLevelFieldOptions } from '../../lib/level-field-options'
 
-export const levelOptions: FieldOption[] = Array.from(
-  { length: MAX_CHARACTER_LEVEL },
-  (_, index) => {
-    const level = index + 1
-    return { value: String(level), label: String(level) }
-  },
-)
+export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
+  return z.object({
+    id: z.string().min(1).optional(),
+    name: z.string().min(1),
+    description: z.string().optional(),
+    level: levelField,
+    grants: z.array(createGrantRowFormSchema(maxLevel)),
+  })
+}
 
-export const featureRowFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  level: z.coerce.number().pipe(levelSchema),
-  grants: z.array(grantRowFormSchema),
-})
+export const featureRowFormSchema = createFeatureRowFormSchema()
 
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 
@@ -50,6 +48,8 @@ export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
+  const levelOptions = getLevelFieldOptions(ctx)
+
   return [
     {
       kind: 'row',
@@ -99,4 +99,15 @@ export function featuresFromFormValues(
   existing?: readonly ClassFeature[],
 ): ClassFeature[] {
   return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
+}
+
+/** @deprecated Use `getLevelFieldOptions(ctx)` from `level-field-options`. */
+export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  return getLevelFieldOptions({
+    campaignRules: { maxCharacterLevel: maxLevel, standardMaxCharacterLevel: maxLevel },
+  })
+}
+
+export function maxLevelFromCtx(ctx: ContentFormCtx): number {
+  return effectiveMaxFromCtx(ctx)
 }

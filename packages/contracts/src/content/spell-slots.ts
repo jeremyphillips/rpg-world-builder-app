@@ -1,13 +1,18 @@
 import type { SpellcastingProgression } from './class/spellcasting'
 
 // ---------------------------------------------------------------------------
-// Spell slot tables — 20-row arrays, one entry per character level.
+// Spell slot tables — one row per character level.
 // Each row is an array of slot counts indexed by slot level (0 = 1st-level).
 // ---------------------------------------------------------------------------
 
+const L20_FULL = [4, 3, 3, 3, 3, 2, 2, 1, 1] // L20
+const L20_HALF = [4, 3, 3, 3, 2] // L20
+const L20_PACT = [0, 0, 0, 0, 4] // L20
+
 /**
  * Full-caster progression (Bard, Cleric, Druid, Sorcerer, Wizard).
- * Rows 0–19 correspond to character levels 1–20.
+ * Rows 0–29 correspond to character levels 1–30.
+ * L21–L30 extrapolate L20 slot counts (no official 5e epic tables).
  */
 export const FULL_CASTER_SLOTS: number[][] = [
   [2], // L1
@@ -29,12 +34,22 @@ export const FULL_CASTER_SLOTS: number[][] = [
   [4, 3, 3, 3, 2, 1, 1, 1, 1], // L17
   [4, 3, 3, 3, 3, 1, 1, 1, 1], // L18
   [4, 3, 3, 3, 3, 2, 1, 1, 1], // L19
-  [4, 3, 3, 3, 3, 2, 2, 1, 1], // L20
+  L20_FULL, // L20
+  L20_FULL, // L21
+  L20_FULL, // L22
+  L20_FULL, // L23
+  L20_FULL, // L24
+  L20_FULL, // L25
+  L20_FULL, // L26
+  L20_FULL, // L27
+  L20_FULL, // L28
+  L20_FULL, // L29
+  L20_FULL, // L30
 ]
 
 /**
  * Half-caster progression (Paladin, Ranger).
- * Rows 0–19 correspond to character levels 1–20.
+ * L21–L30 extrapolate L20 slot counts.
  */
 export const HALF_CASTER_SLOTS: number[][] = [
   [2], // L1
@@ -56,13 +71,23 @@ export const HALF_CASTER_SLOTS: number[][] = [
   [4, 3, 3, 3, 1], // L17
   [4, 3, 3, 3, 1], // L18
   [4, 3, 3, 3, 2], // L19
-  [4, 3, 3, 3, 2], // L20
+  L20_HALF, // L20
+  L20_HALF, // L21
+  L20_HALF, // L22
+  L20_HALF, // L23
+  L20_HALF, // L24
+  L20_HALF, // L25
+  L20_HALF, // L26
+  L20_HALF, // L27
+  L20_HALF, // L28
+  L20_HALF, // L29
+  L20_HALF, // L30
 ]
 
 /**
  * Pact Magic progression (Warlock).
  * All slots are at the highest unlocked spell level; zeros render as "—".
- * 5 elements per row (slot levels 1–5).
+ * L21–L30 repeat L20 pact slot row.
  */
 export const PACT_CASTER_SLOTS: number[][] = [
   [1, 0, 0, 0, 0], // L1
@@ -84,11 +109,29 @@ export const PACT_CASTER_SLOTS: number[][] = [
   [0, 0, 0, 0, 4], // L17
   [0, 0, 0, 0, 4], // L18
   [0, 0, 0, 0, 4], // L19
-  [0, 0, 0, 0, 4], // L20
+  L20_PACT, // L20
+  L20_PACT, // L21
+  L20_PACT, // L22
+  L20_PACT, // L23
+  L20_PACT, // L24
+  L20_PACT, // L25
+  L20_PACT, // L26
+  L20_PACT, // L27
+  L20_PACT, // L28
+  L20_PACT, // L29
+  L20_PACT, // L30
 ]
 
 export const SLOT_TABLES: Record<SpellcastingProgression, number[][]> = {
   full: FULL_CASTER_SLOTS,
   half: HALF_CASTER_SLOTS,
   pact: PACT_CASTER_SLOTS,
+}
+
+/** Slot row for character level (1-based); falls back to last table row when out of range. */
+export function getSlotRow(table: number[][], level: number): number[] | undefined {
+  if (level < 1) return undefined
+  const row = table[level - 1]
+  if (row !== undefined) return row
+  return table.at(-1)
 }

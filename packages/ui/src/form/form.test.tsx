@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
@@ -92,5 +92,41 @@ describe('Form', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {
+    const levelSchema = z.object({
+      level: z.number().int().min(1).max(30),
+    })
+    type LevelValues = z.infer<typeof levelSchema>
+    const levelFields: FormItem[] = [
+      {
+        type: 'number',
+        name: 'level',
+        label: 'Max level',
+        min: 1,
+        max: 30,
+        defaultValue: 20,
+      },
+    ]
+    const onSubmit = vi.fn()
+    render(
+      <Form<LevelValues>
+        schema={levelSchema}
+        fields={levelFields}
+        defaultValues={{ level: 20 }}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const input = screen.getByLabelText('Max level')
+    expect(input).not.toHaveAttribute('min')
+    expect(input).not.toHaveAttribute('max')
+
+    const user = userEvent.setup()
+    fireEvent.change(input, { target: { value: '15' } })
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(onSubmit.mock.lastCall?.[0]).toEqual({ level: 15 }))
   })
 })

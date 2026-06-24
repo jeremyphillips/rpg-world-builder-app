@@ -4,7 +4,7 @@ import { abilitySchema } from '../../vocab/ability'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { hitDieSchema } from '../../primitives/dice'
-import { levelSchema } from '../../primitives/level'
+import { absoluteLevelSchema } from '../../primitives/level'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -27,7 +27,7 @@ import { spellcastingSchema } from './spellcasting'
 export const classFeatureSchema = z.preprocess(
   normalizeContentTrait,
   customContentTraitSchema.extend({
-    level: levelSchema,
+    level: absoluteLevelSchema,
   }),
 )
 
@@ -80,7 +80,7 @@ export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 // ---------------------------------------------------------------------------
 
 export const classResourceEntrySchema = z.object({
-  level: levelSchema,
+  level: absoluteLevelSchema,
   value: z.number().int().min(0),
 })
 
@@ -101,7 +101,7 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   /** Level at which a character chooses their subclass; omit when the class has none. */
-  subclassChoiceLevel: levelSchema.optional(),
+  subclassChoiceLevel: absoluteLevelSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesWriteSchema,
   features: z.array(classFeatureSchema),

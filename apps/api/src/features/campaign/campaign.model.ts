@@ -35,6 +35,13 @@ const campaignSchema = new Schema(
             },
           },
         },
+        ruleOverrides: {
+          maxCharacterLevel: { type: Number },
+          extendedProgression: {
+            tierName: { type: String },
+            maxLevel: { type: Number },
+          },
+        },
       },
       flavor: {
         playStyle: [{ type: String, enum: PLAY_STYLES }],

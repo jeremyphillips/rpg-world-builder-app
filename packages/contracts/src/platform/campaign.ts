@@ -1,6 +1,19 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
+import { ABSOLUTE_MAX_CHARACTER_LEVEL } from '../primitives/level'
+import { resolveCampaignRules } from './campaign-rules'
+import { validateExtendedMaxLevel } from './campaign-level-validation'
+
+/** Max length for extended progression tier names in campaign settings. */
+export const EXTENDED_PROGRESSION_TIER_NAME_MAX = 50
+
+export const extendedProgressionSchema = z.object({
+  tierName: z.string().min(1).max(EXTENDED_PROGRESSION_TIER_NAME_MAX),
+  maxLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
+})
+
+export type ExtendedProgression = z.infer<typeof extendedProgressionSchema>
 
 // ---------------------------------------------------------------------------
 // Campaign identity
@@ -25,14 +38,49 @@ export const importedCharactersPolicySchema = z.enum(IMPORTED_CHARACTERS_POLICIE
 
 export type ImportedCharactersPolicy = z.infer<typeof importedCharactersPolicySchema>
 
-export const campaignSettingsSchema = z.object({
-  characterCreation: z.object({
-    startingLevel: z.number().int().min(1).max(25),
-    importedCharacters: z.object({
-      policy: importedCharactersPolicySchema,
+export const campaignRuleOverridesSchema = z
+  .object({
+    maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
+    extendedProgression: extendedProgressionSchema.optional(),
+  })
+  .strict()
+
+export type CampaignRuleOverrides = z.infer<typeof campaignRuleOverridesSchema>
+
+export const campaignSettingsSchema = z
+  .object({
+    characterCreation: z.object({
+      startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
+      importedCharacters: z.object({
+        policy: importedCharactersPolicySchema,
+      }),
     }),
-  }),
-})
+    ruleOverrides: campaignRuleOverridesSchema.optional(),
+  })
+  .superRefine((settings, ctx) => {
+    const { maxCharacterLevel: effectiveMax, standardMaxCharacterLevel } =
+      resolveCampaignRules(settings)
+
+    if (settings.characterCreation.startingLevel > effectiveMax) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Starting level cannot exceed max character level',
+        path: ['characterCreation', 'startingLevel'],
+      })
+    }
+
+    const extended = settings.ruleOverrides?.extendedProgression
+    if (extended) {
+      const result = validateExtendedMaxLevel(standardMaxCharacterLevel, extended.maxLevel)
+      if (!result.valid) {
+        ctx.addIssue({
+          code: 'custom',
+          message: result.message,
+          path: ['ruleOverrides', 'extendedProgression', 'maxLevel'],
+        })
+      }
+    }
+  })
 
 export type CampaignSettings = z.infer<typeof campaignSettingsSchema>
 

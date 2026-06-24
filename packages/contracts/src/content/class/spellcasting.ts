@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
-import { levelSchema } from '../../primitives/level'
+import { absoluteLevelSchema } from '../../primitives/level'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — progressions and preparation modes shared by class records
@@ -32,14 +32,14 @@ export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_LABELS
  * branches on; inline data for lookup tables like this one.
  */
 export const cantripsKnownEntrySchema = z.object({
-  level: levelSchema,
+  level: absoluteLevelSchema,
   known: z.number().int().min(0),
 })
 
 export const cantripsProgressionSchema = z.array(cantripsKnownEntrySchema)
 
 export const spellsAvailableEntrySchema = z.object({
-  level: levelSchema,
+  level: absoluteLevelSchema,
   count: z.number().int().min(0),
 })
 
@@ -49,7 +49,7 @@ export const DEFAULT_SPELLCASTING_LEVEL = 1 as const
 
 export const spellcastingSchema = z.object({
   /** First class level at which this class's spellcasting block is active. Defaults to 1. */
-  level: levelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
+  level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
   /** SRD rules prose for the class's spellcasting feature (body HTML only). */
   description: z.string().optional(),
   progression: z.enum(SPELLCASTING_PROGRESSIONS),

@@ -4,14 +4,21 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 
 import { updateContent } from './content-client'
 import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
-import type { ContentFormCtx } from './content-form-registry'
+import {
+  contentFormRegistry,
+  type AnyContentFormDef,
+  type ContentFormCtx,
+} from './content-form-registry'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
   ContentFormLayout,
 } from './content-form-shell-parts'
 import { ContentAuthoringGate } from './content-authoring-gate'
-import { contentFormRegistry, type AnyContentFormDef } from './content-form-registry'
+
+function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
+  return def.resolveSchema?.(ctx) ?? def.schema
+}
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -91,7 +98,7 @@ function ContentEditFormReady({
           def={def}
           ctx={formCtx}
           formKey={entity.id}
-          schema={def.schema}
+          schema={resolveContentFormSchema(def, formCtx)}
           defaultValues={def.toFormValues(entity)}
           backHref={backHref}
           submitLabel="Save changes"
@@ -102,6 +109,7 @@ function ContentEditFormReady({
               def.toInput(values, {
                 entity,
                 weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+                campaignRules: formCtx.campaignRules,
               }),
             )
             form.reset(values)

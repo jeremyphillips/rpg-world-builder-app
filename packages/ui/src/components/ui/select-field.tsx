@@ -2,19 +2,28 @@ import type { ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
 import { InfoTooltip } from './tooltip.client'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from './select.client'
 import type { FieldWidth } from './field-control.variants'
+import {
+  isFieldOptionGroup,
+  type FieldOption,
+  type SelectFieldOptionListItem,
+} from '../../form/field-config'
 
-export interface SelectFieldOption {
-  label: string
-  value: string
-  disabled?: boolean
-}
+export type SelectFieldOption = FieldOption
 
 export interface SelectFieldProps {
   id: string
   label: string
-  options: SelectFieldOption[]
+  options: SelectFieldOptionListItem[]
   error?: string
   hint?: string
   info?: ReactNode
@@ -29,6 +38,14 @@ export interface SelectFieldProps {
   onValueChange?: (value: string) => void
   /** Forwarded to the trigger so RHF's `field.onBlur` (touched state) can fire. */
   onBlur?: () => void
+}
+
+function renderSelectOption(option: FieldOption) {
+  return (
+    <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+      {option.label}
+    </SelectItem>
+  )
 }
 
 /** Labelled Radix Select bound to the compound `Field`. */
@@ -69,11 +86,17 @@ export function SelectField({
           </SelectTrigger>
         </Field.Control>
         <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
-              {option.label}
-            </SelectItem>
-          ))}
+          {options.map((item) => {
+            if (isFieldOptionGroup(item)) {
+              return (
+                <SelectGroup key={item.label}>
+                  <SelectLabel>{item.label}</SelectLabel>
+                  {item.options.map((option) => renderSelectOption(option))}
+                </SelectGroup>
+              )
+            }
+            return renderSelectOption(item)
+          })}
         </SelectContent>
       </Select>
       <Field.Hint />

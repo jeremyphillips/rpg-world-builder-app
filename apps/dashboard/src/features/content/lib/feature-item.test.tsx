@@ -19,11 +19,12 @@ describe('FeatureItem', () => {
     renderFeatureItem({
       level: 5,
       name: 'Extra Attack',
-      description: '<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>',
+      description:
+        '<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>',
     })
 
     expect(
-      screen.getByRole('heading', { level: 4, name: 'Level 5: Extra Attack' }),
+      screen.getByRole('heading', { level: 3, name: 'Level 5: Extra Attack' }),
     ).toBeInTheDocument()
     expect(screen.getByText(/twice instead of once/)).toBeInTheDocument()
   })
@@ -37,7 +38,7 @@ describe('FeatureItem', () => {
     })
 
     expect(
-      screen.getByRole('heading', { level: 4, name: 'Level 2: Fighting Style' }),
+      screen.getByRole('heading', { level: 3, name: 'Level 2: Fighting Style' }),
     ).toBeInTheDocument()
     expect(screen.getByText(/Fighting Style feat/)).toBeInTheDocument()
     expect(screen.getByText(/Druidic Warrior/)).toBeInTheDocument()
@@ -49,7 +50,7 @@ describe('FeatureItem', () => {
       name: 'Epic Boon',
     })
     expect(
-      screen.getByRole('heading', { level: 4, name: 'Level 19: Epic Boon' }),
+      screen.getByRole('heading', { level: 3, name: 'Level 19: Epic Boon' }),
     ).toBeInTheDocument()
   })
 

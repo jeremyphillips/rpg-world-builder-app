@@ -3,11 +3,8 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { describe, expect, it, vi } from 'vitest'
 
-import {
-  MasterDetailListPanel,
-  resolveMasterDetailListMove,
-  type MasterDetailListItem,
-} from './master-detail-list-panel.client'
+import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel.client'
+import { resolveMasterDetailListMove } from './master-detail-list-move'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 

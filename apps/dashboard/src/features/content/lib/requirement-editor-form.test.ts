@@ -215,6 +215,23 @@ describe('formatRequirementEditorPreview', () => {
     ).toBe('No prerequisites')
   })
 
+  it('previews extended campaign levels above the default cap', () => {
+    expect(
+      formatRequirementEditorPreview(
+        {
+          groups: [
+            {
+              id: 'g1',
+              kind: 'all',
+              requirements: [{ id: 'l1', type: 'minLevel', level: 21 }],
+            },
+          ],
+        },
+        25,
+      ),
+    ).toBe('Requires Level 21+')
+  })
+
   it('returns no prerequisites for undefined editor state', () => {
     expect(formatRequirementEditorPreview(undefined)).toBe('No prerequisites')
   })
