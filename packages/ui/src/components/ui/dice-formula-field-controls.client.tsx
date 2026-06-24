@@ -2,11 +2,10 @@
 
 import type { ReactNode } from 'react'
 
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
-import { fieldWidthVariants } from './field-control.variants'
 import type { FieldSize } from './field.client'
-import { NumberInput, type NumberInputDigits } from './number-input.client'
+import { fieldDigitsForMax } from './field-digit-metrics'
+import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import {
   DEFAULT_DICE_FORMULA_MODIFIER,
@@ -21,10 +20,9 @@ import {
 import {
   diceFormulaControlCellVariants,
   diceFormulaCountInputVariants,
-  diceFormulaFacesTriggerVariants,
   diceFormulaModifierInputVariants,
-  diceFormulaOperatorTriggerVariants,
   diceFormulaRowVariants,
+  diceFormulaSelectTriggerVariants,
   diceFormulaSeparatorVariants,
 } from './dice-formula-field.variants'
 
@@ -34,16 +32,14 @@ const REMOVE_MODIFIER_LABEL = 'Remove modifier'
 function DiceFormulaControlCell({
   id,
   label,
-  width,
   children,
 }: {
   id: string
   label: string
-  width?: 'xs' | 'sm'
   children: ReactNode
 }) {
   return (
-    <div className={cn(diceFormulaControlCellVariants(), width && fieldWidthVariants({ width }))}>
+    <div className={diceFormulaControlCellVariants()}>
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
@@ -93,7 +89,7 @@ function DiceFormulaCountControl({
   | 'onBlur'
   | 'onUpdate'
 >) {
-  const digits: NumberInputDigits = countMax <= 9 ? 1 : countMax <= 99 ? 2 : 3
+  const digits = fieldDigitsForMax(countMax)
 
   return (
     <DiceFormulaControlCell id={id} label="Count">
@@ -129,8 +125,11 @@ function DiceFormulaFacesControl({
   DiceFormulaControlsProps,
   'id' | 'size' | 'resolved' | 'faces' | 'disabled' | 'hasError' | 'onBlur' | 'onUpdate'
 >) {
+  const maxFace = faces.reduce((max, face) => Math.max(max, face), 0)
+  const digits = fieldDigitsForMax(maxFace)
+
   return (
-    <DiceFormulaControlCell id={id} label="Die faces" width="xs">
+    <DiceFormulaControlCell id={id} label="Die faces">
       <Select
         value={String(resolved.faces)}
         onValueChange={(next) => onUpdate({ faces: Number(next) })}
@@ -139,8 +138,9 @@ function DiceFormulaFacesControl({
         <SelectTrigger
           id={id}
           size={size}
+          digits={digits}
           aria-invalid={hasError || undefined}
-          className={diceFormulaFacesTriggerVariants()}
+          className={diceFormulaSelectTriggerVariants()}
           onBlur={onBlur}
         >
           <SelectValue />
@@ -186,7 +186,7 @@ function DiceFormulaModifierControls({
 }) {
   return (
     <>
-      <DiceFormulaControlCell id={operatorId} label="Operator" width="xs">
+      <DiceFormulaControlCell id={operatorId} label="Operator">
         <Select
           value={resolved.modifier?.operator ?? '+'}
           onValueChange={(next) =>
@@ -202,8 +202,9 @@ function DiceFormulaModifierControls({
           <SelectTrigger
             id={operatorId}
             size={size}
+            digits={1}
             aria-invalid={hasError || undefined}
-            className={diceFormulaOperatorTriggerVariants()}
+            className={diceFormulaSelectTriggerVariants()}
             onBlur={onBlur}
           >
             <SelectValue />
@@ -226,7 +227,7 @@ function DiceFormulaModifierControls({
           max={modifierMax}
           disabled={disabled}
           aria-invalid={hasError || undefined}
-          digits={modifierMax <= 9 ? 1 : modifierMax <= 99 ? 2 : 3}
+          digits={fieldDigitsForMax(modifierMax)}
           className={diceFormulaModifierInputVariants()}
           value={resolved.modifier?.amount ?? 1}
           onChange={(event) => {

@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { fieldControlVariants } from './field-control.variants'
+import { fieldDigitWidthVariants } from './field-digit-metrics'
 
 export const numberInputRootVariants = cva('group relative inline-flex w-full')
 
@@ -103,36 +104,7 @@ export const numberInputStepperButtonVariants = cva(
 
 export type NumberInputVariantProps = VariantProps<typeof numberInputFieldVariants>
 
-/**
- * Width classes for number inputs sized to hold a fixed maximum digit count.
- * Uses `ch` units (width of "0" in the current font) so the width scales with
- * font-size automatically — no compound size variants needed for that axis.
- *
- * The per-size offset = padding-left + right-padding reserved for the stepper
- * + 0.5rem rendering buffer (font variance / sub-pixel rounding):
- *   sm → pl-2.5 (0.625rem) + pr-6 (1.5rem)  + 0.5rem = 2.625rem
- *   md → pl-3.5 (0.875rem) + pr-7 (1.75rem) + 0.5rem = 3.125rem
- *   lg → pl-4   (1rem)     + pr-8 (2rem)    + 0.5rem = 3.5rem
- */
-export const numberInputDigitsVariants = {
-  sm: {
-    1: 'w-[calc(1ch+2.625rem)]',
-    2: 'w-[calc(2ch+2.625rem)]',
-    3: 'w-[calc(3ch+2.625rem)]',
-    4: 'w-[calc(4ch+2.625rem)]',
-  },
-  md: {
-    1: 'w-[calc(1ch+3.125rem)]',
-    2: 'w-[calc(2ch+3.125rem)]',
-    3: 'w-[calc(3ch+3.125rem)]',
-    4: 'w-[calc(4ch+3.125rem)]',
-  },
-  lg: {
-    1: 'w-[calc(1ch+3.5rem)]',
-    2: 'w-[calc(2ch+3.5rem)]',
-    3: 'w-[calc(3ch+3.5rem)]',
-    4: 'w-[calc(4ch+3.5rem)]',
-  },
-} as const
+/** @see fieldDigitWidthVariants — single source of truth for digit-based control widths. */
+export const numberInputDigitsVariants = fieldDigitWidthVariants
 
 export type NumberInputDigits = keyof (typeof numberInputDigitsVariants)['md']

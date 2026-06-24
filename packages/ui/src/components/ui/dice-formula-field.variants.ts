@@ -1,8 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
-import { fieldWidthVariants } from './field-control.variants'
-
 export const diceFormulaRowVariants = cva('flex flex-wrap items-center gap-2')
 
 export const diceFormulaSeparatorVariants = cva(
@@ -17,13 +14,8 @@ export const diceFormulaControlCellVariants = cva('flex shrink-0 items-center')
  */
 export const diceFormulaCountInputVariants = cva('text-center tabular-nums')
 
-export const diceFormulaFacesTriggerVariants = cva(
-  cn(fieldWidthVariants({ width: 'xs' }), 'tabular-nums'),
-)
-
-export const diceFormulaOperatorTriggerVariants = cva(
-  cn(fieldWidthVariants({ width: 'xs' }), 'justify-center px-2'),
-)
+/** Applied to digit-sized SelectTrigger — width comes from the `digits` prop. */
+export const diceFormulaSelectTriggerVariants = cva('shrink-0 tabular-nums')
 
 /**
  * Applied to NumberInput `className` (the `<input>` element). Width is
