@@ -12,6 +12,7 @@ import {
 } from '../../adventuring-gear/components/adventuring-gear-columns'
 import { vehicleColumns, vehicleFilters } from '../../vehicles/components/vehicle-columns'
 import { armorColumns, armorFilters } from '../../armor/components/armor-columns'
+import { weaponColumns, weaponFilters } from '../../weapons/components/weapon-columns'
 import type { EquipmentFamilyPath } from './equipment-family-paths'
 
 function genericFamilyColumns(campaignId: string): ColumnDef<Equipment>[] {
@@ -42,6 +43,8 @@ export function getFamilyColumns(
       return vehicleColumns(campaignId) as ColumnDef<Equipment>[]
     case 'armor':
       return armorColumns(campaignId) as ColumnDef<Equipment>[]
+    case 'weapons':
+      return weaponColumns(campaignId) as ColumnDef<Equipment>[]
     default:
       return genericFamilyColumns(campaignId)
   }
@@ -64,6 +67,8 @@ export function getFamilyFilters(family: EquipmentFamilyPath): FilterDef[] {
       return vehicleFilters
     case 'armor':
       return armorFilters
+    case 'weapons':
+      return weaponFilters
     default:
       return genericFamilyFilters
   }

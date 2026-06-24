@@ -106,6 +106,14 @@ describe('equipmentFormDef kind-scoped fields', () => {
       'Armor',
     ])
   })
+
+  it('weapon route shows Identity, Economy, and Weapon only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'weapon' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Weapon',
+    ])
+  })
 })
 
 describe('equipmentFormDef create vs update modes', () => {

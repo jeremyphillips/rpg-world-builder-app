@@ -1,6 +1,4 @@
 import {
-  createEquipmentInputSchema,
-  dieFaceSchema,
   type CreateEquipmentInput,
   type Equipment,
   type EquipmentKind,
@@ -9,70 +7,21 @@ import {
 import { weightFromForm } from '../../lib/content-form-field-helpers'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
-import { buildServiceInput } from '../services/lib/service-form-input'
-import { buildMountInput } from '../mounts/lib/mount-form-input'
-import { buildToolInput } from '../tools/lib/tool-form-input'
-import { buildMagicItemInput } from '../magic-items/lib/magic-item-form-input'
-import { buildAdventuringGearInput } from '../adventuring-gear/lib/adventuring-gear-form-input'
-import { buildVehicleInput } from '../vehicles/lib/vehicle-form-input'
 import { buildArmorInput } from '../armor/lib/armor-form-input'
+import { buildAdventuringGearInput } from '../adventuring-gear/lib/adventuring-gear-form-input'
+import { buildMagicItemInput } from '../magic-items/lib/magic-item-form-input'
+import { buildMountInput } from '../mounts/lib/mount-form-input'
+import { buildServiceInput } from '../services/lib/service-form-input'
+import { buildToolInput } from '../tools/lib/tool-form-input'
+import { buildVehicleInput } from '../vehicles/lib/vehicle-form-input'
+import { buildWeaponInput } from '../weapons/lib/weapon-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
-
-type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 export type EquipmentInputBuildCtx = {
   values: EquipmentFormValues
   ctx?: ContentFormInputCtx<Equipment>
   weight: ReturnType<typeof weightFromForm>
-}
-
-function damageFromForm(values: EquipmentFormValues): WeaponInput['damage'] {
-  if (!values.hasDamage) return undefined
-  if (values.damageKind === 'flat') {
-    return values.damageAmount !== undefined
-      ? { kind: 'flat', amount: values.damageAmount }
-      : undefined
-  }
-  if (values.damageCount !== undefined && values.damageFaces !== undefined) {
-    return {
-      kind: 'dice',
-      count: values.damageCount,
-      faces: dieFaceSchema.parse(values.damageFaces),
-    }
-  }
-  return undefined
-}
-
-function optionalWeaponDamage(values: EquipmentFormValues): Partial<WeaponInput> {
-  const damage = damageFromForm(values)
-  if (!damage) return {}
-  return {
-    damage,
-    ...(values.damageType && { damageType: values.damageType }),
-  }
-}
-
-function optionalVersatileDamage(values: EquipmentFormValues): Partial<WeaponInput> {
-  if (!(values.properties ?? []).includes('versatile')) return {}
-  if (values.versatileCount === undefined || values.versatileFaces === undefined) return {}
-  return {
-    versatileDamage: {
-      kind: 'dice',
-      count: values.versatileCount,
-      faces: dieFaceSchema.parse(values.versatileFaces),
-    },
-  }
-}
-
-function optionalWeaponRange(values: EquipmentFormValues): Partial<WeaponInput> {
-  if (values.rangeNormal === undefined) return {}
-  return {
-    range: {
-      normal: values.rangeNormal,
-      ...(values.rangeLong !== undefined && { long: values.rangeLong }),
-    },
-  }
 }
 
 /** Shared identity/cost fields for all equipment kind input builders. */
@@ -86,22 +35,6 @@ export function equipmentInputBase(
     description: values.description || undefined,
     cost: values.cost,
   }
-}
-
-function buildWeaponInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'weapon',
-    category: values.category,
-    mode: values.mode,
-    properties: values.properties ?? [],
-    mastery: values.mastery,
-    ...(weight && { weight }),
-    ...optionalWeaponDamage(values),
-    ...optionalVersatileDamage(values),
-    ...optionalWeaponRange(values),
-    ...(values.specialRules && { specialRules: values.specialRules }),
-  })
 }
 
 const kindInputBuilders: Record<

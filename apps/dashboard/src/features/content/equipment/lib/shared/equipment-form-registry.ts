@@ -8,6 +8,7 @@ import { magicItemFormFieldGroup } from '../../magic-items/lib/magic-item-form-f
 import { adventuringGearFormFieldGroup } from '../../adventuring-gear/lib/adventuring-gear-form-fields'
 import { vehicleFormFieldGroup } from '../../vehicles/lib/vehicle-form-fields'
 import { armorFormFieldGroup } from '../../armor/lib/armor-form-fields'
+import { weaponFormFieldGroup } from '../../weapons/lib/weapon-form-fields'
 
 export { visibleWhenKind } from './visible-when-kind'
 
@@ -20,6 +21,7 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, () => FormItem[]>> =
   adventuring_gear: () => [adventuringGearFormFieldGroup()],
   vehicle: () => [vehicleFormFieldGroup()],
   armor: () => [armorFormFieldGroup()],
+  weapon: () => [weaponFormFieldGroup()],
 }
 
 /** Returns registered field groups for a kind, or `undefined` when still in the monolith. */
