@@ -577,6 +577,12 @@ The runnable versions live in Storybook; copy from there.
   [dice-formula-field.stories.tsx](../src/components/ui/dice-formula-field.stories.tsx)):
   the `DiceFormulaField` composite (`type: 'diceFormula'` in `<Form>`) with
   `none` / `optional` / `required` modifier modes.
+- **Value + unit composite** — `Forms/InputSelectField`
+  ([input-select-field.stories.tsx](../src/components/ui/input-select-field.stories.tsx)):
+  `type: 'inputSelect'` binds a nested object via `valueKey` / `unitKey` (e.g.
+  `{ amount, currency }` for cost). Set `valueDigits` for intrinsic number width,
+  or `valueDigitsDependsOn` + `valueDigitsLookup` when width should track another
+  field (e.g. equipment `kind` on the hub create route).
 - **Multi-group schema form** — `Forms/Form`
   ([form.stories.tsx](../src/form/form.stories.tsx)): a `<Form>` combining a group,
   a row, a conditional field, and a rich-text field. The shape of a real form:

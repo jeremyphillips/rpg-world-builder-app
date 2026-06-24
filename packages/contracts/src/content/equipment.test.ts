@@ -177,7 +177,7 @@ const SAMPLE_BODIES = {
     vehicleCategory: 'water',
     speed: '4 mph',
     crew: 80,
-    cargoTons: 150,
+    cargoCapacity: { value: 150, unit: 'ton' },
     ac: 15,
     hp: 500,
     damageThreshold: 20,
@@ -370,6 +370,16 @@ describe('createEquipmentInputSchema', () => {
       createEquipmentInputSchema.parse({ slug: 'longsword', ...LONGSWORD_BODY }),
     ).toMatchObject({ slug: 'longsword' })
   })
+
+  it('rejects weight on service create payloads', () => {
+    expect(
+      createEquipmentInputSchema.safeParse({
+        slug: 'skilled-hireling',
+        ...SAMPLE_BODIES.service,
+        weight: { value: 1, unit: 'lb' },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('updateEquipmentInputSchema', () => {
@@ -381,6 +391,15 @@ describe('updateEquipmentInputSchema', () => {
       }).success,
     ).toBe(true)
     expect(updateEquipmentInputSchema.safeParse({ name: 'Bigger Torch' }).success).toBe(false)
+  })
+
+  it('rejects weight on service update payloads', () => {
+    expect(
+      updateEquipmentInputSchema.safeParse({
+        kind: 'service',
+        weight: { value: 1, unit: 'lb' },
+      }).success,
+    ).toBe(false)
   })
 })
 

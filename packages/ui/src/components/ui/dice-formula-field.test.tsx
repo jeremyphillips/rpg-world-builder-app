@@ -94,6 +94,29 @@ describe('DiceFormulaField', () => {
     expect(document.getElementById('roll-inline-label')).toHaveTextContent('Roll')
   })
 
+  it('aligns count and digit-sized select widths for the same digit count', () => {
+    render(
+      <DiceFormulaField
+        id="roll"
+        label="Roll"
+        modifierMode="required"
+        size="md"
+        countMax={99}
+        modifierMax={99}
+        faces={[6, 8, 100]}
+        value={{ count: 10, faces: 100, modifier: { operator: '+', amount: 10 } }}
+      />,
+    )
+
+    const sharedTwoDigitWidth = 'w-[calc(2*1ch+3.125rem)]'
+    const facesThreeDigitWidth = 'w-[calc(3*1ch+3.125rem)]'
+
+    expect(screen.getByLabelText('Count').parentElement).toHaveClass(sharedTwoDigitWidth)
+    expect(screen.getByLabelText('Modifier').parentElement).toHaveClass(sharedTwoDigitWidth)
+    expect(screen.getByLabelText('Die faces')).toHaveClass(facesThreeDigitWidth)
+    expect(screen.getByLabelText('Operator')).toHaveClass('w-[calc(1*1ch+3.125rem)]')
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <DiceFormulaField

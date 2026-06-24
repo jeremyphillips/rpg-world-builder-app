@@ -35,7 +35,7 @@ export function equipmentFormToInput(
   ctx?: ContentFormInputCtx<Equipment>,
 ): CreateEquipmentInput {
   const kind = ctx?.equipmentKind ?? values.kind
-  const weight = weightFromForm(values.weight?.value)
+  const weight = kind !== 'service' ? weightFromForm(values.weight) : undefined
   const input = kindInputBuilders[kind]({ values: { ...values, kind }, ctx, weight })
   return finalizeContentInput(input, ctx) as CreateEquipmentInput
 }

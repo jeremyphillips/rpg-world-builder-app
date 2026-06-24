@@ -30,6 +30,24 @@ describe('Select', () => {
     expect(screen.getByLabelText('Alignment')).toHaveTextContent('Neutral')
   })
 
+  it('applies shared digit width and trailing column when digits is set', () => {
+    render(
+      <Select value="8">
+        <SelectTrigger aria-label="Faces" size="md" digits={2}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="8">8</SelectItem>
+        </SelectContent>
+      </Select>,
+    )
+
+    const trigger = screen.getByLabelText('Faces')
+    expect(trigger).toHaveClass('w-[calc(2*1ch+3.125rem)]')
+    expect(trigger).toHaveClass('pr-7')
+    expect(trigger.querySelector('[aria-hidden]')).toHaveClass('w-6')
+  })
+
   it('has no axe accessibility violations (closed)', async () => {
     const { container } = renderSelect()
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

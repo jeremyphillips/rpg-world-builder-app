@@ -50,6 +50,19 @@ describe('equipmentFormDef kind-scoped fields', () => {
     ])
   })
 
+  it('service route omits the weight field from Economy', () => {
+    const economyFields = equipmentFormDef
+      .buildFields({ equipmentKind: 'service' })
+      .filter(isGroupField)
+      .find((group) => group.legend === 'Economy')?.fields
+    const row = economyFields?.find(
+      (field): field is Extract<typeof field, { kind: 'row' }> =>
+        'kind' in field && field.kind === 'row',
+    )
+    expect(row?.fields.some((field) => 'name' in field && field.name === 'weight')).toBe(false)
+    expect(row?.fields.some((field) => 'name' in field && field.name === 'cost')).toBe(true)
+  })
+
   it('service route omits the Kind select', () => {
     const fields = equipmentFormDef.buildFields({ equipmentKind: 'service' })
     expect(fields.some((field) => 'name' in field && field.name === 'kind')).toBe(false)

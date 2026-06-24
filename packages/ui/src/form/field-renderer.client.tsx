@@ -17,6 +17,7 @@ import { TextareaField } from '../components/ui/textarea-field'
 import { TextField } from '../components/ui/text-field'
 import { useFileFieldRemotePreview } from './file-field-props.context'
 import { EditableGridFieldRenderer } from './editable-grid-field.client'
+import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import type { FieldConfig, FieldType } from './field-config'
@@ -292,6 +293,15 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       value={(field.value as DiceFormulaValue | undefined) ?? undefined}
       onChange={field.onChange}
       onBlur={field.onBlur}
+    />
+  ),
+  inputSelect: ({ config, field, id, error, namePrefix }) => (
+    <InputSelectFieldRenderer
+      config={config}
+      field={field}
+      id={id}
+      error={error}
+      namePrefix={namePrefix}
     />
   ),
 }

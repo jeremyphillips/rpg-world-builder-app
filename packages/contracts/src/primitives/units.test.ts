@@ -2,11 +2,19 @@ import { describe, expect, it } from 'vitest'
 import {
   CURRENCIES,
   currencySchema,
+  formatMass,
   formatMoney,
   formatWeight,
+  getCurrencyAbbrev,
   getCurrencyLabel,
+  getMassUnitAbbrev,
+  getMassUnitLabel,
+  massSchema,
+  massToLb,
   moneySchema,
   moneyToCp,
+  MOUNT_CARRYING_CAPACITY_LABEL,
+  VEHICLE_CARGO_CAPACITY_LABEL,
   weightSchema,
   weightToLb,
 } from './units'
@@ -34,6 +42,15 @@ describe('getCurrencyLabel', () => {
 
   it('falls back to the raw id for unknown currencies', () => {
     expect(getCurrencyLabel('gil')).toBe('gil')
+  })
+})
+
+describe('getCurrencyAbbrev', () => {
+  it('returns uppercase coin ids', () => {
+    expect(getCurrencyAbbrev('gp')).toBe('GP')
+    expect(getCurrencyAbbrev('cp')).toBe('CP')
+    expect(getCurrencyAbbrev('sp')).toBe('SP')
+    expect(getCurrencyAbbrev('pp')).toBe('PP')
   })
 })
 
@@ -71,6 +88,59 @@ describe('weightSchema', () => {
 describe('weightToLb', () => {
   it('returns the pound value', () => {
     expect(weightToLb({ value: 1.5, unit: 'lb' })).toBe(1.5)
+  })
+})
+
+describe('massSchema', () => {
+  it('accepts lb and ton units', () => {
+    expect(massSchema.parse({ value: 480, unit: 'lb' })).toEqual({ value: 480, unit: 'lb' })
+    expect(massSchema.parse({ value: 150, unit: 'ton' })).toEqual({ value: 150, unit: 'ton' })
+  })
+
+  it('rejects negative values and unknown units', () => {
+    expect(massSchema.safeParse({ value: -1, unit: 'lb' }).success).toBe(false)
+    expect(massSchema.safeParse({ value: 1, unit: 'kg' }).success).toBe(false)
+  })
+})
+
+describe('massToLb', () => {
+  it('converts tons to pounds using the short-ton factor', () => {
+    expect(massToLb({ value: 1, unit: 'ton' })).toBe(2000)
+    expect(massToLb({ value: 150, unit: 'ton' })).toBe(300_000)
+    expect(massToLb({ value: 480, unit: 'lb' })).toBe(480)
+  })
+})
+
+describe('getMassUnitLabel', () => {
+  it('returns display labels for known units', () => {
+    expect(getMassUnitLabel('lb')).toBe('Pounds')
+    expect(getMassUnitLabel('ton')).toBe('Tons')
+  })
+})
+
+describe('getMassUnitAbbrev', () => {
+  it('returns compact unit labels for forms', () => {
+    expect(getMassUnitAbbrev('lb')).toBe('lb.')
+    expect(getMassUnitAbbrev('ton')).toBe('ton')
+  })
+})
+
+describe('formatMass', () => {
+  it('delegates lb values to formatWeight', () => {
+    expect(formatMass({ value: 480, unit: 'lb' })).toBe('480 lb')
+    expect(formatMass({ value: 0.5, unit: 'lb' })).toBe('1/2 lb')
+  })
+
+  it('formats ton values with singular/plural labels', () => {
+    expect(formatMass({ value: 1, unit: 'ton' })).toBe('1 ton')
+    expect(formatMass({ value: 150, unit: 'ton' })).toBe('150 tons')
+  })
+})
+
+describe('capacity field labels', () => {
+  it('exports SRD-aligned user-facing labels', () => {
+    expect(MOUNT_CARRYING_CAPACITY_LABEL).toBe('Carrying capacity')
+    expect(VEHICLE_CARGO_CAPACITY_LABEL).toBe('Cargo')
   })
 })
 

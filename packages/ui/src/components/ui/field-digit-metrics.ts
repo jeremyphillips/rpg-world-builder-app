@@ -1,0 +1,55 @@
+import type { FieldControlVariantProps } from './field-control.variants'
+
+type FieldSize = NonNullable<FieldControlVariantProps['size']>
+
+/**
+ * Shared digit-field layout tokens. Number inputs and digit-sized selects use
+ * the same width formula: N×ch + padding-left + trailing-column reserve + buffer.
+ *
+ * Trailing column width matches `numberInputStepperVariants` (w-5 / w-6 / w-7).
+ * Right padding (pr-6 / pr-7 / pr-8) reserves that column; the caret sits inside
+ * it with no extra gap to the trigger edge.
+ */
+export const fieldDigitSizeVariants = {
+  sm: 'pl-2.5 pr-6',
+  md: 'pl-3.5 pr-7',
+  lg: 'pl-4 pr-8',
+} as const satisfies Record<FieldSize, string>
+
+/**
+ * Digit-based control widths as literal Tailwind classes so the scanner emits every
+ * variant. Uses `N*1ch` (not `Nch`) so digit 5 does not collide with the `w-5`
+ * spacing scale during class detection or merge.
+ */
+export const fieldDigitWidthVariants = {
+  sm: {
+    1: 'w-[calc(1*1ch+2.625rem)]',
+    2: 'w-[calc(2*1ch+2.625rem)]',
+    3: 'w-[calc(3*1ch+2.625rem)]',
+    4: 'w-[calc(4*1ch+2.625rem)]',
+    5: 'w-[calc(5*1ch+2.625rem)]',
+  },
+  md: {
+    1: 'w-[calc(1*1ch+3.125rem)]',
+    2: 'w-[calc(2*1ch+3.125rem)]',
+    3: 'w-[calc(3*1ch+3.125rem)]',
+    4: 'w-[calc(4*1ch+3.125rem)]',
+    5: 'w-[calc(5*1ch+3.125rem)]',
+  },
+  lg: {
+    1: 'w-[calc(1*1ch+3.5rem)]',
+    2: 'w-[calc(2*1ch+3.5rem)]',
+    3: 'w-[calc(3*1ch+3.5rem)]',
+    4: 'w-[calc(4*1ch+3.5rem)]',
+    5: 'w-[calc(5*1ch+3.5rem)]',
+  },
+} as const satisfies Record<FieldSize, Record<1 | 2 | 3 | 4 | 5, string>>
+
+export type FieldDigits = keyof (typeof fieldDigitWidthVariants)['md']
+
+/** Maps a numeric maximum (e.g. countMax, largest die face) to a digit slot count. */
+export function fieldDigitsForMax(max: number): FieldDigits {
+  if (max <= 9) return 1
+  if (max <= 99) return 2
+  return 3
+}

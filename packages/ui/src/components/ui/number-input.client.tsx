@@ -11,10 +11,12 @@ import {
   type StepNumberOptions,
 } from './number-input.lib'
 import {
+  numberInputDigitsVariants,
   numberInputFieldVariants,
   numberInputRootVariants,
   numberInputStepperButtonVariants,
   numberInputStepperVariants,
+  type NumberInputDigits,
   type NumberInputVariantProps,
 } from './number-input.variants'
 
@@ -37,6 +39,15 @@ export interface NumberInputProps
    */
   stepperMin?: number
   stepperMax?: number
+  /** When true, styles for embedding inside a grouped control such as InputSelectField. */
+  grouped?: boolean
+  rootClassName?: string
+  /**
+   * Maximum digit count the input should visually accommodate. Sets the root
+   * width to `calc(N×1ch + padding + stepper)` using the current size's token
+   * offsets, so the width scales automatically with font-size.
+   */
+  digits?: NumberInputDigits
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -50,6 +61,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       step = 1,
       stepperMin,
       stepperMax,
+      grouped = false,
+      rootClassName,
+      digits,
       value,
       defaultValue,
       onChange,
@@ -87,8 +101,16 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const incrementDisabled = disabled || isStepDisabled(currentValue, 'up', stepOptions)
     const decrementDisabled = disabled || isStepDisabled(currentValue, 'down', stepOptions)
 
+    const resolvedSize = size ?? 'md'
+
     return (
-      <div className={numberInputRootVariants()}>
+      <div
+        className={cn(
+          numberInputRootVariants(),
+          digits ? numberInputDigitsVariants[resolvedSize][digits] : 'w-full',
+          rootClassName,
+        )}
+      >
         <input
           type="number"
           inputMode="numeric"
@@ -100,13 +122,17 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           value={value}
           defaultValue={defaultValue}
           onChange={onChange}
-          className={cn(numberInputFieldVariants({ size }), className)}
+          className={cn(
+            numberInputFieldVariants({ size, grouped }),
+            digits && 'min-w-0 w-full',
+            className,
+          )}
           {...props}
         />
 
         <div
           className={cn(
-            numberInputStepperVariants({ size }),
+            numberInputStepperVariants({ size, grouped }),
             'pointer-events-none opacity-0 transition-opacity',
             'group-hover:pointer-events-auto group-hover:opacity-100',
             'group-focus-within:pointer-events-auto group-focus-within:opacity-100',
@@ -142,4 +168,5 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 )
 NumberInput.displayName = 'NumberInput'
 
+export type { NumberInputDigits }
 export { NumberInput }

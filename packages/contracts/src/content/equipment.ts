@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { weightSchema } from '../primitives/units'
+import { massSchema } from '../primitives/units'
 import { abilitySchema } from '../vocab/ability'
 import { gearKindSchema } from '../vocab/equipment/gear-kind'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
@@ -107,7 +107,7 @@ export const toolBodySchema = equipmentBaseSchema.extend({
 
 export const mountBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('mount'),
-  carryingCapacity: weightSchema,
+  carryingCapacity: massSchema,
   /** Movement speed, free text (e.g. "60 ft."). */
   speed: z.string().optional(),
 })
@@ -117,24 +117,26 @@ export const vehicleBodySchema = equipmentBaseSchema.extend({
   vehicleCategory: vehicleCategorySchema,
   /** Movement speed, free text (e.g. "8 mph"). */
   speed: z.string().optional(),
-  /** Carrying/cargo capacity for land and drawn vehicles. */
-  capacity: weightSchema.optional(),
+  /** Cargo capacity (SRD ships in tons; land vehicles may use lb). */
+  cargoCapacity: massSchema.optional(),
   crew: z.number().int().min(0).optional(),
   passengers: z.number().int().min(0).optional(),
-  cargoTons: z.number().min(0).optional(),
   ac: z.number().int().min(0).optional(),
   hp: z.number().int().min(0).optional(),
   damageThreshold: z.number().int().min(0).optional(),
 })
 
-export const serviceBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('service'),
-  serviceCategory: serviceCategorySchema,
-  /** Billing cadence, free text (e.g. "per day", "per mile"). */
-  duration: z.string().optional(),
-  /** Free-form notes for pricing or scope. */
-  notes: z.string().optional(),
-})
+export const serviceBodySchema = equipmentBaseSchema
+  .omit({ weight: true })
+  .extend({
+    kind: z.literal('service'),
+    serviceCategory: serviceCategorySchema,
+    /** Billing cadence, free text (e.g. "per day", "per mile"). */
+    duration: z.string().optional(),
+    /** Free-form notes for pricing or scope. */
+    notes: z.string().optional(),
+  })
+  .strict()
 
 export const magicItemBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('magic_item'),

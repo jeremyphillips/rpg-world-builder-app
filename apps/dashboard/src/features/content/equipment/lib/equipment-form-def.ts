@@ -9,6 +9,7 @@ import {
   gearKindSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
+  massUnitSchema,
   serviceCategorySchema,
   slugSchema,
   toolCategorySchema,
@@ -25,10 +26,10 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import {
-  costFields,
   costToFormDefaults,
+  economyFields,
   identityFields,
-  optionalWeightFields,
+  weightToForm,
 } from '../../lib/content-form-field-helpers'
 import {
   contentFormRegistry,
@@ -65,7 +66,9 @@ const equipmentFormSchema = z.object({
     amount: z.coerce.number().int().min(0),
     currency: currencySchema,
   }),
-  weight: z.object({ value: z.coerce.number().min(0).optional() }).optional(),
+  weight: z
+    .object({ value: z.coerce.number().min(0).optional(), unit: z.literal('lb') })
+    .optional(),
 
   // adventuring gear
   gearKind: gearKindSchema.optional(),
@@ -79,15 +82,24 @@ const equipmentFormSchema = z.object({
   ability: abilitySchema.optional(),
 
   // mount
-  carryingCapacity: z.coerce.number().min(0).optional(),
+  carryingCapacity: z
+    .object({
+      value: z.coerce.number().min(0),
+      unit: massUnitSchema,
+    })
+    .optional(),
   speed: z.string().optional(),
 
   // vehicle
   vehicleCategory: vehicleCategorySchema.optional(),
-  vehicleCapacity: z.coerce.number().min(0).optional(),
+  cargoCapacity: z
+    .object({
+      value: z.coerce.number().min(0).optional(),
+      unit: massUnitSchema,
+    })
+    .optional(),
   crew: z.coerce.number().int().min(0).optional(),
   passengers: z.coerce.number().int().min(0).optional(),
-  cargoTons: z.coerce.number().min(0).optional(),
   ac: z.coerce.number().int().min(0).optional(),
   hp: z.coerce.number().int().min(0).optional(),
   damageThreshold: z.coerce.number().int().min(0).optional(),
@@ -134,6 +146,11 @@ const equipmentFormSchema = z.object({
 
 type EquipmentFormValues = z.infer<typeof equipmentFormSchema>
 
+function sharedWeightToForm(entity: Equipment): EquipmentFormValues['weight'] {
+  if (entity.kind === 'service') return undefined
+  return weightToForm(entity.weight)
+}
+
 function sharedFormValues(
   entity: Equipment,
 ): Pick<EquipmentFormValues, 'name' | 'slug' | 'description' | 'kind' | 'cost' | 'weight'> {
@@ -143,7 +160,7 @@ function sharedFormValues(
     description: entity.description,
     kind: entity.kind,
     cost: entity.cost,
-    weight: entity.weight ? { value: entity.weight.value } : undefined,
+    weight: sharedWeightToForm(entity),
   }
 }
 
@@ -202,7 +219,12 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
       speed: (legacy as { speed?: string }).speed,
       crew: (legacy as { crew?: number }).crew,
       passengers: (legacy as { passengers?: number }).passengers,
-      cargoTons: (legacy as { cargoTons?: number }).cargoTons,
+      cargoCapacity: (() => {
+        const cargoTons = (legacy as Record<string, unknown>).cargoTons
+        return typeof cargoTons === 'number'
+          ? { value: cargoTons, unit: 'ton' as const }
+          : undefined
+      })(),
       ac: (legacy as { ac?: number }).ac,
       hp: (legacy as { hp?: number }).hp,
       damageThreshold: (legacy as { damageThreshold?: number }).damageThreshold,
@@ -236,19 +258,19 @@ function buildUnscopedEquipmentFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Economy',
-      fields: [...costFields(), ...optionalWeightFields()],
+      fields: economyFields(),
     },
     ...allRegisteredKindFieldGroups(),
   ]
 }
 
-function identityAndEconomyGroups(): FormItem[] {
+function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
   return [
     { kind: 'group', legend: 'Identity', fields: identityFields() },
     {
       kind: 'group',
       legend: 'Economy',
-      fields: [...costFields(), ...optionalWeightFields()],
+      fields: economyFields({ kind: ctx.equipmentKind }),
     },
   ]
 }
@@ -257,7 +279,7 @@ function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
   if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
 
   const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind)
-  return [...identityAndEconomyGroups(), ...(registered ?? [])]
+  return [...identityAndEconomyGroups(ctx), ...(registered ?? [])]
 }
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {

@@ -6,6 +6,12 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { fieldControlVariants, type FieldControlVariantProps } from './field-control.variants'
+import {
+  fieldDigitSizeVariants,
+  fieldDigitWidthVariants,
+  type FieldDigits,
+} from './field-digit-metrics'
+import { selectDigitTrailingColumnVariants } from './select-digit.variants'
 
 const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
@@ -14,23 +20,61 @@ const SelectValue = SelectPrimitive.Value
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> &
-    Pick<FieldControlVariantProps, 'size'>
->(({ className, size, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      fieldControlVariants({ size }),
-      'items-center justify-between gap-2 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="size-4 opacity-50" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-))
+    Pick<FieldControlVariantProps, 'size'> & {
+      /** When true, styles for embedding inside a grouped control such as InputSelectField. */
+      grouped?: boolean
+      /**
+       * Maximum digit count the trigger should visually accommodate. Uses the same
+       * width formula as NumberInput `digits`; the caret sits in a trailing column
+       * matching the number-input stepper width.
+       */
+      digits?: FieldDigits
+    }
+>(({ className, size: sizeProp = 'md', grouped = false, digits, children, ...props }, ref) => {
+  const size = sizeProp ?? 'md'
+
+  if (digits != null) {
+    return (
+      <SelectPrimitive.Trigger
+        ref={ref}
+        className={cn(
+          fieldControlVariants({ size }),
+          fieldDigitSizeVariants[size],
+          fieldDigitWidthVariants[size][digits],
+          'relative shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <span aria-hidden className={selectDigitTrailingColumnVariants({ size })}>
+          <ChevronDown className="opacity-50" />
+        </span>
+      </SelectPrimitive.Trigger>
+    )
+  }
+
+  return (
+    <SelectPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        grouped
+          ? 'inline-flex items-center justify-between gap-1.5 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1'
+          : cn(
+              fieldControlVariants({ size }),
+              'items-center justify-between gap-2 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+            ),
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <SelectPrimitive.Icon asChild>
+        <ChevronDown className="size-4 opacity-50" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+  )
+})
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<
