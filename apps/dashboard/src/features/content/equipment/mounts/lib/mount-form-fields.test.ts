@@ -34,7 +34,7 @@ describe('mount form round-trips', () => {
       if (item.kind !== 'mount') return
       const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
       expect(formValues.carryingCapacity).toEqual(item.carryingCapacity)
-      expect(formValues.speed).toBe(item.speed)
+      expect(formValues.speed).toEqual(item.speed)
     })
   }
 })

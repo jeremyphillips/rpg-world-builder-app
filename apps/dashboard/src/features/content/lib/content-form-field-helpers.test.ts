@@ -90,7 +90,7 @@ describe('economyFields', () => {
     const row = economyFields({ kind: 'weapon' })[0]
     expect(row).toMatchObject({
       kind: 'row',
-      className: 'grid w-full grid-cols-1 md:grid-cols-3',
+      className: 'grid w-full grid-cols-2 md:grid-cols-3',
     })
     if (row && 'kind' in row && row.kind === 'row') {
       expect(row.fields).toHaveLength(2)

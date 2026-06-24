@@ -1,5 +1,6 @@
 import {
   formatMass,
+  formatSpeedRate,
   getVehicleCategoryLabel,
   VEHICLE_CARGO_CAPACITY_LABEL,
   type VehicleEquipment,
@@ -11,7 +12,7 @@ import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 export function getVehicleStatRows(item: VehicleEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: getVehicleCategoryLabel(item.vehicleCategory) },
-    ...(item.speed ? [{ label: 'Speed', value: item.speed }] : []),
+    { label: 'Speed', value: formatSpeedRate(item.speed) },
     ...(item.cargoCapacity
       ? [{ label: VEHICLE_CARGO_CAPACITY_LABEL, value: formatMass(item.cargoCapacity) }]
       : []),

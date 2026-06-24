@@ -1,4 +1,4 @@
-import type { VehicleEquipment } from '@rpg/contracts'
+import { formatSpeedRate, type VehicleEquipment } from '@rpg/contracts'
 import { VEHICLE_CATEGORIES, getVehicleCategoryLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
@@ -19,9 +19,10 @@ const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
     meta: { label: 'Category' },
   },
   {
-    accessorKey: 'speed',
+    id: 'speed',
+    accessorFn: (row) => row.speed.value,
     header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
-    cell: ({ row }) => row.getValue<string>('speed') ?? '—',
+    cell: ({ row }) => formatSpeedRate(row.original.speed),
     meta: { label: 'Speed' },
   },
   costColumn<VehicleEquipment>(),

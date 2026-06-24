@@ -4,16 +4,20 @@ import {
   currencySchema,
   formatMass,
   formatMoney,
+  formatSpeedRate,
   formatWeight,
   getCurrencyAbbrev,
   getCurrencyLabel,
   getMassUnitAbbrev,
   getMassUnitLabel,
+  getSpeedRateUnitAbbrev,
   massSchema,
   massToLb,
   moneySchema,
   moneyToCp,
   MOUNT_CARRYING_CAPACITY_LABEL,
+  parseSpeedRateString,
+  speedRateSchema,
   VEHICLE_CARGO_CAPACITY_LABEL,
   weightSchema,
   weightToLb,
@@ -180,5 +184,42 @@ describe('formatWeight', () => {
   it('groups large whole-pound weights', () => {
     expect(formatWeight({ value: 1500, unit: 'lb' })).toBe('1,500 lb')
     expect(formatWeight({ value: 1500.5, unit: 'lb' })).toBe('1,500½ lb')
+  })
+})
+
+describe('speedRateSchema', () => {
+  it('accepts ft and mph units with fractional values', () => {
+    expect(speedRateSchema.parse({ value: 60, unit: 'ft' })).toEqual({ value: 60, unit: 'ft' })
+    expect(speedRateSchema.parse({ value: 1.5, unit: 'mph' })).toEqual({
+      value: 1.5,
+      unit: 'mph',
+    })
+  })
+
+  it('rejects negative values and unknown units', () => {
+    expect(speedRateSchema.safeParse({ value: -1, unit: 'ft' }).success).toBe(false)
+    expect(speedRateSchema.safeParse({ value: 1, unit: 'kph' }).success).toBe(false)
+  })
+})
+
+describe('getSpeedRateUnitAbbrev', () => {
+  it('returns compact unit labels for forms', () => {
+    expect(getSpeedRateUnitAbbrev('ft')).toBe('ft.')
+    expect(getSpeedRateUnitAbbrev('mph')).toBe('mph')
+  })
+})
+
+describe('parseSpeedRateString', () => {
+  it('parses legacy catalog speed strings', () => {
+    expect(parseSpeedRateString('60 ft.')).toEqual({ value: 60, unit: 'ft' })
+    expect(parseSpeedRateString('4 mph')).toEqual({ value: 4, unit: 'mph' })
+    expect(parseSpeedRateString('1½ mph')).toEqual({ value: 1.5, unit: 'mph' })
+  })
+})
+
+describe('formatSpeedRate', () => {
+  it('formats mount and vehicle speed rates', () => {
+    expect(formatSpeedRate({ value: 60, unit: 'ft' })).toBe('60 ft.')
+    expect(formatSpeedRate({ value: 1.5, unit: 'mph' })).toBe('1½ mph')
   })
 })

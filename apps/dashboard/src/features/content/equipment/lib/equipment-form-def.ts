@@ -10,7 +10,9 @@ import {
   magicItemCategorySchema,
   magicItemRaritySchema,
   massUnitSchema,
+  parseSpeedRateString,
   serviceCategorySchema,
+  speedRateUnitSchema,
   slugSchema,
   toolCategorySchema,
   vehicleCategorySchema,
@@ -88,7 +90,10 @@ const equipmentFormSchema = z.object({
       unit: massUnitSchema,
     })
     .optional(),
-  speed: z.string().optional(),
+  speed: z.object({
+    value: z.coerce.number().min(0),
+    unit: speedRateUnitSchema,
+  }),
 
   // vehicle
   vehicleCategory: vehicleCategorySchema.optional(),
@@ -213,10 +218,11 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
     }
   }
   if (legacyKind === 'ship') {
+    const legacySpeed = (legacy as { speed?: string }).speed
     return {
       kind: 'vehicle',
       vehicleCategory: 'water',
-      speed: (legacy as { speed?: string }).speed,
+      speed: legacySpeed ? parseSpeedRateString(legacySpeed) : undefined,
       crew: (legacy as { crew?: number }).crew,
       passengers: (legacy as { passengers?: number }).passengers,
       cargoCapacity: (() => {

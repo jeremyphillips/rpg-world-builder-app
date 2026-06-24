@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatGroupedNumber, parseGroupedNumber } from './number-format'
+import {
+  formatFractionalNumber,
+  formatGroupedNumber,
+  normalizeUnicodeFractions,
+  parseFractionalNumber,
+  parseGroupedNumber,
+} from './number-format'
 
 describe('formatGroupedNumber', () => {
   it('formats values at or above 1,000 with grouping', () => {
@@ -36,5 +42,26 @@ describe('parseGroupedNumber', () => {
     expect(parseGroupedNumber('')).toBeUndefined()
     expect(parseGroupedNumber('   ')).toBeUndefined()
     expect(parseGroupedNumber('abc')).toBeUndefined()
+  })
+})
+
+describe('normalizeUnicodeFractions', () => {
+  it('converts half glyphs to decimal fractions', () => {
+    expect(normalizeUnicodeFractions('1½')).toBe('1.5')
+  })
+})
+
+describe('formatFractionalNumber', () => {
+  it('renders whole values and SRD half fractions', () => {
+    expect(formatFractionalNumber(60)).toBe('60')
+    expect(formatFractionalNumber(0.5)).toBe('1/2')
+    expect(formatFractionalNumber(1.5)).toBe('1½')
+  })
+})
+
+describe('parseFractionalNumber', () => {
+  it('parses unicode half fractions and grouped numbers', () => {
+    expect(parseFractionalNumber('1½')).toBe(1.5)
+    expect(parseFractionalNumber('1,500')).toBe(1500)
   })
 })
