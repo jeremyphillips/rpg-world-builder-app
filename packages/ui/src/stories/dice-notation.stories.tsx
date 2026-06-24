@@ -5,6 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
+import type { FieldSize } from '../components/ui/field.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { Text } from '../components/ui/text'
 import { Form } from '../form/form.client'
@@ -24,7 +25,7 @@ function RecipePanel({ title, children }: { title: string; children: ReactNode }
   )
 }
 
-function WeaponDamageRecipe() {
+function WeaponDamageRecipe({ size }: { size?: FieldSize }) {
   const [value, setValue] = useState<DiceFormulaValue>({ count: 1, faces: 8 })
 
   return (
@@ -33,6 +34,7 @@ function WeaponDamageRecipe() {
         id="weapon-damage"
         label="Damage"
         modifierMode="optional"
+        size={size}
         value={value}
         onChange={setValue}
       />
@@ -44,7 +46,7 @@ function WeaponDamageRecipe() {
   )
 }
 
-function HitDieRecipe() {
+function HitDieRecipe({ size }: { size?: FieldSize }) {
   const [value, setValue] = useState<DiceFormulaValue>({ count: 1, faces: 8 })
 
   return (
@@ -54,6 +56,7 @@ function HitDieRecipe() {
         label="Hit die"
         modifierMode="none"
         faces={CLASS_HIT_DICE}
+        size={size}
         value={value}
         onChange={setValue}
       />
@@ -65,7 +68,7 @@ function HitDieRecipe() {
   )
 }
 
-function HealingRecipe() {
+function HealingRecipe({ size }: { size?: FieldSize }) {
   const [value, setValue] = useState<DiceFormulaValue>({
     count: 2,
     faces: 8,
@@ -78,6 +81,7 @@ function HealingRecipe() {
         id="healing"
         label="Healing"
         modifierMode="required"
+        size={size}
         value={value}
         onChange={setValue}
       />
@@ -129,12 +133,12 @@ function SchemaDrivenRecipe() {
   )
 }
 
-function DiceNotationRecipes() {
+function DiceNotationRecipes({ size }: { size?: FieldSize }) {
   return (
     <FieldGroup legend="Dice formula recipes" className="max-w-md">
-      <WeaponDamageRecipe />
-      <HitDieRecipe />
-      <HealingRecipe />
+      <WeaponDamageRecipe size={size} />
+      <HitDieRecipe size={size} />
+      <HealingRecipe size={size} />
       <SchemaDrivenRecipe />
     </FieldGroup>
   )
@@ -150,3 +154,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const Medium: Story = {
+  render: () => <DiceNotationRecipes size="md" />,
+}
