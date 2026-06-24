@@ -9,6 +9,7 @@ import {
   isSpellcastingActiveAtLevel,
   spellcastingFeatureLabel,
   spellcastingUnlockLevel,
+  type ResolvedCampaignRules,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
@@ -156,6 +157,16 @@ function buildColumnFlags(characterClass: CharacterClass, rows: ProgressionRow[]
   }
 }
 
+function columnCount(flags: ColumnFlags): number {
+  return (
+    3 +
+    flags.resourceNames.length +
+    (flags.showCantrips ? 1 : 0) +
+    (flags.showSpellsAvailable ? 1 : 0) +
+    flags.slotLevels.length
+  )
+}
+
 function ResourceCell({ resources, name }: { resources?: Record<string, number>; name: string }) {
   const value = resources?.[name]
   return <TableCell className="text-center">{value !== undefined ? value : '—'}</TableCell>
@@ -231,17 +242,44 @@ function ProgressionBodyRow({
   )
 }
 
+function TierSeparatorRow({ tierName, colSpan }: { tierName: string; colSpan: number }) {
+  return (
+    <TableRow>
+      <TableCell
+        colSpan={colSpan}
+        className="border-border border-y bg-muted/30 py-2 text-center text-sm font-medium"
+      >
+        {tierName}
+      </TableCell>
+    </TableRow>
+  )
+}
+
 type ClassProgressionTableProps = {
   characterClass: CharacterClass
+  campaignRules?: ResolvedCampaignRules
+  /** @deprecated Prefer `campaignRules`. */
   maxCharacterLevel?: number
+}
+
+const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
+  maxCharacterLevel: MAX_CHARACTER_LEVEL,
+  standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
 }
 
 export function ClassProgressionTable({
   characterClass,
-  maxCharacterLevel = MAX_CHARACTER_LEVEL,
+  campaignRules,
+  maxCharacterLevel,
 }: ClassProgressionTableProps) {
-  const rows = buildRows(characterClass, maxCharacterLevel)
+  const rules = campaignRules ?? {
+    ...DEFAULT_CAMPAIGN_RULES,
+    maxCharacterLevel: maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
+  }
+  const rows = buildRows(characterClass, rules.maxCharacterLevel)
   const flags = buildColumnFlags(characterClass, rows)
+  const colSpan = columnCount(flags)
+  const extended = rules.extendedProgression
 
   return (
     <section aria-labelledby="progression-heading">
@@ -251,9 +289,20 @@ export function ClassProgressionTable({
       <Table>
         <ProgressionTableHeader {...flags} />
         <TableBody>
-          {rows.map((row) => (
-            <ProgressionBodyRow key={row.level} row={row} {...flags} />
-          ))}
+          {rows.flatMap((row) => {
+            const bodyRow = <ProgressionBodyRow key={`level-${row.level}`} row={row} {...flags} />
+            if (extended && row.level === rules.standardMaxCharacterLevel) {
+              return [
+                bodyRow,
+                <TierSeparatorRow
+                  key={`tier-separator-${extended.tierName}`}
+                  tierName={`${extended.tierName} Tier`}
+                  colSpan={colSpan}
+                />,
+              ]
+            }
+            return [bodyRow]
+          })}
         </TableBody>
       </Table>
     </section>

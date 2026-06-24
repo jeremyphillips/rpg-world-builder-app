@@ -107,4 +107,40 @@ describe('ClassProgressionTable', () => {
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
   })
+
+  it('inserts a tier separator when extended progression is active', () => {
+    render(
+      <ClassProgressionTable
+        characterClass={pickClass('bard')}
+        campaignRules={{
+          maxCharacterLevel: 30,
+          standardMaxCharacterLevel: 20,
+          extendedProgression: {
+            tierName: 'Epic Destiny',
+            startsAt: 21,
+            maxLevel: 30,
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Epic Destiny Tier')).toBeInTheDocument()
+    const rows = screen.getAllByRole('row')
+    expect(rows).toHaveLength(32)
+  })
+
+  it('does not insert a separator for a flat cap above 20 without extended progression', () => {
+    render(
+      <ClassProgressionTable
+        characterClass={pickClass('bard')}
+        campaignRules={{
+          maxCharacterLevel: 25,
+          standardMaxCharacterLevel: 25,
+        }}
+      />,
+    )
+
+    expect(screen.queryByText(/Tier$/)).not.toBeInTheDocument()
+    expect(screen.getAllByRole('row')).toHaveLength(26)
+  })
 })

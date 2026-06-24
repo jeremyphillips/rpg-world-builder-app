@@ -12,7 +12,10 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
 vi.mock('@/features/campaign/hooks/use-campaign-rules', () => ({
-  useCampaignRules: vi.fn(() => ({ maxCharacterLevel: 20 })),
+  useCampaignRules: vi.fn(() => ({
+    maxCharacterLevel: 20,
+    standardMaxCharacterLevel: 20,
+  })),
 }))
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'

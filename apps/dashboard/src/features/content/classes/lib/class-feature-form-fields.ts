@@ -1,11 +1,6 @@
 import { z } from 'zod'
-import {
-  buildLevelOptions,
-  campaignLevelSchema,
-  MAX_CHARACTER_LEVEL,
-  type ClassFeature,
-} from '@rpg/contracts'
-import { type FieldOption, type FormItem } from '@rpg/ui/form'
+import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
+import { type FormItem } from '@rpg/ui/form'
 
 import {
   CLASS_GRANT_TYPES,
@@ -17,13 +12,7 @@ import {
 } from '../../lib/grant-form-helpers'
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
-
-export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL): FieldOption[] {
-  return buildLevelOptions(maxLevel).map((option) => ({
-    value: option.value,
-    label: option.label.replace('Level ', ''),
-  }))
-}
+import { effectiveMaxFromCtx, getLevelFieldOptions } from '../../lib/level-field-options'
 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
@@ -59,8 +48,7 @@ export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
-  const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
-  const levelOptions = getLevelOptions(maxLevel)
+  const levelOptions = getLevelFieldOptions(ctx)
 
   return [
     {
@@ -111,4 +99,15 @@ export function featuresFromFormValues(
   existing?: readonly ClassFeature[],
 ): ClassFeature[] {
   return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
+}
+
+/** @deprecated Use `getLevelFieldOptions(ctx)` from `level-field-options`. */
+export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  return getLevelFieldOptions({
+    campaignRules: { maxCharacterLevel: maxLevel, standardMaxCharacterLevel: maxLevel },
+  })
+}
+
+export function maxLevelFromCtx(ctx: ContentFormCtx): number {
+  return effectiveMaxFromCtx(ctx)
 }

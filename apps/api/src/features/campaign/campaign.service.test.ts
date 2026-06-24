@@ -171,6 +171,55 @@ describe('updateCampaign', () => {
     await expect(updateCampaign('507f1f77bcf86cd799439011', { name: 'Nope' })).resolves.toBeNull()
     void owner
   })
+
+  it('persists extended progression rule overrides', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+    const updated = await updateCampaign(campaign.id, {
+      settings: {
+        characterCreation: {
+          startingLevel: 1,
+          importedCharacters: { policy: 'disabled' },
+        },
+        ruleOverrides: {
+          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+        },
+      },
+    })
+
+    expect(updated?.configuration.settings?.ruleOverrides).toEqual({
+      extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+    })
+  })
+
+  it('unsets extended progression when omitted from the patch', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({
+      name: 'Epic',
+      createdBy: owner.id,
+      settings: {
+        characterCreation: {
+          startingLevel: 1,
+          importedCharacters: { policy: 'disabled' },
+        },
+        ruleOverrides: {
+          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+        },
+      },
+    })
+
+    const updated = await updateCampaign(campaign.id, {
+      settings: {
+        characterCreation: {
+          startingLevel: 1,
+          importedCharacters: { policy: 'disabled' },
+        },
+      },
+    })
+
+    expect(updated?.configuration.settings?.ruleOverrides?.extendedProgression).toBeUndefined()
+  })
 })
 
 describe('isCampaignMember', () => {

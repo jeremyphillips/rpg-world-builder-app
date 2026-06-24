@@ -144,6 +144,16 @@ function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['setti
     $unset['configuration.settings.ruleOverrides.maxCharacterLevel'] = 1
   }
 
+  const extendedProgression = settings.ruleOverrides?.extendedProgression
+  if (extendedProgression) {
+    $set['configuration.settings.ruleOverrides.extendedProgression.tierName'] =
+      extendedProgression.tierName
+    $set['configuration.settings.ruleOverrides.extendedProgression.maxLevel'] =
+      extendedProgression.maxLevel
+  } else {
+    $unset['configuration.settings.ruleOverrides.extendedProgression'] = 1
+  }
+
   return { $set, $unset }
 }
 

@@ -23,7 +23,6 @@ import {
   featCategorySchema,
   innateSpellKindSchema,
   campaignLevelSchema,
-  buildLevelOptions,
   MAX_CHARACTER_LEVEL,
   senseTypeSchema,
   skillSchema,
@@ -42,6 +41,7 @@ import {
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from './content-form-registry'
+import { getLevelFieldOptions } from './level-field-options'
 import { titleCase } from './title-case'
 
 // ---------------------------------------------------------------------------
@@ -339,7 +339,7 @@ export function grantItemFields<T extends string>(
           type: 'select',
           name: 'level',
           label: 'Character level',
-          options: levelOptions(maxLevelFromCtx(ctx)),
+          options: getLevelFieldOptions(ctx),
           required: true,
         },
         {
@@ -434,14 +434,6 @@ export function grantArrayFields<T extends string>(
       fields: grantItemFields(grantTypes, labels, ctx),
     },
   ]
-}
-
-function maxLevelFromCtx(ctx: ContentFormCtx): number {
-  return ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
-}
-
-function levelOptions(maxLevel: number = MAX_CHARACTER_LEVEL): FieldOption[] {
-  return buildLevelOptions(maxLevel)
 }
 
 // ---------------------------------------------------------------------------

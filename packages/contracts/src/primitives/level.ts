@@ -8,7 +8,10 @@ import { z } from 'zod'
 export const MAX_CHARACTER_LEVEL = 20
 
 /** Upper bound for campaign overrides and stored content body levels. */
-export const ABSOLUTE_MAX_CHARACTER_LEVEL = 30
+export const ABSOLUTE_MAX_CHARACTER_LEVEL = 100
+
+/** Default offset added to standard max when enabling extended progression. */
+export const DEFAULT_EXTENDED_LEVEL_OFFSET = 10
 
 /** System catalog default bound (1–20). */
 export const levelSchema = z.number().int().min(1).max(MAX_CHARACTER_LEVEL)
@@ -35,4 +38,9 @@ export function buildLevelOptions(maxLevel: number): { value: string; label: str
     const level = index + 1
     return { value: String(level), label: `Level ${level}` }
   })
+}
+
+export type LevelOptionGroup = {
+  label: string
+  options: { value: string; label: string }[]
 }

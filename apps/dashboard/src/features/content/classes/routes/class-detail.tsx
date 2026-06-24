@@ -176,7 +176,7 @@ export function ClassDetailContent({
   skillsPending,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
-  const { maxCharacterLevel } = useCampaignRules(campaignId)
+  const campaignRules = useCampaignRules(campaignId)
 
   return (
     <div className="space-y-6">
@@ -206,10 +206,7 @@ export function ClassDetailContent({
           <FeaturesList className={characterClass.name} features={characterClass.features} />
         )}
       </ContentDetailLayout>
-      <ClassProgressionTable
-        characterClass={characterClass}
-        maxCharacterLevel={maxCharacterLevel}
-      />
+      <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
       <SubclassesList subclasses={subclasses} />
     </div>
   )

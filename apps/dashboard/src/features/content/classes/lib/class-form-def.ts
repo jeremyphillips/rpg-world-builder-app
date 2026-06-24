@@ -46,6 +46,11 @@ import {
 } from '../../lib/content-form-registry'
 import { identityFields } from '../../lib/content-form-field-helpers'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import {
+  getLevelFieldOptions,
+  getFlatLevelFieldOptions,
+  effectiveMaxFromCtx,
+} from '../../lib/level-field-options'
 import { titleCase } from '../../lib/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 import {
@@ -63,7 +68,6 @@ import {
   createFeatureRowFormSchema,
   featuresFromFormValues,
   featureToFormRow,
-  getLevelOptions,
 } from './class-feature-form-fields'
 import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
 
@@ -95,13 +99,13 @@ const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   label: formatHitDie(face),
 }))
 
-const subclassChoiceLevelOptions = (maxLevel: number): FieldOption[] => [
+const subclassChoiceLevelOptions = (ctx: ContentFormCtx) => [
   { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
-  ...getLevelOptions(maxLevel),
+  ...getLevelFieldOptions(ctx),
 ]
 
 function maxLevelFromCtx(ctx: ContentFormCtx): number {
-  return ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+  return effectiveMaxFromCtx(ctx)
 }
 
 const armorCategoryOptions = toOptions(
@@ -273,8 +277,8 @@ function buildSpellProgressionGridField(rowCount: number): FormItem {
 // Field builders
 // ---------------------------------------------------------------------------
 
-function resourceItemFields(maxLevel: number): FormItem[] {
-  const levelOptions = getLevelOptions(maxLevel)
+function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
+  const levelOptions = getLevelFieldOptions(ctx)
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
     {
@@ -474,8 +478,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
 // ---------------------------------------------------------------------------
 
 function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
-  const maxLevel = maxLevelFromCtx(ctx)
-  const levelOptions = getLevelOptions(maxLevel)
+  const flatLevelOptions = getFlatLevelFieldOptions(ctx)
   return [
     {
       kind: 'row',
@@ -503,14 +506,14 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
       type: 'chips',
       name: 'asiLevels',
       label: 'ASI levels',
-      options: levelOptions,
+      options: flatLevelOptions,
       hint: 'Levels that grant an ability score improvement',
     },
     {
       type: 'select',
       name: 'subclassChoiceLevel',
       label: 'Subclass choice level',
-      options: subclassChoiceLevelOptions(maxLevel),
+      options: subclassChoiceLevelOptions(ctx),
       hint: 'Level at which a character chooses their subclass',
       width: 'sm-md',
     },
@@ -518,8 +521,7 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
-  const maxLevel = maxLevelFromCtx(ctx)
-  const levelOptions = getLevelOptions(maxLevel)
+  const levelOptions = getLevelFieldOptions(ctx)
   return [
     {
       type: 'switch',
@@ -572,7 +574,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       visibility: visibleWhenSpellcasting(),
       hint: 'SRD spellcasting feature prose (shown on the class detail view)',
     },
-    buildSpellProgressionGridField(maxLevel),
+    buildSpellProgressionGridField(effectiveMaxFromCtx(ctx)),
   ]
 }
 
@@ -647,14 +649,13 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function resourcesArrayField(ctx: ContentFormCtx): FormItem {
-  const maxLevel = maxLevelFromCtx(ctx)
   return {
     kind: 'array',
     name: 'resources',
     legend: 'Resources',
     addLabel: 'Add resource',
     itemTitle: (values, index) => (values['name'] as string) || `Resource ${index + 1}`,
-    fields: resourceItemFields(maxLevel),
+    fields: resourceItemFields(ctx),
   }
 }
 
