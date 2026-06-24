@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { formatGroupedNumber } from './number-format'
+
 // ---------------------------------------------------------------------------
 // Shared value objects — Money and Weight. Both are tiny, reusable primitives
 // consumed by equipment now and by the full Armor/Weapon content types later,
@@ -137,8 +139,8 @@ export function formatMass(m: Mass): string {
   }
   const whole = m.value
   if (whole === 1) return '1 ton'
-  if (whole === Math.floor(whole)) return `${whole} tons`
-  return `${m.value} tons`
+  if (whole === Math.floor(whole)) return `${formatGroupedNumber(whole)} tons`
+  return `${formatGroupedNumber(m.value)} tons`
 }
 
 /**
@@ -159,7 +161,7 @@ export type Distance = z.infer<typeof distanceSchema>
  * @example formatMoney({ amount: 1, currency: 'cp' }) // → "1 CP"
  */
 export function formatMoney(m: Money): string {
-  return `${m.amount} ${getCurrencyAbbrev(m.currency)}`
+  return `${formatGroupedNumber(m.amount)} ${getCurrencyAbbrev(m.currency)}`
 }
 
 /**
@@ -174,10 +176,10 @@ export function formatWeight(w: Weight): string {
   const { value } = w
   const whole = Math.floor(value)
   const frac = value - whole
-  if (frac === 0) return `${whole} lb`
+  if (frac === 0) return `${formatGroupedNumber(whole)} lb`
   if (frac === 0.5) {
     if (whole === 0) return '1/2 lb'
-    return `${whole}½ lb`
+    return `${formatGroupedNumber(whole)}½ lb`
   }
-  return `${value} lb`
+  return `${formatGroupedNumber(value)} lb`
 }

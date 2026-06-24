@@ -951,7 +951,7 @@ export function DataTable<TData>({
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>
         <Table>
-          {caption && <TableCaption>{caption}</TableCaption>}
+          {caption && <TableCaption className="pb-3">{caption}</TableCaption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

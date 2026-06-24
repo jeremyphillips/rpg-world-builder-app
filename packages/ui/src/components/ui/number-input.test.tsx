@@ -74,4 +74,61 @@ describe('NumberInput', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  describe('formatGrouped', () => {
+    it('renders a text input with decimal input mode', () => {
+      render(<NumberInput aria-label="Cost" formatGrouped value={3000} onChange={() => {}} />)
+      const input = screen.getByLabelText('Cost')
+      expect(input).toHaveAttribute('type', 'text')
+      expect(input).toHaveAttribute('inputmode', 'decimal')
+      expect(input).toHaveValue('3,000')
+    })
+
+    it('formats while typing and removes grouping when value drops below 1,000', async () => {
+      function Harness() {
+        const [value, setValue] = React.useState<number | undefined>(undefined)
+        return (
+          <NumberInput
+            aria-label="Cost"
+            formatGrouped
+            value={value}
+            onChange={(event) => {
+              const next = event.target.value
+              setValue(next === '' ? undefined : Number(next))
+            }}
+          />
+        )
+      }
+
+      render(<Harness />)
+      const input = screen.getByLabelText('Cost')
+
+      await userEvent.type(input, '3000')
+      expect(input).toHaveValue('3,000')
+
+      await userEvent.type(input, '{Backspace}')
+      expect(input).toHaveValue('300')
+    })
+
+    it('increments grouped values through steppers', async () => {
+      function Harness() {
+        const [value, setValue] = React.useState(999)
+        return (
+          <NumberInput
+            aria-label="Cost"
+            formatGrouped
+            value={value}
+            onChange={(event) => setValue(Number(event.target.value))}
+          />
+        )
+      }
+
+      render(<Harness />)
+      const input = screen.getByLabelText('Cost')
+      expect(input).toHaveValue('999')
+
+      await userEvent.click(screen.getByLabelText('Increment'))
+      expect(input).toHaveValue('1,000')
+    })
+  })
 })

@@ -1,35 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import {
-  isStepDisabled,
-  resolveNumberBounds,
-  stepNumber,
-  type StepNumberOptions,
-} from './number-input.lib'
+import { NumberInputSteppers } from './number-input-steppers.client'
+import { useNumberInput } from './number-input.use.client'
 import {
   numberInputDigitsVariants,
   numberInputFieldVariants,
   numberInputRootVariants,
-  numberInputStepperButtonVariants,
-  numberInputStepperVariants,
   type NumberInputDigits,
   type NumberInputVariantProps,
 } from './number-input.variants'
-
-const INCREMENT_LABEL = 'Increment'
-const DECREMENT_LABEL = 'Decrement'
-
-function normalizeInputValue(
-  raw: string | number | readonly string[] | undefined,
-): string | number | undefined {
-  if (raw === undefined) return undefined
-  if (typeof raw === 'number' || typeof raw === 'string') return raw
-  return raw[0]
-}
 
 export interface NumberInputProps
   extends Omit<React.ComponentProps<'input'>, 'size' | 'type'>, NumberInputVariantProps {
@@ -48,6 +30,8 @@ export interface NumberInputProps
    * offsets, so the width scales automatically with font-size.
    */
   digits?: NumberInputDigits
+  /** When true, renders en-US thousand separators while storing plain numbers. */
+  formatGrouped?: boolean
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -64,6 +48,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       grouped = false,
       rootClassName,
       digits,
+      formatGrouped = false,
       value,
       defaultValue,
       onChange,
@@ -71,35 +56,27 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref,
   ) => {
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
-
-    const bounds = resolveNumberBounds(
-      typeof min === 'number' ? min : undefined,
-      typeof max === 'number' ? max : undefined,
+    const {
+      inputRef,
+      fieldBinding,
+      incrementDisabled,
+      decrementDisabled,
+      bump,
+      onChange: handleChange,
+    } = useNumberInput({
+      disabled,
+      min,
+      max,
+      step,
       stepperMin,
       stepperMax,
-    )
-    const stepOptions: StepNumberOptions = { step: Number(step) || 1, ...bounds }
+      formatGrouped,
+      value,
+      defaultValue,
+      onChange,
+    })
 
-    const currentValue = normalizeInputValue(value ?? defaultValue)
-
-    function bump(direction: 'up' | 'down') {
-      if (disabled) return
-
-      const next = stepNumber(currentValue, direction, stepOptions)
-      const input = inputRef.current
-      if (!input) return
-
-      const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-      valueSetter?.call(input, String(next))
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-      input.dispatchEvent(new Event('change', { bubbles: true }))
-      input.focus()
-    }
-
-    const incrementDisabled = disabled || isStepDisabled(currentValue, 'up', stepOptions)
-    const decrementDisabled = disabled || isStepDisabled(currentValue, 'down', stepOptions)
+    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
     const resolvedSize = size ?? 'md'
 
@@ -112,56 +89,26 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         )}
       >
         <input
-          type="number"
-          inputMode="numeric"
+          {...props}
+          {...fieldBinding}
           ref={inputRef}
           disabled={disabled}
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          defaultValue={defaultValue}
-          onChange={onChange}
+          onChange={handleChange}
           className={cn(
             numberInputFieldVariants({ size, grouped }),
             digits && 'min-w-0 w-full',
             className,
           )}
-          {...props}
         />
 
-        <div
-          className={cn(
-            numberInputStepperVariants({ size, grouped }),
-            'pointer-events-none opacity-0 transition-opacity',
-            'group-hover:pointer-events-auto group-hover:opacity-100',
-            'group-focus-within:pointer-events-auto group-focus-within:opacity-100',
-            disabled && 'hidden',
-          )}
-        >
-          <button
-            type="button"
-            tabIndex={-1}
-            disabled={incrementDisabled}
-            aria-label={INCREMENT_LABEL}
-            className={numberInputStepperButtonVariants({ size })}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => bump('up')}
-          >
-            <ChevronUp aria-hidden />
-          </button>
-          <button
-            type="button"
-            tabIndex={-1}
-            disabled={decrementDisabled}
-            aria-label={DECREMENT_LABEL}
-            className={numberInputStepperButtonVariants({ size })}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => bump('down')}
-          >
-            <ChevronDown aria-hidden />
-          </button>
-        </div>
+        <NumberInputSteppers
+          size={size}
+          grouped={grouped}
+          disabled={disabled}
+          incrementDisabled={incrementDisabled}
+          decrementDisabled={decrementDisabled}
+          onBump={bump}
+        />
       </div>
     )
   },

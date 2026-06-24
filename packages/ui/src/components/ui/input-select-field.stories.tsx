@@ -88,6 +88,21 @@ export const Cost: Story = {
   },
 }
 
+export const CostGrouped: Story = {
+  args: {
+    id: 'cost-grouped',
+    label: 'Cost',
+    inputType: 'number',
+    options: currencyOptions,
+    initialValue: 3000,
+    initialUnit: 'gp',
+    min: 0,
+    width: 'auto',
+    valueDigits: 5,
+    formatGrouped: true,
+  },
+}
+
 export const CastingTime: Story = {
   args: {
     id: 'casting-time',

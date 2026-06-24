@@ -57,6 +57,7 @@ export function costFields(
       min: 0,
       width,
       required,
+      formatGrouped: true,
       defaultValue: costToFormDefaults(),
       ...(kind
         ? { valueDigits: costValueDigitsForKind(kind) }
@@ -89,6 +90,7 @@ export function optionalWeightFields(
       min: 0,
       step: 0.5,
       width,
+      formatGrouped: true,
       hint: 'Leave blank for no weight',
       defaultValue: weightToFormDefaults(),
       ...(kind && isWeightEquipmentKind(kind)
@@ -168,6 +170,7 @@ export function massInputSelectField(options: {
     step: defaultUnit === 'lb' ? 0.5 : 1,
     width,
     required,
+    formatGrouped: true,
     valueDigits,
     defaultValue: massToFormDefaults(defaultUnit),
   }

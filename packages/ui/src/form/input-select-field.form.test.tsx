@@ -161,4 +161,33 @@ describe('Form inputSelect field', () => {
     expect(screen.getByLabelText('Weight value')).not.toBeDisabled()
     expect(screen.getByRole('combobox', { name: 'Weight unit' })).toBeDisabled()
   })
+
+  it('stores plain numbers while displaying grouped cost values', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    const fields: FormItem[] = [
+      {
+        type: 'inputSelect',
+        name: 'cost',
+        label: 'Cost',
+        inputType: 'number',
+        valueKey: 'amount',
+        unitKey: 'currency',
+        options: [{ value: 'gp', label: 'GP' }],
+        formatGrouped: true,
+        min: 0,
+        defaultValue: { amount: 0, currency: 'gp' },
+      },
+    ]
+
+    renderInputSelectForm(fields, onSubmit)
+
+    const input = screen.getByLabelText('Cost value')
+    await user.type(input, '3000')
+    expect(input).toHaveValue('3,000')
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.lastCall?.[0]).toEqual({ cost: { amount: 3000, currency: 'gp' } })
+  })
 })
