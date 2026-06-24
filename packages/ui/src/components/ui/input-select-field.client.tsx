@@ -99,6 +99,7 @@ function RadixUnitSelect({
       <SelectTrigger
         id={id}
         size={size}
+        grouped
         onBlur={onBlur}
         className={inputSelectUnitSegmentVariants({ size, searchable: false })}
       >
@@ -298,15 +299,12 @@ function ValueSegment({
 
   if (inputType === 'number') {
     return (
-      <div
-        data-input-select-value
-        className={inputSelectValueWrapperVariants({ size, digits: valueDigits })}
-      >
+      <div data-input-select-value className={inputSelectValueWrapperVariants()}>
         <NumberInput
           id={id}
           grouped
-          rootClassName="w-full"
           size={size}
+          digits={valueDigits}
           disabled={disabled}
           placeholder={placeholder}
           min={min}
@@ -374,6 +372,7 @@ export function InputSelectField({
   const unitId = `${id}-unit`
   const hasError = Boolean(error)
   const describedBy = hasError ? `${id}-error` : hint ? `${id}-hint` : undefined
+  const layout = inputType === 'number' && valueDigits != null ? 'intrinsic' : 'stretch'
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
@@ -395,7 +394,7 @@ export function InputSelectField({
       <div
         role="group"
         aria-labelledby={`${id}-label`}
-        className={inputSelectGroupVariants({ invalid: hasError, disabled })}
+        className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
       >
         <label htmlFor={valueId} className="sr-only">
           {label} value

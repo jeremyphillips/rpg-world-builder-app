@@ -14,13 +14,20 @@ const SelectValue = SelectPrimitive.Value
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> &
-    Pick<FieldControlVariantProps, 'size'>
->(({ className, size, children, ...props }, ref) => (
+    Pick<FieldControlVariantProps, 'size'> & {
+      /** When true, styles for embedding inside a grouped control such as InputSelectField. */
+      grouped?: boolean
+    }
+>(({ className, size, grouped = false, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      fieldControlVariants({ size }),
-      'items-center justify-between gap-2 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+      grouped
+        ? 'inline-flex items-center justify-between gap-1.5 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1'
+        : cn(
+            fieldControlVariants({ size }),
+            'items-center justify-between gap-2 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+          ),
       className,
     )}
     {...props}

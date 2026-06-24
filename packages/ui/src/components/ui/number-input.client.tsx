@@ -120,7 +120,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           value={value}
           defaultValue={defaultValue}
           onChange={onChange}
-          className={cn(numberInputFieldVariants({ size }), className)}
+          className={cn(numberInputFieldVariants({ size, grouped }), className)}
           {...props}
         />
 

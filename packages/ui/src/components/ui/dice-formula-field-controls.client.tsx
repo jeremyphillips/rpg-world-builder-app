@@ -309,7 +309,7 @@ export function DiceFormulaControls({
 
       <DiceFormulaFacesControl
         id={facesId}
-        size={'md'}
+        size={size}
         resolved={resolved}
         faces={faces}
         disabled={disabled}

@@ -83,7 +83,7 @@ export const Cost: Story = {
     initialValue: 15,
     initialUnit: 'gp',
     min: 0,
-    width: 'lg',
+    width: 'auto',
     valueDigits: 2,
   },
 }
@@ -97,7 +97,7 @@ export const CastingTime: Story = {
     initialValue: 1,
     initialUnit: 'action',
     min: 1,
-    width: 'lg',
+    width: 'auto',
     valueDigits: 2,
   },
 }
@@ -173,4 +173,26 @@ export const Disabled: Story = {
     disabled: true,
     valueDigits: 2,
   },
+}
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <InputSelectFieldHarness
+          key={size}
+          id={`cost-${size}`}
+          label={`Cost (${size})`}
+          inputType="number"
+          options={currencyOptions}
+          initialValue={15}
+          initialUnit="gp"
+          min={0}
+          size={size}
+          width="auto"
+          valueDigits={2}
+        />
+      ))}
+    </div>
+  ),
 }

@@ -116,6 +116,35 @@ describe('InputSelectField', () => {
     expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-48')
   })
 
+  it('uses intrinsic layout when valueDigits is set on a number field', () => {
+    const { container } = render(<ControlledField valueDigits={2} width="auto" />)
+    const group = container.querySelector('[role="group"]')
+    expect(group).toHaveClass('w-fit')
+    expect(group).toHaveClass('grid-cols-[auto_1px_auto]')
+
+    const numberInputRoot = screen.getByLabelText('Cost value').parentElement
+    expect(numberInputRoot).toHaveClass('w-[calc(2ch+3.125rem)]')
+  })
+
+  it('uses stretch layout for text fields', () => {
+    const { container } = render(
+      <InputSelectField
+        id="label-text"
+        label="Label text"
+        inputType="text"
+        options={options}
+        value="Example"
+        unit="left"
+        onValueChange={() => {}}
+        onUnitChange={() => {}}
+        width="full"
+      />,
+    )
+    const group = container.querySelector('[role="group"]')
+    expect(group).toHaveClass('w-full')
+    expect(group).toHaveClass('grid-cols-[1fr_1px_auto]')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledField min={0} />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
