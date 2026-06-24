@@ -21,7 +21,7 @@ export function FeatureItem({ feature }: FeatureItemProps) {
 
   return (
     <li className="space-y-2">
-      <Heading variant="label" as="h4">
+      <Heading variant="label" as="h3">
         {heading}
       </Heading>
       {hasFeatureDescription(feature.description) && (
