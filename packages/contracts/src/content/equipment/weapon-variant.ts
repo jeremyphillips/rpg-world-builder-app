@@ -102,7 +102,7 @@ export const weaponEquipmentKindFields = {
   specialRules: z.string().optional(),
 } as const
 
-const weaponEquipmentKindSchema = z.object(weaponEquipmentKindFields)
+export const weaponEquipmentKindSchema = z.object(weaponEquipmentKindFields)
 
 export type WeaponEquipmentKindFields = z.infer<typeof weaponEquipmentKindSchema>
 

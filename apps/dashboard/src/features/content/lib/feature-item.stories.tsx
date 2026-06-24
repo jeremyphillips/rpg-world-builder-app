@@ -31,7 +31,7 @@ export const SingleParagraph: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(
-      canvas.getByRole('heading', { level: 4, name: 'Level 5: Extra Attack' }),
+      canvas.getByRole('heading', { level: 3, name: 'Level 5: Extra Attack' }),
     ).toBeInTheDocument()
     await expect(canvas.getByText(/twice instead of once/)).toBeInTheDocument()
   },

@@ -40,7 +40,7 @@ export const armorEquipmentKindFields = {
   strengthRequirement: z.number().int().optional(),
 } as const
 
-const armorEquipmentKindSchema = z.object(armorEquipmentKindFields)
+export const armorEquipmentKindSchema = z.object(armorEquipmentKindFields)
 
 export type ArmorEquipmentKindFields = z.infer<typeof armorEquipmentKindSchema>
 
