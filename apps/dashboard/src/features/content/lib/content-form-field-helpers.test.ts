@@ -19,6 +19,7 @@ describe('costFields', () => {
       valueKey: 'amount',
       unitKey: 'currency',
       valueDigits: 2,
+      formatGrouped: true,
     })
     expect(field).not.toHaveProperty('valueDigitsDependsOn')
   })
@@ -51,6 +52,7 @@ describe('optionalWeightFields', () => {
       unitDisabled: true,
       valueDigits: 2,
       step: 0.5,
+      formatGrouped: true,
     })
     expect(field).not.toHaveProperty('valueDigitsDependsOn')
   })

@@ -97,6 +97,7 @@ export function InputSelectFieldRenderer({
       step={config.step}
       placeholder={config.placeholder}
       valueDigits={valueDigits}
+      formatGrouped={config.formatGrouped}
       value={value}
       unit={unit}
       onValueChange={(next) => updateObject({ [valueKey]: next })}

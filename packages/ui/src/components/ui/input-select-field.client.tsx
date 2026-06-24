@@ -68,6 +68,8 @@ export interface InputSelectFieldProps {
    * collapses below the needed character width. Only affects the `number` input type.
    */
   valueDigits?: NumberInputDigits
+  /** When true, formats the numeric value with en-US thousand separators. */
+  formatGrouped?: boolean
   onBlur?: () => void
 }
 
@@ -267,6 +269,7 @@ interface ValueSegmentProps {
   hasError: boolean
   describedBy?: string
   valueDigits?: NumberInputDigits
+  formatGrouped?: boolean
   onValueChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -284,6 +287,7 @@ function ValueSegment({
   hasError,
   describedBy,
   valueDigits,
+  formatGrouped,
   onValueChange,
   onBlur,
 }: ValueSegmentProps) {
@@ -307,6 +311,7 @@ function ValueSegment({
           grouped
           size={size}
           digits={valueDigits}
+          formatGrouped={formatGrouped}
           disabled={disabled}
           placeholder={placeholder}
           min={min}
@@ -369,6 +374,7 @@ export function InputSelectField({
   step,
   placeholder,
   valueDigits,
+  formatGrouped = false,
   onBlur,
 }: InputSelectFieldProps) {
   const valueId = `${id}-value`
@@ -410,6 +416,7 @@ export function InputSelectField({
           hasError={hasError}
           describedBy={describedBy}
           valueDigits={valueDigits}
+          formatGrouped={formatGrouped}
           onValueChange={onValueChange}
           onBlur={onBlur}
         />

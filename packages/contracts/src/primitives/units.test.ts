@@ -134,6 +134,7 @@ describe('formatMass', () => {
   it('formats ton values with singular/plural labels', () => {
     expect(formatMass({ value: 1, unit: 'ton' })).toBe('1 ton')
     expect(formatMass({ value: 150, unit: 'ton' })).toBe('150 tons')
+    expect(formatMass({ value: 1500, unit: 'ton' })).toBe('1,500 tons')
   })
 })
 
@@ -150,6 +151,10 @@ describe('formatMoney', () => {
     expect(formatMoney({ amount: 1, currency: 'cp' })).toBe('1 CP')
     expect(formatMoney({ amount: 10, currency: 'sp' })).toBe('10 SP')
     expect(formatMoney({ amount: 2, currency: 'pp' })).toBe('2 PP')
+  })
+
+  it('groups large amounts', () => {
+    expect(formatMoney({ amount: 3000, currency: 'gp' })).toBe('3,000 GP')
   })
 
   it('renders a zero amount', () => {
@@ -170,5 +175,10 @@ describe('formatWeight', () => {
   it('renders n.5 as "n½ lb"', () => {
     expect(formatWeight({ value: 1.5, unit: 'lb' })).toBe('1½ lb')
     expect(formatWeight({ value: 2.5, unit: 'lb' })).toBe('2½ lb')
+  })
+
+  it('groups large whole-pound weights', () => {
+    expect(formatWeight({ value: 1500, unit: 'lb' })).toBe('1,500 lb')
+    expect(formatWeight({ value: 1500.5, unit: 'lb' })).toBe('1,500½ lb')
   })
 })

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { isStepDisabled, parseNumberInput, stepNumber } from './number-input.lib'
+import {
+  groupedDisplayValue,
+  isStepDisabled,
+  normalizeInputValue,
+  parseNumberInput,
+  resolveNumberInputFieldBinding,
+  stepNumber,
+} from './number-input.lib'
 
 describe('parseNumberInput', () => {
   it('returns undefined for blank input', () => {
@@ -15,6 +22,11 @@ describe('parseNumberInput', () => {
   it('parses numeric strings', () => {
     expect(parseNumberInput('12')).toBe(12)
     expect(parseNumberInput('-3')).toBe(-3)
+  })
+
+  it('strips grouping separators when grouped parsing is enabled', () => {
+    expect(parseNumberInput('3,000', true)).toBe(3000)
+    expect(parseNumberInput('3,00', true)).toBe(300)
   })
 })
 
@@ -40,5 +52,39 @@ describe('isStepDisabled', () => {
     expect(isStepDisabled(20, 'up', { min: 1, max: 20 })).toBe(true)
     expect(isStepDisabled(20, 'down', { min: 1, max: 20 })).toBe(false)
     expect(isStepDisabled(1, 'down', { min: 1, max: 20 })).toBe(true)
+  })
+})
+
+describe('normalizeInputValue', () => {
+  it('returns the first array entry for array values', () => {
+    expect(normalizeInputValue(['12'])).toBe('12')
+  })
+})
+
+describe('groupedDisplayValue', () => {
+  it('formats numeric values with grouping', () => {
+    expect(groupedDisplayValue(3000)).toBe('3,000')
+    expect(groupedDisplayValue(undefined)).toBe('')
+  })
+})
+
+describe('resolveNumberInputFieldBinding', () => {
+  it('uses text input settings when formatGrouped is enabled', () => {
+    expect(
+      resolveNumberInputFieldBinding({
+        formatGrouped: true,
+        value: 3000,
+        defaultValue: undefined,
+        currentValue: 3000,
+        min: 0,
+        max: 10,
+        step: 1,
+      }),
+    ).toMatchObject({
+      type: 'text',
+      inputMode: 'decimal',
+      value: '3,000',
+      min: undefined,
+    })
   })
 })
