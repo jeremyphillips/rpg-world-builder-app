@@ -2,12 +2,12 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { FormField } from './form-field'
-import { Input } from './input.client'
+import { NumberInput, type NumberInputProps } from './number-input.client'
 import { fieldWidthVariants } from './field-control.variants'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 
-export interface NumberFieldProps extends Omit<React.ComponentProps<typeof Input>, 'id' | 'type'> {
+export interface NumberFieldProps extends Omit<NumberInputProps, 'id'> {
   id: string
   label: string
   error?: string
@@ -53,10 +53,9 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         width={width}
         size={size}
       >
-        <Input
+        <NumberInput
           ref={ref}
-          type="number"
-          inputMode="numeric"
+          id={id}
           size={size}
           className={cn(
             inputWidth ? fieldWidthVariants({ width: inputWidth }) : undefined,

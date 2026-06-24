@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { fieldWidthVariants } from './field-control.variants'
 import type { FieldSize } from './field.client'
-import { Input } from './input.client'
+import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import {
   DEFAULT_DICE_FORMULA_MODIFIER,
@@ -95,10 +95,8 @@ function DiceFormulaCountControl({
 >) {
   return (
     <DiceFormulaControlCell id={id} label="Count" width="xs">
-      <Input
+      <NumberInput
         id={id}
-        type="number"
-        inputMode="numeric"
         size={size}
         min={countMin}
         max={countMax}
@@ -218,10 +216,8 @@ function DiceFormulaModifierControls({
       </DiceFormulaControlCell>
 
       <DiceFormulaControlCell id={modifierId} label="Modifier" width="xs">
-        <Input
+        <NumberInput
           id={modifierId}
-          type="number"
-          inputMode="numeric"
           size={size}
           min={modifierMin}
           max={modifierMax}

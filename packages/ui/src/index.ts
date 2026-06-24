@@ -24,6 +24,7 @@ export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
 export { Input, type InputProps } from './components/ui/input.client'
+export { NumberInput, type NumberInputProps } from './components/ui/number-input.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
   Card,

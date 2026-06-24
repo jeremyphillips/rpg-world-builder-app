@@ -13,7 +13,7 @@ import {
 } from './dropdown-menu.client'
 import { Field } from './field.client'
 import { fieldGroupLegendVariants } from './field.variants'
-import { Input } from './input.client'
+import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 import {
@@ -180,9 +180,7 @@ function EditableGridNumberCell({
   onChange,
 }: EditableGridNumberCellProps) {
   return (
-    <Input
-      type="number"
-      inputMode="numeric"
+    <NumberInput
       size="sm"
       className={editableGridControlVariants()}
       min={column.min}

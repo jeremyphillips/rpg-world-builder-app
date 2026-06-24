@@ -78,6 +78,9 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       size={config.size}
       placeholder={config.placeholder}
       disabled={config.disabled}
+      step={config.step}
+      stepperMin={config.min}
+      stepperMax={config.max}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={(event) => field.onChange(parseNumber(event.target.value))}
