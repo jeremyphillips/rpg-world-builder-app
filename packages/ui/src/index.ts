@@ -187,6 +187,7 @@ export {
 } from './components/ui/tabs.variants'
 
 export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'
+export { type ChipSize } from './components/ui/chips-field.variants'
 export {
   ComboboxField,
   type ComboboxFieldProps,

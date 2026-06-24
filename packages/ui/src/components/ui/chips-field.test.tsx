@@ -190,7 +190,7 @@ describe('ChipsField', () => {
     expect(screen.getByText('Pick as many as apply.')).toBeInTheDocument()
   })
 
-  it('applies md pill classes when size is md', () => {
+  it('applies sm pill classes by default', () => {
     render(
       <ChipsField
         id="play-style"
@@ -198,11 +198,38 @@ describe('ChipsField', () => {
         options={playStyleOptions}
         multiple
         value={[]}
-        size="md"
+      />,
+    )
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-xs')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-2.5')
+  })
+
+  it('applies md pill classes when chipSize is md', () => {
+    render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        chipSize="md"
       />,
     )
     expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm')
     expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-3')
+  })
+
+  it('uses md label type scale by default', () => {
+    render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+      />,
+    )
+    expect(screen.getByText('Play Style')).toHaveClass('text-sm')
   })
 
   it('disables all options when disabled', () => {

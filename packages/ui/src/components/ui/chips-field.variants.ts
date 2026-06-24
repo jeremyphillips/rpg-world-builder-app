@@ -21,3 +21,4 @@ export const chipPillVariants = cva(
 )
 
 export type ChipPillVariantProps = VariantProps<typeof chipPillVariants>
+export type ChipSize = NonNullable<ChipPillVariantProps['size']>

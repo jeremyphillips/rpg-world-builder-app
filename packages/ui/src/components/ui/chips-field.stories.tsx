@@ -92,7 +92,7 @@ export const SizeMedium: Story = {
     options: playStyleOptions,
     multiple: true,
     value: ['exploration'],
-    size: 'md',
+    chipSize: 'md',
   },
 }
 
@@ -102,6 +102,6 @@ export const SizeLarge: Story = {
     options: difficultyOptions,
     multiple: false,
     value: 'dangerous',
-    size: 'lg',
+    chipSize: 'lg',
   },
 }

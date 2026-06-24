@@ -211,6 +211,8 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   multiple?: boolean
   /** Maximum selections when `multiple` is true. */
   max?: number
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  chipSize?: FieldSize
   defaultValue?: string | string[]
 }
 

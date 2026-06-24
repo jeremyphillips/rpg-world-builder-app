@@ -239,7 +239,8 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       hint={config.hint}
       info={config.info}
       required={config.required}
-      size={config.size ?? 'sm'}
+      size={config.size}
+      chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
       value={field.value ?? (config.multiple === false ? '' : [])}

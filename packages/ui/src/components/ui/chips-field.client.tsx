@@ -13,7 +13,7 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
-import { chipPillVariants } from './chips-field.variants'
+import { chipPillVariants, type ChipSize } from './chips-field.variants'
 
 interface ChipOptionButtonProps {
   id: string
@@ -21,7 +21,7 @@ interface ChipOptionButtonProps {
   role: 'checkbox' | 'radio'
   isActive: boolean
   isDisabled: boolean
-  size: FieldSize
+  chipSize: ChipSize
   onToggle: (value: string) => void
 }
 
@@ -31,7 +31,7 @@ function ChipOptionButton({
   role,
   isActive,
   isDisabled,
-  size,
+  chipSize,
   onToggle,
 }: ChipOptionButtonProps) {
   return (
@@ -44,7 +44,7 @@ function ChipOptionButton({
       disabled={isDisabled}
       onClick={() => onToggle(option.value)}
       className={cn(
-        chipPillVariants({ size }),
+        chipPillVariants({ size: chipSize }),
         isActive
           ? 'border-foreground bg-foreground text-background'
           : 'border-border bg-transparent text-foreground hover:bg-muted',
@@ -84,7 +84,10 @@ export interface ChipsFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
+  /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
+  /** Pill padding/type scale (default `sm`). */
+  chipSize?: ChipSize
   width?: FieldWidth
 }
 
@@ -106,7 +109,8 @@ export function ChipsField({
   info,
   required,
   disabled,
-  size = 'sm',
+  size = 'md',
+  chipSize = 'sm',
   width,
 }: ChipsFieldProps) {
   const legendId = `${id}-legend`
@@ -168,7 +172,7 @@ export function ChipsField({
               role={selectionRole}
               isActive={isActive}
               isDisabled={isDisabled}
-              size={size}
+              chipSize={chipSize}
               onToggle={toggle}
             />
           )

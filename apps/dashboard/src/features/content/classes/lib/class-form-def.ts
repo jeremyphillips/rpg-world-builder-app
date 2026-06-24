@@ -77,14 +77,13 @@ import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
-const CLASS_SKILL_OPTIONS_HINT =
+const CLASS_SKILL_OPTIONS_INFO =
   'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
 
 const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
-  'Choose named weapons instead of categories. Most classes use categories; limited lists (e.g. Sorcerer) use this mode.'
+  'Most classes use categories. Use individual weapons for limited weapon lists.'
 
-const WEAPON_PROFICIENCIES_HINT =
-  'Each selected category grants proficiency with every weapon in it.'
+const WEAPON_PROFICIENCIES_HINT = 'Categories include all weapons in that group.'
 
 // ---------------------------------------------------------------------------
 // Vocab option lists
@@ -671,7 +670,7 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
               name: 'proficiencies.skills.from',
               label: 'Skill options',
               options: skillOptions,
-              hint: CLASS_SKILL_OPTIONS_HINT,
+              info: CLASS_SKILL_OPTIONS_INFO,
             },
           ],
         },
