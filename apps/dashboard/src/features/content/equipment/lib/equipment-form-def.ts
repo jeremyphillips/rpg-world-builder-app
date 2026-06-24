@@ -65,7 +65,10 @@ import {
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { serviceFormValuesFromEntity } from '../services/lib/service-form-fields'
 import { equipmentFormToInput } from './equipment-form-input'
-import { buildRegisteredKindFieldGroups } from './shared/equipment-form-registry'
+import {
+  allRegisteredKindFieldGroups,
+  fieldGroupsForEquipmentKind,
+} from './shared/equipment-form-registry'
 import { visibleWhenKind } from './shared/visible-when-kind'
 
 const equipmentKindSchema = z.enum(EQUIPMENT_KINDS)
@@ -837,7 +840,7 @@ function buildUnscopedEquipmentFields(): FormItem[] {
         },
       ],
     },
-    ...buildRegisteredKindFieldGroups(),
+    ...allRegisteredKindFieldGroups(),
     {
       kind: 'group',
       legend: 'Magic Item',
@@ -888,11 +891,19 @@ function isEquipmentGroupField(item: FormItem): item is Extract<FormItem, { kind
   return 'kind' in item && item.kind === 'group'
 }
 
-function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
-  const fields = buildUnscopedEquipmentFields()
-  if (!ctx.equipmentKind) return fields
+function identityAndEconomyGroups(): FormItem[] {
+  return [
+    { kind: 'group', legend: 'Identity', fields: identityFields() },
+    {
+      kind: 'group',
+      legend: 'Economy',
+      fields: [...costFields(), ...optionalWeightFields()],
+    },
+  ]
+}
 
-  const activeLegend = EQUIPMENT_KIND_GROUP_LEGEND[ctx.equipmentKind]
+function filterMonolithFieldsToKind(fields: FormItem[], kind: EquipmentKind): FormItem[] {
+  const activeLegend = EQUIPMENT_KIND_GROUP_LEGEND[kind]
   return fields.filter((item) => {
     if ('name' in item && item.name === 'kind') return false
     if (isEquipmentGroupField(item) && item.legend !== 'Identity' && item.legend !== 'Economy') {
@@ -900,6 +911,17 @@ function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
     }
     return true
   })
+}
+
+function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
+  if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
+
+  const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind)
+  if (registered) {
+    return [...identityAndEconomyGroups(), ...registered]
+  }
+
+  return filterMonolithFieldsToKind(buildUnscopedEquipmentFields(), ctx.equipmentKind)
 }
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
