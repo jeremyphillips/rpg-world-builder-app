@@ -70,17 +70,17 @@ export const inputSelectUnitSegmentVariants = cva(
         sm: cn(
           fieldControlVariants({ size: 'sm' }),
           segmentReset,
-          'rounded-l-none rounded-r-md pl-2 pr-1.5',
+          'w-auto rounded-l-none rounded-r-md pl-2 pr-1.5',
         ),
         md: cn(
           fieldControlVariants({ size: 'md' }),
           segmentReset,
-          'rounded-l-none rounded-r-md pl-2.5 pr-2',
+          'w-auto rounded-l-none rounded-r-md pl-2.5 pr-2',
         ),
         lg: cn(
           fieldControlVariants({ size: 'lg' }),
           segmentReset,
-          'rounded-l-none rounded-r-md pl-3 pr-2.5',
+          'w-auto rounded-l-none rounded-r-md pl-3 pr-2.5',
         ),
       },
       searchable: {
