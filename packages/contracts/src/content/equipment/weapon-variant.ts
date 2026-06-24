@@ -1,26 +1,19 @@
 import { z } from 'zod'
 
-import { averageDiceRoll, dieFaceSchema } from '../primitives/dice'
-import { moneySchema, weightSchema } from '../primitives/units'
-import { PHYSICAL_DAMAGE_TYPE_IDS } from '../vocab/damage-type'
+import { averageDiceRoll, dieFaceSchema } from '../../primitives/dice'
+import { PHYSICAL_DAMAGE_TYPE_IDS } from '../../vocab/damage-type'
 import {
+  getWeaponPropertyLabel,
   weaponCategorySchema,
   weaponMasterySchema,
   weaponModeSchema,
   weaponPropertySchema,
-  getWeaponPropertyLabel,
   type WeaponProperty,
-} from '../vocab/weapon'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './envelope'
+} from '../../vocab/weapon'
+import type { EquipmentBaseFields } from './base'
 
 // ---------------------------------------------------------------------------
-// Damage types — weapons deal only physical damage. Derived from the shared
-// `damage-type` vocab (single source of truth) so the two never drift.
+// Damage types — weapons deal only physical damage.
 // ---------------------------------------------------------------------------
 
 export const weaponDamageTypeSchema = z.enum(PHYSICAL_DAMAGE_TYPE_IDS)
@@ -53,9 +46,7 @@ export function formatWeaponRange(range: WeaponRange): string {
 }
 
 // ---------------------------------------------------------------------------
-// Damage — discriminated union covering both dice rolls and the blowgun's
-// flat-1 case. `versatileDamage` is always dice-based (no flat versatile
-// damage exists in SRD). The net has neither `damage` nor `damageType`.
+// Damage — dice rolls and the blowgun's flat-1 case.
 // ---------------------------------------------------------------------------
 
 export const diceDamageSchema = z.object({
@@ -80,8 +71,6 @@ export function formatWeaponDamage(d: WeaponDamage): string {
 
 /**
  * Returns the average damage for a weapon damage value.
- * Delegates to `averageDiceRoll` for dice-based damage; returns the flat
- * amount directly for flat damage (e.g. the Blowgun's 1 piercing).
  *
  * @example averageWeaponDamage({ kind: 'dice', count: 1, faces: 8 }) // 4.5
  * @example averageWeaponDamage({ kind: 'flat', amount: 1 })          // 1
@@ -91,15 +80,14 @@ export function averageWeaponDamage(d: WeaponDamage): number {
 }
 
 // ---------------------------------------------------------------------------
-// Body — the fields every weapon has. Unexported so `.shape` survives
-// `.superRefine()` and can be spread into the stored/DTO schemas.
+// Weapon equipment variant
 // ---------------------------------------------------------------------------
 
-const weaponBodyFields = contentBodyBaseSchema.extend({
+/** Kind-specific fields for `kind: 'weapon'`. Spread onto {@link EquipmentBaseFields}. */
+export const weaponEquipmentKindFields = {
+  kind: z.literal('weapon'),
   category: weaponCategorySchema,
   mode: weaponModeSchema,
-  cost: moneySchema,
-  weight: weightSchema.optional(),
   /** Absent for utility weapons (net) that deal no damage. */
   damage: weaponDamageSchema.optional(),
   /** Must be present whenever `damage` is present, and absent otherwise. */
@@ -112,13 +100,17 @@ const weaponBodyFields = contentBodyBaseSchema.extend({
   range: weaponRangeSchema.optional(),
   /** Prose for the 'special' property — lance mounted rule, net restrain text, etc. */
   specialRules: z.string().optional(),
-})
+} as const
 
-/**
- * Cross-field invariants applied to both the body schema and the stored schema.
- * Extracted to avoid duplicating the predicate logic.
- */
-function refineWeapon(val: z.infer<typeof weaponBodyFields>, ctx: z.RefinementCtx): void {
+const weaponEquipmentKindSchema = z.object(weaponEquipmentKindFields)
+
+export type WeaponEquipmentKindFields = z.infer<typeof weaponEquipmentKindSchema>
+
+/** Cross-field invariants for weapon equipment records. */
+export function refineWeaponEquipment(
+  val: EquipmentBaseFields & WeaponEquipmentKindFields,
+  ctx: z.RefinementCtx,
+): void {
   const hasDamage = val.damage !== undefined
   const hasDamageType = val.damageType !== undefined
   if (hasDamage !== hasDamageType) {
@@ -146,34 +138,3 @@ function refineWeapon(val: z.infer<typeof weaponBodyFields>, ctx: z.RefinementCt
     })
   }
 }
-
-// ---------------------------------------------------------------------------
-// Exported schemas + types
-// ---------------------------------------------------------------------------
-
-/** The editable shape: what a form authors and what a patch overrides. */
-export const weaponBodySchema = weaponBodyFields.superRefine(refineWeapon)
-export type WeaponBody = z.infer<typeof weaponBodySchema>
-
-/** Stored shape = ownership envelope + body fields + refinements. */
-export const weaponSchema = contentMetaSchema
-  .extend(weaponBodyFields.shape)
-  .superRefine(refineWeapon)
-export type Weapon = z.infer<typeof weaponSchema>
-
-// Homebrew authoring DTOs. Server sets id/source/campaignId/timestamps.
-export const createWeaponInputSchema = weaponBodyFields
-  .extend({ slug: slugSchema })
-  .superRefine(refineWeapon)
-export type CreateWeaponInput = z.infer<typeof createWeaponInputSchema>
-
-// Partial update — cross-field invariants are not checked here because the
-// caller may legitimately send a subset of fields. Invariants are re-enforced
-// at merge time when the full record is parsed before writing.
-export const updateWeaponInputSchema = weaponBodyFields.extend({ slug: slugSchema }).partial()
-export type UpdateWeaponInput = z.infer<typeof updateWeaponInputSchema>
-
-export const weaponPatchSchema = contentPatchBaseSchema.extend({
-  patch: weaponBodyFields.partial(),
-})
-export type WeaponPatch = z.infer<typeof weaponPatchSchema>

@@ -1,38 +1,66 @@
 import { z } from 'zod'
+
+import { weightSchema } from '../primitives/units'
 import { abilitySchema } from '../vocab/ability'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './envelope'
-import { moneySchema, weightSchema } from '../primitives/units'
+import { gearKindSchema } from '../vocab/equipment/gear-kind'
+import { serviceCategorySchema } from '../vocab/equipment/service-category'
+import { toolCategorySchema } from '../vocab/equipment/tool-category'
+import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
+import { magicItemCategorySchema } from '../vocab/magic-item/category'
+import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
+import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './envelope'
+import { equipmentBaseSchema } from './equipment/base'
+import { armorEquipmentKindFields, refineArmorEquipment } from './equipment/armor-variant'
+import { refineWeaponEquipment, weaponEquipmentKindFields } from './equipment/weapon-variant'
+
+// Re-export weapon/armor helpers and damage schemas for consumers.
+export {
+  averageWeaponDamage,
+  diceDamageSchema,
+  flatDamageSchema,
+  formatWeaponDamage,
+  formatWeaponProperties,
+  formatWeaponRange,
+  weaponDamageSchema,
+  weaponDamageTypeSchema,
+  weaponRangeSchema,
+  type WeaponDamage,
+  type WeaponDamageType,
+  type WeaponRange,
+} from './equipment/weapon-variant'
+
+export {
+  ARMOR_MATERIALS,
+  armorMaterialSchema,
+  getArmorAcDisplay,
+  getArmorMaterialEntry,
+  getArmorMaterialLabel,
+  type ArmorMaterial,
+} from './equipment/armor-variant'
+
+export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
 // ---------------------------------------------------------------------------
-// Equipment — the consolidated "long tail" content type. Armor, weapons, and
-// magic items remain their own content types (rich, frequently-referenced
-// mechanics); everything else (adventuring gear, ammunition, focuses, tools,
-// mounts, vehicles, ships, and one-off items) lives here as a single content
-// type discriminated by `kind`. New item kinds cost a new union variant, never
-// a new registry entry — that is what keeps the catalog from blowing up.
+// Equipment — unified catalog content type discriminated by `kind`. Weapons,
+// armor, adventuring gear, tools, mounts, vehicles, services, and magic items
+// are union variants of a single registry entry. New item kinds cost a new
+// union variant, never a new content type — that is what keeps the catalog
+// from blowing up.
 //
-// Modeling note: only `name`, `description`, `imageKey`, and `cost` are truly
-// universal; every other field is per-kind, so this is a discriminated union
-// rather than a flat bag of optionals. The four derived schemas (stored,
-// create, update, patch) are spelled out as explicit array literals: mapping a
-// transform over the variants would collapse the discriminant through `.extend`
-// and lose per-kind narrowing.
+// The four derived schemas (stored, create, update, patch) are spelled out as
+// explicit array literals: mapping a transform over the variants would collapse
+// the discriminant through `.extend` and lose per-kind narrowing.
 // ---------------------------------------------------------------------------
 
 export const EQUIPMENT_KIND_LABELS = {
-  gear: 'Adventuring Gear',
-  ammunition: 'Ammunition',
-  focus: 'Focus',
+  weapon: 'Weapon',
+  armor: 'Armor',
+  adventuring_gear: 'Adventuring Gear',
   tool: 'Tool',
   mount: 'Mount',
   vehicle: 'Vehicle',
-  ship: 'Ship',
-  misc: 'Miscellaneous',
+  service: 'Service',
+  magic_item: 'Magic Item',
 } as const
 
 export type EquipmentKind = keyof typeof EQUIPMENT_KIND_LABELS
@@ -42,94 +70,36 @@ export const EQUIPMENT_KINDS = Object.keys(EQUIPMENT_KIND_LABELS) as [
   ...EquipmentKind[],
 ]
 
-/**
- * Returns the display name for an equipment kind.
- * Falls back to the raw value for unknown kinds.
- */
+/** Returns the display name for an equipment kind. Falls back to the raw value. */
 export function getEquipmentKindLabel(kind: string): string {
   return EQUIPMENT_KIND_LABELS[kind as EquipmentKind] ?? kind
 }
 
 // ---------------------------------------------------------------------------
-// Per-kind sub-taxonomies
+// Per-kind body variants
 // ---------------------------------------------------------------------------
 
-export const GEAR_CATEGORY_LABELS = {
-  container: 'Container',
-  consumable: 'Consumable',
-  lighting: 'Lighting',
-  writing: 'Writing',
-  kit: 'Kit',
-  other: 'Other',
-} as const
+const weaponEquipmentBodyFields = equipmentBaseSchema.extend(weaponEquipmentKindFields)
+const armorEquipmentBodyFields = equipmentBaseSchema.extend(armorEquipmentKindFields)
 
-export type GearCategory = keyof typeof GEAR_CATEGORY_LABELS
+export const weaponBodySchema = weaponEquipmentBodyFields.superRefine(refineWeaponEquipment)
+export const armorBodySchema = armorEquipmentBodyFields.superRefine(refineArmorEquipment)
 
-export const gearCategorySchema = z.enum(
-  Object.keys(GEAR_CATEGORY_LABELS) as [GearCategory, ...GearCategory[]],
-)
-
-export const FOCUS_TYPE_LABELS = {
-  arcane: 'Arcane',
-  druidic: 'Druidic',
-  holy: 'Holy',
-} as const
-
-export type FocusType = keyof typeof FOCUS_TYPE_LABELS
-
-export const focusTypeSchema = z.enum(Object.keys(FOCUS_TYPE_LABELS) as [FocusType, ...FocusType[]])
-
-export const TOOL_CATEGORY_LABELS = {
-  artisan: "Artisan's Tools",
-  'gaming-set': 'Gaming Set',
-  'musical-instrument': 'Musical Instrument',
-  other: 'Other',
-} as const
-
-export type ToolCategory = keyof typeof TOOL_CATEGORY_LABELS
-
-export const toolCategorySchema = z.enum(
-  Object.keys(TOOL_CATEGORY_LABELS) as [ToolCategory, ...ToolCategory[]],
-)
-
-// ---------------------------------------------------------------------------
-// Shared base — the fields every equipment item has, regardless of kind.
-// ---------------------------------------------------------------------------
-
-const equipmentBaseSchema = contentBodyBaseSchema.extend({ cost: moneySchema })
-
-// ---------------------------------------------------------------------------
-// Per-kind body variants — each adds only the fields that kind actually uses.
-// ---------------------------------------------------------------------------
-
-export const gearBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('gear'),
-  weight: weightSchema.optional(),
-  gearCategory: gearCategorySchema.optional(),
+export const adventuringGearBodySchema = equipmentBaseSchema.extend({
+  kind: z.literal('adventuring_gear'),
+  gearKind: gearKindSchema,
+  /** How many units the listed cost/weight buys (e.g. 20 arrows). */
+  bundleSize: z.number().int().min(1).optional(),
+  /** The container a bundle ships in (e.g. "Quiver", "Case"). */
+  storage: z.string().optional(),
   /** Open-ended mechanical notes (e.g. "burst DC 13", "1-hour duration"). */
   properties: z.array(z.string()).optional(),
   /** Storage capacity, free text (e.g. "1 cubic foot / 30 lb of gear"). */
   capacity: z.string().optional(),
 })
 
-export const ammunitionBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('ammunition'),
-  weight: weightSchema.optional(),
-  /** How many rounds the listed cost/weight buys (e.g. 20 arrows). */
-  bundleSize: z.number().int().min(1),
-  /** The container the bundle ships in (e.g. "Quiver", "Case", "Pouch"). */
-  storage: z.string(),
-})
-
-export const focusBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('focus'),
-  weight: weightSchema.optional(),
-  focusType: focusTypeSchema,
-})
-
 export const toolBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('tool'),
-  weight: weightSchema.optional(),
   toolCategory: toolCategorySchema,
   /** The ability a check with this tool typically uses. */
   ability: abilitySchema.optional(),
@@ -144,15 +114,11 @@ export const mountBodySchema = equipmentBaseSchema.extend({
 
 export const vehicleBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('vehicle'),
-  weight: weightSchema.optional(),
-  /** Carrying/cargo capacity for land and drawn vehicles. */
-  capacity: weightSchema.optional(),
-})
-
-export const shipBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('ship'),
+  vehicleCategory: vehicleCategorySchema,
   /** Movement speed, free text (e.g. "8 mph"). */
   speed: z.string().optional(),
+  /** Carrying/cargo capacity for land and drawn vehicles. */
+  capacity: weightSchema.optional(),
   crew: z.number().int().min(0).optional(),
   passengers: z.number().int().min(0).optional(),
   cargoTons: z.number().min(0).optional(),
@@ -161,71 +127,86 @@ export const shipBodySchema = equipmentBaseSchema.extend({
   damageThreshold: z.number().int().min(0).optional(),
 })
 
-export const miscBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('misc'),
-  weight: weightSchema.optional(),
-  /** Free-form notes for one-off items and services. */
+export const serviceBodySchema = equipmentBaseSchema.extend({
+  kind: z.literal('service'),
+  serviceCategory: serviceCategorySchema,
+  /** Billing cadence, free text (e.g. "per day", "per mile"). */
+  duration: z.string().optional(),
+  /** Free-form notes for pricing or scope. */
   notes: z.string().optional(),
+})
+
+export const magicItemBodySchema = equipmentBaseSchema.extend({
+  kind: z.literal('magic_item'),
+  rarity: magicItemRaritySchema.optional(),
+  requiresAttunement: z.boolean().optional(),
+  attunementRequirement: z.string().optional(),
+  magicItemCategory: magicItemCategorySchema.optional(),
+  /** Optional link to a mundane base item (weapon, armor, etc.) by content id. */
+  baseEquipmentId: z.string().optional(),
 })
 
 // ---------------------------------------------------------------------------
 // Equipment — editable body + stored shape + authoring DTOs
 // ---------------------------------------------------------------------------
 
-/** The editable shape: what a form authors and what a patch overrides. */
-export const equipmentBodySchema = z.discriminatedUnion('kind', [
-  gearBodySchema,
-  ammunitionBodySchema,
-  focusBodySchema,
+const equipmentBodyVariants = [
+  weaponBodySchema,
+  armorBodySchema,
+  adventuringGearBodySchema,
   toolBodySchema,
   mountBodySchema,
   vehicleBodySchema,
-  shipBodySchema,
-  miscBodySchema,
-])
+  serviceBodySchema,
+  magicItemBodySchema,
+] as const
+
+/** The editable shape: what a form authors and what a patch overrides. */
+export const equipmentBodySchema = z.discriminatedUnion('kind', [...equipmentBodyVariants])
 
 export type EquipmentBody = z.infer<typeof equipmentBodySchema>
 
 /** Stored shape = ownership envelope + body, per variant. */
 export const equipmentSchema = z.discriminatedUnion('kind', [
-  contentMetaSchema.extend(gearBodySchema.shape),
-  contentMetaSchema.extend(ammunitionBodySchema.shape),
-  contentMetaSchema.extend(focusBodySchema.shape),
+  contentMetaSchema.extend(weaponEquipmentBodyFields.shape).superRefine(refineWeaponEquipment),
+  contentMetaSchema.extend(armorEquipmentBodyFields.shape).superRefine(refineArmorEquipment),
+  contentMetaSchema.extend(adventuringGearBodySchema.shape),
   contentMetaSchema.extend(toolBodySchema.shape),
   contentMetaSchema.extend(mountBodySchema.shape),
   contentMetaSchema.extend(vehicleBodySchema.shape),
-  contentMetaSchema.extend(shipBodySchema.shape),
-  contentMetaSchema.extend(miscBodySchema.shape),
+  contentMetaSchema.extend(serviceBodySchema.shape),
+  contentMetaSchema.extend(magicItemBodySchema.shape),
 ])
 
 export type Equipment = z.infer<typeof equipmentSchema>
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
 export const createEquipmentInputSchema = z.discriminatedUnion('kind', [
-  gearBodySchema.extend({ slug: slugSchema }),
-  ammunitionBodySchema.extend({ slug: slugSchema }),
-  focusBodySchema.extend({ slug: slugSchema }),
+  weaponBodySchema.extend({ slug: slugSchema }),
+  armorBodySchema.extend({ slug: slugSchema }),
+  adventuringGearBodySchema.extend({ slug: slugSchema }),
   toolBodySchema.extend({ slug: slugSchema }),
   mountBodySchema.extend({ slug: slugSchema }),
   vehicleBodySchema.extend({ slug: slugSchema }),
-  shipBodySchema.extend({ slug: slugSchema }),
-  miscBodySchema.extend({ slug: slugSchema }),
+  serviceBodySchema.extend({ slug: slugSchema }),
+  magicItemBodySchema.extend({ slug: slugSchema }),
 ])
 
 export type CreateEquipmentInput = z.infer<typeof createEquipmentInputSchema>
 
-// Partial of create, but `kind` stays required — it is the discriminant, so we
-// always know which variant is being edited.
 export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
-  gearBodySchema.extend({ slug: slugSchema }).partial().extend({ kind: gearBodySchema.shape.kind }),
-  ammunitionBodySchema
+  weaponEquipmentBodyFields
     .extend({ slug: slugSchema })
     .partial()
-    .extend({ kind: ammunitionBodySchema.shape.kind }),
-  focusBodySchema
+    .extend({ kind: weaponEquipmentKindFields.kind }),
+  armorEquipmentBodyFields
     .extend({ slug: slugSchema })
     .partial()
-    .extend({ kind: focusBodySchema.shape.kind }),
+    .extend({ kind: armorEquipmentKindFields.kind }),
+  adventuringGearBodySchema
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: adventuringGearBodySchema.shape.kind }),
   toolBodySchema.extend({ slug: slugSchema }).partial().extend({ kind: toolBodySchema.shape.kind }),
   mountBodySchema
     .extend({ slug: slugSchema })
@@ -235,29 +216,61 @@ export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
     .extend({ slug: slugSchema })
     .partial()
     .extend({ kind: vehicleBodySchema.shape.kind }),
-  shipBodySchema.extend({ slug: slugSchema }).partial().extend({ kind: shipBodySchema.shape.kind }),
-  miscBodySchema.extend({ slug: slugSchema }).partial().extend({ kind: miscBodySchema.shape.kind }),
+  serviceBodySchema
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: serviceBodySchema.shape.kind }),
+  magicItemBodySchema
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: magicItemBodySchema.shape.kind }),
 ])
 
 export type UpdateEquipmentInput = z.infer<typeof updateEquipmentInputSchema>
 
-/**
- * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow; the read-time merge handles
- * deep-merging (arrays replaced wholesale). `slug` is not patchable, and `kind`
- * stays required as the discriminant.
- */
 export const equipmentPatchSchema = contentPatchBaseSchema.extend({
   patch: z.discriminatedUnion('kind', [
-    gearBodySchema.partial().extend({ kind: gearBodySchema.shape.kind }),
-    ammunitionBodySchema.partial().extend({ kind: ammunitionBodySchema.shape.kind }),
-    focusBodySchema.partial().extend({ kind: focusBodySchema.shape.kind }),
+    weaponEquipmentBodyFields.partial().extend({ kind: weaponEquipmentKindFields.kind }),
+    armorEquipmentBodyFields.partial().extend({ kind: armorEquipmentKindFields.kind }),
+    adventuringGearBodySchema.partial().extend({ kind: adventuringGearBodySchema.shape.kind }),
     toolBodySchema.partial().extend({ kind: toolBodySchema.shape.kind }),
     mountBodySchema.partial().extend({ kind: mountBodySchema.shape.kind }),
     vehicleBodySchema.partial().extend({ kind: vehicleBodySchema.shape.kind }),
-    shipBodySchema.partial().extend({ kind: shipBodySchema.shape.kind }),
-    miscBodySchema.partial().extend({ kind: miscBodySchema.shape.kind }),
+    serviceBodySchema.partial().extend({ kind: serviceBodySchema.shape.kind }),
+    magicItemBodySchema.partial().extend({ kind: magicItemBodySchema.shape.kind }),
   ]),
 })
 
 export type EquipmentPatch = z.infer<typeof equipmentPatchSchema>
+
+// ---------------------------------------------------------------------------
+// Narrow union helpers + transitional type aliases
+// ---------------------------------------------------------------------------
+
+export type WeaponEquipment = Extract<Equipment, { kind: 'weapon' }>
+export type ArmorEquipment = Extract<Equipment, { kind: 'armor' }>
+export type AdventuringGearEquipment = Extract<Equipment, { kind: 'adventuring_gear' }>
+export type ToolEquipment = Extract<Equipment, { kind: 'tool' }>
+export type MountEquipment = Extract<Equipment, { kind: 'mount' }>
+export type VehicleEquipment = Extract<Equipment, { kind: 'vehicle' }>
+export type ServiceEquipment = Extract<Equipment, { kind: 'service' }>
+export type MagicItemEquipment = Extract<Equipment, { kind: 'magic_item' }>
+
+/** @deprecated Use {@link WeaponEquipment} or `Equipment` narrowed by `kind: 'weapon'`. */
+export type Weapon = WeaponEquipment
+
+/** @deprecated Use {@link ArmorEquipment} or `Equipment` narrowed by `kind: 'armor'`. */
+export type Armor = ArmorEquipment
+
+export type WeaponBody = z.infer<typeof weaponBodySchema>
+export type ArmorBody = z.infer<typeof armorBodySchema>
+
+/** Returns true when an equipment record is a weapon variant. */
+export function isWeaponEquipment(e: Equipment): e is WeaponEquipment {
+  return e.kind === 'weapon'
+}
+
+/** Returns true when an equipment record is an armor variant. */
+export function isArmorEquipment(e: Equipment): e is ArmorEquipment {
+  return e.kind === 'armor'
+}
