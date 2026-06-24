@@ -1,7 +1,5 @@
 import { z } from 'zod'
 import {
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
@@ -11,13 +9,7 @@ import {
   EQUIPMENT_KIND_LABELS,
   GEAR_KINDS,
   GEAR_KIND_ENTRIES,
-  MAGIC_ITEM_CATEGORIES,
-  MAGIC_ITEM_CATEGORY_ENTRIES,
-  MAGIC_ITEM_RARITIES,
-  MAGIC_ITEM_RARITY_ENTRIES,
   PHYSICAL_DAMAGE_TYPE_IDS,
-  TOOL_CATEGORIES,
-  TOOL_CATEGORY_ENTRIES,
   VEHICLE_CATEGORIES,
   VEHICLE_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
@@ -64,6 +56,9 @@ import {
 } from '../../lib/content-form-registry'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { serviceFormValuesFromEntity } from '../services/lib/service-form-fields'
+import { mountFormValuesFromEntity } from '../mounts/lib/mount-form-fields'
+import { toolFormValuesFromEntity } from '../tools/lib/tool-form-fields'
+import { magicItemFormValuesFromEntity } from '../magic-items/lib/magic-item-form-fields'
 import { equipmentFormToInput } from './equipment-form-input'
 import {
   allRegisteredKindFieldGroups,
@@ -83,18 +78,9 @@ function labelsFromEntries<const T extends string>(
 
 const equipmentKindOptions = toOptions(EQUIPMENT_KINDS, EQUIPMENT_KIND_LABELS)
 const gearKindOptions = toOptions(GEAR_KINDS, labelsFromEntries(GEAR_KIND_ENTRIES))
-const toolCategoryOptions = toOptions(TOOL_CATEGORIES, labelsFromEntries(TOOL_CATEGORY_ENTRIES))
 const vehicleCategoryOptions = toOptions(
   VEHICLE_CATEGORIES,
   labelsFromEntries(VEHICLE_CATEGORY_ENTRIES),
-)
-const magicItemRarityOptions = toOptions(
-  MAGIC_ITEM_RARITIES,
-  labelsFromEntries(MAGIC_ITEM_RARITY_ENTRIES),
-)
-const magicItemCategoryOptions = toOptions(
-  MAGIC_ITEM_CATEGORIES,
-  labelsFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES),
 )
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
@@ -109,13 +95,6 @@ const weaponPropertyOptions = toOptions(
 const armorCategoryOptions = toOptions(ARMOR_CATEGORIES, labelsFromEntries(ARMOR_CATEGORY_ENTRIES))
 const armorMaterialOptions = toOptions(ARMOR_MATERIALS, labelsFromEntries(ARMOR_MATERIAL_ENTRIES))
 
-const abilityOptions = toOptions(
-  ABILITY_IDS,
-  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
-    (typeof ABILITY_IDS)[number],
-    string
-  >,
-)
 const damageTypeOptions = toOptions(
   PHYSICAL_DAMAGE_TYPE_IDS,
   Object.fromEntries(PHYSICAL_DAMAGE_TYPE_IDS.map((id) => [id, id])) as Record<
@@ -346,14 +325,8 @@ const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
       capacity: item.capacity,
     }
   },
-  tool: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'tool' }>
-    return { toolCategory: item.toolCategory, ability: item.ability }
-  },
-  mount: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'mount' }>
-    return { carryingCapacity: item.carryingCapacity.value, speed: item.speed }
-  },
+  tool: (entity) => toolFormValuesFromEntity(entity as Extract<Equipment, { kind: 'tool' }>),
+  mount: (entity) => mountFormValuesFromEntity(entity as Extract<Equipment, { kind: 'mount' }>),
   vehicle: (entity) => {
     const item = entity as Extract<Equipment, { kind: 'vehicle' }>
     return {
@@ -370,16 +343,8 @@ const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
   },
   service: (entity) =>
     serviceFormValuesFromEntity(entity as Extract<Equipment, { kind: 'service' }>),
-  magic_item: (entity) => {
-    const item = entity as Extract<Equipment, { kind: 'magic_item' }>
-    return {
-      rarity: item.rarity,
-      requiresAttunement: item.requiresAttunement,
-      attunementRequirement: item.attunementRequirement,
-      magicItemCategory: item.magicItemCategory,
-      baseEquipmentId: item.baseEquipmentId,
-    }
-  },
+  magic_item: (entity) =>
+    magicItemFormValuesFromEntity(entity as Extract<Equipment, { kind: 'magic_item' }>),
 }
 
 function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
@@ -722,47 +687,6 @@ function buildUnscopedEquipmentFields(): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Tool',
-      fields: [
-        {
-          type: 'select',
-          name: 'toolCategory',
-          label: 'Tool category',
-          options: toolCategoryOptions,
-          visibility: visibleWhenKind('tool'),
-          required: true,
-        },
-        {
-          type: 'select',
-          name: 'ability',
-          label: 'Typical ability',
-          options: abilityOptions,
-          visibility: visibleWhenKind('tool'),
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Mount',
-      fields: [
-        {
-          type: 'number',
-          name: 'carryingCapacity',
-          label: 'Carrying capacity (lb)',
-          min: 0,
-          visibility: visibleWhenKind('mount'),
-          required: true,
-        },
-        {
-          type: 'text',
-          name: 'speed',
-          label: 'Speed',
-          visibility: visibleWhenKind('mount'),
-        },
-      ],
-    },
-    {
-      kind: 'group',
       legend: 'Vehicle',
       fields: [
         {
@@ -841,49 +765,6 @@ function buildUnscopedEquipmentFields(): FormItem[] {
       ],
     },
     ...allRegisteredKindFieldGroups(),
-    {
-      kind: 'group',
-      legend: 'Magic Item',
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            {
-              type: 'select',
-              name: 'rarity',
-              label: 'Rarity',
-              options: magicItemRarityOptions,
-              visibility: visibleWhenKind('magic_item'),
-            },
-            {
-              type: 'select',
-              name: 'magicItemCategory',
-              label: 'Category',
-              options: magicItemCategoryOptions,
-              visibility: visibleWhenKind('magic_item'),
-            },
-          ],
-        },
-        {
-          type: 'switch',
-          name: 'requiresAttunement',
-          label: 'Requires attunement',
-          visibility: visibleWhenKind('magic_item'),
-        },
-        {
-          type: 'text',
-          name: 'attunementRequirement',
-          label: 'Attunement requirement',
-          visibility: visibleWhenKind('magic_item'),
-        },
-        {
-          type: 'text',
-          name: 'baseEquipmentId',
-          label: 'Base equipment ID',
-          visibility: visibleWhenKind('magic_item'),
-        },
-      ],
-    },
   ]
 }
 

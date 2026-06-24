@@ -60,6 +60,30 @@ describe('equipmentFormDef kind-scoped fields', () => {
     expect(legends).not.toContain('Weapon')
     expect(legends).not.toContain('Armor')
   })
+
+  it('mount route shows Identity, Economy, and Mount only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'mount' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Mount',
+    ])
+  })
+
+  it('tool route shows Identity, Economy, and Tool only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'tool' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Tool',
+    ])
+  })
+
+  it('magic item route shows Identity, Economy, and Magic Item only', () => {
+    expect(groupLegends(equipmentFormDef.buildFields({ equipmentKind: 'magic_item' }))).toEqual([
+      'Identity',
+      'Economy',
+      'Magic Item',
+    ])
+  })
 })
 
 describe('equipmentFormDef create vs update modes', () => {

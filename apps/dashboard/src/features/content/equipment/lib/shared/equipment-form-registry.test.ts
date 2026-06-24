@@ -13,6 +13,24 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Service' })
   })
 
+  it('registers mount field group', () => {
+    const groups = fieldGroupsForEquipmentKind('mount')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Mount' })
+  })
+
+  it('registers tool field group', () => {
+    const groups = fieldGroupsForEquipmentKind('tool')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Tool' })
+  })
+
+  it('registers magic item field group', () => {
+    const groups = fieldGroupsForEquipmentKind('magic_item')
+    expect(groups).toHaveLength(1)
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Magic Item' })
+  })
+
   it('returns undefined for kinds still in the monolith', () => {
     expect(fieldGroupsForEquipmentKind('weapon')).toBeUndefined()
   })

@@ -10,6 +10,9 @@ import { weightFromForm } from '../../lib/content-form-field-helpers'
 import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
 import { buildServiceInput } from '../services/lib/service-form-input'
+import { buildMountInput } from '../mounts/lib/mount-form-input'
+import { buildToolInput } from '../tools/lib/tool-form-input'
+import { buildMagicItemInput } from '../magic-items/lib/magic-item-form-input'
 
 import type { EquipmentFormValues } from './equipment-form-def'
 
@@ -152,26 +155,6 @@ function buildAdventuringGearInput({
   })
 }
 
-function buildToolInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'tool',
-    toolCategory: values.toolCategory ?? 'other',
-    ...(weight && { weight }),
-    ...(values.ability && { ability: values.ability }),
-  })
-}
-
-function buildMountInput({ values, ctx, weight }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'mount',
-    carryingCapacity: { value: values.carryingCapacity ?? 0, unit: 'lb' },
-    ...(weight && { weight }),
-    ...(values.speed && { speed: values.speed }),
-  })
-}
-
 function optionalVehicleFields(values: EquipmentFormValues): Partial<VehicleInput> {
   return {
     ...(values.speed && { speed: values.speed }),
@@ -194,27 +177,6 @@ function buildVehicleInput({ values, ctx, weight }: EquipmentInputBuildCtx): Cre
     vehicleCategory: values.vehicleCategory ?? 'other',
     ...(weight && { weight }),
     ...optionalVehicleFields(values),
-  })
-}
-
-function buildMagicItemInput({
-  values,
-  ctx,
-  weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'magic_item',
-    ...(weight && { weight }),
-    ...(values.rarity && { rarity: values.rarity }),
-    ...(values.requiresAttunement !== undefined && {
-      requiresAttunement: values.requiresAttunement,
-    }),
-    ...(values.attunementRequirement && {
-      attunementRequirement: values.attunementRequirement,
-    }),
-    ...(values.magicItemCategory && { magicItemCategory: values.magicItemCategory }),
-    ...(values.baseEquipmentId && { baseEquipmentId: values.baseEquipmentId }),
   })
 }
 

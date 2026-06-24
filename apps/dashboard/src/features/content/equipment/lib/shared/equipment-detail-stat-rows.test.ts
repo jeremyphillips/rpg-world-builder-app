@@ -41,4 +41,22 @@ describe('getEquipmentKindStatRows', () => {
     expect(rows.some((row) => row.label === 'Category' && row.value === 'Hireling')).toBe(true)
     expect(rows.some((row) => row.label === 'Duration' && row.value === 'per day')).toBe(true)
   })
+
+  it('returns mount stat rows for a riding horse', () => {
+    const horse = pickEquipment('riding-horse')
+    const rows = getEquipmentKindStatRows(horse)
+    expect(rows.some((row) => row.label === 'Carrying capacity' && row.value === '480 lb')).toBe(
+      true,
+    )
+    expect(rows.some((row) => row.label === 'Speed' && row.value === '60 ft.')).toBe(true)
+  })
+
+  it('returns tool stat rows for thieves tools', () => {
+    const tools = pickEquipment('thieves-tools')
+    const rows = getEquipmentKindStatRows(tools)
+    expect(rows.some((row) => row.label === 'Category' && row.value === "Thieves' Tools")).toBe(
+      true,
+    )
+    expect(rows.some((row) => row.label === 'Ability' && row.value === 'Dexterity')).toBe(true)
+  })
 })

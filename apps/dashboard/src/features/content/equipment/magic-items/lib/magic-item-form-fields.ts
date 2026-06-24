@@ -1,0 +1,89 @@
+import {
+  MAGIC_ITEM_CATEGORIES,
+  MAGIC_ITEM_CATEGORY_ENTRIES,
+  MAGIC_ITEM_RARITIES,
+  MAGIC_ITEM_RARITY_ENTRIES,
+  type MagicItemEquipment,
+} from '@rpg/contracts'
+import { toOptions, type FormItem } from '@rpg/ui/form'
+
+import type { EquipmentFormValues } from '../../lib/equipment-form-def'
+
+function labelsFromEntries<const T extends string>(
+  entries: Record<T, { label: string }>,
+): Record<T, string> {
+  return Object.fromEntries(
+    (Object.entries(entries) as [T, { label: string }][]).map(([key, value]) => [key, value.label]),
+  ) as Record<T, string>
+}
+
+const magicItemRarityOptions = toOptions(
+  MAGIC_ITEM_RARITIES,
+  labelsFromEntries(MAGIC_ITEM_RARITY_ENTRIES),
+)
+
+const magicItemCategoryOptions = toOptions(
+  MAGIC_ITEM_CATEGORIES,
+  labelsFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES),
+)
+
+/** Magic item-specific form field group for the unified equipment form. */
+export function magicItemFormFieldGroup(): FormItem {
+  return {
+    kind: 'group',
+    legend: 'Magic Item',
+    fields: [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'rarity',
+            label: 'Rarity',
+            options: magicItemRarityOptions,
+          },
+          {
+            type: 'select',
+            name: 'magicItemCategory',
+            label: 'Category',
+            options: magicItemCategoryOptions,
+          },
+        ],
+      },
+      {
+        type: 'switch',
+        name: 'requiresAttunement',
+        label: 'Requires attunement',
+      },
+      {
+        type: 'text',
+        name: 'attunementRequirement',
+        label: 'Attunement requirement',
+      },
+      {
+        type: 'text',
+        name: 'baseEquipmentId',
+        label: 'Base equipment ID',
+      },
+    ],
+  }
+}
+
+export function magicItemFormValuesFromEntity(
+  item: MagicItemEquipment,
+): Pick<
+  EquipmentFormValues,
+  | 'rarity'
+  | 'requiresAttunement'
+  | 'attunementRequirement'
+  | 'magicItemCategory'
+  | 'baseEquipmentId'
+> {
+  return {
+    rarity: item.rarity,
+    requiresAttunement: item.requiresAttunement,
+    attunementRequirement: item.attunementRequirement,
+    magicItemCategory: item.magicItemCategory,
+    baseEquipmentId: item.baseEquipmentId,
+  }
+}
