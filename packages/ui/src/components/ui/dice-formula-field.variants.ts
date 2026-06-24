@@ -11,9 +11,11 @@ export const diceFormulaSeparatorVariants = cva(
 
 export const diceFormulaControlCellVariants = cva('flex shrink-0 items-center')
 
-export const diceFormulaCountInputVariants = cva(
-  cn(fieldWidthVariants({ width: 'xs' }), 'text-center tabular-nums'),
-)
+/**
+ * Applied to NumberInput `className` (the `<input>` element). Width is
+ * controlled by the `digits` prop on NumberInput itself, not here.
+ */
+export const diceFormulaCountInputVariants = cva('text-center tabular-nums')
 
 export const diceFormulaFacesTriggerVariants = cva(
   cn(fieldWidthVariants({ width: 'xs' }), 'tabular-nums'),
@@ -23,6 +25,8 @@ export const diceFormulaOperatorTriggerVariants = cva(
   cn(fieldWidthVariants({ width: 'xs' }), 'justify-center px-2'),
 )
 
-export const diceFormulaModifierInputVariants = cva(
-  cn(fieldWidthVariants({ width: 'xs' }), 'text-center tabular-nums'),
-)
+/**
+ * Applied to NumberInput `className` (the `<input>` element). Width is
+ * controlled by the `digits` prop on NumberInput itself, not here.
+ */
+export const diceFormulaModifierInputVariants = cva('text-center tabular-nums')

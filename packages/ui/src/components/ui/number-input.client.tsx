@@ -11,10 +11,12 @@ import {
   type StepNumberOptions,
 } from './number-input.lib'
 import {
+  numberInputDigitsVariants,
   numberInputFieldVariants,
   numberInputRootVariants,
   numberInputStepperButtonVariants,
   numberInputStepperVariants,
+  type NumberInputDigits,
   type NumberInputVariantProps,
 } from './number-input.variants'
 
@@ -40,6 +42,12 @@ export interface NumberInputProps
   /** When true, styles for embedding inside a grouped control such as InputSelectField. */
   grouped?: boolean
   rootClassName?: string
+  /**
+   * Maximum digit count the input should visually accommodate. Sets the root
+   * width to `calc(N×1ch + padding + stepper)` using the current size's token
+   * offsets, so the width scales automatically with font-size.
+   */
+  digits?: NumberInputDigits
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -55,6 +63,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       stepperMax,
       grouped = false,
       rootClassName,
+      digits,
       value,
       defaultValue,
       onChange,
@@ -93,7 +102,13 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const decrementDisabled = disabled || isStepDisabled(currentValue, 'down', stepOptions)
 
     return (
-      <div className={cn(numberInputRootVariants(), rootClassName)}>
+      <div
+        className={cn(
+          numberInputRootVariants(),
+          digits && numberInputDigitsVariants[size ?? 'md'][digits],
+          rootClassName,
+        )}
+      >
         <input
           type="number"
           inputMode="numeric"
@@ -147,4 +162,5 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 )
 NumberInput.displayName = 'NumberInput'
 
+export type { NumberInputDigits }
 export { NumberInput }

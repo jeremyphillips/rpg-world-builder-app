@@ -25,12 +25,12 @@ import {
   inputSelectDividerVariants,
   inputSelectGroupVariants,
   inputSelectSearchablePanelVariants,
-  inputSelectSegmentResetClassNames,
   inputSelectUnitSegmentVariants,
   inputSelectValueSegmentVariants,
   inputSelectValueWrapperVariants,
+  segmentSizeVariants,
 } from './input-select-field.variants'
-import { NumberInput } from './number-input.client'
+import { NumberInput, type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { InfoTooltip } from './tooltip.client'
 
@@ -60,6 +60,12 @@ export interface InputSelectFieldProps {
   max?: number
   step?: number
   placeholder?: string
+  /**
+   * Maximum digit count the value input should accommodate. Sets a `min-w` floor
+   * on the number input wrapper using `ch`-based sizing so the column never
+   * collapses below the needed character width. Only affects the `number` input type.
+   */
+  valueDigits?: NumberInputDigits
   onBlur?: () => void
 }
 
@@ -257,6 +263,7 @@ interface ValueSegmentProps {
   step?: number
   hasError: boolean
   describedBy?: string
+  valueDigits?: NumberInputDigits
   onValueChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -273,6 +280,7 @@ function ValueSegment({
   step,
   hasError,
   describedBy,
+  valueDigits,
   onValueChange,
   onBlur,
 }: ValueSegmentProps) {
@@ -290,7 +298,10 @@ function ValueSegment({
 
   if (inputType === 'number') {
     return (
-      <div data-input-select-value className={inputSelectValueWrapperVariants()}>
+      <div
+        data-input-select-value
+        className={inputSelectValueWrapperVariants({ size, digits: valueDigits })}
+      >
         <NumberInput
           id={id}
           grouped
@@ -306,7 +317,10 @@ function ValueSegment({
           aria-describedby={describedBy}
           onChange={handleValueChange}
           onBlur={onBlur}
-          className={inputSelectSegmentResetClassNames}
+          className={cn(
+            segmentSizeVariants[size],
+            'bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-md rounded-r-none',
+          )}
         />
       </div>
     )
@@ -353,6 +367,7 @@ export function InputSelectField({
   max,
   step,
   placeholder,
+  valueDigits,
   onBlur,
 }: InputSelectFieldProps) {
   const valueId = `${id}-value`
@@ -397,6 +412,7 @@ export function InputSelectField({
           step={step}
           hasError={hasError}
           describedBy={describedBy}
+          valueDigits={valueDigits}
           onValueChange={onValueChange}
           onBlur={onBlur}
         />

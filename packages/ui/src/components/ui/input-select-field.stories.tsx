@@ -83,7 +83,8 @@ export const Cost: Story = {
     initialValue: 15,
     initialUnit: 'gp',
     min: 0,
-    width: 'md',
+    width: 'lg',
+    valueDigits: 2,
   },
 }
 
@@ -97,6 +98,7 @@ export const CastingTime: Story = {
     initialUnit: 'action',
     min: 1,
     width: 'lg',
+    valueDigits: 2,
   },
 }
 
@@ -110,7 +112,8 @@ export const SearchableUnits: Story = {
     initialUnit: 'gp',
     searchable: true,
     unitPlaceholder: 'Choose unit',
-    width: 'lg',
+    width: 'full',
+    valueDigits: 3,
   },
 }
 
@@ -127,7 +130,7 @@ export const TextValue: Story = {
     initialValue: 'Example',
     initialUnit: 'center',
     placeholder: 'Enter text',
-    width: 'md',
+    width: 'xl',
   },
 }
 
@@ -141,6 +144,7 @@ export const WithHint: Story = {
     initialUnit: 'sp',
     hint: 'Enter an amount and pick a coin type.',
     min: 0,
+    valueDigits: 2,
   },
 }
 
@@ -154,6 +158,7 @@ export const WithError: Story = {
     initialUnit: 'gp',
     error: 'Cost must be zero or greater.',
     min: 0,
+    valueDigits: 2,
   },
 }
 
@@ -166,5 +171,6 @@ export const Disabled: Story = {
     initialValue: 50,
     initialUnit: 'gp',
     disabled: true,
+    valueDigits: 2,
   },
 }
