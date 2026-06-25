@@ -8,6 +8,7 @@ import { speedSchema } from '../vocab/movement-mode'
 import { senseSchema } from '../vocab/sense'
 import { usageFrequencySchema } from '../vocab/usage-frequency'
 import { featCategorySchema } from '../vocab/feat'
+import { languageCategorySchema, languageSchema } from '../vocab/language'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -69,6 +70,33 @@ export const contentProficienciesSchema = z.object({
 
 export type ContentProficiencies = z.infer<typeof contentProficienciesSchema>
 
+// --- Language choices --------------------------------------------------------
+
+/**
+ * A language choice grant from a constrained pool.
+ *
+ * Fixed languages use `contentGrants.languages`. Choice grants use this shape so
+ * class features such as Rogue's Thieves' Cant can grant one fixed language plus
+ * an additional pick from the character-creation language tables.
+ */
+export const languageChoiceGrantSchema = z
+  .object({
+    choose: z.number().int().min(1),
+    from: z.array(languageSchema).min(1).optional(),
+    categories: z.array(languageCategorySchema).min(1).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.from === undefined && val.categories === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'language choices require a fixed language list or language categories',
+        path: ['from'],
+      })
+    }
+  })
+
+export type LanguageChoiceGrant = z.infer<typeof languageChoiceGrantSchema>
+
 // --- Feat choices -----------------------------------------------------------
 
 /**
@@ -112,7 +140,8 @@ export const contentGrantsSchema = z.object({
   damageType: z.array(damageTypeSchema).optional(),
   resistances: z.array(damageTypeSchema).optional(),
   proficiencies: contentProficienciesSchema.optional(),
-  languages: z.array(z.string()).optional(),
+  languages: z.array(languageSchema).optional(),
+  languageChoices: z.array(languageChoiceGrantSchema).optional(),
   innateSpells: innateSpellsSchema.optional(),
   featChoice: featChoiceGrantSchema.optional(),
 })

@@ -86,6 +86,28 @@ const baseCharacter = {
       },
     ],
   },
+  languages: [
+    {
+      language: 'thieves-cant',
+      sources: [
+        {
+          kind: 'classFeature',
+          sourceId: 'srd-cc-5.2.1:rogue',
+          grantId: 'thieves-cant',
+        },
+      ],
+    },
+    {
+      language: 'elvish',
+      sources: [
+        {
+          kind: 'classFeature',
+          sourceId: 'srd-cc-5.2.1:ranger',
+          grantId: 'roving',
+        },
+      ],
+    },
+  ],
   spells: [
     {
       spellId: 'srd-cc-5.2.1:light',
@@ -153,6 +175,7 @@ describe('characterSchema', () => {
     expect(parsed.characterType).toBe('pc')
     expect(getCharacterTotalLevel(parsed)).toBe(7)
     expect(parsed.equipment.gear).toEqual([])
+    expect(parsed.languages.map((entry) => entry.language)).toEqual(['thieves-cant', 'elvish'])
     expect(parsed.wealth).toEqual({ cp: 0, sp: 0, gp: 125, pp: 0 })
   })
 
@@ -210,6 +233,18 @@ describe('characterSchema', () => {
         ],
       }).success,
     ).toBe(false)
+  })
+
+  it('defaults omitted languages to an empty list', () => {
+    const { languages: _languages, ...withoutLanguages } = baseCharacter
+
+    const parsed = characterSchema.parse({
+      ...withoutLanguages,
+      characterType: 'pc',
+      userId: 'user_1',
+    })
+
+    expect(parsed.languages).toEqual([])
   })
 })
 

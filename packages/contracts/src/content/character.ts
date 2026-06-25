@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { alignmentSchema } from '../vocab/alignment'
 import { armorCategorySchema } from '../vocab/armor/category'
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
+import { languageSchema } from '../vocab/language'
 import { weaponCategorySchema } from '../vocab/weapon/category'
 import { absoluteLevelSchema } from '../primitives/level'
 import { creatureAbilityScoresSchema, creatureRuntimeHitPointsSchema } from './creature'
@@ -198,6 +199,14 @@ export const characterProficienciesSchema = z.object({
 
 export type CharacterProficiencies = z.infer<typeof characterProficienciesSchema>
 
+export const characterLanguageEntrySchema = z.object({
+  language: languageSchema,
+  sources: characterSelectionSourcesSchema,
+  notes: z.string().optional(),
+})
+
+export type CharacterLanguageEntry = z.infer<typeof characterLanguageEntrySchema>
+
 // ---------------------------------------------------------------------------
 // Spells, equipment, wealth, feats, and narrative
 // ---------------------------------------------------------------------------
@@ -287,6 +296,7 @@ const characterBaseSchema = z.object({
   abilityScores: characterAbilityScoresSchema,
   hitPoints: characterHitPointsSchema,
   proficiencies: characterProficienciesSchema,
+  languages: z.array(characterLanguageEntrySchema).default([]),
   spells: z.array(characterSpellEntrySchema).default([]),
   equipment: characterEquipmentSchema,
   wealth: characterWealthSchema,
