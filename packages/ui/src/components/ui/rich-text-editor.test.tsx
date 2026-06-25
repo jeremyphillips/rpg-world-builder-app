@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 
@@ -133,46 +133,6 @@ describe('RichTextEditor', () => {
     expect(html).toContain('target="_blank"')
     expect(html).toContain('rel="noopener noreferrer"')
     expect(html).toContain(`${RICH_TEXT_LINK_ATTRS.linkKind}="external"`)
-  })
-
-  it('shows an edit affordance when hovering an existing link', async () => {
-    render(
-      <RichTextEditor
-        aria-label="Biography"
-        linkable
-        value='<p><a href="/campaigns/demo/spells/fire-bolt" data-content-title="Fire Bolt">Fire Bolt</a></p>'
-      />,
-    )
-
-    const link = await screen.findByRole('link', { name: 'Fire Bolt' })
-    fireEvent.mouseMove(link)
-
-    expect(screen.getByRole('button', { name: 'Edit link' })).toBeInTheDocument()
-  })
-
-  it('shows an edit affordance when hovering an existing link', async () => {
-    const user = userEvent.setup()
-    render(
-      <RichTextEditor
-        aria-label="Biography"
-        linkable
-        internalLinkOptions={internalLinkOptions}
-        value={
-          '<p><a href="/campaigns/demo/content/spells/fireball" data-content-type="spell" data-content-id="fireball" data-content-title="Fireball" data-link-kind="detail">Fire Bolt</a></p>'
-        }
-      />,
-    )
-
-    const link = await screen.findByRole('link', { name: 'Fire Bolt' })
-    fireEvent.mouseMove(link)
-    await user.click(screen.getByRole('button', { name: 'Edit link' }))
-
-    await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: 'Internal display text' })).toHaveValue(
-        'Fire Bolt',
-      )
-    })
-    expect(screen.getByRole('button', { name: 'Remove link' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations when linkable', async () => {

@@ -4,7 +4,9 @@ import { RICH_TEXT_LINK_ATTRS } from '../../lib/rich-text-link-attrs'
 import {
   buildLinkMarkAttributes,
   createFallbackLinkContext,
+  findLinkAnchorFromDom,
   mergeLinkInsertPayload,
+  resolveLinkBubblePosition,
   resolveLinkContextFromAnchor,
   resolveLinkContextFromSelection,
   resolveLinkPickerMode,
@@ -107,6 +109,25 @@ describe('mergeLinkInsertPayload', () => {
         linkKind: 'detail',
       },
     })
+  })
+})
+
+describe('resolveLinkBubblePosition', () => {
+  it('positions the bubble above the link anchor', () => {
+    expect(
+      resolveLinkBubblePosition(
+        { top: 0, left: 0, right: 400, bottom: 200, width: 400, height: 200 } as DOMRect,
+        { top: 40, left: 24, right: 120, bottom: 60, width: 96, height: 20 } as DOMRect,
+      ),
+    ).toEqual({ top: 2, left: 24 })
+  })
+})
+
+describe('findLinkAnchorFromDom', () => {
+  it('finds the anchor wrapping a text node', () => {
+    const anchor = document.createElement('a')
+    anchor.textContent = 'Fire Bolt'
+    expect(findLinkAnchorFromDom(anchor.firstChild)).toBe(anchor)
   })
 })
 

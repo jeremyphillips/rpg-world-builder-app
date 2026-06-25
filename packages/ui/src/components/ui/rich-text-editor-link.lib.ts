@@ -93,29 +93,25 @@ export function mergeLinkInsertPayload(
   }
 }
 
-export function resolveAnchorEditPosition(
+export function resolveLinkBubblePosition(
   rootRect: DOMRect,
   anchorRect: DOMRect,
+  bubbleHeight = 32,
+  gap = 6,
 ): { top: number; left: number } {
   return {
-    top: Math.max(anchorRect.top - rootRect.top - 10, 0),
-    left: Math.max(anchorRect.right - rootRect.left + 4, 0),
+    top: Math.max(anchorRect.top - rootRect.top - bubbleHeight - gap, 0),
+    left: Math.max(anchorRect.left - rootRect.left, 0),
   }
 }
 
-export function resolveSelectionEditPosition(
-  rootRect: DOMRect,
-  coords: { top: number; right: number },
-): { top: number; left: number } {
-  return {
-    top: Math.max(coords.top - rootRect.top - 10, 0),
-    left: Math.max(coords.right - rootRect.left + 4, 0),
-  }
-}
+export function findLinkAnchorFromDom(node: Node | null): HTMLAnchorElement | null {
+  if (!node) return null
 
-export function findHoveredLinkAnchor(target: EventTarget | null): HTMLAnchorElement | null {
-  if (!(target instanceof HTMLElement)) return null
-  const anchor = target.closest('a')
+  const element = node.nodeType === Node.TEXT_NODE ? node.parentElement : node
+  if (!(element instanceof HTMLElement)) return null
+
+  const anchor = element.closest('a')
   return anchor instanceof HTMLAnchorElement ? anchor : null
 }
 

@@ -338,8 +338,9 @@ If you need a control `<Form>` doesn't support, you have two options:
     `internalLinkOptions` and optional `contentTypeOptions` from the app layer
     (dashboard builds these from catalog routes).
   - **External tab**: URL + display text; new-window defaults to on.
-  - Hovering or focusing an existing link exposes an **Edit link** affordance that
-    reopens the picker prefilled and offers **Remove link** when editing.
+  - Hovering or focusing an existing link exposes an **Edit link** bubble menu with
+    **Remove link** when the caret is inside the link mark. The toolbar link button
+    also opens the picker for the active link.
 - **Storage model:** links persist a canonical relative or absolute `href` plus
   metadata attributes for picker round-trip:
   - `data-content-type`, `data-content-id`, `data-content-title`, optional

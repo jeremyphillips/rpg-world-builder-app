@@ -5,33 +5,26 @@ import type { Editor } from '@tiptap/react'
 
 import {
   buildLinkMarkAttributes,
-  findHoveredLinkAnchor,
   mergeLinkInsertPayload,
-  resolveAnchorEditPosition,
-  resolveLinkContextFromAnchor,
   resolveLinkContextFromSelection,
   resolveLinkPickerMode,
-  resolveSelectionEditPosition,
   type RichTextLinkContext,
 } from './rich-text-editor-link.lib'
 import type { RichTextLinkPickerValue } from './rich-text-link-picker.types'
 
 interface UseRichTextEditorLinksOptions {
   editor: Editor | null
-  rootRef: React.RefObject<HTMLDivElement | null>
   onLinkPickerOpen?: (context: RichTextLinkContext) => void
 }
 
 export function useRichTextEditorLinks({
   editor,
-  rootRef,
   onLinkPickerOpen,
 }: UseRichTextEditorLinksOptions) {
   const [isLinkPickerOpen, setIsLinkPickerOpen] = React.useState(false)
   const [editingLinkContext, setEditingLinkContext] = React.useState<RichTextLinkContext | null>(
     null,
   )
-  const [hoveredLinkAnchor, setHoveredLinkAnchor] = React.useState<HTMLAnchorElement | null>(null)
 
   const resolveLinkContext = React.useCallback((): RichTextLinkContext | null => {
     if (!editor) return null
@@ -118,66 +111,12 @@ export function useRichTextEditorLinks({
     setIsLinkPickerOpen(false)
   }, [removeLink])
 
-  const handleMouseMove = React.useCallback(
-    (event: React.MouseEvent) => {
-      if (!editor) return
-      const anchor = findHoveredLinkAnchor(event.target)
-      if (!anchor) {
-        if (!(editor.isFocused && editor.isActive('link'))) {
-          setHoveredLinkAnchor(null)
-        }
-        return
-      }
+  const handleRemoveLinkFromBubble = React.useCallback(() => {
+    removeLink()
+  }, [removeLink])
 
-      setHoveredLinkAnchor(anchor)
-    },
-    [editor],
-  )
-
-  const handleMouseLeave = React.useCallback(() => {
-    setHoveredLinkAnchor(null)
-  }, [])
-
-  const resolveEditAffordance = React.useCallback(
-    (rootElement: HTMLDivElement | null) => {
-      if (!rootElement) return null
-
-      if (hoveredLinkAnchor) {
-        const style = resolveAnchorEditPosition(
-          rootElement.getBoundingClientRect(),
-          hoveredLinkAnchor.getBoundingClientRect(),
-        )
-        return {
-          style,
-          onClick: () => {
-            if (hoveredLinkAnchor) {
-              openLinkPickerWithContext(resolveLinkContextFromAnchor(hoveredLinkAnchor))
-              return
-            }
-            openLinkPickerFromCurrentSelection()
-          },
-        }
-      }
-
-      if (!editor || !editor.isFocused || !editor.isActive('link')) return null
-
-      try {
-        const { from } = editor.state.selection
-        const coords = editor.view.coordsAtPos(from)
-        return {
-          style: resolveSelectionEditPosition(rootElement.getBoundingClientRect(), coords),
-          onClick: () => openLinkPickerFromCurrentSelection(),
-        }
-      } catch {
-        return null
-      }
-    },
-    [editor, hoveredLinkAnchor, openLinkPickerFromCurrentSelection, openLinkPickerWithContext],
-  )
-
-  const linkEditAffordance = React.useMemo(
-    () => resolveEditAffordance(rootRef.current),
-    [resolveEditAffordance, rootRef, editor?.state.selection, hoveredLinkAnchor],
+  const showLinkBubbleMenu = Boolean(
+    editor?.isFocused && editor.isActive('link') && !isLinkPickerOpen,
   )
 
   const linkPickerMode = resolveLinkPickerMode(editingLinkContext)
@@ -186,12 +125,12 @@ export function useRichTextEditorLinks({
     isLinkPickerOpen,
     editingLinkContext,
     linkPickerMode,
+    showLinkBubbleMenu,
     handleLinkPickerOpenChange,
     handleInsertLink,
     handleLinkPickerCancel,
+    handleEditLink: openLinkPickerFromCurrentSelection,
     handleRemoveLink: editor?.isActive('link') ? handleRemoveLink : undefined,
-    handleMouseMove,
-    handleMouseLeave,
-    linkEditAffordance,
+    handleRemoveLinkFromBubble,
   }
 }

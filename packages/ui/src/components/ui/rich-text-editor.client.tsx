@@ -3,15 +3,14 @@
 import * as React from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { Pencil } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { Button } from './button.client'
 import { RichTextLink } from './rich-text-link-extension'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 import type { RichTextLinkContext } from './rich-text-editor-link.lib'
 import { RichTextEditorToolbar } from './rich-text-editor-toolbar.client'
+import { RichTextLinkBubbleMenu } from './rich-text-link-bubble-menu.client'
 import type {
   RichTextLinkPickerContentTypeOption,
   RichTextLinkPickerInternalOption,
@@ -99,8 +98,12 @@ export function RichTextEditor({
   React.useEffect(() => {
     if (!editor) return undefined
     editor.on('transaction', forceRender)
+    editor.on('focus', forceRender)
+    editor.on('blur', forceRender)
     return () => {
       editor.off('transaction', forceRender)
+      editor.off('focus', forceRender)
+      editor.off('blur', forceRender)
     }
   }, [editor])
 
@@ -136,14 +139,14 @@ export function RichTextEditor({
     isLinkPickerOpen,
     editingLinkContext,
     linkPickerMode,
+    showLinkBubbleMenu,
     handleLinkPickerOpenChange,
     handleInsertLink,
     handleLinkPickerCancel,
+    handleEditLink,
     handleRemoveLink,
-    handleMouseMove,
-    handleMouseLeave,
-    linkEditAffordance,
-  } = useRichTextEditorLinks({ editor, onLinkPickerOpen, rootRef })
+    handleRemoveLinkFromBubble,
+  } = useRichTextEditorLinks({ editor, onLinkPickerOpen })
 
   return (
     <div
@@ -169,26 +172,15 @@ export function RichTextEditor({
         onLinkPickerCancel={handleLinkPickerCancel}
         onRemoveLink={handleRemoveLink}
       />
-      <EditorContent
-        editor={editor}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      />
-      {linkable && linkEditAffordance ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="absolute z-10 size-6"
-          style={{
-            top: `${linkEditAffordance.style.top}px`,
-            left: `${linkEditAffordance.style.left}px`,
-          }}
-          aria-label="Edit link"
-          onClick={linkEditAffordance.onClick}
-        >
-          <Pencil className="size-3.5" />
-        </Button>
+      <EditorContent editor={editor} />
+      {linkable ? (
+        <RichTextLinkBubbleMenu
+          editor={editor}
+          rootRef={rootRef}
+          open={showLinkBubbleMenu}
+          onEditLink={handleEditLink}
+          onRemoveLink={handleRemoveLinkFromBubble}
+        />
       ) : null}
     </div>
   )
