@@ -18,6 +18,10 @@ Add these folders within a feature as it grows (none are required up front):
 | `api/`        | Same-origin API client wrappers (`fetch("/api/...")`)    |
 | `index.ts`    | Public barrel — the **only** entry other features import |
 
+Do **not** re-export route screens from `index.ts`. The app router lazy-loads
+route modules directly (`src/app/lazy-routes.ts`); barrel re-exports pin those
+modules in the entry chunk and defeat code splitting.
+
 See the implemented [`auth`](../src/features/auth) feature for a worked example.
 
 ## Boundary rule
