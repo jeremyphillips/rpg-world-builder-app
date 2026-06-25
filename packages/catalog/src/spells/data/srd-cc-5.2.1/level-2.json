@@ -1,5 +1,30 @@
 [
   {
+    "id": "srd-cc-5.2.1:aid",
+    "slug": "aid",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Aid",
+    "description": "<p>Choose up to three creatures within range. Each target's Hit Point maximum and current Hit Points increase by 5 for the duration.</p><p><strong>Using a Higher-Level Spell Slot.</strong> Each target's Hit Points increase by 5 for each spell slot level above 2.</p>",
+    "school": "abjuration",
+    "level": 2,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "roles": ["buff", "healing", "warding"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
+    "duration": { "kind": "timed", "value": 8, "unit": "hour" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "a strip of white cloth" }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:darkness",
     "slug": "darkness",
     "rulesetId": "srd-cc-5.2.1",
@@ -28,6 +53,59 @@
     "components": {
       "verbal": true,
       "material": { "description": "bat fur and a piece of coal" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:lesser-restoration",
+    "slug": "lesser-restoration",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lesser Restoration",
+    "description": "<p>You touch a creature and end one condition on it: Blinded, Deafened, Paralyzed, or Poisoned.</p>",
+    "school": "abjuration",
+    "level": 2,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "conditions": ["blinded", "deafened", "paralyzed", "poisoned"],
+      "roles": ["healing"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "touch" },
+    "duration": { "kind": "instantaneous" },
+    "components": { "verbal": true, "somatic": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:levitate",
+    "slug": "levitate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Levitate",
+    "description": "<p>One creature or loose object of your choice that you can see within range rises vertically up to 20 feet and remains suspended there for the duration. The spell can levitate an object that weighs up to 500 pounds. An unwilling creature that succeeds on a Constitution saving throw is unaffected.</p><p>The target can move only by pushing or pulling against a fixed object or surface within reach (such as a wall or a ceiling), which allows it to move as if it were climbing. You can change the target's altitude by up to 20 feet in either direction on your turn. If you are the target, you can move up or down as part of your move. Otherwise, you can take a Magic action to move the target, which must remain within the spell's range.</p><p>When the spell ends, the target floats gently to the ground if it is still aloft.</p>",
+    "school": "transmutation",
+    "level": 2,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["control", "movement"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "a metal spring" }
     }
   },
   {

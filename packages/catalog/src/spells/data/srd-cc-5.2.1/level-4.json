@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "id": "srd-cc-5.2.1:aura-of-life",
+    "slug": "aura-of-life",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Aura of Life",
+    "description": "<p>An aura radiates from you in a 30-foot Emanation for the duration. While in the aura, you and your allies have Resistance to Necrotic damage, and your Hit Point maximums can't be reduced. If an ally with 0 Hit Points starts its turn in the aura, that ally regains 1 Hit Point.</p>",
+    "school": "abjuration",
+    "level": 4,
+    "classIds": ["cleric", "paladin"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["buff", "healing", "warding"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "self" },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": { "verbal": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:death-ward",
+    "slug": "death-ward",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Death Ward",
+    "description": "<p>You touch a creature and grant it a measure of protection from death. The first time the target would drop to 0 Hit Points before the spell ends, the target instead drops to 1 Hit Point, and the spell ends.</p><p>If the spell is still in effect when the target is subjected to an effect that would kill it instantly without dealing damage, that effect is negated against the target, and the spell ends.</p>",
+    "school": "abjuration",
+    "level": 4,
+    "classIds": ["cleric", "paladin"],
+    "tags": {
+      "roles": ["warding"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "touch" },
+    "duration": { "kind": "timed", "value": 8, "unit": "hour" },
+    "components": { "verbal": true, "somatic": true }
+  }
+]
