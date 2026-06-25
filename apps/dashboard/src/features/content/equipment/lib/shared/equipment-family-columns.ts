@@ -1,63 +1,96 @@
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
-import { equipmentColumns, equipmentFilters } from '../../components/equipment-columns'
-import { serviceColumns, serviceFilters } from '../../services/components/service-columns'
-import { mountColumns, mountFilters } from '../../mounts/components/mount-columns'
-import { toolColumns, toolFilters } from '../../tools/components/tool-columns'
-import { magicItemColumns, magicItemFilters } from '../../magic-items/components/magic-item-columns'
-import {
-  adventuringGearColumns,
-  adventuringGearFilters,
-} from '../../adventuring-gear/components/adventuring-gear-columns'
-import { vehicleColumns, vehicleFilters } from '../../vehicles/components/vehicle-columns'
-import { armorColumns, armorFilters } from '../../armor/components/armor-columns'
-import { weaponColumns, weaponFilters } from '../../weapons/components/weapon-columns'
 import type { EquipmentFamilyPath } from './equipment-family-paths'
 
-function genericFamilyColumns(campaignId: string): ColumnDef<Equipment>[] {
-  return equipmentColumns(campaignId).filter(
-    (column) => 'accessorKey' in column && column.accessorKey !== 'kind',
-  )
+export type FamilyTableConfig = {
+  columns: ColumnDef<Equipment>[]
+  filters: FilterDef[]
 }
 
-const genericFamilyFilters = equipmentFilters.filter((filter) => filter.id !== 'kind')
-
-/** Per-family overview table columns registered by URL path segment. */
-const familyColumns: Partial<
-  Record<EquipmentFamilyPath, (campaignId: string) => ColumnDef<Equipment>[]>
-> = {
-  services: (campaignId) => serviceColumns(campaignId) as ColumnDef<Equipment>[],
-  mounts: (campaignId) => mountColumns(campaignId) as ColumnDef<Equipment>[],
-  tools: (campaignId) => toolColumns(campaignId) as ColumnDef<Equipment>[],
-  'magic-items': (campaignId) => magicItemColumns(campaignId) as ColumnDef<Equipment>[],
-  'adventuring-gear': (campaignId) => adventuringGearColumns(campaignId) as ColumnDef<Equipment>[],
-  vehicles: (campaignId) => vehicleColumns(campaignId) as ColumnDef<Equipment>[],
-  armor: (campaignId) => armorColumns(campaignId) as ColumnDef<Equipment>[],
-  weapons: (campaignId) => weaponColumns(campaignId) as ColumnDef<Equipment>[],
+async function loadGenericFamilyTableConfig(campaignId: string): Promise<FamilyTableConfig> {
+  const { equipmentColumns, equipmentFilters } = await import('../../components/equipment-columns')
+  return {
+    columns: equipmentColumns(campaignId).filter(
+      (column) => 'accessorKey' in column && column.accessorKey !== 'kind',
+    ),
+    filters: equipmentFilters.filter((filter) => filter.id !== 'kind'),
+  }
 }
 
-/** Per-family overview table filters registered by URL path segment. */
-const familyFilters: Partial<Record<EquipmentFamilyPath, FilterDef[]>> = {
-  services: serviceFilters,
-  mounts: mountFilters,
-  tools: toolFilters,
-  'magic-items': magicItemFilters,
-  'adventuring-gear': adventuringGearFilters,
-  vehicles: vehicleFilters,
-  armor: armorFilters,
-  weapons: weaponFilters,
-}
-
-/** Overview table columns for an equipment family path segment. */
-export function getFamilyColumns(
+/** Loads overview table columns and filters for one equipment family on demand. */
+export async function loadFamilyTableConfig(
   campaignId: string,
   family: EquipmentFamilyPath,
-): ColumnDef<Equipment>[] {
-  return familyColumns[family]?.(campaignId) ?? genericFamilyColumns(campaignId)
-}
-
-/** Overview table filters for an equipment family path segment. */
-export function getFamilyFilters(family: EquipmentFamilyPath): FilterDef[] {
-  return familyFilters[family] ?? genericFamilyFilters
+): Promise<FamilyTableConfig> {
+  switch (family) {
+    case 'services': {
+      const { serviceColumns, serviceFilters } = await import(
+        '../../services/components/service-columns'
+      )
+      return {
+        columns: serviceColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: serviceFilters,
+      }
+    }
+    case 'mounts': {
+      const { mountColumns, mountFilters } = await import('../../mounts/components/mount-columns')
+      return {
+        columns: mountColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: mountFilters,
+      }
+    }
+    case 'tools': {
+      const { toolColumns, toolFilters } = await import('../../tools/components/tool-columns')
+      return {
+        columns: toolColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: toolFilters,
+      }
+    }
+    case 'magic-items': {
+      const { magicItemColumns, magicItemFilters } = await import(
+        '../../magic-items/components/magic-item-columns'
+      )
+      return {
+        columns: magicItemColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: magicItemFilters,
+      }
+    }
+    case 'adventuring-gear': {
+      const { adventuringGearColumns, adventuringGearFilters } = await import(
+        '../../adventuring-gear/components/adventuring-gear-columns'
+      )
+      return {
+        columns: adventuringGearColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: adventuringGearFilters,
+      }
+    }
+    case 'vehicles': {
+      const { vehicleColumns, vehicleFilters } = await import(
+        '../../vehicles/components/vehicle-columns'
+      )
+      return {
+        columns: vehicleColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: vehicleFilters,
+      }
+    }
+    case 'armor': {
+      const { armorColumns, armorFilters } = await import('../../armor/components/armor-columns')
+      return {
+        columns: armorColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: armorFilters,
+      }
+    }
+    case 'weapons': {
+      const { weaponColumns, weaponFilters } = await import(
+        '../../weapons/components/weapon-columns'
+      )
+      return {
+        columns: weaponColumns(campaignId) as ColumnDef<Equipment>[],
+        filters: weaponFilters,
+      }
+    }
+    default:
+      return loadGenericFamilyTableConfig(campaignId)
+  }
 }

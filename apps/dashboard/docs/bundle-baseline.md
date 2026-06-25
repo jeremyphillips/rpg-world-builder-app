@@ -63,9 +63,20 @@ Heavy `@rpg/ui/form` field types (`json`, `richtext`, `file`, `editableGrid`) lo
 | `file-field.client-*.js` | 8 kB | 3 kB | deferred from core form chunk |
 | Core `form-*.js` | 62 kB | 20 kB | text/select/checkbox only |
 
+## After Phase 4 — equipment family columns (2026-06-24)
+
+[`loadFamilyTableConfig`](../src/features/content/equipment/lib/shared/equipment-family-columns.ts)
+dynamic-imports one family column module per overview route (weapons, armor, etc.).
+
+| Asset | Raw | Gzip | Notes |
+| ----- | ---: | ---: | ----- |
+| `equipment-family-overview-*.js` | 5 kB | 1.6 kB | down from ~7.5 kB; no longer bundles all 8 column modules |
+| Per-family column chunks (e.g. `weapon-columns-*.js`) | ~1 kB each | ~0.6 kB | loaded only for the active family overview |
+
 ## Targets for later phases
 
 - ~~Remove Lora → drop ~158 kB font bytes~~ (done)
 - ~~Lazy routes → split 1.5 MB main chunk by feature area~~ (done)
 - ~~Lazy form fields → defer TipTap and heavy field renderers~~ (done)
+- ~~Equipment family columns → per-family dynamic import~~ (done)
 - `manualChunks` → cacheable vendor splits (react-table, tiptap, dnd-kit, radix)

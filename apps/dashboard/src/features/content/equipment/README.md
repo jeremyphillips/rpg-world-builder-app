@@ -23,7 +23,7 @@ Shared wiring lives under [`lib/`](./lib/):
 - [`equipment-form-input.ts`](./lib/equipment-form-input.ts) — kind-aware `toInput` dispatch
 - [`lib/shared/equipment-form-registry.ts`](./lib/shared/equipment-form-registry.ts) — `kindFieldGroups` registry
 - [`lib/shared/equipment-family-paths.ts`](./lib/shared/equipment-family-paths.ts) — URL segment ↔ kind mapping
-- [`lib/shared/equipment-family-columns.ts`](./lib/shared/equipment-family-columns.ts) — family overview tables
+- [`lib/shared/equipment-family-columns.ts`](./lib/shared/equipment-family-columns.ts) — lazy-loaded family overview table config (`loadFamilyTableConfig`)
 - [`lib/shared/equipment-detail-stat-rows.ts`](./lib/shared/equipment-detail-stat-rows.ts) — detail stat rows by kind
 
 ## Dashboard URLs
