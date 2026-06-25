@@ -8,6 +8,7 @@ import {
   grantContentTraitSchema,
   innateSpellEntrySchema,
   isGrantEligibleGrants,
+  languageChoiceGrantSchema,
   normalizeContentTrait,
   speciesGrantsSchema,
 } from './grants'
@@ -150,6 +151,26 @@ describe('featChoiceGrantSchema', () => {
   })
 })
 
+describe('languageChoiceGrantSchema', () => {
+  it('parses a category-based language choice', () => {
+    expect(languageChoiceGrantSchema.parse({ choose: 2, categories: ['standard'] })).toEqual({
+      choose: 2,
+      categories: ['standard'],
+    })
+  })
+
+  it('parses a fixed-pool language choice', () => {
+    expect(languageChoiceGrantSchema.parse({ choose: 1, from: ['common', 'elvish'] })).toEqual({
+      choose: 1,
+      from: ['common', 'elvish'],
+    })
+  })
+
+  it('requires an explicit choice pool', () => {
+    expect(languageChoiceGrantSchema.safeParse({ choose: 1 }).success).toBe(false)
+  })
+})
+
 describe('contentGrantsSchema', () => {
   it('parses a grants bag with innateSpells', () => {
     const grants = {
@@ -175,6 +196,18 @@ describe('contentGrantsSchema', () => {
       },
     }
     expect(contentGrantsSchema.parse(grants)).toEqual(grants)
+  })
+
+  it('parses fixed language grants and language choices', () => {
+    const grants = {
+      languages: ['thieves-cant' as const],
+      languageChoices: [{ choose: 1, categories: ['standard' as const] }],
+    }
+    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
+  })
+
+  it('rejects display labels in fixed language grants', () => {
+    expect(contentGrantsSchema.safeParse({ languages: ['Common'] }).success).toBe(false)
   })
 })
 

@@ -129,6 +129,11 @@ Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocab/weapon/property.ts`, and `vocab/armor/category.ts`. Co-located
 `*.test.ts` files assert every entry has non-empty `label` and `description`.
 
+Some vocabularies intentionally define a narrower local entry type when SRD text
+is sparse or policy-driven. For example, `vocab/language.ts` requires `label`
+and `category`, while `description` is optional so only authored language text is
+stored.
+
 Entity-specific fields (e.g. a weapon's `specialRules` text) stay on the
 content schema in `content/`, not in vocab maps.
 

@@ -1,4 +1,5 @@
 import { getDamageTypeLabel } from '../vocab/damage-type'
+import { getLanguageLabel } from '../vocab/language'
 import { getSenseLabel } from '../vocab/sense'
 import type { ContentGrants, ContentTrait, CustomContentTrait, GrantContentTrait } from './grants'
 
@@ -39,7 +40,7 @@ function formatLanguageGrantDescription(grants: ContentGrants): TraitDisplay | u
   if (!language) return undefined
   return {
     name: 'Language',
-    descriptionHtml: `<p>You know ${language}.</p>`,
+    descriptionHtml: `<p>You know ${getLanguageLabel(language)}.</p>`,
   }
 }
 

@@ -9,6 +9,8 @@ import {
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
   INNATE_SPELL_KINDS,
+  LANGUAGE_ENTRIES,
+  LANGUAGE_IDS,
   SENSE_RANGES,
   SENSE_TYPES,
   SENSE_ENTRIES,
@@ -22,6 +24,7 @@ import {
   damageTypeSchema,
   featCategorySchema,
   innateSpellKindSchema,
+  languageSchema,
   campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   senseTypeSchema,
@@ -34,6 +37,7 @@ import {
   type DamageType,
   type FeatCategory,
   type InnateSpellKind,
+  type Language,
   type SenseType,
   type SkillId,
   type UsageFrequency,
@@ -149,6 +153,14 @@ const featCategoryOptions = toOptions(
   ) as Record<FeatCategory, string>,
 )
 
+const languageOptions = toOptions(
+  LANGUAGE_IDS,
+  Object.fromEntries(LANGUAGE_IDS.map((id) => [id, LANGUAGE_ENTRIES[id].label])) as Record<
+    Language,
+    string
+  >,
+)
+
 // ---------------------------------------------------------------------------
 // Form schema
 // ---------------------------------------------------------------------------
@@ -170,7 +182,7 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
     senseType: senseTypeSchema.optional(),
     senseRange: z.coerce.number().int().min(0).optional(),
     speedWalkOverride: z.coerce.number().int().min(0).optional(),
-    language: z.string().optional(),
+    language: languageSchema.optional(),
     proficiencySkills: z.array(skillSchema).optional(),
     proficiencyArmor: z.array(armorCategorySchema).optional(),
     proficiencyTools: z.array(z.string()).optional(),
@@ -277,10 +289,10 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('speedOverride'),
     },
     {
-      type: 'text',
+      type: 'select',
       name: 'language',
       label: 'Language',
-      placeholder: 'e.g. Common',
+      options: languageOptions,
       visibility: visibleFor('languages'),
     },
     {
@@ -448,7 +460,7 @@ function emptyGrantRow(grantType: ClassGrantType): GrantRowForm {
     senseType: undefined,
     senseRange: undefined,
     speedWalkOverride: undefined,
-    language: '',
+    language: undefined,
     proficiencySkills: [],
     proficiencyArmor: [],
     proficiencyTools: [],
@@ -579,9 +591,9 @@ function applySpeedOverrideFromRows(result: ContentGrants, rows: GrantRowForm[])
 }
 
 function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language?.trim())
+  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language)
   if (!languageRows.length) return
-  result.languages = languageRows.map((r) => r.language!.trim())
+  result.languages = languageRows.map((r) => r.language!)
 }
 
 function skillArmorProficiencies(row: GrantRowForm): ContentProficiencies {

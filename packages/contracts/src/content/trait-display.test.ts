@@ -47,7 +47,7 @@ describe('resolveTraitDisplay', () => {
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'common',
-        grants: { languages: ['Common'] },
+        grants: { languages: ['common'] },
       }),
     )
     expect(display.name).toBe('Language')
