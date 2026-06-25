@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 
 import { RichTextEditor } from './rich-text-editor.client'
@@ -9,6 +10,8 @@ describe('RichTextEditor', () => {
     render(<RichTextEditor aria-label="Biography" />)
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Italic' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Bulleted list' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ordered list' })).toBeInTheDocument()
   })
 
   it('hides the link button unless linkable is set', () => {
@@ -50,5 +53,18 @@ describe('RichTextEditor', () => {
     const { container } = render(<RichTextEditor aria-label="Biography" />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('opens the link panel instead of using a prompt', async () => {
+    const user = userEvent.setup()
+    render(<RichTextEditor aria-label="Biography" linkable />)
+
+    await user.click(screen.getByRole('button', { name: 'Link' }))
+
+    expect(screen.getByText('Insert link')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Link URL' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Display text' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel link insert' })).toBeInTheDocument()
   })
 })
