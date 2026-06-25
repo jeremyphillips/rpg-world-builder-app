@@ -6,6 +6,7 @@ import StarterKit from '@tiptap/starter-kit'
 import { Bold, Italic, Link as LinkIcon, List, ListOrdered, Pencil } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { RICH_TEXT_LINK_ATTRS, readRichTextLinkAttr } from '../../lib/rich-text-link-attrs'
 import { Button } from './button.client'
 import {
   RichTextLinkPicker,
@@ -160,17 +161,13 @@ export function RichTextEditor({
     return {
       href: typeof attrs.href === 'string' ? attrs.href : '',
       displayText:
-        selectedText ||
-        (typeof attrs['data-content-title'] === 'string' ? attrs['data-content-title'] : ''),
+        selectedText || readRichTextLinkAttr(attrs, RICH_TEXT_LINK_ATTRS.contentTitle) || '',
       openInNewWindow: attrs.target === '_blank',
       metadata: {
-        contentType:
-          typeof attrs['data-content-type'] === 'string' ? attrs['data-content-type'] : undefined,
-        contentId:
-          typeof attrs['data-content-id'] === 'string' ? attrs['data-content-id'] : undefined,
-        contentTitle:
-          typeof attrs['data-content-title'] === 'string' ? attrs['data-content-title'] : undefined,
-        linkKind: parseLinkKind(attrs['data-link-kind']),
+        contentType: readRichTextLinkAttr(attrs, RICH_TEXT_LINK_ATTRS.contentType),
+        contentId: readRichTextLinkAttr(attrs, RICH_TEXT_LINK_ATTRS.contentId),
+        contentTitle: readRichTextLinkAttr(attrs, RICH_TEXT_LINK_ATTRS.contentTitle),
+        linkKind: parseLinkKind(readRichTextLinkAttr(attrs, RICH_TEXT_LINK_ATTRS.linkKind)),
       },
     }
   }, [editor])
@@ -186,13 +183,17 @@ export function RichTextEditor({
         target: payload.openInNewWindow ? '_blank' : null,
         rel: payload.openInNewWindow ? 'noopener noreferrer' : null,
         ...(payload.metadata?.contentType
-          ? { 'data-content-type': payload.metadata.contentType }
+          ? { [RICH_TEXT_LINK_ATTRS.contentType]: payload.metadata.contentType }
           : {}),
-        ...(payload.metadata?.contentId ? { 'data-content-id': payload.metadata.contentId } : {}),
+        ...(payload.metadata?.contentId
+          ? { [RICH_TEXT_LINK_ATTRS.contentId]: payload.metadata.contentId }
+          : {}),
         ...(payload.metadata?.contentTitle
-          ? { 'data-content-title': payload.metadata.contentTitle }
+          ? { [RICH_TEXT_LINK_ATTRS.contentTitle]: payload.metadata.contentTitle }
           : {}),
-        ...(payload.metadata?.linkKind ? { 'data-link-kind': payload.metadata.linkKind } : {}),
+        ...(payload.metadata?.linkKind
+          ? { [RICH_TEXT_LINK_ATTRS.linkKind]: payload.metadata.linkKind }
+          : {}),
       } as never
 
       const displayText = payload.displayText.trim()

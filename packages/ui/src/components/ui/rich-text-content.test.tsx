@@ -34,6 +34,24 @@ describe('RichTextContent', () => {
     expect(screen.getByText('Safe')).toBeInTheDocument()
   })
 
+  it('renders internal links with preserved metadata attributes', () => {
+    render(
+      <RichTextContent
+        html={
+          '<p>See <a href="/campaigns/demo/spells/fire-bolt" data-content-type="spell" data-content-id="fire-bolt" data-content-title="Fire Bolt" data-link-kind="detail">Fire Bolt</a>.</p>'
+        }
+        size="sm"
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Fire Bolt' })
+    expect(link).toHaveAttribute('href', '/campaigns/demo/spells/fire-bolt')
+    expect(link).toHaveAttribute('data-content-type', 'spell')
+    expect(link).toHaveAttribute('data-content-id', 'fire-bolt')
+    expect(link).toHaveAttribute('data-content-title', 'Fire Bolt')
+    expect(link).toHaveAttribute('data-link-kind', 'detail')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <RichTextContent html="<p>Trait description with a <a href='#'>link</a>.</p>" tone="muted" />,

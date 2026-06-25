@@ -47,17 +47,23 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  render: () => {
-    const [open, setOpen] = React.useState(true)
+  args: {
+    open: true,
+    onOpenChange: action('onOpenChange'),
+    onInsert: action('onInsert'),
+    onCancel: action('onCancel'),
+    onRemove: action('onRemove'),
+    internalOptions: demoInternalOptions,
+    trigger: <Button type="button">Link</Button>,
+  },
+  render: (args) => {
+    const [open, setOpen] = React.useState(args.open)
     return (
       <div className="min-h-[24rem] min-w-[32rem] p-4">
         <RichTextLinkPicker
+          {...args}
           open={open}
           onOpenChange={setOpen}
-          onInsert={action('onInsert')}
-          onCancel={action('onCancel')}
-          onRemove={action('onRemove')}
-          internalOptions={demoInternalOptions}
           trigger={<Button type="button">Link</Button>}
         />
       </div>
