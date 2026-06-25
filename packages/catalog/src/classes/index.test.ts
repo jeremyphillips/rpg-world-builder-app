@@ -730,6 +730,31 @@ describe('SRD 5.2.1 class seed', () => {
     )
   })
 
+  it('gold alternatives match SRD starting wealth amounts', () => {
+    const expectedGoldGp: Record<string, number> = {
+      barbarian: 75,
+      bard: 90,
+      cleric: 110,
+      druid: 50,
+      fighter: 155,
+      monk: 50,
+      paladin: 150,
+      ranger: 150,
+      rogue: 100,
+      sorcerer: 50,
+      warlock: 100,
+      wizard: 55,
+    }
+
+    for (const cls of classes) {
+      const goldOption = cls.characterCreation?.startingEquipment.options.find(
+        (option) => option.id === 'gold',
+      )
+      expect(goldOption, `${cls.slug} missing gold starting equipment option`).toBeDefined()
+      expect(goldOption!.wealth).toEqual({ gp: expectedGoldGp[cls.slug] })
+    }
+  })
+
   it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
     const monk = getClassBySlug(RULESET, 'monk')
     const standard = monk.characterCreation?.startingEquipment.options.find(
