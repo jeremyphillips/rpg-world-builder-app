@@ -23,7 +23,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/inter": "^5.2.8",
-    "@fontsource-variable/lora": "^5.2.8",
     "@hookform/resolvers": "^5.4.0",
     "@rpg/api-client": "workspace:*",
     "@rpg/catalog": "workspace:*",

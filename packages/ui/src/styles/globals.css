@@ -19,8 +19,9 @@
  * so the theme reads warm rather than sterile gray.
  *
  * Fonts: apps provide the actual font faces. The public app (Next.js) sets
- * `--font-body` / `--font-heading` via `next/font`; the dashboard (Vite) loads
- * `@fontsource-variable` faces whose family names match the var() fallbacks.
+ * `--font-body` via `next/font`; the dashboard (Vite) loads `@fontsource-variable/inter`.
+ * `--font-display` is a semantic alias for the same Inter family (weight/size
+ * differentiate headings in components).
  */
 @theme inline {
   --color-background: var(--background);
@@ -45,7 +46,9 @@
   --color-overlay: var(--overlay);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-heading, 'Lora Variable'), 'Lora', ui-serif, Georgia, serif;
+  --font-display:
+    var(--font-heading, var(--font-body, 'Inter Variable')), 'Inter', ui-sans-serif, system-ui,
+    sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
