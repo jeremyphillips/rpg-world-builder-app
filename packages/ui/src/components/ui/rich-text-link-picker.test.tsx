@@ -24,6 +24,13 @@ const internalOptions: RichTextLinkPickerInternalOption[] = [
     kind: 'detail',
     sourceLabel: 'Homebrew',
   },
+  {
+    id: 'sharpshooter',
+    title: 'Sharpshooter',
+    href: '/campaigns/demo/content/feats/sharpshooter',
+    contentType: 'feat',
+    kind: 'detail',
+  },
 ]
 
 describe('RichTextLinkPicker', () => {
@@ -41,8 +48,26 @@ describe('RichTextLinkPicker', () => {
     expect(screen.getByText('Insert link')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Internal' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('textbox', { name: 'Search internal content' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Filter content type' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toHaveTextContent(
+      'All types',
+    )
     expect(screen.getByRole('textbox', { name: 'Internal display text' })).toBeInTheDocument()
+  })
+
+  it('shows internal options from every content type when the filter is unset', () => {
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Fireball/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sharpshooter/i })).toBeInTheDocument()
   })
 
   it('submits an internal link with metadata', async () => {

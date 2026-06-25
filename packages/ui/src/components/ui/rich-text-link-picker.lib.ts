@@ -4,6 +4,9 @@ import type {
   RichTextLinkTab,
 } from './rich-text-link-picker.types'
 
+export const RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL = 'all'
+export const RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL = 'All types'
+
 export interface LinkPickerFormState {
   tab: RichTextLinkTab
   searchQuery: string
@@ -16,6 +19,10 @@ export interface LinkPickerFormState {
   externalOpenInNewWindow: boolean
 }
 
+export function isRichTextLinkContentTypeFilterActive(contentType: string): boolean {
+  return contentType !== RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL
+}
+
 export function filterInternalLinkOptions(
   internalOptions: RichTextLinkPickerInternalOption[],
   contentType: string,
@@ -23,7 +30,9 @@ export function filterInternalLinkOptions(
 ): RichTextLinkPickerInternalOption[] {
   const query = searchQuery.trim().toLowerCase()
   return internalOptions.filter((option) => {
-    if (option.contentType !== contentType) return false
+    if (isRichTextLinkContentTypeFilterActive(contentType) && option.contentType !== contentType) {
+      return false
+    }
     if (!query) return true
     return [option.title, option.sourceLabel, option.href].some((value) =>
       value?.toLowerCase().includes(query),
@@ -48,12 +57,13 @@ function matchesInitialInternalOption(
   initialValue: Partial<RichTextLinkPickerValue> | undefined,
   contentType: string,
 ): boolean {
-  if (
-    initialValue?.metadata?.contentId &&
-    option.id === initialValue.metadata.contentId &&
-    option.contentType === contentType
-  ) {
-    return true
+  if (initialValue?.metadata?.contentId && option.id === initialValue.metadata.contentId) {
+    if (
+      contentType === RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL ||
+      option.contentType === contentType
+    ) {
+      return true
+    }
   }
 
   return initialValue?.href ? option.href === initialValue.href : false
@@ -90,10 +100,9 @@ function resolveExternalTabFields(
 export function resolveLinkPickerFormState(
   initialValue: Partial<RichTextLinkPickerValue> | undefined,
   internalOptions: RichTextLinkPickerInternalOption[],
-  defaultContentType: string,
 ): LinkPickerFormState {
   const tab: RichTextLinkTab = initialValue?.mode ?? 'internal'
-  const contentType = initialValue?.metadata?.contentType ?? defaultContentType
+  const contentType = initialValue?.metadata?.contentType ?? RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL
   const selectedOption = findInitialInternalOption(initialValue, internalOptions, contentType)
 
   return {

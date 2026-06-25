@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   buildExternalLinkPickerValue,
   buildInternalLinkPickerValue,
+  filterInternalLinkOptions,
   findInitialInternalOption,
   isLinkPickerInsertDisabled,
+  RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL,
   resolveLinkPickerFormState,
 } from './rich-text-link-picker.lib'
 import type { RichTextLinkPickerInternalOption } from './rich-text-link-picker.types'
@@ -25,6 +27,13 @@ const internalOptions: RichTextLinkPickerInternalOption[] = [
     kind: 'detail',
     sourceLabel: 'Homebrew',
   },
+  {
+    id: 'sharpshooter',
+    title: 'Sharpshooter',
+    href: '/campaigns/demo/content/feats/sharpshooter',
+    contentType: 'feat',
+    kind: 'detail',
+  },
 ]
 
 describe('resolveLinkPickerFormState', () => {
@@ -44,7 +53,6 @@ describe('resolveLinkPickerFormState', () => {
           },
         },
         internalOptions,
-        'spell',
       ),
     ).toEqual({
       tab: 'internal',
@@ -69,7 +77,6 @@ describe('resolveLinkPickerFormState', () => {
           openInNewWindow: false,
         },
         internalOptions,
-        'spell',
       ),
     ).toMatchObject({
       tab: 'external',
@@ -77,6 +84,25 @@ describe('resolveLinkPickerFormState', () => {
       externalDisplayText: 'Rules',
       externalOpenInNewWindow: false,
     })
+  })
+
+  it('defaults the content type filter to all types for new links', () => {
+    expect(resolveLinkPickerFormState(undefined, internalOptions)).toMatchObject({
+      contentType: RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL,
+    })
+  })
+})
+
+describe('filterInternalLinkOptions', () => {
+  it('returns all content types when the filter is unset', () => {
+    expect(
+      filterInternalLinkOptions(internalOptions, RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL, ''),
+    ).toHaveLength(3)
+  })
+
+  it('filters by content type when a specific type is selected', () => {
+    expect(filterInternalLinkOptions(internalOptions, 'spell', '')).toHaveLength(2)
+    expect(filterInternalLinkOptions(internalOptions, 'feat', '')).toHaveLength(1)
   })
 })
 

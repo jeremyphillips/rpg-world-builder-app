@@ -13,6 +13,8 @@ import {
   buildInternalLinkPickerValue,
   filterInternalLinkOptions,
   isLinkPickerInsertDisabled,
+  RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL,
+  RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL,
   resolveLinkPickerFormState,
 } from './rich-text-link-picker.lib'
 import type {
@@ -49,10 +51,9 @@ export function RichTextLinkPicker({
   contentTypeOptions = DEFAULT_CONTENT_TYPE_OPTIONS,
   heading = 'Insert link',
 }: RichTextLinkPickerProps) {
-  const defaultContentType = contentTypeOptions[0]?.value ?? 'spell'
   const [tab, setTab] = React.useState<RichTextLinkTab>('internal')
   const [searchQuery, setSearchQuery] = React.useState('')
-  const [contentType, setContentType] = React.useState(defaultContentType)
+  const [contentType, setContentType] = React.useState(RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL)
   const [selectedOptionId, setSelectedOptionId] = React.useState<string | null>(null)
   const [internalDisplayText, setInternalDisplayText] = React.useState('')
   const [externalHref, setExternalHref] = React.useState('')
@@ -73,7 +74,7 @@ export function RichTextLinkPicker({
   React.useEffect(() => {
     if (!open) return
 
-    const nextState = resolveLinkPickerFormState(initialValue, internalOptions, defaultContentType)
+    const nextState = resolveLinkPickerFormState(initialValue, internalOptions)
     setTab(nextState.tab)
     setSearchQuery(nextState.searchQuery)
     setContentType(nextState.contentType)
@@ -83,7 +84,7 @@ export function RichTextLinkPicker({
     setExternalHref(nextState.externalHref)
     setExternalDisplayText(nextState.externalDisplayText)
     setExternalOpenInNewWindow(nextState.externalOpenInNewWindow)
-  }, [defaultContentType, initialValue, internalOptions, open])
+  }, [initialValue, internalOptions, open])
 
   const handleCancel = React.useCallback(() => {
     onOpenChange(false)
@@ -176,10 +177,13 @@ export function RichTextLinkPicker({
                   />
                 </div>
                 <Select value={contentType} onValueChange={setContentType}>
-                  <SelectTrigger size="sm" aria-label="Filter content type">
-                    <SelectValue placeholder="Type" />
+                  <SelectTrigger size="sm" aria-label="Filter by content type">
+                    <SelectValue placeholder={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL}>
+                      {RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL}
+                    </SelectItem>
                     {contentTypeOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
