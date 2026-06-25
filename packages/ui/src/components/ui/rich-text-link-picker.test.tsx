@@ -22,7 +22,7 @@ const internalOptions: RichTextLinkPickerInternalOption[] = [
     href: '/campaigns/demo/content/spells/fireball',
     contentType: 'spell',
     kind: 'detail',
-    subtitle: 'Homebrew',
+    sourceLabel: 'Homebrew',
   },
 ]
 

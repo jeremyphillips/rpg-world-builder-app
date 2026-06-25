@@ -109,6 +109,17 @@ export {
   type RichTextLinkPickerInternalOption,
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
+export {
+  RichTextLinkPreviewCard,
+  type RichTextLinkPreviewCardProps,
+} from './components/ui/rich-text-link-preview-card.client'
+export {
+  richTextLinkPreviewCardRootVariants,
+  richTextLinkPreviewCardEyebrowVariants,
+  richTextLinkPreviewCardTitleVariants,
+  richTextLinkPreviewCardMetaVariants,
+  type RichTextLinkPreviewCardRootVariantProps,
+} from './components/ui/rich-text-link-preview-card.variants'
 
 export {
   Tooltip,

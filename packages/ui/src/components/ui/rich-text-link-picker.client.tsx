@@ -4,10 +4,10 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { Search, X } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
+import { RichTextLinkPreviewCard } from './rich-text-link-preview-card.client'
 import {
   Select,
   SelectContent,
@@ -26,7 +26,7 @@ export interface RichTextLinkPickerInternalOption {
   href: string
   contentType: string
   kind: Exclude<RichTextLinkKind, 'external'>
-  subtitle?: string
+  sourceLabel?: string
 }
 
 export interface RichTextLinkPickerContentTypeOption {
@@ -100,7 +100,7 @@ export function RichTextLinkPicker({
     return internalOptions.filter((option) => {
       if (option.contentType !== contentType) return false
       if (!query) return true
-      return [option.title, option.subtitle, option.href].some((value) =>
+      return [option.title, option.sourceLabel, option.href].some((value) =>
         value?.toLowerCase().includes(query),
       )
     })
@@ -246,59 +246,33 @@ export function RichTextLinkPicker({
               </div>
 
               {selectedInternalOption ? (
-                <div className="rounded-md border border-border bg-muted/30 p-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                        {selectedInternalOption.contentType}
-                      </p>
-                      <p className="truncate text-sm font-medium">{selectedInternalOption.title}</p>
-                      {selectedInternalOption.subtitle ? (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {selectedInternalOption.subtitle}
-                        </p>
-                      ) : null}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-6"
-                      aria-label="Clear selected internal link"
-                      onClick={() => setSelectedOptionId(null)}
-                    >
-                      <X className="size-3.5" />
-                    </Button>
-                  </div>
-                </div>
+                <RichTextLinkPreviewCard
+                  tone="selected"
+                  title={selectedInternalOption.title}
+                  contentType={selectedInternalOption.contentType}
+                  sourceLabel={selectedInternalOption.sourceLabel}
+                  onClear={() => setSelectedOptionId(null)}
+                />
               ) : (
                 <div className="max-h-40 space-y-1 overflow-auto rounded-md border border-border p-1">
                   {filteredInternalOptions.length === 0 ? (
                     <p className="px-2 py-1.5 text-xs text-muted-foreground">{EMPTY_SEARCH_MESSAGE}</p>
                   ) : (
                     filteredInternalOptions.map((option) => (
-                      <button
+                      <RichTextLinkPreviewCard
                         key={option.id}
-                        type="button"
-                        onClick={() => {
+                        title={option.title}
+                        contentType={option.contentType}
+                        sourceLabel={option.sourceLabel}
+                        interactive
+                        tone={selectedOptionId === option.id ? 'selected' : 'default'}
+                        onSelect={() => {
                           setSelectedOptionId(option.id)
                           if (internalDisplayText.trim().length === 0) {
                             setInternalDisplayText(option.title)
                           }
                         }}
-                        className={cn(
-                          'flex w-full cursor-pointer flex-col rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
-                          selectedOptionId === option.id && 'bg-accent text-accent-foreground',
-                        )}
-                      >
-                        <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          {option.contentType}
-                        </span>
-                        <span className="truncate font-medium">{option.title}</span>
-                        {option.subtitle ? (
-                          <span className="truncate text-xs text-muted-foreground">{option.subtitle}</span>
-                        ) : null}
-                      </button>
+                      />
                     ))
                   )}
                 </div>

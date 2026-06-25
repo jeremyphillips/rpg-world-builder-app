@@ -19,7 +19,7 @@ const demoInternalOptions = [
     href: '/campaigns/demo/content/spells/fireball',
     contentType: 'spell',
     kind: 'detail' as const,
-    subtitle: 'Homebrew',
+    sourceLabel: 'Homebrew',
   },
   {
     id: 'feat-overview',
