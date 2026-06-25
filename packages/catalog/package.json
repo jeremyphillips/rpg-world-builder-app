@@ -27,6 +27,10 @@
     "./feats": {
       "types": "./src/feats/index.ts",
       "default": "./src/feats/index.ts"
+    },
+    "./xp-progressions": {
+      "types": "./src/xp-progressions/index.ts",
+      "default": "./src/xp-progressions/index.ts"
     }
   },
   "scripts": {
