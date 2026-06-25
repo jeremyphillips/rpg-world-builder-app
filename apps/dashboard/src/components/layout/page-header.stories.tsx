@@ -1,4 +1,4 @@
-import { Link, MemoryRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
@@ -7,13 +7,6 @@ import { PageHeader } from './page-header'
 const meta = {
   title: 'Layout/PageHeader',
   component: PageHeader,
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    ),
-  ],
 } satisfies Meta<typeof PageHeader>
 
 export default meta
