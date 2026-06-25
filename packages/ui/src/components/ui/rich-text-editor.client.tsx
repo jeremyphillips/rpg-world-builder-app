@@ -8,6 +8,7 @@ import { Bold, Italic, Link as LinkIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
+import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 
 export interface RichTextEditorProps {
   /** Current value as an HTML string. */
@@ -43,6 +44,11 @@ export function RichTextEditor({
   'aria-invalid': ariaInvalid,
 }: RichTextEditorProps) {
   const [, forceRender] = React.useReducer((count: number) => count + 1, 0)
+  const valueRef = React.useRef(value)
+  const onChangeRef = React.useRef(onChange)
+
+  valueRef.current = value
+  onChangeRef.current = onChange
 
   const editor = useEditor(
     {
@@ -50,7 +56,12 @@ export function RichTextEditor({
       editable: !disabled,
       extensions: [StarterKit.configure({ link: linkable ? { openOnClick: false } : false })],
       content: value ?? '',
-      onUpdate: ({ editor: instance }) => onChange?.(instance.getHTML()),
+      onUpdate: ({ editor: instance }) => {
+        const nextHtml = instance.getHTML()
+        if (richTextHtmlEquals(valueRef.current, nextHtml)) return
+        const normalized = normalizeRichTextHtml(nextHtml)
+        onChangeRef.current?.(normalized === '' ? '' : nextHtml)
+      },
       onBlur: () => onBlur?.(),
       editorProps: {
         attributes: {
@@ -77,8 +88,8 @@ export function RichTextEditor({
 
   React.useEffect(() => {
     if (!editor) return
-    if (value !== undefined && value !== editor.getHTML()) {
-      editor.commands.setContent(value, { emitUpdate: false })
+    if (value !== undefined && !richTextHtmlEquals(value, editor.getHTML())) {
+      editor.commands.setContent(value ?? '', { emitUpdate: false })
     }
   }, [editor, value])
 

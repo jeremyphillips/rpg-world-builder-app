@@ -6,6 +6,7 @@ import {
   envelopeSlugFields,
   finalizeContentInput,
   slugForInputParse,
+  stripEditEnvelopeFromFormDefaults,
   stripSlugFromInput,
 } from './content-form-key-helpers'
 
@@ -67,5 +68,26 @@ describe('finalizeContentInput', () => {
   it('keeps slug on create', () => {
     const input = { name: 'Elf', slug: 'wood-elf' }
     expect(finalizeContentInput(input)).toEqual(input)
+  })
+})
+
+describe('stripEditEnvelopeFromFormDefaults', () => {
+  it('removes slug from edit defaults', () => {
+    expect(
+      stripEditEnvelopeFromFormDefaults({
+        name: 'Athletics',
+        slug: 'athletics',
+        description: 'Jump farther.',
+      }),
+    ).toEqual({ name: 'Athletics', description: 'Jump farther.' })
+  })
+
+  it('removes kind when route-scoped equipment edit omits the kind field', () => {
+    expect(
+      stripEditEnvelopeFromFormDefaults(
+        { name: 'Lute', slug: 'lute', kind: 'tool', description: 'A stringed instrument.' },
+        { stripKind: true },
+      ),
+    ).toEqual({ name: 'Lute', description: 'A stringed instrument.' })
   })
 })

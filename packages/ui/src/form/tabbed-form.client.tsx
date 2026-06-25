@@ -110,9 +110,13 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     [allItems, defaultValues],
   )
 
+  // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
+  // changes reference; callers use the `key` prop to remount when defaults change.
+  const [formDefaults] = React.useState(() => resolvedDefaults)
+
   const form = useForm<TFieldValues>({
     resolver,
-    defaultValues: resolvedDefaults,
+    defaultValues: formDefaults,
     mode,
   })
 
