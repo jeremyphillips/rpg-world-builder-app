@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Editor } from '@tiptap/react'
 
@@ -28,7 +28,7 @@ function createEditorMock(isActiveLink: boolean) {
 }
 
 describe('RichTextLinkBubbleMenu', () => {
-  it('renders edit and remove actions when open', () => {
+  it('renders edit and remove actions when open', async () => {
     const { editor, rootRef, anchor } = createEditorMock(true)
     const rect = {
       top: 40,
@@ -66,7 +66,9 @@ describe('RichTextLinkBubbleMenu', () => {
       />,
     )
 
-    expect(screen.getByRole('toolbar', { name: 'Link options' })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('toolbar', { name: 'Link options' })).toBeInTheDocument()
+    })
     expect(screen.getByRole('button', { name: 'Edit link' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove link' })).toBeInTheDocument()
   })
@@ -112,6 +114,9 @@ describe('RichTextLinkBubbleMenu', () => {
       />,
     )
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Edit link' })).toBeInTheDocument()
+    })
     await user.click(screen.getByRole('button', { name: 'Edit link' }))
     await user.click(screen.getByRole('button', { name: 'Remove link' }))
 

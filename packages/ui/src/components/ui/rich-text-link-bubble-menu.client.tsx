@@ -16,6 +16,18 @@ export interface RichTextLinkBubbleMenuProps {
   className?: string
 }
 
+function resolveLinkBubbleMenuPosition(
+  editor: Editor,
+  root: HTMLDivElement,
+): { top: number; left: number } | null {
+  const { from } = editor.state.selection
+  const domAtPos = editor.view.domAtPos(from)
+  const anchor = findLinkAnchorFromDom(domAtPos.node)
+  if (!anchor) return null
+
+  return resolveLinkBubblePosition(root.getBoundingClientRect(), anchor.getBoundingClientRect())
+}
+
 export function RichTextLinkBubbleMenu({
   editor,
   rootRef,
@@ -27,32 +39,30 @@ export function RichTextLinkBubbleMenu({
   const [position, setPosition] = React.useState<{ top: number; left: number } | null>(null)
 
   React.useLayoutEffect(() => {
-    if (!open || !editor || !rootRef.current) {
-      setPosition(null)
-      return
-    }
-
-    const { from } = editor.state.selection
-    const domAtPos = editor.view.domAtPos(from)
-    const anchor = findLinkAnchorFromDom(domAtPos.node)
-    if (!anchor) {
-      setPosition(null)
-      return
+    if (!open || !editor) {
+      const frameId = window.requestAnimationFrame(() => {
+        setPosition(null)
+      })
+      return () => window.cancelAnimationFrame(frameId)
     }
 
     const updatePosition = () => {
-      if (!rootRef.current) return
-      setPosition(
-        resolveLinkBubblePosition(
-          rootRef.current.getBoundingClientRect(),
-          anchor.getBoundingClientRect(),
-        ),
-      )
+      const root = rootRef.current
+      if (!root) {
+        setPosition(null)
+        return
+      }
+
+      setPosition(resolveLinkBubbleMenuPosition(editor, root))
     }
 
-    updatePosition()
+    const frameId = window.requestAnimationFrame(updatePosition)
     window.addEventListener('resize', updatePosition)
-    return () => window.removeEventListener('resize', updatePosition)
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      window.removeEventListener('resize', updatePosition)
+    }
   }, [editor, editor?.state.selection, open, rootRef])
 
   if (!open || !position) return null
