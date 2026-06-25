@@ -5,6 +5,7 @@ import {
   buildLinkMarkAttributes,
   createFallbackLinkContext,
   mergeLinkInsertPayload,
+  resolveLinkContextFromAnchor,
   resolveLinkContextFromSelection,
   resolveLinkPickerMode,
 } from './rich-text-editor-link.lib'
@@ -103,6 +104,29 @@ describe('mergeLinkInsertPayload', () => {
         contentTitle: 'Fireball',
         contentType: 'spell',
         contentId: 'fireball',
+        linkKind: 'detail',
+      },
+    })
+  })
+})
+
+describe('resolveLinkContextFromAnchor', () => {
+  it('reads metadata attrs from rendered anchor elements', () => {
+    const anchor = document.createElement('a')
+    anchor.setAttribute('href', '/campaigns/demo/content/spells/fireball')
+    anchor.textContent = 'Fire Bolt'
+    anchor.setAttribute(RICH_TEXT_LINK_ATTRS.contentType, 'spell')
+    anchor.setAttribute(RICH_TEXT_LINK_ATTRS.contentId, 'fireball')
+    anchor.setAttribute(RICH_TEXT_LINK_ATTRS.contentTitle, 'Fireball')
+    anchor.setAttribute(RICH_TEXT_LINK_ATTRS.linkKind, 'detail')
+
+    expect(resolveLinkContextFromAnchor(anchor)).toMatchObject({
+      href: '/campaigns/demo/content/spells/fireball',
+      displayText: 'Fire Bolt',
+      metadata: {
+        contentType: 'spell',
+        contentId: 'fireball',
+        contentTitle: 'Fireball',
         linkKind: 'detail',
       },
     })

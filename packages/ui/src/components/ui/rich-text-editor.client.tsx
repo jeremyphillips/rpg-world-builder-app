@@ -7,6 +7,7 @@ import { Pencil } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { RichTextLink } from './rich-text-link-extension'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 import type { RichTextLinkContext } from './rich-text-editor-link.lib'
@@ -72,7 +73,10 @@ export function RichTextEditor({
     {
       immediatelyRender: false,
       editable: !disabled,
-      extensions: [StarterKit.configure({ link: linkable ? { openOnClick: false } : false })],
+      extensions: [
+        StarterKit.configure({ link: false }),
+        ...(linkable ? [RichTextLink.configure({ openOnClick: false })] : []),
+      ],
       content: value ?? '',
       onUpdate: ({ editor: instance }) => {
         const nextHtml = instance.getHTML()

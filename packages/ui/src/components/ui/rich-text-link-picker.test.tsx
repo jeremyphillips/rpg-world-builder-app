@@ -60,7 +60,10 @@ describe('RichTextLinkPicker', () => {
 
     await user.click(screen.getByRole('button', { name: /Fireball/i }))
     await user.clear(screen.getByRole('textbox', { name: 'Internal display text' }))
-    await user.type(screen.getByRole('textbox', { name: 'Internal display text' }), 'Fireball spell')
+    await user.type(
+      screen.getByRole('textbox', { name: 'Internal display text' }),
+      'Fireball spell',
+    )
     await user.click(screen.getByRole('button', { name: 'Insert' }))
 
     expect(onInsert).toHaveBeenCalledWith({
@@ -74,6 +77,59 @@ describe('RichTextLinkPicker', () => {
         contentTitle: 'Fireball',
         linkKind: 'detail',
       },
+    })
+  })
+
+  it('keeps Insert disabled until internal display text is provided', async () => {
+    const user = userEvent.setup()
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: /Fireball/i }))
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeEnabled()
+
+    await user.clear(screen.getByRole('textbox', { name: 'Internal display text' }))
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeDisabled()
+  })
+
+  it('submits an external link from the external tab', async () => {
+    const user = userEvent.setup()
+    const onInsert = vi.fn()
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={onInsert}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    await user.click(screen.getByRole('tab', { name: 'External' }))
+    expect(screen.getByRole('button', { name: 'Insert' })).toBeDisabled()
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'External URL' }),
+      'https://example.com/rules',
+    )
+    await user.type(screen.getByRole('textbox', { name: 'External display text' }), 'Rules')
+    await user.click(screen.getByRole('button', { name: 'Insert' }))
+
+    expect(onInsert).toHaveBeenCalledWith({
+      mode: 'external',
+      href: 'https://example.com/rules',
+      displayText: 'Rules',
+      openInNewWindow: true,
+      metadata: { linkKind: 'external' },
     })
   })
 
@@ -93,7 +149,7 @@ describe('RichTextLinkPicker', () => {
     expect(screen.getByRole('checkbox', { name: 'Open external link in new window' })).toBeChecked()
   })
 
-  it('has no axe accessibility violations', async () => {
+  it('has no axe accessibility violations on the internal tab', async () => {
     const { container } = render(
       <RichTextLinkPicker
         open
@@ -101,6 +157,26 @@ describe('RichTextLinkPicker', () => {
         trigger={<button type="button">Open picker</button>}
         onInsert={vi.fn()}
         internalOptions={internalOptions}
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+
+  it('has no axe accessibility violations on the external tab', async () => {
+    const { container } = render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+        initialValue={{
+          mode: 'external',
+          href: 'https://example.com',
+          displayText: 'Rules',
+          openInNewWindow: true,
+        }}
       />,
     )
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

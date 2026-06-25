@@ -70,3 +70,44 @@ export const Default: Story = {
     )
   },
 }
+
+export const ExternalTab: Story = {
+  args: {
+    open: true,
+    onOpenChange: action('onOpenChange'),
+    onInsert: action('onInsert'),
+    onCancel: action('onCancel'),
+    internalOptions: demoInternalOptions,
+    initialValue: {
+      mode: 'external',
+      href: 'https://example.com/rules',
+      displayText: 'House rules',
+      openInNewWindow: true,
+    },
+    trigger: <Button type="button">Link</Button>,
+  },
+}
+
+export const EditExistingInternalLink: Story = {
+  args: {
+    open: true,
+    onOpenChange: action('onOpenChange'),
+    onInsert: action('onInsert'),
+    onCancel: action('onCancel'),
+    onRemove: action('onRemove'),
+    internalOptions: demoInternalOptions,
+    initialValue: {
+      mode: 'internal',
+      href: '/campaigns/demo/content/spells/fireball',
+      displayText: 'Fireball spell',
+      openInNewWindow: false,
+      metadata: {
+        contentType: 'spell',
+        contentId: 'fireball',
+        contentTitle: 'Fireball',
+        linkKind: 'detail',
+      },
+    },
+    trigger: <Button type="button">Link</Button>,
+  },
+}

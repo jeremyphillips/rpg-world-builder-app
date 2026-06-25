@@ -118,3 +118,17 @@ export function findHoveredLinkAnchor(target: EventTarget | null): HTMLAnchorEle
   const anchor = target.closest('a')
   return anchor instanceof HTMLAnchorElement ? anchor : null
 }
+
+export function resolveLinkContextFromAnchor(anchor: HTMLAnchorElement): RichTextLinkContext {
+  return resolveLinkContextFromSelection(
+    {
+      href: anchor.getAttribute('href'),
+      target: anchor.getAttribute('target'),
+      [RICH_TEXT_LINK_ATTRS.contentType]: anchor.getAttribute(RICH_TEXT_LINK_ATTRS.contentType),
+      [RICH_TEXT_LINK_ATTRS.contentId]: anchor.getAttribute(RICH_TEXT_LINK_ATTRS.contentId),
+      [RICH_TEXT_LINK_ATTRS.contentTitle]: anchor.getAttribute(RICH_TEXT_LINK_ATTRS.contentTitle),
+      [RICH_TEXT_LINK_ATTRS.linkKind]: anchor.getAttribute(RICH_TEXT_LINK_ATTRS.linkKind),
+    },
+    anchor.textContent ?? '',
+  )
+}

@@ -30,3 +30,12 @@ export const SelectedOverview: Story = {
     onClear: action('onClear'),
   },
 }
+
+export const FeatDetailResult: Story = {
+  args: {
+    contentType: 'feat',
+    title: 'Sharpshooter',
+    interactive: true,
+    onSelect: action('onSelect'),
+  },
+}

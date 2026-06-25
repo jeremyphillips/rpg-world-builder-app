@@ -5,10 +5,10 @@ import type { Editor } from '@tiptap/react'
 
 import {
   buildLinkMarkAttributes,
-  createFallbackLinkContext,
   findHoveredLinkAnchor,
   mergeLinkInsertPayload,
   resolveAnchorEditPosition,
+  resolveLinkContextFromAnchor,
   resolveLinkContextFromSelection,
   resolveLinkPickerMode,
   resolveSelectionEditPosition,
@@ -32,7 +32,6 @@ export function useRichTextEditorLinks({
     null,
   )
   const [hoveredLinkAnchor, setHoveredLinkAnchor] = React.useState<HTMLAnchorElement | null>(null)
-  const [hoveredLinkPos, setHoveredLinkPos] = React.useState<number | null>(null)
 
   const resolveLinkContext = React.useCallback((): RichTextLinkContext | null => {
     if (!editor) return null
@@ -58,21 +57,6 @@ export function useRichTextEditorLinks({
     if (!context) return
     openLinkPickerWithContext(context)
   }, [openLinkPickerWithContext, resolveLinkContext])
-
-  const openLinkPickerForPosition = React.useCallback(
-    (position: number, fallback?: { href?: string; text?: string }) => {
-      if (!editor) return
-      editor.chain().focus().setTextSelection(position).extendMarkRange('link').run()
-      const context = resolveLinkContext()
-      if (context) {
-        openLinkPickerWithContext(context)
-        return
-      }
-      if (!fallback?.href) return
-      openLinkPickerWithContext(createFallbackLinkContext(fallback.href, fallback.text))
-    },
-    [editor, openLinkPickerWithContext, resolveLinkContext],
-  )
 
   const handleLinkPickerOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -141,22 +125,17 @@ export function useRichTextEditorLinks({
       if (!anchor) {
         if (!(editor.isFocused && editor.isActive('link'))) {
           setHoveredLinkAnchor(null)
-          setHoveredLinkPos(null)
         }
         return
       }
 
-      const node = anchor.firstChild ?? anchor
-      const position = editor.view.posAtDOM(node, 0)
       setHoveredLinkAnchor(anchor)
-      setHoveredLinkPos(position)
     },
     [editor],
   )
 
   const handleMouseLeave = React.useCallback(() => {
     setHoveredLinkAnchor(null)
-    setHoveredLinkPos(null)
   }, [])
 
   const resolveEditAffordance = React.useCallback(
@@ -171,11 +150,8 @@ export function useRichTextEditorLinks({
         return {
           style,
           onClick: () => {
-            if (hoveredLinkPos != null) {
-              openLinkPickerForPosition(hoveredLinkPos, {
-                href: hoveredLinkAnchor.getAttribute('href') ?? undefined,
-                text: hoveredLinkAnchor.textContent ?? undefined,
-              })
+            if (hoveredLinkAnchor) {
+              openLinkPickerWithContext(resolveLinkContextFromAnchor(hoveredLinkAnchor))
               return
             }
             openLinkPickerFromCurrentSelection()
@@ -196,13 +172,7 @@ export function useRichTextEditorLinks({
         return null
       }
     },
-    [
-      editor,
-      hoveredLinkAnchor,
-      hoveredLinkPos,
-      openLinkPickerForPosition,
-      openLinkPickerFromCurrentSelection,
-    ],
+    [editor, hoveredLinkAnchor, openLinkPickerFromCurrentSelection, openLinkPickerWithContext],
   )
 
   const linkEditAffordance = React.useMemo(
