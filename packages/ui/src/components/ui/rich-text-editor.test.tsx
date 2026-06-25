@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 
@@ -66,5 +66,20 @@ describe('RichTextEditor', () => {
     expect(screen.getByRole('textbox', { name: 'Internal display text' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Insert' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+  })
+
+  it('shows an edit affordance when hovering an existing link', async () => {
+    render(
+      <RichTextEditor
+        aria-label="Biography"
+        linkable
+        value='<p><a href="/campaigns/demo/spells/fire-bolt" data-content-title="Fire Bolt">Fire Bolt</a></p>'
+      />,
+    )
+
+    const link = await screen.findByRole('link', { name: 'Fire Bolt' })
+    fireEvent.mouseMove(link)
+
+    expect(screen.getByRole('button', { name: 'Edit link' })).toBeInTheDocument()
   })
 })
