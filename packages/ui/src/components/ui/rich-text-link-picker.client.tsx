@@ -9,56 +9,26 @@ import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
 import { RichTextLinkPreviewCard } from './rich-text-link-preview-card.client'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './select.client'
+  buildExternalLinkPickerValue,
+  buildInternalLinkPickerValue,
+  filterInternalLinkOptions,
+  isLinkPickerInsertDisabled,
+  resolveLinkPickerFormState,
+} from './rich-text-link-picker.lib'
+import type {
+  RichTextLinkPickerContentTypeOption,
+  RichTextLinkPickerProps,
+  RichTextLinkTab,
+} from './rich-text-link-picker.types'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs.client'
 
-type RichTextLinkTab = 'internal' | 'external'
-type RichTextLinkKind = 'detail' | 'overview' | 'external'
-
-export interface RichTextLinkPickerInternalOption {
-  id: string
-  title: string
-  href: string
-  contentType: string
-  kind: Exclude<RichTextLinkKind, 'external'>
-  sourceLabel?: string
-}
-
-export interface RichTextLinkPickerContentTypeOption {
-  value: string
-  label: string
-}
-
-export interface RichTextLinkPickerValue {
-  mode: RichTextLinkTab
-  href: string
-  displayText: string
-  openInNewWindow: boolean
-  metadata?: {
-    contentType?: string
-    contentId?: string
-    contentTitle?: string
-    linkKind?: RichTextLinkKind
-  }
-}
-
-export interface RichTextLinkPickerProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  trigger: React.ReactElement
-  onInsert: (value: RichTextLinkPickerValue) => void
-  onCancel?: () => void
-  onRemove?: () => void
-  initialValue?: Partial<RichTextLinkPickerValue>
-  internalOptions?: RichTextLinkPickerInternalOption[]
-  contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
-  heading?: string
-}
+export type {
+  RichTextLinkPickerContentTypeOption,
+  RichTextLinkPickerInternalOption,
+  RichTextLinkPickerProps,
+  RichTextLinkPickerValue,
+} from './rich-text-link-picker.types'
 
 const DEFAULT_CONTENT_TYPE_OPTIONS: RichTextLinkPickerContentTypeOption[] = [
   { value: 'spell', label: 'Spells' },
@@ -95,48 +65,24 @@ export function RichTextLinkPicker({
     [internalOptions, selectedOptionId],
   )
 
-  const filteredInternalOptions = React.useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-    return internalOptions.filter((option) => {
-      if (option.contentType !== contentType) return false
-      if (!query) return true
-      return [option.title, option.sourceLabel, option.href].some((value) =>
-        value?.toLowerCase().includes(query),
-      )
-    })
-  }, [contentType, internalOptions, searchQuery])
+  const filteredInternalOptions = React.useMemo(
+    () => filterInternalLinkOptions(internalOptions, contentType, searchQuery),
+    [contentType, internalOptions, searchQuery],
+  )
 
   React.useEffect(() => {
     if (!open) return
 
-    const nextMode: RichTextLinkTab = initialValue?.mode ?? 'internal'
-    const nextContentType = initialValue?.metadata?.contentType ?? defaultContentType
-    const selectedOption =
-      internalOptions.find((option) => {
-        if (
-          initialValue?.metadata?.contentId &&
-          option.id === initialValue.metadata.contentId &&
-          option.contentType === nextContentType
-        ) {
-          return true
-        }
-        return initialValue?.href ? option.href === initialValue.href : false
-      }) ?? null
-
-    setTab(nextMode)
-    setSearchQuery('')
-    setContentType(nextContentType)
-    setSelectedOptionId(selectedOption?.id ?? null)
-    setInternalDisplayText(
-      initialValue?.displayText ?? selectedOption?.title ?? initialValue?.metadata?.contentTitle ?? '',
-    )
-    setInternalOpenInNewWindow(initialValue?.openInNewWindow ?? false)
-
-    setExternalHref(nextMode === 'external' ? (initialValue?.href ?? '') : '')
-    setExternalDisplayText(nextMode === 'external' ? (initialValue?.displayText ?? '') : '')
-    setExternalOpenInNewWindow(
-      nextMode === 'external' ? (initialValue?.openInNewWindow ?? true) : true,
-    )
+    const nextState = resolveLinkPickerFormState(initialValue, internalOptions, defaultContentType)
+    setTab(nextState.tab)
+    setSearchQuery(nextState.searchQuery)
+    setContentType(nextState.contentType)
+    setSelectedOptionId(nextState.selectedOptionId)
+    setInternalDisplayText(nextState.internalDisplayText)
+    setInternalOpenInNewWindow(nextState.internalOpenInNewWindow)
+    setExternalHref(nextState.externalHref)
+    setExternalDisplayText(nextState.externalDisplayText)
+    setExternalOpenInNewWindow(nextState.externalOpenInNewWindow)
   }, [defaultContentType, initialValue, internalOptions, open])
 
   const handleCancel = React.useCallback(() => {
@@ -147,30 +93,21 @@ export function RichTextLinkPicker({
   const handleInsert = React.useCallback(() => {
     if (tab === 'internal') {
       if (!selectedInternalOption || internalDisplayText.trim().length === 0) return
-      onInsert({
-        mode: 'internal',
-        href: selectedInternalOption.href,
-        displayText: internalDisplayText.trim(),
-        openInNewWindow: internalOpenInNewWindow,
-        metadata: {
-          contentType: selectedInternalOption.contentType,
-          contentId: selectedInternalOption.id,
-          contentTitle: selectedInternalOption.title,
-          linkKind: selectedInternalOption.kind,
-        },
-      })
+      onInsert(
+        buildInternalLinkPickerValue(
+          selectedInternalOption,
+          internalDisplayText,
+          internalOpenInNewWindow,
+        ),
+      )
       onOpenChange(false)
       return
     }
 
     if (externalHref.trim().length === 0 || externalDisplayText.trim().length === 0) return
-    onInsert({
-      mode: 'external',
-      href: externalHref.trim(),
-      displayText: externalDisplayText.trim(),
-      openInNewWindow: externalOpenInNewWindow,
-      metadata: { linkKind: 'external' },
-    })
+    onInsert(
+      buildExternalLinkPickerValue(externalHref, externalDisplayText, externalOpenInNewWindow),
+    )
     onOpenChange(false)
   }, [
     externalDisplayText,
@@ -184,10 +121,13 @@ export function RichTextLinkPicker({
     tab,
   ])
 
-  const isInsertDisabled =
-    tab === 'internal'
-      ? !selectedInternalOption || internalDisplayText.trim().length === 0
-      : externalHref.trim().length === 0 || externalDisplayText.trim().length === 0
+  const isInsertDisabled = isLinkPickerInsertDisabled(
+    tab,
+    selectedInternalOption,
+    internalDisplayText,
+    externalHref,
+    externalDisplayText,
+  )
 
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -212,7 +152,11 @@ export function RichTextLinkPicker({
             </Button>
           </div>
 
-          <Tabs value={tab} onValueChange={(value) => setTab(value as RichTextLinkTab)} variant="pill">
+          <Tabs
+            value={tab}
+            onValueChange={(value) => setTab(value as RichTextLinkTab)}
+            variant="pill"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="internal">Internal</TabsTrigger>
               <TabsTrigger value="external">External</TabsTrigger>
@@ -256,7 +200,9 @@ export function RichTextLinkPicker({
               ) : (
                 <div className="max-h-40 space-y-1 overflow-auto rounded-md border border-border p-1">
                   {filteredInternalOptions.length === 0 ? (
-                    <p className="px-2 py-1.5 text-xs text-muted-foreground">{EMPTY_SEARCH_MESSAGE}</p>
+                    <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                      {EMPTY_SEARCH_MESSAGE}
+                    </p>
                   ) : (
                     filteredInternalOptions.map((option) => (
                       <RichTextLinkPreviewCard
@@ -337,7 +283,13 @@ export function RichTextLinkPicker({
               <Button type="button" variant="ghost" size="sm" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button type="button" variant="default" size="sm" onClick={handleInsert} disabled={isInsertDisabled}>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={handleInsert}
+                disabled={isInsertDisabled}
+              >
                 Insert
               </Button>
             </div>
