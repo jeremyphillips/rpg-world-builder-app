@@ -1,1 +1,49 @@
-[]
+[
+  {
+    "id": "srd-cc-5.2.1:greater-restoration",
+    "slug": "greater-restoration",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Greater Restoration",
+    "description": "<p>You touch a creature and magically remove one of the following effects from it:</p><ul><li>1 Exhaustion level</li><li>The Charmed or Petrified condition</li><li>A curse, including the target's Attunement to a cursed magic item</li><li>Any reduction to one of the target's ability scores</li><li>Any reduction to the target's Hit Point maximum</li></ul>",
+    "school": "abjuration",
+    "level": 5,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "conditions": ["charmed", "petrified"],
+      "roles": ["healing"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "touch" },
+    "duration": { "kind": "instantaneous" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "diamond dust worth 100+ GP, which the spell consumes" }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:mass-cure-wounds",
+    "slug": "mass-cure-wounds",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mass Cure Wounds",
+    "description": "<p>A wave of healing energy washes out from a point you can see within range. Choose up to six creatures in a 30-foot-radius Sphere centered on that point. Each target regains Hit Points equal to 5d8 plus your spellcasting ability modifier.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 1d8 for each spell slot level above 5.</p>",
+    "school": "abjuration",
+    "level": 5,
+    "classIds": ["bard", "cleric", "druid"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": { "kind": "instantaneous" },
+    "components": { "verbal": true, "somatic": true }
+  }
+]

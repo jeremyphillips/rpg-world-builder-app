@@ -1,1 +1,48 @@
-[]
+[
+  {
+    "id": "srd-cc-5.2.1:mass-healing-word",
+    "slug": "mass-healing-word",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mass Healing Word",
+    "description": "<p>Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 1d4 for each spell slot level above 3.</p>",
+    "school": "abjuration",
+    "level": 3,
+    "classIds": ["bard", "cleric"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "duration": { "kind": "instantaneous" },
+    "components": { "verbal": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:revivify",
+    "slug": "revivify",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Revivify",
+    "description": "<p>You touch a creature that has died within the last minute. That creature revives with 1 Hit Point. This spell can't revive a creature that has died of old age, nor does it restore any missing body parts.</p>",
+    "school": "necromancy",
+    "level": 3,
+    "classIds": ["cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
+    "range": { "kind": "touch" },
+    "duration": { "kind": "instantaneous" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": { "description": "a diamond worth 300+ GP, which the spell consumes" }
+    }
+  }
+]

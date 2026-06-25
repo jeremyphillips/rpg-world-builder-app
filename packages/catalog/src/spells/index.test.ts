@@ -10,8 +10,8 @@ const SRD_CLASS_SLUGS = new Set(Object.keys(CLASS_NAMES))
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 20 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(20)
+  it('ships 32 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(32)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -26,7 +26,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(20)
+    expect(seedSpellSlugs(RULESET).size).toBe(32)
   })
 
   it('stores each spell in the level file matching its level field', () => {
