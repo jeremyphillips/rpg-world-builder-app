@@ -51,6 +51,7 @@ interface RichTextLinkPickerFormProps {
   internalOptions: RichTextLinkPickerProps['internalOptions']
   contentTypeOptions: RichTextLinkPickerContentTypeOption[]
   heading: string
+  headingId: string
   onOpenChange: (open: boolean) => void
   onInsert: (value: RichTextLinkPickerValue) => void
   onCancel?: () => void
@@ -62,6 +63,7 @@ function RichTextLinkPickerForm({
   internalOptions = [],
   contentTypeOptions,
   heading,
+  headingId,
   onOpenChange,
   onInsert,
   onCancel,
@@ -152,7 +154,9 @@ function RichTextLinkPickerForm({
   return (
     <>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold">{heading}</h2>
+        <h2 id={headingId} className="text-sm font-semibold">
+          {heading}
+        </h2>
         <Button
           type="button"
           variant="ghost"
@@ -320,6 +324,7 @@ export function RichTextLinkPicker({
   contentTypeOptions = DEFAULT_CONTENT_TYPE_OPTIONS,
   heading = 'Insert link',
 }: RichTextLinkPickerProps) {
+  const headingId = React.useId()
   const formKey = serializeLinkPickerInitialValue(initialValue)
 
   return (
@@ -329,6 +334,7 @@ export function RichTextLinkPicker({
         <PopoverPrimitive.Content
           sideOffset={8}
           align="end"
+          aria-labelledby={open ? headingId : undefined}
           className="z-50 w-[28rem] rounded-md border border-border bg-popover p-3 text-popover-foreground shadow-md outline-none"
         >
           {open ? (
@@ -338,6 +344,7 @@ export function RichTextLinkPicker({
               internalOptions={internalOptions}
               contentTypeOptions={contentTypeOptions}
               heading={heading}
+              headingId={headingId}
               onOpenChange={onOpenChange}
               onInsert={onInsert}
               onCancel={onCancel}
