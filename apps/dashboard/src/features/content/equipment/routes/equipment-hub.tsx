@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
-import { Card, CardHeader, CardTitle, Heading } from '@rpg/ui'
+import { Card, CardHeader, CardTitle } from '@rpg/ui'
 
+import { PageHeader } from '@/components/layout/page-header'
+import { WidePage } from '@/components/layout/wide-page'
 import { ROUTES } from '@/app/routes'
 
 import {
@@ -15,10 +17,8 @@ type EquipmentHubContentProps = {
 
 export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
   return (
-    <div className="space-y-6">
-      <Heading variant="page" as="h2">
-        Equipment
-      </Heading>
+    <WidePage spacing="relaxed">
+      <PageHeader heading="Equipment" />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (
           <li key={family}>
@@ -35,7 +35,7 @@ export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
           </li>
         ))}
       </ul>
-    </div>
+    </WidePage>
   )
 }
 

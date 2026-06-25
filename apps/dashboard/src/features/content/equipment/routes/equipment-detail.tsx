@@ -3,6 +3,7 @@ import type { Equipment } from '@rpg/contracts'
 import { formatMoney, getEquipmentKindLabel } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -36,14 +37,20 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   ]
 
   return (
-    <ContentDetailLayout
-      imageUrl={getContentImageUrl(item.imageKey)}
-      imageName={item.name}
-      campaignId={campaignId}
-      editHref={contentEditHref('equipment', campaignId, item.id, family)}
-    >
-      <ContentDetailStatBody name={item.name} statRows={statRows} description={item.description} />
-    </ContentDetailLayout>
+    <WidePage>
+      <ContentDetailLayout
+        imageUrl={getContentImageUrl(item.imageKey)}
+        imageName={item.name}
+        campaignId={campaignId}
+        editHref={contentEditHref('equipment', campaignId, item.id, family)}
+      >
+        <ContentDetailStatBody
+          name={item.name}
+          statRows={statRows}
+          description={item.description}
+        />
+      </ContentDetailLayout>
+    </WidePage>
   )
 }
 

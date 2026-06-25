@@ -61,37 +61,62 @@ Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
 (`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
 in `@rpg/ui` Storybook (`:6006`) instead.
 
-| Story title prefix | Use for                                                      |
-| ------------------ | ------------------------------------------------------------ |
-| `Content/*`        | Catalog feature stories (detail routes, tables)              |
-| `Layout/*`         | Shell/layout stories (e.g. concentration mode, `NarrowPage`) |
+| Story title prefix | Use for                                                          |
+| ------------------ | ---------------------------------------------------------------- |
+| `Content/*`        | Catalog feature stories (detail routes, tables)                  |
+| `Layout/*`         | Shell/layout stories (`NarrowPage`, `WidePage`, `PageHeader`, …) |
 
 ## Page layout
 
-Use [`NarrowPage`](../src/components/layout/narrow-page.tsx) for centered
-`max-w-3xl` routes — settings pages, wizards, account/profile stubs, and
-content create/edit forms. Pass `spacing="relaxed"` or `"loose"` when the default
-compact rhythm is too tight; add `className="pb-10"` on long forms so the sticky
-footer clears the viewport.
+Every route picks **one width shell** from `components/layout/`:
 
-Keep these **full-width** (no `NarrowPage`):
+| Shell                                                    | Width                | Typical routes                                                      |
+| -------------------------------------------------------- | -------------------- | ------------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-3xl` | Settings, wizards, account/profile stubs, content create/edit forms |
+| [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                                   |
 
-- [`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
-  — list pages with `DataTable` toolbars
-- Content detail routes using
-  [`ContentDetailLayout`](../src/features/content/lib/content-detail-layout.tsx)
-  — wide two-column detail + progression tables
+Shared spacing tokens live in
+[`page-spacing.variants.ts`](../src/components/layout/page-spacing.variants.ts):
+`compact` (space-y-2), `list` (space-y-4), `relaxed` (space-y-6), `loose`
+(space-y-10). Pass `className="pb-10"` on long narrow forms so the sticky footer
+clears the viewport.
+
+### Page chrome (composes inside a width shell)
+
+| Component                                                       | Role                                          |
+| --------------------------------------------------------------- | --------------------------------------------- |
+| [`PageHeader`](../src/components/layout/page-header.tsx)        | Page title + optional actions                 |
+| [`PageLoadState`](../src/components/layout/page-load-state.tsx) | Spinner / error / ready body beneath a header |
 
 ```tsx
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageHeader } from '@/components/layout/page-header'
+import { WidePage } from '@/components/layout/wide-page'
 
-;<NarrowPage spacing="relaxed" className="pb-10">
-  <Heading variant="page" as="h2">
-    New Species
-  </Heading>
-  {/* form or wizard */}
+// Narrow form page
+<NarrowPage spacing="relaxed" className="pb-10">
+  <PageHeader heading="New Species" />
+  {/* form */}
 </NarrowPage>
+
+// Full-width hub (no domain shell needed)
+<WidePage spacing="relaxed">
+  <PageHeader heading="Equipment" />
+  {/* card grid */}
+</WidePage>
 ```
+
+### Domain layouts (feature-specific, nest inside a width shell)
+
+- [`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
+  — managed catalog **list** recipe: `WidePage` + `PageHeader` + `PageLoadState`
+  - campaign-manager "New" gating. Use for catalog list routes only.
+- [`ContentDetailLayout`](../src/features/content/lib/content-detail-layout.tsx)
+  — two-column detail **presentation** (2/3 content + 1/3 artwork). Wrap in
+  `WidePage`; not a width shell itself.
+
+Do not use `ContentOverviewShell` for non-catalog full-width pages (hubs,
+dashboard widgets, etc.) — compose `WidePage` + `PageHeader` directly instead.
 
 Use CSF3 with `satisfies Meta<typeof Component>` and `StoryObj` (not
 `StoryObj<typeof meta>`) for custom `render` stories.

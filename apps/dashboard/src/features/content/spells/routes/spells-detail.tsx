@@ -11,6 +11,7 @@ import type { Spell, SpellTags } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
@@ -105,24 +106,26 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   const statRows = buildSpellStatRows(spell).filter((row) => row.label !== 'Classes')
 
   return (
-    <ContentDetailLayout
-      imageUrl={getContentImageUrl(spell.imageKey)}
-      imageName={spell.name}
-      campaignId={campaignId}
-      editHref={contentEditHref('spells', campaignId, spell.id)}
-    >
-      <ContentDetailStatBody
-        name={spell.name}
-        statRows={statRows}
-        descriptionContent={
-          spell.description ? (
-            <RichTextContent html={spell.description} size="sm" tone="muted" />
-          ) : undefined
-        }
-      />
-      <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
-      <SpellTagsSection tags={spell.tags} />
-    </ContentDetailLayout>
+    <WidePage>
+      <ContentDetailLayout
+        imageUrl={getContentImageUrl(spell.imageKey)}
+        imageName={spell.name}
+        campaignId={campaignId}
+        editHref={contentEditHref('spells', campaignId, spell.id)}
+      >
+        <ContentDetailStatBody
+          name={spell.name}
+          statRows={statRows}
+          descriptionContent={
+            spell.description ? (
+              <RichTextContent html={spell.description} size="sm" tone="muted" />
+            ) : undefined
+          }
+        />
+        <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
+        <SpellTagsSection tags={spell.tags} />
+      </ContentDetailLayout>
+    </WidePage>
   )
 }
 
