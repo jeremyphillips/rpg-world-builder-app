@@ -77,3 +77,8 @@ export const classCharacterCreationSchema = z.object({
 })
 
 export type ClassCharacterCreation = z.infer<typeof classCharacterCreationSchema>
+
+/** Resolves a bare equipment slug to the opaque catalog content id for a ruleset. */
+export function resolveEquipmentContentId(rulesetId: string, equipmentSlug: string): string {
+  return `${rulesetId}:${equipmentSlug}`
+}

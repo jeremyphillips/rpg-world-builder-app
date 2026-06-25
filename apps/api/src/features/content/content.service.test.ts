@@ -8,6 +8,8 @@ import { HomebrewClassModel } from './classes/homebrew-class.model'
 import { classContentConfig } from './classes/classes.config'
 import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from './content.service'
+import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
+import { StartingWealthPatchModel } from './starting-wealth/starting-wealth-patch.model'
 
 beforeAll(async () => {
   await startTestDb()
@@ -107,5 +109,42 @@ describe('resolveCatalogForCampaign (classes)', () => {
     await expect(
       resolveCatalogForCampaign(classContentConfig, '507f1f77bcf86cd799439011'),
     ).rejects.toMatchObject({ status: 404 })
+  })
+})
+
+describe('resolveCatalogForCampaign (starting-wealth)', () => {
+  it('returns the unmodified system starting wealth table', async () => {
+    const campaign = await makeCampaign()
+    const tables = await resolveCatalogForCampaign(startingWealthContentConfig, campaign.id)
+
+    expect(tables).toHaveLength(1)
+    expect(tables[0]?.slug).toBe('standard-starting-wealth')
+    expect(tables[0]?.tiers).toHaveLength(5)
+  })
+
+  it('deep-merges a campaign overlay patch onto the system starting wealth table', async () => {
+    const campaign = await makeCampaign()
+    await StartingWealthPatchModel.create({
+      campaignId: campaign.id,
+      targetId: 'srd-cc-5.2.1:standard-starting-wealth',
+      patch: {
+        name: 'House Starting Wealth',
+        tiers: [
+          {
+            id: 'level-1',
+            label: 'Level 1',
+            minLevel: 1,
+            maxLevel: 1,
+            includeNormalStartingEquipment: true,
+            bonusGold: null,
+            magicItemGrants: [],
+          },
+        ],
+      },
+    })
+
+    const tables = await resolveCatalogForCampaign(startingWealthContentConfig, campaign.id)
+    expect(tables[0]?.name).toBe('House Starting Wealth')
+    expect(tables[0]?.tiers).toHaveLength(1)
   })
 })

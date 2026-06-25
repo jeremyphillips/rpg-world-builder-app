@@ -5,6 +5,7 @@ import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from './content.service'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { getContentWriteConfig, isContentWriteType } from './lib/content-write-types'
+import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
 import { loadSubclassesByClassId } from '@rpg/catalog/classes'
 import { findCampaignById } from '../campaign'
 import { HttpError } from '../../lib/http-error'
@@ -83,4 +84,10 @@ export async function listFeats(req: Request, res: Response): Promise<void> {
   const config = getContentTypeConfig('feats')
   const feats = await resolveCatalogForCampaign(config, campaignId)
   res.status(200).json({ feats })
+}
+
+export async function listStartingWealth(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const startingWealth = await resolveCatalogForCampaign(startingWealthContentConfig, campaignId)
+  res.status(200).json({ startingWealth })
 }

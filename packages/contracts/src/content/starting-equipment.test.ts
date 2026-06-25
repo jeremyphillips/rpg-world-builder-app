@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { classCharacterCreationSchema, startingEquipmentChoiceSchema } from './starting-equipment'
+import {
+  classCharacterCreationSchema,
+  resolveEquipmentContentId,
+  startingEquipmentChoiceSchema,
+} from './starting-equipment'
 
 const DRUID_STARTING_EQUIPMENT = {
   choose: 1,
@@ -94,5 +98,11 @@ describe('classCharacterCreationSchema', () => {
     ).toEqual({
       startingEquipment: DRUID_STARTING_EQUIPMENT,
     })
+  })
+})
+
+describe('resolveEquipmentContentId', () => {
+  it('formats ruleset-scoped equipment ids from bare slugs', () => {
+    expect(resolveEquipmentContentId('srd-cc-5.2.1', 'longsword')).toBe('srd-cc-5.2.1:longsword')
   })
 })

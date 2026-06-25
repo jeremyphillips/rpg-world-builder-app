@@ -256,6 +256,51 @@ describe('characterSelectionSourceSchema', () => {
   it('requires sourceId for catalog-backed sources', () => {
     expect(characterSelectionSourceSchema.safeParse({ kind: 'feat' }).success).toBe(false)
   })
+
+  it('accepts character creation and starting wealth provenance kinds', () => {
+    expect(
+      characterSelectionSourceSchema.safeParse({
+        kind: 'classStartingEquipment',
+        sourceId: 'srd-cc-5.2.1:druid',
+        grantId: 'standard',
+      }).success,
+    ).toBe(true)
+    expect(
+      characterSelectionSourceSchema.safeParse({
+        kind: 'startingWealthTier',
+        sourceId: 'srd-cc-5.2.1:standard-starting-wealth',
+        grantId: 'levels-5-10',
+      }).success,
+    ).toBe(true)
+  })
+})
+
+describe('characterEquipmentEntrySchema', () => {
+  it('accepts equipment modifiers on inventory rows', () => {
+    expect(
+      characterSchema.safeParse({
+        ...baseCharacter,
+        characterType: 'pc',
+        userId: 'user_1',
+        equipment: {
+          ...baseCharacter.equipment,
+          weapons: [
+            {
+              equipmentId: 'srd-cc-5.2.1:quarterstaff',
+              modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+              sources: [
+                {
+                  kind: 'classStartingEquipment',
+                  sourceId: 'srd-cc-5.2.1:druid',
+                  grantId: 'standard',
+                },
+              ],
+            },
+          ],
+        },
+      }).success,
+    ).toBe(true)
+  })
 })
 
 describe('character proficiency entries', () => {

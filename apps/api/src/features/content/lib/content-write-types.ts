@@ -4,6 +4,7 @@ import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-profic
 import { speciesWriteConfig } from '../species/species.config'
 import { spellWriteConfig } from '../spells/spells.config'
 import { featWriteConfig } from '../feats/feats.config'
+import { startingWealthWriteConfig } from '../starting-wealth/starting-wealth.config'
 import type { ContentWriteConfig } from './content-write-config'
 import type { ContentTypeName } from '../content-types'
 
@@ -14,6 +15,7 @@ const CONTENT_WRITE_CONFIGS = {
   species: speciesWriteConfig,
   spells: spellWriteConfig,
   feats: featWriteConfig,
+  'starting-wealth': startingWealthWriteConfig,
 } as const satisfies Record<
   ContentTypeName,
   ContentWriteConfig<{
