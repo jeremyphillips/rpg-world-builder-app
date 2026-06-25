@@ -48,7 +48,14 @@ export function buildSubclassFields(
       label: 'Tagline',
       hint: 'Short italic lead-in shown under the name',
     },
-    { type: 'richtext', name: 'description', label: 'Description' },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+    },
     {
       kind: 'array',
       name: 'features',

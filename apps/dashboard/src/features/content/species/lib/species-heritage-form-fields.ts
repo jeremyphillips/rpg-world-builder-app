@@ -30,7 +30,7 @@ export const heritageFormSchema = z.object({
 
 export type HeritageForm = z.infer<typeof heritageFormSchema>
 
-export function heritageScalarFields(_ctx: ContentFormCtx): FormItem[] {
+export function heritageScalarFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       type: 'text',
@@ -39,7 +39,14 @@ export function heritageScalarFields(_ctx: ContentFormCtx): FormItem[] {
       required: true,
       hint: HERITAGE_NAME_HINT,
     },
-    { type: 'richtext', name: 'description', label: 'Description' },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+    },
   ]
 }
 
