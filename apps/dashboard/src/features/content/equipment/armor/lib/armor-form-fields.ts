@@ -1,4 +1,6 @@
 import {
+  ABILITY_SCORE_MAX,
+  ABILITY_SCORE_MIN,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
@@ -83,17 +85,22 @@ export function armorFormFieldGroup(): FormItem {
         required: true,
       },
       {
-        type: 'switch',
-        name: 'addDexModifier',
-        label: 'Add Dex modifier',
-        visibility: visibleWhenArmorNotShield(),
-      },
-      {
-        type: 'number',
-        name: 'maxDexBonus',
-        label: 'Max Dex bonus',
-        min: 0,
-        visibility: visibleWhenArmorDexCap(),
+        kind: 'row',
+        fields: [
+          {
+            type: 'switch',
+            name: 'addDexModifier',
+            label: 'Add Dex modifier',
+            visibility: visibleWhenArmorNotShield(),
+          },
+          {
+            type: 'number',
+            name: 'maxDexBonus',
+            label: 'Max Dex bonus',
+            min: 0,
+            visibility: visibleWhenArmorDexCap(),
+          },
+        ],
       },
       {
         type: 'switch',
@@ -104,7 +111,9 @@ export function armorFormFieldGroup(): FormItem {
         type: 'number',
         name: 'strengthRequirement',
         label: 'Strength requirement',
-        min: 0,
+        min: ABILITY_SCORE_MIN,
+        max: ABILITY_SCORE_MAX,
+        width: 'xs',
         hint: 'Minimum Strength to avoid speed penalty (heavy armor)',
       },
     ],

@@ -362,8 +362,31 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 ```
 
 - Renders as a `<fieldset>` / `<legend>` (a11y group labelling).
+- `size` — field label type scale (`md` default, same as other fields).
+- `chipSize` — pill padding/type scale (`sm` default).
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
+
+### Choose from chips (`chooseFromChips` / `ChooseFromChipsField`)
+
+Inline “Choose [N] skills from:” sentence with chip options below — for class-style
+skill proficiency authoring.
+
+```ts
+{
+  type: 'chooseFromChips',
+  name: 'proficiencies.skills.from',
+  chooseName: 'proficiencies.skills.choose',
+  label: 'Skill proficiencies',
+  info: 'Shared with skill suggested classes.',
+  options: skillOptions,
+  chooseMin: 0,
+  chooseMax: 18,
+}
+```
+
+- `name` — chip selection path (`string[]`); `chooseName` — numeric count path.
+- `prefix` / `suffix` default to `Choose` and `skills from:`.
 
 ### Combobox (`combobox` / `ComboboxField`)
 

@@ -155,7 +155,7 @@ export function DiceFormulaField({
           {error}
         </Text>
       ) : hint ? (
-        <Text id={hintId} variant="small">
+        <Text id={hintId} variant="caption">
           {hint}
         </Text>
       ) : null}

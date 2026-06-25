@@ -153,7 +153,7 @@ function FieldHint({ className, children, ...props }: FieldHintProps) {
   const { hintId, hasError, hasHint, hint } = useFieldContext('Field.Hint')
   if (hasError || !hasHint) return null
   return (
-    <Text id={hintId} variant="small" className={className} {...props}>
+    <Text id={hintId} variant="caption" className={className} {...props}>
       {children ?? hint}
     </Text>
   )

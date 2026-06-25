@@ -10,7 +10,7 @@ import type { ContentFormOptionSets } from './content-form-options'
 
 /**
  * Context passed to `buildFields` / `buildTabs`. Carries campaign-scoped catalog
- * options for combobox fields (weapons, spells, tools). `buildFields({})` remains
+ * options for combobox fields (weapons, spells, tools, magic-item base equipment).
  * valid in drift tests — combobox fields should fall back to `ctx.options?.weapons ?? []`.
  */
 export type ContentFormCtx = {

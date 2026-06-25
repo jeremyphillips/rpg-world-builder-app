@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import {
   fieldAnatomyStackClasses,
   fieldChipWrapGapClasses,
@@ -13,6 +13,7 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
+import { chipPillVariants, type ChipSize } from './chips-field.variants'
 
 interface ChipOptionButtonProps {
   id: string
@@ -20,6 +21,7 @@ interface ChipOptionButtonProps {
   role: 'checkbox' | 'radio'
   isActive: boolean
   isDisabled: boolean
+  chipSize: ChipSize
   onToggle: (value: string) => void
 }
 
@@ -29,6 +31,7 @@ function ChipOptionButton({
   role,
   isActive,
   isDisabled,
+  chipSize,
   onToggle,
 }: ChipOptionButtonProps) {
   return (
@@ -41,8 +44,7 @@ function ChipOptionButton({
       disabled={isDisabled}
       onClick={() => onToggle(option.value)}
       className={cn(
-        'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
+        chipPillVariants({ size: chipSize }),
         isActive
           ? 'border-foreground bg-foreground text-background'
           : 'border-border bg-transparent text-foreground hover:bg-muted',
@@ -61,6 +63,79 @@ function nextMultiSelection(
   if (selected.includes(optionValue)) return selected.filter((v) => v !== optionValue)
   if (max !== undefined && selected.length >= max) return selected
   return [...selected, optionValue]
+}
+
+export interface ChipsFieldOptionsProps {
+  id: string
+  options: FieldOption[]
+  /** Associates the chip group with an external legend or label id. */
+  labelledBy: string
+  multiple?: boolean
+  max?: number
+  value?: string | number | Array<string | number>
+  onChange?: (value: string | string[]) => void
+  onBlur?: () => void
+  disabled?: boolean
+  chipSize?: ChipSize
+}
+
+/** Chip pill row only — for embedding inside a parent fieldset (e.g. `ChooseFromChipsField`). */
+export function ChipsFieldOptions({
+  id,
+  options,
+  labelledBy,
+  multiple = true,
+  max,
+  value,
+  onChange,
+  onBlur,
+  disabled,
+  chipSize = 'sm',
+}: ChipsFieldOptionsProps) {
+  const selected: string[] = React.useMemo(() => {
+    if (multiple) {
+      return Array.isArray(value) ? value.map(String) : []
+    }
+    return value != null && value !== '' ? [String(value)] : []
+  }, [multiple, value])
+
+  function toggle(optionValue: string) {
+    if (disabled) return
+    if (multiple) {
+      onChange?.(nextMultiSelection(selected, optionValue, max))
+      return
+    }
+    onChange?.(selected[0] === optionValue ? '' : optionValue)
+  }
+
+  const selectionRole = multiple ? 'checkbox' : 'radio'
+  const atMax = max !== undefined && selected.length >= max
+
+  return (
+    <div
+      className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
+      role="group"
+      aria-labelledby={labelledBy}
+      onBlur={onBlur}
+    >
+      {options.map((option) => {
+        const isActive = selected.includes(option.value)
+        const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
+        return (
+          <ChipOptionButton
+            key={option.value}
+            id={`${id}-${option.value}`}
+            option={option}
+            role={selectionRole}
+            isActive={isActive}
+            isDisabled={isDisabled}
+            chipSize={chipSize}
+            onToggle={toggle}
+          />
+        )
+      })}
+    </div>
+  )
 }
 
 export interface ChipsFieldProps {
@@ -82,6 +157,10 @@ export interface ChipsFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
+  /** Label type scale — matches other field wrappers (default `md`). */
+  size?: FieldSize
+  /** Pill padding/type scale (default `sm`). */
+  chipSize?: ChipSize
   width?: FieldWidth
 }
 
@@ -103,31 +182,14 @@ export function ChipsField({
   info,
   required,
   disabled,
+  size = 'md',
+  chipSize = 'sm',
   width,
 }: ChipsFieldProps) {
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
   const describedBy = error ? errorId : hint ? hintId : undefined
-
-  const selected: string[] = React.useMemo(() => {
-    if (multiple) {
-      return Array.isArray(value) ? value.map(String) : []
-    }
-    return value != null && value !== '' ? [String(value)] : []
-  }, [multiple, value])
-
-  function toggle(optionValue: string) {
-    if (disabled) return
-    if (multiple) {
-      onChange?.(nextMultiSelection(selected, optionValue, max))
-      return
-    }
-    onChange?.(selected[0] === optionValue ? '' : optionValue)
-  }
-
-  const selectionRole = multiple ? 'checkbox' : 'radio'
-  const atMax = max !== undefined && selected.length >= max
 
   return (
     <fieldset
@@ -138,44 +200,33 @@ export function ChipsField({
       className={cn(fieldAnatomyStackClasses, width === 'auto' ? 'w-auto' : 'w-full')}
       onBlur={onBlur}
     >
-      <legend id={legendId} className={fieldLabelVariants({ size: 'md' })}>
+      <legend
+        id={legendId}
+        data-required={required || undefined}
+        className={fieldLabelVariants({ size })}
+      >
         {label}
-        {required ? (
-          <span aria-hidden="true" className="text-destructive">
-            *
-          </span>
-        ) : null}
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </legend>
 
-      <div
-        className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
-        role="group"
-        aria-labelledby={legendId}
-      >
-        {options.map((option) => {
-          const isActive = selected.includes(option.value)
-          const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
-          return (
-            <ChipOptionButton
-              key={option.value}
-              id={`${id}-${option.value}`}
-              option={option}
-              role={selectionRole}
-              isActive={isActive}
-              isDisabled={isDisabled}
-              onToggle={toggle}
-            />
-          )
-        })}
-      </div>
+      <ChipsFieldOptions
+        id={id}
+        options={options}
+        labelledBy={legendId}
+        multiple={multiple}
+        max={max}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        chipSize={chipSize}
+      />
 
       {error ? (
         <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
           {error}
         </Text>
       ) : hint ? (
-        <Text id={hintId} variant="small">
+        <Text id={hintId} variant="caption">
           {hint}
         </Text>
       ) : null}
@@ -193,6 +244,7 @@ export function ChipsFormField(props: ChipsFieldProps) {
       hint={props.hint}
       required={props.required}
       width={props.width}
+      size={props.size}
     >
       <ChipsField {...props} />
     </Field.Root>

@@ -31,6 +31,13 @@ export const Small: Story = {
   },
 }
 
+export const Caption: Story = {
+  args: {
+    variant: 'caption',
+    children: 'Form field hint — persistent guidance below a control.',
+  },
+}
+
 export const Lead: Story = {
   args: {
     variant: 'lead',
@@ -52,6 +59,7 @@ export const AllVariants: Story = {
       <Text variant="body">Body — default foreground copy.</Text>
       <Text variant="muted">Muted — supplementary descriptions.</Text>
       <Text variant="small">Small — hints and secondary metadata.</Text>
+      <Text variant="caption">Caption — form field hints.</Text>
       <Text variant="lead">Lead — hero or intro paragraphs.</Text>
       <Text variant="destructive" role="alert">
         Destructive — inline error messages.

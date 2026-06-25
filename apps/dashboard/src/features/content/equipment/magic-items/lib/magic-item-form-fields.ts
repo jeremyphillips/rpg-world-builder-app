@@ -5,8 +5,10 @@ import {
   MAGIC_ITEM_RARITY_ENTRIES,
   type MagicItemEquipment,
 } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import type { ContentFormCtx } from '../../../lib/content-form-registry'
+import { responsiveHalfRowClassName } from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 function labelsFromEntries<const T extends string>(
@@ -27,8 +29,15 @@ const magicItemCategoryOptions = toOptions(
   labelsFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES),
 )
 
+function visibleWhenAttunementRequired(): FieldVisibility {
+  return {
+    dependsOn: ['requiresAttunement'],
+    visibleWhen: (v) => v.requiresAttunement === true,
+  }
+}
+
 /** Magic item-specific form field group for the unified equipment form. */
-export function magicItemFormFieldGroup(): FormItem {
+export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
   return {
     kind: 'group',
     legend: 'Magic Item',
@@ -59,11 +68,21 @@ export function magicItemFormFieldGroup(): FormItem {
         type: 'text',
         name: 'attunementRequirement',
         label: 'Attunement requirement',
+        visibility: visibleWhenAttunementRequired(),
       },
       {
-        type: 'text',
-        name: 'baseEquipmentId',
-        label: 'Base equipment ID',
+        kind: 'row',
+        className: responsiveHalfRowClassName,
+        fields: [
+          {
+            type: 'chips',
+            name: 'baseEquipmentId',
+            label: 'Base equipment',
+            multiple: false,
+            width: 'full',
+            options: ctx.options?.magicItemBaseEquipment ?? [],
+          },
+        ],
       },
     ],
   }

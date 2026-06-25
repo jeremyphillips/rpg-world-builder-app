@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { cn } from '../../lib/utils'
 import { Field } from './field.client'
 import { fieldLabelVariants } from './field.variants'
 import { textVariants } from './text.variants'
@@ -29,6 +30,8 @@ export interface RadioGroupFieldProps {
   onValueChange?: (value: string) => void
   /** Forwarded to the group root so RHF's `field.onBlur` (touched state) can fire. */
   onBlur?: () => void
+  orientation?: 'horizontal' | 'vertical'
+  labelHidden?: boolean
 }
 
 /**
@@ -50,11 +53,16 @@ export function RadioGroupField({
   defaultValue,
   onValueChange,
   onBlur,
+  orientation = 'vertical',
+  labelHidden,
 }: RadioGroupFieldProps) {
   const labelId = `${id}-label`
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
-      <span id={labelId} className={fieldLabelVariants({ size: 'md' })}>
+      <span
+        id={labelId}
+        className={cn(fieldLabelVariants({ size: 'md' }), labelHidden && 'sr-only')}
+      >
         {label}
         {required ? (
           <span aria-hidden="true" className="text-destructive">
@@ -72,6 +80,12 @@ export function RadioGroupField({
           defaultValue={defaultValue}
           onValueChange={onValueChange}
           onBlur={onBlur}
+          orientation={orientation}
+          className={cn(
+            orientation === 'horizontal'
+              ? 'flex flex-wrap items-center gap-x-6 gap-y-2'
+              : 'grid gap-2',
+          )}
         >
           {options.map((option) => {
             const optionId = `${id}-${option.value}`

@@ -23,8 +23,6 @@ export function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
     rows.push({
       label: 'Prerequisite',
       value: formatRequirementExpression(feat.prerequisite),
-      info: FEAT_PART_ENTRIES.prerequisite.description,
-      infoPlacement: 'label',
     })
   }
 

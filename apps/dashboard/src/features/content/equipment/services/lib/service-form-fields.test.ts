@@ -34,7 +34,7 @@ describe('service form round-trips', () => {
       if (item.kind !== 'service') return
       const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
       expect(formValues.serviceCategory).toBe(item.serviceCategory)
-      expect(formValues.duration).toBe(item.duration)
+      expect(formValues.duration).toEqual(item.duration)
       expect(formValues.notes).toBe(item.notes)
     })
   }

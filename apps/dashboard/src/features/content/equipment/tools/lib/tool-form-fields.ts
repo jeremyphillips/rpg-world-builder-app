@@ -34,17 +34,24 @@ export function toolFormFieldGroup(): FormItem {
     legend: 'Tool',
     fields: [
       {
-        type: 'select',
-        name: 'toolCategory',
-        label: 'Tool category',
-        options: toolCategoryOptions,
-        required: true,
-      },
-      {
-        type: 'select',
-        name: 'ability',
-        label: 'Typical ability',
-        options: abilityOptions,
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'toolCategory',
+            label: 'Tool category',
+            options: toolCategoryOptions,
+            required: true,
+            width: '1/2',
+          },
+          {
+            type: 'select',
+            name: 'ability',
+            label: 'Typical ability',
+            options: abilityOptions,
+            width: '1/2',
+          },
+        ],
       },
     ],
   }

@@ -22,6 +22,8 @@ export const fieldChipWrapGapClasses = 'gap-2'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
+export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
+export const chooseFromChipsSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 
 export const fieldLabelVariants = cva(
   [

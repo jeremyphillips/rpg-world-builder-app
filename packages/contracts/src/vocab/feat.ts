@@ -52,16 +52,6 @@ export function getFeatCategoryLabel(id: string): string {
 // ---------------------------------------------------------------------------
 
 export const FEAT_PART_ENTRIES = {
-  category: {
-    label: 'Category',
-    description:
-      'A feat is a member of a category, which is noted in the feat. If you’re instructed to choose a feat from a specific category, such as the Origin category, that category must appear under the feat’s name. If you’re instructed to choose a feat and no category is specified, you can choose from any category.',
-  },
-  prerequisite: {
-    label: 'Prerequisite',
-    description:
-      'To take a feat, you must meet any prerequisite in its description unless a feature allows you to take the feat without the prerequisite. If a prerequisite includes a class, you must have at least 1 level in that class to take the feat.',
-  },
   benefit: {
     label: 'Benefit',
     description:

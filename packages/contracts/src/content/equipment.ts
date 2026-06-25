@@ -4,6 +4,7 @@ import { massSchema, speedRateSchema } from '../primitives/units'
 import { abilitySchema } from '../vocab/ability'
 import { gearKindSchema } from '../vocab/equipment/gear-kind'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
+import { serviceDurationSchema } from '../vocab/equipment/service-duration'
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
@@ -37,6 +38,13 @@ export {
   getArmorMaterialLabel,
   type ArmorMaterial,
 } from './equipment/armor-variant'
+
+export {
+  isMagicItemBaseEquipment,
+  isMagicItemBaseEquipmentKind,
+  MAGIC_ITEM_BASE_EQUIPMENT_KINDS,
+  type MagicItemBaseEquipmentKind,
+} from './equipment/magic-item-base-equipment'
 
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
@@ -129,8 +137,8 @@ export const serviceBodySchema = equipmentBaseSchema
   .extend({
     kind: z.literal('service'),
     serviceCategory: serviceCategorySchema,
-    /** Billing cadence, free text (e.g. "per day", "per mile"). */
-    duration: z.string().optional(),
+    /** Billing cadence (e.g. 1 day, 1 mile). */
+    duration: serviceDurationSchema.optional(),
     /** Free-form notes for pricing or scope. */
     notes: z.string().optional(),
   })

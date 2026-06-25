@@ -61,7 +61,7 @@ describe('SRD 5.2.1 equipment seed', () => {
     expect(hireling.kind).toBe('service')
     if (hireling.kind === 'service') {
       expect(hireling.serviceCategory).toBe('hireling')
-      expect(hireling.duration).toBe('per day')
+      expect(hireling.duration).toEqual({ value: 1, unit: 'day' })
     }
   })
 })

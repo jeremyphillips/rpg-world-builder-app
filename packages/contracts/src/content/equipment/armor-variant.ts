@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { armorMaterialSchema } from '../../vocab/armor/material'
+import { abilityScoreSchema } from '../../vocab/ability'
 import type { EquipmentBaseFields } from './base'
 
 export {
@@ -37,7 +38,7 @@ export const armorEquipmentKindFields = {
   maxDexBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean(),
   /** Minimum Strength score required to wear without speed penalty (heavy armor). */
-  strengthRequirement: z.number().int().optional(),
+  strengthRequirement: abilityScoreSchema.optional(),
 } as const
 
 export const armorEquipmentKindSchema = z.object(armorEquipmentKindFields)

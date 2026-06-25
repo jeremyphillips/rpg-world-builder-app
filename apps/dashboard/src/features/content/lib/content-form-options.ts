@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import {
   classHasSpellcasting,
+  isMagicItemBaseEquipment,
   type CharacterClass,
   type ContentSource,
   type Equipment,
@@ -31,6 +32,8 @@ export interface ContentFormOptionSets {
   spells: FieldOption[]
   feats: FieldOption[]
   tools: FieldOption[]
+  /** Weapons, armor, and adventuring gear eligible as a magic item base. */
+  magicItemBaseEquipment: FieldOption[]
   weaponCategoryBySlug: Readonly<Partial<Record<string, WeaponCategory>>>
 }
 
@@ -79,12 +82,15 @@ export function buildContentFormOptionSets(input: {
       input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
     ),
     weapons: sortFieldOptions(weapons?.map(toContentFieldOption) ?? []),
-    weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
       input.equipment?.filter((item) => item.kind === 'tool').map(toContentFieldOption) ?? [],
     ),
+    magicItemBaseEquipment: sortFieldOptions(
+      input.equipment?.filter(isMagicItemBaseEquipment).map(toContentFieldOption) ?? [],
+    ),
+    weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
   }
 }
 

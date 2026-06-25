@@ -1,4 +1,8 @@
-import { getServiceCategoryLabel, type ServiceEquipment } from '@rpg/contracts'
+import {
+  formatServiceDuration,
+  getServiceCategoryLabel,
+  type ServiceEquipment,
+} from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 
@@ -6,7 +10,7 @@ import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 export function getServiceStatRows(item: ServiceEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: getServiceCategoryLabel(item.serviceCategory) },
-    ...(item.duration ? [{ label: 'Duration', value: item.duration }] : []),
+    ...(item.duration ? [{ label: 'Duration', value: formatServiceDuration(item.duration) }] : []),
     ...(item.notes ? [{ label: 'Notes', value: item.notes }] : []),
   ]
 }

@@ -85,3 +85,23 @@ export const Disabled: Story = {
     disabled: true,
   },
 }
+
+export const SizeMedium: Story = {
+  args: {
+    label: 'Play Style',
+    options: playStyleOptions,
+    multiple: true,
+    value: ['exploration'],
+    chipSize: 'md',
+  },
+}
+
+export const SizeLarge: Story = {
+  args: {
+    label: 'Difficulty',
+    options: difficultyOptions,
+    multiple: false,
+    value: 'dangerous',
+    chipSize: 'lg',
+  },
+}
