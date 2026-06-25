@@ -9,6 +9,7 @@ import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import {
   RichTextLinkPicker,
+  type RichTextLinkPickerContentTypeOption,
   type RichTextLinkPickerInternalOption,
   type RichTextLinkPickerValue,
 } from './rich-text-link-picker.client'
@@ -43,6 +44,7 @@ export interface RichTextEditorProps {
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
+  contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   onLinkPickerOpen?: (context: RichTextLinkContext) => void
   disabled?: boolean
   id?: string
@@ -63,6 +65,7 @@ export function RichTextEditor({
   onBlur,
   linkable = false,
   internalLinkOptions = [],
+  contentTypeOptions,
   onLinkPickerOpen,
   disabled = false,
   id,
@@ -229,18 +232,21 @@ export function RichTextEditor({
     [onLinkPickerOpen, resolveLinkContext],
   )
 
-  const handleInsertLink = React.useCallback((value: RichTextLinkPickerValue) => {
-    applyLinkPayload({
-      href: value.href,
-      displayText: value.displayText,
-      openInNewWindow: value.openInNewWindow,
-      metadata: {
-        ...editingLinkContext?.metadata,
-        ...value.metadata,
-      },
-    })
-    setIsLinkPickerOpen(false)
-  }, [applyLinkPayload, editingLinkContext])
+  const handleInsertLink = React.useCallback(
+    (value: RichTextLinkPickerValue) => {
+      applyLinkPayload({
+        href: value.href,
+        displayText: value.displayText,
+        openInNewWindow: value.openInNewWindow,
+        metadata: {
+          ...editingLinkContext?.metadata,
+          ...value.metadata,
+        },
+      })
+      setIsLinkPickerOpen(false)
+    },
+    [applyLinkPayload, editingLinkContext],
+  )
 
   return (
     <div
@@ -318,6 +324,7 @@ export function RichTextEditor({
               metadata: editingLinkContext?.metadata,
             }}
             internalOptions={internalLinkOptions}
+            contentTypeOptions={contentTypeOptions}
             onInsert={handleInsertLink}
             onCancel={() => setIsLinkPickerOpen(false)}
             onRemove={
@@ -332,7 +339,10 @@ export function RichTextEditor({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn('size-7', editor?.isActive('link') && 'bg-accent text-accent-foreground')}
+                className={cn(
+                  'size-7',
+                  editor?.isActive('link') && 'bg-accent text-accent-foreground',
+                )}
                 aria-label="Link"
                 aria-pressed={editor?.isActive('link') ?? false}
                 disabled={disabled || !editor}

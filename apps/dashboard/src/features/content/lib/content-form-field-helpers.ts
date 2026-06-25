@@ -23,6 +23,7 @@ import {
   isWeightEquipmentKind,
   weightValueDigitsForKind,
 } from './equipment-weight-config'
+import type { ContentFormCtx } from './content-form-registry'
 
 type GroupField = FieldConfig | RowConfig
 
@@ -41,10 +42,17 @@ const currencyOptions = toOptions(
 const weightUnitOptions: FieldOption[] = [{ value: 'lb', label: 'lb.' }]
 
 /** Identity fields shared by every catalog content type (slug is derived, not authored). */
-export function identityFields(): GroupField[] {
+export function identityFields(ctx?: ContentFormCtx): GroupField[] {
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
-    { type: 'richtext', name: 'description', label: 'Description' },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      linkable: true,
+      internalLinkOptions: ctx?.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx?.options?.richTextContentTypeOptions,
+    },
   ]
 }
 

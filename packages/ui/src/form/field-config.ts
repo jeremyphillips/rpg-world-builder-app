@@ -10,6 +10,10 @@ import type {
   EditableGridTemplates,
   EditableGridValue,
 } from '../components/ui/editable-grid.client'
+import type {
+  RichTextLinkPickerContentTypeOption,
+  RichTextLinkPickerInternalOption,
+} from '../components/ui/rich-text-link-picker.client'
 import type { FieldSize } from '../components/ui/field.client'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
@@ -166,6 +170,10 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
+  /** Internal link targets shown in the rich-text link picker. */
+  internalLinkOptions?: RichTextLinkPickerInternalOption[]
+  /** Content type filter options for the rich-text link picker. */
+  contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   defaultValue?: string
 }
 

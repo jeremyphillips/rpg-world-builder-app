@@ -278,7 +278,7 @@ const spellCreateDefaultValues: Partial<SpellFormValues> = {
 
 function basicsFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    ...identityFields(),
+    ...identityFields(ctx),
     {
       kind: 'row',
       fields: [

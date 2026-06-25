@@ -685,7 +685,7 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...identityFields(), ...coreAttributesFields(ctx)],
+      fields: [...identityFields(ctx), ...coreAttributesFields(ctx)],
     },
     {
       id: 'proficiencies',

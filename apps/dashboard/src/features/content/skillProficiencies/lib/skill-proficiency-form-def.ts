@@ -52,7 +52,7 @@ const skillProficiencyFormDef: ContentFormDef<
     ability: 'str',
   },
   buildFields: (ctx): FormItem[] => [
-    { kind: 'group', legend: 'Identity', fields: identityFields() },
+    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
     {
       kind: 'group',
       legend: 'Mechanics',

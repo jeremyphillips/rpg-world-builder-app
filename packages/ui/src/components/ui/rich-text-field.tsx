@@ -4,6 +4,10 @@ import { Field } from './field.client'
 import { InfoTooltip } from './tooltip.client'
 import { RichTextEditor } from './rich-text-editor.client'
 import type { FieldWidth } from './field-control.variants'
+import type {
+  RichTextLinkPickerContentTypeOption,
+  RichTextLinkPickerInternalOption,
+} from './rich-text-link-picker.client'
 
 export interface RichTextFieldProps {
   id: string
@@ -14,6 +18,8 @@ export interface RichTextFieldProps {
   required?: boolean
   width?: FieldWidth
   linkable?: boolean
+  internalLinkOptions?: RichTextLinkPickerInternalOption[]
+  contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   disabled?: boolean
   value?: string
   onChange?: (html: string) => void
@@ -34,6 +40,8 @@ export function RichTextField({
   required,
   width,
   linkable,
+  internalLinkOptions,
+  contentTypeOptions,
   disabled,
   value,
   onChange,
@@ -49,6 +57,8 @@ export function RichTextField({
         <RichTextEditor
           aria-label={label}
           linkable={linkable}
+          internalLinkOptions={internalLinkOptions}
+          contentTypeOptions={contentTypeOptions}
           disabled={disabled}
           value={value}
           onChange={onChange}

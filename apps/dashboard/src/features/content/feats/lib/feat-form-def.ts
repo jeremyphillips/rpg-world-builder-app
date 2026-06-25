@@ -83,7 +83,7 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
     repeatableAllowed: false,
   },
   buildFields: (ctx: ContentFormCtx): FormItem[] => [
-    { kind: 'group', legend: 'Identity', fields: identityFields() },
+    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
     {
       kind: 'group',
       legend: 'Classification',
