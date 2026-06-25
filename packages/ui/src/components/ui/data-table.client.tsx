@@ -125,6 +125,7 @@ import {
   dataTableResetColumnVariants,
   dataTableLockedColumnVariants,
   dataTableRootVariants,
+  dataTableTableVariants,
   dataTableTableWrapVariants,
   dataTableToolbarVariants,
 } from './data-table.variants'
@@ -953,7 +954,7 @@ export function DataTable<TData>({
 
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>
-        <Table>
+        <Table className={dataTableTableVariants()}>
           {caption && <TableCaption className="pb-3">{caption}</TableCaption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

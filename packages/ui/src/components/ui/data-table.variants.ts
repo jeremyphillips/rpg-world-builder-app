@@ -46,6 +46,13 @@ export const dataTablePaginationVariants = cva(
 /** Table container with border + rounded corners. */
 export const dataTableTableWrapVariants = cva('rounded-md border border-border')
 
+/**
+ * Table element — below `lg`, keep natural column widths and scroll horizontally
+ * instead of crushing fixed-width columns (e.g. thumbnails). At `lg+`, allow the
+ * table to shrink to the container when there is enough room.
+ */
+export const dataTableTableVariants = cva('min-w-max lg:min-w-0')
+
 /** Popover panel for the column visibility / order editor. */
 export const dataTableColumnPanelVariants = cva(
   'z-50 w-[240px] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-md',
