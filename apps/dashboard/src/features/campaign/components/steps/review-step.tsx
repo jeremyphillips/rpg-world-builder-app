@@ -2,12 +2,11 @@ import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
 
 import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
 import {
-  PLAY_STYLE_LABELS,
-  MOOD_LABELS,
-  MAGIC_LEVEL_LABELS,
-  DIFFICULTY_LABELS,
-  IMPORTED_CHARACTERS_POLICY_LABELS,
-} from '../../lib/labels'
+  buildFlavorRows,
+  buildIdentityRows,
+  buildRulesRows,
+  type ReviewRowData,
+} from './review-step.lib'
 
 interface ReviewStepProps {
   /** Error message from the create-campaign mutation, if any. */
@@ -18,57 +17,18 @@ export function ReviewStep({ error }: ReviewStepProps) {
   const { accumulatedValues, complete } = useWizard()
   const values = accumulatedValues as Partial<CampaignSettingsValues>
 
-  const bannerFile = values.banner?.[0]
-  const playStyles = values.playStyle?.map((v) => PLAY_STYLE_LABELS[v]).join(', ')
-  const moods = values.mood?.map((v) => MOOD_LABELS[v]).join(', ')
-
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault()
+      onSubmit={(event) => {
+        event.preventDefault()
         void complete()
       }}
     >
       <div className="space-y-6">
-        <ReviewSection id="review-identity" heading="Identity">
-          <ReviewRow label="Name" value={values.name ?? '—'} />
-          {values.description && <ReviewRow label="Description" value={values.description} />}
-          {bannerFile && <ReviewRow label="Image" value={bannerFile.name} />}
-        </ReviewSection>
-
-        <ReviewSection id="review-rules" heading="Rules">
-          <ReviewRow
-            label="Starting level"
-            value={values.startingLevel !== undefined ? String(values.startingLevel) : '—'}
-          />
-          <ReviewRow
-            label="Imported characters"
-            value={
-              values.importedCharactersPolicy
-                ? IMPORTED_CHARACTERS_POLICY_LABELS[values.importedCharactersPolicy]
-                : '—'
-            }
-          />
-        </ReviewSection>
-
-        <ReviewSection id="review-flavor" heading="Flavor">
-          <ReviewRow label="Play style" value={playStyles || '—'} />
-          <ReviewRow label="Mood" value={moods || '—'} />
-          <ReviewRow
-            label="Magic level"
-            value={values.magicLevel ? MAGIC_LEVEL_LABELS[values.magicLevel] : '—'}
-          />
-          <ReviewRow
-            label="Difficulty"
-            value={values.difficulty ? DIFFICULTY_LABELS[values.difficulty] : '—'}
-          />
-        </ReviewSection>
-
-        {error && (
-          <Text variant="destructive" role="alert">
-            {error}
-          </Text>
-        )}
+        <ReviewSection id="review-identity" heading="Identity" rows={buildIdentityRows(values)} />
+        <ReviewSection id="review-rules" heading="Rules" rows={buildRulesRows(values)} />
+        <ReviewSection id="review-flavor" heading="Flavor" rows={buildFlavorRows(values)} />
+        <ReviewErrorMessage error={error} />
       </div>
 
       <WizardFooter submitLabel="Create Campaign" />
@@ -79,23 +39,37 @@ export function ReviewStep({ error }: ReviewStepProps) {
 function ReviewSection({
   id,
   heading,
-  children,
+  rows,
 }: {
   id: string
   heading: string
-  children: React.ReactNode
+  rows: ReviewRowData[]
 }) {
   return (
     <section aria-labelledby={id}>
       <Text variant="small" as="h3" id={id} className="mb-3 font-semibold uppercase tracking-wide">
         {heading}
       </Text>
-      <dl className="space-y-2 text-sm">{children}</dl>
+      <dl className="space-y-2 text-sm">
+        {rows.map((row) => (
+          <ReviewRow key={row.label} label={row.label} value={row.value} />
+        ))}
+      </dl>
     </section>
   )
 }
 
-function ReviewRow({ label, value }: { label: string; value: string }) {
+function ReviewErrorMessage({ error }: { error?: string | null }) {
+  if (!error) return null
+
+  return (
+    <Text variant="destructive" role="alert">
+      {error}
+    </Text>
+  )
+}
+
+function ReviewRow({ label, value }: ReviewRowData) {
   return (
     <div className="flex gap-2">
       <Text variant="muted" as="dt" className="w-40 shrink-0">
