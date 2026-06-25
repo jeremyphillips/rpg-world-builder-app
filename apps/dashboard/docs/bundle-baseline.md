@@ -1,5 +1,8 @@
 # Dashboard bundle baseline
 
+For conventions and contributor rules, see [code-splitting.md](./code-splitting.md).
+This file tracks measurement history.
+
 Captured before bundle-size reduction work (single main JS chunk, Inter + Lora fonts).
 Phase 1 (2026-06-24) removed Lora — Inter-only fonts; JS chunk unchanged.
 

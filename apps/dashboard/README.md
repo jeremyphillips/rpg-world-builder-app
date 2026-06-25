@@ -84,6 +84,7 @@ pnpm --filter @rpg/dashboard typecheck
 pnpm --filter @rpg/dashboard lint
 ```
 
-See [`docs/auth-guard.md`](./docs/auth-guard.md) for the auth-guard data flow
-and [`docs/feature-conventions.md`](./docs/feature-conventions.md) for the
-feature-folder convention.
+See [`docs/auth-guard.md`](./docs/auth-guard.md) for the auth-guard data flow,
+[`docs/feature-conventions.md`](./docs/feature-conventions.md) for the
+feature-folder convention, and [`docs/code-splitting.md`](./docs/code-splitting.md)
+for route lazy loading and bundle conventions.

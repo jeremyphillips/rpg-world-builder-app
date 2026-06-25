@@ -24,16 +24,16 @@ tools/
 docs/          # this folder — cross-cutting architecture/env/run guides
 ```
 
-| Workspace        | README                                                          |
-| ---------------- | --------------------------------------------------------------- |
-| `@rpg/public`    | [apps/public/README.md](../apps/public/README.md)               |
-| `@rpg/dashboard` | [apps/dashboard/README.md](../apps/dashboard/README.md)         |
-| `@rpg/api`       | [apps/api/README.md](../apps/api/README.md)                     |
-| `@rpg/config`    | [packages/config/README.md](../packages/config/README.md)       |
-| `@rpg/contracts` | [packages/contracts/README.md](../packages/contracts/README.md) |
+| Workspace         | README                                                            |
+| ----------------- | ----------------------------------------------------------------- |
+| `@rpg/public`     | [apps/public/README.md](../apps/public/README.md)                 |
+| `@rpg/dashboard`  | [apps/dashboard/README.md](../apps/dashboard/README.md)           |
+| `@rpg/api`        | [apps/api/README.md](../apps/api/README.md)                       |
+| `@rpg/config`     | [packages/config/README.md](../packages/config/README.md)         |
+| `@rpg/contracts`  | [packages/contracts/README.md](../packages/contracts/README.md)   |
 | `@rpg/api-client` | [packages/api-client/README.md](../packages/api-client/README.md) |
-| `@rpg/catalog`   | [packages/catalog/README.md](../packages/catalog/README.md)     |
-| `@rpg/ui`        | [packages/ui/README.md](../packages/ui/README.md)               |
+| `@rpg/catalog`    | [packages/catalog/README.md](../packages/catalog/README.md)       |
+| `@rpg/ui`         | [packages/ui/README.md](../packages/ui/README.md)                 |
 
 ## Single-origin topology
 
@@ -65,17 +65,18 @@ flowchart LR
   api --- contracts
 ```
 
-| Path   | App             | Dev upstream            |
-| ------ | --------------- | ----------------------- |
-| `/`    | Next public app | `http://localhost:3000` |
-| `/app` | Vite dashboard  | `http://localhost:5173` |
-| `/api` | Express API     | `http://localhost:5001` |
+| Path   | App                             | Dev upstream            |
+| ------ | ------------------------------- | ----------------------- |
+| `/`    | Next public app                 | `http://localhost:3000` |
+| `/app` | Vite dashboard (code-split SPA) | `http://localhost:5173` |
+| `/api` | Express API                     | `http://localhost:5001` |
 
 In dev this routing is provided by
 [`tools/proxy/dev-proxy.mjs`](../tools/proxy/dev-proxy.mjs) (listens on `:8080`);
 in prod the platform's reverse proxy / CDN performs the same path routing. The
 dashboard is built with Vite `base: "/app/"`, so it is served (and its router
-runs) under `/app`.
+runs) under `/app`. Route screens are lazy-loaded to keep the entry chunk small;
+see [apps/dashboard/docs/code-splitting.md](../apps/dashboard/docs/code-splitting.md).
 
 ## Auth flow
 

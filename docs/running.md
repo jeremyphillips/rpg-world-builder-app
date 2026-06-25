@@ -51,6 +51,11 @@ pnpm --filter @rpg/dashboard dev    # Vite only (:5173)
 pnpm --filter @rpg/dashboard analyze # production build + bundle treemap (opens bundle-stats/stats.html)
 ```
 
+See [apps/dashboard/docs/code-splitting.md](../apps/dashboard/docs/code-splitting.md)
+for how routes and vendor chunks are split, and
+[apps/dashboard/docs/bundle-baseline.md](../apps/dashboard/docs/bundle-baseline.md)
+for historical size comparisons.
+
 ### Storybook
 
 Root shorthands (from the repo root):
