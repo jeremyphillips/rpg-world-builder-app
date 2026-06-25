@@ -25,6 +25,7 @@ Tree-shake by content type:
 ```ts
 import { loadSeedSpecies, getSpeciesBySlug } from '@rpg/catalog/species'
 import { loadSeedClasses, getClassBySlug } from '@rpg/catalog/classes'
+import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 ```
 
 ## Validation
