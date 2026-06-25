@@ -267,6 +267,13 @@ describe('characterSelectionSourceSchema', () => {
     ).toBe(true)
     expect(
       characterSelectionSourceSchema.safeParse({
+        kind: 'backgroundStartingEquipment',
+        sourceId: 'srd-cc-5.2.1:acolyte',
+        grantId: 'standard',
+      }).success,
+    ).toBe(true)
+    expect(
+      characterSelectionSourceSchema.safeParse({
         kind: 'startingWealthTier',
         sourceId: 'srd-cc-5.2.1:standard-starting-wealth',
         grantId: 'levels-5-10',

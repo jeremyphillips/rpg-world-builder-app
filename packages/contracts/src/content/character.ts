@@ -49,6 +49,11 @@ export type CharacterSelectionSourceKind = z.infer<typeof characterSelectionSour
  * `sourceId` points at the granting content record when there is one. For
  * class/subclass features, `grantId` can hold the feature id that is unique
  * within that parent content record.
+ *
+ * Starting equipment and wealth tier kinds:
+ * - `classStartingEquipment` — `sourceId` = class content id, `grantId` = starting option id
+ * - `backgroundStartingEquipment` — reserved for future background content; same shape as class
+ * - `startingWealthTier` — `sourceId` = starting wealth table id, `grantId` = tier id
  */
 export const characterSelectionSourceSchema = z
   .object({
