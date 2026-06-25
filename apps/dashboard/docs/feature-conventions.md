@@ -61,10 +61,37 @@ Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
 (`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
 in `@rpg/ui` Storybook (`:6006`) instead.
 
-| Story title prefix | Use for                                         |
-| ------------------ | ----------------------------------------------- |
-| `Content/*`        | Catalog feature stories (detail routes, tables) |
-| `Layout/*`         | Shell/layout stories (e.g. concentration mode)  |
+| Story title prefix | Use for                                                      |
+| ------------------ | ------------------------------------------------------------ |
+| `Content/*`        | Catalog feature stories (detail routes, tables)              |
+| `Layout/*`         | Shell/layout stories (e.g. concentration mode, `NarrowPage`) |
+
+## Page layout
+
+Use [`NarrowPage`](../src/components/layout/narrow-page.tsx) for centered
+`max-w-3xl` routes — settings pages, wizards, account/profile stubs, and
+content create/edit forms. Pass `spacing="relaxed"` or `"loose"` when the default
+compact rhythm is too tight; add `className="pb-10"` on long forms so the sticky
+footer clears the viewport.
+
+Keep these **full-width** (no `NarrowPage`):
+
+- [`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
+  — list pages with `DataTable` toolbars
+- Content detail routes using
+  [`ContentDetailLayout`](../src/features/content/lib/content-detail-layout.tsx)
+  — wide two-column detail + progression tables
+
+```tsx
+import { NarrowPage } from '@/components/layout/narrow-page'
+
+;<NarrowPage spacing="relaxed" className="pb-10">
+  <Heading variant="page" as="h2">
+    New Species
+  </Heading>
+  {/* form or wizard */}
+</NarrowPage>
+```
 
 Use CSF3 with `satisfies Meta<typeof Component>` and `StoryObj` (not
 `StoryObj<typeof meta>`) for custom `render` stories.

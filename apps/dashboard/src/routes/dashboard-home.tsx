@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSession } from '@/features/auth'
 import { CampaignPicker, useCampaigns, useSelectCampaign } from '@/features/campaign'
 import { ROUTES } from '@/app/routes'
@@ -22,7 +23,7 @@ export function DashboardHome() {
   const hasCampaigns = campaigns !== undefined && campaigns.length > 0
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <NarrowPage spacing="relaxed">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <Heading variant="page" as="h2">
@@ -40,6 +41,6 @@ export function DashboardHome() {
       </div>
 
       {hasCampaigns ? <CampaignPicker campaigns={campaigns} onSelect={selectCampaign} /> : null}
-    </div>
+    </NarrowPage>
   )
 }
