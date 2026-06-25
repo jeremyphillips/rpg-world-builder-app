@@ -2,7 +2,7 @@ import { lazy, type ComponentType } from 'react'
 
 import type { EquipmentFamilyPath } from '@/features/content/equipment/lib/shared/equipment-family-paths'
 
-import { withRouteSuspense } from './route-suspense'
+import { withRouteSuspense } from './with-route-suspense'
 
 function lazyNamed<P = Record<string, never>>(
   importFn: () => Promise<Record<string, unknown>>,

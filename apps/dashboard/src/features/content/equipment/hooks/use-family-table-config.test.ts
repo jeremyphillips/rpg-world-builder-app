@@ -2,16 +2,18 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { FamilyTableConfig } from '../lib/shared/equipment-family-columns'
-import { loadFamilyTableConfig } from '../lib/shared/equipment-family-columns'
+import * as equipmentFamilyColumns from '../lib/shared/equipment-family-columns'
 import { useFamilyTableConfig } from './use-family-table-config'
 
 vi.mock('../lib/shared/equipment-family-columns', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../lib/shared/equipment-family-columns')>()
+  const actual = (await importOriginal()) as typeof equipmentFamilyColumns
   return {
     ...actual,
     loadFamilyTableConfig: vi.fn(),
   }
 })
+
+const { loadFamilyTableConfig } = equipmentFamilyColumns
 
 const mockConfig: FamilyTableConfig = {
   columns: [{ accessorKey: 'name', header: 'Name' }],

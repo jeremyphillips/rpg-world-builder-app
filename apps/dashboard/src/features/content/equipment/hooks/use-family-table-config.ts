@@ -6,21 +6,34 @@ import {
 } from '../lib/shared/equipment-family-columns'
 import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'
 
+type FamilyTableLoadState = {
+  campaignId: string
+  family: EquipmentFamilyPath
+  tableConfig: FamilyTableConfig | null
+  isError: boolean
+}
+
 export function useFamilyTableConfig(campaignId: string, family: EquipmentFamilyPath) {
-  const [tableConfig, setTableConfig] = useState<FamilyTableConfig | null>(null)
-  const [isError, setIsError] = useState(false)
+  const [loadState, setLoadState] = useState<FamilyTableLoadState>({
+    campaignId,
+    family,
+    tableConfig: null,
+    isError: false,
+  })
 
   useEffect(() => {
     let cancelled = false
-    setTableConfig(null)
-    setIsError(false)
 
     void loadFamilyTableConfig(campaignId, family)
       .then((config) => {
-        if (!cancelled) setTableConfig(config)
+        if (!cancelled) {
+          setLoadState({ campaignId, family, tableConfig: config, isError: false })
+        }
       })
       .catch(() => {
-        if (!cancelled) setIsError(true)
+        if (!cancelled) {
+          setLoadState({ campaignId, family, tableConfig: null, isError: true })
+        }
       })
 
     return () => {
@@ -28,9 +41,11 @@ export function useFamilyTableConfig(campaignId: string, family: EquipmentFamily
     }
   }, [campaignId, family])
 
+  const isStale = loadState.campaignId !== campaignId || loadState.family !== family
+
   return {
-    tableConfig,
-    isPending: tableConfig === null && !isError,
-    isError,
+    tableConfig: isStale ? null : loadState.tableConfig,
+    isPending: isStale || (loadState.tableConfig === null && !loadState.isError),
+    isError: isStale ? false : loadState.isError,
   }
 }
