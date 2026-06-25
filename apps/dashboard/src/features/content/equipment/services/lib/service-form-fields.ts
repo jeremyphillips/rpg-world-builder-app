@@ -51,6 +51,7 @@ function serviceDurationField(): FieldConfig {
     options: serviceDurationUnitOptions,
     min: 1,
     valueDigits: 1,
+    width: 'auto',
     unitPlaceholder: 'Select…',
     hint: 'Leave blank for no duration',
     defaultValue: { unit: 'day' },
@@ -64,13 +65,19 @@ export function serviceFormFieldGroup(): FormItem {
     legend: 'Service',
     fields: [
       {
-        type: 'select',
-        name: 'serviceCategory',
-        label: 'Service category',
-        options: serviceCategoryOptions,
-        required: true,
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'serviceCategory',
+            label: 'Service category',
+            options: serviceCategoryOptions,
+            required: true,
+            width: 'full',
+          },
+          serviceDurationField(),
+        ],
       },
-      serviceDurationField(),
       {
         type: 'textarea',
         name: 'notes',
