@@ -22,6 +22,31 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Greataxe, 4 Javelins, Explorer's Pack, and 15 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "greataxe", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 4 },
+              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 15 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 75 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 75 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "rage",
@@ -383,6 +408,37 @@
         "choose": 3
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
+              {
+                "kind": "choice",
+                "choose": 1,
+                "label": "Musical Instrument",
+                "from": { "toolCategories": ["musical_instrument"] }
+              },
+              { "kind": "fixed", "equipmentSlug": "entertainers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 19 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 90 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 90 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "bardic-inspiration",
@@ -664,6 +720,38 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "chain-shirt", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "mace", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "holy-symbol",
+                "quantity": 1,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 7 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 110 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 110 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "divine-order",
@@ -923,6 +1011,40 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "quarterstaff",
+                "quantity": 1,
+                "equipped": false,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "herbalism-kit", "quantity": 1 }
+            ],
+            "wealth": { "gp": 9 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 50 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 50 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "druidic",
@@ -1102,6 +1224,53 @@
       },
       "skills": {
         "choose": 2
+      }
+    },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "heavy",
+            "label": "Heavy Armor",
+            "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "chain-mail", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "greatsword", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "flail", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 8 },
+              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 4 }
+          },
+          {
+            "id": "skirmisher",
+            "label": "Skirmisher",
+            "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, and 11 GP.",
+            "items": [
+              {
+                "kind": "fixed",
+                "equipmentSlug": "studded-leather",
+                "quantity": 1,
+                "equipped": true
+              },
+              { "kind": "fixed", "equipmentSlug": "scimitar", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "longbow", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
+              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 11 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 155 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 155 }
+          }
+        ]
       }
     },
     "features": [
@@ -1363,6 +1532,31 @@
       },
       "skills": {
         "choose": 2
+      }
+    },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument chosen for the tool proficiency above, Explorer's Pack, and 11 GP. FOLLOWUP: proficiencyLinkedChoice — structured item choice deferred until class tool proficiency selection is modeled.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "spear", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 5 },
+              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 11 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 50 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 50 }
+          }
+        ]
       }
     },
     "features": [
@@ -1760,6 +1954,39 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "chain-mail", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "longsword", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 6 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "holy-symbol",
+                "quantity": 1,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 9 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 150 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 150 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "lay-on-hands",
@@ -2036,6 +2263,46 @@
         "choose": 3
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer's Pack, and 7 GP.",
+            "items": [
+              {
+                "kind": "fixed",
+                "equipmentSlug": "studded-leather",
+                "quantity": 1,
+                "equipped": true
+              },
+              { "kind": "fixed", "equipmentSlug": "scimitar", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "longbow", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
+              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "sprig-of-mistletoe",
+                "quantity": 1,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 7 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 150 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 150 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "favored-enemy",
@@ -2263,6 +2530,36 @@
       "tools": ["thieves-tools"],
       "skills": {
         "choose": 4
+      }
+    },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "shortbow", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
+              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "thieves-tools", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "burglars-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 8 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 100 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 100 }
+          }
+        ]
       }
     },
     "features": [
@@ -2568,6 +2865,37 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, and 28 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "spear", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "crystal",
+                "quantity": 1,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 28 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 50 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 50 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "innate-sorcery",
@@ -2861,6 +3189,39 @@
         "choose": 2
       }
     },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "orb",
+                "quantity": 1,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "book-occult-lore", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 15 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 100 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 100 }
+          }
+        ]
+      }
+    },
     "features": [
       {
         "id": "eldritch-invocations",
@@ -3144,6 +3505,39 @@
       },
       "skills": {
         "choose": 2
+      }
+    },
+    "characterCreation": {
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard Equipment",
+            "description": "2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
+            "items": [
+              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "quarterstaff",
+                "quantity": 1,
+                "equipped": true,
+                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+              },
+              { "kind": "fixed", "equipmentSlug": "robe", "quantity": 1, "equipped": true },
+              { "kind": "fixed", "equipmentSlug": "spellbook", "quantity": 1 },
+              { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
+            ],
+            "wealth": { "gp": 5 }
+          },
+          {
+            "id": "gold",
+            "label": "Starting Gold",
+            "description": "Take 55 GP instead of standard equipment.",
+            "items": [],
+            "wealth": { "gp": 55 }
+          }
+        ]
       }
     },
     "features": [

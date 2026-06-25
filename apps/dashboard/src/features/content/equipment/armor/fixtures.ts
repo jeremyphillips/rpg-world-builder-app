@@ -12,7 +12,7 @@ export const PLATE = loadSeedEquipment(STORY_RULESET_ID).find(
 )!
 
 export const SHIELD = loadSeedEquipment(STORY_RULESET_ID).find(
-  (item): item is ArmorEquipment => item.slug === 'shield-steel',
+  (item): item is ArmorEquipment => item.slug === 'shield',
 )!
 
 export const ARMOR_LIST = loadSeedEquipment(STORY_RULESET_ID).filter(

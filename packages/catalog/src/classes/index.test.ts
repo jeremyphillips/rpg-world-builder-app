@@ -707,4 +707,36 @@ describe('SRD 5.2.1 class seed', () => {
       expect(cls.proficiencies.skills.from).toEqual(skillSlugsSuggestingClass(cls.slug, skills))
     }
   })
+
+  it('ships starting equipment for every class with at least two options', () => {
+    for (const cls of classes) {
+      const startingEquipment = cls.characterCreation?.startingEquipment
+      expect(
+        startingEquipment,
+        `${cls.slug} missing characterCreation.startingEquipment`,
+      ).toBeDefined()
+      expect(startingEquipment!.choose).toBe(1)
+      expect(startingEquipment!.options.length).toBeGreaterThanOrEqual(2)
+      expect(new Set(startingEquipment!.options.map((option) => option.id)).size).toBe(
+        startingEquipment!.options.length,
+      )
+    }
+  })
+
+  it('Fighter ships three distinct starting equipment packages', () => {
+    const fighter = getClassBySlug(RULESET, 'fighter')
+    expect(fighter.characterCreation?.startingEquipment.options.map((option) => option.id)).toEqual(
+      ['heavy', 'skirmisher', 'gold'],
+    )
+  })
+
+  it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const standard = monk.characterCreation?.startingEquipment.options.find(
+      (option) => option.id === 'standard',
+    )
+    expect(standard?.description).toContain('Artisan')
+    expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
+    expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)
+  })
 })
