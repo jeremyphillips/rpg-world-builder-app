@@ -285,7 +285,7 @@ function buildUnscopedEquipmentFields(): FormItem[] {
 
 function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
   return [
-    { kind: 'group', legend: 'Identity', fields: identityFields() },
+    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
     {
       kind: 'group',
       legend: 'Economy',

@@ -56,6 +56,7 @@
     "@radix-ui/react-tooltip": "^1.2.9",
     "@rpg/contracts": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
+    "@tiptap/extension-link": "^3.26.0",
     "@tiptap/pm": "^3.26.0",
     "@tiptap/react": "^3.26.0",
     "@tiptap/starter-kit": "^3.26.0",

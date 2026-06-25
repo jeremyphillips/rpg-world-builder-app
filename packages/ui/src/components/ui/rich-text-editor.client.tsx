@@ -3,12 +3,21 @@
 import * as React from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { Bold, Italic, Link as LinkIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { Button } from './button.client'
+import { RichTextLink } from './rich-text-link-extension'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
+import type { RichTextLinkContext } from './rich-text-editor-link.lib'
+import { RichTextEditorToolbar } from './rich-text-editor-toolbar.client'
+import { RichTextLinkBubbleMenu } from './rich-text-link-bubble-menu.client'
+import type {
+  RichTextLinkPickerContentTypeOption,
+  RichTextLinkPickerInternalOption,
+} from './rich-text-link-picker.types'
+import { useRichTextEditorLinks } from './use-rich-text-editor-links.client'
+
+export type { RichTextLinkContext } from './rich-text-editor-link.lib'
 
 export interface RichTextEditorProps {
   /** Current value as an HTML string. */
@@ -18,6 +27,9 @@ export interface RichTextEditorProps {
   onBlur?: () => void
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
+  internalLinkOptions?: RichTextLinkPickerInternalOption[]
+  contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
+  onLinkPickerOpen?: (context: RichTextLinkContext) => void
   disabled?: boolean
   id?: string
   className?: string
@@ -36,6 +48,9 @@ export function RichTextEditor({
   onChange,
   onBlur,
   linkable = false,
+  internalLinkOptions = [],
+  contentTypeOptions,
+  onLinkPickerOpen,
   disabled = false,
   id,
   className,
@@ -44,6 +59,7 @@ export function RichTextEditor({
   'aria-invalid': ariaInvalid,
 }: RichTextEditorProps) {
   const [, forceRender] = React.useReducer((count: number) => count + 1, 0)
+  const rootRef = React.useRef<HTMLDivElement | null>(null)
   const valueRef = React.useRef(value)
   const onChangeRef = React.useRef(onChange)
 
@@ -56,7 +72,10 @@ export function RichTextEditor({
     {
       immediatelyRender: false,
       editable: !disabled,
-      extensions: [StarterKit.configure({ link: linkable ? { openOnClick: false } : false })],
+      extensions: [
+        StarterKit.configure({ link: false }),
+        ...(linkable ? [RichTextLink.configure({ openOnClick: false })] : []),
+      ],
       content: value ?? '',
       onUpdate: ({ editor: instance }) => {
         const nextHtml = instance.getHTML()
@@ -79,8 +98,12 @@ export function RichTextEditor({
   React.useEffect(() => {
     if (!editor) return undefined
     editor.on('transaction', forceRender)
+    editor.on('focus', forceRender)
+    editor.on('blur', forceRender)
     return () => {
       editor.off('transaction', forceRender)
+      editor.off('focus', forceRender)
+      editor.off('blur', forceRender)
     }
   }, [editor])
 
@@ -112,65 +135,53 @@ export function RichTextEditor({
     })
   }, [editor, id, ariaLabel, ariaDescribedBy, ariaInvalid])
 
-  const toggleLink = React.useCallback(() => {
-    if (!editor) return
-    if (editor.isActive('link')) {
-      editor.chain().focus().unsetLink().run()
-      return
-    }
-    const url = window.prompt('Link URL')
-    if (url) {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
-    }
-  }, [editor])
+  const {
+    isLinkPickerOpen,
+    editingLinkContext,
+    linkPickerMode,
+    showLinkBubbleMenu,
+    handleLinkPickerOpenChange,
+    handleInsertLink,
+    handleLinkPickerCancel,
+    handleEditLink,
+    handleRemoveLink,
+    handleRemoveLinkFromBubble,
+  } = useRichTextEditorLinks({ editor, onLinkPickerOpen })
 
   return (
     <div
+      ref={rootRef}
       className={cn(
-        'rounded-md border border-input shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background',
+        'relative rounded-md border border-input shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background',
         ariaInvalid && 'border-destructive focus-within:ring-destructive',
         disabled && 'cursor-not-allowed opacity-50',
         className,
       )}
     >
-      <div className="flex items-center gap-1 border-b border-border p-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn('size-7', editor?.isActive('bold') && 'bg-accent text-accent-foreground')}
-          aria-label="Bold"
-          aria-pressed={editor?.isActive('bold') ?? false}
-          disabled={disabled || !editor}
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-        >
-          <Bold className="size-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn('size-7', editor?.isActive('italic') && 'bg-accent text-accent-foreground')}
-          aria-label="Italic"
-          aria-pressed={editor?.isActive('italic') ?? false}
-          disabled={disabled || !editor}
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-        >
-          <Italic className="size-4" />
-        </Button>
-        {linkable ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn('size-7', editor?.isActive('link') && 'bg-accent text-accent-foreground')}
-            aria-label="Link"
-            aria-pressed={editor?.isActive('link') ?? false}
-            disabled={disabled || !editor}
-            onClick={toggleLink}
-          >
-            <LinkIcon className="size-4" />
-          </Button>
-        ) : null}
-      </div>
+      <RichTextEditorToolbar
+        editor={editor}
+        disabled={disabled}
+        linkable={linkable}
+        isLinkPickerOpen={isLinkPickerOpen}
+        editingLinkContext={editingLinkContext}
+        internalLinkOptions={internalLinkOptions}
+        contentTypeOptions={contentTypeOptions}
+        linkPickerMode={linkPickerMode}
+        onLinkPickerOpenChange={handleLinkPickerOpenChange}
+        onInsertLink={handleInsertLink}
+        onLinkPickerCancel={handleLinkPickerCancel}
+        onRemoveLink={handleRemoveLink}
+      />
       <EditorContent editor={editor} />
+      {linkable ? (
+        <RichTextLinkBubbleMenu
+          editor={editor}
+          rootRef={rootRef}
+          open={showLinkBubbleMenu}
+          onEditLink={handleEditLink}
+          onRemoveLink={handleRemoveLinkFromBubble}
+        />
+      ) : null}
     </div>
   )
 }

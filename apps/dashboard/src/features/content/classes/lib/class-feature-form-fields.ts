@@ -68,7 +68,14 @@ export function classFeatureItemFields(
         { type: 'text', name: 'name', label: 'Name', required: true },
       ],
     },
-    { type: 'richtext', name: 'description', label: 'Description' },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+    },
     ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS, ctx),
   ]
 }

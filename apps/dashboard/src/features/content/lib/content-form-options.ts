@@ -10,6 +10,7 @@ import {
   type Spell,
   type WeaponCategory,
 } from '@rpg/contracts'
+import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOption } from '@rpg/ui'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { useCampaignRules } from '@/features/campaign'
@@ -19,6 +20,10 @@ import { useEquipment } from '../equipment/hooks/use-equipment'
 import { useFeats } from '../feats/hooks/use-feats'
 import { useSpells } from '../spells/hooks/use-spells'
 import type { ContentFormCtx } from './content-form-registry'
+import {
+  buildRichTextInternalLinkOptions,
+  RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,
+} from './rich-text-link-options'
 
 export interface ContentFormOptionSets {
   classes: FieldOption[]
@@ -35,6 +40,10 @@ export interface ContentFormOptionSets {
   /** Weapons, armor, and adventuring gear eligible as a magic item base. */
   magicItemBaseEquipment: FieldOption[]
   weaponCategoryBySlug: Readonly<Partial<Record<string, WeaponCategory>>>
+  /** Internal content targets shown in rich-text link pickers. */
+  richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
+  /** Content type filters shown in rich-text link pickers. */
+  richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
 }
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
@@ -68,6 +77,7 @@ function buildWeaponCategoryBySlug(
 
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
+  campaignId?: string
   classes?: CharacterClass[]
   spells?: Spell[]
   feats?: Feat[]
@@ -91,6 +101,16 @@ export function buildContentFormOptionSets(input: {
       input.equipment?.filter(isMagicItemBaseEquipment).map(toContentFieldOption) ?? [],
     ),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
+    richTextInternalLinkOptions: input.campaignId
+      ? buildRichTextInternalLinkOptions({
+          campaignId: input.campaignId,
+          entitiesByType: {
+            spell: input.spells,
+            feat: input.feats,
+          },
+        })
+      : [],
+    richTextContentTypeOptions: [...RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS],
   }
 }
 
@@ -108,12 +128,13 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const options = useMemo(
     () =>
       buildContentFormOptionSets({
+        campaignId,
         classes: classesQuery.data,
         spells: spellsQuery.data,
         feats: featsQuery.data,
         equipment: equipmentQuery.data,
       }),
-    [classesQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
+    [campaignId, classesQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
   )
 
   const ctx = useMemo(

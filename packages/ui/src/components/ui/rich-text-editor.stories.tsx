@@ -3,6 +3,32 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { RichTextEditor } from './rich-text-editor.client'
 import { RichTextContent } from './rich-text-content'
+import type { RichTextLinkPickerInternalOption } from './rich-text-link-picker.types'
+
+const demoInternalLinkOptions: RichTextLinkPickerInternalOption[] = [
+  {
+    id: 'spell-overview',
+    title: 'Spell Overview',
+    href: '/campaigns/demo/content/spells',
+    contentType: 'spell',
+    kind: 'overview',
+  },
+  {
+    id: 'fireball',
+    title: 'Fireball',
+    href: '/campaigns/demo/content/spells/fireball',
+    contentType: 'spell',
+    kind: 'detail',
+    sourceLabel: 'Homebrew',
+  },
+  {
+    id: 'sharpshooter',
+    title: 'Sharpshooter',
+    href: '/campaigns/demo/content/feats/sharpshooter',
+    contentType: 'feat',
+    kind: 'detail',
+  },
+]
 
 const meta = {
   title: 'Forms/Controls/RichTextEditor',
@@ -22,6 +48,23 @@ export const Linkable: Story = {
   args: {
     linkable: true,
     value: '<p>See the <a href="https://example.com">tavern notice</a>.</p>',
+  },
+}
+
+/** Link picker with searchable internal spell/feat targets (dashboard supplies options). */
+export const LinkableWithInternalLinks: Story = {
+  args: {
+    linkable: true,
+    internalLinkOptions: demoInternalLinkOptions,
+    value:
+      '<p>See <a href="/campaigns/demo/content/spells/fireball" data-content-type="spell" data-content-id="fireball" data-content-title="Fireball" data-link-kind="detail">Fireball</a> for details.</p>',
+  },
+}
+
+export const WithLists: Story = {
+  args: {
+    value:
+      '<ul><li>Pack bedroll and rations.</li><li>Memorize the marching song.</li></ul><ol><li>Reach the pass before dusk.</li></ol>',
   },
 }
 

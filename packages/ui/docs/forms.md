@@ -328,16 +328,43 @@ If you need a control `<Form>` doesn't support, you have two options:
 
 - Backed by Tiptap; value is a **sanitized HTML string**, so it fits the universal
   `value: string` field contract and drops straight into RHF.
-- Bold, italic, and hard breaks ship by default. Links are **opt-in** via the
-  `linkable` prop (the `Link` extension + toolbar button are gated behind it).
+- Bold, italic, bullet/ordered lists, and hard breaks ship by default. Links are
+  **opt-in** via the `linkable` prop (the `Link` extension + toolbar button are
+  gated behind it).
+- When `linkable` is enabled, the toolbar opens a **link picker popover** instead
+  of a browser prompt:
+  - **Internal tab** (default): searchable spell/feat targets plus overview pages.
+    Requires display text; new-window is off by default. Pass
+    `internalLinkOptions` and optional `contentTypeOptions` from the app layer
+    (dashboard builds these from catalog routes).
+  - **External tab**: URL + display text; new-window defaults to on.
+  - Hovering or focusing an existing link exposes an **Edit link** bubble menu with
+    **Remove link** when the caret is inside the link mark. The toolbar link button
+    also opens the picker for the active link.
+- **Storage model:** links persist a canonical relative or absolute `href` plus
+  metadata attributes for picker round-trip:
+  - `data-content-type`, `data-content-id`, `data-content-title`, optional
+    `data-link-kind` (`detail` | `overview` | `external`)
+  - External links opened in a new window also store `target="_blank"` and
+    `rel="noopener noreferrer"`.
 - **Rendering stored content is a one-liner with a hard rule:** always pass it
-  through `sanitizeHtml` ([sanitize-html.ts](../src/lib/sanitize-html.ts)). Never
-  drop raw editor output into `dangerouslySetInnerHTML`.
+  through `sanitizeHtml` ([sanitize-html.ts](../src/lib/sanitize-html.ts)). The
+  sanitizer allowlists the link metadata attrs above while stripping other
+  `data-*` values. Never drop raw editor output into `dangerouslySetInnerHTML`.
+  Prefer `RichTextContent`, which sanitizes automatically.
 
 ```tsx
-import { sanitizeHtml } from '@rpg/ui'
-;<div dangerouslySetInnerHTML={{ __html: sanitizeHtml(stored) }} />
+import { RichTextContent, sanitizeHtml } from '@rpg/ui'
+
+<RichTextContent html={trait.description} size="sm" tone="muted" />
+
+// Only when you truly need raw HTML output:
+<div dangerouslySetInnerHTML={{ __html: sanitizeHtml(stored) }} />
 ```
+
+Form config (`FieldType: 'richtext'`) forwards `linkable`, `internalLinkOptions`,
+and `contentTypeOptions` to `RichTextField` / `RichTextEditor` when internal
+linking is required.
 
 ### JSON (`json` / `JsonField`)
 

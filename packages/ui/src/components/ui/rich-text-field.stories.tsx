@@ -1,6 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { RichTextField } from './rich-text-field'
+import type { RichTextLinkPickerInternalOption } from './rich-text-link-picker.types'
+
+const demoInternalLinkOptions: RichTextLinkPickerInternalOption[] = [
+  {
+    id: 'fireball',
+    title: 'Fireball',
+    href: '/campaigns/demo/content/spells/fireball',
+    contentType: 'spell',
+    kind: 'detail',
+  },
+  {
+    id: 'spell-overview',
+    title: 'Spell Overview',
+    href: '/campaigns/demo/content/spells',
+    contentType: 'spell',
+    kind: 'overview',
+  },
+]
 
 const meta = {
   title: 'Forms/RichTextField',
@@ -20,6 +38,14 @@ export const Default: Story = {}
 export const WithHint: Story = { args: { hint: 'Bold and italics are supported.' } }
 
 export const Linkable: Story = { args: { linkable: true } }
+
+export const LinkableWithInternalLinks: Story = {
+  args: {
+    linkable: true,
+    internalLinkOptions: demoInternalLinkOptions,
+    hint: 'Use the link button to reference spells or overview pages.',
+  },
+}
 
 export const WithError: Story = { args: { error: 'Add a short backstory.', value: '' } }
 
