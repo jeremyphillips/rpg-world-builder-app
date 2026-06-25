@@ -48,3 +48,21 @@ export function finalizeContentInput<T extends { slug?: string }>(
 ): T | Omit<T, 'slug'> {
   return ctx?.entity ? stripSlugFromInput(input) : input
 }
+
+/**
+ * Removes envelope-only keys from edit form defaults. These values are not
+ * rendered (slug is derived; kind is route-scoped on family equipment routes)
+ * and with `shouldUnregister` they spuriously appear in `dirtyFields` when
+ * any registered field updates.
+ */
+export function stripEditEnvelopeFromFormDefaults<T extends Record<string, unknown>>(
+  values: Partial<T>,
+  options?: { stripKind?: boolean },
+): Partial<T> {
+  const next = { ...values }
+  delete next.slug
+  if (options?.stripKind) {
+    delete next.kind
+  }
+  return next
+}

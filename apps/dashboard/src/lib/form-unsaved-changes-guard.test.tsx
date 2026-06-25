@@ -3,6 +3,8 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+import { Form, type FormItem } from '@rpg/ui/form'
 
 import { FormUnsavedChangesGuard } from './form-unsaved-changes-guard'
 import { renderWithDataRouter } from './test-router'
@@ -145,6 +147,103 @@ describe('FormUnsavedChangesGuard', () => {
     )
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Original')
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(await screen.findByText('Away page')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('allows navigation when an empty rich text description initializes without user edits', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({
+      name: z.string().min(1),
+      description: z.string().optional(),
+    })
+    const fields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      { type: 'richtext', name: 'description', label: 'Description' },
+    ]
+
+    renderWithDataRouter(
+      [
+        {
+          path: '/form',
+          element: (
+            <Form
+              schema={schema}
+              fields={fields}
+              defaultValues={{ name: 'Test item', description: undefined }}
+              onSubmit={() => undefined}
+              footer={() => (
+                <>
+                  <FormUnsavedChangesGuard />
+                  <Link to="/away">Leave</Link>
+                </>
+              )}
+            />
+          ),
+        },
+        { path: '/away', element: <div>Away page</div> },
+      ],
+      { initialEntries: ['/form'] },
+    )
+
+    await screen.findByRole('textbox', { name: 'Description' })
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Leave' })).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(await screen.findByText('Away page')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('allows navigation when a plain-text catalog description initializes without user edits', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({
+      name: z.string().min(1),
+      slug: z.string().optional(),
+      description: z.string().optional(),
+    })
+    const fields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      { type: 'richtext', name: 'description', label: 'Description' },
+    ]
+
+    renderWithDataRouter(
+      [
+        {
+          path: '/form',
+          element: (
+            <Form
+              schema={schema}
+              fields={fields}
+              defaultValues={{
+                name: 'Athletics',
+                description:
+                  'Jump farther than normal, stay afloat in rough water, or break something.',
+              }}
+              onSubmit={() => undefined}
+              footer={() => (
+                <>
+                  <FormUnsavedChangesGuard />
+                  <Link to="/away">Leave</Link>
+                </>
+              )}
+            />
+          ),
+        },
+        { path: '/away', element: <div>Away page</div> },
+      ],
+      { initialEntries: ['/form'] },
+    )
+
+    await screen.findByRole('textbox', { name: 'Description' })
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Leave' })).toBeInTheDocument()
+    })
+
     await user.click(screen.getByRole('link', { name: 'Leave' }))
 
     expect(await screen.findByText('Away page')).toBeInTheDocument()

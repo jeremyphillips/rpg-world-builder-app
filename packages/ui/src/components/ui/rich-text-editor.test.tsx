@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import axe from 'axe-core'
 
 import { RichTextEditor } from './rich-text-editor.client'
@@ -22,6 +22,28 @@ describe('RichTextEditor', () => {
     render(<RichTextEditor aria-label="Biography" />)
     const surface = await screen.findByRole('textbox')
     expect(surface).toHaveClass('prose', 'prose-sm', 'max-w-none')
+  })
+
+  it('does not call onChange when mounted with an empty value', async () => {
+    const onChange = vi.fn()
+    render(<RichTextEditor aria-label="Description" value="" onChange={onChange} />)
+
+    await screen.findByRole('textbox')
+    await waitFor(() => expect(onChange).not.toHaveBeenCalled())
+  })
+
+  it('does not call onChange when mounted with plain-text catalog content', async () => {
+    const onChange = vi.fn()
+    render(
+      <RichTextEditor
+        aria-label="Description"
+        value="Jump farther than normal."
+        onChange={onChange}
+      />,
+    )
+
+    await screen.findByRole('textbox')
+    await waitFor(() => expect(onChange).not.toHaveBeenCalled())
   })
 
   it('has no axe accessibility violations', async () => {

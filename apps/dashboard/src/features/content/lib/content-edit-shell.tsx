@@ -6,6 +6,7 @@ import type { ZodType } from 'zod'
 
 import { updateContent } from './content-client'
 import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
+import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
 import {
   contentFormRegistry,
   type AnyContentFormDef,
@@ -155,7 +156,9 @@ function ContentEditFormReady({
       headingFn={headingFn}
       layoutCtx={layoutCtx}
       schema={resolveContentFormSchema(def, layoutCtx)}
-      defaultValues={def.toFormValues(entity)}
+      defaultValues={stripEditEnvelopeFromFormDefaults(def.toFormValues(entity), {
+        stripKind: layoutCtx.equipmentKind != null,
+      })}
       submitPending={mutation.isPending}
       formError={mutation.isError ? String(mutation.error) : null}
       onSubmit={async (values, form) => {
