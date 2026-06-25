@@ -3,15 +3,11 @@ import { DataTable } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { useEquipment } from '../hooks/use-equipment'
-import { getFamilyColumns, getFamilyFilters } from '../lib/shared/equipment-family-columns'
+import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
+import type { FamilyTableConfig } from '../lib/shared/equipment-family-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
-import {
-  familyPathToEquipmentKind,
-  getEquipmentFamilyLabel,
-  type EquipmentFamilyPath,
-} from '../lib/shared/equipment-family-paths'
+import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'
 
 function EquipmentRowActions({
   row,
@@ -42,30 +38,53 @@ export function EquipmentFamilyOverviewContent({
   campaignId,
   family,
 }: EquipmentFamilyOverviewContentProps) {
-  const kind = familyPathToEquipmentKind(family)
-  const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
-  const filtered = kind ? equipment.filter((item) => item.kind === kind) : []
-  const heading = getEquipmentFamilyLabel(family)
+  const overview = useEquipmentFamilyOverview(campaignId, family)
 
   return (
     <ContentOverviewShell
-      heading={heading}
+      heading={overview.heading}
       campaignId={campaignId}
-      isPending={isPending}
-      isError={isError}
-      newHref={ROUTES.content.equipment.create(campaignId, family)}
-      newLabel={`New ${heading.replace(/s$/, '')}`}
+      isPending={overview.isPending}
+      isError={overview.isError}
+      newHref={overview.newHref}
+      newLabel={overview.newLabel}
     >
-      <DataTable
-        columns={getFamilyColumns(campaignId, family)}
-        data={filtered}
-        filters={getFamilyFilters(family)}
-        rowActions={(row) => (
-          <EquipmentRowActions row={row} campaignId={campaignId} family={family} />
-        )}
-        caption={`${heading} available in this campaign`}
-      />
+      {overview.tableConfig ? (
+        <EquipmentFamilyTable
+          tableConfig={overview.tableConfig}
+          data={overview.filtered}
+          heading={overview.heading}
+          campaignId={campaignId}
+          family={family}
+        />
+      ) : null}
     </ContentOverviewShell>
+  )
+}
+
+function EquipmentFamilyTable({
+  tableConfig,
+  data,
+  heading,
+  campaignId,
+  family,
+}: {
+  tableConfig: FamilyTableConfig
+  data: Equipment[]
+  heading: string
+  campaignId: string
+  family: EquipmentFamilyPath
+}) {
+  return (
+    <DataTable
+      columns={tableConfig.columns}
+      data={data}
+      filters={tableConfig.filters}
+      rowActions={(row) => (
+        <EquipmentRowActions row={row} campaignId={campaignId} family={family} />
+      )}
+      caption={`${heading} available in this campaign`}
+    />
   )
 }
 

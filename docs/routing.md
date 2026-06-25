@@ -50,6 +50,10 @@ already the single declaration point for the React Router tree and do not need t
 import `ROUTES`. `ROUTES` handles the _navigation_ side (links, `navigate()`
 calls, programmatic builders).
 
+On the dashboard, route **components** (not path strings) lazy-load via
+[`lazy-routes.ts`](../apps/dashboard/src/app/lazy-routes.ts). See
+[apps/dashboard/docs/code-splitting.md](../apps/dashboard/docs/code-splitting.md).
+
 ## Cross-app paths
 
 `LOGIN_PATH` (dashboard → public `/login`) and `DASHBOARD_PATH` (public → dashboard

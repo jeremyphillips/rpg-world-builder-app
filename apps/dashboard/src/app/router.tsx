@@ -4,48 +4,48 @@ import { AuthGuard } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
 import type { CrumbHandle } from '@/app/breadcrumbs'
 import {
-  CampaignCreate,
-  CampaignDetail,
-  CampaignSessions,
-  CampaignSettings,
-} from '@/features/campaign'
-import {
-  ClassesOverview,
-  ClassDetail,
-  ClassCreate,
-  ClassEdit,
-  EquipmentHub,
-  EquipmentFamilyOverview,
-  EquipmentFamilyCreate,
-  EquipmentDetail,
-  EquipmentEdit,
   EQUIPMENT_FAMILY_PATHS,
   getEquipmentFamilyLabel,
-  SkillProficienciesOverview,
-  SkillProficiencyDetail,
-  SkillProficiencyCreate,
-  SkillProficiencyEdit,
-  SpeciesOverview,
-  SpeciesDetail,
-  SpeciesCreate,
-  SpeciesEdit,
-  FeatsOverview,
-  FeatDetail,
-  FeatCreate,
-  FeatEdit,
-  SpellsOverview,
-  SpellDetail,
-  SpellCreate,
-  SpellEdit,
-} from '@/features/content'
+} from '@/features/content/equipment/lib/shared/equipment-family-paths'
+import {
+  AccountSettingsRoute,
+  AdminSettingsRoute,
+  AdminUsersRoute,
+  CampaignCreateRoute,
+  CampaignDetailRoute,
+  CampaignSessionsRoute,
+  CampaignSettingsRoute,
+  CharactersRoute,
+  ClassCreateRoute,
+  ClassDetailRoute,
+  ClassEditRoute,
+  ClassesOverviewRoute,
+  EquipmentDetailRoute,
+  EquipmentEditRoute,
+  EquipmentFamilyCreateRoute,
+  EquipmentFamilyOverviewRoute,
+  EquipmentHubRoute,
+  FeatCreateRoute,
+  FeatDetailRoute,
+  FeatEditRoute,
+  FeatsOverviewRoute,
+  ProfileRoute,
+  SkillProficienciesOverviewRoute,
+  SkillProficiencyCreateRoute,
+  SkillProficiencyDetailRoute,
+  SkillProficiencyEditRoute,
+  SpeciesCreateRoute,
+  SpeciesDetailRoute,
+  SpeciesEditRoute,
+  SpeciesOverviewRoute,
+  SpellCreateRoute,
+  SpellDetailRoute,
+  SpellEditRoute,
+  SpellsOverviewRoute,
+} from '@/app/lazy-routes'
 import { AppShell } from '@/components/layout/app-shell'
 import { ConcentrationShell } from '@/components/layout/concentration-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
-import { Characters } from '@/routes/characters'
-import { Profile } from '@/routes/profile'
-import { AccountSettings } from '@/routes/account'
-import { AdminUsers } from '@/routes/admin/admin-users'
-import { AdminSettings } from '@/routes/admin/admin-settings'
 
 // Vite serves the app under `base: "/app/"`; React Router needs the matching
 // basename (without the trailing slash) so route paths resolve under `/app`.
@@ -62,17 +62,17 @@ const router = createBrowserRouter(
             { index: true, element: <DashboardHome /> },
             {
               path: 'characters',
-              element: <Characters />,
+              element: <CharactersRoute />,
               handle: { crumb: () => ({ label: 'Characters' }) } satisfies CrumbHandle,
             },
             {
               path: 'profile',
-              element: <Profile />,
+              element: <ProfileRoute />,
               handle: { crumb: () => ({ label: 'Profile' }) } satisfies CrumbHandle,
             },
             {
               path: 'account',
-              element: <AccountSettings />,
+              element: <AccountSettingsRoute />,
               handle: { crumb: () => ({ label: 'Account Settings' }) } satisfies CrumbHandle,
             },
             {
@@ -81,12 +81,12 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: 'users',
-                  element: <AdminUsers />,
+                  element: <AdminUsersRoute />,
                   handle: { crumb: () => ({ label: 'Admin / Users' }) } satisfies CrumbHandle,
                 },
                 {
                   path: 'settings',
-                  element: <AdminSettings />,
+                  element: <AdminSettingsRoute />,
                   handle: {
                     crumb: () => ({ label: 'Admin / Settings' }),
                   } satisfies CrumbHandle,
@@ -107,15 +107,15 @@ const router = createBrowserRouter(
                 }),
               } satisfies CrumbHandle,
               children: [
-                { index: true, element: <CampaignDetail /> },
+                { index: true, element: <CampaignDetailRoute /> },
                 {
                   path: 'sessions',
-                  element: <CampaignSessions />,
+                  element: <CampaignSessionsRoute />,
                   handle: { crumb: () => ({ label: 'Sessions' }) } satisfies CrumbHandle,
                 },
                 {
                   path: 'settings',
-                  element: <CampaignSettings />,
+                  element: <CampaignSettingsRoute />,
                   handle: { crumb: () => ({ label: 'Settings' }) } satisfies CrumbHandle,
                 },
                 {
@@ -128,10 +128,10 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <ClassesOverview /> },
+                    { index: true, element: <ClassesOverviewRoute /> },
                     {
                       path: 'new',
-                      element: <ClassCreate />,
+                      element: <ClassCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                     },
                     {
@@ -143,10 +143,10 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <ClassDetail /> },
+                        { index: true, element: <ClassDetailRoute /> },
                         {
                           path: 'edit',
-                          element: <ClassEdit />,
+                          element: <ClassEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
@@ -163,10 +163,10 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <SpeciesOverview /> },
+                    { index: true, element: <SpeciesOverviewRoute /> },
                     {
                       path: 'new',
-                      element: <SpeciesCreate />,
+                      element: <SpeciesCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                     },
                     {
@@ -178,10 +178,10 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <SpeciesDetail /> },
+                        { index: true, element: <SpeciesDetailRoute /> },
                         {
                           path: 'edit',
-                          element: <SpeciesEdit />,
+                          element: <SpeciesEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
@@ -198,10 +198,10 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <FeatsOverview /> },
+                    { index: true, element: <FeatsOverviewRoute /> },
                     {
                       path: 'new',
-                      element: <FeatCreate />,
+                      element: <FeatCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                     },
                     {
@@ -213,10 +213,10 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <FeatDetail /> },
+                        { index: true, element: <FeatDetailRoute /> },
                         {
                           path: 'edit',
-                          element: <FeatEdit />,
+                          element: <FeatEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
@@ -233,10 +233,10 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <SpellsOverview /> },
+                    { index: true, element: <SpellsOverviewRoute /> },
                     {
                       path: 'new',
-                      element: <SpellCreate />,
+                      element: <SpellCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                     },
                     {
@@ -248,10 +248,10 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <SpellDetail /> },
+                        { index: true, element: <SpellDetailRoute /> },
                         {
                           path: 'edit',
-                          element: <SpellEdit />,
+                          element: <SpellEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
@@ -268,7 +268,7 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <EquipmentHub /> },
+                    { index: true, element: <EquipmentHubRoute /> },
                     ...EQUIPMENT_FAMILY_PATHS.map((family) => ({
                       path: family,
                       element: <Outlet />,
@@ -279,10 +279,13 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <EquipmentFamilyOverview family={family} /> },
+                        {
+                          index: true,
+                          element: <EquipmentFamilyOverviewRoute family={family} />,
+                        },
                         {
                           path: 'new',
-                          element: <EquipmentFamilyCreate family={family} />,
+                          element: <EquipmentFamilyCreateRoute family={family} />,
                           handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                         },
                         {
@@ -294,10 +297,13 @@ const router = createBrowserRouter(
                             }),
                           } satisfies CrumbHandle,
                           children: [
-                            { index: true, element: <EquipmentDetail family={family} /> },
+                            {
+                              index: true,
+                              element: <EquipmentDetailRoute family={family} />,
+                            },
                             {
                               path: 'edit',
-                              element: <EquipmentEdit family={family} />,
+                              element: <EquipmentEditRoute family={family} />,
                               handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                             },
                           ],
@@ -316,10 +322,10 @@ const router = createBrowserRouter(
                     }),
                   } satisfies CrumbHandle,
                   children: [
-                    { index: true, element: <SkillProficienciesOverview /> },
+                    { index: true, element: <SkillProficienciesOverviewRoute /> },
                     {
                       path: 'new',
-                      element: <SkillProficiencyCreate />,
+                      element: <SkillProficiencyCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
                     },
                     {
@@ -331,10 +337,10 @@ const router = createBrowserRouter(
                         }),
                       } satisfies CrumbHandle,
                       children: [
-                        { index: true, element: <SkillProficiencyDetail /> },
+                        { index: true, element: <SkillProficiencyDetailRoute /> },
                         {
                           path: 'edit',
-                          element: <SkillProficiencyEdit />,
+                          element: <SkillProficiencyEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
@@ -347,7 +353,7 @@ const router = createBrowserRouter(
         },
         {
           element: <ConcentrationShell />,
-          children: [{ path: 'campaigns/new', element: <CampaignCreate /> }],
+          children: [{ path: 'campaigns/new', element: <CampaignCreateRoute /> }],
         },
       ],
     },

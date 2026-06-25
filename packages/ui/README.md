@@ -67,14 +67,14 @@ amber/gold primary over parchment-tinted neutrals (light) and warm charcoal
 
 ### Fonts
 
-The preset defines two font tokens — `--font-sans` (body, Inter) and
-`--font-display` (headings, Lora; used by `CardTitle` and `Modal.Header`).
-Apps provide the actual faces:
+The preset defines two font tokens — `--font-sans` (body) and `--font-display`
+(semantic heading alias; same Inter family, used by `CardTitle` and `Modal.Header`).
+Apps provide the Inter face:
 
-- **Next.js (public)**: load via `next/font` with `variable: '--font-body'` /
-  `'--font-heading'` on the `<html>` element.
-- **Vite (dashboard, Storybook)**: import `@fontsource-variable/inter` and
-  `@fontsource-variable/lora`; their family names match the tokens' fallbacks.
+- **Next.js (public)**: load via `next/font` with `variable: '--font-body'` on
+  the `<html>` element. `--font-display` resolves through that variable.
+- **Vite (dashboard, Storybook)**: import `@fontsource-variable/inter`; its
+  family name matches the token fallback (`'Inter Variable'`).
 
 If an app loads neither, the tokens fall back to system stacks.
 
