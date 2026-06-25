@@ -49,9 +49,23 @@ Vite warns the main chunk exceeds 500 kB — expected until route-level code spl
 Route modules load via `React.lazy` in [`src/app/lazy-routes.ts`](../src/app/lazy-routes.ts).
 Feature barrels must not re-export route components (breaks splitting) — import routes only from the router lazy map.
 
+## After Phase 3 — lazy form fields (2026-06-24)
+
+Heavy `@rpg/ui/form` field types (`json`, `richtext`, `file`, `editableGrid`) load via
+`React.lazy` in [`packages/ui/src/form/field-renderer.client.tsx`](../../../packages/ui/src/form/field-renderer.client.tsx).
+
+| Asset | Raw | Gzip | Notes |
+| ----- | ---: | ---: | ----- |
+| Entry `index-*.js` | 214 kB | 67 kB | unchanged vs Phase 2 |
+| Shared `page-spacing.variants-*.js` | **214 kB** | **65 kB** | down from 894 kB / 274 kB |
+| `rich-text-field-*.js` (TipTap) | 419 kB | 131 kB | only on edit routes with richtext fields |
+| `editable-grid.client-*.js` | 160 kB | 46 kB | only when editableGrid fields render |
+| `file-field.client-*.js` | 8 kB | 3 kB | deferred from core form chunk |
+| Core `form-*.js` | 62 kB | 20 kB | text/select/checkbox only |
+
 ## Targets for later phases
 
 - ~~Remove Lora → drop ~158 kB font bytes~~ (done)
 - ~~Lazy routes → split 1.5 MB main chunk by feature area~~ (done)
-- Lazy form fields → defer TipTap and heavy field renderers
+- ~~Lazy form fields → defer TipTap and heavy field renderers~~ (done)
 - `manualChunks` → cacheable vendor splits (react-table, tiptap, dnd-kit, radix)

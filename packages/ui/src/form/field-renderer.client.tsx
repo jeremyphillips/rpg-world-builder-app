@@ -6,22 +6,40 @@ import { useController, type ControllerRenderProps } from 'react-hook-form'
 import { CheckboxField } from '../components/ui/checkbox-field'
 import { ChipsField } from '../components/ui/chips-field.client'
 import { ComboboxField } from '../components/ui/combobox-field.client'
-import { FileField } from '../components/ui/file-field.client'
-import { JsonField } from '../components/ui/json-field.client'
 import { NumberField } from '../components/ui/number-field'
 import { RadioGroupField } from '../components/ui/radio-group-field'
-import { RichTextField } from '../components/ui/rich-text-field'
 import { SelectField } from '../components/ui/select-field'
 import { SwitchField } from '../components/ui/switch-field'
 import { TextareaField } from '../components/ui/textarea-field'
 import { TextField } from '../components/ui/text-field'
 import { useFileFieldRemotePreview } from './file-field-props.context'
-import { EditableGridFieldRenderer } from './editable-grid-field.client'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
+import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type { FieldConfig, FieldType } from './field-config'
+import type { JsonFieldProps } from '../components/ui/json-field.client'
+import type { RichTextFieldProps } from '../components/ui/rich-text-field'
+import type { FileFieldProps } from '../components/ui/file-field.client'
+import type { EditableGridFieldRendererProps } from './editable-grid-field.client'
+
+const LazyJsonField = lazyFieldComponent<JsonFieldProps>(
+  () => import('../components/ui/json-field.client'),
+  'JsonField',
+)
+const LazyRichTextField = lazyFieldComponent<RichTextFieldProps>(
+  () => import('../components/ui/rich-text-field'),
+  'RichTextField',
+)
+const LazyFileField = lazyFieldComponent<FileFieldProps>(
+  () => import('../components/ui/file-field.client'),
+  'FileField',
+)
+const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRendererProps>(
+  () => import('./editable-grid-field.client'),
+  'EditableGridFieldRenderer',
+)
 
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
 function parseNumber(raw: string): number | undefined {
@@ -175,59 +193,65 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
     />
   ),
   json: ({ config, field, id, error }) => (
-    <JsonField
-      id={id}
-      label={config.label}
-      error={error}
-      hint={config.hint}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={config.size}
-      placeholder={config.placeholder}
-      example={config.example}
-      disabled={config.disabled}
-      value={field.value ?? ''}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
+    <LazyFieldSuspense>
+      <LazyJsonField
+        id={id}
+        label={config.label}
+        error={error}
+        hint={config.hint}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        size={config.size}
+        placeholder={config.placeholder}
+        example={config.example}
+        disabled={config.disabled}
+        value={field.value ?? ''}
+        onChange={field.onChange}
+        onBlur={field.onBlur}
+      />
+    </LazyFieldSuspense>
   ),
   richtext: ({ config, field, id, error }) => (
-    <RichTextField
-      id={id}
-      label={config.label}
-      error={error}
-      hint={config.hint}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      linkable={config.linkable}
-      disabled={config.disabled}
-      value={field.value ?? ''}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
+    <LazyFieldSuspense>
+      <LazyRichTextField
+        id={id}
+        label={config.label}
+        error={error}
+        hint={config.hint}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        linkable={config.linkable}
+        disabled={config.disabled}
+        value={field.value ?? ''}
+        onChange={field.onChange}
+        onBlur={field.onBlur}
+      />
+    </LazyFieldSuspense>
   ),
   file: ({ config, field, id, error, remotePreview }) => (
-    <FileField
-      id={id}
-      label={config.label}
-      error={error}
-      hint={config.hint}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      accept={config.accept}
-      multiple={config.multiple}
-      maxFiles={config.maxFiles}
-      maxSize={config.maxSize}
-      disabled={config.disabled}
-      value={field.value ?? []}
-      onChange={field.onChange}
-      existingImageUrl={remotePreview?.existingImageUrl}
-      existingImageLabel={remotePreview?.existingImageLabel}
-      onClearExisting={remotePreview?.onClearExisting}
-    />
+    <LazyFieldSuspense>
+      <LazyFileField
+        id={id}
+        label={config.label}
+        error={error}
+        hint={config.hint}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        accept={config.accept}
+        multiple={config.multiple}
+        maxFiles={config.maxFiles}
+        maxSize={config.maxSize}
+        disabled={config.disabled}
+        value={field.value ?? []}
+        onChange={field.onChange}
+        existingImageUrl={remotePreview?.existingImageUrl}
+        existingImageLabel={remotePreview?.existingImageLabel}
+        onClearExisting={remotePreview?.onClearExisting}
+      />
+    </LazyFieldSuspense>
   ),
   chips: ({ config, field, id, error }) => (
     <ChipsField
@@ -279,13 +303,15 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
     />
   ),
   editableGrid: ({ config, field, id, error, namePrefix }) => (
-    <EditableGridFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      error={error}
-      namePrefix={namePrefix}
-    />
+    <LazyFieldSuspense>
+      <LazyEditableGridFieldRenderer
+        config={config}
+        field={field}
+        id={id}
+        error={error}
+        namePrefix={namePrefix}
+      />
+    </LazyFieldSuspense>
   ),
   diceFormula: ({ config, field, id, error }) => (
     <DiceFormulaField

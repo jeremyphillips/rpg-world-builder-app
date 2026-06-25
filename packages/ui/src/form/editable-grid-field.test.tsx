@@ -127,11 +127,13 @@ describe('EditableGrid in Form', () => {
       />,
     )
 
-    expect(screen.getByRole('columnheader', { name: /Spells prepared/ })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('columnheader', { name: /Spells prepared/ }),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByLabelText('Preparation'))
     await user.click(screen.getByRole('option', { name: 'Known' }))
-    expect(screen.getByRole('columnheader', { name: /Spells known/ })).toBeInTheDocument()
+    expect(await screen.findByRole('columnheader', { name: /Spells known/ })).toBeInTheDocument()
 
     await user.click(screen.getByLabelText('Preparation'))
     await user.click(screen.getByRole('option', { name: 'Always prepared' }))
@@ -152,6 +154,8 @@ describe('EditableGrid in Form', () => {
         footer={<button type="submit">Save</button>}
       />,
     )
+
+    await screen.findByRole('columnheader', { name: /Spells prepared/ })
 
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
