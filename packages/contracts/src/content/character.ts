@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
 import { armorCategorySchema } from '../vocab/armor/category'
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
 import { weaponCategorySchema } from '../vocab/weapon/category'
 import { absoluteLevelSchema } from '../primitives/level'
+import { creatureAbilityScoresSchema, creatureRuntimeHitPointsSchema } from './creature'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -108,21 +108,11 @@ export const characterSpeciesSchema = z.object({
 
 export type CharacterSpecies = z.infer<typeof characterSpeciesSchema>
 
-export const characterAbilityScoresSchema = z.object({
-  str: abilityScoreSchema,
-  dex: abilityScoreSchema,
-  con: abilityScoreSchema,
-  int: abilityScoreSchema,
-  wis: abilityScoreSchema,
-  cha: abilityScoreSchema,
-})
+export const characterAbilityScoresSchema = creatureAbilityScoresSchema
 
 export type CharacterAbilityScores = z.infer<typeof characterAbilityScoresSchema>
 
-export const characterHitPointsSchema = z.object({
-  base: z.number().int().min(0),
-  temporary: z.number().int().min(0),
-})
+export const characterHitPointsSchema = creatureRuntimeHitPointsSchema
 
 export type CharacterHitPoints = z.infer<typeof characterHitPointsSchema>
 
