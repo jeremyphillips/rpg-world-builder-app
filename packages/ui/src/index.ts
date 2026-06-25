@@ -285,6 +285,7 @@ export {
   dataTableAdvancedPanelVariants,
   dataTableAdvancedInnerVariants,
   dataTablePaginationVariants,
+  dataTableTableVariants,
   dataTableTableWrapVariants,
   dataTableColumnPanelVariants,
   dataTableColumnItemVariants,

@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
@@ -52,30 +54,18 @@ export function CampaignSettings() {
     form.reset(values)
   }, 'Could not save campaign.')
 
+  let body: ReactNode
+
   if (isLoadingCampaigns) {
-    return (
-      <div className="mx-auto max-w-3xl space-y-2">
-        <CampaignSettingsHeading />
-        <Spinner />
-      </div>
+    body = <Spinner />
+  } else if (isError || !campaign) {
+    body = (
+      <Text variant="destructive" role="alert">
+        {isError ? 'Could not load campaign.' : 'Campaign not found.'}
+      </Text>
     )
-  }
-
-  if (isError || !campaign) {
-    return (
-      <div className="mx-auto max-w-3xl space-y-2">
-        <CampaignSettingsHeading />
-        <Text variant="destructive" role="alert">
-          {isError ? 'Could not load campaign.' : 'Campaign not found.'}
-        </Text>
-      </div>
-    )
-  }
-
-  return (
-    <div className="mx-auto max-w-3xl space-y-2">
-      <CampaignSettingsHeading />
-      {/* key forces a remount once the campaign loads so RHF initialises with the correct defaults */}
+  } else {
+    body = (
       <TabbedForm<CampaignSettingsValues>
         key={campaign.id}
         schema={campaignSettingsSchema}
@@ -96,6 +86,13 @@ export function CampaignSettings() {
           </>
         )}
       />
-    </div>
+    )
+  }
+
+  return (
+    <NarrowPage>
+      <CampaignSettingsHeading />
+      {body}
+    </NarrowPage>
   )
 }

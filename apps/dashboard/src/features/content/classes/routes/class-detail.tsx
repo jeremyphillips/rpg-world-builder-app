@@ -4,6 +4,7 @@ import { getAbilityLabel, skillSlugsSuggestingClass } from '@rpg/contracts'
 import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { WidePage } from '@/components/layout/wide-page'
 import { useCampaignRules } from '@/features/campaign'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
@@ -179,7 +180,7 @@ export function ClassDetailContent({
   const campaignRules = useCampaignRules(campaignId)
 
   return (
-    <div className="space-y-6">
+    <WidePage spacing="relaxed">
       <ContentDetailLayout
         imageUrl={getContentImageUrl(characterClass.imageKey)}
         imageName={characterClass.name}
@@ -208,7 +209,7 @@ export function ClassDetailContent({
       </ContentDetailLayout>
       <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
       <SubclassesList subclasses={subclasses} />
-    </div>
+    </WidePage>
   )
 }
 

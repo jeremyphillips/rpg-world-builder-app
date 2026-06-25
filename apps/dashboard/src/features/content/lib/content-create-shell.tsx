@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { createContent } from './content-client'
 import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
 import { ContentAuthoringGate } from './content-authoring-gate'
@@ -119,12 +120,10 @@ export function ContentCreateShell({
   const def = contentFormRegistry[contentType]
 
   return (
-    <div className="space-y-6 pb-10">
-      <div className="flex items-center gap-4">
-        <Heading variant="page" as="h2">
-          {heading}
-        </Heading>
-      </div>
+    <NarrowPage spacing="relaxed" className="pb-10">
+      <Heading variant="page" as="h2">
+        {heading}
+      </Heading>
 
       {def ? (
         <ContentAuthoringGate campaignId={campaignId}>
@@ -139,7 +138,7 @@ export function ContentCreateShell({
       ) : (
         <ContentFormComingSoon />
       )}
-    </div>
+    </NarrowPage>
   )
 }
 

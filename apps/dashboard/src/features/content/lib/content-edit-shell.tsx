@@ -4,6 +4,7 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { updateContent } from './content-client'
 import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
 import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
@@ -96,7 +97,7 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
 }: ContentEditEntityFormProps<TEntity>) {
   return (
     <ContentAuthoringGate campaignId={campaignId}>
-      <div className="space-y-6 pb-10">
+      <NarrowPage spacing="relaxed" className="pb-10">
         <Heading variant="page" as="h2">
           {headingFn(entity.name)}
         </Heading>
@@ -113,7 +114,7 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
           formError={formError}
           onSubmit={onSubmit}
         />
-      </div>
+      </NarrowPage>
     </ContentAuthoringGate>
   )
 }

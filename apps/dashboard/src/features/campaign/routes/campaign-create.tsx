@@ -4,6 +4,7 @@ import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import {
@@ -54,7 +55,7 @@ export function CampaignCreate() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-2">
+    <NarrowPage>
       <Heading variant="page" as="h2">
         New campaign
       </Heading>
@@ -68,6 +69,6 @@ export function CampaignCreate() {
         <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
         <ReviewStep error={createError} />
       </Wizard>
-    </div>
+    </NarrowPage>
   )
 }

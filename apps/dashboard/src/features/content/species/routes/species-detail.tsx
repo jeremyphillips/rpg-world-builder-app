@@ -11,6 +11,7 @@ import {
 import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/wide-page'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -119,24 +120,26 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
   useSetBreadcrumbLabel(species.name)
 
   return (
-    <ContentDetailLayout
-      imageUrl={getContentImageUrl(species.imageKey)}
-      imageName={species.name}
-      campaignId={campaignId}
-      editHref={contentEditHref('species', campaignId, species.id)}
-    >
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {species.name}
-        </Heading>
-        <SpeciesStatsSection species={species} />
-        {species.description && (
-          <RichTextContent html={species.description} size="sm" tone="muted" />
-        )}
-      </div>
-      <TraitsList traits={species.traits} />
-      {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
-    </ContentDetailLayout>
+    <WidePage>
+      <ContentDetailLayout
+        imageUrl={getContentImageUrl(species.imageKey)}
+        imageName={species.name}
+        campaignId={campaignId}
+        editHref={contentEditHref('species', campaignId, species.id)}
+      >
+        <div className="space-y-4">
+          <Heading variant="display" as="h2">
+            {species.name}
+          </Heading>
+          <SpeciesStatsSection species={species} />
+          {species.description && (
+            <RichTextContent html={species.description} size="sm" tone="muted" />
+          )}
+        </div>
+        <TraitsList traits={species.traits} />
+        {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
+      </ContentDetailLayout>
+    </WidePage>
   )
 }
 

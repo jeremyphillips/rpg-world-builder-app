@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Heading, Spinner, Text, buttonVariants } from '@rpg/ui'
+import { buttonVariants } from '@rpg/ui'
 
+import { PageHeader } from '@/components/layout/page-header'
+import { PageLoadState } from '@/components/layout/page-load-state'
+import { WidePage } from '@/components/layout/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 
 type ContentOverviewShellProps = {
@@ -17,8 +20,8 @@ type ContentOverviewShellProps = {
 }
 
 /**
- * Handles the three-state loading/error/ready pattern shared by every content
- * overview page. Pass `children` for the ready state (typically a DataTable).
+ * Managed catalog list page — composes WidePage + PageHeader + PageLoadState with
+ * campaign-manager "New" action gating.
  */
 export function ContentOverviewShell({
   heading,
@@ -32,46 +35,23 @@ export function ContentOverviewShell({
 }: ContentOverviewShellProps) {
   const canManage = useCanManageCampaign(campaignId)
   const showNew = canManage && newHref
-
-  if (isPending) {
-    return (
-      <div className="space-y-2">
-        <Heading variant="page" as="h2">
-          {heading}
-        </Heading>
-        <div className="flex justify-center py-8">
-          <Spinner />
-        </div>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="space-y-2">
-        <Heading variant="page" as="h2">
-          {heading}
-        </Heading>
-        <Text variant="destructive" role="alert">
-          {errorLabel ?? `Could not load ${heading.toLowerCase()}.`}
-        </Text>
-      </div>
-    )
-  }
+  const actions = showNew ? (
+    <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
+      {newLabel}
+    </Link>
+  ) : undefined
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Heading variant="page" as="h2">
-          {heading}
-        </Heading>
-        {showNew ? (
-          <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
-            {newLabel}
-          </Link>
-        ) : null}
-      </div>
-      {children}
-    </div>
+    <WidePage spacing="list">
+      <PageHeader heading={heading} actions={actions} />
+      <PageLoadState
+        isPending={isPending}
+        isError={isError}
+        errorLabel={errorLabel}
+        defaultErrorLabel={`Could not load ${heading.toLowerCase()}.`}
+      >
+        {children}
+      </PageLoadState>
+    </WidePage>
   )
 }

@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 
 export function CampaignSessions() {
@@ -9,11 +10,11 @@ export function CampaignSessions() {
   usePersistViewedCampaign(campaignId)
 
   return (
-    <div className="mx-auto max-w-3xl space-y-2">
+    <NarrowPage>
       <Heading variant="page" as="h2">
         Sessions
       </Heading>
       <Text variant="muted">Coming soon.</Text>
-    </div>
+    </NarrowPage>
   )
 }

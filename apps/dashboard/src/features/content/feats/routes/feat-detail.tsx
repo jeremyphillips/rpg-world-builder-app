@@ -3,6 +3,7 @@ import { Heading, RichTextContent } from '@rpg/ui'
 import type { Feat } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/wide-page'
 import { useFeats } from '../hooks/use-feats'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -21,30 +22,32 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
   const statRows = buildFeatStatRows(feat)
 
   return (
-    <ContentDetailLayout
-      imageUrl={getContentImageUrl(feat.imageKey)}
-      imageName={feat.name}
-      campaignId={campaignId}
-      editHref={contentEditHref('feats', campaignId, feat.id)}
-    >
-      <ContentDetailStatBody
-        name={feat.name}
-        statRows={statRows}
-        descriptionContent={
-          feat.description ? (
-            <RichTextContent html={feat.description} size="sm" tone="muted" />
-          ) : undefined
-        }
-      />
-      {feat.repeatable.allowed && feat.repeatable.notes && (
-        <section aria-labelledby="feat-repeatable-notes-heading">
-          <Heading variant="section" as="h3" id="feat-repeatable-notes-heading" className="mb-3">
-            Repeatable
-          </Heading>
-          <RichTextContent html={feat.repeatable.notes} size="sm" tone="muted" />
-        </section>
-      )}
-    </ContentDetailLayout>
+    <WidePage>
+      <ContentDetailLayout
+        imageUrl={getContentImageUrl(feat.imageKey)}
+        imageName={feat.name}
+        campaignId={campaignId}
+        editHref={contentEditHref('feats', campaignId, feat.id)}
+      >
+        <ContentDetailStatBody
+          name={feat.name}
+          statRows={statRows}
+          descriptionContent={
+            feat.description ? (
+              <RichTextContent html={feat.description} size="sm" tone="muted" />
+            ) : undefined
+          }
+        />
+        {feat.repeatable.allowed && feat.repeatable.notes && (
+          <section aria-labelledby="feat-repeatable-notes-heading">
+            <Heading variant="section" as="h3" id="feat-repeatable-notes-heading" className="mb-3">
+              Repeatable
+            </Heading>
+            <RichTextContent html={feat.repeatable.notes} size="sm" tone="muted" />
+          </section>
+        )}
+      </ContentDetailLayout>
+    </WidePage>
   )
 }
 

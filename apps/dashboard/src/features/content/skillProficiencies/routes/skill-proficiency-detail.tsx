@@ -5,6 +5,7 @@ import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
@@ -71,25 +72,27 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   useSetBreadcrumbLabel(skill.name)
 
   return (
-    <ContentDetailLayout
-      imageUrl={getContentImageUrl(skill.imageKey)}
-      imageName={skill.name}
-      campaignId={campaignId}
-      editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
-    >
-      <div className="space-y-4">
-        <Heading variant="display" as="h2">
-          {skill.name}
-        </Heading>
-        <div className="space-y-3">
-          <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
+    <WidePage>
+      <ContentDetailLayout
+        imageUrl={getContentImageUrl(skill.imageKey)}
+        imageName={skill.name}
+        campaignId={campaignId}
+        editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
+      >
+        <div className="space-y-4">
+          <Heading variant="display" as="h2">
+            {skill.name}
+          </Heading>
+          <div className="space-y-3">
+            <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
+          </div>
+          {skill.description && <Text variant="muted">{skill.description}</Text>}
         </div>
-        {skill.description && <Text variant="muted">{skill.description}</Text>}
-      </div>
-      {skill.suggestedClasses.length > 0 && (
-        <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
-      )}
-    </ContentDetailLayout>
+        {skill.suggestedClasses.length > 0 && (
+          <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
+        )}
+      </ContentDetailLayout>
+    </WidePage>
   )
 }
 

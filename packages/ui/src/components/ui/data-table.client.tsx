@@ -125,6 +125,7 @@ import {
   dataTableResetColumnVariants,
   dataTableLockedColumnVariants,
   dataTableRootVariants,
+  dataTableTableVariants,
   dataTableTableWrapVariants,
   dataTableToolbarVariants,
 } from './data-table.variants'
@@ -834,13 +835,14 @@ export function DataTable<TData>({
 
   // Notify parent when column visibility changes
   const onColumnChangeRef = React.useRef(onColumnChange)
-  onColumnChangeRef.current = onColumnChange
+  React.useEffect(() => {
+    onColumnChangeRef.current = onColumnChange
+  })
   React.useEffect(() => {
     onColumnChangeRef.current?.({
       visibility: columnVisibility,
       order: columnOrder,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnVisibility, columnOrder])
 
   // Inject selection column
@@ -883,6 +885,8 @@ export function DataTable<TData>({
     ...(rowActions ? [actionsColumn] : []),
   ]
 
+  // TanStack Table returns unstable function references; intentional here.
+  // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
     data,
     columns: resolvedColumns,
@@ -950,7 +954,7 @@ export function DataTable<TData>({
 
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>
-        <Table>
+        <Table className={dataTableTableVariants()}>
           {caption && <TableCaption className="pb-3">{caption}</TableCaption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

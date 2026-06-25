@@ -4,6 +4,7 @@ import type { ZodType } from 'zod'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { Form, FormSaveFooter, TabbedForm, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useContentFormOptions } from './content-form-options'
 import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
@@ -21,12 +22,12 @@ export function ContentFormComingSoon() {
 
 export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
   return (
-    <div className="space-y-4">
+    <NarrowPage spacing="relaxed" className="pb-10">
       <Heading variant="page" as="h2">
         {heading}
       </Heading>
       <ContentFormComingSoon />
-    </div>
+    </NarrowPage>
   )
 }
 
@@ -86,25 +87,23 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
   collapsibleSections,
 }: ContentSchemaFormProps<TFormValues>) {
   return (
-    <div className="max-w-3xl">
-      <Form<TFormValues>
-        key={formKey}
-        schema={schema}
-        fields={fields}
-        defaultValues={defaultValues}
-        onSubmit={onSubmit}
-        formError={formError}
-        collapsibleSections={collapsibleSections}
-        stickyFooter
-        footer={(form) => (
-          <ContentFormCancelFooter
-            backHref={backHref}
-            submitLabel={submitLabel}
-            pending={submitPending || form.formState.isSubmitting}
-          />
-        )}
-      />
-    </div>
+    <Form<TFormValues>
+      key={formKey}
+      schema={schema}
+      fields={fields}
+      defaultValues={defaultValues}
+      onSubmit={onSubmit}
+      formError={formError}
+      collapsibleSections={collapsibleSections}
+      stickyFooter
+      footer={(form) => (
+        <ContentFormCancelFooter
+          backHref={backHref}
+          submitLabel={submitLabel}
+          pending={submitPending || form.formState.isSubmitting}
+        />
+      )}
+    />
   )
 }
 
@@ -132,24 +131,22 @@ export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   return (
-    <div className="max-w-3xl">
-      <TabbedForm<TFormValues>
-        key={formKey}
-        schema={schema}
-        tabs={tabs}
-        defaultValues={defaultValues}
-        collapsibleSections={false}
-        onSubmit={(values, form) => onSubmit(values, form)}
-        formError={formError}
-        footer={(form) => (
-          <ContentFormCancelFooter
-            backHref={backHref}
-            submitLabel={submitLabel}
-            pending={submitPending || form.formState.isSubmitting}
-          />
-        )}
-      />
-    </div>
+    <TabbedForm<TFormValues>
+      key={formKey}
+      schema={schema}
+      tabs={tabs}
+      defaultValues={defaultValues}
+      collapsibleSections={false}
+      onSubmit={(values, form) => onSubmit(values, form)}
+      formError={formError}
+      footer={(form) => (
+        <ContentFormCancelFooter
+          backHref={backHref}
+          submitLabel={submitLabel}
+          pending={submitPending || form.formState.isSubmitting}
+        />
+      )}
+    />
   )
 }
 
