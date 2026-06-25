@@ -102,6 +102,13 @@ export { SubmitButton, type SubmitButtonProps } from './components/ui/submit-but
 export { SidebarTrigger, type SidebarTriggerProps } from './components/ui/sidebar-trigger.client'
 
 export { RichTextEditor, type RichTextEditorProps } from './components/ui/rich-text-editor.client'
+export {
+  RichTextLinkPicker,
+  type RichTextLinkPickerProps,
+  type RichTextLinkPickerValue,
+  type RichTextLinkPickerInternalOption,
+  type RichTextLinkPickerContentTypeOption,
+} from './components/ui/rich-text-link-picker.client'
 
 export {
   Tooltip,

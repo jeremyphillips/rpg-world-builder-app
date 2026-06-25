@@ -1,0 +1,109 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import axe from 'axe-core'
+import { describe, expect, it, vi } from 'vitest'
+
+import {
+  RichTextLinkPicker,
+  type RichTextLinkPickerInternalOption,
+} from './rich-text-link-picker.client'
+
+const internalOptions: RichTextLinkPickerInternalOption[] = [
+  {
+    id: 'spell-overview',
+    title: 'Spell Overview',
+    href: '/campaigns/demo/content/spells',
+    contentType: 'spell',
+    kind: 'overview',
+  },
+  {
+    id: 'fireball',
+    title: 'Fireball',
+    href: '/campaigns/demo/content/spells/fireball',
+    contentType: 'spell',
+    kind: 'detail',
+    subtitle: 'Homebrew',
+  },
+]
+
+describe('RichTextLinkPicker', () => {
+  it('renders internal tab controls by default', () => {
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    expect(screen.getByText('Insert link')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Internal' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('textbox', { name: 'Search internal content' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Filter content type' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Internal display text' })).toBeInTheDocument()
+  })
+
+  it('submits an internal link with metadata', async () => {
+    const user = userEvent.setup()
+    const onInsert = vi.fn()
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={onInsert}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Fireball/i }))
+    await user.clear(screen.getByRole('textbox', { name: 'Internal display text' }))
+    await user.type(screen.getByRole('textbox', { name: 'Internal display text' }), 'Fireball spell')
+    await user.click(screen.getByRole('button', { name: 'Insert' }))
+
+    expect(onInsert).toHaveBeenCalledWith({
+      mode: 'internal',
+      href: '/campaigns/demo/content/spells/fireball',
+      displayText: 'Fireball spell',
+      openInNewWindow: false,
+      metadata: {
+        contentType: 'spell',
+        contentId: 'fireball',
+        contentTitle: 'Fireball',
+        linkKind: 'detail',
+      },
+    })
+  })
+
+  it('defaults external links to opening in a new window', async () => {
+    const user = userEvent.setup()
+    render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+      />,
+    )
+
+    await user.click(screen.getByRole('tab', { name: 'External' }))
+    expect(screen.getByRole('checkbox', { name: 'Open external link in new window' })).toBeChecked()
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <RichTextLinkPicker
+        open
+        onOpenChange={vi.fn()}
+        trigger={<button type="button">Open picker</button>}
+        onInsert={vi.fn()}
+        internalOptions={internalOptions}
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+})

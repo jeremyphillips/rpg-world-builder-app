@@ -7,8 +7,11 @@ import { Bold, Italic, Link as LinkIcon, List, ListOrdered } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
-import { Checkbox } from './checkbox.client'
-import { Input } from './input.client'
+import {
+  RichTextLinkPicker,
+  type RichTextLinkPickerInternalOption,
+  type RichTextLinkPickerValue,
+} from './rich-text-link-picker.client'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 
@@ -39,6 +42,7 @@ export interface RichTextEditorProps {
   onBlur?: () => void
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
+  internalLinkOptions?: RichTextLinkPickerInternalOption[]
   onLinkPickerOpen?: (context: RichTextLinkContext) => void
   disabled?: boolean
   id?: string
@@ -58,6 +62,7 @@ export function RichTextEditor({
   onChange,
   onBlur,
   linkable = false,
+  internalLinkOptions = [],
   onLinkPickerOpen,
   disabled = false,
   id,
@@ -73,9 +78,6 @@ export function RichTextEditor({
   const [editingLinkContext, setEditingLinkContext] = React.useState<RichTextLinkContext | null>(
     null,
   )
-  const [linkHref, setLinkHref] = React.useState('')
-  const [linkDisplayText, setLinkDisplayText] = React.useState('')
-  const [openLinkInNewWindow, setOpenLinkInNewWindow] = React.useState(false)
 
   React.useEffect(() => {
     valueRef.current = value
@@ -211,27 +213,34 @@ export function RichTextEditor({
     editor.chain().focus().extendMarkRange('link').unsetLink().run()
   }, [editor])
 
-  const openLinkPicker = React.useCallback(() => {
-    const context = resolveLinkContext()
-    if (!context) return
+  const handleLinkPickerOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) {
+        setIsLinkPickerOpen(false)
+        return
+      }
 
-    setEditingLinkContext(context)
-    setLinkHref(context.href)
-    setLinkDisplayText(context.displayText)
-    setOpenLinkInNewWindow(context.openInNewWindow)
-    setIsLinkPickerOpen(true)
-    onLinkPickerOpen?.(context)
-  }, [onLinkPickerOpen, resolveLinkContext])
+      const context = resolveLinkContext()
+      if (!context) return
+      setEditingLinkContext(context)
+      setIsLinkPickerOpen(true)
+      onLinkPickerOpen?.(context)
+    },
+    [onLinkPickerOpen, resolveLinkContext],
+  )
 
-  const handleInsertLink = React.useCallback(() => {
+  const handleInsertLink = React.useCallback((value: RichTextLinkPickerValue) => {
     applyLinkPayload({
-      href: linkHref,
-      displayText: linkDisplayText,
-      openInNewWindow: openLinkInNewWindow,
-      metadata: editingLinkContext?.metadata,
+      href: value.href,
+      displayText: value.displayText,
+      openInNewWindow: value.openInNewWindow,
+      metadata: {
+        ...editingLinkContext?.metadata,
+        ...value.metadata,
+      },
     })
     setIsLinkPickerOpen(false)
-  }, [applyLinkPayload, editingLinkContext, linkDisplayText, linkHref, openLinkInNewWindow])
+  }, [applyLinkPayload, editingLinkContext])
 
   return (
     <div
@@ -294,71 +303,46 @@ export function RichTextEditor({
           <ListOrdered className="size-4" />
         </Button>
         {linkable ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn('size-7', editor?.isActive('link') && 'bg-accent text-accent-foreground')}
-            aria-label="Link"
-            aria-pressed={editor?.isActive('link') ?? false}
-            disabled={disabled || !editor}
-            onClick={openLinkPicker}
-          >
-            <LinkIcon className="size-4" />
-          </Button>
+          <RichTextLinkPicker
+            open={isLinkPickerOpen}
+            onOpenChange={handleLinkPickerOpenChange}
+            initialValue={{
+              mode:
+                editingLinkContext?.metadata?.linkKind === 'external' ||
+                /^https?:\/\//i.test(editingLinkContext?.href ?? '')
+                  ? 'external'
+                  : 'internal',
+              href: editingLinkContext?.href,
+              displayText: editingLinkContext?.displayText,
+              openInNewWindow: editingLinkContext?.openInNewWindow,
+              metadata: editingLinkContext?.metadata,
+            }}
+            internalOptions={internalLinkOptions}
+            onInsert={handleInsertLink}
+            onCancel={() => setIsLinkPickerOpen(false)}
+            onRemove={
+              editor?.isActive('link')
+                ? () => {
+                    removeLink()
+                    setIsLinkPickerOpen(false)
+                  }
+                : undefined
+            }
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn('size-7', editor?.isActive('link') && 'bg-accent text-accent-foreground')}
+                aria-label="Link"
+                aria-pressed={editor?.isActive('link') ?? false}
+                disabled={disabled || !editor}
+              >
+                <LinkIcon className="size-4" />
+              </Button>
+            }
+          />
         ) : null}
       </div>
-      {linkable && isLinkPickerOpen ? (
-        <div className="border-b border-border p-2">
-          <div className="mb-2 text-sm font-medium">Insert link</div>
-          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <Input
-              value={linkHref}
-              onChange={(event) => setLinkHref(event.target.value)}
-              placeholder="https://example.com or /campaigns/..."
-              aria-label="Link URL"
-              size="sm"
-            />
-            <Input
-              value={linkDisplayText}
-              onChange={(event) => setLinkDisplayText(event.target.value)}
-              placeholder="Display text"
-              aria-label="Display text"
-              size="sm"
-            />
-          </div>
-          <label className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground">
-            <Checkbox
-              checked={openLinkInNewWindow}
-              onCheckedChange={(checked) => setOpenLinkInNewWindow(Boolean(checked))}
-              aria-label="Open link in new window"
-            />
-            Open link in new window
-          </label>
-          <div className="mt-3 flex items-center justify-end gap-2">
-            {editor?.isActive('link') ? (
-              <Button variant="outline" size="sm" onClick={removeLink}>
-                Remove link
-              </Button>
-            ) : null}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsLinkPickerOpen(false)}
-              aria-label="Cancel link insert"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleInsertLink}
-              disabled={linkHref.trim().length === 0}
-            >
-              Insert
-            </Button>
-          </div>
-        </div>
-      ) : null}
       <EditorContent editor={editor} />
     </div>
   )

@@ -62,9 +62,9 @@ describe('RichTextEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Link' }))
 
     expect(screen.getByText('Insert link')).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Link URL' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Display text' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search internal content' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Internal display text' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Insert' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancel link insert' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
   })
 })
