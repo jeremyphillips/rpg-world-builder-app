@@ -66,6 +66,7 @@ export function RichTextLinkBubbleMenu({
         className,
       )}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
+      onMouseDown={(event) => event.preventDefault()}
     >
       <Button type="button" variant="ghost" size="sm" onClick={onEditLink}>
         Edit link
