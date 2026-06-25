@@ -52,9 +52,7 @@ pnpm --filter @rpg/dashboard analyze # production build + bundle treemap (opens 
 ```
 
 See [apps/dashboard/docs/code-splitting.md](../apps/dashboard/docs/code-splitting.md)
-for how routes and vendor chunks are split, and
-[apps/dashboard/docs/bundle-baseline.md](../apps/dashboard/docs/bundle-baseline.md)
-for historical size comparisons.
+for splitting conventions and interpreting the treemap.
 
 ### Storybook
 

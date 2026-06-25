@@ -4,8 +4,7 @@ The dashboard SPA is split so the entry chunk stays small and heavy surfaces loa
 on demand. Entry JS is ~8 kB gzip (down from a ~453 kB monolith); TipTap, form
 defs, and DataTable ride in route or vendor chunks instead.
 
-For measurement history and phase-by-phase sizes, see
-[bundle-baseline.md](./bundle-baseline.md).
+For before/after size history, see [bundle-baseline.md](./bundle-baseline.md).
 
 ## Where splitting lives
 
