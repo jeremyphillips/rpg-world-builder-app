@@ -47,8 +47,10 @@ export function RichTextEditor({
   const valueRef = React.useRef(value)
   const onChangeRef = React.useRef(onChange)
 
-  valueRef.current = value
-  onChangeRef.current = onChange
+  React.useEffect(() => {
+    valueRef.current = value
+    onChangeRef.current = onChange
+  })
 
   const editor = useEditor(
     {
