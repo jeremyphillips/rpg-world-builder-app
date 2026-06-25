@@ -48,6 +48,7 @@ Run a single workspace with a pnpm filter:
 pnpm --filter @rpg/api dev          # API only (tsx watch on :5001)
 pnpm --filter @rpg/public dev       # Next only (:3000)
 pnpm --filter @rpg/dashboard dev    # Vite only (:5173)
+pnpm --filter @rpg/dashboard analyze # production build + bundle treemap (opens bundle-stats/stats.html)
 ```
 
 ### Storybook
