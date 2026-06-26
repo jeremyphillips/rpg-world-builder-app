@@ -6,8 +6,8 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import {
-  chooseFromChipsSentenceClasses,
   fieldAnatomyStackClasses,
+  fieldInlineSentenceClasses,
   fieldLabelVariants,
   fieldSetResetClasses,
 } from './field.variants'
@@ -93,7 +93,7 @@ export function InlineChooseCountField({
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </legend>
 
-      <div className={chooseFromChipsSentenceClasses}>
+      <div className={fieldInlineSentenceClasses}>
         <Text variant="body">{prefix}</Text>
         <label htmlFor={chooseId} className="sr-only">
           {label} count

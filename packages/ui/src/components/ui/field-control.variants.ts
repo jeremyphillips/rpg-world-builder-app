@@ -1,5 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { fieldControlSizeClasses } from './field-sizing.variants'
+
 /**
  * Look shared by every text-like field control: border, background, focus ring,
  * disabled state, and the error treatment. The error "outline border in error
@@ -15,11 +17,7 @@ const fieldControlBase =
  */
 export const fieldControlVariants = cva(fieldControlBase, {
   variants: {
-    size: {
-      sm: 'h-8 px-2.5 py-1 text-xs',
-      md: 'h-9 px-3 py-1.5 text-sm',
-      lg: 'h-13 px-4 py-2.5 text-lg',
-    },
+    size: fieldControlSizeClasses,
   },
   defaultVariants: {
     size: 'md',

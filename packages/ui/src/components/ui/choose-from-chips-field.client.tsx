@@ -9,8 +9,8 @@ import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { ChipSize } from './chips-field.variants'
 import {
-  chooseFromChipsSentenceClasses,
   fieldAnatomyStackClasses,
+  fieldInlineSentenceClasses,
   fieldLabelVariants,
   fieldSetResetClasses,
 } from './field.variants'
@@ -103,7 +103,7 @@ export function ChooseFromChipsField({
         {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
       </legend>
 
-      <div className={chooseFromChipsSentenceClasses}>
+      <div className={fieldInlineSentenceClasses}>
         <Text variant="body">{prefix}</Text>
         <label htmlFor={chooseId} className="sr-only">
           {label} count

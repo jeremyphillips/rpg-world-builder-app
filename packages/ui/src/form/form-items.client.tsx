@@ -258,7 +258,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
 
   if (item.kind === 'row') {
     return (
-      <FieldRow key={`row-${index}`} className={item.className}>
+      <FieldRow key={`row-${index}`} layout={item.layout} className={item.className}>
         {item.fields.map((field) => (
           <FieldNode
             key={namePrefix ? `${namePrefix}.${field.name}` : field.name}

@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 
@@ -10,10 +10,12 @@ import { cn } from '../../lib/utils'
  * - `fieldGroupFlexStackClasses` — same 24px rhythm as `fieldGroupStackClasses`, gap-based (avoids margin collapse with fieldsets)
  * - `formSectionStackClasses` — top-level accordion sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
+ * - `fieldRowLayoutVariants` — display mode for schema-driven rows
  * - `fieldChipWrapGapClasses` — gap between chip pills inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — space below a group/section description
  * - `fieldGroupLegendSpacingClasses` — space below a group legend
  * - `fieldArrayItemActionsClasses` — space above array item action buttons
+ * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  */
 export const fieldAnatomyStackClasses = 'space-y-3'
 export const fieldGroupStackClasses = 'space-y-6'
@@ -25,7 +27,24 @@ export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
-export const chooseFromChipsSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
+export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
+export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
+
+export const fieldRowLayoutVariants = cva('', {
+  variants: {
+    layout: {
+      flex: cn('flex flex-wrap items-start', fieldRowGapClasses),
+      'responsive-2': cn('grid w-full grid-cols-1 md:grid-cols-2', fieldRowGapClasses),
+      'responsive-3': cn('grid w-full grid-cols-2 md:grid-cols-3', fieldRowGapClasses),
+    },
+  },
+  defaultVariants: {
+    layout: 'flex',
+  },
+})
+
+export type FieldRowLayoutVariantProps = VariantProps<typeof fieldRowLayoutVariants>
+export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
 
 export const fieldLabelVariants = cva(
   [

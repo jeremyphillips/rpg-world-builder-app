@@ -17,6 +17,7 @@ import type {
 import type { FieldSize } from '../components/ui/field.client'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import type { FieldRowLayout } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -367,6 +368,8 @@ export type FieldConfig =
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
+  /** Preferred display recipe. Use `className` only for one-off escape hatches. */
+  layout?: FieldRowLayout
   className?: string
 }
 

@@ -3,13 +3,19 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { fieldControlVariants } from './field-control.variants'
 import { fieldDigitWidthVariants } from './field-digit-metrics'
+import {
+  fieldDigitTrailingColumnClasses,
+  fieldDigitTrailingIconClasses,
+  fieldDigitTrailingPaddingClasses,
+  fieldGroupedControlSizeClasses,
+} from './field-sizing.variants'
 
 export const numberInputRootVariants = cva('group relative inline-flex')
 
 const groupedNumberInputFieldSizeClasses = {
-  sm: 'h-8 pl-2.5 py-1 text-xs pr-6',
-  md: 'h-9 pl-3 py-1.5 text-sm pr-6',
-  lg: 'h-13 pl-4 py-2.5 text-lg pr-8',
+  sm: cn(fieldGroupedControlSizeClasses.sm, fieldDigitTrailingPaddingClasses.sm),
+  md: cn(fieldGroupedControlSizeClasses.md, fieldDigitTrailingPaddingClasses.md),
+  lg: cn(fieldGroupedControlSizeClasses.lg, fieldDigitTrailingPaddingClasses.lg),
 } as const
 
 export const numberInputFieldVariants = cva(
@@ -30,17 +36,17 @@ export const numberInputFieldVariants = cva(
       {
         grouped: false,
         size: 'sm',
-        class: cn(fieldControlVariants({ size: 'sm' }), 'pr-6'),
+        class: cn(fieldControlVariants({ size: 'sm' }), fieldDigitTrailingPaddingClasses.sm),
       },
       {
         grouped: false,
         size: 'md',
-        class: cn(fieldControlVariants({ size: 'md' }), 'pr-6'),
+        class: cn(fieldControlVariants({ size: 'md' }), fieldDigitTrailingPaddingClasses.md),
       },
       {
         grouped: false,
         size: 'lg',
-        class: cn(fieldControlVariants({ size: 'lg' }), 'pr-8'),
+        class: cn(fieldControlVariants({ size: 'lg' }), fieldDigitTrailingPaddingClasses.lg),
       },
       {
         grouped: true,
@@ -70,9 +76,9 @@ export const numberInputStepperVariants = cva(
   {
     variants: {
       size: {
-        sm: 'w-5',
-        md: 'w-5',
-        lg: 'w-7',
+        sm: fieldDigitTrailingColumnClasses.sm,
+        md: fieldDigitTrailingColumnClasses.md,
+        lg: fieldDigitTrailingColumnClasses.lg,
       },
       grouped: {
         true: 'rounded-none',
@@ -91,9 +97,9 @@ export const numberInputStepperButtonVariants = cva(
   {
     variants: {
       size: {
-        sm: '[&_svg]:size-2.5',
-        md: '[&_svg]:size-2.5',
-        lg: '[&_svg]:size-3.5',
+        sm: fieldDigitTrailingIconClasses.sm,
+        md: fieldDigitTrailingIconClasses.md,
+        lg: fieldDigitTrailingIconClasses.lg,
       },
     },
     defaultVariants: {
