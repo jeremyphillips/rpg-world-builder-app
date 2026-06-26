@@ -11,7 +11,8 @@ import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
-import { getSeedCreatureTypeDisplayLabel } from '../../lib/seed-creature-type-helpers'
+import { useCreatureTypeVocabulary } from '@/features/homebrew'
+import { getCreatureTypeLabel } from '../../lib/creature-type-field-options'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -96,7 +97,8 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
   )
 }
 
-function SpeciesStatsSection({ species }: { species: Species }) {
+function SpeciesStatsSection({ species, campaignId }: { species: Species; campaignId: string }) {
+  const { vocabulary } = useCreatureTypeVocabulary(campaignId)
   const sizeLabel = species.sizes.map(getCreatureSizeLabel).join(' or ')
   const sensesLabel = collectSenses(species.traits)
 
@@ -104,7 +106,7 @@ function SpeciesStatsSection({ species }: { species: Species }) {
     <div className="space-y-3">
       <ContentStatRow
         label="Creature Type"
-        value={getSeedCreatureTypeDisplayLabel(species.creatureType)}
+        value={getCreatureTypeLabel(species.creatureType, { creatureTypeVocabulary: vocabulary })}
       />
       <ContentStatRow label="Size" value={sizeLabel} />
       <ContentStatRow label="Speed" value={formatSpeed(species.speed)} />
@@ -134,7 +136,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
           <Heading variant="display" as="h2">
             {species.name}
           </Heading>
-          <SpeciesStatsSection species={species} />
+          <SpeciesStatsSection species={species} campaignId={campaignId} />
           {species.description && (
             <RichTextContent html={species.description} size="sm" tone="muted" />
           )}

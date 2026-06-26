@@ -4,53 +4,66 @@ import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import type { CreatureTypeVocabulary } from '@/features/homebrew'
 import {
-  CREATURE_TYPES,
-  getSeedCreatureTypeDisplayLabel,
-} from '../../lib/seed-creature-type-helpers'
+  buildActiveCreatureTypeFieldOptions,
+  getCreatureTypeLabel as getVocabularyCreatureTypeLabel,
+} from '@/features/homebrew'
 
-const SPECIES_MIDDLE_COLUMNS: ColumnDef<Species>[] = [
-  {
-    accessorKey: 'creatureType',
-    header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-    cell: ({ row }) => getSeedCreatureTypeDisplayLabel(row.getValue<string>('creatureType')),
-    filterFn: 'equalsString',
-    meta: { label: 'Type' },
-  },
-  {
-    id: 'sizes',
-    accessorFn: (row) => row.sizes.map(getCreatureSizeLabel).join(' / '),
-    header: ({ column }) => <SortableHeader column={column}>Size</SortableHeader>,
-    cell: ({ row }) => row.getValue<string>('sizes'),
-    meta: { label: 'Size' },
-  },
-  {
-    id: 'speed',
-    accessorFn: (row) => row.speed.walk,
-    header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
-    cell: ({ row }) => `${row.original.speed.walk} ft.`,
-    meta: { label: 'Speed' },
-  },
-]
+import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { getCreatureTypeLabel } from '../../lib/creature-type-field-options'
 
-const SPECIES_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
-    id: 'creatureType',
-    label: 'Creature Type',
-    options: CREATURE_TYPES.map((value) => ({
-      label: getSeedCreatureTypeDisplayLabel(value),
-      value,
-    })),
-  },
-]
+function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Species>[] {
+  return [
+    {
+      accessorKey: 'creatureType',
+      header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+      cell: ({ row }) =>
+        vocabulary
+          ? getVocabularyCreatureTypeLabel(vocabulary, row.getValue<string>('creatureType'))
+          : getCreatureTypeLabel(row.getValue<string>('creatureType')),
+      filterFn: 'equalsString',
+      meta: { label: 'Type' },
+    },
+    {
+      id: 'sizes',
+      accessorFn: (row) => row.sizes.map(getCreatureSizeLabel).join(' / '),
+      header: ({ column }) => <SortableHeader column={column}>Size</SortableHeader>,
+      cell: ({ row }) => row.getValue<string>('sizes'),
+      meta: { label: 'Size' },
+    },
+    {
+      id: 'speed',
+      accessorFn: (row) => row.speed.walk,
+      header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
+      cell: ({ row }) => `${row.original.speed.walk} ft.`,
+      meta: { label: 'Speed' },
+    },
+  ]
+}
+
+function speciesSpecificFilters(vocabulary?: CreatureTypeVocabulary): FilterDef[] {
+  const options = vocabulary
+    ? buildActiveCreatureTypeFieldOptions(vocabulary)
+    : [{ label: 'Humanoid', value: 'humanoid' }]
+
+  return [
+    {
+      type: 'select',
+      id: 'creatureType',
+      label: 'Creature Type',
+      options,
+    },
+  ]
+}
 
 /** Species column definitions with the name cell linked to the species detail page. */
-export function speciesColumns(campaignId: string) {
-  return buildContentColumns<Species>(SPECIES_MIDDLE_COLUMNS, {
+export function speciesColumns(campaignId: string, vocabulary?: CreatureTypeVocabulary) {
+  return buildContentColumns<Species>(speciesMiddleColumns(vocabulary), {
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })
 }
 
-export const speciesFilters = buildContentFilters(SPECIES_SPECIFIC_FILTERS)
+export function speciesFilters(vocabulary?: CreatureTypeVocabulary) {
+  return buildContentFilters(speciesSpecificFilters(vocabulary))
+}

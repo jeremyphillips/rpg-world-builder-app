@@ -19,6 +19,7 @@ import type {
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
+import { assertCreatureTypesActiveInCampaign } from '../vocabulary'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
@@ -216,6 +217,11 @@ export async function updateCampaign(
   input: UpdateCampaignInput,
 ): Promise<Campaign | null> {
   if (!isValidObjectId(campaignId)) return null
+
+  const allowedTypes = input.settings?.ruleOverrides?.allowedCharacterCreatureTypes
+  if (allowedTypes !== undefined) {
+    await assertCreatureTypesActiveInCampaign(campaignId, allowedTypes)
+  }
 
   const { $set, $unset } = buildCampaignUpdateSet(input)
   if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {

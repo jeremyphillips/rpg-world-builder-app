@@ -3,6 +3,7 @@ import { ContentKeyError, stripClassSkillFromFromInput } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
+import { assertCreatureTypesActiveInCampaign } from '../../vocabulary'
 import { enrichClassWithDerivedSkills } from '../classes/derive-classes-catalog'
 import { classContentConfig } from '../classes/classes.config'
 import { resolveCatalogForCampaign } from '../content.service'
@@ -206,6 +207,17 @@ async function assertSpellClassIdsForCampaign<T extends StoredEntity>(
   assertSpellClassIdsHaveSpellcasting(classIds, classes)
 }
 
+async function assertSpeciesCreatureTypeForCampaign<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  input: Record<string, unknown>,
+): Promise<void> {
+  if (config.typeName !== 'species') return
+  const creatureType = input.creatureType
+  if (typeof creatureType !== 'string') return
+  await assertCreatureTypesActiveInCampaign(campaignId, [creatureType])
+}
+
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -222,6 +234,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
   const { rulesetId } = campaign
   const slug = input.slug as string
   await assertSpellClassIdsForCampaign(config, campaignId, input.classIds as string[])
+  await assertSpeciesCreatureTypeForCampaign(config, campaignId, input)
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
@@ -270,6 +283,7 @@ export async function updateContentEntity<T extends StoredEntity>(
       (existing as unknown as { classIds: string[] }).classIds) as string[]
     await assertSpellClassIdsForCampaign(config, campaignId, effectiveClassIds)
   }
+  await assertSpeciesCreatureTypeForCampaign(config, campaignId, update)
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {

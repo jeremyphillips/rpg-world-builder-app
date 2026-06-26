@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
+
 import {
   allowedCharacterCreatureTypesFromCtx,
   getCharacterCreatureTypeFieldOptions,
+  getCreatureTypeLabel,
 } from './creature-type-field-options'
+
+const seedVocabulary = buildSeedCreatureTypeVocabulary()
 
 describe('getCharacterCreatureTypeFieldOptions', () => {
   it('defaults to humanoid when campaign rules are absent', () => {
@@ -20,11 +25,30 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid', 'fey'],
         },
+        creatureTypeVocabulary: seedVocabulary,
       }),
     ).toEqual([
       { value: 'humanoid', label: 'Humanoid' },
       { value: 'fey', label: 'Fey' },
     ])
+  })
+
+  it('omits allowed types that are disabled in campaign vocabulary', () => {
+    const vocabulary = {
+      labelById: { humanoid: 'Humanoid', fey: 'Fey' },
+      activeIds: new Set(['humanoid']),
+    }
+
+    expect(
+      getCharacterCreatureTypeFieldOptions({
+        campaignRules: {
+          maxCharacterLevel: 20,
+          standardMaxCharacterLevel: 20,
+          allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+        },
+        creatureTypeVocabulary: vocabulary,
+      }),
+    ).toEqual([{ value: 'humanoid', label: 'Humanoid' }])
   })
 })
 
@@ -39,5 +63,18 @@ describe('allowedCharacterCreatureTypesFromCtx', () => {
         },
       }),
     ).toEqual(['construct'])
+  })
+})
+
+describe('getCreatureTypeLabel', () => {
+  it('uses campaign vocabulary labels when provided', () => {
+    expect(
+      getCreatureTypeLabel('fey', {
+        creatureTypeVocabulary: {
+          labelById: { fey: 'Custom Fey' },
+          activeIds: new Set(['fey']),
+        },
+      }),
+    ).toBe('Custom Fey')
   })
 })

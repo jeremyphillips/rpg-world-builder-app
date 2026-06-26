@@ -14,3 +14,11 @@ export {
   useVocabularyMutations,
   vocabularySetQueryKey,
 } from './hooks/use-vocabulary-set'
+export { useCreatureTypeVocabulary } from './hooks/use-creature-type-vocabulary'
+export {
+  buildCreatureTypeVocabulary,
+  buildSeedCreatureTypeVocabulary,
+  buildActiveCreatureTypeFieldOptions,
+  getCreatureTypeLabel,
+  type CreatureTypeVocabulary,
+} from './lib/creature-type-vocabulary'

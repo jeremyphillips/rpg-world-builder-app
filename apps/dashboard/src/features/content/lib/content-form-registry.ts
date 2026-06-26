@@ -5,6 +5,8 @@ import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 import type { ContentSource, EquipmentKind, WeaponCategory } from '@rpg/contracts'
 import type { ResolvedCampaignRules } from '@rpg/contracts'
 
+import type { CreatureTypeVocabulary } from '@/features/homebrew'
+
 import type { ContentListQueryResult } from './content-client'
 import type { ContentFormOptionSets } from './content-form-options'
 
@@ -26,6 +28,8 @@ export type ContentFormCtx = {
   entitySource?: ContentSource
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
+  /** Campaign-resolved creature type labels and active ids. */
+  creatureTypeVocabulary?: CreatureTypeVocabulary
   options?: Partial<ContentFormOptionSets>
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind

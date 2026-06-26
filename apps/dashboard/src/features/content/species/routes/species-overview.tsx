@@ -3,6 +3,7 @@ import { DataTable } from '@rpg/ui'
 import type { Species } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { useCreatureTypeVocabulary } from '@/features/homebrew'
 import { useSpecies } from '../hooks/use-species'
 import { speciesColumns, speciesFilters } from '../components/species-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
@@ -23,20 +24,25 @@ function SpeciesRowActions({ row, campaignId }: { row: Species; campaignId: stri
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: species = [], isPending, isError } = useSpecies(campaignId)
+  const {
+    vocabulary,
+    isPending: isVocabularyPending,
+    isError: isVocabularyError,
+  } = useCreatureTypeVocabulary(campaignId)
 
   return (
     <ContentOverviewShell
       heading="Species"
       campaignId={campaignId}
-      isPending={isPending}
-      isError={isError}
+      isPending={isPending || isVocabularyPending}
+      isError={isError || isVocabularyError}
       newHref={ROUTES.content.species.create(campaignId)}
       newLabel="New Species"
     >
       <DataTable
-        columns={speciesColumns(campaignId)}
+        columns={speciesColumns(campaignId, vocabulary)}
         data={species}
-        filters={speciesFilters}
+        filters={speciesFilters(vocabulary)}
         rowActions={(row) => <SpeciesRowActions row={row} campaignId={campaignId} />}
         caption="Playable species available in this campaign"
       />

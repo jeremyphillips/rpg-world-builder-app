@@ -1,6 +1,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
+import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { updateVocabularyEntry } from '../vocabulary'
 import { createUser } from '../user'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
@@ -211,6 +214,32 @@ describe('updateCampaign', () => {
 
     expect(updated?.configuration.settings?.ruleOverrides).toEqual({
       allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+    })
+  })
+
+  it('rejects disabled creature types in allowed character settings', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
+
+    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'fey', {
+      status: 'disabled',
+    })
+
+    await expect(
+      updateCampaign(campaign.id, {
+        settings: {
+          characterCreation: {
+            startingLevel: 1,
+            importedCharacters: { policy: 'disabled' },
+          },
+          ruleOverrides: {
+            allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'invalid_vocabulary',
     })
   })
 

@@ -1,19 +1,27 @@
 import { type CreatureTypeId } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
+import {
+  buildSeedCreatureTypeVocabulary,
+  getCreatureTypeLabel as getVocabularyCreatureTypeLabel,
+  type CreatureTypeVocabulary,
+} from '@/features/homebrew'
+
 import type { ContentFormCtx } from './content-form-registry'
 import { campaignRulesFromCtx } from './level-field-options'
-import {
-  getSeedCreatureTypeDisplayLabel,
-  seedCreatureTypeLabelMap,
-} from './seed-creature-type-helpers'
 
-const creatureTypeLabels = seedCreatureTypeLabelMap()
+const seedCreatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
+
+function resolveCreatureTypeVocabulary(ctx?: ContentFormCtx): CreatureTypeVocabulary {
+  return ctx?.creatureTypeVocabulary ?? seedCreatureTypeVocabulary
+}
 
 /** Select options for species creature type — filtered to campaign-allowed character types. */
 export function getCharacterCreatureTypeFieldOptions(ctx?: ContentFormCtx): FieldOption[] {
+  const vocabulary = resolveCreatureTypeVocabulary(ctx)
   const allowed = campaignRulesFromCtx(ctx).allowedCharacterCreatureTypes
-  return toOptions([...allowed], creatureTypeLabels)
+  const activeAllowed = allowed.filter((id) => vocabulary.activeIds.has(id))
+  return toOptions([...activeAllowed], vocabulary.labelById)
 }
 
 export function allowedCharacterCreatureTypesFromCtx(
@@ -22,4 +30,9 @@ export function allowedCharacterCreatureTypesFromCtx(
   return campaignRulesFromCtx(ctx).allowedCharacterCreatureTypes
 }
 
-export { getSeedCreatureTypeDisplayLabel as getCreatureTypeLabel }
+/** Campaign-aware creature type label; falls back to seed labels when vocabulary is absent. */
+export function getCreatureTypeLabel(id: string, ctx?: ContentFormCtx): string {
+  return getVocabularyCreatureTypeLabel(resolveCreatureTypeVocabulary(ctx), id)
+}
+
+export { seedCreatureTypeVocabulary }
