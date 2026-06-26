@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { CampaignListItem } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
-import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew/lib/creature-type-vocabulary'
+import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
