@@ -350,7 +350,8 @@ Pattern (see `SENSE_ENTRIES`, `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
 `vocab/creature-size.ts`, `vocab/damage-type.ts`, `vocab/weapon/property.ts`,
 `vocab/weapon/mastery.ts`, and `vocab/armor/category.ts`). Campaign-customizable
 sets such as creature types ship seed JSON from `@rpg/catalog/vocabulary` instead
-of a closed `*_ENTRIES` map in contracts:
+of a closed `*_ENTRIES` map in contracts — see [vocabulary.md](./vocabulary.md)
+for seed vs patch storage, validation, and how to add the next set.
 
 ```typescript
 import type { GameTermEntry } from '../vocab/types' // adjust relative path from content/
