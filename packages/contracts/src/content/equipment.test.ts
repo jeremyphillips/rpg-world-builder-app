@@ -333,7 +333,7 @@ describe('tool display helpers', () => {
         { description: 'Pick a lock', dc: 15 },
         { description: 'Disarm a trap', dc: 15 },
       ]),
-    ).toBe('Pick a lock (DC 15); Disarm a trap (DC 15)')
+    ).toBe('Pick a lock (DC 15), or Disarm a trap (DC 15)')
   })
 })
 

@@ -19,9 +19,9 @@ export function formatToolUtilizeAction({ description, dc }: ToolUtilizeAction):
   return `${description} (DC ${dc})`
 }
 
-/** Joins utilize actions for display (semicolon-separated). */
+/** Joins utilize actions for display (e.g. "Pick a lock (DC 15), or Disarm a trap (DC 15)"). */
 export function formatToolUtilizes(actions: readonly ToolUtilizeAction[]): string {
-  return actions.map(formatToolUtilizeAction).join('; ')
+  return actions.map(formatToolUtilizeAction).join(', or ')
 }
 
 // ---------------------------------------------------------------------------

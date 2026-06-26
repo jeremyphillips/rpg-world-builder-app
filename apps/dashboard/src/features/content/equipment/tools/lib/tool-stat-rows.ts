@@ -1,5 +1,5 @@
 import {
-  formatToolUtilizeAction,
+  formatToolUtilizes,
   formatWeight,
   getAbilityLabel,
   getToolCategoryLabel,
@@ -13,10 +13,7 @@ export function getToolStatRows(item: ToolEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: getToolCategoryLabel(item.toolCategory) },
     { label: 'Ability', value: getAbilityLabel(item.ability) },
-    ...item.utilizes.map((action, index) => ({
-      label: index === 0 ? 'Utilize' : '',
-      value: formatToolUtilizeAction(action),
-    })),
+    { label: 'Utilize', value: formatToolUtilizes(item.utilizes) },
     ...(item.crafts?.length ? [{ label: 'Craft', value: item.crafts.join(', ') }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
   ]
