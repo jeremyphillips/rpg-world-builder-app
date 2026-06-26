@@ -89,16 +89,14 @@ describe('optionalWeightFields', () => {
 })
 
 describe('economyFields', () => {
-  it('places cost and weight in a three-column row', () => {
+  it('places cost and weight in an auto-width row', () => {
     const row = economyFields({ kind: 'weapon' })[0]
-    expect(row).toMatchObject({
-      kind: 'row',
-      className: 'grid w-full grid-cols-2 md:grid-cols-3',
-    })
+    expect(row).toMatchObject({ kind: 'row' })
     if (row && 'kind' in row && row.kind === 'row') {
+      expect(row).not.toHaveProperty('className')
       expect(row.fields).toHaveLength(2)
-      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'full' })
-      expect(row.fields[1]).toMatchObject({ name: 'weight', width: 'full' })
+      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'auto' })
+      expect(row.fields[1]).toMatchObject({ name: 'weight', width: 'auto' })
     }
   })
 
@@ -107,7 +105,7 @@ describe('economyFields', () => {
     expect(row).toMatchObject({ kind: 'row' })
     if (row && 'kind' in row && row.kind === 'row') {
       expect(row.fields).toHaveLength(1)
-      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'full' })
+      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'auto' })
     }
   })
 })

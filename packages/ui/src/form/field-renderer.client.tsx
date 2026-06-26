@@ -329,6 +329,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       hint={config.hint}
       info={config.info}
       required={config.required}
+      width={config.width}
       size={config.size}
       disabled={config.disabled}
       labelPosition={config.labelPosition}

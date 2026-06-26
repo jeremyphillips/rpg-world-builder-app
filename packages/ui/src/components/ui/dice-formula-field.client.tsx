@@ -6,6 +6,8 @@ import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
+import type { FieldWidth } from './field-control.variants'
+import { fieldWidthVariants } from './field-control.variants'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
@@ -33,6 +35,7 @@ export interface DiceFormulaFieldProps {
   required?: boolean
   disabled?: boolean
   size?: FieldSize
+  width?: FieldWidth
   labelPosition?: DiceFormulaLabelPosition
   modifierMode?: DiceFormulaModifierMode
   faces?: readonly number[]
@@ -77,6 +80,7 @@ export function DiceFormulaField({
   required = false,
   disabled = false,
   size = 'sm',
+  width = 'full',
   labelPosition = 'above',
   modifierMode = 'optional',
   faces = DIE_FACES,
@@ -128,7 +132,7 @@ export function DiceFormulaField({
       aria-describedby={describedBy}
       aria-invalid={hasError || undefined}
       disabled={disabled}
-      className={cn(fieldAnatomyStackClasses, 'w-full')}
+      className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
       onBlur={onBlur}
     >
       {labelPosition === 'above' ? (

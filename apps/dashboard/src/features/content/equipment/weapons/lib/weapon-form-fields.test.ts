@@ -21,29 +21,36 @@ describe('weapon kindFieldGroups', () => {
     expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Weapon' })
   })
 
-  it('uses diceFormula fields for weapon damage and versatile damage', () => {
+  it('uses diceFormula fields for weapon damage and versatile damage in an auto-width row', () => {
     const weaponGroup = weaponFormFieldGroup()
     if (!('fields' in weaponGroup)) {
       throw new Error('expected weapon form group')
     }
 
-    const diceFields = weaponGroup.fields.filter(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { type: 'diceFormula' }> =>
-        !('kind' in field) && field.type === 'diceFormula',
+    const damageRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'damageDice'),
     )
+    if (!damageRow || !('fields' in damageRow)) {
+      throw new Error('expected damage dice row')
+    }
 
-    expect(diceFields).toEqual([
+    expect(damageRow.fields).toEqual([
       expect.objectContaining({
         name: 'damageDice',
         label: 'Damage',
         modifierMode: 'none',
         size: 'md',
+        width: 'auto',
       }),
       expect.objectContaining({
         name: 'versatileDamage',
         label: 'Versatile damage',
         modifierMode: 'none',
         size: 'md',
+        width: 'auto',
       }),
     ])
   })
@@ -72,6 +79,29 @@ describe('weapon kindFieldGroups', () => {
         placeholder: 'Choose...',
       }),
     ])
+  })
+
+  it('uses Choose... placeholders for required weapon selects', () => {
+    const weaponGroup = weaponFormFieldGroup()
+    if (!('fields' in weaponGroup)) {
+      throw new Error('expected weapon form group')
+    }
+
+    const coreRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'category'),
+    )
+    if (!coreRow || !('fields' in coreRow)) {
+      throw new Error('expected category/mode/mastery row')
+    }
+
+    for (const name of ['category', 'mode', 'mastery'] as const) {
+      expect(
+        coreRow.fields.find((field) => !('kind' in field) && field.name === name),
+      ).toMatchObject({ placeholder: 'Choose...' })
+    }
   })
 
   it('defaults deals damage to on and damage kind to dice', () => {

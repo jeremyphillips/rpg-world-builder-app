@@ -45,6 +45,8 @@ const damageKindOptions = [
   { value: 'flat', label: 'Flat amount' },
 ]
 
+const WEAPON_SELECT_PLACEHOLDER = 'Choose...'
+
 function visibleWhenHasDamage(): FieldVisibility {
   return {
     dependsOn: ['hasDamage'],
@@ -112,6 +114,7 @@ export function weaponFormFieldGroup(): FormItem {
             name: 'category',
             label: 'Category',
             options: weaponCategoryOptions,
+            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
           },
           {
@@ -119,6 +122,7 @@ export function weaponFormFieldGroup(): FormItem {
             name: 'mode',
             label: 'Mode',
             options: weaponModeOptions,
+            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
           },
           {
@@ -126,6 +130,7 @@ export function weaponFormFieldGroup(): FormItem {
             name: 'mastery',
             label: 'Mastery',
             options: weaponMasteryOptions,
+            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
           },
         ],
@@ -159,7 +164,7 @@ export function weaponFormFieldGroup(): FormItem {
             name: 'damageType',
             label: 'Damage type',
             options: damageTypeOptions,
-            placeholder: 'Choose...',
+            placeholder: WEAPON_SELECT_PLACEHOLDER,
             width: '1/2',
             visibility: visibleWhenHasDamage(),
             required: true,
@@ -167,14 +172,31 @@ export function weaponFormFieldGroup(): FormItem {
         ],
       },
       {
-        type: 'diceFormula',
-        name: 'damageDice',
-        label: 'Damage',
-        modifierMode: 'none',
-        size: 'md',
-        countMin: 1,
-        visibility: visibleWhenDiceDamage(),
-        required: true,
+        kind: 'row',
+        fields: [
+          {
+            type: 'diceFormula',
+            name: 'damageDice',
+            label: 'Damage',
+            modifierMode: 'none',
+            size: 'md',
+            width: 'auto',
+            countMin: 1,
+            visibility: visibleWhenDiceDamage(),
+            required: true,
+          },
+          {
+            type: 'diceFormula',
+            name: 'versatileDamage',
+            label: 'Versatile damage',
+            modifierMode: 'none',
+            size: 'md',
+            width: 'auto',
+            countMin: 1,
+            visibility: visibleWhenVersatile(),
+            required: true,
+          },
+        ],
       },
       {
         type: 'number',
@@ -182,16 +204,6 @@ export function weaponFormFieldGroup(): FormItem {
         label: 'Flat damage',
         min: 1,
         visibility: visibleWhenFlatDamage(),
-        required: true,
-      },
-      {
-        type: 'diceFormula',
-        name: 'versatileDamage',
-        label: 'Versatile damage',
-        modifierMode: 'none',
-        size: 'md',
-        countMin: 1,
-        visibility: visibleWhenVersatile(),
         required: true,
       },
       {
