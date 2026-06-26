@@ -50,6 +50,40 @@ describe('CampaignRulesetPatch persistence', () => {
     expect(docs).toHaveLength(1)
     expect(docs[0]?.rulesetId).toBe('srd-cc-5.2.1')
   })
+
+  it('updates the same patch document on subsequent writes', async () => {
+    const campaign = await makeCampaign()
+
+    await createCampaignVocabularyEntry(campaign.id, {
+      setId: CREATURE_TYPE_SET_ID,
+      id: 'robot',
+      label: 'Robot',
+    })
+    const docAfterCreate = await CampaignRulesetPatchModel.findOne({
+      campaignId: campaign.id,
+    }).lean()
+
+    await createCampaignVocabularyEntry(campaign.id, {
+      setId: CREATURE_TYPE_SET_ID,
+      id: 'golem',
+      label: 'Golem',
+    })
+    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
+      label: 'People',
+    })
+
+    const docs = await CampaignRulesetPatchModel.find({ campaignId: campaign.id }).lean()
+    expect(docs).toHaveLength(1)
+    expect(String(docs[0]?._id)).toBe(String(docAfterCreate?._id))
+
+    const creatureTypePatch = docs[0]?.vocabulary?.find(
+      (entry) => entry.setId === CREATURE_TYPE_SET_ID,
+    )
+    expect(creatureTypePatch?.campaignEntries).toHaveLength(2)
+    expect(
+      creatureTypePatch?.systemEntryPatches?.find((patch) => patch.id === 'humanoid')?.label,
+    ).toBe('People')
+  })
 })
 
 describe('vocabulary write rules', () => {

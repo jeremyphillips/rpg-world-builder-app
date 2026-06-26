@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { systemRulesetIdSchema } from '../primitives/ruleset'
-
 // ---------------------------------------------------------------------------
 // Campaign vocabulary — reusable option sets (creature types, damage types, …)
 // scoped to a campaign ruleset. System seed data lives in catalog JSON; campaign
@@ -162,17 +160,6 @@ export const vocabularyOptionSetPatchSchema = z
   .strict()
 
 export type VocabularyOptionSetPatch = z.infer<typeof vocabularyOptionSetPatchSchema>
-
-export const campaignRulesetPatchSchema = z.object({
-  id: z.string().min(1),
-  campaignId: z.string().min(1),
-  rulesetId: systemRulesetIdSchema,
-  vocabulary: z.array(vocabularyOptionSetPatchSchema).optional(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-})
-
-export type CampaignRulesetPatch = z.infer<typeof campaignRulesetPatchSchema>
 
 // ---------------------------------------------------------------------------
 // Write DTOs — API input for vocabulary CRUD (Phase 3+)
