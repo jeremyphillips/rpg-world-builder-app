@@ -10,7 +10,7 @@ export const diceFormulaSeparatorVariants = cva('shrink-0 font-mono font-medium 
   variants: {
     size: {
       sm: 'text-xs',
-      md: 'text-base',
+      md: 'text-sm',
       lg: 'text-lg',
     },
   },

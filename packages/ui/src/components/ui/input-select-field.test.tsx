@@ -113,7 +113,7 @@ describe('InputSelectField', () => {
 
   it('uses a wider unit trigger when searchable', () => {
     render(<ControlledField searchable />)
-    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-48')
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-44')
   })
 
   it('uses intrinsic layout when valueDigits is set on a number field', () => {
@@ -124,13 +124,13 @@ describe('InputSelectField', () => {
     expect(group).toHaveClass('items-center')
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
-    expect(numberInputRoot).toHaveClass('w-[calc(2*1ch+3.125rem)]')
+    expect(numberInputRoot).toHaveClass('w-[calc(2*1ch+2.75rem)]')
   })
 
   it('applies five-digit intrinsic width without w-full on the root', () => {
     const { container } = render(<ControlledField valueDigits={5} width="auto" />)
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
-    expect(numberInputRoot).toHaveClass('w-[calc(5*1ch+3.125rem)]')
+    expect(numberInputRoot).toHaveClass('w-[calc(5*1ch+2.75rem)]')
     expect(numberInputRoot).not.toHaveClass('w-full')
 
     const group = container.querySelector('[role="group"]')

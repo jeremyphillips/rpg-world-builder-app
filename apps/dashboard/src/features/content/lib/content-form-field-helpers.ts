@@ -130,16 +130,16 @@ export function optionalWeightFields(
   ]
 }
 
-/** Cost and weight side-by-side in the Economy group (one-third row each). */
+/** Cost and weight side-by-side in the Economy group at intrinsic width. */
 export function economyFields(
   options: { kind?: EquipmentKind; required?: boolean } = {},
 ): GroupField[] {
   const fields = [
-    ...costFields({ ...options, width: 'full' }),
-    ...optionalWeightFields({ kind: options.kind, width: 'full' }),
+    ...costFields({ ...options, width: 'auto' }),
+    ...optionalWeightFields({ kind: options.kind, width: 'auto' }),
   ]
 
-  return [{ kind: 'row', className: scalarUnitRowClassName, fields }]
+  return [{ kind: 'row', fields }]
 }
 
 export function weightFromForm(
