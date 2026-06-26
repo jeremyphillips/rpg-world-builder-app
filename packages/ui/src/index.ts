@@ -105,8 +105,11 @@ export { RichTextField, type RichTextFieldProps } from './components/ui/rich-tex
 
 export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
 export {
+  fieldArrayItemActionRowClasses,
+  fieldArrayItemClasses,
   fieldGroupFlexStackClasses,
   fieldGroupStackClasses,
+  fieldInlineControlRowClasses,
   fieldInlineSentenceClasses,
   fieldRowLayoutVariants,
   type FieldRowLayout,

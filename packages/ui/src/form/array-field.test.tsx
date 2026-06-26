@@ -65,6 +65,12 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Traits item 1' })).toHaveClass(
+      'rounded-md',
+      'border',
+      'border-border',
+      'p-4',
+    )
   })
 
   it('removes an item when the remove button is clicked', async () => {

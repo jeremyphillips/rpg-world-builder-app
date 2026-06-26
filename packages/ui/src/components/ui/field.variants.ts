@@ -14,8 +14,11 @@ import { cn } from '../../lib/utils'
  * - `fieldChipWrapGapClasses` — gap between chip pills inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — space below a group/section description
  * - `fieldGroupLegendSpacingClasses` — space below a group legend
+ * - `fieldArrayItemClasses` — chrome around one repeatable array item
  * - `fieldArrayItemActionsClasses` — space above array item action buttons
+ * - `fieldArrayItemActionRowClasses` — action button row inside one array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
+ * - `fieldInlineControlRowClasses` — inline label + control rows
  */
 export const fieldAnatomyStackClasses = 'space-y-3'
 export const fieldGroupStackClasses = 'space-y-6'
@@ -25,9 +28,15 @@ export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-4'
+export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
+export const fieldArrayItemActionRowClasses = cn(
+  'flex items-center gap-2',
+  fieldArrayItemActionsClasses,
+)
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
+export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 export const fieldRowLayoutVariants = cva('', {
