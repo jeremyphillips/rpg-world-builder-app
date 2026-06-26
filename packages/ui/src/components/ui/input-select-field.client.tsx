@@ -2,19 +2,21 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Check, ChevronDown, Search } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldLabelVariants } from './field.variants'
 import {
+  COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxContentVariants,
   comboboxEmptyVariants,
   comboboxListVariants,
   comboboxOptionVariants,
-  comboboxSearchRowVariants,
+  comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
+import { ComboboxSearchField } from './combobox-field-parts.client'
 import { Input } from './input.client'
 import {
   filterInputSelectOptions,
@@ -170,6 +172,7 @@ function SearchableUnitSelect({
           className={cn(
             inputSelectUnitSegmentVariants({ size, searchable: true }),
             !unit && 'text-muted-foreground',
+            open && comboboxTriggerOpenVariants(),
           )}
         >
           <span className="truncate">{triggerText}</span>
@@ -180,28 +183,24 @@ function SearchableUnitSelect({
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
           align="start"
-          sideOffset={4}
+          side="bottom"
+          avoidCollisions
+          sideOffset={-COMBOBOX_TRIGGER_OVERLAP_OFFSET[size]}
           className={cn(comboboxContentVariants(), inputSelectSearchablePanelVariants())}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             searchInputRef.current?.focus()
           }}
         >
-          <div className={comboboxSearchRowVariants()}>
-            <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-            <Input
-              ref={searchInputRef}
-              id={searchId}
-              type="search"
-              size="sm"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={`Search ${label.toLowerCase()}…`}
-              aria-label={`Search ${label}`}
-              aria-controls={listboxId}
-              className="h-8 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-          </div>
+          <ComboboxSearchField
+            label={label}
+            listboxId={listboxId}
+            searchId={searchId}
+            size={size}
+            query={query}
+            searchInputRef={searchInputRef}
+            onQueryChange={setQuery}
+          />
 
           <div id={listboxId} role="listbox" aria-label={label} className={comboboxListVariants()}>
             {filteredOptions.length > 0 ? (

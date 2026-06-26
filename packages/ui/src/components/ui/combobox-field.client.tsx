@@ -64,6 +64,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           label={label}
           listboxId={control.listboxId}
           searchId={control.searchId}
+          size={size}
           multiple={multiple}
           query={control.query}
           emptyMessage={emptyMessage}

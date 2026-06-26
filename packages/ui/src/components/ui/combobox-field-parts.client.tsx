@@ -8,17 +8,19 @@ import { cn } from '../../lib/utils'
 import { DismissibleBadge } from './dismissible-badge.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
-import { Input } from './input.client'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type { ComboboxFieldOption } from './combobox-field.types'
 import {
+  COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxChipRowVariants,
   comboboxContentVariants,
   comboboxEmptyVariants,
   comboboxListVariants,
   comboboxOptionVariants,
+  comboboxSearchInputVariants,
   comboboxSearchRowVariants,
+  comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
 
 interface ComboboxTriggerProps {
@@ -58,6 +60,7 @@ export function ComboboxTrigger({
             fieldControlVariants({ size }),
             'items-center justify-between gap-2 text-left [&>span]:line-clamp-1',
             muted && 'text-muted-foreground',
+            open && comboboxTriggerOpenVariants(),
           )}
         >
           <span className="truncate">{triggerText}</span>
@@ -119,10 +122,55 @@ function ComboboxOptionItem({
   )
 }
 
+interface ComboboxSearchFieldProps {
+  label: string
+  listboxId: string
+  searchId: string
+  size: FieldSize
+  query: string
+  activeOptionId?: string
+  searchInputRef: React.RefObject<HTMLInputElement | null>
+  onQueryChange: (value: string) => void
+  onSearchKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+}
+
+/** Search row shared by combobox panel and searchable input-select unit segments. */
+export function ComboboxSearchField({
+  label,
+  listboxId,
+  searchId,
+  size,
+  query,
+  activeOptionId,
+  searchInputRef,
+  onQueryChange,
+  onSearchKeyDown,
+}: ComboboxSearchFieldProps) {
+  return (
+    <div className={comboboxSearchRowVariants({ size })}>
+      <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+      <input
+        ref={searchInputRef}
+        id={searchId}
+        type="search"
+        value={query}
+        onChange={(event) => onQueryChange(event.target.value)}
+        onKeyDown={onSearchKeyDown}
+        placeholder={`Search ${label.toLowerCase()}…`}
+        aria-label={`Search ${label}`}
+        aria-controls={listboxId}
+        aria-activedescendant={activeOptionId}
+        className={comboboxSearchInputVariants()}
+      />
+    </div>
+  )
+}
+
 interface ComboboxPanelProps {
   label: string
   listboxId: string
   searchId: string
+  size: FieldSize
   multiple: boolean
   query: string
   emptyMessage: string
@@ -144,6 +192,7 @@ export function ComboboxPanel({
   label,
   listboxId,
   searchId,
+  size,
   multiple,
   query,
   emptyMessage,
@@ -164,30 +213,26 @@ export function ComboboxPanel({
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         align="start"
-        sideOffset={4}
+        side="bottom"
+        avoidCollisions
+        sideOffset={-COMBOBOX_TRIGGER_OVERLAP_OFFSET[size]}
         className={comboboxContentVariants()}
         onOpenAutoFocus={(event) => {
           event.preventDefault()
           onOpenAutoFocus()
         }}
       >
-        <div className={comboboxSearchRowVariants()}>
-          <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-          <Input
-            ref={searchInputRef}
-            id={searchId}
-            type="search"
-            size="sm"
-            value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-            onKeyDown={onSearchKeyDown}
-            placeholder={`Search ${label.toLowerCase()}…`}
-            aria-label={`Search ${label}`}
-            aria-controls={listboxId}
-            aria-activedescendant={activeOptionId}
-            className="h-8 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
-        </div>
+        <ComboboxSearchField
+          label={label}
+          listboxId={listboxId}
+          searchId={searchId}
+          size={size}
+          query={query}
+          activeOptionId={activeOptionId}
+          searchInputRef={searchInputRef}
+          onQueryChange={onQueryChange}
+          onSearchKeyDown={onSearchKeyDown}
+        />
 
         <div
           id={listboxId}

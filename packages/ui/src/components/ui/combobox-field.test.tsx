@@ -96,6 +96,19 @@ describe('ComboboxField', () => {
     expect(screen.getByRole('button', { name: 'Remove missing-weapon' })).toBeInTheDocument()
   })
 
+  it('opens with a chromeless search row that replaces the trigger', async () => {
+    const user = userEvent.setup()
+    render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)
+
+    await user.click(screen.getByRole('combobox', { name: 'Spells' }))
+    const trigger = screen.getByRole('combobox', { name: 'Spells' })
+    const search = screen.getByRole('searchbox', { name: 'Search Spells' })
+
+    expect(trigger).toHaveClass('invisible')
+    expect(search).toHaveClass('dark:bg-transparent')
+    expect(search.closest('[class*="dark:bg-input/30"]')).not.toBeNull()
+  })
+
   it('filters options while searching', async () => {
     const user = userEvent.setup()
     render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)
