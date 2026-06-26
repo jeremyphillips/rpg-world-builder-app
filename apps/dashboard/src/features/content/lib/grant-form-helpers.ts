@@ -45,7 +45,7 @@ import {
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from './content-form-registry'
-import { getLevelFieldOptions } from './level-field-options'
+import { getCompactLevelFieldOptions, levelSelectDigits } from './level-field-options'
 import { titleCase } from './title-case'
 
 // ---------------------------------------------------------------------------
@@ -351,7 +351,8 @@ export function grantItemFields<T extends string>(
           type: 'select',
           name: 'level',
           label: 'Character level',
-          options: getLevelFieldOptions(ctx),
+          options: getCompactLevelFieldOptions(ctx),
+          digits: levelSelectDigits(ctx),
           required: true,
         },
         {

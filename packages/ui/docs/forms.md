@@ -197,10 +197,25 @@ same formula used by `DiceFormulaField` and digit-sized primitives.
 - `number` fields may also use `inputWidth` for a non-digit intrinsic cap on
   the input element.
 
+**Select + `digits`:** the trigger shows the option **label**, not the value.
+Use short numeric labels (`"1"`, `"d8"`) when sizing with `digits`. Verbose
+labels such as `"Level 10"` or `"Cantrip"` need a wider trigger — keep
+`width: 'sm'`/`md` without `digits`, or supply compact option labels.
+
+Dashboard level selects use
+[`getCompactLevelFieldOptions` / `getCompactLevelFieldOptionsGrouped`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
+with `levelSelectDigits(ctx)` so triggers stay aligned with digit-sized number
+fields. Hit die selects use `HIT_DIE_SELECT_DIGITS` (`3`) for `d10`/`d12`
+labels.
+
 ```tsx
 { type: 'select', name: 'spellcasting.level', label: 'Spellcasting level', digits: 2, ... }
-{ type: 'number', name: 'quantity', label: 'Quantity', digits: 2, width: 'auto', ... } // row-only width
+{ type: 'select', name: 'hitDie', label: 'Hit die', digits: 3, width: 'auto', ... } // in a row
+{ type: 'number', name: 'quantity', label: 'Quantity', digits: 2, width: 'auto', ... }
 ```
+
+Do **not** combine `digits` with mixed-length enum labels (e.g. subclass choice
+level with a `"None"` option) — use full-width container sizing instead.
 
 ### Row layout — flex vs responsive grid
 

@@ -12,7 +12,12 @@ import {
 } from '../../lib/grant-form-helpers'
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
-import { effectiveMaxFromCtx, getLevelFieldOptions } from '../../lib/level-field-options'
+import {
+  effectiveMaxFromCtx,
+  getCompactLevelFieldOptions,
+  getLevelFieldOptions,
+  levelSelectDigits,
+} from '../../lib/level-field-options'
 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
@@ -48,7 +53,8 @@ export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
-  const levelOptions = getLevelFieldOptions(ctx)
+  const levelOptions = getCompactLevelFieldOptions(ctx)
+  const levelDigits = levelSelectDigits(ctx)
 
   return [
     {
@@ -60,7 +66,8 @@ export function classFeatureItemFields(
           label: 'Level',
           options: levelOptions,
           required: true,
-          width: 'sm',
+          digits: levelDigits,
+          width: 'auto',
           ...(options?.defaultFeatureLevel !== undefined
             ? { defaultValue: String(options.defaultFeatureLevel) }
             : {}),
