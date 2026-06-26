@@ -1,5 +1,34 @@
 [
   {
+    "id": "srd-cc-5.2.1:airship",
+    "slug": "airship",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Airship",
+    "description": "",
+    "cost": {
+      "amount": 40000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "air",
+    "speed": {
+      "value": 8,
+      "unit": "mph"
+    },
+    "crew": 10,
+    "passengers": 20,
+    "cargoCapacity": {
+      "value": 1,
+      "unit": "ton"
+    },
+    "ac": 13,
+    "hp": 300
+  },
+  {
     "id": "srd-cc-5.2.1:cart",
     "slug": "cart",
     "rulesetId": "srd-cc-5.2.1",
@@ -33,7 +62,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Galley",
-    "description": "A large oared warship capable of carrying substantial cargo.",
+    "description": "",
     "cost": {
       "amount": 30000,
       "currency": "gp"
@@ -54,6 +83,66 @@
     "damageThreshold": 20
   },
   {
+    "id": "srd-cc-5.2.1:keelboat",
+    "slug": "keelboat",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Keelboat",
+    "description": "",
+    "cost": {
+      "amount": 3000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 1,
+      "unit": "mph"
+    },
+    "crew": 1,
+    "passengers": 6,
+    "cargoCapacity": {
+      "value": 0.5,
+      "unit": "ton"
+    },
+    "ac": 15,
+    "hp": 100,
+    "damageThreshold": 10
+  },
+  {
+    "id": "srd-cc-5.2.1:longship",
+    "slug": "longship",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Longship",
+    "description": "",
+    "cost": {
+      "amount": 10000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 3,
+      "unit": "mph"
+    },
+    "crew": 40,
+    "passengers": 150,
+    "cargoCapacity": {
+      "value": 10,
+      "unit": "ton"
+    },
+    "ac": 15,
+    "hp": 300,
+    "damageThreshold": 15
+  },
+  {
     "id": "srd-cc-5.2.1:rowboat",
     "slug": "rowboat",
     "rulesetId": "srd-cc-5.2.1",
@@ -62,7 +151,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Rowboat",
-    "description": "A small open boat propelled by oars.",
+    "description": "",
     "cost": {
       "amount": 50,
       "currency": "gp"
@@ -77,6 +166,36 @@
     "passengers": 3,
     "ac": 11,
     "hp": 50
+  },
+  {
+    "id": "srd-cc-5.2.1:sailing-ship",
+    "slug": "sailing-ship",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sailing Ship",
+    "description": "",
+    "cost": {
+      "amount": 10000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 2,
+      "unit": "mph"
+    },
+    "crew": 20,
+    "passengers": 20,
+    "cargoCapacity": {
+      "value": 100,
+      "unit": "ton"
+    },
+    "ac": 15,
+    "hp": 300,
+    "damageThreshold": 15
   },
   {
     "id": "srd-cc-5.2.1:wagon",
@@ -102,5 +221,35 @@
       "value": 2,
       "unit": "mph"
     }
+  },
+  {
+    "id": "srd-cc-5.2.1:warship",
+    "slug": "warship",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Warship",
+    "description": "",
+    "cost": {
+      "amount": 25000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 2.5,
+      "unit": "mph"
+    },
+    "crew": 60,
+    "passengers": 60,
+    "cargoCapacity": {
+      "value": 200,
+      "unit": "ton"
+    },
+    "ac": 15,
+    "hp": 500,
+    "damageThreshold": 20
   }
 ]
