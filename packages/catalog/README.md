@@ -27,6 +27,7 @@ import { loadSeedSpecies, getSpeciesBySlug } from '@rpg/catalog/species'
 import { loadSeedClasses, getClassBySlug } from '@rpg/catalog/classes'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 import { getStandardStartingWealth } from '@rpg/catalog/starting-wealth'
+import { loadSeedCreatureTypes } from '@rpg/catalog/vocabulary'
 ```
 
 ## Validation

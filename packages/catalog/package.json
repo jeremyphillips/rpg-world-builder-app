@@ -35,6 +35,10 @@
     "./starting-wealth": {
       "types": "./src/starting-wealth/index.ts",
       "default": "./src/starting-wealth/index.ts"
+    },
+    "./vocabulary": {
+      "types": "./src/vocabulary/index.ts",
+      "default": "./src/vocabulary/index.ts"
     }
   },
   "scripts": {

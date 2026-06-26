@@ -43,6 +43,15 @@ export const vocabularyOptionSetIdSchema = z.enum(VOCABULARY_OPTION_SET_IDS)
 
 export type VocabularyOptionSetId = z.infer<typeof vocabularyOptionSetIdSchema>
 
+/** One system vocabulary row in catalog seed JSON (before merge into a resolved set). */
+export const vocabularySeedOptionSchema = z.object({
+  id: vocabularyOptionIdSchema,
+  label: z.string().min(1),
+  description: z.string().min(1),
+})
+
+export type VocabularySeedOption = z.infer<typeof vocabularySeedOptionSchema>
+
 /** One resolved option after merging catalog seed + campaign patch. */
 export const vocabularyOptionSchema = z.object({
   id: vocabularyOptionIdSchema,

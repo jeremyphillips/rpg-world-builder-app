@@ -9,6 +9,7 @@ import {
   vocabularyOptionIdSchema,
   vocabularyOptionSetSchema,
   vocabularyOptionSetPatchSchema,
+  vocabularySeedOptionSchema,
 } from './vocabulary'
 
 const CREATURE_TYPE_SET = vocabularyOptionSetSchema.parse({
@@ -34,6 +35,22 @@ const CREATURE_TYPE_SET = vocabularyOptionSetSchema.parse({
       status: 'active',
     },
   ],
+})
+
+describe('vocabularySeedOptionSchema', () => {
+  it('requires id, label, and description', () => {
+    expect(
+      vocabularySeedOptionSchema.parse({
+        id: 'humanoid',
+        label: 'Humanoid',
+        description: 'People of the world.',
+      }),
+    ).toEqual({
+      id: 'humanoid',
+      label: 'Humanoid',
+      description: 'People of the world.',
+    })
+  })
 })
 
 describe('vocabularyOptionIdSchema', () => {

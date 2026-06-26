@@ -1,0 +1,72 @@
+[
+  {
+    "id": "aberration",
+    "label": "Aberration",
+    "description": "Aberrations are utterly alien beings whose anatomy and senses defy the natural order (e.g. aboleths, mind flayers, beholders)."
+  },
+  {
+    "id": "beast",
+    "label": "Beast",
+    "description": "Beasts are nonhumanoid creatures that are a natural part of the fantasy ecology (e.g. animals, dinosaurs, giant insects)."
+  },
+  {
+    "id": "celestial",
+    "label": "Celestial",
+    "description": "Celestials are creatures native to the Upper Planes, many of them the servants of deities (e.g. angels, couatls, pegasi)."
+  },
+  {
+    "id": "construct",
+    "label": "Construct",
+    "description": "Constructs are made, not born—built to follow orders, whether mindless automatons or sentient creations (e.g. golems, animated objects)."
+  },
+  {
+    "id": "dragon",
+    "label": "Dragon",
+    "description": "Dragons are large reptilian creatures of ancient origin and tremendous power, including true dragons, wyverns, and dragon-kin."
+  },
+  {
+    "id": "elemental",
+    "label": "Elemental",
+    "description": "Elementals are creatures native to the elemental planes, embodying earth, air, fire, and water (e.g. elementals, genies, mephits)."
+  },
+  {
+    "id": "fey",
+    "label": "Fey",
+    "description": "Fey are magical creatures closely tied to the forces of nature and the Feywild (e.g. dryads, pixies, hags)."
+  },
+  {
+    "id": "fiend",
+    "label": "Fiend",
+    "description": "Fiends are creatures of wickedness native to the Lower Planes (e.g. demons, devils, yugoloths)."
+  },
+  {
+    "id": "giant",
+    "label": "Giant",
+    "description": "Giants tower over humans and their kind, ranging from ogres and trolls to true giants with their own societies."
+  },
+  {
+    "id": "humanoid",
+    "label": "Humanoid",
+    "description": "Humanoids are the main peoples of a fantasy world, both civilized and savage, and include most playable species (e.g. humans, elves, dwarves, orcs)."
+  },
+  {
+    "id": "monstrosity",
+    "label": "Monstrosity",
+    "description": "Monstrosities are frightening creatures that are not ordinary, not truly natural, and almost never benign (e.g. owlbears, chimeras, minotaurs)."
+  },
+  {
+    "id": "ooze",
+    "label": "Ooze",
+    "description": "Oozes are gelatinous creatures that rarely have a fixed shape, dwelling in caverns and dungeons and subsisting on refuse and prey (e.g. gelatinous cubes, black puddings)."
+  },
+  {
+    "id": "plant",
+    "label": "Plant",
+    "description": "Plants are vegetable creatures, not ordinary flora—ranging from ambulatory shrubs to fungal monsters (e.g. treants, shambling mounds, myconids)."
+  },
+  {
+    "id": "undead",
+    "label": "Undead",
+    "description": "Undead are once-living creatures brought to a horrifying state of undeath through necromancy or curse (e.g. zombies, vampires, liches, ghosts)."
+  }
+]

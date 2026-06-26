@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
 import {
   formatSpeed,
-  getCreatureTypeLabel,
   getCreatureSizeLabel,
   getSenseLabel,
   getTraitGrants,
@@ -12,6 +11,7 @@ import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
+import { getSeedCreatureTypeDisplayLabel } from '../../lib/seed-creature-type-helpers'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -102,7 +102,10 @@ function SpeciesStatsSection({ species }: { species: Species }) {
 
   return (
     <div className="space-y-3">
-      <ContentStatRow label="Creature Type" value={getCreatureTypeLabel(species.creatureType)} />
+      <ContentStatRow
+        label="Creature Type"
+        value={getSeedCreatureTypeDisplayLabel(species.creatureType)}
+      />
       <ContentStatRow label="Size" value={sizeLabel} />
       <ContentStatRow label="Speed" value={formatSpeed(species.speed)} />
       <ContentStatRow label="Senses" value={sensesLabel} />

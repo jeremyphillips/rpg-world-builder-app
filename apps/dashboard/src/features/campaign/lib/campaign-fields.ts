@@ -2,8 +2,6 @@ import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
-  CREATURE_TYPES,
-  CREATURE_TYPE_ENTRIES,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
   MAX_CHARACTER_LEVEL,
@@ -15,6 +13,11 @@ import {
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+
+import {
+  CREATURE_TYPES,
+  seedCreatureTypeLabelMap,
+} from '../../content/lib/seed-creature-type-helpers'
 
 import { ExtendedProgressionEffects } from '../components/extended-progression-effects.client'
 import {
@@ -29,13 +32,7 @@ import {
   IMPORTED_CHARACTERS_POLICY_LABELS,
 } from './labels'
 
-const creatureTypeOptions = toOptions(
-  CREATURE_TYPES,
-  Object.fromEntries(CREATURE_TYPES.map((t) => [t, CREATURE_TYPE_ENTRIES[t].label])) as Record<
-    (typeof CREATURE_TYPES)[number],
-    string
-  >,
-)
+const creatureTypeOptions = toOptions(CREATURE_TYPES, seedCreatureTypeLabelMap())
 
 const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
 

@@ -1,16 +1,20 @@
 import type { Species } from '@rpg/contracts'
-import { CREATURE_TYPES, getCreatureTypeLabel, getCreatureSizeLabel } from '@rpg/contracts'
+import { getCreatureSizeLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import {
+  CREATURE_TYPES,
+  getSeedCreatureTypeDisplayLabel,
+} from '../../lib/seed-creature-type-helpers'
 
 const SPECIES_MIDDLE_COLUMNS: ColumnDef<Species>[] = [
   {
     accessorKey: 'creatureType',
     header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-    cell: ({ row }) => getCreatureTypeLabel(row.getValue<string>('creatureType')),
+    cell: ({ row }) => getSeedCreatureTypeDisplayLabel(row.getValue<string>('creatureType')),
     filterFn: 'equalsString',
     meta: { label: 'Type' },
   },
@@ -35,7 +39,10 @@ const SPECIES_SPECIFIC_FILTERS: FilterDef[] = [
     type: 'select',
     id: 'creatureType',
     label: 'Creature Type',
-    options: CREATURE_TYPES.map((value) => ({ label: getCreatureTypeLabel(value), value })),
+    options: CREATURE_TYPES.map((value) => ({
+      label: getSeedCreatureTypeDisplayLabel(value),
+      value,
+    })),
   },
 ]
 

@@ -1,6 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { loadFamilyTableConfig } from './equipment-family-columns'
+
+vi.mock('../../weapons/components/weapon-columns', () => ({
+  weaponColumns: () => [
+    { accessorKey: 'name', header: 'Name' },
+    { accessorKey: 'category', header: 'Category' },
+  ],
+  weaponFilters: [{ id: 'category', label: 'Category' }],
+}))
 
 describe('loadFamilyTableConfig', () => {
   it('loads only the requested family column module', async () => {
@@ -8,8 +16,8 @@ describe('loadFamilyTableConfig', () => {
 
     expect(config.columns.length).toBeGreaterThan(0)
     expect(config.filters.length).toBeGreaterThan(0)
-    expect(config.columns.some((column) => 'accessorKey' in column && column.accessorKey === 'name')).toBe(
-      true,
-    )
+    expect(
+      config.columns.some((column) => 'accessorKey' in column && column.accessorKey === 'name'),
+    ).toBe(true)
   })
 })
