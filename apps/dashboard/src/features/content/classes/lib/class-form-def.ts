@@ -626,7 +626,7 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Subclass choice level',
       options: subclassChoiceLevelOptions(ctx),
       hint: 'Level at which a character chooses their subclass',
-      width: 'sm-md',
+      width: 'md',
     },
   ]
 }
@@ -647,7 +647,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       visibility: visibleWhenSpellcasting(),
       required: true,
       hint: 'First class level at which this class gains spellcasting',
-      width: 'sm-md',
+      width: 'md',
     },
     {
       kind: 'row',

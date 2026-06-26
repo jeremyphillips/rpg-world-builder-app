@@ -170,10 +170,10 @@ instead of repeating the tuples.
 
 One union, two intents:
 
-- **Intrinsic** (`xs`, `sm`, `sm-md`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
+- **Intrinsic** (`xs`, `sm`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
   `flex-none`, so the field keeps its own width and never grows. `xs` (~64px)
-  suits 1–2 character inputs like a die count; `sm-md` (~128px) suits compact
-  selects like level pickers.
+  suits 1–2 character inputs like a die count; `sm` suits compact inputs like
+  level pickers.
 - **Proportional** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): these flex within
   a `FieldRow`. `full` (the default) fills remaining space; fractions distribute
   space by **grow weight** (a base-12 scale), so mixed denominators compose and
