@@ -38,9 +38,6 @@ export const STARTING_EQUIPMENT_ITEM_KIND_LABELS = {
 export const STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT =
   'For cross-references tied to another proficiency pick (e.g. Monk tool/instrument), describe the choice in prose and include FOLLOWUP: proficiencyLinkedChoice when structured support is deferred.'
 
-export const STARTING_EQUIPMENT_EQUIPMENT_SLUG_HINT =
-  'Equipment must exist in the campaign catalog. Slugs from imported content may display on edit but cannot be selected for new rows until seeded.'
-
 export const ADD_STARTING_EQUIPMENT_LABEL = 'Add starting equipment'
 export const STARTING_EQUIPMENT_EMPTY_MESSAGE =
   'No starting equipment yet. Add packages players choose from at character creation.'
@@ -243,9 +240,9 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
       name: 'equipmentSlug',
       label: 'Equipment',
       options: equipmentOptions,
+      multiple: false,
       placeholder: 'Choose equipment…',
       required: true,
-      hint: STARTING_EQUIPMENT_EQUIPMENT_SLUG_HINT,
       visibility: visibleForItemKind('fixed'),
     },
     {
@@ -285,7 +282,6 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
       multiple: true,
       options: equipmentOptions,
       placeholder: 'Choose equipment…',
-      hint: STARTING_EQUIPMENT_EQUIPMENT_SLUG_HINT,
       visibility: visibleForItemKind('choice'),
     },
     {

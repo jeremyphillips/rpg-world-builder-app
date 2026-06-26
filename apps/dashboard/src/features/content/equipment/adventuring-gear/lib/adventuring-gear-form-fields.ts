@@ -1,5 +1,11 @@
-import { GEAR_KINDS, GEAR_KIND_ENTRIES, type AdventuringGearEquipment } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import {
+  GEAR_KINDS,
+  GEAR_KIND_ENTRIES,
+  HOLY_SYMBOL_USAGES,
+  HOLY_SYMBOL_USAGE_ENTRIES,
+  type AdventuringGearEquipment,
+} from '@rpg/contracts'
+import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
@@ -12,6 +18,21 @@ function labelsFromEntries<const T extends string>(
 }
 
 const gearKindOptions = toOptions(GEAR_KINDS, labelsFromEntries(GEAR_KIND_ENTRIES))
+const holySymbolUsageOptions = toOptions(
+  HOLY_SYMBOL_USAGES,
+  labelsFromEntries(HOLY_SYMBOL_USAGE_ENTRIES),
+)
+
+const visibleWhenHolySymbol: FieldVisibility = {
+  dependsOn: ['gearKind'],
+  visibleWhen: (values) => values.gearKind === 'holy_symbol',
+}
+
+const visibleWhenFocusStaff: FieldVisibility = {
+  dependsOn: ['gearKind'],
+  visibleWhen: (values) =>
+    values.gearKind === 'arcane_focus' || values.gearKind === 'druidic_focus',
+}
 
 /** Joins mechanical property lines for the unified equipment form textarea. */
 export function formatPropertiesText(items: string[] | undefined): string | undefined {
@@ -30,6 +51,22 @@ export function adventuringGearFormFieldGroup(): FormItem {
         label: 'Gear kind',
         options: gearKindOptions,
         required: true,
+      },
+      {
+        type: 'combobox',
+        name: 'holySymbolUsage',
+        label: 'Holy symbol usage',
+        options: holySymbolUsageOptions,
+        multiple: true,
+        required: true,
+        visibility: visibleWhenHolySymbol,
+      },
+      {
+        type: 'text',
+        name: 'alsoWeaponSlug',
+        label: 'Also weapon slug',
+        hint: 'Weapon slug when this focus also counts as a weapon (e.g. quarterstaff).',
+        visibility: visibleWhenFocusStaff,
       },
       {
         kind: 'row',
@@ -66,7 +103,13 @@ export function adventuringGearFormValuesFromEntity(
   item: AdventuringGearEquipment,
 ): Pick<
   EquipmentFormValues,
-  'gearKind' | 'bundleSize' | 'storage' | 'propertiesText' | 'capacity'
+  | 'gearKind'
+  | 'bundleSize'
+  | 'storage'
+  | 'propertiesText'
+  | 'capacity'
+  | 'holySymbolUsage'
+  | 'alsoWeaponSlug'
 > {
   return {
     gearKind: item.gearKind,
@@ -74,5 +117,7 @@ export function adventuringGearFormValuesFromEntity(
     storage: item.storage,
     propertiesText: formatPropertiesText(item.properties),
     capacity: item.capacity,
+    holySymbolUsage: item.holySymbolUsage,
+    alsoWeaponSlug: item.alsoWeaponSlug,
   }
 }

@@ -5,6 +5,7 @@ import {
   startingEquipmentChoiceItemFormSchema,
   startingEquipmentFormSchema,
   startingEquipmentFromFormValues,
+  startingEquipmentItemFields,
   startingEquipmentOptionFormSchema,
   startingEquipmentToFormValues,
 } from './class-starting-equipment-form-def'
@@ -46,22 +47,22 @@ describe('startingEquipment round-trip', () => {
     )
   })
 
-  it('preserves spellcasting focus modifiers on fixed items', () => {
+  it('preserves wooden staff starting equipment without modifiers', () => {
     const druid = pickClass('druid')
     const startingEquipment = druid.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
 
     const formValues = startingEquipmentToFormValues(startingEquipment!)
-    const quarterstaff = formValues.options
+    const woodenStaff = formValues.options
       .find((option) => option.id === 'standard')
-      ?.items.find((item) => item.itemKind === 'fixed' && item.equipmentSlug === 'quarterstaff')
+      ?.items.find((item) => item.itemKind === 'fixed' && item.equipmentSlug === 'wooden-staff')
 
-    expect(quarterstaff).toMatchObject({
+    expect(woodenStaff).toMatchObject({
       itemKind: 'fixed',
-      equipmentSlug: 'quarterstaff',
+      equipmentSlug: 'wooden-staff',
       equipped: false,
-      modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
     })
+    expect(woodenStaff?.itemKind === 'fixed' ? woodenStaff.modifiers : undefined).toBeUndefined()
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
@@ -86,6 +87,20 @@ describe('startingEquipment round-trip', () => {
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
+  })
+})
+
+describe('startingEquipmentItemFields', () => {
+  it('uses single-select combobox for fixed equipment slugs', () => {
+    const fields = startingEquipmentItemFields({
+      options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
+    })
+    const equipmentField = fields.find((field) => 'name' in field && field.name === 'equipmentSlug')
+
+    expect(equipmentField).toMatchObject({
+      type: 'combobox',
+      multiple: false,
+    })
   })
 })
 

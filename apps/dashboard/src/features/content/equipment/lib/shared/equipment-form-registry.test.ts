@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { EquipmentKind } from '@rpg/contracts'
 
 import {
   allRegisteredKindFieldGroups,
@@ -21,8 +22,13 @@ describe('kindFieldGroups', () => {
 
   it('registers tool field group', () => {
     const groups = fieldGroupsForEquipmentKind('tool')
-    expect(groups).toHaveLength(1)
+    expect(groups).toHaveLength(2)
     expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Tool' })
+    expect(groups?.[1]).toMatchObject({
+      kind: 'array',
+      name: 'utilizes',
+      legend: 'Utilize actions',
+    })
   })
 
   it('registers magic item field group', () => {
@@ -56,7 +62,11 @@ describe('kindFieldGroups', () => {
   })
 
   it('allRegisteredKindFieldGroups includes every registered kind', () => {
-    const registeredKinds = Object.keys(kindFieldGroups)
-    expect(allRegisteredKindFieldGroups()).toHaveLength(registeredKinds.length)
+    const registeredKinds = Object.keys(kindFieldGroups) as EquipmentKind[]
+    const expectedLength = registeredKinds.reduce(
+      (total, kind) => total + kindFieldGroups[kind]!().length,
+      0,
+    )
+    expect(allRegisteredKindFieldGroups()).toHaveLength(expectedLength)
   })
 })

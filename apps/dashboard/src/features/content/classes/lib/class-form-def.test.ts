@@ -98,10 +98,13 @@ describe('classFormDef round-trips', () => {
     ])
   })
 
-  it('rogue: tool proficiencies round-trip as slug arrays', () => {
+  it('rogue: tool proficiencies round-trip with categories and items', () => {
     const rogue = SRD_CLASSES.find((c) => c.slug === 'rogue')!
     const formValues = classFormDef.toFormValues(rogue) as ClassFormValues
-    expect(formValues.proficiencies.tools).toEqual(['thieves-tools'])
+    expect(formValues.proficiencies.tools).toEqual({
+      categories: [],
+      items: ['thieves-tools'],
+    })
     expect(formValues.proficiencies.weapons.items).toEqual([])
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.tools).toEqual(rogue.proficiencies.tools)
@@ -161,18 +164,16 @@ describe('classFormDef round-trips', () => {
     )
   })
 
-  it('druid: spellcasting focus modifiers round-trip through the class form', () => {
+  it('druid: wooden staff starting equipment round-trips through the class form', () => {
     const druid = SRD_CLASSES.find((c) => c.slug === 'druid')!
     const formValues = classFormDef.toFormValues(druid) as ClassFormValues
     const standardOption = formValues.characterCreation?.startingEquipment?.options.find(
       (option) => option.id === 'standard',
     )
-    const quarterstaff = standardOption?.items.find(
-      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'quarterstaff',
+    const woodenStaff = standardOption?.items.find(
+      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'wooden-staff',
     )
-    expect(quarterstaff?.itemKind === 'fixed' ? quarterstaff.modifiers : undefined).toEqual([
-      { kind: 'spellcasting_focus', focusKind: 'druidic_focus' },
-    ])
+    expect(woodenStaff?.itemKind === 'fixed' ? woodenStaff.modifiers : undefined).toBeUndefined()
     const input = classFormDef.toInput(formValues, { entity: druid })
     expect(input.characterCreation?.startingEquipment).toEqual(
       druid.characterCreation?.startingEquipment,

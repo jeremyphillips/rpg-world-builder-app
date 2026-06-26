@@ -278,4 +278,50 @@ describe('ArrayFieldRenderer', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  it('does not duplicate accordion landmarks for nested arrays inside multiple items', async () => {
+    const user = userEvent.setup()
+    const nestedSchema = z.object({
+      items: z.array(
+        z.object({
+          name: z.string(),
+          tags: z.array(z.object({ label: z.string() })).optional(),
+        }),
+      ),
+    })
+
+    const nestedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'items',
+        legend: 'Items',
+        addLabel: 'Add item',
+        fields: [
+          { type: 'text', name: 'name', label: 'Name' },
+          {
+            kind: 'array',
+            name: 'tags',
+            legend: 'Tags',
+            addLabel: 'Add tag',
+            fields: [{ type: 'text', name: 'label', label: 'Label' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form
+        schema={nestedSchema}
+        fields={nestedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add item' }))
+    await user.click(screen.getByRole('button', { name: 'Add item' }))
+
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations.filter((violation) => violation.id === 'landmark-unique')).toEqual([])
+  })
 })

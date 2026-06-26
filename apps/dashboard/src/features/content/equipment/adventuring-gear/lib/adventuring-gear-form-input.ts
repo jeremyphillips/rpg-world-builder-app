@@ -31,5 +31,7 @@ export function buildAdventuringGearInput({
       properties: parseProperties(values.propertiesText),
     }),
     ...(values.capacity && { capacity: values.capacity }),
+    ...(values.holySymbolUsage?.length && { holySymbolUsage: values.holySymbolUsage }),
+    ...(values.alsoWeaponSlug && { alsoWeaponSlug: values.alsoWeaponSlug }),
   })
 }

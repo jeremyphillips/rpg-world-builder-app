@@ -1,0 +1,82 @@
+[
+  {
+    "id": "srd-cc-5.2.1:bracers-of-defense",
+    "slug": "bracers-of-defense",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bracers of Defense",
+    "description": "<p>While wearing these bracers, you gain a +2 bonus to Armor Class if you are wearing no armor and using no shield.</p>",
+    "cost": {
+      "amount": 0,
+      "currency": "gp"
+    },
+    "kind": "magic_item",
+    "rarity": "rare",
+    "requiresAttunement": true,
+    "magicItemCategory": "wondrous_item"
+  },
+  {
+    "id": "srd-cc-5.2.1:potion-of-healing",
+    "slug": "potion-of-healing",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Potion of Healing",
+    "description": "<p>This potion is a magic item. As a Bonus Action, you can drink it or administer it to another creature within 5 feet of yourself. The creature that drinks the magical red fluid in this vial regains 2d4 + 2 Hit Points.</p>",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "kind": "magic_item",
+    "rarity": "common",
+    "requiresAttunement": false,
+    "magicItemCategory": "potion",
+    "weight": {
+      "value": 0.5,
+      "unit": "lb"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:spell-scroll-cantrip",
+    "slug": "spell-scroll-cantrip",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Spell Scroll (Cantrip)",
+    "description": "<p>A Spell Scroll (Cantrip) is a magic item that bears the words of a cantrip, determined by the scroll's creator. If the spell is on your class's spell list, you can read the scroll and cast the spell using its normal casting time and without providing any Material components. If the spell requires a saving throw or an attack roll, the spell save DC is 13, and the attack bonus is +5. The scroll disintegrates when the casting is completed.</p>",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "kind": "magic_item",
+    "rarity": "common",
+    "requiresAttunement": false,
+    "magicItemCategory": "scroll"
+  },
+  {
+    "id": "srd-cc-5.2.1:spell-scroll-level-1",
+    "slug": "spell-scroll-level-1",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Spell Scroll (Level 1)",
+    "description": "<p>A Spell Scroll (Level 1) is a magic item that bears the words of a level 1 spell, determined by the scroll's creator. If the spell is on your class's spell list, you can read the scroll and cast the spell using its normal casting time and without providing any Material components. If the spell requires a saving throw or an attack roll, the spell save DC is 13, and the attack bonus is +5. The scroll disintegrates when the casting is completed.</p>",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "kind": "magic_item",
+    "rarity": "common",
+    "requiresAttunement": false,
+    "magicItemCategory": "scroll"
+  }
+]

@@ -310,6 +310,17 @@ describe('classStoredBodySchema', () => {
       }).success,
     ).toBe(false)
   })
+  it('parses tool proficiencies with categories and items', () => {
+    expect(
+      classStoredBodySchema.safeParse({
+        ...fighterStoredBody,
+        proficiencies: {
+          ...fighterStoredBody.proficiencies,
+          tools: { categories: [], items: ['thieves-tools'] },
+        },
+      }).success,
+    ).toBe(true)
+  })
 })
 
 describe('classStoredSchema', () => {

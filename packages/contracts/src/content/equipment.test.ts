@@ -10,6 +10,8 @@ import {
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
+  formatToolUtilizeAction,
+  formatToolUtilizes,
   getArmorAcDisplay,
   getEquipmentKindLabel,
   updateEquipmentInputSchema,
@@ -86,9 +88,9 @@ const BLOWGUN_STORED = systemRecord('blowgun', {
   range: { normal: 25, long: 100 },
 })
 
-const LEATHER_STORED = systemRecord('leather', {
+const LEATHER_STORED = systemRecord('leather-armor', {
   kind: 'armor',
-  name: 'Leather',
+  name: 'Leather Armor',
   cost: { amount: 10, currency: 'gp' },
   weight: { value: 10, unit: 'lb' },
   category: 'light',
@@ -98,9 +100,9 @@ const LEATHER_STORED = systemRecord('leather', {
   stealthDisadvantage: false,
 })
 
-const HALF_PLATE_STORED = systemRecord('half-plate', {
+const HALF_PLATE_STORED = systemRecord('half-plate-armor', {
   kind: 'armor',
-  name: 'Half Plate',
+  name: 'Half Plate Armor',
   cost: { amount: 750, currency: 'gp' },
   weight: { value: 40, unit: 'lb' },
   category: 'medium',
@@ -111,9 +113,9 @@ const HALF_PLATE_STORED = systemRecord('half-plate', {
   stealthDisadvantage: true,
 })
 
-const PLATE_STORED = systemRecord('plate', {
+const PLATE_STORED = systemRecord('plate-armor', {
   kind: 'armor',
-  name: 'Plate',
+  name: 'Plate Armor',
   cost: { amount: 1500, currency: 'gp' },
   weight: { value: 65, unit: 'lb' },
   category: 'heavy',
@@ -162,6 +164,8 @@ const SAMPLE_BODIES = {
     weight: { value: 8, unit: 'lb' },
     toolCategory: 'artisan',
     ability: 'str',
+    utilizes: [{ description: 'Pry open a door or container', dc: 20 }],
+    crafts: ['Any Melee weapon (except Club, Greatclub, Quarterstaff, and Whip)'],
   },
   mount: {
     kind: 'mount',
@@ -307,6 +311,29 @@ describe('armor equipment variant', () => {
     expect(equipmentSchema.safeParse(noBase).success).toBe(false)
     const { acBonus: _a, ...noBonus } = SHIELD_WOOD_STORED as Record<string, unknown>
     expect(equipmentSchema.safeParse(noBonus).success).toBe(false)
+  })
+})
+
+describe('tool equipment variant', () => {
+  it('rejects tools missing utilizes or ability', () => {
+    const { utilizes: _u, ...noUtilizes } = SAMPLE_BODIES.tool
+    expect(equipmentSchema.safeParse(systemRecord('smiths-tools', noUtilizes)).success).toBe(false)
+    const { ability: _a, ...noAbility } = SAMPLE_BODIES.tool
+    expect(equipmentSchema.safeParse(systemRecord('smiths-tools', noAbility)).success).toBe(false)
+  })
+})
+
+describe('tool display helpers', () => {
+  it('formats utilize actions', () => {
+    expect(formatToolUtilizeAction({ description: 'Identify a substance', dc: 15 })).toBe(
+      'Identify a substance (DC 15)',
+    )
+    expect(
+      formatToolUtilizes([
+        { description: 'Pick a lock', dc: 15 },
+        { description: 'Disarm a trap', dc: 15 },
+      ]),
+    ).toBe('Pick a lock (DC 15), or Disarm a trap (DC 15)')
   })
 })
 

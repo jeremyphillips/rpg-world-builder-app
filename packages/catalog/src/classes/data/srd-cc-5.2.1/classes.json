@@ -417,7 +417,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
               {
                 "kind": "choice",
@@ -734,9 +739,8 @@
               { "kind": "fixed", "equipmentSlug": "mace", "quantity": 1, "equipped": true },
               {
                 "kind": "fixed",
-                "equipmentSlug": "holy-symbol",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+                "equipmentSlug": "holy-symbol-amulet",
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
             ],
@@ -1020,15 +1024,19 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
               {
                 "kind": "fixed",
-                "equipmentSlug": "quarterstaff",
+                "equipmentSlug": "wooden-staff",
                 "quantity": 1,
-                "equipped": false,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+                "equipped": false
               },
               { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 },
               { "kind": "fixed", "equipmentSlug": "herbalism-kit", "quantity": 1 }
@@ -1969,9 +1977,8 @@
               { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 6 },
               {
                 "kind": "fixed",
-                "equipmentSlug": "holy-symbol",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+                "equipmentSlug": "holy-symbol-amulet",
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
             ],
@@ -2286,8 +2293,7 @@
               {
                 "kind": "fixed",
                 "equipmentSlug": "sprig-of-mistletoe",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
             ],
@@ -2527,7 +2533,10 @@
       "weapons": {
         "categories": ["simple", "martial"]
       },
-      "tools": ["thieves-tools"],
+      "tools": {
+        "categories": [],
+        "items": ["thieves-tools"]
+      },
       "skills": {
         "choose": 4
       }
@@ -2541,7 +2550,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "shortbow", "quantity": 1, "equipped": true },
@@ -2879,8 +2893,7 @@
               {
                 "kind": "fixed",
                 "equipmentSlug": "crystal",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
             ],
@@ -3198,14 +3211,18 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
               {
                 "kind": "fixed",
                 "equipmentSlug": "orb",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "book-occult-lore", "quantity": 1 },
               { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
@@ -3514,15 +3531,14 @@
           {
             "id": "standard",
             "label": "Standard Equipment",
-            "description": "2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
+            "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
             "items": [
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
               {
                 "kind": "fixed",
-                "equipmentSlug": "quarterstaff",
+                "equipmentSlug": "arcane-staff",
                 "quantity": 1,
-                "equipped": true,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "equipped": true
               },
               { "kind": "fixed", "equipmentSlug": "robe", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "spellbook", "quantity": 1 },

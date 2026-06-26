@@ -9,6 +9,7 @@ import type { GameTermEntry } from '../types'
 export const GEAR_KINDS = [
   'general',
   'ammunition',
+  'book',
   'arcane_focus',
   'druidic_focus',
   'holy_symbol',
@@ -29,6 +30,10 @@ export const GEAR_KIND_ENTRIES = {
     label: 'Ammunition',
     description:
       'Arrows, bolts, sling bullets, and similar consumable projectiles sold in bundles.',
+  },
+  book: {
+    label: 'Book',
+    description: 'A reference or lore volume, such as occult texts used by Warlocks.',
   },
   arcane_focus: {
     label: 'Arcane Focus',

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "srd-cc-5.2.1:messenger",
+    "slug": "messenger",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Messenger",
+    "description": "<p>A messenger carries a letter or parcel overland.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "cp"
+    },
+    "kind": "service",
+    "serviceCategory": "travel",
+    "duration": {
+      "value": 1,
+      "unit": "mile"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:skilled-hireling",
+    "slug": "skilled-hireling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Skilled Hireling",
+    "description": "<p>A skilled hireling performs a service involving a proficiency, such as a mercenary, artisan, or scribe.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "kind": "service",
+    "serviceCategory": "hireling",
+    "duration": {
+      "value": 1,
+      "unit": "day"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:stabling",
+    "slug": "stabling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Stabling",
+    "description": "Stabling and feed for one mount for one day.",
+    "cost": {
+      "amount": 5,
+      "currency": "sp"
+    },
+    "kind": "service",
+    "serviceCategory": "stable",
+    "notes": "Cost per day, per mount."
+  },
+  {
+    "id": "srd-cc-5.2.1:untrained-hireling",
+    "slug": "untrained-hireling",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Untrained Hireling",
+    "description": "<p>An untrained hireling performs manual labor that requires no particular proficiencies, such as a laborer or porter.</p>",
+    "cost": {
+      "amount": 2,
+      "currency": "sp"
+    },
+    "kind": "service",
+    "serviceCategory": "hireling",
+    "duration": {
+      "value": 1,
+      "unit": "day"
+    }
+  }
+]

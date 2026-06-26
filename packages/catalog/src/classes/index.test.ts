@@ -144,6 +144,10 @@ describe('SRD 5.2.1 class seed', () => {
     expect(rogue.features.every((f) => f.description && f.description.length > 0)).toBe(true)
     expect(asiLevelsFromFeatures(rogue)).toEqual([4, 8, 10, 12, 16])
     expect(rogue.features.map((f) => f.id)).not.toContain('rogue-subclass')
+    expect(rogue.proficiencies.tools).toEqual({
+      categories: [],
+      items: ['thieves-tools'],
+    })
     const cunningStrike = rogue.features.find((f) => f.id === 'cunning-strike')
     expect(cunningStrike?.description).toContain('<strong>Poison (Cost: 1d6).</strong>')
     const expertise = rogue.features.find((f) => f.id === 'expertise')

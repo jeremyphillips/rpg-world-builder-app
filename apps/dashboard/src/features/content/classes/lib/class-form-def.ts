@@ -13,10 +13,13 @@ import {
   SPELLCASTING_PROGRESSIONS,
   SPELL_PREPARATION_MODES,
   SPELL_PREPARATION_MODE_LABELS,
+  TOOL_CATEGORIES,
+  TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   abilitySchema,
   armorCategorySchema,
+  toolCategorySchema,
   formatHitDie,
   hitDieSchema,
   skillSchema,
@@ -138,6 +141,14 @@ const weaponCategoryOptions = toOptions(
   >,
 )
 
+const toolCategoryOptions = toOptions(
+  TOOL_CATEGORIES,
+  Object.fromEntries(TOOL_CATEGORIES.map((c) => [c, TOOL_CATEGORY_ENTRIES[c].label])) as Record<
+    (typeof TOOL_CATEGORIES)[number],
+    string
+  >,
+)
+
 const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
 
 const spellcastingProgressionOptions = toOptions(
@@ -166,7 +177,10 @@ const proficienciesFormSchema = z.object({
     categories: z.array(weaponCategorySchema),
     items: z.array(z.string()).optional(),
   }),
-  tools: z.array(z.string()).optional(),
+  tools: z.object({
+    categories: z.array(toolCategorySchema),
+    items: z.array(z.string()).optional(),
+  }),
   skills: z.object({
     choose: z.coerce.number().int().min(0).max(SKILL_IDS.length),
     from: z.array(skillSchema),
@@ -346,8 +360,23 @@ function proficienciesToFormValues(proficiencies: ClassProficiencies) {
       categories: proficiencies.weapons.categories,
       items: proficiencies.weapons.items ?? [],
     },
-    tools: proficiencies.tools ?? [],
+    tools: {
+      categories: proficiencies.tools?.categories ?? [],
+      items: proficiencies.tools?.items ?? [],
+    },
     skills: proficiencies.skills,
+  }
+}
+
+function normalizeClassToolProficiencies(
+  tools: ClassFormValues['proficiencies']['tools'],
+): ClassProficienciesWrite['tools'] {
+  const categories = [...tools.categories]
+  const items = tools.items ?? []
+  if (categories.length === 0 && items.length === 0) return undefined
+  return {
+    categories,
+    ...(items.length ? { items: [...items] } : {}),
   }
 }
 
@@ -355,7 +384,7 @@ function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
 ): ClassProficienciesWrite {
-  const tools = proficiencies.tools ?? []
+  const tools = normalizeClassToolProficiencies(proficiencies.tools)
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
@@ -366,7 +395,7 @@ function proficienciesFromFormValues(
     savingThrows: proficiencies.savingThrows,
     armor: proficiencies.armor,
     weapons,
-    ...(tools.length ? { tools } : {}),
+    ...(tools ? { tools } : {}),
     skills: { choose: proficiencies.skills.choose },
   }
 }
@@ -548,7 +577,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
     savingThrows: ['str'],
     armor: [],
     weapons: { categories: [], items: [] },
-    tools: [],
+    tools: { categories: [], items: [] },
     skills: { choose: 2, from: [] },
   },
   features: [],
@@ -723,9 +752,15 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Tools & Skills',
       fields: [
         {
+          type: 'chips',
+          name: 'proficiencies.tools.categories',
+          label: 'Tool categories',
+          options: toolCategoryOptions,
+        },
+        {
           type: 'combobox',
-          name: 'proficiencies.tools',
-          label: 'Tool proficiencies',
+          name: 'proficiencies.tools.items',
+          label: 'Specific tools',
           multiple: true,
           options: ctx.options?.tools ?? [],
           placeholder: 'Choose tools…',

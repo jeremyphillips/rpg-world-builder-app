@@ -48,6 +48,12 @@ export interface FormItemsProps {
    * so leaf renderers and conditional watchers resolve to the correct RHF names.
    */
   namePrefix?: string
+  /**
+   * When true, groups and arrays render as plain fieldsets instead of accordion
+   * sections. Use for embedded editors and other nested surfaces where top-level
+   * accordion landmarks would duplicate (axe `landmark-unique`).
+   */
+  plainSections?: boolean
 }
 
 function isSectionItem(item: FormItem): item is GroupConfig | ArrayConfig {
@@ -67,8 +73,9 @@ function isCollapsibleSection(
 }
 
 /** Renders an ordered list of fields/rows/groups/arrays, recursing into containers. */
-export function FormItems({ items, idPrefix, namePrefix }: FormItemsProps) {
+export function FormItems({ items, idPrefix, namePrefix, plainSections }: FormItemsProps) {
   const { collapsibleSections, depth } = React.useContext(FormSectionContext)
+  const resolvedCollapsibleSections = plainSections ? false : collapsibleSections
 
   if (depth === 0) {
     return (
@@ -76,7 +83,7 @@ export function FormItems({ items, idPrefix, namePrefix }: FormItemsProps) {
         items={items}
         idPrefix={idPrefix}
         namePrefix={namePrefix}
-        collapsibleSections={collapsibleSections}
+        collapsibleSections={resolvedCollapsibleSections}
       />
     )
   }
@@ -527,7 +534,12 @@ export function ArrayFieldRenderer({
                 <legend className="px-1 text-xs text-muted-foreground">{title}</legend>
               ) : null}
               <div className={fieldGroupStackClasses}>
-                <FormItems items={config.fields} idPrefix={idPrefix} namePrefix={itemPrefix} />
+                <FormItems
+                  items={config.fields}
+                  idPrefix={idPrefix}
+                  namePrefix={itemPrefix}
+                  plainSections
+                />
               </div>
               <div className={cn('flex items-center gap-2', fieldArrayItemActionsClasses)}>
                 <Button

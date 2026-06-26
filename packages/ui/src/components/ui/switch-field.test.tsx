@@ -24,4 +24,13 @@ describe('SwitchField', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  it('renders the label above the switch when labelPosition is above', () => {
+    render(<SwitchField id="notify" label="Email reminders" labelPosition="above" />)
+    const switchControl = screen.getByRole('switch', { name: 'Email reminders' })
+    const label = screen.getByText('Email reminders')
+    expect(
+      label.compareDocumentPosition(switchControl) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
 })

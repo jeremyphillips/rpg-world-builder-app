@@ -11,6 +11,7 @@ import {
   MAGIC_ITEM_RARITIES,
   PHYSICAL_DAMAGE_TYPE_IDS,
   SERVICE_CATEGORIES,
+  HOLY_SYMBOL_USAGES,
   SYSTEM_RULESET_IDS,
   TOOL_CATEGORIES,
   VEHICLE_CATEGORIES,
@@ -54,9 +55,18 @@ const homebrewEquipmentSchema = new Schema(
     bundleSize: { type: Number },
     storage: { type: String },
     capacity: { type: Schema.Types.Mixed },
+    holySymbolUsage: [{ type: String, enum: [...HOLY_SYMBOL_USAGES] }],
+    alsoWeaponSlug: { type: String, trim: true },
     // tool
     toolCategory: { type: String, enum: [...TOOL_CATEGORIES] },
     ability: { type: String, enum: [...ABILITY_IDS] },
+    utilizes: [
+      {
+        description: { type: String, required: true },
+        dc: { type: Number, required: true },
+      },
+    ],
+    crafts: [{ type: String }],
     // mount
     carryingCapacity: { type: Schema.Types.Mixed },
     speed: { type: Schema.Types.Mixed },

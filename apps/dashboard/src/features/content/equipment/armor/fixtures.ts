@@ -4,11 +4,11 @@ import type { ArmorEquipment } from '@rpg/contracts'
 import { STORY_RULESET_ID } from '../../lib/fixtures/constants'
 
 export const LEATHER = loadSeedEquipment(STORY_RULESET_ID).find(
-  (item): item is ArmorEquipment => item.slug === 'leather',
+  (item): item is ArmorEquipment => item.slug === 'leather-armor',
 )!
 
 export const PLATE = loadSeedEquipment(STORY_RULESET_ID).find(
-  (item): item is ArmorEquipment => item.slug === 'plate',
+  (item): item is ArmorEquipment => item.slug === 'plate-armor',
 )!
 
 export const SHIELD = loadSeedEquipment(STORY_RULESET_ID).find(

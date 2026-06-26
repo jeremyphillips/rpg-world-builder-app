@@ -64,12 +64,29 @@ describe('createHomebrewContent (equipment)', () => {
     mastery: 'sap' as const,
   }
 
+  const minimalToolInput = {
+    kind: 'tool' as const,
+    slug: 'custom-lockpicks',
+    name: 'Custom Lockpicks',
+    toolCategory: 'thieves' as const,
+    ability: 'dex' as const,
+    cost: { amount: 30, currency: 'gp' as const },
+    weight: { value: 1, unit: 'lb' as const },
+    utilizes: [
+      { description: 'Pick a lock', dc: 15 },
+      { description: 'Disarm a trap', dc: 15 },
+    ],
+    crafts: ['Lock'],
+  }
+
   it('returns the merged system catalog including weapons and armor', async () => {
     const campaign = await makeCampaign()
     const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
 
     expect(equipment.some((item) => item.kind === 'weapon' && item.slug === 'longsword')).toBe(true)
-    expect(equipment.some((item) => item.kind === 'armor' && item.slug === 'leather')).toBe(true)
+    expect(equipment.some((item) => item.kind === 'armor' && item.slug === 'leather-armor')).toBe(
+      true,
+    )
     expect(
       equipment.some((item) => item.kind === 'magic_item' && item.slug === 'bracers-of-defense'),
     ).toBe(true)
@@ -106,6 +123,49 @@ describe('createHomebrewContent (equipment)', () => {
     expect(created.damage).toEqual({ kind: 'dice', count: 1, faces: 8 })
   })
 
+  it('creates homebrew tool with utilizes and crafts', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, minimalToolInput)
+
+    expect(created.kind).toBe('tool')
+    if (created.kind !== 'tool') throw new Error('expected tool')
+    expect(created.utilizes).toEqual(minimalToolInput.utilizes)
+    expect(created.crafts).toEqual(['Lock'])
+    expect(created.ability).toBe('dex')
+  })
+
+  it('updates homebrew tool utilizes and crafts', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, minimalToolInput)
+
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, created.id, {
+      kind: 'tool',
+      utilizes: [{ description: 'Detect a hidden compartment', dc: 20 }],
+      crafts: ['Hidden compartment'],
+    })
+
+    if (updated.kind !== 'tool') throw new Error('expected tool')
+    expect(updated.utilizes).toEqual([{ description: 'Detect a hidden compartment', dc: 20 }])
+    expect(updated.crafts).toEqual(['Hidden compartment'])
+  })
+
+  it('patches a system tool record', async () => {
+    const campaign = await makeCampaign()
+    const thievesTools = (
+      await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    ).find((item) => item.slug === 'thieves-tools' && item.kind === 'tool')!
+
+    const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, thievesTools.id, {
+      kind: 'tool',
+      name: "Enhanced Thieves' Tools",
+    })
+
+    if (updated.kind !== 'tool') throw new Error('expected tool')
+    expect(updated.name).toBe("Enhanced Thieves' Tools")
+    expect(updated.utilizes).toHaveLength(2)
+    expect(updated.source).toBe('system')
+  })
+
   it('derives slug from name and ignores client-provided slug', async () => {
     const campaign = await makeCampaign()
     const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, {
@@ -138,7 +198,7 @@ describe('createHomebrewContent (equipment)', () => {
     const campaign = await makeCampaign()
     const leather = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
-    ).find((item) => item.slug === 'leather' && item.kind === 'armor')!
+    ).find((item) => item.slug === 'leather-armor' && item.kind === 'armor')!
 
     const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, leather.id, {
       kind: 'armor',

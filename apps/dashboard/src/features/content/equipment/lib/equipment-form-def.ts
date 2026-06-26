@@ -9,6 +9,7 @@ import {
   armorMaterialSchema,
   currencySchema,
   gearKindSchema,
+  holySymbolUsageSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
   massUnitSchema,
@@ -18,6 +19,7 @@ import {
   speedRateUnitSchema,
   slugSchema,
   toolCategorySchema,
+  toolUtilizeActionSchema,
   vehicleCategorySchema,
   weaponCategorySchema,
   weaponDamageTypeSchema,
@@ -81,10 +83,14 @@ const equipmentFormSchema = z.object({
   storage: z.string().optional(),
   propertiesText: z.string().optional(),
   capacity: z.string().optional(),
+  holySymbolUsage: z.array(holySymbolUsageSchema).min(1).optional(),
+  alsoWeaponSlug: slugSchema.optional(),
 
   // tool
   toolCategory: toolCategorySchema.optional(),
   ability: abilitySchema.optional(),
+  utilizes: z.array(toolUtilizeActionSchema).optional(),
+  craftsText: z.string().optional(),
 
   // mount
   carryingCapacity: z

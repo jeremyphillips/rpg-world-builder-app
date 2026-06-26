@@ -1,0 +1,1201 @@
+[
+  {
+    "id": "srd-cc-5.2.1:alchemists-supplies",
+    "slug": "alchemists-supplies",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Alchemist's Supplies",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Identify a substance",
+        "dc": 15
+      },
+      {
+        "description": "Start a fire",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Acid", "Alchemist's Fire", "Component Pouch", "Oil", "Paper", "Perfume"]
+  },
+  {
+    "id": "srd-cc-5.2.1:bagpipes",
+    "slug": "bagpipes",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bagpipes",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:brewers-supplies",
+    "slug": "brewers-supplies",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Brewer's Supplies",
+    "description": "",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 9,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Detect poisoned drink",
+        "dc": 15
+      },
+      {
+        "description": "Identify alcohol",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Antitoxin"]
+  },
+  {
+    "id": "srd-cc-5.2.1:calligraphers-supplies",
+    "slug": "calligraphers-supplies",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Calligrapher's Supplies",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Write text with impressive flourishes that guard against forgery",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Ink", "Spell Scroll"]
+  },
+  {
+    "id": "srd-cc-5.2.1:carpenters-tools",
+    "slug": "carpenters-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Carpenter's Tools",
+    "description": "",
+    "cost": {
+      "amount": 8,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "str",
+    "utilizes": [
+      {
+        "description": "Seal or pry open a door or container",
+        "dc": 20
+      }
+    ],
+    "crafts": [
+      "Club",
+      "Greatclub",
+      "Quarterstaff",
+      "Barrel",
+      "Chest",
+      "Ladder",
+      "Pole",
+      "Portable Ram",
+      "Torch"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:cartographers-tools",
+    "slug": "cartographers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cartographer's Tools",
+    "description": "",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Draft a map of a small area",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Map"]
+  },
+  {
+    "id": "srd-cc-5.2.1:cobblers-tools",
+    "slug": "cobblers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cobbler's Tools",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Modify footwear to give Advantage on the wearer's next Dexterity (Acrobatics) check",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Climber's Kit"]
+  },
+  {
+    "id": "srd-cc-5.2.1:cooks-utensils",
+    "slug": "cooks-utensils",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cook's Utensils",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Improve food's flavor",
+        "dc": 10
+      },
+      {
+        "description": "Detect spoiled or poisoned food",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Rations"]
+  },
+  {
+    "id": "srd-cc-5.2.1:dice",
+    "slug": "dice",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dice",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "sp"
+    },
+    "kind": "tool",
+    "toolCategory": "gaming_set",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Discern whether someone is cheating",
+        "dc": 10
+      },
+      {
+        "description": "Win the game",
+        "dc": 20
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:disguise-kit",
+    "slug": "disguise-kit",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Disguise Kit",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "other",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Apply makeup",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Costume"]
+  },
+  {
+    "id": "srd-cc-5.2.1:dragonchess",
+    "slug": "dragonchess",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dragonchess",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "kind": "tool",
+    "toolCategory": "gaming_set",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Discern whether someone is cheating",
+        "dc": 10
+      },
+      {
+        "description": "Win the game",
+        "dc": 20
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:drum",
+    "slug": "drum",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Drum",
+    "description": "",
+    "cost": {
+      "amount": 6,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:dulcimer",
+    "slug": "dulcimer",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dulcimer",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:flute",
+    "slug": "flute",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Flute",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:forgery-kit",
+    "slug": "forgery-kit",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Forgery Kit",
+    "description": "",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "other",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Mimic 10 or fewer words of someone else's handwriting",
+        "dc": 15
+      },
+      {
+        "description": "Duplicate a wax seal",
+        "dc": 20
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:glassblowers-tools",
+    "slug": "glassblowers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Glassblower's Tools",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Discern what a glass object held in the past 24 hours",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Glass Bottle", "Magnifying Glass", "Spyglass", "Vial"]
+  },
+  {
+    "id": "srd-cc-5.2.1:herbalism-kit",
+    "slug": "herbalism-kit",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Herbalism Kit",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "other",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Identify a plant",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Antitoxin", "Candle", "Healer's Kit", "Potion of Healing"]
+  },
+  {
+    "id": "srd-cc-5.2.1:horn",
+    "slug": "horn",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Horn",
+    "description": "",
+    "cost": {
+      "amount": 3,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:jewelers-tools",
+    "slug": "jewelers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Jeweler's Tools",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Discern a gem's value",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Arcane Focus", "Holy Symbol"]
+  },
+  {
+    "id": "srd-cc-5.2.1:leatherworkers-tools",
+    "slug": "leatherworkers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Leatherworker's Tools",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Add a design to a leather item",
+        "dc": 10
+      }
+    ],
+    "crafts": [
+      "Sling",
+      "Whip",
+      "Hide Armor",
+      "Leather Armor",
+      "Studded Leather Armor",
+      "Backpack",
+      "Crossbow Bolt Case",
+      "Map or Scroll Case",
+      "Parchment",
+      "Pouch",
+      "Quiver",
+      "Waterskin"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:lute",
+    "slug": "lute",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lute",
+    "description": "",
+    "cost": {
+      "amount": 35,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:lyre",
+    "slug": "lyre",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lyre",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:masons-tools",
+    "slug": "masons-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mason's Tools",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "str",
+    "utilizes": [
+      {
+        "description": "Chisel a symbol or hole in stone",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Block and Tackle"]
+  },
+  {
+    "id": "srd-cc-5.2.1:navigators-tools",
+    "slug": "navigators-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Navigator's Tools",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "navigator",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Plot a course",
+        "dc": 10
+      },
+      {
+        "description": "Determine position by stargazing",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:painters-supplies",
+    "slug": "painters-supplies",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Painter's Supplies",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Paint a recognizable image of something you've seen",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Druidic Focus", "Holy Symbol"]
+  },
+  {
+    "id": "srd-cc-5.2.1:pan-flute",
+    "slug": "pan-flute",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Pan Flute",
+    "description": "",
+    "cost": {
+      "amount": 12,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:playing-cards",
+    "slug": "playing-cards",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Playing Cards",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "sp"
+    },
+    "kind": "tool",
+    "toolCategory": "gaming_set",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Discern whether someone is cheating",
+        "dc": 10
+      },
+      {
+        "description": "Win the game",
+        "dc": 20
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:poisoners-kit",
+    "slug": "poisoners-kit",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Poisoner's Kit",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "other",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Detect a poisoned object",
+        "dc": 10
+      }
+    ],
+    "crafts": ["Basic Poison"]
+  },
+  {
+    "id": "srd-cc-5.2.1:potters-tools",
+    "slug": "potters-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Potter's Tools",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "int",
+    "utilizes": [
+      {
+        "description": "Discern what a ceramic object held in the past 24 hours",
+        "dc": 15
+      }
+    ],
+    "crafts": ["Jug", "Lamp"]
+  },
+  {
+    "id": "srd-cc-5.2.1:shawm",
+    "slug": "shawm",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shawm",
+    "description": "",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:smiths-tools",
+    "slug": "smiths-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Smith's Tools",
+    "description": "",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "str",
+    "utilizes": [
+      {
+        "description": "Pry open a door or container",
+        "dc": 20
+      }
+    ],
+    "crafts": [
+      "Any Melee weapon (except Club, Greatclub, Quarterstaff, and Whip)",
+      "Medium armor (except Hide)",
+      "Heavy armor",
+      "Ball Bearings",
+      "Bucket",
+      "Caltrops",
+      "Chain",
+      "Crowbar",
+      "Firearm Bullets",
+      "Grappling Hook",
+      "Iron Pot",
+      "Iron Spikes",
+      "Sling Bullets"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:thieves-tools",
+    "slug": "thieves-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Thieves' Tools",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "thieves",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Pick a lock",
+        "dc": 15
+      },
+      {
+        "description": "Disarm a trap",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:three-dragon-ante",
+    "slug": "three-dragon-ante",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Three-Dragon Ante",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "kind": "tool",
+    "toolCategory": "gaming_set",
+    "ability": "wis",
+    "utilizes": [
+      {
+        "description": "Discern whether someone is cheating",
+        "dc": 10
+      },
+      {
+        "description": "Win the game",
+        "dc": 20
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:tinkers-tools",
+    "slug": "tinkers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Tinker's Tools",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Assemble a Tiny item composed of scrap, which falls apart in 1 minute",
+        "dc": 20
+      }
+    ],
+    "crafts": [
+      "Musket",
+      "Pistol",
+      "Bell",
+      "Bullseye Lantern",
+      "Flask",
+      "Hooded Lantern",
+      "Hunting Trap",
+      "Lock",
+      "Manacles",
+      "Mirror",
+      "Shovel",
+      "Signal Whistle",
+      "Tinderbox"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:viol",
+    "slug": "viol",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Viol",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha",
+    "utilizes": [
+      {
+        "description": "Play a known tune",
+        "dc": 10
+      },
+      {
+        "description": "Improvise a song",
+        "dc": 15
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:weavers-tools",
+    "slug": "weavers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Weaver's Tools",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Mend a tear in clothing",
+        "dc": 10
+      },
+      {
+        "description": "Sew a Tiny design",
+        "dc": 10
+      }
+    ],
+    "crafts": [
+      "Padded Armor",
+      "Basket",
+      "Bedroll",
+      "Blanket",
+      "Fine Clothes",
+      "Net",
+      "Robe",
+      "Rope",
+      "Sack",
+      "String",
+      "Tent",
+      "Traveler's Clothes"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:woodcarvers-tools",
+    "slug": "woodcarvers-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Woodcarver's Tools",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "dex",
+    "utilizes": [
+      {
+        "description": "Carve a pattern in wood",
+        "dc": 10
+      }
+    ],
+    "crafts": [
+      "Club",
+      "Greatclub",
+      "Quarterstaff",
+      "Ranged weapons (except Pistol, Musket, and Sling)",
+      "Arcane Focus",
+      "Arrows",
+      "Bolts",
+      "Druidic Focus",
+      "Ink Pen",
+      "Needles"
+    ]
+  }
+]

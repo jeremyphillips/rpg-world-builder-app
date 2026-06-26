@@ -39,6 +39,8 @@ describe('adventuring gear form round-trips', () => {
       expect(formValues.bundleSize).toBe(item.bundleSize)
       expect(formValues.storage).toBe(item.storage)
       expect(formValues.capacity).toBe(item.capacity)
+      expect(formValues.holySymbolUsage).toEqual(item.holySymbolUsage)
+      expect(formValues.alsoWeaponSlug).toBe(item.alsoWeaponSlug)
     })
   }
 })
