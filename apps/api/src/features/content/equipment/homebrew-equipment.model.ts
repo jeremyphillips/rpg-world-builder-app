@@ -57,6 +57,13 @@ const homebrewEquipmentSchema = new Schema(
     // tool
     toolCategory: { type: String, enum: [...TOOL_CATEGORIES] },
     ability: { type: String, enum: [...ABILITY_IDS] },
+    utilizes: [
+      {
+        description: { type: String, required: true },
+        dc: { type: Number, required: true },
+      },
+    ],
+    crafts: [{ type: String }],
     // mount
     carryingCapacity: { type: Schema.Types.Mixed },
     speed: { type: Schema.Types.Mixed },
