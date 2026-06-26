@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { choiceOptionTitle, contentChoiceSchema, contentNamedChoiceSchema } from './choice'
+import {
+  choiceOptionTitle,
+  contentChoiceSchema,
+  contentNamedChoiceSchema,
+  contentPoolChoiceSchema,
+} from './choice'
 
 describe('contentChoiceSchema', () => {
   it('accepts a pick-one option set with default choose count', () => {
@@ -44,6 +49,26 @@ describe('contentNamedChoiceSchema', () => {
 
     expect(result.choose).toBe(1)
     expect(result.name).toBe('Elven Lineage')
+  })
+})
+
+describe('contentPoolChoiceSchema', () => {
+  it('defaults choose to 1', () => {
+    expect(contentPoolChoiceSchema.parse({ label: 'Musical Instrument' }).choose).toBe(1)
+  })
+
+  it('accepts optional label and description for builder-facing pool picks', () => {
+    expect(
+      contentPoolChoiceSchema.parse({
+        choose: 2,
+        label: 'Languages',
+        description: '<p>Pick from the standard table.</p>',
+      }),
+    ).toEqual({
+      choose: 2,
+      label: 'Languages',
+      description: '<p>Pick from the standard table.</p>',
+    })
   })
 })
 

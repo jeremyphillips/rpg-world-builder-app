@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
-import { contentChoiceOptionSchema, contentChoiceSchema } from './choice'
+import { contentChoiceOptionSchema, contentChoiceSchema, contentPoolChoiceSchema } from './choice'
 import { characterWealthGrantSchema } from './character'
 import { equipmentModifierSchema } from './equipment/modifier'
 
@@ -27,12 +27,10 @@ export type StartingEquipmentFixedItem = z.infer<typeof startingEquipmentFixedIt
  * linked to class tool proficiency) are prose-only in v1 — see catalog Monk seed
  * and FOLLOWUP: proficiencyLinkedChoice.
  */
-export const startingEquipmentItemChoiceSchema = z
-  .object({
+export const startingEquipmentItemChoiceSchema = contentPoolChoiceSchema
+  .extend({
     kind: z.literal('choice'),
-    choose: z.number().int().min(1).default(1),
     label: z.string().min(1),
-    description: z.string().optional(),
     from: z
       .object({
         equipmentSlugs: z.array(z.string().min(1)).min(1).optional(),
