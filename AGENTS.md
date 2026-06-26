@@ -11,7 +11,7 @@ Work is **not done** until the pre-commit gate passes. The source of truth is
 Currently:
 
 ```text
-pnpm lint-staged → pnpm typecheck → pnpm test → fallow --format human --production-dupes
+pnpm lint-staged → pnpm typecheck → pnpm test → fallow dupes --production --format human
 ```
 
 ## fallow (code health)

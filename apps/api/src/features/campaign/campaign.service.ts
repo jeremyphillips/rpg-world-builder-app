@@ -1,45 +1,26 @@
 import { isValidObjectId } from 'mongoose'
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
-  DEFAULT_SYSTEM_RULESET_ID,
   MAX_CHARACTER_LEVEL,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
   Campaign,
-  CampaignConfiguration,
-  CampaignIdentity,
   CampaignListItem,
   CampaignRole,
-  CampaignStatus,
-  CampaignVisibility,
   CreateCampaignInput,
-  SystemRulesetId,
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
-import { assertCreatureTypesActiveInCampaign } from '../vocabulary'
+import { findCampaignById, toCampaign } from './find-campaign-by-id'
+import { assertCreatureTypesActiveInCampaign } from '../vocabulary/assert-campaign-creature-types'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
-}
-
-function toCampaign(doc: CampaignRecord): Campaign {
-  return {
-    id: String(doc._id),
-    identity: doc.identity as CampaignIdentity,
-    configuration: (doc.configuration ?? {}) as CampaignConfiguration,
-    status: doc.status as CampaignStatus,
-    visibility: doc.visibility as CampaignVisibility,
-    rulesetId: (doc.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
-    createdBy: doc.createdBy,
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
-  }
 }
 
 const DEFAULT_SETTINGS = {
@@ -85,13 +66,6 @@ export async function createCampaign(
   }
 
   return toCampaign(doc.toObject() as CampaignRecord)
-}
-
-export async function findCampaignById(id: string): Promise<Campaign | null> {
-  if (!isValidObjectId(id)) return null
-  const doc = await CampaignModel.findById(id).lean<CampaignRecord | null>()
-  if (!doc) return null
-  return toCampaign(doc)
 }
 
 /**

@@ -1,5 +1,5 @@
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign'
+import { findCampaignById } from '../campaign/find-campaign-by-id'
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { resolveCatalog } from './lib/resolve-catalog'
 

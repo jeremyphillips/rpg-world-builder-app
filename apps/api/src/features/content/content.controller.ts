@@ -7,7 +7,7 @@ import { createHomebrewContent, updateContentEntity } from './lib/content-write.
 import { getContentWriteConfig, isContentWriteType } from './lib/content-write-types'
 import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
 import { loadSubclassesByClassId } from '@rpg/catalog/classes'
-import { findCampaignById } from '../campaign'
+import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { HttpError } from '../../lib/http-error'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {

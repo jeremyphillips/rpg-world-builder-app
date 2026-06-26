@@ -13,7 +13,7 @@ import type {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign'
+import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { assertVocabularyIdAvailable } from './assert-vocabulary-id-available'
 import {
   CampaignRulesetPatchModel,
