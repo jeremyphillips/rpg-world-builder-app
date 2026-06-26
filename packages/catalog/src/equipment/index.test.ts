@@ -25,8 +25,8 @@ function armor() {
 describe('SRD 5.2.1 equipment seed', () => {
   const equipment = loadSeedEquipment(RULESET)
 
-  it('loads 191 unified equipment records', () => {
-    expect(equipment).toHaveLength(191)
+  it('loads 202 unified equipment records', () => {
+    expect(equipment).toHaveLength(202)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -91,10 +91,10 @@ describe('SRD 5.2.1 equipment seed', () => {
 })
 
 describe('adventuring gear records in unified seed', () => {
-  it('loads 76 adventuring gear records', () => {
+  it('loads 87 adventuring gear records', () => {
     expect(
       loadSeedEquipment(RULESET).filter((item) => item.kind === 'adventuring_gear'),
-    ).toHaveLength(76)
+    ).toHaveLength(87)
   })
 })
 

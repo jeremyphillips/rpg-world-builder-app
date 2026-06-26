@@ -1,4 +1,5 @@
 export * from './gear-kind'
+export * from './holy-symbol-usage'
 export * from './service-category'
 export * from './service-duration'
 export * from './tool-category'

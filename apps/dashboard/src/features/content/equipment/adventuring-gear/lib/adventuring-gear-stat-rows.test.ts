@@ -24,4 +24,14 @@ describe('getAdventuringGearStatRows', () => {
     expect(rows.some((row) => row.label === 'Bundle size' && row.value === '20')).toBe(true)
     expect(rows.some((row) => row.label === 'Storage' && row.value === 'Quiver')).toBe(true)
   })
+
+  it('returns holy symbol usage for an amulet', () => {
+    const amulet = pickEquipment('holy-symbol-amulet')
+    if (amulet.kind !== 'adventuring_gear') throw new Error('expected adventuring gear')
+
+    const rows = getAdventuringGearStatRows(amulet)
+    expect(rows.some((row) => row.label === 'Holy symbol usage' && row.value === 'Worn, Held')).toBe(
+      true,
+    )
+  })
 })

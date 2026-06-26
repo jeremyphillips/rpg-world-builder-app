@@ -21,6 +21,28 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:arcane-staff",
+    "slug": "arcane-staff",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Staff",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus",
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "alsoWeaponSlug": "quarterstaff"
+  },
+  {
     "id": "srd-cc-5.2.1:arrows",
     "slug": "arrows",
     "rulesetId": "srd-cc-5.2.1",
@@ -228,6 +250,27 @@
     "gearKind": "general",
     "weight": {
       "value": 5,
+      "unit": "lb"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:book-occult-lore",
+    "slug": "book-occult-lore",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Book (Occult lore)",
+    "description": "",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "book",
+    "weight": {
+      "value": 3,
       "unit": "lb"
     }
   },
@@ -571,6 +614,27 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:crystal",
+    "slug": "crystal",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Crystal",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus",
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:diplomats-pack",
     "slug": "diplomats-pack",
     "rulesetId": "srd-cc-5.2.1",
@@ -717,6 +781,76 @@
       "value": 3,
       "unit": "lb"
     }
+  },
+  {
+    "id": "srd-cc-5.2.1:holy-symbol-amulet",
+    "slug": "holy-symbol-amulet",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Amulet",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "holy_symbol",
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "holySymbolUsage": [
+      "worn",
+      "held"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:holy-symbol-emblem",
+    "slug": "holy-symbol-emblem",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Emblem",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "holy_symbol",
+    "holySymbolUsage": [
+      "borne_on_fabric",
+      "borne_on_shield"
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:holy-symbol-reliquary",
+    "slug": "holy-symbol-reliquary",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Reliquary",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "holy_symbol",
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "holySymbolUsage": [
+      "held"
+    ]
   },
   {
     "id": "srd-cc-5.2.1:holy-water",
@@ -1027,7 +1161,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Orb",
-    "description": "A glass or crystal orb used as an arcane focus for spellcasting.",
+    "description": "",
     "cost": {
       "amount": 20,
       "currency": "gp"
@@ -1279,6 +1413,27 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:rod",
+    "slug": "rod",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rod",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus",
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:rope-hempen",
     "slug": "rope-hempen",
     "rulesetId": "srd-cc-5.2.1",
@@ -1381,6 +1536,27 @@
     "gearKind": "general"
   },
   {
+    "id": "srd-cc-5.2.1:spellbook",
+    "slug": "spellbook",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Spellbook",
+    "description": "A leather-bound tome with one hundred blank vellum pages used to record and prepare spells.",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general",
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:spikes-iron",
     "slug": "spikes-iron",
     "rulesetId": "srd-cc-5.2.1",
@@ -1401,6 +1577,23 @@
       "value": 5,
       "unit": "lb"
     }
+  },
+  {
+    "id": "srd-cc-5.2.1:sprig-of-mistletoe",
+    "slug": "sprig-of-mistletoe",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sprig of Mistletoe",
+    "description": "",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "druidic_focus"
   },
   {
     "id": "srd-cc-5.2.1:spyglass",
@@ -1530,7 +1723,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Wand",
-    "description": "A slender rod carved from special wood used as an arcane focus for spellcasting.",
+    "description": "",
     "cost": {
       "amount": 10,
       "currency": "gp"
@@ -1561,6 +1754,49 @@
     "capacity": "4 pints",
     "weight": {
       "value": 5,
+      "unit": "lb"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:wooden-staff",
+    "slug": "wooden-staff",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wooden Staff",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "druidic_focus",
+    "weight": {
+      "value": 4,
+      "unit": "lb"
+    },
+    "alsoWeaponSlug": "quarterstaff"
+  },
+  {
+    "id": "srd-cc-5.2.1:yew-wand",
+    "slug": "yew-wand",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Yew Wand",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "druidic_focus",
+    "weight": {
+      "value": 1,
       "unit": "lb"
     }
   }

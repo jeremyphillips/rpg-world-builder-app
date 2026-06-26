@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 import { massSchema, speedRateSchema } from '../primitives/units'
-import { gearKindSchema } from '../vocab/equipment/gear-kind'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
 import { serviceDurationSchema } from '../vocab/equipment/service-duration'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
@@ -9,6 +8,10 @@ import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
 import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './envelope'
 import { equipmentBaseSchema } from './equipment/base'
+import {
+  adventuringGearEquipmentKindFields,
+  refineAdventuringGearEquipment,
+} from './equipment/adventuring-gear-variant'
 import { armorEquipmentKindFields, refineArmorEquipment } from './equipment/armor-variant'
 import { toolEquipmentKindFields } from './equipment/tool-variant'
 import { refineWeaponEquipment, weaponEquipmentKindFields } from './equipment/weapon-variant'
@@ -53,6 +56,15 @@ export {
 } from './equipment/magic-item-base-equipment'
 
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
+
+export {
+  formatHolySymbolUsage,
+  getHolySymbolUsageLabel,
+  HOLY_SYMBOL_USAGE_ENTRIES,
+  HOLY_SYMBOL_USAGES,
+  holySymbolUsageSchema,
+  type HolySymbolUsage,
+} from '../vocab/equipment/holy-symbol-usage'
 
 export {
   EQUIPMENT_MODIFIER_KINDS,
@@ -113,18 +125,13 @@ const armorEquipmentBodyFields = equipmentBaseSchema.extend(armorEquipmentKindFi
 export const weaponBodySchema = weaponEquipmentBodyFields.superRefine(refineWeaponEquipment)
 export const armorBodySchema = armorEquipmentBodyFields.superRefine(refineArmorEquipment)
 
-export const adventuringGearBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('adventuring_gear'),
-  gearKind: gearKindSchema,
-  /** How many units the listed cost/weight buys (e.g. 20 arrows). */
-  bundleSize: z.number().int().min(1).optional(),
-  /** The container a bundle ships in (e.g. "Quiver", "Case"). */
-  storage: z.string().optional(),
-  /** Open-ended mechanical notes (e.g. "burst DC 13", "1-hour duration"). */
-  properties: z.array(z.string()).optional(),
-  /** Storage capacity, free text (e.g. "1 cubic foot / 30 lb of gear"). */
-  capacity: z.string().optional(),
-})
+const adventuringGearEquipmentBodyFields = equipmentBaseSchema.extend(
+  adventuringGearEquipmentKindFields,
+)
+
+export const adventuringGearBodySchema = adventuringGearEquipmentBodyFields.superRefine(
+  refineAdventuringGearEquipment,
+)
 
 const toolEquipmentBodyFields = equipmentBaseSchema.extend(toolEquipmentKindFields)
 
@@ -228,10 +235,10 @@ export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
     .extend({ slug: slugSchema })
     .partial()
     .extend({ kind: armorEquipmentKindFields.kind }),
-  adventuringGearBodySchema
+  adventuringGearEquipmentBodyFields
     .extend({ slug: slugSchema })
     .partial()
-    .extend({ kind: adventuringGearBodySchema.shape.kind }),
+    .extend({ kind: adventuringGearEquipmentKindFields.kind }),
   toolBodySchema.extend({ slug: slugSchema }).partial().extend({ kind: toolBodySchema.shape.kind }),
   mountBodySchema
     .extend({ slug: slugSchema })
@@ -257,7 +264,9 @@ export const equipmentPatchSchema = contentPatchBaseSchema.extend({
   patch: z.discriminatedUnion('kind', [
     weaponEquipmentBodyFields.partial().extend({ kind: weaponEquipmentKindFields.kind }),
     armorEquipmentBodyFields.partial().extend({ kind: armorEquipmentKindFields.kind }),
-    adventuringGearBodySchema.partial().extend({ kind: adventuringGearBodySchema.shape.kind }),
+    adventuringGearEquipmentBodyFields
+      .partial()
+      .extend({ kind: adventuringGearEquipmentKindFields.kind }),
     toolBodySchema.partial().extend({ kind: toolBodySchema.shape.kind }),
     mountBodySchema.partial().extend({ kind: mountBodySchema.shape.kind }),
     vehicleBodySchema.partial().extend({ kind: vehicleBodySchema.shape.kind }),

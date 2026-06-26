@@ -1,4 +1,9 @@
-import { formatWeight, getGearKindLabel, type AdventuringGearEquipment } from '@rpg/contracts'
+import {
+  formatHolySymbolUsage,
+  formatWeight,
+  getGearKindLabel,
+  type AdventuringGearEquipment,
+} from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 
@@ -6,6 +11,12 @@ import type { ContentStatRowData } from '../../../lib/content-stat-rows'
 export function getAdventuringGearStatRows(item: AdventuringGearEquipment): ContentStatRowData[] {
   return [
     { label: 'Gear kind', value: getGearKindLabel(item.gearKind) },
+    ...(item.holySymbolUsage?.length
+      ? [{ label: 'Holy symbol usage', value: formatHolySymbolUsage(item.holySymbolUsage) }]
+      : []),
+    ...(item.alsoWeaponSlug
+      ? [{ label: 'Also weapon', value: item.alsoWeaponSlug }]
+      : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
     ...(item.bundleSize !== undefined
       ? [{ label: 'Bundle size', value: String(item.bundleSize) }]

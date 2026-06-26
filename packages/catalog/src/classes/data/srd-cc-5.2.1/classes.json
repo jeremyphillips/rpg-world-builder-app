@@ -739,9 +739,8 @@
               { "kind": "fixed", "equipmentSlug": "mace", "quantity": 1, "equipped": true },
               {
                 "kind": "fixed",
-                "equipmentSlug": "holy-symbol",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+                "equipmentSlug": "holy-symbol-amulet",
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
             ],
@@ -1035,10 +1034,9 @@
               { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
               {
                 "kind": "fixed",
-                "equipmentSlug": "quarterstaff",
+                "equipmentSlug": "wooden-staff",
                 "quantity": 1,
-                "equipped": false,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+                "equipped": false
               },
               { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 },
               { "kind": "fixed", "equipmentSlug": "herbalism-kit", "quantity": 1 }
@@ -1979,9 +1977,8 @@
               { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 6 },
               {
                 "kind": "fixed",
-                "equipmentSlug": "holy-symbol",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "holy_symbol" }]
+                "equipmentSlug": "holy-symbol-amulet",
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
             ],
@@ -2296,8 +2293,7 @@
               {
                 "kind": "fixed",
                 "equipmentSlug": "sprig-of-mistletoe",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "druidic_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
             ],
@@ -2897,8 +2893,7 @@
               {
                 "kind": "fixed",
                 "equipmentSlug": "crystal",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
             ],
@@ -3227,8 +3222,7 @@
               {
                 "kind": "fixed",
                 "equipmentSlug": "orb",
-                "quantity": 1,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "quantity": 1
               },
               { "kind": "fixed", "equipmentSlug": "book-occult-lore", "quantity": 1 },
               { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
@@ -3537,15 +3531,14 @@
           {
             "id": "standard",
             "label": "Standard Equipment",
-            "description": "2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
+            "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
             "items": [
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
               {
                 "kind": "fixed",
-                "equipmentSlug": "quarterstaff",
+                "equipmentSlug": "arcane-staff",
                 "quantity": 1,
-                "equipped": true,
-                "modifiers": [{ "kind": "spellcasting_focus", "focusKind": "arcane_focus" }]
+                "equipped": true
               },
               { "kind": "fixed", "equipmentSlug": "robe", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "spellbook", "quantity": 1 },
