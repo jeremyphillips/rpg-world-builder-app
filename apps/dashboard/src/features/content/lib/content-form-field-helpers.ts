@@ -6,6 +6,7 @@ import {
   MASS_UNIT_IDS,
   MOUNT_CARRYING_CAPACITY_LABEL,
   SPEED_RATE_UNIT_IDS,
+  type CharacterWealthGrant,
   type Currency,
   type EquipmentKind,
   type Mass,
@@ -14,7 +15,13 @@ import {
   type SpeedRateUnit,
   VEHICLE_CARGO_CAPACITY_LABEL,
 } from '@rpg/contracts'
-import { toOptions, type FieldConfig, type FieldOption, type RowConfig } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldConfig,
+  type FieldOption,
+  type FormItem,
+  type RowConfig,
+} from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
 
 import { EQUIPMENT_COST_VALUE_DIGITS, costValueDigitsForKind } from './equipment-cost-config'
@@ -154,6 +161,67 @@ export function weightToFormDefaults(): { unit: 'lb' } {
 
 export function costToFormDefaults(): { amount: number; currency: Currency } {
   return { amount: 0, currency: 'gp' }
+}
+
+const WEALTH_GRANT_DENOMINATIONS = [
+  'cp',
+  'sp',
+  'gp',
+  'pp',
+] as const satisfies readonly (keyof CharacterWealthGrant)[]
+
+export type WealthGrantForm = Partial<Record<(typeof WEALTH_GRANT_DENOMINATIONS)[number], number>>
+
+/** Optional coin fields for starting equipment and similar sparse wealth grants. */
+export function wealthGrantFields(namePrefix: string): FormItem[] {
+  const fields: FieldConfig[] = WEALTH_GRANT_DENOMINATIONS.map((denomination) => ({
+    type: 'number',
+    name: `${namePrefix}.${denomination}`,
+    label: getCurrencyAbbrev(denomination),
+    min: 0,
+    width: 'sm',
+  }))
+
+  return [
+    {
+      kind: 'group',
+      legend: 'Wealth',
+      fields: [{ kind: 'row', className: responsiveHalfRowClassName, fields }],
+    },
+  ]
+}
+
+/** Maps wealth grant form values to a strict partial coin object (positive integers only). */
+export function wealthGrantFromForm(
+  wealth: WealthGrantForm | undefined,
+): CharacterWealthGrant | undefined {
+  if (!wealth) return undefined
+
+  const result: CharacterWealthGrant = {}
+  for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+    const value = wealth[denomination]
+    if (value !== undefined && !Number.isNaN(value) && value > 0) {
+      result[denomination] = value
+    }
+  }
+
+  return Object.keys(result).length ? result : undefined
+}
+
+export function wealthGrantToForm(
+  wealth: CharacterWealthGrant | undefined,
+): WealthGrantForm | undefined {
+  if (!wealth) return undefined
+
+  const result: WealthGrantForm = {}
+  for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+    const value = wealth[denomination]
+    if (value !== undefined) {
+      result[denomination] = value
+    }
+  }
+
+  return Object.keys(result).length ? result : undefined
 }
 
 const massUnitOptions = toOptions(

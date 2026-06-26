@@ -4,6 +4,9 @@ import {
   costFields,
   economyFields,
   optionalWeightFields,
+  wealthGrantFields,
+  wealthGrantFromForm,
+  wealthGrantToForm,
   weightFromForm,
   weightToForm,
 } from './content-form-field-helpers'
@@ -124,5 +127,31 @@ describe('weightToForm', () => {
   it('round-trips stored weight into form values', () => {
     expect(weightToForm({ value: 1.5, unit: 'lb' })).toEqual({ value: 1.5, unit: 'lb' })
     expect(weightToForm(undefined)).toBeUndefined()
+  })
+})
+
+describe('wealthGrantFields', () => {
+  it('renders cp, sp, gp, and pp under the given prefix', () => {
+    const [group] = wealthGrantFields('wealth')
+    expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
+    if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
+      expect(
+        group.fields[0].fields.map((field) => ('name' in field ? field.name : undefined)),
+      ).toEqual(['wealth.cp', 'wealth.sp', 'wealth.gp', 'wealth.pp'])
+    }
+  })
+})
+
+describe('wealthGrantFromForm', () => {
+  it('returns a strict partial object with positive integers only', () => {
+    expect(wealthGrantFromForm({ cp: 0, gp: 19, sp: undefined })).toEqual({ gp: 19 })
+    expect(wealthGrantFromForm(undefined)).toBeUndefined()
+  })
+})
+
+describe('wealthGrantToForm', () => {
+  it('round-trips stored wealth into form values', () => {
+    expect(wealthGrantToForm({ gp: 90 })).toEqual({ gp: 90 })
+    expect(wealthGrantToForm(undefined)).toBeUndefined()
   })
 })
