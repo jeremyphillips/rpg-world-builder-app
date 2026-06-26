@@ -1,5 +1,5 @@
 import type { CampaignSettings } from './campaign'
-import type { CreatureType } from '../vocab/creature-type'
+import type { CreatureTypeId } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   buildLevelOptions,
@@ -16,7 +16,7 @@ export {
 /** Default creature types allowed on character sheets (PC and NPC). */
 export const DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES = [
   'humanoid',
-] as const satisfies readonly CreatureType[]
+] as const satisfies readonly CreatureTypeId[]
 
 export type ResolvedExtendedProgression = {
   tierName: string
@@ -30,7 +30,7 @@ export type ResolvedCampaignRules = {
   /** Standard tier separator point (sparse override or 20). */
   standardMaxCharacterLevel: number
   /** Creature types allowed on character sheets in this campaign. */
-  allowedCharacterCreatureTypes: readonly CreatureType[]
+  allowedCharacterCreatureTypes: readonly CreatureTypeId[]
   extendedProgression?: ResolvedExtendedProgression
 }
 
@@ -42,7 +42,7 @@ export function resolveStandardMaxCharacterLevel(settings?: CampaignSettings): n
 /** Creature types allowed on character sheets — sparse override or SRD default. */
 export function resolveAllowedCharacterCreatureTypes(
   settings?: CampaignSettings,
-): readonly CreatureType[] {
+): readonly CreatureTypeId[] {
   return (
     settings?.ruleOverrides?.allowedCharacterCreatureTypes ??
     DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES

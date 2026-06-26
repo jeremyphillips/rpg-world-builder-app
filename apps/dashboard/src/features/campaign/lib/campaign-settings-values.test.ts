@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Campaign, CreatureType } from '@rpg/contracts'
+import type { Campaign, CreatureTypeId } from '@rpg/contracts'
 
 import {
   buildCreateCampaignInput,
@@ -162,7 +162,7 @@ describe('buildCreateCampaignInput', () => {
   it('includes creature type override when not default', () => {
     const values = {
       ...mapCampaignToSettingsValues(campaign),
-      allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureType[],
+      allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureTypeId[],
     }
 
     expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({

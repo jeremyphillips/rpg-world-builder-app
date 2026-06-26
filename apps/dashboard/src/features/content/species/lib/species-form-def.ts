@@ -7,7 +7,7 @@ import {
   creatureTypeSchema,
   slugSchema,
   type CreateSpeciesInput,
-  type CreatureType,
+  type CreatureTypeId,
   type Species,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
@@ -55,7 +55,7 @@ const creatureSizeOptions = toOptions(
 // Form schema
 // ---------------------------------------------------------------------------
 
-function createSpeciesFormSchema(allowedCreatureTypes: readonly CreatureType[]) {
+function createSpeciesFormSchema(allowedCreatureTypes: readonly CreatureTypeId[]) {
   const allowedSet = new Set(allowedCreatureTypes)
 
   return z

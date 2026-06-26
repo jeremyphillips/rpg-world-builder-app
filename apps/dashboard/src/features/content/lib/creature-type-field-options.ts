@@ -1,12 +1,12 @@
-import { CREATURE_TYPE_ENTRIES, type CreatureType } from '@rpg/contracts'
+import { CREATURE_TYPE_ENTRIES, type CreatureTypeId } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from './content-form-registry'
 import { campaignRulesFromCtx } from './level-field-options'
 
-const creatureTypeLabels = Object.fromEntries(
+const creatureTypeLabels: Record<string, string> = Object.fromEntries(
   Object.entries(CREATURE_TYPE_ENTRIES).map(([id, entry]) => [id, entry.label]),
-) as Record<CreatureType, string>
+)
 
 /** Select options for species creature type — filtered to campaign-allowed character types. */
 export function getCharacterCreatureTypeFieldOptions(ctx?: ContentFormCtx): FieldOption[] {
@@ -16,6 +16,6 @@ export function getCharacterCreatureTypeFieldOptions(ctx?: ContentFormCtx): Fiel
 
 export function allowedCharacterCreatureTypesFromCtx(
   ctx?: ContentFormCtx,
-): readonly CreatureType[] {
+): readonly CreatureTypeId[] {
   return campaignRulesFromCtx(ctx).allowedCharacterCreatureTypes
 }

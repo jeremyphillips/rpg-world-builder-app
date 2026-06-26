@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type { GameTermEntry } from './types'
+import { vocabularyOptionIdSchema } from './vocabulary'
 
 // ---------------------------------------------------------------------------
 // Creature types — the closed SRD 5.2.1 taxonomy of what a creature is, shared
@@ -81,18 +82,30 @@ export const CREATURE_TYPE_ENTRIES = {
   },
 } as const satisfies Record<string, GameTermEntry>
 
-export type CreatureType = keyof typeof CREATURE_TYPE_ENTRIES
+/** System seed ids shipped in SRD catalog data — not the write-time validation boundary. */
+export type SystemCreatureType = keyof typeof CREATURE_TYPE_ENTRIES
+
+/** @deprecated Prefer `SystemCreatureType` for seed ids or `CreatureTypeId` for stored values. */
+export type CreatureType = SystemCreatureType
 
 export const CREATURE_TYPES = Object.keys(CREATURE_TYPE_ENTRIES) as [
-  CreatureType,
-  ...CreatureType[],
+  SystemCreatureType,
+  ...SystemCreatureType[],
 ]
 
-export const creatureTypeSchema = z.enum(CREATURE_TYPES)
+export const CREATURE_TYPE_SET_ID = 'creature-types' as const
+
+/**
+ * Primitive shape for stored creature type ids. Catalog membership is validated
+ * against the campaign-resolved vocabulary, not this closed seed map.
+ */
+export const creatureTypeSchema = vocabularyOptionIdSchema
+
+export type CreatureTypeId = z.infer<typeof creatureTypeSchema>
 
 /** Returns the reference entry for a creature type id, if known. */
 export function getCreatureTypeEntry(id: string): GameTermEntry | undefined {
-  return CREATURE_TYPE_ENTRIES[id as CreatureType]
+  return CREATURE_TYPE_ENTRIES[id as SystemCreatureType]
 }
 
 /** Returns the display label for a creature type id. Falls back to the raw value. */

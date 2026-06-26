@@ -1,4 +1,5 @@
 export * from './types'
+export * from './vocabulary'
 export * from './ability'
 export * from './alignment'
 export * from './creature-size'

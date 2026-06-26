@@ -110,9 +110,13 @@ describe('speciesSchema', () => {
     expect(speciesSchema.safeParse(minimal).success).toBe(true)
   })
 
-  it('rejects an unknown creature type or size', () => {
-    expect(speciesSchema.safeParse({ ...ELF_SYSTEM, creatureType: 'robot' }).success).toBe(false)
+  it('rejects invalid creature type slug shapes', () => {
+    expect(speciesSchema.safeParse({ ...ELF_SYSTEM, creatureType: 'Bad Type' }).success).toBe(false)
     expect(speciesSchema.safeParse({ ...ELF_SYSTEM, sizes: ['colossal'] }).success).toBe(false)
+  })
+
+  it('accepts slug-shaped creature types before catalog membership validation', () => {
+    expect(speciesSchema.safeParse({ ...ELF_SYSTEM, creatureType: 'robot' }).success).toBe(true)
   })
 })
 

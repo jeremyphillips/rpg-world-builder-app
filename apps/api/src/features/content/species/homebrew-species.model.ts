@@ -2,7 +2,7 @@ import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
 const { model, models, Schema } = mongoose
 
-import { CREATURE_SIZES, CREATURE_TYPES, SYSTEM_RULESET_IDS } from '@rpg/contracts'
+import { CREATURE_SIZES, SYSTEM_RULESET_IDS } from '@rpg/contracts'
 
 const homebrewSpeciesSchema = new Schema(
   {
@@ -12,7 +12,7 @@ const homebrewSpeciesSchema = new Schema(
     name: { type: String, required: true, trim: true },
     imageKey: { type: String },
     description: { type: String },
-    creatureType: { type: String, enum: [...CREATURE_TYPES], required: true },
+    creatureType: { type: String, required: true, trim: true },
     sizes: [{ type: String, enum: [...CREATURE_SIZES] }],
     speed: { type: Schema.Types.Mixed, required: true },
     traits: { type: [Schema.Types.Mixed], default: [] },
