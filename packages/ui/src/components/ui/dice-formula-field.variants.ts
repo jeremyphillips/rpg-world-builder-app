@@ -1,7 +1,9 @@
 import { cva } from 'class-variance-authority'
 
-/** Outer row — wider gap before modifier controls and action buttons. */
-export const diceFormulaRowVariants = cva('flex flex-wrap items-center gap-2')
+import { fieldInlineSentenceClasses } from './field.variants'
+
+/** Outer row — control segments and action buttons share the inline sentence gap. */
+export const diceFormulaRowVariants = cva(fieldInlineSentenceClasses)
 
 /** Tighter cluster for count + d + faces so the separator reads as notation. */
 export const diceFormulaCoreVariants = cva('flex shrink-0 items-center gap-1')
