@@ -52,6 +52,9 @@ import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form
 import {
   getLevelFieldOptions,
   getFlatLevelFieldOptions,
+  getCompactLevelFieldOptionsGrouped,
+  HIT_DIE_SELECT_DIGITS,
+  levelSelectDigits,
   effectiveMaxFromCtx,
 } from '../../lib/level-field-options'
 import { titleCase } from '../../lib/title-case'
@@ -311,7 +314,8 @@ function buildSpellProgressionGridField(rowCount: number): FormItem {
 // ---------------------------------------------------------------------------
 
 function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getLevelFieldOptions(ctx)
+  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelDigits = levelSelectDigits(ctx)
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
     {
@@ -332,6 +336,8 @@ function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
               label: 'Character level',
               options: levelOptions,
               required: true,
+              digits: levelDigits,
+              width: 'auto',
             },
             {
               type: 'number',
@@ -609,7 +615,8 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
           label: 'Hit die',
           options: hitDieOptions,
           required: true,
-          width: 'sm',
+          digits: HIT_DIE_SELECT_DIGITS,
+          width: 'auto',
         },
       ],
     },
@@ -626,13 +633,14 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Subclass choice level',
       options: subclassChoiceLevelOptions(ctx),
       hint: 'Level at which a character chooses their subclass',
-      width: 'sm-md',
+      width: 'md',
     },
   ]
 }
 
 function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getLevelFieldOptions(ctx)
+  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelDigits = levelSelectDigits(ctx)
   return [
     {
       type: 'switch',
@@ -647,7 +655,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       visibility: visibleWhenSpellcasting(),
       required: true,
       hint: 'First class level at which this class gains spellcasting',
-      width: 'sm-md',
+      digits: levelDigits,
     },
     {
       kind: 'row',

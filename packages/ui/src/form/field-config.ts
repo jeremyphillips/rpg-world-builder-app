@@ -17,6 +17,7 @@ import type {
 import type { FieldSize } from '../components/ui/field.client'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import type { FieldRowLayout } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -139,6 +140,12 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
+  /**
+   * Visual digit capacity for the select trigger (sets width from ch-based tokens).
+   * Keep `width` at `full` (default) on standalone fields so label and hint are not
+   * compressed; use row `width` tokens only when sharing a `FieldRow`.
+   */
+  digits?: FieldDigits
 }
 
 export interface RadioFieldConfig extends BaseFieldConfig {
@@ -259,6 +266,8 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   prefix?: string
   /** Trailing sentence fragment after the count input. Defaults to `from:`. */
   suffix?: string
+  /** Visual digit capacity for the count input. Defaults to `1`. */
+  digits?: FieldDigits
   /** When true, the legend is visually hidden but kept for assistive tech. */
   hideLabel?: boolean
   defaultValue?: number
@@ -367,6 +376,8 @@ export type FieldConfig =
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
+  /** Preferred display recipe. Use `className` only for one-off escape hatches. */
+  layout?: FieldRowLayout
   className?: string
 }
 

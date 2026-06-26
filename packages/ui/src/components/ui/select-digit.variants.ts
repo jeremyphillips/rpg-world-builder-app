@@ -1,5 +1,11 @@
 import { cva } from 'class-variance-authority'
 
+import {
+  fieldDigitTrailingColumnClasses,
+  fieldDigitTrailingIconClasses,
+} from './field-sizing.variants'
+import { cn } from '../../lib/utils'
+
 /**
  * Trailing column for digit-sized Select triggers. Mirrors the number-input
  * stepper column width; caret centered — no gap beyond pr reserve.
@@ -9,9 +15,9 @@ export const selectDigitTrailingColumnVariants = cva(
   {
     variants: {
       size: {
-        sm: 'w-5 [&_svg]:size-2.5',
-        md: 'w-5 [&_svg]:size-2.5',
-        lg: 'w-7 [&_svg]:size-3.5',
+        sm: cn(fieldDigitTrailingColumnClasses.sm, fieldDigitTrailingIconClasses.sm),
+        md: cn(fieldDigitTrailingColumnClasses.md, fieldDigitTrailingIconClasses.md),
+        lg: cn(fieldDigitTrailingColumnClasses.lg, fieldDigitTrailingIconClasses.lg),
       },
     },
     defaultVariants: {

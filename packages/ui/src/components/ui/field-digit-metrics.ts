@@ -1,6 +1,5 @@
-import type { FieldControlVariantProps } from './field-control.variants'
-
-type FieldSize = NonNullable<FieldControlVariantProps['size']>
+import type { FieldSizeToken } from './field-sizing.variants'
+import { fieldDigitSizeClasses } from './field-sizing.variants'
 
 /**
  * Shared digit-field layout tokens. Number inputs and digit-sized selects use
@@ -10,11 +9,7 @@ type FieldSize = NonNullable<FieldControlVariantProps['size']>
  * Right padding (pr-6 for sm/md, pr-8 for lg) reserves that column; the caret sits inside
  * it with no extra gap to the trigger edge.
  */
-export const fieldDigitSizeVariants = {
-  sm: 'pl-2.5 pr-6',
-  md: 'pl-3 pr-6',
-  lg: 'pl-4 pr-8',
-} as const satisfies Record<FieldSize, string>
+export const fieldDigitSizeVariants = fieldDigitSizeClasses
 
 /**
  * Digit-based control widths as literal Tailwind classes so the scanner emits every
@@ -43,7 +38,7 @@ export const fieldDigitWidthVariants = {
     4: 'w-[calc(4*1ch+3.5rem)]',
     5: 'w-[calc(5*1ch+3.5rem)]',
   },
-} as const satisfies Record<FieldSize, Record<1 | 2 | 3 | 4 | 5, string>>
+} as const satisfies Record<FieldSizeToken, Record<1 | 2 | 3 | 4 | 5, string>>
 
 export type FieldDigits = keyof (typeof fieldDigitWidthVariants)['md']
 

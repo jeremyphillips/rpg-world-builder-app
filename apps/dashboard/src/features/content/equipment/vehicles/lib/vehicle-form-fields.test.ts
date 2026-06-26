@@ -4,6 +4,7 @@ import { createEquipmentInputSchema } from '@rpg/contracts'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
 import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-registry'
+import { vehicleFormFieldGroup } from './vehicle-form-fields'
 
 const VEHICLE_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'vehicle')
 
@@ -19,6 +20,21 @@ describe('vehicle kindFieldGroups', () => {
 
     expect(legends).toEqual(['Identity', 'Economy', 'Vehicle'])
     expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
+  })
+
+  it('uses responsive row layouts for scalar and capacity rows', () => {
+    const group = vehicleFormFieldGroup()
+    if (!('fields' in group)) throw new Error('Expected vehicle group fields')
+
+    const rows = group.fields.filter(
+      (field): field is Extract<(typeof group.fields)[number], { kind: 'row' }> =>
+        'kind' in field && field.kind === 'row',
+    )
+
+    expect(rows[0]).toMatchObject({ layout: 'responsive-3' })
+    expect(rows[1]).toMatchObject({ layout: 'responsive-3' })
+    expect(rows[0]).not.toHaveProperty('className')
+    expect(rows[1]).not.toHaveProperty('className')
   })
 })
 

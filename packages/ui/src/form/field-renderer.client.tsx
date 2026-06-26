@@ -139,6 +139,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       required={config.required}
       width={config.width}
       size={config.size}
+      digits={config.digits}
       placeholder={config.placeholder}
       disabled={config.disabled}
       value={field.value != null && field.value !== '' ? String(field.value) : ''}

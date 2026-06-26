@@ -33,3 +33,18 @@ export const WithError: Story = {
 }
 
 export const Disabled: Story = { args: { disabled: true, defaultValue: 'n' } }
+
+/** Trigger uses digit tokens; container stays full width so label and hint are not compressed. */
+export const WithDigits: Story = {
+  args: {
+    id: 'spellcasting-level',
+    label: 'Spellcasting level',
+    hint: 'First class level at which this class gains spellcasting',
+    digits: 2,
+    defaultValue: '1',
+    options: [
+      { label: '1', value: '1' },
+      { label: '2', value: '2' },
+    ],
+  },
+}

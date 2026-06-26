@@ -16,7 +16,6 @@ import {
   SENSE_ENTRIES,
   SKILL_IDS,
   SKILLS,
-  STANDARD_SPEEDS,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   abilitySchema,
@@ -45,7 +44,8 @@ import {
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from './content-form-registry'
-import { getLevelFieldOptions } from './level-field-options'
+import { getCompactLevelFieldOptions, levelSelectDigits } from './level-field-options'
+import { walkSpeedInlineCountField } from './content-form-field-helpers'
 import { titleCase } from './title-case'
 
 // ---------------------------------------------------------------------------
@@ -86,11 +86,6 @@ const CLASS_GRANT_TYPE_LABELS: Record<ClassGrantType, string> = {
 // ---------------------------------------------------------------------------
 // Shared option lists
 // ---------------------------------------------------------------------------
-
-const speedWalkOptions: FieldOption[] = STANDARD_SPEEDS.map((s) => ({
-  value: String(s),
-  label: `${s} ft.`,
-}))
 
 const senseTypeOptions = toOptions(
   SENSE_TYPES,
@@ -281,13 +276,9 @@ export function grantItemFields<T extends string>(
       options: senseRangeOptions,
       visibility: visibleFor('senses'),
     },
-    {
-      type: 'select',
-      name: 'speedWalkOverride',
-      label: 'Walk speed (ft.)',
-      options: speedWalkOptions,
+    walkSpeedInlineCountField('speedWalkOverride', {
       visibility: visibleFor('speedOverride'),
-    },
+    }),
     {
       type: 'select',
       name: 'language',
@@ -351,7 +342,8 @@ export function grantItemFields<T extends string>(
           type: 'select',
           name: 'level',
           label: 'Character level',
-          options: getLevelFieldOptions(ctx),
+          options: getCompactLevelFieldOptions(ctx),
+          digits: levelSelectDigits(ctx),
           required: true,
         },
         {

@@ -1,5 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { fieldControlSizeClasses } from './field-sizing.variants'
+
 /**
  * Look shared by every text-like field control: border, background, focus ring,
  * disabled state, and the error treatment. The error "outline border in error
@@ -15,11 +17,7 @@ const fieldControlBase =
  */
 export const fieldControlVariants = cva(fieldControlBase, {
   variants: {
-    size: {
-      sm: 'h-8 px-2.5 py-1 text-xs',
-      md: 'h-9 px-3 py-1.5 text-sm',
-      lg: 'h-13 px-4 py-2.5 text-lg',
-    },
+    size: fieldControlSizeClasses,
   },
   defaultVariants: {
     size: 'md',
@@ -53,7 +51,7 @@ export type TextareaVariantProps = VariantProps<typeof textareaVariants>
  *
  * - Intrinsic (`xs`–`xl`, `auto`): map to `max-width` + `flex-none` so the field
  *   keeps its own width and never grows. `xs` (~64px) suits 1–2 char inputs like
- *   a die count; `sm-md` (~128px) suits compact selects like level pickers.
+ *   a die count; `sm` suits compact inputs like level pickers.
  * - Proportional (`full`, fractions): flex along a `FieldRow`. `full` (default)
  *   fills the remaining space; fractions distribute it by **grow weight** rather
  *   than `flex-basis` percentages, which keeps them gap-safe and lets mixed
@@ -68,7 +66,6 @@ export const fieldWidthVariants = cva('', {
     width: {
       xs: 'max-w-16 flex-none',
       sm: 'max-w-24 flex-none',
-      'sm-md': 'max-w-32 flex-none',
       md: 'max-w-36 flex-none',
       lg: 'max-w-48 flex-none',
       xl: 'max-w-64 flex-none',

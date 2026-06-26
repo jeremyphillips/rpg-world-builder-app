@@ -14,7 +14,8 @@ import { Button } from '../components/ui/button.client'
 import { FieldGroup } from '../components/ui/field-group'
 import { FieldRow } from '../components/ui/field-row'
 import {
-  fieldArrayItemActionsClasses,
+  fieldArrayItemActionRowClasses,
+  fieldArrayItemClasses,
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
@@ -258,7 +259,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
 
   if (item.kind === 'row') {
     return (
-      <FieldRow key={`row-${index}`} className={item.className}>
+      <FieldRow key={`row-${index}`} layout={item.layout} className={item.className}>
         {item.fields.map((field) => (
           <FieldNode
             key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
@@ -527,7 +528,7 @@ export function ArrayFieldRenderer({
           return (
             <fieldset
               key={rhfField.id}
-              className="rounded-md border border-border p-4"
+              className={fieldArrayItemClasses}
               aria-label={title ?? `${legend} item ${index + 1}`}
             >
               {title ? (
@@ -541,7 +542,7 @@ export function ArrayFieldRenderer({
                   plainSections
                 />
               </div>
-              <div className={cn('flex items-center gap-2', fieldArrayItemActionsClasses)}>
+              <div className={fieldArrayItemActionRowClasses}>
                 <Button
                   variant="outline"
                   size="sm"

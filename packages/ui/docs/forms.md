@@ -119,10 +119,14 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
-| `fieldRowGapClasses`             | `gap-4`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
+| `fieldRowGapClasses`             | `gap-6`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
+| `fieldRowLayoutVariants`         | —                     | Display recipe for `FieldRow` / `RowConfig.layout` (`flex`, `responsive-2`, …)  |
+| `fieldInlineSentenceClasses`     | `gap-x-2 gap-y-2`     | Inline “Choose [N] from:” sentence rows (`ChooseFromChipsField`, …)             |
+| `fieldInlineControlRowClasses`   | `gap-3`               | Inline label + control rows (e.g. `DiceFormulaField`)                           |
 | `fieldChipWrapGapClasses`        | `gap-2`               | Gap between chip pills inside `ChipsField`                                      |
 | `fieldGroupDescriptionClasses`   | `mb-3`                | Space below a group or accordion section description                            |
 | `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
+| `fieldArrayItemClasses`          | `p-4 border`          | Chrome around one repeatable array item                                         |
 | `fieldArrayItemActionsClasses`   | `mt-3`                | Space above array item move/remove controls                                     |
 
 Do not sprinkle ad-hoc `space-y-*` or margin utilities on field wrappers in apps — adjust the shared
@@ -138,9 +142,21 @@ WCAG 2.2 AA bar.
 
 ## Sizing conventions
 
-Two independent token scales, both defined once in
-[field-control.variants.ts](../src/components/ui/field-control.variants.ts) and
-shared by every control.
+Two independent token scales. Control height, padding, and type scale come from
+[field-sizing.variants.ts](../src/components/ui/field-sizing.variants.ts) — the
+single source of truth for `sm | md | lg` sizing. Primitives and composites
+(`field-control.variants.ts`, `number-input.variants.ts`,
+`input-select-field.variants.ts`, digit metrics, and so on) compose those maps
+instead of repeating the tuples.
+
+| Map                                | Use                                                        |
+| ---------------------------------- | ---------------------------------------------------------- |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                |
+| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, …) |
+| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls              |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls  |
+| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                 |
+| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                |
 
 ### `size` — control height + type scale
 
@@ -154,10 +170,10 @@ shared by every control.
 
 One union, two intents:
 
-- **Intrinsic** (`xs`, `sm`, `sm-md`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
+- **Intrinsic** (`xs`, `sm`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
   `flex-none`, so the field keeps its own width and never grows. `xs` (~64px)
-  suits 1–2 character inputs like a die count; `sm-md` (~128px) suits compact
-  selects like level pickers.
+  suits 1–2 character inputs like a die count; `sm` suits compact inputs like
+  level pickers.
 - **Proportional** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): these flex within
   a `FieldRow`. `full` (the default) fills remaining space; fractions distribute
   space by **grow weight** (a base-12 scale), so mixed denominators compose and
@@ -166,6 +182,73 @@ One union, two intents:
 
 A plain `FieldRow` with two inputs and no `width` splits 50/50, and wraps to full
 width on narrow viewports.
+
+### `digits` — ch-based control width
+
+`number` and `select` fields accept an optional `digits` prop that sizes the
+**control** (`NumberInput` or `SelectTrigger`) via
+[`fieldDigitWidthVariants`](../src/components/ui/field-digit-metrics.ts) — the
+same formula used by `DiceFormulaField` and digit-sized primitives.
+
+- Leave `width` at default `full` on standalone fields so label and hint span
+  the form column while the control stays narrow.
+- Use row `width` tokens (`auto`, fractions, …) only when the field shares a
+  `FieldRow` and should occupy a compact column.
+- `number` fields may also use `inputWidth` for a non-digit intrinsic cap on
+  the input element.
+
+**Select + `digits`:** the trigger shows the option **label**, not the value.
+Use short numeric labels (`"1"`, `"d8"`) when sizing with `digits`. Verbose
+labels such as `"Level 10"` or `"Cantrip"` need a wider trigger — keep
+`width: 'sm'`/`md` without `digits`, or supply compact option labels.
+
+Dashboard level selects use
+[`getCompactLevelFieldOptions` / `getCompactLevelFieldOptionsGrouped`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
+with `levelSelectDigits(ctx)` so triggers stay aligned with digit-sized number
+fields. Hit die selects use `HIT_DIE_SELECT_DIGITS` (`3`) for `d10`/`d12`
+labels.
+
+```tsx
+{ type: 'select', name: 'spellcasting.level', label: 'Spellcasting level', digits: 2, ... }
+{ type: 'select', name: 'hitDie', label: 'Hit die', digits: 3, width: 'auto', ... } // in a row
+{ type: 'number', name: 'quantity', label: 'Quantity', digits: 2, width: 'auto', ... }
+```
+
+Do **not** combine `digits` with mixed-length enum labels (e.g. subclass choice
+level with a `"None"` option) — use full-width container sizing instead.
+
+### Row layout — flex vs responsive grid
+
+`FieldRow` and schema `RowConfig` share a `layout` prop backed by
+`fieldRowLayoutVariants` in [field.variants.ts](../src/components/ui/field.variants.ts).
+Each layout applies **either** flex **or** grid display classes — never both.
+
+| `layout`         | Use                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `flex` (default) | Side-by-side fields that grow/wrap by `width` — the XdY recipe, class + level rows, … |
+| `responsive-2`   | Two equal columns from `md` up (`grid-cols-1 md:grid-cols-2`)                         |
+| `responsive-3`   | Three columns from `md` up (`grid-cols-2 md:grid-cols-3`)                             |
+
+Prefer `width` fractions inside a flex row when fields should share remaining space
+by grow weight (e.g. a narrow count beside a wide select). Reach for
+`responsive-2` / `responsive-3` when every child should occupy an equal grid cell
+regardless of intrinsic width — wealth coin rows, scalar unit rows, vehicle
+crew/passenger rows, and similar dashboard recipes.
+
+In `<Form>` config, set `layout` on a row item; reserve `className` for genuine
+one-offs:
+
+```ts
+{
+  kind: 'row',
+  layout: 'responsive-3',
+  fields: [
+    { type: 'number', name: 'crew', label: 'Crew', width: 'full' },
+    { type: 'number', name: 'passengers', label: 'Passengers', width: 'full' },
+    { type: 'number', name: 'cargo', label: 'Cargo (tons)', width: 'full' },
+  ],
+}
+```
 
 #### Worked example: the XdY recipe
 
@@ -415,6 +498,33 @@ skill proficiency authoring.
 
 - `name` — chip selection path (`string[]`); `chooseName` — numeric count path.
 - `prefix` / `suffix` default to `Choose` and `skills from:`.
+- Sentence layout uses `fieldInlineSentenceClasses` from
+  [field.variants.ts](../src/components/ui/field.variants.ts).
+
+### Inline choose count (`inlineChooseCount` / `InlineChooseCountField`)
+
+Inline “Choose [N] packages” (or similar) sentence — a compact count input between
+prefix/suffix text, without chip options below. Same sentence-row token as
+`chooseFromChips`.
+
+```ts
+{
+  type: 'inlineChooseCount',
+  name: 'startingEquipment.packages.choose',
+  label: 'Starting packages',
+  prefix: 'Choose',
+  suffix: 'packages',
+  chooseMin: 0,
+  chooseMax: 4,
+}
+```
+
+- Binds a single numeric count path; pair with a separate field or array for the
+  actual choices.
+- `prefix` / `suffix` default to `Choose` and `from:`.
+- Set `prefix: ''` for a suffix-only sentence such as walk speed (`[N] ft.`).
+- Optional `digits` sets count input width (defaults to `1`).
+- Sentence layout uses `fieldInlineSentenceClasses`.
 
 ### Combobox (`combobox` / `ComboboxField`)
 

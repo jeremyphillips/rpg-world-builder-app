@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   costFields,
   economyFields,
+  mountCapacitySpeedFields,
   optionalWeightFields,
+  vehicleCargoSpeedFields,
   wealthGrantFields,
   wealthGrantFromForm,
   wealthGrantToForm,
+  walkSpeedInlineCountField,
   weightFromForm,
   weightToForm,
 } from './content-form-field-helpers'
@@ -133,10 +136,26 @@ describe('wealthGrantFields', () => {
     const [group] = wealthGrantFields('wealth')
     expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
     if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
+      expect(group.fields[0]).toMatchObject({ kind: 'row', layout: 'responsive-2' })
+      expect(group.fields[0]).not.toHaveProperty('className')
       expect(
         group.fields[0].fields.map((field) => ('name' in field ? field.name : undefined)),
       ).toEqual(['wealth.cp', 'wealth.sp', 'wealth.gp', 'wealth.pp'])
     }
+  })
+})
+
+describe('scalar unit rows', () => {
+  it('uses the responsive three-column row layout for mount capacity and speed', () => {
+    const [row] = mountCapacitySpeedFields()
+    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
+    expect(row).not.toHaveProperty('className')
+  })
+
+  it('uses the responsive three-column row layout for vehicle cargo and speed', () => {
+    const [row] = vehicleCargoSpeedFields()
+    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
+    expect(row).not.toHaveProperty('className')
   })
 })
 
@@ -151,5 +170,19 @@ describe('wealthGrantToForm', () => {
   it('round-trips stored wealth into form values', () => {
     expect(wealthGrantToForm({ gp: 90 })).toEqual({ gp: 90 })
     expect(wealthGrantToForm(undefined)).toBeUndefined()
+  })
+})
+
+describe('walkSpeedInlineCountField', () => {
+  it('builds an inlineChooseCount field with a suffix-only ft sentence', () => {
+    expect(walkSpeedInlineCountField('speed.walk')).toMatchObject({
+      type: 'inlineChooseCount',
+      name: 'speed.walk',
+      label: 'Walk speed',
+      prefix: '',
+      suffix: 'ft.',
+      chooseMin: 0,
+      digits: 2,
+    })
   })
 })

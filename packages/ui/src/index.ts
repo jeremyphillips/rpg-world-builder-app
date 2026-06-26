@@ -49,6 +49,15 @@ export {
   type FieldWidth,
 } from './components/ui/field-control.variants'
 export {
+  fieldControlSizeClasses,
+  fieldDigitSizeClasses,
+  fieldDigitTrailingColumnClasses,
+  fieldDigitTrailingIconClasses,
+  fieldDigitTrailingPaddingClasses,
+  fieldGroupedControlSizeClasses,
+  type FieldSizeToken,
+} from './components/ui/field-sizing.variants'
+export {
   Field,
   type FieldSize,
   type FieldRootProps,
@@ -95,7 +104,16 @@ export { JsonField, type JsonFieldProps } from './components/ui/json-field.clien
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 
 export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
-export { fieldGroupFlexStackClasses, fieldGroupStackClasses } from './components/ui/field.variants'
+export {
+  fieldArrayItemActionRowClasses,
+  fieldArrayItemClasses,
+  fieldGroupFlexStackClasses,
+  fieldGroupStackClasses,
+  fieldInlineControlRowClasses,
+  fieldInlineSentenceClasses,
+  fieldRowLayoutVariants,
+  type FieldRowLayout,
+} from './components/ui/field.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'

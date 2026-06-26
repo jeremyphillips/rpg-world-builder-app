@@ -20,6 +20,7 @@ import {
   type FieldConfig,
   type FieldOption,
   type FormItem,
+  type InlineChooseCountFieldConfig,
   type RowConfig,
 } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
@@ -34,10 +35,6 @@ import type { ContentFormCtx } from './content-form-registry'
 
 type GroupField = FieldConfig | RowConfig
 
-const responsiveHalfRowClassName = 'grid w-full grid-cols-1 md:grid-cols-2'
-
-const scalarUnitRowClassName = 'grid w-full grid-cols-2 md:grid-cols-3'
-
 const currencyOptions = toOptions(
   CURRENCY_IDS,
   Object.fromEntries(CURRENCY_IDS.map((c) => [c, getCurrencyAbbrev(c)])) as Record<
@@ -47,6 +44,26 @@ const currencyOptions = toOptions(
 )
 
 const weightUnitOptions: FieldOption[] = [{ value: 'lb', label: 'lb.' }]
+
+/** Digit width for walk-speed inline count fields (values such as 30 or 35). */
+export const WALK_SPEED_INLINE_COUNT_DIGITS = 2 satisfies NumberInputDigits
+
+/** Inline walk speed field: visible label with `[N] ft.` on the sentence row. */
+export function walkSpeedInlineCountField(
+  name: string,
+  overrides?: Partial<InlineChooseCountFieldConfig>,
+): InlineChooseCountFieldConfig {
+  return {
+    type: 'inlineChooseCount',
+    name,
+    label: 'Walk speed',
+    prefix: '',
+    suffix: 'ft.',
+    chooseMin: 0,
+    digits: WALK_SPEED_INLINE_COUNT_DIGITS,
+    ...overrides,
+  }
+}
 
 /** Identity fields shared by every catalog content type (slug is derived, not authored). */
 export function identityFields(ctx?: ContentFormCtx): GroupField[] {
@@ -236,7 +253,7 @@ export function wealthGrantFields(namePrefix: string): FormItem[] {
     {
       kind: 'group',
       legend: 'Wealth',
-      fields: [{ kind: 'row', className: responsiveHalfRowClassName, fields }],
+      fields: [{ kind: 'row', layout: 'responsive-2', fields }],
     },
   ]
 }
@@ -395,7 +412,7 @@ export function mountCapacitySpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      className: scalarUnitRowClassName,
+      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'carryingCapacity',
@@ -421,7 +438,7 @@ export function vehicleCargoSpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      className: scalarUnitRowClassName,
+      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'cargoCapacity',
@@ -478,8 +495,6 @@ export function speedRateToFormDefaults(unit: SpeedRateUnit): { unit: SpeedRateU
 export {
   currencyOptions,
   MOUNT_CARRYING_CAPACITY_LABEL,
-  responsiveHalfRowClassName,
-  scalarUnitRowClassName,
   VEHICLE_CARGO_CAPACITY_LABEL,
   type FieldOption,
 }

@@ -21,7 +21,11 @@ import {
   resolveDiceFormulaValue,
   shouldShowModifierFields,
 } from './dice-formula-field.lib'
-import { fieldAnatomyStackClasses, fieldLabelVariants } from './field.variants'
+import {
+  fieldAnatomyStackClasses,
+  fieldInlineControlRowClasses,
+  fieldLabelVariants,
+} from './field.variants'
 
 export interface DiceFormulaFieldProps {
   id: string
@@ -144,7 +148,7 @@ export function DiceFormulaField({
       )}
 
       {labelPosition === 'inline' ? (
-        <div className="flex flex-wrap items-center gap-3">
+        <div className={fieldInlineControlRowClasses}>
           <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
             <DiceFormulaFieldLabelContent label={label} required={required} info={info} />
           </span>

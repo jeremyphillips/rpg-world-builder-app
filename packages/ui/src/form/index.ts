@@ -41,6 +41,7 @@ export {
   type FileFieldPropsMap,
   type ChipsFieldConfig,
   type ChooseFromChipsFieldConfig,
+  type InlineChooseCountFieldConfig,
   type ComboboxFieldConfig,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,

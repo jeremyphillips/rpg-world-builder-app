@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 
 export const inputSelectGroupVariants = cva(
   'grid items-center rounded-md border border-input bg-transparent shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background dark:bg-input/30',
@@ -32,11 +33,7 @@ export const inputSelectGroupVariants = cva(
  * right-padding in NumberInput's `numberInputFieldVariants` (pr-6 stepper gap)
  * is never overridden by a later `pr-*` from this object.
  */
-export const segmentSizeVariants = {
-  sm: 'h-8 pl-2.5 py-1 text-xs',
-  md: 'h-9 pl-3 py-1.5 text-sm',
-  lg: 'h-13 pl-4 py-2.5 text-lg',
-} as const
+export const segmentSizeVariants = fieldGroupedControlSizeClasses
 
 /**
  * Appearance-only reset applied to every segment. Suppresses standalone field

@@ -94,6 +94,31 @@ describe('Form', () => {
     expect(results.violations).toEqual([])
   })
 
+  it('renders schema rows with responsive grid layout without flex classes', () => {
+    const rowSchema = z.object({
+      first: z.string(),
+      second: z.string(),
+    })
+    const rowFields: FormItem[] = [
+      {
+        kind: 'row',
+        layout: 'responsive-2',
+        fields: [
+          { type: 'text', name: 'first', label: 'First name' },
+          { type: 'text', name: 'second', label: 'Last name' },
+        ],
+      },
+    ]
+    const { container } = render(<Form schema={rowSchema} fields={rowFields} onSubmit={vi.fn()} />)
+
+    const row = container.querySelector('.grid')
+    expect(row).toBeTruthy()
+    expect(row).toHaveClass('grid-cols-1')
+    expect(row).toHaveClass('md:grid-cols-2')
+    expect(row).not.toHaveClass('flex')
+    expect(row).not.toHaveClass('flex-wrap')
+  })
+
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {
     const levelSchema = z.object({
       level: z.number().int().min(1).max(30),

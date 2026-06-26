@@ -44,3 +44,17 @@ export const WithError: Story = {
     error: 'Choose at least one package.',
   },
 }
+
+/** Walk speed authoring: label above, `[N] ft.` inline row. */
+export const WalkSpeed: Story = {
+  args: {
+    id: 'walk-speed',
+    label: 'Walk speed',
+    hideLabel: false,
+    prefix: '',
+    suffix: 'ft.',
+    chooseMin: 0,
+    digits: 2,
+    value: 30,
+  },
+}

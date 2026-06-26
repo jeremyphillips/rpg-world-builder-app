@@ -89,9 +89,10 @@ describe('DiceFormulaField', () => {
   })
 
   it('renders inline label layout', () => {
-    render(<DiceFormulaField id="roll" label="Roll" labelPosition="inline" />)
+    const { container } = render(<DiceFormulaField id="roll" label="Roll" labelPosition="inline" />)
 
     expect(document.getElementById('roll-inline-label')).toHaveTextContent('Roll')
+    expect(container.querySelector('.gap-3')).toHaveClass('flex', 'flex-wrap', 'items-center')
   })
 
   it('aligns count and digit-sized select widths for the same digit count', () => {
