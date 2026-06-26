@@ -25,6 +25,7 @@ export const heritageFormSchema = z.object({
   id: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().optional(),
+  choose: z.coerce.number().int().min(1).default(1),
   options: z.array(traitRowFormSchema).min(1),
 })
 
@@ -55,6 +56,7 @@ export function heritageToFormRow(heritage: SpeciesHeritage): HeritageForm {
     id: heritage.id,
     name: heritage.name,
     description: heritage.description,
+    choose: heritage.choose,
     options: heritage.options.map(traitToFormRow),
   }
 }
@@ -71,6 +73,7 @@ export function heritageFromFormRow(
     id: row.id,
     name: row.name,
     description: row.description || undefined,
+    choose: row.choose ?? existing?.choose ?? 1,
     options,
   }
 }
@@ -96,6 +99,7 @@ export function heritageDefaultValues(ctx: ContentFormCtx): HeritageForm {
       HeritageForm,
       'name' | 'description'
     >),
+    choose: 1,
     options: [buildItemDefaultValues(traitItemFields(ctx)) as TraitRowForm],
   }
 }
