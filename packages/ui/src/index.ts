@@ -196,6 +196,13 @@ export {
   type ModalSize,
 } from './components/ui/modal.variants'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
+export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
+export {
+  sheetBodyVariants,
+  sheetContentVariants,
+  type SheetContentVariantProps,
+  type SheetSide,
+} from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
 
 export {

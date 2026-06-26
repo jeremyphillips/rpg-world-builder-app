@@ -57,6 +57,19 @@ export async function patchJson<T>(
   return sendJson<T>('PATCH', path, body, fallbackMessage)
 }
 
+/** DELETE with the double-submit CSRF token attached. */
+export async function deleteJson<T>(path: string, fallbackMessage?: string): Promise<T> {
+  const csrfToken = await fetchCsrfToken()
+  return request<T>(
+    path,
+    {
+      method: 'DELETE',
+      headers: { [CSRF_HEADER]: csrfToken },
+    },
+    fallbackMessage,
+  )
+}
+
 /** Shared JSON-body sender for mutating methods; attaches the CSRF token. */
 async function sendJson<T>(
   method: 'POST' | 'PUT' | 'PATCH',

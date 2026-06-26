@@ -9,3 +9,8 @@ export {
   type HomebrewVocabularySetEntry,
 } from './lib/vocabulary-set-registry'
 export { useHomebrewSummary, homebrewSummaryQueryKey } from './hooks/use-homebrew-summary'
+export {
+  useVocabularySet,
+  useVocabularyMutations,
+  vocabularySetQueryKey,
+} from './hooks/use-vocabulary-set'

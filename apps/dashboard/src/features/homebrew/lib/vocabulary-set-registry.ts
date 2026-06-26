@@ -20,6 +20,10 @@ export const HOMEBREW_VOCABULARY_SETS: readonly HomebrewVocabularySetEntry[] = [
   { setId: 'equipment-categories', label: 'Equipment Categories', enabled: false },
 ]
 
+export function findVocabularySetEntry(setId: string): HomebrewVocabularySetEntry | undefined {
+  return HOMEBREW_VOCABULARY_SETS.find((entry) => entry.setId === setId)
+}
+
 export const ENABLED_HOMEBREW_VOCABULARY_SETS = HOMEBREW_VOCABULARY_SETS.filter(
   (entry) => entry.enabled,
 )
