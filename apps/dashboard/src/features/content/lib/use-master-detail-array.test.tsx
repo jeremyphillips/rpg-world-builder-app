@@ -72,6 +72,18 @@ describe('findFirstInvalidRowIndex', () => {
 
     expect(findFirstInvalidRowIndex(errors, 'heritage.options')).toBe(1)
   })
+
+  it('returns the first invalid package index for class starting equipment options', () => {
+    const errors = {
+      characterCreation: {
+        startingEquipment: {
+          options: [undefined, { label: { message: 'Required', type: 'required' } }],
+        },
+      },
+    } as unknown as FieldErrors
+
+    expect(findFirstInvalidRowIndex(errors, 'characterCreation.startingEquipment.options')).toBe(1)
+  })
 })
 
 describe('autoSelectFirstInvalid', () => {
@@ -286,6 +298,44 @@ describe('useMasterDetailArray', () => {
 
     act(() => {
       getForm().setError('heritage.options.1.name', {
+        type: 'required',
+        message: 'Required',
+      })
+    })
+
+    expect(result.current.hasRowError(0)).toBe(false)
+    expect(result.current.hasRowError(1)).toBe(true)
+  })
+
+  it('reports row validation errors for class starting equipment package paths', () => {
+    type StartingEquipmentForm = {
+      characterCreation: {
+        startingEquipment: {
+          choose: number
+          options: Array<{ id: string; label: string; items: never[] }>
+        }
+      }
+    }
+
+    const { Wrapper, getForm } = createFormWrapper<StartingEquipmentForm>({
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            { id: 'standard', label: 'Standard Equipment', items: [] },
+            { id: 'gold', label: '', items: [] },
+          ],
+        },
+      },
+    })
+
+    const { result } = renderHook(
+      () => useMasterDetailArray('characterCreation.startingEquipment.options', makeDefaults),
+      { wrapper: Wrapper },
+    )
+
+    act(() => {
+      getForm().setError('characterCreation.startingEquipment.options.1.label', {
         type: 'required',
         message: 'Required',
       })

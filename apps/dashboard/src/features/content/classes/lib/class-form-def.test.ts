@@ -167,7 +167,9 @@ describe('classFormDef round-trips', () => {
     const standardOption = formValues.characterCreation?.startingEquipment?.options.find(
       (option) => option.id === 'standard',
     )
-    const quarterstaff = standardOption?.items.find((item) => item.itemKind === 'fixed')
+    const quarterstaff = standardOption?.items.find(
+      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'quarterstaff',
+    )
     expect(quarterstaff?.itemKind === 'fixed' ? quarterstaff.modifiers : undefined).toEqual([
       { kind: 'spellcasting_focus', focusKind: 'druidic_focus' },
     ])

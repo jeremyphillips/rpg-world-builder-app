@@ -142,4 +142,12 @@ describe('ClassCharacterCreationTab', () => {
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
   })
+
+  it('has no axe accessibility violations with bard starting equipment', async () => {
+    const { container } = render(
+      <TabShell startingEquipment={bardStartingEquipment} entitySource="system" />,
+    )
+    const results = await axe.run(container, axeOptions)
+    expect(results.violations).toEqual([])
+  })
 })

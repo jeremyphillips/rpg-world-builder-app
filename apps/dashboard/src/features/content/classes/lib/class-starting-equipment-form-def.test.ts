@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { pickClass } from '../../lib/fixtures/pick'
 import {
+  startingEquipmentChoiceItemFormSchema,
   startingEquipmentFormSchema,
   startingEquipmentFromFormValues,
+  startingEquipmentOptionFormSchema,
   startingEquipmentToFormValues,
 } from './class-starting-equipment-form-def'
 
@@ -84,5 +86,74 @@ describe('startingEquipment round-trip', () => {
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
+  })
+})
+
+describe('startingEquipmentFormSchema validation', () => {
+  it('rejects a pool choice item without equipment slugs or tool categories', () => {
+    const result = startingEquipmentChoiceItemFormSchema.safeParse({
+      itemKind: 'choice',
+      label: 'Musical Instrument',
+      choose: 1,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a package with empty items and no wealth grant', () => {
+    const result = startingEquipmentOptionFormSchema.safeParse({
+      id: 'gold',
+      label: 'Starting Gold',
+      items: [],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('accepts a gold-only package with wealth and no items', () => {
+    const result = startingEquipmentOptionFormSchema.safeParse({
+      id: 'gold',
+      label: 'Starting Gold',
+      items: [],
+      wealth: { gp: 75 },
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('startingEquipmentFromFormValues omits when options are empty', () => {
+    expect(
+      startingEquipmentFromFormValues({
+        choose: 1,
+        options: [],
+      }),
+    ).toBeUndefined()
+  })
+
+  it('round-trips all 12 SRD classes through the form schema', () => {
+    for (const slug of [
+      'barbarian',
+      'bard',
+      'cleric',
+      'druid',
+      'fighter',
+      'monk',
+      'paladin',
+      'ranger',
+      'rogue',
+      'sorcerer',
+      'warlock',
+      'wizard',
+    ] as const) {
+      const characterClass = pickClass(slug)
+      const startingEquipment = characterClass.characterCreation?.startingEquipment
+      expect(startingEquipment, `${slug} missing starting equipment seed`).toBeDefined()
+
+      const formValues = startingEquipmentToFormValues(startingEquipment!)
+      expect(startingEquipmentFormSchema.parse(formValues)).toEqual(formValues)
+      expect(startingEquipmentFromFormValues(formValues, startingEquipment)).toEqual(
+        startingEquipment,
+      )
+    }
   })
 })
