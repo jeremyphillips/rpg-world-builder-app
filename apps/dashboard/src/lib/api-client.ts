@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import { CSRF_HEADER, request } from '@rpg/api-client'
 
-export { CSRF_HEADER, patchJson, postJson, putJson, request } from '@rpg/api-client'
+export { CSRF_HEADER, deleteJson, patchJson, postJson, putJson, request } from '@rpg/api-client'
 
 /**
  * Upload a single file to `POST /api/uploads` and return the storage key.

@@ -345,11 +345,13 @@ export type GameTermEntry = {
 ```
 
 Pattern (see `SENSE_ENTRIES`, `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
-`CREATURE_TYPE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`,
-`WEAPON_MASTERY_ENTRIES`, and `ARMOR_CATEGORY_ENTRIES` in `vocab/sense.ts`,
-`vocab/alignment.ts`, `vocab/creature-size.ts`, `vocab/creature-type.ts`,
-`vocab/damage-type.ts`, `vocab/weapon/property.ts`, `vocab/weapon/mastery.ts`,
-and `vocab/armor/category.ts`):
+`DAMAGE_TYPE_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`, `WEAPON_MASTERY_ENTRIES`, and
+`ARMOR_CATEGORY_ENTRIES` in `vocab/sense.ts`, `vocab/alignment.ts`,
+`vocab/creature-size.ts`, `vocab/damage-type.ts`, `vocab/weapon/property.ts`,
+`vocab/weapon/mastery.ts`, and `vocab/armor/category.ts`). Campaign-customizable
+sets such as creature types ship seed JSON from `@rpg/catalog/vocabulary` instead
+of a closed `*_ENTRIES` map in contracts — see [vocabulary.md](./vocabulary.md)
+for seed vs patch storage, validation, and how to add the next set.
 
 ```typescript
 import type { GameTermEntry } from '../vocab/types' // adjust relative path from content/

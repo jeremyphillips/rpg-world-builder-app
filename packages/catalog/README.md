@@ -27,12 +27,16 @@ import { loadSeedSpecies, getSpeciesBySlug } from '@rpg/catalog/species'
 import { loadSeedClasses, getClassBySlug } from '@rpg/catalog/classes'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 import { getStandardStartingWealth } from '@rpg/catalog/starting-wealth'
+import { loadSeedCreatureTypes } from '@rpg/catalog/vocabulary'
 ```
 
 ## Validation
 
 Each loader parses JSON through the matching `@rpg/contracts` Zod schema at
 module load so malformed seed data fails in CI, not at request time.
+
+Campaign-customizable vocabulary sets (`@rpg/catalog/vocabulary`) follow the
+same pattern; see [docs/vocabulary.md](../../docs/vocabulary.md).
 
 ## Commands
 

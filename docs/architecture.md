@@ -118,6 +118,8 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
   `LoginInput`, `RegisterInput`) and cross-app route constants (`CROSS_APP_PATHS`).
   The API validates against them; the public app's forms reuse the same schemas
   with `@hookform/resolvers/zod`.
+  Campaign **rules vocabulary** (creature types, …) is documented in
+  [vocabulary.md](./vocabulary.md).
 - **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,
   `ApiError`, `fetchSession`, `logout`) shared by the public and dashboard apps.
   No React dependency — apps wire it through TanStack Query hooks locally.

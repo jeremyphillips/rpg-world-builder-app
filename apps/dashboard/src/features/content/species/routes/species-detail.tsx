@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
 import {
   formatSpeed,
-  getCreatureTypeLabel,
   getCreatureSizeLabel,
   getSenseLabel,
   getTraitGrants,
@@ -12,6 +11,8 @@ import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
+import { useCreatureTypeVocabulary } from '@/features/homebrew'
+import { getCreatureTypeLabel } from '../../lib/creature-type-field-options'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
@@ -96,13 +97,17 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
   )
 }
 
-function SpeciesStatsSection({ species }: { species: Species }) {
+function SpeciesStatsSection({ species, campaignId }: { species: Species; campaignId: string }) {
+  const { vocabulary } = useCreatureTypeVocabulary(campaignId)
   const sizeLabel = species.sizes.map(getCreatureSizeLabel).join(' or ')
   const sensesLabel = collectSenses(species.traits)
 
   return (
     <div className="space-y-3">
-      <ContentStatRow label="Creature Type" value={getCreatureTypeLabel(species.creatureType)} />
+      <ContentStatRow
+        label="Creature Type"
+        value={getCreatureTypeLabel(species.creatureType, { creatureTypeVocabulary: vocabulary })}
+      />
       <ContentStatRow label="Size" value={sizeLabel} />
       <ContentStatRow label="Speed" value={formatSpeed(species.speed)} />
       <ContentStatRow label="Senses" value={sensesLabel} />
@@ -131,7 +136,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
           <Heading variant="display" as="h2">
             {species.name}
           </Heading>
-          <SpeciesStatsSection species={species} />
+          <SpeciesStatsSection species={species} campaignId={campaignId} />
           {species.description && (
             <RichTextContent html={species.description} size="sm" tone="muted" />
           )}

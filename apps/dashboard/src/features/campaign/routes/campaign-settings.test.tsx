@@ -5,11 +5,24 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { CampaignListItem } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
+import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew/lib/creature-type-vocabulary'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
   updateCampaign: vi.fn(),
 }))
+
+vi.mock('@/features/homebrew', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useCreatureTypeVocabulary: vi.fn(() => ({
+      vocabulary: buildSeedCreatureTypeVocabulary(),
+      isPending: false,
+      isError: false,
+    })),
+  }
+})
 
 import {
   listCampaigns as listCampaignsFn,

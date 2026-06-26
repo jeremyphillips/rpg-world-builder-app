@@ -14,6 +14,7 @@ import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOpt
 import type { FieldOption } from '@rpg/ui/form'
 
 import { useCampaignRules } from '@/features/campaign'
+import { useCreatureTypeVocabulary } from '@/features/homebrew'
 
 import { useClasses } from '../classes/hooks/use-classes'
 import { useEquipment } from '../equipment/hooks/use-equipment'
@@ -127,6 +128,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const featsQuery = useFeats(campaignId)
   const equipmentQuery = useEquipment(campaignId)
   const campaignRules = useCampaignRules(campaignId)
+  const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
 
   const options = useMemo(
     () =>
@@ -144,9 +146,10 @@ export function useContentFormOptions(campaignId: string | undefined): {
     (): ContentFormCtx => ({
       campaignId,
       campaignRules,
+      creatureTypeVocabulary: creatureTypeQuery.vocabulary,
       options,
     }),
-    [campaignId, campaignRules, options],
+    [campaignId, campaignRules, creatureTypeQuery.vocabulary, options],
   )
 
   return {
@@ -155,8 +158,13 @@ export function useContentFormOptions(campaignId: string | undefined): {
       classesQuery.isPending ||
       spellsQuery.isPending ||
       featsQuery.isPending ||
-      equipmentQuery.isPending,
+      equipmentQuery.isPending ||
+      creatureTypeQuery.isPending,
     isError:
-      classesQuery.isError || spellsQuery.isError || featsQuery.isError || equipmentQuery.isError,
+      classesQuery.isError ||
+      spellsQuery.isError ||
+      featsQuery.isError ||
+      equipmentQuery.isError ||
+      creatureTypeQuery.isError,
   }
 }

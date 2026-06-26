@@ -7,7 +7,7 @@ import {
   creatureTypeSchema,
   slugSchema,
   type CreateSpeciesInput,
-  type CreatureType,
+  type CreatureTypeId,
   type Species,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
@@ -55,7 +55,10 @@ const creatureSizeOptions = toOptions(
 // Form schema
 // ---------------------------------------------------------------------------
 
-function createSpeciesFormSchema(allowedCreatureTypes: readonly CreatureType[]) {
+function createSpeciesFormSchema(
+  allowedCreatureTypes: readonly CreatureTypeId[],
+  activeCreatureTypes?: ReadonlySet<string>,
+) {
   const allowedSet = new Set(allowedCreatureTypes)
 
   return z
@@ -76,6 +79,13 @@ function createSpeciesFormSchema(allowedCreatureTypes: readonly CreatureType[]) 
         ctx.addIssue({
           code: 'custom',
           message: 'Creature type is not allowed for character sheets in this campaign',
+          path: ['creatureType'],
+        })
+      }
+      if (activeCreatureTypes && !activeCreatureTypes.has(values.creatureType)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Creature type is not available in this campaign vocabulary',
           path: ['creatureType'],
         })
       }
@@ -160,7 +170,11 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   routeKey: 'species',
 
   schema: speciesFormSchema,
-  resolveSchema: (ctx) => createSpeciesFormSchema(allowedCharacterCreatureTypesFromCtx(ctx)),
+  resolveSchema: (ctx) =>
+    createSpeciesFormSchema(
+      allowedCharacterCreatureTypesFromCtx(ctx),
+      ctx.creatureTypeVocabulary?.activeIds,
+    ),
   createDefaultValues: speciesCreateDefaultValues,
 
   buildTabs: buildSpeciesTabs,

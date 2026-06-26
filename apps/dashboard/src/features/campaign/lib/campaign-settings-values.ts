@@ -7,9 +7,13 @@ import {
   resolveStandardMaxCharacterLevel,
 } from '@rpg/contracts'
 
-import { identitySchema, rulesSchema, flavorSchema } from './campaign-fields'
+import { identitySchema, rulesSchema, flavorSchema, resolveRulesSchema } from './campaign-fields'
 
 export const campaignSettingsSchema = identitySchema.and(rulesSchema).and(flavorSchema)
+
+export function resolveCampaignSettingsSchema(activeCreatureTypeIds?: ReadonlySet<string>) {
+  return identitySchema.and(resolveRulesSchema(activeCreatureTypeIds)).and(flavorSchema)
+}
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 

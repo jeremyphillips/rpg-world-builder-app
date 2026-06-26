@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
+import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
+
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPECIES_LIST } from '../fixtures'
 import { speciesColumns, speciesFilters } from './species-columns'
+
+const storyVocabulary = buildSeedCreatureTypeVocabulary()
 
 const meta = {
   title: 'Content/Species/SpeciesColumns',
@@ -17,9 +21,9 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => (
     <DataTable
-      columns={speciesColumns(STORY_CAMPAIGN_ID)}
+      columns={speciesColumns(STORY_CAMPAIGN_ID, storyVocabulary)}
       data={[...SPECIES_LIST]}
-      filters={speciesFilters}
+      filters={speciesFilters(storyVocabulary)}
       caption="Playable species available in this campaign"
     />
   ),

@@ -13,10 +13,13 @@ import { HomebrewClassModel } from './classes/homebrew-class.model'
 import { skillProficiencyWriteConfig } from './skill-proficiencies/skill-proficiencies.config'
 import { spellWriteConfig } from './spells/spells.config'
 import { featWriteConfig } from './feats/feats.config'
+import { speciesWriteConfig } from './species/species.config'
 import { startingWealthWriteConfig } from './starting-wealth/starting-wealth.config'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { resolveCatalogForCampaign } from './content.service'
 import { HttpError } from '../../lib/http-error'
+import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import { updateVocabularyEntry } from '../vocabulary'
 
 beforeAll(async () => {
   await startTestDb()
@@ -522,5 +525,42 @@ describe('updateContentEntity (starting-wealth)', () => {
     expect(
       updated.tiers.find((tier) => tier.id === 'level-1')?.includeNormalStartingEquipment,
     ).toBe(false)
+  })
+})
+
+describe('createHomebrewContent (species)', () => {
+  const minimalSpeciesInput = {
+    slug: 'custom-folk',
+    name: 'Custom Folk',
+    creatureType: 'humanoid',
+    sizes: ['medium'],
+    speed: { walk: 30 },
+    traits: [],
+  }
+
+  it('creates homebrew species with an active creature type', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(
+      speciesWriteConfig,
+      campaign.id,
+      minimalSpeciesInput,
+    )
+
+    expect(created.source).toBe('homebrew')
+    expect(created.creatureType).toBe('humanoid')
+  })
+
+  it('rejects a disabled creature type', async () => {
+    const campaign = await makeCampaign()
+    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
+      status: 'disabled',
+    })
+
+    await expect(
+      createHomebrewContent(speciesWriteConfig, campaign.id, minimalSpeciesInput),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'invalid_vocabulary',
+    })
   })
 })
