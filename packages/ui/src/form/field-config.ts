@@ -140,6 +140,12 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
+  /**
+   * Visual digit capacity for the select trigger (sets width from ch-based tokens).
+   * Keep `width` at `full` (default) on standalone fields so label and hint are not
+   * compressed; use row `width` tokens only when sharing a `FieldRow`.
+   */
+  digits?: FieldDigits
 }
 
 export interface RadioFieldConfig extends BaseFieldConfig {

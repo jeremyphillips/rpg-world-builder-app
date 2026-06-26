@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from './select.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldDigits } from './field-digit-metrics'
 import {
   isFieldOptionGroup,
   type FieldOption,
@@ -30,6 +31,12 @@ export interface SelectFieldProps {
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  /**
+   * Visual digit capacity for the trigger (same ch-based tokens as `NumberInput`).
+   * Sizes the control only; leave `width` at default `full` so label and hint span
+   * the form column unless the field shares a `FieldRow`.
+   */
+  digits?: FieldDigits
   placeholder?: string
   name?: string
   disabled?: boolean
@@ -59,6 +66,7 @@ export function SelectField({
   required,
   width,
   size = 'md',
+  digits,
   placeholder,
   name,
   disabled,
@@ -81,7 +89,7 @@ export function SelectField({
         disabled={disabled}
       >
         <Field.Control>
-          <SelectTrigger size={size} onBlur={onBlur}>
+          <SelectTrigger size={size} digits={digits} onBlur={onBlur}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
         </Field.Control>

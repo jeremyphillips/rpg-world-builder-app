@@ -647,7 +647,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       visibility: visibleWhenSpellcasting(),
       required: true,
       hint: 'First class level at which this class gains spellcasting',
-      width: 'md',
+      digits: 2,
     },
     {
       kind: 'row',

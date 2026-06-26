@@ -183,6 +183,25 @@ One union, two intents:
 A plain `FieldRow` with two inputs and no `width` splits 50/50, and wraps to full
 width on narrow viewports.
 
+### `digits` — ch-based control width
+
+`number` and `select` fields accept an optional `digits` prop that sizes the
+**control** (`NumberInput` or `SelectTrigger`) via
+[`fieldDigitWidthVariants`](../src/components/ui/field-digit-metrics.ts) — the
+same formula used by `DiceFormulaField` and digit-sized primitives.
+
+- Leave `width` at default `full` on standalone fields so label and hint span
+  the form column while the control stays narrow.
+- Use row `width` tokens (`auto`, fractions, …) only when the field shares a
+  `FieldRow` and should occupy a compact column.
+- `number` fields may also use `inputWidth` for a non-digit intrinsic cap on
+  the input element.
+
+```tsx
+{ type: 'select', name: 'spellcasting.level', label: 'Spellcasting level', digits: 2, ... }
+{ type: 'number', name: 'quantity', label: 'Quantity', digits: 2, width: 'auto', ... } // row-only width
+```
+
 ### Row layout — flex vs responsive grid
 
 `FieldRow` and schema `RowConfig` share a `layout` prop backed by

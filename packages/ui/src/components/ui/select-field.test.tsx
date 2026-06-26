@@ -59,4 +59,26 @@ describe('SelectField', () => {
     render(<SelectField id="level" label="Level" placeholder="Choose…" options={groupedOptions} />)
     expect(screen.getByLabelText('Level')).toBeInTheDocument()
   })
+
+  it('applies digit width to the trigger while keeping the field container full width', () => {
+    const hint = 'First class level at which this class gains spellcasting'
+    const { container } = render(
+      <SelectField
+        id="level"
+        label="Spellcasting level"
+        hint={hint}
+        digits={2}
+        defaultValue="3"
+        options={[
+          { label: '1', value: '1' },
+          { label: '3', value: '3' },
+        ]}
+      />,
+    )
+
+    const trigger = screen.getByLabelText('Spellcasting level')
+    expect(trigger).toHaveClass('w-[calc(2*1ch+2.75rem)]')
+    expect(container.firstChild).toHaveClass('w-full')
+    expect(screen.getByText(hint)).toBeInTheDocument()
+  })
 })
