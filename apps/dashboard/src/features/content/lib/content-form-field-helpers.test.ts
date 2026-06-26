@@ -9,6 +9,7 @@ import {
   wealthGrantFields,
   wealthGrantFromForm,
   wealthGrantToForm,
+  walkSpeedInlineCountField,
   weightFromForm,
   weightToForm,
 } from './content-form-field-helpers'
@@ -169,5 +170,19 @@ describe('wealthGrantToForm', () => {
   it('round-trips stored wealth into form values', () => {
     expect(wealthGrantToForm({ gp: 90 })).toEqual({ gp: 90 })
     expect(wealthGrantToForm(undefined)).toBeUndefined()
+  })
+})
+
+describe('walkSpeedInlineCountField', () => {
+  it('builds an inlineChooseCount field with a suffix-only ft sentence', () => {
+    expect(walkSpeedInlineCountField('speed.walk')).toMatchObject({
+      type: 'inlineChooseCount',
+      name: 'speed.walk',
+      label: 'Walk speed',
+      prefix: '',
+      suffix: 'ft.',
+      chooseMin: 0,
+      digits: 2,
+    })
   })
 })

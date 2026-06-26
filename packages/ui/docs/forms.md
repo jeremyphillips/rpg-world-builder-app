@@ -522,6 +522,8 @@ prefix/suffix text, without chip options below. Same sentence-row token as
 - Binds a single numeric count path; pair with a separate field or array for the
   actual choices.
 - `prefix` / `suffix` default to `Choose` and `from:`.
+- Set `prefix: ''` for a suffix-only sentence such as walk speed (`[N] ft.`).
+- Optional `digits` sets count input width (defaults to `1`).
 - Sentence layout uses `fieldInlineSentenceClasses`.
 
 ### Combobox (`combobox` / `ComboboxField`)

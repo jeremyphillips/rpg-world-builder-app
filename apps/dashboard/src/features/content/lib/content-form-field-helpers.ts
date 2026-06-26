@@ -20,6 +20,7 @@ import {
   type FieldConfig,
   type FieldOption,
   type FormItem,
+  type InlineChooseCountFieldConfig,
   type RowConfig,
 } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
@@ -43,6 +44,26 @@ const currencyOptions = toOptions(
 )
 
 const weightUnitOptions: FieldOption[] = [{ value: 'lb', label: 'lb.' }]
+
+/** Digit width for walk-speed inline count fields (values such as 30 or 35). */
+export const WALK_SPEED_INLINE_COUNT_DIGITS = 2 satisfies NumberInputDigits
+
+/** Inline walk speed field: visible label with `[N] ft.` on the sentence row. */
+export function walkSpeedInlineCountField(
+  name: string,
+  overrides?: Partial<InlineChooseCountFieldConfig>,
+): InlineChooseCountFieldConfig {
+  return {
+    type: 'inlineChooseCount',
+    name,
+    label: 'Walk speed',
+    prefix: '',
+    suffix: 'ft.',
+    chooseMin: 0,
+    digits: WALK_SPEED_INLINE_COUNT_DIGITS,
+    ...overrides,
+  }
+}
 
 /** Identity fields shared by every catalog content type (slug is derived, not authored). */
 export function identityFields(ctx?: ContentFormCtx): GroupField[] {

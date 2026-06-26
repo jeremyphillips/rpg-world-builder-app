@@ -5,6 +5,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldDigits } from './field-digit-metrics'
 import {
   fieldAnatomyStackClasses,
   fieldInlineSentenceClasses,
@@ -27,6 +28,8 @@ export interface InlineChooseCountFieldProps {
   prefix?: string
   /** Trailing sentence fragment after the count input. Defaults to `from:`. */
   suffix?: string
+  /** Visual digit capacity for the count input. Defaults to `1`. */
+  digits?: FieldDigits
   error?: string
   hint?: string
   info?: React.ReactNode
@@ -51,6 +54,7 @@ export function InlineChooseCountField({
   chooseMax,
   prefix = 'Choose',
   suffix = 'from:',
+  digits = 1,
   error,
   hint,
   info,
@@ -94,14 +98,14 @@ export function InlineChooseCountField({
       </legend>
 
       <div className={fieldInlineSentenceClasses}>
-        <Text variant="body">{prefix}</Text>
+        {prefix ? <Text variant="body">{prefix}</Text> : null}
         <label htmlFor={chooseId} className="sr-only">
           {label} count
         </label>
         <NumberInput
           id={chooseId}
           size={size}
-          digits={1}
+          digits={digits}
           stepperMin={chooseMin}
           stepperMax={chooseMax}
           min={chooseMin}

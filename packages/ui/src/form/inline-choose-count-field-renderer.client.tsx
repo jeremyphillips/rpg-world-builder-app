@@ -30,6 +30,7 @@ export function InlineChooseCountFieldRenderer({
       chooseMax={config.chooseMax}
       prefix={config.prefix}
       suffix={config.suffix}
+      digits={config.digits}
       error={error}
       hint={config.hint}
       info={config.info}

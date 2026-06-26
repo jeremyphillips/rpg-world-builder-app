@@ -179,6 +179,10 @@ Keep [`getLevelFieldOptions`](../../../apps/dashboard/src/features/content/lib/l
 options (e.g. subclass choice level with `"None"`). Standalone fields with hints
 use default `width: 'full'`; row fields pair `digits` with `width: 'auto'`.
 
+Walk speed fields use [`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`, `digits: 2`) in species
+and grant authoring.
+
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to
 [`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)

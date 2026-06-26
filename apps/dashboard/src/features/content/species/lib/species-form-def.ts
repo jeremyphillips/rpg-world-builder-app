@@ -5,16 +5,15 @@ import {
   CREATURE_SIZE_ENTRIES,
   CREATURE_TYPES,
   CREATURE_TYPE_ENTRIES,
-  STANDARD_SPEEDS,
   creatureSizeSchema,
   creatureTypeSchema,
   slugSchema,
   type CreateSpeciesInput,
   type Species,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-form-field-helpers'
+import { identityFields, walkSpeedInlineCountField } from '../../lib/content-form-field-helpers'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import {
   contentFormRegistry,
@@ -56,11 +55,6 @@ const creatureSizeOptions = toOptions(
     string
   >,
 )
-
-const speedWalkOptions: FieldOption[] = STANDARD_SPEEDS.map((s) => ({
-  value: String(s),
-  label: `${s} ft.`,
-}))
 
 // ---------------------------------------------------------------------------
 // Form schema
@@ -107,13 +101,11 @@ function attributesFields(): FormItem[] {
           options: creatureTypeOptions,
           required: true,
         },
-        {
-          type: 'select',
-          name: 'speed.walk',
-          label: 'Walk speed',
-          options: speedWalkOptions,
+        walkSpeedInlineCountField('speed.walk', {
           required: true,
-        },
+          width: 'auto',
+          defaultValue: 30,
+        }),
       ],
     },
     {

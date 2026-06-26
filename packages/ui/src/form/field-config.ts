@@ -266,6 +266,8 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   prefix?: string
   /** Trailing sentence fragment after the count input. Defaults to `from:`. */
   suffix?: string
+  /** Visual digit capacity for the count input. Defaults to `1`. */
+  digits?: FieldDigits
   /** When true, the legend is visually hidden but kept for assistive tech. */
   hideLabel?: boolean
   defaultValue?: number
