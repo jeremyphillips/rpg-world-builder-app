@@ -3,7 +3,6 @@ import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { createEquipmentInputSchema } from '@rpg/contracts'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
-import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-registry'
 
 const TOOL_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'tool')
 
@@ -18,7 +17,7 @@ describe('tool kindFieldGroups', () => {
       .map((field) => field.legend)
 
     expect(legends).toEqual(['Identity', 'Economy', 'Tool'])
-    expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('tool')?.[0])
+    expect(fields.some((field) => 'name' in field && field.name === 'utilizes')).toBe(true)
   })
 })
 
@@ -35,6 +34,8 @@ describe('tool form round-trips', () => {
       const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
       expect(formValues.toolCategory).toBe(item.toolCategory)
       expect(formValues.ability).toBe(item.ability)
+      expect(formValues.utilizes).toEqual(item.utilizes)
+      expect(formValues.craftsText).toBe(item.crafts?.length ? item.crafts.join('\n') : undefined)
     })
   }
 })

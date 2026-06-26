@@ -20,6 +20,8 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["versatile"],
+    "mastery": "topple",
     "damage": {
       "kind": "dice",
       "count": 1,
@@ -30,9 +32,7 @@
       "kind": "dice",
       "count": 1,
       "faces": 10
-    },
-    "properties": ["versatile"],
-    "mastery": "topple"
+    }
   },
   {
     "id": "srd-cc-5.2.1:blowgun",
@@ -55,13 +55,13 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "ranged",
+    "properties": ["ammunition", "loading"],
+    "mastery": "vex",
     "damage": {
       "kind": "flat",
       "amount": 1
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "loading"],
-    "mastery": "vex",
     "range": {
       "normal": 25,
       "long": 100
@@ -88,14 +88,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["light"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
-    "damageType": "bludgeoning",
-    "properties": ["light"],
-    "mastery": "slow"
+    "damageType": "bludgeoning"
   },
   {
     "id": "srd-cc-5.2.1:dagger",
@@ -118,14 +118,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["finesse", "light", "thrown"],
+    "mastery": "nick",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
     "damageType": "piercing",
-    "properties": ["finesse", "light", "thrown"],
-    "mastery": "nick",
     "range": {
       "normal": 20,
       "long": 60
@@ -152,14 +152,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "ranged",
+    "properties": ["finesse", "thrown"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
     "damageType": "piercing",
-    "properties": ["finesse", "thrown"],
-    "mastery": "vex",
     "range": {
       "normal": 20,
       "long": 60
@@ -186,14 +186,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": [],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
-    "damageType": "bludgeoning",
-    "properties": [],
-    "mastery": "sap"
+    "damageType": "bludgeoning"
   },
   {
     "id": "srd-cc-5.2.1:glaive",
@@ -216,14 +216,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "graze",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 10
     },
-    "damageType": "slashing",
-    "properties": ["heavy", "reach", "two-handed"],
-    "mastery": "graze"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:greataxe",
@@ -246,14 +246,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "cleave",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 12
     },
-    "damageType": "slashing",
-    "properties": ["heavy", "two-handed"],
-    "mastery": "cleave"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:greatclub",
@@ -276,14 +276,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["two-handed"],
+    "mastery": "push",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
-    "damageType": "bludgeoning",
-    "properties": ["two-handed"],
-    "mastery": "push"
+    "damageType": "bludgeoning"
   },
   {
     "id": "srd-cc-5.2.1:greatsword",
@@ -306,14 +306,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "graze",
     "damage": {
       "kind": "dice",
       "count": 2,
       "faces": 6
     },
-    "damageType": "slashing",
-    "properties": ["heavy", "two-handed"],
-    "mastery": "graze"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:halberd",
@@ -336,14 +336,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "cleave",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 10
     },
-    "damageType": "slashing",
-    "properties": ["heavy", "reach", "two-handed"],
-    "mastery": "cleave"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:hand-crossbow",
@@ -353,7 +353,7 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Crossbow, Hand",
+    "name": "Hand Crossbow",
     "description": "",
     "cost": {
       "amount": 75,
@@ -366,14 +366,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "ranged",
+    "properties": ["ammunition", "light", "loading"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "light", "loading"],
-    "mastery": "vex",
     "range": {
       "normal": 30,
       "long": 120
@@ -400,14 +400,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["light", "thrown"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
     "damageType": "slashing",
-    "properties": ["light", "thrown"],
-    "mastery": "vex",
     "range": {
       "normal": 20,
       "long": 60
@@ -421,7 +421,7 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Crossbow, Heavy",
+    "name": "Heavy Crossbow",
     "description": "",
     "cost": {
       "amount": 50,
@@ -434,14 +434,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "ranged",
+    "properties": ["ammunition", "heavy", "loading", "two-handed"],
+    "mastery": "push",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 10
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "heavy", "loading", "two-handed"],
-    "mastery": "push",
     "range": {
       "normal": 100,
       "long": 400
@@ -468,14 +468,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["thrown"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
     "damageType": "piercing",
-    "properties": ["thrown"],
-    "mastery": "slow",
     "range": {
       "normal": 30,
       "long": 120
@@ -502,15 +502,15 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "reach", "special", "two-handed"],
+    "mastery": "topple",
     "damage": {
       "kind": "dice",
       "count": 1,
-      "faces": 12
+      "faces": 10
     },
     "damageType": "piercing",
-    "properties": ["reach", "special"],
-    "mastery": "topple",
-    "specialRules": "You have Disadvantage when you use a Lance to attack a target within 5 feet of you. Also, you can use a Lance only if you are mounted."
+    "specialRules": "You have Disadvantage when you use a Lance to attack a target within 5 feet of you. Also, a Lance requires two hands to wield when you aren't mounted."
   },
   {
     "id": "srd-cc-5.2.1:light-crossbow",
@@ -520,7 +520,7 @@
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Crossbow, Light",
+    "name": "Light Crossbow",
     "description": "",
     "cost": {
       "amount": 25,
@@ -533,14 +533,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "ranged",
+    "properties": ["ammunition", "loading", "two-handed"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "loading", "two-handed"],
-    "mastery": "slow",
     "range": {
       "normal": 80,
       "long": 320
@@ -567,14 +567,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["light", "thrown"],
+    "mastery": "nick",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
     "damageType": "bludgeoning",
-    "properties": ["light", "thrown"],
-    "mastery": "nick",
     "range": {
       "normal": 20,
       "long": 60
@@ -601,14 +601,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "ranged",
+    "properties": ["ammunition", "heavy", "two-handed"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "heavy", "two-handed"],
-    "mastery": "slow",
     "range": {
       "normal": 150,
       "long": 600
@@ -635,6 +635,8 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["versatile"],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
@@ -645,9 +647,7 @@
       "kind": "dice",
       "count": 1,
       "faces": 10
-    },
-    "properties": ["versatile"],
-    "mastery": "sap"
+    }
   },
   {
     "id": "srd-cc-5.2.1:mace",
@@ -670,14 +670,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": [],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
-    "damageType": "bludgeoning",
-    "properties": [],
-    "mastery": "sap"
+    "damageType": "bludgeoning"
   },
   {
     "id": "srd-cc-5.2.1:maul",
@@ -700,14 +700,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "two-handed"],
+    "mastery": "topple",
     "damage": {
       "kind": "dice",
       "count": 2,
       "faces": 6
     },
-    "damageType": "bludgeoning",
-    "properties": ["heavy", "two-handed"],
-    "mastery": "topple"
+    "damageType": "bludgeoning"
   },
   {
     "id": "srd-cc-5.2.1:morningstar",
@@ -730,14 +730,48 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": [],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
+    "damageType": "piercing"
+  },
+  {
+    "id": "srd-cc-5.2.1:musket",
+    "slug": "musket",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Musket",
+    "description": "",
+    "cost": {
+      "amount": 500,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "properties": ["ammunition", "loading", "two-handed"],
+    "mastery": "slow",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 12
+    },
     "damageType": "piercing",
-    "properties": [],
-    "mastery": "sap"
+    "range": {
+      "normal": 40,
+      "long": 120
+    }
   },
   {
     "id": "srd-cc-5.2.1:net",
@@ -789,14 +823,48 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["heavy", "reach", "two-handed"],
+    "mastery": "push",
+    "damage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    },
+    "damageType": "piercing"
+  },
+  {
+    "id": "srd-cc-5.2.1:pistol",
+    "slug": "pistol",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Pistol",
+    "description": "",
+    "cost": {
+      "amount": 250,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "weapon",
+    "category": "martial",
+    "mode": "ranged",
+    "properties": ["ammunition", "loading"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 10
     },
     "damageType": "piercing",
-    "properties": ["heavy", "reach", "two-handed"],
-    "mastery": "push"
+    "range": {
+      "normal": 30,
+      "long": 90
+    }
   },
   {
     "id": "srd-cc-5.2.1:quarterstaff",
@@ -819,6 +887,8 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["versatile"],
+    "mastery": "topple",
     "damage": {
       "kind": "dice",
       "count": 1,
@@ -829,9 +899,7 @@
       "kind": "dice",
       "count": 1,
       "faces": 8
-    },
-    "properties": ["versatile"],
-    "mastery": "topple"
+    }
   },
   {
     "id": "srd-cc-5.2.1:rapier",
@@ -854,14 +922,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["finesse"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
-    "damageType": "piercing",
-    "properties": ["finesse"],
-    "mastery": "vex"
+    "damageType": "piercing"
   },
   {
     "id": "srd-cc-5.2.1:scimitar",
@@ -884,14 +952,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["finesse", "light"],
+    "mastery": "nick",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
-    "damageType": "slashing",
-    "properties": ["finesse", "light"],
-    "mastery": "nick"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:shortbow",
@@ -914,14 +982,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "ranged",
+    "properties": ["ammunition", "two-handed"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
     "damageType": "piercing",
-    "properties": ["ammunition", "two-handed"],
-    "mastery": "vex",
     "range": {
       "normal": 80,
       "long": 320
@@ -948,14 +1016,14 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["finesse", "light"],
+    "mastery": "vex",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 6
     },
-    "damageType": "piercing",
-    "properties": ["finesse", "light"],
-    "mastery": "vex"
+    "damageType": "piercing"
   },
   {
     "id": "srd-cc-5.2.1:sickle",
@@ -978,14 +1046,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["light"],
+    "mastery": "nick",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
-    "damageType": "slashing",
-    "properties": ["light"],
-    "mastery": "nick"
+    "damageType": "slashing"
   },
   {
     "id": "srd-cc-5.2.1:sling",
@@ -1008,14 +1076,14 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "ranged",
+    "properties": ["ammunition"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
     "damageType": "bludgeoning",
-    "properties": ["ammunition"],
-    "mastery": "slow",
     "range": {
       "normal": 30,
       "long": 120
@@ -1042,6 +1110,8 @@
     "kind": "weapon",
     "category": "simple",
     "mode": "melee",
+    "properties": ["thrown", "versatile"],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
@@ -1053,8 +1123,6 @@
       "count": 1,
       "faces": 8
     },
-    "properties": ["thrown", "versatile"],
-    "mastery": "sap",
     "range": {
       "normal": 20,
       "long": 60
@@ -1081,19 +1149,19 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["thrown", "versatile"],
+    "mastery": "topple",
     "damage": {
       "kind": "dice",
       "count": 1,
-      "faces": 6
+      "faces": 8
     },
     "damageType": "piercing",
     "versatileDamage": {
       "kind": "dice",
       "count": 1,
-      "faces": 8
+      "faces": 10
     },
-    "properties": ["thrown", "versatile"],
-    "mastery": "topple",
     "range": {
       "normal": 20,
       "long": 60
@@ -1120,14 +1188,19 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["versatile"],
+    "mastery": "sap",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 8
     },
     "damageType": "piercing",
-    "properties": [],
-    "mastery": "sap"
+    "versatileDamage": {
+      "kind": "dice",
+      "count": 1,
+      "faces": 10
+    }
   },
   {
     "id": "srd-cc-5.2.1:warhammer",
@@ -1144,12 +1217,14 @@
       "currency": "gp"
     },
     "weight": {
-      "value": 2,
+      "value": 5,
       "unit": "lb"
     },
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["versatile"],
+    "mastery": "push",
     "damage": {
       "kind": "dice",
       "count": 1,
@@ -1160,9 +1235,7 @@
       "kind": "dice",
       "count": 1,
       "faces": 10
-    },
-    "properties": ["versatile"],
-    "mastery": "push"
+    }
   },
   {
     "id": "srd-cc-5.2.1:whip",
@@ -1185,13 +1258,13 @@
     "kind": "weapon",
     "category": "martial",
     "mode": "melee",
+    "properties": ["finesse", "reach"],
+    "mastery": "slow",
     "damage": {
       "kind": "dice",
       "count": 1,
       "faces": 4
     },
-    "damageType": "slashing",
-    "properties": ["finesse", "reach"],
-    "mastery": "slow"
+    "damageType": "slashing"
   }
 ]

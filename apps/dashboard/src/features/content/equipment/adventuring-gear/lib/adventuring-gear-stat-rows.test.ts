@@ -12,7 +12,6 @@ describe('getAdventuringGearStatRows', () => {
     expect(rows).toEqual([
       { label: 'Gear kind', value: 'General' },
       { label: 'Weight', value: '1 lb' },
-      { label: 'Properties', value: '1-hour duration' },
     ])
   })
 

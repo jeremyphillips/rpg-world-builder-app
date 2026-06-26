@@ -25,8 +25,8 @@ function armor() {
 describe('SRD 5.2.1 equipment seed', () => {
   const equipment = loadSeedEquipment(RULESET)
 
-  it('loads 72 unified equipment records', () => {
-    expect(equipment).toHaveLength(72)
+  it('loads 180 unified equipment records', () => {
+    expect(equipment).toHaveLength(180)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -83,6 +83,18 @@ describe('SRD 5.2.1 equipment seed', () => {
       expect(hireling.serviceCategory).toBe('hireling')
       expect(hireling.duration).toEqual({ value: 1, unit: 'day' })
     }
+
+    const explorersPack = getEquipmentBySlugHelper('explorers-pack')
+    expect(explorersPack.kind).toBe('adventuring_gear')
+    expect(explorersPack.name).toBe("Explorer's Pack")
+  })
+})
+
+describe('adventuring gear records in unified seed', () => {
+  it('loads 76 adventuring gear records', () => {
+    expect(
+      loadSeedEquipment(RULESET).filter((item) => item.kind === 'adventuring_gear'),
+    ).toHaveLength(76)
   })
 })
 
@@ -91,8 +103,8 @@ function getEquipmentBySlugHelper(slug: string) {
 }
 
 describe('weapon records in unified seed', () => {
-  it('loads 37 weapons', () => {
-    expect(weapons()).toHaveLength(37)
+  it('loads 39 weapons', () => {
+    expect(weapons()).toHaveLength(39)
   })
 
   it('simple and martial categories are represented', () => {
@@ -144,8 +156,8 @@ describe('weapon records in unified seed', () => {
 })
 
 describe('armor records in unified seed', () => {
-  it('loads 13 armor records', () => {
-    expect(armor()).toHaveLength(13)
+  it('loads 14 armor records', () => {
+    expect(armor()).toHaveLength(14)
   })
 
   it('all four categories are represented', () => {
@@ -170,13 +182,13 @@ describe('armor records in unified seed', () => {
   })
 
   it('plate has addDexModifier false and strengthRequirement 15', () => {
-    const plate = getArmorBySlug(RULESET, 'plate')
+    const plate = getArmorBySlug(RULESET, 'plate-armor')
     expect(plate.addDexModifier).toBe(false)
     expect(plate.strengthRequirement).toBe(15)
   })
 
   it('leather has addDexModifier true and no maxDexBonus', () => {
-    const leather = getArmorBySlug(RULESET, 'leather')
+    const leather = getArmorBySlug(RULESET, 'leather-armor')
     expect(leather.addDexModifier).toBe(true)
     expect(leather.maxDexBonus).toBeUndefined()
   })
@@ -192,6 +204,29 @@ describe('armor records in unified seed', () => {
   it('heavy armor has stealthDisadvantage true', () => {
     for (const a of armor().filter((item) => item.category === 'heavy')) {
       expect(a.stealthDisadvantage).toBe(true)
+    }
+  })
+})
+
+describe('tool records in unified seed', () => {
+  it('loads 37 tool records', () => {
+    expect(loadSeedEquipment(RULESET).filter((item) => item.kind === 'tool')).toHaveLength(37)
+  })
+
+  it('Forgery Kit has two utilizes and no crafts', () => {
+    const forgery = getEquipmentBySlugHelper('forgery-kit')
+    expect(forgery.kind).toBe('tool')
+    if (forgery.kind === 'tool') {
+      expect(forgery.utilizes).toHaveLength(2)
+      expect(forgery.crafts).toBeUndefined()
+    }
+  })
+
+  it("Smith's Tools has crafts", () => {
+    const smiths = getEquipmentBySlugHelper('smiths-tools')
+    expect(smiths.kind).toBe('tool')
+    if (smiths.kind === 'tool') {
+      expect(smiths.crafts?.length).toBeGreaterThan(0)
     }
   })
 })

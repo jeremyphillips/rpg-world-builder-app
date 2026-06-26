@@ -12,6 +12,8 @@ describe('getToolStatRows', () => {
     expect(rows).toEqual([
       { label: 'Category', value: "Thieves' Tools" },
       { label: 'Ability', value: 'Dexterity' },
+      { label: 'Utilize', value: 'Pick a lock (DC 15)' },
+      { label: '', value: 'Disarm a trap (DC 15)' },
       { label: 'Weight', value: '1 lb' },
     ])
   })

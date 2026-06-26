@@ -12,6 +12,7 @@ import {
   slugSchema,
 } from '../envelope'
 import { customContentTraitSchema, normalizeContentTrait } from '../grants'
+import { toolCategorySchema } from '../../vocab/equipment/tool-category'
 import { skillSchema } from '../skill-proficiency'
 
 import { classCharacterCreationSchema } from '../starting-equipment'
@@ -62,7 +63,12 @@ export const classProficienciesWriteSchema = z.object({
     categories: z.array(weaponCategorySchema),
     items: z.array(z.string()).optional(), // weapon ids (future weapon content)
   }),
-  tools: z.array(z.string()).optional(),
+  tools: z
+    .object({
+      categories: z.array(toolCategorySchema),
+      items: z.array(z.string()).optional(),
+    })
+    .optional(),
   skills: classSkillProficienciesWriteSchema,
 })
 

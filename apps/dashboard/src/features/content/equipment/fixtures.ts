@@ -6,7 +6,7 @@ export const ORB = pickEquipment('orb')
 export const RIDING_HORSE = pickEquipment('riding-horse')
 export const ROWBOAT = pickEquipment('rowboat')
 export const LONGSWORD = pickEquipment('longsword')
-export const LEATHER = pickEquipment('leather')
+export const LEATHER = pickEquipment('leather-armor')
 export const BRACERS_OF_DEFENSE = pickEquipment('bracers-of-defense')
 
 export const EQUIPMENT_LIST = [

@@ -15,7 +15,7 @@ const DRUID_STARTING_EQUIPMENT = {
       description:
         "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
       items: [
-        { kind: 'fixed', equipmentSlug: 'leather', quantity: 1, equipped: true },
+        { kind: 'fixed', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
         { kind: 'fixed', equipmentSlug: 'shield', quantity: 1, equipped: true },
         { kind: 'fixed', equipmentSlug: 'sickle', quantity: 1, equipped: true },
         {

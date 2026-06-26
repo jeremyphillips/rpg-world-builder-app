@@ -4,8 +4,8 @@ import { isArmorEquipment } from '@rpg/contracts'
 import { pickEquipment } from '../../../lib/fixtures/pick'
 import { getArmorStatRows } from './armor-stat-rows'
 
-const LEATHER = pickEquipment('leather')
-const PLATE = pickEquipment('plate')
+const LEATHER = pickEquipment('leather-armor')
+const PLATE = pickEquipment('plate-armor')
 if (!isArmorEquipment(LEATHER) || !isArmorEquipment(PLATE)) {
   throw new Error('Expected armor fixtures')
 }

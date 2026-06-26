@@ -18,6 +18,7 @@ import {
   speedRateUnitSchema,
   slugSchema,
   toolCategorySchema,
+  toolUtilizeActionSchema,
   vehicleCategorySchema,
   weaponCategorySchema,
   weaponDamageTypeSchema,
@@ -85,6 +86,8 @@ const equipmentFormSchema = z.object({
   // tool
   toolCategory: toolCategorySchema.optional(),
   ability: abilitySchema.optional(),
+  utilizes: z.array(toolUtilizeActionSchema).optional(),
+  craftsText: z.string().optional(),
 
   // mount
   carryingCapacity: z

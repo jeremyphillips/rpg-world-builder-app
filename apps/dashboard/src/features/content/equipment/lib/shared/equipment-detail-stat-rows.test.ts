@@ -12,7 +12,7 @@ describe('getEquipmentKindStatRows', () => {
   })
 
   it('returns armor stat rows for leather', () => {
-    const leather = pickEquipment('leather')
+    const leather = pickEquipment('leather-armor')
     const rows = getEquipmentKindStatRows(leather)
     expect(rows.some((row) => row.label === 'AC')).toBe(true)
   })

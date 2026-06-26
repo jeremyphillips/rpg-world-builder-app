@@ -69,7 +69,9 @@ describe('createHomebrewContent (equipment)', () => {
     const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
 
     expect(equipment.some((item) => item.kind === 'weapon' && item.slug === 'longsword')).toBe(true)
-    expect(equipment.some((item) => item.kind === 'armor' && item.slug === 'leather')).toBe(true)
+    expect(equipment.some((item) => item.kind === 'armor' && item.slug === 'leather-armor')).toBe(
+      true,
+    )
     expect(
       equipment.some((item) => item.kind === 'magic_item' && item.slug === 'bracers-of-defense'),
     ).toBe(true)
@@ -138,7 +140,7 @@ describe('createHomebrewContent (equipment)', () => {
     const campaign = await makeCampaign()
     const leather = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
-    ).find((item) => item.slug === 'leather' && item.kind === 'armor')!
+    ).find((item) => item.slug === 'leather-armor' && item.kind === 'armor')!
 
     const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, leather.id, {
       kind: 'armor',

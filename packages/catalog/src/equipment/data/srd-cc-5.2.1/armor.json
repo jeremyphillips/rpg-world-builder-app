@@ -78,14 +78,14 @@
     "stealthDisadvantage": false
   },
   {
-    "id": "srd-cc-5.2.1:half-plate",
-    "slug": "half-plate",
+    "id": "srd-cc-5.2.1:half-plate-armor",
+    "slug": "half-plate-armor",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Half Plate",
+    "name": "Half Plate Armor",
     "description": "",
     "cost": {
       "amount": 750,
@@ -130,14 +130,14 @@
     "stealthDisadvantage": false
   },
   {
-    "id": "srd-cc-5.2.1:leather",
-    "slug": "leather",
+    "id": "srd-cc-5.2.1:leather-armor",
+    "slug": "leather-armor",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Leather",
+    "name": "Leather Armor",
     "description": "",
     "cost": {
       "amount": 10,
@@ -155,14 +155,39 @@
     "stealthDisadvantage": false
   },
   {
-    "id": "srd-cc-5.2.1:plate",
-    "slug": "plate",
+    "id": "srd-cc-5.2.1:padded",
+    "slug": "padded",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Plate",
+    "name": "Padded",
+    "description": "",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "light",
+    "material": "organic",
+    "baseAc": 11,
+    "addDexModifier": true,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:plate-armor",
+    "slug": "plate-armor",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Plate Armor",
     "description": "",
     "cost": {
       "amount": 1500,

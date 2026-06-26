@@ -1,17 +1,16 @@
 import { z } from 'zod'
 
 import { massSchema, speedRateSchema } from '../primitives/units'
-import { abilitySchema } from '../vocab/ability'
 import { gearKindSchema } from '../vocab/equipment/gear-kind'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
 import { serviceDurationSchema } from '../vocab/equipment/service-duration'
-import { toolCategorySchema } from '../vocab/equipment/tool-category'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
 import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './envelope'
 import { equipmentBaseSchema } from './equipment/base'
 import { armorEquipmentKindFields, refineArmorEquipment } from './equipment/armor-variant'
+import { toolEquipmentKindFields } from './equipment/tool-variant'
 import { refineWeaponEquipment, weaponEquipmentKindFields } from './equipment/weapon-variant'
 
 // Re-export weapon/armor helpers and damage schemas for consumers.
@@ -29,6 +28,13 @@ export {
   type WeaponDamageType,
   type WeaponRange,
 } from './equipment/weapon-variant'
+
+export {
+  formatToolUtilizeAction,
+  formatToolUtilizes,
+  toolUtilizeActionSchema,
+  type ToolUtilizeAction,
+} from './equipment/tool-variant'
 
 export {
   ARMOR_MATERIALS,
@@ -120,12 +126,9 @@ export const adventuringGearBodySchema = equipmentBaseSchema.extend({
   capacity: z.string().optional(),
 })
 
-export const toolBodySchema = equipmentBaseSchema.extend({
-  kind: z.literal('tool'),
-  toolCategory: toolCategorySchema,
-  /** The ability a check with this tool typically uses. */
-  ability: abilitySchema.optional(),
-})
+const toolEquipmentBodyFields = equipmentBaseSchema.extend(toolEquipmentKindFields)
+
+export const toolBodySchema = toolEquipmentBodyFields
 
 export const mountBodySchema = equipmentBaseSchema.extend({
   kind: z.literal('mount'),
@@ -193,7 +196,7 @@ export const equipmentSchema = z.discriminatedUnion('kind', [
   contentMetaSchema.extend(weaponEquipmentBodyFields.shape).superRefine(refineWeaponEquipment),
   contentMetaSchema.extend(armorEquipmentBodyFields.shape).superRefine(refineArmorEquipment),
   contentMetaSchema.extend(adventuringGearBodySchema.shape),
-  contentMetaSchema.extend(toolBodySchema.shape),
+  contentMetaSchema.extend(toolEquipmentBodyFields.shape),
   contentMetaSchema.extend(mountBodySchema.shape),
   contentMetaSchema.extend(vehicleBodySchema.shape),
   contentMetaSchema.extend(serviceBodySchema.shape),

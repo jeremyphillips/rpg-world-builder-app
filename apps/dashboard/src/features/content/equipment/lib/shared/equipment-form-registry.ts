@@ -17,7 +17,7 @@ type KindFieldGroupBuilder = (ctx?: ContentFormCtx) => FormItem[]
 export const kindFieldGroups: Partial<Record<EquipmentKind, KindFieldGroupBuilder>> = {
   service: () => [serviceFormFieldGroup()],
   mount: () => [mountFormFieldGroup()],
-  tool: () => [toolFormFieldGroup()],
+  tool: () => toolFormFieldGroup(),
   magic_item: (ctx) => [magicItemFormFieldGroup(ctx)],
   adventuring_gear: () => [adventuringGearFormFieldGroup()],
   vehicle: () => [vehicleFormFieldGroup()],

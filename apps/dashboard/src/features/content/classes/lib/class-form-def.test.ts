@@ -98,10 +98,13 @@ describe('classFormDef round-trips', () => {
     ])
   })
 
-  it('rogue: tool proficiencies round-trip as slug arrays', () => {
+  it('rogue: tool proficiencies round-trip with categories and items', () => {
     const rogue = SRD_CLASSES.find((c) => c.slug === 'rogue')!
     const formValues = classFormDef.toFormValues(rogue) as ClassFormValues
-    expect(formValues.proficiencies.tools).toEqual(['thieves-tools'])
+    expect(formValues.proficiencies.tools).toEqual({
+      categories: [],
+      items: ['thieves-tools'],
+    })
     expect(formValues.proficiencies.weapons.items).toEqual([])
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.tools).toEqual(rogue.proficiencies.tools)

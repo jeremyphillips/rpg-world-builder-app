@@ -417,7 +417,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
               {
                 "kind": "choice",
@@ -1020,7 +1025,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
               {
@@ -2527,7 +2537,10 @@
       "weapons": {
         "categories": ["simple", "martial"]
       },
-      "tools": ["thieves-tools"],
+      "tools": {
+        "categories": [],
+        "items": ["thieves-tools"]
+      },
       "skills": {
         "choose": 4
       }
@@ -2541,7 +2554,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "shortbow", "quantity": 1, "equipped": true },
@@ -3198,7 +3216,12 @@
             "label": "Standard Equipment",
             "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "leather", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "leather-armor",
+                "quantity": 1,
+                "equipped": true
+              },
               { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
               { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
               {
