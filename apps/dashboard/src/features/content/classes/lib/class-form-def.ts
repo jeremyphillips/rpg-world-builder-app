@@ -62,6 +62,7 @@ import {
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
+import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import {
   SUBCLASS_CHOICE_LEVEL_NONE,
@@ -74,6 +75,11 @@ import {
   featureToFormRow,
 } from './class-feature-form-fields'
 import { deriveAsiLevels, syncAsiFeatures } from './class-asi-features'
+import {
+  startingEquipmentFormSchema,
+  startingEquipmentFromFormValues,
+  startingEquipmentToFormValues,
+} from './class-starting-equipment-form-def'
 
 const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
 
@@ -208,6 +214,11 @@ function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     proficiencies: proficienciesFormSchema,
     features: z.array(createFeatureRowFormSchema(maxLevel)),
     resources: z.array(resourceRowFormSchema).optional(),
+    characterCreation: z
+      .object({
+        startingEquipment: startingEquipmentFormSchema.optional(),
+      })
+      .optional(),
   })
 }
 
@@ -371,6 +382,69 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   return {
     name: row.name,
     entries: row.entries,
+  }
+}
+
+function subclassChoiceLevelInputFromForm(
+  subclassChoiceLevel: ClassFormValues['subclassChoiceLevel'],
+  maxLevel: number,
+): number | undefined {
+  if (subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE) return undefined
+  return campaignLevelSchema(maxLevel).parse(Number(subclassChoiceLevel))
+}
+
+function classProficienciesInputFromForm(values: ClassFormValues) {
+  return {
+    ...proficienciesFromFormValues(
+      values.proficiencies,
+      values.weaponProficiencyMode === 'individual',
+    ),
+    skills: {
+      choose: values.proficiencies.skills.choose,
+      from: values.proficiencies.skills.from,
+    },
+  }
+}
+
+function classCharacterCreationInputFromForm(
+  values: ClassFormValues,
+  entity?: CharacterClass,
+): CreateClassInput['characterCreation'] | undefined {
+  const startingEquipment = startingEquipmentFromFormValues(
+    values.characterCreation?.startingEquipment,
+    entity?.characterCreation?.startingEquipment,
+  )
+  return startingEquipment ? { startingEquipment } : undefined
+}
+
+function classResourcesInputFromForm(
+  resources: ClassFormValues['resources'],
+): ClassResource[] | undefined {
+  return resources?.length ? resources.map(resourceFromFormRow) : undefined
+}
+
+function buildClassCreateInput(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  maxLevel: number,
+) {
+  const characterCreation = classCharacterCreationInputFromForm(values, ctx?.entity)
+
+  return {
+    ...envelopeSlugFields(values.name, ctx),
+    name: values.name,
+    description: values.description || undefined,
+    primaryAbilities: values.primaryAbilities,
+    hitDie: values.hitDie,
+    subclassChoiceLevel: subclassChoiceLevelInputFromForm(values.subclassChoiceLevel, maxLevel),
+    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+    proficiencies: classProficienciesInputFromForm(values),
+    features: syncAsiFeatures(
+      values.asiLevels,
+      featuresFromFormValues(values.features, ctx?.entity?.features),
+    ),
+    resources: classResourcesInputFromForm(values.resources),
+    ...(characterCreation ? { characterCreation } : {}),
   }
 }
 
@@ -717,6 +791,12 @@ function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         formCtx: ctx,
       }),
     },
+    {
+      id: 'characterCreation',
+      label: 'Character creation',
+      fields: [],
+      header: createElement(ClassCharacterCreationTab, { formCtx: ctx }),
+    },
   ]
 }
 
@@ -752,41 +832,24 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     proficiencies: proficienciesToFormValues(entity.proficiencies),
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
+    characterCreation: entity.characterCreation?.startingEquipment
+      ? {
+          startingEquipment: startingEquipmentToFormValues(
+            entity.characterCreation.startingEquipment,
+          ),
+        }
+      : undefined,
   }),
 
-  toInput: (values, ctx?: ContentFormInputCtx<CharacterClass>) => {
-    const maxLevel = ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
-    return finalizeContentInput(
-      {
-        ...envelopeSlugFields(values.name, ctx),
-        name: values.name,
-        description: values.description || undefined,
-        primaryAbilities: values.primaryAbilities,
-        hitDie: values.hitDie,
-        subclassChoiceLevel:
-          values.subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE
-            ? undefined
-            : campaignLevelSchema(maxLevel).parse(Number(values.subclassChoiceLevel)),
-        spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-        proficiencies: {
-          ...proficienciesFromFormValues(
-            values.proficiencies,
-            values.weaponProficiencyMode === 'individual',
-          ),
-          skills: {
-            choose: values.proficiencies.skills.choose,
-            from: values.proficiencies.skills.from,
-          },
-        },
-        features: syncAsiFeatures(
-          values.asiLevels,
-          featuresFromFormValues(values.features, ctx?.entity?.features),
-        ),
-        resources: values.resources?.length ? values.resources.map(resourceFromFormRow) : undefined,
-      },
+  toInput: (values, ctx) =>
+    finalizeContentInput(
+      buildClassCreateInput(
+        values,
+        ctx,
+        ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
+      ),
       ctx,
-    ) as CreateClassInput
-  },
+    ) as CreateClassInput,
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,

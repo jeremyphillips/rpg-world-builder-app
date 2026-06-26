@@ -77,6 +77,14 @@ describe('classFormDef round-trips', () => {
       const input = classFormDef.toInput(formValues)
       expect(input.features).toHaveLength(characterClass.features.length)
     })
+
+    it(`${characterClass.slug}: starting equipment round-trips`, () => {
+      const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+      const input = classFormDef.toInput(formValues, { entity: characterClass })
+      expect(input.characterCreation?.startingEquipment).toEqual(
+        characterClass.characterCreation?.startingEquipment,
+      )
+    })
   }
 
   it('bard: innate spell grant on Words of Creation is preserved', () => {
@@ -122,6 +130,55 @@ describe('classFormDef round-trips', () => {
     expect(input.proficiencies.weapons.items).toBeUndefined()
   })
 
+  it('fighter: ships three distinct starting equipment packages', () => {
+    const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
+    const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
+    expect(
+      formValues.characterCreation?.startingEquipment?.options.map((option) => option.id),
+    ).toEqual(['heavy', 'skirmisher', 'gold'])
+    const input = classFormDef.toInput(formValues, { entity: fighter })
+    expect(input.characterCreation?.startingEquipment?.options.map((option) => option.id)).toEqual([
+      'heavy',
+      'skirmisher',
+      'gold',
+    ])
+  })
+
+  it('bard: pool choice items round-trip through the class form', () => {
+    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    const instrumentChoice = formValues.characterCreation?.startingEquipment?.options
+      .find((option) => option.id === 'standard')
+      ?.items.find((item) => item.itemKind === 'choice')
+    expect(instrumentChoice).toMatchObject({
+      itemKind: 'choice',
+      label: 'Musical Instrument',
+      fromToolCategories: ['musical_instrument'],
+    })
+    const input = classFormDef.toInput(formValues, { entity: bard })
+    expect(input.characterCreation?.startingEquipment).toEqual(
+      bard.characterCreation?.startingEquipment,
+    )
+  })
+
+  it('druid: spellcasting focus modifiers round-trip through the class form', () => {
+    const druid = SRD_CLASSES.find((c) => c.slug === 'druid')!
+    const formValues = classFormDef.toFormValues(druid) as ClassFormValues
+    const standardOption = formValues.characterCreation?.startingEquipment?.options.find(
+      (option) => option.id === 'standard',
+    )
+    const quarterstaff = standardOption?.items.find(
+      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'quarterstaff',
+    )
+    expect(quarterstaff?.itemKind === 'fixed' ? quarterstaff.modifiers : undefined).toEqual([
+      { kind: 'spellcasting_focus', focusKind: 'druidic_focus' },
+    ])
+    const input = classFormDef.toInput(formValues, { entity: druid })
+    expect(input.characterCreation?.startingEquipment).toEqual(
+      druid.characterCreation?.startingEquipment,
+    )
+  })
+
   it('toInput omits categories when individual weapons mode is on', () => {
     const formValues = {
       ...classFormDef.createDefaultValues,
@@ -142,6 +199,17 @@ describe('classFormDef round-trips', () => {
       categories: [],
       items: ['dagger', 'longsword'],
     })
+  })
+
+  it('toInput omits characterCreation when starting equipment is absent', () => {
+    const formValues = {
+      ...classFormDef.createDefaultValues,
+      name: 'Custom Class',
+      features: [],
+    } as ClassFormValues
+
+    const input = classFormDef.toInput(formValues)
+    expect(input).not.toHaveProperty('characterCreation')
   })
 
   it('toInput omits items when category mode is on', () => {
@@ -278,15 +346,16 @@ describe('classFormDef.buildFields', () => {
 })
 
 describe('classFormDef.buildTabs', () => {
-  it('returns five tabs with expected ids', () => {
+  it('returns six tabs with expected ids', () => {
     const tabs = classFormDef.buildTabs!({})
-    expect(tabs).toHaveLength(5)
+    expect(tabs).toHaveLength(6)
     expect(tabs.map((tab) => tab.id)).toEqual([
       'basics',
       'proficiencies',
       'spellcasting',
       'features',
       'subclasses',
+      'characterCreation',
     ])
   })
 })

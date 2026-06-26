@@ -34,6 +34,8 @@ export interface ContentFormOptionSets {
    */
   spellcastingClasses: FieldOption[]
   weapons: FieldOption[]
+  /** All campaign-resolved equipment (weapons, armor, tools, gear, …), sorted by label. */
+  equipment: FieldOption[]
   spells: FieldOption[]
   feats: FieldOption[]
   tools: FieldOption[]
@@ -92,6 +94,7 @@ export function buildContentFormOptionSets(input: {
       input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
     ),
     weapons: sortFieldOptions(weapons?.map(toContentFieldOption) ?? []),
+    equipment: sortFieldOptions(input.equipment?.map(toContentFieldOption) ?? []),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
