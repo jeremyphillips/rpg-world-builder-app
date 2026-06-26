@@ -41,6 +41,16 @@ export const STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT =
 export const STARTING_EQUIPMENT_EQUIPMENT_SLUG_HINT =
   'Equipment must exist in the campaign catalog. Slugs from imported content may display on edit but cannot be selected for new rows until seeded.'
 
+export const ADD_STARTING_EQUIPMENT_LABEL = 'Add starting equipment'
+export const STARTING_EQUIPMENT_EMPTY_MESSAGE =
+  'No starting equipment yet. Add packages players choose from at character creation.'
+export const STARTING_EQUIPMENT_OPTION_NOUN = 'package'
+export const ADD_STARTING_EQUIPMENT_OPTION_LABEL = 'Add package'
+export const REMOVE_STARTING_EQUIPMENT_LABEL = 'Remove starting equipment'
+
+export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipment'
+export const STARTING_EQUIPMENT_OPTIONS_FIELD_NAME = 'characterCreation.startingEquipment.options'
+
 const itemKindOptions = toOptions(
   STARTING_EQUIPMENT_ITEM_KINDS,
   STARTING_EQUIPMENT_ITEM_KIND_LABELS,
@@ -199,6 +209,19 @@ export function startingEquipmentModifierFields(): FormItem[] {
           required: true,
         },
       ],
+    },
+  ]
+}
+
+export function startingEquipmentChooseFields(): FormItem[] {
+  return [
+    {
+      type: 'number',
+      name: 'choose',
+      label: 'Packages to choose',
+      min: 1,
+      defaultValue: 1,
+      hint: 'How many packages the player picks from this list.',
     },
   ]
 }
