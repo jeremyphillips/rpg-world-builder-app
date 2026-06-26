@@ -407,12 +407,11 @@ export function speedInputSelectField(options: {
   })
 }
 
-/** Carrying capacity and speed side-by-side in the Mount group (one-third row each). */
+/** Carrying capacity and speed side-by-side at intrinsic width in the Mount group. */
 export function mountCapacitySpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'carryingCapacity',
@@ -420,38 +419,37 @@ export function mountCapacitySpeedFields(): GroupField[] {
           required: true,
           defaultUnit: 'lb',
           valueDigits: 3,
-          width: 'full',
+          width: 'auto',
         }),
         speedInputSelectField({
           defaultUnit: 'ft',
           required: true,
           valueDigits: 3,
-          width: 'full',
+          width: 'auto',
         }),
       ],
     },
   ]
 }
 
-/** Cargo and speed side-by-side in the Vehicle group (one-third row each). */
+/** Cargo and speed side-by-side at intrinsic width in the Vehicle group. */
 export function vehicleCargoSpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'cargoCapacity',
           label: VEHICLE_CARGO_CAPACITY_LABEL,
           defaultUnit: 'ton',
           valueDigits: 3,
-          width: 'full',
+          width: 'auto',
         }),
         speedInputSelectField({
           defaultUnit: 'mph',
           required: true,
           valueDigits: 3,
-          width: 'full',
+          width: 'auto',
         }),
       ],
     },

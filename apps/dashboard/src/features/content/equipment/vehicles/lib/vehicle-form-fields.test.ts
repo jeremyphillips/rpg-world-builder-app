@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { createEquipmentInputSchema } from '@rpg/contracts'
+import type { RowConfig } from '@rpg/ui/form'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
 import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-registry'
@@ -22,19 +23,31 @@ describe('vehicle kindFieldGroups', () => {
     expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
   })
 
-  it('uses responsive row layouts for scalar and capacity rows', () => {
+  it('uses flex auto-width for cargo/speed and responsive grid for crew/passengers', () => {
     const group = vehicleFormFieldGroup()
-    if (!('fields' in group)) throw new Error('Expected vehicle group fields')
+    if (!('kind' in group) || group.kind !== 'group') {
+      throw new Error('Expected vehicle group fields')
+    }
 
-    const rows = group.fields.filter(
-      (field): field is Extract<(typeof group.fields)[number], { kind: 'row' }> =>
-        'kind' in field && field.kind === 'row',
+    const rows: RowConfig[] = group.fields.filter(
+      (field): field is RowConfig => 'kind' in field && field.kind === 'row',
     )
 
-    expect(rows[0]).toMatchObject({ layout: 'responsive-3' })
-    expect(rows[1]).toMatchObject({ layout: 'responsive-3' })
-    expect(rows[0]).not.toHaveProperty('className')
-    expect(rows[1]).not.toHaveProperty('className')
+    const [cargoSpeedRow, crewPassengersRow] = rows
+    if (!cargoSpeedRow || !crewPassengersRow) {
+      throw new Error('Expected cargo/speed and crew/passengers rows')
+    }
+
+    expect(cargoSpeedRow).toMatchObject({ kind: 'row' })
+    expect(cargoSpeedRow).not.toHaveProperty('layout')
+    expect(cargoSpeedRow).not.toHaveProperty('className')
+    expect(cargoSpeedRow.fields).toEqual([
+      expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
+      expect.objectContaining({ name: 'speed', width: 'auto' }),
+    ])
+
+    expect(crewPassengersRow).toMatchObject({ layout: 'responsive-3' })
+    expect(crewPassengersRow).not.toHaveProperty('className')
   })
 })
 

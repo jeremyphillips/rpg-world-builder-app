@@ -22,37 +22,46 @@ function sameCreatureTypeSet(left: readonly string[], right: readonly string[]):
   return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
 }
 
-function buildRuleOverrides(values: CampaignSettingsValues) {
-  const maxCharacterLevel =
-    values.maxCharacterLevel === MAX_CHARACTER_LEVEL ? undefined : values.maxCharacterLevel
+function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
+  const defined = Object.fromEntries(
+    Object.entries(values).filter(([, value]) => value !== undefined),
+  ) as Partial<T>
 
-  const extendedProgression = values.extendedProgressionEnabled
-    ? {
-        tierName: values.extendedTierName?.trim() ?? '',
-        maxLevel: values.extendedMaxLevel!,
-      }
-    : undefined
+  return Object.keys(defined).length > 0 ? defined : undefined
+}
 
-  const allowedCharacterCreatureTypes = sameCreatureTypeSet(
-    values.allowedCharacterCreatureTypes,
+function resolveMaxCharacterLevelOverride(maxCharacterLevel: number) {
+  return maxCharacterLevel === MAX_CHARACTER_LEVEL ? undefined : maxCharacterLevel
+}
+
+function resolveExtendedProgressionOverride(values: CampaignSettingsValues) {
+  if (!values.extendedProgressionEnabled) return undefined
+
+  return {
+    tierName: values.extendedTierName?.trim() ?? '',
+    maxLevel: values.extendedMaxLevel!,
+  }
+}
+
+function resolveAllowedCharacterCreatureTypesOverride(
+  allowedCharacterCreatureTypes: CampaignSettingsValues['allowedCharacterCreatureTypes'],
+) {
+  return sameCreatureTypeSet(
+    allowedCharacterCreatureTypes,
     DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   )
     ? undefined
-    : values.allowedCharacterCreatureTypes
+    : allowedCharacterCreatureTypes
+}
 
-  if (
-    maxCharacterLevel === undefined &&
-    extendedProgression === undefined &&
-    allowedCharacterCreatureTypes === undefined
-  ) {
-    return undefined
-  }
-
-  return {
-    ...(maxCharacterLevel !== undefined && { maxCharacterLevel }),
-    ...(extendedProgression !== undefined && { extendedProgression }),
-    ...(allowedCharacterCreatureTypes !== undefined && { allowedCharacterCreatureTypes }),
-  }
+function buildRuleOverrides(values: CampaignSettingsValues) {
+  return pickDefined({
+    maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
+    extendedProgression: resolveExtendedProgressionOverride(values),
+    allowedCharacterCreatureTypes: resolveAllowedCharacterCreatureTypesOverride(
+      values.allowedCharacterCreatureTypes,
+    ),
+  })
 }
 
 /** Maps a `Campaign` document to the flat shape used by the settings form. */

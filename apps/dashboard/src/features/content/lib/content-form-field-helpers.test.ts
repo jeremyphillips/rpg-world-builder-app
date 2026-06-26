@@ -146,16 +146,30 @@ describe('wealthGrantFields', () => {
 })
 
 describe('scalar unit rows', () => {
-  it('uses the responsive three-column row layout for mount capacity and speed', () => {
-    const [row] = mountCapacitySpeedFields()
-    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
-    expect(row).not.toHaveProperty('className')
+  it('uses a flex row at intrinsic width for mount capacity and speed', () => {
+    const row = mountCapacitySpeedFields()[0]
+    expect(row).toMatchObject({ kind: 'row' })
+    if (row && 'kind' in row && row.kind === 'row') {
+      expect(row).not.toHaveProperty('layout')
+      expect(row).not.toHaveProperty('className')
+      expect(row.fields).toEqual([
+        expect.objectContaining({ name: 'carryingCapacity', width: 'auto' }),
+        expect.objectContaining({ name: 'speed', width: 'auto' }),
+      ])
+    }
   })
 
-  it('uses the responsive three-column row layout for vehicle cargo and speed', () => {
-    const [row] = vehicleCargoSpeedFields()
-    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
-    expect(row).not.toHaveProperty('className')
+  it('uses a flex row at intrinsic width for vehicle cargo and speed', () => {
+    const row = vehicleCargoSpeedFields()[0]
+    expect(row).toMatchObject({ kind: 'row' })
+    if (row && 'kind' in row && row.kind === 'row') {
+      expect(row).not.toHaveProperty('layout')
+      expect(row).not.toHaveProperty('className')
+      expect(row.fields).toEqual([
+        expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
+        expect.objectContaining({ name: 'speed', width: 'auto' }),
+      ])
+    }
   })
 })
 
