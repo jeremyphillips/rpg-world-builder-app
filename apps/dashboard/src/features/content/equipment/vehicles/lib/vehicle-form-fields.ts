@@ -1,11 +1,7 @@
 import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES, type VehicleEquipment } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import {
-  massToForm,
-  scalarUnitRowClassName,
-  vehicleCargoSpeedFields,
-} from '../../../lib/content-form-field-helpers'
+import { massToForm, vehicleCargoSpeedFields } from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 function labelsFromEntries<const T extends string>(
@@ -37,7 +33,7 @@ export function vehicleFormFieldGroup(): FormItem {
       ...vehicleCargoSpeedFields(),
       {
         kind: 'row',
-        className: scalarUnitRowClassName,
+        layout: 'responsive-3',
         fields: [
           {
             type: 'number',

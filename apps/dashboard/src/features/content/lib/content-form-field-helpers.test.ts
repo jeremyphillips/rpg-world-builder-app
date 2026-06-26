@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   costFields,
   economyFields,
+  mountCapacitySpeedFields,
   optionalWeightFields,
+  vehicleCargoSpeedFields,
   wealthGrantFields,
   wealthGrantFromForm,
   wealthGrantToForm,
@@ -133,10 +135,26 @@ describe('wealthGrantFields', () => {
     const [group] = wealthGrantFields('wealth')
     expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
     if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
+      expect(group.fields[0]).toMatchObject({ kind: 'row', layout: 'responsive-2' })
+      expect(group.fields[0]).not.toHaveProperty('className')
       expect(
         group.fields[0].fields.map((field) => ('name' in field ? field.name : undefined)),
       ).toEqual(['wealth.cp', 'wealth.sp', 'wealth.gp', 'wealth.pp'])
     }
+  })
+})
+
+describe('scalar unit rows', () => {
+  it('uses the responsive three-column row layout for mount capacity and speed', () => {
+    const [row] = mountCapacitySpeedFields()
+    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
+    expect(row).not.toHaveProperty('className')
+  })
+
+  it('uses the responsive three-column row layout for vehicle cargo and speed', () => {
+    const [row] = vehicleCargoSpeedFields()
+    expect(row).toMatchObject({ kind: 'row', layout: 'responsive-3' })
+    expect(row).not.toHaveProperty('className')
   })
 })
 

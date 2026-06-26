@@ -8,7 +8,6 @@ import {
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/content-form-registry'
-import { responsiveHalfRowClassName } from '../../../lib/content-form-field-helpers'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 function labelsFromEntries<const T extends string>(
@@ -72,7 +71,7 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
       },
       {
         kind: 'row',
-        className: responsiveHalfRowClassName,
+        layout: 'responsive-2',
         fields: [
           {
             type: 'chips',

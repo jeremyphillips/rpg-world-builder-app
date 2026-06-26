@@ -34,10 +34,6 @@ import type { ContentFormCtx } from './content-form-registry'
 
 type GroupField = FieldConfig | RowConfig
 
-const responsiveHalfRowClassName = 'grid w-full grid-cols-1 md:grid-cols-2'
-
-const scalarUnitRowClassName = 'grid w-full grid-cols-2 md:grid-cols-3'
-
 const currencyOptions = toOptions(
   CURRENCY_IDS,
   Object.fromEntries(CURRENCY_IDS.map((c) => [c, getCurrencyAbbrev(c)])) as Record<
@@ -236,7 +232,7 @@ export function wealthGrantFields(namePrefix: string): FormItem[] {
     {
       kind: 'group',
       legend: 'Wealth',
-      fields: [{ kind: 'row', className: responsiveHalfRowClassName, fields }],
+      fields: [{ kind: 'row', layout: 'responsive-2', fields }],
     },
   ]
 }
@@ -395,7 +391,7 @@ export function mountCapacitySpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      className: scalarUnitRowClassName,
+      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'carryingCapacity',
@@ -421,7 +417,7 @@ export function vehicleCargoSpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      className: scalarUnitRowClassName,
+      layout: 'responsive-3',
       fields: [
         massInputSelectField({
           name: 'cargoCapacity',
@@ -478,8 +474,6 @@ export function speedRateToFormDefaults(unit: SpeedRateUnit): { unit: SpeedRateU
 export {
   currencyOptions,
   MOUNT_CARRYING_CAPACITY_LABEL,
-  responsiveHalfRowClassName,
-  scalarUnitRowClassName,
   VEHICLE_CARGO_CAPACITY_LABEL,
   type FieldOption,
 }
