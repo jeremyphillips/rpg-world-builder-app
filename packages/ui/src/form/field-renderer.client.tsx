@@ -181,6 +181,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
     <SwitchField
       id={id}
       label={config.label}
+      labelPosition={config.labelPosition}
       error={error}
       hint={config.hint}
       info={config.info}

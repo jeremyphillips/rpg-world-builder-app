@@ -21,3 +21,5 @@ export const On: Story = { args: { defaultChecked: true } }
 export const WithHint: Story = { args: { hint: 'Sent the day before each session.' } }
 
 export const Disabled: Story = { args: { disabled: true, defaultChecked: true } }
+
+export const LabelAbove: Story = { args: { labelPosition: 'above' } }

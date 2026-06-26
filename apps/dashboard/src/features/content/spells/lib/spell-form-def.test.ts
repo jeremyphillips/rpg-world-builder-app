@@ -1,10 +1,22 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpells } from '@rpg/catalog/spells'
 import { createSpellInputSchema, deriveContentKey, type CreateSpellInput } from '@rpg/contracts'
+import type { FormItem, GroupConfig, RowConfig } from '@rpg/ui/form'
 
 import { spellFormDef, type SpellFormValues } from './spell-form-def'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
+
+function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
+  return fields.find(
+    (field): field is GroupConfig =>
+      'kind' in field && field.kind === 'group' && field.legend === legend,
+  )
+}
+
+function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
+  return fields.find((field): field is RowConfig => 'kind' in field && field.kind === 'row')
+}
 
 it('type: toInput return type matches CreateSpellInput', () => {
   expectTypeOf(spellFormDef.toInput).returns.toEqualTypeOf<CreateSpellInput>()
@@ -25,6 +37,49 @@ describe('spellFormDef round-trips', () => {
       expect(input.school).toBe(spell.school)
     })
   }
+})
+
+describe('spellFormDef casting fields', () => {
+  it('uses inputSelect for normal casting time with ritual switch in the same row', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const castingTimeGroup = findGroup(castingTab?.fields ?? [], 'Casting time')
+    expect(castingTimeGroup?.kind).toBe('group')
+
+    const row = findRow(castingTimeGroup?.fields ?? [])
+    expect(row?.kind).toBe('row')
+    expect(row).not.toHaveProperty('className')
+
+    expect(row?.fields).toEqual([
+      expect.objectContaining({
+        type: 'inputSelect',
+        name: 'castingTime.normal',
+        valueKey: 'value',
+        unitKey: 'unit',
+        width: 'auto',
+      }),
+      expect.objectContaining({
+        type: 'switch',
+        name: 'castingTime.canBeCastAsRitual',
+        labelPosition: 'above',
+        width: 'auto',
+      }),
+    ])
+  })
+})
+
+describe('spellFormDef component fields', () => {
+  it('lays out verbal and somatic switches in a flex row at natural width', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const componentsGroup = findGroup(castingTab?.fields ?? [], 'Components')
+    const row = findRow(componentsGroup?.fields ?? [])
+
+    expect(row?.kind).toBe('row')
+    expect(row).not.toHaveProperty('className')
+    expect(row?.fields).toEqual([
+      expect.objectContaining({ name: 'components.verbal', width: 'auto' }),
+      expect.objectContaining({ name: 'components.somatic', width: 'auto' }),
+    ])
+  })
 })
 
 describe('spellFormDef create vs update modes', () => {
