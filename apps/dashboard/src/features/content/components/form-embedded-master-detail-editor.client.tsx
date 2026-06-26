@@ -1,7 +1,9 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
+import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../lib/content-form-registry'
@@ -51,6 +53,11 @@ export interface FormEmbeddedMasterDetailEditorProps {
   showDelete?: boolean
   /** When false, hides the campaign availability toggle. Defaults to `true`. */
   showActiveToggle?: boolean
+  /**
+   * Optional fields or chrome rendered above the list/detail grid with standard
+   * field-group spacing (`fieldGroupFlexStackClasses`).
+   */
+  leadingContent?: ReactNode
 }
 
 interface FormEmbeddedMasterDetailEditorBodyProps extends FormEmbeddedMasterDetailEditorProps {
@@ -71,6 +78,7 @@ function FormEmbeddedMasterDetailEditorBody({
   sortable = true,
   showDelete = true,
   showActiveToggle = true,
+  leadingContent,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
   const {
     formState: { submitCount },
@@ -124,42 +132,61 @@ function FormEmbeddedMasterDetailEditorBody({
       ? (watched?.[editor.selectedIndex] as { id?: string } | undefined)
       : undefined
 
+  const masterDetailGrid = (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <MasterDetailListPanel
+        items={items}
+        selectedIndex={editor.selectedIndex}
+        ariaLabel={ariaLabel}
+        addLabel={addLabel}
+        emptyLabel={emptyListLabel}
+        onAdd={editor.handleAdd}
+        onSelect={editor.select}
+        onRemove={editor.requestRemove}
+        onMove={sortable ? editor.move : undefined}
+      />
+
+      <MasterDetailEditorPanel
+        editor={editor}
+        itemFields={itemFields}
+        fieldName={fieldName}
+        idPrefix={idPrefix}
+        showValidationBanner={showValidationBanner}
+        emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
+        showActiveToggle={showActiveToggle}
+        selectedRow={selectedRow}
+      />
+    </div>
+  )
+
+  const deleteDialog = (
+    <MasterDetailDeleteDialog
+      open={editor.deleteIndex !== null}
+      itemNoun={itemNoun}
+      itemName={deleteName}
+      onOpenChange={(open) => {
+        if (!open) editor.cancelRemove()
+      }}
+      onConfirm={editor.confirmRemove}
+    />
+  )
+
+  if (!leadingContent) {
+    return (
+      <>
+        {masterDetailGrid}
+        {deleteDialog}
+      </>
+    )
+  }
+
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <MasterDetailListPanel
-          items={items}
-          selectedIndex={editor.selectedIndex}
-          ariaLabel={ariaLabel}
-          addLabel={addLabel}
-          emptyLabel={emptyListLabel}
-          onAdd={editor.handleAdd}
-          onSelect={editor.select}
-          onRemove={editor.requestRemove}
-          onMove={sortable ? editor.move : undefined}
-        />
-
-        <MasterDetailEditorPanel
-          editor={editor}
-          itemFields={itemFields}
-          fieldName={fieldName}
-          idPrefix={idPrefix}
-          showValidationBanner={showValidationBanner}
-          emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
-          showActiveToggle={showActiveToggle}
-          selectedRow={selectedRow}
-        />
+      <div className={fieldGroupFlexStackClasses}>
+        {leadingContent}
+        {masterDetailGrid}
       </div>
-
-      <MasterDetailDeleteDialog
-        open={editor.deleteIndex !== null}
-        itemNoun={itemNoun}
-        itemName={deleteName}
-        onOpenChange={(open) => {
-          if (!open) editor.cancelRemove()
-        }}
-        onConfirm={editor.confirmRemove}
-      />
+      {deleteDialog}
     </>
   )
 }

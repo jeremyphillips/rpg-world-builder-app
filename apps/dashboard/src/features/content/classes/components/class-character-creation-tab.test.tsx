@@ -66,8 +66,8 @@ describe('ClassCharacterCreationTab', () => {
         screen.getByRole('spinbutton', { name: /Packages to choose count/i }),
       ).toBeInTheDocument()
     })
-    expect(screen.getByText('packages from list')).toBeInTheDocument()
-    expect(screen.getByText('Class can choose')).toBeInTheDocument()
+    expect(screen.getByText('package(s) from list')).toBeInTheDocument()
+    expect(screen.getByText('Character can choose')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()

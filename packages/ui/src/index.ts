@@ -95,6 +95,7 @@ export { JsonField, type JsonFieldProps } from './components/ui/json-field.clien
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 
 export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
+export { fieldGroupFlexStackClasses, fieldGroupStackClasses } from './components/ui/field.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'

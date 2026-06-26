@@ -58,27 +58,27 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const editor = useMasterDetailArray(STARTING_EQUIPMENT_OPTIONS_FIELD_NAME, makeOptionDefaults)
 
   return (
-    <div className="space-y-6">
-      <FormItems
-        items={chooseFields}
-        idPrefix="class-starting-equipment"
-        namePrefix={STARTING_EQUIPMENT_FIELD_NAME}
-      />
-      <FormEmbeddedMasterDetailEditor
-        formCtx={formCtx}
-        fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
-        itemFields={optionFields}
-        itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}
-        ariaLabel="Starting equipment packages"
-        addLabel={ADD_STARTING_EQUIPMENT_OPTION_LABEL}
-        emptyListLabel="No packages yet. Add one to get started."
-        idPrefix="class-starting-equipment-option"
-        editor={editor}
-        mapListItem={({ row }) => ({
-          title: startingEquipmentOptionTitle(row as StartingEquipmentOptionForm | undefined),
-        })}
-      />
-    </div>
+    <FormEmbeddedMasterDetailEditor
+      formCtx={formCtx}
+      fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
+      itemFields={optionFields}
+      itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}
+      ariaLabel="Starting equipment packages"
+      addLabel={ADD_STARTING_EQUIPMENT_OPTION_LABEL}
+      emptyListLabel="No packages yet. Add one to get started."
+      idPrefix="class-starting-equipment-option"
+      editor={editor}
+      leadingContent={
+        <FormItems
+          items={chooseFields}
+          idPrefix="class-starting-equipment"
+          namePrefix={STARTING_EQUIPMENT_FIELD_NAME}
+        />
+      }
+      mapListItem={({ row }) => ({
+        title: startingEquipmentOptionTitle(row as StartingEquipmentOptionForm | undefined),
+      })}
+    />
   )
 }
 

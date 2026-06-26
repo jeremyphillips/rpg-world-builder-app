@@ -106,6 +106,100 @@ function MasterDetailListRowStatus({
   )
 }
 
+function masterDetailListRowClassName(active: boolean, isSelected: boolean) {
+  return cn(
+    masterDetailListRowClasses,
+    !active && masterDetailListRowInactiveClasses,
+    isSelected && masterDetailListRowSelectedClasses,
+  )
+}
+
+type MasterDetailListDragHandleProps = {
+  title: string
+  dragHandleProps: NonNullable<MasterDetailListRowContentProps['dragHandleProps']>
+}
+
+function MasterDetailListDragHandle({ title, dragHandleProps }: MasterDetailListDragHandleProps) {
+  return (
+    <button
+      type="button"
+      className={masterDetailListDragHandleClasses}
+      aria-label={`Drag to reorder ${title}`}
+      onClick={(event) => event.stopPropagation()}
+      {...dragHandleProps.attributes}
+      {...dragHandleProps.listeners}
+    >
+      <GripVertical className="size-4" aria-hidden />
+    </button>
+  )
+}
+
+type MasterDetailListRowSelectButtonProps = {
+  item: MasterDetailListItem
+  index: number
+  isSelected: boolean
+  active: boolean
+  onSelect: (index: number) => void
+}
+
+function MasterDetailListRowSelectButton({
+  item,
+  index,
+  isSelected,
+  active,
+  onSelect,
+}: MasterDetailListRowSelectButtonProps) {
+  return (
+    <button
+      type="button"
+      aria-current={isSelected ? 'true' : undefined}
+      aria-invalid={item.hasError ? true : undefined}
+      onClick={() => onSelect(index)}
+      className={masterDetailListRowSelectClasses}
+    >
+      {item.eyebrow ? (
+        <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {item.eyebrow}
+        </span>
+      ) : null}
+      <span
+        className={cn(
+          'block truncate font-medium',
+          !active && masterDetailListRowInactiveTitleClasses,
+        )}
+      >
+        {item.title}
+      </span>
+      <MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />
+    </button>
+  )
+}
+
+type MasterDetailListRowRemoveButtonProps = {
+  title: string
+  index: number
+  onRemove: (index: number) => void
+}
+
+function MasterDetailListRowRemoveButton({
+  title,
+  index,
+  onRemove,
+}: MasterDetailListRowRemoveButtonProps) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="mr-1 size-8 shrink-0 p-0"
+      aria-label={`Remove ${title}`}
+      onClick={() => onRemove(index)}
+    >
+      <Trash2 className="size-4" aria-hidden />
+    </Button>
+  )
+}
+
 function MasterDetailListRowContent({
   item,
   index,
@@ -119,58 +213,19 @@ function MasterDetailListRowContent({
   const active = item.active !== false
 
   return (
-    <div
-      className={cn(
-        masterDetailListRowClasses,
-        !active && masterDetailListRowInactiveClasses,
-        isSelected && masterDetailListRowSelectedClasses,
-      )}
-    >
+    <div className={masterDetailListRowClassName(active, isSelected)}>
       {showDragHandle && dragHandleProps ? (
-        <button
-          type="button"
-          className={masterDetailListDragHandleClasses}
-          aria-label={`Drag to reorder ${item.title}`}
-          onClick={(event) => event.stopPropagation()}
-          {...dragHandleProps.attributes}
-          {...dragHandleProps.listeners}
-        >
-          <GripVertical className="size-4" aria-hidden />
-        </button>
+        <MasterDetailListDragHandle title={item.title} dragHandleProps={dragHandleProps} />
       ) : null}
-      <button
-        type="button"
-        aria-current={isSelected ? 'true' : undefined}
-        aria-invalid={item.hasError ? true : undefined}
-        onClick={() => onSelect(index)}
-        className={masterDetailListRowSelectClasses}
-      >
-        {item.eyebrow ? (
-          <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {item.eyebrow}
-          </span>
-        ) : null}
-        <span
-          className={cn(
-            'block truncate font-medium',
-            !active && masterDetailListRowInactiveTitleClasses,
-          )}
-        >
-          {item.title}
-        </span>
-        <MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />
-      </button>
+      <MasterDetailListRowSelectButton
+        item={item}
+        index={index}
+        isSelected={isSelected}
+        active={active}
+        onSelect={onSelect}
+      />
       {deletable ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mr-1 size-8 shrink-0 p-0"
-          aria-label={`Remove ${item.title}`}
-          onClick={() => onRemove(index)}
-        >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
+        <MasterDetailListRowRemoveButton title={item.title} index={index} onRemove={onRemove} />
       ) : null}
     </div>
   )

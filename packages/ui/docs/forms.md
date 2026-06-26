@@ -117,6 +117,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
 | `fieldAnatomyStackClasses`       | `space-y-3`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
+| `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
 | `fieldRowGapClasses`             | `gap-4`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
 | `fieldChipWrapGapClasses`        | `gap-2`               | Gap between chip pills inside `ChipsField`                                      |
