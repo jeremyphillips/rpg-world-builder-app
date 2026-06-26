@@ -888,6 +888,12 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
+
+  extractEmbeddedSeedRowIds: (entity) => ({
+    features: entity.features.map((feature) => feature.id),
+    'characterCreation.startingEquipment.options':
+      entity.characterCreation?.startingEquipment?.options.map((option) => option.id) ?? [],
+  }),
 }
 
 contentFormRegistry['classes'] = classFormDef

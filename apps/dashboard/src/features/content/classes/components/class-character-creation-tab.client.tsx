@@ -11,7 +11,6 @@ import { useMasterDetailArray } from '../../lib/use-master-detail-array'
 import {
   ADD_STARTING_EQUIPMENT_LABEL,
   ADD_STARTING_EQUIPMENT_OPTION_LABEL,
-  REMOVE_STARTING_EQUIPMENT_LABEL,
   STARTING_EQUIPMENT_EMPTY_MESSAGE,
   STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTION_NOUN,
@@ -26,14 +25,6 @@ import {
 
 export interface ClassCharacterCreationTabProps {
   formCtx: ContentFormCtx
-}
-
-/**
- * Starting equipment packages are always editable — even on system classes — so
- * embedded rows never inherit delete-locking from `entitySource`.
- */
-function unlockedFormCtx(formCtx: ContentFormCtx): ContentFormCtx {
-  return { ...formCtx, entitySource: undefined }
 }
 
 function StartingEquipmentEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
@@ -61,32 +52,20 @@ function StartingEquipmentEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
 }
 
 function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
-  const { setValue } = useFormContext()
   const optionFields = useMemo(() => startingEquipmentOptionItemFields(formCtx), [formCtx])
   const chooseFields = useMemo(() => startingEquipmentChooseFields(), [])
   const makeOptionDefaults = useCallback(() => buildItemDefaultValues(optionFields), [optionFields])
-  const editorFormCtx = useMemo(() => unlockedFormCtx(formCtx), [formCtx])
   const editor = useMasterDetailArray(STARTING_EQUIPMENT_OPTIONS_FIELD_NAME, makeOptionDefaults)
-
-  const handleRemoveStartingEquipment = () => {
-    setValue(STARTING_EQUIPMENT_FIELD_NAME, undefined, { shouldDirty: true })
-    editor.cancelRemove()
-  }
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
-        <FormItems
-          items={chooseFields}
-          idPrefix="class-starting-equipment"
-          namePrefix={STARTING_EQUIPMENT_FIELD_NAME}
-        />
-        <Button type="button" variant="ghost" size="sm" onClick={handleRemoveStartingEquipment}>
-          {REMOVE_STARTING_EQUIPMENT_LABEL}
-        </Button>
-      </div>
+      <FormItems
+        items={chooseFields}
+        idPrefix="class-starting-equipment"
+        namePrefix={STARTING_EQUIPMENT_FIELD_NAME}
+      />
       <FormEmbeddedMasterDetailEditor
-        formCtx={editorFormCtx}
+        formCtx={formCtx}
         fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
         itemFields={optionFields}
         itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}

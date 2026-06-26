@@ -4,6 +4,8 @@ import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import type { UseMasterDetailArrayResult } from '../lib/use-master-detail-array'
+import { resolveMasterDetailRowKey } from '../lib/content-campaign-availability'
+import { MasterDetailActiveToggle } from './master-detail-active-toggle.client'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
 
 export interface MasterDetailEditorPanelProps {
@@ -15,11 +17,15 @@ export interface MasterDetailEditorPanelProps {
   idPrefix: string
   showValidationBanner: boolean
   emptySelectionLabel: string
+  /** When true (default), renders the campaign availability toggle above the form. */
+  showActiveToggle?: boolean
+  /** Selected row values used to resolve the stable row key for the toggle. */
+  selectedRow?: { id?: string }
 }
 
 /**
  * Detail column for a form-embedded master-detail editor: validation banner,
- * selected row form, or empty-selection hint.
+ * optional active toggle, selected row form, or empty-selection hint.
  */
 export function MasterDetailEditorPanel({
   editor,
@@ -28,21 +34,36 @@ export function MasterDetailEditorPanel({
   idPrefix,
   showValidationBanner,
   emptySelectionLabel,
+  showActiveToggle = true,
+  selectedRow,
 }: MasterDetailEditorPanelProps) {
   const selectedFieldId =
     editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
+  const rowKey =
+    selectedFieldId !== undefined
+      ? resolveMasterDetailRowKey(selectedFieldId, selectedRow)
+      : undefined
 
   return (
     <div className="space-y-3 md:col-span-2">
       <MasterDetailValidationBanner visible={showValidationBanner} />
       {editor.selectedIndex !== null && selectedFieldId ? (
-        <FormItems
-          key={selectedFieldId}
-          items={itemFields}
-          idPrefix={`${idPrefix}-${selectedFieldId}`}
-          namePrefix={`${fieldName}.${editor.selectedIndex}`}
-          plainSections
-        />
+        <>
+          {showActiveToggle && rowKey ? (
+            <MasterDetailActiveToggle
+              controlId={`${idPrefix}-${selectedFieldId}-active`}
+              activeInCampaign={editor.isRowActive(editor.selectedIndex, selectedRow)}
+              onActiveChange={(active) => editor.setRowActive(rowKey, active)}
+            />
+          ) : null}
+          <FormItems
+            key={selectedFieldId}
+            items={itemFields}
+            idPrefix={`${idPrefix}-${selectedFieldId}`}
+            namePrefix={`${fieldName}.${editor.selectedIndex}`}
+            plainSections
+          />
+        </>
       ) : !showValidationBanner ? (
         <Text variant="muted" className="text-sm">
           {emptySelectionLabel}

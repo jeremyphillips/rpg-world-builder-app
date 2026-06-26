@@ -18,17 +18,7 @@ export interface ClassFeaturesTabProps {
   formCtx: ContentFormCtx
 }
 
-/**
- * Master-detail editor for the class `features` field array: a selectable list
- * on the left, the selected feature's form on the right. Renders directly into
- * the parent form via `useFieldArray`, so global save and validation are
- * unchanged from the previous inline array.
- *
- * Deferred: an "Active in campaign" toggle (like subclasses) is intentionally
- * not shown here — class features have no per-feature availability contract or
- * persistence target yet. When that lands, the toggle attaches to the detail
- * panel below and an "Inactive" badge surfaces via the list item's `badge`.
- */
+/** Master-detail editor for the class `features` field array. */
 export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const fields = useMemo(() => classFeatureItemFields(formCtx), [formCtx])
 

@@ -172,6 +172,56 @@ const WEALTH_GRANT_DENOMINATIONS = [
 
 export type WealthGrantForm = Partial<Record<(typeof WEALTH_GRANT_DENOMINATIONS)[number], number>>
 
+export type WealthGrantMoneyForm = { amount: number; currency: Currency }
+
+/** Single amount + currency field for sparse wealth grants (starting equipment, etc.). */
+export function wealthGrantMoneyField(namePrefix: string): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      legend: 'Wealth',
+      fields: [
+        {
+          type: 'inputSelect',
+          name: namePrefix,
+          label: 'Wealth',
+          inputType: 'number',
+          valueKey: 'amount',
+          unitKey: 'currency',
+          options: currencyOptions,
+          min: 0,
+          width: 'auto',
+          formatGrouped: true,
+          defaultValue: { amount: 0, currency: 'gp' as Currency },
+        },
+      ],
+    },
+  ]
+}
+
+/** Maps a money composite to a sparse coin grant (positive integers only). */
+export function wealthGrantMoneyFromForm(
+  wealth: WealthGrantMoneyForm | undefined,
+): CharacterWealthGrant | undefined {
+  if (!wealth || wealth.amount <= 0) return undefined
+  return { [wealth.currency]: wealth.amount }
+}
+
+export function wealthGrantMoneyToForm(
+  wealth: CharacterWealthGrant | undefined,
+): WealthGrantMoneyForm | undefined {
+  if (!wealth) return undefined
+
+  for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+    const value = wealth[denomination]
+    if (value !== undefined && value > 0) {
+      return { amount: value, currency: denomination }
+    }
+  }
+
+  return undefined
+}
+
 /** Optional coin fields for starting equipment and similar sparse wealth grants. */
 export function wealthGrantFields(namePrefix: string): FormItem[] {
   const fields: FieldConfig[] = WEALTH_GRANT_DENOMINATIONS.map((denomination) => ({

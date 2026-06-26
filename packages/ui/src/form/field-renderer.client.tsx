@@ -17,6 +17,7 @@ import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
+import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type { FieldConfig, FieldType } from './field-config'
 import type { JsonFieldProps } from '../components/ui/json-field.client'
@@ -284,6 +285,9 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       error={error}
       namePrefix={namePrefix}
     />
+  ),
+  inlineChooseCount: ({ config, field, id, error }) => (
+    <InlineChooseCountFieldRenderer config={config} field={field} id={id} error={error} />
   ),
   combobox: ({ config, field, id, error }) => (
     <ComboboxField

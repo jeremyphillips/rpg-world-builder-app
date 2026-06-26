@@ -31,6 +31,11 @@ export type ContentFormCtx = {
   equipmentKind?: EquipmentKind
   /** Equipment family URL segment for breadcrumbs and back links. */
   equipmentFamily?: string
+  /**
+   * Seed domain ids for embedded master-detail arrays on edit, keyed by field
+   * path (e.g. `features`, `characterCreation.startingEquipment.options`).
+   */
+  embeddedSeedRowIds?: Readonly<Record<string, readonly string[]>>
 }
 
 /** Optional context for `toInput` — present on edit, omitted on create. */
@@ -91,6 +96,11 @@ export interface ContentFormDef<
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */
   queryKey: (campaignId: string) => readonly unknown[]
+  /**
+   * Maps a saved entity to seed row domain ids for embedded master-detail
+   * delete-lock and source badge derivation on edit.
+   */
+  extractEmbeddedSeedRowIds?: (entity: TEntity) => Readonly<Record<string, readonly string[]>>
   /**
    * Coverage mode for the drift test suite:
    * - `'roundtrip-only'` (default): verifies `toFormValues` → `toInput` →

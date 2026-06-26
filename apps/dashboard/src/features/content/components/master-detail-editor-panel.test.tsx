@@ -35,6 +35,9 @@ function makeEditor(
     move: vi.fn(),
     moveUp: vi.fn(),
     moveDown: vi.fn(),
+    activeById: {},
+    isRowActive: vi.fn(() => true),
+    setRowActive: vi.fn(),
     ...overrides,
   }
 }

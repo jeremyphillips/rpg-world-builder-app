@@ -57,37 +57,45 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`useMasterDetailArray`](./lib/use-master-detail-array.ts)                                     | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing. |
 | [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)                    | Sidebar: add button + selectable rows with optional eyebrow, status badge, per-row delete, and drag-to-reorder (keyboard-accessible handle).          |
-| [`MasterDetailEditorPanel`](./components/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, selected row `FormItems`, or empty-selection hint.                                                                  |
+| [`MasterDetailEditorPanel`](./components/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, **Active in campaign** toggle, selected row `FormItems`, or empty-selection hint.                                   |
 | [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx)              | Shared `ConfirmDialog` wrapper for row removal.                                                                                                       |
 | [`MasterDetailValidationBanner`](./components/master-detail-validation-banner.client.tsx)      | Post-submit alert when unselected list rows have validation errors.                                                                                   |
-| [`buildEmbeddedMasterDetailListItem`](./lib/build-embedded-master-detail-list-item.ts)         | Builds a list row with derived system-lock badge and `deletable` flag.                                                                                |
+| [`MasterDetailActiveToggle`](./components/master-detail-active-toggle.client.tsx)              | Shared campaign availability switch for detail panels.                                                                                                |
+| [`buildEmbeddedMasterDetailListItem`](./lib/build-embedded-master-detail-list-item.ts)         | Builds a list row with source badges, `deletable`, and inactive styling.                                                                              |
+| [`resolveEmbeddedRowMeta`](./lib/resolve-embedded-row-meta.ts)                                 | Derives system/homebrew source, delete-lock, and badge set for embedded rows.                                                                         |
 | [`isEmbeddedRowSystemLocked`](./lib/is-embedded-row-system-locked.ts)                          | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                |
+| [`content-campaign-availability`](./lib/content-campaign-availability.ts)                      | Shared active-in-campaign labels and row-key helpers (also used by subclasses).                                                                       |
 | [`FormEmbeddedMasterDetailEditor`](./components/form-embedded-master-detail-editor.client.tsx) | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form.                                                        |
 
 It is presentation-only over the parent form, so global save and validation are
 unchanged. Use `FormEmbeddedMasterDetailEditor` for the standard traits/features
 pattern, or compose the lower-level pieces when a tab needs extra chrome (e.g.
-species **Heritage** scalar header + `heritage.options`). Consumers: the classes
-**Features** tab, the species **Traits** tab, and the species **Heritage** tab
-(scalar header + master-detail over `heritage.options`).
+species **Heritage** scalar header + `heritage.options`), and the classes
+**Character creation** tab (starting equipment packages).
 
 `useMasterDetailArray` resolves validation errors for nested dot paths (e.g.
-`heritage.options`) so error badges and auto-select work on inner lists.
+`heritage.options`) so error badges and auto-select work on inner lists. It also
+tracks local **Active in campaign** state (`activeById`) — not persisted until a
+contract lands for embedded rows.
+
+`FormEmbeddedMasterDetailEditor` defaults: sortable list, delete controls,
+System/Homebrew/Inactive badges, and the active toggle. Pass
+`ContentFormCtx.embeddedSeedRowIds` (populated on edit via
+`ContentFormDef.extractEmbeddedSeedRowIds`) so only seed rows lock on system
+entities; newly added rows show Homebrew and remain deletable.
 
 Scope notes:
 
 - The existing classes **Subclasses** tab predates this abstraction and is
   **not** migrated yet (it manages a separate API resource with its own
   drafts/active state). Migrating it is a follow-up.
-- **Active in campaign** is a planned capability but has no home in this
-  abstraction yet: per-row availability needs a contract + persistence target
-  (subclasses have `subclassCampaignAvailabilitySchema`; embedded rows like
-  class features do not). The detail panel is the intended attachment point,
-  with the list item `badge` slot surfacing an "Inactive" marker.
+- **Active in campaign** toggle state is local-only for embedded rows (same as
+  subclasses today). Persistence is a follow-up once embedded rows have a
+  contract target.
 
-`ContentFormCtx.entitySource` (set by the create/edit shells) lets a consumer
-derive per-row delete-locking when the embedded element has no own `source`
-(e.g. protecting a system class's saved features, a system species's saved
-traits, or a system species's saved heritage block and its options). The same
+`ContentFormCtx.entitySource` (set by the create/edit shells) plus
+`embeddedSeedRowIds` lets the editor derive per-row delete-locking when the
+embedded element has no own `source` (e.g. protecting a system class's saved
+features, starting equipment packages, species traits, or heritage options). The same
 policy applies to subclasses via `isSubclassDeletable`
 (`source === 'homebrew' || isDraftId`).

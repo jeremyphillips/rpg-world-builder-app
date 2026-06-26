@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useFieldArray, useFormContext, type FieldErrors } from 'react-hook-form'
 
+import { isContentRowActive, resolveMasterDetailRowKey } from './content-campaign-availability'
+
 export interface UseMasterDetailArrayResult {
   /** Field-array rows from RHF; each carries a stable `id` for React keys. */
   fields: Array<Record<'id', string>>
@@ -27,6 +29,12 @@ export interface UseMasterDetailArrayResult {
   moveUp: (index: number) => void
   /** Moves a row down one position; no-op at the last row. */
   moveDown: (index: number) => void
+  /** Local per-row campaign availability; default is active. Not persisted yet. */
+  activeById: Record<string, boolean>
+  /** Whether the row at `index` is active in the current campaign. */
+  isRowActive: (index: number, row?: { id?: string }) => boolean
+  /** Updates campaign availability for a row key. */
+  setRowActive: (rowKey: string, active: boolean) => void
 }
 
 /** Resolves the effective selection: null when empty, else clamped in range. */
@@ -136,6 +144,7 @@ export function useMasterDetailArray(
   const { fields, append, remove, move: fieldArrayMove } = useFieldArray({ control, name })
   const [rawSelected, setRawSelected] = useState<number | null>(null)
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+  const [activeById, setActiveById] = useState<Record<string, boolean>>({})
 
   const selectedIndex = resolveSelectedIndex(rawSelected, fields.length)
 
@@ -198,6 +207,19 @@ export function useMasterDetailArray(
     [fields.length, move],
   )
 
+  const setRowActive = useCallback((rowKey: string, active: boolean) => {
+    setActiveById((current) => ({ ...current, [rowKey]: active }))
+  }, [])
+
+  const isRowActive = useCallback(
+    (index: number, row?: { id?: string }) => {
+      const field = fields[index]
+      if (!field) return true
+      return isContentRowActive(activeById, resolveMasterDetailRowKey(field.id, row))
+    },
+    [activeById, fields],
+  )
+
   return {
     fields,
     selectedIndex,
@@ -212,5 +234,8 @@ export function useMasterDetailArray(
     move,
     moveUp,
     moveDown,
+    activeById,
+    isRowActive,
+    setRowActive,
   }
 }

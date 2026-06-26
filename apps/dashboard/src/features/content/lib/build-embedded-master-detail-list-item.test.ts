@@ -6,46 +6,52 @@ describe('buildEmbeddedMasterDetailListItem', () => {
   const field = { id: 'rhf-1' }
   const hasRowError = vi.fn(() => false)
 
-  it('marks system rows as non-deletable with a System badge', () => {
+  it('marks system seed rows as non-deletable with System and Homebrew badges context', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 0,
       row: { id: 'rage' },
       entitySource: 'system',
+      seedRowIds: new Set(['rage']),
+      activeById: {},
       hasRowError,
       title: 'Rage',
       eyebrow: 'Level 1',
     })
 
-    expect(item).toEqual({
+    expect(item).toMatchObject({
       id: 'rhf-1',
       title: 'Rage',
       eyebrow: 'Level 1',
       deletable: false,
       hasError: false,
-      badge: { label: 'System', variant: 'secondary' },
+      active: true,
+      badges: [{ label: 'System', variant: 'secondary' }],
     })
   })
 
-  it('allows homebrew rows to be deleted without a badge', () => {
+  it('allows homebrew rows to be deleted with a Homebrew badge', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 1,
-      row: { id: 'rage' },
-      entitySource: 'homebrew',
+      row: { id: 'custom-feature' },
+      entitySource: 'system',
+      seedRowIds: new Set(['rage']),
+      activeById: {},
       hasRowError,
-      title: 'Rage',
+      title: 'Custom Feature',
     })
 
-    expect(item).toEqual({
+    expect(item).toMatchObject({
       id: 'rhf-1',
-      title: 'Rage',
+      title: 'Custom Feature',
       deletable: true,
       hasError: false,
+      badges: [{ label: 'Homebrew', variant: 'outline' }],
     })
   })
 
-  it('surfaces row validation errors from hasRowError', () => {
+  it('surfaces row validation errors and inactive badge from hasRowError/activeById', () => {
     hasRowError.mockReturnValueOnce(true)
 
     const item = buildEmbeddedMasterDetailListItem({
@@ -53,11 +59,17 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       index: 0,
       row: {},
       entitySource: 'homebrew',
+      activeById: { 'rhf-1': false },
       hasRowError,
       title: 'Untitled',
     })
 
     expect(item.hasError).toBe(true)
+    expect(item.active).toBe(false)
+    expect(item.badges).toEqual([
+      { label: 'Homebrew', variant: 'outline' },
+      { label: 'Inactive', variant: 'outline' },
+    ])
     expect(hasRowError).toHaveBeenCalledWith(0)
   })
 })

@@ -21,9 +21,11 @@ type TraitRow = { id?: string; kind: 'custom' | 'grant'; name?: string; grants: 
 function EditorShell({
   traits = [] as TraitRow[],
   entitySource,
+  embeddedSeedRowIds,
 }: {
   traits?: TraitRow[]
   entitySource?: 'system' | 'homebrew'
+  embeddedSeedRowIds?: Record<string, readonly string[]>
 }) {
   const form = useForm({ defaultValues: { traits } })
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
@@ -31,7 +33,7 @@ function EditorShell({
   return (
     <FormProvider {...form}>
       <FormEmbeddedMasterDetailEditor
-        formCtx={{ entitySource }}
+        formCtx={{ entitySource, embeddedSeedRowIds }}
         fieldName="traits"
         itemFields={itemFields}
         itemNoun="trait"
@@ -86,15 +88,27 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     })
   })
 
-  it('locks system rows on a system entity', () => {
+  it('locks system seed rows on a system entity', () => {
     render(
       <EditorShell
         entitySource="system"
+        embeddedSeedRowIds={{ traits: ['t1'] }}
         traits={[{ id: 't1', kind: 'custom', name: 'Darkvision', grants: [] }]}
       />,
     )
 
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove Darkvision/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the active in campaign toggle on the detail panel', () => {
+    render(
+      <EditorShell
+        entitySource="homebrew"
+        traits={[{ kind: 'custom', name: 'Darkvision', grants: [] }]}
+      />,
+    )
+
+    expect(screen.getByRole('switch', { name: /Active in campaign/i })).toBeInTheDocument()
   })
 })

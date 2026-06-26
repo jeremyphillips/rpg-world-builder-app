@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  applyStableIdsForChoiceOptions,
   applyStableIdsForUpdate,
   deriveSlugForCreate,
   envelopeSlugFields,
@@ -24,6 +25,18 @@ describe('applyStableIdsForUpdate', () => {
     expect(applyStableIdsForUpdate(rows, existing)).toEqual([
       { id: 'darkvision', name: 'Superior Darkvision' },
       { id: 'keen-senses', name: 'Keen Senses' },
+    ])
+  })
+})
+
+describe('applyStableIdsForChoiceOptions', () => {
+  it('preserves existing ids and derives new ones from labels', () => {
+    const existing = [{ id: 'standard' }]
+    const rows = [{ id: 'standard', label: 'Standard Equipment' }, { label: 'Starting Gold' }]
+
+    expect(applyStableIdsForChoiceOptions(rows, existing)).toEqual([
+      { id: 'standard', label: 'Standard Equipment' },
+      { id: 'starting-gold', label: 'Starting Gold' },
     ])
   })
 })

@@ -38,7 +38,7 @@ describe('startingEquipment round-trip', () => {
       id: 'gold',
       label: 'Starting Gold',
       items: [],
-      wealth: { gp: 75 },
+      wealth: { amount: 75, currency: 'gp' },
     })
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
@@ -130,10 +130,42 @@ describe('startingEquipmentFormSchema validation', () => {
       id: 'gold',
       label: 'Starting Gold',
       items: [],
-      wealth: { gp: 75 },
+      wealth: { amount: 75, currency: 'gp' },
     })
 
     expect(result.success).toBe(true)
+  })
+
+  it('derives stable option ids from labels on save', () => {
+    const existing = pickClass('monk').characterCreation!.startingEquipment!
+    const formValues = startingEquipmentToFormValues(existing)
+    const renamed = formValues.options.map((option) =>
+      option.id === 'standard' ? { ...option, label: 'Renamed Standard Equipment' } : option,
+    )
+
+    const roundTripped = startingEquipmentFromFormValues(
+      { ...formValues, options: renamed },
+      existing,
+    )
+
+    expect(roundTripped?.options.find((option) => option.id === 'standard')?.label).toBe(
+      'Renamed Standard Equipment',
+    )
+  })
+
+  it('assigns ids to new options from labels', () => {
+    const input = startingEquipmentFromFormValues({
+      choose: 1,
+      options: [
+        {
+          label: 'Heavy Armor',
+          items: [],
+          wealth: { amount: 10, currency: 'gp' },
+        },
+      ],
+    })
+
+    expect(input?.options[0]?.id).toBe('heavy-armor')
   })
 
   it('startingEquipmentFromFormValues omits when options are empty', () => {

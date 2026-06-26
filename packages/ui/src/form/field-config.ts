@@ -36,6 +36,7 @@ export type FieldType =
   | 'diceFormula'
   | 'inputSelect'
   | 'chooseFromChips'
+  | 'inlineChooseCount'
 
 /** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -247,6 +248,20 @@ export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
   chooseDefaultValue?: number
 }
 
+/** Inline “Choose [N] …” sentence with a numeric count input only. */
+export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
+  type: 'inlineChooseCount'
+  chooseMin?: number
+  chooseMax?: number
+  /** Leading sentence fragment before the count input. Defaults to `Choose`. */
+  prefix?: string
+  /** Trailing sentence fragment after the count input. Defaults to `from:`. */
+  suffix?: string
+  /** When true, the legend is visually hidden but kept for assistive tech. */
+  hideLabel?: boolean
+  defaultValue?: number
+}
+
 /**
  * Searchable dropdown for picking one or many values from a large option list.
  * `multiple: true` (default) → value is `string[]`; selected values render as removable chips.
@@ -340,6 +355,7 @@ export type FieldConfig =
   | FileFieldConfig
   | ChipsFieldConfig
   | ChooseFromChipsFieldConfig
+  | InlineChooseCountFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
@@ -480,6 +496,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   diceFormula: defaultDiceFormulaForMode('optional'),
   inputSelect: {},
   chooseFromChips: [],
+  inlineChooseCount: undefined,
 }
 
 function emptyEditableGridValue(
