@@ -18,11 +18,11 @@ function damageFromForm(values: EquipmentInputBuildCtx['values']): WeaponInput['
       ? { kind: 'flat', amount: values.damageAmount }
       : undefined
   }
-  if (values.damageCount !== undefined && values.damageFaces !== undefined) {
+  if (values.damageDice?.count !== undefined && values.damageDice?.faces !== undefined) {
     return {
       kind: 'dice',
-      count: values.damageCount,
-      faces: dieFaceSchema.parse(values.damageFaces),
+      count: values.damageDice.count,
+      faces: dieFaceSchema.parse(values.damageDice.faces),
     }
   }
   return undefined
@@ -39,12 +39,14 @@ function optionalWeaponDamage(values: EquipmentInputBuildCtx['values']): Partial
 
 function optionalVersatileDamage(values: EquipmentInputBuildCtx['values']): Partial<WeaponInput> {
   if (!(values.properties ?? []).includes('versatile')) return {}
-  if (values.versatileCount === undefined || values.versatileFaces === undefined) return {}
+  if (values.versatileDamage?.count === undefined || values.versatileDamage?.faces === undefined) {
+    return {}
+  }
   return {
     versatileDamage: {
       kind: 'dice',
-      count: values.versatileCount,
-      faces: dieFaceSchema.parse(values.versatileFaces),
+      count: values.versatileDamage.count,
+      faces: dieFaceSchema.parse(values.versatileDamage.faces),
     },
   }
 }

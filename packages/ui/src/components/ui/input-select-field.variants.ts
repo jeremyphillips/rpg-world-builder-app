@@ -29,12 +29,12 @@ export const inputSelectGroupVariants = cva(
 
 /**
  * Size-only tokens shared by all segments. Uses `pl-*` (not `px-*`) so the
- * right-padding in NumberInput's `numberInputFieldVariants` (pr-7 stepper gap)
+ * right-padding in NumberInput's `numberInputFieldVariants` (pr-6 stepper gap)
  * is never overridden by a later `pr-*` from this object.
  */
 export const segmentSizeVariants = {
   sm: 'h-8 pl-2.5 py-1 text-xs',
-  md: 'h-10 pl-3.5 py-2 text-base',
+  md: 'h-9 pl-3 py-1.5 text-sm',
   lg: 'h-13 pl-4 py-2.5 text-lg',
 } as const
 
@@ -90,7 +90,7 @@ export const inputSelectUnitSegmentVariants = cva(
       {
         searchable: false,
         size: 'md',
-        class: 'min-w-[5.25rem]',
+        class: 'min-w-[5rem]',
       },
       {
         searchable: false,
@@ -105,7 +105,7 @@ export const inputSelectUnitSegmentVariants = cva(
       {
         searchable: true,
         size: 'md',
-        class: 'min-w-48 max-w-64',
+        class: 'min-w-44 max-w-60',
       },
       {
         searchable: true,

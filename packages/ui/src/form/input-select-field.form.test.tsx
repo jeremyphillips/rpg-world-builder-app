@@ -127,7 +127,7 @@ describe('Form inputSelect field', () => {
     )
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
-    expect(numberInputRoot).toHaveClass('w-[calc(3*1ch+3.125rem)]')
+    expect(numberInputRoot).toHaveClass('w-[calc(3*1ch+2.75rem)]')
 
     const group = container.querySelector('[role="group"]')
     expect(group).toHaveClass('w-fit')

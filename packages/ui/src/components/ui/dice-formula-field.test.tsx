@@ -108,13 +108,13 @@ describe('DiceFormulaField', () => {
       />,
     )
 
-    const sharedTwoDigitWidth = 'w-[calc(2*1ch+3.125rem)]'
-    const facesThreeDigitWidth = 'w-[calc(3*1ch+3.125rem)]'
+    const sharedTwoDigitWidth = 'w-[calc(2*1ch+2.75rem)]'
+    const facesThreeDigitWidth = 'w-[calc(3*1ch+2.75rem)]'
 
     expect(screen.getByLabelText('Count').parentElement).toHaveClass(sharedTwoDigitWidth)
     expect(screen.getByLabelText('Modifier').parentElement).toHaveClass(sharedTwoDigitWidth)
     expect(screen.getByLabelText('Die faces')).toHaveClass(facesThreeDigitWidth)
-    expect(screen.getByLabelText('Operator')).toHaveClass('w-[calc(1*1ch+3.125rem)]')
+    expect(screen.getByLabelText('Operator')).toHaveClass('w-[calc(1*1ch+2.75rem)]')
   })
 
   it('has no axe violations', async () => {

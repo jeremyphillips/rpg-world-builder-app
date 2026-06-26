@@ -215,8 +215,8 @@ describe('ChipsField', () => {
         chipSize="md"
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm')
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-3')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-xs')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-2.5')
   })
 
   it('uses md label type scale by default', () => {
@@ -229,7 +229,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style')).toHaveClass('text-sm')
+    expect(screen.getByText('Play Style')).toHaveClass('text-xs')
   })
 
   it('disables all options when disabled', () => {

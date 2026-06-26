@@ -36,7 +36,7 @@ export const fieldLabelVariants = cva(
     variants: {
       size: {
         sm: 'text-xs',
-        md: 'text-sm',
+        md: 'text-xs',
         lg: 'text-sm',
       },
     },

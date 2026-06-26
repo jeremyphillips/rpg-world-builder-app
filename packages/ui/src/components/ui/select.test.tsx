@@ -43,9 +43,9 @@ describe('Select', () => {
     )
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('w-[calc(2*1ch+3.125rem)]')
-    expect(trigger).toHaveClass('pr-7')
-    expect(trigger.querySelector('[aria-hidden]')).toHaveClass('w-6')
+    expect(trigger).toHaveClass('w-[calc(2*1ch+2.75rem)]')
+    expect(trigger).toHaveClass('pr-6')
+    expect(trigger.querySelector('[aria-hidden]')).toHaveClass('w-5')
   })
 
   it('has no axe accessibility violations (closed)', async () => {

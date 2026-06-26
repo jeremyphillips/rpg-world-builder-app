@@ -8,7 +8,7 @@ export const numberInputRootVariants = cva('group relative inline-flex')
 
 const groupedNumberInputFieldSizeClasses = {
   sm: 'h-8 pl-2.5 py-1 text-xs pr-6',
-  md: 'h-10 pl-3.5 py-2 text-base pr-7',
+  md: 'h-9 pl-3 py-1.5 text-sm pr-6',
   lg: 'h-13 pl-4 py-2.5 text-lg pr-8',
 } as const
 
@@ -35,7 +35,7 @@ export const numberInputFieldVariants = cva(
       {
         grouped: false,
         size: 'md',
-        class: cn(fieldControlVariants({ size: 'md' }), 'pr-7'),
+        class: cn(fieldControlVariants({ size: 'md' }), 'pr-6'),
       },
       {
         grouped: false,
@@ -71,7 +71,7 @@ export const numberInputStepperVariants = cva(
     variants: {
       size: {
         sm: 'w-5',
-        md: 'w-6',
+        md: 'w-5',
         lg: 'w-7',
       },
       grouped: {
@@ -92,7 +92,7 @@ export const numberInputStepperButtonVariants = cva(
     variants: {
       size: {
         sm: '[&_svg]:size-2.5',
-        md: '[&_svg]:size-3',
+        md: '[&_svg]:size-2.5',
         lg: '[&_svg]:size-3.5',
       },
     },

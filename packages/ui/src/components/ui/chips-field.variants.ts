@@ -10,7 +10,7 @@ export const chipPillVariants = cva(
     variants: {
       size: {
         sm: 'px-2.5 py-0.5 text-xs',
-        md: 'px-3 py-1 text-sm',
+        md: 'px-2.5 py-0.5 text-xs',
         lg: 'px-4 py-1.5 text-base',
       },
     },

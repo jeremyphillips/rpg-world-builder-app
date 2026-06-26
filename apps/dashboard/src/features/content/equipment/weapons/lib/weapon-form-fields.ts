@@ -1,5 +1,4 @@
 import {
-  DIE_FACES,
   PHYSICAL_DAMAGE_TYPE_IDS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
@@ -24,10 +23,16 @@ function labelsFromEntries<const T extends string>(
   ) as Record<T, string>
 }
 
-const weaponCategoryOptions = toOptions(WEAPON_CATEGORIES, labelsFromEntries(WEAPON_CATEGORY_ENTRIES))
+const weaponCategoryOptions = toOptions(
+  WEAPON_CATEGORIES,
+  labelsFromEntries(WEAPON_CATEGORY_ENTRIES),
+)
 const weaponModeOptions = toOptions(WEAPON_MODES, labelsFromEntries(WEAPON_MODE_ENTRIES))
 const weaponMasteryOptions = toOptions(WEAPON_MASTERIES, labelsFromEntries(WEAPON_MASTERY_ENTRIES))
-const weaponPropertyOptions = toOptions(WEAPON_PROPERTIES, labelsFromEntries(WEAPON_PROPERTY_ENTRIES))
+const weaponPropertyOptions = toOptions(
+  WEAPON_PROPERTIES,
+  labelsFromEntries(WEAPON_PROPERTY_ENTRIES),
+)
 const damageTypeOptions = toOptions(
   PHYSICAL_DAMAGE_TYPE_IDS,
   Object.fromEntries(PHYSICAL_DAMAGE_TYPE_IDS.map((id) => [id, id])) as Record<
@@ -35,7 +40,6 @@ const damageTypeOptions = toOptions(
     string
   >,
 )
-const dieFaceOptions = DIE_FACES.map((face) => ({ value: String(face), label: `d${face}` }))
 const damageKindOptions = [
   { value: 'dice', label: 'Dice' },
   { value: 'flat', label: 'Flat amount' },
@@ -78,17 +82,13 @@ function visibleWhenRanged(): FieldVisibility {
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<
-  EquipmentFormValues,
-  'hasDamage' | 'damageKind' | 'damageCount' | 'damageFaces' | 'damageAmount'
-> {
+): Pick<EquipmentFormValues, 'hasDamage' | 'damageKind' | 'damageDice' | 'damageAmount'> {
   if (!damage) return { hasDamage: false }
   if (damage.kind === 'dice') {
     return {
       hasDamage: true,
       damageKind: 'dice',
-      damageCount: damage.count,
-      damageFaces: damage.faces,
+      damageDice: { count: damage.count, faces: damage.faces },
     }
   }
   return {
@@ -140,71 +140,59 @@ export function weaponFormFieldGroup(): FormItem {
         type: 'switch',
         name: 'hasDamage',
         label: 'Deals damage',
+        defaultValue: true,
       },
       {
-        type: 'select',
-        name: 'damageKind',
-        label: 'Damage kind',
-        options: damageKindOptions,
-        visibility: visibleWhenHasDamage(),
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'damageKind',
+            label: 'Damage kind',
+            options: damageKindOptions,
+            defaultValue: 'dice',
+            width: '1/2',
+            visibility: visibleWhenHasDamage(),
+          },
+          {
+            type: 'select',
+            name: 'damageType',
+            label: 'Damage type',
+            options: damageTypeOptions,
+            placeholder: 'Choose...',
+            width: '1/2',
+            visibility: visibleWhenHasDamage(),
+            required: true,
+          },
+        ],
       },
       {
-        type: 'select',
-        name: 'damageType',
-        label: 'Damage type',
-        options: damageTypeOptions,
-        visibility: visibleWhenHasDamage(),
+        type: 'diceFormula',
+        name: 'damageDice',
+        label: 'Damage',
+        modifierMode: 'none',
+        size: 'md',
+        countMin: 1,
+        visibility: visibleWhenDiceDamage(),
         required: true,
       },
       {
-        kind: 'row',
-        fields: [
-          {
-            type: 'number',
-            name: 'damageCount',
-            label: 'Dice count',
-            min: 1,
-            visibility: visibleWhenDiceDamage(),
-            required: true,
-          },
-          {
-            type: 'select',
-            name: 'damageFaces',
-            label: 'Die faces',
-            options: dieFaceOptions,
-            visibility: visibleWhenDiceDamage(),
-            required: true,
-          },
-          {
-            type: 'number',
-            name: 'damageAmount',
-            label: 'Flat damage',
-            min: 1,
-            visibility: visibleWhenFlatDamage(),
-            required: true,
-          },
-        ],
+        type: 'number',
+        name: 'damageAmount',
+        label: 'Flat damage',
+        min: 1,
+        visibility: visibleWhenFlatDamage(),
+        required: true,
       },
       {
-        kind: 'row',
-        fields: [
-          {
-            type: 'number',
-            name: 'versatileCount',
-            label: 'Versatile dice count',
-            min: 1,
-            visibility: visibleWhenVersatile(),
-            required: true,
-          },
-          {
-            type: 'select',
-            name: 'versatileFaces',
-            label: 'Versatile die faces',
-            options: dieFaceOptions,
-            visibility: visibleWhenVersatile(),
-            required: true,
-          },
-        ],
+        type: 'diceFormula',
+        name: 'versatileDamage',
+        label: 'Versatile damage',
+        modifierMode: 'none',
+        size: 'md',
+        countMin: 1,
+        visibility: visibleWhenVersatile(),
+        required: true,
       },
       {
         kind: 'row',
@@ -243,12 +231,10 @@ export function weaponFormValuesFromEntity(
   | 'mode'
   | 'hasDamage'
   | 'damageKind'
-  | 'damageCount'
-  | 'damageFaces'
+  | 'damageDice'
   | 'damageAmount'
   | 'damageType'
-  | 'versatileCount'
-  | 'versatileFaces'
+  | 'versatileDamage'
   | 'properties'
   | 'mastery'
   | 'rangeNormal'
@@ -260,8 +246,9 @@ export function weaponFormValuesFromEntity(
     mode: item.mode,
     ...damageToForm(item.damage),
     damageType: item.damageType,
-    versatileCount: item.versatileDamage?.count,
-    versatileFaces: item.versatileDamage?.faces,
+    versatileDamage: item.versatileDamage
+      ? { count: item.versatileDamage.count, faces: item.versatileDamage.faces }
+      : undefined,
     properties: item.properties,
     mastery: item.mastery,
     rangeNormal: item.range?.normal,

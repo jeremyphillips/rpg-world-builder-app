@@ -10,7 +10,7 @@ export const selectDigitTrailingColumnVariants = cva(
     variants: {
       size: {
         sm: 'w-5 [&_svg]:size-2.5',
-        md: 'w-6 [&_svg]:size-3',
+        md: 'w-5 [&_svg]:size-2.5',
         lg: 'w-7 [&_svg]:size-3.5',
       },
     },
