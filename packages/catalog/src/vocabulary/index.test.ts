@@ -6,6 +6,7 @@ import {
   getSeedCreatureTypeEntry,
   getSeedCreatureTypeLabel,
   getVocabularyOptionById,
+  listSeedVocabularySetIds,
   loadSeedCreatureTypes,
   loadSeedVocabularyOptionSet,
   seedCreatureTypeIds,
@@ -64,5 +65,9 @@ describe('SRD 5.2.1 creature type vocabulary seed', () => {
         (entry) => entry.id === option.id,
       ),
     ).toBe(true)
+  })
+
+  it('lists seeded vocabulary set ids for a ruleset', () => {
+    expect(listSeedVocabularySetIds(RULESET)).toEqual([CREATURE_TYPE_SET_ID])
   })
 })

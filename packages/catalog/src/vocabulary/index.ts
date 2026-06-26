@@ -144,3 +144,11 @@ export function getSeedCreatureTypeEntry(
     return undefined
   }
 }
+
+/** Vocabulary set ids with catalog seed data for a ruleset. */
+export function listSeedVocabularySetIds(rulesetId: SystemRulesetId): VocabularyOptionSetId[] {
+  const sets = SEED_SETS_BY_RULESET[rulesetId] as Partial<
+    Record<VocabularyOptionSetId, readonly VocabularySeedOption[]>
+  >
+  return Object.keys(sets) as VocabularyOptionSetId[]
+}

@@ -6,6 +6,7 @@ import { errorHandler, notFound } from './middleware/error-handler'
 import { authRouter } from './features/auth'
 import { campaignRouter } from './features/campaign/campaign.routes'
 import { contentRouter } from './features/content'
+import { homebrewRouter, vocabularyRouter } from './features/vocabulary/vocabulary.routes'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
 import { userRouter } from './features/user/user.routes'
 
@@ -35,6 +36,8 @@ export function createApp(): Express {
   api.use('/auth', authRouter)
   api.use('/campaigns', campaignRouter)
   api.use('/campaigns/:campaignId/content', contentRouter)
+  api.use('/campaigns/:campaignId/vocabulary', vocabularyRouter)
+  api.use('/campaigns/:campaignId/homebrew', homebrewRouter)
   api.use('/uploads', uploadsRouter)
   api.use('/users', userRouter)
 
