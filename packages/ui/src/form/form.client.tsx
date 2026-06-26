@@ -1,21 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import {
-  FormProvider,
-  useForm,
-  type DefaultValues,
-  type FieldValues,
-  type UseFormReturn,
-} from 'react-hook-form'
+import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
 import { Text } from '../components/ui/text'
 import { fieldGroupStackClasses } from '../components/ui/field.variants'
 import { FormItems } from './form-items.client'
-import { FormSectionContext } from './form-section-context.client'
-import { FileFieldPropsProvider } from './file-field-props.context'
+import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
 import { FormActionsBar } from './form-actions-bar'
@@ -107,39 +100,30 @@ export function Form<TFieldValues extends FieldValues>({
     mode,
   })
 
-  const sectionContext = React.useMemo(
-    () => ({ collapsibleSections, depth: 0 }),
-    [collapsibleSections],
-  )
-
-  const resolvedFooter = typeof footer === 'function' ? footer(form) : footer
+  const resolvedFooter = resolveSchemaFormFooter(footer, form)
 
   return (
-    <FormProvider {...form}>
-      <FileFieldPropsProvider value={fileFieldProps ?? {}}>
-        <form
-          id={formId}
-          noValidate
-          onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
-          className={className}
-        >
-          <div className={cn(fieldGroupStackClasses, contentClassName)}>
-            {!stickyFooter && formError ? (
-              <Text variant="destructive" role="alert">
-                {formError}
-              </Text>
-            ) : null}
-            <FormSectionContext.Provider value={sectionContext}>
-              <FormItems items={fields} idPrefix={formId} />
-            </FormSectionContext.Provider>
-          </div>
-          {stickyFooter ? (
-            <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
-          ) : resolvedFooter ? (
-            <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
-          ) : null}
-        </form>
-      </FileFieldPropsProvider>
-    </FormProvider>
+    <SchemaFormShell
+      form={form}
+      formId={formId}
+      fileFieldProps={fileFieldProps}
+      collapsibleSections={collapsibleSections}
+      onSubmit={onSubmit}
+      className={className}
+    >
+      <div className={cn(fieldGroupStackClasses, contentClassName)}>
+        {!stickyFooter && formError ? (
+          <Text variant="destructive" role="alert">
+            {formError}
+          </Text>
+        ) : null}
+        <FormItems items={fields} idPrefix={formId} />
+      </div>
+      {stickyFooter ? (
+        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+      ) : resolvedFooter ? (
+        <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
+      ) : null}
+    </SchemaFormShell>
   )
 }

@@ -13,6 +13,7 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
+import type { SelectFieldValueProps } from './select-field-value-props'
 import { chipPillVariants, type ChipSize } from './chips-field.variants'
 
 interface ChipOptionButtonProps {
@@ -138,25 +139,10 @@ export function ChipsFieldOptions({
   )
 }
 
-export interface ChipsFieldProps {
+export interface ChipsFieldProps extends SelectFieldValueProps {
   id: string
   label: string
   options: FieldOption[]
-  /**
-   * `true` (default) — value is `string[]`; multiple pills may be active.
-   * `false` — value is `string`; selecting one deselects the others.
-   */
-  multiple?: boolean
-  /** Maximum selections when `multiple` is true. */
-  max?: number
-  value?: string | number | Array<string | number>
-  onChange?: (value: string | string[]) => void
-  onBlur?: () => void
-  error?: string
-  hint?: string
-  info?: React.ReactNode
-  required?: boolean
-  disabled?: boolean
   /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
   /** Pill padding/type scale (default `sm`). */

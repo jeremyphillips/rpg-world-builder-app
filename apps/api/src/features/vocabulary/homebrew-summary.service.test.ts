@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createUser } from '../user'
 import { createCampaign } from '../campaign'
-import { HomebrewClassModel } from '../content/classes/homebrew-class.model'
+import { HomebrewClassModel } from '../content'
 import { getHomebrewContentSummary } from './homebrew-summary.service'
 
 beforeAll(async () => {

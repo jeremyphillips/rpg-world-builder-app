@@ -2,13 +2,15 @@
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { headingVariants } from './heading.variants'
+import {
+  DialogCloseButton,
+  DialogPanelHeader as SheetHeaderBase,
+  dialogDismissHandlers,
+} from './dialog-parts.client'
 import { modalOverlayVariants } from './modal.variants'
 import { sheetBodyVariants, sheetContentVariants, type SheetSide } from './sheet.variants'
-import { textVariants } from './text.variants'
 
 const SheetRoot = DialogPrimitive.Root
 
@@ -56,23 +58,16 @@ const SheetContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(sheetContentVariants({ side }), className)}
-        onInteractOutside={(event) => {
-          if (!closeOnOutsideClick) event.preventDefault()
-          onInteractOutside?.(event)
-        }}
-        onEscapeKeyDown={(event) => {
-          if (!closeOnEscape) event.preventDefault()
-          onEscapeKeyDown?.(event)
-        }}
+        {...dialogDismissHandlers(
+          closeOnOutsideClick,
+          closeOnEscape,
+          onInteractOutside,
+          onEscapeKeyDown,
+        )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close
-          aria-label={closeLabel}
-          className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none"
-        >
-          <X className="size-4" />
-        </DialogPrimitive.Close>
+        <DialogCloseButton closeLabel={closeLabel} />
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
   ),
@@ -86,17 +81,15 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
   ({ className, headline, description, children, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      <DialogPrimitive.Title className={headingVariants({ variant: 'card' })}>
-        {headline}
-      </DialogPrimitive.Title>
-      {description ? (
-        <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
-          {description}
-        </DialogPrimitive.Description>
-      ) : null}
+    <SheetHeaderBase
+      ref={ref}
+      className={className}
+      headline={headline}
+      description={description}
+      {...props}
+    >
       {children}
-    </div>
+    </SheetHeaderBase>
   ),
 )
 SheetHeader.displayName = 'Sheet.Header'

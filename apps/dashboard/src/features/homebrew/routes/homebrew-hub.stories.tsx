@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
+import type { HomebrewContentSummary } from '@rpg/contracts'
 
 import { withDashboardProviders } from '../../../../.storybook/decorators'
 
-const STORY_CAMPAIGN_ID = 'camp_1'
-import type { HomebrewContentSummary } from '@rpg/contracts'
-
 import { HomebrewHubContent } from './homebrew-hub'
+
+const STORY_CAMPAIGN_ID = 'camp_1'
 
 const mockSummary: HomebrewContentSummary = {
   content: [
@@ -28,9 +27,7 @@ function withHomebrewSummary(): Meta<typeof HomebrewHubContent>['decorators'] {
       queryClient.setQueryData(['campaigns', STORY_CAMPAIGN_ID, 'homebrew', 'summary'], mockSummary)
       return (
         <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <Story />
-          </MemoryRouter>
+          <Story />
         </QueryClientProvider>
       )
     },

@@ -1,17 +1,17 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
-const { model, models, Schema } = mongoose
+import { CREATURE_SIZES } from '@rpg/contracts'
 
-import { CREATURE_SIZES, SYSTEM_RULESET_IDS } from '@rpg/contracts'
+import {
+  homebrewCampaignSlugIndex,
+  homebrewContentIdentityFields,
+} from '../lib/homebrew-content-schema'
+
+const { model, models, Schema } = mongoose
 
 const homebrewSpeciesSchema = new Schema(
   {
-    slug: { type: String, required: true, trim: true },
-    rulesetId: { type: String, enum: [...SYSTEM_RULESET_IDS], required: true },
-    campaignId: { type: String, required: true, index: true },
-    name: { type: String, required: true, trim: true },
-    imageKey: { type: String },
-    description: { type: String },
+    ...homebrewContentIdentityFields,
     creatureType: { type: String, required: true, trim: true },
     sizes: [{ type: String, enum: [...CREATURE_SIZES] }],
     speed: { type: Schema.Types.Mixed, required: true },
@@ -21,7 +21,7 @@ const homebrewSpeciesSchema = new Schema(
   { timestamps: true },
 )
 
-homebrewSpeciesSchema.index({ campaignId: 1, rulesetId: 1, slug: 1 }, { unique: true })
+homebrewCampaignSlugIndex(homebrewSpeciesSchema)
 
 export type HomebrewSpeciesSchemaType = InferSchemaType<typeof homebrewSpeciesSchema>
 

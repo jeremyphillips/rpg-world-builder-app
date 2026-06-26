@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Button, SelectField, Sheet, TextareaField, TextField } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
@@ -42,13 +42,13 @@ export function VocabularyEntrySheet({
     handleSubmit,
     reset,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<VocabularyEntryFormValues>({
     defaultValues: { id: '', label: '', description: '', status: 'active' },
   })
 
-  const status = watch('status')
+  const status = useWatch({ control, name: 'status' })
 
   useEffect(() => {
     if (!open) return

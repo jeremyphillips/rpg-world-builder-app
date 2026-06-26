@@ -5,6 +5,7 @@ import {
   MAX_CHARACTER_LEVEL,
   resolveAllowedCharacterCreatureTypes,
   resolveStandardMaxCharacterLevel,
+  sameStringSet,
 } from '@rpg/contracts'
 
 import { identitySchema, rulesSchema, flavorSchema, resolveRulesSchema } from './campaign-fields'
@@ -19,12 +20,6 @@ export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
 const DEFAULT_STARTING_LEVEL = 1
 const DEFAULT_IMPORTED_CHARACTERS_POLICY = 'disabled' as const
-
-function sameCreatureTypeSet(left: readonly string[], right: readonly string[]): boolean {
-  if (left.length !== right.length) return false
-  const rightSet = new Set(right)
-  return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
-}
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
   const defined = Object.fromEntries(
@@ -50,10 +45,7 @@ function resolveExtendedProgressionOverride(values: CampaignSettingsValues) {
 function resolveAllowedCharacterCreatureTypesOverride(
   allowedCharacterCreatureTypes: CampaignSettingsValues['allowedCharacterCreatureTypes'],
 ) {
-  return sameCreatureTypeSet(
-    allowedCharacterCreatureTypes,
-    DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
-  )
+  return sameStringSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
     ? undefined
     : allowedCharacterCreatureTypes
 }

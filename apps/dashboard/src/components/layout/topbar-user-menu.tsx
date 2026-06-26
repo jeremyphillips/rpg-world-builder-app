@@ -1,15 +1,13 @@
-import { ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-import { getAssetUrl, type SessionUser } from '@rpg/contracts'
+import { type SessionUser } from '@rpg/contracts'
 import {
-  Avatar,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
   ThemeSwitch,
+  UserMenuTrigger,
 } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -25,15 +23,7 @@ export function TopbarUserMenu({ user }: TopbarUserMenuProps) {
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-        <Avatar
-          name={user.displayName}
-          src={user.avatarKey ? getAssetUrl(user.avatarKey) : undefined}
-          size="sm"
-        />
-        <span className="max-w-[160px] truncate font-medium">{user.displayName}</span>
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-      </DropdownMenuTrigger>
+      <UserMenuTrigger displayName={user.displayName} avatarKey={user.avatarKey} />
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onSelect={() => navigate(ROUTES.profile)}>Profile</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate(ROUTES.account)}>

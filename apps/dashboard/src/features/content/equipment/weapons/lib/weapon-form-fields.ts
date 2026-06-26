@@ -14,14 +14,7 @@ import {
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
-
-function labelsFromEntries<const T extends string>(
-  entries: Record<T, { label: string }>,
-): Record<T, string> {
-  return Object.fromEntries(
-    (Object.entries(entries) as [T, { label: string }][]).map(([key, value]) => [key, value.label]),
-  ) as Record<T, string>
-}
+import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,

@@ -6,35 +6,17 @@ import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
+import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 
 let app: Express
 
-const credentials = {
-  email: 'dm@example.com',
-  password: 'supersecret',
-  displayName: 'Game Master',
-}
-
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  const agent = request.agent(app)
-  const csrf1 = (await agent.get('/api/auth/csrf')).body.csrfToken as string
-  await agent.post('/api/auth/register').set(CSRF_HEADER, csrf1).send(credentials).expect(201)
-  const loginRes = await agent
-    .post('/api/auth/login')
-    .set(CSRF_HEADER, csrf1)
-    .send({ email: credentials.email, password: credentials.password })
-    .expect(200)
-  return { agent, csrfToken: loginRes.body.csrfToken as string }
+  return registerAndLoginTestUser(app)
 }
 
 async function createCampaign(agent: Agent, csrfToken: string): Promise<string> {
-  const createRes = await agent
-    .post('/api/campaigns')
-    .set(CSRF_HEADER, csrfToken)
-    .send({ name: 'Vocabulary Test' })
-    .expect(201)
-  return createRes.body.campaign.id as string
+  return createTestCampaign(agent, csrfToken, 'Vocabulary Test')
 }
 
 beforeAll(async () => {

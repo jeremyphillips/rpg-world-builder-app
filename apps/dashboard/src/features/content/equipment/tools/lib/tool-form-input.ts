@@ -4,15 +4,7 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-input-base'
-
-function parseCrafts(text: string | undefined): string[] | undefined {
-  if (!text?.trim()) return undefined
-  const items = text
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  return items.length > 0 ? items : undefined
-}
+import { parseNewlineList } from '../../lib/parse-newline-list'
 
 /** Maps tool form values to a create/update API input fragment. */
 export function buildToolInput({
@@ -20,7 +12,7 @@ export function buildToolInput({
   ctx,
   weight,
 }: EquipmentInputBuildCtx): CreateEquipmentInput {
-  const crafts = parseCrafts(values.craftsText)
+  const crafts = parseNewlineList(values.craftsText)
 
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),

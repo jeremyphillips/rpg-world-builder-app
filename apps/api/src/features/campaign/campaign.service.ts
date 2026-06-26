@@ -1,44 +1,26 @@
 import { isValidObjectId } from 'mongoose'
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
-  DEFAULT_SYSTEM_RULESET_ID,
   MAX_CHARACTER_LEVEL,
+  sameStringSet,
 } from '@rpg/contracts'
 import type {
   Campaign,
-  CampaignConfiguration,
-  CampaignIdentity,
   CampaignListItem,
   CampaignRole,
-  CampaignStatus,
-  CampaignVisibility,
   CreateCampaignInput,
-  SystemRulesetId,
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
+import { findCampaignById, toCampaign } from './find-campaign-by-id'
 import { assertCreatureTypesActiveInCampaign } from '../vocabulary'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
-}
-
-function toCampaign(doc: CampaignRecord): Campaign {
-  return {
-    id: String(doc._id),
-    identity: doc.identity as CampaignIdentity,
-    configuration: (doc.configuration ?? {}) as CampaignConfiguration,
-    status: doc.status as CampaignStatus,
-    visibility: doc.visibility as CampaignVisibility,
-    rulesetId: (doc.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
-    createdBy: doc.createdBy,
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
-  }
 }
 
 const DEFAULT_SETTINGS = {
@@ -86,13 +68,6 @@ export async function createCampaign(
   return toCampaign(doc.toObject() as CampaignRecord)
 }
 
-export async function findCampaignById(id: string): Promise<Campaign | null> {
-  if (!isValidObjectId(id)) return null
-  const doc = await CampaignModel.findById(id).lean<CampaignRecord | null>()
-  if (!doc) return null
-  return toCampaign(doc)
-}
-
 /**
  * List every campaign the user can reach via membership. Because the creator is
  * given an `owner` membership on create, this covers both campaigns they own and
@@ -130,12 +105,6 @@ function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unkn
   return $set
 }
 
-function sameCreatureTypeSet(left: readonly string[], right: readonly string[]): boolean {
-  if (left.length !== right.length) return false
-  const rightSet = new Set(right)
-  return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
-}
-
 function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['settings']>): {
   $set: Record<string, unknown>
   $unset: Record<string, 1>
@@ -168,7 +137,7 @@ function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['setti
   const allowedCharacterCreatureTypes = settings.ruleOverrides?.allowedCharacterCreatureTypes
   if (
     allowedCharacterCreatureTypes !== undefined &&
-    !sameCreatureTypeSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
+    !sameStringSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
   ) {
     $set['configuration.settings.ruleOverrides.allowedCharacterCreatureTypes'] =
       allowedCharacterCreatureTypes

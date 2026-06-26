@@ -2,18 +2,18 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Check, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldLabelVariants } from './field.variants'
+import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxContentVariants,
   comboboxEmptyVariants,
   comboboxListVariants,
-  comboboxOptionVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
 import { ComboboxSearchField } from './combobox-field-parts.client'
@@ -207,28 +207,12 @@ function SearchableUnitSelect({
               filteredOptions.map((option) => {
                 const isSelected = option.value === unit
                 return (
-                  <button
+                  <ListboxOptionButton
                     key={option.value}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    className={comboboxOptionVariants()}
-                    onClick={() => handleSelect(option.value)}
-                  >
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate">{option.label}</span>
-                      {option.description ? (
-                        <span className="truncate text-xs text-muted-foreground">
-                          {option.description}
-                        </span>
-                      ) : null}
-                    </span>
-                    {isSelected ? (
-                      <Check className="size-4 shrink-0" aria-hidden />
-                    ) : (
-                      <span className="size-4 shrink-0" aria-hidden />
-                    )}
-                  </button>
+                    option={option}
+                    isSelected={isSelected}
+                    onSelect={() => handleSelect(option.value)}
+                  />
                 )
               })
             ) : (

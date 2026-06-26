@@ -1,8 +1,13 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
-const { model, models, Schema } = mongoose
+import { FEAT_CATEGORY_IDS } from '@rpg/contracts'
 
-import { FEAT_CATEGORY_IDS, SYSTEM_RULESET_IDS } from '@rpg/contracts'
+import {
+  homebrewCampaignSlugIndex,
+  homebrewContentIdentityFields,
+} from '../lib/homebrew-content-schema'
+
+const { model, models, Schema } = mongoose
 
 const featRepeatableSubSchema = new Schema(
   {
@@ -14,12 +19,7 @@ const featRepeatableSubSchema = new Schema(
 
 const homebrewFeatSchema = new Schema(
   {
-    slug: { type: String, required: true, trim: true },
-    rulesetId: { type: String, enum: [...SYSTEM_RULESET_IDS], required: true },
-    campaignId: { type: String, required: true, index: true },
-    name: { type: String, required: true, trim: true },
-    imageKey: { type: String },
-    description: { type: String },
+    ...homebrewContentIdentityFields,
     category: { type: String, enum: [...FEAT_CATEGORY_IDS], required: true },
     prerequisite: { type: Schema.Types.Mixed },
     repeatable: {
@@ -32,7 +32,7 @@ const homebrewFeatSchema = new Schema(
   { timestamps: true },
 )
 
-homebrewFeatSchema.index({ campaignId: 1, rulesetId: 1, slug: 1 }, { unique: true })
+homebrewCampaignSlugIndex(homebrewFeatSchema)
 
 export type HomebrewFeatSchemaType = InferSchemaType<typeof homebrewFeatSchema>
 

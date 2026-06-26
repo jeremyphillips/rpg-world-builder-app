@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Check, ChevronDown, Search } from 'lucide-react'
+import { ChevronDown, Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { DismissibleBadge } from './dismissible-badge.client'
@@ -11,13 +11,13 @@ import { fieldControlVariants } from './field-control.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type { ComboboxFieldOption } from './combobox-field.types'
+import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxChipRowVariants,
   comboboxContentVariants,
   comboboxEmptyVariants,
   comboboxListVariants,
-  comboboxOptionVariants,
   comboboxSearchInputVariants,
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
@@ -95,30 +95,15 @@ function ComboboxOptionItem({
   onSelect,
 }: ComboboxOptionItemProps) {
   return (
-    <button
-      id={optionId}
-      type="button"
-      role="option"
-      aria-selected={isSelected}
-      data-active={isHighlighted}
-      data-disabled={isDisabled}
-      disabled={isDisabled}
-      className={comboboxOptionVariants()}
-      onMouseEnter={onHighlight}
-      onClick={onSelect}
-    >
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate">{option.label}</span>
-        {option.description ? (
-          <span className="truncate text-xs text-muted-foreground">{option.description}</span>
-        ) : null}
-      </span>
-      {isSelected ? (
-        <Check className="size-4 shrink-0" aria-hidden />
-      ) : (
-        <span className="size-4 shrink-0" aria-hidden />
-      )}
-    </button>
+    <ListboxOptionButton
+      option={option}
+      optionId={optionId}
+      isSelected={isSelected}
+      isHighlighted={isHighlighted}
+      isDisabled={isDisabled}
+      onHighlight={onHighlight}
+      onSelect={onSelect}
+    />
   )
 }
 

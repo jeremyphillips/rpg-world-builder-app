@@ -1,4 +1,8 @@
 pnpm lint-staged
 pnpm typecheck
 pnpm test
-fallow --format human --production-dupes
+fallow dupes --production --format human
+# fallow health exits 1 even with 0 findings (v2.89); gate on the human summary line.
+complexity_out=$(fallow health --production --complexity --format human 2>&1) || true
+printf '%s\n' "$complexity_out"
+echo "$complexity_out" | grep -Fq '✓ No functions exceed complexity thresholds' || exit 1

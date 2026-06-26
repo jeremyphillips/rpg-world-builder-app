@@ -4,15 +4,7 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-input-base'
-
-function parseProperties(text: string | undefined): string[] | undefined {
-  if (!text?.trim()) return undefined
-  const items = text
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  return items.length > 0 ? items : undefined
-}
+import { parseNewlineList } from '../../lib/parse-newline-list'
 
 /** Maps adventuring gear form values to a create/update API input fragment. */
 export function buildAdventuringGearInput({
@@ -27,8 +19,8 @@ export function buildAdventuringGearInput({
     ...(weight && { weight }),
     ...(values.bundleSize !== undefined && { bundleSize: values.bundleSize }),
     ...(values.storage && { storage: values.storage }),
-    ...(parseProperties(values.propertiesText) && {
-      properties: parseProperties(values.propertiesText),
+    ...(parseNewlineList(values.propertiesText) && {
+      properties: parseNewlineList(values.propertiesText),
     }),
     ...(values.capacity && { capacity: values.capacity }),
     ...(values.holySymbolUsage?.length && { holySymbolUsage: values.holySymbolUsage }),

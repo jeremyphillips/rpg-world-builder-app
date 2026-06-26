@@ -1,7 +1,5 @@
-import { formatSpeedRate, type VehicleEquipment } from '@rpg/contracts'
-import { VEHICLE_CATEGORIES, getVehicleCategoryLabel } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import { VEHICLE_CATEGORIES, getVehicleCategoryLabel, type VehicleEquipment } from '@rpg/contracts'
+import { SortableHeader, type ColumnDef, type FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import {
@@ -9,6 +7,7 @@ import {
   buildContentFilters,
   costColumn,
 } from '../../../lib/content-table-config'
+import { equipmentSpeedColumn } from '../../lib/equipment-form-field-helpers'
 
 const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
   {
@@ -18,13 +17,7 @@ const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
     filterFn: 'equalsString',
     meta: { label: 'Category' },
   },
-  {
-    id: 'speed',
-    accessorFn: (row) => row.speed.value,
-    header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
-    cell: ({ row }) => formatSpeedRate(row.original.speed),
-    meta: { label: 'Speed' },
-  },
+  equipmentSpeedColumn<VehicleEquipment>(),
   costColumn<VehicleEquipment>(),
 ]
 

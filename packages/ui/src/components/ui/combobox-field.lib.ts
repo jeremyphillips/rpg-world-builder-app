@@ -1,3 +1,4 @@
+import { optionMatchesQuery } from './option-query.lib'
 import type { ComboboxFieldOption } from './combobox-field.types'
 
 export function normalizeSelected(multiple: boolean, value: unknown): string[] {
@@ -5,16 +6,6 @@ export function normalizeSelected(multiple: boolean, value: unknown): string[] {
     return Array.isArray(value) ? value.map(String) : []
   }
   return value != null && value !== '' ? [String(value)] : []
-}
-
-export function optionMatchesQuery(option: ComboboxFieldOption, query: string): boolean {
-  const normalized = query.trim().toLowerCase()
-  if (!normalized) return true
-  return (
-    option.label.toLowerCase().includes(normalized) ||
-    option.value.toLowerCase().includes(normalized) ||
-    (option.description?.toLowerCase().includes(normalized) ?? false)
-  )
 }
 
 export function filterOptions(
