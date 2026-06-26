@@ -34,6 +34,8 @@ import {
   SkillProficiencyCreateRoute,
   SkillProficiencyDetailRoute,
   SkillProficiencyEditRoute,
+  HomebrewHubRoute,
+  VocabularyDetailRoute,
   SpeciesCreateRoute,
   SpeciesDetailRoute,
   SpeciesEditRoute,
@@ -344,6 +346,28 @@ const router = createBrowserRouter(
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],
+                    },
+                  ],
+                },
+                {
+                  path: 'homebrew',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'Homebrew',
+                      href: ROUTES.homebrew.hub(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <HomebrewHubRoute /> },
+                    {
+                      path: 'vocabulary/:setId',
+                      element: <VocabularyDetailRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? 'Vocabulary',
+                        }),
+                      } satisfies CrumbHandle,
                     },
                   ],
                 },

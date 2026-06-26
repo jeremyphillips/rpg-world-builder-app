@@ -1,4 +1,5 @@
 import { CONTENT_ROUTES } from './content-routes'
+import { HOMEBREW_ROUTES } from './homebrew-routes'
 
 export const ROUTES = {
   home: '/',
@@ -16,4 +17,5 @@ export const ROUTES = {
     settings: '/admin/settings',
   },
   content: CONTENT_ROUTES,
+  homebrew: HOMEBREW_ROUTES,
 } as const

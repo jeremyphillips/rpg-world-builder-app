@@ -14,10 +14,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import {
-  CREATURE_TYPES,
-  seedCreatureTypeLabelMap,
-} from '../../content/lib/seed-creature-type-helpers'
+import { CREATURE_TYPES, seedCreatureTypeLabelMap } from '@/features/content'
 
 import { ExtendedProgressionEffects } from '../components/extended-progression-effects.client'
 import {

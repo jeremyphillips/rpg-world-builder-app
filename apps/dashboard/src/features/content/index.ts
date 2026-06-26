@@ -41,3 +41,8 @@ export {
   type ContentFormOptionSets,
 } from './lib/content-form-options'
 export { createContentMutationHooks } from './lib/use-content-mutations'
+export {
+  CREATURE_TYPES,
+  getSeedCreatureTypeDisplayLabel,
+  seedCreatureTypeLabelMap,
+} from './lib/seed-creature-type-helpers'
