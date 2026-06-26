@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { FormProvider, useForm } from 'react-hook-form'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
@@ -13,16 +13,6 @@ import {
 import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
-
-vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid={`detail-${namePrefix?.replace(/\./g, '-')}`}>{namePrefix}</div>
-    ),
-  }
-})
 
 function TabShell({
   startingEquipment,
@@ -65,13 +55,8 @@ describe('ClassCharacterCreationTab', () => {
     await user.click(screen.getByRole('button', { name: /Add starting equipment/i }))
 
     await waitFor(() => {
-      expect(screen.getByTestId('detail-characterCreation-startingEquipment')).toHaveTextContent(
-        'characterCreation.startingEquipment',
-      )
+      expect(screen.getByRole('spinbutton', { name: /Packages to choose/i })).toBeInTheDocument()
     })
-    expect(
-      screen.getByTestId('detail-characterCreation-startingEquipment-options-0'),
-    ).toHaveTextContent('characterCreation.startingEquipment.options.0')
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -82,9 +67,7 @@ describe('ClassCharacterCreationTab', () => {
 
   it('renders monk packages when pre-filled', () => {
     render(<TabShell startingEquipment={monkStartingEquipment} entitySource="system" />)
-    expect(screen.getByTestId('detail-characterCreation-startingEquipment')).toHaveTextContent(
-      'characterCreation.startingEquipment',
-    )
+    expect(screen.getByRole('spinbutton', { name: /Packages to choose/i })).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -98,9 +81,8 @@ describe('ClassCharacterCreationTab', () => {
     render(<TabShell startingEquipment={bardStartingEquipment} entitySource="system" />)
 
     await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }))
-    expect(
-      screen.getByTestId('detail-characterCreation-startingEquipment-options-0'),
-    ).toHaveTextContent('characterCreation.startingEquipment.options.0')
+    expect(screen.getByRole('textbox', { name: /Option id/i })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 
   it('allows deleting packages on a system class (no delete lock)', async () => {
