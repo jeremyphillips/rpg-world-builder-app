@@ -14,6 +14,7 @@ import {
 import { customContentTraitSchema, normalizeContentTrait } from '../grants'
 import { skillSchema } from '../skill-proficiency'
 
+import { classCharacterCreationSchema } from '../starting-equipment'
 import { spellcastingSchema } from './spellcasting'
 
 // ---------------------------------------------------------------------------
@@ -106,6 +107,7 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
   proficiencies: classProficienciesWriteSchema,
   features: z.array(classFeatureSchema),
   resources: z.array(classResourceSchema).optional(),
+  characterCreation: classCharacterCreationSchema.optional(),
 })
 
 export type ClassStoredBody = z.infer<typeof classStoredBodySchema>

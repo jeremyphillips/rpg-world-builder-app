@@ -9,6 +9,7 @@ import {
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { speedSchema } from '../vocab/movement-mode'
+import { contentNamedChoiceSchema } from './choice'
 import {
   contentGrantsSchema,
   contentTraitSchema,
@@ -53,10 +54,7 @@ export type SpeciesTrait = z.infer<typeof contentTraitSchema>
  * Ancestry). Each option is a trait — prose plus the grants that option confers.
  * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
-export const speciesHeritageSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional(),
+export const speciesHeritageSchema = contentNamedChoiceSchema.extend({
   options: z.array(speciesTraitSchema).min(1),
 })
 

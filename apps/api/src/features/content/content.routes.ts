@@ -60,6 +60,13 @@ contentRouter.get(
   controller.listFeats,
 )
 
+contentRouter.get(
+  '/starting-wealth',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listStartingWealth,
+)
+
 // Authoring — owner/co-owner only. Body validation happens in the write service
 // per content type so each route can use its contract DTO schema.
 contentRouter.post(

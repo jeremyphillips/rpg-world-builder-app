@@ -48,6 +48,20 @@ export {
 
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
+export {
+  EQUIPMENT_MODIFIER_KINDS,
+  equipmentModifierKindSchema,
+  equipmentModifierSchema,
+  isSpellcastingFocusGearKind,
+  SPELLCASTING_FOCUS_GEAR_KINDS,
+  spellcastingFocusGearKindSchema,
+  spellcastingFocusModifierSchema,
+  type EquipmentModifier,
+  type EquipmentModifierKind,
+  type SpellcastingFocusGearKind,
+  type SpellcastingFocusModifier,
+} from './equipment/modifier'
+
 // ---------------------------------------------------------------------------
 // Equipment — unified catalog content type discriminated by `kind`. Weapons,
 // armor, adventuring gear, tools, mounts, vehicles, services, and magic items

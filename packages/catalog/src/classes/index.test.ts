@@ -707,4 +707,61 @@ describe('SRD 5.2.1 class seed', () => {
       expect(cls.proficiencies.skills.from).toEqual(skillSlugsSuggestingClass(cls.slug, skills))
     }
   })
+
+  it('ships starting equipment for every class with at least two options', () => {
+    for (const cls of classes) {
+      const startingEquipment = cls.characterCreation?.startingEquipment
+      expect(
+        startingEquipment,
+        `${cls.slug} missing characterCreation.startingEquipment`,
+      ).toBeDefined()
+      expect(startingEquipment!.choose).toBe(1)
+      expect(startingEquipment!.options.length).toBeGreaterThanOrEqual(2)
+      expect(new Set(startingEquipment!.options.map((option) => option.id)).size).toBe(
+        startingEquipment!.options.length,
+      )
+    }
+  })
+
+  it('Fighter ships three distinct starting equipment packages', () => {
+    const fighter = getClassBySlug(RULESET, 'fighter')
+    expect(fighter.characterCreation?.startingEquipment.options.map((option) => option.id)).toEqual(
+      ['heavy', 'skirmisher', 'gold'],
+    )
+  })
+
+  it('gold alternatives match SRD starting wealth amounts', () => {
+    const expectedGoldGp: Record<string, number> = {
+      barbarian: 75,
+      bard: 90,
+      cleric: 110,
+      druid: 50,
+      fighter: 155,
+      monk: 50,
+      paladin: 150,
+      ranger: 150,
+      rogue: 100,
+      sorcerer: 50,
+      warlock: 100,
+      wizard: 55,
+    }
+
+    for (const cls of classes) {
+      const goldOption = cls.characterCreation?.startingEquipment.options.find(
+        (option) => option.id === 'gold',
+      )
+      expect(goldOption, `${cls.slug} missing gold starting equipment option`).toBeDefined()
+      expect(goldOption!.wealth).toEqual({ gp: expectedGoldGp[cls.slug] })
+    }
+  })
+
+  it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const standard = monk.characterCreation?.startingEquipment.options.find(
+      (option) => option.id === 'standard',
+    )
+    expect(standard?.description).toContain('Artisan')
+    expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
+    expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)
+  })
 })

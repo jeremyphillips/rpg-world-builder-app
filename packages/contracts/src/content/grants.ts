@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../vocab/ability'
 import { armorCategorySchema } from '../vocab/armor/category'
 import { damageTypeSchema } from '../vocab/damage-type'
@@ -79,9 +80,8 @@ export type ContentProficiencies = z.infer<typeof contentProficienciesSchema>
  * class features such as Rogue's Thieves' Cant can grant one fixed language plus
  * an additional pick from the character-creation language tables.
  */
-export const languageChoiceGrantSchema = z
-  .object({
-    choose: z.number().int().min(1),
+export const languageChoiceGrantSchema = contentPoolChoiceSchema
+  .extend({
     from: z.array(languageSchema).min(1).optional(),
     categories: z.array(languageCategorySchema).min(1).optional(),
   })

@@ -75,6 +75,9 @@ describe('speciesSchema', () => {
   it('parses a well-formed system record (with lineage grants)', () => {
     const result = speciesSchema.safeParse(ELF_SYSTEM)
     expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.heritage?.choose).toBe(1)
+    }
   })
 
   it('parses a homebrew record with a campaignId', () => {

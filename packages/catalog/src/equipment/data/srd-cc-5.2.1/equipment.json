@@ -1443,14 +1443,14 @@
     "mastery": "nick"
   },
   {
-    "id": "srd-cc-5.2.1:shield-steel",
-    "slug": "shield-steel",
+    "id": "srd-cc-5.2.1:shield",
+    "slug": "shield",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Shield (Steel)",
+    "name": "Shield",
     "description": "",
     "cost": {
       "amount": 10,

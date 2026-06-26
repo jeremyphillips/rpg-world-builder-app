@@ -1,0 +1,140 @@
+[
+  {
+    "id": "srd-cc-5.2.1:standard-starting-wealth",
+    "slug": "standard-starting-wealth",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Standard Starting Wealth",
+    "description": "<p>Default starting wealth tiers for higher-level character creation in SRD 5.2.1.</p>",
+    "scope": {
+      "kind": "standard"
+    },
+    "tiers": [
+      {
+        "id": "level-1",
+        "label": "Level 1",
+        "minLevel": 1,
+        "maxLevel": 1,
+        "includeNormalStartingEquipment": true,
+        "bonusGold": null,
+        "magicItemGrants": []
+      },
+      {
+        "id": "levels-2-4",
+        "label": "Levels 2–4",
+        "minLevel": 2,
+        "maxLevel": 4,
+        "includeNormalStartingEquipment": true,
+        "bonusGold": null,
+        "magicItemGrants": [
+          {
+            "rarity": "common",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "id": "levels-5-10",
+        "label": "Levels 5–10",
+        "minLevel": 5,
+        "maxLevel": 10,
+        "includeNormalStartingEquipment": true,
+        "bonusGold": {
+          "baseGp": 500,
+          "formula": {
+            "kind": "dice",
+            "dice": {
+              "count": 1,
+              "faces": 10
+            },
+            "multiplier": 25,
+            "currency": "gp"
+          }
+        },
+        "magicItemGrants": [
+          {
+            "rarity": "common",
+            "quantity": 1
+          },
+          {
+            "rarity": "uncommon",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "id": "levels-11-16",
+        "label": "Levels 11–16",
+        "minLevel": 11,
+        "maxLevel": 16,
+        "includeNormalStartingEquipment": true,
+        "bonusGold": {
+          "baseGp": 5000,
+          "formula": {
+            "kind": "dice",
+            "dice": {
+              "count": 1,
+              "faces": 10
+            },
+            "multiplier": 250,
+            "currency": "gp"
+          }
+        },
+        "magicItemGrants": [
+          {
+            "rarity": "common",
+            "quantity": 2
+          },
+          {
+            "rarity": "uncommon",
+            "quantity": 3
+          },
+          {
+            "rarity": "rare",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "id": "levels-17-20",
+        "label": "Levels 17–20",
+        "minLevel": 17,
+        "maxLevel": 20,
+        "includeNormalStartingEquipment": true,
+        "bonusGold": {
+          "baseGp": 20000,
+          "formula": {
+            "kind": "dice",
+            "dice": {
+              "count": 1,
+              "faces": 10
+            },
+            "multiplier": 250,
+            "currency": "gp"
+          }
+        },
+        "magicItemGrants": [
+          {
+            "rarity": "common",
+            "quantity": 2
+          },
+          {
+            "rarity": "uncommon",
+            "quantity": 4
+          },
+          {
+            "rarity": "rare",
+            "quantity": 3
+          },
+          {
+            "rarity": "very_rare",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  }
+]

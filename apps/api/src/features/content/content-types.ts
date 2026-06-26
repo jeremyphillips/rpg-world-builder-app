@@ -5,6 +5,7 @@ import { skillProficiencyContentConfig } from './skill-proficiencies/skill-profi
 import { speciesContentConfig } from './species/species.config'
 import { spellContentConfig } from './spells/spells.config'
 import { featContentConfig } from './feats/feats.config'
+import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
 
 /**
  * The registry of content types. This is the single extension point: adding a
@@ -18,6 +19,7 @@ const CONTENT_TYPES = {
   species: speciesContentConfig,
   spells: spellContentConfig,
   feats: featContentConfig,
+  'starting-wealth': startingWealthContentConfig,
 } as const satisfies Record<string, ContentTypeConfig>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES

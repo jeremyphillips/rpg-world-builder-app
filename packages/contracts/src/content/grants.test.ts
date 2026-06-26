@@ -169,6 +169,13 @@ describe('languageChoiceGrantSchema', () => {
   it('requires an explicit choice pool', () => {
     expect(languageChoiceGrantSchema.safeParse({ choose: 1 }).success).toBe(false)
   })
+
+  it('defaults choose to 1 when a pool is provided', () => {
+    expect(languageChoiceGrantSchema.parse({ categories: ['standard'] })).toEqual({
+      choose: 1,
+      categories: ['standard'],
+    })
+  })
 })
 
 describe('contentGrantsSchema', () => {

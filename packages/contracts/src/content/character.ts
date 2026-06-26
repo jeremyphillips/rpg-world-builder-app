@@ -7,6 +7,7 @@ import { languageSchema } from '../vocab/language'
 import { weaponCategorySchema } from '../vocab/weapon/category'
 import { absoluteLevelSchema } from '../primitives/level'
 import { creatureAbilityScoresSchema, creatureRuntimeHitPointsSchema } from './creature'
+import { equipmentModifierSchema } from './equipment/modifier'
 import { skillSchema } from './skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -32,6 +33,9 @@ export const CHARACTER_SELECTION_SOURCE_KINDS = [
   'heritageOption',
   'feat',
   'equipment',
+  'classStartingEquipment',
+  'backgroundStartingEquipment',
+  'startingWealthTier',
   'manual',
 ] as const
 
@@ -45,6 +49,11 @@ export type CharacterSelectionSourceKind = z.infer<typeof characterSelectionSour
  * `sourceId` points at the granting content record when there is one. For
  * class/subclass features, `grantId` can hold the feature id that is unique
  * within that parent content record.
+ *
+ * Starting equipment and wealth tier kinds:
+ * - `classStartingEquipment` — `sourceId` = class content id, `grantId` = starting option id
+ * - `backgroundStartingEquipment` — reserved for future background content; same shape as class
+ * - `startingWealthTier` — `sourceId` = starting wealth table id, `grantId` = tier id
  */
 export const characterSelectionSourceSchema = z
   .object({
@@ -234,6 +243,7 @@ export const characterEquipmentEntrySchema = z.object({
   equipped: z.boolean().optional(),
   attuned: z.boolean().optional(),
   customName: z.string().min(1).optional(),
+  modifiers: z.array(equipmentModifierSchema).optional(),
   sources: characterSelectionSourcesSchema,
   notes: z.string().optional(),
 })
@@ -260,6 +270,18 @@ export const characterWealthSchema = z.object({
 })
 
 export type CharacterWealth = z.infer<typeof characterWealthSchema>
+
+/** Sparse coin grant for starting equipment and similar content — omits unset denominations. */
+export const characterWealthGrantSchema = z
+  .object({
+    cp: z.number().int().min(0).optional(),
+    sp: z.number().int().min(0).optional(),
+    gp: z.number().int().min(0).optional(),
+    pp: z.number().int().min(0).optional(),
+  })
+  .strict()
+
+export type CharacterWealthGrant = z.infer<typeof characterWealthGrantSchema>
 
 export const characterFeatEntrySchema = z.object({
   featId: z.string().min(1),
