@@ -1,13 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  FormProvider,
-  useForm,
-  type DefaultValues,
-  type FieldValues,
-  type UseFormReturn,
-} from 'react-hook-form'
+import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
@@ -15,8 +9,7 @@ import { fieldGroupStackClasses } from '../components/ui/field.variants'
 import { Text } from '../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FormItems } from './form-items.client'
-import { FormSectionContext } from './form-section-context.client'
-import { FileFieldPropsProvider } from './file-field-props.context'
+import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
 import { FormActionsBar } from './form-actions-bar'
@@ -120,70 +113,59 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     mode,
   })
 
-  const sectionContext = React.useMemo(
-    () => ({ collapsibleSections, depth: 0 }),
-    [collapsibleSections],
-  )
-
-  const resolvedFooter = typeof footer === 'function' ? footer(form) : footer
+  const resolvedFooter = resolveSchemaFormFooter(footer, form)
 
   return (
-    <FormProvider {...form}>
-      <FileFieldPropsProvider value={fileFieldProps ?? {}}>
-        <form
-          id={formId}
-          noValidate
-          onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
-          className={cn(stickyChrome ? undefined : 'space-y-6', className)}
-        >
-          <Tabs defaultValue={tabs[0]?.id} variant="line">
-            <div className={cn(stickyChrome ? formStickyTabsClasses : undefined)}>
-              <TabsList>
-                {tabs.map((tab) => (
-                  <TabsTrigger key={tab.id} value={tab.id}>
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
+    <SchemaFormShell
+      form={form}
+      formId={formId}
+      fileFieldProps={fileFieldProps}
+      collapsibleSections={collapsibleSections}
+      onSubmit={onSubmit}
+      className={cn(stickyChrome ? undefined : 'space-y-6', className)}
+    >
+      <Tabs defaultValue={tabs[0]?.id} variant="line">
+        <div className={cn(stickyChrome ? formStickyTabsClasses : undefined)}>
+          <TabsList>
             {tabs.map((tab) => (
-              // forceMount keeps all panels mounted so every field is registered
-              // with RHF and validated on global save; inactive panels are hidden
-              // by Radix via the HTML `hidden` attribute.
-              <TabsContent key={tab.id} value={tab.id} forceMount>
-                <div
-                  className={cn(
-                    fieldGroupStackClasses,
-                    stickyChrome ? formTabPanelsBottomPaddingClasses : undefined,
-                  )}
-                >
-                  {tab.header}
-                  {tab.fields.length > 0 ? (
-                    <FormSectionContext.Provider value={sectionContext}>
-                      <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-                    </FormSectionContext.Provider>
-                  ) : null}
-                </div>
-              </TabsContent>
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+              </TabsTrigger>
             ))}
-          </Tabs>
+          </TabsList>
+        </div>
+        {tabs.map((tab) => (
+          // forceMount keeps all panels mounted so every field is registered
+          // with RHF and validated on global save; inactive panels are hidden
+          // by Radix via the HTML `hidden` attribute.
+          <TabsContent key={tab.id} value={tab.id} forceMount>
+            <div
+              className={cn(
+                fieldGroupStackClasses,
+                stickyChrome ? formTabPanelsBottomPaddingClasses : undefined,
+              )}
+            >
+              {tab.header}
+              {tab.fields.length > 0 ? (
+                <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+              ) : null}
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
 
-          {stickyChrome ? (
-            <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
-          ) : (
-            <>
-              {formError ? (
-                <Text variant="destructive" role="alert">
-                  {formError}
-                </Text>
-              ) : null}
-              {resolvedFooter ? (
-                <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
-              ) : null}
-            </>
-          )}
-        </form>
-      </FileFieldPropsProvider>
-    </FormProvider>
+      {stickyChrome ? (
+        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+      ) : (
+        <>
+          {formError ? (
+            <Text variant="destructive" role="alert">
+              {formError}
+            </Text>
+          ) : null}
+          {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
+        </>
+      )}
+    </SchemaFormShell>
   )
 }

@@ -8,10 +8,10 @@ import {
   nextMultiSelection,
   nextSingleSelection,
   normalizeSelected,
-  optionMatchesQuery,
   resolveSearchKeyAction,
   resolveTriggerLabel,
 } from './combobox-field.lib'
+import { optionMatchesQuery } from './option-query.lib'
 
 const options = [
   { value: 'dagger', label: 'Dagger' },

@@ -2,17 +2,19 @@
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { headingVariants } from './heading.variants'
+import {
+  DialogCloseButton,
+  DialogPanelHeader as ModalHeaderBase,
+  dialogDismissHandlers,
+} from './dialog-parts.client'
 import {
   modalContentVariants,
   modalBodyVariants,
   modalOverlayVariants,
   type ModalSize,
 } from './modal.variants'
-import { textVariants } from './text.variants'
 
 const ModalRoot = DialogPrimitive.Root
 
@@ -64,23 +66,16 @@ const ModalContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(modalContentVariants({ size }), className)}
-        onInteractOutside={(event) => {
-          if (!closeOnOutsideClick) event.preventDefault()
-          onInteractOutside?.(event)
-        }}
-        onEscapeKeyDown={(event) => {
-          if (!closeOnEscape) event.preventDefault()
-          onEscapeKeyDown?.(event)
-        }}
+        {...dialogDismissHandlers(
+          closeOnOutsideClick,
+          closeOnEscape,
+          onInteractOutside,
+          onEscapeKeyDown,
+        )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close
-          aria-label={closeLabel}
-          className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none"
-        >
-          <X className="size-4" />
-        </DialogPrimitive.Close>
+        <DialogCloseButton closeLabel={closeLabel} />
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
   ),
@@ -96,17 +91,15 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, headline, description, children, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      <DialogPrimitive.Title className={headingVariants({ variant: 'card' })}>
-        {headline}
-      </DialogPrimitive.Title>
-      {description ? (
-        <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
-          {description}
-        </DialogPrimitive.Description>
-      ) : null}
+    <ModalHeaderBase
+      ref={ref}
+      className={className}
+      headline={headline}
+      description={description}
+      {...props}
+    >
       {children}
-    </div>
+    </ModalHeaderBase>
   ),
 )
 ModalHeader.displayName = 'Modal.Header'

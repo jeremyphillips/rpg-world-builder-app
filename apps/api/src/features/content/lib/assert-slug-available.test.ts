@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { HttpError } from '../../../lib/http-error'
 import { assertSlugAvailable } from './assert-slug-available'
+import { expectHttpError } from '../../../test/expect-http-error'
 
 const systemSlugs = new Set(['fighter', 'wizard'])
 
@@ -13,26 +13,21 @@ describe('assertSlugAvailable', () => {
   })
 
   it('rejects a slug that shadows a system slug (409)', () => {
-    try {
-      assertSlugAvailable({ slug: 'fighter', systemSlugs, campaignSlugs: new Set() })
-      throw new Error('expected to throw')
-    } catch (err) {
-      expect(err).toBeInstanceOf(HttpError)
-      expect((err as HttpError).status).toBe(409)
-    }
+    expectHttpError(
+      () => assertSlugAvailable({ slug: 'fighter', systemSlugs, campaignSlugs: new Set() }),
+      409,
+    )
   })
 
   it('rejects a slug already used by homebrew in the campaign (409)', () => {
-    try {
-      assertSlugAvailable({
-        slug: 'blood-hunter',
-        systemSlugs,
-        campaignSlugs: new Set(['blood-hunter']),
-      })
-      throw new Error('expected to throw')
-    } catch (err) {
-      expect(err).toBeInstanceOf(HttpError)
-      expect((err as HttpError).status).toBe(409)
-    }
+    expectHttpError(
+      () =>
+        assertSlugAvailable({
+          slug: 'blood-hunter',
+          systemSlugs,
+          campaignSlugs: new Set(['blood-hunter']),
+        }),
+      409,
+    )
   })
 })

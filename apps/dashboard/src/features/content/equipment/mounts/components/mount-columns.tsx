@@ -1,5 +1,4 @@
-import { formatMass, formatSpeedRate, type MountEquipment } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { formatMass, type MountEquipment } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -8,6 +7,8 @@ import {
   buildContentFilters,
   costColumn,
 } from '../../../lib/content-table-config'
+import { equipmentSpeedColumn } from '../../lib/equipment-form-field-helpers'
+import { SortableHeader } from '@rpg/ui'
 
 const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
   {
@@ -17,13 +18,7 @@ const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
     cell: ({ row }) => formatMass(row.original.carryingCapacity),
     meta: { label: 'Carrying capacity' },
   },
-  {
-    id: 'speed',
-    accessorFn: (row) => row.speed.value,
-    header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
-    cell: ({ row }) => formatSpeedRate(row.original.speed),
-    meta: { label: 'Speed' },
-  },
+  equipmentSpeedColumn<MountEquipment>(),
   costColumn<MountEquipment>(),
 ]
 

@@ -13,11 +13,12 @@ import {
 } from './combobox-field-parts.client'
 import { normalizeSelected } from './combobox-field.lib'
 import type { ComboboxFieldControlProps, ComboboxFieldOption } from './combobox-field.types'
+import type { SelectFieldValueProps } from './select-field-value-props'
 import { useComboboxControl } from './use-combobox-control.client'
 
 export type { ComboboxFieldOption } from './combobox-field.types'
 
-export interface ComboboxFieldProps {
+export interface ComboboxFieldProps extends SelectFieldValueProps {
   id: string
   label: string
   options: ComboboxFieldOption[]
@@ -26,16 +27,6 @@ export interface ComboboxFieldProps {
    * `false` — value is `string`; picking an option closes the panel.
    */
   multiple?: boolean
-  /** Maximum selections when `multiple` is true. */
-  max?: number
-  value?: string | number | Array<string | number>
-  onChange?: (value: string | string[]) => void
-  onBlur?: () => void
-  error?: string
-  hint?: string
-  info?: React.ReactNode
-  required?: boolean
-  disabled?: boolean
   loading?: boolean
   width?: FieldWidth
   size?: FieldSize

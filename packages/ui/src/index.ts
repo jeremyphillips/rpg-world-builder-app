@@ -180,6 +180,10 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 } from './components/ui/dropdown-menu.client'
+export {
+  UserMenuTrigger,
+  type UserMenuTriggerProps,
+} from './components/ui/user-menu-trigger.client'
 
 export {
   FileDropzone,

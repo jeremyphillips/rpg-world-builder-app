@@ -22,6 +22,10 @@
     "./storybook/with-theme-context": {
       "types": "./src/storybook/with-theme-context.tsx",
       "default": "./src/storybook/with-theme-context.tsx"
+    },
+    "./vitest/setup": {
+      "types": "./src/vitest/setup.ts",
+      "default": "./src/vitest/setup.ts"
     }
   },
   "scripts": {

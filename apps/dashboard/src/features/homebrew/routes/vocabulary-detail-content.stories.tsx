@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
 import type { ResolvedVocabularyOptionSet } from '@rpg/contracts'
 
 import { withDashboardProviders } from '../../../../.storybook/decorators'
@@ -44,9 +43,7 @@ const meta = {
       )
       return (
         <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
-            <Story />
-          </MemoryRouter>
+          <Story />
         </QueryClientProvider>
       )
     },

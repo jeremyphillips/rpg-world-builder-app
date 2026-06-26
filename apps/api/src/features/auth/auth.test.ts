@@ -4,40 +4,29 @@ import type { Express } from 'express'
 
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
+import {
+  defaultTestCredentials,
+  newAuthAgent,
+  registerAndLoginTestUser,
+  registerTestUser,
+} from '../../test/auth-agent'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { updateLastSelectedCampaign } from '../user'
 
 let app: Express
 
-const credentials = {
-  email: 'dm@example.com',
-  password: 'supersecret',
-  displayName: 'Game Master',
-}
+const credentials = defaultTestCredentials
 
-/** A supertest agent that persists cookies, primed with a CSRF token. */
 async function newAgent(): Promise<{ agent: Agent; csrfToken: string }> {
-  const agent = request.agent(app)
-  const res = await agent.get('/api/auth/csrf')
-  return { agent, csrfToken: res.body.csrfToken as string }
+  return newAuthAgent(app)
 }
 
 async function registerUser(): Promise<{ agent: Agent; csrfToken: string }> {
-  const { agent, csrfToken } = await newAgent()
-  await agent.post('/api/auth/register').set(CSRF_HEADER, csrfToken).send(credentials).expect(201)
-  return { agent, csrfToken }
+  return registerTestUser(app, credentials)
 }
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  const { agent } = await newAgent()
-  const csrf1 = (await agent.get('/api/auth/csrf')).body.csrfToken as string
-  await agent.post('/api/auth/register').set(CSRF_HEADER, csrf1).send(credentials).expect(201)
-  const loginRes = await agent
-    .post('/api/auth/login')
-    .set(CSRF_HEADER, csrf1)
-    .send({ email: credentials.email, password: credentials.password })
-    .expect(200)
-  return { agent, csrfToken: loginRes.body.csrfToken as string }
+  return registerAndLoginTestUser(app, credentials)
 }
 
 beforeAll(async () => {
