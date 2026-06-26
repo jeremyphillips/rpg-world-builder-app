@@ -1,10 +1,8 @@
 import type { HomebrewContentSummary, HomebrewSummaryContentType } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { getContentTypeConfig } from '../content/content-types'
-import type { ContentTypeConfig } from '../content/lib/content-type-config'
-import { resolveCatalogForCampaign } from '../content/content.service'
+import { findCampaignById } from '../campaign'
+import { getContentTypeConfig, resolveCatalogForCampaign, type ContentTypeConfig } from '../content'
 
 const SUMMARY_CONTENT_TYPES = [
   'classes',

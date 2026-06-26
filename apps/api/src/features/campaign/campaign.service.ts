@@ -15,7 +15,7 @@ import type {
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
-import { assertCreatureTypesActiveInCampaign } from '../vocabulary/assert-campaign-creature-types'
+import { assertCreatureTypesActiveInCampaign } from '../vocabulary'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown

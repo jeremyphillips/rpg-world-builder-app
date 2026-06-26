@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import type mongoose from 'mongoose'
 
 import { SYSTEM_RULESET_IDS } from '@rpg/contracts'
 
