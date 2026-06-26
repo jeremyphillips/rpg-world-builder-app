@@ -1,4 +1,5 @@
 import type { CampaignSettings } from './campaign'
+import type { CreatureType } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   buildLevelOptions,
@@ -12,6 +13,11 @@ export {
   type ExtendedMaxValidationResult,
 } from './campaign-level-validation'
 
+/** Default creature types allowed on character sheets (PC and NPC). */
+export const DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES = [
+  'humanoid',
+] as const satisfies readonly CreatureType[]
+
 export type ResolvedExtendedProgression = {
   tierName: string
   startsAt: number
@@ -23,12 +29,24 @@ export type ResolvedCampaignRules = {
   maxCharacterLevel: number
   /** Standard tier separator point (sparse override or 20). */
   standardMaxCharacterLevel: number
+  /** Creature types allowed on character sheets in this campaign. */
+  allowedCharacterCreatureTypes: readonly CreatureType[]
   extendedProgression?: ResolvedExtendedProgression
 }
 
 /** Standard max before any optional extended tier. */
 export function resolveStandardMaxCharacterLevel(settings?: CampaignSettings): number {
   return settings?.ruleOverrides?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+}
+
+/** Creature types allowed on character sheets — sparse override or SRD default. */
+export function resolveAllowedCharacterCreatureTypes(
+  settings?: CampaignSettings,
+): readonly CreatureType[] {
+  return (
+    settings?.ruleOverrides?.allowedCharacterCreatureTypes ??
+    DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES
+  )
 }
 
 /** Effective max character level — extended cap when present, else standard max. */
@@ -40,12 +58,14 @@ export function resolveMaxCharacterLevel(settings?: CampaignSettings): number {
 
 export function resolveCampaignRules(settings?: CampaignSettings): ResolvedCampaignRules {
   const standardMaxCharacterLevel = resolveStandardMaxCharacterLevel(settings)
+  const allowedCharacterCreatureTypes = resolveAllowedCharacterCreatureTypes(settings)
   const storedExtended = settings?.ruleOverrides?.extendedProgression
 
   if (storedExtended) {
     return {
       maxCharacterLevel: storedExtended.maxLevel,
       standardMaxCharacterLevel,
+      allowedCharacterCreatureTypes,
       extendedProgression: {
         tierName: storedExtended.tierName,
         startsAt: standardMaxCharacterLevel + 1,
@@ -57,6 +77,7 @@ export function resolveCampaignRules(settings?: CampaignSettings): ResolvedCampa
   return {
     maxCharacterLevel: standardMaxCharacterLevel,
     standardMaxCharacterLevel,
+    allowedCharacterCreatureTypes,
   }
 }
 

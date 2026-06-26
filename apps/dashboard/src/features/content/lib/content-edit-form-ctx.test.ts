@@ -4,7 +4,11 @@ import { entityEquipmentKind, mergeEditLayoutCtx } from './content-edit-form-ctx
 import type { ContentFormCtx } from './content-form-registry'
 
 const baseOptionsCtx: ContentFormCtx = {
-  campaignRules: { maxCharacterLevel: 20, standardMaxCharacterLevel: 20 },
+  campaignRules: {
+    maxCharacterLevel: 20,
+    standardMaxCharacterLevel: 20,
+    allowedCharacterCreatureTypes: ['humanoid'],
+  },
 }
 
 describe('entityEquipmentKind', () => {

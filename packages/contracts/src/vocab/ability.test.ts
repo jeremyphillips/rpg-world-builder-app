@@ -4,10 +4,10 @@ import {
   ABILITY_IDS,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
-  PC_ABILITY_SCORE_MAX,
+  CHARACTER_ABILITY_SCORE_MAX,
   abilitySchema,
   abilityScoreSchema,
-  pcAbilityScoreSchema,
+  characterAbilityScoreSchema,
 } from './ability'
 
 describe('abilitySchema', () => {
@@ -40,9 +40,13 @@ describe('abilityScoreSchema', () => {
   })
 })
 
-describe('pcAbilityScoreSchema', () => {
-  it('caps at the PC maximum', () => {
-    expect(pcAbilityScoreSchema.parse(PC_ABILITY_SCORE_MAX)).toBe(PC_ABILITY_SCORE_MAX)
-    expect(pcAbilityScoreSchema.safeParse(PC_ABILITY_SCORE_MAX + 1).success).toBe(false)
+describe('characterAbilityScoreSchema', () => {
+  it('caps at the character maximum', () => {
+    expect(characterAbilityScoreSchema.parse(CHARACTER_ABILITY_SCORE_MAX)).toBe(
+      CHARACTER_ABILITY_SCORE_MAX,
+    )
+    expect(characterAbilityScoreSchema.safeParse(CHARACTER_ABILITY_SCORE_MAX + 1).success).toBe(
+      false,
+    )
   })
 })

@@ -51,16 +51,20 @@ export function getAbilityLabel(id: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Ability scores — bounds are context-dependent: PCs cap at 20, monsters reach
-// ~30. Groundwork for character/monster sheets; not used by class.ts.
+// Ability scores — bounds are context-dependent: character sheets (PC and NPC)
+// cap at 20; monsters reach ~30. Groundwork for character/monster sheets; not
+// used by class.ts.
 // ---------------------------------------------------------------------------
 
 export const ABILITY_SCORE_MIN = 1
-export const PC_ABILITY_SCORE_MAX = 20
+export const CHARACTER_ABILITY_SCORE_MAX = 20
 export const ABILITY_SCORE_MAX = 30
 
 export const abilityScoreSchema = z.number().int().min(ABILITY_SCORE_MIN).max(ABILITY_SCORE_MAX)
 
-export const pcAbilityScoreSchema = abilityScoreSchema.refine((n) => n <= PC_ABILITY_SCORE_MAX, {
-  message: `Ability score must not exceed ${PC_ABILITY_SCORE_MAX}`,
-})
+export const characterAbilityScoreSchema = abilityScoreSchema.refine(
+  (n) => n <= CHARACTER_ABILITY_SCORE_MAX,
+  {
+    message: `Ability score must not exceed ${CHARACTER_ABILITY_SCORE_MAX}`,
+  },
+)

@@ -28,6 +28,7 @@ describe('level-field-options', () => {
       campaignRules: {
         maxCharacterLevel: 25,
         standardMaxCharacterLevel: 20,
+        allowedCharacterCreatureTypes: ['humanoid'],
         extendedProgression: {
           tierName: 'Epic Destiny',
           startsAt: 21,
@@ -57,11 +58,21 @@ describe('level-field-options', () => {
   it('derives digit slots from campaign max level', () => {
     expect(levelSelectDigits()).toBe(2)
     expect(
-      levelSelectDigits({ campaignRules: { maxCharacterLevel: 9, standardMaxCharacterLevel: 9 } }),
+      levelSelectDigits({
+        campaignRules: {
+          maxCharacterLevel: 9,
+          standardMaxCharacterLevel: 9,
+          allowedCharacterCreatureTypes: ['humanoid'],
+        },
+      }),
     ).toBe(1)
     expect(
       levelSelectDigits({
-        campaignRules: { maxCharacterLevel: 100, standardMaxCharacterLevel: 20 },
+        campaignRules: {
+          maxCharacterLevel: 100,
+          standardMaxCharacterLevel: 20,
+          allowedCharacterCreatureTypes: ['humanoid'],
+        },
       }),
     ).toBe(3)
   })

@@ -1,6 +1,11 @@
 import type { z } from 'zod'
 import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '@rpg/contracts'
-import { MAX_CHARACTER_LEVEL, resolveStandardMaxCharacterLevel } from '@rpg/contracts'
+import {
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  MAX_CHARACTER_LEVEL,
+  resolveAllowedCharacterCreatureTypes,
+  resolveStandardMaxCharacterLevel,
+} from '@rpg/contracts'
 
 import { identitySchema, rulesSchema, flavorSchema } from './campaign-fields'
 
@@ -11,25 +16,52 @@ export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 const DEFAULT_STARTING_LEVEL = 1
 const DEFAULT_IMPORTED_CHARACTERS_POLICY = 'disabled' as const
 
-function buildRuleOverrides(values: CampaignSettingsValues) {
-  const maxCharacterLevel =
-    values.maxCharacterLevel === MAX_CHARACTER_LEVEL ? undefined : values.maxCharacterLevel
+function sameCreatureTypeSet(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false
+  const rightSet = new Set(right)
+  return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
+}
 
-  const extendedProgression = values.extendedProgressionEnabled
-    ? {
-        tierName: values.extendedTierName?.trim() ?? '',
-        maxLevel: values.extendedMaxLevel!,
-      }
-    : undefined
+function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
+  const defined = Object.fromEntries(
+    Object.entries(values).filter(([, value]) => value !== undefined),
+  ) as Partial<T>
 
-  if (maxCharacterLevel === undefined && extendedProgression === undefined) {
-    return undefined
-  }
+  return Object.keys(defined).length > 0 ? defined : undefined
+}
+
+function resolveMaxCharacterLevelOverride(maxCharacterLevel: number) {
+  return maxCharacterLevel === MAX_CHARACTER_LEVEL ? undefined : maxCharacterLevel
+}
+
+function resolveExtendedProgressionOverride(values: CampaignSettingsValues) {
+  if (!values.extendedProgressionEnabled) return undefined
 
   return {
-    ...(maxCharacterLevel !== undefined && { maxCharacterLevel }),
-    ...(extendedProgression !== undefined && { extendedProgression }),
+    tierName: values.extendedTierName?.trim() ?? '',
+    maxLevel: values.extendedMaxLevel!,
   }
+}
+
+function resolveAllowedCharacterCreatureTypesOverride(
+  allowedCharacterCreatureTypes: CampaignSettingsValues['allowedCharacterCreatureTypes'],
+) {
+  return sameCreatureTypeSet(
+    allowedCharacterCreatureTypes,
+    DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  )
+    ? undefined
+    : allowedCharacterCreatureTypes
+}
+
+function buildRuleOverrides(values: CampaignSettingsValues) {
+  return pickDefined({
+    maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
+    extendedProgression: resolveExtendedProgressionOverride(values),
+    allowedCharacterCreatureTypes: resolveAllowedCharacterCreatureTypesOverride(
+      values.allowedCharacterCreatureTypes,
+    ),
+  })
 }
 
 /** Maps a `Campaign` document to the flat shape used by the settings form. */
@@ -50,6 +82,7 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSetting
     extendedMaxLevel: extended?.maxLevel,
     importedCharactersPolicy:
       characterCreation?.importedCharacters.policy ?? DEFAULT_IMPORTED_CHARACTERS_POLICY,
+    allowedCharacterCreatureTypes: [...resolveAllowedCharacterCreatureTypes(settings)],
     playStyle: flavor?.playStyle,
     mood: flavor?.mood,
     magicLevel: flavor?.magicLevel,

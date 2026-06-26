@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { ABSOLUTE_MAX_CHARACTER_LEVEL } from '../primitives/level'
+import { creatureTypeSchema } from '../vocab/creature-type'
 import { resolveCampaignRules } from './campaign-rules'
 import { validateExtendedMaxLevel } from './campaign-level-validation'
 
@@ -42,6 +43,7 @@ export const campaignRuleOverridesSchema = z
   .object({
     maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
     extendedProgression: extendedProgressionSchema.optional(),
+    allowedCharacterCreatureTypes: z.array(creatureTypeSchema).min(1).optional(),
   })
   .strict()
 

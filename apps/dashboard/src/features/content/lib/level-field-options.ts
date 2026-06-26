@@ -1,5 +1,6 @@
 import {
   buildGroupedLevelOptions,
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   MAX_CHARACTER_LEVEL,
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
@@ -14,6 +15,7 @@ export function defaultCampaignRules(): ResolvedCampaignRules {
   return {
     maxCharacterLevel: MAX_CHARACTER_LEVEL,
     standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
+    allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
   }
 }
 

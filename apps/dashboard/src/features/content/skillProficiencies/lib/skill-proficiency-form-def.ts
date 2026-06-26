@@ -48,9 +48,6 @@ const skillProficiencyFormDef: ContentFormDef<
   routeKey: 'skill-proficiencies',
   schema: skillProficiencyFormSchema,
   coverage: 'structural',
-  createDefaultValues: {
-    ability: 'str',
-  },
   buildFields: (ctx): FormItem[] => [
     { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
     {

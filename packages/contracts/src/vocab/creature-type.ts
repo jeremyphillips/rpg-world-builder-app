@@ -4,7 +4,8 @@ import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Creature types — the closed SRD 5.2.1 taxonomy of what a creature is, shared
-// by species (playable creatures are typically Humanoid) and monsters.
+// by species, monsters, and character sheets. Campaign rules may restrict which
+// types are allowed on character sheets (PC and NPC); monsters use the full set.
 // ---------------------------------------------------------------------------
 
 export const CREATURE_TYPE_ENTRIES = {

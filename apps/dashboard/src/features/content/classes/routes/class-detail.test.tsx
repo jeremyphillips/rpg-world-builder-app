@@ -13,6 +13,7 @@ vi.mock('@/features/campaign', () => ({
   useCampaignRules: vi.fn(() => ({
     maxCharacterLevel: 20,
     standardMaxCharacterLevel: 20,
+    allowedCharacterCreatureTypes: ['humanoid'],
   })),
 }))
 

@@ -74,7 +74,7 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
         layout: 'responsive-2',
         fields: [
           {
-            type: 'chips',
+            type: 'combobox',
             name: 'baseEquipmentId',
             label: 'Base equipment',
             multiple: false,

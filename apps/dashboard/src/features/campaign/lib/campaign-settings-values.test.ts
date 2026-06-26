@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Campaign } from '@rpg/contracts'
+import type { Campaign, CreatureType } from '@rpg/contracts'
 
 import {
   buildCreateCampaignInput,
@@ -48,6 +48,7 @@ describe('mapCampaignToSettingsValues', () => {
       extendedTierName: '',
       extendedMaxLevel: undefined,
       importedCharactersPolicy: 'approval_required',
+      allowedCharacterCreatureTypes: ['humanoid'],
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
       magicLevel: 'standard_fantasy',
@@ -66,6 +67,7 @@ describe('mapCampaignToSettingsValues', () => {
       maxCharacterLevel: 20,
       extendedProgressionEnabled: false,
       importedCharactersPolicy: 'disabled',
+      allowedCharacterCreatureTypes: ['humanoid'],
     })
   })
 
@@ -92,6 +94,26 @@ describe('mapCampaignToSettingsValues', () => {
       extendedTierName: 'Epic Destiny',
       extendedMaxLevel: 30,
     })
+  })
+  it('maps creature type override from stored rule overrides', () => {
+    const withCreatureTypes: Campaign = {
+      ...campaign,
+      configuration: {
+        ...campaign.configuration,
+        settings: {
+          characterCreation: {
+            startingLevel: 1,
+            importedCharacters: { policy: 'disabled' },
+          },
+          ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'fey'] },
+        },
+      },
+    }
+
+    expect(mapCampaignToSettingsValues(withCreatureTypes).allowedCharacterCreatureTypes).toEqual([
+      'humanoid',
+      'fey',
+    ])
   })
 })
 
@@ -135,6 +157,23 @@ describe('buildCreateCampaignInput', () => {
     expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({
       extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
     })
+  })
+
+  it('includes creature type override when not default', () => {
+    const values = {
+      ...mapCampaignToSettingsValues(campaign),
+      allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureType[],
+    }
+
+    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({
+      allowedCharacterCreatureTypes: ['humanoid', 'construct'],
+    })
+  })
+
+  it('omits creature type override when default', () => {
+    const values = mapCampaignToSettingsValues(campaign)
+
+    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toBeUndefined()
   })
 
   it('omits extended progression when disabled even if stale fields remain', () => {

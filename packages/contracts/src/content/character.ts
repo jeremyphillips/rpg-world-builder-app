@@ -5,8 +5,9 @@ import { armorCategorySchema } from '../vocab/armor/category'
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
 import { languageSchema } from '../vocab/language'
 import { weaponCategorySchema } from '../vocab/weapon/category'
+import { characterAbilityScoreSchema } from '../vocab/ability'
 import { absoluteLevelSchema } from '../primitives/level'
-import { creatureAbilityScoresSchema, creatureRuntimeHitPointsSchema } from './creature'
+import { creatureRuntimeHitPointsSchema } from './creature'
 import { equipmentModifierSchema } from './equipment/modifier'
 import { skillSchema } from './skill-proficiency'
 
@@ -118,7 +119,14 @@ export const characterSpeciesSchema = z.object({
 
 export type CharacterSpecies = z.infer<typeof characterSpeciesSchema>
 
-export const characterAbilityScoresSchema = creatureAbilityScoresSchema
+export const characterAbilityScoresSchema = z.object({
+  str: characterAbilityScoreSchema,
+  dex: characterAbilityScoreSchema,
+  con: characterAbilityScoreSchema,
+  int: characterAbilityScoreSchema,
+  wis: characterAbilityScoreSchema,
+  cha: characterAbilityScoreSchema,
+})
 
 export type CharacterAbilityScores = z.infer<typeof characterAbilityScoresSchema>
 

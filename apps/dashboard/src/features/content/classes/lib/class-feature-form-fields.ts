@@ -118,7 +118,11 @@ export function featuresFromFormValues(
 /** @deprecated Use `getLevelFieldOptions(ctx)` from `level-field-options`. */
 export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return getLevelFieldOptions({
-    campaignRules: { maxCharacterLevel: maxLevel, standardMaxCharacterLevel: maxLevel },
+    campaignRules: {
+      maxCharacterLevel: maxLevel,
+      standardMaxCharacterLevel: maxLevel,
+      allowedCharacterCreatureTypes: ['humanoid'],
+    },
   })
 }
 

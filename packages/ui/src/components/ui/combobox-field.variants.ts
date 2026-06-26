@@ -1,13 +1,42 @@
 import { cva } from 'class-variance-authority'
 
+import type { FieldSizeToken } from './field-sizing.variants'
+
+/** Negative `sideOffset` magnitude — matches field-control height so the panel overlaps the trigger. */
+export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
+  sm: 32,
+  md: 36,
+  lg: 52,
+} as const satisfies Record<FieldSizeToken, number>
+
 /** Popover panel wrapping the search field and scrollable option list. */
 export const comboboxContentVariants = cva(
-  'z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-border bg-popover p-0 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+  'z-50 w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-md border border-border bg-popover p-0 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
 )
 
-/** Search row pinned to the top of the combobox panel. */
+/**
+ * Search row pinned to the top of the combobox panel — matches trigger field-control
+ * height/background so the open panel reads as one expanded input.
+ */
 export const comboboxSearchRowVariants = cva(
-  'flex items-center gap-2 border-b border-border px-3 py-2',
+  'flex items-center gap-2 border-b border-border bg-transparent px-3 dark:bg-input/30',
+  {
+    variants: {
+      size: {
+        sm: 'h-8 text-xs',
+        md: 'h-9 text-sm',
+        lg: 'h-13 text-lg',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+)
+
+/** Inner search control — no standalone field chrome; the search row owns the input look. */
+export const comboboxSearchInputVariants = cva(
+  'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
 )
 
 /** Scrollable listbox region. */
@@ -23,3 +52,6 @@ export const comboboxEmptyVariants = cva('px-2 py-4 text-center text-sm text-mut
 
 /** Chip row shown below the trigger in multi-select mode. */
 export const comboboxChipRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
+
+/** Hides the trigger while open; panel overlaps the same slot via negative sideOffset. */
+export const comboboxTriggerOpenVariants = cva('pointer-events-none invisible')

@@ -115,6 +115,7 @@ describe('ClassProgressionTable', () => {
         campaignRules={{
           maxCharacterLevel: 30,
           standardMaxCharacterLevel: 20,
+          allowedCharacterCreatureTypes: ['humanoid'],
           extendedProgression: {
             tierName: 'Epic Destiny',
             startsAt: 21,
@@ -136,6 +137,7 @@ describe('ClassProgressionTable', () => {
         campaignRules={{
           maxCharacterLevel: 25,
           standardMaxCharacterLevel: 25,
+          allowedCharacterCreatureTypes: ['humanoid'],
         }}
       />,
     )

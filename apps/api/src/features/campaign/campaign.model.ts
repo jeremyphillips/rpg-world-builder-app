@@ -7,6 +7,7 @@ const { model, models, Schema } = mongoose
 import {
   CAMPAIGN_STATUSES,
   CAMPAIGN_VISIBILITY,
+  CREATURE_TYPES,
   DEFAULT_SYSTEM_RULESET_ID,
   DIFFICULTIES,
   IMPORTED_CHARACTERS_POLICIES,
@@ -41,6 +42,7 @@ const campaignSchema = new Schema(
             tierName: { type: String },
             maxLevel: { type: Number },
           },
+          allowedCharacterCreatureTypes: [{ type: String, enum: [...CREATURE_TYPES] }],
         },
       },
       flavor: {

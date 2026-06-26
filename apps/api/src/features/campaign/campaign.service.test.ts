@@ -193,6 +193,27 @@ describe('updateCampaign', () => {
     })
   })
 
+  it('persists allowed character creature type rule overrides', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
+
+    const updated = await updateCampaign(campaign.id, {
+      settings: {
+        characterCreation: {
+          startingLevel: 1,
+          importedCharacters: { policy: 'disabled' },
+        },
+        ruleOverrides: {
+          allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+        },
+      },
+    })
+
+    expect(updated?.configuration.settings?.ruleOverrides).toEqual({
+      allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+    })
+  })
+
   it('unsets extended progression when omitted from the patch', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({
