@@ -2,12 +2,16 @@ import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
+  CREATURE_TYPES,
+  CREATURE_TYPE_ENTRIES,
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
   MAX_CHARACTER_LEVEL,
   PLAY_STYLES,
   MOODS,
   MAGIC_LEVELS,
   DIFFICULTIES,
+  creatureTypeSchema,
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -24,6 +28,14 @@ import {
   DIFFICULTY_LABELS,
   IMPORTED_CHARACTERS_POLICY_LABELS,
 } from './labels'
+
+const creatureTypeOptions = toOptions(
+  CREATURE_TYPES,
+  Object.fromEntries(CREATURE_TYPES.map((t) => [t, CREATURE_TYPE_ENTRIES[t].label])) as Record<
+    (typeof CREATURE_TYPES)[number],
+    string
+  >,
+)
 
 const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
 
@@ -99,6 +111,10 @@ export const rulesSchema = z
     extendedTierName: z.string().max(EXTENDED_PROGRESSION_TIER_NAME_MAX).optional(),
     extendedMaxLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
     importedCharactersPolicy: z.enum(['approval_required', 'disabled']),
+    allowedCharacterCreatureTypes: z
+      .array(creatureTypeSchema)
+      .min(1)
+      .default([...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]),
   })
   .superRefine((values, ctx) => {
     const effectiveMax = resolveEffectiveMax(values)
@@ -161,7 +177,7 @@ export const rulesFields: FormItem[] = [
             required: true,
             hint: 'The level at which new player characters begin.',
             width: '1/2',
-            inputWidth: 'sm',
+            digits: 2,
           },
           {
             type: 'radio',
@@ -175,6 +191,15 @@ export const rulesFields: FormItem[] = [
             ),
           },
         ],
+      },
+      {
+        type: 'chips',
+        name: 'allowedCharacterCreatureTypes',
+        label: 'Allowed creature types',
+        multiple: true,
+        required: true,
+        hint: 'Creature types allowed for player and NPC character sheets.',
+        options: creatureTypeOptions,
       },
     ],
   },
@@ -192,7 +217,7 @@ export const rulesFields: FormItem[] = [
         required: true,
         hint: 'Normal cap before any extended tier.',
         width: '1/2',
-        inputWidth: 'sm',
+        digits: 2,
       },
       {
         kind: 'slot',
@@ -231,7 +256,7 @@ export const rulesFields: FormItem[] = [
                 max: ABSOLUTE_MAX_CHARACTER_LEVEL,
                 required: true,
                 width: '1/2',
-                inputWidth: 'sm',
+                digits: 2,
                 visibility: visibleWhenExtendedProgression(),
               },
             ],

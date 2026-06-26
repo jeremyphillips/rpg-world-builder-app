@@ -4,6 +4,7 @@ import {
   proficiencyBonus,
   getSlotRow,
   SLOT_TABLES,
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   MAX_CHARACTER_LEVEL,
   subclassChoiceFeatureLabel,
   isSpellcastingActiveAtLevel,
@@ -265,6 +266,7 @@ type ClassProgressionTableProps = {
 const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   maxCharacterLevel: MAX_CHARACTER_LEVEL,
   standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
+  allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
 }
 
 export function ClassProgressionTable({

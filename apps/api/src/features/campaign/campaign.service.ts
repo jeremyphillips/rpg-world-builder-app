@@ -1,5 +1,9 @@
 import { isValidObjectId } from 'mongoose'
-import { DEFAULT_SYSTEM_RULESET_ID, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
+import {
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_SYSTEM_RULESET_ID,
+  MAX_CHARACTER_LEVEL,
+} from '@rpg/contracts'
 import type {
   Campaign,
   CampaignConfiguration,
@@ -125,6 +129,12 @@ function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unkn
   return $set
 }
 
+function sameCreatureTypeSet(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false
+  const rightSet = new Set(right)
+  return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
+}
+
 function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['settings']>): {
   $set: Record<string, unknown>
   $unset: Record<string, 1>
@@ -152,6 +162,17 @@ function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['setti
       extendedProgression.maxLevel
   } else {
     $unset['configuration.settings.ruleOverrides.extendedProgression'] = 1
+  }
+
+  const allowedCharacterCreatureTypes = settings.ruleOverrides?.allowedCharacterCreatureTypes
+  if (
+    allowedCharacterCreatureTypes !== undefined &&
+    !sameCreatureTypeSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
+  ) {
+    $set['configuration.settings.ruleOverrides.allowedCharacterCreatureTypes'] =
+      allowedCharacterCreatureTypes
+  } else {
+    $unset['configuration.settings.ruleOverrides.allowedCharacterCreatureTypes'] = 1
   }
 
   return { $set, $unset }

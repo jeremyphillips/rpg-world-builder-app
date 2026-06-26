@@ -3,15 +3,19 @@ import { describe, expect, it } from 'vitest'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   buildGroupedLevelOptions,
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultExtendedMaxLevel,
   formatExtendedLevelRange,
   formatStandardLevelRange,
   MAX_CHARACTER_LEVEL,
+  resolveAllowedCharacterCreatureTypes,
   resolveCampaignRules,
   resolveMaxCharacterLevel,
   resolveStandardMaxCharacterLevel,
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
+
+const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
 
 const baseSettings = {
   characterCreation: { startingLevel: 1, importedCharacters: { policy: 'disabled' as const } },
@@ -61,6 +65,22 @@ describe('resolveMaxCharacterLevel', () => {
   })
 })
 
+describe('resolveAllowedCharacterCreatureTypes', () => {
+  it('defaults to humanoid when override is absent', () => {
+    expect(resolveAllowedCharacterCreatureTypes(undefined)).toEqual(['humanoid'])
+    expect(resolveAllowedCharacterCreatureTypes(baseSettings)).toEqual(['humanoid'])
+  })
+
+  it('returns sparse override when set', () => {
+    expect(
+      resolveAllowedCharacterCreatureTypes({
+        ...baseSettings,
+        ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'fey'] },
+      }),
+    ).toEqual(['humanoid', 'fey'])
+  })
+})
+
 describe('resolveCampaignRules', () => {
   it('returns flat cap without extended metadata', () => {
     expect(
@@ -71,6 +91,7 @@ describe('resolveCampaignRules', () => {
     ).toEqual({
       maxCharacterLevel: 25,
       standardMaxCharacterLevel: 25,
+      allowedCharacterCreatureTypes: defaultCreatureTypes,
     })
   })
 
@@ -86,12 +107,22 @@ describe('resolveCampaignRules', () => {
     ).toEqual({
       maxCharacterLevel: 30,
       standardMaxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: defaultCreatureTypes,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
         maxLevel: 30,
       },
     })
+  })
+
+  it('returns creature type override when set', () => {
+    expect(
+      resolveCampaignRules({
+        ...baseSettings,
+        ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'construct'] },
+      }).allowedCharacterCreatureTypes,
+    ).toEqual(['humanoid', 'construct'])
   })
 
   it('supports absolute max at 100', () => {
@@ -164,6 +195,7 @@ describe('buildGroupedLevelOptions', () => {
     const groups = buildGroupedLevelOptions({
       maxCharacterLevel: 20,
       standardMaxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: defaultCreatureTypes,
     })
     expect(groups).toHaveLength(1)
     expect(groups[0]?.options).toHaveLength(20)
@@ -173,6 +205,7 @@ describe('buildGroupedLevelOptions', () => {
     const groups = buildGroupedLevelOptions({
       maxCharacterLevel: 30,
       standardMaxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: defaultCreatureTypes,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,

@@ -1,6 +1,11 @@
 import type { z } from 'zod'
 import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '@rpg/contracts'
-import { MAX_CHARACTER_LEVEL, resolveStandardMaxCharacterLevel } from '@rpg/contracts'
+import {
+  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  MAX_CHARACTER_LEVEL,
+  resolveAllowedCharacterCreatureTypes,
+  resolveStandardMaxCharacterLevel,
+} from '@rpg/contracts'
 
 import { identitySchema, rulesSchema, flavorSchema } from './campaign-fields'
 
@@ -10,6 +15,12 @@ export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
 const DEFAULT_STARTING_LEVEL = 1
 const DEFAULT_IMPORTED_CHARACTERS_POLICY = 'disabled' as const
+
+function sameCreatureTypeSet(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false
+  const rightSet = new Set(right)
+  return left.every((value) => rightSet.has(value)) && rightSet.size === left.length
+}
 
 function buildRuleOverrides(values: CampaignSettingsValues) {
   const maxCharacterLevel =
@@ -22,13 +33,25 @@ function buildRuleOverrides(values: CampaignSettingsValues) {
       }
     : undefined
 
-  if (maxCharacterLevel === undefined && extendedProgression === undefined) {
+  const allowedCharacterCreatureTypes = sameCreatureTypeSet(
+    values.allowedCharacterCreatureTypes,
+    DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  )
+    ? undefined
+    : values.allowedCharacterCreatureTypes
+
+  if (
+    maxCharacterLevel === undefined &&
+    extendedProgression === undefined &&
+    allowedCharacterCreatureTypes === undefined
+  ) {
     return undefined
   }
 
   return {
     ...(maxCharacterLevel !== undefined && { maxCharacterLevel }),
     ...(extendedProgression !== undefined && { extendedProgression }),
+    ...(allowedCharacterCreatureTypes !== undefined && { allowedCharacterCreatureTypes }),
   }
 }
 
@@ -50,6 +73,7 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSetting
     extendedMaxLevel: extended?.maxLevel,
     importedCharactersPolicy:
       characterCreation?.importedCharacters.policy ?? DEFAULT_IMPORTED_CHARACTERS_POLICY,
+    allowedCharacterCreatureTypes: [...resolveAllowedCharacterCreatureTypes(settings)],
     playStyle: flavor?.playStyle,
     mood: flavor?.mood,
     magicLevel: flavor?.magicLevel,
