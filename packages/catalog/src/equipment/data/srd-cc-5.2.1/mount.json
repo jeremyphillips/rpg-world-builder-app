@@ -1,0 +1,50 @@
+[
+  {
+    "id": "srd-cc-5.2.1:mule",
+    "slug": "mule",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mule",
+    "description": "A sturdy pack animal suited to carrying loads over rough terrain.",
+    "cost": {
+      "amount": 8,
+      "currency": "gp"
+    },
+    "kind": "mount",
+    "carryingCapacity": {
+      "value": 420,
+      "unit": "lb"
+    },
+    "speed": {
+      "value": 40,
+      "unit": "ft"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:riding-horse",
+    "slug": "riding-horse",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Horse, Riding",
+    "description": "A common riding horse. Fast and sure-footed, suited for travel on roads and open terrain.",
+    "cost": {
+      "amount": 75,
+      "currency": "gp"
+    },
+    "kind": "mount",
+    "carryingCapacity": {
+      "value": 480,
+      "unit": "lb"
+    },
+    "speed": {
+      "value": 60,
+      "unit": "ft"
+    }
+  }
+]

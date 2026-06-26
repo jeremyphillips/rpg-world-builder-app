@@ -1,0 +1,106 @@
+[
+  {
+    "id": "srd-cc-5.2.1:cart",
+    "slug": "cart",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cart",
+    "description": "A two-wheeled vehicle drawn by one or more beasts of burden.",
+    "cost": {
+      "amount": 15,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 200,
+      "unit": "lb"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "land",
+    "speed": {
+      "value": 2,
+      "unit": "mph"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:galley",
+    "slug": "galley",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Galley",
+    "description": "A large oared warship capable of carrying substantial cargo.",
+    "cost": {
+      "amount": 30000,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 4,
+      "unit": "mph"
+    },
+    "crew": 80,
+    "cargoCapacity": {
+      "value": 150,
+      "unit": "ton"
+    },
+    "ac": 15,
+    "hp": 500,
+    "damageThreshold": 20
+  },
+  {
+    "id": "srd-cc-5.2.1:rowboat",
+    "slug": "rowboat",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rowboat",
+    "description": "A small open boat propelled by oars.",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "water",
+    "speed": {
+      "value": 1.5,
+      "unit": "mph"
+    },
+    "crew": 1,
+    "passengers": 3,
+    "ac": 11,
+    "hp": 50
+  },
+  {
+    "id": "srd-cc-5.2.1:wagon",
+    "slug": "wagon",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wagon",
+    "description": "A four-wheeled vehicle drawn by two or more beasts of burden.",
+    "cost": {
+      "amount": 35,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 400,
+      "unit": "lb"
+    },
+    "kind": "vehicle",
+    "vehicleCategory": "land",
+    "speed": {
+      "value": 2,
+      "unit": "mph"
+    }
+  }
+]

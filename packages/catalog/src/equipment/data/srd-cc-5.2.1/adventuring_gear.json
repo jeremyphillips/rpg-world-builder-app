@@ -1,0 +1,176 @@
+[
+  {
+    "id": "srd-cc-5.2.1:arrows",
+    "slug": "arrows",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Arrows",
+    "description": "Standard arrows for a shortbow or longbow. Sold in bundles of 20.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "ammunition",
+    "bundleSize": 20,
+    "storage": "Quiver"
+  },
+  {
+    "id": "srd-cc-5.2.1:backpack",
+    "slug": "backpack",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Backpack",
+    "description": "A backpack can hold 1 cubic foot / 30 pounds of gear.",
+    "cost": {
+      "amount": 2,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "container",
+    "capacity": "1 cubic foot / 30 lb of gear"
+  },
+  {
+    "id": "srd-cc-5.2.1:crossbow-bolts",
+    "slug": "crossbow-bolts",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bolts",
+    "description": "Crossbow bolts used with any crossbow. Sold in bundles of 20.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1.5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "ammunition",
+    "bundleSize": 20,
+    "storage": "Case"
+  },
+  {
+    "id": "srd-cc-5.2.1:lantern-hooded",
+    "slug": "lantern-hooded",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lantern, Hooded",
+    "description": "A Hooded Lantern burns Oil as fuel to cast Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. As a Bonus Action, you can lower the hood, reducing the light to Dim Light in a 5-foot radius, or raise it again.",
+    "cost": {
+      "amount": 5,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general"
+  },
+  {
+    "id": "srd-cc-5.2.1:orb",
+    "slug": "orb",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Orb",
+    "description": "A glass or crystal orb used as an arcane focus for spellcasting.",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus"
+  },
+  {
+    "id": "srd-cc-5.2.1:rope-hempen",
+    "slug": "rope-hempen",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Rope",
+    "description": "50-foot coil of rope with 2 hit points and can be burst with a DC 17 Strength check.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 5,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general"
+  },
+  {
+    "id": "srd-cc-5.2.1:torch",
+    "slug": "torch",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Torch",
+    "description": "A torch burns for 1 hour, shedding bright light in a 20-foot radius and dim light for an additional 20 feet.",
+    "cost": {
+      "amount": 1,
+      "currency": "cp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general",
+    "properties": ["1-hour duration"]
+  },
+  {
+    "id": "srd-cc-5.2.1:wand",
+    "slug": "wand",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wand",
+    "description": "A slender rod carved from special wood used as an arcane focus for spellcasting.",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "arcane_focus"
+  }
+]

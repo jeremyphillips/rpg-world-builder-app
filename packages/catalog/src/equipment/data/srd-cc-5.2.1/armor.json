@@ -1,0 +1,335 @@
+[
+  {
+    "id": "srd-cc-5.2.1:breastplate",
+    "slug": "breastplate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Breastplate",
+    "description": "",
+    "cost": {
+      "amount": 400,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 20,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:chain-mail",
+    "slug": "chain-mail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Chain Mail",
+    "description": "",
+    "cost": {
+      "amount": 75,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 55,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 16,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 13
+  },
+  {
+    "id": "srd-cc-5.2.1:chain-shirt",
+    "slug": "chain-shirt",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Chain Shirt",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 20,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 13,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:half-plate",
+    "slug": "half-plate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Half Plate",
+    "description": "",
+    "cost": {
+      "amount": 750,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 40,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 15,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:hide",
+    "slug": "hide",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hide",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 12,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "organic",
+    "baseAc": 12,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:leather",
+    "slug": "leather",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Leather",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "light",
+    "material": "organic",
+    "baseAc": 11,
+    "addDexModifier": true,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:plate",
+    "slug": "plate",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Plate",
+    "description": "",
+    "cost": {
+      "amount": 1500,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 65,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 18,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 15
+  },
+  {
+    "id": "srd-cc-5.2.1:ring-mail",
+    "slug": "ring-mail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ring Mail",
+    "description": "",
+    "cost": {
+      "amount": 30,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 40,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": false,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:scale-mail",
+    "slug": "scale-mail",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Scale Mail",
+    "description": "",
+    "cost": {
+      "amount": 50,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 45,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "medium",
+    "material": "metal",
+    "baseAc": 14,
+    "addDexModifier": true,
+    "maxDexBonus": 2,
+    "stealthDisadvantage": true
+  },
+  {
+    "id": "srd-cc-5.2.1:shield",
+    "slug": "shield",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "shields",
+    "material": "metal",
+    "acBonus": 2,
+    "addDexModifier": false,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-wood",
+    "slug": "shield-wood",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield (Wood)",
+    "description": "",
+    "cost": {
+      "amount": 10,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 6,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "shields",
+    "material": "organic",
+    "acBonus": 2,
+    "addDexModifier": false,
+    "stealthDisadvantage": false
+  },
+  {
+    "id": "srd-cc-5.2.1:splint",
+    "slug": "splint",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Splint",
+    "description": "",
+    "cost": {
+      "amount": 200,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 60,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "heavy",
+    "material": "metal",
+    "baseAc": 17,
+    "addDexModifier": false,
+    "stealthDisadvantage": true,
+    "strengthRequirement": 15
+  },
+  {
+    "id": "srd-cc-5.2.1:studded-leather",
+    "slug": "studded-leather",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Studded Leather",
+    "description": "",
+    "cost": {
+      "amount": 45,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 13,
+      "unit": "lb"
+    },
+    "kind": "armor",
+    "category": "light",
+    "material": "metal",
+    "baseAc": 12,
+    "addDexModifier": true,
+    "stealthDisadvantage": false
+  }
+]

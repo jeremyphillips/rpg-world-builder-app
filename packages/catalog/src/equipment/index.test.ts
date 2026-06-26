@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { EQUIPMENT_KINDS } from '@rpg/contracts'
 
 import {
+  EQUIPMENT_KIND_FILES,
   getArmorBySlug,
   getWeaponBySlug,
   loadSeedArmor,
   loadSeedEquipment,
+  loadSeedEquipmentByKind,
   loadSeedWeapons,
   seedEquipmentSlugs,
 } from './index'
@@ -46,6 +48,24 @@ describe('SRD 5.2.1 equipment seed', () => {
     const presentKinds = new Set(equipment.map((e) => e.kind))
     for (const kind of EQUIPMENT_KINDS) {
       expect(presentKinds.has(kind), `missing kind: ${kind}`).toBe(true)
+    }
+  })
+
+  it('stores each item in the kind file matching its kind field', () => {
+    for (const kind of EQUIPMENT_KIND_FILES) {
+      const kindItems = loadSeedEquipmentByKind(RULESET, kind)
+      for (const item of kindItems) {
+        expect(item.kind).toBe(kind)
+      }
+    }
+  })
+
+  it('orders slugs alphabetically within each kind file', () => {
+    for (const kind of EQUIPMENT_KIND_FILES) {
+      const slugs = loadSeedEquipmentByKind(RULESET, kind).map((item) => item.slug)
+      for (let i = 1; i < slugs.length; i++) {
+        expect(slugs[i - 1]!.localeCompare(slugs[i]!)).toBeLessThan(0)
+      }
     }
   })
 

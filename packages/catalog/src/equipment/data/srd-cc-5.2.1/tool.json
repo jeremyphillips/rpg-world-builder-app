@@ -1,0 +1,68 @@
+[
+  {
+    "id": "srd-cc-5.2.1:lute",
+    "slug": "lute",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lute",
+    "description": "A stringed musical instrument. Proficiency allows you to add your bonus to any ability check made to play the instrument.",
+    "cost": {
+      "amount": 35,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "musical_instrument",
+    "ability": "cha"
+  },
+  {
+    "id": "srd-cc-5.2.1:smiths-tools",
+    "slug": "smiths-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Smith's Tools",
+    "description": "Proficiency with these tools lets you add your proficiency bonus to ability checks made to craft or repair metal objects.",
+    "cost": {
+      "amount": 20,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 8,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "artisan",
+    "ability": "str"
+  },
+  {
+    "id": "srd-cc-5.2.1:thieves-tools",
+    "slug": "thieves-tools",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Thieves' Tools",
+    "description": "This set of tools includes a small file, a set of lock picks, a small mirror on a metal handle, a set of narrow-bladed scissors, and a pair of pliers.",
+    "cost": {
+      "amount": 25,
+      "currency": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "unit": "lb"
+    },
+    "kind": "tool",
+    "toolCategory": "thieves",
+    "ability": "dex"
+  }
+]
