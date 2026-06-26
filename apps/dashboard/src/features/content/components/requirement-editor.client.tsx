@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
+  fieldInlineSentenceClasses,
   fieldWidthVariants,
 } from '@rpg/ui'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
@@ -21,6 +22,7 @@ import { Trash2 } from 'lucide-react'
 
 import {
   ABILITY_FIELD_LABEL,
+  ABILITY_MINIMUM_OF_CONNECTOR,
   ADD_CONDITION_LABEL,
   ADD_CONDITION_SET_LABEL,
   CONDITION_SETS_HEADING,
@@ -59,9 +61,8 @@ export interface RequirementEditorProps {
   maxCharacterLevel?: number
 }
 
-/** Flat field stack + shared control row keep sentence operands on one baseline. */
+/** Flat field stack keeps sentence operands on one baseline inside the inline row. */
 const SENTENCE_FIELD_STACK = 'space-y-0'
-const SENTENCE_CONTROLS_ROW = 'flex flex-wrap items-center gap-2'
 const SENTENCE_TYPE_LABEL_CLASS =
   "flex items-center gap-1.5 text-xs font-medium leading-none after:text-destructive data-[required]:after:ml-0.5 data-[required]:after:content-['*']"
 const SENTENCE_OPERATOR_CLASS = 'text-sm text-muted-foreground'
@@ -155,6 +156,9 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
 
   return (
     <>
+      <span className={SENTENCE_OPERATOR_CLASS} aria-hidden="true">
+        {ABILITY_MINIMUM_OF_CONNECTOR}
+      </span>
       <Field.Root
         id={`${idPrefix}-ability`}
         width="sm"
@@ -264,7 +268,7 @@ function ConditionSentenceRow({
         {CONDITION_TYPE_LABEL}
       </label>
 
-      <div className={SENTENCE_CONTROLS_ROW}>
+      <div className={fieldInlineSentenceClasses}>
         <Field.Root
           id={typeControlId}
           width="md"

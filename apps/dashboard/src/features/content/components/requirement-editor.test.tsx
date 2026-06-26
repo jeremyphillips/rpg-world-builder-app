@@ -100,6 +100,15 @@ describe('RequirementEditor', () => {
     expect(typeSelects[2]).toHaveTextContent('Ability score')
   })
 
+  it('renders ability score conditions as an inline sentence with of and is at least', () => {
+    render(
+      <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
+    )
+
+    expect(screen.getAllByText('of')).toHaveLength(2)
+    expect(screen.getAllByText('is at least')).toHaveLength(3)
+  })
+
   it('shows AND between condition sets and OR between rows in an any set', () => {
     render(
       <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,

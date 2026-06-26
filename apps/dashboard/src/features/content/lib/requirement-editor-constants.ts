@@ -20,9 +20,11 @@ export const LOGIC_CONNECTOR_LABELS = {
   OR: 'OR',
 } as const
 
+export const ABILITY_MINIMUM_OF_CONNECTOR = 'of'
+
 export const SENTENCE_OPERATOR_LABELS = {
   minLevel: 'is at least',
-  abilityMinimum: 'at least',
+  abilityMinimum: 'is at least',
 } as const
 
 export const SPELLCASTING_SENTENCE_LABEL = 'Has Spellcasting feature'
