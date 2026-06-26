@@ -119,10 +119,14 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
-| `fieldRowGapClasses`             | `gap-4`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
+| `fieldRowGapClasses`             | `gap-6`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
+| `fieldRowLayoutVariants`         | —                     | Display recipe for `FieldRow` / `RowConfig.layout` (`flex`, `responsive-2`, …)  |
+| `fieldInlineSentenceClasses`     | `gap-x-2 gap-y-2`     | Inline “Choose [N] from:” sentence rows (`ChooseFromChipsField`, …)             |
+| `fieldInlineControlRowClasses`   | `gap-3`               | Inline label + control rows (e.g. `DiceFormulaField`)                           |
 | `fieldChipWrapGapClasses`        | `gap-2`               | Gap between chip pills inside `ChipsField`                                      |
 | `fieldGroupDescriptionClasses`   | `mb-3`                | Space below a group or accordion section description                            |
 | `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
+| `fieldArrayItemClasses`          | `p-4 border`          | Chrome around one repeatable array item                                         |
 | `fieldArrayItemActionsClasses`   | `mt-3`                | Space above array item move/remove controls                                     |
 
 Do not sprinkle ad-hoc `space-y-*` or margin utilities on field wrappers in apps — adjust the shared
@@ -138,9 +142,21 @@ WCAG 2.2 AA bar.
 
 ## Sizing conventions
 
-Two independent token scales, both defined once in
-[field-control.variants.ts](../src/components/ui/field-control.variants.ts) and
-shared by every control.
+Two independent token scales. Control height, padding, and type scale come from
+[field-sizing.variants.ts](../src/components/ui/field-sizing.variants.ts) — the
+single source of truth for `sm | md | lg` sizing. Primitives and composites
+(`field-control.variants.ts`, `number-input.variants.ts`,
+`input-select-field.variants.ts`, digit metrics, and so on) compose those maps
+instead of repeating the tuples.
+
+| Map                                | Use                                                        |
+| ---------------------------------- | ---------------------------------------------------------- |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                |
+| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, …) |
+| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls              |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls  |
+| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                 |
+| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                |
 
 ### `size` — control height + type scale
 
@@ -166,6 +182,39 @@ One union, two intents:
 
 A plain `FieldRow` with two inputs and no `width` splits 50/50, and wraps to full
 width on narrow viewports.
+
+### Row layout — flex vs responsive grid
+
+`FieldRow` and schema `RowConfig` share a `layout` prop backed by
+`fieldRowLayoutVariants` in [field.variants.ts](../src/components/ui/field.variants.ts).
+Each layout applies **either** flex **or** grid display classes — never both.
+
+| `layout`         | Use                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `flex` (default) | Side-by-side fields that grow/wrap by `width` — the XdY recipe, class + level rows, … |
+| `responsive-2`   | Two equal columns from `md` up (`grid-cols-1 md:grid-cols-2`)                         |
+| `responsive-3`   | Three columns from `md` up (`grid-cols-2 md:grid-cols-3`)                             |
+
+Prefer `width` fractions inside a flex row when fields should share remaining space
+by grow weight (e.g. a narrow count beside a wide select). Reach for
+`responsive-2` / `responsive-3` when every child should occupy an equal grid cell
+regardless of intrinsic width — wealth coin rows, scalar unit rows, vehicle
+crew/passenger rows, and similar dashboard recipes.
+
+In `<Form>` config, set `layout` on a row item; reserve `className` for genuine
+one-offs:
+
+```ts
+{
+  kind: 'row',
+  layout: 'responsive-3',
+  fields: [
+    { type: 'number', name: 'crew', label: 'Crew', width: 'full' },
+    { type: 'number', name: 'passengers', label: 'Passengers', width: 'full' },
+    { type: 'number', name: 'cargo', label: 'Cargo (tons)', width: 'full' },
+  ],
+}
+```
 
 #### Worked example: the XdY recipe
 
@@ -415,6 +464,31 @@ skill proficiency authoring.
 
 - `name` — chip selection path (`string[]`); `chooseName` — numeric count path.
 - `prefix` / `suffix` default to `Choose` and `skills from:`.
+- Sentence layout uses `fieldInlineSentenceClasses` from
+  [field.variants.ts](../src/components/ui/field.variants.ts).
+
+### Inline choose count (`inlineChooseCount` / `InlineChooseCountField`)
+
+Inline “Choose [N] packages” (or similar) sentence — a compact count input between
+prefix/suffix text, without chip options below. Same sentence-row token as
+`chooseFromChips`.
+
+```ts
+{
+  type: 'inlineChooseCount',
+  name: 'startingEquipment.packages.choose',
+  label: 'Starting packages',
+  prefix: 'Choose',
+  suffix: 'packages',
+  chooseMin: 0,
+  chooseMax: 4,
+}
+```
+
+- Binds a single numeric count path; pair with a separate field or array for the
+  actual choices.
+- `prefix` / `suffix` default to `Choose` and `from:`.
+- Sentence layout uses `fieldInlineSentenceClasses`.
 
 ### Combobox (`combobox` / `ComboboxField`)
 
