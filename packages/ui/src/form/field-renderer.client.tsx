@@ -102,6 +102,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       step={config.step}
       stepperMin={config.min}
       stepperMax={config.max}
+      digits={config.digits}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={(event) => field.onChange(parseNumber(event.target.value))}

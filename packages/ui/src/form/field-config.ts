@@ -123,6 +123,8 @@ export interface NumberFieldConfig extends BaseFieldConfig {
    * container's layout `width`. Use intrinsic tokens (`xs`–`xl`, `auto`).
    */
   inputWidth?: FieldWidth
+  /** Visual digit capacity for the numeric input (sets input width from ch-based tokens). */
+  digits?: FieldDigits
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {

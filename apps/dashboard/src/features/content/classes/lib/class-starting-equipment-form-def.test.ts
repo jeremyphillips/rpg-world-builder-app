@@ -91,15 +91,26 @@ describe('startingEquipment round-trip', () => {
 })
 
 describe('startingEquipmentItemFields', () => {
-  it('uses single-select combobox for fixed equipment slugs', () => {
+  it('uses single-select combobox for fixed equipment slugs in a row with quantity', () => {
     const fields = startingEquipmentItemFields({
       options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
     })
-    const equipmentField = fields.find((field) => 'name' in field && field.name === 'equipmentSlug')
+    const equipmentRow = fields.find(
+      (field): field is Extract<typeof field, { kind: 'row' }> =>
+        'kind' in field && field.kind === 'row',
+    )
+    const equipmentField = equipmentRow?.fields.find((field) => field.name === 'equipmentSlug')
+    const quantityField = equipmentRow?.fields.find((field) => field.name === 'quantity')
 
     expect(equipmentField).toMatchObject({
       type: 'combobox',
       multiple: false,
+      width: 'full',
+    })
+    expect(quantityField).toMatchObject({
+      type: 'number',
+      width: 'auto',
+      digits: 2,
     })
   })
 })
