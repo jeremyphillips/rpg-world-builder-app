@@ -1,36 +1,58 @@
 import type { ContentFormCtx } from './content-form-registry'
-import { isEmbeddedRowSystemLocked } from './is-embedded-row-system-locked'
+import { isContentRowActive, resolveMasterDetailRowKey } from './content-campaign-availability'
+import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
 import type { MasterDetailListItem } from '../components/master-detail-list-panel.client'
-
-const SYSTEM_ROW_BADGE = { label: 'System', variant: 'secondary' as const }
 
 export interface BuildEmbeddedMasterDetailListItemParams {
   field: { id: string }
   index: number
   row: { id?: string } | undefined
   entitySource: ContentFormCtx['entitySource']
+  seedRowIds?: ReadonlySet<string>
+  activeById: Record<string, boolean>
   hasRowError: (index: number) => boolean
   title: string
   eyebrow?: string
+  showDelete?: boolean
 }
 
-/** Builds a list row with derived system-lock badge and deletable flag. */
+/** Builds a list row with derived source badges, deletable flag, and active state. */
 export function buildEmbeddedMasterDetailListItem({
   field,
   index,
   row,
   entitySource,
+  seedRowIds,
+  activeById,
   hasRowError,
   title,
   eyebrow,
+  showDelete = true,
 }: BuildEmbeddedMasterDetailListItemParams): MasterDetailListItem {
-  const locked = isEmbeddedRowSystemLocked(row, entitySource)
+  const rowKey = resolveMasterDetailRowKey(field.id, row)
+  const meta = resolveEmbeddedRowMeta({
+    row,
+    entitySource,
+    seedRowIds,
+    activeById,
+    rowKey,
+  })
+
   return {
     id: field.id,
     title,
     ...(eyebrow !== undefined ? { eyebrow } : {}),
-    deletable: !locked,
+    badges: meta.badges,
+    deletable: showDelete && meta.deletable,
     hasError: hasRowError(index),
-    ...(locked ? { badge: SYSTEM_ROW_BADGE } : {}),
+    active: meta.active,
   }
+}
+
+export function isEmbeddedListRowActive(
+  field: { id: string },
+  row: { id?: string } | undefined,
+  activeById: Record<string, boolean>,
+): boolean {
+  return isContentRowActive(activeById, resolveMasterDetailRowKey(field.id, row))
 }

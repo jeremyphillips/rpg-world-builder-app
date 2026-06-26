@@ -1,7 +1,9 @@
 'use client'
 
-import { useCallback } from 'react'
+import type { ReactNode } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
+import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../lib/content-form-registry'
@@ -45,6 +47,17 @@ export interface FormEmbeddedMasterDetailEditorProps {
    * object). When omitted, this component binds its own field array.
    */
   editor?: UseMasterDetailArrayResult
+  /** When false, rows cannot be reordered. Defaults to `true`. */
+  sortable?: boolean
+  /** When false, hides row delete controls entirely. Defaults to `true`. */
+  showDelete?: boolean
+  /** When false, hides the campaign availability toggle. Defaults to `true`. */
+  showActiveToggle?: boolean
+  /**
+   * Optional fields or chrome rendered above the list/detail grid with standard
+   * field-group spacing (`fieldGroupFlexStackClasses`).
+   */
+  leadingContent?: ReactNode
 }
 
 interface FormEmbeddedMasterDetailEditorBodyProps extends FormEmbeddedMasterDetailEditorProps {
@@ -62,12 +75,21 @@ function FormEmbeddedMasterDetailEditorBody({
   idPrefix,
   mapListItem,
   editor,
+  sortable = true,
+  showDelete = true,
+  showActiveToggle = true,
+  leadingContent,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
   const {
     formState: { submitCount },
   } = useFormContext()
 
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
+
+  const seedRowIds = useMemo(() => {
+    const ids = formCtx.embeddedSeedRowIds?.[fieldName]
+    return ids?.length ? new Set(ids) : undefined
+  }, [formCtx.embeddedSeedRowIds, fieldName])
 
   const items: MasterDetailListItem[] = editor.fields.map((field, index) => {
     const row = watched?.[index]
@@ -83,9 +105,12 @@ function FormEmbeddedMasterDetailEditorBody({
       index,
       row: row as { id?: string } | undefined,
       entitySource: formCtx.entitySource,
+      seedRowIds,
+      activeById: editor.activeById,
       hasRowError: editor.hasRowError,
       title: listDisplay.title,
       eyebrow: listDisplay.eyebrow,
+      showDelete,
     })
   })
 
@@ -102,40 +127,66 @@ function FormEmbeddedMasterDetailEditorBody({
         }).title
       : ''
 
+  const selectedRow =
+    editor.selectedIndex !== null
+      ? (watched?.[editor.selectedIndex] as { id?: string } | undefined)
+      : undefined
+
+  const masterDetailGrid = (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <MasterDetailListPanel
+        items={items}
+        selectedIndex={editor.selectedIndex}
+        ariaLabel={ariaLabel}
+        addLabel={addLabel}
+        emptyLabel={emptyListLabel}
+        onAdd={editor.handleAdd}
+        onSelect={editor.select}
+        onRemove={editor.requestRemove}
+        onMove={sortable ? editor.move : undefined}
+      />
+
+      <MasterDetailEditorPanel
+        editor={editor}
+        itemFields={itemFields}
+        fieldName={fieldName}
+        idPrefix={idPrefix}
+        showValidationBanner={showValidationBanner}
+        emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
+        showActiveToggle={showActiveToggle}
+        selectedRow={selectedRow}
+      />
+    </div>
+  )
+
+  const deleteDialog = (
+    <MasterDetailDeleteDialog
+      open={editor.deleteIndex !== null}
+      itemNoun={itemNoun}
+      itemName={deleteName}
+      onOpenChange={(open) => {
+        if (!open) editor.cancelRemove()
+      }}
+      onConfirm={editor.confirmRemove}
+    />
+  )
+
+  if (!leadingContent) {
+    return (
+      <>
+        {masterDetailGrid}
+        {deleteDialog}
+      </>
+    )
+  }
+
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <MasterDetailListPanel
-          items={items}
-          selectedIndex={editor.selectedIndex}
-          ariaLabel={ariaLabel}
-          addLabel={addLabel}
-          emptyLabel={emptyListLabel}
-          onAdd={editor.handleAdd}
-          onSelect={editor.select}
-          onRemove={editor.requestRemove}
-          onMove={editor.move}
-        />
-
-        <MasterDetailEditorPanel
-          editor={editor}
-          itemFields={itemFields}
-          fieldName={fieldName}
-          idPrefix={idPrefix}
-          showValidationBanner={showValidationBanner}
-          emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
-        />
+      <div className={fieldGroupFlexStackClasses}>
+        {leadingContent}
+        {masterDetailGrid}
       </div>
-
-      <MasterDetailDeleteDialog
-        open={editor.deleteIndex !== null}
-        itemNoun={itemNoun}
-        itemName={deleteName}
-        onOpenChange={(open) => {
-          if (!open) editor.cancelRemove()
-        }}
-        onConfirm={editor.confirmRemove}
-      />
+      {deleteDialog}
     </>
   )
 }

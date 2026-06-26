@@ -189,6 +189,11 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,
+
+  extractEmbeddedSeedRowIds: (entity) => ({
+    traits: entity.traits.map((trait) => trait.id),
+    'heritage.options': entity.heritage?.options.map((option) => option.id) ?? [],
+  }),
 }
 
 contentFormRegistry['species'] = speciesFormDef

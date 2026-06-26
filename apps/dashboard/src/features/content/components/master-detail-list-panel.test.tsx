@@ -56,7 +56,13 @@ describe('MasterDetailListPanel', () => {
 
   it('renders the eyebrow and hides the remove control for protected rows', () => {
     const protectedItems: MasterDetailListItem[] = [
-      { id: 'a', title: 'Rage', eyebrow: 'Level 1', badge: { label: 'System' }, deletable: false },
+      {
+        id: 'a',
+        title: 'Rage',
+        eyebrow: 'Level 1',
+        badges: [{ label: 'System' }],
+        deletable: false,
+      },
     ]
     render(<MasterDetailListPanel {...baseProps()} items={protectedItems} />)
 

@@ -1,9 +1,10 @@
 export const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
 
-export const ACTIVE_IN_CAMPAIGN_LABEL = 'Active in campaign'
-
-export const ACTIVE_IN_CAMPAIGN_TOOLTIP =
-  'Hides this item from players in the current campaign. The item remains available globally.'
+export {
+  ACTIVE_IN_CAMPAIGN_LABEL,
+  ACTIVE_IN_CAMPAIGN_TOOLTIP,
+  isContentRowActive as isSubclassActive,
+} from '../../lib/content-campaign-availability'
 
 export const UNTITLED_SUBCLASS_LABEL = 'Untitled subclass'
 
@@ -19,8 +20,4 @@ export function createDraftSubclassId(): string {
 
 export function isSubclassDeletable(source: 'system' | 'homebrew', id: string): boolean {
   return isDraftSubclassId(id) || source === 'homebrew'
-}
-
-export function isSubclassActive(activeById: Record<string, boolean>, id: string): boolean {
-  return activeById[id] !== false
 }

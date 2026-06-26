@@ -21,14 +21,16 @@ type Feature = { id?: string; name: string; level: number; description: string; 
 function TabShell({
   features = [] as Feature[],
   entitySource,
+  embeddedSeedRowIds,
 }: {
   features?: Feature[]
   entitySource?: ContentFormCtx['entitySource']
+  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
-      <ClassFeaturesTab formCtx={{ entitySource }} />
+      <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds }} />
     </FormProvider>
   )
 }
@@ -55,7 +57,7 @@ describe('ClassFeaturesTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
-    expect(screen.getByRole('button', { name: 'Feature 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^(?!Remove|Drag).*Feature 1/ })).toBeInTheDocument()
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
   })
 
@@ -87,7 +89,13 @@ describe('ClassFeaturesTab', () => {
   })
 
   it('locks system features on a system class (no remove control, System badge)', () => {
-    render(<TabShell features={[rage]} entitySource="system" />)
+    render(
+      <TabShell
+        features={[rage]}
+        entitySource="system"
+        embeddedSeedRowIds={{ features: ['f1'] }}
+      />,
+    )
 
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove Rage/i })).not.toBeInTheDocument()

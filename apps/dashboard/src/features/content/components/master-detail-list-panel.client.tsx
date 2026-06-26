@@ -19,17 +19,25 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { cn, Badge, Button, Text } from '@rpg/ui'
+import { cn, Button, Text } from '@rpg/ui'
 import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
 import {
   masterDetailListDragHandleClasses,
   masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
+  masterDetailListRowInactiveClasses,
+  masterDetailListRowInactiveTitleClasses,
   masterDetailListRowSelectClasses,
   masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
 import { resolveMasterDetailListMove } from './master-detail-list-move'
+import { MasterDetailRowBadges } from './master-detail-row-badges.client'
+
+export interface MasterDetailListBadge {
+  label: string
+  variant?: 'secondary' | 'outline'
+}
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -38,10 +46,12 @@ export interface MasterDetailListItem {
   title: string
   /** Optional small label rendered above the title (e.g. "Level 3"). */
   eyebrow?: string
-  /** Optional status badge (e.g. ownership). */
-  badge?: { label: string; variant?: 'secondary' | 'outline' }
+  /** Optional status badges (e.g. System, Homebrew, Inactive). */
+  badges?: MasterDetailListBadge[]
   /** When true, surfaces a validation error indicator on the row. */
   hasError?: boolean
+  /** When false, row uses inactive styling. Defaults to `true`. */
+  active?: boolean
   /**
    * Whether the row shows a remove control. Defaults to `true`; pass `false`
    * for protected rows (e.g. system content).
@@ -79,9 +89,9 @@ interface MasterDetailListRowContentProps {
 
 function MasterDetailListRowStatus({
   hasError,
-  badge,
-}: Pick<MasterDetailListItem, 'hasError' | 'badge'>) {
-  if (!hasError && !badge) return null
+  badges,
+}: Pick<MasterDetailListItem, 'hasError' | 'badges'>) {
+  if (!hasError && !badges?.length) return null
 
   return (
     <span className="mt-1 flex flex-wrap items-center gap-1">
@@ -91,12 +101,102 @@ function MasterDetailListRowStatus({
           <span className="sr-only">Has validation errors</span>
         </>
       ) : null}
-      {badge ? (
-        <Badge variant={badge.variant ?? 'outline'} className="text-[10px]">
-          {badge.label}
-        </Badge>
-      ) : null}
+      {badges?.length ? <MasterDetailRowBadges badges={badges} /> : null}
     </span>
+  )
+}
+
+function masterDetailListRowClassName(active: boolean, isSelected: boolean) {
+  return cn(
+    masterDetailListRowClasses,
+    !active && masterDetailListRowInactiveClasses,
+    isSelected && masterDetailListRowSelectedClasses,
+  )
+}
+
+type MasterDetailListDragHandleProps = {
+  title: string
+  dragHandleProps: NonNullable<MasterDetailListRowContentProps['dragHandleProps']>
+}
+
+function MasterDetailListDragHandle({ title, dragHandleProps }: MasterDetailListDragHandleProps) {
+  return (
+    <button
+      type="button"
+      className={masterDetailListDragHandleClasses}
+      aria-label={`Drag to reorder ${title}`}
+      onClick={(event) => event.stopPropagation()}
+      {...dragHandleProps.attributes}
+      {...dragHandleProps.listeners}
+    >
+      <GripVertical className="size-4" aria-hidden />
+    </button>
+  )
+}
+
+type MasterDetailListRowSelectButtonProps = {
+  item: MasterDetailListItem
+  index: number
+  isSelected: boolean
+  active: boolean
+  onSelect: (index: number) => void
+}
+
+function MasterDetailListRowSelectButton({
+  item,
+  index,
+  isSelected,
+  active,
+  onSelect,
+}: MasterDetailListRowSelectButtonProps) {
+  return (
+    <button
+      type="button"
+      aria-current={isSelected ? 'true' : undefined}
+      aria-invalid={item.hasError ? true : undefined}
+      onClick={() => onSelect(index)}
+      className={masterDetailListRowSelectClasses}
+    >
+      {item.eyebrow ? (
+        <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {item.eyebrow}
+        </span>
+      ) : null}
+      <span
+        className={cn(
+          'block truncate font-medium',
+          !active && masterDetailListRowInactiveTitleClasses,
+        )}
+      >
+        {item.title}
+      </span>
+      <MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />
+    </button>
+  )
+}
+
+type MasterDetailListRowRemoveButtonProps = {
+  title: string
+  index: number
+  onRemove: (index: number) => void
+}
+
+function MasterDetailListRowRemoveButton({
+  title,
+  index,
+  onRemove,
+}: MasterDetailListRowRemoveButtonProps) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="mr-1 size-8 shrink-0 p-0"
+      aria-label={`Remove ${title}`}
+      onClick={() => onRemove(index)}
+    >
+      <Trash2 className="size-4" aria-hidden />
+    </Button>
   )
 }
 
@@ -110,49 +210,22 @@ function MasterDetailListRowContent({
   onRemove,
 }: MasterDetailListRowContentProps) {
   const deletable = item.deletable !== false
+  const active = item.active !== false
 
   return (
-    <div
-      className={cn(masterDetailListRowClasses, isSelected && masterDetailListRowSelectedClasses)}
-    >
+    <div className={masterDetailListRowClassName(active, isSelected)}>
       {showDragHandle && dragHandleProps ? (
-        <button
-          type="button"
-          className={masterDetailListDragHandleClasses}
-          aria-label={`Drag to reorder ${item.title}`}
-          onClick={(event) => event.stopPropagation()}
-          {...dragHandleProps.attributes}
-          {...dragHandleProps.listeners}
-        >
-          <GripVertical className="size-4" aria-hidden />
-        </button>
+        <MasterDetailListDragHandle title={item.title} dragHandleProps={dragHandleProps} />
       ) : null}
-      <button
-        type="button"
-        aria-current={isSelected ? 'true' : undefined}
-        aria-invalid={item.hasError ? true : undefined}
-        onClick={() => onSelect(index)}
-        className={masterDetailListRowSelectClasses}
-      >
-        {item.eyebrow ? (
-          <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {item.eyebrow}
-          </span>
-        ) : null}
-        <span className="block truncate font-medium">{item.title}</span>
-        <MasterDetailListRowStatus hasError={item.hasError} badge={item.badge} />
-      </button>
+      <MasterDetailListRowSelectButton
+        item={item}
+        index={index}
+        isSelected={isSelected}
+        active={active}
+        onSelect={onSelect}
+      />
       {deletable ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mr-1 size-8 shrink-0 p-0"
-          aria-label={`Remove ${item.title}`}
-          onClick={() => onRemove(index)}
-        >
-          <Trash2 className="size-4" aria-hidden />
-        </Button>
+        <MasterDetailListRowRemoveButton title={item.title} index={index} onRemove={onRemove} />
       ) : null}
     </div>
   )
@@ -289,13 +362,9 @@ function MasterDetailListItems({
 
 /**
  * Generic sidebar for a master-detail editor: an add button plus a selectable,
- * optionally-removable list with an optional eyebrow and status badge per row.
+ * optionally-removable list with optional eyebrow and status badges per row.
  * Presentation only — selection and array mutation are owned by the parent (see
  * `useMasterDetailArray`).
- *
- * Future capability: an "Active in campaign" affordance would attach to the
- * detail panel (caller-owned), not this list; the `badge` slot can surface an
- * "Inactive" marker once per-row availability has a contract + persistence.
  */
 export function MasterDetailListPanel({
   items,

@@ -7,6 +7,7 @@ import { cn } from '../../lib/utils'
  *
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldGroupStackClasses` — sibling fields within a group or form column
+ * - `fieldGroupFlexStackClasses` — same 24px rhythm as `fieldGroupStackClasses`, gap-based (avoids margin collapse with fieldsets)
  * - `formSectionStackClasses` — top-level accordion sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldChipWrapGapClasses` — gap between chip pills inside `ChipsField`
@@ -16,6 +17,7 @@ import { cn } from '../../lib/utils'
  */
 export const fieldAnatomyStackClasses = 'space-y-3'
 export const fieldGroupStackClasses = 'space-y-6'
+export const fieldGroupFlexStackClasses = 'flex flex-col gap-6'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2'

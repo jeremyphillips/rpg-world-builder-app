@@ -5,6 +5,11 @@ export const masterDetailListRowClasses =
 /** Selected row — same footprint as hover, stronger fill + border. */
 export const masterDetailListRowSelectedClasses = 'border-border bg-muted/40 hover:bg-muted/40'
 
+/** Inactive row — dashed border and muted title (matches subclass list). */
+export const masterDetailListRowInactiveClasses = 'border-dashed border-border/60'
+
+export const masterDetailListRowInactiveTitleClasses = 'text-muted-foreground'
+
 /** Drag handle control in a master-detail list row. */
 export const masterDetailListDragHandleClasses =
   'flex size-8 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground hover:text-foreground active:cursor-grabbing'

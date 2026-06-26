@@ -155,7 +155,10 @@ function ContentEditFormReady({
       campaignId={campaignId}
       backHref={backHref}
       headingFn={headingFn}
-      layoutCtx={layoutCtx}
+      layoutCtx={{
+        ...layoutCtx,
+        embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
+      }}
       schema={resolveContentFormSchema(def, layoutCtx)}
       defaultValues={stripEditEnvelopeFromFormDefaults(def.toFormValues(entity), {
         stripKind: layoutCtx.equipmentKind != null,

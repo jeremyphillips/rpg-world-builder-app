@@ -94,27 +94,27 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   }
 
   return (
-    <div className="space-y-6">
-      <HeritageScalarSection
-        formCtx={formCtx}
-        heritage={heritage}
-        onRemove={handleRemoveHeritage}
-      />
-      <FormEmbeddedMasterDetailEditor
-        formCtx={formCtx}
-        fieldName={OPTIONS_FIELD_NAME}
-        itemFields={traitFields}
-        itemNoun={HERITAGE_OPTION_NOUN}
-        ariaLabel="Heritage options"
-        addLabel={ADD_HERITAGE_OPTION_LABEL}
-        emptyListLabel="No options yet. Add one to get started."
-        idPrefix="species-heritage-option"
-        editor={editor}
-        mapListItem={({ row, index }) => ({
-          title: traitItemTitle((row ?? {}) as TraitRowForm, index),
-        })}
-      />
-    </div>
+    <FormEmbeddedMasterDetailEditor
+      formCtx={formCtx}
+      fieldName={OPTIONS_FIELD_NAME}
+      itemFields={traitFields}
+      itemNoun={HERITAGE_OPTION_NOUN}
+      ariaLabel="Heritage options"
+      addLabel={ADD_HERITAGE_OPTION_LABEL}
+      emptyListLabel="No options yet. Add one to get started."
+      idPrefix="species-heritage-option"
+      editor={editor}
+      leadingContent={
+        <HeritageScalarSection
+          formCtx={formCtx}
+          heritage={heritage}
+          onRemove={handleRemoveHeritage}
+        />
+      }
+      mapListItem={({ row, index }) => ({
+        title: traitItemTitle((row ?? {}) as TraitRowForm, index),
+      })}
+    />
   )
 }
 

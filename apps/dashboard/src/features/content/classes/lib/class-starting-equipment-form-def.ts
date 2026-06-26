@@ -22,10 +22,11 @@ import {
 } from '@rpg/ui/form'
 
 import {
-  wealthGrantFields,
-  wealthGrantFromForm,
-  wealthGrantToForm,
+  wealthGrantMoneyField,
+  wealthGrantMoneyFromForm,
+  wealthGrantMoneyToForm,
 } from '../../lib/content-form-field-helpers'
+import { applyStableIdsForChoiceOptions } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 
 export const STARTING_EQUIPMENT_ITEM_KINDS = ['fixed', 'choice'] as const
@@ -45,8 +46,10 @@ export const STARTING_EQUIPMENT_OPTION_NOUN = 'package'
 export const ADD_STARTING_EQUIPMENT_OPTION_LABEL = 'Add package'
 export const REMOVE_STARTING_EQUIPMENT_LABEL = 'Remove starting equipment'
 
-export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipment'
-export const STARTING_EQUIPMENT_OPTIONS_FIELD_NAME = 'characterCreation.startingEquipment.options'
+export const STARTING_EQUIPMENT_OPTIONS_FIELD_NAME =
+  'characterCreation.startingEquipment.options' as const
+
+export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipment' as const
 
 const itemKindOptions = toOptions(
   STARTING_EQUIPMENT_ITEM_KINDS,
@@ -67,14 +70,10 @@ const toolCategoryOptions = toOptions(
   ) as Record<(typeof TOOL_CATEGORIES)[number], string>,
 )
 
-const wealthGrantFormSchema = z
-  .object({
-    cp: z.coerce.number().int().min(0).optional(),
-    sp: z.coerce.number().int().min(0).optional(),
-    gp: z.coerce.number().int().min(0).optional(),
-    pp: z.coerce.number().int().min(0).optional(),
-  })
-  .strict()
+const wealthGrantMoneyFormSchema = z.object({
+  amount: z.coerce.number().int().min(0).default(0),
+  currency: z.enum(['cp', 'sp', 'gp', 'pp']).default('gp'),
+})
 
 export const startingEquipmentModifierFormSchema = z.object({
   kind: z.literal('spellcasting_focus'),
@@ -121,15 +120,15 @@ export const startingEquipmentOptionFormSchema = z
     id: z.string().min(1).optional(),
     label: z.string().min(1),
     description: z.string().optional(),
-    wealth: wealthGrantFormSchema.optional(),
+    wealth: wealthGrantMoneyFormSchema.optional(),
     items: z.array(startingEquipmentItemFormSchema),
   })
   .superRefine((row, ctx) => {
-    if (!row.items.length && !wealthGrantFromForm(row.wealth)) {
+    if (!row.items.length && !wealthGrantMoneyFromForm(row.wealth)) {
       ctx.addIssue({
         code: 'custom',
         message: 'Packages with no items require a wealth grant',
-        path: ['wealth', 'gp'],
+        path: ['wealth', 'amount'],
       })
     }
   })
@@ -213,12 +212,14 @@ export function startingEquipmentModifierFields(): FormItem[] {
 export function startingEquipmentChooseFields(): FormItem[] {
   return [
     {
-      type: 'number',
+      type: 'inlineChooseCount',
       name: 'choose',
       label: 'Packages to choose',
-      min: 1,
+      hideLabel: true,
+      prefix: 'Character can choose',
+      suffix: 'package(s) from list',
+      chooseMin: 1,
       defaultValue: 1,
-      hint: 'How many packages the player picks from this list.',
     },
   ]
 }
@@ -236,22 +237,30 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
       defaultValue: 'fixed',
     },
     {
-      type: 'combobox',
-      name: 'equipmentSlug',
-      label: 'Equipment',
-      options: equipmentOptions,
-      multiple: false,
-      placeholder: 'Choose equipment…',
-      required: true,
-      visibility: visibleForItemKind('fixed'),
-    },
-    {
-      type: 'number',
-      name: 'quantity',
-      label: 'Quantity',
-      min: 1,
-      defaultValue: 1,
-      visibility: visibleForItemKind('fixed'),
+      kind: 'row',
+      fields: [
+        {
+          type: 'combobox',
+          name: 'equipmentSlug',
+          label: 'Equipment',
+          options: equipmentOptions,
+          multiple: false,
+          placeholder: 'Choose equipment…',
+          required: true,
+          width: 'full',
+          visibility: visibleForItemKind('fixed'),
+        },
+        {
+          type: 'number',
+          name: 'quantity',
+          label: 'Quantity',
+          min: 1,
+          defaultValue: 1,
+          width: 'auto',
+          digits: 2,
+          visibility: visibleForItemKind('fixed'),
+        },
+      ],
     },
     {
       type: 'switch',
@@ -300,13 +309,6 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
   return [
     {
       type: 'text',
-      name: 'id',
-      label: 'Option id',
-      required: true,
-      hint: 'Stable key for this package (e.g. standard, gold, heavy).',
-    },
-    {
-      type: 'text',
       name: 'label',
       label: 'Label',
       required: true,
@@ -320,7 +322,7 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
       hint: STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
     },
-    ...wealthGrantFields('wealth'),
+    ...wealthGrantMoneyField('wealth'),
     {
       kind: 'array',
       name: 'items',
@@ -411,7 +413,7 @@ export function startingEquipmentOptionToFormRow(
     id: option.id,
     label: option.label,
     description: option.description,
-    wealth: wealthGrantToForm(option.wealth),
+    wealth: wealthGrantMoneyToForm(option.wealth),
     items: option.items.map(startingEquipmentItemToFormRow),
   }
 }
@@ -427,7 +429,7 @@ export function startingEquipmentOptionFromFormRow(
   if (row.description) {
     option.description = row.description
   }
-  const wealth = wealthGrantFromForm(row.wealth)
+  const wealth = wealthGrantMoneyFromForm(row.wealth)
   if (wealth) {
     option.wealth = wealth
   }
@@ -449,14 +451,10 @@ export function startingEquipmentFromFormValues(
 ): StartingEquipmentChoice | undefined {
   if (!row?.options?.length) return undefined
 
-  const options = row.options
-    .filter((option) => option.label.trim() && option.id?.trim())
-    .map((option) =>
-      startingEquipmentOptionFromFormRow({
-        ...option,
-        id: option.id!.trim(),
-      }),
-    )
+  const options = applyStableIdsForChoiceOptions(
+    row.options.filter((option) => option.label.trim()),
+    existing?.options,
+  ).map((option) => startingEquipmentOptionFromFormRow(option))
 
   if (!options.length) return undefined
 

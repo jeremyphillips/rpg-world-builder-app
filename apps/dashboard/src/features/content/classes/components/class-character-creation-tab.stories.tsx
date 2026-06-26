@@ -76,14 +76,14 @@ export const HomebrewWithStartingEquipment: Story = {
                 equipped: true,
               },
             ],
-            wealth: { gp: 10 },
+            wealth: { amount: 10, currency: 'gp' },
           },
           {
             id: 'gold',
             label: 'Starting Gold',
             description: '',
             items: [],
-            wealth: { gp: 100 },
+            wealth: { amount: 100, currency: 'gp' },
           },
         ],
       }}

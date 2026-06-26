@@ -38,7 +38,7 @@ describe('startingEquipment round-trip', () => {
       id: 'gold',
       label: 'Starting Gold',
       items: [],
-      wealth: { gp: 75 },
+      wealth: { amount: 75, currency: 'gp' },
     })
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
@@ -91,15 +91,26 @@ describe('startingEquipment round-trip', () => {
 })
 
 describe('startingEquipmentItemFields', () => {
-  it('uses single-select combobox for fixed equipment slugs', () => {
+  it('uses single-select combobox for fixed equipment slugs in a row with quantity', () => {
     const fields = startingEquipmentItemFields({
       options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
     })
-    const equipmentField = fields.find((field) => 'name' in field && field.name === 'equipmentSlug')
+    const equipmentRow = fields.find(
+      (field): field is Extract<typeof field, { kind: 'row' }> =>
+        'kind' in field && field.kind === 'row',
+    )
+    const equipmentField = equipmentRow?.fields.find((field) => field.name === 'equipmentSlug')
+    const quantityField = equipmentRow?.fields.find((field) => field.name === 'quantity')
 
     expect(equipmentField).toMatchObject({
       type: 'combobox',
       multiple: false,
+      width: 'full',
+    })
+    expect(quantityField).toMatchObject({
+      type: 'number',
+      width: 'auto',
+      digits: 2,
     })
   })
 })
@@ -130,10 +141,42 @@ describe('startingEquipmentFormSchema validation', () => {
       id: 'gold',
       label: 'Starting Gold',
       items: [],
-      wealth: { gp: 75 },
+      wealth: { amount: 75, currency: 'gp' },
     })
 
     expect(result.success).toBe(true)
+  })
+
+  it('derives stable option ids from labels on save', () => {
+    const existing = pickClass('monk').characterCreation!.startingEquipment!
+    const formValues = startingEquipmentToFormValues(existing)
+    const renamed = formValues.options.map((option) =>
+      option.id === 'standard' ? { ...option, label: 'Renamed Standard Equipment' } : option,
+    )
+
+    const roundTripped = startingEquipmentFromFormValues(
+      { ...formValues, options: renamed },
+      existing,
+    )
+
+    expect(roundTripped?.options.find((option) => option.id === 'standard')?.label).toBe(
+      'Renamed Standard Equipment',
+    )
+  })
+
+  it('assigns ids to new options from labels', () => {
+    const input = startingEquipmentFromFormValues({
+      choose: 1,
+      options: [
+        {
+          label: 'Heavy Armor',
+          items: [],
+          wealth: { amount: 10, currency: 'gp' },
+        },
+      ],
+    })
+
+    expect(input?.options[0]?.id).toBe('heavy-armor')
   })
 
   it('startingEquipmentFromFormValues omits when options are empty', () => {

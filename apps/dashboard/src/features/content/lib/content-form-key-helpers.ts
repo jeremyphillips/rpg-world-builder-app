@@ -18,6 +18,18 @@ export function applyStableIdsForUpdate<T extends { id?: string; name: string }>
   return assignStableContentIds(rows, existing)
 }
 
+/** Assigns stable ids to choice options that use `label` instead of `name`. */
+export function applyStableIdsForChoiceOptions<T extends { id?: string; label: string }>(
+  rows: readonly T[],
+  existing?: ReadonlyArray<{ id: string }>,
+): Array<T & { id: string }> {
+  const withNames = rows.map((row) => ({ ...row, name: row.label }))
+  return applyStableIdsForUpdate(withNames, existing).map(({ name: _name, ...rest }) => ({
+    ...rest,
+    id: rest.id,
+  })) as Array<T & { id: string }>
+}
+
 /** Removes envelope slug from an update payload (immutable after create). */
 export function stripSlugFromInput<T extends { slug?: string }>(input: T): Omit<T, 'slug'> {
   const { slug: _slug, ...rest } = input

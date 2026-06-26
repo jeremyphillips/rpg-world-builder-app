@@ -16,10 +16,10 @@ const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 function TabShell({
   startingEquipment,
-  entitySource,
+  formCtx,
 }: {
   startingEquipment?: StartingEquipmentForm
-  entitySource?: ContentFormCtx['entitySource']
+  formCtx?: ContentFormCtx
 }) {
   const form = useForm({
     defaultValues: {
@@ -29,7 +29,12 @@ function TabShell({
 
   return (
     <FormProvider {...form}>
-      <ClassCharacterCreationTab formCtx={{ entitySource }} />
+      <ClassCharacterCreationTab
+        formCtx={{
+          entitySource: formCtx?.entitySource,
+          embeddedSeedRowIds: formCtx?.embeddedSeedRowIds,
+        }}
+      />
     </FormProvider>
   )
 }
@@ -41,6 +46,8 @@ const bardStartingEquipment = startingEquipmentToFormValues(
   pickClass('bard').characterCreation!.startingEquipment!,
 )
 
+const monkSeedIds = monkStartingEquipment.options.map((option) => option.id!)
+
 describe('ClassCharacterCreationTab', () => {
   it('shows the empty state when there is no starting equipment', () => {
     render(<TabShell />)
@@ -48,15 +55,19 @@ describe('ClassCharacterCreationTab', () => {
     expect(screen.getByRole('button', { name: /Add starting equipment/i })).toBeInTheDocument()
   })
 
-  it('adds starting equipment and shows choose field plus package master-detail', async () => {
+  it('adds starting equipment and shows inline choose field plus package master-detail', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
     await user.click(screen.getByRole('button', { name: /Add starting equipment/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('spinbutton', { name: /Packages to choose/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole('spinbutton', { name: /Packages to choose count/i }),
+      ).toBeInTheDocument()
     })
+    expect(screen.getByText('package(s) from list')).toBeInTheDocument()
+    expect(screen.getByText('Character can choose')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -66,8 +77,20 @@ describe('ClassCharacterCreationTab', () => {
   })
 
   it('renders monk packages when pre-filled', () => {
-    render(<TabShell startingEquipment={monkStartingEquipment} entitySource="system" />)
-    expect(screen.getByRole('spinbutton', { name: /Packages to choose/i })).toBeInTheDocument()
+    render(
+      <TabShell
+        startingEquipment={monkStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
+    )
+    expect(
+      screen.getByRole('spinbutton', { name: /Packages to choose count/i }),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -78,37 +101,50 @@ describe('ClassCharacterCreationTab', () => {
 
   it('renders bard pool choice packages when pre-filled', async () => {
     const user = userEvent.setup()
-    render(<TabShell startingEquipment={bardStartingEquipment} entitySource="system" />)
+    render(
+      <TabShell
+        startingEquipment={bardStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': bardStartingEquipment.options.map(
+              (option) => option.id!,
+            ),
+          },
+        }}
+      />,
+    )
 
     await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }))
-    expect(screen.getByRole('textbox', { name: /Option id/i })).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: /Option id/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /Active in campaign/i })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 
-  it('allows deleting packages on a system class (no delete lock)', async () => {
+  it('protects system seed packages on a system class', async () => {
     const user = userEvent.setup()
-    render(<TabShell startingEquipment={monkStartingEquipment} entitySource="system" />)
+    render(
+      <TabShell
+        startingEquipment={monkStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
+    )
 
-    await user.click(screen.getByRole('button', { name: /Remove Starting Gold/i }))
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete package?')
+    expect(screen.getAllByText('System').length).toBeGreaterThanOrEqual(1)
+    expect(screen.queryByRole('button', { name: /Remove Starting Gold/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Remove Standard Equipment/i }),
+    ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
+    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }))
+    await user.click(screen.getByRole('switch', { name: /Active in campaign/i }))
 
-    await waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Starting Gold/i })).not.toBeInTheDocument()
-    })
-    expect(screen.queryByText('System')).not.toBeInTheDocument()
-  })
-
-  it('removes all starting equipment from the remove control', async () => {
-    const user = userEvent.setup()
-    render(<TabShell startingEquipment={monkStartingEquipment} />)
-
-    await user.click(screen.getByRole('button', { name: /Remove starting equipment/i }))
-
-    await waitFor(() => {
-      expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
-    })
+    expect(screen.getByText('Inactive')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations in the empty state', async () => {
@@ -119,7 +155,15 @@ describe('ClassCharacterCreationTab', () => {
 
   it('has no axe accessibility violations with monk starting equipment', async () => {
     const { container } = render(
-      <TabShell startingEquipment={monkStartingEquipment} entitySource="system" />,
+      <TabShell
+        startingEquipment={monkStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
     )
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
@@ -127,7 +171,17 @@ describe('ClassCharacterCreationTab', () => {
 
   it('has no axe accessibility violations with bard starting equipment', async () => {
     const { container } = render(
-      <TabShell startingEquipment={bardStartingEquipment} entitySource="system" />,
+      <TabShell
+        startingEquipment={bardStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': bardStartingEquipment.options.map(
+              (option) => option.id!,
+            ),
+          },
+        }}
+      />,
     )
     const results = await axe.run(container, axeOptions)
     expect(results.violations).toEqual([])
