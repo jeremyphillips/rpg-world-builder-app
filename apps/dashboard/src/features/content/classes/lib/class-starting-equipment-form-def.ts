@@ -283,6 +283,7 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
       min: 1,
       defaultValue: 1,
       visibility: visibleForItemKind('choice'),
+      digits: 1,
     },
     {
       type: 'combobox',

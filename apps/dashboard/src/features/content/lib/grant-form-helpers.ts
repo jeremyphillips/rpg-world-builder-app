@@ -390,6 +390,7 @@ export function grantItemFields<T extends string>(
       min: 1,
       defaultValue: 1,
       visibility: visibleFor('featChoice'),
+      digits: 1,
     },
     {
       type: 'checkbox',

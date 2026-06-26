@@ -111,6 +111,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
           label: 'Creature type',
           options: getCharacterCreatureTypeFieldOptions(ctx),
           required: true,
+          width: 'lg',
         },
         walkSpeedInlineCountField('speed.walk', {
           required: true,

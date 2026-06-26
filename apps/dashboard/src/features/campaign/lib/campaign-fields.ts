@@ -192,15 +192,6 @@ export const rulesFields: FormItem[] = [
           },
         ],
       },
-      {
-        type: 'chips',
-        name: 'allowedCharacterCreatureTypes',
-        label: 'Allowed creature types',
-        multiple: true,
-        required: true,
-        hint: 'Creature types allowed for player and NPC character sheets.',
-        options: creatureTypeOptions,
-      },
     ],
   },
   {
@@ -223,6 +214,16 @@ export const rulesFields: FormItem[] = [
         kind: 'slot',
         name: '_standardLevelRangeSummary',
         render: () => createElement(StandardLevelRangeSummary),
+      },
+      {
+        type: 'combobox',
+        name: 'allowedCharacterCreatureTypes',
+        label: 'Allowed creature types',
+        multiple: true,
+        required: true,
+        hint: 'Creature types allowed for player and NPC character sheets.',
+        options: creatureTypeOptions,
+        placeholder: 'Choose creature types…',
       },
       {
         kind: 'group',

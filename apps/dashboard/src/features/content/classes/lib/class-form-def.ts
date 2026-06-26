@@ -633,7 +633,7 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Subclass choice level',
       options: subclassChoiceLevelOptions(ctx),
       hint: 'Level at which a character chooses their subclass',
-      width: 'md',
+      digits: 2,
     },
   ]
 }
@@ -752,6 +752,7 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           options: ctx.options?.weapons ?? [],
           placeholder: 'Choose weapons…',
           visibility: visibleWhenIndividualWeapons(),
+          width: 'xl',
         },
       ],
     },
@@ -772,6 +773,7 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           multiple: true,
           options: ctx.options?.tools ?? [],
           placeholder: 'Choose tools…',
+          width: 'xl',
         },
         {
           type: 'chooseFromChips',
