@@ -16,6 +16,8 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
+import { vocabularyComboboxField } from '@/features/homebrew'
+
 import { ExtendedProgressionEffects } from '../components/extended-progression-effects.client'
 import {
   ExtendedLevelRangeSummary,
@@ -186,8 +188,7 @@ function standardLevelRangeSummarySlot(): FormItem {
 }
 
 function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]): FormItem {
-  return {
-    type: 'combobox',
+  return vocabularyComboboxField({
     name: 'allowedCharacterCreatureTypes',
     label: 'Allowed creature types',
     multiple: true,
@@ -195,7 +196,7 @@ function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]):
     hint: 'Creature types allowed for player and NPC character sheets.',
     options: creatureTypeOptions,
     placeholder: 'Choose creature types…',
-  }
+  })
 }
 
 function extendedProgressionGroup(): FormItem {

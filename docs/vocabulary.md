@@ -153,7 +153,10 @@ Shared UI for all sets:
 
 Per-set consumption (forms, columns, settings) should use a thin hook that
 loads the resolved set and builds label/active-id maps — see
-`useCreatureTypeVocabulary` and `buildCreatureTypeVocabulary`.
+`useCreatureTypeVocabulary` and `buildCreatureTypeVocabulary`. Vocabulary-backed
+`<Form>` fields should use `vocabularySelectField` / `vocabularyComboboxField`
+from `lib/vocabulary-field-factories.ts` (options still come from the set hook,
+not static seed constants).
 
 ---
 

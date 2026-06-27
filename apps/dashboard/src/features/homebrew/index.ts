@@ -24,3 +24,8 @@ export {
   getCreatureTypeLabel,
   type CreatureTypeVocabulary,
 } from './lib/creature-type-vocabulary'
+export {
+  VOCABULARY_COMBOBOX_PLACEHOLDER,
+  vocabularyComboboxField,
+  vocabularySelectField,
+} from './lib/vocabulary-field-factories'
