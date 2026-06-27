@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import type { Campaign, CreatureTypeId } from '@rpg/contracts'
 
 import {
+  buildCharacterCreationPatchInput,
   buildCreateCampaignInput,
   buildUpdateCampaignInput,
   mapCampaignToSettingsValues,
+  type CampaignCreateValues,
 } from './campaign-settings-values'
 
 const campaign: Campaign = {
@@ -15,12 +17,6 @@ const campaign: Campaign = {
     imageKey: 'banner.jpg',
   },
   configuration: {
-    settings: {
-      characterCreation: {
-        startingLevel: 3,
-        importedCharacters: { policy: 'approval_required' },
-      },
-    },
     flavor: {
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
@@ -36,19 +32,29 @@ const campaign: Campaign = {
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
+const defaultRules: CampaignCreateValues = {
+  name: 'Sunless Citadel',
+  description: 'A classic dungeon delve.',
+  banner: [],
+  startingLevel: 1,
+  maxCharacterLevel: 20,
+  extendedProgressionEnabled: false,
+  extendedTierName: '',
+  extendedMaxLevel: undefined,
+  importedCharactersPolicy: 'disabled',
+  allowedCharacterCreatureTypes: ['humanoid'],
+  playStyle: ['dungeon_crawl'],
+  mood: ['heroic'],
+  magicLevel: 'standard_fantasy',
+  difficulty: 'dangerous',
+}
+
 describe('mapCampaignToSettingsValues', () => {
-  it('maps nested campaign fields to the flat form shape', () => {
+  it('maps identity and flavor fields to the flat settings form shape', () => {
     expect(mapCampaignToSettingsValues(campaign)).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
       banner: [],
-      startingLevel: 3,
-      maxCharacterLevel: 20,
-      extendedProgressionEnabled: false,
-      extendedTierName: '',
-      extendedMaxLevel: undefined,
-      importedCharactersPolicy: 'approval_required',
-      allowedCharacterCreatureTypes: ['humanoid'],
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
       magicLevel: 'standard_fantasy',
@@ -56,80 +62,102 @@ describe('mapCampaignToSettingsValues', () => {
     })
   })
 
-  it('falls back to server defaults when settings are absent', () => {
+  it('falls back when flavor is absent', () => {
     const minimal: Campaign = {
       ...campaign,
       configuration: {},
     }
 
-    expect(mapCampaignToSettingsValues(minimal)).toMatchObject({
+    expect(mapCampaignToSettingsValues(minimal)).toEqual({
+      name: 'Sunless Citadel',
+      description: 'A classic dungeon delve.',
+      banner: [],
+      playStyle: undefined,
+      mood: undefined,
+      magicLevel: undefined,
+      difficulty: undefined,
+    })
+  })
+})
+
+describe('buildCharacterCreationPatchInput', () => {
+  it('maps flat rules fields to the nested patch shape', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 3,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'approval_required',
+        allowedCharacterCreatureTypes: ['humanoid'],
+      }),
+    ).toEqual({
+      startingLevel: 3,
+      importedCharacters: { policy: 'approval_required' },
+    })
+  })
+
+  it('includes extended progression in progression when enabled', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: true,
+        extendedTierName: 'Epic Destiny',
+        extendedMaxLevel: 30,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid'],
+      }),
+    ).toEqual({
       startingLevel: 1,
-      maxCharacterLevel: 20,
-      extendedProgressionEnabled: false,
-      importedCharactersPolicy: 'disabled',
-      allowedCharacterCreatureTypes: ['humanoid'],
+      importedCharacters: { policy: 'disabled' },
+      progression: {
+        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+      },
     })
   })
 
-  it('maps extended progression from stored rule overrides', () => {
-    const withExtended: Campaign = {
-      ...campaign,
-      configuration: {
-        ...campaign.configuration,
-        settings: {
-          characterCreation: {
-            startingLevel: 1,
-            importedCharacters: { policy: 'disabled' },
-          },
-          ruleOverrides: {
-            extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-          },
-        },
-      },
-    }
-
-    expect(mapCampaignToSettingsValues(withExtended)).toMatchObject({
-      maxCharacterLevel: 20,
-      extendedProgressionEnabled: true,
-      extendedTierName: 'Epic Destiny',
-      extendedMaxLevel: 30,
+  it('includes creature type policy when not default', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureTypeId[],
+      }),
+    ).toMatchObject({
+      species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'construct'] } },
     })
   })
-  it('maps creature type override from stored rule overrides', () => {
-    const withCreatureTypes: Campaign = {
-      ...campaign,
-      configuration: {
-        ...campaign.configuration,
-        settings: {
-          characterCreation: {
-            startingLevel: 1,
-            importedCharacters: { policy: 'disabled' },
-          },
-          ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'fey'] },
-        },
-      },
-    }
 
-    expect(mapCampaignToSettingsValues(withCreatureTypes).allowedCharacterCreatureTypes).toEqual([
-      'humanoid',
-      'fey',
-    ])
+  it('omits creature type policy when default', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid'],
+      }),
+    ).not.toHaveProperty('species')
   })
 })
 
 describe('buildCreateCampaignInput', () => {
-  it('maps the flat wizard values to the create payload including flavor', () => {
-    const values = mapCampaignToSettingsValues(campaign)
+  it('maps the flat wizard values to the create payload including characterCreation and flavor', () => {
+    const values: CampaignCreateValues = {
+      ...defaultRules,
+      startingLevel: 3,
+      importedCharactersPolicy: 'approval_required',
+    }
 
     expect(buildCreateCampaignInput(values, 'banner.webp')).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
       imageKey: 'banner.webp',
-      settings: {
-        characterCreation: {
-          startingLevel: 3,
-          importedCharacters: { policy: 'approval_required' },
-        },
+      characterCreation: {
+        startingLevel: 3,
+        importedCharacters: { policy: 'approval_required' },
       },
       flavor: {
         playStyle: ['dungeon_crawl'],
@@ -141,67 +169,29 @@ describe('buildCreateCampaignInput', () => {
   })
 
   it('omits imageKey when no banner was uploaded', () => {
-    const values = mapCampaignToSettingsValues(campaign)
-
-    expect(buildCreateCampaignInput(values)).not.toHaveProperty('imageKey')
+    expect(buildCreateCampaignInput(defaultRules)).not.toHaveProperty('imageKey')
   })
 
-  it('includes extended progression in rule overrides when enabled', () => {
-    const values = {
-      ...mapCampaignToSettingsValues(campaign),
+  it('includes extended progression in characterCreation when enabled', () => {
+    const values: CampaignCreateValues = {
+      ...defaultRules,
       extendedProgressionEnabled: true,
       extendedTierName: 'Epic Destiny',
       extendedMaxLevel: 30,
     }
 
-    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({
+    expect(buildCreateCampaignInput(values).characterCreation?.progression).toEqual({
       extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
     })
-  })
-
-  it('includes creature type override when not default', () => {
-    const values = {
-      ...mapCampaignToSettingsValues(campaign),
-      allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureTypeId[],
-    }
-
-    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toEqual({
-      allowedCharacterCreatureTypes: ['humanoid', 'construct'],
-    })
-  })
-
-  it('omits creature type override when default', () => {
-    const values = mapCampaignToSettingsValues(campaign)
-
-    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toBeUndefined()
-  })
-
-  it('omits extended progression when disabled even if stale fields remain', () => {
-    const values = {
-      ...mapCampaignToSettingsValues(campaign),
-      extendedProgressionEnabled: false,
-      extendedTierName: 'Epic Destiny',
-      extendedMaxLevel: 30,
-    }
-
-    expect(buildCreateCampaignInput(values).settings?.ruleOverrides).toBeUndefined()
   })
 })
 
 describe('buildUpdateCampaignInput', () => {
-  it('maps form values to the update payload and includes imageKey when provided', () => {
-    const values = mapCampaignToSettingsValues(campaign)
-
-    expect(buildUpdateCampaignInput(values, 'new-banner.webp')).toEqual({
+  it('maps settings form values to identity and flavor only', () => {
+    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign), 'new-banner.webp')).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
       imageKey: 'new-banner.webp',
-      settings: {
-        characterCreation: {
-          startingLevel: 3,
-          importedCharacters: { policy: 'approval_required' },
-        },
-      },
       flavor: {
         playStyle: ['dungeon_crawl'],
         mood: ['heroic'],
@@ -212,8 +202,6 @@ describe('buildUpdateCampaignInput', () => {
   })
 
   it('omits imageKey when no new banner was uploaded', () => {
-    const values = mapCampaignToSettingsValues(campaign)
-
-    expect(buildUpdateCampaignInput(values)).not.toHaveProperty('imageKey')
+    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).not.toHaveProperty('imageKey')
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
 import { buildFlavorRows, buildIdentityRows, buildRulesRows } from './review-step.lib'
 
 describe('review-step row builders', () => {
@@ -19,11 +19,17 @@ describe('review-step row builders', () => {
     ])
   })
 
-  it('builds rules rows with fallbacks', () => {
-    const rows = buildRulesRows({ startingLevel: 3 } satisfies Partial<CampaignSettingsValues>)
+  it('builds rules rows with fallbacks and advanced fields', () => {
+    const rows = buildRulesRows({
+      startingLevel: 3,
+      maxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: ['humanoid'],
+    } satisfies Partial<CampaignCreateValues>)
 
     expect(rows[0]).toEqual({ label: 'Starting level', value: '3' })
     expect(rows[1]).toEqual({ label: 'Imported characters', value: '—' })
+    expect(rows[2]).toEqual({ label: 'Standard max level', value: '20' })
+    expect(rows[3]).toEqual({ label: 'Allowed creature types', value: 'Humanoid' })
   })
 
   it('builds flavor rows from label maps', () => {
@@ -32,7 +38,7 @@ describe('review-step row builders', () => {
       mood: ['heroic'],
       magicLevel: 'high_magic',
       difficulty: 'dangerous',
-    } satisfies Partial<CampaignSettingsValues>)
+    } satisfies Partial<CampaignCreateValues>)
 
     expect(rows.map((row) => row.value)).toEqual(['Sandbox', 'Heroic', 'High Magic', 'Dangerous'])
   })

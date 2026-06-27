@@ -1,4 +1,9 @@
-import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
+import {
+  buildSeedCreatureTypeVocabulary,
+  getCreatureTypeLabel,
+} from '@/features/homebrew'
+
+import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
 import {
   DIFFICULTY_LABELS,
   IMPORTED_CHARACTERS_POLICY_LABELS,
@@ -12,7 +17,9 @@ export type ReviewRowData = {
   value: string
 }
 
-export function buildIdentityRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
+const seedCreatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
+
+export function buildIdentityRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
   const rows: ReviewRowData[] = [{ label: 'Name', value: values.name ?? '—' }]
 
   if (values.description) {
@@ -27,8 +34,8 @@ export function buildIdentityRows(values: Partial<CampaignSettingsValues>): Revi
   return rows
 }
 
-export function buildRulesRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
-  return [
+export function buildRulesRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
+  const rows: ReviewRowData[] = [
     {
       label: 'Starting level',
       value: values.startingLevel !== undefined ? String(values.startingLevel) : '—',
@@ -39,7 +46,29 @@ export function buildRulesRows(values: Partial<CampaignSettingsValues>): ReviewR
         ? IMPORTED_CHARACTERS_POLICY_LABELS[values.importedCharactersPolicy]
         : '—',
     },
+    {
+      label: 'Standard max level',
+      value: values.maxCharacterLevel !== undefined ? String(values.maxCharacterLevel) : '—',
+    },
   ]
+
+  if (values.extendedProgressionEnabled) {
+    rows.push({
+      label: 'Extended progression',
+      value: `${values.extendedTierName?.trim() || '—'} (max ${values.extendedMaxLevel ?? '—'})`,
+    })
+  }
+
+  if (values.allowedCharacterCreatureTypes?.length) {
+    rows.push({
+      label: 'Allowed creature types',
+      value: values.allowedCharacterCreatureTypes
+        .map((id) => getCreatureTypeLabel(seedCreatureTypeVocabulary, id))
+        .join(', '),
+    })
+  }
+
+  return rows
 }
 
 function formatLabelList<T extends string>(
@@ -49,7 +78,7 @@ function formatLabelList<T extends string>(
   return values?.map((value) => labels[value]).join(', ') || '—'
 }
 
-export function buildFlavorRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
+export function buildFlavorRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
   return [
     { label: 'Play style', value: formatLabelList(values.playStyle, PLAY_STYLE_LABELS) },
     { label: 'Mood', value: formatLabelList(values.mood, MOOD_LABELS) },

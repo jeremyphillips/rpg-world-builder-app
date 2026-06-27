@@ -5,24 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { CampaignListItem } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
-import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
   updateCampaign: vi.fn(),
 }))
-
-vi.mock('@/features/homebrew', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    useCreatureTypeVocabulary: vi.fn(() => ({
-      vocabulary: buildSeedCreatureTypeVocabulary(),
-      isPending: false,
-      isError: false,
-    })),
-  }
-})
 
 import {
   listCampaigns as listCampaignsFn,
@@ -38,11 +25,9 @@ const campaign: CampaignListItem = {
   id: 'c1',
   identity: { name: 'Sunless Citadel', description: 'A dungeon delve.' },
   configuration: {
-    settings: {
-      characterCreation: {
-        startingLevel: 2,
-        importedCharacters: { policy: 'disabled' },
-      },
+    flavor: {
+      playStyle: ['dungeon_crawl'],
+      mood: ['heroic'],
     },
   },
   status: 'active',
@@ -92,6 +77,14 @@ describe('CampaignSettings', () => {
     expect(screen.getByDisplayValue('A dungeon delve.')).toBeInTheDocument()
   })
 
+  it('shows identity and flavor tabs only', async () => {
+    renderSettings()
+    await screen.findByDisplayValue('Sunless Citadel')
+    expect(screen.getByRole('tab', { name: 'Identity' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Flavor' })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: 'Rules' })).not.toBeInTheDocument()
+  })
+
   it('shows the saved banner preview when the campaign has an imageKey', async () => {
     listCampaigns.mockResolvedValue([
       { ...campaign, identity: { ...campaign.identity, imageKey: 'banner.jpg' } },
@@ -101,7 +94,7 @@ describe('CampaignSettings', () => {
     expect(img).toHaveAttribute('src', '/api/uploads/banner.jpg')
   })
 
-  it('calls updateCampaign with the current values on submit', async () => {
+  it('calls updateCampaign with identity and flavor on submit', async () => {
     const user = userEvent.setup()
     updateCampaign.mockResolvedValue(campaign)
     renderSettings()
@@ -110,9 +103,13 @@ describe('CampaignSettings', () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => expect(updateCampaign).toHaveBeenCalledTimes(1))
-    expect(updateCampaign.mock.lastCall?.[1]).toMatchObject({
+    expect(updateCampaign.mock.lastCall?.[1]).toEqual({
       name: 'Sunless Citadel',
       description: 'A dungeon delve.',
+      flavor: {
+        playStyle: ['dungeon_crawl'],
+        mood: ['heroic'],
+      },
     })
   })
 
