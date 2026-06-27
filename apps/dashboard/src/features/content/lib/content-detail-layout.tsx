@@ -1,10 +1,42 @@
 import type { ReactNode } from 'react'
+import { Card, CardContent, Heading } from '@rpg/ui'
 
+import { narrowPageContentClasses } from '@/components/layout/page-content.variants'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { ContentDetailEditAction } from './content-detail-edit-action'
+import {
+  contentDetailHeroCardClasses,
+  contentDetailHeroCardContentClasses,
+  contentDetailHeroGridClasses,
+  contentDetailHeroImageClasses,
+  contentDetailHeroMainClasses,
+  contentDetailRootClasses,
+  contentDetailToolbarClasses,
+} from './content-detail-layout.variants'
+import { ContentStatRow } from './content-stat-row.client'
+import type { ContentStatRowData } from './content-stat-rows'
+
+function ContentDetailStatRows({ statRows }: { statRows: ContentStatRowData[] }) {
+  return (
+    <div className="space-y-3">
+      {statRows.map(({ label, value, info, infoPlacement, infoAriaLabel }) => (
+        <ContentStatRow
+          key={label}
+          label={label}
+          value={value}
+          info={info}
+          infoPlacement={infoPlacement}
+          infoAriaLabel={infoAriaLabel}
+        />
+      ))}
+    </div>
+  )
+}
 
 export type ContentDetailLayoutProps = {
+  /** Content item display name — rendered as the hero heading. */
+  name: string
   /** Resolved artwork URL for the content item. */
   imageUrl: string
   /** Accessible name for the image (e.g. the content item's name). */
@@ -15,49 +47,74 @@ export type ContentDetailLayoutProps = {
   editHref?: string
   /** Optional extra action elements rendered alongside Edit in the top-right toolbar. */
   actions?: ReactNode
-  /** Main content occupying the 2/3-width left column. */
-  children: ReactNode
+  /** Static metadata rows in the hero card. Ignored when `metadata` is set. */
+  statRows?: ContentStatRowData[]
+  /** Hook-driven or custom metadata in the hero card; takes precedence over `statRows`. */
+  metadata?: ReactNode
+  /** First block in the narrow body column (rich text or plain). */
+  descriptionContent?: ReactNode
+  /** Additional sections in the narrow body column below `descriptionContent`. */
+  children?: ReactNode
 }
 
 /**
- * Reusable two-column detail layout for catalog content types.
+ * Catalog content detail layout: toolbar, full-width hero card (name + metadata + image),
+ * and a `max-w-narrow-content` body column for prose sections.
  *
- * Left column (2/3): children (name, description, features, etc.)
- * Right column (1/3): artwork image
- *
- * Used by ClassDetail and intended as the standard pattern for all future
- * content type detail routes (species, spells, monsters, equipment…).
+ * Wrap in `WidePage`. Render full-width sections (e.g. progression tables) as `WidePage`
+ * siblings outside this layout.
  */
 export function ContentDetailLayout({
+  name,
   imageUrl,
   imageName,
   campaignId,
   editHref,
   actions,
+  statRows,
+  metadata,
+  descriptionContent,
   children,
 }: ContentDetailLayoutProps) {
   const canManage = useCanManageCampaign(campaignId)
   const showEdit = Boolean(canManage && editHref)
   const toolbar = showEdit || actions
+  const heroMetadata =
+    metadata ??
+    (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
+  const hasBody = Boolean(descriptionContent || children)
 
   return (
-    <div className="space-y-6">
+    <div className={contentDetailRootClasses}>
       {toolbar ? (
-        <div className="flex justify-end gap-2" role="toolbar" aria-label="Page actions">
+        <div className={contentDetailToolbarClasses} role="toolbar" aria-label="Page actions">
           {showEdit && editHref ? <ContentDetailEditAction to={editHref} /> : null}
           {actions}
         </div>
       ) : null}
-      <div className="grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-8">{children}</div>
-        <div className="col-span-1">
-          <img
-            src={imageUrl}
-            alt={imageName}
-            className="w-full rounded-lg object-cover shadow-sm"
-          />
+
+      <Card className={contentDetailHeroCardClasses}>
+        <CardContent className={contentDetailHeroCardContentClasses}>
+          <div className={contentDetailHeroGridClasses}>
+            <div className={contentDetailHeroMainClasses}>
+              <Heading variant="display" as="h1">
+                {name}
+              </Heading>
+              {heroMetadata}
+            </div>
+            <div>
+              <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {hasBody ? (
+        <div className={narrowPageContentClasses}>
+          {descriptionContent}
+          {children}
         </div>
-      </div>
+      ) : null}
     </div>
   )
 }

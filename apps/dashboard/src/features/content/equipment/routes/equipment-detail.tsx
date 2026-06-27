@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { Text } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 import { formatMoney, getEquipmentKindLabel } from '@rpg/contracts'
 
@@ -7,7 +8,6 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
-import { ContentDetailStatBody } from '../../lib/content-detail-stat-body'
 import { contentEditHref } from '../../lib/content-edit-href'
 import type { ContentStatRowData } from '../../lib/content-stat-rows'
 import { getContentImageUrl } from '../../lib/content-image-url'
@@ -39,17 +39,16 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   return (
     <WidePage>
       <ContentDetailLayout
+        name={item.name}
         imageUrl={getContentImageUrl(item.imageKey)}
         imageName={item.name}
         campaignId={campaignId}
         editHref={contentEditHref('equipment', campaignId, item.id, family)}
-      >
-        <ContentDetailStatBody
-          name={item.name}
-          statRows={statRows}
-          description={item.description}
-        />
-      </ContentDetailLayout>
+        statRows={statRows}
+        descriptionContent={
+          item.description ? <Text variant="muted">{item.description}</Text> : undefined
+        }
+      />
     </WidePage>
   )
 }

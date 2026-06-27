@@ -127,20 +127,18 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
   return (
     <WidePage>
       <ContentDetailLayout
+        name={species.name}
         imageUrl={getContentImageUrl(species.imageKey)}
         imageName={species.name}
         campaignId={campaignId}
         editHref={contentEditHref('species', campaignId, species.id)}
-      >
-        <div className="space-y-4">
-          <Heading variant="display" as="h1">
-            {species.name}
-          </Heading>
-          <SpeciesStatsSection species={species} campaignId={campaignId} />
-          {species.description && (
+        metadata={<SpeciesStatsSection species={species} campaignId={campaignId} />}
+        descriptionContent={
+          species.description ? (
             <RichTextContent html={species.description} size="sm" tone="muted" />
-          )}
-        </div>
+          ) : undefined
+        }
+      >
         <TraitsList traits={species.traits} />
         {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
       </ContentDetailLayout>

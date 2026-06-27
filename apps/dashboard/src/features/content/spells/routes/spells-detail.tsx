@@ -16,7 +16,6 @@ import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
-import { ContentDetailStatBody } from '../../lib/content-detail-stat-body'
 import { contentEditHref } from '../../lib/content-edit-href'
 import { getContentImageUrl } from '../../lib/content-image-url'
 import { buildSpellStatRows } from '../lib/spell-stat-rows'
@@ -108,20 +107,18 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   return (
     <WidePage>
       <ContentDetailLayout
+        name={spell.name}
         imageUrl={getContentImageUrl(spell.imageKey)}
         imageName={spell.name}
         campaignId={campaignId}
         editHref={contentEditHref('spells', campaignId, spell.id)}
+        statRows={statRows}
+        descriptionContent={
+          spell.description ? (
+            <RichTextContent html={spell.description} size="sm" tone="muted" />
+          ) : undefined
+        }
       >
-        <ContentDetailStatBody
-          name={spell.name}
-          statRows={statRows}
-          descriptionContent={
-            spell.description ? (
-              <RichTextContent html={spell.description} size="sm" tone="muted" />
-            ) : undefined
-          }
-        />
         <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
         <SpellTagsSection tags={spell.tags} />
       </ContentDetailLayout>

@@ -32,7 +32,7 @@ function SuggestedClassesList({
 
   return (
     <section aria-labelledby="suggested-classes-heading">
-      <Heading variant="section" as="h2" id="suggested-classes-heading" className="mb-3">
+      <Heading variant="label" as="h3" id="suggested-classes-heading" className="mb-3">
         Suggested classes
       </Heading>
       {isPending ? (
@@ -74,24 +74,24 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   return (
     <WidePage>
       <ContentDetailLayout
+        name={skill.name}
         imageUrl={getContentImageUrl(skill.imageKey)}
         imageName={skill.name}
         campaignId={campaignId}
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
-      >
-        <div className="space-y-4">
-          <Heading variant="page" as="h1">
-            {skill.name}
-          </Heading>
-          <div className="space-y-3">
+        metadata={
+          <div className="space-y-8">
             <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
+            {skill.description ? <Text variant="muted">{skill.description}</Text> : null}
+            {skill.suggestedClasses.length > 0 && (
+              <SuggestedClassesList
+                campaignId={campaignId}
+                suggestedClasses={skill.suggestedClasses}
+              />
+            )}
           </div>
-          {skill.description && <Text variant="muted">{skill.description}</Text>}
-        </div>
-        {skill.suggestedClasses.length > 0 && (
-          <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
-        )}
-      </ContentDetailLayout>
+        }
+      />
     </WidePage>
   )
 }
