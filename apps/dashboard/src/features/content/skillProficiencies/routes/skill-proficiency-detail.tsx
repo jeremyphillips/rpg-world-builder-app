@@ -11,6 +11,7 @@ import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { contentEditHref } from '../../lib/content-edit-href'
+import { ContentStatRow } from '../../lib/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
 const SUGGESTED_CLASS_CHIP_CLASS =
@@ -31,7 +32,7 @@ function SuggestedClassesList({
 
   return (
     <section aria-labelledby="suggested-classes-heading">
-      <Heading variant="section" as="h2" id="suggested-classes-heading" className="mb-3">
+      <Heading variant="label" as="h3" id="suggested-classes-heading" className="mb-3">
         Suggested classes
       </Heading>
       {isPending ? (
@@ -78,15 +79,19 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         imageName={skill.name}
         campaignId={campaignId}
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
-        statRows={[{ label: 'Governing Ability', value: getAbilityLabel(skill.ability) }]}
-        descriptionContent={
-          skill.description ? <Text variant="muted">{skill.description}</Text> : undefined
+        metadata={
+          <div className="space-y-8">
+            <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
+            {skill.description ? <Text variant="muted">{skill.description}</Text> : null}
+            {skill.suggestedClasses.length > 0 && (
+              <SuggestedClassesList
+                campaignId={campaignId}
+                suggestedClasses={skill.suggestedClasses}
+              />
+            )}
+          </div>
         }
-      >
-        {skill.suggestedClasses.length > 0 && (
-          <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
-        )}
-      </ContentDetailLayout>
+      />
     </WidePage>
   )
 }
