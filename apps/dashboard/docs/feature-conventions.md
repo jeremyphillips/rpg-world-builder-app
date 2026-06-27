@@ -52,7 +52,7 @@ Standard pattern:
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
-<Heading variant="display" as="h2">{item.name}</Heading>
+<Heading variant="content" as="h1">{item.name}</Heading>
 <RichTextContent html={item.description} size="sm" tone="muted" />
 <Heading variant="section" as="h3" id="traits-heading">Traits</Heading>
 <RichTextContent html={trait.description} size="sm" tone="muted" />

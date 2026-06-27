@@ -80,7 +80,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
       >
         <div className="space-y-4">
-          <Heading variant="display" as="h2">
+          <Heading variant="page" as="h1">
             {skill.name}
           </Heading>
           <div className="space-y-3">

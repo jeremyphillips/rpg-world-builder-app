@@ -5,7 +5,7 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 export function Characters() {
   return (
     <NarrowPage>
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         Characters
       </Heading>
       <Text variant="muted">Coming soon.</Text>

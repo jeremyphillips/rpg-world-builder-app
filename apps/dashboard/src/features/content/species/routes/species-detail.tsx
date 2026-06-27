@@ -51,7 +51,7 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
 function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
   if (traits.length === 0) return null
   return (
-    <section aria-labelledby="traits-heading">
+    <section aria-labelledby="tra its-heading">
       <Heading variant="section" as="h3" id="traits-heading" className="mb-4">
         Traits
       </Heading>
@@ -133,7 +133,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         editHref={contentEditHref('species', campaignId, species.id)}
       >
         <div className="space-y-4">
-          <Heading variant="display" as="h2">
+          <Heading variant="page" as="h1">
             {species.name}
           </Heading>
           <SpeciesStatsSection species={species} campaignId={campaignId} />

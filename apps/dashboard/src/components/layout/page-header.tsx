@@ -12,7 +12,7 @@ export interface PageHeaderProps {
 export function PageHeader({ heading, actions }: PageHeaderProps) {
   return (
     <div className={actions ? 'flex items-center justify-between gap-4' : undefined}>
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         {heading}
       </Heading>
       {actions}

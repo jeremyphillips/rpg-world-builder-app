@@ -7,7 +7,7 @@ import { ChangePasswordSection } from '@/features/user/components/change-passwor
 export function AccountSettings() {
   return (
     <NarrowPage spacing="loose">
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         Account Settings
       </Heading>
       <ProfileSection />

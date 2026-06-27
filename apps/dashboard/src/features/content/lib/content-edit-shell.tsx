@@ -98,7 +98,7 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
   return (
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
-        <Heading variant="page" as="h2">
+        <Heading variant="page" as="h1">
           {headingFn(entity.name)}
         </Heading>
 

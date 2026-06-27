@@ -42,8 +42,8 @@ Polymorphic via `as`. Size tokens live in `globals.css`; weight and layout live 
 ```tsx
 import { Heading } from '@rpg/ui'
 
-<Heading variant="display" as="h2">{species.name}</Heading>
-<Heading variant="section" as="h3" id="traits-heading">
+<Heading variant="content" as="h1">{species.name}</Heading>
+<Heading variant="section" as="h2" id="traits-heading">
   Traits
 </Heading>
 ```

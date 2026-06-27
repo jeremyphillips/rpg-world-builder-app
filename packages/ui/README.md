@@ -89,7 +89,7 @@ primitive rules: **[docs/typography.md](docs/typography.md)**.
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
-<Heading variant="display" as="h2">{item.name}</Heading>
+<Heading variant="page" as="h1">{item.name}</Heading>
 <Text variant="muted">{item.description}</Text>
 <RichTextContent html={trait.description} size="sm" tone="muted" />
 ```

@@ -121,7 +121,7 @@ export function ContentCreateShell({
 
   return (
     <NarrowPage spacing="relaxed" className="pb-10">
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         {heading}
       </Heading>
 

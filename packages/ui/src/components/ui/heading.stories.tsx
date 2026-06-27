@@ -52,10 +52,10 @@ export const Label: Story = {
 export const Hierarchy: Story = {
   render: () => (
     <div className="space-y-4">
-      <Heading variant="display" as="h2">
+      <Heading variant="page" as="h1">
         Elf
       </Heading>
-      <Heading variant="section" as="h3">
+      <Heading variant="section" as="h2">
         Traits
       </Heading>
       <Heading variant="label" as="p">
