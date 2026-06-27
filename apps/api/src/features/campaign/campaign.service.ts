@@ -1,9 +1,4 @@
 import { isValidObjectId } from 'mongoose'
-import {
-  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
-  MAX_CHARACTER_LEVEL,
-  sameStringSet,
-} from '@rpg/contracts'
 import type {
   Campaign,
   CampaignListItem,
@@ -12,22 +7,15 @@ import type {
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
+import { writeInitialCharacterCreation } from '../vocabulary/ruleset-patch.service'
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
-import { assertCreatureTypesActiveInCampaign } from '../vocabulary'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
-}
-
-const DEFAULT_SETTINGS = {
-  characterCreation: {
-    startingLevel: 1,
-    importedCharacters: { policy: 'disabled' as const },
-  },
 }
 
 export async function createCampaign(
@@ -40,7 +28,6 @@ export async function createCampaign(
       ...(input.imageKey !== undefined && { imageKey: input.imageKey }),
     },
     configuration: {
-      settings: input.settings ?? DEFAULT_SETTINGS,
       ...(input.flavor !== undefined && { flavor: input.flavor }),
     },
     // Omit when undefined so the model default (DEFAULT_SYSTEM_RULESET_ID) applies.
@@ -48,18 +35,25 @@ export async function createCampaign(
     createdBy: input.createdBy,
   })
 
+  const campaignId = String(doc._id)
+  const rulesetId = doc.rulesetId
+
   // Access control is membership-based, so the creator's owner membership must
   // exist for the campaign to be reachable. No replica set is guaranteed in
   // local dev (so no transaction); compensate by deleting the orphan on failure.
   try {
     await CampaignMembershipModel.create({
-      campaignId: String(doc._id),
+      campaignId,
       userId: input.createdBy,
       campaignRole: 'owner',
       characterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
+
+    if (input.characterCreation) {
+      await writeInitialCharacterCreation(campaignId, rulesetId, input.characterCreation)
+    }
   } catch (err) {
     await CampaignModel.deleteOne({ _id: doc._id })
     throw err
@@ -105,49 +99,6 @@ function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unkn
   return $set
 }
 
-function buildSettingsUpdateSet(settings: NonNullable<UpdateCampaignInput['settings']>): {
-  $set: Record<string, unknown>
-  $unset: Record<string, 1>
-} {
-  const $set: Record<string, unknown> = {
-    'configuration.settings.characterCreation.startingLevel':
-      settings.characterCreation.startingLevel,
-    'configuration.settings.characterCreation.importedCharacters.policy':
-      settings.characterCreation.importedCharacters.policy,
-  }
-  const $unset: Record<string, 1> = {}
-
-  const maxCharacterLevel = settings.ruleOverrides?.maxCharacterLevel
-  if (maxCharacterLevel !== undefined && maxCharacterLevel !== MAX_CHARACTER_LEVEL) {
-    $set['configuration.settings.ruleOverrides.maxCharacterLevel'] = maxCharacterLevel
-  } else {
-    $unset['configuration.settings.ruleOverrides.maxCharacterLevel'] = 1
-  }
-
-  const extendedProgression = settings.ruleOverrides?.extendedProgression
-  if (extendedProgression) {
-    $set['configuration.settings.ruleOverrides.extendedProgression.tierName'] =
-      extendedProgression.tierName
-    $set['configuration.settings.ruleOverrides.extendedProgression.maxLevel'] =
-      extendedProgression.maxLevel
-  } else {
-    $unset['configuration.settings.ruleOverrides.extendedProgression'] = 1
-  }
-
-  const allowedCharacterCreatureTypes = settings.ruleOverrides?.allowedCharacterCreatureTypes
-  if (
-    allowedCharacterCreatureTypes !== undefined &&
-    !sameStringSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
-  ) {
-    $set['configuration.settings.ruleOverrides.allowedCharacterCreatureTypes'] =
-      allowedCharacterCreatureTypes
-  } else {
-    $unset['configuration.settings.ruleOverrides.allowedCharacterCreatureTypes'] = 1
-  }
-
-  return { $set, $unset }
-}
-
 const FLAVOR_PATHS = {
   playStyle: 'configuration.flavor.playStyle',
   mood: 'configuration.flavor.mood',
@@ -165,18 +116,10 @@ function buildFlavorUpdateSet(
   return $set
 }
 
-function buildCampaignUpdateSet(input: UpdateCampaignInput): {
-  $set: Record<string, unknown>
-  $unset: Record<string, 1>
-} {
-  const settingsPatch = input.settings ? buildSettingsUpdateSet(input.settings) : null
+function buildCampaignUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {
   return {
-    $set: {
-      ...buildIdentityUpdateSet(input),
-      ...(settingsPatch?.$set ?? {}),
-      ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
-    },
-    $unset: settingsPatch?.$unset ?? {},
+    ...buildIdentityUpdateSet(input),
+    ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
   }
 }
 
@@ -187,23 +130,16 @@ export async function updateCampaign(
 ): Promise<Campaign | null> {
   if (!isValidObjectId(campaignId)) return null
 
-  const allowedTypes = input.settings?.ruleOverrides?.allowedCharacterCreatureTypes
-  if (allowedTypes !== undefined) {
-    await assertCreatureTypesActiveInCampaign(campaignId, allowedTypes)
-  }
-
-  const { $set, $unset } = buildCampaignUpdateSet(input)
-  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
+  const $set = buildCampaignUpdateSet(input)
+  if (Object.keys($set).length === 0) {
     return findCampaignById(campaignId)
   }
 
-  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
-  if (Object.keys($set).length > 0) update.$set = $set
-  if (Object.keys($unset).length > 0) update.$unset = $unset
-
-  const doc = await CampaignModel.findByIdAndUpdate(campaignId, update, {
-    new: true,
-  }).lean<CampaignRecord | null>()
+  const doc = await CampaignModel.findByIdAndUpdate(
+    campaignId,
+    { $set },
+    { new: true },
+  ).lean<CampaignRecord | null>()
   if (!doc) return null
   return toCampaign(doc)
 }

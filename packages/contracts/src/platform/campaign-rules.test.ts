@@ -9,6 +9,7 @@ import {
   formatStandardLevelRange,
   MAX_CHARACTER_LEVEL,
   resolveAllowedCharacterCreatureTypes,
+  resolveAllowedCreatureTypesFromPolicy,
   resolveCampaignRules,
   resolveMaxCharacterLevel,
   resolveStandardMaxCharacterLevel,
@@ -17,21 +18,22 @@ import {
 
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
 
-const baseSettings = {
-  characterCreation: { startingLevel: 1, importedCharacters: { policy: 'disabled' as const } },
+const basePatch = {
+  startingLevel: 1,
+  importedCharacters: { policy: 'disabled' as const },
 }
 
 describe('resolveStandardMaxCharacterLevel', () => {
   it('defaults to system max when override is absent', () => {
     expect(resolveStandardMaxCharacterLevel(undefined)).toBe(MAX_CHARACTER_LEVEL)
-    expect(resolveStandardMaxCharacterLevel(baseSettings)).toBe(MAX_CHARACTER_LEVEL)
+    expect(resolveStandardMaxCharacterLevel(basePatch)).toBe(MAX_CHARACTER_LEVEL)
   })
 
   it('returns sparse override when set', () => {
     expect(
       resolveStandardMaxCharacterLevel({
-        ...baseSettings,
-        ruleOverrides: { maxCharacterLevel: 25 },
+        ...basePatch,
+        progression: { maxCharacterLevel: 25 },
       }),
     ).toBe(25)
   })
@@ -40,14 +42,14 @@ describe('resolveStandardMaxCharacterLevel', () => {
 describe('resolveMaxCharacterLevel', () => {
   it('defaults to system max when override is absent', () => {
     expect(resolveMaxCharacterLevel(undefined)).toBe(MAX_CHARACTER_LEVEL)
-    expect(resolveMaxCharacterLevel(baseSettings)).toBe(MAX_CHARACTER_LEVEL)
+    expect(resolveMaxCharacterLevel(basePatch)).toBe(MAX_CHARACTER_LEVEL)
   })
 
   it('returns flat override when extended progression is absent', () => {
     expect(
       resolveMaxCharacterLevel({
-        ...baseSettings,
-        ruleOverrides: { maxCharacterLevel: 25 },
+        ...basePatch,
+        progression: { maxCharacterLevel: 25 },
       }),
     ).toBe(25)
   })
@@ -55,8 +57,8 @@ describe('resolveMaxCharacterLevel', () => {
   it('returns extended max when extended progression is present', () => {
     expect(
       resolveMaxCharacterLevel({
-        ...baseSettings,
-        ruleOverrides: {
+        ...basePatch,
+        progression: {
           maxCharacterLevel: 20,
           extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
         },
@@ -65,17 +67,32 @@ describe('resolveMaxCharacterLevel', () => {
   })
 })
 
-describe('resolveAllowedCharacterCreatureTypes', () => {
-  it('defaults to humanoid when override is absent', () => {
-    expect(resolveAllowedCharacterCreatureTypes(undefined)).toEqual(['humanoid'])
-    expect(resolveAllowedCharacterCreatureTypes(baseSettings)).toEqual(['humanoid'])
+describe('resolveAllowedCreatureTypesFromPolicy', () => {
+  it('defaults to humanoid when policy is absent', () => {
+    expect(resolveAllowedCreatureTypesFromPolicy(undefined)).toEqual(['humanoid'])
   })
 
-  it('returns sparse override when set', () => {
+  it('returns ids when mode is only', () => {
+    expect(
+      resolveAllowedCreatureTypesFromPolicy({
+        mode: 'only',
+        ids: ['humanoid', 'fey'],
+      }),
+    ).toEqual(['humanoid', 'fey'])
+  })
+})
+
+describe('resolveAllowedCharacterCreatureTypes', () => {
+  it('defaults to humanoid when policy is absent', () => {
+    expect(resolveAllowedCharacterCreatureTypes(undefined)).toEqual(['humanoid'])
+    expect(resolveAllowedCharacterCreatureTypes(basePatch)).toEqual(['humanoid'])
+  })
+
+  it('returns policy ids when set', () => {
     expect(
       resolveAllowedCharacterCreatureTypes({
-        ...baseSettings,
-        ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'fey'] },
+        ...basePatch,
+        species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
       }),
     ).toEqual(['humanoid', 'fey'])
   })
@@ -85,8 +102,8 @@ describe('resolveCampaignRules', () => {
   it('returns flat cap without extended metadata', () => {
     expect(
       resolveCampaignRules({
-        ...baseSettings,
-        ruleOverrides: { maxCharacterLevel: 25 },
+        ...basePatch,
+        progression: { maxCharacterLevel: 25 },
       }),
     ).toEqual({
       maxCharacterLevel: 25,
@@ -98,8 +115,8 @@ describe('resolveCampaignRules', () => {
   it('returns extended progression metadata when enabled', () => {
     expect(
       resolveCampaignRules({
-        ...baseSettings,
-        ruleOverrides: {
+        ...basePatch,
+        progression: {
           maxCharacterLevel: 20,
           extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
         },
@@ -116,11 +133,11 @@ describe('resolveCampaignRules', () => {
     })
   })
 
-  it('returns creature type override when set', () => {
+  it('returns creature type policy ids when set', () => {
     expect(
       resolveCampaignRules({
-        ...baseSettings,
-        ruleOverrides: { allowedCharacterCreatureTypes: ['humanoid', 'construct'] },
+        ...basePatch,
+        species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'construct'] } },
       }).allowedCharacterCreatureTypes,
     ).toEqual(['humanoid', 'construct'])
   })
@@ -128,8 +145,8 @@ describe('resolveCampaignRules', () => {
   it('supports absolute max at 100', () => {
     expect(
       resolveCampaignRules({
-        ...baseSettings,
-        ruleOverrides: { maxCharacterLevel: ABSOLUTE_MAX_CHARACTER_LEVEL },
+        ...basePatch,
+        progression: { maxCharacterLevel: ABSOLUTE_MAX_CHARACTER_LEVEL },
       }).maxCharacterLevel,
     ).toBe(ABSOLUTE_MAX_CHARACTER_LEVEL)
   })

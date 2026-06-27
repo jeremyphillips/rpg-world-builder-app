@@ -1,6 +1,7 @@
 export * from './auth'
 export * from './user'
 export * from './campaign-level-validation'
+export * from './campaign-character-creation-patch'
 export * from './campaign-rules'
 export * from './campaign'
 export * from './campaign-ruleset-patch'

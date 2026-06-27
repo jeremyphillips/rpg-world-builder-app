@@ -1,20 +1,16 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
-import { ABSOLUTE_MAX_CHARACTER_LEVEL } from '../primitives/level'
-import { creatureTypeSchema } from '../vocab/creature-type'
-import { resolveCampaignRules } from './campaign-rules'
-import { validateExtendedMaxLevel } from './campaign-level-validation'
+import { updateCampaignCharacterCreationInputSchema } from './campaign-character-creation-patch'
 
-/** Max length for extended progression tier names in campaign settings. */
-export const EXTENDED_PROGRESSION_TIER_NAME_MAX = 50
-
-export const extendedProgressionSchema = z.object({
-  tierName: z.string().min(1).max(EXTENDED_PROGRESSION_TIER_NAME_MAX),
-  maxLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
-})
-
-export type ExtendedProgression = z.infer<typeof extendedProgressionSchema>
+export {
+  EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  extendedProgressionSchema,
+  type ExtendedProgression,
+  IMPORTED_CHARACTERS_POLICIES,
+  importedCharactersPolicySchema,
+  type ImportedCharactersPolicy,
+} from './campaign-character-creation-patch'
 
 // ---------------------------------------------------------------------------
 // Campaign identity
@@ -32,59 +28,6 @@ export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>
 // ---------------------------------------------------------------------------
 // Campaign configuration
 // ---------------------------------------------------------------------------
-
-export const IMPORTED_CHARACTERS_POLICIES = ['disabled', 'approval_required'] as const
-
-export const importedCharactersPolicySchema = z.enum(IMPORTED_CHARACTERS_POLICIES)
-
-export type ImportedCharactersPolicy = z.infer<typeof importedCharactersPolicySchema>
-
-export const campaignRuleOverridesSchema = z
-  .object({
-    maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
-    extendedProgression: extendedProgressionSchema.optional(),
-    allowedCharacterCreatureTypes: z.array(creatureTypeSchema).min(1).optional(),
-  })
-  .strict()
-
-export type CampaignRuleOverrides = z.infer<typeof campaignRuleOverridesSchema>
-
-export const campaignSettingsSchema = z
-  .object({
-    characterCreation: z.object({
-      startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
-      importedCharacters: z.object({
-        policy: importedCharactersPolicySchema,
-      }),
-    }),
-    ruleOverrides: campaignRuleOverridesSchema.optional(),
-  })
-  .superRefine((settings, ctx) => {
-    const { maxCharacterLevel: effectiveMax, standardMaxCharacterLevel } =
-      resolveCampaignRules(settings)
-
-    if (settings.characterCreation.startingLevel > effectiveMax) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Starting level cannot exceed max character level',
-        path: ['characterCreation', 'startingLevel'],
-      })
-    }
-
-    const extended = settings.ruleOverrides?.extendedProgression
-    if (extended) {
-      const result = validateExtendedMaxLevel(standardMaxCharacterLevel, extended.maxLevel)
-      if (!result.valid) {
-        ctx.addIssue({
-          code: 'custom',
-          message: result.message,
-          path: ['ruleOverrides', 'extendedProgression', 'maxLevel'],
-        })
-      }
-    }
-  })
-
-export type CampaignSettings = z.infer<typeof campaignSettingsSchema>
 
 export const PLAY_STYLES = [
   'dungeon_crawl',
@@ -135,7 +78,6 @@ export const campaignFlavorSchema = z.object({
 export type CampaignFlavor = z.infer<typeof campaignFlavorSchema>
 
 export const campaignConfigurationSchema = z.object({
-  settings: campaignSettingsSchema.optional(),
   flavor: campaignFlavorSchema.optional(),
 })
 
@@ -214,7 +156,8 @@ export type CampaignListItem = z.infer<typeof campaignListItemSchema>
  * defaults for any omitted configuration.
  */
 export const createCampaignInputSchema = campaignIdentitySchema.extend({
-  settings: campaignSettingsSchema.optional(),
+  /** Written to CampaignRulesetPatch on create — not stored on the campaign document. */
+  characterCreation: updateCampaignCharacterCreationInputSchema.optional(),
   flavor: campaignFlavorSchema.optional(),
   /** Optional at create; the server falls back to `DEFAULT_SYSTEM_RULESET_ID`. */
   rulesetId: systemRulesetIdSchema.optional(),
@@ -234,7 +177,7 @@ export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
  */
 export const updateCampaignInputSchema = createCampaignInputSchema
   .partial({ name: true })
-  .omit({ rulesetId: true })
+  .omit({ rulesetId: true, characterCreation: true })
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 
