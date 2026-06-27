@@ -311,10 +311,23 @@ export {
 export {
   BooleanCell,
   DataTable,
+  NameCell,
   RowActionsMenu,
   SortableHeader,
+  TableBadgeCell,
 } from './components/ui/data-table.client'
-export type { BooleanCellProps, RowActionsMenuProps } from './components/ui/data-table.client'
+export type {
+  BooleanCellProps,
+  NameCellProps,
+  RowActionsMenuProps,
+  TableBadgeCellProps,
+} from './components/ui/data-table.client'
+export {
+  dataTableColumnMeta,
+  dataTableColumnWidths,
+  dataTableWidthMeta,
+} from './components/ui/data-table-meta'
+export type { DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
   DataTableProps,
@@ -338,4 +351,16 @@ export {
   dataTableColumnPanelVariants,
   dataTableColumnItemVariants,
   dataTableColumnDragHandleVariants,
+  dataTableEmptyPanelVariants,
+  dataTableEmptyStateVariants,
+  dataTableFilterChipVariants,
+  dataTableLockedColumnVariants,
+  dataTableResetColumnVariants,
+  dataTableNameCellVariants,
+  dataTableNameLinkCellVariants,
+  dataTableRowVariants,
+  dataTableBodyCellPaddingVariants,
+  dataTableBodyCellVariants,
+  dataTableHeaderCellVariants,
+  dataTableSortIconVariants,
 } from './components/ui/data-table.variants'

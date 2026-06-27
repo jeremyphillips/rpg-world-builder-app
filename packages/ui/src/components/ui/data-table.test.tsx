@@ -13,7 +13,14 @@ declare module '@tanstack/react-table' {
   }
 }
 
-import { BooleanCell, DataTable, RowActionsMenu, SortableHeader } from './data-table.client'
+import {
+  BooleanCell,
+  DataTable,
+  NameCell,
+  RowActionsMenu,
+  SortableHeader,
+  TableBadgeCell,
+} from './data-table.client'
 import type { FilterDef } from './data-table.types'
 
 // ---------------------------------------------------------------------------
@@ -125,6 +132,89 @@ describe('DataTable — rendering', () => {
     renderTable()
     expect(screen.getByRole('button', { name: /^Filters/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /columns/i })).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Shared cell helpers
+// ---------------------------------------------------------------------------
+
+describe('DataTable cell helpers', () => {
+  it('NameCell renders semibold text', () => {
+    render(<NameCell>Barbarian</NameCell>)
+    expect(screen.getByText('Barbarian')).toHaveClass('font-semibold')
+  })
+
+  it('TableBadgeCell renders a compact badge', () => {
+    render(<TableBadgeCell variant="secondary">System</TableBadgeCell>)
+    expect(screen.getByText('System')).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Column sorting
+// ---------------------------------------------------------------------------
+
+describe('DataTable — sorting', () => {
+  it('marks sortable headers with aria-sort="none" before sorting', () => {
+    renderTable()
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' })
+    expect(nameHeader).toHaveAttribute('aria-sort', 'none')
+  })
+
+  it('updates aria-sort after clicking a sortable header', async () => {
+    const user = userEvent.setup()
+    renderTable()
+
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' })
+    await user.click(screen.getByRole('button', { name: /sort by name/i }))
+
+    expect(nameHeader).toHaveAttribute('aria-sort', 'ascending')
+  })
+
+  it('shows a directional chevron on the actively sorted column', async () => {
+    const user = userEvent.setup()
+    const { container } = renderTable()
+
+    const sortButton = screen.getByRole('button', { name: /sort by name/i })
+    expect(sortButton.querySelector('.lucide-chevron-up')).not.toBeInTheDocument()
+
+    await user.click(sortButton)
+
+    expect(sortButton.querySelector('.lucide-chevron-up')).toBeInTheDocument()
+    expect(container.querySelector('.lucide-arrow-up-down')).not.toBeInTheDocument()
+  })
+
+  it('applies column tone classes to body cells', () => {
+    const tonedColumns: ColumnDef<Item>[] = [
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        meta: { columnTone: 'identity' },
+      },
+      {
+        accessorKey: 'category',
+        header: 'Category',
+        meta: { columnTone: 'data' },
+      },
+      {
+        accessorKey: 'active',
+        header: 'Active',
+        cell: ({ row }) => <BooleanCell value={row.getValue('active')} />,
+        meta: { columnTone: 'neutral' },
+      },
+    ]
+
+    renderTable({ columns: tonedColumns, filters: [] })
+
+    const rows = screen.getAllByRole('row').slice(1)
+    const firstRowCells = within(rows[0]!).getAllByRole('cell')
+
+    expect(firstRowCells[0]).toHaveClass('bg-accent/20')
+    expect(firstRowCells[0]).not.toHaveClass('text-muted-foreground')
+    expect(firstRowCells[1]).toHaveClass('bg-muted/10', 'text-muted-foreground')
+    expect(firstRowCells[2]).toHaveClass('text-muted-foreground')
+    expect(firstRowCells[2]).not.toHaveClass('bg-muted/10')
   })
 })
 

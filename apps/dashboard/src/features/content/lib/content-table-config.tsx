@@ -1,9 +1,15 @@
-import { Link } from 'react-router-dom'
 import { formatMoney, moneyToCp, type Money } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
+import {
+  buildNameColumn,
+  buildSourceColumn,
+  stampDataColumns,
+} from '@/lib/data-table/column-builders'
+
 import { getContentImageUrl } from './content-image-url'
+import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -12,7 +18,7 @@ import { getContentImageUrl } from './content-image-url'
 export type ContentBase = {
   imageKey?: string
   name: string
-  source: 'system' | 'homebrew'
+  source: ContentSource
 }
 
 const BASE_NAME_FILTER: FilterDef = {
@@ -78,41 +84,31 @@ export function buildContentColumns<T extends ContentBase>(
           src={getContentImageUrl(key)}
           alt=""
           aria-hidden="true"
-          className="size-9 shrink-0 rounded-md object-cover"
+          className="size-8 shrink-0 rounded-md object-cover"
         />
       )
     },
     enableSorting: false,
     enableHiding: false,
-    meta: { headerClassName: 'w-16', cellClassName: 'w-16', label: 'Image', locked: true },
+    meta: {
+      ...dataTableColumnMeta.identity,
+      ...dataTableWidthMeta('image'),
+      label: 'Image',
+      locked: true,
+    },
   }
 
-  const nameColumn: ColumnDef<T> = {
+  const nameColumn = buildNameColumn<T>({
     accessorKey: 'name',
-    header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
-    cell: nameHref
-      ? ({ row }) => (
-          <Link
-            to={nameHref(row.original)}
-            className="font-medium hover:underline focus-visible:underline"
-          >
-            {row.getValue<string>('name')}
-          </Link>
-        )
-      : undefined,
-    enableHiding: false,
-    meta: { label: 'Name', locked: true },
-  }
+    locked: true,
+    nameHref,
+  })
 
-  const sourceColumn: ColumnDef<T> = {
-    accessorKey: 'source',
-    header: 'Source',
-    cell: ({ row }) => <span className="capitalize">{row.getValue<string>('source')}</span>,
-    enableSorting: false,
-    meta: { label: 'Source' },
-  }
+  const sourceColumn = buildSourceColumn<T, ContentSource>({
+    badgeMap: CONTENT_SOURCE_BADGE,
+  })
 
-  return [imageColumn, nameColumn, ...middleColumns, sourceColumn]
+  return [imageColumn, nameColumn, ...stampDataColumns(middleColumns), sourceColumn]
 }
 
 /**

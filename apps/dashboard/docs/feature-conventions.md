@@ -158,6 +158,29 @@ import { SPECIES_LIST } from '../fixtures'
 ;<DataTable columns={speciesColumns(STORY_CAMPAIGN_ID)} data={[...SPECIES_LIST]} />
 ```
 
+### DataTable column recipes
+
+Catalog and homebrew overview tables share styling via `@rpg/ui` cell helpers
+(`NameCell`, `TableBadgeCell`, `dataTableColumnMeta`) and dashboard builders in
+[`src/lib/data-table/column-builders.tsx`](../src/lib/data-table/column-builders.tsx).
+
+| Helper                | Use                                                  |
+| --------------------- | ---------------------------------------------------- |
+| `buildNameColumn`     | Sortable identity column (name/label)                |
+| `buildSourceColumn`   | Source badge column — pass a domain `SourceBadgeMap` |
+| `stampDataColumns`    | Apply `columnTone: 'data'` to middle columns         |
+| `withColumnWidth`     | Pin column width via `dataTableWidthMeta` preset     |
+| `buildContentColumns` | Content overviews — image + name + middle + source   |
+
+Use `dataTableWidthMeta('compact')` (from `@rpg/ui`) for narrow fixed columns
+(hit die, spellcasting, source). Presets: `image`, `compact`, `compactCenter`,
+`medium`, `minimal`. `compact` / `compactCenter` / `medium` pin width at `lg+`
+only; below `lg` columns size to content (table still scrolls horizontally).
+
+Do not hand-wire `font-semibold`, `Badge size="sm"`, `columnTone`, or raw
+`w-[…]` width classes in feature column files; use the builders, cell helpers,
+and width presets so tables stay visually in sync.
+
 Use `pickClass()` / `pickSubclassesForClass()` from `lib/fixtures/pick` for
 one-off catalog slugs not worth a named fixture export.
 

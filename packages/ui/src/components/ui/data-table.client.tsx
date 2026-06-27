@@ -13,6 +13,8 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
     headerClassName?: string
     cellClassName?: string
+    /** Background tone for body cells — identity, data, source, actions, or neutral. */
+    columnTone?: 'identity' | 'data' | 'source' | 'actions' | 'neutral'
     /** Display name shown in the column visibility panel. Required when the
      *  column header is a JSX function (e.g. SortableHeader) so the panel
      *  does not fall back to the raw column id. */
@@ -78,6 +80,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 
+import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
@@ -102,6 +105,7 @@ import {
   TableRow,
 } from './table'
 import { Badge } from './badge'
+import { dataTableWidthMeta } from './data-table-meta'
 import type {
   BooleanFilterDef,
   ColumnChangeState,
@@ -113,6 +117,8 @@ import type {
 import {
   dataTableAdvancedInnerVariants,
   dataTableAdvancedPanelVariants,
+  dataTableBodyCellPaddingVariants,
+  dataTableBodyCellVariants,
   dataTableColumnDragHandleVariants,
   dataTableColumnItemVariants,
   dataTableColumnPanelVariants,
@@ -123,7 +129,11 @@ import {
   dataTableFilterGroupVariants,
   dataTablePaginationVariants,
   dataTableResetColumnVariants,
+  dataTableRowVariants,
+  dataTableSortIconVariants,
   dataTableLockedColumnVariants,
+  dataTableHeaderCellVariants,
+  dataTableNameCellVariants,
   dataTableRootVariants,
   dataTableTableVariants,
   dataTableTableWrapVariants,
@@ -665,16 +675,27 @@ export function SortableHeader<TData, TValue>({
   label,
 }: SortableHeaderProps<TData, TValue>) {
   const ariaLabel = `Sort by ${label ?? (typeof children === 'string' ? children : '')}`
+  const sorted = column.getIsSorted()
+
+  const sortIcon =
+    sorted === 'asc' ? (
+      <ChevronUp className={dataTableSortIconVariants({ state: 'asc' })} aria-hidden="true" />
+    ) : sorted === 'desc' ? (
+      <ChevronDown className={dataTableSortIconVariants({ state: 'desc' })} aria-hidden="true" />
+    ) : (
+      <ArrowUpDown className={dataTableSortIconVariants({ state: 'idle' })} aria-hidden="true" />
+    )
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      className="-ml-3 h-8 data-[state=open]:bg-accent"
+      className="-ml-2 h-7 data-[state=open]:bg-accent"
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       aria-label={ariaLabel}
     >
       {children}
-      <ArrowUpDown className="ml-1 size-3.5 opacity-50" />
+      {sortIcon}
     </Button>
   )
 }
@@ -698,6 +719,35 @@ export function BooleanCell({ value, icons = true }: BooleanCellProps) {
     <Check className="size-4" aria-label="Yes" />
   ) : (
     <X className="size-4 opacity-30" aria-label="No" />
+  )
+}
+
+// ---------------------------------------------------------------------------
+// NameCell — semibold primary label for identity columns
+// ---------------------------------------------------------------------------
+
+export interface NameCellProps {
+  children: React.ReactNode
+}
+
+export function NameCell({ children }: NameCellProps) {
+  return <span className={dataTableNameCellVariants()}>{children}</span>
+}
+
+// ---------------------------------------------------------------------------
+// TableBadgeCell — compact badge for source/status columns
+// ---------------------------------------------------------------------------
+
+export interface TableBadgeCellProps {
+  variant: React.ComponentProps<typeof Badge>['variant']
+  children: React.ReactNode
+}
+
+export function TableBadgeCell({ variant, children }: TableBadgeCellProps) {
+  return (
+    <Badge size="sm" variant={variant}>
+      {children}
+    </Badge>
   )
 }
 
@@ -867,7 +917,7 @@ export function DataTable<TData>({
     ),
     enableSorting: false,
     enableHiding: false,
-    meta: { headerClassName: 'w-px', cellClassName: 'w-px' },
+    meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
   }
 
   // Inject actions column
@@ -877,6 +927,7 @@ export function DataTable<TData>({
     cell: ({ row }) => rowActions?.(row.original) ?? null,
     enableSorting: false,
     enableHiding: false,
+    meta: { ...dataTableWidthMeta('minimal'), columnTone: 'actions' },
   }
 
   const resolvedColumns: ColumnDef<TData>[] = [
@@ -959,29 +1010,61 @@ export function DataTable<TData>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={header.column.columnDef.meta?.headerClassName}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted()
+                  const canSort = header.column.getCanSort()
+                  return (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={cn(
+                        dataTableHeaderCellVariants(),
+                        header.column.columnDef.meta?.headerClassName,
+                      )}
+                      aria-sort={
+                        sorted === 'asc'
+                          ? 'ascending'
+                          : sorted === 'desc'
+                            ? 'descending'
+                            : canSort
+                              ? 'none'
+                              : undefined
+                      }
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {rows.length > 0 ? (
               rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() ? 'selected' : undefined}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={cell.column.columnDef.meta?.cellClassName}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                <TableRow
+                  key={row.id}
+                  className={dataTableRowVariants()}
+                  data-state={row.getIsSelected() ? 'selected' : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          dataTableBodyCellVariants({
+                            tone: meta?.columnTone ?? 'neutral',
+                          }),
+                          dataTableBodyCellPaddingVariants(),
+                          meta?.cellClassName,
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (

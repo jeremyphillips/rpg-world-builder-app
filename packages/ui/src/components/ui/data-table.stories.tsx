@@ -2,7 +2,15 @@ import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { BooleanCell, DataTable, RowActionsMenu, SortableHeader } from './data-table.client'
+import {
+  BooleanCell,
+  DataTable,
+  NameCell,
+  RowActionsMenu,
+  SortableHeader,
+  TableBadgeCell,
+} from './data-table.client'
+import { dataTableColumnMeta, dataTableWidthMeta } from './data-table-meta'
 import type { DataTableProps, FilterDef } from './data-table.types'
 
 // ---------------------------------------------------------------------------
@@ -11,6 +19,7 @@ import type { DataTableProps, FilterDef } from './data-table.types'
 
 interface CharacterClass {
   id: string
+  imageKey?: string
   name: string
   hitDie: number
   primaryAbility: string
@@ -120,30 +129,59 @@ const CLASSES: CharacterClass[] = [
 
 const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
   {
+    accessorKey: 'imageKey',
+    header: () => <span className="sr-only">Image</span>,
+    cell: () => (
+      <div className="size-8 shrink-0 rounded-md bg-muted" aria-hidden="true" role="presentation" />
+    ),
+    enableSorting: false,
+    meta: {
+      ...dataTableColumnMeta.identity,
+      ...dataTableWidthMeta('image'),
+      label: 'Image',
+    },
+  },
+  {
     accessorKey: 'name',
     header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
+    cell: ({ row }) => <NameCell>{row.getValue<string>('name')}</NameCell>,
+    meta: { ...dataTableColumnMeta.identity, label: 'Name' },
   },
   {
     accessorKey: 'hitDie',
     header: ({ column }) => <SortableHeader column={column}>Hit Die</SortableHeader>,
     cell: ({ row }) => `d${row.getValue('hitDie')}`,
-    // hitDie is a number — equalsString converts both sides for select filter
     filterFn: 'equalsString',
+    meta: { ...dataTableColumnMeta.data, ...dataTableWidthMeta('compact'), label: 'Hit Die' },
   },
   {
     accessorKey: 'primaryAbility',
     header: 'Primary Ability',
+    meta: { ...dataTableColumnMeta.data, label: 'Primary Ability' },
   },
   {
     accessorKey: 'spellcasting',
     header: 'Spellcasting',
     cell: ({ row }) => <BooleanCell value={row.getValue('spellcasting')} />,
     filterFn: 'boolean',
+    meta: {
+      ...dataTableColumnMeta.data,
+      ...dataTableWidthMeta('compactCenter'),
+      label: 'Spellcasting',
+    },
   },
   {
     accessorKey: 'source',
     header: 'Source',
-    cell: ({ row }) => <span className="capitalize">{row.getValue('source')}</span>,
+    cell: ({ row }) => {
+      const source = row.getValue<'system' | 'homebrew'>('source')
+      return (
+        <TableBadgeCell variant={source === 'system' ? 'secondary' : 'outline'}>
+          {source === 'system' ? 'System' : 'Homebrew'}
+        </TableBadgeCell>
+      )
+    },
+    meta: { ...dataTableColumnMeta.source, ...dataTableWidthMeta('compact'), label: 'Source' },
   },
 ]
 
