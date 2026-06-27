@@ -9,6 +9,8 @@ export {
   type HomebrewVocabularySetEntry,
 } from './lib/vocabulary-set-registry'
 export { useHomebrewSummary, homebrewSummaryQueryKey } from './hooks/use-homebrew-summary'
+export { useRulesetPatch, rulesetPatchQueryKey } from './hooks/use-ruleset-patch'
+export { usePatchCharacterCreationMutation } from './hooks/use-patch-character-creation-mutation'
 export {
   useVocabularySet,
   useVocabularyMutations,

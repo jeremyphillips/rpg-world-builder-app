@@ -6,7 +6,7 @@ import {
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
 
-import { useCampaigns } from './use-campaigns'
+import { useRulesetPatch } from '@/features/homebrew'
 
 const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   maxCharacterLevel: 20,
@@ -14,14 +14,12 @@ const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
 }
 
-/** Resolved campaign rules from the list cache (defaults when campaign or settings are absent). */
+/** Resolved campaign rules from the ruleset-patch query (defaults while loading or absent). */
 export function useCampaignRules(campaignId: string | undefined): ResolvedCampaignRules {
-  const { data: campaigns } = useCampaigns()
+  const { data: patch } = useRulesetPatch(campaignId)
 
   return useMemo(() => {
-    if (!campaignId || !campaigns) return DEFAULT_CAMPAIGN_RULES
-    const campaign = campaigns.find((c) => c.id === campaignId)
-    if (!campaign) return DEFAULT_CAMPAIGN_RULES
-    return resolveCampaignRules(campaign.configuration.settings)
-  }, [campaignId, campaigns])
+    if (!patch) return DEFAULT_CAMPAIGN_RULES
+    return resolveCampaignRules(patch.characterCreation)
+  }, [patch])
 }
