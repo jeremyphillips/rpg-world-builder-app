@@ -643,7 +643,7 @@ Follow the `ClassDetail` pattern:
 
 - Load the full list query (no per-id endpoint — find client-side with `findById`).
 - Inner component calls `useSetBreadcrumbLabel(item.name)` for dynamic breadcrumb.
-- Use `ContentDetailLayout` + `ContentStatRow` for standard two-column layout.
+- Use `ContentDetailLayout` (`statRows` or `metadata`, `descriptionContent`, `children`) inside `WidePage`; full-width tables as `WidePage` siblings. See [feature-conventions.md](../apps/dashboard/docs/feature-conventions.md).
 - Edit link targets `ROUTES.content.<camelPlural>.edit(campaignId, itemId)`.
 
 Add co-located `*.stories.tsx` (CSF3, `title: 'Content/<TypeName>Detail'`).

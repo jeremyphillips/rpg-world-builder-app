@@ -21,7 +21,7 @@ function StatRowInfo({
 
 /**
  * Reusable label/value row for content detail pages.
- * Used by content detail routes via {@link ContentDetailStatBody}.
+ * Used by {@link ContentDetailLayout} hero metadata and custom detail sections.
  *
  * @example
  * <ContentStatRow label="Hit Die" value="d12 per level" />

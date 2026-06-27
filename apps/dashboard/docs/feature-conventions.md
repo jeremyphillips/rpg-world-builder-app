@@ -86,6 +86,11 @@ Every route picks **one width shell** from `components/layout/`:
 | [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-3xl` | Settings, wizards, account/profile stubs, content create/edit forms |
 | [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                                   |
 
+Nested readable columns inside `WidePage` use
+[`narrowPageContentClasses`](../src/components/layout/page-content.variants.ts)
+(`max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose body
+sections on catalog detail routes.
+
 Shared spacing tokens live in
 [`page-spacing.variants.ts`](../src/components/layout/page-spacing.variants.ts):
 `compact` (space-y-2), `list` (space-y-4), `relaxed` (space-y-6), `loose`
@@ -123,8 +128,33 @@ import { WidePage } from '@/components/layout/wide-page'
   — managed catalog **list** recipe: `WidePage` + `PageHeader` + `PageLoadState`
   - campaign-manager "New" gating. Use for catalog list routes only.
 - [`ContentDetailLayout`](../src/features/content/lib/content-detail-layout.tsx)
-  — two-column detail **presentation** (2/3 content + 1/3 artwork). Wrap in
-  `WidePage`; not a width shell itself.
+  — catalog **detail** recipe inside `WidePage`: edit toolbar, full-width hero
+  card (name + metadata + artwork), then a `narrowPageContentClasses` body column
+  for description and sections. Pass static rows via `statRows` or hook-driven
+  rows via `metadata` (e.g. species creature type). Not a page width shell.
+
+  Full-width blocks (e.g. [`ClassProgressionTable`](../src/features/content/classes/components/class-progression-table.tsx))
+  render as **siblings** below `ContentDetailLayout` in the same `WidePage` — do
+  not nest wide tables inside the layout.
+
+```tsx
+import { WidePage } from '@/components/layout/wide-page'
+import { ContentDetailLayout } from '@/features/content/lib/content-detail-layout'
+;<WidePage spacing="relaxed">
+  <ContentDetailLayout
+    name={item.name}
+    statRows={rows}
+    imageUrl={getContentImageUrl(item.imageKey)}
+    imageName={item.name}
+    campaignId={campaignId}
+    editHref={contentEditHref('feats', campaignId, item.id)}
+    descriptionContent={<RichTextContent html={item.description} size="sm" tone="muted" />}
+  >
+    {/* narrow sections */}
+  </ContentDetailLayout>
+  <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
+</WidePage>
+```
 
 Do not use `ContentOverviewShell` for non-catalog full-width pages (hubs,
 dashboard widgets, etc.) — compose `WidePage` + `PageHeader` directly instead.
