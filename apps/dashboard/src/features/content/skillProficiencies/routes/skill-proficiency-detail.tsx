@@ -11,7 +11,6 @@ import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/content-detail-resolver'
 import { contentEditHref } from '../../lib/content-edit-href'
-import { ContentStatRow } from '../../lib/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/content-image-url'
 
 const SUGGESTED_CLASS_CHIP_CLASS =
@@ -79,16 +78,11 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         imageName={skill.name}
         campaignId={campaignId}
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
+        statRows={[{ label: 'Governing Ability', value: getAbilityLabel(skill.ability) }]}
+        descriptionContent={
+          skill.description ? <Text variant="muted">{skill.description}</Text> : undefined
+        }
       >
-        <div className="space-y-4">
-          <Heading variant="page" as="h1">
-            {skill.name}
-          </Heading>
-          <div className="space-y-3">
-            <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
-          </div>
-          {skill.description && <Text variant="muted">{skill.description}</Text>}
-        </div>
         {skill.suggestedClasses.length > 0 && (
           <SuggestedClassesList campaignId={campaignId} suggestedClasses={skill.suggestedClasses} />
         )}
