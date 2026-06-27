@@ -43,7 +43,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
         defaultErrorLabel="Could not load homebrew summary."
       >
         <section aria-labelledby="homebrew-content-heading" className="space-y-4">
-          <Heading variant="section" as="h3" id="homebrew-content-heading">
+          <Heading variant="section" as="h2" id="homebrew-content-heading">
             Content
           </Heading>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,7 +65,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
         </section>
 
         <section aria-labelledby="homebrew-vocabulary-heading" className="space-y-4">
-          <Heading variant="section" as="h3" id="homebrew-vocabulary-heading">
+          <Heading variant="section" as="h2" id="homebrew-vocabulary-heading">
             Rules Vocabulary
           </Heading>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

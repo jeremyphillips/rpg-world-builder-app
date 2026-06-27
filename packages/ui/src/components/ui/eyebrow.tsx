@@ -10,7 +10,7 @@ export interface EyebrowProps
 
 export function Eyebrow({ children, className, size, ...props }: EyebrowProps) {
   return (
-    <p className={cn(eyebrowVariants({ size }), className)} {...props}>
+    <p className={cn(className, eyebrowVariants({ size }))} {...props}>
       {children}
     </p>
   )

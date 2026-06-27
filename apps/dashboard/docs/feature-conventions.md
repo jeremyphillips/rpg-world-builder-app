@@ -52,11 +52,16 @@ Standard pattern:
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
-<Heading variant="content" as="h1">{item.name}</Heading>
+<Heading variant="display" as="h1">{item.name}</Heading>
 <RichTextContent html={item.description} size="sm" tone="muted" />
-<Heading variant="section" as="h3" id="traits-heading">Traits</Heading>
+<Heading variant="section" as="h2" id="traits-heading">Traits</Heading>
+<Heading variant="subsection" as="h3">Heritage name</Heading>
 <RichTextContent html={trait.description} size="sm" tone="muted" />
 ```
+
+Use **one h1 per page** (`page` on list/settings routes, `display` on detail entity
+titles). Do not override heading typography with atomic `text-heading-*` classes in
+`className`.
 
 Preserve semantic `as` values and section `id`s used by `aria-labelledby`. Full
 hierarchy and prose rules: [`packages/ui/docs/typography.md`](../../../packages/ui/docs/typography.md).

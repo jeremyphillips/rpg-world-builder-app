@@ -1,11 +1,11 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-export const eyebrowVariants = cva('uppercase font-meta text-muted-foreground', {
+export const eyebrowVariants = cva('', {
   variants: {
     size: {
-      xs: 'text-eyebrow-xs tracking-eyebrow-xs',
-      sm: 'text-eyebrow-sm tracking-eyebrow',
-      md: 'text-eyebrow-md tracking-eyebrow',
+      xs: 'eyebrow-style-xs',
+      sm: 'eyebrow-style-sm',
+      md: 'eyebrow-style-md',
     },
   },
   defaultVariants: {

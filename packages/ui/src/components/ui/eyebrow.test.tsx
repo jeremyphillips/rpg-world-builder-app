@@ -5,26 +5,20 @@ import axe from 'axe-core'
 import { Eyebrow } from './eyebrow'
 
 describe('Eyebrow', () => {
-  it('defaults to sm size classes', () => {
+  it('defaults to sm size composite', () => {
     render(<Eyebrow>Campaign</Eyebrow>)
     const eyebrow = screen.getByText('Campaign')
-    expect(eyebrow).toHaveClass(
-      'text-eyebrow-sm',
-      'font-meta',
-      'uppercase',
-      'tracking-eyebrow',
-      'text-muted-foreground',
-    )
+    expect(eyebrow).toHaveClass('eyebrow-style-sm')
   })
 
-  it('applies md size classes', () => {
+  it('applies md size composite', () => {
     render(<Eyebrow size="md">Overview</Eyebrow>)
-    expect(screen.getByText('Overview')).toHaveClass('text-eyebrow-md', 'tracking-eyebrow')
+    expect(screen.getByText('Overview')).toHaveClass('eyebrow-style-md')
   })
 
-  it('applies xs size classes with tighter tracking', () => {
+  it('applies xs size composite', () => {
     render(<Eyebrow size="xs">Spell</Eyebrow>)
-    expect(screen.getByText('Spell')).toHaveClass('text-eyebrow-xs', 'tracking-eyebrow-xs')
+    expect(screen.getByText('Spell')).toHaveClass('eyebrow-style-xs')
   })
 
   it('merges custom className', () => {

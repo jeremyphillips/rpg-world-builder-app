@@ -13,11 +13,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Page titles — dashboard routes, overview shells. */
+/** Route titles — dashboard routes, overview shells. */
 export const Page: Story = {
   args: {
     variant: 'page',
-    as: 'h2',
+    as: 'h1',
     children: 'Account Settings',
   },
 }
@@ -26,17 +26,71 @@ export const Page: Story = {
 export const Display: Story = {
   args: {
     variant: 'display',
-    as: 'h2',
+    as: 'h1',
     children: 'Elf',
   },
 }
 
-/** Section headings within a detail page. */
+/** Top-level section headings within a detail page. */
 export const Section: Story = {
   args: {
     variant: 'section',
-    as: 'h3',
+    as: 'h2',
     children: 'Traits',
+  },
+}
+
+/** Nested subsection headings. */
+export const Subsection: Story = {
+  args: {
+    variant: 'subsection',
+    as: 'h3',
+    children: 'Wood Elf Heritage',
+  },
+}
+
+/** Group headings inside subsections. */
+export const Group: Story = {
+  args: {
+    variant: 'group',
+    as: 'h4',
+    children: 'Level 1 Features',
+  },
+}
+
+/** Card and modal titles. */
+export const Card: Story = {
+  args: {
+    variant: 'card',
+    as: 'h2',
+    children: 'Edit species',
+  },
+}
+
+/** Confirm dialog titles. */
+export const Alert: Story = {
+  args: {
+    variant: 'alert',
+    as: 'h2',
+    children: 'Delete item?',
+  },
+}
+
+/** Topbar navigation title. */
+export const Nav: Story = {
+  args: {
+    variant: 'nav',
+    as: 'span',
+    children: 'Campaign settings',
+  },
+}
+
+/** Sidebar product name. */
+export const Brand: Story = {
+  args: {
+    variant: 'brand',
+    as: 'span',
+    children: 'World Builder',
   },
 }
 
@@ -52,11 +106,20 @@ export const Label: Story = {
 export const Hierarchy: Story = {
   render: () => (
     <div className="space-y-4">
-      <Heading variant="page" as="h1">
+      <Heading variant="display" as="h1">
         Elf
+      </Heading>
+      <Heading variant="page" as="h1">
+        Species catalog
       </Heading>
       <Heading variant="section" as="h2">
         Traits
+      </Heading>
+      <Heading variant="subsection" as="h3">
+        Wood Elf Heritage
+      </Heading>
+      <Heading variant="group" as="h4">
+        Level 1 Features
       </Heading>
       <Heading variant="label" as="p">
         Darkvision

@@ -40,7 +40,7 @@ export function ProfileSection() {
   return (
     <section aria-labelledby="profile-heading" className="space-y-4">
       <div className="space-y-1">
-        <Heading variant="section" as="h3" id="profile-heading" className="text-lg">
+        <Heading variant="section" as="h2" id="profile-heading" className="mb-4">
           Profile
         </Heading>
         <Text variant="small">Your public display name, email address, and avatar.</Text>

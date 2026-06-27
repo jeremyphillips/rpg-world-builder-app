@@ -19,5 +19,5 @@ export function Heading<T extends React.ElementType = 'h2'>({
   ...props
 }: HeadingProps<T>) {
   const Comp = as ?? 'h2'
-  return <Comp className={cn(headingVariants({ variant }), className)} {...props} />
+  return <Comp className={cn(className, headingVariants({ variant }))} {...props} />
 }

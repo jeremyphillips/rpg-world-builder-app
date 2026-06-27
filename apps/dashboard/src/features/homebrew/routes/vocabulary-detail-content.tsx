@@ -173,7 +173,7 @@ export function VocabularyDetailContent({
           ) : (
             <>
               <PageHeader heading={setLabel} />
-              <Heading variant="section" as="h3">
+              <Heading variant="section" as="h2">
                 Not available yet
               </Heading>
               <Text variant="muted">{VOCABULARY_NOT_IMPLEMENTED_MESSAGE}</Text>

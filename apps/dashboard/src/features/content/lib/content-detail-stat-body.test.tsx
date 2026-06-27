@@ -19,7 +19,7 @@ describe('ContentDetailStatBody', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Longsword' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Longsword' })).toBeInTheDocument()
     expect(screen.getByText('Category')).toBeInTheDocument()
     expect(screen.getByText('Martial')).toBeInTheDocument()
     expect(screen.getByText('Cost')).toBeInTheDocument()

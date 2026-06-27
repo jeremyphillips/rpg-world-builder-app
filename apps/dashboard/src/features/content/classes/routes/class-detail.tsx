@@ -188,7 +188,7 @@ export function ClassDetailContent({
         editHref={contentEditHref('classes', campaignId, classId)}
       >
         <div className="space-y-4">
-          <Heading variant="page" as="h1">
+          <Heading variant="display" as="h1">
             {characterClass.name}
           </Heading>
           <ClassStatsSection characterClass={characterClass} />

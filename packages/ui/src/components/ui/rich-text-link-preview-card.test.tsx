@@ -21,7 +21,7 @@ describe('RichTextLinkPreviewCard', () => {
 
   it('renders the content type with xs Eyebrow typography', () => {
     render(<RichTextLinkPreviewCard contentType="spell" title="Fireball" />)
-    expect(screen.getByText('Spell')).toHaveClass('text-eyebrow-xs', 'tracking-eyebrow-xs')
+    expect(screen.getByText('Spell')).toHaveClass('eyebrow-style-xs')
   })
 
   it('supports selection and clear actions', async () => {

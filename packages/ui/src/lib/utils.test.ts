@@ -38,4 +38,30 @@ describe('cn', () => {
     expect(cn('font-heading', 'font-body-emphasis')).toBe('font-body-emphasis')
     expect(cn('font-meta', 'font-data-name')).toBe('font-data-name')
   })
+
+  it('replaces sibling heading-style composites', () => {
+    expect(cn('heading-style-page', 'heading-style-section')).toBe('heading-style-section')
+  })
+
+  it('drops atomic heading typography when a composite follows', () => {
+    expect(cn('text-heading-display font-heading tracking-tight', 'heading-style-page')).toBe(
+      'heading-style-page',
+    )
+  })
+
+  it('replaces sibling eyebrow-style composites', () => {
+    expect(cn('eyebrow-style-sm', 'eyebrow-style-xs')).toBe('eyebrow-style-xs')
+  })
+
+  it('drops atomic eyebrow typography when a composite follows', () => {
+    expect(cn('text-eyebrow-xs tracking-eyebrow uppercase', 'eyebrow-style-sm')).toBe(
+      'eyebrow-style-sm',
+    )
+  })
+
+  it('preserves layout and color classes when merging heading composites', () => {
+    expect(cn('heading-style-section', 'mb-4 text-foreground')).toBe(
+      'heading-style-section mb-4 text-foreground',
+    )
+  })
 })

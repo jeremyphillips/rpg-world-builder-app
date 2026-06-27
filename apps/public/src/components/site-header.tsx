@@ -11,7 +11,7 @@ export function SiteHeader() {
     <header className="border-b border-border">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         <Link href={ROUTES.home}>
-          <Heading variant="section" as="span" className="text-lg">
+          <Heading variant="brand" as="span">
             RPG World Builder
           </Heading>
         </Link>

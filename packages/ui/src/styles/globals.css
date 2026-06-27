@@ -94,18 +94,18 @@
   --text-9xl--line-height: 1;
 
   /*
-   * Heading visual tiers — map to type scale (@ 16px root).
-   * Not HTML h1–h5; use with Heading `variant` + polymorphic `as`.
+   * Heading visual tiers (@ 16px root). Not HTML h1–h5 — use with Heading
+   * `variant` + polymorphic `as`. Retune the document ladder here only.
    */
-  --text-heading-1: var(--text-3xl); /* 30px */
-  --text-heading-1--line-height: var(--text-3xl--line-height);
-  --text-heading-2: var(--text-2xl); /* 24px */
-  --text-heading-2--line-height: var(--text-2xl--line-height);
-  --text-heading-3: var(--text-xl); /* 20px */
-  --text-heading-3--line-height: var(--text-xl--line-height);
-  --text-heading-4: var(--text-lg); /* 18px */
-  --text-heading-4--line-height: var(--text-lg--line-height);
-  --text-heading-5: var(--text-base); /* 16px */
+  --text-heading-1: 2.625rem; /* 42px */
+  --text-heading-1--line-height: 2.875rem; /* 46px */
+  --text-heading-2: 2.125rem; /* 34px */
+  --text-heading-2--line-height: 2.4375rem; /* 39px */
+  --text-heading-3: 1.75rem; /* 28px */
+  --text-heading-3--line-height: 2.125rem; /* 34px */
+  --text-heading-4: 1.1875rem; /* 19px */
+  --text-heading-4--line-height: 1.5625rem; /* 25px */
+  --text-heading-5: 1rem; /* 16px */
   --text-heading-5--line-height: var(--text-base--line-height);
 
   /* Heading role aliases — retune hierarchy without touching variants. */
@@ -115,12 +115,19 @@
   --text-heading-page--line-height: var(--text-heading-2--line-height);
   --text-heading-section: var(--text-heading-3);
   --text-heading-section--line-height: var(--text-heading-3--line-height);
-  --text-heading-card: var(--text-heading-4);
-  --text-heading-card--line-height: var(--text-heading-4--line-height);
+  --text-heading-subsection: var(--text-heading-4);
+  --text-heading-subsection--line-height: var(--text-heading-4--line-height);
+  --text-heading-group: var(--text-heading-5);
+  --text-heading-group--line-height: var(--text-heading-5--line-height);
+  --text-heading-card: var(--text-heading-subsection);
+  --text-heading-card--line-height: var(--text-heading-subsection--line-height);
   --text-heading-compact: var(--text-heading-5);
   --text-heading-compact--line-height: var(--text-heading-5--line-height);
-  --text-heading-label: var(--text-heading-5);
-  --text-heading-label--line-height: var(--text-heading-5--line-height);
+  --text-heading-label: var(--text-heading-group);
+  --text-heading-label--line-height: var(--text-heading-group--line-height);
+
+  --tracking-heading: -0.025em;
+  --leading-none: 1;
 
   /* Meta typography — sub-step sizes below the type scale (@ 16px root). */
   --text-2xs-meta: 0.5625rem; /* 9px */
@@ -150,6 +157,8 @@
   /* Heading weight roles */
   --font-weight-heading-display: var(--font-weight-bold);
   --font-weight-heading: var(--font-weight-semibold);
+  --font-weight-heading-section: var(--font-weight-light);
+  --font-weight-heading-group: var(--font-weight-medium);
   --font-weight-heading-label: var(--font-weight-medium);
 
   /* Body / UI weight roles */
@@ -254,6 +263,101 @@
   :where(p:last-child) {
     margin-bottom: 0;
   }
+}
+
+/* Heading composite utilities — bundle role tokens; variants map 1:1. */
+@utility heading-style-display {
+  font-size: var(--text-heading-display);
+  line-height: var(--text-heading-display--line-height);
+  font-weight: var(--font-weight-heading-display);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-page {
+  font-size: var(--text-heading-page);
+  line-height: var(--text-heading-page--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-section {
+  font-size: var(--text-heading-section);
+  line-height: var(--text-heading-section--line-height);
+  font-weight: var(--font-weight-heading-section);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-subsection {
+  font-size: var(--text-heading-subsection);
+  line-height: var(--text-heading-subsection--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-group {
+  font-size: var(--text-heading-group);
+  line-height: var(--text-heading-group--line-height);
+  font-weight: var(--font-weight-heading-group);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-card {
+  font-size: var(--text-heading-card);
+  line-height: var(--leading-none);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-alert {
+  font-size: var(--text-heading-compact);
+  line-height: var(--leading-none);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-nav {
+  font-size: var(--text-heading-compact);
+  line-height: var(--text-heading-compact--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-brand {
+  font-size: var(--text-heading-compact);
+  line-height: var(--text-heading-compact--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-label {
+  font-size: var(--text-heading-label);
+  line-height: var(--text-heading-label--line-height);
+  font-weight: var(--font-weight-heading-label);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility eyebrow-style-xs {
+  font-size: var(--text-eyebrow-xs);
+  font-weight: var(--font-weight-meta);
+  letter-spacing: var(--tracking-eyebrow-xs);
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+@utility eyebrow-style-sm {
+  font-size: var(--text-eyebrow-sm);
+  font-weight: var(--font-weight-meta);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+@utility eyebrow-style-md {
+  font-size: var(--text-eyebrow-md);
+  font-weight: var(--font-weight-meta);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
 }
 
 @keyframes accordion-down {

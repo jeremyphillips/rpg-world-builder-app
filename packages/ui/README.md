@@ -68,7 +68,7 @@ amber/gold primary over parchment-tinted neutrals (light) and warm charcoal
 ### Fonts
 
 The preset defines two font tokens — `--font-sans` (body) and `--font-display`
-(semantic heading alias; same Inter family, used by `CardTitle` and `Modal.Header`).
+(semantic alias for future display-font rollout; prose headings use it today).
 Apps provide the Inter face:
 
 - **Next.js (public)**: load via `next/font` with `variable: '--font-body'` on

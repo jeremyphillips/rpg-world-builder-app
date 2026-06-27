@@ -32,7 +32,7 @@ function SuggestedClassesList({
 
   return (
     <section aria-labelledby="suggested-classes-heading">
-      <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
+      <Heading variant="section" as="h2" id="suggested-classes-heading" className="mb-3">
         Suggested classes
       </Heading>
       {isPending ? (

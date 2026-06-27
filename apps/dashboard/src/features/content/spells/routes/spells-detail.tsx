@@ -35,7 +35,7 @@ function SpellClassesList({ campaignId, classIds }: { campaignId: string; classI
 
   return (
     <section aria-labelledby="spell-classes-heading">
-      <Heading variant="section" as="h3" id="spell-classes-heading" className="mb-3">
+      <Heading variant="section" as="h2" id="spell-classes-heading" className="mb-3">
         Classes
       </Heading>
       {isPending ? (
@@ -82,7 +82,7 @@ function SpellTagsSection({ tags }: { tags?: SpellTags }) {
 
   return (
     <section aria-labelledby="spell-tags-heading">
-      <Heading variant="section" as="h3" id="spell-tags-heading" className="mb-3">
+      <Heading variant="section" as="h2" id="spell-tags-heading" className="mb-3">
         Tags
       </Heading>
       <ul className="flex flex-wrap gap-2" role="list">

@@ -38,7 +38,7 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
   const display = resolveTraitDisplay(trait)
   return (
     <li className="space-y-1">
-      <Heading variant="label" as="p">
+      <Heading variant="subsection" as="h3">
         {display.name}
       </Heading>
       {display.descriptionHtml && (
@@ -51,8 +51,8 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
 function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
   if (traits.length === 0) return null
   return (
-    <section aria-labelledby="tra its-heading">
-      <Heading variant="section" as="h3" id="traits-heading" className="mb-4">
+    <section aria-labelledby="traits-heading">
+      <Heading variant="section" as="h2" id="traits-heading" className="mb-4">
         Traits
       </Heading>
       <ul className="space-y-4" role="list">
@@ -69,7 +69,7 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
     <section aria-labelledby={`heritage-${heritage.id}-heading`}>
       <Heading
         variant="section"
-        as="h3"
+        as="h2"
         id={`heritage-${heritage.id}-heading`}
         className="mb-2 capitalize"
       >
@@ -83,7 +83,7 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
           const display = resolveTraitDisplay(option)
           return (
             <li key={option.id} className="space-y-1">
-              <Heading variant="label" as="p">
+              <Heading variant="subsection" as="h3">
                 {display.name}
               </Heading>
               {display.descriptionHtml && (
@@ -133,7 +133,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         editHref={contentEditHref('species', campaignId, species.id)}
       >
         <div className="space-y-4">
-          <Heading variant="page" as="h1">
+          <Heading variant="display" as="h1">
             {species.name}
           </Heading>
           <SpeciesStatsSection species={species} campaignId={campaignId} />

@@ -22,7 +22,7 @@ import { useUpdateCampaign } from '../hooks/use-update-campaign'
 
 function CampaignSettingsHeading() {
   return (
-    <Heading variant="page" as="h2">
+    <Heading variant="page" as="h1">
       Campaign Settings
     </Heading>
   )
