@@ -36,7 +36,8 @@ routes use `aria-labelledby` on trait sections.
 
 ## `Heading`
 
-Polymorphic via `as`. All Tailwind lives in `heading.variants.ts`.
+Polymorphic via `as`. Size tokens live in `globals.css`; weight and layout live in
+`heading.variants.ts`.
 
 ```tsx
 import { Heading } from '@rpg/ui'
@@ -96,6 +97,43 @@ prose` map `--tw-prose-*` variables to design tokens (`--color-foreground`,
 Light and dark themes share the same class names — switching the `dark` class on
 a root element updates CSS variables, and prose colors follow automatically. No
 per-theme prose classes are required in components.
+
+## Type scale
+
+Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@theme inline`.
+They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
+`text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
+
+| Token / utility       | px @ 16px root | Typical use                          |
+| --------------------- | -------------- | ------------------------------------ |
+| `text-xs`             | 12             | Captions, table stat columns         |
+| `text-sm`             | 14             | Helper text, form copy, compact UI   |
+| `text-base`           | 16             | Body default                         |
+| `text-lg`             | 18             | Card titles, lead copy               |
+| `text-xl`             | 20             | Section headings                     |
+| `text-2xl`            | 24             | Page titles                          |
+| `text-3xl`            | 30             | Content detail titles                |
+| `text-4xl`            | 36             | Marketing display (e.g. public hero) |
+| `text-5xl`            | 48             | Marketing display (responsive hero)  |
+| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness   |
+
+## Heading size tokens
+
+Visual tiers and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
+`Heading` variants use **role utilities** (`text-heading-page`, …); retune the ladder
+via tiers or aliases without editing component code (@ 16px root):
+
+| Visual tier | Role utility           | `Heading` variant       | Primitive   | px  |
+| ----------- | ---------------------- | ----------------------- | ----------- | --- |
+| heading-1   | `text-heading-display` | `display`               | `text-3xl`  | 30  |
+| heading-2   | `text-heading-page`    | `page`                  | `text-2xl`  | 24  |
+| heading-3   | `text-heading-section` | `section`               | `text-xl`   | 20  |
+| heading-4   | `text-heading-card`    | `card`                  | `text-lg`   | 18  |
+| heading-5   | `text-heading-compact` | `nav`, `brand`, `alert` | `text-base` | 16  |
+| heading-5   | `text-heading-label`   | `label`                 | `text-base` | 16  |
+
+`variant` controls appearance; `as` controls document semantics (`h2`, `h3`, `p`, …).
+Do not equate visual tiers with HTML heading levels.
 
 ## Meta typography tokens
 

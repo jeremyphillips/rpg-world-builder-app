@@ -14,6 +14,12 @@
  * toggling the `.dark` class on a root element. The `@theme inline` block
  * maps those variables to Tailwind color utilities (e.g. `bg-primary`).
  *
+ * Type scale: `--text-xs` … `--text-9xl` in `@theme inline` are the SSOT for
+ * Tailwind `text-*` font sizes (defaults at 16px root). Heading tiers
+ * (`--text-heading-1` … `--text-heading-5`) and role aliases
+ * (`--text-heading-display`, …) map variants to that scale. Meta/semantic aliases
+ * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
+ *
  * Palette: warm amber/gold primary over parchment-tinted neutrals (light) and
  * warm charcoal (dark). All neutrals carry a whisper of chroma at hue ~60–85
  * so the theme reads warm rather than sterile gray.
@@ -55,7 +61,67 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Meta typography — 1px below each Tailwind text step at 16px root. */
+  /*
+   * Type scale — SSOT for Tailwind `text-*` utilities (@ 16px root).
+   * Values match Tailwind v4 defaults; retune the app by editing here.
+   */
+  --text-xs: 0.75rem; /* 12px */
+  --text-xs--line-height: 1rem; /* 16px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-sm--line-height: 1.25rem; /* 20px */
+  --text-base: 1rem; /* 16px */
+  --text-base--line-height: 1.5rem; /* 24px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-lg--line-height: 1.75rem; /* 28px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-xl--line-height: 1.75rem; /* 28px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-2xl--line-height: 2rem; /* 32px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-3xl--line-height: 2.25rem; /* 36px */
+  --text-4xl: 2.25rem; /* 36px */
+  --text-4xl--line-height: 2.5rem; /* 40px */
+  --text-5xl: 3rem; /* 48px */
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem; /* 60px */
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem; /* 72px */
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem; /* 96px */
+  --text-8xl--line-height: 1;
+  --text-9xl: 8rem; /* 128px */
+  --text-9xl--line-height: 1;
+
+  /*
+   * Heading visual tiers — map to type scale (@ 16px root).
+   * Not HTML h1–h5; use with Heading `variant` + polymorphic `as`.
+   */
+  --text-heading-1: var(--text-3xl); /* 30px */
+  --text-heading-1--line-height: var(--text-3xl--line-height);
+  --text-heading-2: var(--text-2xl); /* 24px */
+  --text-heading-2--line-height: var(--text-2xl--line-height);
+  --text-heading-3: var(--text-xl); /* 20px */
+  --text-heading-3--line-height: var(--text-xl--line-height);
+  --text-heading-4: var(--text-lg); /* 18px */
+  --text-heading-4--line-height: var(--text-lg--line-height);
+  --text-heading-5: var(--text-base); /* 16px */
+  --text-heading-5--line-height: var(--text-base--line-height);
+
+  /* Heading role aliases — retune hierarchy without touching variants. */
+  --text-heading-display: var(--text-heading-1);
+  --text-heading-display--line-height: var(--text-heading-1--line-height);
+  --text-heading-page: var(--text-heading-2);
+  --text-heading-page--line-height: var(--text-heading-2--line-height);
+  --text-heading-section: var(--text-heading-3);
+  --text-heading-section--line-height: var(--text-heading-3--line-height);
+  --text-heading-card: var(--text-heading-4);
+  --text-heading-card--line-height: var(--text-heading-4--line-height);
+  --text-heading-compact: var(--text-heading-5);
+  --text-heading-compact--line-height: var(--text-heading-5--line-height);
+  --text-heading-label: var(--text-heading-5);
+  --text-heading-label--line-height: var(--text-heading-5--line-height);
+
+  /* Meta typography — sub-step sizes below the type scale (@ 16px root). */
   --text-2xs-meta: 0.5625rem; /* 9px */
   --text-xs-meta: 0.6875rem; /* 11px */
   --text-sm-meta: 0.8125rem; /* 13px */
@@ -68,7 +134,7 @@
   --text-badge-md: var(--text-sm-meta);
 
   --text-table-body: var(--text-sm-meta);
-  --text-table-stat: 0.75rem;
+  --text-table-stat: var(--text-xs);
 
   --tracking-eyebrow-xs: 0.075rem; /* 1.2px @ 16px root */
   --tracking-eyebrow: 0.1rem; /* 1.6px @ 16px root */

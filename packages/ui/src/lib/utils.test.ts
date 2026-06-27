@@ -27,4 +27,10 @@ describe('cn', () => {
       'text-foreground text-xs-meta font-light',
     )
   })
+
+  it('keeps heading role font-size utilities alongside text color classes', () => {
+    expect(cn('text-foreground', 'text-heading-page font-semibold')).toBe(
+      'text-foreground text-heading-page font-semibold',
+    )
+  })
 })
