@@ -6,6 +6,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import {
+  contentDetailHeroCardClasses,
   contentDetailHeroCardContentClasses,
   contentDetailHeroGridClasses,
   contentDetailHeroImageClasses,
@@ -92,7 +93,7 @@ export function ContentDetailLayout({
         </div>
       ) : null}
 
-      <Card>
+      <Card className={contentDetailHeroCardClasses}>
         <CardContent className={contentDetailHeroCardContentClasses}>
           <div className={contentDetailHeroGridClasses}>
             <div className={contentDetailHeroMainClasses}>

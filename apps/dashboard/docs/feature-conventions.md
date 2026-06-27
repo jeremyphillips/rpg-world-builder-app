@@ -88,8 +88,8 @@ Every route picks **one width shell** from `components/layout/`:
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page-content.variants.ts)
-(`max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose body
-sections on catalog detail routes.
+(left-aligned `max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose
+body sections on catalog detail routes.
 
 Shared spacing tokens live in
 [`page-spacing.variants.ts`](../src/components/layout/page-spacing.variants.ts):
