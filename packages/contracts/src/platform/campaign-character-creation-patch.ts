@@ -151,7 +151,7 @@ export function resolveCharacterCreationPatch(
       policy: patch?.importedCharacters?.policy ?? DEFAULT_IMPORTED_CHARACTERS_POLICY,
     },
     progression: {
-      maxCharacterLevel: extendedProgression?.maxLevel ?? standardMaxCharacterLevel,
+      maxCharacterLevel: standardMaxCharacterLevel,
       ...(extendedProgression !== undefined && { extendedProgression }),
     },
     species: {

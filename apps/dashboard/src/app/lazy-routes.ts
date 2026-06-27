@@ -155,3 +155,6 @@ export const HomebrewHubRoute = withRouteSuspense(
 export const VocabularyDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/vocabulary-detail'), 'VocabularyDetail'),
 )
+export const RulesConfigDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/homebrew/routes/rules-config-detail'), 'RulesConfigDetail'),
+)

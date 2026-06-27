@@ -7,11 +7,16 @@ export {
 } from './components/level-range-summary.client'
 export {
   buildRulesFields,
+  buildRulesConfigFields,
   resolveRulesSchema,
   rulesFields,
   rulesSchema,
   type RulesValues,
 } from './lib/character-configuration-fields'
+export {
+  buildCharacterCreationPatchInput,
+  mapRulesetPatchToRulesValues,
+} from './lib/campaign-settings-values'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useSelectCampaign } from './hooks/use-select-campaign'

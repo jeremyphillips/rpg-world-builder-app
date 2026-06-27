@@ -2,6 +2,7 @@ import type { z } from 'zod'
 import type {
   Campaign,
   CreateCampaignInput,
+  ResolvedCampaignCharacterCreationPatch,
   UpdateCampaignInput,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
@@ -75,6 +76,23 @@ export function buildCharacterCreationPatchInput(
   }
 
   return patch
+}
+
+/** Maps resolved ruleset-patch character creation to flat rules form values. */
+export function mapRulesetPatchToRulesValues(
+  characterCreation: ResolvedCampaignCharacterCreationPatch,
+): RulesValues {
+  const extended = characterCreation.progression.extendedProgression
+
+  return {
+    startingLevel: characterCreation.startingLevel,
+    maxCharacterLevel: characterCreation.progression.maxCharacterLevel,
+    extendedProgressionEnabled: extended !== undefined,
+    extendedTierName: extended?.tierName ?? '',
+    extendedMaxLevel: extended?.maxLevel,
+    importedCharactersPolicy: characterCreation.importedCharacters.policy,
+    allowedCharacterCreatureTypes: [...characterCreation.species.creatureTypePolicy.ids],
+  }
 }
 
 /** Maps a `Campaign` document to the flat shape used by the settings form. */

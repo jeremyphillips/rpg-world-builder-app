@@ -6,6 +6,7 @@ import {
   buildCreateCampaignInput,
   buildUpdateCampaignInput,
   mapCampaignToSettingsValues,
+  mapRulesetPatchToRulesValues,
   type CampaignCreateValues,
 } from './campaign-settings-values'
 
@@ -186,9 +187,35 @@ describe('buildCreateCampaignInput', () => {
   })
 })
 
+describe('mapRulesetPatchToRulesValues', () => {
+  it('maps resolved patch data to flat rules form values', () => {
+    expect(
+      mapRulesetPatchToRulesValues({
+        startingLevel: 3,
+        importedCharacters: { policy: 'approval_required' },
+        progression: {
+          maxCharacterLevel: 25,
+          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+        },
+        species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+      }),
+    ).toEqual({
+      startingLevel: 3,
+      maxCharacterLevel: 25,
+      extendedProgressionEnabled: true,
+      extendedTierName: 'Epic Destiny',
+      extendedMaxLevel: 30,
+      importedCharactersPolicy: 'approval_required',
+      allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+    })
+  })
+})
+
 describe('buildUpdateCampaignInput', () => {
   it('maps settings form values to identity and flavor only', () => {
-    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign), 'new-banner.webp')).toEqual({
+    expect(
+      buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign), 'new-banner.webp'),
+    ).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
       imageKey: 'new-banner.webp',
@@ -202,6 +229,8 @@ describe('buildUpdateCampaignInput', () => {
   })
 
   it('omits imageKey when no new banner was uploaded', () => {
-    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).not.toHaveProperty('imageKey')
+    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).not.toHaveProperty(
+      'imageKey',
+    )
   })
 })

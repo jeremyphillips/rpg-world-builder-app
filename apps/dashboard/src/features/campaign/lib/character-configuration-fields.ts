@@ -10,7 +10,10 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import { buildActiveCreatureTypeFieldOptions, buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
+import {
+  buildActiveCreatureTypeFieldOptions,
+  buildSeedCreatureTypeVocabulary,
+} from '@/features/homebrew'
 
 import { ExtendedProgressionEffects } from '../components/extended-progression-effects.client'
 import {
@@ -243,3 +246,117 @@ export function buildRulesFields(creatureTypeOptions: FieldOption[]): FormItem[]
 
 /** Seed-based rules fields for campaign create (no campaign vocabulary yet). */
 export const rulesFields = buildRulesFields(defaultCreatureTypeOptions)
+
+function sectionAnchor(id: string): FormItem {
+  return {
+    kind: 'slot',
+    name: `_anchor_${id}`,
+    render: () => createElement('div', { id, className: 'scroll-mt-20' }),
+  }
+}
+
+/** Rules fields for Homebrew Rules Configuration — flat sections with in-page anchor targets. */
+export function buildRulesConfigFields(creatureTypeOptions: FieldOption[]): FormItem[] {
+  return [
+    sectionAnchor('starting-level'),
+    {
+      type: 'number',
+      name: 'startingLevel',
+      label: 'Character starting level',
+      min: 1,
+      max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+      defaultValue: 1,
+      required: true,
+      hint: 'The level at which new player characters begin.',
+      width: '1/2',
+      digits: 2,
+    },
+    sectionAnchor('imported-characters'),
+    {
+      type: 'radio',
+      name: 'importedCharactersPolicy',
+      label: 'Allow imported characters?',
+      required: true,
+      options: toOptions(['approval_required', 'disabled'], IMPORTED_CHARACTERS_POLICY_LABELS),
+    },
+    sectionAnchor('standard-max-level'),
+    {
+      type: 'number',
+      name: 'maxCharacterLevel',
+      label: 'Standard max level',
+      min: 1,
+      max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+      defaultValue: MAX_CHARACTER_LEVEL,
+      required: true,
+      hint: 'Normal cap before any extended tier.',
+      width: '1/2',
+      digits: 2,
+    },
+    {
+      kind: 'slot',
+      name: '_standardLevelRangeSummary',
+      render: () => createElement(StandardLevelRangeSummary),
+    },
+    sectionAnchor('creature-type-policy'),
+    {
+      type: 'combobox',
+      name: 'allowedCharacterCreatureTypes',
+      label: 'Allowed creature types',
+      multiple: true,
+      required: true,
+      hint: 'Creature types allowed for player and NPC character sheets.',
+      options: creatureTypeOptions,
+      placeholder: 'Choose creature types…',
+    },
+    sectionAnchor('extended-progression'),
+    {
+      kind: 'group',
+      legend: 'Extended progression',
+      collapsible: false,
+      fields: [
+        {
+          type: 'switch',
+          name: EXTENDED_PROGRESSION_ENABLED,
+          label: 'Extended progression',
+          hint: 'Use a named tier for levels beyond the standard cap.',
+          defaultValue: false,
+        },
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'text',
+              name: 'extendedTierName',
+              label: 'Tier name',
+              hint: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
+              required: true,
+              width: '1/2',
+              visibility: visibleWhenExtendedProgression(),
+            },
+            {
+              type: 'number',
+              name: 'extendedMaxLevel',
+              label: 'Extended max level',
+              min: 1,
+              max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+              required: true,
+              width: '1/2',
+              digits: 2,
+              visibility: visibleWhenExtendedProgression(),
+            },
+          ],
+        },
+        {
+          kind: 'slot',
+          name: '_extendedProgressionEffects',
+          render: () => createElement(ExtendedProgressionEffects),
+        },
+        {
+          kind: 'slot',
+          name: '_extendedLevelRangeSummary',
+          render: () => createElement(ExtendedLevelRangeSummary),
+        },
+      ],
+    },
+  ]
+}
