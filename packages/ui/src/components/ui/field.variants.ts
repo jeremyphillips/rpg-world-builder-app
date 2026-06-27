@@ -57,7 +57,7 @@ export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
 
 export const fieldLabelVariants = cva(
   [
-    'flex items-center gap-1.5 font-medium leading-none',
+    'flex items-center gap-1.5 font-body-emphasis leading-none',
     "data-[required]:after:content-['*'] data-[required]:after:text-destructive",
   ],
   {
@@ -75,5 +75,5 @@ export const fieldLabelVariants = cva(
 )
 
 export const fieldGroupLegendVariants = cva(
-  cn(fieldGroupLegendSpacingClasses, 'text-lg font-semibold leading-none text-foreground'),
+  cn(fieldGroupLegendSpacingClasses, 'text-lg font-heading leading-none text-foreground'),
 )

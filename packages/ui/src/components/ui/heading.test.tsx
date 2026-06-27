@@ -23,7 +23,7 @@ describe('Heading', () => {
   it('applies variant classes', () => {
     render(<Heading variant="display">Elf</Heading>)
     const heading = screen.getByRole('heading', { name: 'Elf' })
-    expect(heading).toHaveClass('text-heading-display', 'font-bold', 'tracking-tight')
+    expect(heading).toHaveClass('text-heading-display', 'font-heading-display', 'tracking-tight')
   })
 
   it('applies explicit size tokens for compact and label variants', () => {
@@ -37,7 +37,7 @@ describe('Heading', () => {
         Darkvision
       </Heading>,
     )
-    expect(screen.getByText('Darkvision')).toHaveClass('text-heading-label', 'font-medium')
+    expect(screen.getByText('Darkvision')).toHaveClass('text-heading-label', 'font-heading-label')
   })
 
   it('merges custom className', () => {

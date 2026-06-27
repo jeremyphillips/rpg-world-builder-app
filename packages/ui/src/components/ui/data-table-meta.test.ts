@@ -44,19 +44,19 @@ describe('dataTableTypographyMeta', () => {
 
   it('includes meta typography tokens', () => {
     expect(dataTableCellTypography.meta).toContain('text-badge-sm')
-    expect(dataTableCellTypography.meta).toContain('font-light')
+    expect(dataTableCellTypography.meta).toContain('font-meta')
     expect(dataTableCellTypography.meta).not.toContain('italic')
   })
 
   it('includes metaItalic typography tokens', () => {
     expect(dataTableCellTypography.metaItalic).toContain('text-badge-sm')
-    expect(dataTableCellTypography.metaItalic).toContain('font-light')
+    expect(dataTableCellTypography.metaItalic).toContain('font-meta')
     expect(dataTableCellTypography.metaItalic).toContain('italic')
   })
 
   it('includes stat typography tokens', () => {
     expect(dataTableCellTypography.stat).toContain('text-table-stat')
-    expect(dataTableCellTypography.stat).toContain('font-medium')
+    expect(dataTableCellTypography.stat).toContain('font-data-stat')
     expect(dataTableCellTypography.stat).toContain('text-foreground')
   })
 })

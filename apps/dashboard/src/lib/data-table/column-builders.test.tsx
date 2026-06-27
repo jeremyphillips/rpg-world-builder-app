@@ -40,7 +40,7 @@ describe('buildNameColumn', () => {
     expect(col.meta).toMatchObject({ ...dataTableColumnMeta.identity, label: 'Name', locked: true })
 
     render(<NameCell>Barbarian</NameCell>)
-    expect(screen.getByText('Barbarian')).toHaveClass('font-semibold')
+    expect(screen.getByText('Barbarian')).toHaveClass('font-data-name')
   })
 })
 

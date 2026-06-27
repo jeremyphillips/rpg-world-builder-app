@@ -135,6 +135,23 @@ via tiers or aliases without editing component code (@ 16px root):
 `variant` controls appearance; `as` controls document semantics (`h2`, `h3`, `p`, …).
 Do not equate visual tiers with HTML heading levels.
 
+## Font weight tokens
+
+Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
+Components use **role utilities** (`font-heading`, `font-meta`, …); retune globally via
+primitives or aliases:
+
+| Role utility           | Primitive       | Value | Typical use                                         |
+| ---------------------- | --------------- | ----- | --------------------------------------------------- |
+| `font-heading-display` | `font-bold`     | 700   | `Heading` display                                   |
+| `font-heading`         | `font-semibold` | 600   | page, section, card, nav, alert, field group legend |
+| `font-heading-label`   | `font-medium`   | 500   | `Heading` label                                     |
+| `font-body-emphasis`   | `font-medium`   | 500   | Button, badge, field label, `Text` emphasis         |
+| `font-body`            | `font-normal`   | 400   | `Text` option, body default                         |
+| `font-meta`            | `font-light`    | 300   | Eyebrow, data-table meta cells                      |
+| `font-data-name`       | `font-semibold` | 600   | Data-table name / identity cells                    |
+| `font-data-stat`       | `font-medium`   | 500   | Data-table stat columns                             |
+
 ## Meta typography tokens
 
 Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):

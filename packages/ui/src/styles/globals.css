@@ -17,7 +17,8 @@
  * Type scale: `--text-xs` … `--text-9xl` in `@theme inline` are the SSOT for
  * Tailwind `text-*` font sizes (defaults at 16px root). Heading tiers
  * (`--text-heading-1` … `--text-heading-5`) and role aliases
- * (`--text-heading-display`, …) map variants to that scale. Meta/semantic aliases
+ * (`--text-heading-display`, …) map variants to that scale. Font-weight roles
+ * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
  * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
  *
  * Palette: warm amber/gold primary over parchment-tinted neutrals (light) and
@@ -135,6 +136,28 @@
 
   --text-table-body: var(--text-sm-meta);
   --text-table-stat: var(--text-xs);
+
+  /*
+   * Font weights — SSOT for Tailwind `font-*` weight utilities.
+   * Values match Tailwind v4 defaults (Inter Variable supports 300–700).
+   */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Heading weight roles */
+  --font-weight-heading-display: var(--font-weight-bold);
+  --font-weight-heading: var(--font-weight-semibold);
+  --font-weight-heading-label: var(--font-weight-medium);
+
+  /* Body / UI weight roles */
+  --font-weight-body: var(--font-weight-normal);
+  --font-weight-body-emphasis: var(--font-weight-medium);
+  --font-weight-meta: var(--font-weight-light);
+  --font-weight-data-name: var(--font-weight-semibold);
+  --font-weight-data-stat: var(--font-weight-medium);
 
   --tracking-eyebrow-xs: 0.075rem; /* 1.2px @ 16px root */
   --tracking-eyebrow: 0.1rem; /* 1.6px @ 16px root */

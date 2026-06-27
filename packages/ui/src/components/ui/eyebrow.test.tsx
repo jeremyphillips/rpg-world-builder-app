@@ -10,7 +10,7 @@ describe('Eyebrow', () => {
     const eyebrow = screen.getByText('Campaign')
     expect(eyebrow).toHaveClass(
       'text-eyebrow-sm',
-      'font-light',
+      'font-meta',
       'uppercase',
       'tracking-eyebrow',
       'text-muted-foreground',

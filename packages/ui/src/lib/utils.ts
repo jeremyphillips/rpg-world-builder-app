@@ -2,8 +2,9 @@ import { clsx, type ClassValue } from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
 /**
- * Custom `text-*` font-size utilities from `@theme` in `styles/globals.css`.
- * Register here so `cn()` does not treat them as `text-{color}` and drop them.
+ * Custom `text-*` font-size and `font-*` weight utilities from `@theme` in
+ * `styles/globals.css`. Register here so `cn()` does not treat them as color
+ * utilities and drop them.
  */
 const twMerge = extendTailwindMerge({
   extend: {
@@ -30,6 +31,16 @@ const twMerge = extendTailwindMerge({
         'badge-md',
         'table-body',
         'table-stat',
+      ],
+      'font-weight': [
+        'heading-display',
+        'heading',
+        'heading-label',
+        'body',
+        'body-emphasis',
+        'meta',
+        'data-name',
+        'data-stat',
       ],
     },
   },

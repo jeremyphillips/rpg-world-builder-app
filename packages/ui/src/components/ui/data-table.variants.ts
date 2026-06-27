@@ -96,21 +96,21 @@ export const dataTableCellTextVariants = cva('', {
   variants: {
     role: {
       /** Secondary metadata — 11px / light. */
-      meta: 'text-badge-sm font-light',
+      meta: 'text-badge-sm font-meta',
       /** Supplementary metadata — 11px / light / italic. */
-      metaItalic: 'text-badge-sm font-light italic',
+      metaItalic: 'text-badge-sm font-meta italic',
       /** Abbreviated stats (STR, CON, AC) — 12px / medium. */
-      stat: 'text-table-stat font-medium text-foreground',
+      stat: 'text-table-stat font-data-stat text-foreground',
     },
   },
 })
 
 /** Primary name/label cell typography inside identity columns. */
-export const dataTableNameCellVariants = cva('font-semibold')
+export const dataTableNameCellVariants = cva('font-data-name')
 
 /** Name cell when rendered as a navigable link. */
 export const dataTableNameLinkCellVariants = cva(
-  'font-semibold hover:underline focus-visible:underline',
+  'font-data-name hover:underline focus-visible:underline',
 )
 
 /** Popover panel for the column visibility / order editor. */

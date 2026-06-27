@@ -29,8 +29,13 @@ describe('cn', () => {
   })
 
   it('keeps heading role font-size utilities alongside text color classes', () => {
-    expect(cn('text-foreground', 'text-heading-page font-semibold')).toBe(
-      'text-foreground text-heading-page font-semibold',
+    expect(cn('text-foreground', 'text-heading-page font-heading')).toBe(
+      'text-foreground text-heading-page font-heading',
     )
+  })
+
+  it('merges conflicting semantic font-weight utilities', () => {
+    expect(cn('font-heading', 'font-body-emphasis')).toBe('font-body-emphasis')
+    expect(cn('font-meta', 'font-data-name')).toBe('font-data-name')
   })
 })

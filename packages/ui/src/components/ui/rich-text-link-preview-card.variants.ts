@@ -27,7 +27,7 @@ export const richTextLinkPreviewCardRootVariants = cva(
   },
 )
 
-export const richTextLinkPreviewCardTitleVariants = cva('truncate text-sm font-medium')
+export const richTextLinkPreviewCardTitleVariants = cva('truncate text-sm font-body-emphasis')
 export const richTextLinkPreviewCardMetaVariants = cva('truncate text-xs text-muted-foreground')
 
 export type RichTextLinkPreviewCardRootVariantProps = VariantProps<

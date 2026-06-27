@@ -144,7 +144,7 @@ describe('DataTable — rendering', () => {
 describe('DataTable cell helpers', () => {
   it('NameCell renders semibold text', () => {
     render(<NameCell>Barbarian</NameCell>)
-    expect(screen.getByText('Barbarian')).toHaveClass('font-semibold')
+    expect(screen.getByText('Barbarian')).toHaveClass('font-data-name')
   })
 
   it('TableBadgeCell renders a compact badge', () => {
