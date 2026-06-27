@@ -8,7 +8,18 @@ import { extendTailwindMerge } from 'tailwind-merge'
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      text: ['table-body', 'table-stat', 'badge-sm'],
+      text: [
+        '2xs-meta',
+        'xs-meta',
+        'sm-meta',
+        'eyebrow-xs',
+        'eyebrow-sm',
+        'eyebrow-md',
+        'badge-sm',
+        'badge-md',
+        'table-body',
+        'table-stat',
+      ],
     },
   },
 })

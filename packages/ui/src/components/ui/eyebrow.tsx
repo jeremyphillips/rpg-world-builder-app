@@ -1,20 +1,16 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { eyebrowVariants, type EyebrowVariantProps } from './eyebrow.variants'
 
-export interface EyebrowProps extends React.HTMLAttributes<HTMLParagraphElement> {
+export interface EyebrowProps
+  extends React.HTMLAttributes<HTMLParagraphElement>, EyebrowVariantProps {
   children: React.ReactNode
 }
 
-export function Eyebrow({ children, className, ...props }: EyebrowProps) {
+export function Eyebrow({ children, className, size, ...props }: EyebrowProps) {
   return (
-    <p
-      className={cn(
-        'text-xs font-semibold uppercase tracking-wider text-muted-foreground',
-        className,
-      )}
-      {...props}
-    >
+    <p className={cn(eyebrowVariants({ size }), className)} {...props}>
       {children}
     </p>
   )

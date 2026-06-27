@@ -167,7 +167,7 @@ export function VocabularyDetailContent({
     <WidePage spacing="list">
       <div className="flex flex-col gap-6 lg:flex-row">
         <VocabularySetNav campaignId={campaignId} activeSetId={setId} />
-        <div className="min-w-0 flex-1">
+        <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
           {setEnabled ? (
             <VocabularySetManager campaignId={campaignId} setId={setId} setLabel={setLabel} />
           ) : (

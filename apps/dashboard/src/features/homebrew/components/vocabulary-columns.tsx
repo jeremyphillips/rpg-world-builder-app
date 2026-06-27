@@ -34,7 +34,11 @@ export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
       accessorKey: 'usedBy',
       header: ({ column }) => <SortableHeader column={column}>Used By</SortableHeader>,
       cell: ({ row }) => row.getValue<number>('usedBy'),
-      meta: { ...dataTableColumnMeta.data, label: 'Used By', ...dataTableWidthMeta('compact') },
+      meta: {
+        ...dataTableColumnMeta.data,
+        label: 'Used By',
+        ...dataTableWidthMeta('compactCenter'),
+      },
     },
   ]
 }

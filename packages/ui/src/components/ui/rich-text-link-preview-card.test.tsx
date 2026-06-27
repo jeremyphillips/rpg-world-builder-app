@@ -19,6 +19,11 @@ describe('RichTextLinkPreviewCard', () => {
     expect(screen.getByText('Feat Overview')).toBeInTheDocument()
   })
 
+  it('renders the content type with xs Eyebrow typography', () => {
+    render(<RichTextLinkPreviewCard contentType="spell" title="Fireball" />)
+    expect(screen.getByText('Spell')).toHaveClass('text-eyebrow-xs', 'tracking-eyebrow-xs')
+  })
+
   it('supports selection and clear actions', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()

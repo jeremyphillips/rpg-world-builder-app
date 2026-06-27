@@ -55,9 +55,23 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --text-table-body: 0.8125rem;
+  /* Meta typography — 1px below each Tailwind text step at 16px root. */
+  --text-2xs-meta: 0.5625rem; /* 9px */
+  --text-xs-meta: 0.6875rem; /* 11px */
+  --text-sm-meta: 0.8125rem; /* 13px */
+
+  --text-eyebrow-xs: var(--text-2xs-meta);
+  --text-eyebrow-sm: var(--text-xs-meta);
+  --text-eyebrow-md: var(--text-sm-meta);
+
+  --text-badge-sm: var(--text-xs-meta);
+  --text-badge-md: var(--text-sm-meta);
+
+  --text-table-body: var(--text-sm-meta);
   --text-table-stat: 0.75rem;
-  --text-badge-sm: 0.6875rem;
+
+  --tracking-eyebrow-xs: 0.075rem; /* 1.2px @ 16px root */
+  --tracking-eyebrow: 0.1rem; /* 1.6px @ 16px root */
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;

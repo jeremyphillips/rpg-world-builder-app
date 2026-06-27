@@ -27,10 +27,6 @@ export const richTextLinkPreviewCardRootVariants = cva(
   },
 )
 
-export const richTextLinkPreviewCardEyebrowVariants = cva(
-  'text-[10px] font-semibold uppercase tracking-wide text-muted-foreground',
-)
-
 export const richTextLinkPreviewCardTitleVariants = cva('truncate text-sm font-medium')
 export const richTextLinkPreviewCardMetaVariants = cva('truncate text-xs text-muted-foreground')
 

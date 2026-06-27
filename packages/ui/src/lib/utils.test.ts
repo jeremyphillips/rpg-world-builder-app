@@ -18,4 +18,13 @@ describe('cn', () => {
       'text-muted-foreground text-badge-sm font-light italic',
     )
   })
+
+  it('keeps eyebrow and meta font-size utilities alongside text color classes', () => {
+    expect(cn('text-muted-foreground', 'text-eyebrow-sm tracking-eyebrow')).toBe(
+      'text-muted-foreground text-eyebrow-sm tracking-eyebrow',
+    )
+    expect(cn('text-foreground', 'text-xs-meta font-light')).toBe(
+      'text-foreground text-xs-meta font-light',
+    )
+  })
 })

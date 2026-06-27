@@ -19,6 +19,7 @@ export {
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export { Button, type ButtonProps } from './components/ui/button.client'
@@ -134,7 +135,6 @@ export {
 } from './components/ui/rich-text-link-preview-card.client'
 export {
   richTextLinkPreviewCardRootVariants,
-  richTextLinkPreviewCardEyebrowVariants,
   richTextLinkPreviewCardTitleVariants,
   richTextLinkPreviewCardMetaVariants,
   type RichTextLinkPreviewCardRootVariantProps,

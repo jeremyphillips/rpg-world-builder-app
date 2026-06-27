@@ -27,6 +27,7 @@ styles, and list behavior on all descendants and fights layout utilities
 | `Text` `caption`              | `p`             | Extra-small muted italic copy (`text-xs`); used for form field hints |
 | `Text` `lead`                 | `p`             | Marketing subheads                                                   |
 | `Text` `destructive`          | `p`             | Inline errors — pair with `role="alert"` when live                   |
+| `Eyebrow` `xs` / `sm` / `md`  | `p`             | Uppercase section labels; `xs` for dense preview cards               |
 | `RichTextContent` `size="sm"` | `div`           | Catalog descriptions (top-level, traits, features)                   |
 | `CardDescription`             | `div`           | Card header secondary line (uses shared `textVariants`)              |
 
@@ -95,6 +96,21 @@ prose` map `--tw-prose-*` variables to design tokens (`--color-foreground`,
 Light and dark themes share the same class names — switching the `dark` class on
 a root element updates CSS variables, and prose colors follow automatically. No
 per-theme prose classes are required in components.
+
+## Meta typography tokens
+
+Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
+
+| Token / utility       | px @ 16px root | Use                                                                                |
+| --------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                                   |
+| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-badge-sm`, `text-eyebrow-sm`                    |
+| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-badge-md`, `text-eyebrow-md`, `text-table-body` |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                           |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                             |
+
+Prefer semantic aliases (`text-eyebrow-sm`, `text-badge-sm`) in component variants; use
+`text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
 
 ## Internal primitives
 
