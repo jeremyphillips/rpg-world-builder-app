@@ -74,6 +74,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   return (
     <WidePage>
       <ContentDetailLayout
+        name={skill.name}
         imageUrl={getContentImageUrl(skill.imageKey)}
         imageName={skill.name}
         campaignId={campaignId}

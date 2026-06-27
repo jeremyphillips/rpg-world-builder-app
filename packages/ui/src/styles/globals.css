@@ -63,6 +63,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
+  /* Layout — readable body column nested inside full-width page shells. */
+  --max-width-narrow-content: 41.25rem; /* ~660px */
+
   /*
    * Type scale — SSOT for Tailwind `text-*` utilities (@ 16px root).
    * Values match Tailwind v4 defaults; retune the app by editing here.

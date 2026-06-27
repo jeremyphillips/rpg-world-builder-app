@@ -108,6 +108,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   return (
     <WidePage>
       <ContentDetailLayout
+        name={spell.name}
         imageUrl={getContentImageUrl(spell.imageKey)}
         imageName={spell.name}
         campaignId={campaignId}

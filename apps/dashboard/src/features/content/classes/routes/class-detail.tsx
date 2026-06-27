@@ -182,6 +182,7 @@ export function ClassDetailContent({
   return (
     <WidePage spacing="relaxed">
       <ContentDetailLayout
+        name={characterClass.name}
         imageUrl={getContentImageUrl(characterClass.imageKey)}
         imageName={characterClass.name}
         campaignId={campaignId}

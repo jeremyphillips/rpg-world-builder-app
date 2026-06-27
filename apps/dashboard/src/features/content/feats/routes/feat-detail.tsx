@@ -24,6 +24,7 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
   return (
     <WidePage>
       <ContentDetailLayout
+        name={feat.name}
         imageUrl={getContentImageUrl(feat.imageKey)}
         imageName={feat.name}
         campaignId={campaignId}

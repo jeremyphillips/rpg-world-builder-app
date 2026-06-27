@@ -39,6 +39,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   return (
     <WidePage>
       <ContentDetailLayout
+        name={item.name}
         imageUrl={getContentImageUrl(item.imageKey)}
         imageName={item.name}
         campaignId={campaignId}
