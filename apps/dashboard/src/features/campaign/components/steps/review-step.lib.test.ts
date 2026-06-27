@@ -19,17 +19,16 @@ describe('review-step row builders', () => {
     ])
   })
 
-  it('builds rules rows with fallbacks and advanced fields', () => {
+  it('builds rules rows with fallbacks for create-wizard fields only', () => {
     const rows = buildRulesRows({
       startingLevel: 3,
-      maxCharacterLevel: 20,
-      allowedCharacterCreatureTypes: ['humanoid'],
+      importedCharactersPolicy: 'approval_required',
     } satisfies Partial<CampaignCreateValues>)
 
-    expect(rows[0]).toEqual({ label: 'Starting level', value: '3' })
-    expect(rows[1]).toEqual({ label: 'Imported characters', value: '—' })
-    expect(rows[2]).toEqual({ label: 'Standard max level', value: '20' })
-    expect(rows[3]).toEqual({ label: 'Allowed creature types', value: 'Humanoid' })
+    expect(rows).toEqual([
+      { label: 'Starting level', value: '3' },
+      { label: 'Imported characters', value: 'Yes, with DM approval' },
+    ])
   })
 
   it('builds flavor rows from label maps', () => {

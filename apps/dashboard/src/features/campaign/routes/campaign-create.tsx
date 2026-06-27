@@ -5,7 +5,11 @@ import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { rulesFields, rulesSchema, type RulesValues } from '../lib/character-configuration-fields'
+import {
+  createRulesFields,
+  createRulesSchema,
+  type CreateRulesValues,
+} from '../lib/character-configuration-fields'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import {
@@ -63,7 +67,7 @@ export function CampaignCreate() {
         hint="Configure rules later from Homebrew → Rules Configuration."
       >
         <WizardStepForm<IdentityValues> schema={identitySchema} fields={identityFields} />
-        <WizardStepForm<RulesValues> schema={rulesSchema} fields={rulesFields} />
+        <WizardStepForm<CreateRulesValues> schema={createRulesSchema} fields={createRulesFields} />
         <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
         <ReviewStep error={createError} />
       </Wizard>

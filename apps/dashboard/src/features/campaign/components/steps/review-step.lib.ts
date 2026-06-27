@@ -1,12 +1,7 @@
-import {
-  buildSeedCreatureTypeVocabulary,
-  getCreatureTypeLabel,
-} from '@/features/homebrew'
-
 import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
+import { buildRulesReviewRowsForSurface } from '../../lib/character-configuration-fields'
 import {
   DIFFICULTY_LABELS,
-  IMPORTED_CHARACTERS_POLICY_LABELS,
   MAGIC_LEVEL_LABELS,
   MOOD_LABELS,
   PLAY_STYLE_LABELS,
@@ -16,8 +11,6 @@ export type ReviewRowData = {
   label: string
   value: string
 }
-
-const seedCreatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 
 export function buildIdentityRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
   const rows: ReviewRowData[] = [{ label: 'Name', value: values.name ?? '—' }]
@@ -35,40 +28,7 @@ export function buildIdentityRows(values: Partial<CampaignCreateValues>): Review
 }
 
 export function buildRulesRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
-  const rows: ReviewRowData[] = [
-    {
-      label: 'Starting level',
-      value: values.startingLevel !== undefined ? String(values.startingLevel) : '—',
-    },
-    {
-      label: 'Imported characters',
-      value: values.importedCharactersPolicy
-        ? IMPORTED_CHARACTERS_POLICY_LABELS[values.importedCharactersPolicy]
-        : '—',
-    },
-    {
-      label: 'Standard max level',
-      value: values.maxCharacterLevel !== undefined ? String(values.maxCharacterLevel) : '—',
-    },
-  ]
-
-  if (values.extendedProgressionEnabled) {
-    rows.push({
-      label: 'Extended progression',
-      value: `${values.extendedTierName?.trim() || '—'} (max ${values.extendedMaxLevel ?? '—'})`,
-    })
-  }
-
-  if (values.allowedCharacterCreatureTypes?.length) {
-    rows.push({
-      label: 'Allowed creature types',
-      value: values.allowedCharacterCreatureTypes
-        .map((id) => getCreatureTypeLabel(seedCreatureTypeVocabulary, id))
-        .join(', '),
-    })
-  }
-
-  return rows
+  return buildRulesReviewRowsForSurface('create', values)
 }
 
 function formatLabelList<T extends string>(

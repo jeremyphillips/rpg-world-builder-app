@@ -3,6 +3,7 @@ import type { Campaign, CreatureTypeId } from '@rpg/contracts'
 
 import {
   buildCharacterCreationPatchInput,
+  buildCharacterCreationPatchInputFromCreateWizard,
   buildCreateCampaignInput,
   buildUpdateCampaignInput,
   mapCampaignToSettingsValues,
@@ -38,12 +39,7 @@ const defaultRules: CampaignCreateValues = {
   description: 'A classic dungeon delve.',
   banner: [],
   startingLevel: 1,
-  maxCharacterLevel: 20,
-  extendedProgressionEnabled: false,
-  extendedTierName: '',
-  extendedMaxLevel: undefined,
   importedCharactersPolicy: 'disabled',
-  allowedCharacterCreatureTypes: ['humanoid'],
   playStyle: ['dungeon_crawl'],
   mood: ['heroic'],
   magicLevel: 'standard_fantasy',
@@ -144,6 +140,20 @@ describe('buildCharacterCreationPatchInput', () => {
   })
 })
 
+describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
+  it('merges create-wizard values with defaults before building the patch', () => {
+    expect(
+      buildCharacterCreationPatchInputFromCreateWizard({
+        startingLevel: 3,
+        importedCharactersPolicy: 'approval_required',
+      }),
+    ).toEqual({
+      startingLevel: 3,
+      importedCharacters: { policy: 'approval_required' },
+    })
+  })
+})
+
 describe('buildCreateCampaignInput', () => {
   it('maps the flat wizard values to the create payload including characterCreation and flavor', () => {
     const values: CampaignCreateValues = {
@@ -171,19 +181,6 @@ describe('buildCreateCampaignInput', () => {
 
   it('omits imageKey when no banner was uploaded', () => {
     expect(buildCreateCampaignInput(defaultRules)).not.toHaveProperty('imageKey')
-  })
-
-  it('includes extended progression in characterCreation when enabled', () => {
-    const values: CampaignCreateValues = {
-      ...defaultRules,
-      extendedProgressionEnabled: true,
-      extendedTierName: 'Epic Destiny',
-      extendedMaxLevel: 30,
-    }
-
-    expect(buildCreateCampaignInput(values).characterCreation?.progression).toEqual({
-      extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-    })
   })
 })
 

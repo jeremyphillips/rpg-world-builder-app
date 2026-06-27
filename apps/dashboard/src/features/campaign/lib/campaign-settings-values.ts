@@ -12,15 +12,20 @@ import {
   sameStringSet,
 } from '@rpg/contracts'
 
-import { rulesSchema, type RulesValues } from './character-configuration-fields'
-
 import { identitySchema, flavorSchema } from './campaign-fields'
+import {
+  createRulesSchema,
+  type CreateRulesValues,
+  type RulesValues,
+} from './character-configuration-fields'
+
+export type { CreateRulesValues, RulesValues }
 
 export const campaignSettingsSchema = identitySchema.and(flavorSchema)
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
-export const campaignCreateSchema = identitySchema.and(rulesSchema).and(flavorSchema)
+export const campaignCreateSchema = identitySchema.and(createRulesSchema).and(flavorSchema)
 
 export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
 
@@ -55,6 +60,17 @@ function resolveCreatureTypePolicyOverride(
   return { mode: 'only' as const, ids: [...allowedCharacterCreatureTypes] }
 }
 
+function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValues {
+  return {
+    ...createRules,
+    maxCharacterLevel: MAX_CHARACTER_LEVEL,
+    extendedProgressionEnabled: false,
+    extendedTierName: '',
+    extendedMaxLevel: undefined,
+    allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
+  }
+}
+
 /** Maps flat rules wizard fields to the nested character-creation patch shape. */
 export function buildCharacterCreationPatchInput(
   values: RulesValues,
@@ -76,6 +92,13 @@ export function buildCharacterCreationPatchInput(
   }
 
   return patch
+}
+
+/** Merges create-wizard rules with defaults before building the character-creation patch. */
+export function buildCharacterCreationPatchInputFromCreateWizard(
+  createRules: CreateRulesValues,
+): UpdateCampaignCharacterCreationInput {
+  return buildCharacterCreationPatchInput(mergeCreateRulesWithDefaults(createRules))
 }
 
 /** Maps resolved ruleset-patch character creation to flat rules form values. */
@@ -119,7 +142,7 @@ export function buildCreateCampaignInput(
     name: values.name,
     description: values.description,
     ...(imageKey !== undefined && { imageKey }),
-    characterCreation: buildCharacterCreationPatchInput(values),
+    characterCreation: buildCharacterCreationPatchInputFromCreateWizard(values),
     flavor: {
       playStyle: values.playStyle,
       mood: values.mood,
