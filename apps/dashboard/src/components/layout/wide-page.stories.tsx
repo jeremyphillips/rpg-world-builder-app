@@ -14,7 +14,7 @@ type Story = StoryObj
 export const ListSpacing: Story = {
   render: () => (
     <WidePage spacing="list">
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         Species
       </Heading>
       <Text variant="muted">List page body (space-y-4).</Text>
@@ -25,7 +25,7 @@ export const ListSpacing: Story = {
 export const Relaxed: Story = {
   render: () => (
     <WidePage spacing="relaxed">
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         Fighter
       </Heading>
       <Text variant="muted">Detail page with multiple sections (space-y-6).</Text>

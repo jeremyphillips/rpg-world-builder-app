@@ -1,6 +1,6 @@
 import type { ArmorEquipment } from '@rpg/contracts'
 import { ARMOR_CATEGORIES, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -28,7 +28,7 @@ const ARMOR_MIDDLE_COLUMNS: ColumnDef<ArmorEquipment>[] = [
     accessorFn: (row) => armorAcSortValue(row),
     header: ({ column }) => <SortableHeader column={column}>AC</SortableHeader>,
     cell: ({ row }) => getArmorAcDisplay(row.original),
-    meta: { label: 'AC' },
+    meta: { label: 'AC', ...dataTableTypographyMeta('meta') },
   },
   {
     id: 'stealth',

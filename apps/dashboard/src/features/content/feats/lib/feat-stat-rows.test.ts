@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import type { Feat } from '@rpg/contracts'
 import { getFeatBySlug } from '@rpg/catalog/feats'
 
-import { buildFeatStatRows, formatFeatPrerequisiteSummary } from './feat-stat-rows'
+import {
+  buildFeatStatRows,
+  formatFeatCategoryTableLabel,
+  formatFeatPrerequisiteSummary,
+} from './feat-stat-rows'
 
 describe('buildFeatStatRows', () => {
   it('includes category and repeatable for Alert', () => {
@@ -20,9 +25,25 @@ describe('buildFeatStatRows', () => {
   })
 })
 
+describe('formatFeatCategoryTableLabel', () => {
+  it('strips the trailing " Feat" suffix from category labels', () => {
+    expect(formatFeatCategoryTableLabel('origin')).toBe('Origin')
+    expect(formatFeatCategoryTableLabel('general')).toBe('General')
+  })
+
+  it('returns the full label when it does not end with " Feat"', () => {
+    expect(formatFeatCategoryTableLabel('custom' as Feat['category'])).toBe('custom')
+  })
+})
+
 describe('formatFeatPrerequisiteSummary', () => {
   it('returns an em dash when no prerequisite is set', () => {
     const alert = getFeatBySlug('srd-cc-5.2.1', 'alert')
     expect(formatFeatPrerequisiteSummary(alert)).toBe('—')
+  })
+
+  it('uses uppercase ability ids in overview tables', () => {
+    const grappler = getFeatBySlug('srd-cc-5.2.1', 'grappler')
+    expect(formatFeatPrerequisiteSummary(grappler)).toBe('Level 4+, STR or DEX 13+')
   })
 })

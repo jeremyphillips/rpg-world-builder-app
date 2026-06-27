@@ -1,5 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { textSecondaryBodyClasses } from './text.variants'
+
 const PROSE_MUTED_TOKENS =
   '[--tw-prose-body:var(--color-muted-foreground)] [--tw-prose-headings:var(--color-muted-foreground)] [--tw-prose-bold:var(--color-muted-foreground)] text-muted-foreground'
 
@@ -13,7 +15,7 @@ export const richTextProseBase = 'prose max-w-none'
 export const richTextEditorProseClasses = [
   richTextProseBase,
   'prose-sm',
-  'min-h-20 w-full px-3 py-2 text-sm focus:outline-none',
+  `min-h-20 w-full px-3 py-2 ${textSecondaryBodyClasses} focus:outline-none`,
 ].join(' ')
 
 export const richTextContentVariants = cva(richTextProseBase, {

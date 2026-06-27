@@ -1,5 +1,5 @@
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
-import { BooleanCell, SortableHeader } from '@rpg/ui'
+import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -11,7 +11,7 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     header: ({ column }) => <SortableHeader column={column}>Hit Die</SortableHeader>,
     cell: ({ row }) => `d${row.getValue<number>('hitDie')}`,
     filterFn: 'equalsString',
-    meta: { label: 'Hit Die' },
+    meta: { label: 'Hit Die', ...dataTableWidthMeta('tiny') },
   },
   {
     accessorKey: 'primaryAbilities',
@@ -19,6 +19,11 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     cell: ({ row }) =>
       row.getValue<CharacterClass['primaryAbilities']>('primaryAbilities').join(', ').toUpperCase(),
     enableSorting: false,
+    meta: {
+      label: 'Primary Abilities',
+      ...dataTableWidthMeta('medium'),
+      ...dataTableTypographyMeta('stat'),
+    },
   },
   {
     accessorKey: 'spellcasting',
@@ -28,6 +33,7 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     ),
     filterFn: 'boolean',
     enableSorting: false,
+    meta: { label: 'Spellcasting', ...dataTableWidthMeta('compactCenter') },
   },
 ]
 

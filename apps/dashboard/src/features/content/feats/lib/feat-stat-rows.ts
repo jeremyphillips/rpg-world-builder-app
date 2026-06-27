@@ -36,8 +36,19 @@ export function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
   return rows
 }
 
+/** Suffix stripped from category labels in overview tables (e.g. "Origin Feat" → "Origin"). */
+const FEAT_CATEGORY_TABLE_SUFFIX = ' Feat'
+
+/** Category label for feat overview tables — omits the trailing " Feat" suffix. */
+export function formatFeatCategoryTableLabel(category: Feat['category']): string {
+  const label = getFeatCategoryLabel(category)
+  return label.endsWith(FEAT_CATEGORY_TABLE_SUFFIX)
+    ? label.slice(0, -FEAT_CATEGORY_TABLE_SUFFIX.length)
+    : label
+}
+
 /** Short prerequisite label for overview tables. */
 export function formatFeatPrerequisiteSummary(feat: Feat): string {
   if (!feat.prerequisite) return '—'
-  return formatRequirementExpression(feat.prerequisite)
+  return formatRequirementExpression(feat.prerequisite, { abilityDisplay: 'id' })
 }

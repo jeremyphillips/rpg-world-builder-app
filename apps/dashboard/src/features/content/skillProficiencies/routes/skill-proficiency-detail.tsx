@@ -32,7 +32,7 @@ function SuggestedClassesList({
 
   return (
     <section aria-labelledby="suggested-classes-heading">
-      <Heading variant="section" as="h3" id="suggested-classes-heading" className="mb-3">
+      <Heading variant="section" as="h2" id="suggested-classes-heading" className="mb-3">
         Suggested classes
       </Heading>
       {isPending ? (
@@ -80,7 +80,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
       >
         <div className="space-y-4">
-          <Heading variant="display" as="h2">
+          <Heading variant="page" as="h1">
             {skill.name}
           </Heading>
           <div className="space-y-3">

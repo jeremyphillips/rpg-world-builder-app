@@ -80,6 +80,9 @@ describe('formatRequirementExpression', () => {
     expect(formatRequirementExpression(grapplerPrerequisite)).toBe(
       'Level 4+, Strength or Dexterity 13+',
     )
+    expect(formatRequirementExpression(grapplerPrerequisite, { abilityDisplay: 'id' })).toBe(
+      'Level 4+, STR or DEX 13+',
+    )
   })
 
   it('formats fighting style feature prerequisites', () => {

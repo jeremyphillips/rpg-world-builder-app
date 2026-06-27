@@ -26,7 +26,7 @@ export function DashboardHome() {
     <NarrowPage spacing="relaxed">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <Heading variant="page" as="h2">
+          <Heading variant="page" as="h1">
             Welcome{user ? `, ${user.displayName}` : ''}
           </Heading>
           <Text variant="muted">

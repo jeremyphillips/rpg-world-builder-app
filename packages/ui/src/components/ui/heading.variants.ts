@@ -1,16 +1,18 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-export const headingVariants = cva('tracking-tight', {
+export const headingVariants = cva('', {
   variants: {
     variant: {
-      page: 'text-2xl font-semibold',
-      display: 'text-3xl font-bold',
-      section: 'text-xl font-semibold',
-      card: 'font-display text-lg font-semibold leading-none',
-      alert: 'font-semibold leading-none',
-      nav: 'text-base font-semibold',
-      brand: 'text-medium font-semibold',
-      label: 'font-medium',
+      display: 'heading-style-display',
+      page: 'heading-style-page',
+      section: 'heading-style-section',
+      subsection: 'heading-style-subsection',
+      group: 'heading-style-group',
+      card: 'heading-style-card',
+      alert: 'heading-style-alert',
+      nav: 'heading-style-nav',
+      brand: 'heading-style-brand',
+      label: 'heading-style-label',
     },
   },
   defaultVariants: {

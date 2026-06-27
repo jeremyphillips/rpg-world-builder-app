@@ -23,7 +23,7 @@ export function ContentFormComingSoon() {
 export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
   return (
     <NarrowPage spacing="relaxed" className="pb-10">
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         {heading}
       </Heading>
       <ContentFormComingSoon />

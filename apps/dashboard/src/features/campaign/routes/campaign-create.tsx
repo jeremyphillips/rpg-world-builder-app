@@ -56,7 +56,7 @@ export function CampaignCreate() {
 
   return (
     <NarrowPage>
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         New campaign
       </Heading>
       <Wizard

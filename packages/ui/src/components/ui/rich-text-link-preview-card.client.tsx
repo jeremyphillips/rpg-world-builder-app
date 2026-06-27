@@ -4,8 +4,8 @@ import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { Eyebrow } from './eyebrow'
 import {
-  richTextLinkPreviewCardEyebrowVariants,
   richTextLinkPreviewCardMetaVariants,
   richTextLinkPreviewCardRootVariants,
   richTextLinkPreviewCardTitleVariants,
@@ -42,9 +42,11 @@ export function RichTextLinkPreviewCard({
   const content = (
     <div className="flex items-start justify-between gap-2 px-2 py-1.5">
       <div className="min-w-0">
-        <p className={richTextLinkPreviewCardEyebrowVariants()}>{toEyebrow(contentType)}</p>
+        <Eyebrow size="xs">{toEyebrow(contentType)}</Eyebrow>
         <p className={richTextLinkPreviewCardTitleVariants()}>{title}</p>
-        {sourceLabel ? <p className={richTextLinkPreviewCardMetaVariants()}>{sourceLabel}</p> : null}
+        {sourceLabel ? (
+          <p className={richTextLinkPreviewCardMetaVariants()}>{sourceLabel}</p>
+        ) : null}
       </div>
       {onClear ? (
         <Button
@@ -72,7 +74,10 @@ export function RichTextLinkPreviewCard({
         type="button"
         onClick={onSelect}
         className={cn(
-          richTextLinkPreviewCardRootVariants({ tone, interactive: interactive || Boolean(onSelect) }),
+          richTextLinkPreviewCardRootVariants({
+            tone,
+            interactive: interactive || Boolean(onSelect),
+          }),
           className,
         )}
       >

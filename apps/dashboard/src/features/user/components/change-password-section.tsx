@@ -31,7 +31,7 @@ export function ChangePasswordSection() {
   return (
     <section aria-labelledby="password-heading" className="space-y-4">
       <div className="space-y-1">
-        <Heading variant="section" as="h3" id="password-heading" className="text-lg">
+        <Heading variant="section" as="h2" id="password-heading" className="mb-4">
           Change password
         </Heading>
         <Text variant="small">You must enter your current password to set a new one.</Text>

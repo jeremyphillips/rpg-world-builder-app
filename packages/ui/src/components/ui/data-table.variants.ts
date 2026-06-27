@@ -51,7 +51,67 @@ export const dataTableTableWrapVariants = cva('rounded-md border border-border')
  * instead of crushing fixed-width columns (e.g. thumbnails). At `lg+`, allow the
  * table to shrink to the container when there is enough room.
  */
-export const dataTableTableVariants = cva('min-w-max lg:min-w-0')
+export const dataTableTableVariants = cva('min-w-max text-table-body lg:min-w-0')
+
+/** Body row — fixed ~56px height with group context for cell hover. */
+export const dataTableRowVariants = cva('group/row h-14')
+
+/** Header cell — group context for sort icon hover/focus affordance. */
+export const dataTableHeaderCellVariants = cva('group/header')
+
+/** Tighter body cell padding than the base TableCell default. */
+export const dataTableBodyCellPaddingVariants = cva('px-3 py-2')
+
+/** Body cell background tone — body only; headers stay flat. */
+export const dataTableBodyCellVariants = cva(
+  'transition-[filter,background-color] group-hover/row:brightness-95',
+  {
+    variants: {
+      tone: {
+        identity: 'bg-accent/20',
+        data: 'bg-muted/10 text-muted-foreground',
+        source: 'bg-muted/15 text-muted-foreground',
+        actions: 'bg-muted/15',
+        neutral: 'text-muted-foreground',
+      },
+    },
+    defaultVariants: { tone: 'neutral' },
+  },
+)
+
+/** Sort icon visibility and size inside SortableHeader. */
+export const dataTableSortIconVariants = cva('ml-1 size-3 shrink-0', {
+  variants: {
+    state: {
+      asc: 'opacity-70',
+      desc: 'opacity-70',
+      idle: 'opacity-0 group-hover/header:opacity-50 group-focus-within/header:opacity-50',
+    },
+  },
+  defaultVariants: { state: 'idle' },
+})
+
+/** Body cell text roles — metadata, stats, and other opt-in typography. */
+export const dataTableCellTextVariants = cva('', {
+  variants: {
+    role: {
+      /** Secondary metadata — 11px / light. */
+      meta: 'text-badge-sm font-meta',
+      /** Supplementary metadata — 11px / light / italic. */
+      metaItalic: 'text-badge-sm font-meta italic',
+      /** Abbreviated stats (STR, CON, AC) — 12px / medium. */
+      stat: 'text-table-stat font-data-stat text-foreground',
+    },
+  },
+})
+
+/** Primary name/label cell typography inside identity columns. */
+export const dataTableNameCellVariants = cva('font-data-name')
+
+/** Name cell when rendered as a navigable link. */
+export const dataTableNameLinkCellVariants = cva(
+  'font-data-name hover:underline focus-visible:underline',
+)
 
 /** Popover panel for the column visibility / order editor. */
 export const dataTableColumnPanelVariants = cva(
@@ -88,3 +148,6 @@ export const dataTableResetColumnVariants = cva(
 export const dataTableFilterChipVariants = cva(
   'inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground',
 )
+
+/** Accessible caption below the table — supplementary source / scope note. */
+export const dataTableCaptionVariants = cva('pb-3 text-badge-sm italic text-muted-foreground/50')

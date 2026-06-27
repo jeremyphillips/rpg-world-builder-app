@@ -1,42 +1,44 @@
-import { Badge, SortableHeader } from '@rpg/ui'
+import { SortableHeader, TableBadgeCell, dataTableColumnMeta, dataTableWidthMeta } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { getVocabularySourceLabel, getVocabularyStatusLabel } from '../lib/vocabulary-labels'
+import { buildNameColumn, buildSourceColumn } from '@/lib/data-table/column-builders'
+
+import { getVocabularyStatusLabel, VOCABULARY_SOURCE_BADGE } from '../lib/vocabulary-labels'
 
 export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
   return [
-    {
+    buildNameColumn<VocabularyOptionWithUsage>({
       accessorKey: 'label',
-      header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
-      meta: { label: 'Name', locked: true },
-    },
-    {
-      accessorKey: 'source',
-      header: 'Source',
-      cell: ({ row }) => getVocabularySourceLabel(row.getValue('source')),
-      enableSorting: false,
-      meta: { label: 'Source' },
-    },
+      locked: true,
+    }),
+    buildSourceColumn<VocabularyOptionWithUsage, VocabularyOptionWithUsage['source']>({
+      badgeMap: VOCABULARY_SOURCE_BADGE,
+      width: 'badge',
+    }),
     {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue<VocabularyOptionWithUsage['status']>('status')
         return (
-          <Badge variant={status === 'active' ? 'secondary' : 'outline'}>
+          <TableBadgeCell variant={status === 'active' ? 'secondary' : 'outline'}>
             {getVocabularyStatusLabel(status)}
-          </Badge>
+          </TableBadgeCell>
         )
       },
       enableSorting: false,
-      meta: { label: 'Status' },
+      meta: { ...dataTableColumnMeta.data, label: 'Status', ...dataTableWidthMeta('badge') },
     },
     {
       accessorKey: 'usedBy',
       header: ({ column }) => <SortableHeader column={column}>Used By</SortableHeader>,
       cell: ({ row }) => row.getValue<number>('usedBy'),
-      meta: { label: 'Used By' },
+      meta: {
+        ...dataTableColumnMeta.data,
+        label: 'Used By',
+        ...dataTableWidthMeta('compactCenter'),
+      },
     },
   ]
 }

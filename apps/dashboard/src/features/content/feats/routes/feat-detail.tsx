@@ -40,7 +40,7 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
         />
         {feat.repeatable.allowed && feat.repeatable.notes && (
           <section aria-labelledby="feat-repeatable-notes-heading">
-            <Heading variant="section" as="h3" id="feat-repeatable-notes-heading" className="mb-3">
+            <Heading variant="section" as="h2" id="feat-repeatable-notes-heading" className="mb-3">
               Repeatable
             </Heading>
             <RichTextContent html={feat.repeatable.notes} size="sm" tone="muted" />

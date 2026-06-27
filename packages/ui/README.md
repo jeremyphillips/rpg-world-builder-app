@@ -68,7 +68,7 @@ amber/gold primary over parchment-tinted neutrals (light) and warm charcoal
 ### Fonts
 
 The preset defines two font tokens — `--font-sans` (body) and `--font-display`
-(semantic heading alias; same Inter family, used by `CardTitle` and `Modal.Header`).
+(semantic alias for future display-font rollout; prose headings use it today).
 Apps provide the Inter face:
 
 - **Next.js (public)**: load via `next/font` with `variable: '--font-body'` on
@@ -89,7 +89,7 @@ primitive rules: **[docs/typography.md](docs/typography.md)**.
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
-<Heading variant="display" as="h2">{item.name}</Heading>
+<Heading variant="page" as="h1">{item.name}</Heading>
 <Text variant="muted">{item.description}</Text>
 <RichTextContent html={trait.description} size="sm" tone="muted" />
 ```

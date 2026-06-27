@@ -11,7 +11,7 @@ describe('WidePage', () => {
   it('renders children', () => {
     render(
       <WidePage spacing="list">
-        <Heading variant="page" as="h2">
+        <Heading variant="page" as="h1">
           Equipment
         </Heading>
       </WidePage>,
@@ -22,7 +22,7 @@ describe('WidePage', () => {
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <WidePage>
-        <Heading variant="page" as="h2">
+        <Heading variant="page" as="h1">
           Sessions
         </Heading>
       </WidePage>,

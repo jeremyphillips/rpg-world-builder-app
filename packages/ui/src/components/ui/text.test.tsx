@@ -24,7 +24,7 @@ describe('Text', () => {
 
   it('applies variant classes', () => {
     render(<Text variant="small">Hint</Text>)
-    expect(screen.getByText('Hint')).toHaveClass('text-sm', 'text-muted-foreground')
+    expect(screen.getByText('Hint')).toHaveClass('text-md', 'text-muted-foreground')
   })
 
   it('has no axe accessibility violations', async () => {

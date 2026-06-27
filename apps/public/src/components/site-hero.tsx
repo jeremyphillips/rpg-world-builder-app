@@ -14,7 +14,7 @@ export function SiteHero() {
       >
         Campaign tooling for tabletop RPGs
       </Text>
-      <Heading variant="display" as="h1" className="text-balance text-4xl sm:text-5xl">
+      <Heading variant="display" as="h1" className="text-balance">
         Build worlds your party will never forget
       </Heading>
       <Text variant="lead" className="max-w-xl text-pretty">

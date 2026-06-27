@@ -22,7 +22,7 @@ export const Default: Story = {
     imageName: 'Fighter',
     children: (
       <div className="space-y-4">
-        <Heading variant="page" as="h2">
+        <Heading variant="page" as="h1">
           Fighter
         </Heading>
         <Text variant="muted">
@@ -44,7 +44,7 @@ export const WithActions: Story = {
     ),
     children: (
       <div className="space-y-4">
-        <Heading variant="page" as="h2">
+        <Heading variant="page" as="h1">
           Wizard
         </Heading>
         <Text variant="muted">

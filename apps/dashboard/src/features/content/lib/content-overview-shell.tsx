@@ -3,7 +3,7 @@ import { buttonVariants } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { NarrowPage } from '@/components/layout/narrow-page'
 import { useCanManageCampaign } from '@/features/campaign'
 
 type ContentOverviewShellProps = {
@@ -42,7 +42,7 @@ export function ContentOverviewShell({
   ) : undefined
 
   return (
-    <WidePage spacing="list">
+    <NarrowPage spacing="list">
       <PageHeader heading={heading} actions={actions} />
       <PageLoadState
         isPending={isPending}
@@ -52,6 +52,6 @@ export function ContentOverviewShell({
       >
         {children}
       </PageLoadState>
-    </WidePage>
+    </NarrowPage>
   )
 }

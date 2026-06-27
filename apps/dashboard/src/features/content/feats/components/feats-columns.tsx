@@ -1,17 +1,17 @@
 import type { Feat } from '@rpg/contracts'
 import { FEAT_CATEGORY_IDS, getFeatCategoryLabel } from '@rpg/contracts'
-import { BooleanCell, SortableHeader } from '@rpg/ui'
+import { BooleanCell, dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
-import { formatFeatPrerequisiteSummary } from '../lib/feat-stat-rows'
+import { formatFeatCategoryTableLabel, formatFeatPrerequisiteSummary } from '../lib/feat-stat-rows'
 
 const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [
   {
     accessorKey: 'category',
     header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
-    cell: ({ row }) => getFeatCategoryLabel(row.getValue<Feat['category']>('category')),
+    cell: ({ row }) => formatFeatCategoryTableLabel(row.getValue<Feat['category']>('category')),
     filterFn: 'equalsString',
     meta: { label: 'Category' },
   },
@@ -20,7 +20,7 @@ const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [
     accessorFn: (row) => formatFeatPrerequisiteSummary(row),
     header: ({ column }) => <SortableHeader column={column}>Prerequisite</SortableHeader>,
     cell: ({ row }) => row.getValue<string>('prerequisite'),
-    meta: { label: 'Prerequisite' },
+    meta: { label: 'Prerequisite', ...dataTableTypographyMeta('metaItalic') },
   },
   {
     id: 'repeatable',

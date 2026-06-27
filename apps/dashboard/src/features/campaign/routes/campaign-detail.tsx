@@ -17,7 +17,7 @@ export function CampaignDetail() {
 
   return (
     <NarrowPage>
-      <Heading variant="page" as="h2">
+      <Heading variant="page" as="h1">
         {campaign?.identity.name ?? 'Campaign'}
       </Heading>
       <Text variant="muted">Overview</Text>

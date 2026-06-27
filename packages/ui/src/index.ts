@@ -19,6 +19,7 @@ export {
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export { Button, type ButtonProps } from './components/ui/button.client'
@@ -134,7 +135,6 @@ export {
 } from './components/ui/rich-text-link-preview-card.client'
 export {
   richTextLinkPreviewCardRootVariants,
-  richTextLinkPreviewCardEyebrowVariants,
   richTextLinkPreviewCardTitleVariants,
   richTextLinkPreviewCardMetaVariants,
   type RichTextLinkPreviewCardRootVariantProps,
@@ -311,10 +311,25 @@ export {
 export {
   BooleanCell,
   DataTable,
+  NameCell,
   RowActionsMenu,
   SortableHeader,
+  TableBadgeCell,
 } from './components/ui/data-table.client'
-export type { BooleanCellProps, RowActionsMenuProps } from './components/ui/data-table.client'
+export type {
+  BooleanCellProps,
+  NameCellProps,
+  RowActionsMenuProps,
+  TableBadgeCellProps,
+} from './components/ui/data-table.client'
+export {
+  dataTableCellTypography,
+  dataTableColumnMeta,
+  dataTableColumnWidths,
+  dataTableTypographyMeta,
+  dataTableWidthMeta,
+} from './components/ui/data-table-meta'
+export type { DataTableCellTypography, DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
   DataTableProps,
@@ -338,4 +353,18 @@ export {
   dataTableColumnPanelVariants,
   dataTableColumnItemVariants,
   dataTableColumnDragHandleVariants,
+  dataTableEmptyPanelVariants,
+  dataTableEmptyStateVariants,
+  dataTableFilterChipVariants,
+  dataTableLockedColumnVariants,
+  dataTableResetColumnVariants,
+  dataTableCellTextVariants,
+  dataTableNameCellVariants,
+  dataTableNameLinkCellVariants,
+  dataTableRowVariants,
+  dataTableBodyCellPaddingVariants,
+  dataTableBodyCellVariants,
+  dataTableCaptionVariants,
+  dataTableHeaderCellVariants,
+  dataTableSortIconVariants,
 } from './components/ui/data-table.variants'
