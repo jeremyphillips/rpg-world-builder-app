@@ -187,16 +187,13 @@ export function ClassDetailContent({
         imageName={characterClass.name}
         campaignId={campaignId}
         editHref={contentEditHref('classes', campaignId, classId)}
-      >
-        <div className="space-y-4">
-          <Heading variant="display" as="h1">
-            {characterClass.name}
-          </Heading>
-          <ClassStatsSection characterClass={characterClass} />
-          {characterClass.description && (
+        metadata={<ClassStatsSection characterClass={characterClass} />}
+        descriptionContent={
+          characterClass.description ? (
             <RichTextContent html={characterClass.description} size="sm" tone="muted" />
-          )}
-        </div>
+          ) : undefined
+        }
+      >
         <SuggestedProficienciesList
           campaignId={campaignId}
           classSlug={characterClass.slug}
@@ -207,9 +204,9 @@ export function ClassDetailContent({
         {characterClass.features.length > 0 && (
           <FeaturesList className={characterClass.name} features={characterClass.features} />
         )}
+        <SubclassesList subclasses={subclasses} />
       </ContentDetailLayout>
       <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
-      <SubclassesList subclasses={subclasses} />
     </WidePage>
   )
 }

@@ -126,38 +126,19 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
 
   return (
     <WidePage>
-      <div className="grid grid-cols-3 gap-8 bg-card p-4 rounded-md">
-        <div className="col-span-2 space-y-8">
-          <Heading variant="display" as="h1">
-            {species.name}
-          </Heading>
-          <SpeciesStatsSection species={species} campaignId={campaignId} />
-        </div>
-        <div className="col-span-1">
-          <img
-            src={getContentImageUrl(species.imageKey)}
-            alt={species.name}
-            className="w-full rounded-lg object-cover shadow-sm"
-          />
-        </div>
-      </div>
       <ContentDetailLayout
         name={species.name}
         imageUrl={getContentImageUrl(species.imageKey)}
         imageName={species.name}
         campaignId={campaignId}
         editHref={contentEditHref('species', campaignId, species.id)}
+        metadata={<SpeciesStatsSection species={species} campaignId={campaignId} />}
+        descriptionContent={
+          species.description ? (
+            <RichTextContent html={species.description} size="sm" tone="muted" />
+          ) : undefined
+        }
       >
-        {/* <div className="space-y-4">
-
-          <Heading variant="display" as="h1">
-            {species.name}
-          </Heading>
-          <SpeciesStatsSection species={species} campaignId={campaignId} />
-        </div> */}
-        {species.description && (
-          <RichTextContent html={species.description} size="sm" tone="muted" />
-        )}
         <TraitsList traits={species.traits} />
         {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
       </ContentDetailLayout>
