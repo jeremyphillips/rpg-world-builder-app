@@ -8,9 +8,9 @@ import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useHomebrewSummary } from '../hooks/use-homebrew-summary'
-import { VISIBLE_SIDEBAR_CONTENT } from '../lib/visible-sidebar-content-registry'
-import { ENABLED_HOMEBREW_VOCABULARY_SETS } from '../lib/vocabulary-set-registry'
-import { ENABLED_HOMEBREW_RULES_CONFIGS } from '../lib/rules-config-registry'
+import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
+import { ENABLED_HOMEBREW_VOCABULARY_SETS } from '../lib/hub/vocabulary-set-registry'
+import { ENABLED_HOMEBREW_RULES_CONFIGS } from '../lib/hub/rules-config-registry'
 import { HomebrewHubCard } from '../components/homebrew-hub-card'
 
 const HOMEBREW_DESCRIPTION =

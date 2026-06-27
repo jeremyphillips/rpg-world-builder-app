@@ -125,23 +125,30 @@ Duplicate ids (shadowing seed or an existing campaign entry) return **409** via
 
 ## Dashboard registries
 
-The Homebrew feature (`apps/dashboard/src/features/homebrew/`) uses two registries
-kept in sync with contracts via drift tests.
+The Homebrew feature (`apps/dashboard/src/features/homebrew/`) uses hub registries
+under `lib/hub/` kept in sync with contracts via drift tests.
 
 ### Content cards (sidebar + hub)
 
-`VISIBLE_SIDEBAR_CONTENT` in
-`lib/visible-sidebar-content-registry.ts` must match
+`VISIBLE_SIDEBAR_CONTENT` in `lib/hub/content-registry.ts` must match
 `HOMEBREW_SUMMARY_CONTENT_TYPES` in contracts — same types, same order. The hub
 maps this array to cards; adding a summary content type without updating the
 registry fails CI.
 
 ### Vocabulary sets (hub + detail rail)
 
-`HOMEBREW_VOCABULARY_SETS` in `lib/vocabulary-set-registry.ts` lists every
+`HOMEBREW_VOCABULARY_SETS` in `lib/hub/vocabulary-set-registry.ts` lists every
 `VOCABULARY_OPTION_SET_ID` with a label and `enabled` flag. Only enabled sets
 get hub cards and an active manager; disabled sets appear in the detail rail /
 mobile select as not-yet-implemented.
+
+### Rules configuration (hub)
+
+`HOMEBREW_RULES_CONFIGS` in `lib/hub/rules-config-registry.ts` lists rules
+configuration pages on the hub. In-page section anchors for character
+configuration are derived from the campaign field registry
+(`CHARACTER_CONFIGURATION_SECTIONS` in
+`features/campaign/lib/character-configuration-field-registry.ts`).
 
 Shared UI for all sets:
 
@@ -153,10 +160,11 @@ Shared UI for all sets:
 
 Per-set consumption (forms, columns, settings) should use a thin hook that
 loads the resolved set and builds label/active-id maps — see
-`useCreatureTypeVocabulary` and `buildCreatureTypeVocabulary`. Vocabulary-backed
-`<Form>` fields should use `vocabularySelectField` / `vocabularyComboboxField`
-from `lib/vocabulary-field-factories.ts` (options still come from the set hook,
-not static seed constants).
+`useCreatureTypeVocabulary` and `buildCreatureTypeVocabulary` in
+`lib/vocabulary/sets/creature-types.ts`. Vocabulary-backed `<Form>` fields should
+use `vocabularySelectField` / `vocabularyComboboxField` from
+`lib/vocabulary/field-factories.ts` (options still come from the set hook, not
+static seed constants).
 
 ---
 

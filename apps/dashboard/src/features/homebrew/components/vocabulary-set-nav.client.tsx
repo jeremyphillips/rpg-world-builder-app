@@ -6,7 +6,7 @@ import type { VocabularyOptionSetId } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import { HOMEBREW_VOCABULARY_SETS } from '../lib/vocabulary-set-registry'
+import { HOMEBREW_VOCABULARY_SETS } from '../lib/hub/vocabulary-set-registry'
 
 type VocabularySetNavProps = {
   campaignId: string

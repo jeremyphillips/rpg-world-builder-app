@@ -2,12 +2,19 @@ export {
   VISIBLE_SIDEBAR_CONTENT,
   findVisibleSidebarContent,
   type VisibleSidebarContentEntry,
-} from './lib/visible-sidebar-content-registry'
+} from './lib/hub/content-registry'
 export {
   HOMEBREW_VOCABULARY_SETS,
   ENABLED_HOMEBREW_VOCABULARY_SETS,
   type HomebrewVocabularySetEntry,
-} from './lib/vocabulary-set-registry'
+} from './lib/hub/vocabulary-set-registry'
+export {
+  HOMEBREW_RULES_CONFIGS,
+  ENABLED_HOMEBREW_RULES_CONFIGS,
+  findRulesConfigEntry,
+  type RulesConfigEntry,
+  type RulesConfigId,
+} from './lib/hub/rules-config-registry'
 export { useHomebrewSummary, homebrewSummaryQueryKey } from './hooks/use-homebrew-summary'
 export { useRulesetPatch, rulesetPatchQueryKey } from './hooks/use-ruleset-patch'
 export { usePatchCharacterCreationMutation } from './hooks/use-patch-character-creation-mutation'
@@ -23,9 +30,9 @@ export {
   buildActiveCreatureTypeFieldOptions,
   getCreatureTypeLabel,
   type CreatureTypeVocabulary,
-} from './lib/creature-type-vocabulary'
+} from './lib/vocabulary/sets/creature-types'
 export {
   VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,
   vocabularySelectField,
-} from './lib/vocabulary-field-factories'
+} from './lib/vocabulary/field-factories'

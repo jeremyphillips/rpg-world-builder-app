@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text, cn } from '@rpg/ui'
 
-import { CHARACTER_CONFIGURATION_SECTIONS } from '../lib/rules-config-registry'
+import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
 
 type RulesConfigFieldNavProps = {
   activeSectionId?: string
@@ -14,7 +14,8 @@ function scrollToSection(sectionId: string) {
 
 /** Desktop anchor rail + mobile select for in-page rules configuration sections. */
 export function RulesConfigFieldNav({ activeSectionId }: RulesConfigFieldNavProps) {
-  const selectedSection = activeSectionId ?? CHARACTER_CONFIGURATION_SECTIONS[0].id
+  const selectedSection =
+    activeSectionId ?? CHARACTER_CONFIGURATION_SECTIONS[0]?.id ?? 'starting-level'
 
   return (
     <>

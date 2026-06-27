@@ -9,6 +9,7 @@ import {
   buildRulesFieldsForSurface,
   buildRulesReviewRowsForSurface,
   buildRulesSchemaForSurface,
+  CHARACTER_CONFIGURATION_SECTIONS,
   CREATE_WIZARD_RULE_FIELD_IDS,
 } from './character-configuration-field-registry'
 
@@ -129,6 +130,18 @@ describe('character-configuration-field-registry', () => {
       expect(rows).toEqual([
         { label: 'Starting level', value: '5' },
         { label: 'Imported characters', value: 'Yes, with DM approval' },
+      ])
+    })
+  })
+
+  describe('CHARACTER_CONFIGURATION_SECTIONS', () => {
+    it('derives config anchor nav from the field registry', () => {
+      expect(CHARACTER_CONFIGURATION_SECTIONS.map((section) => section.id)).toEqual([
+        'starting-level',
+        'imported-characters',
+        'standard-max-level',
+        'extended-progression',
+        'creature-type-policy',
       ])
     })
   })

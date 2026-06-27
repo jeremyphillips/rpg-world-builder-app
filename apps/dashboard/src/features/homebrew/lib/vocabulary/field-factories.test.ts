@@ -4,7 +4,7 @@ import {
   VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,
   vocabularySelectField,
-} from './vocabulary-field-factories'
+} from './field-factories'
 
 const options = [
   { value: 'humanoid', label: 'Humanoid' },

@@ -16,10 +16,12 @@ const defaultCreatureTypeOptions = buildActiveCreatureTypeFieldOptions(
 )
 
 export {
+  CHARACTER_CONFIGURATION_SECTIONS,
   CREATE_WIZARD_RULE_FIELD_IDS,
   buildRulesFieldsForSurface,
   buildRulesReviewRowsForSurface,
   buildRulesSchemaForSurface,
+  type CharacterConfigurationSectionId,
   type CharacterRuleSurface,
   type CreateRulesValues,
   type CreateWizardRuleFieldId,

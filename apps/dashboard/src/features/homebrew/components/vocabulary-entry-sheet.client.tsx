@@ -5,7 +5,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { Button, SelectField, Sheet, TextareaField, TextField } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { VOCABULARY_STATUS_LABELS } from '../lib/vocabulary-labels'
+import { VOCABULARY_STATUS_LABELS } from '../lib/vocabulary/labels'
 
 export type VocabularyEntryFormValues = {
   id: string

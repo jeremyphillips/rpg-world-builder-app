@@ -7,10 +7,12 @@ export {
 } from './components/level-range-summary.client'
 export {
   buildRulesConfigFields,
+  CHARACTER_CONFIGURATION_SECTIONS,
   createRulesFields,
   createRulesSchema,
   resolveRulesSchema,
   rulesSchema,
+  type CharacterConfigurationSectionId,
   type CreateRulesValues,
   type RulesValues,
 } from './lib/character-configuration-fields'

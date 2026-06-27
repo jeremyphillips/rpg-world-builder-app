@@ -251,10 +251,15 @@ function extendedProgressionGroup(): FormItem {
   }
 }
 
+type CharacterConfigurationSection = {
+  id: string
+  label: string
+}
+
 type CharacterRuleFieldDef = {
   id: string
   surfaces: readonly CharacterRuleSurface[]
-  configAnchorId?: string
+  configSection?: CharacterConfigurationSection
   buildFormItems: (creatureTypeOptions: FieldOption[]) => FormItem[]
   buildReviewRow?: (values: Partial<RulesValues>) => RulesReviewRow | undefined
 }
@@ -263,7 +268,7 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   {
     id: 'startingLevel',
     surfaces: ['create', 'config'],
-    configAnchorId: 'starting-level',
+    configSection: { id: 'starting-level', label: 'Starting level' },
     buildFormItems: () => [startingLevelField()],
     buildReviewRow: (values) => ({
       label: 'Starting level',
@@ -273,7 +278,7 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   {
     id: 'importedCharactersPolicy',
     surfaces: ['create', 'config'],
-    configAnchorId: 'imported-characters',
+    configSection: { id: 'imported-characters', label: 'Imported characters' },
     buildFormItems: () => [importedCharactersPolicyField()],
     buildReviewRow: (values) => ({
       label: 'Imported characters',
@@ -285,24 +290,32 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   {
     id: 'maxCharacterLevel',
     surfaces: ['config'],
-    configAnchorId: 'standard-max-level',
+    configSection: { id: 'standard-max-level', label: 'Standard max level' },
     buildFormItems: () => [maxCharacterLevelField(), standardLevelRangeSummarySlot()],
-  },
-  {
-    id: 'allowedCharacterCreatureTypes',
-    surfaces: ['config'],
-    configAnchorId: 'creature-type-policy',
-    buildFormItems: (creatureTypeOptions) => [
-      allowedCharacterCreatureTypesField(creatureTypeOptions),
-    ],
   },
   {
     id: 'extendedProgression',
     surfaces: ['config'],
-    configAnchorId: 'extended-progression',
+    configSection: { id: 'extended-progression', label: 'Extended progression' },
     buildFormItems: () => [extendedProgressionGroup()],
   },
+  {
+    id: 'allowedCharacterCreatureTypes',
+    surfaces: ['config'],
+    configSection: { id: 'creature-type-policy', label: 'Creature types' },
+    buildFormItems: (creatureTypeOptions) => [
+      allowedCharacterCreatureTypesField(creatureTypeOptions),
+    ],
+  },
 ]
+
+/** In-page anchor sections for Homebrew character configuration — derived from field registry. */
+export const CHARACTER_CONFIGURATION_SECTIONS = CHARACTER_RULE_FIELD_REGISTRY.flatMap((field) =>
+  field.configSection ? [field.configSection] : [],
+)
+
+export type CharacterConfigurationSectionId =
+  (typeof CHARACTER_CONFIGURATION_SECTIONS)[number]['id']
 
 function fieldsForSurface(surface: CharacterRuleSurface): CharacterRuleFieldDef[] {
   return CHARACTER_RULE_FIELD_REGISTRY.filter((field) => field.surfaces.includes(surface))
@@ -311,12 +324,13 @@ function fieldsForSurface(surface: CharacterRuleSurface): CharacterRuleFieldDef[
 export function buildRulesConfigLayoutFields(creatureTypeOptions: FieldOption[]): FormItem[] {
   return fieldsForSurface('config').flatMap((field) => {
     const items = field.buildFormItems(creatureTypeOptions)
-    if (!field.configAnchorId) return items
+    const section = field.configSection
+    if (!section) return items
     return [
       {
         kind: 'slot' as const,
-        name: `_anchor_${field.configAnchorId}`,
-        render: () => createElement('div', { id: field.configAnchorId, className: 'scroll-mt-20' }),
+        name: `_anchor_${section.id}`,
+        render: () => createElement('div', { id: section.id, className: 'scroll-mt-20' }),
       },
       ...items,
     ]

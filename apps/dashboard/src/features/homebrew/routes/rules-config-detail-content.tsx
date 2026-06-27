@@ -22,9 +22,9 @@ import {
 } from '@/features/campaign'
 
 import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
-import { buildActiveCreatureTypeFieldOptions } from '../lib/creature-type-vocabulary'
-import { disableFormItems } from '../lib/disable-form-items'
-import { findRulesConfigEntry } from '../lib/rules-config-registry'
+import { buildActiveCreatureTypeFieldOptions } from '../lib/vocabulary/sets/creature-types'
+import { disableFormItems } from '@/lib/disable-form-items'
+import { findRulesConfigEntry } from '../lib/hub/rules-config-registry'
 import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
 import { usePatchCharacterCreationMutation } from '../hooks/use-patch-character-creation-mutation'
 import { useRulesetPatch } from '../hooks/use-ruleset-patch'

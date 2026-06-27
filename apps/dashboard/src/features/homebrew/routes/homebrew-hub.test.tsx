@@ -9,7 +9,7 @@ vi.mock('@/features/campaign', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
-import { VISIBLE_SIDEBAR_CONTENT } from '../lib/visible-sidebar-content-registry'
+import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
 
 import { HomebrewHubContent } from './homebrew-hub'
 
