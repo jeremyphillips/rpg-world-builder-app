@@ -1,5 +1,5 @@
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
-import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
+import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -19,7 +19,11 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     cell: ({ row }) =>
       row.getValue<CharacterClass['primaryAbilities']>('primaryAbilities').join(', ').toUpperCase(),
     enableSorting: false,
-    meta: { label: 'Primary Abilities', ...dataTableWidthMeta('medium') },
+    meta: {
+      label: 'Primary Abilities',
+      ...dataTableWidthMeta('medium'),
+      ...dataTableTypographyMeta('stat'),
+    },
   },
   {
     accessorKey: 'spellcasting',

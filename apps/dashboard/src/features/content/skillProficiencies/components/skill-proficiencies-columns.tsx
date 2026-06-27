@@ -1,6 +1,6 @@
 import type { SkillProficiency } from '@rpg/contracts'
 import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -10,9 +10,9 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
   {
     accessorKey: 'ability',
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
-    cell: ({ row }) => ABILITY_ENTRIES[row.getValue<SkillProficiency['ability']>('ability')].label,
+    cell: ({ row }) => row.getValue<SkillProficiency['ability']>('ability').toUpperCase(),
     filterFn: 'equalsString',
-    meta: { label: 'Ability' },
+    meta: { label: 'Ability', ...dataTableWidthMeta('tiny'), ...dataTableTypographyMeta('stat') },
   },
 ]
 

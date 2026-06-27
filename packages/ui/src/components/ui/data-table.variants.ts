@@ -91,6 +91,20 @@ export const dataTableSortIconVariants = cva('ml-1 size-3 shrink-0', {
   defaultVariants: { state: 'idle' },
 })
 
+/** Body cell text roles — metadata, stats, and other opt-in typography. */
+export const dataTableCellTextVariants = cva('', {
+  variants: {
+    role: {
+      /** Secondary metadata — 11px / light. */
+      meta: 'text-badge-sm font-light',
+      /** Supplementary metadata — 11px / light / italic. */
+      metaItalic: 'text-badge-sm font-light italic',
+      /** Abbreviated stats (STR, CON, AC) — 12px / medium. */
+      stat: 'text-table-stat font-medium text-foreground',
+    },
+  },
+})
+
 /** Primary name/label cell typography inside identity columns. */
 export const dataTableNameCellVariants = cva('font-semibold')
 
@@ -134,3 +148,6 @@ export const dataTableResetColumnVariants = cva(
 export const dataTableFilterChipVariants = cva(
   'inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground',
 )
+
+/** Accessible caption below the table — supplementary source / scope note. */
+export const dataTableCaptionVariants = cva('pb-3 text-badge-sm italic text-muted-foreground/50')

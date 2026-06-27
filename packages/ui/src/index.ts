@@ -323,11 +323,13 @@ export type {
   TableBadgeCellProps,
 } from './components/ui/data-table.client'
 export {
+  dataTableCellTypography,
   dataTableColumnMeta,
   dataTableColumnWidths,
+  dataTableTypographyMeta,
   dataTableWidthMeta,
 } from './components/ui/data-table-meta'
-export type { DataTableColumnWidth } from './components/ui/data-table-meta'
+export type { DataTableCellTypography, DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
   DataTableProps,
@@ -356,11 +358,13 @@ export {
   dataTableFilterChipVariants,
   dataTableLockedColumnVariants,
   dataTableResetColumnVariants,
+  dataTableCellTextVariants,
   dataTableNameCellVariants,
   dataTableNameLinkCellVariants,
   dataTableRowVariants,
   dataTableBodyCellPaddingVariants,
   dataTableBodyCellVariants,
+  dataTableCaptionVariants,
   dataTableHeaderCellVariants,
   dataTableSortIconVariants,
 } from './components/ui/data-table.variants'

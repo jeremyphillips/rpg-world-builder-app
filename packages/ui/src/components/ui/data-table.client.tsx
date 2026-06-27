@@ -119,6 +119,7 @@ import {
   dataTableAdvancedPanelVariants,
   dataTableBodyCellPaddingVariants,
   dataTableBodyCellVariants,
+  dataTableCaptionVariants,
   dataTableColumnDragHandleVariants,
   dataTableColumnItemVariants,
   dataTableColumnPanelVariants,
@@ -1006,7 +1007,7 @@ export function DataTable<TData>({
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>
         <Table className={dataTableTableVariants()}>
-          {caption && <TableCaption className="pb-3">{caption}</TableCaption>}
+          {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

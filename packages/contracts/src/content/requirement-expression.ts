@@ -6,6 +6,7 @@ import {
   ABILITY_SCORE_MIN,
   abilitySchema,
   getAbilityLabel,
+  type Ability,
 } from '../vocab/ability'
 
 import { classSlugSchema, getClassName } from './class/class'
@@ -91,31 +92,53 @@ export function formatFeatureRequirement(featureId: string): string {
   return `${label} Feature`
 }
 
-function formatAnyGroup(requirements: RequirementExpression[]): string {
+export type FormatRequirementExpressionOptions = {
+  /** Full ability name (default) or uppercase id (`STR`). */
+  abilityDisplay?: 'label' | 'id'
+}
+
+function formatAbilityReference(
+  ability: Ability,
+  abilityDisplay: NonNullable<FormatRequirementExpressionOptions['abilityDisplay']>,
+): string {
+  return abilityDisplay === 'id' ? ability.toUpperCase() : getAbilityLabel(ability)
+}
+
+function formatAnyGroup(
+  requirements: RequirementExpression[],
+  options: FormatRequirementExpressionOptions,
+): string {
+  const abilityDisplay = options.abilityDisplay ?? 'label'
   const abilityMins = requirements.filter(
     (req): req is RequirementAbilityMinimum => req.kind === 'abilityMinimum',
   )
   if (abilityMins.length === requirements.length && abilityMins.length > 0) {
     const { minimum } = abilityMins[0]!
     if (abilityMins.every((req) => req.minimum === minimum)) {
-      const labels = abilityMins.map((req) => getAbilityLabel(req.ability)).join(' or ')
+      const labels = abilityMins
+        .map((req) => formatAbilityReference(req.ability, abilityDisplay))
+        .join(' or ')
       return `${labels} ${minimum}+`
     }
   }
-  return requirements.map(formatRequirementExpression).join(' or ')
+  return requirements.map((req) => formatRequirementExpression(req, options)).join(' or ')
 }
 
 /** Formats a requirement tree as player-facing prerequisite prose. */
-export function formatRequirementExpression(expr: RequirementExpression): string {
+export function formatRequirementExpression(
+  expr: RequirementExpression,
+  options: FormatRequirementExpressionOptions = {},
+): string {
+  const abilityDisplay = options.abilityDisplay ?? 'label'
   switch (expr.kind) {
     case 'all':
-      return expr.requirements.map(formatRequirementExpression).join(', ')
+      return expr.requirements.map((req) => formatRequirementExpression(req, options)).join(', ')
     case 'any':
-      return formatAnyGroup(expr.requirements)
+      return formatAnyGroup(expr.requirements, options)
     case 'minLevel':
       return `Level ${expr.level}+`
     case 'abilityMinimum':
-      return `${getAbilityLabel(expr.ability)} ${expr.minimum}+`
+      return `${formatAbilityReference(expr.ability, abilityDisplay)} ${expr.minimum}+`
     case 'classLevel':
       return `${getClassName(expr.classSlug)} level ${expr.minimum}+`
     case 'feature':

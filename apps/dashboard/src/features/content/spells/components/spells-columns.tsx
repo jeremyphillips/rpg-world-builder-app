@@ -5,7 +5,7 @@ import {
   SPELL_SCHOOLS,
   getSpellSchoolLabel,
 } from '@rpg/contracts'
-import { BooleanCell, SortableHeader } from '@rpg/ui'
+import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -26,21 +26,21 @@ const SPELLS_MIDDLE_COLUMNS: ColumnDef<Spell>[] = [
     header: ({ column }) => <SortableHeader column={column}>Level</SortableHeader>,
     cell: ({ row }) => formatSpellLevelLabel(row.original.level),
     filterFn: (row, _columnId, filterValue) => String(row.original.level) === filterValue,
-    meta: { label: 'Level' },
+    meta: { label: 'Level', ...dataTableWidthMeta('compact') },
   },
   {
     accessorKey: 'school',
     header: ({ column }) => <SortableHeader column={column}>School</SortableHeader>,
     cell: ({ row }) => getSpellSchoolLabel(row.getValue<string>('school')),
     filterFn: 'equalsString',
-    meta: { label: 'School' },
+    meta: { label: 'School', ...dataTableWidthMeta('medium') },
   },
   {
     id: 'castingTime',
     accessorFn: (row) => formatCastingTime(row.castingTime, { includeTrigger: false }),
     header: ({ column }) => <SortableHeader column={column}>Casting Time</SortableHeader>,
     cell: ({ row }) => row.getValue<string>('castingTime'),
-    meta: { label: 'Casting Time' },
+    meta: { label: 'Casting Time', ...dataTableWidthMeta('compact') },
   },
   {
     id: 'ritual',
@@ -49,7 +49,7 @@ const SPELLS_MIDDLE_COLUMNS: ColumnDef<Spell>[] = [
     cell: ({ row }) => <BooleanCell value={row.getValue<boolean>('ritual')} />,
     filterFn: 'boolean',
     enableSorting: false,
-    meta: { label: 'Ritual' },
+    meta: { label: 'Ritual', ...dataTableWidthMeta('compactCenter') },
   },
 ]
 

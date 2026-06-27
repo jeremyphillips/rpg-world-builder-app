@@ -1,3 +1,5 @@
+import { dataTableCellTextVariants } from './data-table.variants'
+
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
   identity: { columnTone: 'identity' as const },
@@ -38,8 +40,31 @@ export const dataTableColumnWidths = {
 
 export type DataTableColumnWidth = keyof typeof dataTableColumnWidths
 
+/** Body-cell layout for centered width presets — flex breaks table `align-middle`. */
+const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:block'
+
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {
   const className = dataTableColumnWidths[width]
+  if (width === 'compactCenter' || width === 'tinyCenter') {
+    return {
+      headerClassName: className,
+      cellClassName: `${className} ${dataTableCenteredBodyCellLayout}`,
+    } as const
+  }
   return { headerClassName: className, cellClassName: className } as const
+}
+
+/** Typography presets for `ColumnMeta.cellClassName` or inner cell spans. */
+export const dataTableCellTypography = {
+  meta: dataTableCellTextVariants({ role: 'meta' }),
+  metaItalic: dataTableCellTextVariants({ role: 'metaItalic' }),
+  stat: dataTableCellTextVariants({ role: 'stat' }),
+} as const
+
+export type DataTableCellTypography = keyof typeof dataTableCellTypography
+
+/** Applies a typography preset to body cells. */
+export function dataTableTypographyMeta(role: DataTableCellTypography) {
+  return { cellClassName: dataTableCellTypography[role] } as const
 }

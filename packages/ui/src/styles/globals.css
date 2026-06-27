@@ -56,6 +56,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --text-table-body: 0.8125rem;
+  --text-table-stat: 0.75rem;
   --text-badge-sm: 0.6875rem;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;

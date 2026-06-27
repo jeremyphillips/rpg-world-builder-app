@@ -1,6 +1,6 @@
 import type { ToolEquipment } from '@rpg/contracts'
-import { TOOL_CATEGORIES, getAbilityLabel, getToolCategoryLabel } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { TOOL_CATEGORIES, getToolCategoryLabel } from '@rpg/contracts'
+import { dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -22,10 +22,10 @@ const TOOL_MIDDLE_COLUMNS: ColumnDef<ToolEquipment>[] = [
     accessorKey: 'ability',
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
     cell: ({ row }) => {
-      const ability = row.getValue<string | undefined>('ability')
-      return ability ? getAbilityLabel(ability) : '—'
+      const ability = row.getValue<ToolEquipment['ability']>('ability')
+      return ability.toUpperCase()
     },
-    meta: { label: 'Ability' },
+    meta: { label: 'Ability', ...dataTableTypographyMeta('stat') },
   },
   costColumn<ToolEquipment>(),
 ]

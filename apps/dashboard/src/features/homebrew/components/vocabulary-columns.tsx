@@ -1,4 +1,4 @@
-import { SortableHeader, TableBadgeCell, dataTableColumnMeta } from '@rpg/ui'
+import { SortableHeader, TableBadgeCell, dataTableColumnMeta, dataTableWidthMeta } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
@@ -14,6 +14,7 @@ export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
     }),
     buildSourceColumn<VocabularyOptionWithUsage, VocabularyOptionWithUsage['source']>({
       badgeMap: VOCABULARY_SOURCE_BADGE,
+      width: 'badge',
     }),
     {
       accessorKey: 'status',
@@ -27,13 +28,13 @@ export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
         )
       },
       enableSorting: false,
-      meta: { ...dataTableColumnMeta.data, label: 'Status' },
+      meta: { ...dataTableColumnMeta.data, label: 'Status', ...dataTableWidthMeta('badge') },
     },
     {
       accessorKey: 'usedBy',
       header: ({ column }) => <SortableHeader column={column}>Used By</SortableHeader>,
       cell: ({ row }) => row.getValue<number>('usedBy'),
-      meta: { ...dataTableColumnMeta.data, label: 'Used By' },
+      meta: { ...dataTableColumnMeta.data, label: 'Used By', ...dataTableWidthMeta('compact') },
     },
   ]
 }

@@ -117,7 +117,9 @@ describe('DataTable — rendering', () => {
 
   it('renders caption when provided', () => {
     renderTable({ caption: 'All items' })
-    expect(screen.getByText('All items')).toBeInTheDocument()
+    const caption = screen.getByText('All items')
+    expect(caption).toBeInTheDocument()
+    expect(caption).toHaveClass('text-badge-sm', 'italic', 'text-muted-foreground/50')
   })
 
   it('renders the primary filter controls', () => {

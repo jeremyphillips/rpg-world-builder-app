@@ -1,6 +1,6 @@
 import type { Species } from '@rpg/contracts'
 import { getCreatureSizeLabel } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -23,21 +23,21 @@ function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Sp
           ? getVocabularyCreatureTypeLabel(vocabulary, row.getValue<string>('creatureType'))
           : getCreatureTypeLabel(row.getValue<string>('creatureType')),
       filterFn: 'equalsString',
-      meta: { label: 'Type' },
+      meta: { label: 'Type', ...dataTableWidthMeta('medium') },
     },
     {
       id: 'sizes',
       accessorFn: (row) => row.sizes.map(getCreatureSizeLabel).join(' / '),
       header: ({ column }) => <SortableHeader column={column}>Size</SortableHeader>,
       cell: ({ row }) => row.getValue<string>('sizes'),
-      meta: { label: 'Size' },
+      meta: { label: 'Size', ...dataTableWidthMeta('medium') },
     },
     {
       id: 'speed',
       accessorFn: (row) => row.speed.walk,
       header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
       cell: ({ row }) => `${row.original.speed.walk} ft.`,
-      meta: { label: 'Speed' },
+      meta: { label: 'Speed', ...dataTableWidthMeta('tiny') },
     },
   ]
 }

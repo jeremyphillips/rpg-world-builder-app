@@ -1,5 +1,17 @@
 import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+
+/**
+ * Custom `text-*` font-size utilities from `@theme` in `styles/globals.css`.
+ * Register here so `cn()` does not treat them as `text-{color}` and drop them.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: ['table-body', 'table-stat', 'badge-sm'],
+    },
+  },
+})
 
 /**
  * Merge conditional class names and de-duplicate conflicting Tailwind classes.
