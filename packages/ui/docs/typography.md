@@ -29,13 +29,13 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Heading` `label`             | `p`    | 16   | 500    | Inline non-outline titles (trait names)  |
 | `Text` `body`                 | `p`    | 16   | 400    | Default foreground copy                  |
 | `Text` `muted`                | `p`    | 16   | 400    | Non-catalog plain copy (hints, errors)   |
-| `Text` `small`                | `p`    | 14   | 400    | Helper text, secondary metadata          |
+| `Text` `small`                | `p`    | 15   | 400    | Helper text, secondary metadata          |
 | `Text` `caption`              | `p`    | 12   | 400    | Form field hints                         |
 | `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                       |
-| `Text` `destructive`          | `p`    | 16   | 400    | Inline errors — pair with `role="alert"` |
+| `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"` |
 | `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels                 |
-| `RichTextContent` `size="sm"` | `div`  | —    | —      | Catalog descriptions (TipTap / CMS HTML) |
-| `CardDescription`             | `div`  | 14   | 400    | Card header secondary line               |
+| `RichTextContent` `size="sm"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
+| `CardDescription`             | `div`  | 15   | 400    | Card header secondary line               |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -85,11 +85,11 @@ Form hints and errors inside `Field.*`, `Form`, and field wrappers already compo
 Always use this instead of raw `dangerouslySetInnerHTML`. Sanitization via
 `sanitizeHtml` is built in.
 
-| Prop   | Values               | Default   | Notes                                         |
-| ------ | -------------------- | --------- | --------------------------------------------- |
-| `html` | `string`             | required  | Sanitized before render                       |
-| `size` | `sm` \| `base`       | `base`    | `sm` → `prose-sm` for catalog detail copy     |
-| `tone` | `default` \| `muted` | `default` | `muted` maps prose tokens to muted foreground |
+| Prop   | Values               | Default   | Notes                                                           |
+| ------ | -------------------- | --------- | --------------------------------------------------------------- |
+| `html` | `string`             | required  | Sanitized before render                                         |
+| `size` | `sm` \| `base`       | `base`    | `sm` → `prose-sm` at `--text-md` (15px) for catalog detail copy |
+| `tone` | `default` \| `muted` | `default` | `muted` maps prose tokens to muted foreground                   |
 
 ```tsx
 import { RichTextContent } from '@rpg/ui'
@@ -111,24 +111,39 @@ Light and dark themes share the same class names — switching the `dark` class 
 a root element updates CSS variables, and prose colors follow automatically. No
 per-theme prose classes are required in components.
 
+## Secondary body (`text-md`)
+
+At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`,
+14px) and primary body (`text-base`, 16px).
+
+| Surface                                             | Size                                |
+| --------------------------------------------------- | ----------------------------------- |
+| `RichTextContent` `size="sm"` (`prose-sm`)          | 15px via `.prose.prose-sm` override |
+| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                           |
+| `CardDescription`                                   | `text-md` (via `Text` small)        |
+| Rich-text editor                                    | `text-md` (matches read view)       |
+
+Compact UI chrome (buttons, menus, inputs, data tables) stays on **`text-sm` (14px)**.
+
 ## Type scale
 
 Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@theme inline`.
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility       | px @ 16px root | Typical use                          |
-| --------------------- | -------------- | ------------------------------------ |
-| `text-xs`             | 12             | Captions, table stat columns         |
-| `text-sm`             | 14             | Helper text, form copy, compact UI   |
-| `text-base`           | 16             | Body default                         |
-| `text-lg`             | 18             | Card titles, lead copy               |
-| `text-xl`             | 20             | Section headings                     |
-| `text-2xl`            | 24             | Page titles                          |
-| `text-3xl`            | 30             | Content detail titles                |
-| `text-4xl`            | 36             | Marketing display (e.g. public hero) |
-| `text-5xl`            | 48             | Marketing display (responsive hero)  |
-| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness   |
+| Token / utility       | px @ 16px root | Typical use                                  |
+| --------------------- | -------------- | -------------------------------------------- |
+| `text-xs`             | 12             | Captions, table stat columns                 |
+| `text-sm`             | 14             | Compact UI chrome (buttons, menus, inputs)   |
+| `text-md`             | 15             | Secondary body (`Text` small, `prose-sm`, …) |
+| `text-base`           | 16             | Primary body default                         |
+| `text-lg`             | 18             | Card titles, lead copy                       |
+| `text-xl`             | 20             | Section headings                             |
+| `text-2xl`            | 24             | Page titles                                  |
+| `text-3xl`            | 30             | Content detail titles                        |
+| `text-4xl`            | 36             | Marketing display (e.g. public hero)         |
+| `text-5xl`            | 48             | Marketing display (responsive hero)          |
+| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness           |
 
 ## Heading size tokens
 

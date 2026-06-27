@@ -57,6 +57,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         '2xs-meta',
         'xs-meta',
         'sm-meta',
+        'md',
         'eyebrow-xs',
         'eyebrow-sm',
         'eyebrow-md',
