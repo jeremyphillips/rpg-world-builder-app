@@ -13,6 +13,7 @@ export function useUpdateTicket(ticketId: string) {
     onSuccess: (ticket) => {
       queryClient.setQueryData(ticketQueryKeys.detail(ticketId), ticket)
       void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.bench() })
     },
   })
 }

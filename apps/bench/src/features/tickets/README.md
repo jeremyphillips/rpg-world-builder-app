@@ -14,7 +14,7 @@ detail edit, and a backlog drawer (`?ticketId=`).
 
 - API client: `api/tickets-client.ts` (CSRF-free mutations via `request()`)
 - TanStack Query hooks in `hooks/`
-- Query key namespace: `['bench', 'tickets', …]`
+- Query key namespace: `['bench', 'tickets', …]` — includes `ticketQueryKeys.bench()` for the workflow board (plan 06)
 
 ## Cross-feature exports
 

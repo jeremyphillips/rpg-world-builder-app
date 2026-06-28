@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 
-import { createTicketInputSchema } from '@rpg/contracts/dev-bench'
+import { createTicketInputSchema, type TicketStatus } from '@rpg/contracts/dev-bench'
 import { Button, Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
@@ -25,6 +25,8 @@ const defaultValues: QuickCreateFormValues = {
 interface TicketCreateDialogProps {
   /** Pre-fill epicId on create (epic detail scoped create). */
   defaultEpicId?: string
+  /** Pre-fill status on create (Bench up_next). Defaults to backlog. */
+  defaultStatus?: TicketStatus
   /** Override default "New ticket" trigger; omit when using controlled open. */
   trigger?: ReactNode
   /** Controlled open state (epic detail "Add ticket" button). */
@@ -35,6 +37,7 @@ interface TicketCreateDialogProps {
 
 export function TicketCreateDialog({
   defaultEpicId,
+  defaultStatus,
   trigger,
   open: controlledOpen,
   onOpenChange,
@@ -53,6 +56,7 @@ export function TicketCreateDialog({
       createTicketInputSchema.parse({
         ...buildQuickCreateInput(values),
         epicId: defaultEpicId ?? null,
+        status: defaultStatus ?? 'backlog',
       }),
     )
     form.reset(defaultValues)

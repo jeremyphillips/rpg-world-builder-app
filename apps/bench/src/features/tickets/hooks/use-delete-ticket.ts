@@ -15,6 +15,7 @@ export function useDeleteTicket(ticketId: string) {
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ticketQueryKeys.detail(ticketId) })
       void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.bench() })
       void navigate(BENCH_ROUTES.backlog)
     },
   })

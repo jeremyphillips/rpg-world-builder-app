@@ -12,6 +12,7 @@ export function useCreateTicket() {
     mutationFn: (input: CreateTicketInput) => createTicket(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: ticketQueryKeys.bench() })
     },
   })
 }

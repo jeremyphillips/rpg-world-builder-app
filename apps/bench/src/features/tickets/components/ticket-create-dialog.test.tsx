@@ -45,7 +45,20 @@ describe('TicketCreateDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Create ticket' }))
 
     expect(mutateAsync).toHaveBeenCalledWith(
-      expect.objectContaining({ epicId: 'epic-123', title: 'Scoped ticket' }),
+      expect.objectContaining({ epicId: 'epic-123', title: 'Scoped ticket', status: 'backlog' }),
+    )
+  })
+
+  it('passes defaultStatus to create mutation', async () => {
+    mutateAsync.mockResolvedValueOnce({ id: 'new-ticket-id' })
+    const user = userEvent.setup()
+    renderDialog({ defaultStatus: 'up_next', open: true })
+
+    await user.type(screen.getByLabelText(/title/i), 'Up next ticket')
+    await user.click(screen.getByRole('button', { name: 'Create ticket' }))
+
+    expect(mutateAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'up_next', title: 'Up next ticket' }),
     )
   })
 
