@@ -7,6 +7,7 @@ import { CheckboxField } from '../components/ui/checkbox-field'
 import { ChipsField } from '../components/ui/chips-field.client'
 import { ComboboxField } from '../components/ui/combobox-field.client'
 import { NumberField } from '../components/ui/number-field'
+import { RadioCardField } from '../components/ui/radio-card-field'
 import { RadioGroupField } from '../components/ui/radio-group-field'
 import { SelectField } from '../components/ui/select-field'
 import { SwitchField } from '../components/ui/switch-field'
@@ -62,7 +63,7 @@ interface RenderArgs<K extends FieldType> {
  * Per-type adapter registry: the single place that bridges RHF's `field`
  * (`{ value, onChange, onBlur, ref }`) to each wrapper's prop contract. Adding a
  * new control = adding one entry here. Notable per-type quirks handled below:
- * `number` coerces to `number | undefined`; `select`/`radio` use `onValueChange`;
+ * `number` coerces to `number | undefined`; `select`/`radio`/`radioCard` use `onValueChange`;
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
 const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactElement } = {
@@ -159,6 +160,23 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       width={config.width}
       disabled={config.disabled}
       orientation={config.orientation}
+      labelHidden={config.labelHidden}
+      value={field.value ?? ''}
+      onValueChange={field.onChange}
+      onBlur={field.onBlur}
+    />
+  ),
+  radioCard: ({ config, field, id, error }) => (
+    <RadioCardField
+      id={id}
+      label={config.label}
+      options={config.options}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      disabled={config.disabled}
       labelHidden={config.labelHidden}
       value={field.value ?? ''}
       onValueChange={field.onChange}
