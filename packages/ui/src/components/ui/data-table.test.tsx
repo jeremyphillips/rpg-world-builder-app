@@ -119,7 +119,7 @@ describe('DataTable — rendering', () => {
     renderTable({ caption: 'All items' })
     const caption = screen.getByText('All items')
     expect(caption).toBeInTheDocument()
-    expect(caption).toHaveClass('text-sm-meta', 'italic', 'text-muted-foreground/80')
+    expect(caption).toHaveClass('text-sm-meta', 'italic', 'text-muted-foreground')
   })
 
   it('renders the primary filter controls', () => {

@@ -150,4 +150,4 @@ export const dataTableFilterChipVariants = cva(
 )
 
 /** Accessible caption below the table — supplementary source / scope note. */
-export const dataTableCaptionVariants = cva('pb-3 text-sm-meta italic text-muted-foreground/80')
+export const dataTableCaptionVariants = cva('pb-3 text-sm-meta italic text-muted-foreground')
