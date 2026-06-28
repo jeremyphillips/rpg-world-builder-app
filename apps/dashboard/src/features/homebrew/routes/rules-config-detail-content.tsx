@@ -3,14 +3,13 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { buttonVariants, Heading, Text } from '@rpg/ui'
-import { Form, FormSaveFooter } from '@rpg/ui/form'
+import { Form } from '@rpg/ui/form'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { ROUTES } from '@/app/routes'
-import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import {
   buildCharacterCreationPatchInput,
@@ -29,6 +28,7 @@ import {
 } from '@/features/campaign'
 
 import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
+import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
 import { buildEditionPresetFieldOptions } from '../lib/vocabulary/sets/edition-presets'
 import { buildAttackResolutionModeFieldOptions } from '../lib/vocabulary/sets/attack-resolution-modes'
 import { buildActiveCreatureTypeFieldOptions } from '../lib/vocabulary/sets/creature-types'
@@ -68,6 +68,8 @@ export type RulesConfigDetailContentProps = {
   configId: string
 }
 
+const READ_ONLY_RULES_MESSAGE = 'You can view these rules but only campaign owners can edit them.'
+
 function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
   const canManage = useCanManageCampaign(campaignId)
   const { data: patch, isPending, isError } = useRulesetPatch(campaignId)
@@ -99,6 +101,11 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
     form.reset(values)
   }, 'Could not save character configuration.')
 
+  const saveFooter = useMemo(
+    () => createRulesConfigSaveFooter({ pending: isSaving, isSuccess }),
+    [isSaving, isSuccess],
+  )
+
   return (
     <PageLoadState
       isPending={isPending || isVocabularyPending}
@@ -108,11 +115,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
       {defaultValues ? (
         <>
           <PageHeader heading="Character Configuration" />
-          {!canManage ? (
-            <Text variant="muted">
-              You can view these rules but only campaign owners can edit them.
-            </Text>
-          ) : null}
+          {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<RulesValues>
             key={campaignId}
             schema={schema}
@@ -122,21 +125,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
             formError={formError}
             collapsibleSections={false}
             stickyFooter={canManage}
-            footer={
-              canManage
-                ? (form) => (
-                    <>
-                      <FormUnsavedChangesGuard />
-                      <FormSaveFooter
-                        pending={isSaving || form.formState.isSubmitting}
-                        isSuccess={isSuccess}
-                        submitLabel="Save changes"
-                        successMessage="Changes saved."
-                      />
-                    </>
-                  )
-                : undefined
-            }
+            footer={canManage ? saveFooter : undefined}
           />
         </>
       ) : null}
@@ -181,6 +170,11 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
     form.reset(values)
   }, 'Could not save mechanics configuration.')
 
+  const saveFooter = useMemo(
+    () => createRulesConfigSaveFooter({ pending: isSaving, isSuccess }),
+    [isSaving, isSuccess],
+  )
+
   return (
     <PageLoadState
       isPending={isPending || isEditionPresetPending || isAttackResolutionPending}
@@ -190,11 +184,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
       {defaultValues ? (
         <>
           <PageHeader heading="Mechanics" />
-          {!canManage ? (
-            <Text variant="muted">
-              You can view these rules but only campaign owners can edit them.
-            </Text>
-          ) : null}
+          {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<MechanicsValues>
             key={campaignId}
             schema={mechanicsValuesSchema}
@@ -204,21 +194,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             formError={formError}
             collapsibleSections={false}
             stickyFooter={canManage}
-            footer={
-              canManage
-                ? (form) => (
-                    <>
-                      <FormUnsavedChangesGuard />
-                      <FormSaveFooter
-                        pending={isSaving || form.formState.isSubmitting}
-                        isSuccess={isSuccess}
-                        submitLabel="Save changes"
-                        successMessage="Changes saved."
-                      />
-                    </>
-                  )
-                : undefined
-            }
+            footer={canManage ? saveFooter : undefined}
           />
         </>
       ) : null}

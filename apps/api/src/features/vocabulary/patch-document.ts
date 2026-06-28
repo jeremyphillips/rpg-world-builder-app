@@ -42,3 +42,29 @@ export async function getOrCreatePatchDocument(
   const created = await CampaignRulesetPatchModel.create({ campaignId, rulesetId, vocabulary: [] })
   return created.toObject() as PatchDocument
 }
+
+export type SparsePatchUpdateOps = {
+  $set: Record<string, unknown>
+  $unset: Record<string, 1>
+}
+
+/** Applies sparse `$set` / `$unset` operations to a campaign ruleset patch document. */
+export async function applySparsePatchUpdate(
+  campaignId: string,
+  rulesetId: SystemRulesetId,
+  ops: SparsePatchUpdateOps,
+): Promise<void> {
+  await getOrCreatePatchDocument(campaignId, rulesetId)
+
+  if (Object.keys(ops.$set).length === 0 && Object.keys(ops.$unset).length === 0) {
+    return
+  }
+
+  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
+  if (Object.keys(ops.$set).length > 0) update.$set = ops.$set
+  if (Object.keys(ops.$unset).length > 0) update.$unset = ops.$unset
+
+  await CampaignRulesetPatchModel.findOneAndUpdate({ campaignId, rulesetId }, update, {
+    upsert: true,
+  })
+}

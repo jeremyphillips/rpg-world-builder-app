@@ -92,7 +92,8 @@ export type ResolvedMechanicsKnobs = Pick<
   'armorClass' | 'attackResolution'
 >
 
-function resolveMechanicsKnobs(
+/** Materializes mechanics knobs from a sparse patch and preset id. */
+export function resolveMechanicsKnobsFromPatch(
   patch: CampaignMechanicsPatch | undefined,
   presetId: EditionPresetId,
 ): ResolvedMechanicsKnobs {
@@ -128,7 +129,7 @@ export function resolveMechanicsPatch(
   patch?: CampaignMechanicsPatch,
 ): ResolvedCampaignMechanicsPatch {
   const presetId = patch?.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID
-  const knobs = resolveMechanicsKnobs(patch, presetId)
+  const knobs = resolveMechanicsKnobsFromPatch(patch, presetId)
   const modified = patch?.editionPreset?.modified ?? mechanicsDriftFromPreset(presetId, knobs)
 
   return {

@@ -7,6 +7,7 @@ import {
   getEditionPresetMechanics,
   mechanicsDriftFromPreset,
   resolveCharacterCreationPatch,
+  resolveMechanicsKnobsFromPatch,
   resolveMechanicsPatch,
   sameStringSet,
 } from '@rpg/contracts'
@@ -15,7 +16,6 @@ import type {
   CampaignMechanicsPatch,
   CreatureTypePolicy,
   EditionPresetId,
-  ResolvedMechanicsKnobs,
   RulesetPatchRead,
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
@@ -24,11 +24,11 @@ import type {
 
 import { findCampaignById } from '../campaign'
 import { assertCreatureTypesActiveInCampaign } from './assert-campaign-creature-types'
-import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
 import {
-  getOrCreatePatchDocument,
+  applySparsePatchUpdate,
   loadPatchDocument,
   requireCampaignRuleset,
+  type SparsePatchUpdateOps,
 } from './patch-document'
 
 const CHARACTER_CREATION_PREFIX = 'characterCreation.'
@@ -53,29 +53,12 @@ function normalizeMechanicsPatchFromDoc(
   return mechanics
 }
 
-function resolveStoredMechanicsKnobs(
-  patch: CampaignMechanicsPatch,
-  presetId: EditionPresetId,
-): ResolvedMechanicsKnobs {
-  const bundle = getEditionPresetMechanics(presetId)
-
-  return {
-    armorClass: {
-      mode: patch.armorClass?.mode ?? bundle.armorClass.mode,
-      base: patch.armorClass?.base ?? bundle.armorClass.base,
-    },
-    attackResolution: {
-      mode: patch.attackResolution?.mode ?? bundle.attackResolution.mode,
-    },
-  }
-}
-
 function computeMechanicsPatchMetadata(
   patch: CampaignMechanicsPatch,
   options?: { appliedAt?: string; presetIdChanged?: boolean },
 ): CampaignMechanicsPatch {
   const presetId = (patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID) as EditionPresetId
-  const knobs = resolveStoredMechanicsKnobs(patch, presetId)
+  const knobs = resolveMechanicsKnobsFromPatch(patch, presetId)
   const bundle = getEditionPresetMechanics(presetId)
   const modified = mechanicsDriftFromPreset(presetId, knobs)
   const appliedAt =
@@ -166,10 +149,7 @@ function isSparseDefaultMechanicsPatch(patch: CampaignMechanicsPatch): boolean {
   return true
 }
 
-type MongoUpdateOps = {
-  $set: Record<string, unknown>
-  $unset: Record<string, 1>
-}
+type MongoUpdateOps = SparsePatchUpdateOps
 
 function sparseSetOrUnset(ops: MongoUpdateOps, path: string, value: unknown | undefined): void {
   if (value !== undefined) {
@@ -236,20 +216,7 @@ async function applyMechanicsUpdate(
   rulesetId: SystemRulesetId,
   patch: CampaignMechanicsPatch,
 ): Promise<void> {
-  await getOrCreatePatchDocument(campaignId, rulesetId)
-
-  const { $set, $unset } = buildMechanicsUpdateSet(patch)
-  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
-    return
-  }
-
-  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
-  if (Object.keys($set).length > 0) update.$set = $set
-  if (Object.keys($unset).length > 0) update.$unset = $unset
-
-  await CampaignRulesetPatchModel.findOneAndUpdate({ campaignId, rulesetId }, update, {
-    upsert: true,
-  })
+  await applySparsePatchUpdate(campaignId, rulesetId, buildMechanicsUpdateSet(patch))
 }
 
 function isDefaultCreatureTypePolicy(policy: CreatureTypePolicy | undefined): boolean {
@@ -355,20 +322,7 @@ async function applyCharacterCreationUpdate(
   rulesetId: SystemRulesetId,
   patch: CampaignCharacterCreationPatch,
 ): Promise<void> {
-  await getOrCreatePatchDocument(campaignId, rulesetId)
-
-  const { $set, $unset } = buildCharacterCreationUpdateSet(patch)
-  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
-    return
-  }
-
-  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
-  if (Object.keys($set).length > 0) update.$set = $set
-  if (Object.keys($unset).length > 0) update.$unset = $unset
-
-  await CampaignRulesetPatchModel.findOneAndUpdate({ campaignId, rulesetId }, update, {
-    upsert: true,
-  })
+  await applySparsePatchUpdate(campaignId, rulesetId, buildCharacterCreationUpdateSet(patch))
 }
 
 async function assertCreatureTypePolicyIds(
@@ -452,6 +406,7 @@ export async function updateCharacterCreationPatch(
 }
 
 export {
+  applySparsePatchUpdate,
   getOrCreatePatchDocument,
   loadPatchDocument,
   requireCampaignRuleset,

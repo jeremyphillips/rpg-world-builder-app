@@ -1,6 +1,4 @@
-import { loadSeedVocabularyOptionSet } from '@rpg/catalog/vocabulary'
 import {
-  DEFAULT_SYSTEM_RULESET_ID,
   EDITION_PRESET_ENTRIES,
   EDITION_PRESET_SET_ID,
   getEditionPresetEntry,
@@ -8,37 +6,24 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-export type EditionPresetVocabulary = {
-  labelById: Record<string, string>
-  descriptionById: Record<string, string>
-  activeIds: ReadonlySet<string>
-}
+import {
+  buildLabelDescriptionActiveVocabulary,
+  buildVocabularyFromSeedSet,
+  type LabelDescriptionActiveVocabulary,
+} from '../build-vocabulary-maps'
+
+export type EditionPresetVocabulary = LabelDescriptionActiveVocabulary
 
 /** Build label/description/active-id maps from a resolved edition-presets set. */
 export function buildEditionPresetVocabulary(
   set: Pick<ResolvedVocabularyOptionSet, 'options'>,
 ): EditionPresetVocabulary {
-  const labelById = Object.fromEntries(set.options.map((option) => [option.id, option.label]))
-  const descriptionById = Object.fromEntries(
-    set.options.map((option) => [option.id, option.description ?? '']),
-  )
-  const activeIds = new Set(
-    set.options.filter((option) => option.status === 'active').map((option) => option.id),
-  )
-  return { labelById, descriptionById, activeIds }
+  return buildLabelDescriptionActiveVocabulary(set)
 }
 
 /** Default ruleset seed vocabulary for flows without a campaign id. */
 export function buildSeedEditionPresetVocabulary(): EditionPresetVocabulary {
-  const seed = loadSeedVocabularyOptionSet(DEFAULT_SYSTEM_RULESET_ID, EDITION_PRESET_SET_ID)
-  return buildEditionPresetVocabulary({
-    options: seed.options.map((option) => ({
-      ...option,
-      source: 'system' as const,
-      status: 'active' as const,
-      usedBy: 0,
-    })),
-  })
+  return buildVocabularyFromSeedSet(EDITION_PRESET_SET_ID, buildEditionPresetVocabulary)
 }
 
 export function buildEditionPresetFieldOptions(
