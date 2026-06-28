@@ -7,7 +7,7 @@ import type {
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
-import { writeInitialCharacterCreation } from '../vocabulary/ruleset-patch.service'
+import { writeInitialCharacterCreation } from '../vocabulary'
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'

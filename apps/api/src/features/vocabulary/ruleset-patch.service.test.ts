@@ -11,7 +11,7 @@ import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
 import { getRulesetPatchRead, updateCharacterCreationPatch } from './ruleset-patch.service'
 import { updateVocabularyEntry } from './vocabulary.service'
-import { createCampaign } from '../campaign/campaign.service'
+import { createCampaign } from '../campaign'
 import { createUser } from '../user'
 
 let app: Express

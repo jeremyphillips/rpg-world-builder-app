@@ -9,7 +9,7 @@ import {
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
-import { getRulesetPatchRead } from '../vocabulary/ruleset-patch.service'
+import { getRulesetPatchRead } from '../vocabulary'
 
 beforeAll(async () => {
   await startTestDb()
