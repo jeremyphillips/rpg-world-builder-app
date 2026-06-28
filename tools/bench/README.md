@@ -2,6 +2,8 @@
 
 Agent-friendly CLI for Dev Bench tickets and epics. Primary integration surface for Cursor agents.
 
+Workflow playbook → [`.cursor/skills/dev-bench/SKILL.md`](../../.cursor/skills/dev-bench/SKILL.md). Field authoring detail → [`docs/dev-bench-agent-reference.md`](../../docs/dev-bench-agent-reference.md).
+
 ## Prerequisites
 
 Ensure **`apps/api` is running** before using the CLI:
@@ -39,13 +41,44 @@ Global flags:
 - `--format json|text` — default `json` (stdout success envelope; stderr errors)
 - `-h, --help` — usage
 
+`add-ticket` also accepts `--created-by user|agent` (default `agent`).
+
+## list-tickets filters
+
+```bash
+pnpm bench list-tickets --status backlog
+pnpm bench list-tickets --area rules
+pnpm bench list-tickets --type feature --priority high
+pnpm bench list-tickets --epic-id <mongoId> --size m --created-by agent
+```
+
+| Flag           | Values                                                            |
+| -------------- | ----------------------------------------------------------------- |
+| `--status`     | `backlog`, `up_next`, `in_progress`, `blocked`, `done`, `wont_do` |
+| `--area`       | lowercase slug (see agent reference)                              |
+| `--type`       | ticket type enum                                                  |
+| `--priority`   | `critical`, `high`, `medium`, `low`                               |
+| `--size`       | `xs`, `s`, `m`, `l`, `xl`                                         |
+| `--epic-id`    | Mongo epic id                                                     |
+| `--created-by` | `user`, `agent`                                                   |
+
+## Blocker and related ticket ids
+
+`blockedByTicketIds` and `relatedTicketIds` in update JSON require **Mongo ids**, not display keys.
+
+```bash
+pnpm bench get-ticket BENCH-001          # copy data.ticket.id
+pnpm bench update-ticket BENCH-042 --json '{
+  "status": "blocked",
+  "blockedByTicketIds": ["507f1f77bcf86cd799439011"]
+}'
+```
+
 ## Examples
 
 ```bash
-# Seed starter epics (idempotent)
 pnpm bench seed-epics
 
-# Create a ticket for an agent workflow
 pnpm bench add-ticket --json '{
   "title": "Add patch write support",
   "type": "feature",
@@ -55,15 +88,12 @@ pnpm bench add-ticket --json '{
   "epicName": "Rules Configuration"
 }'
 
-# Read a ticket as markdown
 pnpm bench get-ticket BENCH-001 --format text
-
-# List backlog tickets
 pnpm bench list-tickets --status backlog
-
-# Update status
 pnpm bench update-ticket BENCH-001 --json '{"status":"in_progress"}'
 ```
+
+**Never set `key` on create** — the server assigns `BENCH-###`.
 
 ## Output
 
@@ -76,7 +106,19 @@ Success (JSON):
 }
 ```
 
-Errors print to **stderr** and exit `1`. Codes: `VALIDATION_ERROR`, `API_ERROR`, `NETWORK_ERROR`, `NOT_FOUND`, `AMBIGUOUS_EPIC`.
+Errors print to **stderr** and exit `1`.
+
+| Code               | Meaning                                        |
+| ------------------ | ---------------------------------------------- |
+| `VALIDATION_ERROR` | Bad JSON or Zod parse                          |
+| `API_ERROR`        | 4xx/5xx from API                               |
+| `NETWORK_ERROR`    | API unreachable — start `@rpg/api`             |
+| `NOT_FOUND`        | Ticket/epic missing                            |
+| `AMBIGUOUS_EPIC`   | Multiple epics match `epicName` — use `epicId` |
+
+On `epicName` with no match: ticket still creates **without epic**; response includes `warnings`.
+
+`--format text` on `get-ticket` returns a markdown snapshot via `formatTicketForAgent`.
 
 ## Development
 
@@ -87,5 +129,3 @@ pnpm --filter @rpg/bench-cli lint
 ```
 
 HTTP client lives in `src/lib/api.ts` only — no `@rpg/api-client`, no `apps/bench` clients. Domain helpers come from `@rpg/dev-bench-core`.
-
-Agent workflow skill → [`.cursor/skills/dev-bench/SKILL.md`](../../.cursor/skills/dev-bench/SKILL.md).

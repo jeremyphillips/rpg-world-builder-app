@@ -103,7 +103,7 @@ The CLI calls the API **directly** at `BENCH_API_URL` (default `http://localhost
 pnpm --filter @rpg/api dev
 ```
 
-See [`tools/bench/README.md`](../tools/bench/README.md) for command reference.
+See [`tools/bench/README.md`](../tools/bench/README.md) for command reference and [`docs/dev-bench-agent-reference.md`](dev-bench-agent-reference.md) for field authoring detail.
 
 ## Quality gates (Turbo, all workspaces)
 
