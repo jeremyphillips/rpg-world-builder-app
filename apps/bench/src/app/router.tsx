@@ -5,7 +5,8 @@ import { BENCH_ROUTE_SEGMENTS } from '@/app/routes'
 import {
   BacklogPageRoute,
   BenchHomeRoute,
-  EpicsHomeRoute,
+  EpicsListPageRoute,
+  EpicDetailRoute,
   SearchHomeRoute,
   SettingsHomeRoute,
   TicketDetailRoute,
@@ -19,7 +20,8 @@ const router = createBrowserRouter(
       element: <AppShell />,
       children: [
         { index: true, element: <BenchHomeRoute /> },
-        { path: BENCH_ROUTE_SEGMENTS.epics, element: <EpicsHomeRoute /> },
+        { path: BENCH_ROUTE_SEGMENTS.epics, element: <EpicsListPageRoute /> },
+        { path: BENCH_ROUTE_SEGMENTS.epicDetail, element: <EpicDetailRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.backlog, element: <BacklogPageRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.ticketDetail, element: <TicketDetailRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.search, element: <SearchHomeRoute /> },

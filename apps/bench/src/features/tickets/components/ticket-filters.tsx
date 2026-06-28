@@ -20,7 +20,7 @@ import {
   Text,
 } from '@rpg/ui'
 
-import { useEpicsList } from '../hooks/use-epics-list'
+import { useEpicsList } from '@/features/epics'
 import {
   EPIC_FILTER_ALL,
   EPIC_FILTER_NONE,

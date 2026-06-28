@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
+import { createTicketInputSchema } from '@rpg/contracts/dev-bench'
 import { Button, Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
@@ -22,15 +23,38 @@ const defaultValues: QuickCreateFormValues = {
 }
 
 interface TicketCreateDialogProps {
+  /** Pre-fill epicId on create (epic detail scoped create). */
+  defaultEpicId?: string
+  /** Override default "New ticket" trigger; omit when using controlled open. */
+  trigger?: ReactNode
+  /** Controlled open state (epic detail "Add ticket" button). */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onCreated?: (ticketId: string) => void
 }
 
-export function TicketCreateDialog({ onCreated }: TicketCreateDialogProps) {
-  const [open, setOpen] = useState(false)
+export function TicketCreateDialog({
+  defaultEpicId,
+  trigger,
+  open: controlledOpen,
+  onOpenChange,
+  onCreated,
+}: TicketCreateDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+  const setOpen = isControlled ? onOpenChange! : setInternalOpen
+  const showTrigger = trigger !== undefined || !isControlled
+
   const { mutateAsync, isPending, isSuccess } = useCreateTicket()
 
   const { onSubmit, formError } = useSubmitHandler<QuickCreateFormValues>(async (values, form) => {
-    const ticket = await mutateAsync(buildQuickCreateInput(values))
+    const ticket = await mutateAsync(
+      createTicketInputSchema.parse({
+        ...buildQuickCreateInput(values),
+        epicId: defaultEpicId ?? null,
+      }),
+    )
     form.reset(defaultValues)
     setOpen(false)
     onCreated?.(ticket.id)
@@ -38,9 +62,9 @@ export function TicketCreateDialog({ onCreated }: TicketCreateDialogProps) {
 
   return (
     <Modal.Root open={open} onOpenChange={setOpen}>
-      <Modal.Trigger asChild>
-        <Button>New ticket</Button>
-      </Modal.Trigger>
+      {showTrigger ? (
+        <Modal.Trigger asChild>{trigger ?? <Button>New ticket</Button>}</Modal.Trigger>
+      ) : null}
       <Modal.Content size="md">
         <Modal.Header
           headline="New ticket"

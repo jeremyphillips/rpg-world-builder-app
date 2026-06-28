@@ -1,3 +1,5 @@
+export * from './aggregation/epic-aggregation'
 export * from './formatting/ticket-for-agent'
 export * from './parsing/parse-acceptance-criteria'
+export * from './seed/epic-seeds'
 export * from './workflow/bench-columns'

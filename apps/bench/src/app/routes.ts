@@ -6,6 +6,7 @@ export const BENCH_ROUTES = {
   search: '/search',
   settings: '/settings',
   ticketDetail: '/tickets/:ticketId',
+  epicDetail: '/epics/:epicId',
 } as const
 
 /** Router path segments (no leading slash; index route uses `index: true`). */
@@ -15,10 +16,15 @@ export const BENCH_ROUTE_SEGMENTS = {
   search: 'search',
   settings: 'settings',
   ticketDetail: 'tickets/:ticketId',
+  epicDetail: 'epics/:epicId',
 } as const
 
 export function benchTicketPath(ticketId: string): string {
   return `/tickets/${ticketId}`
+}
+
+export function benchEpicPath(epicId: string): string {
+  return `/epics/${epicId}`
 }
 
 export interface BenchNavItem {

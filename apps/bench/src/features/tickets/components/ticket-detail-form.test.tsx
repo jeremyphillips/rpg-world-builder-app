@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TicketDetailForm } from './ticket-detail-form'
 import { sampleTicket } from '../test-fixtures'
 
-vi.mock('../hooks/use-epics-list', () => ({
+vi.mock('@/features/epics', () => ({
   useEpicsList: () => ({ data: [] }),
 }))
 

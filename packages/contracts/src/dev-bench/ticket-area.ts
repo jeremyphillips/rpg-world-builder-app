@@ -7,6 +7,7 @@ export type TicketArea = z.infer<typeof ticketAreaSchema>
 export const TICKET_AREA_SUGGESTIONS = [
   'character_builder',
   'rules',
+  'campaigns',
   'contracts',
   'api',
   'ui',

@@ -16,8 +16,11 @@ function lazyNamed<P = Record<string, never>>(
 export const BenchHomeRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/bench/routes/bench-home'), 'BenchHome'),
 )
-export const EpicsHomeRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/epics/routes/epics-home'), 'EpicsHome'),
+export const EpicsListPageRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/epics/routes/epics-list-page'), 'EpicsListPage'),
+)
+export const EpicDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/epics/routes/epic-detail-page'), 'EpicDetailPage'),
 )
 export const BacklogPageRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/tickets/routes/backlog-page'), 'BacklogPage'),

@@ -9,7 +9,7 @@ import { TicketCard } from '../components/ticket-card'
 import { TicketCreateDialog } from '../components/ticket-create-dialog'
 import { TicketDetailDrawer } from '../components/ticket-detail-drawer'
 import { TicketFilters } from '../components/ticket-filters'
-import { useEpicsList } from '../hooks/use-epics-list'
+import { useEpicsList } from '@/features/epics'
 import { useTicketFiltersFromUrl } from '../hooks/use-ticket-filters-from-url'
 import { useTickets } from '../hooks/use-tickets'
 

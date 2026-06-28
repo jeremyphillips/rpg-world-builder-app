@@ -1,2 +1,18 @@
-/** Epic browsing and management — public barrel for cross-feature imports. */
-export {}
+export { EpicStatusBadge } from './components/epic-status-badge'
+export { EpicTicketCounts } from './components/epic-ticket-counts'
+export { EpicCard } from './components/epic-card'
+export { EpicFilters } from './components/epic-filters'
+export { CreateEpicDialog } from './components/epic-create-dialog'
+export { EpicDetailForm } from './components/epic-detail-form'
+export { EpicRelatedCodeAreas } from './components/epic-related-code-areas'
+export { EpicTicketSection } from './components/epic-ticket-section'
+
+export { useEpicsList } from './hooks/use-epics-list'
+export { useEpic } from './hooks/use-epic'
+export { useCreateEpic } from './hooks/use-create-epic'
+export { useUpdateEpic } from './hooks/use-update-epic'
+export { useDeleteEpic } from './hooks/use-delete-epic'
+export { useEpicTickets } from './hooks/use-epic-tickets'
+export { useEpicsWithCounts } from './hooks/use-epics-with-counts'
+export { useEpicFiltersFromUrl } from './hooks/use-epic-filters-from-url'
+export { epicQueryKeys, type EpicListFilters } from './hooks/epic-query-keys'

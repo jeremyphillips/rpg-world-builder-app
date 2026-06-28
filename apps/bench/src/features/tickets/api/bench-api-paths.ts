@@ -1,6 +1,6 @@
-export const BENCH_TICKETS_PATH = '/api/bench/tickets'
-export const BENCH_EPICS_PATH = '/api/bench/epics'
-
-export function ticketDetailPath(ticketId: string): string {
-  return `${BENCH_TICKETS_PATH}/${ticketId}`
-}
+export {
+  BENCH_EPICS_PATH,
+  BENCH_TICKETS_PATH,
+  epicDetailPath,
+  ticketDetailPath,
+} from '@/lib/api/dev-bench-paths'

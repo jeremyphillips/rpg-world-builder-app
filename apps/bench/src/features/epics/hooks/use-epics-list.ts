@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { fetchEpics } from '../api/tickets-client'
-import { epicQueryKeys } from './ticket-query-keys'
+import { fetchEpics } from '../api/epics-client'
+import { epicQueryKeys } from './epic-query-keys'
 
-/** Stub until plan 05 migrates epic hooks to features/epics. */
 export function useEpicsList() {
   return useQuery({
     queryKey: epicQueryKeys.list(),

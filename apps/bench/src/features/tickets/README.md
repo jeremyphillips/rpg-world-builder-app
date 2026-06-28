@@ -21,4 +21,4 @@ detail edit, and a backlog drawer (`?ticketId=`).
 Import display components and hooks from `features/tickets/index.ts` only. Route
 screens are lazy-loaded from `routes/` — not re-exported from the barrel.
 
-Plan 05 replaces `useEpicsList` with `features/epics` as the epic data source.
+Plan 05 moved epic data access to `features/epics` — import `useEpicsList` from `@/features/epics`.

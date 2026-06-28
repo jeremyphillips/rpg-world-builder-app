@@ -28,11 +28,6 @@ export const ticketQueryKeys = {
   detail: (id: string) => [...ticketQueryKeys.details(), id] as const,
 }
 
-export const epicQueryKeys = {
-  all: ['bench', 'epics'] as const,
-  list: () => [...epicQueryKeys.all, 'list'] as const,
-}
-
 /** Maps UI filters to API query params (client-side epic/status refinements applied after fetch). */
 export function toTicketListQuery(filters: TicketListFilters): TicketListQuery {
   const query: TicketListQuery = {}

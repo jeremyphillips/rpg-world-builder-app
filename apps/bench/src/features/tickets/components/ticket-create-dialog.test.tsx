@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
@@ -6,11 +6,21 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { TicketCreateDialog } from './ticket-create-dialog'
 
-function renderDialog() {
+const mutateAsync = vi.fn()
+
+vi.mock('../hooks/use-create-ticket', () => ({
+  useCreateTicket: () => ({
+    mutateAsync,
+    isPending: false,
+    isSuccess: false,
+  }),
+}))
+
+function renderDialog(props: React.ComponentProps<typeof TicketCreateDialog> = {}) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <TicketCreateDialog />
+      <TicketCreateDialog {...props} />
     </QueryClientProvider>,
   )
 }
@@ -24,6 +34,19 @@ describe('TicketCreateDialog', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create ticket' })).toBeInTheDocument()
+  })
+
+  it('passes defaultEpicId to create mutation', async () => {
+    mutateAsync.mockResolvedValueOnce({ id: 'new-ticket-id' })
+    const user = userEvent.setup()
+    renderDialog({ defaultEpicId: 'epic-123', open: true })
+
+    await user.type(screen.getByLabelText(/title/i), 'Scoped ticket')
+    await user.click(screen.getByRole('button', { name: 'Create ticket' }))
+
+    expect(mutateAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ epicId: 'epic-123', title: 'Scoped ticket' }),
+    )
   })
 
   it('has no axe accessibility violations when open', async () => {

@@ -16,7 +16,7 @@ import {
   type TicketDetailFormValues,
 } from '../lib/ticket-form-def'
 import { useDeleteTicket } from '../hooks/use-delete-ticket'
-import { useEpicsList } from '../hooks/use-epics-list'
+import { useEpicsList } from '@/features/epics'
 import { useTickets } from '../hooks/use-tickets'
 import { useUpdateTicket } from '../hooks/use-update-ticket'
 
