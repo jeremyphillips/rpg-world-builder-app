@@ -10,7 +10,7 @@ import {
   fieldLabelVariants,
 } from './field.variants'
 import { Text } from './text'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
@@ -191,8 +191,7 @@ export function ChipsField({
         data-required={required || undefined}
         className={fieldLabelVariants({ size })}
       >
-        {label}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+        <FieldLabelContent label={label} info={info} />
       </legend>
 
       <ChipsFieldOptions

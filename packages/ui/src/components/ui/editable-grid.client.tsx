@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import type { ReactNode } from 'react'
+
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
@@ -12,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
 import { Field } from './field.client'
+import { FieldLabelContent } from './field-label-content'
 import { fieldGroupLegendVariants } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
@@ -54,6 +57,8 @@ export interface EditableGridProps {
   value: EditableGridValue
   onChange: (value: EditableGridValue) => void
   legend?: string
+  /** Optional info-icon content rendered as an `[i]` tooltip beside the legend. */
+  info?: ReactNode
   error?: string
   templates?: EditableGridTemplates
   disabled?: boolean
@@ -248,6 +253,7 @@ export function EditableGrid({
   value,
   onChange,
   legend,
+  info,
   error,
   templates,
   disabled,
@@ -275,7 +281,11 @@ export function EditableGrid({
   return (
     <Field.Root id={id} error={error} width="full" className={className}>
       <fieldset className="min-w-0 border-0 p-0">
-        {legend ? <legend className={fieldGroupLegendVariants()}>{legend}</legend> : null}
+        {legend ? (
+          <legend className={cn(fieldGroupLegendVariants(), 'flex items-center gap-1.5')}>
+            <FieldLabelContent label={legend} info={info} />
+          </legend>
+        ) : null}
         <Table className={editableGridTableVariants()}>
           <TableHeader>
             <TableRow>

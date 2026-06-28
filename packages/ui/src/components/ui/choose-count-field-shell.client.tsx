@@ -11,7 +11,7 @@ import {
   fieldLabelVariants,
   fieldSetResetClasses,
 } from './field.variants'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 
 export interface ChooseCountFieldAnatomy {
   legendId: string
@@ -68,8 +68,7 @@ export function ChooseCountFieldShell({
         data-required={required || undefined}
         className={cn(fieldLabelVariants({ size }), hideLabel && 'sr-only')}
       >
-        {label}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+        <FieldLabelContent label={label} info={info} />
       </legend>
       {children({ legendId, chooseId, hintId, errorId })}
     </fieldset>
