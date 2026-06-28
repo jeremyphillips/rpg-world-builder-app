@@ -19,8 +19,11 @@ export const BenchHomeRoute = withRouteSuspense(
 export const EpicsHomeRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/epics/routes/epics-home'), 'EpicsHome'),
 )
-export const BacklogHomeRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/backlog/routes/backlog-home'), 'BacklogHome'),
+export const BacklogPageRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/tickets/routes/backlog-page'), 'BacklogPage'),
+)
+export const TicketDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/tickets/routes/ticket-detail-page'), 'TicketDetailPage'),
 )
 export const SearchHomeRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/search/routes/search-home'), 'SearchHome'),

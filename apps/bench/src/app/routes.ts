@@ -5,6 +5,7 @@ export const BENCH_ROUTES = {
   backlog: '/backlog',
   search: '/search',
   settings: '/settings',
+  ticketDetail: '/tickets/:ticketId',
 } as const
 
 /** Router path segments (no leading slash; index route uses `index: true`). */
@@ -13,7 +14,12 @@ export const BENCH_ROUTE_SEGMENTS = {
   backlog: 'backlog',
   search: 'search',
   settings: 'settings',
+  ticketDetail: 'tickets/:ticketId',
 } as const
+
+export function benchTicketPath(ticketId: string): string {
+  return `/tickets/${ticketId}`
+}
 
 export interface BenchNavItem {
   to: (typeof BENCH_ROUTES)[keyof typeof BENCH_ROUTES]

@@ -4,6 +4,10 @@ Dev Bench follows the same feature-first layout as the dashboard. Each domain
 area lives under `src/features/<feature>/` and owns its UI, hooks, and data access
 as it grows.
 
+Nav-aligned placeholders (`bench/`, `epics/`, `search/`, `settings/`) remain until
+their feature plans land. Ticket UI lives in `tickets/` (plan 04) and serves the
+`/backlog` route.
+
 ## Layout
 
 | Folder        | Responsibility                                           |
