@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
 import { describe, expect, it } from 'vitest'
+import { defaultMulticlassingRules } from '@rpg/contracts'
+import axe from 'axe-core'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { pickClass } from '../../lib/fixtures/pick'
@@ -116,6 +117,7 @@ describe('ClassProgressionTable', () => {
           maxCharacterLevel: 30,
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassing: defaultMulticlassingRules(),
           extendedProgression: {
             tierName: 'Epic Destiny',
             startsAt: 21,
@@ -138,6 +140,7 @@ describe('ClassProgressionTable', () => {
           maxCharacterLevel: 25,
           standardMaxCharacterLevel: 25,
           allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassing: defaultMulticlassingRules(),
         }}
       />,
     )

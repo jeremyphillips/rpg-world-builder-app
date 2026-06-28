@@ -28,6 +28,7 @@ import {
   type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
 import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
+import { SpeciesRulesTab } from '../components/species-rules-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
@@ -35,6 +36,12 @@ import {
   heritageFromFormValues,
   heritageToFormRow,
 } from './species-heritage-form-fields'
+import {
+  characterCreationFromFormValues,
+  characterCreationToFormValues,
+  refineSpeciesCharacterCreationForm,
+  speciesCharacterCreationFormSchema,
+} from './species-rules-form-fields'
 import {
   traitRowFormSchema,
   traitToFormRow,
@@ -60,6 +67,7 @@ const creatureSizeOptions = toOptions(
 function createSpeciesFormSchema(
   allowedCreatureTypes: readonly CreatureTypeId[],
   activeCreatureTypes?: ReadonlySet<string>,
+  formCtx: ContentFormCtx = {},
 ) {
   const allowedSet = new Set(allowedCreatureTypes)
 
@@ -75,6 +83,7 @@ function createSpeciesFormSchema(
       }),
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
+      characterCreation: speciesCharacterCreationFormSchema.optional(),
     })
     .superRefine((values, ctx) => {
       if (!allowedSet.has(values.creatureType)) {
@@ -91,6 +100,7 @@ function createSpeciesFormSchema(
           path: ['creatureType'],
         })
       }
+      refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
     })
 }
 
@@ -160,6 +170,12 @@ function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       fields: [],
       header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },
+    {
+      id: 'rules',
+      label: 'Rules',
+      fields: [],
+      header: createElement(SpeciesRulesTab, { formCtx: ctx }),
+    },
   ]
 }
 
@@ -175,6 +191,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     createSpeciesFormSchema(
       allowedCharacterCreatureTypesFromCtx(ctx),
       ctx.creatureTypeVocabulary?.activeIds,
+      ctx,
     ),
   createDefaultValues: speciesCreateDefaultValues,
 
@@ -190,10 +207,13 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     speed: { walk: entity.speed.walk },
     traits: entity.traits.map(traitToFormRow),
     heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
+    characterCreation: characterCreationToFormValues(entity.characterCreation),
   }),
 
-  toInput: (values, ctx?: ContentFormInputCtx<Species>) =>
-    finalizeContentInput(
+  toInput: (values, ctx?: ContentFormInputCtx<Species>) => {
+    const characterCreation = characterCreationFromFormValues(values.characterCreation)
+
+    return finalizeContentInput(
       {
         ...envelopeSlugFields(values.name, ctx),
         name: values.name,
@@ -203,9 +223,11 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
         speed: { walk: values.speed.walk },
         traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
         heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
+        ...(characterCreation ? { characterCreation } : {}),
       },
       ctx,
-    ) as CreateSpeciesInput,
+    ) as CreateSpeciesInput
+  },
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,

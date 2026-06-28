@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defaultMulticlassingRules } from '@rpg/contracts'
 
 import { entityEquipmentKind, mergeEditLayoutCtx } from './content-edit-form-ctx'
 import type { ContentFormCtx } from './content-form-registry'
@@ -8,6 +9,7 @@ const baseOptionsCtx: ContentFormCtx = {
     maxCharacterLevel: 20,
     standardMaxCharacterLevel: 20,
     allowedCharacterCreatureTypes: ['humanoid'],
+    multiclassing: defaultMulticlassingRules(),
   },
 }
 

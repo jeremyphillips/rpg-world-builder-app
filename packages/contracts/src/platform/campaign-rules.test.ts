@@ -5,6 +5,7 @@ import {
   buildGroupedLevelOptions,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultExtendedMaxLevel,
+  defaultMulticlassingRules,
   formatExtendedLevelRange,
   formatStandardLevelRange,
   MAX_CHARACTER_LEVEL,
@@ -17,6 +18,7 @@ import {
 } from '@rpg/contracts'
 
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
+const defaultMulticlassing = defaultMulticlassingRules()
 
 const basePatch = {
   startingLevel: 1,
@@ -109,6 +111,7 @@ describe('resolveCampaignRules', () => {
       maxCharacterLevel: 25,
       standardMaxCharacterLevel: 25,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
+      multiclassing: defaultMulticlassing,
     })
   })
 
@@ -125,6 +128,7 @@ describe('resolveCampaignRules', () => {
       maxCharacterLevel: 30,
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
+      multiclassing: defaultMulticlassing,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
@@ -213,6 +217,7 @@ describe('buildGroupedLevelOptions', () => {
       maxCharacterLevel: 20,
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
+      multiclassing: defaultMulticlassing,
     })
     expect(groups).toHaveLength(1)
     expect(groups[0]?.options).toHaveLength(20)
@@ -223,6 +228,7 @@ describe('buildGroupedLevelOptions', () => {
       maxCharacterLevel: 30,
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
+      multiclassing: defaultMulticlassing,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,

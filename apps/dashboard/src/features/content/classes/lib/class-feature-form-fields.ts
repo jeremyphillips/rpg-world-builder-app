@@ -13,6 +13,7 @@ import {
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import {
+  defaultCampaignRules,
   effectiveMaxFromCtx,
   getCompactLevelFieldOptions,
   getLevelFieldOptions,
@@ -119,9 +120,9 @@ export function featuresFromFormValues(
 export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return getLevelFieldOptions({
     campaignRules: {
+      ...defaultCampaignRules(),
       maxCharacterLevel: maxLevel,
       standardMaxCharacterLevel: maxLevel,
-      allowedCharacterCreatureTypes: ['humanoid'],
     },
   })
 }
