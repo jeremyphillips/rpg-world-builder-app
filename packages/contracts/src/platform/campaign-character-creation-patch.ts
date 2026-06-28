@@ -3,6 +3,11 @@ import { z } from 'zod'
 import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../primitives/level'
 import { creatureTypeSchema, type CreatureTypeId } from '../vocab/creature-type'
 import { validateExtendedMaxLevel } from './campaign-level-validation'
+import {
+  campaignMulticlassingPatchSchema,
+  resolveMulticlassingRules,
+  resolvedCampaignMulticlassingPatchSchema,
+} from './campaign-multiclassing-patch'
 
 /** Max length for extended progression tier names in campaign character-creation patch. */
 export const EXTENDED_PROGRESSION_TIER_NAME_MAX = 50
@@ -67,6 +72,7 @@ export const campaignCharacterCreationPatchSchema = z
         creatureTypePolicy: creatureTypePolicySchema.optional(),
       })
       .optional(),
+    multiclassing: campaignMulticlassingPatchSchema.optional(),
   })
   .strict()
 
@@ -91,6 +97,7 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
   species: z.object({
     creatureTypePolicy: creatureTypePolicySchema,
   }),
+  multiclassing: resolvedCampaignMulticlassingPatchSchema,
 })
 
 export type ResolvedCampaignCharacterCreationPatch = z.infer<
@@ -160,5 +167,6 @@ export function resolveCharacterCreationPatch(
         ids: [...DEFAULT_CREATURE_TYPE_POLICY.ids] as CreatureTypeId[],
       },
     },
+    multiclassing: resolveMulticlassingRules(patch?.multiclassing),
   }
 }

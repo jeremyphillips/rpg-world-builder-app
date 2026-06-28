@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Campaign, CreatureTypeId } from '@rpg/contracts'
+import { defaultMulticlassingRules, type Campaign, type CreatureTypeId } from '@rpg/contracts'
 
 import {
   buildCharacterCreationPatchInput,
@@ -195,6 +195,7 @@ describe('mapRulesetPatchToRulesValues', () => {
           extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
         },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+        multiclassing: defaultMulticlassingRules(),
       }),
     ).toEqual({
       startingLevel: 3,

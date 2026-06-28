@@ -6,6 +6,7 @@ import {
   CREATURE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
   defaultCampaignMechanicsPatch,
+  defaultMulticlassingRules,
   type RulesetPatchRead,
 } from '@rpg/contracts'
 
@@ -35,6 +36,7 @@ const mockPatch: RulesetPatchRead = {
     importedCharacters: { policy: 'approval_required' },
     progression: { maxCharacterLevel: 20 },
     species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
+    multiclassing: defaultMulticlassingRules(),
   },
   mechanics: defaultCampaignMechanicsPatch(),
 }
