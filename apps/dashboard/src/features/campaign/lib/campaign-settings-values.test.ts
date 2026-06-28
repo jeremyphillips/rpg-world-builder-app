@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules, type Campaign, type CreatureTypeId } from '@rpg/contracts'
+import {
+  defaultMulticlassingRules,
+  DEFAULT_MULTICLASSING_ENABLED,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+  type Campaign,
+  type CreatureTypeId,
+} from '@rpg/contracts'
 
 import {
   buildCharacterCreationPatchInput,
@@ -46,6 +55,14 @@ const defaultRules: CampaignCreateValues = {
   difficulty: 'dangerous',
 }
 
+const defaultMulticlassingFields = {
+  multiclassingEnabled: DEFAULT_MULTICLASSING_ENABLED,
+  primaryAbilityMinimumEnabled: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+  speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+} as const
+
 describe('mapCampaignToSettingsValues', () => {
   it('maps identity and flavor fields to the flat settings form shape', () => {
     expect(mapCampaignToSettingsValues(campaign)).toEqual({
@@ -86,6 +103,7 @@ describe('buildCharacterCreationPatchInput', () => {
         extendedProgressionEnabled: false,
         importedCharactersPolicy: 'approval_required',
         allowedCharacterCreatureTypes: ['humanoid'],
+        ...defaultMulticlassingFields,
       }),
     ).toEqual({
       startingLevel: 3,
@@ -103,6 +121,7 @@ describe('buildCharacterCreationPatchInput', () => {
         extendedMaxLevel: 30,
         importedCharactersPolicy: 'disabled',
         allowedCharacterCreatureTypes: ['humanoid'],
+        ...defaultMulticlassingFields,
       }),
     ).toEqual({
       startingLevel: 1,
@@ -121,6 +140,7 @@ describe('buildCharacterCreationPatchInput', () => {
         extendedProgressionEnabled: false,
         importedCharactersPolicy: 'disabled',
         allowedCharacterCreatureTypes: ['humanoid', 'construct'] as CreatureTypeId[],
+        ...defaultMulticlassingFields,
       }),
     ).toMatchObject({
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'construct'] } },
@@ -135,8 +155,49 @@ describe('buildCharacterCreationPatchInput', () => {
         extendedProgressionEnabled: false,
         importedCharactersPolicy: 'disabled',
         allowedCharacterCreatureTypes: ['humanoid'],
+        ...defaultMulticlassingFields,
       }),
     ).not.toHaveProperty('species')
+  })
+
+  it('includes multiclassing overrides when not at defaults', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid'],
+        multiclassingEnabled: false,
+        primaryAbilityMinimumEnabled: true,
+        primaryAbilityMinimumScore: 15,
+        speciesMulticlassPolicyEnabled: true,
+        speciesLevelLimitsEnabled: false,
+      }),
+    ).toEqual({
+      startingLevel: 1,
+      importedCharacters: { policy: 'disabled' },
+      multiclassing: {
+        enabled: false,
+        requirements: {
+          primaryAbilityMinimum: { minimumScore: 15 },
+          speciesPolicy: { enabled: true },
+        },
+      },
+    })
+  })
+
+  it('omits multiclassing when all values are defaults', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid'],
+        ...defaultMulticlassingFields,
+      }),
+    ).not.toHaveProperty('multiclassing')
   })
 })
 
@@ -205,6 +266,11 @@ describe('mapRulesetPatchToRulesValues', () => {
       extendedMaxLevel: 30,
       importedCharactersPolicy: 'approval_required',
       allowedCharacterCreatureTypes: ['humanoid', 'fey'],
+      multiclassingEnabled: true,
+      primaryAbilityMinimumEnabled: true,
+      primaryAbilityMinimumScore: 13,
+      speciesMulticlassPolicyEnabled: false,
+      speciesLevelLimitsEnabled: false,
     })
   })
 })

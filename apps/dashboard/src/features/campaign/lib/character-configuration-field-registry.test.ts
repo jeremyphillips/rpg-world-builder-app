@@ -74,6 +74,8 @@ describe('character-configuration-field-registry', () => {
         expect(missingAdvanced.data.allowedCharacterCreatureTypes).toEqual([
           ...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
         ])
+        expect(missingAdvanced.data.multiclassingEnabled).toBe(true)
+        expect(missingAdvanced.data.primaryAbilityMinimumScore).toBe(13)
       }
 
       const invalidExtended = buildRulesSchemaForSurface('config').safeParse({
@@ -115,6 +117,8 @@ describe('character-configuration-field-registry', () => {
       expect(fieldNames).toContain('maxCharacterLevel')
       expect(fieldNames).toContain('allowedCharacterCreatureTypes')
       expect(fieldNames).toContain('extendedProgressionEnabled')
+      expect(fieldNames).toContain('multiclassingEnabled')
+      expect(fieldNames).toContain('primaryAbilityMinimumScore')
     })
   })
 
@@ -142,6 +146,7 @@ describe('character-configuration-field-registry', () => {
         'standard-max-level',
         'extended-progression',
         'creature-type-policy',
+        'multiclassing',
       ])
     })
   })

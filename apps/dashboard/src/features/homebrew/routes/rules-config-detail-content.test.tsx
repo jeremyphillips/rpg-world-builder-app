@@ -119,6 +119,7 @@ describe('RulesConfigDetailContent', () => {
       screen.getByRole('navigation', { name: 'Character configuration sections' }),
     ).toBeInTheDocument()
     expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
+    expect(screen.getByLabelText('Allow multiclassing')).toBeChecked()
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
   })
 

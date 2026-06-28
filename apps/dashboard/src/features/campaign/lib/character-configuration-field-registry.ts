@@ -2,7 +2,13 @@ import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
+  CHARACTER_ABILITY_SCORE_MAX,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_MULTICLASSING_ENABLED,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
   MAX_CHARACTER_LEVEL,
   creatureTypeSchema,
@@ -32,6 +38,8 @@ export const CREATE_WIZARD_RULE_FIELD_IDS = ['startingLevel', 'importedCharacter
 export type CreateWizardRuleFieldId = (typeof CREATE_WIZARD_RULE_FIELD_IDS)[number]
 
 const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
+const MULTICLASSING_ENABLED = 'multiclassingEnabled'
+const PRIMARY_ABILITY_MINIMUM_ENABLED = 'primaryAbilityMinimumEnabled'
 
 const configRulesObjectSchema = z.object({
   startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
@@ -49,6 +57,16 @@ const configRulesObjectSchema = z.object({
     .array(creatureTypeSchema)
     .min(1)
     .default([...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]),
+  multiclassingEnabled: z.boolean().default(DEFAULT_MULTICLASSING_ENABLED),
+  primaryAbilityMinimumEnabled: z.boolean().default(DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED),
+  primaryAbilityMinimumScore: z
+    .number()
+    .int()
+    .min(1)
+    .max(CHARACTER_ABILITY_SCORE_MAX)
+    .default(DEFAULT_PRIMARY_ABILITY_MINIMUM),
+  speciesMulticlassPolicyEnabled: z.boolean().default(DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED),
+  speciesLevelLimitsEnabled: z.boolean().default(DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -83,6 +101,21 @@ function visibleWhenExtendedProgression(): FieldVisibility {
   return {
     dependsOn: [EXTENDED_PROGRESSION_ENABLED],
     visibleWhen: (watched) => watched[EXTENDED_PROGRESSION_ENABLED] === true,
+  }
+}
+
+function visibleWhenMulticlassingEnabled(): FieldVisibility {
+  return {
+    dependsOn: [MULTICLASSING_ENABLED],
+    visibleWhen: (watched) => watched[MULTICLASSING_ENABLED] === true,
+  }
+}
+
+function visibleWhenPrimaryAbilityMinimumEnabled(): FieldVisibility {
+  return {
+    dependsOn: [MULTICLASSING_ENABLED, PRIMARY_ABILITY_MINIMUM_ENABLED],
+    visibleWhen: (watched) =>
+      watched[MULTICLASSING_ENABLED] === true && watched[PRIMARY_ABILITY_MINIMUM_ENABLED] === true,
   }
 }
 
@@ -251,6 +284,60 @@ function extendedProgressionGroup(): FormItem {
   }
 }
 
+function multiclassingGroup(): FormItem {
+  return {
+    kind: 'group',
+    legend: 'Multiclassing',
+    collapsible: false,
+    fields: [
+      {
+        type: 'switch',
+        name: MULTICLASSING_ENABLED,
+        label: 'Allow multiclassing',
+        hint: 'When off, characters cannot take levels in additional classes.',
+        defaultValue: DEFAULT_MULTICLASSING_ENABLED,
+      },
+      {
+        type: 'switch',
+        name: PRIMARY_ABILITY_MINIMUM_ENABLED,
+        label: 'Primary ability minimum',
+        hint: 'Require a minimum score in each relevant class primary ability.',
+        defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+        visibility: visibleWhenMulticlassingEnabled(),
+      },
+      {
+        type: 'number',
+        name: 'primaryAbilityMinimumScore',
+        label: 'Minimum ability score',
+        min: 1,
+        max: CHARACTER_ABILITY_SCORE_MAX,
+        defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM,
+        required: true,
+        width: '1/2',
+        digits: 2,
+        hint: 'Applied to every primary ability on the target class and all current classes.',
+        visibility: visibleWhenPrimaryAbilityMinimumEnabled(),
+      },
+      {
+        type: 'switch',
+        name: 'speciesMulticlassPolicyEnabled',
+        label: 'Species multiclass policy',
+        hint: 'Let each species define whether and which classes it may multiclass into.',
+        defaultValue: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+        visibility: visibleWhenMulticlassingEnabled(),
+      },
+      {
+        type: 'switch',
+        name: 'speciesLevelLimitsEnabled',
+        label: 'Species level limits',
+        hint: 'Let each species cap total character level and per-class levels.',
+        defaultValue: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+        visibility: visibleWhenMulticlassingEnabled(),
+      },
+    ],
+  }
+}
+
 type CharacterConfigurationSection = {
   id: string
   label: string
@@ -306,6 +393,12 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     buildFormItems: (creatureTypeOptions) => [
       allowedCharacterCreatureTypesField(creatureTypeOptions),
     ],
+  },
+  {
+    id: 'multiclassing',
+    surfaces: ['config'],
+    configSection: { id: 'multiclassing', label: 'Multiclassing' },
+    buildFormItems: () => [multiclassingGroup()],
   },
 ]
 
