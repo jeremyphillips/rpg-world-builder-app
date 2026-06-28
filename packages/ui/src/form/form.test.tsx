@@ -119,6 +119,56 @@ describe('Form', () => {
     expect(row).not.toHaveClass('flex-wrap')
   })
 
+  it('submits when hidden fields use a refined object schema', async () => {
+    const refinedSchema = z
+      .object({
+        name: z.string().min(1, 'Name is required'),
+        hasExtra: z.boolean(),
+        extra: z.string().min(1, 'Extra is required').optional(),
+      })
+      .superRefine((values, ctx) => {
+        if (values.hasExtra && !values.extra?.trim()) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Extra is required when enabled',
+            path: ['extra'],
+          })
+        }
+      })
+
+    type RefinedValues = z.infer<typeof refinedSchema>
+
+    const refinedFields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name' },
+      { type: 'switch', name: 'hasExtra', label: 'Has extra' },
+      {
+        type: 'text',
+        name: 'extra',
+        label: 'Extra',
+        visibility: {
+          dependsOn: ['hasExtra'],
+          visibleWhen: (values) => values.hasExtra === true,
+        },
+      },
+    ]
+
+    const onSubmit = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <Form<RefinedValues>
+        schema={refinedSchema}
+        fields={refinedFields}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.type(screen.getByLabelText('Name'), 'Tasha')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.lastCall?.[0]).toEqual({ name: 'Tasha', hasExtra: false })
+  })
+
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {
     const levelSchema = z.object({
       level: z.number().int().min(1).max(30),
