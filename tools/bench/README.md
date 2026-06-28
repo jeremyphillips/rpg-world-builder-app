@@ -86,6 +86,8 @@ JSON success: `{ "ok": true, "data": { "ticket": Ticket \| null, "context": { ..
 
 `blockedByTicketIds` and `relatedTicketIds` in update JSON require **Mongo ids**, not display keys.
 
+Duplicate ids within one array are rejected. The same id cannot appear in **both** arrays — the API returns `invalid_reference` with a clear message (not a misleading “do not exist” error).
+
 ```bash
 pnpm bench get-ticket BENCH-001          # copy data.ticket.id
 pnpm bench update-ticket BENCH-042 --json '{

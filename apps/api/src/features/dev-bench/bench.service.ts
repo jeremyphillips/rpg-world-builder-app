@@ -61,6 +61,19 @@ function assertNoDuplicateIds(ids: string[], field: string): void {
   }
 }
 
+function assertNoCrossArrayOverlap(blockedByTicketIds: string[], relatedTicketIds: string[]): void {
+  const blockedSet = new Set(blockedByTicketIds)
+  for (const id of relatedTicketIds) {
+    if (blockedSet.has(id)) {
+      throw new HttpError(
+        400,
+        'invalid_reference',
+        'A ticket id cannot appear in both blockedByTicketIds and relatedTicketIds.',
+      )
+    }
+  }
+}
+
 async function assertTicketIdsExist(ids: string[]): Promise<void> {
   if (ids.length === 0) {
     return
@@ -99,6 +112,7 @@ async function validateTicketLinks(
 ): Promise<void> {
   assertNoDuplicateIds(blockedByTicketIds, 'blockedByTicketIds')
   assertNoDuplicateIds(relatedTicketIds, 'relatedTicketIds')
+  assertNoCrossArrayOverlap(blockedByTicketIds, relatedTicketIds)
 
   if (ticketId) {
     if (blockedByTicketIds.includes(ticketId) || relatedTicketIds.includes(ticketId)) {

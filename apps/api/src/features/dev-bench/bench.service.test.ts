@@ -92,6 +92,41 @@ describe('updateTicket', () => {
       updateTicket(ticket.id, { epicId: '507f1f77bcf86cd799439011' }),
     ).rejects.toMatchObject({ status: 404, code: 'not_found' })
   })
+
+  it('rejects the same id in blockedByTicketIds and relatedTicketIds', async () => {
+    const blocker = await createTicket({ ...baseTicketInput, title: 'Blocker' })
+    const ticket = await createTicket({ ...baseTicketInput, title: 'Blocked work' })
+
+    await expect(
+      updateTicket(ticket.id, {
+        blockedByTicketIds: [blocker.id],
+        relatedTicketIds: [blocker.id],
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'invalid_reference',
+      message: 'A ticket id cannot appear in both blockedByTicketIds and relatedTicketIds.',
+    })
+  })
+})
+
+describe('createTicket link validation', () => {
+  it('rejects the same id in blockedByTicketIds and relatedTicketIds', async () => {
+    const blocker = await createTicket({ ...baseTicketInput, title: 'Blocker' })
+
+    await expect(
+      createTicket({
+        ...baseTicketInput,
+        title: 'Linked work',
+        blockedByTicketIds: [blocker.id],
+        relatedTicketIds: [blocker.id],
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'invalid_reference',
+      message: 'A ticket id cannot appear in both blockedByTicketIds and relatedTicketIds.',
+    })
+  })
 })
 
 describe('epic CRUD', () => {
