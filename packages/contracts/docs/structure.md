@@ -1,9 +1,13 @@
 # Contracts package structure
 
-`@rpg/contracts` is organized into four layers under `src/`. Each layer has a
-focused responsibility; imports flow **downward** only (see dependency rules
-below). The root barrel (`src/index.ts`) re-exports everything so existing
+`@rpg/contracts` is organized into layers under `src/`. The RPG game domain uses
+four layers with **downward** imports (see dependency rules below). The root
+barrel (`src/index.ts`) re-exports those four layers so existing
 `import { … } from '@rpg/contracts'` usage stays unchanged.
+
+**Dev Bench** (`dev-bench/`) is a fifth, **isolated** layer for the local
+workbench product. It is **not** re-exported from the root barrel — import
+`@rpg/contracts/dev-bench` explicitly.
 
 ## Layer diagram
 
@@ -15,6 +19,7 @@ packages/contracts/src/
   primitives/           # shared value types (levels, dice, units, ruleset id)
   content/              # catalog content types (species, weapons, classes, …)
   platform/             # auth, users, campaigns, uploads, errors, assets
+  dev-bench/            # Dev Bench tickets, epics (isolated — not in root barrel)
 ```
 
 ```mermaid
@@ -38,12 +43,13 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                      | Layer         | Example path                                   |
-| ---------------------------------------------------- | ------------- | ---------------------------------------------- |
-| A closed id set with labels (and optional SRD text)  | `vocab/`      | `vocab/sense.ts`, `vocab/weapon/property.ts`   |
-| A reusable value type used across content types      | `primitives/` | `primitives/dice.ts`, `primitives/level.ts`    |
-| A catalog content type or its DTOs/patches           | `content/`    | `content/species.ts`, `content/class/class.ts` |
-| Auth, session, campaign, upload, or API error shapes | `platform/`   | `platform/auth.ts`, `platform/campaign.ts`     |
+| You are adding…                                      | Layer         | Example path                                     |
+| ---------------------------------------------------- | ------------- | ------------------------------------------------ |
+| A closed id set with labels (and optional SRD text)  | `vocab/`      | `vocab/sense.ts`, `vocab/weapon/property.ts`     |
+| A reusable value type used across content types      | `primitives/` | `primitives/dice.ts`, `primitives/level.ts`      |
+| A catalog content type or its DTOs/patches           | `content/`    | `content/species.ts`, `content/class/class.ts`   |
+| Auth, session, campaign, upload, or API error shapes | `platform/`   | `platform/auth.ts`, `platform/campaign.ts`       |
+| Dev Bench ticket/epic schemas and input DTOs         | `dev-bench/`  | `dev-bench/ticket.ts`, `dev-bench/epic-input.ts` |
 
 Nested folders are fine when a domain splits cleanly (e.g. `content/class/`
 for spellcasting + class body, `vocab/weapon/` for weapon term maps).
@@ -56,13 +62,14 @@ root barrel already re-exports all four).
 
 Acyclic **downward** imports only — lower layers never import higher layers.
 
-| Layer               | May import                           | Must not import                        |
-| ------------------- | ------------------------------------ | -------------------------------------- |
-| `vocab/`            | `vocab/`                             | `primitives/`, `content/`, `platform/` |
-| `primitives/`       | `vocab/`, `primitives/`              | `content/`, `platform/`                |
-| `content/`          | `vocab/`, `primitives/`, `content/`  | `platform/`                            |
-| `platform/`         | `vocab/`, `primitives/`, `platform/` | `content/`                             |
-| `index.ts` (barrel) | all layers                           | — (re-exports only; no runtime logic)  |
+| Layer               | May import                           | Must not import                                  |
+| ------------------- | ------------------------------------ | ------------------------------------------------ |
+| `vocab/`            | `vocab/`                             | `primitives/`, `content/`, `platform/`           |
+| `primitives/`       | `vocab/`, `primitives/`              | `content/`, `platform/`                          |
+| `content/`          | `vocab/`, `primitives/`, `content/`  | `platform/`                                      |
+| `platform/`         | `vocab/`, `primitives/`, `platform/` | `content/`                                       |
+| `dev-bench/`        | `dev-bench/` only                    | `vocab/`, `primitives/`, `content/`, `platform/` |
+| `index.ts` (barrel) | RPG layers only                      | `dev-bench/` (use subpath export)                |
 
 **Not enforced:** requiring `content/` to reach `vocab/` only via
 `primitives/`. Content types legitimately import vocab schemas directly (e.g.
@@ -98,6 +105,7 @@ in the import path:
 | `@rpg/contracts/primitives` | `src/primitives/index.ts` | Dice, levels, ruleset id              |
 | `@rpg/contracts/content`    | `src/content/index.ts`    | Content schemas and DTOs              |
 | `@rpg/contracts/platform`   | `src/platform/index.ts`   | Auth, user, campaign, assets          |
+| `@rpg/contracts/dev-bench`  | `src/dev-bench/index.ts`  | Dev Bench tickets, epics, inputs      |
 
 Examples:
 
@@ -109,6 +117,7 @@ import { speciesSchema, getSenseLabel } from '@rpg/contracts'
 import { getSenseLabel, SENSE_ENTRIES } from '@rpg/contracts/vocab'
 import { speciesSchema, contentMetaSchema } from '@rpg/contracts/content'
 import { loginInputSchema } from '@rpg/contracts/platform'
+import { ticketSchema, createTicketInputSchema } from '@rpg/contracts/dev-bench'
 ```
 
 Subpath exports are defined in [`package.json`](../package.json) `exports`.
