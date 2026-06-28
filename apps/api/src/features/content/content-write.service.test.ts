@@ -602,4 +602,56 @@ describe('createHomebrewContent (species)', () => {
       code: 'validation_error',
     })
   })
+
+  it('updates homebrew species characterCreation and round-trips via catalog', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(
+      speciesWriteConfig,
+      campaign.id,
+      minimalSpeciesInput,
+    )
+
+    const updated = await updateContentEntity(speciesWriteConfig, campaign.id, created.id, {
+      characterCreation: {
+        multiclassing: {
+          policy: 'restricted',
+          classPolicy: { mode: 'only', classIds: ['fighter'] },
+        },
+        levelLimits: {
+          maxCharacterLevel: 10,
+          classLevelCaps: [{ classId: 'wizard', maxLevel: 5 }],
+        },
+      },
+    })
+
+    expect(updated.characterCreation?.multiclassing?.classPolicy.classIds).toEqual(['fighter'])
+    expect(updated.characterCreation?.levelLimits?.maxCharacterLevel).toBe(10)
+
+    const species = await resolveCatalogForCampaign(speciesWriteConfig.readConfig, campaign.id)
+    const fromCatalog = species.find((record) => record.slug === 'custom-folk')
+    expect(fromCatalog?.characterCreation).toEqual(updated.characterCreation)
+  })
+
+  it('rejects unknown class slugs on species update', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(
+      speciesWriteConfig,
+      campaign.id,
+      minimalSpeciesInput,
+    )
+
+    await expect(
+      updateContentEntity(speciesWriteConfig, campaign.id, created.id, {
+        characterCreation: {
+          multiclassing: {
+            policy: 'restricted',
+            classPolicy: { mode: 'only', classIds: ['not-a-class'] },
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+    })
+  })
 })
