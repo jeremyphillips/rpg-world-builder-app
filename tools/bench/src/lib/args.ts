@@ -1,5 +1,3 @@
-import { parseArgs } from 'node:util'
-
 import type { TicketCreatedBy } from '@rpg/contracts/dev-bench'
 
 export type OutputFormat = 'json' | 'text'
@@ -9,26 +7,34 @@ export interface GlobalFlags {
   help: boolean
 }
 
-const GLOBAL_OPTIONS = {
-  format: { type: 'string' as const },
-  help: { type: 'boolean' as const, short: 'h' as const },
-}
-
+/** Parse only global flags; leave command flags (--json, filters, etc.) intact. */
 export function parseGlobalArgs(argv: string[]): { flags: GlobalFlags; positionals: string[] } {
-  const { values, positionals } = parseArgs({
-    args: argv,
-    options: GLOBAL_OPTIONS,
-    allowPositionals: true,
-    strict: false,
-  })
+  const positionals: string[] = []
+  let format: OutputFormat = 'json'
+  let help = false
 
-  const format = values.format === 'text' ? 'text' : 'json'
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index]
+
+    if (arg === '--format') {
+      const next = argv[index + 1]
+      if (next !== undefined) {
+        format = next === 'text' ? 'text' : 'json'
+        index += 1
+      }
+      continue
+    }
+
+    if (arg === '--help' || arg === '-h') {
+      help = true
+      continue
+    }
+
+    positionals.push(arg)
+  }
 
   return {
-    flags: {
-      format,
-      help: values.help === true,
-    },
+    flags: { format, help },
     positionals,
   }
 }
