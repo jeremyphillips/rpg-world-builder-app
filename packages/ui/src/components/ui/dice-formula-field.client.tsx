@@ -9,7 +9,7 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
 import { Text } from './text'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import {
   applyDiceFormulaPatch,
@@ -47,28 +47,6 @@ export interface DiceFormulaFieldProps {
   countMax?: number
   modifierMin?: number
   modifierMax?: number
-}
-
-function DiceFormulaFieldLabelContent({
-  label,
-  required,
-  info,
-}: {
-  label: string
-  required: boolean
-  info?: React.ReactNode
-}) {
-  return (
-    <>
-      {label}
-      {required ? (
-        <span aria-hidden className="text-destructive">
-          *
-        </span>
-      ) : null}
-      {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
-    </>
-  )
 }
 
 /** Composite XdY [±N] roll editor with optional or required flat modifiers. */
@@ -141,7 +119,7 @@ export function DiceFormulaField({
     >
       {labelPosition === 'above' ? (
         <legend id={`${id}-legend`} className={fieldLabelVariants({ size })}>
-          <DiceFormulaFieldLabelContent label={label} required={required} info={info} />
+          <FieldLabelContent label={label} required={required} info={info} />
         </legend>
       ) : (
         <legend className="sr-only">{label}</legend>
@@ -150,7 +128,7 @@ export function DiceFormulaField({
       {labelPosition === 'inline' ? (
         <div className={fieldInlineControlRowClasses}>
           <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
-            <DiceFormulaFieldLabelContent label={label} required={required} info={info} />
+            <FieldLabelContent label={label} required={required} info={info} />
           </span>
           {controls}
         </div>

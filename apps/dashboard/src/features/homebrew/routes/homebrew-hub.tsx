@@ -91,7 +91,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
               <li key={entry.id}>
                 <HomebrewHubCard
                   title={entry.label}
-                  description="Configure character creation rules"
+                  description={entry.description}
                   viewHref={ROUTES.homebrew.rulesConfig(campaignId, entry.id)}
                 />
               </li>

@@ -215,6 +215,30 @@ shell per set.
 
 ---
 
+## Internal-only vocabulary sets
+
+Some sets are seeded in catalog and resolved through the vocabulary API for form
+labels, but **not** exposed on the Homebrew hub (`enabled: false` in
+`vocabulary-set-registry.ts`). Campaign managers cannot create or edit these rows
+in the vocabulary UI.
+
+| Set id                    | Used by                                     |
+| ------------------------- | ------------------------------------------- |
+| `edition-presets`         | Rules Configuration → Mechanics (RadioCard) |
+| `attack-resolution-modes` | Rules Configuration → Mechanics (select)    |
+
+Reference copy for edition presets includes `meta` chip strings in
+`EDITION_PRESET_ENTRIES` (`@rpg/contracts`); seed JSON stores `id`, `label`, and
+`description` only. Dashboard hooks:
+`useEditionPresetVocabulary`, `useAttackResolutionModeVocabulary` — see
+`lib/vocabulary/sets/edition-presets.ts` and `attack-resolution-modes.ts`.
+
+Mechanics values persist on `CampaignRulesetPatch.mechanics` via
+`PATCH /api/campaigns/:campaignId/ruleset-patch/mechanics` (not the vocabulary
+patch routes).
+
+---
+
 ## Validation conventions
 
 ### Shape vs membership

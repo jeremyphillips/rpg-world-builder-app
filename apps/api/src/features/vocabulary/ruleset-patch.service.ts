@@ -166,64 +166,69 @@ function isSparseDefaultMechanicsPatch(patch: CampaignMechanicsPatch): boolean {
   return true
 }
 
-function buildMechanicsUpdateSet(patch: CampaignMechanicsPatch): {
+type MongoUpdateOps = {
   $set: Record<string, unknown>
   $unset: Record<string, 1>
-} {
-  const $set: Record<string, unknown> = {}
-  const $unset: Record<string, 1> = {}
-  const prefix = MECHANICS_PREFIX
+}
 
-  if (isSparseDefaultMechanicsPatch(patch)) {
-    return { $set, $unset: { mechanics: 1 } }
-  }
-
-  const presetId = patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID
-  const modified = patch.editionPreset?.modified === true
-  const appliedAt = patch.editionPreset?.appliedAt
-
-  if (presetId === DEFAULT_EDITION_PRESET_ID) {
-    $unset[`${prefix}editionPreset.id`] = 1
+function sparseSetOrUnset(ops: MongoUpdateOps, path: string, value: unknown | undefined): void {
+  if (value !== undefined) {
+    ops.$set[path] = value
   } else {
-    $set[`${prefix}editionPreset.id`] = presetId
+    ops.$unset[path] = 1
   }
+}
 
-  if (modified) {
-    $set[`${prefix}editionPreset.modified`] = true
-  } else {
-    $unset[`${prefix}editionPreset.modified`] = 1
-  }
+function buildEditionPresetUpdateSet(
+  ops: MongoUpdateOps,
+  editionPreset: CampaignMechanicsPatch['editionPreset'],
+  prefix: string,
+): void {
+  const presetId = editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.id`,
+    presetId === DEFAULT_EDITION_PRESET_ID ? undefined : presetId,
+  )
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.modified`,
+    editionPreset?.modified === true ? true : undefined,
+  )
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.appliedAt`,
+    editionPreset?.appliedAt !== undefined ? new Date(editionPreset.appliedAt) : undefined,
+  )
+}
 
-  if (appliedAt !== undefined) {
-    $set[`${prefix}editionPreset.appliedAt`] = new Date(appliedAt)
-  } else {
-    $unset[`${prefix}editionPreset.appliedAt`] = 1
-  }
-
+function buildMechanicsKnobsUpdateSet(
+  ops: MongoUpdateOps,
+  patch: CampaignMechanicsPatch,
+  prefix: string,
+): void {
   if (patch.armorClass !== undefined) {
-    $set[`${prefix}armorClass.mode`] = patch.armorClass.mode
-    $set[`${prefix}armorClass.base`] = patch.armorClass.base
+    ops.$set[`${prefix}armorClass.mode`] = patch.armorClass.mode
+    ops.$set[`${prefix}armorClass.base`] = patch.armorClass.base
   } else {
-    $unset[`${prefix}armorClass`] = 1
+    ops.$unset[`${prefix}armorClass`] = 1
   }
 
-  if (patch.attackResolution !== undefined) {
-    $set[`${prefix}attackResolution.mode`] = patch.attackResolution.mode
-  } else {
-    $unset[`${prefix}attackResolution`] = 1
-  }
+  sparseSetOrUnset(ops, `${prefix}attackResolution.mode`, patch.attackResolution?.mode)
+}
 
-  if (
-    presetId === DEFAULT_EDITION_PRESET_ID &&
-    !modified &&
-    appliedAt === undefined &&
-    patch.armorClass === undefined &&
-    patch.attackResolution === undefined
-  ) {
+function buildMechanicsUpdateSet(patch: CampaignMechanicsPatch): MongoUpdateOps {
+  if (isSparseDefaultMechanicsPatch(patch)) {
     return { $set: {}, $unset: { mechanics: 1 } }
   }
 
-  return { $set, $unset }
+  const ops: MongoUpdateOps = { $set: {}, $unset: {} }
+  const prefix = MECHANICS_PREFIX
+
+  buildEditionPresetUpdateSet(ops, patch.editionPreset, prefix)
+  buildMechanicsKnobsUpdateSet(ops, patch, prefix)
+
+  return ops
 }
 
 async function applyMechanicsUpdate(

@@ -18,12 +18,15 @@ export {
 export { useHomebrewSummary, homebrewSummaryQueryKey } from './hooks/use-homebrew-summary'
 export { useRulesetPatch, rulesetPatchQueryKey } from './hooks/use-ruleset-patch'
 export { usePatchCharacterCreationMutation } from './hooks/use-patch-character-creation-mutation'
+export { usePatchMechanicsMutation } from './hooks/use-patch-mechanics-mutation'
 export {
   useVocabularySet,
   useVocabularyMutations,
   vocabularySetQueryKey,
 } from './hooks/use-vocabulary-set'
 export { useCreatureTypeVocabulary } from './hooks/use-creature-type-vocabulary'
+export { useEditionPresetVocabulary } from './hooks/use-edition-preset-vocabulary'
+export { useAttackResolutionModeVocabulary } from './hooks/use-attack-resolution-mode-vocabulary'
 export {
   buildCreatureTypeVocabulary,
   buildSeedCreatureTypeVocabulary,
@@ -31,6 +34,18 @@ export {
   getCreatureTypeLabel,
   type CreatureTypeVocabulary,
 } from './lib/vocabulary/sets/creature-types'
+export {
+  buildEditionPresetVocabulary,
+  buildSeedEditionPresetVocabulary,
+  buildEditionPresetFieldOptions,
+  type EditionPresetVocabulary,
+} from './lib/vocabulary/sets/edition-presets'
+export {
+  buildAttackResolutionModeVocabulary,
+  buildSeedAttackResolutionModeVocabulary,
+  buildAttackResolutionModeFieldOptions,
+  type AttackResolutionModeVocabulary,
+} from './lib/vocabulary/sets/attack-resolution-modes'
 export {
   VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,

@@ -1,4 +1,8 @@
-import type { RulesetPatchRead, UpdateCampaignCharacterCreationInput } from '@rpg/contracts'
+import type {
+  RulesetPatchRead,
+  UpdateCampaignCharacterCreationInput,
+  UpdateCampaignMechanicsInput,
+} from '@rpg/contracts'
 
 import { patchJson, request } from '@/lib/api-client'
 
@@ -25,6 +29,19 @@ export async function patchCharacterCreation(
     `${rulesetPatchPath(campaignId)}/character-creation`,
     input,
     'Could not update character creation rules.',
+  )
+  return patch
+}
+
+/** Patch mechanics rules on the campaign ruleset patch document. */
+export async function patchMechanics(
+  campaignId: string,
+  input: UpdateCampaignMechanicsInput,
+): Promise<RulesetPatchRead> {
+  const { patch } = await patchJson<{ patch: RulesetPatchRead }>(
+    `${rulesetPatchPath(campaignId)}/mechanics`,
+    input,
+    'Could not update mechanics rules.',
   )
   return patch
 }

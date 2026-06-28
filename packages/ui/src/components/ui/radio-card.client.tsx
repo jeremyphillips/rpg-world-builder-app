@@ -2,11 +2,19 @@
 
 import * as React from 'react'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
+import { Circle } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 import { RadioGroup } from './radio-group.client'
-import { radioCardMetaListVariants, radioCardVariants } from './radio-card.variants'
+import {
+  radioCardBodyVariants,
+  radioCardControlVariants,
+  radioCardIndicatorVariants,
+  radioCardMetaListVariants,
+  radioCardRootLayoutVariants,
+  radioCardVariants,
+} from './radio-card.variants'
 import { textVariants } from './text.variants'
 
 export interface RadioCardOption {
@@ -17,8 +25,9 @@ export interface RadioCardOption {
   meta?: string[]
 }
 
-export interface RadioCardItemProps
-  extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> {
+export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
+  typeof RadioGroupPrimitive.Item
+> {
   label: string
   description?: string
   meta?: string[]
@@ -34,25 +43,37 @@ const RadioCardItem = React.forwardRef<
     className={cn(radioCardVariants(), className)}
     {...props}
   >
-    <span className={textVariants({ variant: 'emphasis' })}>{label}</span>
-    {description ? <span className={textVariants({ variant: 'small' })}>{description}</span> : null}
-    {meta && meta.length > 0 ? (
-      <ul className={radioCardMetaListVariants()} aria-hidden="true">
-        {meta.map((chip) => (
-          <li key={chip}>
-            <Badge variant="secondary" size="sm">
-              {chip}
-            </Badge>
-          </li>
-        ))}
-      </ul>
-    ) : null}
+    <div className={radioCardRootLayoutVariants()}>
+      <span className={cn(radioCardControlVariants(), 'mt-0.5')} aria-hidden="true">
+        <span className={radioCardIndicatorVariants()}>
+          <Circle className="size-3 fill-primary text-primary" />
+        </span>
+      </span>
+      <div className={radioCardBodyVariants()}>
+        <span className={textVariants({ variant: 'emphasis' })}>{label}</span>
+        {description ? (
+          <span className={textVariants({ variant: 'small' })}>{description}</span>
+        ) : null}
+        {meta && meta.length > 0 ? (
+          <ul className={radioCardMetaListVariants()} aria-hidden="true">
+            {meta.map((chip) => (
+              <li key={chip}>
+                <Badge variant="secondary" size="sm">
+                  {chip}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </div>
   </RadioGroupPrimitive.Item>
 ))
 RadioCardItem.displayName = 'RadioCardItem'
 
-export interface RadioCardProps
-  extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> {
+export interface RadioCardProps extends React.ComponentPropsWithoutRef<
+  typeof RadioGroupPrimitive.Root
+> {
   options: RadioCardOption[]
   /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
