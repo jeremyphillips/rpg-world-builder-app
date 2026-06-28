@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import {
   Select,
   SelectContent,
@@ -78,8 +78,7 @@ export function SelectField({
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
       <Field.Label>
-        {label}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+        <FieldLabelContent label={label} info={info} />
       </Field.Label>
       <Select
         value={value}

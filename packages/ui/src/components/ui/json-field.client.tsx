@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import { Textarea } from './textarea.client'
 import { Button } from './button.client'
 import type { FieldWidth } from './field-control.variants'
@@ -101,8 +101,7 @@ export function JsonField({
     >
       <div className="flex items-center justify-between gap-2">
         <Field.Label>
-          {label}
-          {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+          <FieldLabelContent label={label} info={info} />
         </Field.Label>
         {example !== undefined ? (
           <Button

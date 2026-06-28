@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import { Field } from './field.client'
 import { Checkbox } from './checkbox.client'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import type { FieldWidth } from './field-control.variants'
 
 export interface CheckboxFieldProps extends Omit<ComponentProps<typeof Checkbox>, 'id'> {
@@ -33,8 +33,7 @@ export function CheckboxField({
           <Checkbox {...checkboxProps} />
         </Field.Control>
         <Field.Label className="font-normal">
-          {label}
-          {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+          <FieldLabelContent label={label} info={info} />
         </Field.Label>
       </div>
       <Field.Hint />

@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import { Field } from './field.client'
+import { FieldLabelContent } from './field-label-content'
 import { Switch } from './switch.client'
-import { InfoTooltip } from './tooltip.client'
 import type { FieldWidth } from './field-control.variants'
 
 export interface SwitchFieldProps extends Omit<ComponentProps<typeof Switch>, 'id'> {
@@ -31,8 +31,7 @@ export function SwitchField({
 }: SwitchFieldProps) {
   const labelNode = (
     <Field.Label className={labelPosition === 'inline' ? 'font-normal' : undefined}>
-      {label}
-      {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+      <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )
 

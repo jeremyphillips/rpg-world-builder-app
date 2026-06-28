@@ -82,6 +82,7 @@ export function EditableGridFieldRenderer({
     <EditableGrid
       id={id}
       legend={config.label}
+      info={config.info}
       columns={columns}
       rowCount={config.rowCount}
       value={value}

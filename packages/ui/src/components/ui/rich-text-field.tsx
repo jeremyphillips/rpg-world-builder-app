@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { Field } from './field.client'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 import { RichTextEditor } from './rich-text-editor.client'
 import type { FieldWidth } from './field-control.variants'
 import type {
@@ -50,8 +50,7 @@ export function RichTextField({
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
       <Field.Label>
-        {label}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+        <FieldLabelContent label={label} info={info} />
       </Field.Label>
       <Field.Control>
         <RichTextEditor

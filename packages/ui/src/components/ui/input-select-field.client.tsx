@@ -34,7 +34,7 @@ import {
 } from './input-select-field.variants'
 import { NumberInput, type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
-import { InfoTooltip } from './tooltip.client'
+import { FieldLabelContent } from './field-label-content'
 
 const EMPTY_UNIT_MESSAGE = 'No units match your search.'
 
@@ -374,8 +374,7 @@ export function InputSelectField({
         data-required={required || undefined}
         className={fieldLabelVariants({ size })}
       >
-        {label}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+        <FieldLabelContent label={label} info={info} />
       </label>
 
       <div
