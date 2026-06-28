@@ -2,7 +2,7 @@
 
 import type { Editor } from '@tiptap/react'
 import type { LucideIcon } from 'lucide-react'
-import { Bold, Italic, Link as LinkIcon, List, ListOrdered } from 'lucide-react'
+import { Bold, Code, Italic, Link as LinkIcon, List, ListOrdered, SquareCode } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -56,8 +56,37 @@ const FORMAT_ACTIONS: RichTextFormatAction[] = [
   },
 ]
 
-function RichTextFormatButtons({ editor, disabled }: { editor: Editor | null; disabled: boolean }) {
-  return FORMAT_ACTIONS.map(({ label, icon: Icon, isActive, run }) => (
+const CODE_ACTIONS: RichTextFormatAction[] = [
+  {
+    label: 'Inline code',
+    icon: Code,
+    isActive: (editor) => editor.isActive('code'),
+    run: (editor) => {
+      editor.chain().focus().toggleCode().run()
+    },
+  },
+  {
+    label: 'Code block',
+    icon: SquareCode,
+    isActive: (editor) => editor.isActive('codeBlock'),
+    run: (editor) => {
+      editor.chain().focus().toggleCodeBlock().run()
+    },
+  },
+]
+
+function RichTextFormatButtons({
+  editor,
+  disabled,
+  codeBlocks,
+}: {
+  editor: Editor | null
+  disabled: boolean
+  codeBlocks: boolean
+}) {
+  const actions = codeBlocks ? [...FORMAT_ACTIONS, ...CODE_ACTIONS] : FORMAT_ACTIONS
+
+  return actions.map(({ label, icon: Icon, isActive, run }) => (
     <Button
       key={label}
       variant="ghost"
@@ -77,6 +106,7 @@ export interface RichTextEditorToolbarProps {
   editor: Editor | null
   disabled: boolean
   linkable: boolean
+  codeBlocks: boolean
   isLinkPickerOpen: boolean
   editingLinkContext: RichTextLinkContext | null
   internalLinkOptions: RichTextLinkPickerInternalOption[]
@@ -92,6 +122,7 @@ export function RichTextEditorToolbar({
   editor,
   disabled,
   linkable,
+  codeBlocks,
   isLinkPickerOpen,
   editingLinkContext,
   internalLinkOptions,
@@ -104,7 +135,7 @@ export function RichTextEditorToolbar({
 }: RichTextEditorToolbarProps) {
   return (
     <div className="flex items-center gap-1 border-b border-border p-1">
-      <RichTextFormatButtons editor={editor} disabled={disabled} />
+      <RichTextFormatButtons editor={editor} disabled={disabled} codeBlocks={codeBlocks} />
       {linkable ? (
         <RichTextLinkPicker
           open={isLinkPickerOpen}

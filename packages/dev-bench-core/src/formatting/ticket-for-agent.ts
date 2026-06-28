@@ -6,6 +6,8 @@ import {
   getTicketTypeLabel,
 } from '@rpg/contracts/dev-bench'
 
+import { extractRichTextPlainText, normalizeRichTextPlainText } from './rich-text-plain'
+
 function formatCodeRef(ref: CodeRef): string {
   const parts = [ref.path]
 
@@ -56,11 +58,14 @@ export function formatTicketForAgent(ticket: Ticket): string {
     lines.push(`- **Epic ID:** ${ticket.epicId}`)
   }
 
+  const description = normalizeRichTextPlainText(ticket.description)
+  const descriptionText = description ? extractRichTextPlainText(description) : undefined
+
   lines.push(
     '',
     '## Description',
     '',
-    ticket.description ?? '_None_',
+    descriptionText ?? '_None_',
     '',
     '## Acceptance criteria',
     '',

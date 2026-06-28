@@ -22,6 +22,7 @@ import {
   type Ticket,
   type UpdateTicketInput,
 } from '@rpg/contracts/dev-bench'
+import { normalizeRichTextHtml } from '@rpg/ui'
 import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 const acceptanceCriterionSchema = z.object({
@@ -85,7 +86,7 @@ export function mapTicketToDetailFormValues(ticket: Ticket): TicketDetailFormVal
 export function buildUpdateTicketInput(values: TicketDetailFormValues): UpdateTicketInput {
   return {
     title: values.title.trim(),
-    description: values.description?.trim() || undefined,
+    description: normalizeRichTextHtml(values.description) || undefined,
     type: values.type,
     status: values.status,
     priority: values.priority,
@@ -105,7 +106,7 @@ export function buildQuickCreateInput(values: QuickCreateFormValues) {
   return createTicketInputSchema.parse({
     ...values,
     title: values.title.trim(),
-    description: values.description?.trim() || undefined,
+    description: normalizeRichTextHtml(values.description) || undefined,
     status: 'backlog',
     createdBy: 'user',
   })
@@ -147,7 +148,13 @@ export const quickCreateFields: FormItem[] = [
       },
     ],
   },
-  { type: 'textarea', name: 'description', label: 'Description', hint: 'Optional' },
+  {
+    type: 'richtext',
+    name: 'description',
+    label: 'Description',
+    hint: 'Optional',
+    codeBlocks: true,
+  },
 ]
 
 export function buildTicketDetailTabs(options: {
@@ -165,7 +172,7 @@ export function buildTicketDetailTabs(options: {
       label: 'Overview',
       fields: [
         { type: 'text', name: 'title', label: 'Title', required: true },
-        { type: 'textarea', name: 'description', label: 'Description' },
+        { type: 'richtext', name: 'description', label: 'Description', codeBlocks: true },
         {
           kind: 'row',
           fields: [

@@ -15,6 +15,9 @@ export function parseGlobalArgs(argv: string[]): { flags: GlobalFlags; positiona
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index]
+    if (arg === undefined) {
+      continue
+    }
 
     if (arg === '--format') {
       const next = argv[index + 1]

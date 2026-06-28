@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import type { Epic } from '@rpg/contracts/dev-bench'
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import type { EpicTicketBucket } from '@rpg/dev-bench-core'
-import { Card, CardContent, Text } from '@rpg/ui'
+import { Card, CardContent, extractRichTextContent, Text } from '@rpg/ui'
 
 import { benchEpicPath } from '@/app/routes'
 import { PriorityBadge } from '@/features/tickets'
@@ -18,7 +18,8 @@ interface EpicCardProps {
 }
 
 export function EpicCard({ epic, counts, recentlyActive }: EpicCardProps) {
-  const summary = epic.goal?.trim() || epic.description?.trim()
+  const descriptionSummary = epic.description ? extractRichTextContent(epic.description) : undefined
+  const summary = epic.goal?.trim() || descriptionSummary
 
   return (
     <Card>

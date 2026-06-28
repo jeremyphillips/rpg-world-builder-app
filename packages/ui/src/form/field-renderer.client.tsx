@@ -245,6 +245,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
         required={config.required}
         width={config.width}
         linkable={config.linkable}
+        codeBlocks={config.codeBlocks}
         internalLinkOptions={config.internalLinkOptions}
         contentTypeOptions={config.contentTypeOptions}
         disabled={config.disabled}

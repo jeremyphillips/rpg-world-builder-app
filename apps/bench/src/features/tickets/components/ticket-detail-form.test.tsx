@@ -41,6 +41,9 @@ describe('TicketDetailForm', () => {
     const user = userEvent.setup()
     renderForm()
 
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
+    })
     expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Done when' }))
     expect(screen.getByText('Paste bullets')).toBeInTheDocument()
@@ -49,7 +52,7 @@ describe('TicketDetailForm', () => {
   it('has no axe accessibility violations', async () => {
     const { container } = renderForm()
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument()
+      expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
     const results = await axe.run(container, {
       rules: { 'color-contrast': { enabled: false }, 'landmark-unique': { enabled: false } },

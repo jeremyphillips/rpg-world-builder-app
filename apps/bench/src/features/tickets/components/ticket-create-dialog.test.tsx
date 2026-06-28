@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -32,6 +32,9 @@ describe('TicketCreateDialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'New ticket' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
+    })
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create ticket' })).toBeInTheDocument()
   })
@@ -66,6 +69,9 @@ describe('TicketCreateDialog', () => {
     const user = userEvent.setup()
     const { container } = renderDialog()
     await user.click(screen.getByRole('button', { name: 'New ticket' }))
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
+    })
 
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])

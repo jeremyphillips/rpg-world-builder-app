@@ -72,4 +72,14 @@ describe('formatTicketForAgent', () => {
     expect(output).toContain('## Description')
     expect(output).toContain('_None_')
   })
+
+  it('renders stored HTML description as plain text', () => {
+    const output = formatTicketForAgent({
+      ...sampleTicket,
+      description: '<p>Cursor identified that this path is <strong>skipped</strong>.</p>',
+    })
+
+    expect(output).toContain('Cursor identified that this path is skipped.')
+    expect(output).not.toContain('<strong>')
+  })
 })

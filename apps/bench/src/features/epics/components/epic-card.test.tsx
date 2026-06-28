@@ -26,6 +26,24 @@ describe('EpicCard', () => {
     expect(screen.getByText(/BENCH-001/)).toBeInTheDocument()
   })
 
+  it('shows plain-text epic description summary when stored as HTML', () => {
+    render(
+      <MemoryRouter>
+        <EpicCard
+          epic={{
+            ...sampleEpic,
+            goal: undefined,
+            description: '<p>End-to-end player character creation flows.</p>',
+          }}
+          counts={{ open: 1, blocked: 0, done: 0 }}
+          recentlyActive={[]}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('End-to-end player character creation flows.')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>

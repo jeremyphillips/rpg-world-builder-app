@@ -42,7 +42,7 @@ describe('EpicDetailForm', () => {
   it('has no axe accessibility violations', async () => {
     const { container } = renderForm()
     await waitFor(() => {
-      expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
     const results = await axe.run(container, {
       rules: { 'color-contrast': { enabled: false }, 'landmark-unique': { enabled: false } },

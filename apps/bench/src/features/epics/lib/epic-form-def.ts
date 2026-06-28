@@ -12,6 +12,7 @@ import {
   type Epic,
   type UpdateEpicInput,
 } from '@rpg/contracts/dev-bench'
+import { normalizeRichTextHtml } from '@rpg/ui'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 export const epicDetailFormSchema = z.object({
@@ -41,7 +42,7 @@ const areaOptions: FieldOption[] = TICKET_AREA_SUGGESTIONS.map((area) => ({
 export const createEpicFields: FormItem[] = [
   { type: 'text', name: 'title', label: 'Title', required: true },
   { type: 'text', name: 'goal', label: 'Goal' },
-  { type: 'textarea', name: 'description', label: 'Description', rows: 3 },
+  { type: 'richtext', name: 'description', label: 'Description' },
   {
     kind: 'row',
     fields: [
@@ -97,6 +98,11 @@ function optionalString(value: string | undefined): string | undefined {
   return trimmed ? trimmed : undefined
 }
 
+function optionalRichText(value: string | undefined): string | undefined {
+  const normalized = normalizeRichTextHtml(value)
+  return normalized || undefined
+}
+
 function optionalPriority(value: string | undefined): UpdateEpicInput['priority'] {
   if (!value || value === NONE_VALUE) return undefined
   const parsed = ticketPrioritySchema.safeParse(value)
@@ -113,7 +119,7 @@ export function buildCreateEpicInput(values: CreateEpicFormValues) {
   return createEpicInputSchema.parse({
     title: values.title.trim(),
     goal: optionalString(values.goal),
-    description: optionalString(values.description),
+    description: optionalRichText(values.description),
     status: values.status,
     priority: optionalPriority(values.priority),
     area: optionalArea(values.area),
@@ -124,7 +130,7 @@ export function buildUpdateEpicInput(values: EpicDetailFormValues): UpdateEpicIn
   return {
     title: values.title.trim(),
     goal: optionalString(values.goal),
-    description: optionalString(values.description),
+    description: optionalRichText(values.description),
     status: values.status,
     priority: optionalPriority(values.priority),
     area: optionalArea(values.area),

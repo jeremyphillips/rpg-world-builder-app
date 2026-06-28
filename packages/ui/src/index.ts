@@ -18,6 +18,11 @@ export {
   richTextContentVariants,
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
+export {
+  extractRichTextContent,
+  normalizeRichTextHtml,
+  richTextHtmlEquals,
+} from './components/ui/rich-text-html'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'

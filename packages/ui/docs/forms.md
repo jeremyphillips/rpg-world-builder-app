@@ -414,7 +414,8 @@ If you need a control `<Form>` doesn't support, you have two options:
   `value: string` field contract and drops straight into RHF.
 - Bold, italic, bullet/ordered lists, and hard breaks ship by default. Links are
   **opt-in** via the `linkable` prop (the `Link` extension + toolbar button are
-  gated behind it).
+  gated behind it). Inline/code-block marks are **opt-in** via `codeBlocks` (toolbar
+  buttons plus `` `inline` `` and ` ``` ` fence input rules; off by default).
 - When `linkable` is enabled, the toolbar opens a **link picker popover** instead
   of a browser prompt:
   - **Internal tab** (default): searchable spell/feat targets plus overview pages.
@@ -446,7 +447,8 @@ import { RichTextContent, sanitizeHtml } from '@rpg/ui'
 <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(stored) }} />
 ```
 
-Form config (`FieldType: 'richtext'`) forwards `linkable`, `internalLinkOptions`,
+Form config (`FieldType: 'richtext'`) forwards `linkable`, `codeBlocks`,
+`internalLinkOptions`,
 and `contentTypeOptions` to `RichTextField` / `RichTextEditor` when internal
 linking is required.
 
