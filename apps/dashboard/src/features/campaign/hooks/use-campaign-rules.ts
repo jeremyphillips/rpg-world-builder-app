@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  defaultMulticlassingRules,
   resolveCampaignRules,
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
@@ -12,6 +13,7 @@ const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   maxCharacterLevel: 20,
   standardMaxCharacterLevel: 20,
   allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
+  multiclassing: defaultMulticlassingRules(),
 }
 
 /** Resolved campaign rules from the ruleset-patch query (defaults while loading or absent). */

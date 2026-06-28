@@ -2,7 +2,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
 import type { Express } from 'express'
 
-import { CREATURE_TYPE_SET_ID, defaultCampaignMechanicsPatch } from '@rpg/contracts'
+import {
+  CREATURE_TYPE_SET_ID,
+  defaultCampaignMechanicsPatch,
+  defaultMulticlassingRules,
+} from '@rpg/contracts'
 
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
@@ -49,6 +53,7 @@ describe('getRulesetPatchRead', () => {
       importedCharacters: { policy: 'disabled' },
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
+      multiclassing: defaultMulticlassingRules(),
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })
@@ -135,6 +140,83 @@ describe('updateCharacterCreationPatch', () => {
 
     const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
     expect(stored?.characterCreation?.progression?.extendedProgression).toBeUndefined()
+  })
+
+  it('persists non-default multiclassing overrides', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+
+    const patch = await updateCharacterCreationPatch(campaign.id, {
+      multiclassing: {
+        enabled: false,
+        requirements: {
+          primaryAbilityMinimum: { minimumScore: 15 },
+        },
+      },
+    })
+
+    expect(patch?.characterCreation.multiclassing).toMatchObject({
+      enabled: false,
+      requirements: {
+        primaryAbilityMinimum: { enabled: true, minimumScore: 15 },
+      },
+    })
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.characterCreation?.multiclassing?.enabled).toBe(false)
+    expect(
+      stored?.characterCreation?.multiclassing?.requirements?.primaryAbilityMinimum?.minimumScore,
+    ).toBe(15)
+  })
+
+  it('deep-merges partial multiclassing patches without wiping sibling overrides', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+
+    await updateCharacterCreationPatch(campaign.id, {
+      multiclassing: {
+        requirements: {
+          primaryAbilityMinimum: { minimumScore: 15 },
+        },
+      },
+    })
+
+    const patch = await updateCharacterCreationPatch(campaign.id, {
+      multiclassing: {
+        requirements: {
+          speciesPolicy: { enabled: true },
+        },
+      },
+    })
+
+    expect(patch?.characterCreation.multiclassing.requirements).toMatchObject({
+      primaryAbilityMinimum: { enabled: true, minimumScore: 15 },
+      speciesPolicy: { enabled: true },
+      speciesLevelLimits: { enabled: false },
+    })
+  })
+
+  it('unsets stored multiclassing when reverted to defaults', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+
+    await updateCharacterCreationPatch(campaign.id, {
+      multiclassing: { enabled: false },
+    })
+
+    await updateCharacterCreationPatch(campaign.id, {
+      multiclassing: {
+        enabled: true,
+        requirements: {
+          primaryAbilityMinimum: { enabled: true, minimumScore: 13 },
+          speciesPolicy: { enabled: false },
+          speciesLevelLimits: { enabled: false },
+        },
+      },
+    })
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.characterCreation?.multiclassing).toBeUndefined()
   })
 })
 
@@ -227,6 +309,21 @@ describe('ruleset patch routes', () => {
       startingLevel: 5,
       importedCharacters: { policy: 'approval_required' },
     })
+  })
+
+  it('patches multiclassing for campaign managers', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        multiclassing: { enabled: false },
+      })
+      .expect(200)
+
+    expect(res.body.patch.characterCreation.multiclassing.enabled).toBe(false)
   })
 
   it('patches mechanics for campaign managers', async () => {

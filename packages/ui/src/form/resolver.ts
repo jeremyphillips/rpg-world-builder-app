@@ -12,13 +12,22 @@ import { hiddenFieldNames, type FormItem } from './field-config'
 interface OmittableSchema {
   shape?: Record<string, unknown>
   omit?: (mask: Record<string, true>) => ZodType
+  _zod?: { def?: { checks?: unknown[] } }
+}
+
+/** Zod 4 attaches refinements to object schemas via `_zod.def.checks`. */
+function hasObjectRefinements(schema: OmittableSchema): boolean {
+  const checks = schema._zod?.def?.checks
+  return Array.isArray(checks) && checks.length > 0
 }
 
 /**
  * Drops hidden field keys from an object schema so they aren't validated — i.e.
  * a `required` field is only required while visible. Object schemas also strip
  * the hidden keys from their output, so the submitted payload omits them too.
- * Non-object (e.g. refined) schemas are returned unchanged (documented limit).
+ * Object schemas with refinements (e.g. `.superRefine`) are returned unchanged:
+ * Zod 4 rejects `.omit()` on those schemas; refinements and `shouldUnregister`
+ * handle conditional fields instead.
  *
  * **Array item fields**: hidden fields inside array items (e.g. `traits.0.name`)
  * are _not_ stripped by this function — Zod's `.omit` only works on top-level
@@ -35,7 +44,9 @@ function omitHidden(schema: ZodType, hidden: string[]): ZodType {
   for (const name of hidden) {
     if (name in obj.shape) mask[name] = true
   }
-  return Object.keys(mask).length > 0 ? obj.omit(mask) : schema
+  if (Object.keys(mask).length === 0) return schema
+  if (hasObjectRefinements(obj)) return schema
+  return obj.omit(mask)
 }
 
 /** Builds the RHF resolver that treats currently-hidden fields as optional. */

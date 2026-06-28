@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defaultMulticlassingRules } from '@rpg/contracts'
 import { isFieldOptionGroup } from '@rpg/ui/form'
 
 import {
@@ -29,6 +30,7 @@ describe('level-field-options', () => {
         maxCharacterLevel: 25,
         standardMaxCharacterLevel: 20,
         allowedCharacterCreatureTypes: ['humanoid'],
+        multiclassing: defaultMulticlassingRules(),
         extendedProgression: {
           tierName: 'Epic Destiny',
           startsAt: 21,
@@ -63,6 +65,7 @@ describe('level-field-options', () => {
           maxCharacterLevel: 9,
           standardMaxCharacterLevel: 9,
           allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassing: defaultMulticlassingRules(),
         },
       }),
     ).toBe(1)
@@ -72,6 +75,7 @@ describe('level-field-options', () => {
           maxCharacterLevel: 100,
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassing: defaultMulticlassingRules(),
         },
       }),
     ).toBe(3)

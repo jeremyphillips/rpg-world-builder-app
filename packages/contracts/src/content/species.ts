@@ -18,6 +18,7 @@ import {
   speciesGrantsSchema,
   speciesProficienciesSchema,
 } from './grants'
+import { speciesCharacterCreationSchema } from './species-character-creation'
 
 // ---------------------------------------------------------------------------
 // Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
@@ -70,6 +71,8 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   speed: speedSchema,
   traits: z.array(speciesTraitSchema),
   heritage: speciesHeritageSchema.optional(),
+  /** Species-authored data consumed only when the campaign enables the matching rule. */
+  characterCreation: speciesCharacterCreationSchema.optional(),
 })
 
 export type SpeciesBody = z.infer<typeof speciesBodySchema>

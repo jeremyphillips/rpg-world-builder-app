@@ -8,6 +8,7 @@ import { enrichClassWithDerivedSkills } from '../classes/derive-classes-catalog'
 import { classContentConfig } from '../classes/classes.config'
 import { resolveCatalogForCampaign } from '../content.service'
 import { assertSpellClassIdsHaveSpellcasting } from '../spells/assert-spell-class-ids'
+import { assertSpeciesClassSlugsFromInput } from '../species/assert-species-class-slugs'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
@@ -207,6 +208,16 @@ async function assertSpellClassIdsForCampaign<T extends StoredEntity>(
   assertSpellClassIdsHaveSpellcasting(classIds, classes)
 }
 
+async function assertSpeciesClassSlugsForCampaign<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  input: Record<string, unknown>,
+): Promise<void> {
+  if (config.typeName !== 'species') return
+  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
+  assertSpeciesClassSlugsFromInput(input, classes)
+}
+
 async function assertSpeciesCreatureTypeForCampaign<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
@@ -235,6 +246,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
   const slug = input.slug as string
   await assertSpellClassIdsForCampaign(config, campaignId, input.classIds as string[])
   await assertSpeciesCreatureTypeForCampaign(config, campaignId, input)
+  await assertSpeciesClassSlugsForCampaign(config, campaignId, input)
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
@@ -284,6 +296,10 @@ export async function updateContentEntity<T extends StoredEntity>(
     await assertSpellClassIdsForCampaign(config, campaignId, effectiveClassIds)
   }
   await assertSpeciesCreatureTypeForCampaign(config, campaignId, update)
+  await assertSpeciesClassSlugsForCampaign(config, campaignId, {
+    ...entityBody(existing as unknown as Record<string, unknown>),
+    ...update,
+  })
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {

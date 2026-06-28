@@ -14,6 +14,14 @@ vi.mock('@/features/campaign', () => ({
     maxCharacterLevel: 20,
     standardMaxCharacterLevel: 20,
     allowedCharacterCreatureTypes: ['humanoid'],
+    multiclassing: {
+      enabled: true,
+      requirements: {
+        primaryAbilityMinimum: { enabled: true, minimumScore: 13 },
+        speciesPolicy: { enabled: false },
+        speciesLevelLimits: { enabled: false },
+      },
+    },
   })),
 }))
 

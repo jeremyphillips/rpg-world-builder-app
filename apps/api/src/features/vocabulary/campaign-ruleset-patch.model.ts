@@ -55,6 +55,45 @@ const characterCreationProgressionSchema = new Schema(
   { _id: false },
 )
 
+const primaryAbilityMinimumRequirementSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+    minimumScore: { type: Number },
+  },
+  { _id: false },
+)
+
+const speciesPolicyRequirementSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+  },
+  { _id: false },
+)
+
+const speciesLevelLimitsRequirementSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+  },
+  { _id: false },
+)
+
+const multiclassingRequirementsSchema = new Schema(
+  {
+    primaryAbilityMinimum: { type: primaryAbilityMinimumRequirementSchema, default: undefined },
+    speciesPolicy: { type: speciesPolicyRequirementSchema, default: undefined },
+    speciesLevelLimits: { type: speciesLevelLimitsRequirementSchema, default: undefined },
+  },
+  { _id: false },
+)
+
+const multiclassingSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+    requirements: { type: multiclassingRequirementsSchema, default: undefined },
+  },
+  { _id: false },
+)
+
 const characterCreationSchema = new Schema(
   {
     startingLevel: { type: Number },
@@ -68,6 +107,7 @@ const characterCreationSchema = new Schema(
         ids: [{ type: String, trim: true }],
       },
     },
+    multiclassing: { type: multiclassingSchema, default: undefined },
   },
   { _id: false },
 )

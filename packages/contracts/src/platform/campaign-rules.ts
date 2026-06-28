@@ -2,6 +2,10 @@ import type {
   CampaignCharacterCreationPatch,
   CreatureTypePolicy,
 } from './campaign-character-creation-patch'
+import {
+  resolveMulticlassingRules,
+  type ResolvedCampaignMulticlassingPatch,
+} from './campaign-multiclassing-patch'
 import type { CreatureTypeId } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
@@ -35,6 +39,8 @@ export type ResolvedCampaignRules = {
   /** Creature types allowed on character sheets in this campaign. */
   allowedCharacterCreatureTypes: readonly CreatureTypeId[]
   extendedProgression?: ResolvedExtendedProgression
+  /** Resolved multiclassing rules for content authoring and validation gating. */
+  multiclassing: ResolvedCampaignMulticlassingPatch
 }
 
 /** Standard max before any optional extended tier. */
@@ -77,6 +83,7 @@ export function resolveCampaignRules(
       maxCharacterLevel: storedExtended.maxLevel,
       standardMaxCharacterLevel,
       allowedCharacterCreatureTypes,
+      multiclassing: resolveMulticlassingRules(patch?.multiclassing),
       extendedProgression: {
         tierName: storedExtended.tierName,
         startsAt: standardMaxCharacterLevel + 1,
@@ -89,6 +96,7 @@ export function resolveCampaignRules(
     maxCharacterLevel: standardMaxCharacterLevel,
     standardMaxCharacterLevel,
     allowedCharacterCreatureTypes,
+    multiclassing: resolveMulticlassingRules(patch?.multiclassing),
   }
 }
 

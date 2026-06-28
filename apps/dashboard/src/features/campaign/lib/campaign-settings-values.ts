@@ -8,9 +8,15 @@ import type {
 } from '@rpg/contracts'
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_MULTICLASSING_ENABLED,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   MAX_CHARACTER_LEVEL,
   sameStringSet,
 } from '@rpg/contracts'
+import type { CampaignMulticlassingPatch } from '@rpg/contracts'
 
 import { identitySchema, flavorSchema } from './campaign-fields'
 import {
@@ -60,6 +66,49 @@ function resolveCreatureTypePolicyOverride(
   return { mode: 'only' as const, ids: [...allowedCharacterCreatureTypes] }
 }
 
+function resolveMulticlassingOverride(values: RulesValues): CampaignMulticlassingPatch | undefined {
+  const enabledDiff =
+    values.multiclassingEnabled !== DEFAULT_MULTICLASSING_ENABLED
+      ? values.multiclassingEnabled
+      : undefined
+  const primaryAbilityMinimumEnabledDiff =
+    values.primaryAbilityMinimumEnabled !== DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED
+      ? values.primaryAbilityMinimumEnabled
+      : undefined
+  const primaryAbilityMinimumScoreDiff =
+    values.primaryAbilityMinimumScore !== DEFAULT_PRIMARY_ABILITY_MINIMUM
+      ? values.primaryAbilityMinimumScore
+      : undefined
+  const speciesPolicyEnabledDiff =
+    values.speciesMulticlassPolicyEnabled !== DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED
+      ? values.speciesMulticlassPolicyEnabled
+      : undefined
+  const speciesLevelLimitsEnabledDiff =
+    values.speciesLevelLimitsEnabled !== DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED
+      ? values.speciesLevelLimitsEnabled
+      : undefined
+
+  const primaryAbilityMinimum = pickDefined({
+    enabled: primaryAbilityMinimumEnabledDiff,
+    minimumScore: primaryAbilityMinimumScoreDiff,
+  })
+
+  const requirements = pickDefined({
+    ...(primaryAbilityMinimum && { primaryAbilityMinimum }),
+    ...(speciesPolicyEnabledDiff !== undefined && {
+      speciesPolicy: { enabled: speciesPolicyEnabledDiff },
+    }),
+    ...(speciesLevelLimitsEnabledDiff !== undefined && {
+      speciesLevelLimits: { enabled: speciesLevelLimitsEnabledDiff },
+    }),
+  })
+
+  return pickDefined({
+    enabled: enabledDiff,
+    requirements,
+  })
+}
+
 function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValues {
   return {
     ...createRules,
@@ -68,6 +117,11 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     extendedTierName: '',
     extendedMaxLevel: undefined,
     allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
+    multiclassingEnabled: DEFAULT_MULTICLASSING_ENABLED,
+    primaryAbilityMinimumEnabled: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+    primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
+    speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+    speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   }
 }
 
@@ -89,6 +143,11 @@ export function buildCharacterCreationPatchInput(
   const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
   if (creatureTypePolicy) {
     patch.species = { creatureTypePolicy }
+  }
+
+  const multiclassing = resolveMulticlassingOverride(values)
+  if (multiclassing) {
+    patch.multiclassing = multiclassing
   }
 
   return patch
@@ -115,6 +174,15 @@ export function mapRulesetPatchToRulesValues(
     extendedMaxLevel: extended?.maxLevel,
     importedCharactersPolicy: characterCreation.importedCharacters.policy,
     allowedCharacterCreatureTypes: [...characterCreation.species.creatureTypePolicy.ids],
+    multiclassingEnabled: characterCreation.multiclassing.enabled,
+    primaryAbilityMinimumEnabled:
+      characterCreation.multiclassing.requirements.primaryAbilityMinimum.enabled,
+    primaryAbilityMinimumScore:
+      characterCreation.multiclassing.requirements.primaryAbilityMinimum.minimumScore,
+    speciesMulticlassPolicyEnabled:
+      characterCreation.multiclassing.requirements.speciesPolicy.enabled,
+    speciesLevelLimitsEnabled:
+      characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
   }
 }
 
