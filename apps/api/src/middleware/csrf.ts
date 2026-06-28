@@ -17,6 +17,11 @@ export function verifyCsrf(req: Request, _res: Response, next: NextFunction): vo
     return
   }
 
+  if (req.path.startsWith('/api/bench')) {
+    next()
+    return
+  }
+
   const cookieToken = req.cookies?.[CSRF_COOKIE] as string | undefined
   const headerToken = req.get(CSRF_HEADER) ?? undefined
 

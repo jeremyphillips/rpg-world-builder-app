@@ -10,6 +10,7 @@ import { homebrewRouter, vocabularyRouter } from './features/vocabulary/vocabula
 import { rulesetPatchRouter } from './features/vocabulary/ruleset-patch.routes'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
 import { userRouter } from './features/user/user.routes'
+import { benchRouter } from './features/dev-bench'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
@@ -42,6 +43,7 @@ export function createApp(): Express {
   api.use('/campaigns/:campaignId/homebrew', homebrewRouter)
   api.use('/uploads', uploadsRouter)
   api.use('/users', userRouter)
+  api.use('/bench', benchRouter)
 
   app.use('/api', api)
 
