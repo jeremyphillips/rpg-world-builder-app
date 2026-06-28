@@ -3,7 +3,11 @@ import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 const { model, models, Schema } = mongoose
 
 import {
+  ARMOR_CLASS_BASES,
+  ARMOR_CLASS_MODES,
+  ATTACK_RESOLUTION_MODE_IDS,
   CREATURE_TYPE_POLICY_MODES,
+  EDITION_PRESET_IDS,
   IMPORTED_CHARACTERS_POLICIES,
   SYSTEM_RULESET_IDS,
   VOCABULARY_OPTION_SET_IDS,
@@ -68,12 +72,31 @@ const characterCreationSchema = new Schema(
   { _id: false },
 )
 
+const mechanicsSchema = new Schema(
+  {
+    editionPreset: {
+      id: { type: String, enum: EDITION_PRESET_IDS },
+      modified: { type: Boolean },
+      appliedAt: { type: Date },
+    },
+    armorClass: {
+      mode: { type: String, enum: ARMOR_CLASS_MODES },
+      base: { type: Number, enum: ARMOR_CLASS_BASES },
+    },
+    attackResolution: {
+      mode: { type: String, enum: ATTACK_RESOLUTION_MODE_IDS },
+    },
+  },
+  { _id: false },
+)
+
 const campaignRulesetPatchSchema = new Schema(
   {
     campaignId: { type: String, required: true, index: true },
     rulesetId: { type: String, enum: SYSTEM_RULESET_IDS, required: true },
     vocabulary: { type: [vocabularyOptionSetPatchSchema], default: undefined },
     characterCreation: { type: characterCreationSchema, default: undefined },
+    mechanics: { type: mechanicsSchema, default: undefined },
   },
   { timestamps: true },
 )

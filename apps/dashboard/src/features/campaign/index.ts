@@ -17,9 +17,21 @@ export {
   type RulesValues,
 } from './lib/character-configuration-fields'
 export {
+  buildMechanicsConfigFields,
+  MECHANICS_CONFIGURATION_SECTIONS,
+  mechanicsValuesSchema,
+  type MechanicsConfigurationSectionId,
+  type MechanicsValues,
+} from './lib/mechanics-configuration-field-registry'
+export {
   buildCharacterCreationPatchInput,
   mapRulesetPatchToRulesValues,
 } from './lib/campaign-settings-values'
+export {
+  buildMechanicsPatchInput,
+  mapRulesetPatchToMechanicsValues,
+  defaultMechanicsValues,
+} from './lib/mechanics-settings-values'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useSelectCampaign } from './hooks/use-select-campaign'

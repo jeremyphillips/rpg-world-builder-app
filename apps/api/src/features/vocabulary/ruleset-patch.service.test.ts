@@ -2,14 +2,18 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
 import type { Express } from 'express'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import { CREATURE_TYPE_SET_ID, defaultCampaignMechanicsPatch } from '@rpg/contracts'
 
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
-import { getRulesetPatchRead, updateCharacterCreationPatch } from './ruleset-patch.service'
+import {
+  getRulesetPatchRead,
+  updateCharacterCreationPatch,
+  updateMechanicsPatch,
+} from './ruleset-patch.service'
 import { updateVocabularyEntry } from './vocabulary.service'
 import { createCampaign } from '../campaign'
 import { createUser } from '../user'
@@ -46,6 +50,7 @@ describe('getRulesetPatchRead', () => {
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
     })
+    expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })
 })
 
@@ -133,6 +138,61 @@ describe('updateCharacterCreationPatch', () => {
   })
 })
 
+describe('updateMechanicsPatch', () => {
+  it('persists a non-default edition preset sparsely', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Classic', createdBy: owner.id })
+
+    const patch = await updateMechanicsPatch(campaign.id, {
+      editionPreset: { id: 'becmi' },
+    })
+
+    expect(patch?.mechanics).toMatchObject({
+      editionPreset: { id: 'becmi', modified: false },
+      armorClass: { mode: 'descending', base: 9 },
+      attackResolution: { mode: 'attack_matrix' },
+    })
+    expect(patch?.mechanics.editionPreset.appliedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.mechanics?.editionPreset?.id).toBe('becmi')
+    expect(stored?.mechanics?.editionPreset?.appliedAt).toBeInstanceOf(Date)
+    expect(stored?.mechanics?.armorClass).toBeUndefined()
+    expect(stored?.mechanics?.attackResolution).toBeUndefined()
+  })
+
+  it('marks modified when knobs drift from the selected preset', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Drift', createdBy: owner.id })
+
+    await updateMechanicsPatch(campaign.id, { editionPreset: { id: '3e' } })
+
+    const patch = await updateMechanicsPatch(campaign.id, {
+      armorClass: { base: 9 },
+    })
+
+    expect(patch?.mechanics.editionPreset).toMatchObject({ id: '3e', modified: true })
+    expect(patch?.mechanics.armorClass).toEqual({ mode: 'ascending', base: 9 })
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.mechanics?.editionPreset?.modified).toBe(true)
+    expect(stored?.mechanics?.armorClass).toEqual({ mode: 'ascending', base: 9 })
+  })
+
+  it('clears stored mechanics when reverting to the default 5e preset', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Modern', createdBy: owner.id })
+
+    await updateMechanicsPatch(campaign.id, { editionPreset: { id: '2e' } })
+    const patch = await updateMechanicsPatch(campaign.id, { editionPreset: { id: '5e' } })
+
+    expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.mechanics).toBeUndefined()
+  })
+})
+
 describe('ruleset patch routes', () => {
   async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
     return registerAndLoginTestUser(app)
@@ -166,6 +226,23 @@ describe('ruleset patch routes', () => {
     expect(res.body.patch.characterCreation).toMatchObject({
       startingLevel: 5,
       importedCharacters: { policy: 'approval_required' },
+    })
+  })
+
+  it('patches mechanics for campaign managers', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .patch(`/api/campaigns/${campaignId}/ruleset-patch/mechanics`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ editionPreset: { id: '1e' } })
+      .expect(200)
+
+    expect(res.body.patch.mechanics).toMatchObject({
+      editionPreset: { id: '1e', modified: false },
+      armorClass: { mode: 'descending', base: 10 },
+      attackResolution: { mode: 'combat_tables' },
     })
   })
 

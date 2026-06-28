@@ -17,6 +17,13 @@ describe('campaignRulesetPatchSchema', () => {
             removedCampaignEntryIds: ['old-custom'],
           },
         ],
+        characterCreation: {
+          startingLevel: 2,
+        },
+        mechanics: {
+          editionPreset: { id: '3e', modified: true, appliedAt: '2026-06-27T00:00:00.000Z' },
+          armorClass: { mode: 'ascending', base: 10 },
+        },
         createdAt: '2024-05-21T00:00:00.000Z',
         updatedAt: '2024-05-21T00:00:00.000Z',
       }).success,

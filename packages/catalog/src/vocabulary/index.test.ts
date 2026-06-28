@@ -1,15 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import {
+  ATTACK_RESOLUTION_MODE_ENTRIES,
+  ATTACK_RESOLUTION_MODE_IDS,
+  ATTACK_RESOLUTION_MODE_SET_ID,
+  CREATURE_TYPE_SET_ID,
+  EDITION_PRESET_ENTRIES,
+  EDITION_PRESET_IDS,
+  EDITION_PRESET_SET_ID,
+} from '@rpg/contracts'
 
 import {
+  ATTACK_RESOLUTION_MODES,
   CREATURE_TYPES,
+  EDITION_PRESETS,
+  getSeedAttackResolutionModeEntry,
+  getSeedAttackResolutionModeLabel,
   getSeedCreatureTypeEntry,
   getSeedCreatureTypeLabel,
+  getSeedEditionPresetEntry,
+  getSeedEditionPresetLabel,
   getVocabularyOptionById,
   listSeedVocabularySetIds,
+  loadSeedAttackResolutionModes,
   loadSeedCreatureTypes,
+  loadSeedEditionPresets,
   loadSeedVocabularyOptionSet,
+  seedAttackResolutionModeIds,
   seedCreatureTypeIds,
+  seedEditionPresetIds,
   seedVocabularyOptionIds,
 } from './index'
 
@@ -66,8 +84,66 @@ describe('SRD 5.2.1 creature type vocabulary seed', () => {
       ),
     ).toBe(true)
   })
+})
 
-  it('lists seeded vocabulary set ids for a ruleset', () => {
-    expect(listSeedVocabularySetIds(RULESET)).toEqual([CREATURE_TYPE_SET_ID])
+describe('SRD 5.2.1 edition preset vocabulary seed', () => {
+  const editionPresets = loadSeedEditionPresets(RULESET)
+
+  it('loads the edition-presets set', () => {
+    expect(editionPresets.id).toBe(EDITION_PRESET_SET_ID)
+    expect(editionPresets.options.length).toBe(5)
+  })
+
+  it('matches contract edition preset ids and copy', () => {
+    expect([...EDITION_PRESETS].sort()).toEqual([...EDITION_PRESET_IDS].sort())
+    expect(seedEditionPresetIds(RULESET).size).toBe(EDITION_PRESET_IDS.length)
+
+    for (const id of EDITION_PRESET_IDS) {
+      const seed = getSeedEditionPresetEntry(RULESET, id)
+      const contract = EDITION_PRESET_ENTRIES[id]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedEditionPresetLabel(RULESET, '5e')).toBe('Modern 5e')
+    expect(getSeedEditionPresetLabel(RULESET, 'custom')).toBe('custom')
+  })
+})
+
+describe('SRD 5.2.1 attack resolution mode vocabulary seed', () => {
+  const attackResolutionModes = loadSeedAttackResolutionModes(RULESET)
+
+  it('loads the attack-resolution-modes set', () => {
+    expect(attackResolutionModes.id).toBe(ATTACK_RESOLUTION_MODE_SET_ID)
+    expect(attackResolutionModes.options.length).toBe(5)
+  })
+
+  it('matches contract attack resolution mode ids and copy', () => {
+    expect([...ATTACK_RESOLUTION_MODES].sort()).toEqual([...ATTACK_RESOLUTION_MODE_IDS].sort())
+    expect(seedAttackResolutionModeIds(RULESET).size).toBe(ATTACK_RESOLUTION_MODE_IDS.length)
+
+    for (const id of ATTACK_RESOLUTION_MODE_IDS) {
+      const seed = getSeedAttackResolutionModeEntry(RULESET, id)
+      const contract = ATTACK_RESOLUTION_MODE_ENTRIES[id]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedAttackResolutionModeLabel(RULESET, 'proficiency_attack_vs_ac')).toBe(
+      'Proficiency attack vs. AC',
+    )
+    expect(getSeedAttackResolutionModeLabel(RULESET, 'custom')).toBe('custom')
+  })
+})
+
+describe('seeded vocabulary set registry', () => {
+  it('lists every seeded vocabulary set id for a ruleset', () => {
+    expect(listSeedVocabularySetIds(RULESET).sort()).toEqual(
+      [CREATURE_TYPE_SET_ID, EDITION_PRESET_SET_ID, ATTACK_RESOLUTION_MODE_SET_ID].sort(),
+    )
   })
 })

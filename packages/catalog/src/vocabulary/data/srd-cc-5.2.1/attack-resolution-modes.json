@@ -1,0 +1,27 @@
+[
+  {
+    "id": "attack_matrix",
+    "label": "Attack matrix",
+    "description": "Attack success is read from a class-and-level matrix against the target armor class."
+  },
+  {
+    "id": "combat_tables",
+    "label": "Combat tables",
+    "description": "Attack success is determined from dedicated combat tables keyed by level and armor class."
+  },
+  {
+    "id": "thac0",
+    "label": "THAC0",
+    "description": "Attack rolls are compared to THAC0 minus the target armor class to determine a hit."
+  },
+  {
+    "id": "attack_bonus_vs_target_ac",
+    "label": "Attack bonus vs. target AC",
+    "description": "A d20 roll plus attack bonuses is compared directly to the target ascending armor class."
+  },
+  {
+    "id": "proficiency_attack_vs_ac",
+    "label": "Proficiency attack vs. AC",
+    "description": "A d20 roll plus ability modifiers and proficiency bonus is compared to the target ascending armor class."
+  }
+]

@@ -1,10 +1,7 @@
-import { loadSeedVocabularyOptionSet } from '@rpg/catalog/vocabulary'
-import {
-  CREATURE_TYPE_SET_ID,
-  DEFAULT_SYSTEM_RULESET_ID,
-  type ResolvedVocabularyOptionSet,
-} from '@rpg/contracts'
+import { CREATURE_TYPE_SET_ID, type ResolvedVocabularyOptionSet } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
+
+import { buildLabelActiveVocabulary, buildVocabularyFromSeedSet } from '../build-vocabulary-maps'
 
 export type CreatureTypeVocabulary = {
   labelById: Record<string, string>
@@ -15,24 +12,12 @@ export type CreatureTypeVocabulary = {
 export function buildCreatureTypeVocabulary(
   set: Pick<ResolvedVocabularyOptionSet, 'options'>,
 ): CreatureTypeVocabulary {
-  const labelById = Object.fromEntries(set.options.map((option) => [option.id, option.label]))
-  const activeIds = new Set(
-    set.options.filter((option) => option.status === 'active').map((option) => option.id),
-  )
-  return { labelById, activeIds }
+  return buildLabelActiveVocabulary(set)
 }
 
 /** Default ruleset seed vocabulary for flows without a campaign id (e.g. create wizard). */
 export function buildSeedCreatureTypeVocabulary(): CreatureTypeVocabulary {
-  const seed = loadSeedVocabularyOptionSet(DEFAULT_SYSTEM_RULESET_ID, CREATURE_TYPE_SET_ID)
-  return buildCreatureTypeVocabulary({
-    options: seed.options.map((option) => ({
-      ...option,
-      source: 'system' as const,
-      status: 'active' as const,
-      usedBy: 0,
-    })),
-  })
+  return buildVocabularyFromSeedSet(CREATURE_TYPE_SET_ID, buildCreatureTypeVocabulary)
 }
 
 export function buildActiveCreatureTypeFieldOptions(

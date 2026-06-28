@@ -18,6 +18,8 @@ export const HOMEBREW_VOCABULARY_SETS: readonly HomebrewVocabularySetEntry[] = [
   { setId: 'spell-schools', label: 'Spell Schools', enabled: false },
   { setId: 'weapon-properties', label: 'Weapon Properties', enabled: false },
   { setId: 'equipment-categories', label: 'Equipment Categories', enabled: false },
+  { setId: 'edition-presets', label: 'Edition Presets', enabled: false },
+  { setId: 'attack-resolution-modes', label: 'Attack Resolution Modes', enabled: false },
 ]
 
 export function findVocabularySetEntry(setId: string): HomebrewVocabularySetEntry | undefined {

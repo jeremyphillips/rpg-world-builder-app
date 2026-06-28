@@ -7,7 +7,7 @@ import type {
   UpdateCampaignInput,
 } from '@rpg/contracts'
 
-import { writeInitialCharacterCreation } from '../vocabulary'
+import { writeInitialCharacterCreation, writeInitialMechanics } from '../vocabulary'
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
@@ -54,6 +54,8 @@ export async function createCampaign(
     if (input.characterCreation) {
       await writeInitialCharacterCreation(campaignId, rulesetId, input.characterCreation)
     }
+
+    await writeInitialMechanics(campaignId, rulesetId)
   } catch (err) {
     await CampaignModel.deleteOne({ _id: doc._id })
     throw err

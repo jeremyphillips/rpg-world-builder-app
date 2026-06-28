@@ -8,7 +8,7 @@ import { z } from 'zod'
 // ---------------------------------------------------------------------------
 
 /** Lowercase slug shape shared with content keys — validates id format only. */
-export const vocabularyOptionIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+export const vocabularyOptionIdSchema = z.string().regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/)
 
 export type VocabularyOptionId = z.infer<typeof vocabularyOptionIdSchema>
 
@@ -35,6 +35,8 @@ export const VOCABULARY_OPTION_SET_IDS = [
   'spell-schools',
   'weapon-properties',
   'equipment-categories',
+  'edition-presets',
+  'attack-resolution-modes',
 ] as const
 
 export const vocabularyOptionSetIdSchema = z.enum(VOCABULARY_OPTION_SET_IDS)

@@ -2,9 +2,15 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text, cn } from '@rpg/ui'
 
-import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
+export type RulesConfigNavSection = {
+  id: string
+  label: string
+}
 
 type RulesConfigFieldNavProps = {
+  sections: readonly RulesConfigNavSection[]
+  navLabel: string
+  mobileSelectLabel: string
   activeSectionId?: string
 }
 
@@ -13,18 +19,22 @@ function scrollToSection(sectionId: string) {
 }
 
 /** Desktop anchor rail + mobile select for in-page rules configuration sections. */
-export function RulesConfigFieldNav({ activeSectionId }: RulesConfigFieldNavProps) {
-  const selectedSection =
-    activeSectionId ?? CHARACTER_CONFIGURATION_SECTIONS[0]?.id ?? 'starting-level'
+export function RulesConfigFieldNav({
+  sections,
+  navLabel,
+  mobileSelectLabel,
+  activeSectionId,
+}: RulesConfigFieldNavProps) {
+  const selectedSection = activeSectionId ?? sections[0]?.id ?? ''
 
   return (
     <>
-      <nav className="hidden w-56 shrink-0 lg:block" aria-label="Character configuration sections">
+      <nav className="hidden w-56 shrink-0 lg:block" aria-label={navLabel}>
         <Text variant="small" className="mb-2 px-3 font-medium uppercase tracking-wide">
           Sections
         </Text>
         <ul className="space-y-1">
-          {CHARACTER_CONFIGURATION_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
@@ -48,11 +58,11 @@ export function RulesConfigFieldNav({ activeSectionId }: RulesConfigFieldNavProp
 
       <div className="lg:hidden">
         <Select value={selectedSection} onValueChange={scrollToSection}>
-          <SelectTrigger aria-label="Character configuration section">
+          <SelectTrigger aria-label={mobileSelectLabel}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {CHARACTER_CONFIGURATION_SECTIONS.map((section) => (
+            {sections.map((section) => (
               <SelectItem key={section.id} value={section.id}>
                 {section.label}
               </SelectItem>

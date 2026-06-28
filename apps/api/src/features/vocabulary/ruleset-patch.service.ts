@@ -1,29 +1,223 @@
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_EDITION_PRESET_ID,
   DEFAULT_IMPORTED_CHARACTERS_POLICY,
   DEFAULT_STARTING_LEVEL,
   MAX_CHARACTER_LEVEL,
+  getEditionPresetMechanics,
+  mechanicsDriftFromPreset,
   resolveCharacterCreationPatch,
+  resolveMechanicsKnobsFromPatch,
+  resolveMechanicsPatch,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
   CampaignCharacterCreationPatch,
+  CampaignMechanicsPatch,
   CreatureTypePolicy,
+  EditionPresetId,
   RulesetPatchRead,
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
+  UpdateCampaignMechanicsInput,
 } from '@rpg/contracts'
 
 import { findCampaignById } from '../campaign'
 import { assertCreatureTypesActiveInCampaign } from './assert-campaign-creature-types'
-import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
 import {
-  getOrCreatePatchDocument,
+  applySparsePatchUpdate,
   loadPatchDocument,
   requireCampaignRuleset,
+  type SparsePatchUpdateOps,
 } from './patch-document'
 
 const CHARACTER_CREATION_PREFIX = 'characterCreation.'
+const MECHANICS_PREFIX = 'mechanics.'
+
+function normalizeMechanicsPatchFromDoc(
+  mechanics: CampaignMechanicsPatch | undefined,
+): CampaignMechanicsPatch | undefined {
+  if (!mechanics?.editionPreset?.appliedAt) return mechanics
+
+  const appliedAt = mechanics.editionPreset.appliedAt as string | Date | undefined
+  if (appliedAt instanceof Date) {
+    return {
+      ...mechanics,
+      editionPreset: {
+        ...mechanics.editionPreset,
+        appliedAt: appliedAt.toISOString(),
+      },
+    }
+  }
+
+  return mechanics
+}
+
+function computeMechanicsPatchMetadata(
+  patch: CampaignMechanicsPatch,
+  options?: { appliedAt?: string; presetIdChanged?: boolean },
+): CampaignMechanicsPatch {
+  const presetId = (patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID) as EditionPresetId
+  const knobs = resolveMechanicsKnobsFromPatch(patch, presetId)
+  const bundle = getEditionPresetMechanics(presetId)
+  const modified = mechanicsDriftFromPreset(presetId, knobs)
+  const appliedAt =
+    options?.presetIdChanged === true
+      ? options.appliedAt
+      : (patch.editionPreset?.appliedAt ?? options?.appliedAt)
+
+  const result: CampaignMechanicsPatch = {
+    editionPreset: {
+      id: presetId,
+      modified,
+      ...(appliedAt !== undefined && { appliedAt }),
+    },
+  }
+
+  if (
+    knobs.armorClass.mode !== bundle.armorClass.mode ||
+    knobs.armorClass.base !== bundle.armorClass.base
+  ) {
+    result.armorClass = knobs.armorClass
+  }
+
+  if (knobs.attackResolution.mode !== bundle.attackResolution.mode) {
+    result.attackResolution = knobs.attackResolution
+  }
+
+  return result
+}
+
+function mergeMechanicsPatch(
+  existing: CampaignMechanicsPatch | undefined,
+  input: UpdateCampaignMechanicsInput,
+): CampaignMechanicsPatch {
+  const existingPresetId = (existing?.editionPreset?.id ??
+    DEFAULT_EDITION_PRESET_ID) as EditionPresetId
+  const inputPresetId = input.editionPreset?.id
+  const presetIdChanging = inputPresetId !== undefined && inputPresetId !== existingPresetId
+
+  if (presetIdChanging && inputPresetId !== undefined) {
+    const bundle = getEditionPresetMechanics(inputPresetId)
+    return computeMechanicsPatchMetadata(
+      {
+        editionPreset: { id: inputPresetId },
+        armorClass: { ...bundle.armorClass },
+        attackResolution: { ...bundle.attackResolution },
+      },
+      {
+        appliedAt:
+          inputPresetId === DEFAULT_EDITION_PRESET_ID ? undefined : new Date().toISOString(),
+        presetIdChanged: true,
+      },
+    )
+  }
+
+  const merged: CampaignMechanicsPatch = { ...(existing ?? {}) }
+
+  if (inputPresetId !== undefined) {
+    merged.editionPreset = {
+      ...(merged.editionPreset ?? {}),
+      id: inputPresetId,
+    }
+  }
+
+  if (input.armorClass !== undefined) {
+    merged.armorClass = {
+      ...(merged.armorClass ?? {}),
+      ...input.armorClass,
+    }
+  }
+
+  if (input.attackResolution !== undefined) {
+    merged.attackResolution = {
+      ...(merged.attackResolution ?? {}),
+      ...input.attackResolution,
+    }
+  }
+
+  return computeMechanicsPatchMetadata(merged)
+}
+
+function isSparseDefaultMechanicsPatch(patch: CampaignMechanicsPatch): boolean {
+  const presetId = patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID
+  if (presetId !== DEFAULT_EDITION_PRESET_ID) return false
+  if (patch.editionPreset?.modified === true) return false
+  if (patch.editionPreset?.appliedAt !== undefined) return false
+  if (patch.armorClass !== undefined) return false
+  if (patch.attackResolution !== undefined) return false
+  return true
+}
+
+type MongoUpdateOps = SparsePatchUpdateOps
+
+function sparseSetOrUnset(ops: MongoUpdateOps, path: string, value: unknown | undefined): void {
+  if (value !== undefined) {
+    ops.$set[path] = value
+  } else {
+    ops.$unset[path] = 1
+  }
+}
+
+function buildEditionPresetUpdateSet(
+  ops: MongoUpdateOps,
+  editionPreset: CampaignMechanicsPatch['editionPreset'],
+  prefix: string,
+): void {
+  const presetId = editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.id`,
+    presetId === DEFAULT_EDITION_PRESET_ID ? undefined : presetId,
+  )
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.modified`,
+    editionPreset?.modified === true ? true : undefined,
+  )
+  sparseSetOrUnset(
+    ops,
+    `${prefix}editionPreset.appliedAt`,
+    editionPreset?.appliedAt !== undefined ? new Date(editionPreset.appliedAt) : undefined,
+  )
+}
+
+function buildMechanicsKnobsUpdateSet(
+  ops: MongoUpdateOps,
+  patch: CampaignMechanicsPatch,
+  prefix: string,
+): void {
+  if (patch.armorClass !== undefined) {
+    ops.$set[`${prefix}armorClass.mode`] = patch.armorClass.mode
+    ops.$set[`${prefix}armorClass.base`] = patch.armorClass.base
+  } else {
+    ops.$unset[`${prefix}armorClass`] = 1
+  }
+
+  sparseSetOrUnset(ops, `${prefix}attackResolution.mode`, patch.attackResolution?.mode)
+}
+
+function buildMechanicsUpdateSet(patch: CampaignMechanicsPatch): MongoUpdateOps {
+  if (isSparseDefaultMechanicsPatch(patch)) {
+    return { $set: {}, $unset: { mechanics: 1 } }
+  }
+
+  const ops: MongoUpdateOps = { $set: {}, $unset: {} }
+  const prefix = MECHANICS_PREFIX
+
+  buildEditionPresetUpdateSet(ops, patch.editionPreset, prefix)
+  buildMechanicsKnobsUpdateSet(ops, patch, prefix)
+
+  return ops
+}
+
+async function applyMechanicsUpdate(
+  campaignId: string,
+  rulesetId: SystemRulesetId,
+  patch: CampaignMechanicsPatch,
+): Promise<void> {
+  await applySparsePatchUpdate(campaignId, rulesetId, buildMechanicsUpdateSet(patch))
+}
 
 function isDefaultCreatureTypePolicy(policy: CreatureTypePolicy | undefined): boolean {
   if (!policy) return true
@@ -128,20 +322,7 @@ async function applyCharacterCreationUpdate(
   rulesetId: SystemRulesetId,
   patch: CampaignCharacterCreationPatch,
 ): Promise<void> {
-  await getOrCreatePatchDocument(campaignId, rulesetId)
-
-  const { $set, $unset } = buildCharacterCreationUpdateSet(patch)
-  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
-    return
-  }
-
-  const update: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
-  if (Object.keys($set).length > 0) update.$set = $set
-  if (Object.keys($unset).length > 0) update.$unset = $unset
-
-  await CampaignRulesetPatchModel.findOneAndUpdate({ campaignId, rulesetId }, update, {
-    upsert: true,
-  })
+  await applySparsePatchUpdate(campaignId, rulesetId, buildCharacterCreationUpdateSet(patch))
 }
 
 async function assertCreatureTypePolicyIds(
@@ -173,10 +354,39 @@ export async function getRulesetPatchRead(campaignId: string): Promise<RulesetPa
   const characterCreation = patchDoc?.characterCreation as
     | CampaignCharacterCreationPatch
     | undefined
+  const mechanics = normalizeMechanicsPatchFromDoc(
+    patchDoc?.mechanics as CampaignMechanicsPatch | undefined,
+  )
 
   return {
     characterCreation: resolveCharacterCreationPatch(characterCreation),
+    mechanics: resolveMechanicsPatch(mechanics),
   }
+}
+
+/** Merges a partial mechanics patch and persists sparse overrides. */
+export async function updateMechanicsPatch(
+  campaignId: string,
+  input: UpdateCampaignMechanicsInput,
+): Promise<RulesetPatchRead | null> {
+  const { rulesetId } = await requireCampaignRuleset(campaignId)
+
+  const patchDoc = await loadPatchDocument(campaignId, rulesetId)
+  const existing = normalizeMechanicsPatchFromDoc(
+    patchDoc?.mechanics as CampaignMechanicsPatch | undefined,
+  )
+  const merged = mergeMechanicsPatch(existing, input)
+
+  await applyMechanicsUpdate(campaignId, rulesetId, merged)
+  return getRulesetPatchRead(campaignId)
+}
+
+/** Default mechanics require no persisted overrides — resolved on read as 5e. */
+export async function writeInitialMechanics(
+  _campaignId: string,
+  _rulesetId: SystemRulesetId,
+): Promise<void> {
+  // Intentionally sparse: resolveMechanicsPatch(undefined) applies 5e defaults.
 }
 
 /** Merges a partial character-creation patch and persists sparse overrides. */
@@ -196,6 +406,7 @@ export async function updateCharacterCreationPatch(
 }
 
 export {
+  applySparsePatchUpdate,
   getOrCreatePatchDocument,
   loadPatchDocument,
   requireCampaignRuleset,

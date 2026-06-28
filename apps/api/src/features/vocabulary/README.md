@@ -30,4 +30,16 @@ Mounted under `/api/campaigns/:campaignId`.
 | DELETE | `/vocabulary/:setId/entries/:entryId` | owner/co-owner | Delete campaign entry (stub allows when `usedBy === 0`)                                                 |
 | GET    | `/homebrew/summary`                   | member         | Resolved catalog counts for hub cards (classes, spells, species, feats, equipment, skill proficiencies) |
 
+## Ruleset patch
+
+Mounted under `/api/campaigns/:campaignId/ruleset-patch`.
+
+| Method | Path                  | Role           | Description                                                                            |
+| ------ | --------------------- | -------------- | -------------------------------------------------------------------------------------- |
+| GET    | `/`                   | member         | Resolved `characterCreation` and `mechanics`                                           |
+| PATCH  | `/character-creation` | owner/co-owner | Partial character-creation patch (sparse)                                              |
+| PATCH  | `/mechanics`          | owner/co-owner | Partial mechanics patch (sparse; server sets `editionPreset.modified` and `appliedAt`) |
+
+`mechanics` stores edition preset selection, armor class knobs, and attack resolution mode. Defaults resolve to the **5e** preset when nothing is stored.
+
 Id conflicts use `assertVocabularyIdAvailable` (409) — campaign ids must not shadow system seed ids.

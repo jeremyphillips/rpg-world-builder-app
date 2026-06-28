@@ -26,6 +26,7 @@ export type FieldType =
   | 'textarea'
   | 'select'
   | 'radio'
+  | 'radioCard'
   | 'checkbox'
   | 'switch'
   | 'json'
@@ -39,13 +40,15 @@ export type FieldType =
   | 'chooseFromChips'
   | 'inlineChooseCount'
 
-/** Option for the `select`, `radio`, `chips`, and `combobox` field types. */
+/** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
   label: string
   value: string
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
+  /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
+  meta?: string[]
 }
 
 /** Labeled option group for `select` fields (rendered as `<optgroup>`-style sections). */
@@ -154,6 +157,14 @@ export interface RadioFieldConfig extends BaseFieldConfig {
   defaultValue?: string
   /** When `'horizontal'`, options lay out in a row (default `'vertical'`). */
   orientation?: 'horizontal' | 'vertical'
+  /** Visually hide the label while keeping it available to screen readers. */
+  labelHidden?: boolean
+}
+
+export interface RadioCardFieldConfig extends BaseFieldConfig {
+  type: 'radioCard'
+  options: FieldOption[]
+  defaultValue?: string
   /** Visually hide the label while keeping it available to screen readers. */
   labelHidden?: boolean
 }
@@ -359,6 +370,7 @@ export type FieldConfig =
   | TextareaFieldConfig
   | SelectFieldConfig
   | RadioFieldConfig
+  | RadioCardFieldConfig
   | CheckboxFieldConfig
   | SwitchFieldConfig
   | JsonFieldConfig
@@ -498,6 +510,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   textarea: '',
   select: '',
   radio: '',
+  radioCard: '',
   checkbox: false,
   switch: false,
   json: '',

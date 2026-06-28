@@ -1,6 +1,10 @@
 import { Router } from 'express'
 
-import { CAMPAIGN_ROLES, updateCampaignCharacterCreationInputSchema } from '@rpg/contracts'
+import {
+  CAMPAIGN_ROLES,
+  updateCampaignCharacterCreationInputSchema,
+  updateCampaignMechanicsInputSchema,
+} from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
@@ -22,4 +26,12 @@ rulesetPatchRouter.patch(
   requireCampaignRole('owner', 'co-owner'),
   validate(updateCampaignCharacterCreationInputSchema),
   controller.patchCharacterCreation,
+)
+
+rulesetPatchRouter.patch(
+  '/mechanics',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(updateCampaignMechanicsInputSchema),
+  controller.patchMechanics,
 )

@@ -1,12 +1,7 @@
-import type { ReactNode } from 'react'
-
 import { cn } from '../../lib/utils'
-import { Field } from './field.client'
-import { fieldLabelVariants } from './field.variants'
 import { textVariants } from './text.variants'
 import { RadioGroup, RadioGroupItem } from './radio-group.client'
-import { InfoTooltip } from './tooltip.client'
-import type { FieldWidth } from './field-control.variants'
+import { RadioFieldShell, type BaseRadioFieldProps } from './radio-field-shell'
 
 export interface RadioGroupFieldOption {
   label: string
@@ -14,15 +9,8 @@ export interface RadioGroupFieldOption {
   disabled?: boolean
 }
 
-export interface RadioGroupFieldProps {
-  id: string
-  label: string
+export interface RadioGroupFieldProps extends BaseRadioFieldProps {
   options: RadioGroupFieldOption[]
-  error?: string
-  hint?: string
-  info?: ReactNode
-  required?: boolean
-  width?: FieldWidth
   name?: string
   disabled?: boolean
   value?: string
@@ -31,7 +19,6 @@ export interface RadioGroupFieldProps {
   /** Forwarded to the group root so RHF's `field.onBlur` (touched state) can fire. */
   onBlur?: () => void
   orientation?: 'horizontal' | 'vertical'
-  labelHidden?: boolean
 }
 
 /**
@@ -56,22 +43,18 @@ export function RadioGroupField({
   orientation = 'vertical',
   labelHidden,
 }: RadioGroupFieldProps) {
-  const labelId = `${id}-label`
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
-      <span
-        id={labelId}
-        className={cn(fieldLabelVariants({ size: 'md' }), labelHidden && 'sr-only')}
-      >
-        {label}
-        {required ? (
-          <span aria-hidden="true" className="text-destructive">
-            *
-          </span>
-        ) : null}
-        {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
-      </span>
-      <Field.Control>
+    <RadioFieldShell
+      id={id}
+      label={label}
+      error={error}
+      hint={hint}
+      info={info}
+      required={required}
+      width={width}
+      labelHidden={labelHidden}
+    >
+      {(labelId) => (
         <RadioGroup
           aria-labelledby={labelId}
           name={name}
@@ -99,9 +82,7 @@ export function RadioGroupField({
             )
           })}
         </RadioGroup>
-      </Field.Control>
-      <Field.Hint />
-      <Field.Error />
-    </Field.Root>
+      )}
+    </RadioFieldShell>
   )
 }

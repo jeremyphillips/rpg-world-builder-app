@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 
+import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
+
 import { RulesConfigFieldNav } from './rules-config-field-nav.client'
 
 beforeAll(() => {
@@ -16,11 +18,17 @@ beforeAll(() => {
   }
 })
 
+const defaultNavProps = {
+  sections: CHARACTER_CONFIGURATION_SECTIONS,
+  navLabel: 'Character configuration sections',
+  mobileSelectLabel: 'Character configuration section',
+}
+
 describe('RulesConfigFieldNav', () => {
-  it('lists character configuration sections in the desktop rail', () => {
+  it('lists provided sections in the desktop rail', () => {
     render(
       <MemoryRouter>
-        <RulesConfigFieldNav />
+        <RulesConfigFieldNav {...defaultNavProps} />
       </MemoryRouter>,
     )
 
@@ -41,7 +49,7 @@ describe('RulesConfigFieldNav', () => {
     const user = userEvent.setup()
     render(
       <MemoryRouter>
-        <RulesConfigFieldNav />
+        <RulesConfigFieldNav {...defaultNavProps} />
       </MemoryRouter>,
     )
 
