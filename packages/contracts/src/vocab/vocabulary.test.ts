@@ -56,6 +56,8 @@ describe('vocabularyOptionIdSchema', () => {
   it('accepts lowercase slug ids', () => {
     expect(vocabularyOptionIdSchema.parse('humanoid')).toBe('humanoid')
     expect(vocabularyOptionIdSchema.parse('custom-type')).toBe('custom-type')
+    expect(vocabularyOptionIdSchema.parse('attack_matrix')).toBe('attack_matrix')
+    expect(vocabularyOptionIdSchema.parse('1e')).toBe('1e')
   })
 
   it('rejects invalid slug shapes', () => {

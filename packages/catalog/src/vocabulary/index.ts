@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { CREATURE_TYPE_SET_ID, vocabularySeedOptionSchema } from '@rpg/contracts'
+import {
+  ATTACK_RESOLUTION_MODE_SET_ID,
+  CREATURE_TYPE_SET_ID,
+  EDITION_PRESET_SET_ID,
+  vocabularySeedOptionSchema,
+} from '@rpg/contracts'
 import type {
   SystemRulesetId,
   VocabularyOption,
@@ -9,7 +14,9 @@ import type {
 } from '@rpg/contracts'
 
 import { getById } from '../lib/get-by-id'
+import attackResolutionModesRaw from './data/srd-cc-5.2.1/attack-resolution-modes.json'
 import creatureTypesRaw from './data/srd-cc-5.2.1/creature-types.json'
+import editionPresetsRaw from './data/srd-cc-5.2.1/edition-presets.json'
 
 function assertUniqueOptionIds(options: readonly VocabularySeedOption[], label: string): void {
   const ids = options.map((option) => option.id)
@@ -27,10 +34,17 @@ function parseSeedOptions(raw: unknown, label: string): VocabularySeedOption[] {
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.
 const SRD_521_CREATURE_TYPES = parseSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
+const SRD_521_EDITION_PRESETS = parseSeedOptions(editionPresetsRaw, EDITION_PRESET_SET_ID)
+const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
+  attackResolutionModesRaw,
+  ATTACK_RESOLUTION_MODE_SET_ID,
+)
 
 const SEED_SETS_BY_RULESET = {
   'srd-cc-5.2.1': {
     [CREATURE_TYPE_SET_ID]: SRD_521_CREATURE_TYPES,
+    [EDITION_PRESET_SET_ID]: SRD_521_EDITION_PRESETS,
+    [ATTACK_RESOLUTION_MODE_SET_ID]: SRD_521_ATTACK_RESOLUTION_MODES,
   },
 } as const satisfies Record<
   SystemRulesetId,
@@ -139,6 +153,88 @@ export function getSeedCreatureTypeEntry(
       CREATURE_TYPE_SET_ID,
       id,
       'Creature type',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Edition presets — internal mechanics vocabulary
+// ---------------------------------------------------------------------------
+
+export const EDITION_PRESETS = SRD_521_EDITION_PRESETS.map((option) => option.id) as [
+  (typeof SRD_521_EDITION_PRESETS)[number]['id'],
+  ...(typeof SRD_521_EDITION_PRESETS)[number]['id'][],
+]
+
+export type SeedEditionPreset = (typeof EDITION_PRESETS)[number]
+
+export function loadSeedEditionPresets(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, EDITION_PRESET_SET_ID)
+}
+
+export function seedEditionPresetIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, EDITION_PRESET_SET_ID)
+}
+
+export function getSeedEditionPresetLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, EDITION_PRESET_SET_ID, id)
+}
+
+export function getSeedEditionPresetEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, EDITION_PRESET_SET_ID),
+      rulesetId,
+      EDITION_PRESET_SET_ID,
+      id,
+      'Edition preset',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Attack resolution modes — internal mechanics vocabulary
+// ---------------------------------------------------------------------------
+
+export const ATTACK_RESOLUTION_MODES = SRD_521_ATTACK_RESOLUTION_MODES.map(
+  (option) => option.id,
+) as [
+  (typeof SRD_521_ATTACK_RESOLUTION_MODES)[number]['id'],
+  ...(typeof SRD_521_ATTACK_RESOLUTION_MODES)[number]['id'][],
+]
+
+export type SeedAttackResolutionMode = (typeof ATTACK_RESOLUTION_MODES)[number]
+
+export function loadSeedAttackResolutionModes(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, ATTACK_RESOLUTION_MODE_SET_ID)
+}
+
+export function seedAttackResolutionModeIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, ATTACK_RESOLUTION_MODE_SET_ID)
+}
+
+export function getSeedAttackResolutionModeLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, ATTACK_RESOLUTION_MODE_SET_ID, id)
+}
+
+export function getSeedAttackResolutionModeEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, ATTACK_RESOLUTION_MODE_SET_ID),
+      rulesetId,
+      ATTACK_RESOLUTION_MODE_SET_ID,
+      id,
+      'Attack resolution mode',
     )
   } catch {
     return undefined

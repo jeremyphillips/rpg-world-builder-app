@@ -8,7 +8,7 @@ import { z } from 'zod'
 // ---------------------------------------------------------------------------
 
 /** Lowercase slug shape shared with content keys — validates id format only. */
-export const vocabularyOptionIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+export const vocabularyOptionIdSchema = z.string().regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/)
 
 export type VocabularyOptionId = z.infer<typeof vocabularyOptionIdSchema>
 
