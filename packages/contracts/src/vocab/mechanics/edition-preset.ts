@@ -52,9 +52,28 @@ export const EDITION_PRESET_IDS = Object.keys(EDITION_PRESET_ENTRIES) as [
   ...EditionPresetId[],
 ]
 
+/** UI display order for edition presets — most recent era first. */
+export const EDITION_PRESET_DISPLAY_ORDER = [
+  '5e',
+  '3e',
+  '2e',
+  '1e',
+  'becmi',
+] as const satisfies readonly EditionPresetId[]
+
 export const editionPresetIdSchema = z.enum(EDITION_PRESET_IDS)
 
 export const DEFAULT_EDITION_PRESET_ID = '5e' as const satisfies EditionPresetId
+
+/** Sorts edition preset ids by {@link EDITION_PRESET_DISPLAY_ORDER}; unknown ids sort last. */
+export function sortEditionPresetIds(ids: Iterable<string>): string[] {
+  const order = new Map(EDITION_PRESET_DISPLAY_ORDER.map((id, index) => [id, index]))
+  return [...ids].sort(
+    (a, b) =>
+      (order.get(a as EditionPresetId) ?? Number.MAX_SAFE_INTEGER) -
+      (order.get(b as EditionPresetId) ?? Number.MAX_SAFE_INTEGER),
+  )
+}
 
 /** Returns the reference entry for an edition preset id, if known. */
 export function getEditionPresetEntry(id: string): EditionPresetEntry | undefined {

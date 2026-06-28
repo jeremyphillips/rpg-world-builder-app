@@ -2,6 +2,7 @@ import {
   EDITION_PRESET_ENTRIES,
   EDITION_PRESET_SET_ID,
   getEditionPresetEntry,
+  sortEditionPresetIds,
   type ResolvedVocabularyOptionSet,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
@@ -31,7 +32,7 @@ export function buildEditionPresetFieldOptions(
 ): FieldOption[] {
   if (!vocabulary) return []
 
-  return [...vocabulary.activeIds].sort().map((id) => {
+  return sortEditionPresetIds(vocabulary.activeIds).map((id) => {
     const reference =
       getEditionPresetEntry(id) ?? EDITION_PRESET_ENTRIES[id as keyof typeof EDITION_PRESET_ENTRIES]
     return {

@@ -1,18 +1,8 @@
 [
   {
-    "id": "becmi",
-    "label": "Classic Basic",
-    "description": "Fast old-school play with descending armor class, class tables, simple saves, and lightweight character options."
-  },
-  {
-    "id": "1e",
-    "label": "Advanced Classic 1e",
-    "description": "A stricter classic framework with table-driven combat, granular saves, and more detailed class structure."
-  },
-  {
-    "id": "2e",
-    "label": "Advanced Classic 2e",
-    "description": "A refined classic framework with THAC0-style attacks, class advancement, and broader character customization."
+    "id": "5e",
+    "label": "Modern 5e",
+    "description": "A familiar modern fantasy rules framework with ascending armor class, proficiency-based advancement, ability checks, saving throws, and standardized d20 combat."
   },
   {
     "id": "3e",
@@ -20,8 +10,18 @@
     "description": "A detailed d20 framework with ascending armor class, attack bonuses, Fortitude/Reflex/Will saves, skill ranks, feats, and more granular character customization."
   },
   {
-    "id": "5e",
-    "label": "Modern 5e",
-    "description": "A familiar modern fantasy rules framework with ascending armor class, proficiency-based advancement, ability checks, saving throws, and standardized d20 combat."
+    "id": "2e",
+    "label": "Advanced Classic 2e",
+    "description": "A refined classic framework with THAC0-style attacks, class advancement, and broader character customization."
+  },
+  {
+    "id": "1e",
+    "label": "Advanced Classic 1e",
+    "description": "A stricter classic framework with table-driven combat, granular saves, and more detailed class structure."
+  },
+  {
+    "id": "becmi",
+    "label": "Classic Basic",
+    "description": "Fast old-school play with descending armor class, class tables, simple saves, and lightweight character options."
   }
 ]
