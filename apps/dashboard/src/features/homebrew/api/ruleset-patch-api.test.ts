@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError } from '@rpg/contracts'
+import { ApiError, defaultCampaignMechanicsPatch } from '@rpg/contracts'
 
 import { fetchRulesetPatch, patchCharacterCreation } from './ruleset-patch-api'
 
@@ -30,6 +30,7 @@ describe('fetchRulesetPatch', () => {
         progression: { maxCharacterLevel: 20 },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       },
+      mechanics: defaultCampaignMechanicsPatch(),
     }
     stubFetch(fakeResponse(true, 200, { patch }))
 
@@ -54,6 +55,7 @@ describe('patchCharacterCreation', () => {
         progression: { maxCharacterLevel: 20 },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       },
+      mechanics: defaultCampaignMechanicsPatch(),
     }
     stubFetch(fakeResponse(true, 200, { patch }))
 

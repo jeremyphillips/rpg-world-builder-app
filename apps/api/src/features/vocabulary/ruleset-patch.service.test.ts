@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
 import type { Express } from 'express'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import { CREATURE_TYPE_SET_ID, defaultCampaignMechanicsPatch } from '@rpg/contracts'
 
 import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
@@ -46,6 +46,7 @@ describe('getRulesetPatchRead', () => {
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
     })
+    expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })
 })
 

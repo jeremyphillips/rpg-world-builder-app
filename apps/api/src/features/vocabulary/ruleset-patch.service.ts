@@ -4,10 +4,12 @@ import {
   DEFAULT_STARTING_LEVEL,
   MAX_CHARACTER_LEVEL,
   resolveCharacterCreationPatch,
+  resolveMechanicsPatch,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
   CampaignCharacterCreationPatch,
+  CampaignMechanicsPatch,
   CreatureTypePolicy,
   RulesetPatchRead,
   SystemRulesetId,
@@ -173,9 +175,11 @@ export async function getRulesetPatchRead(campaignId: string): Promise<RulesetPa
   const characterCreation = patchDoc?.characterCreation as
     | CampaignCharacterCreationPatch
     | undefined
+  const mechanics = patchDoc?.mechanics as CampaignMechanicsPatch | undefined
 
   return {
     characterCreation: resolveCharacterCreationPatch(characterCreation),
+    mechanics: resolveMechanicsPatch(mechanics),
   }
 }
 

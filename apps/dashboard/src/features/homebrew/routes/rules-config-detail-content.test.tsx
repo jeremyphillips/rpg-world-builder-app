@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CREATURE_TYPE_SET_ID, type RulesetPatchRead } from '@rpg/contracts'
+import {
+  CREATURE_TYPE_SET_ID,
+  defaultCampaignMechanicsPatch,
+  type RulesetPatchRead,
+} from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
 
@@ -30,6 +34,7 @@ const mockPatch: RulesetPatchRead = {
     progression: { maxCharacterLevel: 20 },
     species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
   },
+  mechanics: defaultCampaignMechanicsPatch(),
 }
 
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {

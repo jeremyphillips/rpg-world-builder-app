@@ -35,6 +35,8 @@ export const VOCABULARY_OPTION_SET_IDS = [
   'spell-schools',
   'weapon-properties',
   'equipment-categories',
+  'edition-presets',
+  'attack-resolution-modes',
 ] as const
 
 export const vocabularyOptionSetIdSchema = z.enum(VOCABULARY_OPTION_SET_IDS)
