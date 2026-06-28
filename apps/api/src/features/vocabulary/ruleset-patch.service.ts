@@ -2,9 +2,15 @@ import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   DEFAULT_EDITION_PRESET_ID,
   DEFAULT_IMPORTED_CHARACTERS_POLICY,
+  DEFAULT_MULTICLASSING_ENABLED,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_STARTING_LEVEL,
   MAX_CHARACTER_LEVEL,
   getEditionPresetMechanics,
+  isSparseDefaultMulticlassingPatch,
   mechanicsDriftFromPreset,
   resolveCharacterCreationPatch,
   resolveMechanicsKnobsFromPatch,
@@ -14,6 +20,7 @@ import {
 import type {
   CampaignCharacterCreationPatch,
   CampaignMechanicsPatch,
+  CampaignMulticlassingPatch,
   CreatureTypePolicy,
   EditionPresetId,
   RulesetPatchRead,
@@ -226,6 +233,48 @@ function isDefaultCreatureTypePolicy(policy: CreatureTypePolicy | undefined): bo
   )
 }
 
+function mergeMulticlassingPatch(
+  existing: CampaignMulticlassingPatch | undefined,
+  input: CampaignMulticlassingPatch,
+): CampaignMulticlassingPatch {
+  const merged: CampaignMulticlassingPatch = {
+    ...(existing ?? {}),
+    ...input,
+  }
+
+  if (input.requirements !== undefined) {
+    const prevReq = existing?.requirements ?? {}
+    const nextReq = input.requirements
+    merged.requirements = {
+      ...prevReq,
+      ...nextReq,
+    }
+
+    if (nextReq.primaryAbilityMinimum !== undefined) {
+      merged.requirements.primaryAbilityMinimum = {
+        ...(prevReq.primaryAbilityMinimum ?? {}),
+        ...nextReq.primaryAbilityMinimum,
+      }
+    }
+
+    if (nextReq.speciesPolicy !== undefined) {
+      merged.requirements.speciesPolicy = {
+        ...(prevReq.speciesPolicy ?? {}),
+        ...nextReq.speciesPolicy,
+      }
+    }
+
+    if (nextReq.speciesLevelLimits !== undefined) {
+      merged.requirements.speciesLevelLimits = {
+        ...(prevReq.speciesLevelLimits ?? {}),
+        ...nextReq.speciesLevelLimits,
+      }
+    }
+  }
+
+  return merged
+}
+
 function mergeCharacterCreationPatch(
   existing: CampaignCharacterCreationPatch | undefined,
   input: UpdateCampaignCharacterCreationInput,
@@ -256,31 +305,120 @@ function mergeCharacterCreationPatch(
     }
   }
 
+  if (input.multiclassing !== undefined) {
+    merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
+  }
+
   return merged
+}
+
+function sparseSetIfDiffers<T>(
+  ops: MongoUpdateOps,
+  path: string,
+  value: T | undefined,
+  defaultValue: T,
+): void {
+  sparseSetOrUnset(ops, path, value !== undefined && value !== defaultValue ? value : undefined)
+}
+
+function buildPrimaryAbilityMinimumUpdateSet(
+  ops: MongoUpdateOps,
+  pam: NonNullable<
+    NonNullable<CampaignMulticlassingPatch['requirements']>['primaryAbilityMinimum']
+  >,
+  reqPrefix: string,
+): void {
+  sparseSetIfDiffers(
+    ops,
+    `${reqPrefix}.primaryAbilityMinimum.enabled`,
+    pam.enabled,
+    DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+  )
+  sparseSetIfDiffers(
+    ops,
+    `${reqPrefix}.primaryAbilityMinimum.minimumScore`,
+    pam.minimumScore,
+    DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  )
+}
+
+function buildMulticlassingRequirementsUpdateSet(
+  ops: MongoUpdateOps,
+  requirements: NonNullable<CampaignMulticlassingPatch['requirements']>,
+  reqPrefix: string,
+): void {
+  if (requirements.primaryAbilityMinimum !== undefined) {
+    buildPrimaryAbilityMinimumUpdateSet(ops, requirements.primaryAbilityMinimum, reqPrefix)
+  }
+
+  if (requirements.speciesPolicy !== undefined) {
+    sparseSetIfDiffers(
+      ops,
+      `${reqPrefix}.speciesPolicy.enabled`,
+      requirements.speciesPolicy.enabled,
+      DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+    )
+  }
+
+  if (requirements.speciesLevelLimits !== undefined) {
+    sparseSetIfDiffers(
+      ops,
+      `${reqPrefix}.speciesLevelLimits.enabled`,
+      requirements.speciesLevelLimits.enabled,
+      DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+    )
+  }
+}
+
+function buildMulticlassingUpdateSet(
+  ops: MongoUpdateOps,
+  multiclassing: CampaignMulticlassingPatch,
+  prefix: string,
+): void {
+  const mcPrefix = `${prefix}multiclassing`
+
+  if (isSparseDefaultMulticlassingPatch(multiclassing)) {
+    ops.$unset[mcPrefix] = 1
+    return
+  }
+
+  sparseSetIfDiffers(
+    ops,
+    `${mcPrefix}.enabled`,
+    multiclassing.enabled,
+    DEFAULT_MULTICLASSING_ENABLED,
+  )
+
+  if (multiclassing.requirements !== undefined) {
+    buildMulticlassingRequirementsUpdateSet(
+      ops,
+      multiclassing.requirements,
+      `${mcPrefix}.requirements`,
+    )
+  }
 }
 
 function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch): {
   $set: Record<string, unknown>
   $unset: Record<string, 1>
 } {
-  const $set: Record<string, unknown> = {}
-  const $unset: Record<string, 1> = {}
+  const ops: MongoUpdateOps = { $set: {}, $unset: {} }
   const prefix = CHARACTER_CREATION_PREFIX
 
   if (patch.startingLevel !== undefined) {
     if (patch.startingLevel !== DEFAULT_STARTING_LEVEL) {
-      $set[`${prefix}startingLevel`] = patch.startingLevel
+      ops.$set[`${prefix}startingLevel`] = patch.startingLevel
     } else {
-      $unset[`${prefix}startingLevel`] = 1
+      ops.$unset[`${prefix}startingLevel`] = 1
     }
   }
 
   const policy = patch.importedCharacters?.policy
   if (policy !== undefined) {
     if (policy !== DEFAULT_IMPORTED_CHARACTERS_POLICY) {
-      $set[`${prefix}importedCharacters.policy`] = policy
+      ops.$set[`${prefix}importedCharacters.policy`] = policy
     } else {
-      $unset[`${prefix}importedCharacters`] = 1
+      ops.$unset[`${prefix}importedCharacters`] = 1
     }
   }
 
@@ -288,33 +426,37 @@ function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch):
     const maxLevel = patch.progression.maxCharacterLevel
     if (maxLevel !== undefined) {
       if (maxLevel !== MAX_CHARACTER_LEVEL) {
-        $set[`${prefix}progression.maxCharacterLevel`] = maxLevel
+        ops.$set[`${prefix}progression.maxCharacterLevel`] = maxLevel
       } else {
-        $unset[`${prefix}progression.maxCharacterLevel`] = 1
+        ops.$unset[`${prefix}progression.maxCharacterLevel`] = 1
       }
     }
 
     const extended = patch.progression.extendedProgression
     if (extended) {
-      $set[`${prefix}progression.extendedProgression.tierName`] = extended.tierName
-      $set[`${prefix}progression.extendedProgression.maxLevel`] = extended.maxLevel
+      ops.$set[`${prefix}progression.extendedProgression.tierName`] = extended.tierName
+      ops.$set[`${prefix}progression.extendedProgression.maxLevel`] = extended.maxLevel
     } else {
-      $unset[`${prefix}progression.extendedProgression`] = 1
+      ops.$unset[`${prefix}progression.extendedProgression`] = 1
     }
   }
 
   const creaturePolicy = patch.species?.creatureTypePolicy
   if (creaturePolicy !== undefined) {
     if (!isDefaultCreatureTypePolicy(creaturePolicy)) {
-      $set[`${prefix}species.creatureTypePolicy.mode`] = creaturePolicy.mode
-      $set[`${prefix}species.creatureTypePolicy.ids`] = creaturePolicy.ids
+      ops.$set[`${prefix}species.creatureTypePolicy.mode`] = creaturePolicy.mode
+      ops.$set[`${prefix}species.creatureTypePolicy.ids`] = creaturePolicy.ids
     } else {
-      $unset[`${prefix}species.creatureTypePolicy`] = 1
-      $unset[`${prefix}species`] = 1
+      ops.$unset[`${prefix}species.creatureTypePolicy`] = 1
+      ops.$unset[`${prefix}species`] = 1
     }
   }
 
-  return { $set, $unset }
+  if (patch.multiclassing !== undefined) {
+    buildMulticlassingUpdateSet(ops, patch.multiclassing, prefix)
+  }
+
+  return ops
 }
 
 async function applyCharacterCreationUpdate(

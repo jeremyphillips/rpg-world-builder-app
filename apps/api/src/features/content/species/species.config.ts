@@ -40,6 +40,9 @@ function toHomebrewSpecies(doc: HomebrewDoc): Species {
     ...(record.heritage != null && {
       heritage: record.heritage as Species['heritage'],
     }),
+    ...(record.characterCreation != null && {
+      characterCreation: record.characterCreation as Species['characterCreation'],
+    }),
   } as Species
 }
 

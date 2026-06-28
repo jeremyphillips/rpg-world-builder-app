@@ -563,4 +563,43 @@ describe('createHomebrewContent (species)', () => {
       code: 'invalid_vocabulary',
     })
   })
+
+  it('creates homebrew species with characterCreation multiclass data', async () => {
+    const campaign = await makeCampaign()
+    const created = await createHomebrewContent(speciesWriteConfig, campaign.id, {
+      ...minimalSpeciesInput,
+      characterCreation: {
+        multiclassing: {
+          policy: 'restricted',
+          classPolicy: { mode: 'only', classIds: ['fighter'] },
+        },
+        levelLimits: {
+          maxCharacterLevel: 10,
+          classLevelCaps: [{ classId: 'wizard', maxLevel: 5 }],
+        },
+      },
+    })
+
+    expect(created.characterCreation?.multiclassing?.classPolicy.classIds).toEqual(['fighter'])
+    expect(created.characterCreation?.levelLimits?.maxCharacterLevel).toBe(10)
+  })
+
+  it('rejects unknown class slugs in characterCreation', async () => {
+    const campaign = await makeCampaign()
+
+    await expect(
+      createHomebrewContent(speciesWriteConfig, campaign.id, {
+        ...minimalSpeciesInput,
+        characterCreation: {
+          multiclassing: {
+            policy: 'restricted',
+            classPolicy: { mode: 'only', classIds: ['not-a-class'] },
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+    })
+  })
 })
