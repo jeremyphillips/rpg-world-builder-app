@@ -24,7 +24,9 @@ describe('RadioCard', () => {
   it('selects an option on click', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
-    render(<RadioCard aria-label="Edition preset" options={options} onValueChange={onValueChange} />)
+    render(
+      <RadioCard aria-label="Edition preset" options={options} onValueChange={onValueChange} />,
+    )
     await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
     expect(onValueChange).toHaveBeenCalledWith('3e')
   })
@@ -40,9 +42,34 @@ describe('RadioCard', () => {
     expect(screen.getByText('Attack bonuses')).toBeInTheDocument()
   })
 
+  it('renders an inline title badge when provided', () => {
+    render(
+      <RadioCard
+        aria-label="Edition preset"
+        options={[{ label: 'Modern 5e', value: '5e', badge: 'Recommended' }]}
+      />,
+    )
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RadioCard aria-label="Edition preset" options={options} />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('selects an option when controlPosition is right', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <RadioCard
+        aria-label="Edition preset"
+        options={options}
+        controlPosition="right"
+        onValueChange={onValueChange}
+      />,
+    )
+    await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
+    expect(onValueChange).toHaveBeenCalledWith('3e')
   })
 })

@@ -49,6 +49,8 @@ export interface FieldOption {
   description?: string
   /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
   meta?: string[]
+  /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
+  badge?: string
 }
 
 /** Labeled option group for `select` fields (rendered as `<optgroup>`-style sections). */

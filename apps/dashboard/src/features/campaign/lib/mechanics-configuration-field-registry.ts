@@ -36,6 +36,16 @@ type MechanicsFieldOptions = {
   attackResolutionModeOptions: FieldOption[]
 }
 
+const EDITION_PRESET_RECOMMENDED_BADGE = 'Recommended'
+
+function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): FieldOption[] {
+  return options.map((option) =>
+    option.value === DEFAULT_EDITION_PRESET_ID
+      ? { ...option, badge: EDITION_PRESET_RECOMMENDED_BADGE }
+      : option,
+  )
+}
+
 function anchorSlot(sectionId: string): FormItem {
   return {
     kind: 'slot',
@@ -56,7 +66,7 @@ function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
         label: 'Edition preset',
         labelHidden: true,
         required: true,
-        options: editionPresetOptions,
+        options: editionPresetOptionsWithRecommendedBadge(editionPresetOptions),
         defaultValue: DEFAULT_EDITION_PRESET_ID,
       },
       {

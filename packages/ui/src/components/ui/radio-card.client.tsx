@@ -13,6 +13,8 @@ import {
   radioCardIndicatorVariants,
   radioCardMetaListVariants,
   radioCardRootLayoutVariants,
+  radioCardTitleRowVariants,
+  radioCardTitleVariants,
   radioCardVariants,
 } from './radio-card.variants'
 import { textVariants } from './text.variants'
@@ -22,6 +24,8 @@ export interface RadioCardOption {
   value: string
   disabled?: boolean
   description?: string
+  /** Optional badge rendered inline with the title (e.g. "Recommended"). */
+  badge?: string
   meta?: string[]
 }
 
@@ -30,45 +34,60 @@ export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
 > {
   label: string
   description?: string
+  badge?: string
   meta?: string[]
+  /** Horizontal placement of the decorative radio control within the card. */
+  controlPosition?: 'left' | 'right'
 }
 
 const RadioCardItem = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Item>,
   RadioCardItemProps
->(({ className, label, description, meta, disabled, ...props }, ref) => (
-  <RadioGroupPrimitive.Item
-    ref={ref}
-    disabled={disabled}
-    className={cn(radioCardVariants(), className)}
-    {...props}
-  >
-    <div className={radioCardRootLayoutVariants()}>
-      <span className={cn(radioCardControlVariants(), 'mt-0.5')} aria-hidden="true">
-        <span className={radioCardIndicatorVariants()}>
-          <Circle className="size-3 fill-primary text-primary" />
+>(
+  (
+    { className, label, description, badge, meta, controlPosition = 'left', disabled, ...props },
+    ref,
+  ) => (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      disabled={disabled}
+      className={cn(radioCardVariants(), className)}
+      {...props}
+    >
+      <div className={radioCardRootLayoutVariants({ controlPosition })}>
+        <span className={cn(radioCardControlVariants(), 'mt-0.5')} aria-hidden="true">
+          <span className={radioCardIndicatorVariants()}>
+            <Circle className="size-3 fill-primary text-primary" />
+          </span>
         </span>
-      </span>
-      <div className={radioCardBodyVariants()}>
-        <span className={textVariants({ variant: 'emphasis' })}>{label}</span>
-        {description ? (
-          <span className={textVariants({ variant: 'small' })}>{description}</span>
-        ) : null}
-        {meta && meta.length > 0 ? (
-          <ul className={radioCardMetaListVariants()} aria-hidden="true">
-            {meta.map((chip) => (
-              <li key={chip}>
-                <Badge variant="secondary" size="sm">
-                  {chip}
-                </Badge>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <div className={radioCardBodyVariants()}>
+          <div className={radioCardTitleRowVariants()}>
+            <span className={radioCardTitleVariants()}>{label}</span>
+            {badge ? (
+              <Badge variant="default" size="sm">
+                {badge}
+              </Badge>
+            ) : null}
+          </div>
+          {description ? (
+            <span className={textVariants({ variant: 'small' })}>{description}</span>
+          ) : null}
+          {meta && meta.length > 0 ? (
+            <ul className={radioCardMetaListVariants()} aria-hidden="true">
+              {meta.map((chip) => (
+                <li key={chip}>
+                  <Badge variant="secondary" size="sm">
+                    {chip}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       </div>
-    </div>
-  </RadioGroupPrimitive.Item>
-))
+    </RadioGroupPrimitive.Item>
+  ),
+)
 RadioCardItem.displayName = 'RadioCardItem'
 
 export interface RadioCardProps extends React.ComponentPropsWithoutRef<
@@ -77,13 +96,21 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<
   options: RadioCardOption[]
   /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
+  /** Horizontal placement of the decorative radio control within each card. */
+  controlPosition?: 'left' | 'right'
 }
 
 /**
  * Card-style single-select built on Radix `RadioGroup`. Each option renders a
  * label, optional description, and optional meta chip list.
  */
-function RadioCard({ className, options, idPrefix = 'radio-card', ...props }: RadioCardProps) {
+function RadioCard({
+  className,
+  options,
+  idPrefix = 'radio-card',
+  controlPosition = 'left',
+  ...props
+}: RadioCardProps) {
   return (
     <RadioGroup className={cn('grid gap-3', className)} {...props}>
       {options.map((option) => (
@@ -94,7 +121,9 @@ function RadioCard({ className, options, idPrefix = 'radio-card', ...props }: Ra
           disabled={option.disabled}
           label={option.label}
           description={option.description}
+          badge={option.badge}
           meta={option.meta}
+          controlPosition={controlPosition}
         />
       ))}
     </RadioGroup>
