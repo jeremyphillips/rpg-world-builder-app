@@ -17,6 +17,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "analyze": "fallow --format human || true",
+    "bench": "pnpm --filter @rpg/bench-cli bench",
     "storybook": "concurrently -n ui,dash -c cyan,magenta \"pnpm storybook:ui\" \"pnpm storybook:dashboard\"",
     "storybook:ui": "pnpm --filter @rpg/ui storybook",
     "storybook:dashboard": "pnpm --filter @rpg/dashboard storybook",

@@ -87,6 +87,24 @@ CI runs axe against both Storybooks on PRs via the
 [Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
 `dashboard` matrix jobs).
 
+## Dev Bench CLI
+
+Agent-facing ticket/epic commands via `@rpg/bench-cli`:
+
+```bash
+pnpm bench --help
+pnpm bench seed-epics
+pnpm bench list-tickets --status backlog
+```
+
+The CLI calls the API **directly** at `BENCH_API_URL` (default `http://localhost:5001`) — not through the `:8080` proxy. Start `@rpg/api` first:
+
+```bash
+pnpm --filter @rpg/api dev
+```
+
+See [`tools/bench/README.md`](../tools/bench/README.md) for command reference.
+
 ## Quality gates (Turbo, all workspaces)
 
 ```bash

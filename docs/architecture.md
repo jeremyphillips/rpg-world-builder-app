@@ -16,26 +16,30 @@ apps/
 packages/
   config/      # shared tsconfig / eslint / prettier / vitest / storybook presets
   contracts/   # Zod schemas + inferred TS types (single source of truth)
+  dev-bench-core/  # Dev Bench domain helpers (workflow, seeds, agent formatting)
   api-client/  # same-origin fetch + CSRF + auth helpers (fetchSession, logout)
   catalog/     # system SRD seed JSON + validated loaders (shared catalog data)
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
 tools/
   proxy/       # single-origin dev reverse proxy
+  bench/       # @rpg/bench-cli — agent CLI (pnpm bench)
 docs/          # this folder — cross-cutting architecture/env/run guides
 ```
 
-| Workspace         | README                                                            |
-| ----------------- | ----------------------------------------------------------------- |
-| `@rpg/public`     | [apps/public/README.md](../apps/public/README.md)                 |
-| `@rpg/dashboard`  | [apps/dashboard/README.md](../apps/dashboard/README.md)           |
-| `@rpg/bench`      | [apps/bench/README.md](../apps/bench/README.md)                   |
-| `@rpg/api`        | [apps/api/README.md](../apps/api/README.md)                       |
-| `@rpg/config`     | [packages/config/README.md](../packages/config/README.md)         |
-| `@rpg/contracts`  | [packages/contracts/README.md](../packages/contracts/README.md)   |
-| `@rpg/api-client` | [packages/api-client/README.md](../packages/api-client/README.md) |
-| `@rpg/catalog`    | [packages/catalog/README.md](../packages/catalog/README.md)       |
-| `@rpg/ui`         | [packages/ui/README.md](../packages/ui/README.md)                 |
+| Workspace             | README                                                                          |
+| --------------------- | ------------------------------------------------------------------------------- |
+| `@rpg/public`         | [apps/public/README.md](../apps/public/README.md)                               |
+| `@rpg/dashboard`      | [apps/dashboard/README.md](../apps/dashboard/README.md)                         |
+| `@rpg/bench`          | [apps/bench/README.md](../apps/bench/README.md)                                 |
+| `@rpg/api`            | [apps/api/README.md](../apps/api/README.md)                                     |
+| `@rpg/config`         | [packages/config/README.md](../packages/config/README.md)                       |
+| `@rpg/contracts`      | [packages/contracts/README.md](../packages/contracts/README.md)                 |
+| `@rpg/dev-bench-core` | [packages/dev-bench-core/src/index.ts](../packages/dev-bench-core/src/index.ts) |
+| `@rpg/bench-cli`      | [tools/bench/README.md](../tools/bench/README.md)                               |
+| `@rpg/api-client`     | [packages/api-client/README.md](../packages/api-client/README.md)               |
+| `@rpg/catalog`        | [packages/catalog/README.md](../packages/catalog/README.md)                     |
+| `@rpg/ui`             | [packages/ui/README.md](../packages/ui/README.md)                               |
 
 ## Single-origin topology
 
