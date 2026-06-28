@@ -9,7 +9,7 @@ vi.mock('@/features/campaign', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
-import { VISIBLE_SIDEBAR_CONTENT } from '../lib/visible-sidebar-content-registry'
+import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
 
 import { HomebrewHubContent } from './homebrew-hub'
 
@@ -48,12 +48,14 @@ describe('HomebrewHubContent', () => {
     expect(screen.getByRole('heading', { name: 'Homebrew' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Content' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Rules Vocabulary' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Rules Configuration' })).toBeInTheDocument()
 
     for (const entry of VISIBLE_SIDEBAR_CONTENT) {
       expect(screen.getByText(entry.label)).toBeInTheDocument()
     }
 
     expect(screen.getByText('Creature Types')).toBeInTheDocument()
+    expect(screen.getByText('Character Configuration')).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'View' }).length).toBeGreaterThan(0)
   })
 

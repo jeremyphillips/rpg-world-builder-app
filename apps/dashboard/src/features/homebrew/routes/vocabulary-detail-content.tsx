@@ -26,8 +26,8 @@ import { useVocabularyMutations, useVocabularySet } from '../hooks/use-vocabular
 import {
   UNKNOWN_VOCABULARY_SET_MESSAGE,
   VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
-} from '../lib/vocabulary-labels'
-import { findVocabularySetEntry } from '../lib/vocabulary-set-registry'
+} from '../lib/vocabulary/labels'
+import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
 
 type SheetState =
   | { mode: 'closed' }

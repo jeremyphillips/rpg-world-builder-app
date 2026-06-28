@@ -4,9 +4,9 @@ import {
   buildCreatureTypeVocabulary,
   buildSeedCreatureTypeVocabulary,
   getCreatureTypeLabel,
-} from './creature-type-vocabulary'
+} from './creature-types'
 
-describe('creature-type-vocabulary', () => {
+describe('creature-types vocabulary', () => {
   it('marks every seed creature type as active', () => {
     const vocabulary = buildSeedCreatureTypeVocabulary()
     expect(vocabulary.activeIds.has('humanoid')).toBe(true)

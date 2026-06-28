@@ -1,5 +1,25 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
+export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
+export {
+  ExtendedLevelRangeSummary,
+  StandardLevelRangeSummary,
+} from './components/level-range-summary.client'
+export {
+  buildRulesConfigFields,
+  CHARACTER_CONFIGURATION_SECTIONS,
+  createRulesFields,
+  createRulesSchema,
+  resolveRulesSchema,
+  rulesSchema,
+  type CharacterConfigurationSectionId,
+  type CreateRulesValues,
+  type RulesValues,
+} from './lib/character-configuration-fields'
+export {
+  buildCharacterCreationPatchInput,
+  mapRulesetPatchToRulesValues,
+} from './lib/campaign-settings-values'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useSelectCampaign } from './hooks/use-select-campaign'

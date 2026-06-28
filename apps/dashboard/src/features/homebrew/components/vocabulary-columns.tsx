@@ -4,7 +4,7 @@ import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
 import { buildNameColumn, buildSourceColumn } from '@/lib/data-table/column-builders'
 
-import { getVocabularyStatusLabel, VOCABULARY_SOURCE_BADGE } from '../lib/vocabulary-labels'
+import { getVocabularyStatusLabel, VOCABULARY_SOURCE_BADGE } from '../lib/vocabulary/labels'
 
 export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
   return [

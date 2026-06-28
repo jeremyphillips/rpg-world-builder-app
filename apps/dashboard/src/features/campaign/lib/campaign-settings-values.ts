@@ -1,25 +1,33 @@
 import type { z } from 'zod'
-import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '@rpg/contracts'
+import type {
+  Campaign,
+  CreateCampaignInput,
+  ResolvedCampaignCharacterCreationPatch,
+  UpdateCampaignInput,
+  UpdateCampaignCharacterCreationInput,
+} from '@rpg/contracts'
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   MAX_CHARACTER_LEVEL,
-  resolveAllowedCharacterCreatureTypes,
-  resolveStandardMaxCharacterLevel,
   sameStringSet,
 } from '@rpg/contracts'
 
-import { identitySchema, rulesSchema, flavorSchema, resolveRulesSchema } from './campaign-fields'
+import { identitySchema, flavorSchema } from './campaign-fields'
+import {
+  createRulesSchema,
+  type CreateRulesValues,
+  type RulesValues,
+} from './character-configuration-fields'
 
-export const campaignSettingsSchema = identitySchema.and(rulesSchema).and(flavorSchema)
+export type { CreateRulesValues, RulesValues }
 
-export function resolveCampaignSettingsSchema(activeCreatureTypeIds?: ReadonlySet<string>) {
-  return identitySchema.and(resolveRulesSchema(activeCreatureTypeIds)).and(flavorSchema)
-}
+export const campaignSettingsSchema = identitySchema.and(flavorSchema)
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
-const DEFAULT_STARTING_LEVEL = 1
-const DEFAULT_IMPORTED_CHARACTERS_POLICY = 'disabled' as const
+export const campaignCreateSchema = identitySchema.and(createRulesSchema).and(flavorSchema)
+
+export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
   const defined = Object.fromEntries(
@@ -33,7 +41,7 @@ function resolveMaxCharacterLevelOverride(maxCharacterLevel: number) {
   return maxCharacterLevel === MAX_CHARACTER_LEVEL ? undefined : maxCharacterLevel
 }
 
-function resolveExtendedProgressionOverride(values: CampaignSettingsValues) {
+function resolveExtendedProgressionOverride(values: RulesValues) {
   if (!values.extendedProgressionEnabled) return undefined
 
   return {
@@ -42,43 +50,82 @@ function resolveExtendedProgressionOverride(values: CampaignSettingsValues) {
   }
 }
 
-function resolveAllowedCharacterCreatureTypesOverride(
-  allowedCharacterCreatureTypes: CampaignSettingsValues['allowedCharacterCreatureTypes'],
+function resolveCreatureTypePolicyOverride(
+  allowedCharacterCreatureTypes: RulesValues['allowedCharacterCreatureTypes'],
 ) {
-  return sameStringSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)
-    ? undefined
-    : allowedCharacterCreatureTypes
+  if (sameStringSet(allowedCharacterCreatureTypes, DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES)) {
+    return undefined
+  }
+
+  return { mode: 'only' as const, ids: [...allowedCharacterCreatureTypes] }
 }
 
-function buildRuleOverrides(values: CampaignSettingsValues) {
-  return pickDefined({
+function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValues {
+  return {
+    ...createRules,
+    maxCharacterLevel: MAX_CHARACTER_LEVEL,
+    extendedProgressionEnabled: false,
+    extendedTierName: '',
+    extendedMaxLevel: undefined,
+    allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
+  }
+}
+
+/** Maps flat rules wizard fields to the nested character-creation patch shape. */
+export function buildCharacterCreationPatchInput(
+  values: RulesValues,
+): UpdateCampaignCharacterCreationInput {
+  const patch: UpdateCampaignCharacterCreationInput = {
+    startingLevel: values.startingLevel,
+    importedCharacters: { policy: values.importedCharactersPolicy },
+  }
+
+  const progression = pickDefined({
     maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
     extendedProgression: resolveExtendedProgressionOverride(values),
-    allowedCharacterCreatureTypes: resolveAllowedCharacterCreatureTypesOverride(
-      values.allowedCharacterCreatureTypes,
-    ),
   })
+  if (progression) patch.progression = progression
+
+  const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
+  if (creatureTypePolicy) {
+    patch.species = { creatureTypePolicy }
+  }
+
+  return patch
+}
+
+/** Merges create-wizard rules with defaults before building the character-creation patch. */
+export function buildCharacterCreationPatchInputFromCreateWizard(
+  createRules: CreateRulesValues,
+): UpdateCampaignCharacterCreationInput {
+  return buildCharacterCreationPatchInput(mergeCreateRulesWithDefaults(createRules))
+}
+
+/** Maps resolved ruleset-patch character creation to flat rules form values. */
+export function mapRulesetPatchToRulesValues(
+  characterCreation: ResolvedCampaignCharacterCreationPatch,
+): RulesValues {
+  const extended = characterCreation.progression.extendedProgression
+
+  return {
+    startingLevel: characterCreation.startingLevel,
+    maxCharacterLevel: characterCreation.progression.maxCharacterLevel,
+    extendedProgressionEnabled: extended !== undefined,
+    extendedTierName: extended?.tierName ?? '',
+    extendedMaxLevel: extended?.maxLevel,
+    importedCharactersPolicy: characterCreation.importedCharacters.policy,
+    allowedCharacterCreatureTypes: [...characterCreation.species.creatureTypePolicy.ids],
+  }
 }
 
 /** Maps a `Campaign` document to the flat shape used by the settings form. */
 export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSettingsValues {
-  const settings = campaign.configuration.settings
-  const characterCreation = settings?.characterCreation
   const flavor = campaign.configuration.flavor
-  const extended = settings?.ruleOverrides?.extendedProgression
 
   return {
     name: campaign.identity.name,
     description: campaign.identity.description ?? '',
     banner: [],
-    startingLevel: characterCreation?.startingLevel ?? DEFAULT_STARTING_LEVEL,
-    maxCharacterLevel: resolveStandardMaxCharacterLevel(settings),
-    extendedProgressionEnabled: extended !== undefined,
-    extendedTierName: extended?.tierName ?? '',
-    extendedMaxLevel: extended?.maxLevel,
-    importedCharactersPolicy:
-      characterCreation?.importedCharacters.policy ?? DEFAULT_IMPORTED_CHARACTERS_POLICY,
-    allowedCharacterCreatureTypes: [...resolveAllowedCharacterCreatureTypes(settings)],
     playStyle: flavor?.playStyle,
     mood: flavor?.mood,
     magicLevel: flavor?.magicLevel,
@@ -88,22 +135,14 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSetting
 
 /** Builds the create payload from the flat values accumulated by the wizard. */
 export function buildCreateCampaignInput(
-  values: CampaignSettingsValues,
+  values: CampaignCreateValues,
   imageKey?: string,
 ): CreateCampaignInput {
-  const ruleOverrides = buildRuleOverrides(values)
-
   return {
     name: values.name,
     description: values.description,
     ...(imageKey !== undefined && { imageKey }),
-    settings: {
-      characterCreation: {
-        startingLevel: values.startingLevel,
-        importedCharacters: { policy: values.importedCharactersPolicy },
-      },
-      ...(ruleOverrides !== undefined && { ruleOverrides }),
-    },
+    characterCreation: buildCharacterCreationPatchInputFromCreateWizard(values),
     flavor: {
       playStyle: values.playStyle,
       mood: values.mood,
@@ -113,10 +152,20 @@ export function buildCreateCampaignInput(
   }
 }
 
-/** Builds the API patch payload from validated form values (same flat shape as create). */
+/** Builds the API patch payload from validated settings form values. */
 export function buildUpdateCampaignInput(
   values: CampaignSettingsValues,
   imageKey?: string,
 ): UpdateCampaignInput {
-  return buildCreateCampaignInput(values, imageKey)
+  return {
+    name: values.name,
+    description: values.description,
+    ...(imageKey !== undefined && { imageKey }),
+    flavor: {
+      playStyle: values.playStyle,
+      mood: values.mood,
+      magicLevel: values.magicLevel,
+      difficulty: values.difficulty,
+    },
+  }
 }

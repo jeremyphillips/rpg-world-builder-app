@@ -7,13 +7,12 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
-import { buildActiveCreatureTypeFieldOptions, useCreatureTypeVocabulary } from '@/features/homebrew'
 
-import { buildRulesFields, flavorFields, identityFields } from '../lib/campaign-fields'
+import { flavorFields, identityFields } from '../lib/campaign-fields'
 import {
   buildUpdateCampaignInput,
+  campaignSettingsSchema,
   mapCampaignToSettingsValues,
-  resolveCampaignSettingsSchema,
   type CampaignSettingsValues,
 } from '../lib/campaign-settings-values'
 import { useCampaigns } from '../hooks/use-campaigns'
@@ -32,11 +31,6 @@ export function CampaignSettings() {
   const { campaignId } = useParams<{ campaignId: string }>()
   const { data: campaigns, isPending: isLoadingCampaigns, isError } = useCampaigns()
   const campaign = campaigns?.find((c) => c.id === campaignId)
-  const {
-    vocabulary,
-    isPending: isVocabularyPending,
-    isError: isVocabularyError,
-  } = useCreatureTypeVocabulary(campaignId)
 
   usePersistViewedCampaign(campaignId)
 
@@ -49,18 +43,12 @@ export function CampaignSettings() {
     uploadErrorMessage: 'Could not upload campaign image.',
   })
 
-  const tabs = useMemo((): TabbedFormTab[] => {
-    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(vocabulary)
-    return [
+  const tabs = useMemo(
+    (): TabbedFormTab[] => [
       { id: 'identity', label: 'Identity', fields: identityFields },
-      { id: 'rules', label: 'Rules', fields: buildRulesFields(creatureTypeOptions) },
       { id: 'flavor', label: 'Flavor', fields: flavorFields },
-    ]
-  }, [vocabulary])
-
-  const schema = useMemo(
-    () => resolveCampaignSettingsSchema(vocabulary?.activeIds),
-    [vocabulary?.activeIds],
+    ],
+    [],
   )
 
   const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
@@ -71,19 +59,19 @@ export function CampaignSettings() {
 
   let body: ReactNode
 
-  if (isLoadingCampaigns || isVocabularyPending) {
+  if (isLoadingCampaigns) {
     body = <Spinner />
-  } else if (isError || isVocabularyError || !campaign) {
+  } else if (isError || !campaign) {
     body = (
       <Text variant="destructive" role="alert">
-        {isError || isVocabularyError ? 'Could not load campaign.' : 'Campaign not found.'}
+        {isError ? 'Could not load campaign.' : 'Campaign not found.'}
       </Text>
     )
   } else {
     body = (
       <TabbedForm<CampaignSettingsValues>
         key={campaign.id}
-        schema={schema}
+        schema={campaignSettingsSchema}
         tabs={tabs}
         defaultValues={mapCampaignToSettingsValues(campaign)}
         fileFieldProps={bannerField.fileFieldProps}

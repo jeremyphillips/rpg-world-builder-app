@@ -9,7 +9,6 @@ import {
   CAMPAIGN_VISIBILITY,
   DEFAULT_SYSTEM_RULESET_ID,
   DIFFICULTIES,
-  IMPORTED_CHARACTERS_POLICIES,
   MAGIC_LEVELS,
   MOODS,
   PLAY_STYLES,
@@ -24,26 +23,6 @@ const campaignSchema = new Schema(
       imageKey: { type: String },
     },
     configuration: {
-      settings: {
-        characterCreation: {
-          startingLevel: { type: Number, default: 1 },
-          importedCharacters: {
-            policy: {
-              type: String,
-              enum: IMPORTED_CHARACTERS_POLICIES,
-              default: 'disabled',
-            },
-          },
-        },
-        ruleOverrides: {
-          maxCharacterLevel: { type: Number },
-          extendedProgression: {
-            tierName: { type: String },
-            maxLevel: { type: Number },
-          },
-          allowedCharacterCreatureTypes: [{ type: String, trim: true }],
-        },
-      },
       flavor: {
         playStyle: [{ type: String, enum: PLAY_STYLES }],
         mood: [{ type: String, enum: MOODS }],

@@ -13,29 +13,15 @@ import type {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign'
 import { assertVocabularyIdAvailable } from './assert-vocabulary-id-available'
+import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
 import {
-  CampaignRulesetPatchModel,
-  type CampaignRulesetPatchSchemaType,
-} from './campaign-ruleset-patch.model'
+  getOrCreatePatchDocument,
+  loadPatchDocument,
+  requireCampaignRuleset,
+  type PatchDocument,
+} from './patch-document'
 import { resolveVocabularySet } from './resolve-vocabulary'
-
-type PatchDocument = CampaignRulesetPatchSchemaType & {
-  _id: unknown
-  createdAt: Date
-  updatedAt: Date
-}
-
-async function requireCampaignRuleset(campaignId: string): Promise<{
-  rulesetId: SystemRulesetId
-}> {
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-  return { rulesetId: campaign.rulesetId }
-}
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -45,26 +31,6 @@ function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOpt
       `Vocabulary set "${setId}" is not available for ruleset "${rulesetId}".`,
     )
   }
-}
-
-async function loadPatchDocument(
-  campaignId: string,
-  rulesetId: SystemRulesetId,
-): Promise<PatchDocument | null> {
-  return CampaignRulesetPatchModel.findOne({ campaignId, rulesetId }).lean()
-}
-
-async function getOrCreatePatchDocument(
-  campaignId: string,
-  rulesetId: SystemRulesetId,
-): Promise<PatchDocument> {
-  const existing = await CampaignRulesetPatchModel.findOne({ campaignId, rulesetId })
-  if (existing) {
-    return existing.toObject() as PatchDocument
-  }
-
-  const created = await CampaignRulesetPatchModel.create({ campaignId, rulesetId, vocabulary: [] })
-  return created.toObject() as PatchDocument
 }
 
 function getSetPatch(

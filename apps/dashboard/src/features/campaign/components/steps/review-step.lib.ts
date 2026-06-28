@@ -1,7 +1,7 @@
-import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
+import { buildRulesReviewRowsForSurface } from '../../lib/character-configuration-fields'
 import {
   DIFFICULTY_LABELS,
-  IMPORTED_CHARACTERS_POLICY_LABELS,
   MAGIC_LEVEL_LABELS,
   MOOD_LABELS,
   PLAY_STYLE_LABELS,
@@ -12,7 +12,7 @@ export type ReviewRowData = {
   value: string
 }
 
-export function buildIdentityRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
+export function buildIdentityRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
   const rows: ReviewRowData[] = [{ label: 'Name', value: values.name ?? '—' }]
 
   if (values.description) {
@@ -27,19 +27,8 @@ export function buildIdentityRows(values: Partial<CampaignSettingsValues>): Revi
   return rows
 }
 
-export function buildRulesRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
-  return [
-    {
-      label: 'Starting level',
-      value: values.startingLevel !== undefined ? String(values.startingLevel) : '—',
-    },
-    {
-      label: 'Imported characters',
-      value: values.importedCharactersPolicy
-        ? IMPORTED_CHARACTERS_POLICY_LABELS[values.importedCharactersPolicy]
-        : '—',
-    },
-  ]
+export function buildRulesRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
+  return buildRulesReviewRowsForSurface('create', values)
 }
 
 function formatLabelList<T extends string>(
@@ -49,7 +38,7 @@ function formatLabelList<T extends string>(
   return values?.map((value) => labels[value]).join(', ') || '—'
 }
 
-export function buildFlavorRows(values: Partial<CampaignSettingsValues>): ReviewRowData[] {
+export function buildFlavorRows(values: Partial<CampaignCreateValues>): ReviewRowData[] {
   return [
     { label: 'Play style', value: formatLabelList(values.playStyle, PLAY_STYLE_LABELS) },
     { label: 'Mood', value: formatLabelList(values.mood, MOOD_LABELS) },

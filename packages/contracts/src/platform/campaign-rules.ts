@@ -1,4 +1,7 @@
-import type { CampaignSettings } from './campaign'
+import type {
+  CampaignCharacterCreationPatch,
+  CreatureTypePolicy,
+} from './campaign-character-creation-patch'
 import type { CreatureTypeId } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
@@ -35,31 +38,39 @@ export type ResolvedCampaignRules = {
 }
 
 /** Standard max before any optional extended tier. */
-export function resolveStandardMaxCharacterLevel(settings?: CampaignSettings): number {
-  return settings?.ruleOverrides?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+export function resolveStandardMaxCharacterLevel(patch?: CampaignCharacterCreationPatch): number {
+  return patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
 }
 
-/** Creature types allowed on character sheets — sparse override or SRD default. */
-export function resolveAllowedCharacterCreatureTypes(
-  settings?: CampaignSettings,
+/** Resolves allowed creature type ids from a species creature-type policy. */
+export function resolveAllowedCreatureTypesFromPolicy(
+  policy?: CreatureTypePolicy,
 ): readonly CreatureTypeId[] {
-  return (
-    settings?.ruleOverrides?.allowedCharacterCreatureTypes ??
-    DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES
-  )
+  if (!policy) return DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES
+  if (policy.mode === 'only') return policy.ids
+  return DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES
+}
+
+/** Creature types allowed on character sheets — sparse policy or SRD default. */
+export function resolveAllowedCharacterCreatureTypes(
+  patch?: CampaignCharacterCreationPatch,
+): readonly CreatureTypeId[] {
+  return resolveAllowedCreatureTypesFromPolicy(patch?.species?.creatureTypePolicy)
 }
 
 /** Effective max character level — extended cap when present, else standard max. */
-export function resolveMaxCharacterLevel(settings?: CampaignSettings): number {
-  const extended = settings?.ruleOverrides?.extendedProgression
+export function resolveMaxCharacterLevel(patch?: CampaignCharacterCreationPatch): number {
+  const extended = patch?.progression?.extendedProgression
   if (extended) return extended.maxLevel
-  return resolveStandardMaxCharacterLevel(settings)
+  return resolveStandardMaxCharacterLevel(patch)
 }
 
-export function resolveCampaignRules(settings?: CampaignSettings): ResolvedCampaignRules {
-  const standardMaxCharacterLevel = resolveStandardMaxCharacterLevel(settings)
-  const allowedCharacterCreatureTypes = resolveAllowedCharacterCreatureTypes(settings)
-  const storedExtended = settings?.ruleOverrides?.extendedProgression
+export function resolveCampaignRules(
+  patch?: CampaignCharacterCreationPatch,
+): ResolvedCampaignRules {
+  const standardMaxCharacterLevel = resolveStandardMaxCharacterLevel(patch)
+  const allowedCharacterCreatureTypes = resolveAllowedCharacterCreatureTypes(patch)
+  const storedExtended = patch?.progression?.extendedProgression
 
   if (storedExtended) {
     return {

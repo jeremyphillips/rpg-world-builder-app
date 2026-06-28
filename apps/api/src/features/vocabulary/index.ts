@@ -1,5 +1,7 @@
 export * from './campaign-ruleset-patch.model'
 export * from './homebrew-summary.service'
+export * from './patch-document'
 export * from './resolve-vocabulary'
 export * from './assert-campaign-creature-types'
+export * from './ruleset-patch.service'
 export * from './vocabulary.service'

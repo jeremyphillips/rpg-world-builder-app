@@ -12,6 +12,8 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
+import { vocabularySelectField } from '@/features/homebrew'
+
 import {
   allowedCharacterCreatureTypesFromCtx,
   getCharacterCreatureTypeFieldOptions,
@@ -115,14 +117,13 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'row',
       fields: [
-        {
-          type: 'select',
+        vocabularySelectField({
           name: 'creatureType',
           label: 'Creature type',
           options: getCharacterCreatureTypeFieldOptions(ctx),
           required: true,
           width: 'lg',
-        },
+        }),
         walkSpeedInlineCountField('speed.walk', {
           required: true,
           width: 'auto',

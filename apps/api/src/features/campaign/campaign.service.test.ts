@@ -1,9 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
-
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { updateVocabularyEntry } from '../vocabulary'
 import { createUser } from '../user'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
@@ -12,6 +9,7 @@ import {
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
+import { getRulesetPatchRead } from '../vocabulary'
 
 beforeAll(async () => {
   await startTestDb()
@@ -30,17 +28,15 @@ async function makeUser(email: string) {
 }
 
 describe('createCampaign', () => {
-  it('persists the initial settings and flavor', async () => {
+  it('persists flavor on the campaign and character creation on the ruleset patch', async () => {
     const owner = await makeUser('owner@example.com')
 
     const campaign = await createCampaign({
       name: 'Flavored',
       createdBy: owner.id,
-      settings: {
-        characterCreation: {
-          startingLevel: 3,
-          importedCharacters: { policy: 'approval_required' },
-        },
+      characterCreation: {
+        startingLevel: 3,
+        importedCharacters: { policy: 'approval_required' },
       },
       flavor: {
         playStyle: ['mystery', 'sandbox'],
@@ -51,18 +47,18 @@ describe('createCampaign', () => {
     })
 
     expect(campaign.configuration).toMatchObject({
-      settings: {
-        characterCreation: {
-          startingLevel: 3,
-          importedCharacters: { policy: 'approval_required' },
-        },
-      },
       flavor: {
         playStyle: ['mystery', 'sandbox'],
         mood: ['gritty'],
         magicLevel: 'low_magic',
         difficulty: 'dangerous',
       },
+    })
+
+    const patch = await getRulesetPatchRead(campaign.id)
+    expect(patch?.characterCreation).toMatchObject({
+      startingLevel: 3,
+      importedCharacters: { policy: 'approval_required' },
     })
   })
 })
@@ -129,19 +125,13 @@ describe('listCampaignsForUser', () => {
 })
 
 describe('updateCampaign', () => {
-  it('merges identity, settings, and flavor into the existing document', async () => {
+  it('merges identity and flavor into the existing document', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({ name: 'Original', createdBy: owner.id })
 
     const updated = await updateCampaign(campaign.id, {
       name: 'Renamed',
       description: 'New blurb',
-      settings: {
-        characterCreation: {
-          startingLevel: 5,
-          importedCharacters: { policy: 'approval_required' },
-        },
-      },
       flavor: {
         playStyle: ['sandbox'],
         mood: ['heroic'],
@@ -153,12 +143,6 @@ describe('updateCampaign', () => {
     expect(updated).toMatchObject({
       identity: { name: 'Renamed', description: 'New blurb' },
       configuration: {
-        settings: {
-          characterCreation: {
-            startingLevel: 5,
-            importedCharacters: { policy: 'approval_required' },
-          },
-        },
         flavor: {
           playStyle: ['sandbox'],
           mood: ['heroic'],
@@ -173,102 +157,6 @@ describe('updateCampaign', () => {
     const owner = await makeUser('owner@example.com')
     await expect(updateCampaign('507f1f77bcf86cd799439011', { name: 'Nope' })).resolves.toBeNull()
     void owner
-  })
-
-  it('persists extended progression rule overrides', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
-
-    const updated = await updateCampaign(campaign.id, {
-      settings: {
-        characterCreation: {
-          startingLevel: 1,
-          importedCharacters: { policy: 'disabled' },
-        },
-        ruleOverrides: {
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
-      },
-    })
-
-    expect(updated?.configuration.settings?.ruleOverrides).toEqual({
-      extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-    })
-  })
-
-  it('persists allowed character creature type rule overrides', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
-
-    const updated = await updateCampaign(campaign.id, {
-      settings: {
-        characterCreation: {
-          startingLevel: 1,
-          importedCharacters: { policy: 'disabled' },
-        },
-        ruleOverrides: {
-          allowedCharacterCreatureTypes: ['humanoid', 'fey'],
-        },
-      },
-    })
-
-    expect(updated?.configuration.settings?.ruleOverrides).toEqual({
-      allowedCharacterCreatureTypes: ['humanoid', 'fey'],
-    })
-  })
-
-  it('rejects disabled creature types in allowed character settings', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
-
-    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'fey', {
-      status: 'disabled',
-    })
-
-    await expect(
-      updateCampaign(campaign.id, {
-        settings: {
-          characterCreation: {
-            startingLevel: 1,
-            importedCharacters: { policy: 'disabled' },
-          },
-          ruleOverrides: {
-            allowedCharacterCreatureTypes: ['humanoid', 'fey'],
-          },
-        },
-      }),
-    ).rejects.toMatchObject({
-      status: 400,
-      code: 'invalid_vocabulary',
-    })
-  })
-
-  it('unsets extended progression when omitted from the patch', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({
-      name: 'Epic',
-      createdBy: owner.id,
-      settings: {
-        characterCreation: {
-          startingLevel: 1,
-          importedCharacters: { policy: 'disabled' },
-        },
-        ruleOverrides: {
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
-      },
-    })
-
-    const updated = await updateCampaign(campaign.id, {
-      settings: {
-        characterCreation: {
-          startingLevel: 1,
-          importedCharacters: { policy: 'disabled' },
-        },
-      },
-    })
-
-    expect(updated?.configuration.settings?.ruleOverrides?.extendedProgression).toBeUndefined()
   })
 })
 

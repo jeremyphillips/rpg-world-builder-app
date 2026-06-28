@@ -8,8 +8,9 @@ import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useHomebrewSummary } from '../hooks/use-homebrew-summary'
-import { VISIBLE_SIDEBAR_CONTENT } from '../lib/visible-sidebar-content-registry'
-import { ENABLED_HOMEBREW_VOCABULARY_SETS } from '../lib/vocabulary-set-registry'
+import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
+import { ENABLED_HOMEBREW_VOCABULARY_SETS } from '../lib/hub/vocabulary-set-registry'
+import { ENABLED_HOMEBREW_RULES_CONFIGS } from '../lib/hub/rules-config-registry'
 import { HomebrewHubCard } from '../components/homebrew-hub-card'
 
 const HOMEBREW_DESCRIPTION =
@@ -75,6 +76,23 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
                   title={entry.label}
                   description="Manage campaign vocabulary options"
                   viewHref={ROUTES.homebrew.vocabulary(campaignId, entry.setId)}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="homebrew-rules-config-heading" className="space-y-4">
+          <Heading variant="section" as="h2" id="homebrew-rules-config-heading">
+            Rules Configuration
+          </Heading>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {ENABLED_HOMEBREW_RULES_CONFIGS.map((entry) => (
+              <li key={entry.id}>
+                <HomebrewHubCard
+                  title={entry.label}
+                  description="Configure character creation rules"
+                  viewHref={ROUTES.homebrew.rulesConfig(campaignId, entry.id)}
                 />
               </li>
             ))}

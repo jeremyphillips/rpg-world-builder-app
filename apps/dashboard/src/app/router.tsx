@@ -35,6 +35,7 @@ import {
   SkillProficiencyDetailRoute,
   SkillProficiencyEditRoute,
   HomebrewHubRoute,
+  RulesConfigDetailRoute,
   VocabularyDetailRoute,
   SpeciesCreateRoute,
   SpeciesDetailRoute,
@@ -366,6 +367,15 @@ const router = createBrowserRouter(
                       handle: {
                         crumb: (_params, { entityLabel }) => ({
                           label: entityLabel ?? 'Vocabulary',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                    {
+                      path: 'rules-config/:configId',
+                      element: <RulesConfigDetailRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? 'Rules Configuration',
                         }),
                       } satisfies CrumbHandle,
                     },

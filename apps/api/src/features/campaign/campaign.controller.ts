@@ -13,13 +13,13 @@ import {
 export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
   // is guaranteed by `requireAuth` running before this handler.
-  const { name, description, imageKey, settings, flavor, rulesetId } =
+  const { name, description, imageKey, characterCreation, flavor, rulesetId } =
     req.body as CreateCampaignInput
   const campaign = await createCampaign({
     name,
     description,
     imageKey,
-    settings,
+    characterCreation,
     flavor,
     rulesetId,
     createdBy: req.user!.id,

@@ -1,6 +1,6 @@
 import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
 
-import type { CampaignSettingsValues } from '../../lib/campaign-settings-values'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
 import {
   buildFlavorRows,
   buildIdentityRows,
@@ -15,7 +15,7 @@ interface ReviewStepProps {
 
 export function ReviewStep({ error }: ReviewStepProps) {
   const { accumulatedValues, complete } = useWizard()
-  const values = accumulatedValues as Partial<CampaignSettingsValues>
+  const values = accumulatedValues as Partial<CampaignCreateValues>
 
   return (
     <form

@@ -2,6 +2,10 @@ import { z } from 'zod'
 
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { vocabularyOptionSetPatchSchema } from '../vocab/vocabulary'
+import {
+  campaignCharacterCreationPatchSchema,
+  resolvedCampaignCharacterCreationPatchSchema,
+} from './campaign-character-creation-patch'
 
 /** Campaign ruleset patch document — vocabulary deltas keyed by (campaignId, rulesetId). */
 export const campaignRulesetPatchSchema = z.object({
@@ -9,8 +13,16 @@ export const campaignRulesetPatchSchema = z.object({
   campaignId: z.string().min(1),
   rulesetId: systemRulesetIdSchema,
   vocabulary: z.array(vocabularyOptionSetPatchSchema).optional(),
+  characterCreation: campaignCharacterCreationPatchSchema.optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })
 
 export type CampaignRulesetPatch = z.infer<typeof campaignRulesetPatchSchema>
+
+/** Read DTO for GET /api/campaigns/:campaignId/ruleset-patch. */
+export const rulesetPatchReadSchema = z.object({
+  characterCreation: resolvedCampaignCharacterCreationPatchSchema,
+})
+
+export type RulesetPatchRead = z.infer<typeof rulesetPatchReadSchema>

@@ -5,22 +5,24 @@ import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
 import { NarrowPage } from '@/components/layout/narrow-page'
+import {
+  createRulesFields,
+  createRulesSchema,
+  type CreateRulesValues,
+} from '../lib/character-configuration-fields'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import {
   identitySchema,
   identityFields,
-  rulesSchema,
-  rulesFields,
   flavorSchema,
   flavorFields,
   type IdentityValues,
-  type RulesValues,
   type FlavorValues,
 } from '../lib/campaign-fields'
 import {
   buildCreateCampaignInput,
-  type CampaignSettingsValues,
+  type CampaignCreateValues,
 } from '../lib/campaign-settings-values'
 import { ReviewStep } from '../components/steps/review-step'
 
@@ -38,15 +40,15 @@ export function CampaignCreate() {
 
   const onComplete = async (values: Record<string, unknown>) => {
     setCreateError(null)
-    const settingsValues = values as CampaignSettingsValues
+    const createValues = values as CampaignCreateValues
 
     try {
       let imageKey: string | undefined
-      if (settingsValues.banner?.[0]) {
-        imageKey = await uploadFile(settingsValues.banner[0], 'Could not upload campaign image.')
+      if (createValues.banner?.[0]) {
+        imageKey = await uploadFile(createValues.banner[0], 'Could not upload campaign image.')
       }
 
-      const campaign = await mutateAsync(buildCreateCampaignInput(settingsValues, imageKey))
+      const campaign = await mutateAsync(buildCreateCampaignInput(createValues, imageKey))
 
       selectCampaign(campaign.id)
     } catch (err) {
@@ -62,10 +64,10 @@ export function CampaignCreate() {
       <Wizard
         steps={STEPS}
         onComplete={onComplete}
-        hint="You can change these settings later from Campaign Settings."
+        hint="Configure rules later from Homebrew → Rules Configuration."
       >
         <WizardStepForm<IdentityValues> schema={identitySchema} fields={identityFields} />
-        <WizardStepForm<RulesValues> schema={rulesSchema} fields={rulesFields} />
+        <WizardStepForm<CreateRulesValues> schema={createRulesSchema} fields={createRulesFields} />
         <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
         <ReviewStep error={createError} />
       </Wizard>

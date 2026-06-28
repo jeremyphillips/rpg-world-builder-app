@@ -1,6 +1,6 @@
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { buildCreatureTypeVocabulary } from '../lib/creature-type-vocabulary'
+import { buildCreatureTypeVocabulary } from '../lib/vocabulary/sets/creature-types'
 import { useVocabularySet } from './use-vocabulary-set'
 
 /** Campaign-resolved creature type labels and active ids for forms and tables. */
