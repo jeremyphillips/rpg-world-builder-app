@@ -35,6 +35,7 @@ pnpm bench <command> [options]
 | `create-epic`   | Create an epic (`--json` required)                  |
 | `list-epics`    | List/filter epics                                   |
 | `seed-epics`    | Idempotently create starter epics from `SEED_EPICS` |
+| `suggest-next`  | Recommend next eligible ticket (weighted heuristic) |
 
 Global flags:
 
@@ -61,6 +62,25 @@ pnpm bench list-tickets --epic-id <mongoId> --size m --created-by agent
 | `--size`       | `xs`, `s`, `m`, `l`, `xl`                                         |
 | `--epic-id`    | Mongo epic id                                                     |
 | `--created-by` | `user`, `agent`                                                   |
+
+## suggest-next
+
+Recommends one eligible ticket (`backlog` or `up_next`, no blockers) using `@rpg/dev-bench-core` scoring. Fetches all tickets and epics, then filters client-side — no dedicated API route.
+
+```bash
+pnpm bench suggest-next --epic-name "Rules Configuration"
+pnpm bench suggest-next --epic-id <mongoId>
+pnpm bench suggest-next --area rules
+pnpm bench suggest-next --epic-name "Rules Configuration" --area rules
+```
+
+| Flag          | Purpose                                          |
+| ------------- | ------------------------------------------------ |
+| `--epic-id`   | Scope to epic Mongo id (wins over `--epic-name`) |
+| `--epic-name` | Resolve epic by title (errors if no match)       |
+| `--area`      | Scope to ticket area slug                        |
+
+JSON success: `{ "ok": true, "data": { "ticket": Ticket \| null, "context": { ... } } }`. Text: ticket snapshot or `No eligible ticket.`
 
 ## Blocker and related ticket ids
 
@@ -91,6 +111,8 @@ pnpm bench add-ticket --json '{
 pnpm bench get-ticket BENCH-001 --format text
 pnpm bench list-tickets --status backlog
 pnpm bench update-ticket BENCH-001 --json '{"status":"in_progress"}'
+
+pnpm bench suggest-next --epic-name "Rules Configuration" --format text
 ```
 
 **Never set `key` on create** — the server assigns `BENCH-###`.

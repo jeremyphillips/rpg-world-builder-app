@@ -1,5 +1,7 @@
 import type { Epic, Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
 
+import { TICKET_PRIORITY_WEIGHT } from '../scoring/priority-weight'
+
 /** Collapsed epic ticket buckets — excludes wont_do from all buckets. */
 export type EpicTicketBucket = 'open' | 'blocked' | 'done'
 
@@ -9,12 +11,7 @@ const EPIC_STATUS_ORDER: Record<Epic['status'], number> = {
   done: 2,
 }
 
-const PRIORITY_WEIGHT: Record<NonNullable<Epic['priority']>, number> = {
-  critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
-}
+const PRIORITY_WEIGHT = TICKET_PRIORITY_WEIGHT
 
 export function epicTicketBucket(status: TicketStatus): EpicTicketBucket | null {
   switch (status) {

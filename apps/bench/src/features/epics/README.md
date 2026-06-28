@@ -4,10 +4,10 @@ Epic list, detail, CRUD, client-side ticket aggregation, and scoped ticket creat
 
 ## Routes
 
-| Path             | Component                                                                              |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| `/epics`         | `EpicsListPage` — URL-synced status/area filters, sorted cards with counts             |
-| `/epics/:epicId` | `EpicDetailPage` — edit form, related code areas, ticket sections, `?ticketId=` drawer |
+| Path             | Component                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `/epics`         | `EpicsListPage` — URL-synced status/area filters, sorted cards with counts                                 |
+| `/epics/:epicId` | `EpicDetailPage` — edit form, related code areas, **Recommend next**, ticket sections, `?ticketId=` drawer |
 
 ## Data access
 

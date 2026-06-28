@@ -1,4 +1,6 @@
-import type { Ticket, TicketPriority, TicketStatus } from '@rpg/contracts/dev-bench'
+import type { Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
+
+import { compareTicketsByPriorityUpdatedKey } from '../scoring/ticket-compare'
 
 export const BENCH_COLUMNS = ['up_next', 'in_progress', 'blocked', 'done'] as const
 
@@ -11,13 +13,6 @@ export const MOVE_STATUS_OPTIONS: TicketStatus[] = [
   'backlog',
   'wont_do',
 ]
-
-const PRIORITY_WEIGHT: Record<TicketPriority, number> = {
-  critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
-}
 
 export type BenchColumn = (typeof BENCH_COLUMNS)[number]
 
@@ -53,13 +48,7 @@ export function shouldConfirmStatusMove(
 }
 
 function compareBenchColumnTickets(a: Ticket, b: Ticket): number {
-  const priorityDiff = PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority]
-  if (priorityDiff !== 0) return priorityDiff
-
-  const updatedDiff = b.updatedAt.localeCompare(a.updatedAt)
-  if (updatedDiff !== 0) return updatedDiff
-
-  return a.key.localeCompare(b.key)
+  return compareTicketsByPriorityUpdatedKey(a, b)
 }
 
 /** Sort tickets within a bench column. */

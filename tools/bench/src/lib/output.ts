@@ -69,6 +69,7 @@ function formatSuccessText(data: unknown): string {
 
   const record = data as Record<string, unknown>
   const formatters: Array<(value: Record<string, unknown>) => string | null> = [
+    formatSuggestNextSuccessText,
     formatTicketSuccessText,
     formatTicketsSuccessText,
     formatEpicSuccessText,
@@ -82,6 +83,17 @@ function formatSuccessText(data: unknown): string {
   }
 
   return `${JSON.stringify(data, null, 2)}\n`
+}
+
+function formatSuggestNextSuccessText(data: Record<string, unknown>): string | null {
+  if (!('ticket' in data) || !('context' in data)) return null
+
+  if (data.ticket === null) {
+    return 'No eligible ticket.\n'
+  }
+
+  if (typeof data.ticket !== 'object') return null
+  return `${formatTicketForAgent(data.ticket as Ticket)}\n`
 }
 
 function formatTicketSuccessText(data: Record<string, unknown>): string | null {

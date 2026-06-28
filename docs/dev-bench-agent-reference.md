@@ -135,6 +135,14 @@ Do not create many tickets without approval unless the user asked for a breakdow
 
 ---
 
+## Recommendation and duplicates
+
+**Next ticket:** `pnpm bench suggest-next` — see [`tools/bench/README.md`](../tools/bench/README.md#suggest-next). Uses `@rpg/dev-bench-core` (`suggestNextTicket`, `scoreTicketForRecommendation`). Eligible: unblocked `backlog` / `up_next`. Does not change status — user/agent decides to start.
+
+**Duplicate check before create:** `@rpg/dev-bench-core` **`findDuplicateCandidates`** — title overlap, area/epic match, code-ref path overlap on open tickets. Agents should still run `list-tickets` with relevant filters; update existing tickets when overlap is clear.
+
+---
+
 ## Product context
 
 Overview → [`.cursor/plans/dev-bench/00-product-scope.md`](../.cursor/plans/dev-bench/00-product-scope.md).

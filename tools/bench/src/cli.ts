@@ -6,6 +6,7 @@ import { runGetTicket } from './commands/get-ticket'
 import { runListEpics } from './commands/list-epics'
 import { runListTickets } from './commands/list-tickets'
 import { runSeedEpics } from './commands/seed-epics'
+import { runSuggestNext } from './commands/suggest-next'
 import { runUpdateTicket } from './commands/update-ticket'
 
 const HELP = `Dev Bench CLI — agent-friendly ticket and epic commands.
@@ -21,6 +22,7 @@ Commands:
   create-epic     Create an epic (--json required)
   list-epics      List epics with optional filters
   seed-epics      Idempotently create starter epics
+  suggest-next    Recommend the next eligible ticket
 
 Global flags:
   --format json|text   Output format (default: json)
@@ -45,6 +47,7 @@ const COMMANDS: Record<string, CommandRunner> = {
   'create-epic': runCreateEpic,
   'list-epics': runListEpics,
   'seed-epics': runSeedEpics,
+  'suggest-next': runSuggestNext,
 }
 
 async function main(): Promise<void> {

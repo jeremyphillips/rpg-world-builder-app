@@ -31,15 +31,16 @@ When the user says **“add this to Dev Bench”** (see [Trigger phrases](#trigg
 
 ## Trigger phrases
 
-| User says                                                                | Recipe                        |
-| ------------------------------------------------------------------------ | ----------------------------- |
-| “add this to Dev Bench”, “add this gap”, “track this”, “create a ticket” | [Add this gap](#add-this-gap) |
-| “put this on my bench”                                                   | [Put on bench](#put-on-bench) |
-| “plan BENCH-###”                                                         | [Plan](#plan-bench-)          |
-| “start BENCH-###”                                                        | [Start](#start-bench-)        |
-| “mark blocked”, “link as blocker”                                        | [Mark blocked](#mark-blocked) |
-| “move … to done”                                                         | [Mark done](#mark-done)       |
-| “won’t pursue”                                                           | [Won’t pursue](#wont-pursue)  |
+| User says                                                                | Recipe                            |
+| ------------------------------------------------------------------------ | --------------------------------- |
+| “add this to Dev Bench”, “add this gap”, “track this”, “create a ticket” | [Add this gap](#add-this-gap)     |
+| “put this on my bench”                                                   | [Put on bench](#put-on-bench)     |
+| “plan BENCH-###”                                                         | [Plan](#plan-bench-)              |
+| “start BENCH-###”                                                        | [Start](#start-bench-)            |
+| “mark blocked”, “link as blocker”                                        | [Mark blocked](#mark-blocked)     |
+| “move … to done”                                                         | [Mark done](#mark-done)           |
+| “won’t pursue”                                                           | [Won’t pursue](#wont-pursue)      |
+| “what should I work on next”, “recommend next”, “suggest next ticket”    | [Recommend next](#recommend-next) |
 
 ---
 
@@ -125,18 +126,34 @@ Use [Required command patterns](#required-command-patterns). Existing CLI only.
 - `update-ticket` → `"status": "wont_do"`.
 - Preserve reason in description if not obvious.
 
+### Recommend next
+
+- `pnpm bench suggest-next --epic-name "Rules Configuration"` or `--epic-id <mongoId>` or `--area rules`.
+- Read result (`--format text` for planning); **do not** auto-change status.
+- Offer to [Plan](#plan-bench-) or [Start](#start-bench-) if the user wants to proceed.
+- Epic detail UI has the same heuristic via **Recommend next** on `/epics/:epicId`.
+
 ---
 
 ## Duplicate check
 
-No `suggest-next` — manual search before every create:
+Before every create, scan for overlap:
 
 ```bash
 pnpm bench list-tickets --status backlog
 pnpm bench list-tickets --area <area>
+pnpm bench suggest-next --epic-name "<Epic>"   # optional — next work, not duplicate scan
 ```
 
-Scan titles; **update** on match. More filters → [`tools/bench/README.md`](../../../tools/bench/README.md).
+Apply `@rpg/dev-bench-core` **`findDuplicateCandidates`** rules mentally (or in code when scripting):
+
+| Signal                                 | Weight                        |
+| -------------------------------------- | ----------------------------- |
+| Same normalized title                  | Strong duplicate — **update** |
+| Shared title tokens (≥3 chars)         | Review                        |
+| Same `area` / `epicId` / code-ref path | Adds confidence               |
+
+**Update** when title match is clear (score ≥ 10 equivalent). **Review** partial overlap (5–9). More filters → [`tools/bench/README.md`](../../../tools/bench/README.md).
 
 ---
 
@@ -183,6 +200,14 @@ pnpm bench update-ticket BENCH-042 --json '{
 
 **Near-term capture:** add `"status": "up_next"` to create JSON, or patch after create.
 
+**Recommend next:**
+
+```bash
+pnpm bench suggest-next --epic-name "Rules Configuration" --format text
+pnpm bench suggest-next --area rules
+pnpm bench suggest-next --epic-id <mongoId>
+```
+
 ---
 
 ## Status semantics
@@ -209,7 +234,7 @@ Bench UI columns: `up_next`, `in_progress`, `blocked`, `done`. `backlog` and `wo
 - Put `epicName` in contracts — CLI resolver only
 - Auto-run `seed-epics` every task
 - Use `delete-ticket` / `delete-epic` via CLI (not implemented)
-- Change status on **plan** unless user asked to **start**
+- Change status on **plan** or **recommend next** unless user asked to **start**
 - Paste full CLI JSON in chat unless asked
 - Create many tickets without approval (unless user asked for a breakdown)
 

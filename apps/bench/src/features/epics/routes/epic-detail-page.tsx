@@ -11,8 +11,10 @@ import { TicketCreateDialog, TicketDetailDrawer } from '@/features/tickets'
 import { EpicDetailForm } from '../components/epic-detail-form'
 import { EpicRelatedCodeAreas } from '../components/epic-related-code-areas'
 import { EpicTicketSection } from '../components/epic-ticket-section'
+import { RecommendNextButton } from '../components/recommend-next-button'
 import { useEpic } from '../hooks/use-epic'
 import { useEpicTickets } from '../hooks/use-epic-tickets'
+import { useEpicsList } from '../hooks/use-epics-list'
 
 export function EpicDetailPage() {
   const { epicId = '' } = useParams()
@@ -22,6 +24,7 @@ export function EpicDetailPage() {
 
   const epicQuery = useEpic(epicId)
   const ticketsQuery = useEpicTickets(epicId)
+  const { data: epics = [] } = useEpicsList()
 
   const relatedAreas = useMemo(
     () => deriveRelatedCodeAreas(ticketsQuery.data ?? []),
@@ -84,6 +87,12 @@ export function EpicDetailPage() {
         heading={epic.title}
         actions={
           <>
+            <RecommendNextButton
+              tickets={ticketsQuery.data ?? []}
+              epics={epics}
+              epicId={epic.id}
+              onSelectTicket={handleSelectTicket}
+            />
             <Button type="button" onClick={() => setCreateOpen(true)}>
               Add ticket
             </Button>
