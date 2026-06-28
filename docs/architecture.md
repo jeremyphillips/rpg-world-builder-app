@@ -11,6 +11,7 @@ apps/
   public/      # Next.js (App Router): landing + login/signup   -> served at /
   dashboard/   # Vite + React SPA: authenticated DM workspace    -> served at /app
                # Storybook (:6007) for co-located composition stories
+  bench/       # Vite + React SPA: Dev Bench workbench            -> served at /bench
   api/         # Express 5 + Mongoose: auth + domain API          -> served at /api
 packages/
   config/      # shared tsconfig / eslint / prettier / vitest / storybook presets
@@ -28,6 +29,7 @@ docs/          # this folder — cross-cutting architecture/env/run guides
 | ----------------- | ----------------------------------------------------------------- |
 | `@rpg/public`     | [apps/public/README.md](../apps/public/README.md)                 |
 | `@rpg/dashboard`  | [apps/dashboard/README.md](../apps/dashboard/README.md)           |
+| `@rpg/bench`      | [apps/bench/README.md](../apps/bench/README.md)                   |
 | `@rpg/api`        | [apps/api/README.md](../apps/api/README.md)                       |
 | `@rpg/config`     | [packages/config/README.md](../packages/config/README.md)         |
 | `@rpg/contracts`  | [packages/contracts/README.md](../packages/contracts/README.md)   |
@@ -37,7 +39,7 @@ docs/          # this folder — cross-cutting architecture/env/run guides
 
 ## Single-origin topology
 
-All three apps sit behind **one origin**, routed by path. The browser only ever
+All four apps sit behind **one origin**, routed by path. The browser only ever
 talks to that single origin, which removes CORS, allows a host-only session
 cookie, and keeps cross-app redirects as relative paths.
 
@@ -46,6 +48,7 @@ flowchart LR
   proxy["Reverse proxy (single origin)"]
   publicApp["Next.js public app\nlanding + login/signup\n(/)"]
   dashboard["Vite dashboard SPA\nDM workspace\n(/app)"]
+  bench["Vite Dev Bench SPA\n(/bench)"]
   api["Express 5 API\n(/api)"]
   mongo[("MongoDB / Mongoose")]
   ui["packages/ui"]
@@ -54,28 +57,34 @@ flowchart LR
 
   proxy -->|"/"| publicApp
   proxy -->|"/app"| dashboard
+  proxy -->|"/bench"| bench
   proxy -->|"/api"| api
   api --> mongo
   publicApp --- ui
   dashboard --- ui
+  bench --- ui
   publicApp --- contracts
   publicApp --- apiClient
   dashboard --- contracts
   dashboard --- apiClient
+  bench --- contracts
+  bench --- apiClient
   api --- contracts
 ```
 
-| Path   | App                             | Dev upstream            |
-| ------ | ------------------------------- | ----------------------- |
-| `/`    | Next public app                 | `http://localhost:3000` |
-| `/app` | Vite dashboard (code-split SPA) | `http://localhost:5173` |
-| `/api` | Express API                     | `http://localhost:5001` |
+| Path     | App                             | Dev upstream            |
+| -------- | ------------------------------- | ----------------------- |
+| `/`      | Next public app                 | `http://localhost:3000` |
+| `/app`   | Vite dashboard (code-split SPA) | `http://localhost:5173` |
+| `/bench` | Vite Dev Bench SPA              | `http://localhost:5174` |
+| `/api`   | Express API                     | `http://localhost:5001` |
 
 In dev this routing is provided by
 [`tools/proxy/dev-proxy.mjs`](../tools/proxy/dev-proxy.mjs) (listens on `:8080`);
 in prod the platform's reverse proxy / CDN performs the same path routing. The
 dashboard is built with Vite `base: "/app/"`, so it is served (and its router
-runs) under `/app`. Route screens are lazy-loaded to keep the entry chunk small;
+runs) under `/app`. Dev Bench uses `base: "/bench/"` under `/bench`. Route
+screens are lazy-loaded to keep the entry chunk small;
 see [apps/dashboard/docs/code-splitting.md](../apps/dashboard/docs/code-splitting.md).
 
 ## Auth flow
