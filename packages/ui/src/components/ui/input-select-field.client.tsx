@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import type { FieldWidth } from './field-control.variants'
-import { fieldLabelVariants, type FieldHintPosition } from './field.variants'
+import type { FieldHintPosition } from './field.variants'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
@@ -375,14 +375,9 @@ export function InputSelectField({
         hintPosition={hintPosition}
         wrapControl={false}
         label={
-          <label
-            id={`${id}-label`}
-            htmlFor={valueId}
-            data-required={required || undefined}
-            className={fieldLabelVariants({ size })}
-          >
+          <Field.Label id={`${id}-label`} htmlFor={valueId}>
             <FieldLabelContent label={label} info={info} />
-          </label>
+          </Field.Label>
         }
         control={
           <div

@@ -437,10 +437,6 @@ function castingFields(): FormItem[] {
           ],
         },
         {
-          kind: 'row',
-          fields: [],
-        },
-        {
           type: 'switch',
           name: 'duration.concentration',
           label: 'Concentration',

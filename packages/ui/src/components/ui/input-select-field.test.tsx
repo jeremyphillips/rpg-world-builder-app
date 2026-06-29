@@ -163,6 +163,14 @@ describe('InputSelectField', () => {
     expect(label?.querySelector('span.text-destructive')).toBeNull()
   })
 
+  it('wires the visible label through Field.Label for row alignment', () => {
+    render(<ControlledField required />)
+    const label = screen.getByText('Cost').closest('label')
+    expect(label).toHaveAttribute('id', 'cost-label')
+    expect(label).toHaveAttribute('for', 'cost-value')
+    expect(label).not.toHaveAttribute('for', 'cost')
+  })
+
   it('disables only the unit segment when unitDisabled is true', () => {
     render(
       <ControlledField
