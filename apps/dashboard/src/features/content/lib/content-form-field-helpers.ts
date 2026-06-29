@@ -146,7 +146,8 @@ export function optionalWeightFields(
       step: 0.5,
       width,
       formatGrouped: true,
-      hint: 'Leave blank for no weight',
+      hint: 'Leave blank if weightless or not tracked.',
+      hintPosition: 'below-control',
       defaultValue: weightToFormDefaults(),
       ...(kind && isWeightEquipmentKind(kind)
         ? { valueDigits: weightValueDigitsForKind(kind) }

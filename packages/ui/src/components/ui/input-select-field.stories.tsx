@@ -231,7 +231,7 @@ export const Weight: Story = {
     step: 0.5,
     width: 'auto',
     valueDigits: 2,
-    hint: 'Leave blank for no weight',
+    hint: 'Leave blank if weightless or not tracked.',
   },
 }
 
