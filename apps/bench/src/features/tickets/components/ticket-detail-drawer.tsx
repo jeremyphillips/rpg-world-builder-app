@@ -3,7 +3,8 @@ import { Spinner, Text, Sheet } from '@rpg/ui'
 
 import { useTicket } from '../hooks/use-ticket'
 import { TicketDetailForm } from './ticket-detail-form'
-import { TicketMetaKicker, ticketMetaTitleClasses } from './ticket-meta'
+import { TicketMetaKicker } from './ticket-meta'
+import { ticketMetaTitleClasses } from './ticket-meta.variants'
 
 interface TicketDetailDrawerProps {
   ticketId: string | null

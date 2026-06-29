@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { sampleEpic } from '../../epics/test-fixtures'
+import { sampleEpic } from '@/features/epics'
 
 import { EpicBadge } from './epic-badge'
 

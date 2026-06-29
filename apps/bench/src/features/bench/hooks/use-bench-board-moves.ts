@@ -4,8 +4,7 @@ import { useCallback, useState } from 'react'
 import type { Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
 import { shouldConfirmStatusMove } from '@rpg/dev-bench-core'
 
-import { updateTicket } from '@/features/tickets/api/tickets-client'
-import { ticketQueryKeys } from '@/features/tickets/hooks/ticket-query-keys'
+import { ticketQueryKeys, updateTicket } from '@/features/tickets'
 
 export function useBenchBoardMoves() {
   const queryClient = useQueryClient()

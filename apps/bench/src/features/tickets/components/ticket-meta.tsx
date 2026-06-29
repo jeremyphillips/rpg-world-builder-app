@@ -72,5 +72,3 @@ export function TicketMeta({ ticket, detailHref }: TicketMetaProps) {
     </div>
   )
 }
-
-export { ticketMetaTitleClasses }

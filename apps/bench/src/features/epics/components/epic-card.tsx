@@ -6,8 +6,7 @@ import type { EpicTicketBucket } from '@rpg/dev-bench-core'
 import { Card, CardContent, extractRichTextContent, Text } from '@rpg/ui'
 
 import { benchEpicPath, benchTicketPath } from '@/app/routes'
-import { PriorityBadge } from '@/features/tickets'
-import { epicBadgeBackgroundColor } from '@/features/tickets/lib/epic-badge.lib'
+import { epicBadgeBackgroundColor, PriorityBadge } from '@/features/tickets'
 
 import { EpicStatusBadge } from './epic-status-badge'
 import { EpicTicketCounts } from './epic-ticket-counts'

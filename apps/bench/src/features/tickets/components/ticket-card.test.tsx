@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import axe from 'axe-core'
 
-import { sampleEpic } from '../../epics/test-fixtures'
+import { sampleEpic } from '@/features/epics'
 
 import { TicketCard } from './ticket-card'
 import { blockedSampleTicket, sampleTicket } from '../test-fixtures'

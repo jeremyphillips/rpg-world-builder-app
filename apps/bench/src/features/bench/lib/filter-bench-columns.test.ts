@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 
-import { sampleTicket } from '../../tickets/test-fixtures'
+import { sampleTicket } from '@/features/tickets'
 
 import { filterBenchColumnsBySearch } from './filter-bench-columns'
 

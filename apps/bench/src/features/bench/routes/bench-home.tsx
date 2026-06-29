@@ -46,12 +46,16 @@ export function BenchHome() {
     [searchParams, setSearchParams],
   )
 
-  const boardColumns = columns ?? {
-    up_next: [],
-    in_progress: [],
-    blocked: [],
-    done: [],
-  }
+  const boardColumns = useMemo(
+    () =>
+      columns ?? {
+        up_next: [],
+        in_progress: [],
+        blocked: [],
+        done: [],
+      },
+    [columns],
+  )
 
   const filteredColumns = useMemo(
     () => filterBenchColumnsBySearch(boardColumns, titleSearch),
