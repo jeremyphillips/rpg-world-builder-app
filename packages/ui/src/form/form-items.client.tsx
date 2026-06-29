@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useFieldArray } from 'react-hook-form'
+import { useFieldArray, useWatch } from 'react-hook-form'
 
 import { cn } from '../lib/utils'
 import {
@@ -20,10 +20,12 @@ import {
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
+  fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
   formSectionStackClasses,
   fieldSetResetClasses,
 } from '../components/ui/field.variants'
+import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
 import { Text } from '../components/ui/text'
 import { FieldRenderer } from './field-renderer.client'
 import { FormSectionContext } from './form-section-context.client'
@@ -36,7 +38,9 @@ import {
   type RowConfig,
   type StackConfig,
   type FieldConfig,
+  type GroupFieldItem,
   type SlotConfig,
+  type SwitchFieldConfig,
   type FieldVisibility,
 } from './field-config'
 import {
@@ -265,17 +269,23 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
   }
 
   if (item.kind === 'row') {
+    if (item.visibility) {
+      return (
+        <ConditionalRow
+          item={item}
+          index={index}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+        />
+      )
+    }
     return (
-      <FieldRow key={`row-${index}`} layout={item.layout} className={item.className}>
-        {item.fields.map((field) => (
-          <FieldNode
-            key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-            config={field}
-            idPrefix={idPrefix}
-            namePrefix={namePrefix}
-          />
-        ))}
-      </FieldRow>
+      <RowFieldSection
+        item={item}
+        index={index}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+      />
     )
   }
 
@@ -296,9 +306,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
         <ConditionalStack item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
       )
     }
-    return (
-      <StackPassthroughSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
-    )
+    return <StackSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
   }
 
   if (item.kind === 'slot') {
@@ -454,35 +462,171 @@ function ConditionalGroup({ item, idPrefix, namePrefix, depth }: ConditionalGrou
   return <GroupFieldSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
 }
 
-interface StackPassthroughSectionProps {
+function isLeafSwitch(item: GroupFieldItem): item is SwitchFieldConfig {
+  return !('kind' in item) && item.type === 'switch'
+}
+
+function buildFieldControlId(
+  idPrefix: string,
+  namePrefix: string | undefined,
+  fieldName: string,
+): string {
+  const fullName = namePrefix ? `${namePrefix}.${fieldName}` : fieldName
+  return `${idPrefix}-${fullName.replaceAll('.', '-')}`
+}
+
+interface RowFieldSectionProps {
+  item: RowConfig
+  index: number
+  idPrefix: string
+  namePrefix?: string
+}
+
+function RowFieldSection({ item, index, idPrefix, namePrefix }: RowFieldSectionProps) {
+  return (
+    <FieldRow key={`row-${index}`} layout={item.layout} className={item.className}>
+      {item.fields.map((field) => (
+        <FieldNode
+          key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+          config={field}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+        />
+      ))}
+    </FieldRow>
+  )
+}
+
+interface ConditionalRowProps {
+  item: RowConfig
+  index: number
+  idPrefix: string
+  namePrefix?: string
+}
+
+/** Hides a schema row when its `visibility` predicate is false. */
+function ConditionalRow({ item, index, idPrefix, namePrefix }: ConditionalRowProps) {
+  const values = useVisibilityValues(item.visibility!, namePrefix)
+  if (!item.visibility!.visibleWhen(values)) return null
+  return (
+    <RowFieldSection item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
+  )
+}
+
+interface StackSectionProps {
   item: StackConfig
   idPrefix: string
   namePrefix?: string
   depth: number
 }
 
-/** Interim stack render until StackSection lands (toggle-dependent layout step 2). */
-function StackPassthroughSection({
-  item,
-  idPrefix,
-  namePrefix,
-  depth,
-}: StackPassthroughSectionProps) {
+/** Layout-only stack; toggle-dependent preset splits the switch from indented dependents. */
+function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) {
   const childContext = React.useMemo(
     () => ({ collapsibleSections: false, depth: depth + 1 }),
     [depth],
   )
+  const layout = item.layout ?? 'default'
+
+  if (layout !== 'toggleDependent') {
+    return (
+      <div data-field-stack="" className={cn(fieldToggleDependentStackClasses, item.className)}>
+        <FormSectionContext.Provider value={childContext}>
+          <NestedFormItems
+            items={item.fields}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+            depth={depth + 1}
+          />
+        </FormSectionContext.Provider>
+      </div>
+    )
+  }
+
+  const [first, ...dependents] = item.fields
+  const toggleSwitch = first && isLeafSwitch(first) ? first : null
+  const groupLabelledBy = toggleSwitch
+    ? buildFieldControlId(idPrefix, namePrefix, toggleSwitch.name)
+    : undefined
 
   return (
-    <div data-field-stack="" className={cn(fieldToggleDependentStackClasses, item.className)}>
+    <div
+      data-field-stack=""
+      role={groupLabelledBy ? 'group' : undefined}
+      aria-labelledby={groupLabelledBy}
+      className={cn(fieldToggleDependentStackClasses, item.className)}
+    >
       <FormSectionContext.Provider value={childContext}>
-        <NestedFormItems
-          items={item.fields}
+        {first ? (
+          isContainer(first) ? (
+            <FormItemNode
+              item={first}
+              index={0}
+              idPrefix={idPrefix}
+              namePrefix={namePrefix}
+              depth={depth + 1}
+            />
+          ) : (
+            <FieldNode config={first} idPrefix={idPrefix} namePrefix={namePrefix} />
+          )
+        ) : null}
+        <StackDependentsRegion
+          toggleSwitch={toggleSwitch}
+          dependentsChrome={item.dependentsChrome}
+          dependents={dependents}
           idPrefix={idPrefix}
           namePrefix={namePrefix}
-          depth={depth + 1}
+          depth={depth}
         />
       </FormSectionContext.Provider>
+    </div>
+  )
+}
+
+interface StackDependentsRegionProps {
+  toggleSwitch: SwitchFieldConfig | null
+  dependentsChrome?: StackConfig['dependentsChrome']
+  dependents: GroupFieldItem[]
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+/** Indented dependents region with optional chrome; hidden while the gate switch is off. */
+function StackDependentsRegion({
+  toggleSwitch,
+  dependentsChrome,
+  dependents,
+  idPrefix,
+  namePrefix,
+  depth,
+}: StackDependentsRegionProps) {
+  const switchFieldName = toggleSwitch
+    ? namePrefix
+      ? `${namePrefix}.${toggleSwitch.name}`
+      : toggleSwitch.name
+    : ''
+  const switchOn = useWatch({
+    name: switchFieldName,
+    disabled: !toggleSwitch,
+  })
+
+  if (dependents.length === 0) return null
+  if (toggleSwitch && !switchOn) return null
+
+  return (
+    <div
+      className={cn(
+        fieldToggleDependentIndentClasses,
+        dependentsChrome && fieldStackDependentsChromeVariants({ tone: dependentsChrome }),
+      )}
+    >
+      <NestedFormItems
+        items={dependents}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        depth={depth + 1}
+      />
     </div>
   )
 }
@@ -498,9 +642,7 @@ interface ConditionalStackProps {
 function ConditionalStack({ item, idPrefix, namePrefix, depth }: ConditionalStackProps) {
   const values = useVisibilityValues(item.visibility!, namePrefix)
   if (!item.visibility!.visibleWhen(values)) return null
-  return (
-    <StackPassthroughSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
-  )
+  return <StackSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
 }
 
 interface ConditionalArrayFieldProps {

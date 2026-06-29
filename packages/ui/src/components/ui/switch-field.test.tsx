@@ -46,11 +46,10 @@ describe('SwitchField', () => {
     const hint = screen.getByText('When off, characters cannot take levels in additional classes.')
     const textColumn = label.parentElement
 
+    expect(textColumn).not.toBeNull()
     expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
     expect(textColumn).toContainElement(hint)
-    expect(
-      textColumn?.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
+    expect(textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
   })
 })

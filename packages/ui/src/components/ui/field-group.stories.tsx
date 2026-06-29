@@ -43,6 +43,10 @@ export const WithDescription: Story = {
 
 /** Nested subgroup — smaller legend for groups inside another group (weapon Damage, etc.). */
 export const NestedSubgroup: Story = {
+  args: {
+    legend: 'Weapon',
+    children: null,
+  },
   render: () => (
     <FieldGroup legend="Weapon">
       <TextField id="weapon-name" label="Name" placeholder="Longsword" />
