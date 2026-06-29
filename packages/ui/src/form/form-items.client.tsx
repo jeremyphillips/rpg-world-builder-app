@@ -271,22 +271,10 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
   if (item.kind === 'row') {
     if (item.visibility) {
       return (
-        <ConditionalRow
-          item={item}
-          index={index}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-        />
+        <ConditionalRow item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
       )
     }
-    return (
-      <RowFieldSection
-        item={item}
-        index={index}
-        idPrefix={idPrefix}
-        namePrefix={namePrefix}
-      />
-    )
+    return <RowFieldSection item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
 
   if (item.kind === 'group') {
@@ -508,9 +496,7 @@ interface ConditionalRowProps {
 function ConditionalRow({ item, index, idPrefix, namePrefix }: ConditionalRowProps) {
   const values = useVisibilityValues(item.visibility!, namePrefix)
   if (!item.visibility!.visibleWhen(values)) return null
-  return (
-    <RowFieldSection item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
-  )
+  return <RowFieldSection item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
 }
 
 interface StackSectionProps {
@@ -614,19 +600,24 @@ function StackDependentsRegion({
   if (dependents.length === 0) return null
   if (toggleSwitch && !switchOn) return null
 
+  const dependentsContent = (
+    <NestedFormItems
+      items={dependents}
+      idPrefix={idPrefix}
+      namePrefix={namePrefix}
+      depth={depth + 1}
+    />
+  )
+
   return (
-    <div
-      className={cn(
-        fieldToggleDependentIndentClasses,
-        dependentsChrome && fieldStackDependentsChromeVariants({ tone: dependentsChrome }),
+    <div className={fieldToggleDependentIndentClasses} data-field-stack-dependents="">
+      {dependentsChrome ? (
+        <div className={fieldStackDependentsChromeVariants({ tone: dependentsChrome })}>
+          {dependentsContent}
+        </div>
+      ) : (
+        dependentsContent
       )}
-    >
-      <NestedFormItems
-        items={dependents}
-        idPrefix={idPrefix}
-        namePrefix={namePrefix}
-        depth={depth + 1}
-      />
     </div>
   )
 }

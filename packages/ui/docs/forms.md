@@ -746,6 +746,55 @@ prop. Array and collapsible section legends always use the section scale.
 Nested groups may declare `visibility` (same contract as leaf fields). When hidden,
 the whole subgroup — legend and fields — unmounts and nested values clear.
 
+## Toggle-dependent stacks
+
+Use `kind: 'stack'` for layout-only grouping that occupies **one** slot in the
+outer `FieldGroup` rhythm (`gap-6` between siblings). Unlike `kind: 'group'`, stacks
+have no legend or fieldset semantics.
+
+Set `layout: 'toggleDependent'` when a switch controls one or more dependent fields
+(rows, slots, scalars). The renderer:
+
+- Renders field `[0]` (typically the switch) **outside** any chrome inset
+- Indents dependents (`pl-11`) to align with the inline switch label column
+- Hides the entire dependents region while the gate switch is off (no empty inset box)
+- Applies optional `dependentsChrome` border/bg around **dependents only**
+
+Pair dependent scalars with `labelPosition: 'settings'` so the control aligns with
+the inset width.
+
+```ts
+{
+  kind: 'stack',
+  layout: 'toggleDependent',
+  dependentsChrome: 'subtle', // omit for plain indented stack
+  visibility: visibleWhenMulticlassingEnabled(), // optional stack-level gate
+  fields: [
+    {
+      type: 'switch',
+      name: 'primaryAbilityMinimumEnabled',
+      label: 'Primary ability minimum',
+      hint: 'Require a minimum score in each relevant class primary ability.',
+    },
+    {
+      type: 'number',
+      name: 'primaryAbilityMinimumScore',
+      label: 'Minimum ability score',
+      labelPosition: 'settings',
+      visibility: visibleWhenPrimaryAbilityMinimumEnabled(), // validation stripping
+    },
+  ],
+}
+```
+
+`dependentsChrome` tones (`subtle`, `warning`, `error`) are token-driven CVA variants
+in `fieldStackDependentsChromeVariants`. Leaf and row `visibility` inside the
+dependents region still apply for validation and hidden-field stripping; the switch
+gate prevents rendering an empty chrome shell when the toggle is off.
+
+Rows inside a stack may declare `visibility` on the `RowConfig` itself (same
+contract as leaf fields).
+
 ## Collapsible sections
 
 By default, top-level `kind: 'group'` and `kind: 'array'` sections render as plain
