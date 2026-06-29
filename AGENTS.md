@@ -34,11 +34,7 @@ Any string literal used in 2+ places → extract to a named constant.
 
 ## Storybook (dashboard)
 
-Co-located dashboard stories run in Storybook on port **6007**. The preview
-(`.storybook/preview.tsx`) already wraps every story in `MemoryRouter` — **do
-not** add another router in `*.stories.tsx` decorators. Use `MemoryRouter` in
-`*.test.tsx` only when the component uses router hooks or `Link`. Detail →
-[apps/dashboard/docs/feature-conventions.md](apps/dashboard/docs/feature-conventions.md#storybook).
+No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cursor/rules/storybook-router.mdc](.cursor/rules/storybook-router.mdc). Port **6007**; primitives → `@rpg/ui` Storybook (`:6006`).
 
 ## Components
 
