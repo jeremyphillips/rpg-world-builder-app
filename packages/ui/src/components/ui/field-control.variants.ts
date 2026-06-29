@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { fieldControlSizeClasses } from './field-sizing.variants'
+import { fieldControlSizeClasses, fieldTextareaSizeClasses } from './field-sizing.variants'
 
 /**
  * Look shared by every text-like field control: border, background, focus ring,
@@ -32,11 +32,7 @@ export type FieldControlVariantProps = VariantProps<typeof fieldControlVariants>
  */
 export const textareaVariants = cva(fieldControlBase, {
   variants: {
-    size: {
-      sm: 'min-h-16 px-2.5 py-1.5 text-xs',
-      md: 'min-h-20 px-3 py-2 text-sm',
-      lg: 'min-h-28 px-4 py-3 text-base',
-    },
+    size: fieldTextareaSizeClasses,
   },
   defaultVariants: {
     size: 'md',

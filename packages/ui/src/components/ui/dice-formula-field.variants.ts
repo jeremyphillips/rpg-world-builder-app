@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority'
 
+import { fieldSizeTypographyClasses } from './field-sizing.variants'
 import { fieldInlineSentenceClasses } from './field.variants'
 
 /** Outer row — control segments and action buttons share the inline sentence gap. */
@@ -10,11 +11,7 @@ export const diceFormulaCoreVariants = cva('flex shrink-0 items-center gap-1')
 
 export const diceFormulaSeparatorVariants = cva('shrink-0 font-mono font-medium text-foreground', {
   variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-lg',
-    },
+    size: fieldSizeTypographyClasses,
   },
   defaultVariants: {
     size: 'sm',

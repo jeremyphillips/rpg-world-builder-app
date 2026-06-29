@@ -63,6 +63,8 @@ export {
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
+  fieldSizeTypographyClasses,
+  fieldTextareaSizeClasses,
   type FieldSizeToken,
 } from './components/ui/field-sizing.variants'
 export {

@@ -229,7 +229,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style')).toHaveClass('text-xs')
+    expect(screen.getByText('Play Style')).toHaveClass('text-md')
   })
 
   it('disables all options when disabled', () => {

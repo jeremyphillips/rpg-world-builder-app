@@ -131,7 +131,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 
 | Token                            | Class                 | Use                                                                             |
 | -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
-| `fieldAnatomyStackClasses`       | `space-y-3`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
+| `fieldAnatomyStackClasses`       | `space-y-2`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
@@ -165,22 +165,26 @@ single source of truth for `sm | md | lg` sizing. Primitives and composites
 `input-select-field.variants.ts`, digit metrics, and so on) compose those maps
 instead of repeating the tuples.
 
-| Map                                | Use                                                        |
-| ---------------------------------- | ---------------------------------------------------------- |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                |
-| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, …) |
-| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls              |
-| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls  |
-| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                 |
-| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                |
+| Map                                | Use                                                              |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `fieldSizeTypographyClasses`       | Label + control type scale (`text-xs` / `text-md` / `text-base`) |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                      |
+| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, …)       |
+| `fieldTextareaSizeClasses`         | Multi-line controls (`Textarea`, `JsonField`, …)                 |
+| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls                    |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls        |
+| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                       |
+| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                      |
 
 ### `size` — control height + type scale
 
-| `size` | Use                                    |
-| ------ | -------------------------------------- |
-| `sm`   | Dense toolbars, compact tables         |
-| `md`   | Default — most forms                   |
-| `lg`   | Prominent/marketing single-field forms |
+Labels and controls share `fieldSizeTypographyClasses`. At 16px root:
+
+| `size` | Type scale  | px  | Control height | Use                                    |
+| ------ | ----------- | --- | -------------- | -------------------------------------- |
+| `sm`   | `text-xs`   | 12  | `h-8` (32px)   | Dense toolbars, compact tables         |
+| `md`   | `text-md`   | 15  | `h-9` (36px)   | Default — most forms                   |
+| `lg`   | `text-base` | 16  | `h-11` (44px)  | Prominent/marketing single-field forms |
 
 ### `width` — how a field sizes within its container
 

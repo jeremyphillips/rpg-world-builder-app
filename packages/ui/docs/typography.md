@@ -122,8 +122,10 @@ At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`
 | `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                           |
 | `CardDescription`                                   | `text-md` (via `Text` small)        |
 | Rich-text editor                                    | `text-md` (matches read view)       |
+| Form fields (`size="md"`)                           | `text-md` labels + controls         |
+| Form fields (`size="lg"`)                           | `text-base` labels + controls       |
 
-Compact UI chrome (buttons, menus, inputs, data tables) stays on **`text-sm` (14px)**.
+Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
 ## Type scale
 
@@ -131,19 +133,19 @@ Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@them
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility       | px @ 16px root | Typical use                                  |
-| --------------------- | -------------- | -------------------------------------------- |
-| `text-xs`             | 12             | Captions, table stat columns                 |
-| `text-sm`             | 14             | Compact UI chrome (buttons, menus, inputs)   |
-| `text-md`             | 15             | Secondary body (`Text` small, `prose-sm`, …) |
-| `text-base`           | 16             | Primary body default                         |
-| `text-lg`             | 18             | Card titles, lead copy                       |
-| `text-xl`             | 20             | Section headings                             |
-| `text-2xl`            | 24             | Page titles                                  |
-| `text-3xl`            | 30             | Content detail titles                        |
-| `text-4xl`            | 36             | Marketing display (e.g. public hero)         |
-| `text-5xl`            | 48             | Marketing display (responsive hero)          |
-| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness           |
+| Token / utility       | px @ 16px root | Typical use                                     |
+| --------------------- | -------------- | ----------------------------------------------- |
+| `text-xs`             | 12             | Captions, table stat columns                    |
+| `text-sm`             | 14             | Compact UI chrome (buttons, menus, data tables) |
+| `text-md`             | 15             | Secondary body (`Text` small, `prose-sm`, …)    |
+| `text-base`           | 16             | Primary body default                            |
+| `text-lg`             | 18             | Card titles, lead copy                          |
+| `text-xl`             | 20             | Section headings                                |
+| `text-2xl`            | 24             | Page titles                                     |
+| `text-3xl`            | 30             | Content detail titles                           |
+| `text-4xl`            | 36             | Marketing display (e.g. public hero)            |
+| `text-5xl`            | 48             | Marketing display (responsive hero)             |
+| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness              |
 
 ## Heading size tokens
 

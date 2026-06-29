@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { fieldSizeTypographyClasses } from './field-sizing.variants'
 
 /**
  * Form layout spacing — single source of truth.
@@ -20,7 +21,7 @@ import { cn } from '../../lib/utils'
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
  */
-export const fieldAnatomyStackClasses = 'space-y-3'
+export const fieldAnatomyStackClasses = 'space-y-2'
 export const fieldGroupStackClasses = 'space-y-6'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-6'
 export const formSectionStackClasses = 'flex flex-col gap-7'
@@ -62,11 +63,7 @@ export const fieldLabelVariants = cva(
   ],
   {
     variants: {
-      size: {
-        sm: 'text-xs',
-        md: 'text-xs',
-        lg: 'text-sm',
-      },
+      size: fieldSizeTypographyClasses,
     },
     defaultVariants: {
       size: 'md',

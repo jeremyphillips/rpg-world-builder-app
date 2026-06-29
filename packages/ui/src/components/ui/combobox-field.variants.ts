@@ -6,7 +6,7 @@ import type { FieldSizeToken } from './field-sizing.variants'
 export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
   sm: 32,
   md: 36,
-  lg: 52,
+  lg: 44,
 } as const satisfies Record<FieldSizeToken, number>
 
 /** Popover panel wrapping the search field and scrollable option list. */
@@ -24,8 +24,8 @@ export const comboboxSearchRowVariants = cva(
     variants: {
       size: {
         sm: 'h-8 text-xs',
-        md: 'h-9 text-sm',
-        lg: 'h-13 text-lg',
+        md: 'h-9 text-md',
+        lg: 'h-11 text-base',
       },
     },
     defaultVariants: {

@@ -71,7 +71,7 @@ export function MarkdownField({
   const previewId = `${id}-preview`
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
       <Field.Label>
         <FieldLabelContent label={label} info={info} />
       </Field.Label>
