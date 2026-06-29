@@ -15,9 +15,11 @@ export function BacklogTicketCard({ ticket, epic, onSelect }: BacklogTicketCardP
   const { mutateAsync, isPending } = useUpdateTicket(ticket.id)
 
   return (
-    <div className="relative">
-      <TicketCard ticket={ticket} epic={epic} onSelect={onSelect} className="pr-10" />
-      <div className="absolute right-2 top-2">
+    <TicketCard
+      ticket={ticket}
+      epic={epic}
+      onSelect={onSelect}
+      headerActions={
         <TicketCardBacklogMenu
           ticket={ticket}
           isPending={isPending}
@@ -25,7 +27,7 @@ export function BacklogTicketCard({ ticket, epic, onSelect }: BacklogTicketCardP
             void mutateAsync({ status: 'up_next' })
           }}
         />
-      </div>
-    </div>
+      }
+    />
   )
 }

@@ -21,7 +21,7 @@ Ticket create/update/delete hooks invalidate the bench query key so the board st
 
 Lane moves use `@dnd-kit/core` as a **direct dependency of `@rpg/bench`** (not `@rpg/ui`). Kanban cross-column drops are bench-specific workflow UI; `@rpg/ui` keeps `@dnd-kit` for vertical reorder patterns (DataTable column panel). `@rpg/dev-bench-core` stays framework-free.
 
-Drag styling lives in [`components/bench-board.variants.ts`](components/bench-board.variants.ts) (column layout, drop-target fill, grab cursor, overlay). Bench cards use `TicketCard` with `interactive={false}` so the drag surface is a plain div; the overflow menu sits outside the draggable area for a11y.
+Drag styling lives in [`components/bench-board.variants.ts`](components/bench-board.variants.ts) (column layout, drop-target fill, grab cursor, overlay). Bench cards use `TicketCard` with `interactive={false}`; drag listeners attach to the card body via `contentRef`/`contentProps` so the header overflow menu stays outside the draggable surface. The menu is passed via `headerActions` and revealed on card hover/focus.
 
 ## Cross-feature imports
 

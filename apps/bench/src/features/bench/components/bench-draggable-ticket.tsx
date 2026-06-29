@@ -47,24 +47,27 @@ export function BenchDraggableTicket({
   const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
 
   return (
-    <li className="relative">
-      <div
-        ref={setNodeRef}
-        style={style}
-        className={cn(
-          benchDraggableTicketBaseClasses,
-          isDragging && benchDraggableTicketDraggingClasses,
-        )}
-        aria-label={benchTicketAriaLabel(ticket)}
-        onClick={() => onSelect?.(ticket.id)}
-        {...listeners}
-        {...attributes}
-      >
-        <TicketCard ticket={ticket} epic={epic} interactive={false} className="pr-10" />
-      </div>
-      <div className="absolute right-2 top-2 z-10">
-        <TicketCardMoveMenu ticket={ticket} isPending={isMovePending} onMove={onMove} />
-      </div>
+    <li>
+      <TicketCard
+        ticket={ticket}
+        epic={epic}
+        interactive={false}
+        headerActions={
+          <TicketCardMoveMenu ticket={ticket} isPending={isMovePending} onMove={onMove} />
+        }
+        contentRef={setNodeRef}
+        contentProps={{
+          style,
+          className: cn(
+            benchDraggableTicketBaseClasses,
+            isDragging && benchDraggableTicketDraggingClasses,
+          ),
+          'aria-label': benchTicketAriaLabel(ticket),
+          onClick: () => onSelect?.(ticket.id),
+          ...listeners,
+          ...attributes,
+        }}
+      />
     </li>
   )
 }

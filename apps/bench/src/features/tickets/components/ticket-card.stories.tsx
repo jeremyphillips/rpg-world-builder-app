@@ -46,3 +46,13 @@ export const NoEpic: Story = {
   },
   render: (args) => <TicketCardStory {...args} />,
 }
+
+export const WithSizeBadge: Story = {
+  args: {
+    ticket: sampleTicket,
+    epic: { id: 'epic-1', title: 'Dev Bench MVP', badgeColor: '#6366f1' },
+    onSelect: () => undefined,
+    showSizeBadge: true,
+  },
+  render: (args) => <TicketCardStory {...args} />,
+}

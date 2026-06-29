@@ -8,7 +8,6 @@ import { sampleEpic } from '../../epics/test-fixtures'
 
 import { TicketCard } from './ticket-card'
 import { blockedSampleTicket, sampleTicket } from '../test-fixtures'
-import { BLOCKED_TICKET_ARIA_LABEL } from '../lib/ticket-card-labels'
 
 function renderCard(props: ComponentProps<typeof TicketCard>) {
   return render(
@@ -35,7 +34,9 @@ describe('TicketCard', () => {
 
   it('shows blocked indicator when blockers exist', () => {
     renderCard({ ticket: blockedSampleTicket, onSelect: vi.fn() })
-    expect(screen.getByRole('button', { name: BLOCKED_TICKET_ARIA_LABEL })).toBeInTheDocument()
+    expect(screen.getByText('Blocked follow-up')).toBeInTheDocument()
+    // Blocked icon is decorative inside the card; tooltip trigger is the icon wrapper span.
+    expect(document.querySelector('.text-destructive')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
