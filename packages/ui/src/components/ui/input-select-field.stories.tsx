@@ -12,6 +12,7 @@ import { CASTING_TIME_UNIT_ENTRIES } from '@rpg/contracts/vocab'
 
 import {
   InputSelectField,
+  InputUnitField,
   type InputSelectFieldProps,
   type InputSelectOption,
 } from './input-select-field.client'
@@ -226,12 +227,61 @@ export const Weight: Story = {
     options: weightUnitOptions,
     initialValue: 3,
     initialUnit: 'lb',
-    unitDisabled: true,
+    unitMode: 'label',
+    fixedUnit: 'lb.',
     min: 0,
     step: 0.5,
     width: 'auto',
     valueDigits: 2,
     hint: 'Leave blank if weightless or not tracked.',
+  },
+}
+
+function InputUnitFieldHarness({
+  initialValue = 30,
+  ...props
+}: Omit<React.ComponentProps<typeof InputUnitField>, 'value' | 'onValueChange'> & {
+  initialValue?: number
+}) {
+  const [value, setValue] = React.useState<number | undefined>(initialValue)
+  return (
+    <InputUnitField
+      {...props}
+      value={value}
+      onValueChange={(next) => setValue(typeof next === 'number' ? next : undefined)}
+    />
+  )
+}
+
+/** Fixed ft. suffix — walk speed / weapon range authoring shape. */
+export const WalkSpeed: StoryObj<typeof InputUnitFieldHarness> = {
+  render: (args) => <InputUnitFieldHarness {...args} />,
+  args: {
+    id: 'walk-speed',
+    label: 'Walk speed',
+    inputType: 'number',
+    unit: 'ft.',
+    initialValue: 30,
+    min: 0,
+    width: 'auto',
+    valueDigits: 2,
+    required: true,
+  },
+}
+
+/** Label mode on InputSelectField directly (nested weight shape preview). */
+export const FixedUnit: Story = {
+  args: {
+    id: 'weight-fixed',
+    label: 'Weight',
+    inputType: 'number',
+    unitMode: 'label',
+    fixedUnit: 'lb.',
+    initialValue: 12,
+    min: 0,
+    step: 0.5,
+    width: 'auto',
+    valueDigits: 2,
   },
 }
 

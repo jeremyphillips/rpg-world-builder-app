@@ -7,7 +7,7 @@ import { FieldRow } from './field-row'
 import { TextField } from './text-field'
 import { NumberField } from './number-field'
 import { SelectField } from './select-field'
-import { InputSelectField } from './input-select-field.client'
+import { InputSelectField, InputUnitField } from './input-select-field.client'
 import { SwitchField } from './switch-field'
 import { DiceFormulaField } from './dice-formula-field.client'
 
@@ -147,4 +147,51 @@ function WeaponDamageRowHarness() {
 /** Select + select + diceFormula — label baselines should align (weapon damage row). */
 export const LabeledRowWithDiceFormula: Story = {
   render: () => <WeaponDamageRowHarness />,
+}
+
+function RangeRowHarness() {
+  const [normal, setNormal] = React.useState<number | undefined>(150)
+  const [long, setLong] = React.useState<number | undefined>(600)
+
+  return (
+    <FieldRow>
+      <SelectField
+        id="mode"
+        label="Mode"
+        width="md"
+        defaultValue="ranged"
+        options={[
+          { label: 'Melee', value: 'melee' },
+          { label: 'Ranged', value: 'ranged' },
+        ]}
+      />
+      <InputUnitField
+        id="range-normal"
+        label="Normal range"
+        inputType="number"
+        unit="ft."
+        width="auto"
+        valueDigits={3}
+        min={0}
+        value={normal}
+        onValueChange={(next) => setNormal(typeof next === 'number' ? next : undefined)}
+      />
+      <InputUnitField
+        id="range-long"
+        label="Long range"
+        inputType="number"
+        unit="ft."
+        width="auto"
+        valueDigits={3}
+        min={0}
+        value={long}
+        onValueChange={(next) => setLong(typeof next === 'number' ? next : undefined)}
+      />
+    </FieldRow>
+  )
+}
+
+/** Select + inputUnit + inputUnit — label baselines should align (weapon range row). */
+export const LabeledRowWithInputUnit: Story = {
+  render: () => <RangeRowHarness />,
 }

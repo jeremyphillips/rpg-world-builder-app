@@ -119,5 +119,22 @@ export const inputSelectUnitSegmentVariants = cva(
 
 export const inputSelectSearchablePanelVariants = cva('min-w-56')
 
+/** Static unit label segment — no caret, intrinsic width (fixed-unit composites). */
+export const inputSelectUnitLabelSegmentVariants = cva(
+  'inline-flex w-fit shrink-0 select-none items-center text-foreground',
+  {
+    variants: {
+      size: {
+        sm: cn(segmentSizeVariants.sm, segmentReset, 'rounded-l-none rounded-r-md pl-2 pr-2'),
+        md: cn(segmentSizeVariants.md, segmentReset, 'rounded-l-none rounded-r-md pl-2.5 pr-2.5'),
+        lg: cn(segmentSizeVariants.lg, segmentReset, 'rounded-l-none rounded-r-md pl-3 pr-3'),
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+)
+
 export type InputSelectGroupVariantProps = VariantProps<typeof inputSelectGroupVariants>
 export type InputSelectSegmentVariantProps = VariantProps<typeof inputSelectValueSegmentVariants>
