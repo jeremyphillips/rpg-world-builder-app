@@ -170,16 +170,16 @@ single source of truth for `sm | md | lg` sizing. Primitives and composites
 `input-select-field.variants.ts`, digit metrics, and so on) compose those maps
 instead of repeating the tuples.
 
-| Map                                | Use                                                                            |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| `fieldSizeTypographyClasses`       | Label + control type scale (`text-xs` / `text-md` / `text-base`)               |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                    |
-| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, `DiceFormulaField`, …) |
-| `fieldTextareaSizeClasses`         | Multi-line controls (`Textarea`, `JsonField`, …)                               |
-| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls                                  |
-| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls                      |
-| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                                     |
-| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                                    |
+| Map                                | Use                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `fieldSizeTypographyClasses`       | Label + control type scale (`text-xs` / `text-md` / `text-base`)                                 |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                                      |
+| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …) |
+| `fieldTextareaSizeClasses`         | Multi-line controls (`Textarea`, `JsonField`, …)                                                 |
+| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls                                                    |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls                                        |
+| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                                                       |
+| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                                                      |
 
 ### `size` — control height + type scale
 
@@ -566,11 +566,63 @@ prefix/suffix text, without chip options below. Same sentence-row token as
 - Binds a single numeric count path; pair with a separate field or array for the
   actual choices.
 - `prefix` / `suffix` default to `Choose` and `from:`.
-- Set `prefix: ''` for a suffix-only sentence such as walk speed (`[N] ft.`).
 - Optional `digits` sets count input width (defaults to `1`).
 - Sentence layout uses `fieldInlineSentenceClasses`.
+- For fixed-unit distances (walk speed, weapon range, spell distance), prefer
+  [`inputUnit`](#inputunit--inputunitfield) instead of a suffix-only sentence.
 
-### Combobox (`combobox` / `ComboboxField`)
+### Input unit (`inputUnit` / `InputUnitField`)
+
+Scalar number + fixed unit label in the grouped value | unit shell shared with
+`InputSelectField` — no unit caret or `min-w-[5rem]` reserve. Binds a **single
+number path** (not a nested `{ value, unit }` object).
+
+```ts
+{
+  type: 'inputUnit',
+  name: 'speed.walk',
+  label: 'Walk speed',
+  unit: 'ft.',
+  min: 0,
+  valueDigits: 2,
+  defaultValue: 30,
+}
+```
+
+- `unit` is the display label (e.g. `'ft.'`, `'lb.'`).
+- `valueDigits` sizes the value segment; `formatGrouped` adds thousand separators.
+- Uses `fieldGroupedControlSizeClasses` — align with adjacent selects in a
+  `FieldRow` (`FieldRow/LabeledRowWithInputUnit` in Storybook).
+- Dashboard helpers: [`feetInputUnitField`](../../../apps/dashboard/src/features/content/lib/content-form-field-helpers.ts)
+  for feet distances.
+
+### Value + unit select (`inputSelect` / `InputSelectField`)
+
+Nested `{ valueKey, unitKey }` composite for multi-unit enums (cost, mass, speed
+rate). When only one unit option exists, set `fixedUnit` + `unitValue` (or use
+dashboard `scalarUnitInputSelectField`, which auto-switches) to render a static
+unit label instead of a disabled one-option select:
+
+```ts
+{
+  type: 'inputSelect',
+  name: 'weight',
+  label: 'Weight',
+  inputType: 'number',
+  valueKey: 'value',
+  unitKey: 'unit',
+  fixedUnit: 'lb.',
+  unitValue: 'lb',
+  min: 0,
+  step: 0.5,
+  formatGrouped: true,
+}
+```
+
+Multi-unit fields keep `options` on the unit segment (currency, mass units, mph/ft,
+etc.). Set `valueDigits` for intrinsic number width, or `valueDigitsDependsOn` +
+`valueDigitsLookup` when width should track another field (e.g. equipment `kind`
+on the hub create route).
 
 A searchable popover dropdown for picking one or many values from a large option
 list — suitable for campaign-scoped catalog references (weapons, spells, tools)
@@ -716,9 +768,11 @@ names:
 
 ```ts
 {
-  type: 'number',
+  type: 'inputUnit',
   name: 'range',
-  label: 'Range (ft)',
+  label: 'Range',
+  unit: 'ft.',
+  min: 0,
   visibility: {
     dependsOn: ['type'],                    // relative — means `traits.N.type`
     visibleWhen: (v) => v.type === 'sense', // v uses the relative key
@@ -788,12 +842,17 @@ The runnable versions live in Storybook; copy from there.
   use grouped control shells (`fieldGroupedControlSizeClasses`) so the field
   aligns with adjacent selects in a `FieldRow` — set explicit `size` on every
   row member (`Field.Label` + grouped shells; see `FieldRow/LabeledRowWithDiceFormula`).
+- **Scalar number + unit label** — `Forms/InputUnitField`
+  ([input-select-field.stories.tsx](../src/components/ui/input-select-field.stories.tsx)):
+  `type: 'inputUnit'` binds a single number path with a fixed unit label (walk
+  speed, weapon range, spell distance). See `FieldRow/LabeledRowWithInputUnit`.
 - **Value + unit composite** — `Forms/InputSelectField`
   ([input-select-field.stories.tsx](../src/components/ui/input-select-field.stories.tsx)):
   `type: 'inputSelect'` binds a nested object via `valueKey` / `unitKey` (e.g.
-  `{ amount, currency }` for cost). Set `valueDigits` for intrinsic number width,
-  or `valueDigitsDependsOn` + `valueDigitsLookup` when width should track another
-  field (e.g. equipment `kind` on the hub create route).
+  `{ amount, currency }` for cost). Single-option units use `fixedUnit` / `unitValue`
+  for label mode instead of a one-option select. Set `valueDigits` for intrinsic
+  number width, or `valueDigitsDependsOn` + `valueDigitsLookup` when width should
+  track another field (e.g. equipment `kind` on the hub create route).
 - **Multi-group schema form** — `Forms/Form`
   ([form.stories.tsx](../src/form/form.stories.tsx)): a `<Form>` combining a group,
   a row, a conditional field, and a rich-text field. The shape of a real form:

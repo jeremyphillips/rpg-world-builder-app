@@ -1,15 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { createEquipmentInputSchema } from '@rpg/contracts'
+import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
 import { damageToForm, weaponFormFieldGroup } from './weapon-form-fields'
 
 const WEAPON_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'weapon')
 
-function damageRowFromWeaponGroup(
-  weaponGroup: Extract<ReturnType<typeof weaponFormFieldGroup>, { kind: 'group' }>,
-) {
+function assertWeaponGroup(item: FormItem): GroupConfig {
+  if (!('kind' in item) || item.kind !== 'group') {
+    throw new Error('expected weapon form group')
+  }
+  return item
+}
+
+function damageRowFromWeaponGroup(weaponGroup: GroupConfig) {
   const damageGroup = weaponGroup.fields.find(
     (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
       'kind' in field && field.kind === 'group' && field.legend === 'Damage',
@@ -46,17 +52,13 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('uses diceFormula fields with auto width for damage and versatile damage', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const damageRow = damageRowFromWeaponGroup(weaponGroup)
 
     expect(
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageDice'),
     ).toMatchObject({
-      label: 'Damage Dice',
+      label: 'Dice',
       modifierMode: 'none',
       size: 'md',
       width: 'auto',
@@ -66,7 +68,7 @@ describe('weapon kindFieldGroups', () => {
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'versatileDamage'),
     ).toMatchObject({
       name: 'versatileDamage',
-      label: 'Versatile damage',
+      label: 'Versatile dice',
       modifierMode: 'none',
       size: 'md',
       width: 'auto',
@@ -74,11 +76,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('composes damage kind, damage type, and dice damage in one row', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const damageRow = damageRowFromWeaponGroup(weaponGroup)
 
     expect(damageRow.fields).toEqual(
@@ -100,11 +98,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('offers none as a damage option for weapons like the net', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const damageRow = damageRowFromWeaponGroup(weaponGroup)
     const damageKindField = damageRow.fields.find(
       (field) => !('kind' in field) && field.name === 'damageKind',
@@ -121,11 +115,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('uses Choose... placeholders for required weapon selects', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const coreRow = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
@@ -144,11 +134,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('wires range visibility from mode and thrown property', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const rangeRow = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
@@ -180,11 +166,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('wires property and mastery conditional option availability and dynamic hints', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const propertiesField = weaponGroup.fields.find(
       (field) => !('kind' in field) && field.name === 'properties',
     )

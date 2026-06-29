@@ -251,10 +251,10 @@ Contracts SSOT:
 [`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
 (with optional `{ showTierLabels: false }`).
 
-Walk speed and spell range distance use [`feetInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
-(`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`); species walk speed wraps it via
-[`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
-(`digits: 2`) in species and grant authoring.
+Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`type: 'inputUnit'`, `unit: 'ft.'`). Fixed-pound weight uses auto-switched
+[`scalarUnitInputSelectField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`fixedUnit: 'lb.'` when only one unit option).
 
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to

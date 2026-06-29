@@ -104,9 +104,10 @@ const conditionalFields: FormItem[] = [
         },
       },
       {
-        type: 'number',
+        type: 'inputUnit',
         name: 'range',
-        label: 'Range (ft)',
+        label: 'Range',
+        unit: 'ft.',
         min: 0,
         visibility: {
           dependsOn: ['type'],
@@ -127,7 +128,7 @@ const conditionalFields: FormItem[] = [
 /**
  * An array where each item has a type discriminator that controls which sibling
  * fields render. Choosing "Resistance" shows a damage-type text field; choosing
- * "Sense" shows a range number field. This exercises the item-scoped
+ * "Sense" shows a range input with a fixed ft. unit label. This exercises the
  * `ConditionalField` logic.
  */
 export const ConditionalItemFields: StoryObj<Meta<object>> = {
