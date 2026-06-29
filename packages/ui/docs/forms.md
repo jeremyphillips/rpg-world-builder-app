@@ -198,7 +198,9 @@ One union, two intents:
 - **Intrinsic** (`xs`, `sm`, `md`, `lg`, `xl`, `auto`): a capped `max-width` +
   `flex-none`, so the field keeps its own width and never grows. `xs` (~64px)
   suits 1–2 character inputs like a die count; `sm` suits compact inputs like
-  level pickers.
+  level pickers. Inside a `FieldRow`, `xs`–`xl` also set matching `w-*` widths
+  so the token size applies horizontally (standalone fields still stretch up to
+  the cap in a column).
 - **Proportional** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): these flex within
   a `FieldRow`. `full` (the default) fills remaining space; fractions distribute
   space by **grow weight** (a base-12 scale), so mixed denominators compose and

@@ -251,9 +251,10 @@ Contracts SSOT:
 [`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
 (with optional `{ showTierLabels: false }`).
 
-Walk speed fields use [`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
-(`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`, `digits: 2`) in species
-and grant authoring.
+Walk speed and spell range distance use [`feetInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`); species walk speed wraps it via
+[`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`digits: 2`) in species and grant authoring.
 
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to

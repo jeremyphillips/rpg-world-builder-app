@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   costFields,
   economyFields,
+  feetInlineCountField,
   mountCapacitySpeedFields,
   optionalWeightFields,
   vehicleCargoSpeedFields,
@@ -184,6 +185,20 @@ describe('wealthGrantToForm', () => {
   it('round-trips stored wealth into form values', () => {
     expect(wealthGrantToForm({ gp: 90 })).toEqual({ gp: 90 })
     expect(wealthGrantToForm(undefined)).toBeUndefined()
+  })
+})
+
+describe('feetInlineCountField', () => {
+  it('builds an inlineChooseCount field with a suffix-only ft sentence', () => {
+    expect(feetInlineCountField('range.value.value', 'Distance')).toMatchObject({
+      type: 'inlineChooseCount',
+      name: 'range.value.value',
+      label: 'Distance',
+      prefix: '',
+      suffix: 'ft.',
+      chooseMin: 0,
+      digits: 2,
+    })
   })
 })
 

@@ -44,7 +44,11 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-form-field-helpers'
+import {
+  feetInlineCountField,
+  identityFields,
+  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+} from '../../lib/content-form-field-helpers'
 import {
   contentFormRegistry,
   contentFormFields,
@@ -371,16 +375,16 @@ function castingFields(): FormItem[] {
               label: 'Range kind',
               options: rangeKindOptions,
               required: true,
-              width: 'xl',
+              width: 'lg',
             },
-            {
-              type: 'number',
-              name: 'range.value.value',
-              label: 'Distance (ft)',
-              min: 0,
+            feetInlineCountField('range.value.value', 'Distance', {
+              // hideLabel: true,
+              label: 'Distance',
+              digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+              width: 'auto',
               visibility: visibleWhenRangeDistance(),
               required: true,
-            },
+            }),
           ],
         },
         {
@@ -397,15 +401,16 @@ function castingFields(): FormItem[] {
       legend: 'Duration',
       fields: [
         {
-          type: 'select',
-          name: 'duration.kind',
-          label: 'Duration kind',
-          options: durationKindOptions,
-          required: true,
-        },
-        {
           kind: 'row',
           fields: [
+            {
+              type: 'select',
+              name: 'duration.kind',
+              label: 'Duration kind',
+              options: durationKindOptions,
+              required: true,
+              width: 'lg',
+            },
             {
               type: 'inputSelect',
               name: 'duration',
@@ -430,6 +435,10 @@ function castingFields(): FormItem[] {
               visibility: visibleWhenDurationTimed(),
             },
           ],
+        },
+        {
+          kind: 'row',
+          fields: [],
         },
         {
           type: 'switch',

@@ -4,8 +4,39 @@ import axe from 'axe-core'
 
 import { FieldRow } from './field-row'
 import { TextField } from './text-field'
+import { SelectField } from './select-field'
 
 describe('FieldRow', () => {
+  it('marks the row container for intrinsic width resolution', () => {
+    const { container } = render(
+      <FieldRow>
+        <TextField id="first" label="First name" />
+      </FieldRow>,
+    )
+
+    expect(container.firstChild).toHaveAttribute('data-field-row', '')
+  })
+
+  it('applies row width classes to intrinsic-width fields', () => {
+    render(
+      <FieldRow>
+        <SelectField
+          id="kind"
+          label="Range kind"
+          width="xl"
+          placeholder="Choose"
+          options={[
+            { label: 'Self', value: 'self' },
+            { label: 'Distance', value: 'distance' },
+          ]}
+        />
+      </FieldRow>,
+    )
+
+    const fieldRoot = screen.getByLabelText('Range kind').closest('.max-w-64')
+    expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
+  })
+
   it('renders its child fields side by side', () => {
     const { container } = render(
       <FieldRow>

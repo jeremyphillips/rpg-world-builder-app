@@ -13,5 +13,11 @@ export interface FieldRowProps extends HTMLAttributes<HTMLDivElement> {
  * share the remaining space (equal split by default). Wraps on narrow widths.
  */
 export function FieldRow({ layout = 'flex', className, ...props }: FieldRowProps) {
-  return <div className={cn(fieldRowLayoutVariants({ layout }), className)} {...props} />
+  return (
+    <div
+      data-field-row=""
+      className={cn(fieldRowLayoutVariants({ layout }), className)}
+      {...props}
+    />
+  )
 }

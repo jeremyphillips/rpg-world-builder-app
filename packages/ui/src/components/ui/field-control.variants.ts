@@ -47,7 +47,9 @@ export type TextareaVariantProps = VariantProps<typeof textareaVariants>
  *
  * - Intrinsic (`xs`–`xl`, `auto`): map to `max-width` + `flex-none` so the field
  *   keeps its own width and never grows. `xs` (~64px) suits 1–2 char inputs like
- *   a die count; `sm` suits compact inputs like level pickers.
+ *   a die count; `sm` suits compact inputs like level pickers. Inside a
+ *   `FieldRow` (`data-field-row`), `xs`–`xl` also set matching `w-*` so the cap
+ *   becomes an explicit row width (column layouts still stretch up to the cap).
  * - Proportional (`full`, fractions): flex along a `FieldRow`. `full` (default)
  *   fills the remaining space; fractions distribute it by **grow weight** rather
  *   than `flex-basis` percentages, which keeps them gap-safe and lets mixed
@@ -62,11 +64,11 @@ export type TextareaVariantProps = VariantProps<typeof textareaVariants>
 export const fieldWidthVariants = cva('', {
   variants: {
     width: {
-      xs: 'max-w-16 flex-none',
-      sm: 'max-w-24 flex-none',
-      md: 'max-w-36 flex-none',
-      lg: 'max-w-48 flex-none',
-      xl: 'max-w-64 flex-none',
+      xs: 'max-w-16 flex-none in-data-[field-row]:w-16',
+      sm: 'max-w-24 flex-none in-data-[field-row]:w-24',
+      md: 'max-w-36 flex-none in-data-[field-row]:w-36',
+      lg: 'max-w-48 flex-none in-data-[field-row]:w-48',
+      xl: 'max-w-64 flex-none in-data-[field-row]:w-64',
       auto: 'w-fit flex-none',
       full: 'w-full flex-1',
       '1/2': 'min-w-0 max-w-1/2 basis-0 grow-[6]',
