@@ -32,6 +32,7 @@ import {
   ticketCardInteractiveClasses,
   ticketCardKeyClasses,
   ticketCardRootClasses,
+  ticketCardTitleClasses,
 } from './ticket-card.variants'
 
 function BlockedIndicator({ interactive }: { interactive: boolean }) {
@@ -75,7 +76,7 @@ function TicketTitle({ title }: { title: string }) {
     <Tooltip>
       <TooltipTrigger asChild>
         <span className="block min-w-0">
-          <Text className="line-clamp-2 font-medium">{title}</Text>
+          <Text className={ticketCardTitleClasses}>{title}</Text>
         </span>
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-sm">

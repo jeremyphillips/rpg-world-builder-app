@@ -18,6 +18,8 @@ export const ticketCardHeaderActionsClasses =
 
 export const ticketCardContentClasses = 'p-0 px-3 pb-0 pt-2'
 
-export const ticketCardFooterClasses = 'flex flex-wrap items-center gap-x-2 gap-y-1 p-0 pb-2 pt-3'
+export const ticketCardTitleClasses = 'line-clamp-2 min-h-[2lh] font-medium'
+
+export const ticketCardFooterClasses = 'flex flex-wrap items-center gap-x-2 gap-y-1 p-0 pb-3 pt-3'
 
 export const ticketCardAreaClasses = 'text-xs text-muted-foreground'
