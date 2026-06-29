@@ -3,7 +3,7 @@ import { Spinner, Text, Sheet } from '@rpg/ui'
 
 import { useTicket } from '../hooks/use-ticket'
 import { TicketDetailForm } from './ticket-detail-form'
-import { TicketMetaKicker, TicketMetaTimestamps, ticketMetaTitleClasses } from './ticket-meta'
+import { TicketMetaKicker, ticketMetaTitleClasses } from './ticket-meta'
 
 interface TicketDetailDrawerProps {
   ticketId: string | null
@@ -16,7 +16,7 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content side="right" className="w-full max-w-2xl overflow-y-auto">
+      <Sheet.Content side="right" className="w-full max-w-2xl">
         {ticket ? (
           <Sheet.Header
             kicker={<TicketMetaKicker ticket={ticket} detailHref={benchTicketPath(ticket.id)} />}
@@ -24,20 +24,19 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
             headlineClassName={ticketMetaTitleClasses}
           />
         ) : null}
-        <Sheet.Body className="space-y-4">
-          {isPending ? <Spinner /> : null}
-          {isError ? (
+        {isPending ? (
+          <Sheet.Body>
+            <Spinner />
+          </Sheet.Body>
+        ) : null}
+        {isError ? (
+          <Sheet.Body>
             <Text variant="destructive" role="alert">
               Could not load ticket.
             </Text>
-          ) : null}
-          {ticket ? (
-            <>
-              <TicketMetaTimestamps ticket={ticket} />
-              <TicketDetailForm ticket={ticket} transparentStickyChrome />
-            </>
-          ) : null}
-        </Sheet.Body>
+          </Sheet.Body>
+        ) : null}
+        {ticket ? <TicketDetailForm ticket={ticket} layout="sheet" /> : null}
       </Sheet.Content>
     </Sheet.Root>
   )

@@ -67,6 +67,12 @@ with `stickyTabsClassName` / `stickyActionsBarClassName` — merged after the
 defaults via `cn()`. Presets: `formStickyTabsTransparentClasses` and
 `formStickyActionsBarTransparentClasses` from `@rpg/ui/form`.
 
+For side sheets, prefer `footerWrapper` (e.g. render into `<Sheet.Footer>`) and
+`contentWrapper` (e.g. wrap tabs in `<Sheet.Body>`) so actions pin to the panel
+bottom instead of using a sticky bar inside padded scroll content. Keep the
+`<form>` as the flex column parent (`className="flex min-h-0 flex-1 flex-col"`)
+with header/body/footer as siblings.
+
 Single-page `<Form>` layouts can opt into the same sticky footer with
 `stickyFooter`.
 

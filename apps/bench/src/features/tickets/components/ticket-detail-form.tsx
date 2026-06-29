@@ -1,15 +1,10 @@
 import { useMemo, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, type UseFormReturn } from 'react-hook-form'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
-import { Button, ConfirmDialog, Text, Textarea } from '@rpg/ui'
-import {
-  FormFooterActions,
-  TabbedForm,
-  formStickyActionsBarTransparentClasses,
-  formStickyTabsTransparentClasses,
-} from '@rpg/ui/form'
+import { Button, Sheet, Text, Textarea } from '@rpg/ui'
+import { FormSaveFooter, TabbedForm, formStickyTabsTransparentClasses } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -20,10 +15,10 @@ import {
   ticketDetailFormSchema,
   type TicketDetailFormValues,
 } from '../lib/ticket-form-def'
-import { useDeleteTicket } from '../hooks/use-delete-ticket'
 import { useEpicsList } from '@/features/epics'
 import { useTickets } from '../hooks/use-tickets'
 import { useUpdateTicket } from '../hooks/use-update-ticket'
+import { TicketMetaTimestamps } from './ticket-meta'
 
 function AcceptanceCriteriaPasteHelper() {
   const form = useFormContext<TicketDetailFormValues>()
@@ -66,19 +61,14 @@ function AcceptanceCriteriaPasteHelper() {
 
 interface TicketDetailFormProps {
   ticket: Ticket
-  /** Transparent sticky chrome for sheet/drawer surfaces. */
-  transparentStickyChrome?: boolean
+  /** Page uses sticky footer chrome; sheet pins actions in `Sheet.Footer`. */
+  layout?: 'page' | 'sheet'
 }
 
-export function TicketDetailForm({
-  ticket,
-  transparentStickyChrome = false,
-}: TicketDetailFormProps) {
+export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormProps) {
   const { data: epics = [] } = useEpicsList()
   const { data: allTickets = [] } = useTickets({})
   const { mutateAsync, isPending, isSuccess } = useUpdateTicket(ticket.id)
-  const { mutateAsync: deleteAsync, isPending: isDeleting } = useDeleteTicket(ticket.id)
-  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const ticketLinkOptions = useMemo(
     () =>
@@ -109,55 +99,52 @@ export function TicketDetailForm({
     form.reset(mapTicketToDetailFormValues(updated))
   }, 'Could not save ticket.')
 
+  const footer = (form: UseFormReturn<TicketDetailFormValues>) => (
+    <FormSaveFooter
+      pending={isPending || form.formState.isSubmitting}
+      isSuccess={isSuccess}
+      submitLabel="Save ticket"
+      successMessage="Ticket saved."
+    />
+  )
+
+  const isSheetLayout = layout === 'sheet'
+
   return (
-    <>
-      <TabbedForm<TicketDetailFormValues>
-        key={ticket.updatedAt}
-        schema={ticketDetailFormSchema}
-        tabs={tabs}
-        defaultValues={mapTicketToDetailFormValues(ticket)}
-        onSubmit={onSubmit}
-        formError={formError}
-        stickyTabsClassName={transparentStickyChrome ? formStickyTabsTransparentClasses : undefined}
-        stickyActionsBarClassName={
-          transparentStickyChrome ? formStickyActionsBarTransparentClasses : undefined
-        }
-        footer={(form) => (
-          <FormFooterActions
-            leading={
-              <Button
-                type="button"
-                variant="destructive"
-                disabled={isDeleting}
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete ticket
-              </Button>
-            }
-            secondary={
-              <Button type="button" variant="outline" onClick={() => form.reset()}>
-                Cancel
-              </Button>
-            }
-            pending={isPending || form.formState.isSubmitting}
-            isSuccess={isSuccess}
-            submitLabel="Save ticket"
-            successMessage="Ticket saved."
-          />
-        )}
-      />
-      <ConfirmDialog
-        open={confirmDelete}
-        onOpenChange={setConfirmDelete}
-        headline="Delete ticket?"
-        description="This permanently removes the ticket. Linked references may become invalid."
-        confirmLabel="Delete"
-        confirmVariant="destructive"
-        onConfirm={() => {
-          void deleteAsync()
-          setConfirmDelete(false)
-        }}
-      />
-    </>
+    <TabbedForm<TicketDetailFormValues>
+      key={ticket.updatedAt}
+      schema={ticketDetailFormSchema}
+      tabs={tabs}
+      defaultValues={mapTicketToDetailFormValues(ticket)}
+      onSubmit={onSubmit}
+      formError={formError}
+      className={isSheetLayout ? 'flex min-h-0 flex-1 flex-col' : undefined}
+      stickyTabsClassName={isSheetLayout ? formStickyTabsTransparentClasses : undefined}
+      contentWrapper={
+        isSheetLayout
+          ? (content) => (
+              <Sheet.Body className="space-y-4">
+                <TicketMetaTimestamps ticket={ticket} />
+                {content}
+              </Sheet.Body>
+            )
+          : undefined
+      }
+      footerWrapper={
+        isSheetLayout
+          ? ({ footer: footerContent, formError: footerFormError }) => (
+              <Sheet.Footer className="flex-col items-stretch gap-3">
+                {footerFormError ? (
+                  <Text variant="destructive" role="alert">
+                    {footerFormError}
+                  </Text>
+                ) : null}
+                {footerContent}
+              </Sheet.Footer>
+            )
+          : undefined
+      }
+      footer={footer}
+    />
   )
 }

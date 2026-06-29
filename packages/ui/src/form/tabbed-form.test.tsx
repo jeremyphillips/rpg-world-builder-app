@@ -178,6 +178,42 @@ describe('TabbedForm', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
   })
 
+  it('renders footer via footerWrapper instead of the sticky actions bar', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        formError="Something went wrong."
+        footer={<button type="submit">Save changes</button>}
+        footerWrapper={({ footer, formError }) => (
+          <footer data-testid="external-footer">
+            {formError ? <p role="alert">{formError}</p> : null}
+            {footer}
+          </footer>
+        )}
+      />,
+    )
+
+    expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('external-footer')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
+  it('wraps tab content with contentWrapper', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        contentWrapper={(content) => <section data-testid="wrapped-content">{content}</section>}
+      />,
+    )
+
+    expect(screen.getByTestId('wrapped-content')).toContainElement(screen.getByRole('tablist'))
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TabbedForm<TestValues>
