@@ -19,13 +19,18 @@ import {
 } from './dice-formula-field.lib'
 import {
   diceFormulaControlCellVariants,
-  diceFormulaCoreVariants,
+  diceFormulaCoreGroupVariants,
   diceFormulaCountInputVariants,
+  diceFormulaGroupedCountRootVariants,
+  diceFormulaGroupedFacesSegmentVariants,
+  diceFormulaGroupedModifierRootVariants,
+  diceFormulaGroupedOperatorSegmentVariants,
+  diceFormulaModifierGroupVariants,
   diceFormulaModifierInputVariants,
   diceFormulaRowVariants,
-  diceFormulaSelectTriggerVariants,
   diceFormulaSeparatorVariants,
 } from './dice-formula-field.variants'
+import { inputSelectDividerVariants } from './input-select-field.variants'
 
 const ADD_MODIFIER_LABEL = 'Add modifier'
 const REMOVE_MODIFIER_LABEL = 'Remove modifier'
@@ -96,12 +101,14 @@ function DiceFormulaCountControl({
     <DiceFormulaControlCell id={id} label="Count">
       <NumberInput
         id={id}
+        grouped
         size={size}
         min={countMin}
         max={countMax}
         disabled={disabled}
         aria-invalid={hasError || undefined}
         digits={digits}
+        rootClassName={diceFormulaGroupedCountRootVariants()}
         className={diceFormulaCountInputVariants()}
         value={resolved.count}
         onChange={(event) => {
@@ -138,10 +145,11 @@ function DiceFormulaFacesControl({
       >
         <SelectTrigger
           id={id}
+          grouped
           size={size}
           digits={digits}
           aria-invalid={hasError || undefined}
-          className={diceFormulaSelectTriggerVariants()}
+          className={diceFormulaGroupedFacesSegmentVariants({ size })}
           onBlur={onBlur}
         >
           <SelectValue />
@@ -155,6 +163,67 @@ function DiceFormulaFacesControl({
         </SelectContent>
       </Select>
     </DiceFormulaControlCell>
+  )
+}
+
+function DiceFormulaCoreControls({
+  countId,
+  facesId,
+  size,
+  resolved,
+  faces,
+  disabled,
+  hasError,
+  countMin,
+  countMax,
+  onBlur,
+  onUpdate,
+}: {
+  countId: string
+  facesId: string
+  size: FieldSize
+  resolved: DiceFormulaValue
+  faces: readonly number[]
+  disabled: boolean
+  hasError: boolean
+  countMin: number
+  countMax: number
+  onBlur?: () => void
+  onUpdate: (patch: DiceFormulaPatch) => void
+}) {
+  return (
+    <div className={diceFormulaCoreGroupVariants({ invalid: hasError, disabled })}>
+      <DiceFormulaCountControl
+        id={countId}
+        size={size}
+        resolved={resolved}
+        countMin={countMin}
+        countMax={countMax}
+        disabled={disabled}
+        hasError={hasError}
+        onBlur={onBlur}
+        onUpdate={onUpdate}
+      />
+
+      <div aria-hidden className={inputSelectDividerVariants()} />
+
+      <span aria-hidden className={diceFormulaSeparatorVariants({ size })}>
+        d
+      </span>
+
+      <div aria-hidden className={inputSelectDividerVariants()} />
+
+      <DiceFormulaFacesControl
+        id={facesId}
+        size={size}
+        resolved={resolved}
+        faces={faces}
+        disabled={disabled}
+        hasError={hasError}
+        onBlur={onBlur}
+        onUpdate={onUpdate}
+      />
+    </div>
   )
 }
 
@@ -187,66 +256,73 @@ function DiceFormulaModifierControls({
 }) {
   return (
     <>
-      <DiceFormulaControlCell id={operatorId} label="Operator">
-        <Select
-          value={resolved.modifier?.operator ?? '+'}
-          onValueChange={(next) =>
-            onUpdate({
-              modifier: {
-                operator: next as DiceFormulaOperator,
-                amount: resolved.modifier?.amount ?? 1,
-              },
-            })
-          }
-          disabled={disabled}
-        >
-          <SelectTrigger
-            id={operatorId}
-            size={size}
-            digits={1}
-            aria-invalid={hasError || undefined}
-            className={diceFormulaSelectTriggerVariants()}
-            onBlur={onBlur}
+      <div className={diceFormulaModifierGroupVariants({ invalid: hasError, disabled })}>
+        <DiceFormulaControlCell id={operatorId} label="Operator">
+          <Select
+            value={resolved.modifier?.operator ?? '+'}
+            onValueChange={(next) =>
+              onUpdate({
+                modifier: {
+                  operator: next as DiceFormulaOperator,
+                  amount: resolved.modifier?.amount ?? 1,
+                },
+              })
+            }
+            disabled={disabled}
           >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {DICE_FORMULA_OPERATORS.map((operator) => (
-              <SelectItem key={operator} value={operator}>
-                {operator}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </DiceFormulaControlCell>
+            <SelectTrigger
+              id={operatorId}
+              grouped
+              size={size}
+              digits={1}
+              aria-invalid={hasError || undefined}
+              className={diceFormulaGroupedOperatorSegmentVariants({ size })}
+              onBlur={onBlur}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DICE_FORMULA_OPERATORS.map((operator) => (
+                <SelectItem key={operator} value={operator}>
+                  {operator}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </DiceFormulaControlCell>
 
-      <DiceFormulaControlCell id={modifierId} label="Modifier">
-        <NumberInput
-          id={modifierId}
-          size={size}
-          min={modifierMin}
-          max={modifierMax}
-          disabled={disabled}
-          aria-invalid={hasError || undefined}
-          digits={fieldDigitsForMax(modifierMax)}
-          className={diceFormulaModifierInputVariants()}
-          value={resolved.modifier?.amount ?? 1}
-          onChange={(event) => {
-            onUpdate({
-              modifier: {
-                operator: resolved.modifier?.operator ?? '+',
-                amount: parseInputInt(
-                  event.target.value,
-                  resolved.modifier?.amount ?? 1,
-                  modifierMin,
-                  modifierMax,
-                ),
-              },
-            })
-          }}
-          onBlur={onBlur}
-        />
-      </DiceFormulaControlCell>
+        <div aria-hidden className={inputSelectDividerVariants()} />
+
+        <DiceFormulaControlCell id={modifierId} label="Modifier">
+          <NumberInput
+            id={modifierId}
+            grouped
+            size={size}
+            min={modifierMin}
+            max={modifierMax}
+            disabled={disabled}
+            aria-invalid={hasError || undefined}
+            digits={fieldDigitsForMax(modifierMax)}
+            rootClassName={diceFormulaGroupedModifierRootVariants()}
+            className={diceFormulaModifierInputVariants()}
+            value={resolved.modifier?.amount ?? 1}
+            onChange={(event) => {
+              onUpdate({
+                modifier: {
+                  operator: resolved.modifier?.operator ?? '+',
+                  amount: parseInputInt(
+                    event.target.value,
+                    resolved.modifier?.amount ?? 1,
+                    modifierMin,
+                    modifierMax,
+                  ),
+                },
+              })
+            }}
+            onBlur={onBlur}
+          />
+        </DiceFormulaControlCell>
+      </div>
 
       {modifierMode === 'optional' ? (
         <Button
@@ -290,37 +366,22 @@ export function DiceFormulaControls({
   return (
     <div
       className={diceFormulaRowVariants()}
-      role="group"
+      role={labelPosition === 'inline' ? 'group' : undefined}
       aria-labelledby={labelPosition === 'inline' ? inlineLabelId : undefined}
     >
-      <div className={diceFormulaCoreVariants()}>
-        <DiceFormulaCountControl
-          id={countId}
-          size={size}
-          resolved={resolved}
-          countMin={countMin}
-          countMax={countMax}
-          disabled={disabled}
-          hasError={hasError}
-          onBlur={onBlur}
-          onUpdate={onUpdate}
-        />
-
-        <span aria-hidden className={diceFormulaSeparatorVariants({ size })}>
-          d
-        </span>
-
-        <DiceFormulaFacesControl
-          id={facesId}
-          size={size}
-          resolved={resolved}
-          faces={faces}
-          disabled={disabled}
-          hasError={hasError}
-          onBlur={onBlur}
-          onUpdate={onUpdate}
-        />
-      </div>
+      <DiceFormulaCoreControls
+        countId={countId}
+        facesId={facesId}
+        size={size}
+        resolved={resolved}
+        faces={faces}
+        disabled={disabled}
+        hasError={hasError}
+        countMin={countMin}
+        countMax={countMax}
+        onBlur={onBlur}
+        onUpdate={onUpdate}
+      />
 
       {showModifierFields ? (
         <DiceFormulaModifierControls

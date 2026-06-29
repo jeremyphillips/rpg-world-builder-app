@@ -29,6 +29,10 @@ import {
 
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
+import {
+  feetInlineCountField,
+  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+} from '../../../lib/content-form-field-helpers'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
@@ -78,8 +82,9 @@ function visibleWhenFlatDamage(): FieldVisibility {
 
 function visibleWhenVersatile(): FieldVisibility {
   return {
-    dependsOn: ['properties'],
-    visibleWhen: (v) => Array.isArray(v.properties) && v.properties.includes('versatile'),
+    dependsOn: ['properties', 'damageKind'],
+    visibleWhen: (v) =>
+      v.damageKind !== 'none' && Array.isArray(v.properties) && v.properties.includes('versatile'),
   }
 }
 
@@ -208,7 +213,7 @@ export function weaponFormFieldGroup(): FormItem {
           {
             type: 'diceFormula',
             name: 'damageDice',
-            label: 'Damage',
+            label: 'Damage Dice',
             modifierMode: 'none',
             size: 'md',
             width: 'auto',
@@ -216,11 +221,6 @@ export function weaponFormFieldGroup(): FormItem {
             visibility: visibleWhenDiceDamage(),
             required: true,
           },
-        ],
-      },
-      {
-        kind: 'row',
-        fields: [
           {
             type: 'diceFormula',
             name: 'versatileDamage',
@@ -232,33 +232,30 @@ export function weaponFormFieldGroup(): FormItem {
             visibility: visibleWhenVersatile(),
             required: true,
           },
+          {
+            type: 'number',
+            name: 'damageAmount',
+            label: 'Flat damage',
+            min: 1,
+            digits: 2,
+            visibility: visibleWhenFlatDamage(),
+            required: true,
+          },
         ],
-      },
-      {
-        type: 'number',
-        name: 'damageAmount',
-        label: 'Flat damage',
-        min: 1,
-        visibility: visibleWhenFlatDamage(),
-        required: true,
       },
       {
         kind: 'row',
         fields: [
-          {
-            type: 'number',
-            name: 'rangeNormal',
-            label: 'Normal range (ft.)',
-            min: 0,
+          feetInlineCountField('rangeNormal', 'Normal range', {
+            digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+            width: 'auto',
             visibility: visibleWhenRangeFields(),
-          },
-          {
-            type: 'number',
-            name: 'rangeLong',
-            label: 'Long range (ft.)',
-            min: 0,
+          }),
+          feetInlineCountField('rangeLong', 'Long range', {
+            digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+            width: 'auto',
             visibility: visibleWhenRangeFields(),
-          },
+          }),
         ],
       },
       {

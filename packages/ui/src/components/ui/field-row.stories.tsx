@@ -9,6 +9,7 @@ import { NumberField } from './number-field'
 import { SelectField } from './select-field'
 import { InputSelectField } from './input-select-field.client'
 import { SwitchField } from './switch-field'
+import { DiceFormulaField } from './dice-formula-field.client'
 
 const durationKindOptions = [
   { label: 'Instantaneous', value: 'instantaneous' },
@@ -101,4 +102,49 @@ export const FixedPlusFull: Story = {
 /** Select + inputSelect + switch — label baselines should align (spell Duration row). */
 export const LabeledRowWithInputSelect: Story = {
   render: () => <DurationRowHarness />,
+}
+
+const damageKindOptions = [
+  { label: 'Dice', value: 'dice' },
+  { label: 'Fixed', value: 'fixed' },
+]
+
+const damageTypeOptions = [
+  { label: 'Slashing', value: 'slashing' },
+  { label: 'Piercing', value: 'piercing' },
+  { label: 'Bludgeoning', value: 'bludgeoning' },
+]
+
+function WeaponDamageRowHarness() {
+  return (
+    <FieldRow>
+      <SelectField
+        id="damage-kind"
+        label="Damage"
+        width="md"
+        defaultValue="dice"
+        options={damageKindOptions}
+      />
+      <SelectField
+        id="damage-type"
+        label="Damage type"
+        width="md"
+        placeholder="Choose…"
+        options={damageTypeOptions}
+      />
+      <DiceFormulaField
+        id="damage-dice"
+        label="Damage"
+        modifierMode="none"
+        size="md"
+        width="auto"
+        countMin={1}
+      />
+    </FieldRow>
+  )
+}
+
+/** Select + select + diceFormula — label baselines should align (weapon damage row). */
+export const LabeledRowWithDiceFormula: Story = {
+  render: () => <WeaponDamageRowHarness />,
 }

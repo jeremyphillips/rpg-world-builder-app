@@ -10,10 +10,13 @@ import {
 } from './dice-formula-field.lib'
 
 describe('DiceFormulaField', () => {
-  it('renders the legend and dice controls', () => {
+  it('renders the label and dice controls', () => {
     render(<DiceFormulaField id="roll" label="Roll" modifierMode="optional" />)
 
-    expect(screen.getByText('Roll')).toBeInTheDocument()
+    const label = screen.getByText('Roll')
+    expect(label).toHaveAttribute('id', 'roll-label')
+    expect(label).toHaveAttribute('for', 'roll-count')
+
     expect(screen.getByLabelText('Count')).toBeInTheDocument()
     expect(screen.getByLabelText('Die faces')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add modifier' })).toBeInTheDocument()
@@ -67,7 +70,7 @@ describe('DiceFormulaField', () => {
   })
 
   it('shows required modifier controls with 1d6+1 defaults', () => {
-    render(
+    const { container } = render(
       <DiceFormulaField
         id="roll"
         label="Damage"
@@ -79,6 +82,9 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Operator')).toBeInTheDocument()
     expect(screen.getByLabelText('Modifier')).toHaveValue(1)
     expect(screen.queryByRole('button', { name: 'Add modifier' })).not.toBeInTheDocument()
+
+    const modifierGroups = container.querySelectorAll('.inline-flex.items-center.rounded-md.border')
+    expect(modifierGroups.length).toBeGreaterThanOrEqual(2)
   })
 
   it('omits modifier UI in none mode', () => {
@@ -93,6 +99,21 @@ describe('DiceFormulaField', () => {
 
     expect(document.getElementById('roll-inline-label')).toHaveTextContent('Roll')
     expect(container.querySelector('.gap-3')).toHaveClass('flex', 'flex-wrap', 'items-center')
+  })
+
+  it('uses grouped core shell with aligned md control heights', () => {
+    const { container } = render(
+      <DiceFormulaField id="roll" label="Roll" modifierMode="none" size="md" />,
+    )
+
+    const coreGroup = container.querySelector(
+      '.inline-flex.w-fit.max-w-full.items-center.rounded-md.border',
+    )
+    expect(coreGroup).toBeInTheDocument()
+    expect(coreGroup).toHaveClass('items-center')
+
+    expect(screen.getByLabelText('Count')).toHaveClass('h-9')
+    expect(screen.getByLabelText('Die faces')).toHaveClass('h-9')
   })
 
   it('aligns count and digit-sized select widths for the same digit count', () => {

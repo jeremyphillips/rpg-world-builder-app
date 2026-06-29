@@ -167,10 +167,20 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected range row')
     }
 
-    for (const name of ['rangeNormal', 'rangeLong'] as const) {
+    for (const [name, label] of [
+      ['rangeNormal', 'Normal range'],
+      ['rangeLong', 'Long range'],
+    ] as const) {
       expect(
         rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
       ).toMatchObject({
+        type: 'inlineChooseCount',
+        label,
+        prefix: '',
+        suffix: 'ft.',
+        chooseMin: 0,
+        digits: 3,
+        width: 'auto',
         visibility: {
           dependsOn: ['mode', 'properties'],
         },

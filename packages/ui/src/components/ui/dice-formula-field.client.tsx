@@ -5,7 +5,7 @@ import * as React from 'react'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
@@ -21,12 +21,12 @@ import {
   resolveDiceFormulaValue,
   shouldShowModifierFields,
 } from './dice-formula-field.lib'
+import { FieldLayout } from './field-layout'
 import {
   fieldAnatomyStackClasses,
   fieldInlineControlRowClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
-  fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
 
@@ -66,7 +66,7 @@ export function DiceFormulaField({
   info,
   required = false,
   disabled = false,
-  size = 'sm',
+  size = 'md',
   width = 'full',
   labelPosition = 'above',
   modifierMode = 'optional',
@@ -113,28 +113,15 @@ export function DiceFormulaField({
     />
   )
 
-  return (
-    <fieldset
-      id={id}
-      aria-describedby={describedBy}
-      aria-invalid={hasError || undefined}
-      disabled={disabled}
-      className={cn(fieldSetResetClasses, fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
-      onBlur={onBlur}
-    >
-      {labelPosition === 'above' ? (
-        <legend id={`${id}-legend`} className={fieldLabelVariants({ size })}>
-          <FieldLabelContent label={label} required={required} info={info} />
-        </legend>
-      ) : (
-        <legend className="sr-only">{label}</legend>
-      )}
-
-      {labelPosition === 'above' && hintPosition === 'below-label' ? (
-        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
-      ) : null}
-
-      {labelPosition === 'inline' ? (
+  if (labelPosition === 'inline') {
+    return (
+      <div
+        id={id}
+        aria-describedby={describedBy}
+        aria-invalid={hasError || undefined}
+        className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
+        onBlur={onBlur}
+      >
         <div className={fieldInlineControlRowClasses}>
           {hintPosition === 'below-label' ? (
             <div className={fieldLabelHintStackClasses}>
@@ -150,17 +137,39 @@ export function DiceFormulaField({
           )}
           {controls}
         </div>
-      ) : (
-        controls
-      )}
 
-      {hintPosition === 'below-label' ? (
-        error ? (
-          <FieldErrorText id={errorId}>{error}</FieldErrorText>
-        ) : null
-      ) : (
-        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
-      )}
-    </fieldset>
+        {hintPosition === 'below-label' ? (
+          error ? (
+            <FieldErrorText id={errorId}>{error}</FieldErrorText>
+          ) : null
+        ) : (
+          <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <Field.Label id={`${id}-label`} htmlFor={`${id}-count`}>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <div
+            role="group"
+            aria-labelledby={`${id}-label`}
+            aria-describedby={describedBy}
+            aria-invalid={hasError || undefined}
+          >
+            {controls}
+          </div>
+        }
+      />
+    </Field.Root>
   )
 }

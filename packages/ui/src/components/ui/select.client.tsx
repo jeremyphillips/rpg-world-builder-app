@@ -12,6 +12,10 @@ import {
   type FieldDigits,
 } from './field-digit-metrics'
 import { selectDigitTrailingColumnVariants } from './select-digit.variants'
+import {
+  fieldDigitTrailingPaddingClasses,
+  fieldGroupedControlSizeClasses,
+} from './field-sizing.variants'
 
 const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
@@ -38,8 +42,13 @@ const SelectTrigger = React.forwardRef<
       <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-          fieldControlVariants({ size }),
-          fieldDigitSizeVariants[size],
+          grouped
+            ? cn(
+                fieldGroupedControlSizeClasses[size],
+                fieldDigitTrailingPaddingClasses[size],
+                'border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+              )
+            : cn(fieldControlVariants({ size }), fieldDigitSizeVariants[size]),
           fieldDigitWidthVariants[size][digits],
           'relative shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
           className,

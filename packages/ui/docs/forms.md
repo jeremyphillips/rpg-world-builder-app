@@ -170,16 +170,16 @@ single source of truth for `sm | md | lg` sizing. Primitives and composites
 `input-select-field.variants.ts`, digit metrics, and so on) compose those maps
 instead of repeating the tuples.
 
-| Map                                | Use                                                              |
-| ---------------------------------- | ---------------------------------------------------------------- |
-| `fieldSizeTypographyClasses`       | Label + control type scale (`text-xs` / `text-md` / `text-base`) |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                      |
-| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, …)       |
-| `fieldTextareaSizeClasses`         | Multi-line controls (`Textarea`, `JsonField`, …)                 |
-| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls                    |
-| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls        |
-| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                       |
-| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                      |
+| Map                                | Use                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| `fieldSizeTypographyClasses`       | Label + control type scale (`text-xs` / `text-md` / `text-base`)               |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                    |
+| `fieldGroupedControlSizeClasses`   | One segment inside a grouped shell (`InputSelectField`, `DiceFormulaField`, …) |
+| `fieldTextareaSizeClasses`         | Multi-line controls (`Textarea`, `JsonField`, …)                               |
+| `fieldDigitSizeClasses`            | Left + right padding for digit-width controls                                  |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns on digit controls                      |
+| `fieldDigitTrailingColumnClasses`  | Width of the trailing stepper/caret column                                     |
+| `fieldDigitTrailingIconClasses`    | Icon sizing paired with the trailing column                                    |
 
 ### `size` — control height + type scale
 
@@ -784,7 +784,10 @@ The runnable versions live in Storybook; copy from there.
   ([dice-notation.stories.tsx](../src/stories/dice-notation.stories.tsx),
   [dice-formula-field.stories.tsx](../src/components/ui/dice-formula-field.stories.tsx)):
   the `DiceFormulaField` composite (`type: 'diceFormula'` in `<Form>`) with
-  `none` / `optional` / `required` modifier modes.
+  `none` / `optional` / `required` modifier modes. Core and modifier clusters
+  use grouped control shells (`fieldGroupedControlSizeClasses`) so the field
+  aligns with adjacent selects in a `FieldRow` — set explicit `size` on every
+  row member (`Field.Label` + grouped shells; see `FieldRow/LabeledRowWithDiceFormula`).
 - **Value + unit composite** — `Forms/InputSelectField`
   ([input-select-field.stories.tsx](../src/components/ui/input-select-field.stories.tsx)):
   `type: 'inputSelect'` binds a nested object via `valueKey` / `unitKey` (e.g.
