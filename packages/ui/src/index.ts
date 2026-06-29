@@ -84,6 +84,7 @@ export {
   type FieldRadiogroupLabelProps,
 } from './components/ui/field-label-content'
 export { FormField } from './components/ui/form-field'
+export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export { NumberField, type NumberFieldProps } from './components/ui/number-field'
@@ -137,7 +138,9 @@ export {
   fieldGroupStackClasses,
   fieldInlineControlRowClasses,
   fieldInlineSentenceClasses,
+  fieldLabelHintStackClasses,
   fieldRowLayoutVariants,
+  type FieldHintPosition,
   type FieldRowLayout,
 } from './components/ui/field.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'

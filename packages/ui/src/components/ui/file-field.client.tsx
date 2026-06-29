@@ -6,12 +6,14 @@ import { FormField } from './form-field'
 import { FileDropzone, type FileDropzoneProps } from './file-dropzone.client'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 
 export interface FileFieldProps extends FileDropzoneProps {
   id: string
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   width?: FieldWidth
@@ -32,6 +34,7 @@ export function FileField({
   label,
   error,
   hint,
+  hintPosition,
   info,
   required,
   width,
@@ -44,6 +47,7 @@ export function FileField({
       label={label}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       info={info}
       required={required}
       width={width}

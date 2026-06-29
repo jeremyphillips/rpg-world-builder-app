@@ -7,6 +7,7 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * Form layout spacing — single source of truth.
  *
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
+ * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column
  * - `fieldGroupFlexStackClasses` — same 24px rhythm as `fieldGroupStackClasses`, gap-based (avoids margin collapse with fieldsets)
  * - `formSectionStackClasses` — top-level accordion sections
@@ -22,6 +23,8 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldInlineControlRowClasses` — inline label + control rows
  */
 export const fieldAnatomyStackClasses = 'space-y-2'
+/** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
+export const fieldLabelHintStackClasses = 'flex flex-col gap-1'
 export const fieldGroupStackClasses = 'space-y-6'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-6'
 export const formSectionStackClasses = 'flex flex-col gap-7'
@@ -55,6 +58,9 @@ export const fieldRowLayoutVariants = cva('', {
 
 export type FieldRowLayoutVariantProps = VariantProps<typeof fieldRowLayoutVariants>
 export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
+
+/** Where helper text renders relative to the label and control. */
+export type FieldHintPosition = 'below-label' | 'below-control'
 
 export const fieldLabelVariants = cva(
   [

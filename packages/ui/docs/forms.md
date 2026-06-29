@@ -87,14 +87,9 @@ Every field — whether composed by hand or emitted by `<Form>` — resolves to 
 same structure, owned by the compound `Field` ([field.client.tsx](../src/components/ui/field.client.tsx)):
 
 ```tsx
-import { Field } from '@rpg/ui'
+import { Field, FieldLayout } from '@rpg/ui'
 ;<Field.Root id="email" error={error} hint="We never share it." required>
-  <Field.Label>Email</Field.Label>
-  <Field.Control>
-    <Input type="email" />
-  </Field.Control>
-  <Field.Hint />
-  <Field.Error />
+  <FieldLayout label={<Field.Label>Email</Field.Label>} control={<Input type="email" />} />
 </Field.Root>
 ```
 
@@ -125,6 +120,12 @@ keyboard focus.
 validation message. They share the describedby slot — the error replaces the hint
 while present — so never encode required-ness or validation rules as a hint.
 
+**Hint placement.** Leaf field configs and wrappers accept `hintPosition`:
+`below-label` (default) or `below-control`. Default forms render the hint in a
+tighter cluster under the label (`fieldLabelHintStackClasses`) before the
+control; errors always render after the control. Inline checkbox and switch
+fields default to `below-control` unless overridden.
+
 ## Field spacing
 
 Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/field.variants.ts):
@@ -132,6 +133,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | Token                            | Class                 | Use                                                                             |
 | -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
 | `fieldAnatomyStackClasses`       | `space-y-2`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
+| `fieldLabelHintStackClasses`     | `gap-1`               | Label + hint cluster when `hintPosition="below-label"` (default)                |
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |

@@ -6,12 +6,14 @@ import { NumberInput, type NumberInputProps } from './number-input.client'
 import { fieldWidthVariants } from './field-control.variants'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 
 export interface NumberFieldProps extends Omit<NumberInputProps, 'id'> {
   id: string
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   /** Container layout width. Defaults to `full`. */
@@ -32,6 +34,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
       label,
       error,
       hint,
+      hintPosition,
       info,
       required,
       width = 'full',
@@ -48,6 +51,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         label={label}
         error={error}
         hint={hint}
+        hintPosition={hintPosition}
         info={info}
         required={required}
         width={width}

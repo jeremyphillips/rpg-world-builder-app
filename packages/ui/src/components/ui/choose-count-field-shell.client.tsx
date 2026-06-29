@@ -6,10 +6,12 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldAnatomyIds, fieldDescribedBy } from './choose-count-field.lib'
+import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import {
   fieldAnatomyStackClasses,
   fieldLabelVariants,
   fieldSetResetClasses,
+  type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 
@@ -25,6 +27,7 @@ interface ChooseCountFieldShellProps {
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -40,6 +43,7 @@ export function ChooseCountFieldShell({
   label,
   error,
   hint,
+  hintPosition = 'below-label',
   info,
   required,
   disabled,
@@ -70,7 +74,17 @@ export function ChooseCountFieldShell({
       >
         <FieldLabelContent label={label} info={info} />
       </legend>
+      {hintPosition === 'below-label' ? (
+        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+      ) : null}
       {children({ legendId, chooseId, hintId, errorId })}
+      {hintPosition === 'below-label' ? (
+        error ? (
+          <FieldErrorText id={errorId}>{error}</FieldErrorText>
+        ) : null
+      ) : (
+        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+      )}
     </fieldset>
   )
 }

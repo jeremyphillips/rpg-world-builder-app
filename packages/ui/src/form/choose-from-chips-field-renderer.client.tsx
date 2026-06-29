@@ -44,6 +44,7 @@ export function ChooseFromChipsFieldRenderer({
       suffix={config.suffix}
       error={combinedError}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

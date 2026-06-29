@@ -8,8 +8,9 @@ import {
   fieldAnatomyStackClasses,
   fieldChipWrapGapClasses,
   fieldLabelVariants,
+  type FieldHintPosition,
 } from './field.variants'
-import { Text } from './text'
+import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import { FieldLabelContent } from './field-label-content'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
@@ -148,6 +149,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps {
   /** Pill padding/type scale (default `sm`). */
   chipSize?: ChipSize
   width?: FieldWidth
+  hintPosition?: FieldHintPosition
 }
 
 /**
@@ -165,6 +167,7 @@ export function ChipsField({
   onBlur,
   error,
   hint,
+  hintPosition = 'below-label',
   info,
   required,
   disabled,
@@ -194,6 +197,10 @@ export function ChipsField({
         <FieldLabelContent label={label} info={info} />
       </legend>
 
+      {hintPosition === 'below-label' ? (
+        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+      ) : null}
+
       <ChipsFieldOptions
         id={id}
         options={options}
@@ -206,15 +213,13 @@ export function ChipsField({
         chipSize={chipSize}
       />
 
-      {error ? (
-        <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
-          {error}
-        </Text>
-      ) : hint ? (
-        <Text id={hintId} variant="caption">
-          {hint}
-        </Text>
-      ) : null}
+      {hintPosition === 'below-label' ? (
+        error ? (
+          <FieldErrorText id={errorId}>{error}</FieldErrorText>
+        ) : null
+      ) : (
+        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+      )}
     </fieldset>
   )
 }

@@ -4,10 +4,12 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { Textarea } from './textarea.client'
 import { Button } from './button.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 
 const INVALID_JSON_MESSAGE = 'Invalid JSON'
 
@@ -16,6 +18,7 @@ export interface JsonFieldProps {
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   width?: FieldWidth
@@ -46,6 +49,7 @@ export function JsonField({
   label,
   error,
   hint,
+  hintPosition,
   info,
   required,
   width,
@@ -99,40 +103,43 @@ export function JsonField({
       width={width}
       size={size}
     >
-      <div className="flex items-center justify-between gap-2">
-        <Field.Label>
-          <FieldLabelContent label={label} info={info} />
-        </Field.Label>
-        {example !== undefined ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs"
+      <FieldLayout
+        hintPosition={hintPosition}
+        label={
+          <div className="flex items-center justify-between gap-2">
+            <Field.Label>
+              <FieldLabelContent label={label} info={info} />
+            </Field.Label>
+            {example !== undefined ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                disabled={disabled}
+                onClick={handleInsertExample}
+              >
+                Insert example
+              </Button>
+            ) : null}
+          </div>
+        }
+        control={
+          <Textarea
+            name={name}
+            size={size}
             disabled={disabled}
-            onClick={handleInsertExample}
-          >
-            Insert example
-          </Button>
-        ) : null}
-      </div>
-      <Field.Control>
-        <Textarea
-          name={name}
-          size={size}
-          disabled={disabled}
-          placeholder={placeholder}
-          spellCheck={false}
-          className={cn('font-mono')}
-          value={currentValue}
-          onChange={(event) => setValue(event.target.value)}
-          onBlur={() => {
-            validate(currentValue)
-            onBlur?.()
-          }}
-        />
-      </Field.Control>
-      <Field.Hint />
-      <Field.Error />
+            placeholder={placeholder}
+            spellCheck={false}
+            className={cn('font-mono')}
+            value={currentValue}
+            onChange={(event) => setValue(event.target.value)}
+            onBlur={() => {
+              validate(currentValue)
+              onBlur?.()
+            }}
+          />
+        }
+      />
     </Field.Root>
   )
 }

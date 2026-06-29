@@ -6,8 +6,9 @@ import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import type { FieldWidth } from './field-control.variants'
-import { fieldLabelVariants } from './field.variants'
+import { fieldLabelVariants, type FieldHintPosition } from './field.variants'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
@@ -53,6 +54,7 @@ export interface InputSelectFieldProps {
   unitPlaceholder?: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -346,6 +348,7 @@ export function InputSelectField({
   unitPlaceholder,
   error,
   hint,
+  hintPosition,
   info,
   required = false,
   disabled = false,
@@ -368,64 +371,68 @@ export function InputSelectField({
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
-      <label
-        id={`${id}-label`}
-        htmlFor={valueId}
-        data-required={required || undefined}
-        className={fieldLabelVariants({ size })}
-      >
-        <FieldLabelContent label={label} info={info} />
-      </label>
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <label
+            id={`${id}-label`}
+            htmlFor={valueId}
+            data-required={required || undefined}
+            className={fieldLabelVariants({ size })}
+          >
+            <FieldLabelContent label={label} info={info} />
+          </label>
+        }
+        control={
+          <div
+            role="group"
+            aria-labelledby={`${id}-label`}
+            className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
+          >
+            <label htmlFor={valueId} className="sr-only">
+              {label} value
+            </label>
+            <ValueSegment
+              id={valueId}
+              inputType={inputType}
+              value={value}
+              size={size}
+              disabled={disabled}
+              placeholder={placeholder}
+              min={min}
+              max={max}
+              step={step}
+              hasError={hasError}
+              describedBy={describedBy}
+              valueDigits={valueDigits}
+              formatGrouped={formatGrouped}
+              onValueChange={onValueChange}
+              onBlur={onBlur}
+            />
 
-      <div
-        role="group"
-        aria-labelledby={`${id}-label`}
-        className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
-      >
-        <label htmlFor={valueId} className="sr-only">
-          {label} value
-        </label>
-        <ValueSegment
-          id={valueId}
-          inputType={inputType}
-          value={value}
-          size={size}
-          disabled={disabled}
-          placeholder={placeholder}
-          min={min}
-          max={max}
-          step={step}
-          hasError={hasError}
-          describedBy={describedBy}
-          valueDigits={valueDigits}
-          formatGrouped={formatGrouped}
-          onValueChange={onValueChange}
-          onBlur={onBlur}
-        />
+            <div aria-hidden className={inputSelectDividerVariants()} />
 
-        <div aria-hidden className={inputSelectDividerVariants()} />
-
-        <label htmlFor={unitId} className="sr-only">
-          {label} unit
-        </label>
-        <UnitSelectSegment
-          id={unitId}
-          label={label}
-          unit={unit}
-          options={options}
-          searchable={searchable}
-          unitPlaceholder={unitPlaceholder}
-          disabled={disabled || unitDisabled}
-          size={size}
-          hasError={hasError}
-          describedBy={describedBy}
-          onUnitChange={onUnitChange}
-          onBlur={onBlur}
-        />
-      </div>
-
-      <Field.Hint />
-      <Field.Error />
+            <label htmlFor={unitId} className="sr-only">
+              {label} unit
+            </label>
+            <UnitSelectSegment
+              id={unitId}
+              label={label}
+              unit={unit}
+              options={options}
+              searchable={searchable}
+              unitPlaceholder={unitPlaceholder}
+              disabled={disabled || unitDisabled}
+              size={size}
+              hasError={hasError}
+              describedBy={describedBy}
+              onUnitChange={onUnitChange}
+              onBlur={onBlur}
+            />
+          </div>
+        }
+      />
     </Field.Root>
   )
 }

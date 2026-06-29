@@ -18,7 +18,7 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { FieldRowLayout } from '../components/ui/field.variants'
+import type { FieldRowLayout, FieldHintPosition } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -101,6 +101,8 @@ interface BaseFieldConfig {
   size?: FieldSize
   width?: FieldWidth
   hint?: string
+  /** Helper text placement relative to the label and control. Default `below-label`. */
+  hintPosition?: FieldHintPosition
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean

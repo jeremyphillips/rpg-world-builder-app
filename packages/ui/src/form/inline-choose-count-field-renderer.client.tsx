@@ -33,6 +33,7 @@ export function InlineChooseCountFieldRenderer({
       digits={config.digits}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

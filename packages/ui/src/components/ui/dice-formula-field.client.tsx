@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
-import { Text } from './text'
+import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import {
@@ -24,7 +24,9 @@ import {
 import {
   fieldAnatomyStackClasses,
   fieldInlineControlRowClasses,
+  fieldLabelHintStackClasses,
   fieldLabelVariants,
+  type FieldHintPosition,
 } from './field.variants'
 
 export interface DiceFormulaFieldProps {
@@ -35,6 +37,7 @@ export interface DiceFormulaFieldProps {
   onBlur?: () => void
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -58,6 +61,7 @@ export function DiceFormulaField({
   onBlur,
   error,
   hint,
+  hintPosition = 'below-label',
   info,
   required = false,
   disabled = false,
@@ -125,26 +129,37 @@ export function DiceFormulaField({
         <legend className="sr-only">{label}</legend>
       )}
 
+      {labelPosition === 'above' && hintPosition === 'below-label' ? (
+        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+      ) : null}
+
       {labelPosition === 'inline' ? (
         <div className={fieldInlineControlRowClasses}>
-          <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
-            <FieldLabelContent label={label} required={required} info={info} />
-          </span>
+          {hintPosition === 'below-label' ? (
+            <div className={fieldLabelHintStackClasses}>
+              <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
+                <FieldLabelContent label={label} required={required} info={info} />
+              </span>
+              <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+            </div>
+          ) : (
+            <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
+              <FieldLabelContent label={label} required={required} info={info} />
+            </span>
+          )}
           {controls}
         </div>
       ) : (
         controls
       )}
 
-      {error ? (
-        <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
-          {error}
-        </Text>
-      ) : hint ? (
-        <Text id={hintId} variant="caption">
-          {hint}
-        </Text>
-      ) : null}
+      {hintPosition === 'below-label' ? (
+        error ? (
+          <FieldErrorText id={errorId}>{error}</FieldErrorText>
+        ) : null
+      ) : (
+        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+      )}
     </fieldset>
   )
 }

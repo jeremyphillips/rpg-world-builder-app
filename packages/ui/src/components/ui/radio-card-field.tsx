@@ -22,6 +22,7 @@ export function RadioCardField({
   options,
   error,
   hint,
+  hintPosition,
   info,
   required,
   width,
@@ -39,6 +40,7 @@ export function RadioCardField({
       label={label}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       info={info}
       required={required}
       width={width}

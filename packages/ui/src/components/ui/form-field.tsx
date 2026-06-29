@@ -1,14 +1,17 @@
 import type { ReactElement, ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
+import type { FieldHintPosition } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 
-interface FormFieldProps {
+export interface FormFieldProps {
   id: string
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   /** Optional info-icon content rendered as an `[i]` tooltip beside the label. */
   info?: ReactNode
   required?: boolean
@@ -28,6 +31,7 @@ export function FormField({
   label,
   error,
   hint,
+  hintPosition,
   info,
   required,
   size,
@@ -36,12 +40,15 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
-      <Field.Label>
-        <FieldLabelContent label={label} info={info} />
-      </Field.Label>
-      <Field.Control>{children}</Field.Control>
-      <Field.Hint />
-      <Field.Error />
+      <FieldLayout
+        hintPosition={hintPosition}
+        label={
+          <Field.Label>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={children}
+      />
     </Field.Root>
   )
 }

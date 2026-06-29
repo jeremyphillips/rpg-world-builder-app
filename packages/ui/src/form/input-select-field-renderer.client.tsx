@@ -86,6 +86,7 @@ export function InputSelectFieldRenderer({
       unitPlaceholder={config.unitPlaceholder}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

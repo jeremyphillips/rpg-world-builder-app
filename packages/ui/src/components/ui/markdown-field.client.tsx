@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field } from './field.client'
+import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { MarkdownContent } from './markdown-content'
 import { RichTextContent } from './rich-text-content'
@@ -12,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs.client'
 import { Textarea } from './textarea.client'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 
 const MARKDOWN_FIELD_TAB_WRITE = 'write'
 const MARKDOWN_FIELD_TAB_PREVIEW = 'preview'
@@ -26,6 +28,7 @@ export interface MarkdownFieldProps {
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  hintPosition?: FieldHintPosition
   rows?: number
   placeholder?: string
   disabled?: boolean
@@ -60,6 +63,7 @@ export function MarkdownField({
   required,
   width,
   size = 'md',
+  hintPosition,
   rows = 8,
   placeholder,
   disabled,
@@ -72,35 +76,41 @@ export function MarkdownField({
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
-      <Field.Label>
-        <FieldLabelContent label={label} info={info} />
-      </Field.Label>
-      <Field.Control>
-        <Tabs value={tab} onValueChange={setTab} variant="line">
-          <TabsList aria-label={`${label} mode`}>
-            <TabsTrigger value={MARKDOWN_FIELD_TAB_WRITE}>Write</TabsTrigger>
-            <TabsTrigger value={MARKDOWN_FIELD_TAB_PREVIEW}>Preview</TabsTrigger>
-          </TabsList>
-          <TabsContent value={MARKDOWN_FIELD_TAB_WRITE}>
-            <Textarea
-              aria-label={label}
-              size={size}
-              rows={rows}
-              placeholder={placeholder}
-              disabled={disabled}
-              value={value}
-              onChange={(event) => onChange?.(event.target.value)}
-              onBlur={onBlur}
-              className={cn('font-mono')}
-            />
-          </TabsContent>
-          <TabsContent value={MARKDOWN_FIELD_TAB_PREVIEW} id={previewId} aria-live="polite">
-            <MarkdownFieldPreview value={value} />
-          </TabsContent>
-        </Tabs>
-      </Field.Control>
-      <Field.Hint />
-      <Field.Error />
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <Field.Label>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <Tabs value={tab} onValueChange={setTab} variant="line">
+            <TabsList aria-label={`${label} mode`}>
+              <TabsTrigger value={MARKDOWN_FIELD_TAB_WRITE}>Write</TabsTrigger>
+              <TabsTrigger value={MARKDOWN_FIELD_TAB_PREVIEW}>Preview</TabsTrigger>
+            </TabsList>
+            <TabsContent value={MARKDOWN_FIELD_TAB_WRITE}>
+              <Field.Control>
+                <Textarea
+                  aria-label={label}
+                  size={size}
+                  rows={rows}
+                  placeholder={placeholder}
+                  disabled={disabled}
+                  value={value}
+                  onChange={(event) => onChange?.(event.target.value)}
+                  onBlur={onBlur}
+                  className={cn('font-mono')}
+                />
+              </Field.Control>
+            </TabsContent>
+            <TabsContent value={MARKDOWN_FIELD_TAB_PREVIEW} id={previewId} aria-live="polite">
+              <MarkdownFieldPreview value={value} />
+            </TabsContent>
+          </Tabs>
+        }
+      />
     </Field.Root>
   )
 }

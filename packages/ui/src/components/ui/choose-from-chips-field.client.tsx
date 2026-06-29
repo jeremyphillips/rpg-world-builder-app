@@ -7,7 +7,7 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { ChipSize } from './chips-field.variants'
-import { fieldInlineSentenceClasses } from './field.variants'
+import { fieldInlineSentenceClasses, type FieldHintPosition } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Text } from './text'
 import { parseChooseCount } from './choose-count-field.lib'
@@ -31,6 +31,7 @@ export interface ChooseFromChipsFieldProps {
   suffix?: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -58,6 +59,7 @@ export function ChooseFromChipsField({
   suffix = 'skills from:',
   error,
   hint,
+  hintPosition,
   info,
   required,
   disabled,
@@ -71,13 +73,14 @@ export function ChooseFromChipsField({
       label={label}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       info={info}
       required={required}
       disabled={disabled}
       size={size}
       width={width}
     >
-      {({ legendId, chooseId, hintId, errorId }) => (
+      {({ legendId, chooseId }) => (
         <>
           <div className={fieldInlineSentenceClasses}>
             <Text variant="body">{prefix}</Text>
@@ -111,16 +114,6 @@ export function ChooseFromChipsField({
             disabled={disabled}
             chipSize={chipSize}
           />
-
-          {error ? (
-            <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
-              {error}
-            </Text>
-          ) : hint ? (
-            <Text id={hintId} variant="caption">
-              {hint}
-            </Text>
-          ) : null}
         </>
       )}
     </ChooseCountFieldShell>
