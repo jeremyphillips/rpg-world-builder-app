@@ -225,7 +225,8 @@ labels such as `"Level 10"` or `"Cantrip"` need a wider trigger — keep
 `width: 'sm'`/`md` without `digits`, or supply compact option labels.
 
 Dashboard level selects use
-[`getCompactLevelFieldOptions` / `getCompactLevelFieldOptionsGrouped`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
+[`getLevelFieldOptions`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
+(with optional `{ showTierLabels: false }` for flat lists)
 with `levelSelectDigits(ctx)` so triggers stay aligned with digit-sized number
 fields. Hit die selects use `HIT_DIE_SELECT_DIGITS` (`3`) for `d10`/`d12`
 labels.
@@ -634,14 +635,14 @@ keyed by column (`Record<columnKey, (number | null)[]>`); `null` means blank/uns
 
 ## Collapsible sections
 
-By default, top-level `kind: 'group'` and `kind: 'array'` sections render inside
-accordions that **start open** (`collapsibleSections` defaults to `true` on
-`<Form>` and `<TabbedForm>`). Pass `collapsibleSections={false}` for a flat
-fieldset layout.
+By default, top-level `kind: 'group'` and `kind: 'array'` sections render as plain
+fieldsets. Pass `collapsible: true` on a `GroupConfig` or `ArrayConfig` to wrap that
+section in an accordion (requires `collapsibleSections` on `<Form>` / `<TabbedForm>`,
+which defaults to `true`). Pass `collapsibleSections={false}` to force flat fieldsets
+for every section, even when `collapsible: true` is set.
 
-Per-section opt-out: set `collapsible: false` on a `GroupConfig` or
-`ArrayConfig`. Section legends use the shared `fieldGroupLegendVariants` styling
-(`font-display`, `text-lg`, `mb-4`).
+Section legends use the shared `fieldGroupLegendVariants` styling
+(`font-display`, `text-lg`, `mb-4`). Collapsible sections **start open**.
 
 Fields stay mounted while a section is collapsed, so react-hook-form values are
 preserved (`shouldUnregister` only applies to conditional visibility, not

@@ -52,8 +52,9 @@ export interface FormProps<TFieldValues extends FieldValues> {
    */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /**
-   * When true (default), top-level groups and array sections render inside
-   * collapsible accordions that start open. Set false for a flat layout.
+   * When true (default), sections may render inside collapsible accordions when
+   * `collapsible: true` is set on a group or array. Set false to force flat
+   * fieldsets for every section.
    */
   collapsibleSections?: boolean
   /** When true, the footer sticks to the bottom while field content scrolls. */

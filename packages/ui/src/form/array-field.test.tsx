@@ -55,7 +55,7 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
 describe('ArrayFieldRenderer', () => {
   it('renders the add button and legend for an empty array', () => {
     renderForm()
-    expect(screen.getByRole('button', { name: 'Traits' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })
@@ -174,7 +174,6 @@ describe('ArrayFieldRenderer', () => {
         name: 'grants',
         legend: 'Grants',
         addLabel: 'Add grant',
-        collapsible: false,
         fields: [
           {
             type: 'text',

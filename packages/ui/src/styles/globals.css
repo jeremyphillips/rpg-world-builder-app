@@ -170,6 +170,7 @@
   /* Body / UI weight roles */
   --font-weight-body: var(--font-weight-normal);
   --font-weight-body-emphasis: var(--font-weight-medium);
+  --font-weight-field-label: var(--font-weight-semibold);
   --font-weight-meta: var(--font-weight-light);
   --font-weight-data-name: var(--font-weight-semibold);
   --font-weight-data-stat: var(--font-weight-medium);

@@ -58,7 +58,6 @@ function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
     legend: 'Edition preset',
-    collapsible: false,
     fields: [
       {
         type: 'radioCard',
@@ -84,7 +83,6 @@ function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormIt
     legend: 'Mechanics knobs',
     description:
       'Fine-tune armor class and attack resolution. The server tracks whether these differ from your selected preset.',
-    collapsible: false,
     fields: [
       {
         type: 'radio',

@@ -74,6 +74,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'heading-label',
         'body',
         'body-emphasis',
+        'field-label',
         'meta',
         'data-name',
         'data-stat',

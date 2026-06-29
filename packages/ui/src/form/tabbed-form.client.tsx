@@ -60,7 +60,7 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /** When true (default), top-level groups/arrays render in collapsible accordions. */
+  /** When true (default), sections may render in accordions when `collapsible: true` is set. */
   collapsibleSections?: boolean
   /**
    * When true (default), the tab list sticks to the top and the footer sticks to

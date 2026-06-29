@@ -237,7 +237,28 @@ describe('buildGroupedLevelOptions', () => {
     })
     expect(groups).toHaveLength(2)
     expect(groups[0]?.options).toHaveLength(20)
+    expect(groups[0]?.options[0]).toMatchObject({ value: '1', label: '1' })
     expect(groups[1]?.options).toHaveLength(10)
     expect(groups[1]?.label).toContain('Epic Destiny Tier')
+  })
+
+  it('returns one flat group when showTierLabels is false', () => {
+    const groups = buildGroupedLevelOptions(
+      {
+        maxCharacterLevel: 30,
+        standardMaxCharacterLevel: 20,
+        allowedCharacterCreatureTypes: defaultCreatureTypes,
+        multiclassing: defaultMulticlassing,
+        extendedProgression: {
+          tierName: 'Epic Destiny',
+          startsAt: 21,
+          maxLevel: 30,
+        },
+      },
+      { showTierLabels: false },
+    )
+    expect(groups).toHaveLength(1)
+    expect(groups[0]?.options).toHaveLength(30)
+    expect(groups[0]?.label).toBe('')
   })
 })

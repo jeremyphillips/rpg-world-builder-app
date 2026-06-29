@@ -9,7 +9,7 @@ export const textVariants = cva('', {
       body: 'text-foreground',
       muted: 'text-muted-foreground',
       small: `${textSecondaryBodyClasses} text-muted-foreground`,
-      caption: 'text-xs italic text-muted-foreground',
+      caption: 'text-xs text-muted-foreground',
       emphasis: `${textSecondaryBodyClasses} font-body-emphasis`,
       option: `${textSecondaryBodyClasses} font-body leading-none`,
       lead: 'text-lg text-muted-foreground',

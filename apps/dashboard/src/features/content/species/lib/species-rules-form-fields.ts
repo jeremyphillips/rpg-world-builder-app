@@ -13,10 +13,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import {
-  getCompactLevelFieldOptionsGrouped,
-  levelSelectDigits,
-} from '../../lib/level-field-options'
+import { getLevelFieldOptions, levelSelectDigits } from '../../lib/level-field-options'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 
 export const SPECIES_MULTICLASS_POLICY_LABELS = {
@@ -123,7 +120,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
 
   return [
@@ -154,7 +151,7 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
   const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? 20
 

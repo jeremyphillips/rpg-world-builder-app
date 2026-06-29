@@ -70,7 +70,7 @@ function isCollapsibleSection(
   collapsibleSections: boolean,
 ): item is GroupConfig | ArrayConfig {
   if (!collapsibleSections || !isSectionItem(item)) return false
-  return item.collapsible !== false
+  return item.collapsible === true
 }
 
 /** Renders an ordered list of fields/rows/groups/arrays, recursing into containers. */

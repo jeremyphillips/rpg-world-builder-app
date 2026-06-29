@@ -124,21 +124,24 @@ export function defaultExtendedMaxLevel(standardMax: number): number {
   return Math.min(standardMax + DEFAULT_EXTENDED_LEVEL_OFFSET, ABSOLUTE_MAX_CHARACTER_LEVEL)
 }
 
-/** Grouped level options for authoring when extended progression is active. */
-export function buildGroupedLevelOptions(rules: ResolvedCampaignRules): LevelOptionGroup[] {
-  const { standardMaxCharacterLevel, extendedProgression, maxCharacterLevel } = rules
+export type BuildGroupedLevelOptionsConfig = {
+  /** When false, return one flat group without standard/extended tier headers. Default true. */
+  showTierLabels?: boolean
+}
 
-  if (!extendedProgression) {
-    return [
-      { label: `Levels 1–${maxCharacterLevel}`, options: buildLevelOptions(maxCharacterLevel) },
-    ]
+/** Grouped level options for authoring when extended progression is active. */
+export function buildGroupedLevelOptions(
+  rules: ResolvedCampaignRules,
+  config: BuildGroupedLevelOptionsConfig = {},
+): LevelOptionGroup[] {
+  const { standardMaxCharacterLevel, extendedProgression, maxCharacterLevel } = rules
+  const showTierLabels = config.showTierLabels ?? true
+
+  if (!extendedProgression || !showTierLabels) {
+    return [{ label: '', options: buildLevelOptions(maxCharacterLevel) }]
   }
 
-  const standardOptions = buildLevelOptions(standardMaxCharacterLevel).map((option) => ({
-    ...option,
-    label: option.label.replace('Level ', ''),
-  }))
-
+  const standardOptions = buildLevelOptions(standardMaxCharacterLevel)
   const extendedCount = maxCharacterLevel - standardMaxCharacterLevel
   const extendedOptions = Array.from({ length: extendedCount }, (_, index) => {
     const level = standardMaxCharacterLevel + index + 1

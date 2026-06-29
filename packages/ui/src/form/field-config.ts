@@ -423,7 +423,7 @@ export interface GroupConfig {
   description?: string
   fields: GroupFieldItem[]
   className?: string
-  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }
 
@@ -451,7 +451,7 @@ export interface ArrayConfig {
    * by relative field names) and the 0-based index.
    */
   itemTitle?: (values: Record<string, unknown>, index: number) => string
-  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
   /**
    * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
@@ -472,7 +472,7 @@ export interface SlotConfig {
   hint?: string
   className?: string
   render: () => ReactNode
-  /** When false, renders inline even when form collapsible sections are enabled. */
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }
 

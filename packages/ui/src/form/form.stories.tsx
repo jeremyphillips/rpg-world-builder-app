@@ -61,6 +61,11 @@ const fields: FormItem[] = [
   { type: 'richtext', name: 'bio', label: 'Biography', hint: 'Bold and italics are supported.' },
 ]
 
+const collapsibleFields: FormItem[] = [
+  { ...(fields[0] as Extract<FormItem, { kind: 'group' }>), collapsible: true },
+  ...fields.slice(1),
+]
+
 const meta = {
   title: 'Forms/Form',
   component: Form<CharacterForm>,
@@ -88,10 +93,10 @@ export const Default: Story = {
   },
 }
 
-/** Flat fieldsets — no accordion wrappers on top-level groups. */
-export const FlatSections: Story = {
+/** Accordion wrappers on top-level groups — set `collapsible: true` per section. */
+export const CollapsibleSections: Story = {
   args: {
     ...Default.args,
-    collapsibleSections: false,
+    fields: collapsibleFields,
   },
 }

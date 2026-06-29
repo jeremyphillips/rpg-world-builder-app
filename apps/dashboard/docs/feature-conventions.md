@@ -240,17 +240,16 @@ Narrow numeric selects use `digits` on the `@rpg/ui` field config (see
 [`packages/ui/docs/forms.md`](../../../packages/ui/docs/forms.md)). The trigger
 displays option **labels**, so digit-sized level picks must use compact labels.
 
-| Helper                                                                                          | Use                                                      |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [`getCompactLevelFieldOptions(ctx)`](../src/features/content/lib/level-field-options.ts)        | Flat level list with `"1"`, `"2"`, … labels              |
-| [`getCompactLevelFieldOptionsGrouped(ctx)`](../src/features/content/lib/level-field-options.ts) | Same labels, grouped when extended progression is active |
-| [`levelSelectDigits(ctx)`](../src/features/content/lib/level-field-options.ts)                  | `digits` slot count from campaign max level              |
-| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/level-field-options.ts)                   | Constant `3` for `d6`–`d12` labels                       |
+| Helper                                                                                                       | Use                                                                  |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| [`getLevelFieldOptions(ctx)`](../src/features/content/lib/level-field-options.ts)                            | Level selects — numeric labels; grouped when extended tier is active |
+| [`getLevelFieldOptions(ctx, { showTierLabels: false })`](../src/features/content/lib/level-field-options.ts) | Flat level list (chips, controls without option groups)              |
+| [`levelSelectDigits(ctx)`](../src/features/content/lib/level-field-options.ts)                               | `digits` slot count from campaign max level                          |
+| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/level-field-options.ts)                                | Constant `3` for `d6`–`d12` labels                                   |
 
-Keep [`getLevelFieldOptions`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
-(with `"Level N"` labels) for full-width selects that include non-numeric
-options (e.g. subclass choice level with `"None"`). Standalone fields with hints
-use default `width: 'full'`; row fields pair `digits` with `width: 'auto'`.
+Contracts SSOT:
+[`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
+(with optional `{ showTierLabels: false }`).
 
 Walk speed fields use [`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
 (`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`, `digits: 2`) in species

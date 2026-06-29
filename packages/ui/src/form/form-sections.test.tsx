@@ -17,12 +17,14 @@ const fields: FormItem[] = [
   {
     kind: 'group',
     legend: 'Identity',
+    collapsible: true,
     fields: [{ type: 'text', name: 'title', label: 'Title' }],
   },
   {
     kind: 'array',
     name: 'tags',
     legend: 'Tags',
+    collapsible: true,
     fields: [{ type: 'text', name: 'label', label: 'Label' }],
     addLabel: 'Add tag',
   },
@@ -33,7 +35,7 @@ describe('Form collapsible sections', () => {
     resetAccordionBatchStateForTests()
   })
 
-  it('wraps top-level groups and arrays in accordion triggers by default', () => {
+  it('wraps collapsible top-level groups and arrays in accordion triggers', () => {
     const { container } = render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
     expect(screen.getByRole('button', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tags' })).toBeInTheDocument()
@@ -97,18 +99,18 @@ describe('Form collapsible sections', () => {
     expect(screen.getByLabelText('Title')).toHaveValue('Dragonborn')
   })
 
-  it('respects collapsible: false on an individual section', () => {
+  it('respects collapsible: true on an individual section', () => {
     const mixedFields: FormItem[] = [
       {
         kind: 'group',
         legend: 'Identity',
-        collapsible: false,
         fields: [{ type: 'text', name: 'title', label: 'Title' }],
       },
       {
         kind: 'array',
         name: 'tags',
         legend: 'Tags',
+        collapsible: true,
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
     ]

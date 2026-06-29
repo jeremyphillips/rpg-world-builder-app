@@ -236,7 +236,6 @@ function extendedProgressionGroup(): FormItem {
   return {
     kind: 'group',
     legend: 'Extended progression',
-    collapsible: false,
     fields: [
       {
         type: 'switch',
@@ -288,7 +287,6 @@ function multiclassingGroup(): FormItem {
   return {
     kind: 'group',
     legend: 'Multiclassing',
-    collapsible: false,
     fields: [
       {
         type: 'switch',

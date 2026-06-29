@@ -64,7 +64,7 @@ export type FieldHintPosition = 'below-label' | 'below-control'
 
 export const fieldLabelVariants = cva(
   [
-    'flex items-center gap-1.5 font-body-emphasis leading-none',
+    'flex items-center gap-1.5 font-field-label leading-none',
     "data-[required]:after:content-['*'] data-[required]:after:text-destructive",
   ],
   {

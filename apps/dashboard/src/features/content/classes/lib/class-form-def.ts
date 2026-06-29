@@ -51,8 +51,6 @@ import { identityFields } from '../../lib/content-form-field-helpers'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import {
   getLevelFieldOptions,
-  getFlatLevelFieldOptions,
-  getCompactLevelFieldOptionsGrouped,
   HIT_DIE_SELECT_DIGITS,
   levelSelectDigits,
   effectiveMaxFromCtx,
@@ -314,7 +312,7 @@ function buildSpellProgressionGridField(rowCount: number): FormItem {
 // ---------------------------------------------------------------------------
 
 function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
@@ -595,7 +593,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
 // ---------------------------------------------------------------------------
 
 function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
-  const flatLevelOptions = getFlatLevelFieldOptions(ctx)
+  const flatLevelOptions = getLevelFieldOptions(ctx, { showTierLabels: false })
   return [
     {
       kind: 'row',
@@ -639,7 +637,7 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
   return [
     {

@@ -32,11 +32,11 @@ export function proficiencyBonus(level: number): number {
   return Math.floor((level - 1) / 4) + 2
 }
 
-/** Level select options for forms (1 through `maxLevel`). */
+/** Level select options for forms (1 through `maxLevel`). Labels are numeric (`"1"`, `"2"`, …). */
 export function buildLevelOptions(maxLevel: number): { value: string; label: string }[] {
   return Array.from({ length: maxLevel }, (_, index) => {
     const level = index + 1
-    return { value: String(level), label: `Level ${level}` }
+    return { value: String(level), label: String(level) }
   })
 }
 
