@@ -6,6 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { UseFormReturn } from 'react-hook-form'
 
+import type { AdvisoryFormSubmitOptions } from '../../../lib/use-advisory-form-submit'
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 /** Soft advisories for incompatible property selections at save time (tier 3). */
@@ -41,7 +42,7 @@ export function blockWeaponSaveForInvalidMastery(
 
 /** Confirm-dialog body when tier-3 property advisories remain at save. */
 export function formatWeaponPropertyAdvisoryConfirmMessage(
-  advisories: readonly WeaponPropertyModeAdvisory[],
+  advisories: readonly { message: string }[],
 ): string {
   if (advisories.length === 0) return ''
 
@@ -51,4 +52,15 @@ export function formatWeaponPropertyAdvisoryConfirmMessage(
   }
 
   return `${lines.join(' ')} Save anyway?`
+}
+
+/** Advisory submit options for weapon equipment create/edit forms. */
+export function weaponAdvisorySubmitOptions(): AdvisoryFormSubmitOptions<EquipmentFormValues> {
+  return {
+    blockSubmit: (form) => blockWeaponSaveForInvalidMastery(form),
+    getAdvisories: getWeaponFormPropertyAdvisories,
+    formatConfirmDescription: formatWeaponPropertyAdvisoryConfirmMessage,
+    confirmHeadline: 'Incompatible weapon properties',
+    confirmLabel: 'Save anyway',
+  }
 }

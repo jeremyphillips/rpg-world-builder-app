@@ -21,30 +21,42 @@ describe('weapon kindFieldGroups', () => {
     expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Weapon' })
   })
 
-  it('uses diceFormula fields for weapon damage and versatile damage in an auto-width row', () => {
+  it('uses diceFormula fields with auto width for damage and versatile damage', () => {
     const weaponGroup = weaponFormFieldGroup()
     if (!('fields' in weaponGroup)) {
       throw new Error('expected weapon form group')
     }
 
-    const damageRow = weaponGroup.fields.find(
+    const damageDiceRow = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
         field.fields.some((child) => !('kind' in child) && child.name === 'damageDice'),
     )
-    if (!damageRow || !('fields' in damageRow)) {
+    if (!damageDiceRow || !('fields' in damageDiceRow)) {
       throw new Error('expected damage dice row')
     }
 
-    expect(damageRow.fields).toEqual([
-      expect.objectContaining({
-        name: 'damageDice',
-        label: 'Damage',
-        modifierMode: 'none',
-        size: 'md',
-        width: 'auto',
-      }),
+    expect(
+      damageDiceRow.fields.find((field) => !('kind' in field) && field.name === 'damageDice'),
+    ).toMatchObject({
+      label: 'Damage',
+      modifierMode: 'none',
+      size: 'md',
+      width: 'auto',
+    })
+
+    const versatileRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'versatileDamage'),
+    )
+    if (!versatileRow || !('fields' in versatileRow)) {
+      throw new Error('expected versatile damage row')
+    }
+
+    expect(versatileRow.fields).toEqual([
       expect.objectContaining({
         name: 'versatileDamage',
         label: 'Versatile damage',
@@ -55,7 +67,7 @@ describe('weapon kindFieldGroups', () => {
     ])
   })
 
-  it('composes damage kind and damage type in a half-width row', () => {
+  it('composes damage kind, damage type, and dice damage in one row', () => {
     const weaponGroup = weaponFormFieldGroup()
     if (!('fields' in weaponGroup)) {
       throw new Error('expected weapon form group')
@@ -72,11 +84,16 @@ describe('weapon kindFieldGroups', () => {
     }
 
     expect(damageRow.fields).toEqual([
-      expect.objectContaining({ name: 'damageKind', width: '1/2', defaultValue: 'dice' }),
+      expect.objectContaining({ name: 'damageKind', width: 'md', defaultValue: 'dice' }),
       expect.objectContaining({
         name: 'damageType',
-        width: '1/2',
+        width: 'md',
         placeholder: 'Choose...',
+        visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
+      }),
+      expect.objectContaining({
+        name: 'damageDice',
+        width: 'auto',
         visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
       }),
     ])

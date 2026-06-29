@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import { Heading, Spinner, Text, Button } from '@rpg/ui'
@@ -7,14 +8,17 @@ import {
   FormFooterActions,
   TabbedForm,
   type FormItem,
+  type FormValueSync,
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
+import { weaponAdvisorySubmitOptions, weaponFormValueSyncs } from '../equipment/weapons'
 import { useContentFormOptions } from './content-form-options'
 import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
 import { contentFormFields } from './content-form-registry'
+import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 
 export const CONTENT_CATALOG_OPTIONS_ERROR = 'Could not load catalog options.'
 
@@ -77,6 +81,12 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   collapsibleSections?: boolean
+  valueSyncs?: FormValueSync[]
+  beforeSubmit?: (
+    values: TFormValues,
+    form: UseFormReturn<TFormValues>,
+  ) => boolean | Promise<boolean>
+  submitConfirmDialog?: React.ReactNode
 }
 
 export function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -90,25 +100,43 @@ export function ContentSchemaForm<TFormValues extends FieldValues>({
   formError,
   onSubmit,
   collapsibleSections,
+  valueSyncs,
+  beforeSubmit,
+  submitConfirmDialog,
 }: ContentSchemaFormProps<TFormValues>) {
+  const handleSubmit = React.useCallback(
+    async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
+      if (beforeSubmit) {
+        const proceed = await beforeSubmit(values, form)
+        if (!proceed) return
+      }
+      await onSubmit(values, form)
+    },
+    [beforeSubmit, onSubmit],
+  )
+
   return (
-    <Form<TFormValues>
-      key={formKey}
-      schema={schema}
-      fields={fields}
-      defaultValues={defaultValues}
-      onSubmit={onSubmit}
-      formError={formError}
-      collapsibleSections={collapsibleSections}
-      stickyFooter
-      footer={(form) => (
-        <ContentFormCancelFooter
-          backHref={backHref}
-          submitLabel={submitLabel}
-          pending={submitPending || form.formState.isSubmitting}
-        />
-      )}
-    />
+    <>
+      <Form<TFormValues>
+        key={formKey}
+        schema={schema}
+        fields={fields}
+        defaultValues={defaultValues}
+        onSubmit={handleSubmit}
+        formError={formError}
+        collapsibleSections={collapsibleSections}
+        valueSyncs={valueSyncs}
+        stickyFooter
+        footer={(form) => (
+          <ContentFormCancelFooter
+            backHref={backHref}
+            submitLabel={submitLabel}
+            pending={submitPending || form.formState.isSubmitting}
+          />
+        )}
+      />
+      {submitConfirmDialog}
+    </>
   )
 }
 
@@ -122,6 +150,12 @@ interface ContentTabbedSchemaFormProps<TFormValues extends FieldValues> {
   submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  valueSyncs?: FormValueSync[]
+  beforeSubmit?: (
+    values: TFormValues,
+    form: UseFormReturn<TFormValues>,
+  ) => boolean | Promise<boolean>
+  submitConfirmDialog?: React.ReactNode
 }
 
 export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
@@ -134,24 +168,42 @@ export function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   submitPending,
   formError,
   onSubmit,
+  valueSyncs,
+  beforeSubmit,
+  submitConfirmDialog,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
+  const handleSubmit = React.useCallback(
+    async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
+      if (beforeSubmit) {
+        const proceed = await beforeSubmit(values, form)
+        if (!proceed) return
+      }
+      await onSubmit(values, form)
+    },
+    [beforeSubmit, onSubmit],
+  )
+
   return (
-    <TabbedForm<TFormValues>
-      key={formKey}
-      schema={schema}
-      tabs={tabs}
-      defaultValues={defaultValues}
-      collapsibleSections={false}
-      onSubmit={(values, form) => onSubmit(values, form)}
-      formError={formError}
-      footer={(form) => (
-        <ContentFormCancelFooter
-          backHref={backHref}
-          submitLabel={submitLabel}
-          pending={submitPending || form.formState.isSubmitting}
-        />
-      )}
-    />
+    <>
+      <TabbedForm<TFormValues>
+        key={formKey}
+        schema={schema}
+        tabs={tabs}
+        defaultValues={defaultValues}
+        collapsibleSections={false}
+        valueSyncs={valueSyncs}
+        onSubmit={(values, form) => handleSubmit(values, form)}
+        formError={formError}
+        footer={(form) => (
+          <ContentFormCancelFooter
+            backHref={backHref}
+            submitLabel={submitLabel}
+            pending={submitPending || form.formState.isSubmitting}
+          />
+        )}
+      />
+      {submitConfirmDialog}
+    </>
   )
 }
 
@@ -180,6 +232,18 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   formError,
   onSubmit,
 }: ContentFormLayoutProps<TFormValues>) {
+  const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
+  const weaponAdvisoryOptions = React.useMemo(
+    () => (isWeaponEquipmentForm ? weaponAdvisorySubmitOptions() : { enabled: false }),
+    [isWeaponEquipmentForm],
+  )
+  const { onSubmit: advisoryOnSubmit, confirmDialog } = useAdvisoryFormSubmit(
+    onSubmit,
+    weaponAdvisoryOptions as AdvisoryFormSubmitOptions<TFormValues>,
+  )
+  const resolvedOnSubmit = isWeaponEquipmentForm ? advisoryOnSubmit : onSubmit
+  const valueSyncs = isWeaponEquipmentForm ? weaponFormValueSyncs : undefined
+
   const sharedProps = {
     schema,
     defaultValues,
@@ -188,7 +252,9 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     submitLabel,
     submitPending,
     formError,
-    onSubmit,
+    onSubmit: resolvedOnSubmit,
+    valueSyncs,
+    submitConfirmDialog: isWeaponEquipmentForm ? confirmDialog : undefined,
   }
 
   if (def.buildTabs) {

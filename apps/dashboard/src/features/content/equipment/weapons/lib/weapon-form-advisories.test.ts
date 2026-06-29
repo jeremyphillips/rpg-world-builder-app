@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import type { WeaponPropertyModeAdvisory } from '@rpg/contracts'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
 
@@ -103,7 +104,7 @@ describe('formatWeaponPropertyAdvisoryConfirmMessage', () => {
           mode: 'ranged',
           message: "Reach isn't compatible with ranged weapons.",
         },
-      ]),
+      ] as WeaponPropertyModeAdvisory[]),
     ).toBe("Reach isn't compatible with ranged weapons. Save anyway?")
   })
 
@@ -120,7 +121,7 @@ describe('formatWeaponPropertyAdvisoryConfirmMessage', () => {
           mode: 'ranged',
           message: "Versatile isn't compatible with ranged weapons.",
         },
-      ]),
+      ] as WeaponPropertyModeAdvisory[]),
     ).toBe(
       "Reach isn't compatible with ranged weapons. Versatile isn't compatible with ranged weapons. Save anyway?",
     )
