@@ -156,6 +156,7 @@ const fieldRenderers: {
       width={config.width}
       size={config.size}
       digits={config.digits}
+      labelPosition={config.labelPosition}
       placeholder={config.placeholder}
       disabled={config.disabled}
       value={field.value != null && field.value !== '' ? String(field.value) : ''}

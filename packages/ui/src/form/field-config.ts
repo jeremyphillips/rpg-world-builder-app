@@ -207,6 +207,8 @@ export interface SelectFieldConfig extends BaseFieldConfig {
    * compressed; use row `width` tokens only when sharing a `FieldRow`.
    */
   digits?: FieldDigits
+  /** `above` (default) — label over control. `settings` — label + hint left, control right. */
+  labelPosition?: FieldLabelPosition
 }
 
 export interface RadioFieldConfig extends BaseFieldConfig {
@@ -568,7 +570,13 @@ export interface SlotConfig {
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */
-export type FormItem = FieldConfig | RowConfig | GroupConfig | StackConfig | ArrayConfig | SlotConfig
+export type FormItem =
+  | FieldConfig
+  | RowConfig
+  | GroupConfig
+  | StackConfig
+  | ArrayConfig
+  | SlotConfig
 
 /** Narrows a `FormItem` to a container (row/group/stack/array/slot) vs. a leaf field. */
 export function isContainer(
