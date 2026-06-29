@@ -278,11 +278,12 @@ Reserve `labelPosition: 'settings'` for dense panels; default forms stay vertica
 `fieldRowLayoutVariants` in [field.variants.ts](../src/components/ui/field.variants.ts).
 Each layout applies **either** flex **or** grid display classes — never both.
 
-| `layout`         | Use                                                                                   |
-| ---------------- | ------------------------------------------------------------------------------------- |
-| `flex` (default) | Side-by-side fields that grow/wrap by `width` — the XdY recipe, class + level rows, … |
-| `responsive-2`   | Two equal columns from `md` up (`grid-cols-1 md:grid-cols-2`)                         |
-| `responsive-3`   | Three columns from `md` up (`grid-cols-2 md:grid-cols-3`)                             |
+| `layout`         | Use                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `flex` (default) | Side-by-side fields that grow/wrap by `width` — the XdY recipe, class + level rows, …          |
+| `responsive-2`   | Two equal columns from `md` up (`grid-cols-1 md:grid-cols-2`)                                  |
+| `responsive-3`   | Three columns from `md` up (`grid-cols-2 md:grid-cols-3`)                                      |
+| `responsive-4`   | Four columns from `md` up (`grid-cols-2 md:grid-cols-4`) — vehicle cargo/speed/crew/passengers |
 
 Prefer `width` fractions inside a flex row when fields should share remaining space
 by grow weight (e.g. a narrow count beside a wide select). Reach for

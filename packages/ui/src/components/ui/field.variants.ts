@@ -69,6 +69,7 @@ export const fieldRowLayoutVariants = cva('', {
       flex: cn('flex flex-wrap items-start', fieldRowGapClasses),
       'responsive-2': cn('grid w-full grid-cols-1 md:grid-cols-2', fieldRowGapClasses),
       'responsive-3': cn('grid w-full grid-cols-2 md:grid-cols-3', fieldRowGapClasses),
+      'responsive-4': cn('grid w-full grid-cols-2 md:grid-cols-4', fieldRowGapClasses),
     },
   },
   defaultVariants: {

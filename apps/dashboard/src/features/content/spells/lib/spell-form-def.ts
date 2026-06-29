@@ -397,7 +397,7 @@ function castingFields(): FormItem[] {
             {
               type: 'select',
               name: 'range.kind',
-              label: 'Range kind',
+              label: 'Kind',
               options: rangeKindOptions,
               required: true,
               width: 'lg',

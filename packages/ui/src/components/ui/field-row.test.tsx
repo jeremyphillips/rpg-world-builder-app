@@ -22,7 +22,7 @@ describe('FieldRow', () => {
       <FieldRow>
         <SelectField
           id="kind"
-          label="Range kind"
+          label="Kind"
           width="xl"
           placeholder="Choose"
           options={[
@@ -33,7 +33,7 @@ describe('FieldRow', () => {
       </FieldRow>,
     )
 
-    const fieldRoot = screen.getByLabelText('Range kind').closest('.max-w-64')
+    const fieldRoot = screen.getByLabelText('Kind').closest('.max-w-64')
     expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
   })
 
@@ -76,6 +76,20 @@ describe('FieldRow', () => {
     expect(container.firstChild).toHaveClass('grid')
     expect(container.firstChild).toHaveClass('grid-cols-2')
     expect(container.firstChild).toHaveClass('md:grid-cols-3')
+    expect(container.firstChild).not.toHaveClass('flex')
+  })
+
+  it('supports the responsive four-column row recipe', () => {
+    const { container } = render(
+      <FieldRow layout="responsive-4">
+        <TextField id="first" label="First name" />
+        <TextField id="last" label="Last name" />
+      </FieldRow>,
+    )
+
+    expect(container.firstChild).toHaveClass('grid')
+    expect(container.firstChild).toHaveClass('grid-cols-2')
+    expect(container.firstChild).toHaveClass('md:grid-cols-4')
     expect(container.firstChild).not.toHaveClass('flex')
   })
 
