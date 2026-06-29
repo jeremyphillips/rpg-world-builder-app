@@ -16,6 +16,7 @@ import { FieldRow } from '../components/ui/field-row'
 import {
   fieldArrayItemActionRowClasses,
   fieldArrayItemClasses,
+  fieldGroupBottomMarginClasses,
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
@@ -510,7 +511,7 @@ export function ArrayFieldRenderer({
 
   return (
     <fieldset
-      className="min-w-0 border-0 p-0"
+      className={cn('min-w-0 border-0 p-0', fieldGroupBottomMarginClasses)}
       aria-labelledby={hideLegend ? labelledBy : undefined}
     >
       {hideLegend ? (

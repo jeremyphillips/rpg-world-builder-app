@@ -9,7 +9,8 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column
- * - `fieldGroupFlexStackClasses` — same 24px rhythm as `fieldGroupStackClasses`, gap-based (avoids margin collapse with fieldsets)
+ * - `fieldGroupBottomMarginClasses` — space below a field group or array section fieldset
+ * - `fieldGroupFlexStackClasses` — same 32px rhythm as `fieldGroupBottomMarginClasses`, gap-based (avoids margin collapse with fieldsets)
  * - `formSectionStackClasses` — top-level accordion sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutVariants` — display mode for schema-driven rows
@@ -26,7 +27,8 @@ export const fieldAnatomyStackClasses = 'space-y-2'
 /** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
 export const fieldLabelHintStackClasses = 'flex flex-col gap-1'
 export const fieldGroupStackClasses = 'space-y-6'
-export const fieldGroupFlexStackClasses = 'flex flex-col gap-6'
+export const fieldGroupBottomMarginClasses = 'mb-8'
+export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2 pt-1'

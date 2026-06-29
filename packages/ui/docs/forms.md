@@ -135,7 +135,8 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldAnatomyStackClasses`       | `space-y-2`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
 | `fieldLabelHintStackClasses`     | `gap-1`               | Label + hint cluster when `hintPosition="below-label"` (default)                |
 | `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
-| `fieldGroupFlexStackClasses`     | `flex flex-col gap-6` | Same 24px rhythm when stacking fieldsets or other collapse-prone siblings       |
+| `fieldGroupBottomMarginClasses`  | `mb-8`                | Space below a field group or array section fieldset (32px)                      |
+| `fieldGroupFlexStackClasses`     | `flex flex-col gap-8` | Same 32px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
 | `fieldRowGapClasses`             | `gap-6`               | Horizontal and wrap gap between fields in a `FieldRow`                          |
 | `fieldRowLayoutVariants`         | —                     | Display recipe for `FieldRow` / `RowConfig.layout` (`flex`, `responsive-2`, …)  |
