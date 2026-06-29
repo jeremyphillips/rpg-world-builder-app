@@ -15,6 +15,7 @@ import type {
   RichTextLinkPickerInternalOption,
 } from '../components/ui/rich-text-link-picker.client'
 import type { FieldSize } from '../components/ui/field.client'
+import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import type { FieldRowLayout } from '../components/ui/field.variants'
@@ -299,7 +300,11 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
+  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  renderSelectedItem?: ComboboxRenderSelectedItem
 }
+
+export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 
 /** Column definition for `editableGrid` fields (may carry per-column conditionals). */
 export interface EditableGridColumnConfig {

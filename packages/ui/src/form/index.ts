@@ -60,6 +60,7 @@ export {
   type ChooseFromChipsFieldConfig,
   type InlineChooseCountFieldConfig,
   type ComboboxFieldConfig,
+  type ComboboxRenderSelectedItem,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
   type DiceFormulaFieldConfig,

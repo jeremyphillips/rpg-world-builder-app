@@ -23,7 +23,13 @@ import {
   type UpdateTicketInput,
 } from '@rpg/contracts/dev-bench'
 import { normalizeRichTextHtml } from '@rpg/ui'
-import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  toOptions,
+  type ComboboxRenderSelectedItem,
+  type FieldOption,
+  type FormItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 const acceptanceCriterionSchema = z.object({
   text: z.string().min(1),
@@ -160,6 +166,7 @@ export const quickCreateFields: FormItem[] = [
 export function buildTicketDetailTabs(options: {
   epicOptions: FieldOption[]
   ticketLinkOptions: FieldOption[]
+  ticketLinkRenderSelectedItem?: ComboboxRenderSelectedItem
 }): TabbedFormTab[] {
   const epicSelectOptions: FieldOption[] = [
     { value: '__none__', label: 'No epic' },
@@ -243,6 +250,7 @@ export function buildTicketDetailTabs(options: {
           multiple: true,
           options: options.ticketLinkOptions,
           placeholder: 'Search tickets…',
+          renderSelectedItem: options.ticketLinkRenderSelectedItem,
         },
         {
           type: 'combobox',
@@ -251,6 +259,7 @@ export function buildTicketDetailTabs(options: {
           multiple: true,
           options: options.ticketLinkOptions,
           placeholder: 'Search tickets…',
+          renderSelectedItem: options.ticketLinkRenderSelectedItem,
         },
       ],
     },

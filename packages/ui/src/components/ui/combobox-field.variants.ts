@@ -53,5 +53,8 @@ export const comboboxEmptyVariants = cva('px-2 py-4 text-center text-sm text-mut
 /** Chip row shown below the trigger in multi-select mode. */
 export const comboboxChipRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
 
+/** Vertical list for custom selected-item renderers in multi-select mode. */
+export const comboboxSelectedListVariants = cva('flex flex-col gap-2 pt-2')
+
 /** Hides the trigger while open; panel overlaps the same slot via negative sideOffset. */
 export const comboboxTriggerOpenVariants = cva('pointer-events-none invisible')

@@ -1,12 +1,25 @@
+import type { ReactNode } from 'react'
+
 import type { FieldSize } from './field.client'
 
 export interface ComboboxFieldOption {
   label: string
   value: string
   disabled?: boolean
-  /** Secondary line text (e.g. source badge copy). Included in search matching. */
+  /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
 }
+
+export interface ComboboxSelectedItemRenderContext {
+  onRemove: () => void
+  disabled?: boolean
+}
+
+/** Custom renderer for a selected value in multi-select mode (replaces the default chip). */
+export type ComboboxRenderSelectedItem = (
+  option: ComboboxFieldOption,
+  context: ComboboxSelectedItemRenderContext,
+) => ReactNode
 
 export interface ComboboxFieldControlProps {
   label: string
@@ -21,4 +34,5 @@ export interface ComboboxFieldControlProps {
   size: FieldSize
   placeholder: string
   emptyMessage: string
+  renderSelectedItem?: ComboboxRenderSelectedItem
 }

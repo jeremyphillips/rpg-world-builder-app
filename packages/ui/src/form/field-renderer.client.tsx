@@ -328,6 +328,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       value={field.value ?? (config.multiple === false ? '' : [])}
       onChange={field.onChange}
       onBlur={field.onBlur}
+      renderSelectedItem={config.renderSelectedItem}
     />
   ),
   editableGrid: ({ config, field, id, error, namePrefix }) => (

@@ -1,10 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useFormContext, type UseFormReturn } from 'react-hook-form'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
 import { Button, Sheet, Text, Textarea } from '@rpg/ui'
-import { FormFooterActions, TabbedForm, formStickyTabsTransparentClasses } from '@rpg/ui/form'
+import {
+  FormFooterActions,
+  TabbedForm,
+  formStickyTabsTransparentClasses,
+  type ComboboxRenderSelectedItem,
+} from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -16,8 +21,9 @@ import {
   type TicketDetailFormValues,
 } from '../lib/ticket-form-def'
 import { useEpicsList } from '@/features/epics'
-import { useTickets } from '../hooks/use-tickets'
+import { useTicketLinkCatalog } from '../hooks/use-ticket-link-catalog'
 import { useUpdateTicket } from '../hooks/use-update-ticket'
+import { TicketLinkSelectedPreview } from './ticket-link-selected-preview'
 import { TicketMetaTimestamps } from './ticket-meta'
 
 function AcceptanceCriteriaPasteHelper() {
@@ -67,7 +73,7 @@ interface TicketDetailFormProps {
 
 export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormProps) {
   const { data: epics = [] } = useEpicsList()
-  const { data: allTickets = [] } = useTickets({})
+  const { data: allTickets = [] } = useTicketLinkCatalog()
   const { mutateAsync, isPending, isSuccess } = useUpdateTicket(ticket.id)
 
   const ticketLinkOptions = useMemo(
@@ -82,17 +88,35 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
     [allTickets, ticket.id],
   )
 
+  const ticketById = useMemo(() => new Map(allTickets.map((item) => [item.id, item])), [allTickets])
+
+  const ticketLinkRenderSelectedItem = useCallback<ComboboxRenderSelectedItem>(
+    (option, { onRemove, disabled }) => (
+      <TicketLinkSelectedPreview
+        option={option}
+        ticket={ticketById.get(option.value)}
+        onRemove={onRemove}
+        disabled={disabled}
+      />
+    ),
+    [ticketById],
+  )
+
   const epicOptions = useMemo(
     () => epics.map((epic) => ({ value: epic.id, label: epic.title })),
     [epics],
   )
 
   const tabs = useMemo(() => {
-    const built = buildTicketDetailTabs({ epicOptions, ticketLinkOptions })
+    const built = buildTicketDetailTabs({
+      epicOptions,
+      ticketLinkOptions,
+      ticketLinkRenderSelectedItem,
+    })
     return built.map((tab) =>
       tab.id === 'done-when' ? { ...tab, header: <AcceptanceCriteriaPasteHelper /> } : tab,
     )
-  }, [epicOptions, ticketLinkOptions])
+  }, [epicOptions, ticketLinkOptions, ticketLinkRenderSelectedItem])
 
   const { onSubmit, formError } = useSubmitHandler<TicketDetailFormValues>(async (values, form) => {
     const updated = await mutateAsync(buildUpdateTicketInput(values))

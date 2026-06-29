@@ -562,6 +562,8 @@ where a plain `select` or `chips` field would not scale.
 
 - Client-side filter matches `label`, optional `description`, and `value`.
 - Multi mode renders selected values as removable chips below the trigger.
+- Pass `renderSelectedItem` to replace chips with a custom preview (e.g. linked
+  entity cards); the renderer receives `{ onRemove, disabled }` for dismiss affordances.
 - Already-selected values stay visible even when they are missing from the current
   `options` list (stale slug handling).
 - Default value: `[]` when `multiple` is true (default), `''` when `multiple: false`.

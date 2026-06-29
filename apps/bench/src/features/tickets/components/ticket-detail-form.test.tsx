@@ -11,8 +11,8 @@ vi.mock('@/features/epics', () => ({
   useEpicsList: () => ({ data: [] }),
 }))
 
-vi.mock('../hooks/use-tickets', () => ({
-  useTickets: () => ({ data: [] }),
+vi.mock('../hooks/use-ticket-link-catalog', () => ({
+  useTicketLinkCatalog: () => ({ data: [] }),
 }))
 
 vi.mock('../hooks/use-update-ticket', () => ({
