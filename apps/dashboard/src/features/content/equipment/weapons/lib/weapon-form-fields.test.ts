@@ -133,6 +133,65 @@ describe('weapon kindFieldGroups', () => {
       ).toMatchObject({ placeholder: 'Choose...' })
     }
   })
+
+  it('wires range visibility from mode and thrown property', () => {
+    const weaponGroup = weaponFormFieldGroup()
+    if (!('fields' in weaponGroup)) {
+      throw new Error('expected weapon form group')
+    }
+
+    const rangeRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'rangeNormal'),
+    )
+    if (!rangeRow || !('fields' in rangeRow)) {
+      throw new Error('expected range row')
+    }
+
+    for (const name of ['rangeNormal', 'rangeLong'] as const) {
+      expect(
+        rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
+      ).toMatchObject({
+        visibility: {
+          dependsOn: ['mode', 'properties'],
+        },
+      })
+    }
+  })
+
+  it('wires property and mastery conditional option availability and dynamic hints', () => {
+    const weaponGroup = weaponFormFieldGroup()
+    if (!('fields' in weaponGroup)) {
+      throw new Error('expected weapon form group')
+    }
+
+    const propertiesField = weaponGroup.fields.find(
+      (field) => !('kind' in field) && field.name === 'properties',
+    )
+    expect(propertiesField).toMatchObject({
+      optionAvailability: { dependsOn: ['mode'] },
+      dynamicHint: { dependsOn: ['mode'] },
+    })
+
+    const coreRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'mastery'),
+    )
+    if (!coreRow || !('fields' in coreRow)) {
+      throw new Error('expected mastery field row')
+    }
+
+    expect(
+      coreRow.fields.find((field) => !('kind' in field) && field.name === 'mastery'),
+    ).toMatchObject({
+      optionAvailability: { dependsOn: ['mode'] },
+      dynamicHint: { dependsOn: ['mode'] },
+    })
+  })
 })
 
 describe('damageToForm', () => {

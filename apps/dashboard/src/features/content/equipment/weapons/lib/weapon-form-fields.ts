@@ -1,4 +1,8 @@
 import {
+  formatWeaponMasteryModeHint,
+  formatWeaponPropertyModeHint,
+  isWeaponMasteryCompatibleWithMode,
+  isWeaponPropertyCompatibleWithMode,
   PHYSICAL_DAMAGE_TYPE_IDS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
@@ -8,10 +12,20 @@ import {
   WEAPON_MODE_ENTRIES,
   WEAPON_PROPERTIES,
   WEAPON_PROPERTY_ENTRIES,
+  weaponFormValuesHaveRange,
   type WeaponDamage,
   type WeaponEquipment,
+  type WeaponMastery,
+  type WeaponMode,
+  type WeaponProperty,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldDynamicHint,
+  type FieldOptionAvailability,
+  type FieldVisibility,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
@@ -69,11 +83,43 @@ function visibleWhenVersatile(): FieldVisibility {
   }
 }
 
-function visibleWhenRanged(): FieldVisibility {
+function visibleWhenRangeFields(): FieldVisibility {
   return {
-    dependsOn: ['mode'],
-    visibleWhen: (v) => v.mode === 'ranged',
+    dependsOn: ['mode', 'properties'],
+    visibleWhen: (v) =>
+      weaponFormValuesHaveRange({
+        mode: v.mode as WeaponMode | undefined,
+        properties: v.properties as WeaponProperty[] | undefined,
+      }),
   }
+}
+
+const weaponPropertyOptionAvailability: FieldOptionAvailability = {
+  dependsOn: ['mode'],
+  enabledWhen: (values, optionValue) => {
+    const mode = values.mode as WeaponMode | undefined
+    if (!mode) return true
+    return isWeaponPropertyCompatibleWithMode(optionValue as WeaponProperty, mode)
+  },
+}
+
+const weaponMasteryOptionAvailability: FieldOptionAvailability = {
+  dependsOn: ['mode'],
+  enabledWhen: (values, optionValue) => {
+    const mode = values.mode as WeaponMode | undefined
+    if (!mode) return true
+    return isWeaponMasteryCompatibleWithMode(optionValue as WeaponMastery, mode)
+  },
+}
+
+const weaponPropertyDynamicHint: FieldDynamicHint = {
+  dependsOn: ['mode'],
+  hintWhen: (values) => formatWeaponPropertyModeHint(values.mode as WeaponMode | undefined),
+}
+
+const weaponMasteryDynamicHint: FieldDynamicHint = {
+  dependsOn: ['mode'],
+  hintWhen: (values) => formatWeaponMasteryModeHint(values.mode as WeaponMode | undefined),
 }
 
 export function damageToForm(
@@ -124,6 +170,8 @@ export function weaponFormFieldGroup(): FormItem {
             options: weaponMasteryOptions,
             placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
+            optionAvailability: weaponMasteryOptionAvailability,
+            dynamicHint: weaponMasteryDynamicHint,
           },
         ],
       },
@@ -132,6 +180,8 @@ export function weaponFormFieldGroup(): FormItem {
         name: 'properties',
         label: 'Properties',
         options: weaponPropertyOptions,
+        optionAvailability: weaponPropertyOptionAvailability,
+        dynamicHint: weaponPropertyDynamicHint,
       },
       {
         kind: 'row',
@@ -199,14 +249,14 @@ export function weaponFormFieldGroup(): FormItem {
             name: 'rangeNormal',
             label: 'Normal range (ft.)',
             min: 0,
-            visibility: visibleWhenRanged(),
+            visibility: visibleWhenRangeFields(),
           },
           {
             type: 'number',
             name: 'rangeLong',
             label: 'Long range (ft.)',
             min: 0,
-            visibility: visibleWhenRanged(),
+            visibility: visibleWhenRangeFields(),
           },
         ],
       },
