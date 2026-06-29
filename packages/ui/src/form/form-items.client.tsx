@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useFieldArray, useWatch } from 'react-hook-form'
+import { useFieldArray } from 'react-hook-form'
 
 import { cn } from '../lib/utils'
 import {
@@ -42,6 +42,7 @@ import {
   readAccordionBatchOpen,
   writeAccordionBatchOpen,
 } from './form-accordion-state'
+import { useDependsOnValues } from './form-depends-on.client'
 
 export interface FormItemsProps {
   items: Array<FormItem | RowConfig>
@@ -385,14 +386,7 @@ function useVisibilityValues(
   visibility: FieldVisibility,
   namePrefix?: string,
 ): Record<string, unknown> {
-  const { dependsOn } = visibility
-  const prefixedDeps = namePrefix ? dependsOn.map((dep) => `${namePrefix}.${dep}`) : dependsOn
-  const watched = useWatch({ name: prefixedDeps }) as unknown[]
-  const values: Record<string, unknown> = {}
-  dependsOn.forEach((name, index) => {
-    values[name] = watched[index]
-  })
-  return values
+  return useDependsOnValues(visibility.dependsOn, namePrefix)
 }
 
 /** Routes a field to the conditional wrapper when it declares `visibility`. */

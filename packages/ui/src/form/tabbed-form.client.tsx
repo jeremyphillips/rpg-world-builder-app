@@ -11,13 +11,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.
 import { FormItems } from './form-items.client'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { makeResolver } from './resolver'
-import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
+import { buildDefaultValues, type FileFieldPropsMap, type FormItem, type FormValueSync } from './field-config'
 import { FormActionsBar } from './form-actions-bar'
 import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
   formTabPanelsBottomPaddingClasses,
 } from './form-chrome.variants'
+import { FormValueSyncEffects } from './form-value-sync-effects.client'
 
 /** A single tab definition: an id, a display label, and its ordered fields. */
 export interface TabbedFormTab {
@@ -78,6 +79,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * When set, the internal sticky/inline footer chrome is not used.
    */
   footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
+  /** Patches form values when configured driver fields change after initial mount. */
+  valueSyncs?: FormValueSync[]
 }
 
 export interface TabbedFormFooterWrapperProps {
@@ -107,6 +110,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   stickyActionsBarClassName,
   contentWrapper,
   footerWrapper,
+  valueSyncs,
 }: TabbedFormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -196,6 +200,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       onSubmit={onSubmit}
       className={cn(footerWrapper ? undefined : stickyChrome ? undefined : 'space-y-6', className)}
     >
+      {valueSyncs && valueSyncs.length > 0 ? <FormValueSyncEffects valueSyncs={valueSyncs} /> : null}
       {contentWrapper ? contentWrapper(tabsContent) : tabsContent}
       {footerRegion}
     </SchemaFormShell>

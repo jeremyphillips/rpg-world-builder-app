@@ -93,6 +93,44 @@ export interface FieldVisibility {
   visibleWhen: (watched: Record<string, unknown>) => boolean
 }
 
+/** Merges two visibility predicates with OR semantics and a deduped `dependsOn` list. */
+export function combineFieldVisibility(a: FieldVisibility, b: FieldVisibility): FieldVisibility {
+  return {
+    dependsOn: [...new Set([...a.dependsOn, ...b.dependsOn])],
+    visibleWhen: (values) => a.visibleWhen(values) || b.visibleWhen(values),
+  }
+}
+
+/**
+ * Per-option enablement keyed on other field values. Disabled options stay
+ * selectable in the current value but cannot be toggled on (tier-2 UX).
+ */
+export interface FieldOptionAvailability {
+  dependsOn: string[]
+  enabledWhen: (values: Record<string, unknown>, optionValue: string) => boolean
+}
+
+/**
+ * Contextual helper text derived from other field values. When `hintWhen`
+ * returns `undefined`, the static `hint` on the field config is used instead.
+ */
+export interface FieldDynamicHint {
+  dependsOn: string[]
+  hintWhen: (values: Record<string, unknown>) => string | undefined
+}
+
+/**
+ * Patches form values when watched driver fields change (after initial mount).
+ * Used to remove dependent selections when a mode or category changes.
+ */
+export interface FormValueSync {
+  dependsOn: string[]
+  apply: (
+    values: Record<string, unknown>,
+    changedKeys: string[],
+  ) => Partial<Record<string, unknown>> | undefined
+}
+
 /** Properties shared by every leaf field config. */
 interface BaseFieldConfig {
   /** Form value key; also the basis of the generated control id. */
@@ -109,6 +147,8 @@ interface BaseFieldConfig {
   disabled?: boolean
   /** Optional conditional rendering; omit for always-visible fields. */
   visibility?: FieldVisibility
+  /** Optional helper text derived from other field values. */
+  dynamicHint?: FieldDynamicHint
 }
 
 export interface TextFieldConfig extends BaseFieldConfig {
@@ -149,6 +189,8 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
+  /** Disables individual options when `enabledWhen` is false for the current values. */
+  optionAvailability?: FieldOptionAvailability
   /**
    * Visual digit capacity for the select trigger (sets width from ch-based tokens).
    * Keep `width` at `full` (default) on standalone fields so label and hint are not
@@ -251,6 +293,8 @@ export interface FileFieldConfig extends BaseFieldConfig {
 export interface ChipsFieldConfig extends BaseFieldConfig {
   type: 'chips'
   options: FieldOption[]
+  /** Disables individual options when `enabledWhen` is false for the current values. */
+  optionAvailability?: FieldOptionAvailability
   /**
    * Allow selecting more than one option. Defaults to `true`.
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
@@ -626,4 +670,40 @@ export function hiddenFieldNames(items: FormItem[], values: Record<string, unkno
   return flattenFields(items)
     .filter((field) => !isFieldVisible(field, values))
     .map((field) => field.name)
+}
+
+/** Resolves static and dynamic hint text for a field config. */
+export function resolveFieldHint(
+  field: Pick<BaseFieldConfig, 'hint' | 'dynamicHint'>,
+  values: Record<string, unknown>,
+): string | undefined {
+  return field.dynamicHint?.hintWhen(values) ?? field.hint
+}
+
+/** Applies `optionAvailability` to a flat option list without mutating the source. */
+export function applyOptionAvailabilityToFieldOptions(
+  options: readonly FieldOption[],
+  availability: FieldOptionAvailability,
+  values: Record<string, unknown>,
+): FieldOption[] {
+  return options.map((option) => ({
+    ...option,
+    disabled: Boolean(option.disabled) || !availability.enabledWhen(values, option.value),
+  }))
+}
+
+/** Applies `optionAvailability` to select options, including grouped sections. */
+export function applyOptionAvailabilityToSelectOptions(
+  options: readonly SelectFieldOptionListItem[],
+  availability: FieldOptionAvailability,
+  values: Record<string, unknown>,
+): SelectFieldOptionListItem[] {
+  return options.map((item) =>
+    isFieldOptionGroup(item)
+      ? {
+          ...item,
+          options: applyOptionAvailabilityToFieldOptions(item.options, availability, values),
+        }
+      : applyOptionAvailabilityToFieldOptions([item], availability, values)[0]!,
+  )
 }

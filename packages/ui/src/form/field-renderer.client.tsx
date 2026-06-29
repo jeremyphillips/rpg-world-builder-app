@@ -22,6 +22,12 @@ import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type { FieldConfig, FieldType } from './field-config'
+import {
+  applyOptionAvailabilityToFieldOptions,
+  applyOptionAvailabilityToSelectOptions,
+  resolveFieldHint,
+} from './field-config'
+import { useDependsOnValues } from './form-depends-on.client'
 import type { JsonFieldProps } from '../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../components/ui/rich-text-field'
 import type { FileFieldProps } from '../components/ui/file-field.client'
@@ -424,10 +430,29 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
   const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
 
-  if (config.type === 'inputSelect') {
+  const hintValues = useDependsOnValues(config.dynamicHint?.dependsOn ?? [], namePrefix)
+  const resolvedHint = resolveFieldHint(config, hintValues)
+
+  const optionAvailability =
+    config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
+  const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
+
+  let renderConfig: FieldConfig = config
+  if (resolvedHint !== config.hint) {
+    renderConfig = { ...renderConfig, hint: resolvedHint }
+  }
+  if (optionAvailability && (config.type === 'chips' || config.type === 'select')) {
+    const options =
+      config.type === 'chips'
+        ? applyOptionAvailabilityToFieldOptions(config.options, optionAvailability, optionValues)
+        : applyOptionAvailabilityToSelectOptions(config.options, optionAvailability, optionValues)
+    renderConfig = { ...renderConfig, options } as FieldConfig
+  }
+
+  if (renderConfig.type === 'inputSelect') {
     return (
       <InputSelectFieldRenderer
-        config={config}
+        config={renderConfig}
         fullName={fullName}
         id={id}
         namePrefix={namePrefix}
@@ -439,6 +464,13 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
-  const render = fieldRenderers[config.type] as (args: RenderArgs<FieldType>) => React.ReactElement
-  return render({ config, field, id, error: fieldState.error?.message, remotePreview, namePrefix })
+  const render = fieldRenderers[renderConfig.type] as (args: RenderArgs<FieldType>) => React.ReactElement
+  return render({
+    config: renderConfig,
+    field,
+    id,
+    error: fieldState.error?.message,
+    remotePreview,
+    namePrefix,
+  })
 }

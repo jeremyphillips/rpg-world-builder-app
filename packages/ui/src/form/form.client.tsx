@@ -10,9 +10,10 @@ import { fieldGroupStackClasses } from '../components/ui/field.variants'
 import { FormItems } from './form-items.client'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { makeResolver } from './resolver'
-import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
+import { buildDefaultValues, type FileFieldPropsMap, type FormItem, type FormValueSync } from './field-config'
 import { FormActionsBar } from './form-actions-bar'
 import { formFooterSpacingClasses } from './form-chrome.variants'
+import { FormValueSyncEffects } from './form-value-sync-effects.client'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -59,6 +60,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
   collapsibleSections?: boolean
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
+  /** Patches form values when configured driver fields change after initial mount. */
+  valueSyncs?: FormValueSync[]
 }
 
 /**
@@ -82,6 +85,7 @@ export function Form<TFieldValues extends FieldValues>({
   mode,
   collapsibleSections = true,
   stickyFooter = false,
+  valueSyncs,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -118,6 +122,7 @@ export function Form<TFieldValues extends FieldValues>({
             {formError}
           </Text>
         ) : null}
+        {valueSyncs && valueSyncs.length > 0 ? <FormValueSyncEffects valueSyncs={valueSyncs} /> : null}
         <FormItems items={fields} idPrefix={formId} />
       </div>
       {stickyFooter ? (
