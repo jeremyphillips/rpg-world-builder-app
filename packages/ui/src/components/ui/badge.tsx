@@ -8,6 +8,7 @@ export {
   badgeVariants,
   dismissibleBadgeVariants,
   badgeDismissButtonVariants,
+  type BadgeSize,
 } from './badge.variants'
 
 export interface BadgeProps

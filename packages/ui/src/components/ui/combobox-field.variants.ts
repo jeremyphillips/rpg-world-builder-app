@@ -50,8 +50,11 @@ export const comboboxOptionVariants = cva(
 /** Empty-state message when the filter matches nothing. */
 export const comboboxEmptyVariants = cva('px-2 py-4 text-center text-sm text-muted-foreground')
 
-/** Chip row shown below the trigger in multi-select mode. */
-export const comboboxChipRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
+/** Dismissible-badge row shown below the trigger in multi-select mode. */
+export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
+
+/** @deprecated Use {@link comboboxSelectedItemsRowVariants}. */
+export const comboboxChipRowVariants = comboboxSelectedItemsRowVariants
 
 /** Vertical list for custom selected-item renderers in multi-select mode. */
 export const comboboxSelectedListVariants = cva('flex flex-col gap-2 pt-2')

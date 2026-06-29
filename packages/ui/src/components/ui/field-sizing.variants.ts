@@ -58,6 +58,13 @@ export const fieldDigitTrailingColumnClasses = {
   lg: 'w-7',
 } as const satisfies Record<FieldSizeToken, string>
 
+/** Maps field control size to badge size (`Badge` / `DismissibleBadge` only define `sm` | `md`). */
+export const fieldSizeToBadgeSize = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'md',
+} as const satisfies Record<FieldSizeToken, 'sm' | 'md'>
+
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
 export const fieldDigitTrailingIconClasses = {
   sm: '[&_svg]:size-2.5',

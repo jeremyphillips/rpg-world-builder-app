@@ -44,7 +44,7 @@ const toolOptions = [
   { value: 'lute', label: 'Lute' },
 ]
 
-/** Multi-select with removable chips — typical catalog picker. */
+/** Multi-select with removable badges — typical catalog picker. */
 export const MultiSelect: Story = {
   args: {
     label: 'Specific weapons',
@@ -124,6 +124,17 @@ export const Disabled: Story = {
     multiple: true,
     value: ['lute'],
     disabled: true,
+  },
+}
+
+export const Small: Story = {
+  args: {
+    label: 'Specific weapons',
+    options: weaponOptions,
+    multiple: true,
+    size: 'sm',
+    value: ['dagger', 'rapier'],
+    placeholder: 'Choose weapons…',
   },
 }
 

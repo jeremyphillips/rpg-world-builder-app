@@ -8,13 +8,14 @@ import { cn } from '../../lib/utils'
 import { DismissibleBadge } from './dismissible-badge.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
+import { fieldSizeToBadgeSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type { ComboboxFieldOption, ComboboxRenderSelectedItem } from './combobox-field.types'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
-  comboboxChipRowVariants,
+  comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
   comboboxEmptyVariants,
@@ -256,6 +257,7 @@ export function ComboboxPanel({
 interface ComboboxSelectedItemsProps {
   label: string
   options: ComboboxFieldOption[]
+  size: FieldSize
   disabled?: boolean
   onRemove: (value: string) => void
   renderSelectedItem?: ComboboxRenderSelectedItem
@@ -264,15 +266,17 @@ interface ComboboxSelectedItemsProps {
 export function ComboboxSelectedItems({
   label,
   options,
+  size,
   disabled,
   onRemove,
   renderSelectedItem,
 }: ComboboxSelectedItemsProps) {
   if (options.length === 0) return null
 
+  const badgeSize = fieldSizeToBadgeSize[size]
   const listClassName = renderSelectedItem
     ? comboboxSelectedListVariants()
-    : comboboxChipRowVariants()
+    : comboboxSelectedItemsRowVariants()
 
   return (
     <div className={listClassName} role="list" aria-label={`Selected ${label}`}>
@@ -282,10 +286,12 @@ export function ComboboxSelectedItems({
             renderSelectedItem(option, {
               onRemove: () => onRemove(option.value),
               disabled,
+              size,
             })
           ) : (
             <DismissibleBadge
               label={option.label}
+              size={badgeSize}
               disabled={disabled}
               onDismiss={() => onRemove(option.value)}
             />

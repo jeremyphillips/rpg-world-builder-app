@@ -63,6 +63,7 @@ export {
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
+  fieldSizeToBadgeSize,
   fieldSizeTypographyClasses,
   fieldTextareaSizeClasses,
   type FieldSizeToken,
@@ -303,6 +304,7 @@ export {
   dismissibleBadgeVariants,
   badgeDismissButtonVariants,
   type BadgeProps,
+  type BadgeSize,
 } from './components/ui/badge'
 export {
   DismissibleBadge,

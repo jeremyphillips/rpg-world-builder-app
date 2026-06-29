@@ -32,6 +32,11 @@ describe('DismissibleBadge', () => {
     expect(screen.getByRole('button', { name: 'Remove Dagger' })).toBeDisabled()
   })
 
+  it('applies badge size classes', () => {
+    render(<DismissibleBadge label="Dagger" size="sm" onDismiss={vi.fn()} />)
+    expect(screen.getByText('Dagger').parentElement).toHaveClass('text-badge-sm')
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(<DismissibleBadge label="Dagger" onDismiss={vi.fn()} />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

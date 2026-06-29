@@ -301,7 +301,7 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
 
 /**
  * Searchable dropdown for picking one or many values from a large option list.
- * `multiple: true` (default) → value is `string[]`; selected values render as removable chips.
+ * `multiple: true` (default) → value is `string[]`; selected values render as removable badges.
  * `multiple: false` → value is `string`; picking an option closes the panel.
  */
 export interface ComboboxFieldConfig extends BaseFieldConfig {
@@ -312,7 +312,7 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
-  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
 }
 

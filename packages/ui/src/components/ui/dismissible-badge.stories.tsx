@@ -32,6 +32,13 @@ export const Disabled: Story = {
   },
 }
 
+export const Small: Story = {
+  args: {
+    size: 'sm',
+    label: 'Dagger',
+  },
+}
+
 export const Group: Story = {
   render: (args) => (
     <div className="flex flex-wrap gap-1.5" role="group" aria-label="Selected weapons">

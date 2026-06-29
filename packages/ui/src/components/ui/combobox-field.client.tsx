@@ -33,7 +33,7 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   label: string
   options: ComboboxFieldOption[]
   /**
-   * `true` (default) — value is `string[]`; selected values render as removable chips.
+   * `true` (default) — value is `string[]`; selected values render as removable badges.
    * `false` — value is `string`; picking an option closes the panel.
    */
   multiple?: boolean
@@ -42,7 +42,7 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   size?: FieldSize
   placeholder?: string
   emptyMessage?: string
-  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
   hintPosition?: FieldHintPosition
 }
@@ -92,6 +92,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
         <ComboboxSelectedItems
           label={label}
           options={control.selectedOptions}
+          size={size}
           disabled={control.isInteractionDisabled}
           onRemove={control.removeValue}
           renderSelectedItem={renderSelectedItem}
