@@ -13,6 +13,7 @@ import { SelectField } from '../components/ui/select-field'
 import { SwitchField } from '../components/ui/switch-field'
 import { TextareaField } from '../components/ui/textarea-field'
 import { TextField } from '../components/ui/text-field'
+import { MarkdownField } from '../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from './file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
@@ -254,6 +255,24 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
         onBlur={field.onBlur}
       />
     </LazyFieldSuspense>
+  ),
+  markdown: ({ config, field, id, error }) => (
+    <MarkdownField
+      id={id}
+      label={config.label}
+      error={error}
+      hint={config.hint}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      size={config.size}
+      rows={config.rows}
+      placeholder={config.placeholder}
+      disabled={config.disabled}
+      value={field.value ?? ''}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+    />
   ),
   file: ({ config, field, id, error, remotePreview }) => (
     <LazyFieldSuspense>

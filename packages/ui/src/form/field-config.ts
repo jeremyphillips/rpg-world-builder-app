@@ -32,6 +32,7 @@ export type FieldType =
   | 'switch'
   | 'json'
   | 'richtext'
+  | 'markdown'
   | 'file'
   | 'chips'
   | 'combobox'
@@ -200,6 +201,13 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   /** Content type filter options for the rich-text link picker. */
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
+  defaultValue?: string
+}
+
+export interface MarkdownFieldConfig extends BaseFieldConfig {
+  type: 'markdown'
+  placeholder?: string
+  rows?: number
   defaultValue?: string
 }
 
@@ -382,6 +390,7 @@ export type FieldConfig =
   | SwitchFieldConfig
   | JsonFieldConfig
   | RichTextFieldConfig
+  | MarkdownFieldConfig
   | FileFieldConfig
   | ChipsFieldConfig
   | ChooseFromChipsFieldConfig
@@ -522,6 +531,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   switch: false,
   json: '',
   richtext: '',
+  markdown: '',
   file: [],
   chips: [],
   combobox: [],

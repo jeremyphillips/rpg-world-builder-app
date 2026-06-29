@@ -78,6 +78,10 @@ Full enum guidance → [`docs/dev-bench-agent-reference.md`](../../docs/dev-benc
 
 **Include:** action-oriented title, enough context for future readers, ≥1 acceptance criterion, code refs when code-driven, epic only when the match is clear.
 
+**Description:** write markdown (headings, lists, code fences OK). Do not wrap in HTML — the API stores markdown as-is. **Structure for readability:** use short sections (`## Context`, `## Problem`, `## Notes`), blank lines between paragraphs, and bullet lists instead of one long block — future readers scan, not parse. Legacy HTML tickets may exist until re-saved in the UI.
+
+**Typical shape:** `## Context` → 1–2 sentences; `## Problem` or `## Goal` → bullets for symptoms/constraints; inline `` `paths` `` and `` `symbols` `` where helpful. Put done criteria in `acceptanceCriteria`, not duplicated prose. In CLI JSON, use `\n` for line breaks (e.g. `"description": "## Context\n\n…\n\n## Problem\n\n- …"`).
+
 **Avoid:** vague titles (“Fix issue”), duplicate tickets, implementation-only acceptance criteria, `xl` scope without splitting (epic + smaller tickets, research ticket first, or ask user).
 
 ---

@@ -14,12 +14,14 @@ export { headingVariants, type HeadingVariantProps } from './components/ui/headi
 export { Text, type TextProps } from './components/ui/text'
 export { textVariants, type TextVariantProps } from './components/ui/text.variants'
 export { RichTextContent, type RichTextContentProps } from './components/ui/rich-text-content'
+export { MarkdownContent, type MarkdownContentProps } from './components/ui/markdown-content'
 export {
   richTextContentVariants,
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
 export {
   extractRichTextContent,
+  looksLikeRichTextHtml,
   normalizeRichTextHtml,
   richTextHtmlEquals,
 } from './components/ui/rich-text-html'
@@ -123,6 +125,7 @@ export {
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
+export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown-field.client'
 
 export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
 export {

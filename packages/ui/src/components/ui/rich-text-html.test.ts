@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { extractRichTextContent, normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
+import {
+  extractRichTextContent,
+  looksLikeRichTextHtml,
+  normalizeRichTextHtml,
+  richTextHtmlEquals,
+} from './rich-text-html'
 
 describe('normalizeRichTextHtml', () => {
   it('treats empty paragraph markup as empty', () => {
@@ -32,5 +37,15 @@ describe('richTextHtmlEquals', () => {
     expect(
       richTextHtmlEquals('Jump farther than normal.', '<p>Jump farther than normal.</p>'),
     ).toBe(true)
+  })
+})
+
+describe('looksLikeRichTextHtml', () => {
+  it('detects HTML tags', () => {
+    expect(looksLikeRichTextHtml('<p>Hello</p>')).toBe(true)
+  })
+
+  it('returns false for markdown', () => {
+    expect(looksLikeRichTextHtml('## Heading')).toBe(false)
   })
 })

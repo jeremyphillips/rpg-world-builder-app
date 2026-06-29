@@ -468,6 +468,20 @@ Form config (`FieldType: 'richtext'`) forwards `linkable`, `codeBlocks`,
 and `contentTypeOptions` to `RichTextField` / `RichTextEditor` when internal
 linking is required.
 
+### Markdown (`markdown` / `MarkdownField`)
+
+- Use for **plain markdown strings** stored as-is (no HTML conversion at save).
+  Dev Bench ticket `description` is the primary consumer; epic descriptions stay
+  on `richtext`.
+- **Write** tab: monospace `Textarea`. **Preview** tab: `MarkdownContent` (GFM).
+  Legacy HTML values still preview via `RichTextContent` until re-saved.
+- Prefer `richtext` when authors need WYSIWYG editing, internal catalog links, or
+  sanitized HTML output (species traits, epic descriptions). Prefer `markdown`
+  when agents and humans share the same markdown source (CLI JSON, code fences).
+
+Form config (`FieldType: 'markdown'`) forwards `rows` and `placeholder` to
+`MarkdownField`.
+
 ### JSON (`json` / `JsonField`)
 
 - A monospace editor holding a string while you type, validated with `JSON.parse`

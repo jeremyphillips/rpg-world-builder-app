@@ -6,7 +6,17 @@ import {
   getTicketTypeLabel,
 } from '@rpg/contracts/dev-bench'
 
+import { looksLikeRichTextHtml } from './markdown-field'
 import { extractRichTextPlainText, normalizeRichTextPlainText } from './rich-text-plain'
+
+function descriptionForAgentOutput(description: string | undefined): string | undefined {
+  const normalized = normalizeRichTextPlainText(description)
+  if (!normalized) return undefined
+  if (looksLikeRichTextHtml(normalized)) {
+    return extractRichTextPlainText(normalized)
+  }
+  return normalized
+}
 
 function formatCodeRef(ref: CodeRef): string {
   const parts = [ref.path]
@@ -58,8 +68,7 @@ export function formatTicketForAgent(ticket: Ticket): string {
     lines.push(`- **Epic ID:** ${ticket.epicId}`)
   }
 
-  const description = normalizeRichTextPlainText(ticket.description)
-  const descriptionText = description ? extractRichTextPlainText(description) : undefined
+  const descriptionText = descriptionForAgentOutput(ticket.description)
 
   lines.push(
     '',

@@ -1,4 +1,5 @@
 export * from './aggregation/epic-aggregation'
+export * from './formatting/markdown-field'
 export * from './formatting/ticket-for-agent'
 export * from './matching/duplicate-candidates'
 export * from './matching/resolve-epic-by-title'

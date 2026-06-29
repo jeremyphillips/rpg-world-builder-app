@@ -26,3 +26,13 @@ export function richTextHtmlEquals(a: string | undefined, b: string | undefined)
   if (normalizeRichTextHtml(a) === normalizeRichTextHtml(b)) return true
   return extractRichTextContent(a) === extractRichTextContent(b)
 }
+
+const BLOCK_HTML_PATTERN = /<(p|h[1-6]|ul|ol|li|div|blockquote|pre|table|br)\b/i
+
+/** Whether a stored string looks like TipTap / rich-text HTML rather than markdown. */
+export function looksLikeRichTextHtml(value: string): boolean {
+  const trimmed = value.trim()
+  if (trimmed === '') return false
+  if (/^\s*</.test(trimmed)) return true
+  return BLOCK_HTML_PATTERN.test(trimmed)
+}

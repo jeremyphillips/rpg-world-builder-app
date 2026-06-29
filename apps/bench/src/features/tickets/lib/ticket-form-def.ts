@@ -22,7 +22,7 @@ import {
   type Ticket,
   type UpdateTicketInput,
 } from '@rpg/contracts/dev-bench'
-import { normalizeRichTextHtml } from '@rpg/ui'
+import { descriptionForMarkdownForm, normalizeMarkdownField } from '@rpg/dev-bench-core'
 import {
   toOptions,
   type ComboboxRenderSelectedItem,
@@ -75,7 +75,7 @@ const areaOptions: FieldOption[] = TICKET_AREA_SUGGESTIONS.map((area) => ({
 export function mapTicketToDetailFormValues(ticket: Ticket): TicketDetailFormValues {
   return {
     title: ticket.title,
-    description: ticket.description ?? '',
+    description: descriptionForMarkdownForm(ticket.description),
     type: ticket.type,
     status: ticket.status,
     priority: ticket.priority,
@@ -92,7 +92,7 @@ export function mapTicketToDetailFormValues(ticket: Ticket): TicketDetailFormVal
 export function buildUpdateTicketInput(values: TicketDetailFormValues): UpdateTicketInput {
   return {
     title: values.title.trim(),
-    description: normalizeRichTextHtml(values.description) || undefined,
+    description: normalizeMarkdownField(values.description),
     type: values.type,
     status: values.status,
     priority: values.priority,
@@ -112,7 +112,7 @@ export function buildQuickCreateInput(values: QuickCreateFormValues) {
   return createTicketInputSchema.parse({
     ...values,
     title: values.title.trim(),
-    description: normalizeRichTextHtml(values.description) || undefined,
+    description: normalizeMarkdownField(values.description),
     status: 'backlog',
     createdBy: 'user',
   })
@@ -155,11 +155,10 @@ export const quickCreateFields: FormItem[] = [
     ],
   },
   {
-    type: 'richtext',
+    type: 'markdown',
     name: 'description',
     label: 'Description',
-    hint: 'Optional',
-    codeBlocks: true,
+    hint: 'Markdown supported. Agents write plain markdown.',
   },
 ]
 
@@ -179,7 +178,12 @@ export function buildTicketDetailTabs(options: {
       label: 'Overview',
       fields: [
         { type: 'text', name: 'title', label: 'Title', required: true },
-        { type: 'richtext', name: 'description', label: 'Description', codeBlocks: true },
+        {
+          type: 'markdown',
+          name: 'description',
+          label: 'Description',
+          hint: 'Markdown supported. Agents write plain markdown.',
+        },
         {
           kind: 'row',
           fields: [

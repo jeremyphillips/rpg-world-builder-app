@@ -35,6 +35,7 @@ describe('TicketCreateDialog', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
+    expect(screen.getByRole('tab', { name: 'Preview' })).toBeInTheDocument()
     expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create ticket' })).toBeInTheDocument()
   })

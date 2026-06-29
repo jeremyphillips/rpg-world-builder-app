@@ -75,6 +75,10 @@ Lowercase slug: `^[a-z][a-z0-9_]*$`. Suggested values:
 
 Match the epic or primary package touched when obvious.
 
+### Description (`description`)
+
+Ticket descriptions are **markdown** — headings, lists, and code fences are fine; no HTML required. The API stores the string unchanged; agents should write plain markdown in CLI JSON. Prefer scannable structure: section headings, blank lines, and lists — not a single dense paragraph. Legacy HTML tickets may still exist until opened and saved once in the Bench UI (first save persists markdown/plain text).
+
 ### Epic
 
 - Resolve by **`epicName`** or **`epicId`** on list/create flows.

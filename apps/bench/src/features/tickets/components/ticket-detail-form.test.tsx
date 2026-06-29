@@ -44,6 +44,7 @@ describe('TicketDetailForm', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
+    expect(screen.getByRole('tab', { name: 'Preview' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Done when' }))
     expect(screen.getByText('Paste bullets')).toBeInTheDocument()

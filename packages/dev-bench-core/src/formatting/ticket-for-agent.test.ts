@@ -82,4 +82,14 @@ describe('formatTicketForAgent', () => {
     expect(output).toContain('Cursor identified that this path is skipped.')
     expect(output).not.toContain('<strong>')
   })
+
+  it('emits stored markdown description unchanged', () => {
+    const markdown = '## Context\n\nUse `pnpm bench add-ticket`.'
+    const output = formatTicketForAgent({
+      ...sampleTicket,
+      description: markdown,
+    })
+
+    expect(output).toContain(markdown)
+  })
 })
