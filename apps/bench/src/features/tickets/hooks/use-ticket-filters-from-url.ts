@@ -22,6 +22,7 @@ const FILTER_PARAM = {
   area: 'area',
   createdBy: 'createdBy',
   includeWontDo: 'includeWontDo',
+  search: 'search',
 } as const
 
 function parseEnumParam<T extends string>(
@@ -42,6 +43,7 @@ export function filtersFromSearchParams(searchParams: URLSearchParams): TicketLi
     area: searchParams.get(FILTER_PARAM.area) ?? undefined,
     createdBy: parseEnumParam(searchParams.get(FILTER_PARAM.createdBy), ticketCreatedBySchema),
     includeWontDo: searchParams.get(FILTER_PARAM.includeWontDo) === 'true',
+    search: searchParams.get(FILTER_PARAM.search) ?? undefined,
   }
 
   if (epic === EPIC_FILTER_NONE) {
@@ -75,6 +77,7 @@ export function filtersToSearchParams(filters: TicketListFilters): URLSearchPara
     params.set(FILTER_PARAM.epic, filters.epic)
   }
   if (filters.includeWontDo) params.set(FILTER_PARAM.includeWontDo, 'true')
+  if (filters.search) params.set(FILTER_PARAM.search, filters.search)
 
   return params
 }

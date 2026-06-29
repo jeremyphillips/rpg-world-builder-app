@@ -20,6 +20,7 @@ describe('ticket filter URL sync', () => {
       area: 'ui',
       createdBy: 'user' as const,
       includeWontDo: true,
+      search: 'auth bug',
     }
 
     const params = filtersToSearchParams(filters)
@@ -28,17 +29,28 @@ describe('ticket filter URL sync', () => {
 
   it('maps no-epic filter client-side', () => {
     const tickets = [
-      { status: 'backlog', epicId: null },
-      { status: 'backlog', epicId: 'abc' },
+      { status: 'backlog', epicId: null, title: 'No epic ticket' },
+      { status: 'backlog', epicId: 'abc', title: 'Epic ticket' },
     ]
 
     expect(
       applyClientTicketFilters(tickets, { epic: EPIC_FILTER_NONE, includeWontDo: true }),
-    ).toEqual([{ status: 'backlog', epicId: null }])
+    ).toEqual([{ status: 'backlog', epicId: null, title: 'No epic ticket' }])
   })
 
   it('defaults backlog status in API query', () => {
     expect(toTicketListQuery({})).toEqual({ status: 'backlog' })
     expect(toTicketListQuery({ includeWontDo: true })).toEqual({})
+  })
+
+  it('filters tickets by normalized title search client-side', () => {
+    const tickets = [
+      { status: 'backlog', epicId: null, title: 'Fix: Auth bug' },
+      { status: 'backlog', epicId: null, title: 'Validate epic area' },
+    ]
+
+    expect(applyClientTicketFilters(tickets, { search: 'auth bug' })).toEqual([
+      { status: 'backlog', epicId: null, title: 'Fix: Auth bug' },
+    ])
   })
 })

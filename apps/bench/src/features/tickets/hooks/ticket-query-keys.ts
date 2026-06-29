@@ -6,6 +6,7 @@ import type {
 } from '@rpg/contracts/dev-bench'
 
 import type { TicketListQuery } from '../api/tickets-client'
+import { ticketTitleMatchesSearch } from '../lib/ticket-title-search'
 
 export const EPIC_FILTER_ALL = 'all'
 export const EPIC_FILTER_NONE = 'none'
@@ -18,6 +19,7 @@ export interface TicketListFilters {
   area?: string
   createdBy?: TicketCreatedBy
   includeWontDo?: boolean
+  search?: string
 }
 
 export const ticketQueryKeys = {
@@ -48,10 +50,9 @@ export function toTicketListQuery(filters: TicketListFilters): TicketListQuery {
   return query
 }
 
-export function applyClientTicketFilters<T extends { status: string; epicId?: string | null }>(
-  tickets: T[],
-  filters: TicketListFilters,
-): T[] {
+export function applyClientTicketFilters<
+  T extends { status: string; epicId?: string | null; title: string },
+>(tickets: T[], filters: TicketListFilters): T[] {
   let result = tickets
 
   if (filters.includeWontDo) {
@@ -60,6 +61,10 @@ export function applyClientTicketFilters<T extends { status: string; epicId?: st
 
   if (filters.epic === EPIC_FILTER_NONE) {
     result = result.filter((ticket) => ticket.epicId == null)
+  }
+
+  if (filters.search) {
+    result = result.filter((ticket) => ticketTitleMatchesSearch(ticket.title, filters.search))
   }
 
   return result
