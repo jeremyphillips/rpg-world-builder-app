@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { DndContext } from '@dnd-kit/core'
 
 import { blockedBenchTicket, upNextTicket } from '../test-fixtures'
 import { BenchTicketCard } from './bench-ticket-card'
@@ -14,17 +14,21 @@ type Story = StoryObj<typeof meta>
 
 function CardStory(props: React.ComponentProps<typeof BenchTicketCard>) {
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <BenchTicketCard {...props} />
-    </QueryClientProvider>
+    <DndContext>
+      <ul className="max-w-sm">
+        <BenchTicketCard {...props} />
+      </ul>
+    </DndContext>
   )
 }
 
 export const Default: Story = {
   args: {
     ticket: upNextTicket,
+    column: 'up_next',
     epicTitle: 'Dev Bench MVP',
     onSelect: () => undefined,
+    onMove: () => undefined,
   },
   render: (args) => <CardStory {...args} />,
 }
@@ -32,7 +36,9 @@ export const Default: Story = {
 export const Blocked: Story = {
   args: {
     ticket: blockedBenchTicket,
+    column: 'blocked',
     onSelect: () => undefined,
+    onMove: () => undefined,
   },
   render: (args) => <CardStory {...args} />,
 }

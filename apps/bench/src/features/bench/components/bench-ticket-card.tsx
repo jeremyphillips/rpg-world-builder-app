@@ -1,43 +1,34 @@
-import type { Ticket } from '@rpg/contracts/dev-bench'
-import { ConfirmDialog } from '@rpg/ui'
+import type { Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
+import type { BenchColumn } from '@rpg/dev-bench-core'
 
-import { TicketCard } from '@/features/tickets'
-
-import { useMoveTicketStatus } from '../hooks/use-move-ticket-status'
-import { TicketCardMoveMenu } from './ticket-card-move-menu'
+import { BenchDraggableTicket } from './bench-draggable-ticket'
 
 interface BenchTicketCardProps {
   ticket: Ticket
+  column: BenchColumn
   epicTitle?: string | null
   onSelect?: (ticketId: string) => void
+  onMove: (nextStatus: TicketStatus) => void
+  isMovePending?: boolean
 }
 
-export function BenchTicketCard({ ticket, epicTitle, onSelect }: BenchTicketCardProps) {
-  const { moveToStatus, confirmOpen, onConfirmOpenChange, onConfirmMove, isPending } =
-    useMoveTicketStatus(ticket.id)
-
+/** Bench card with drag surface + overflow menu. Requires a DndContext ancestor. */
+export function BenchTicketCard({
+  ticket,
+  column,
+  epicTitle,
+  onSelect,
+  onMove,
+  isMovePending = false,
+}: BenchTicketCardProps) {
   return (
-    <>
-      <div className="relative">
-        <TicketCard ticket={ticket} epicTitle={epicTitle} onSelect={onSelect} className="pr-10" />
-        <div className="absolute right-2 top-2">
-          <TicketCardMoveMenu
-            ticket={ticket}
-            isPending={isPending}
-            onMove={(nextStatus) => {
-              void moveToStatus(ticket, nextStatus)
-            }}
-          />
-        </div>
-      </div>
-      <ConfirmDialog
-        open={confirmOpen}
-        onOpenChange={onConfirmOpenChange}
-        headline="Mark done anyway?"
-        description="This ticket still has blockers. Mark it done anyway?"
-        confirmLabel="Mark done"
-        onConfirm={onConfirmMove}
-      />
-    </>
+    <BenchDraggableTicket
+      ticket={ticket}
+      column={column}
+      epicTitle={epicTitle}
+      onSelect={onSelect}
+      onMove={onMove}
+      isMovePending={isMovePending}
+    />
   )
 }

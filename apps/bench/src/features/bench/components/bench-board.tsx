@@ -1,7 +1,26 @@
+import { useMemo, useState } from 'react'
+
 import { BENCH_COLUMNS, type BenchColumn as BenchColumnId } from '@rpg/dev-bench-core'
 import type { Ticket } from '@rpg/contracts/dev-bench'
-import { Button, Spinner, Text } from '@rpg/ui'
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from '@dnd-kit/core'
+import { Button, ConfirmDialog, Spinner, Text } from '@rpg/ui'
 
+import { TicketCard } from '@/features/tickets'
+
+import { useBenchBoardMoves } from '../hooks/use-bench-board-moves'
+import { parseBenchTicketDndId } from '../lib/bench-dnd-ids'
+import { resolveBenchDropColumn } from '../lib/resolve-bench-drop-column'
+import { benchDragOverlayCardClasses } from './bench-board.variants'
 import { BenchColumn } from './bench-column'
 
 interface BenchBoardProps {
@@ -13,6 +32,16 @@ interface BenchBoardProps {
   onSelectTicket?: (ticketId: string) => void
 }
 
+function buildTicketsById(columns: Record<BenchColumnId, Ticket[]>): Map<string, Ticket> {
+  const ticketsById = new Map<string, Ticket>()
+  for (const column of BENCH_COLUMNS) {
+    for (const ticket of columns[column]) {
+      ticketsById.set(ticket.id, ticket)
+    }
+  }
+  return ticketsById
+}
+
 export function BenchBoard({
   columns,
   epicTitleById,
@@ -21,6 +50,43 @@ export function BenchBoard({
   onRetry,
   onSelectTicket,
 }: BenchBoardProps) {
+  const { moveTicket, confirmOpen, onConfirmOpenChange, onConfirmMove, isMovePending } =
+    useBenchBoardMoves()
+  const [activeTicketId, setActiveTicketId] = useState<string | null>(null)
+
+  const ticketsById = useMemo(() => buildTicketsById(columns), [columns])
+  const activeTicket = activeTicketId ? ticketsById.get(activeTicketId) : undefined
+  const isDragActive = activeTicketId != null
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor),
+  )
+
+  function handleDragStart(event: DragStartEvent) {
+    const ticketId = parseBenchTicketDndId(String(event.active.id))
+    setActiveTicketId(ticketId)
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveTicketId(null)
+
+    const ticketId = parseBenchTicketDndId(String(event.active.id))
+    if (!ticketId || !event.over) return
+
+    const ticket = ticketsById.get(ticketId)
+    const targetColumn = resolveBenchDropColumn(event.over, ticketsById)
+    if (!ticket || !targetColumn) return
+
+    moveTicket(ticket, targetColumn)
+  }
+
+  function handleDragCancel() {
+    setActiveTicketId(null)
+  }
+
   if (isPending) {
     return (
       <div className="grid gap-6 md:grid-cols-4">
@@ -51,16 +117,47 @@ export function BenchBoard({
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-4 md:overflow-x-auto">
-      {BENCH_COLUMNS.map((column) => (
-        <BenchColumn
-          key={column}
-          column={column}
-          tickets={columns[column]}
-          epicTitleById={epicTitleById}
-          onSelectTicket={onSelectTicket}
-        />
-      ))}
-    </div>
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="grid gap-6 md:grid-cols-4 md:overflow-x-auto">
+          {BENCH_COLUMNS.map((column) => (
+            <BenchColumn
+              key={column}
+              column={column}
+              tickets={columns[column]}
+              epicTitleById={epicTitleById}
+              isDragActive={isDragActive}
+              onSelectTicket={onSelectTicket}
+              onMoveTicket={moveTicket}
+              isMovePending={isMovePending}
+            />
+          ))}
+        </div>
+        <DragOverlay dropAnimation={null}>
+          {activeTicket ? (
+            <TicketCard
+              ticket={activeTicket}
+              epicTitle={activeTicket.epicId ? epicTitleById.get(activeTicket.epicId) : null}
+              interactive={false}
+              className={benchDragOverlayCardClasses}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={onConfirmOpenChange}
+        headline="Mark done anyway?"
+        description="This ticket still has blockers. Mark it done anyway?"
+        confirmLabel="Mark done"
+        onConfirm={onConfirmMove}
+      />
+    </>
   )
 }
