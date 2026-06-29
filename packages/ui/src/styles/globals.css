@@ -148,8 +148,9 @@
   --text-eyebrow-sm: var(--text-xs-meta);
   --text-eyebrow-md: var(--text-sm-meta);
 
-  --text-badge-sm: var(--text-xs-meta);
-  --text-badge-md: var(--text-sm-meta);
+  /* Badge type scale — sm aligns with field sm; md aligns with field control body (`text-md`). */
+  --text-badge-sm: var(--text-xs);
+  --text-badge-md: var(--text-md);
 
   --text-table-body: var(--text-sm-meta);
   --text-table-stat: var(--text-xs);

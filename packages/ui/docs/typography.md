@@ -202,13 +202,15 @@ Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/
 
 Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
 
-| Token / utility       | px @ 16px root | Use                                                                                |
-| --------------------- | -------------- | ---------------------------------------------------------------------------------- |
-| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                                   |
-| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-badge-sm`, `text-eyebrow-sm`                    |
-| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-badge-md`, `text-eyebrow-md`, `text-table-body` |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                           |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                             |
+| Token / utility       | px @ 16px root | Use                                                               |
+| --------------------- | -------------- | ----------------------------------------------------------------- |
+| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                  |
+| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-eyebrow-sm`                    |
+| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-eyebrow-md`, `text-table-body` |
+| `text-badge-sm`       | 12             | Badge / dismissible-badge `size="sm"` — aliases `--text-xs`       |
+| `text-badge-md`       | 15             | Badge / dismissible-badge `size="md"` — aliases `--text-md`       |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                          |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`            |
 
 Prefer semantic aliases (`text-eyebrow-sm`, `text-badge-sm`) in component variants; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).

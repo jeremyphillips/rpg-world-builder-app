@@ -53,9 +53,11 @@ export type TextareaVariantProps = VariantProps<typeof textareaVariants>
  *   than `flex-basis` percentages, which keeps them gap-safe and lets mixed
  *   denominators compose (weights use a base-12 scale: `1/2`→6, `1/3`→4,
  *   `2/3`→8, `1/4`→3, `3/4`→9, so e.g. `1/4 + 1/4 + 1/2` resolves to 25/25/50).
+ *   Each fraction also sets a matching `max-w-*` cap so a lone fractional field
+ *   in a row does not expand to the full row width.
  *
- * Fractions only have meaning inside a flex `FieldRow`; outside one they behave
- * like `full`.
+ * Fractions only compose horizontally inside a flex `FieldRow`. Outside a row,
+ * `max-w-*` still caps width but `grow` follows the parent flex direction.
  */
 export const fieldWidthVariants = cva('', {
   variants: {
@@ -67,11 +69,11 @@ export const fieldWidthVariants = cva('', {
       xl: 'max-w-64 flex-none',
       auto: 'w-fit flex-none',
       full: 'w-full flex-1',
-      '1/2': 'basis-0 grow-[6]',
-      '1/3': 'basis-0 grow-[4]',
-      '2/3': 'basis-0 grow-[8]',
-      '1/4': 'basis-0 grow-[3]',
-      '3/4': 'basis-0 grow-[9]',
+      '1/2': 'min-w-0 max-w-1/2 basis-0 grow-[6]',
+      '1/3': 'min-w-0 max-w-1/3 basis-0 grow-[4]',
+      '2/3': 'min-w-0 max-w-2/3 basis-0 grow-[8]',
+      '1/4': 'min-w-0 max-w-1/4 basis-0 grow-[3]',
+      '3/4': 'min-w-0 max-w-3/4 basis-0 grow-[9]',
     },
   },
   defaultVariants: {

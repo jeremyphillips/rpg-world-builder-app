@@ -299,13 +299,19 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
       ],
     },
     {
-      type: 'combobox',
-      name: 'classIds',
-      label: 'Classes',
-      multiple: true,
-      options: ctx.options?.spellcastingClasses ?? [],
-      placeholder: 'Choose classes…',
-      required: true,
+      kind: 'row',
+      fields: [
+        {
+          type: 'combobox',
+          name: 'classIds',
+          label: 'Classes',
+          multiple: true,
+          options: ctx.options?.spellcastingClasses ?? [],
+          placeholder: 'Choose classes…',
+          required: true,
+          width: '1/2',
+        },
+      ],
     },
   ]
 }
