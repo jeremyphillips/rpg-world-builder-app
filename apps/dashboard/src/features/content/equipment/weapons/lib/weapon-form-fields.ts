@@ -172,6 +172,7 @@ export function weaponFormFieldGroup(): FormItem {
             required: true,
             optionAvailability: weaponMasteryOptionAvailability,
             dynamicHint: weaponMasteryDynamicHint,
+            hintPosition: 'below-control',
           },
         ],
       },
