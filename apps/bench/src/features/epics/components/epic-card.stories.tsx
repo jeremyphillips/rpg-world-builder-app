@@ -19,6 +19,14 @@ export const Default: Story = {
   },
 }
 
+export const WithCustomBadgeColor: Story = {
+  args: {
+    epic: { ...sampleEpic, badgeColor: '#16a34a', title: 'Rules Configuration' },
+    counts: { open: 4, blocked: 0, done: 0 },
+    recentlyActive: sampleEpicTickets.slice(0, 3),
+  },
+}
+
 export const EmptyRecentlyActive: Story = {
   args: {
     epic: sampleEpic,

@@ -3,10 +3,13 @@ import type { ComboboxFieldOption } from '@rpg/ui'
 import { cn, Text } from '@rpg/ui'
 import { X } from 'lucide-react'
 
+import { benchTicketPath } from '@/app/routes'
+
 import {
   ticketLinkSelectedPreviewBodyClasses,
   ticketLinkSelectedPreviewClasses,
   ticketLinkSelectedPreviewKeyClasses,
+  ticketLinkSelectedPreviewLinkClasses,
   ticketLinkSelectedPreviewRemoveClasses,
   ticketLinkSelectedPreviewTitleClasses,
 } from './ticket-link-selected-preview.variants'
@@ -42,13 +45,30 @@ export function TicketLinkSelectedPreview({
   disabled,
 }: TicketLinkSelectedPreviewProps) {
   const { key, title } = resolveTicketKeyAndTitle(option, ticket)
+  const detailHref = option.value ? benchTicketPath(option.value) : undefined
+
+  const body = (
+    <>
+      <Text className={ticketLinkSelectedPreviewKeyClasses}>{key}</Text>
+      <Text className={ticketLinkSelectedPreviewTitleClasses}>{title}</Text>
+    </>
+  )
 
   return (
     <div className={ticketLinkSelectedPreviewClasses}>
-      <div className={ticketLinkSelectedPreviewBodyClasses}>
-        <Text className={ticketLinkSelectedPreviewKeyClasses}>{key}</Text>
-        <Text className={ticketLinkSelectedPreviewTitleClasses}>{title}</Text>
-      </div>
+      {detailHref ? (
+        <a
+          href={detailHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={ticketLinkSelectedPreviewLinkClasses}
+          aria-label={`Open ${key} in new tab`}
+        >
+          {body}
+        </a>
+      ) : (
+        <div className={ticketLinkSelectedPreviewBodyClasses}>{body}</div>
+      )}
       <button
         type="button"
         className={cn(ticketLinkSelectedPreviewRemoveClasses)}

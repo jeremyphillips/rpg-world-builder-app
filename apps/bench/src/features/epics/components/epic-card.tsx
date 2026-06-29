@@ -5,34 +5,51 @@ import type { Ticket } from '@rpg/contracts/dev-bench'
 import type { EpicTicketBucket } from '@rpg/dev-bench-core'
 import { Card, CardContent, extractRichTextContent, Text } from '@rpg/ui'
 
-import { benchEpicPath } from '@/app/routes'
+import { benchEpicPath, benchTicketPath } from '@/app/routes'
 import { PriorityBadge } from '@/features/tickets'
+import { epicBadgeBackgroundColor } from '@/features/tickets/lib/epic-badge.lib'
 
 import { EpicStatusBadge } from './epic-status-badge'
 import { EpicTicketCounts } from './epic-ticket-counts'
+import {
+  epicCardAccentStripeClasses,
+  epicCardHeaderBodyClasses,
+  epicCardHeaderClasses,
+  epicCardRecentItemClasses,
+  epicCardRecentSectionLabelClasses,
+} from './epic-card.variants'
 
 interface EpicCardProps {
   epic: Epic
   counts: Record<EpicTicketBucket, number>
   recentlyActive: Ticket[]
+  onSelectTicket?: (ticketId: string) => void
 }
 
-export function EpicCard({ epic, counts, recentlyActive }: EpicCardProps) {
+export function EpicCard({ epic, counts, recentlyActive, onSelectTicket }: EpicCardProps) {
   const descriptionSummary = epic.description ? extractRichTextContent(epic.description) : undefined
   const summary = epic.goal?.trim() || descriptionSummary
+  const accentColor = epicBadgeBackgroundColor(epic.badgeColor)
 
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
-        <div className="space-y-1">
-          <Link to={benchEpicPath(epic.id)} className="font-medium hover:underline">
-            {epic.title}
-          </Link>
-          {summary ? (
-            <Text variant="small" className="line-clamp-2 text-muted-foreground">
-              {summary}
-            </Text>
-          ) : null}
+        <div className={epicCardHeaderClasses}>
+          <div
+            className={epicCardAccentStripeClasses}
+            style={{ backgroundColor: accentColor }}
+            aria-hidden
+          />
+          <div className={epicCardHeaderBodyClasses}>
+            <Link to={benchEpicPath(epic.id)} className="font-medium hover:underline">
+              {epic.title}
+            </Link>
+            {summary ? (
+              <Text variant="small" className="line-clamp-2 text-muted-foreground">
+                {summary}
+              </Text>
+            ) : null}
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <EpicStatusBadge status={epic.status} />
@@ -46,13 +63,23 @@ export function EpicCard({ epic, counts, recentlyActive }: EpicCardProps) {
         <EpicTicketCounts counts={counts} />
         {recentlyActive.length > 0 ? (
           <div className="space-y-1">
-            <Text variant="small" className="font-medium">
-              Recently active
-            </Text>
-            <ul className="space-y-0.5 text-xs text-muted-foreground">
+            <Text className={epicCardRecentSectionLabelClasses}>Recently active</Text>
+            <ul className="space-y-0.5">
               {recentlyActive.map((ticket) => (
-                <li key={ticket.id} className="truncate">
-                  {ticket.key}: {ticket.title}
+                <li key={ticket.id}>
+                  {onSelectTicket ? (
+                    <button
+                      type="button"
+                      className={epicCardRecentItemClasses}
+                      onClick={() => onSelectTicket(ticket.id)}
+                    >
+                      {ticket.key}: {ticket.title}
+                    </button>
+                  ) : (
+                    <Link to={benchTicketPath(ticket.id)} className={epicCardRecentItemClasses}>
+                      {ticket.key}: {ticket.title}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

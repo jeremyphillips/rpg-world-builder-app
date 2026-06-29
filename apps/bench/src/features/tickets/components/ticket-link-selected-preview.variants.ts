@@ -3,6 +3,11 @@ export const ticketLinkSelectedPreviewClasses =
 
 export const ticketLinkSelectedPreviewBodyClasses = 'min-w-0 flex-1 space-y-0.5'
 
+export const ticketLinkSelectedPreviewLinkClasses = [
+  ticketLinkSelectedPreviewBodyClasses,
+  'rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+].join(' ')
+
 export const ticketLinkSelectedPreviewKeyClasses = 'font-mono text-xs text-muted-foreground'
 
 export const ticketLinkSelectedPreviewTitleClasses = 'truncate text-sm'

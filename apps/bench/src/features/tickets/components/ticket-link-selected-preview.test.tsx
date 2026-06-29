@@ -23,6 +23,24 @@ describe('TicketLinkSelectedPreview', () => {
     expect(screen.getByText(sampleTicket.title)).toBeInTheDocument()
   })
 
+  it('links to ticket detail in a new tab', () => {
+    render(
+      <TicketLinkSelectedPreview
+        option={{
+          value: sampleTicket.id,
+          label: `${sampleTicket.key} — ${sampleTicket.title}`,
+        }}
+        ticket={sampleTicket}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: `Open ${sampleTicket.key} in new tab` })
+    expect(link).toHaveAttribute('href', `/tickets/${sampleTicket.id}`)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('calls onRemove when dismiss is clicked', async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()
@@ -53,6 +71,10 @@ describe('TicketLinkSelectedPreview', () => {
 
     expect(screen.getByText('Unknown ticket')).toBeInTheDocument()
     expect(screen.getByText('507f1f77bcf86cd799439011')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open Unknown ticket in new tab' })).toHaveAttribute(
+      'href',
+      '/tickets/missing-ticket',
+    )
   })
 
   it('has no axe accessibility violations', async () => {
