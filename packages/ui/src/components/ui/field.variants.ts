@@ -35,9 +35,13 @@ export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2 pt-1'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-5'
+export const fieldSubgroupLegendSpacingClasses = 'mb-4'
 /** Shared legend typography — field groups, array sections, and collapsible accordion triggers. */
 export const fieldGroupLegendTypographyClasses =
   'text-field-group-legend font-heading leading-none text-foreground'
+/** Nested subgroup legend typography — smaller scale for groups inside another group. */
+export const fieldSubgroupLegendTypographyClasses =
+  'text-field-subgroup-legend font-heading leading-none text-foreground'
 export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
 export const fieldArrayItemActionRowClasses = cn(
@@ -83,6 +87,16 @@ export const fieldLabelVariants = cva(
   },
 )
 
-export const fieldGroupLegendVariants = cva(
-  cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
-)
+export type FieldGroupLegendSize = 'section' | 'subsection'
+
+export const fieldGroupLegendVariants = cva('', {
+  variants: {
+    size: {
+      section: cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
+      subsection: cn(fieldSubgroupLegendSpacingClasses, fieldSubgroupLegendTypographyClasses),
+    },
+  },
+  defaultVariants: {
+    size: 'section',
+  },
+})

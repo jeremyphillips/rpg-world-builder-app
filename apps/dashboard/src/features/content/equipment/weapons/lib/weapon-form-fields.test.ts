@@ -51,6 +51,20 @@ describe('weapon kindFieldGroups', () => {
     expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Weapon' })
   })
 
+  it('uses subsection legend size on the nested Damage group', () => {
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
+    const damageGroup = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
+        'kind' in field && field.kind === 'group' && field.legend === 'Damage',
+    )
+
+    expect(damageGroup).toMatchObject({
+      kind: 'group',
+      legend: 'Damage',
+      legendSize: 'subsection',
+    })
+  })
+
   it('uses diceFormula fields with auto width for damage and versatile damage', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
     const damageRow = damageRowFromWeaponGroup(weaponGroup)
@@ -135,8 +149,23 @@ describe('weapon kindFieldGroups', () => {
 
   it('wires range visibility from mode and thrown property', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
-    const rangeRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+    const rangeGroup = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
+        'kind' in field && field.kind === 'group' && field.legend === 'Range',
+    )
+    if (!rangeGroup || !('fields' in rangeGroup)) {
+      throw new Error('expected Range group')
+    }
+
+    expect(rangeGroup).toMatchObject({
+      legendSize: 'subsection',
+      visibility: {
+        dependsOn: ['mode', 'properties'],
+      },
+    })
+
+    const rangeRow = rangeGroup.fields.find(
+      (field): field is Extract<(typeof rangeGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
         field.fields.some((child) => !('kind' in child) && child.name === 'rangeNormal'),
@@ -146,8 +175,8 @@ describe('weapon kindFieldGroups', () => {
     }
 
     for (const [name, label] of [
-      ['rangeNormal', 'Normal range'],
-      ['rangeLong', 'Long range'],
+      ['rangeNormal', 'Normal'],
+      ['rangeLong', 'Long'],
     ] as const) {
       expect(
         rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
@@ -158,9 +187,6 @@ describe('weapon kindFieldGroups', () => {
         min: 0,
         valueDigits: 3,
         width: 'auto',
-        visibility: {
-          dependsOn: ['mode', 'properties'],
-        },
       })
     }
   })

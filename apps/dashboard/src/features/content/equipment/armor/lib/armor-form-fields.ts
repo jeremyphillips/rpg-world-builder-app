@@ -37,6 +37,13 @@ function visibleWhenArmorDexCap(): FieldVisibility {
   }
 }
 
+function visibleWhenArmorHeavy(): FieldVisibility {
+  return {
+    dependsOn: ['armorCategory'],
+    visibleWhen: (v) => v.armorCategory === 'heavy',
+  }
+}
+
 /** Armor-specific form field group for the unified equipment form. */
 export function armorFormFieldGroup(): FormItem {
   return {
@@ -52,12 +59,14 @@ export function armorFormFieldGroup(): FormItem {
             label: 'Category',
             options: armorCategoryOptions,
             required: true,
+            width: 'lg',
           },
           {
             type: 'select',
             name: 'material',
             label: 'Material',
             options: armorMaterialOptions,
+            width: 'lg',
           },
         ],
       },
@@ -68,6 +77,7 @@ export function armorFormFieldGroup(): FormItem {
         min: 0,
         visibility: visibleWhenArmorNotShield(),
         required: true,
+        digits: 2,
       },
       {
         type: 'number',
@@ -85,20 +95,26 @@ export function armorFormFieldGroup(): FormItem {
             name: 'addDexModifier',
             label: 'Add Dex modifier',
             visibility: visibleWhenArmorNotShield(),
+            width: 'auto',
+            labelPosition: 'above',
           },
           {
             type: 'number',
             name: 'maxDexBonus',
             label: 'Max Dex bonus',
             min: 0,
+            digits: 2,
             visibility: visibleWhenArmorDexCap(),
+            width: 'auto',
+          },
+          {
+            type: 'switch',
+            name: 'stealthDisadvantage',
+            label: 'Stealth disadvantage',
+            width: 'auto',
+            labelPosition: 'above',
           },
         ],
-      },
-      {
-        type: 'switch',
-        name: 'stealthDisadvantage',
-        label: 'Stealth disadvantage',
       },
       {
         type: 'number',
@@ -106,8 +122,10 @@ export function armorFormFieldGroup(): FormItem {
         label: 'Strength requirement',
         min: ABILITY_SCORE_MIN,
         max: ABILITY_SCORE_MAX,
-        width: 'xs',
+        digits: 2,
+        width: 'auto',
         hint: 'Minimum Strength to avoid speed penalty (heavy armor)',
+        visibility: visibleWhenArmorHeavy(),
       },
     ],
   }

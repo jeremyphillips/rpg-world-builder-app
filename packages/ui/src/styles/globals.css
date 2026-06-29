@@ -135,6 +135,8 @@
   /* Form chrome — group/section legend type scale. */
   --text-field-group-legend: var(--text-2xl);
   --text-field-group-legend--line-height: var(--text-2xl--line-height);
+  --text-field-subgroup-legend: var(--text-xl);
+  --text-field-subgroup-legend--line-height: var(--text-xl--line-height);
 
   --tracking-heading: -0.025em;
   --leading-none: 1;

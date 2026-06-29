@@ -276,17 +276,13 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
   }
 
   if (item.kind === 'group') {
+    if (item.visibility) {
+      return (
+        <ConditionalGroup item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+      )
+    }
     return (
-      <FieldGroup legend={item.legend} description={item.description} className={item.className}>
-        <FormSectionContext.Provider value={childContext}>
-          <NestedFormItems
-            items={item.fields}
-            idPrefix={idPrefix}
-            namePrefix={namePrefix}
-            depth={depth + 1}
-          />
-        </FormSectionContext.Provider>
-      </FieldGroup>
+      <GroupFieldSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
     )
   }
 
@@ -395,6 +391,52 @@ function FieldNode({ config, idPrefix, namePrefix }: FieldNodeProps) {
     return <ConditionalField config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
   return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+}
+
+interface GroupFieldSectionProps {
+  item: GroupConfig
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+function GroupFieldSection({ item, idPrefix, namePrefix, depth }: GroupFieldSectionProps) {
+  const childContext = React.useMemo(
+    () => ({ collapsibleSections: false, depth: depth + 1 }),
+    [depth],
+  )
+
+  return (
+    <FieldGroup
+      legend={item.legend}
+      legendSize={item.legendSize}
+      description={item.description}
+      className={item.className}
+    >
+      <FormSectionContext.Provider value={childContext}>
+        <NestedFormItems
+          items={item.fields}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+          depth={depth + 1}
+        />
+      </FormSectionContext.Provider>
+    </FieldGroup>
+  )
+}
+
+interface ConditionalGroupProps {
+  item: GroupConfig
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+/** Hides a nested group when its `visibility` predicate is false. */
+function ConditionalGroup({ item, idPrefix, namePrefix, depth }: ConditionalGroupProps) {
+  const values = useVisibilityValues(item.visibility!, namePrefix)
+  if (!item.visibility!.visibleWhen(values)) return null
+  return <GroupFieldSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
 }
 
 interface ConditionalArrayFieldProps {

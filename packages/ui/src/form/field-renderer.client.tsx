@@ -205,7 +205,6 @@ const fieldRenderers: {
       label={config.label}
       error={error}
       hint={config.hint}
-      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -474,7 +473,9 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
-  const render = fieldRenderers[renderConfig.type] as (args: RenderArgs<FieldType>) => React.ReactElement
+  const render = fieldRenderers[renderConfig.type] as (
+    args: RenderArgs<FieldType>,
+  ) => React.ReactElement
   return render({
     config: renderConfig,
     field,

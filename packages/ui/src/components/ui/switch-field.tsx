@@ -34,8 +34,7 @@ export function SwitchField({
   labelPosition = 'inline',
   ...switchProps
 }: SwitchFieldProps) {
-  const resolvedHintPosition =
-    hintPosition ?? (labelPosition === 'inline' ? 'below-control' : 'below-label')
+  const resolvedHintPosition = hintPosition ?? 'below-label'
 
   const labelNode = (
     <Field.Label className={labelPosition === 'inline' ? 'font-normal' : undefined}>
@@ -61,16 +60,11 @@ export function SwitchField({
         <Field.Control>
           <Switch {...switchProps} />
         </Field.Control>
-        {resolvedHintPosition === 'below-label' ? (
-          <div className={fieldLabelHintStackClasses}>
-            {labelNode}
-            <Field.Hint />
-          </div>
-        ) : (
-          labelNode
-        )}
+        <div className={fieldLabelHintStackClasses}>
+          {labelNode}
+          <Field.Hint />
+        </div>
       </div>
-      {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
       <Field.Error />
     </Field.Root>
   )

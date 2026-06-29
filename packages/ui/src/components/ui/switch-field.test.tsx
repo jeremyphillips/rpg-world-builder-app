@@ -33,4 +33,24 @@ describe('SwitchField', () => {
       label.compareDocumentPosition(switchControl) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
   })
+
+  it('stacks inline label and hint in the same column beside the switch', () => {
+    render(
+      <SwitchField
+        id="multiclass"
+        label="Allow multiclassing"
+        hint="When off, characters cannot take levels in additional classes."
+      />,
+    )
+    const label = screen.getByText('Allow multiclassing')
+    const hint = screen.getByText('When off, characters cannot take levels in additional classes.')
+    const textColumn = label.parentElement
+
+    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
+    expect(textColumn).toContainElement(hint)
+    expect(
+      textColumn?.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
+  })
 })

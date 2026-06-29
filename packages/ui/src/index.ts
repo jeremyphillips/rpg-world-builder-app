@@ -131,7 +131,11 @@ export { JsonField, type JsonFieldProps } from './components/ui/json-field.clien
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown-field.client'
 
-export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
+export {
+  FieldGroup,
+  type FieldGroupLegendSize,
+  type FieldGroupProps,
+} from './components/ui/field-group'
 export {
   fieldArrayItemActionRowClasses,
   fieldArrayItemClasses,

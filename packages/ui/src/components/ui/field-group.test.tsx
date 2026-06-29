@@ -38,6 +38,16 @@ describe('FieldGroup', () => {
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
   })
 
+  it('renders a subsection legend at the smaller type scale', () => {
+    render(
+      <FieldGroup legend="Damage" legendSize="subsection">
+        <TextField id="damage-dice" label="Dice" />
+      </FieldGroup>,
+    )
+    expect(screen.getByText('Damage')).toHaveClass('text-field-subgroup-legend')
+    expect(screen.getByText('Damage')).not.toHaveClass('text-field-group-legend')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldGroup legend="Character basics">

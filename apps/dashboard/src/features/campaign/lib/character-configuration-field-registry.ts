@@ -253,8 +253,9 @@ function extendedProgressionGroup(): FormItem {
             label: 'Tier name',
             hint: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
             required: true,
-            width: '1/2',
+            width: 'xl',
             visibility: visibleWhenExtendedProgression(),
+            hintPosition: 'below-control',
           },
           {
             type: 'number',

@@ -18,7 +18,11 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { FieldRowLayout, FieldHintPosition } from '../components/ui/field.variants'
+import type {
+  FieldRowLayout,
+  FieldHintPosition,
+  FieldGroupLegendSize,
+} from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -488,6 +492,10 @@ export interface GroupConfig {
   description?: string
   fields: GroupFieldItem[]
   className?: string
+  /** Legend scale — `subsection` (20px) for nested groups inside another group. */
+  legendSize?: FieldGroupLegendSize
+  /** When hidden, the whole group unmounts and nested field values clear. */
+  visibility?: FieldVisibility
   /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }

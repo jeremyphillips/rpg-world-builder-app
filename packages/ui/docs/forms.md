@@ -124,7 +124,7 @@ while present — so never encode required-ness or validation rules as a hint.
 `below-label` (default) or `below-control`. Default forms render the hint in a
 tighter cluster under the label (`fieldLabelHintStackClasses`) before the
 control; errors always render after the control. Inline checkbox and switch
-fields default to `below-control` unless overridden.
+fields stack the hint under the label in the text column beside the control.
 
 ## Field spacing
 
@@ -689,6 +689,35 @@ keyed by column (`Record<columnKey, (number | null)[]>`); `null` means blank/uns
   confirm-replace.
 - Default value: a null-filled grid for every configured column (`fieldDefaultValue`).
   Override with an explicit `defaultValue` when seeding from existing data.
+
+## Nested groups
+
+`GroupConfig.fields` may contain another `kind: 'group'` for semantic subsections
+(e.g. a **Damage** block inside **Weapon**). Top-level groups use the section
+legend scale (`text-field-group-legend`, 24px). Pass `legendSize: 'subsection'`
+on nested groups for the smaller scale (`text-field-subgroup-legend`, 20px):
+
+```ts
+{
+  kind: 'group',
+  legend: 'Weapon',
+  fields: [
+    { /* category, mode, … */ },
+    {
+      kind: 'group',
+      legend: 'Damage',
+      legendSize: 'subsection',
+      fields: [/* damageKind, damageDice, … */],
+    },
+  ],
+}
+```
+
+`FieldGroup` (standalone usage outside `<Form>`) accepts the same `legendSize`
+prop. Array and collapsible section legends always use the section scale.
+
+Nested groups may declare `visibility` (same contract as leaf fields). When hidden,
+the whole subgroup — legend and fields — unmounts and nested values clear.
 
 ## Collapsible sections
 

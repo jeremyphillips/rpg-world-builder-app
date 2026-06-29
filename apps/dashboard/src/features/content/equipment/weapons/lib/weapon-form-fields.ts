@@ -192,6 +192,7 @@ export function weaponFormFieldGroup(): FormItem {
       {
         kind: 'group',
         legend: 'Damage',
+        legendSize: 'subsection',
         fields: [
           {
             kind: 'row',
@@ -250,18 +251,24 @@ export function weaponFormFieldGroup(): FormItem {
         ],
       },
       {
-        kind: 'row',
+        kind: 'group',
+        legend: 'Range',
+        legendSize: 'subsection',
+        visibility: visibleWhenRangeFields(),
         fields: [
-          feetInputUnitField('rangeNormal', 'Normal range', {
-            valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-            width: 'auto',
-            visibility: visibleWhenRangeFields(),
-          }),
-          feetInputUnitField('rangeLong', 'Long range', {
-            valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-            width: 'auto',
-            visibility: visibleWhenRangeFields(),
-          }),
+          {
+            kind: 'row',
+            fields: [
+              feetInputUnitField('rangeNormal', 'Normal', {
+                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+                width: 'auto',
+              }),
+              feetInputUnitField('rangeLong', 'Long', {
+                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+                width: 'auto',
+              }),
+            ],
+          },
         ],
       },
       {

@@ -81,3 +81,4 @@ export {
   type SlotConfig,
   type FormItem,
 } from './field-config'
+export type { FieldGroupLegendSize } from '../components/ui/field.variants'
