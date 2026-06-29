@@ -38,14 +38,21 @@ export function DialogCloseButton({ closeLabel }: { closeLabel: string }) {
 }
 
 export interface DialogPanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Optional line above the title (e.g. monospace id, status kicker). */
+  kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
+  /** Merged onto the dialog title element (overrides default heading styles). */
+  headlineClassName?: string
 }
 
 export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHeaderProps>(
-  ({ className, headline, description, children, ...props }, ref) => (
+  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
     <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      <DialogPrimitive.Title className={headingVariants({ variant: 'card' })}>
+      {kicker ? <div className="text-sm">{kicker}</div> : null}
+      <DialogPrimitive.Title
+        className={cn(headingVariants({ variant: 'card' }), headlineClassName)}
+      >
         {headline}
       </DialogPrimitive.Title>
       {description ? (

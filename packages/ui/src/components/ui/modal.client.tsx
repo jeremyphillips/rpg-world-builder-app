@@ -84,18 +84,22 @@ ModalContent.displayName = 'Modal.Content'
 
 export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Required title — maps to `Dialog.Title` for the `aria-labelledby` wiring. */
+  kicker?: React.ReactNode
   headline: React.ReactNode
   /** Optional supporting copy — maps to `Dialog.Description`. */
   description?: React.ReactNode
+  headlineClassName?: string
 }
 
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
-  ({ className, headline, description, children, ...props }, ref) => (
+  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
     <ModalHeaderBase
       ref={ref}
       className={className}
+      kicker={kicker}
       headline={headline}
       description={description}
+      headlineClassName={headlineClassName}
       {...props}
     >
       {children}

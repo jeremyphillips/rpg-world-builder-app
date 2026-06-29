@@ -3,7 +3,7 @@ import { Spinner, Text, Sheet } from '@rpg/ui'
 
 import { useTicket } from '../hooks/use-ticket'
 import { TicketDetailForm } from './ticket-detail-form'
-import { TicketMeta } from './ticket-meta'
+import { TicketMetaKicker, TicketMetaTimestamps, ticketMetaTitleClasses } from './ticket-meta'
 
 interface TicketDetailDrawerProps {
   ticketId: string | null
@@ -17,6 +17,13 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content side="right" className="w-full max-w-2xl overflow-y-auto">
+        {ticket ? (
+          <Sheet.Header
+            kicker={<TicketMetaKicker ticket={ticket} detailHref={benchTicketPath(ticket.id)} />}
+            headline={ticket.title}
+            headlineClassName={ticketMetaTitleClasses}
+          />
+        ) : null}
         <Sheet.Body className="space-y-4">
           {isPending ? <Spinner /> : null}
           {isError ? (
@@ -26,7 +33,7 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
           ) : null}
           {ticket ? (
             <>
-              <TicketMeta ticket={ticket} detailHref={benchTicketPath(ticket.id)} />
+              <TicketMetaTimestamps ticket={ticket} />
               <TicketDetailForm ticket={ticket} transparentStickyChrome />
             </>
           ) : null}
