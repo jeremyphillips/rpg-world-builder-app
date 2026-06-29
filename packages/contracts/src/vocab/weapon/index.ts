@@ -1,4 +1,5 @@
 export * from './category'
+export * from './compatibility'
 export * from './mode'
 export * from './property'
 export * from './mastery'
