@@ -1,4 +1,4 @@
-import type { Epic, Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
+import type { Epic, Ticket } from '@rpg/contracts/dev-bench'
 
 import { TICKET_PRIORITY_WEIGHT } from '../scoring/priority-weight'
 
@@ -13,23 +13,23 @@ const EPIC_STATUS_ORDER: Record<Epic['status'], number> = {
 
 const PRIORITY_WEIGHT = TICKET_PRIORITY_WEIGHT
 
-export function epicTicketBucket(status: TicketStatus): EpicTicketBucket | null {
-  switch (status) {
-    case 'backlog':
-    case 'up_next':
-    case 'in_progress':
-      return 'open'
-    case 'blocked':
-      return 'blocked'
-    case 'done':
-      return 'done'
+type EpicTicketBucketInput = Pick<Ticket, 'status' | 'blockedByTicketIds'>
+
+export function epicTicketBucket(ticket: EpicTicketBucketInput): EpicTicketBucket | null {
+  switch (ticket.status) {
     case 'wont_do':
       return null
+    case 'done':
+      return 'done'
+    case 'blocked':
+      return 'blocked'
+    default:
+      return ticket.blockedByTicketIds.length > 0 ? 'blocked' : 'open'
   }
 }
 
 function isQualifyingEpicTicket(ticket: Ticket): boolean {
-  return epicTicketBucket(ticket.status) !== null
+  return epicTicketBucket(ticket) !== null
 }
 
 function compareUpdatedAtDesc(a: Ticket, b: Ticket): number {
@@ -40,7 +40,7 @@ export function countEpicTicketsByBucket(tickets: Ticket[]): Record<EpicTicketBu
   const counts: Record<EpicTicketBucket, number> = { open: 0, blocked: 0, done: 0 }
 
   for (const ticket of tickets) {
-    const bucket = epicTicketBucket(ticket.status)
+    const bucket = epicTicketBucket(ticket)
     if (bucket) counts[bucket] += 1
   }
 
@@ -51,7 +51,7 @@ export function groupEpicTicketsByBucket(tickets: Ticket[]): Record<EpicTicketBu
   const groups: Record<EpicTicketBucket, Ticket[]> = { open: [], blocked: [], done: [] }
 
   for (const ticket of tickets) {
-    const bucket = epicTicketBucket(ticket.status)
+    const bucket = epicTicketBucket(ticket)
     if (bucket) groups[bucket].push(ticket)
   }
 

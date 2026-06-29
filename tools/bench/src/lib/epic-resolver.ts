@@ -1,5 +1,5 @@
 import type { Epic } from '@rpg/contracts/dev-bench'
-import { normalizeEpicTitle } from '@rpg/dev-bench-core'
+import { EpicResolutionError, findEpicsByTitle } from '@rpg/dev-bench-core'
 
 import { CliError } from './errors'
 
@@ -27,19 +27,27 @@ export function resolveEpicReference(
     return { epicId: input.epicId ?? null, warnings }
   }
 
-  const normalizedName = normalizeEpicTitle(input.epicName)
-  const matches = epics.filter((epic) => normalizeEpicTitle(epic.title) === normalizedName)
+  try {
+    const matches = findEpicsByTitle(epics, input.epicName)
 
-  if (matches.length > 1) {
-    throw new CliError('AMBIGUOUS_EPIC', `Multiple epics match epicName "${input.epicName}".`, {
-      matches: matches.map((epic) => ({ id: epic.id, title: epic.title })),
-    })
+    if (matches.length > 1) {
+      throw new EpicResolutionError(
+        'AMBIGUOUS_EPIC',
+        `Multiple epics match epicName "${input.epicName}".`,
+        { matches: matches.map((epic) => ({ id: epic.id, title: epic.title })) },
+      )
+    }
+
+    if (matches.length === 0) {
+      warnings.push(`No epic matched epicName "${input.epicName}"; ticket created without epic.`)
+      return { epicId: null, warnings }
+    }
+
+    return { epicId: matches[0]!.id, warnings }
+  } catch (error) {
+    if (error instanceof EpicResolutionError && error.code === 'AMBIGUOUS_EPIC') {
+      throw new CliError('AMBIGUOUS_EPIC', error.message, error.details)
+    }
+    throw error
   }
-
-  if (matches.length === 0) {
-    warnings.push(`No epic matched epicName "${input.epicName}"; ticket created without epic.`)
-    return { epicId: null, warnings }
-  }
-
-  return { epicId: matches[0]!.id, warnings }
 }

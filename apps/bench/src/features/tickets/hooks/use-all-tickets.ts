@@ -3,10 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchTickets } from '../api/tickets-client'
 import { ticketQueryKeys } from './ticket-query-keys'
 
-/** All tickets for link pickers — unfiltered by status so related/blocker ids resolve. */
-export function useTicketLinkCatalog() {
+/** All tickets — unfiltered by status (epic counts, link pickers, etc.). */
+export function useAllTickets() {
   return useQuery({
-    queryKey: ticketQueryKeys.linkCatalog(),
+    queryKey: ticketQueryKeys.allTickets(),
     queryFn: () => fetchTickets(),
   })
 }

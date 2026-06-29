@@ -42,18 +42,26 @@ function epic(overrides: Partial<Epic> & Pick<Epic, 'id' | 'title'>): Epic {
 
 describe('epicTicketBucket', () => {
   it('maps open statuses', () => {
-    expect(epicTicketBucket('backlog')).toBe('open')
-    expect(epicTicketBucket('up_next')).toBe('open')
-    expect(epicTicketBucket('in_progress')).toBe('open')
+    expect(epicTicketBucket(ticket({ status: 'backlog' }))).toBe('open')
+    expect(epicTicketBucket(ticket({ status: 'up_next' }))).toBe('open')
+    expect(epicTicketBucket(ticket({ status: 'in_progress' }))).toBe('open')
   })
 
   it('maps blocked and done', () => {
-    expect(epicTicketBucket('blocked')).toBe('blocked')
-    expect(epicTicketBucket('done')).toBe('done')
+    expect(epicTicketBucket(ticket({ status: 'blocked' }))).toBe('blocked')
+    expect(epicTicketBucket(ticket({ status: 'done' }))).toBe('done')
+  })
+
+  it('treats blockedByTicketIds as blocked for non-done tickets', () => {
+    expect(
+      epicTicketBucket(
+        ticket({ status: 'in_progress', blockedByTicketIds: ['507f1f77bcf86cd799439099'] }),
+      ),
+    ).toBe('blocked')
   })
 
   it('excludes wont_do', () => {
-    expect(epicTicketBucket('wont_do')).toBeNull()
+    expect(epicTicketBucket(ticket({ status: 'wont_do' }))).toBeNull()
   })
 })
 
@@ -63,11 +71,16 @@ describe('countEpicTicketsByBucket', () => {
       ticket({ status: 'backlog' }),
       ticket({ id: '2', status: 'in_progress' }),
       ticket({ id: '3', status: 'blocked' }),
+      ticket({
+        id: '6',
+        status: 'up_next',
+        blockedByTicketIds: ['507f1f77bcf86cd799439099'],
+      }),
       ticket({ id: '4', status: 'done' }),
       ticket({ id: '5', status: 'wont_do' }),
     ])
 
-    expect(counts).toEqual({ open: 2, blocked: 1, done: 1 })
+    expect(counts).toEqual({ open: 2, blocked: 2, done: 1 })
   })
 })
 

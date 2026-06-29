@@ -77,11 +77,22 @@ Match the epic or primary package touched when obvious.
 
 ### Epic
 
-- Resolve by **`epicName`** (CLI) or **`epicId`** when known.
-- `pnpm bench list-epics` to see titles.
+- Resolve by **`epicName`** or **`epicId`** on list/create flows.
+- `pnpm bench list-tickets --epic-name "Character Builder" --bucket open` for incomplete epic work (API: `GET /api/bench/tickets?epicName=…&bucket=open`).
+- `pnpm bench list-epics` to see titles and ids.
 - Seed epics: Character Builder, Rules Configuration, Campaign Builder, Content Library, Combat Simulator.
 - Tickets may have **no epic** — do not force assignment.
-- **`epicName` is CLI-only** — not in contracts.
+- **`epicName` on create** remains CLI-only JSON; list-tickets accepts `--epic-name` / API `epicName`.
+
+#### List bucket vs epic UI sections
+
+| Filter                       | Meaning                                                             |
+| ---------------------------- | ------------------------------------------------------------------- |
+| API/CLI `bucket=open`        | Not `done`, not `wont_do` — backlog + on-desk, **includes blocked** |
+| Epic detail **Open Tickets** | UI bucket via `epicTicketBucket` — excludes blocked work            |
+| `bucket=done`                | Completed tickets only                                              |
+
+Do not combine `bucket` with single `status` query param.
 
 ### `createdBy`
 

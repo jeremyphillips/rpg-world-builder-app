@@ -27,7 +27,7 @@ export const ticketQueryKeys = {
   lists: () => [...ticketQueryKeys.all, 'list'] as const,
   list: (filters: TicketListFilters) => [...ticketQueryKeys.lists(), filters] as const,
   bench: () => [...ticketQueryKeys.all, 'bench'] as const,
-  linkCatalog: () => [...ticketQueryKeys.all, 'link-catalog'] as const,
+  allTickets: () => [...ticketQueryKeys.all, 'all-tickets'] as const,
   details: () => [...ticketQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...ticketQueryKeys.details(), id] as const,
 }

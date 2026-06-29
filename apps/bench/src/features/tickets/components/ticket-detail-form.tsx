@@ -21,7 +21,7 @@ import {
   type TicketDetailFormValues,
 } from '../lib/ticket-form-def'
 import { useEpicsList } from '@/features/epics'
-import { useTicketLinkCatalog } from '../hooks/use-ticket-link-catalog'
+import { useAllTickets } from '../hooks/use-all-tickets'
 import { useUpdateTicket } from '../hooks/use-update-ticket'
 import { TicketLinkSelectedPreview } from './ticket-link-selected-preview'
 import { TicketMetaTimestamps } from './ticket-meta'
@@ -73,7 +73,7 @@ interface TicketDetailFormProps {
 
 export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormProps) {
   const { data: epics = [] } = useEpicsList()
-  const { data: allTickets = [] } = useTicketLinkCatalog()
+  const { data: allTickets = [] } = useAllTickets()
   const { mutateAsync, isPending, isSuccess } = useUpdateTicket(ticket.id)
 
   const ticketLinkOptions = useMemo(

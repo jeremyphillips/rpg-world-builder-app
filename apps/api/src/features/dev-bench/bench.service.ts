@@ -9,6 +9,11 @@ import type {
   UpdateEpicInput,
   UpdateTicketInput,
 } from '@rpg/contracts/dev-bench'
+import {
+  CLOSED_TICKET_STATUSES,
+  EpicResolutionError,
+  resolveEpicIdForQuery,
+} from '@rpg/dev-bench-core'
 
 import { HttpError } from '../../lib/http-error'
 import type { ListEpicsQuery, ListTicketsQuery } from './bench-query'
@@ -126,7 +131,14 @@ async function validateTicketLinks(
 function buildTicketListFilter(query: ListTicketsQuery): Record<string, unknown> {
   const filter: Record<string, unknown> = {}
 
-  if (query.status !== undefined) filter.status = query.status
+  if (query.bucket === 'open') {
+    filter.status = { $nin: [...CLOSED_TICKET_STATUSES] }
+  } else if (query.bucket === 'done') {
+    filter.status = 'done'
+  } else if (query.status !== undefined) {
+    filter.status = query.status
+  }
+
   if (query.epicId !== undefined) filter.epicId = query.epicId
   if (query.area !== undefined) filter.area = query.area
   if (query.type !== undefined) filter.type = query.type
@@ -146,8 +158,32 @@ function buildEpicListFilter(query: ListEpicsQuery): Record<string, unknown> {
   return filter
 }
 
+async function resolveListTicketsEpicId(query: ListTicketsQuery): Promise<ListTicketsQuery> {
+  if (query.epicId || !query.epicName) {
+    return query
+  }
+
+  const epics = await listEpics({})
+
+  try {
+    const epicId = resolveEpicIdForQuery({ epicName: query.epicName }, epics)
+    return { ...query, epicId, epicName: undefined }
+  } catch (error) {
+    if (error instanceof EpicResolutionError) {
+      if (error.code === 'EPIC_NOT_FOUND') {
+        throw new HttpError(404, 'not_found', error.message)
+      }
+
+      throw HttpError.badRequest(error.message, error.details)
+    }
+
+    throw error
+  }
+}
+
 export async function listTickets(query: ListTicketsQuery): Promise<Ticket[]> {
-  const docs = await DevBenchTicketModel.find(buildTicketListFilter(query))
+  const resolvedQuery = await resolveListTicketsEpicId(query)
+  const docs = await DevBenchTicketModel.find(buildTicketListFilter(resolvedQuery))
     .sort({ createdAt: -1 })
     .lean<TicketRecord[]>()
 

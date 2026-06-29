@@ -7,6 +7,8 @@ import { writeSuccess } from '../lib/output'
 const OPTIONS = {
   status: { type: 'string' as const },
   'epic-id': { type: 'string' as const },
+  'epic-name': { type: 'string' as const },
+  bucket: { type: 'string' as const },
   area: { type: 'string' as const },
   type: { type: 'string' as const },
   priority: { type: 'string' as const },

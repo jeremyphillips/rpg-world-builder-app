@@ -6,7 +6,7 @@ import {
   sortEpicsForDisplay,
 } from '@rpg/dev-bench-core'
 
-import { useTickets } from '@/features/tickets'
+import { useAllTickets } from '@/features/tickets'
 
 import { useEpicsList } from './use-epics-list'
 import type { EpicListFilters } from './epic-query-keys'
@@ -20,7 +20,7 @@ export interface EpicWithCounts {
 
 export function useEpicsWithCounts(filters: EpicListFilters) {
   const epicsQuery = useEpicsList()
-  const ticketsQuery = useTickets({})
+  const ticketsQuery = useAllTickets()
 
   const epicsWithCounts = useMemo(() => {
     const epics = epicsQuery.data ?? []

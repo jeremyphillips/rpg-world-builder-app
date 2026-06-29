@@ -14,6 +14,7 @@ export { TicketTitleSearchInput } from './components/ticket-title-search-input'
 export { TicketFilters } from './components/ticket-filters'
 
 export { fetchTickets } from './api/tickets-client'
+export { useAllTickets } from './hooks/use-all-tickets'
 export { useTickets } from './hooks/use-tickets'
 export { useTicket } from './hooks/use-ticket'
 export { useCreateTicket } from './hooks/use-create-ticket'

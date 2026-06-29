@@ -31,16 +31,17 @@ When the user says **“add this to Dev Bench”** (see [Trigger phrases](#trigg
 
 ## Trigger phrases
 
-| User says                                                                | Recipe                            |
-| ------------------------------------------------------------------------ | --------------------------------- |
-| “add this to Dev Bench”, “add this gap”, “track this”, “create a ticket” | [Add this gap](#add-this-gap)     |
-| “put this on my bench”                                                   | [Put on bench](#put-on-bench)     |
-| “plan BENCH-###”                                                         | [Plan](#plan-bench-)              |
-| “start BENCH-###”                                                        | [Start](#start-bench-)            |
-| “mark blocked”, “link as blocker”                                        | [Mark blocked](#mark-blocked)     |
-| “move … to done”                                                         | [Mark done](#mark-done)           |
-| “won’t pursue”                                                           | [Won’t pursue](#wont-pursue)      |
-| “what should I work on next”, “recommend next”, “suggest next ticket”    | [Recommend next](#recommend-next) |
+| User says                                                                | Recipe                                  |
+| ------------------------------------------------------------------------ | --------------------------------------- |
+| “add this to Dev Bench”, “add this gap”, “track this”, “create a ticket” | [Add this gap](#add-this-gap)           |
+| “put this on my bench”                                                   | [Put on bench](#put-on-bench)           |
+| “plan BENCH-###”                                                         | [Plan](#plan-bench-)                    |
+| “start BENCH-###”                                                        | [Start](#start-bench-)                  |
+| “mark blocked”, “link as blocker”                                        | [Mark blocked](#mark-blocked)           |
+| “move … to done”                                                         | [Mark done](#mark-done)                 |
+| “won’t pursue”                                                           | [Won’t pursue](#wont-pursue)            |
+| “what should I work on next”, “recommend next”, “suggest next ticket”    | [Recommend next](#recommend-next)       |
+| “list open tickets for …”, “what’s open in \<epic\>”                     | [List epic tickets](#list-epic-tickets) |
 
 ---
 
@@ -133,6 +134,17 @@ Use [Required command patterns](#required-command-patterns). Existing CLI only.
 - Offer to [Plan](#plan-bench-) or [Start](#start-bench-) if the user wants to proceed.
 - Epic detail UI has the same heuristic via **Recommend next** on `/epics/:epicId`.
 
+### List epic tickets
+
+- List incomplete work for an epic by title — backlog plus on-desk (`bucket=open` excludes only `done` and `wont_do`; **includes blocked**).
+- Not the same as epic detail **Open Tickets** UI (that section splits blocked out via `epicTicketBucket`).
+
+```bash
+pnpm bench list-tickets --epic-name "Character Builder" --bucket open --format text
+```
+
+- `epicId` wins over `epicName` when both are set. Do not combine `--bucket` with `--status`.
+
 ---
 
 ## Duplicate check
@@ -199,6 +211,12 @@ pnpm bench update-ticket BENCH-042 --json '{
 ```
 
 **Near-term capture:** add `"status": "up_next"` to create JSON, or patch after create.
+
+**List open epic tickets** (`bucket=open` = not done / not wont_do):
+
+```bash
+pnpm bench list-tickets --epic-name "Character Builder" --bucket open --format text
+```
 
 **Recommend next:**
 

@@ -36,6 +36,8 @@ export interface ApiErrorBody {
 export interface ListTicketsQuery {
   status?: TicketStatus
   epicId?: string
+  epicName?: string
+  bucket?: 'open' | 'done'
   area?: TicketArea
   type?: TicketType
   priority?: TicketPriority
@@ -94,6 +96,8 @@ export async function listTickets(query: ListTicketsQuery = {}): Promise<Ticket[
     apiUrl('/tickets', {
       status: query.status,
       epicId: query.epicId,
+      epicName: query.epicName,
+      bucket: query.bucket,
       area: query.area,
       type: query.type,
       priority: query.priority,
@@ -161,6 +165,8 @@ export function buildListTicketsQuery(values: Record<string, unknown>): ListTick
 
   if (typeof values.status === 'string') query.status = values.status as TicketStatus
   if (typeof values['epic-id'] === 'string') query.epicId = values['epic-id']
+  if (typeof values['epic-name'] === 'string') query.epicName = values['epic-name']
+  if (values.bucket === 'open' || values.bucket === 'done') query.bucket = values.bucket
   if (typeof values.area === 'string') query.area = values.area as TicketArea
   if (typeof values.type === 'string') query.type = values.type as TicketType
   if (typeof values.priority === 'string') query.priority = values.priority as TicketPriority

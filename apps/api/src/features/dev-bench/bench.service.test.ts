@@ -74,6 +74,100 @@ describe('listTickets', () => {
     expect(await listTickets({ epicId: epic.id })).toHaveLength(1)
     expect(await listTickets({ area: 'api' })).toHaveLength(1)
   })
+
+  it('filters by epicName case-insensitively', async () => {
+    const epic = await createEpic(
+      createEpicInputSchema.parse({ title: 'Character Builder', area: 'character_builder' }),
+    )
+    await createTicket({ ...baseTicketInput, epicId: epic.id, status: 'backlog' })
+    await createTicket({ ...baseTicketInput, title: 'Other epic work', status: 'backlog' })
+
+    const tickets = await listTickets({ epicName: '  character builder  ' })
+    expect(tickets).toHaveLength(1)
+    expect(tickets[0]?.epicId).toBe(epic.id)
+  })
+
+  it('returns 404 when epicName has no match', async () => {
+    await expect(listTickets({ epicName: 'Missing Epic' })).rejects.toMatchObject({
+      status: 404,
+      code: 'not_found',
+    })
+  })
+
+  it('returns 400 when epicName is ambiguous', async () => {
+    await createEpic(createEpicInputSchema.parse({ title: 'Rules Configuration' }))
+    await createEpic(createEpicInputSchema.parse({ title: 'rules configuration' }))
+
+    await expect(listTickets({ epicName: 'Rules Configuration' })).rejects.toMatchObject({
+      status: 400,
+      code: 'bad_request',
+    })
+  })
+
+  it('prefers epicId over epicName when both are set', async () => {
+    const characterEpic = await createEpic(
+      createEpicInputSchema.parse({ title: 'Character Builder', area: 'character_builder' }),
+    )
+    const rulesEpic = await createEpic(
+      createEpicInputSchema.parse({ title: 'Rules Configuration', area: 'rules' }),
+    )
+    await createTicket({ ...baseTicketInput, epicId: characterEpic.id, status: 'backlog' })
+    await createTicket({
+      ...baseTicketInput,
+      title: 'Rules work',
+      epicId: rulesEpic.id,
+      status: 'backlog',
+    })
+
+    const tickets = await listTickets({
+      epicId: characterEpic.id,
+      epicName: 'Rules Configuration',
+    })
+    expect(tickets).toHaveLength(1)
+    expect(tickets[0]?.epicId).toBe(characterEpic.id)
+  })
+
+  it('filters bucket open to incomplete work', async () => {
+    await createTicket({ ...baseTicketInput, status: 'backlog' })
+    await createTicket({ ...baseTicketInput, title: 'On desk', status: 'up_next' })
+    await createTicket({ ...baseTicketInput, title: 'Blocked item', status: 'blocked' })
+    await createTicket({ ...baseTicketInput, title: 'Finished', status: 'done' })
+    await createTicket({ ...baseTicketInput, title: 'Declined', status: 'wont_do' })
+
+    const openTickets = await listTickets({ bucket: 'open' })
+    expect(openTickets.map((ticket) => ticket.title).sort()).toEqual([
+      'Blocked item',
+      'Capture gap',
+      'On desk',
+    ])
+  })
+
+  it('filters bucket done to completed tickets only', async () => {
+    await createTicket({ ...baseTicketInput, status: 'backlog' })
+    await createTicket({ ...baseTicketInput, title: 'Finished', status: 'done' })
+
+    const doneTickets = await listTickets({ bucket: 'done' })
+    expect(doneTickets).toHaveLength(1)
+    expect(doneTickets[0]?.title).toBe('Finished')
+  })
+
+  it('combines epicName and bucket open', async () => {
+    const epic = await createEpic(
+      createEpicInputSchema.parse({ title: 'Character Builder', area: 'character_builder' }),
+    )
+    await createTicket({ ...baseTicketInput, epicId: epic.id, status: 'backlog' })
+    await createTicket({
+      ...baseTicketInput,
+      title: 'Done in epic',
+      epicId: epic.id,
+      status: 'done',
+    })
+    await createTicket({ ...baseTicketInput, title: 'Other open', status: 'backlog' })
+
+    const tickets = await listTickets({ epicName: 'Character Builder', bucket: 'open' })
+    expect(tickets).toHaveLength(1)
+    expect(tickets[0]?.title).toBe('Capture gap')
+  })
 })
 
 describe('updateTicket', () => {
