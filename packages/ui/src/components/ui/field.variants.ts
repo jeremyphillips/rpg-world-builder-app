@@ -24,7 +24,8 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
- * - `fieldToggleDependentStackClasses` — outer toggle-dependent stack rhythm
+ * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
+ * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
@@ -58,8 +59,26 @@ export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /** Dense settings row — label + hint column left, compact control right. */
 export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
-/** Outer stack rhythm for toggle-dependent field groups. */
-export const fieldToggleDependentStackClasses = 'flex flex-col gap-2'
+
+/** Vertical gap between siblings in a stack or dependents region. */
+export type FieldStackRhythm = 'compact' | 'comfortable'
+
+export const fieldStackRhythmVariants = cva('flex flex-col', {
+  variants: {
+    rhythm: {
+      compact: 'gap-2',
+      comfortable: 'gap-6',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'compact',
+  },
+})
+
+export type FieldStackRhythmVariantProps = VariantProps<typeof fieldStackRhythmVariants>
+
+/** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
+export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
 /** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
 export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses

@@ -21,11 +21,12 @@ import {
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
   fieldSeparatorVariants,
+  fieldStackRhythmVariants,
   fieldToggleDependentIndentClasses,
-  fieldToggleDependentStackClasses,
   formSectionStackClasses,
   fieldSetResetClasses,
   type FieldSeparator,
+  type FieldStackRhythm,
 } from '../components/ui/field.variants'
 import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
 import { Text } from '../components/ui/text'
@@ -533,10 +534,11 @@ function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) 
     [depth],
   )
   const layout = item.layout ?? 'default'
+  const rhythm = item.rhythm ?? 'compact'
 
   if (layout !== 'toggleDependent') {
     return (
-      <div data-field-stack="" className={cn(fieldToggleDependentStackClasses, item.className)}>
+      <div data-field-stack="" className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}>
         <FormSectionContext.Provider value={childContext}>
           <NestedFormItems
             items={item.fields}
@@ -560,7 +562,7 @@ function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) 
       data-field-stack=""
       role={groupLabelledBy ? 'group' : undefined}
       aria-labelledby={groupLabelledBy}
-      className={cn(fieldToggleDependentStackClasses, item.className)}
+      className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
     >
       <FormSectionContext.Provider value={childContext}>
         {first ? (
@@ -579,6 +581,7 @@ function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) 
         <StackDependentsRegion
           toggleSwitch={toggleSwitch}
           dependentsChrome={item.dependentsChrome}
+          rhythm={rhythm}
           dependents={dependents}
           idPrefix={idPrefix}
           namePrefix={namePrefix}
@@ -592,6 +595,7 @@ function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) 
 interface StackDependentsRegionProps {
   toggleSwitch: SwitchFieldConfig | null
   dependentsChrome?: StackConfig['dependentsChrome']
+  rhythm: FieldStackRhythm
   dependents: GroupFieldItem[]
   idPrefix: string
   namePrefix?: string
@@ -602,6 +606,7 @@ interface StackDependentsRegionProps {
 function StackDependentsRegion({
   toggleSwitch,
   dependentsChrome,
+  rhythm,
   dependents,
   idPrefix,
   namePrefix,
@@ -632,11 +637,16 @@ function StackDependentsRegion({
   return (
     <div className={fieldToggleDependentIndentClasses} data-field-stack-dependents="">
       {dependentsChrome ? (
-        <div className={fieldStackDependentsChromeVariants({ tone: dependentsChrome })}>
+        <div
+          className={cn(
+            fieldStackRhythmVariants({ rhythm }),
+            fieldStackDependentsChromeVariants({ tone: dependentsChrome }),
+          )}
+        >
           {dependentsContent}
         </div>
       ) : (
-        dependentsContent
+        <div className={fieldStackRhythmVariants({ rhythm })}>{dependentsContent}</div>
       )}
     </div>
   )

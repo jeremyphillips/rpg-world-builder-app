@@ -147,6 +147,7 @@ export {
   fieldLabelHintStackClasses,
   fieldRowLayoutVariants,
   fieldSeparatorVariants,
+  fieldStackRhythmVariants,
   fieldSettingsRowClasses,
   fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
@@ -155,6 +156,7 @@ export {
   type FieldRowLayout,
   type FieldSeparator,
   type FieldStackLayout,
+  type FieldStackRhythm,
 } from './components/ui/field.variants'
 export {
   fieldStackDependentsChromeVariants,

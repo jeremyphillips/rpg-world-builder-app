@@ -26,6 +26,7 @@ import type {
   FieldLabelPosition,
   FieldSeparator,
   FieldStackLayout,
+  FieldStackRhythm,
 } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
@@ -505,6 +506,11 @@ export interface StackConfig {
   layout?: FieldStackLayout
   /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
   dependentsChrome?: FieldStackDependentsTone
+  /**
+   * Vertical gap between stack siblings. `compact` (default) — dense settings panels;
+   * `comfortable` — matches `fieldGroupStackClasses` rhythm for multi-field blocks.
+   */
+  rhythm?: FieldStackRhythm
   fields: GroupFieldItem[]
   visibility?: FieldVisibility
   className?: string

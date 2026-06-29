@@ -5,21 +5,28 @@ import axe from 'axe-core'
 import { z } from 'zod'
 
 import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
-import { fieldToggleDependentIndentClasses } from '../components/ui/field.variants'
+import {
+  fieldStackRhythmVariants,
+  fieldToggleDependentIndentClasses,
+} from '../components/ui/field.variants'
 import { Form } from './form.client'
 import type { FormItem } from './field-config'
 
 const schema = z.object({
   featureEnabled: z.boolean(),
   featureValue: z.number().optional(),
+  featureNote: z.string().optional(),
 })
 
 type Values = z.infer<typeof schema>
 
-const toggleDependentStack = (dependentsChrome?: 'subtle' | 'error'): FormItem => ({
+const toggleDependentStack = (
+  options: { dependentsChrome?: 'subtle' | 'error'; rhythm?: 'compact' | 'comfortable' } = {},
+): FormItem => ({
   kind: 'stack',
   layout: 'toggleDependent',
-  ...(dependentsChrome ? { dependentsChrome } : {}),
+  ...(options.dependentsChrome ? { dependentsChrome: options.dependentsChrome } : {}),
+  ...(options.rhythm ? { rhythm: options.rhythm } : {}),
   fields: [
     {
       type: 'switch',
@@ -39,11 +46,24 @@ const toggleDependentStack = (dependentsChrome?: 'subtle' | 'error'): FormItem =
         visibleWhen: (values) => values.featureEnabled === true,
       },
     },
+    ...(options.rhythm === 'comfortable'
+      ? [
+          {
+            type: 'text' as const,
+            name: 'featureNote',
+            label: 'Feature note',
+            visibility: {
+              dependsOn: ['featureEnabled'],
+              visibleWhen: (values: Record<string, unknown>) => values.featureEnabled === true,
+            },
+          },
+        ]
+      : []),
   ],
 })
 
 function renderStackForm(
-  fields: FormItem[] = [toggleDependentStack('subtle')],
+  fields: FormItem[] = [toggleDependentStack({ dependentsChrome: 'subtle' })],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -129,7 +149,35 @@ describe('toggle-dependent stack', () => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveClass(fieldToggleDependentIndentClasses)
       expect(queryChromeShell(container)).toBeNull()
+      expect(region?.querySelector('.gap-2')).toBeInTheDocument()
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
+    })
+  })
+
+  it('applies comfortable rhythm inside dependents chrome', async () => {
+    const user = userEvent.setup()
+    const { container } = renderStackForm([
+      toggleDependentStack({ dependentsChrome: 'subtle', rhythm: 'comfortable' }),
+    ])
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    await waitFor(() => {
+      const shell = queryChromeShell(container)
+      expect(shell).toHaveClass(fieldStackRhythmVariants({ rhythm: 'comfortable' }))
+      expect(screen.getByLabelText('Feature note')).toBeInTheDocument()
+    })
+  })
+
+  it('applies compact rhythm on the outer stack by default', async () => {
+    const user = userEvent.setup()
+    const { container } = renderStackForm()
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    await waitFor(() => {
+      const stack = container.querySelector('[data-field-stack]')
+      expect(stack).toHaveClass(fieldStackRhythmVariants({ rhythm: 'compact' }))
     })
   })
 

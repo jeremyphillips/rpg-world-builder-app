@@ -32,46 +32,48 @@ const plainStackFields: FormItem[] = [
   },
 ]
 
+const toggleDependentStackFieldItems = [
+  {
+    type: 'switch' as const,
+    name: 'advancedEnabled',
+    label: 'Advanced options',
+    hint: 'Enable to configure the threshold below.',
+  },
+  {
+    type: 'select' as const,
+    name: 'advancedLevel',
+    label: 'Start level',
+    labelPosition: 'settings' as const,
+    separator: 'subtle' as const,
+    options: [
+      { label: '1', value: '1' },
+      { label: '3', value: '3' },
+    ],
+    defaultValue: '1',
+    visibility: {
+      dependsOn: ['advancedEnabled'],
+      visibleWhen: (values: Record<string, unknown>) => values.advancedEnabled === true,
+    },
+  },
+  {
+    type: 'number' as const,
+    name: 'advancedValue',
+    label: 'Threshold',
+    labelPosition: 'settings' as const,
+    defaultValue: 10,
+    visibility: {
+      dependsOn: ['advancedEnabled'],
+      visibleWhen: (values: Record<string, unknown>) => values.advancedEnabled === true,
+    },
+  },
+]
+
 const toggleDependentStackFields: FormItem[] = [
   {
     kind: 'stack',
     layout: 'toggleDependent',
     dependentsChrome: 'subtle',
-    fields: [
-      {
-        type: 'switch',
-        name: 'advancedEnabled',
-        label: 'Advanced options',
-        hint: 'Enable to configure the threshold below.',
-      },
-      {
-        type: 'select',
-        name: 'advancedLevel',
-        label: 'Start level',
-        labelPosition: 'settings',
-        separator: 'subtle',
-        options: [
-          { label: '1', value: '1' },
-          { label: '3', value: '3' },
-        ],
-        defaultValue: '1',
-        visibility: {
-          dependsOn: ['advancedEnabled'],
-          visibleWhen: (values) => values.advancedEnabled === true,
-        },
-      },
-      {
-        type: 'number',
-        name: 'advancedValue',
-        label: 'Threshold',
-        labelPosition: 'settings',
-        defaultValue: 10,
-        visibility: {
-          dependsOn: ['advancedEnabled'],
-          visibleWhen: (values) => values.advancedEnabled === true,
-        },
-      },
-    ],
+    fields: toggleDependentStackFieldItems,
   },
 ]
 
@@ -124,6 +126,25 @@ export const ToggleDependentStack: Story = {
   args: {
     schema: stackSchema,
     fields: toggleDependentStackFields,
+    defaultValues: { advancedEnabled: true, advancedLevel: '1', advancedValue: 13 },
+    onSubmit: action('submit'),
+    className: 'max-w-lg',
+  },
+}
+
+/** Toggle-dependent stack with comfortable rhythm for multi-field dependents. */
+export const ToggleDependentStackComfortable: Story = {
+  args: {
+    schema: stackSchema,
+    fields: [
+      {
+        kind: 'stack',
+        layout: 'toggleDependent',
+        dependentsChrome: 'subtle',
+        rhythm: 'comfortable',
+        fields: toggleDependentStackFieldItems,
+      },
+    ],
     defaultValues: { advancedEnabled: true, advancedLevel: '1', advancedValue: 13 },
     onSubmit: action('submit'),
     className: 'max-w-lg',

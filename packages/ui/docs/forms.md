@@ -760,6 +760,7 @@ Set `layout: 'toggleDependent'` when a switch controls one or more dependent fie
 - Indents dependents (`pl-11`) to align with the inline switch label column
 - Hides the entire dependents region while the gate switch is off (no empty inset box)
 - Applies optional `dependentsChrome` border/bg around **dependents only**
+- Applies `rhythm` (`compact` default, or `comfortable` for multi-field blocks)
 
 Pair dependent scalars with `labelPosition: 'settings'` so the control aligns with
 the inset width.
@@ -769,6 +770,7 @@ the inset width.
   kind: 'stack',
   layout: 'toggleDependent',
   dependentsChrome: 'subtle', // omit for plain indented stack
+  rhythm: 'comfortable', // optional — default compact (gap-2); comfortable matches fieldGroupStackClasses (gap-6)
   visibility: visibleWhenMulticlassingEnabled(), // optional stack-level gate
   fields: [
     {
@@ -795,6 +797,18 @@ gate prevents rendering an empty chrome shell when the toggle is off.
 
 Rows inside a stack may declare `visibility` on the `RowConfig` itself (same
 contract as leaf fields).
+
+#### Stack rhythm
+
+`rhythm` controls vertical gap between stack siblings via `fieldStackRhythmVariants`:
+
+| `rhythm`      | Gap  | Use                                                                 |
+| ------------- | ---- | ------------------------------------------------------------------- |
+| `compact`     | 8px  | Default — switch + one or two settings scalars (campaign rules)     |
+| `comfortable` | 24px | Multi-field dependents — rows, richtext, grids (class spellcasting) |
+
+Applies to the outer stack (switch → dependents), dependents inside chrome, and plain
+indented dependents when `dependentsChrome` is omitted.
 
 ### Field separators
 

@@ -645,6 +645,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
     kind: 'stack',
     layout: 'toggleDependent',
     dependentsChrome: 'subtle',
+    rhythm: 'comfortable',
     fields: [
       {
         type: 'switch',

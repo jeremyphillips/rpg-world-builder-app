@@ -86,5 +86,6 @@ export type {
   FieldGroupLegendSize,
   FieldSeparator,
   FieldStackLayout,
+  FieldStackRhythm,
 } from '../components/ui/field.variants'
 export type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
