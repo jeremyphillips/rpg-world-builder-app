@@ -1,12 +1,16 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { BENCH_ROUTES } from '@/app/routes'
 import { Button, Spinner, Text } from '@rpg/ui'
 import { deriveRelatedCodeAreas } from '@rpg/dev-bench-core'
 
-import { TicketCreateDialog, TicketDetailDrawer } from '@/features/tickets'
+import {
+  TicketCreateDialog,
+  TicketDetailDrawer,
+  useTicketDetailDrawerSearchParams,
+} from '@/features/tickets'
 
 import { EpicDetailForm } from '../components/epic-detail-form'
 import { EpicRelatedCodeAreas } from '../components/epic-related-code-areas'
@@ -19,8 +23,8 @@ import { useEpicsList } from '../hooks/use-epics-list'
 
 export function EpicDetailPage() {
   const { epicId = '' } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const ticketId = searchParams.get('ticketId')
+  const { ticketId, drawerOpen, selectTicket, onDrawerOpenChange } =
+    useTicketDetailDrawerSearchParams()
   const [createOpen, setCreateOpen] = useState(false)
 
   const epicQuery = useEpic(epicId)
@@ -32,32 +36,6 @@ export function EpicDetailPage() {
     [ticketsQuery.data],
   )
   const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
-
-  const handleSelectTicket = useCallback(
-    (id: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set('ticketId', id)
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
-
-  const handleCreated = useCallback(
-    (id: string) => {
-      handleSelectTicket(id)
-    },
-    [handleSelectTicket],
-  )
-
-  const handleDrawerOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) return
-      const params = new URLSearchParams(searchParams)
-      params.delete('ticketId')
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
 
   if (epicQuery.isPending) {
     return (
@@ -93,7 +71,7 @@ export function EpicDetailPage() {
               tickets={ticketsQuery.data ?? []}
               epics={epics}
               epicId={epic.id}
-              onSelectTicket={handleSelectTicket}
+              onSelectTicket={selectTicket}
             />
             <Button type="button" onClick={() => setCreateOpen(true)}>
               Add ticket
@@ -102,7 +80,7 @@ export function EpicDetailPage() {
               defaultEpicId={epic.id}
               open={createOpen}
               onOpenChange={setCreateOpen}
-              onCreated={handleCreated}
+              onCreated={selectTicket}
             />
           </>
         }
@@ -136,30 +114,26 @@ export function EpicDetailPage() {
             count={open.length}
             tickets={open}
             epicMetaById={epicMetaById}
-            onSelectTicket={handleSelectTicket}
+            onSelectTicket={selectTicket}
           />
           <EpicTicketSection
             title="Blocked"
             count={blocked.length}
             tickets={blocked}
             epicMetaById={epicMetaById}
-            onSelectTicket={handleSelectTicket}
+            onSelectTicket={selectTicket}
           />
           <EpicTicketSection
             title="Done"
             count={done.length}
             tickets={done}
             epicMetaById={epicMetaById}
-            onSelectTicket={handleSelectTicket}
+            onSelectTicket={selectTicket}
           />
         </div>
       ) : null}
 
-      <TicketDetailDrawer
-        ticketId={ticketId}
-        open={ticketId != null}
-        onOpenChange={handleDrawerOpenChange}
-      />
+      <TicketDetailDrawer ticketId={ticketId} open={drawerOpen} onOpenChange={onDrawerOpenChange} />
     </div>
   )
 }

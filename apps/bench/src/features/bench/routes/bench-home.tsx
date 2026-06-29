@@ -1,50 +1,29 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { BENCH_ROUTES } from '@/app/routes'
 import { Button, Text } from '@rpg/ui'
 import { useEpicsList, buildEpicCardMetaById } from '@/features/epics'
-import { TicketCreateDialog, TicketDetailDrawer, TicketTitleSearchInput } from '@/features/tickets'
+import {
+  TicketCreateDialog,
+  TicketDetailDrawer,
+  TicketTitleSearchInput,
+  useTicketDetailDrawerSearchParams,
+} from '@/features/tickets'
 
 import { BenchBoard } from '../components/bench-board'
 import { filterBenchColumnsBySearch } from '../lib/filter-bench-columns'
 import { useBenchTickets } from '../hooks/use-bench-tickets'
 
 export function BenchHome() {
-  const [searchParams, setSearchParams] = useSearchParams()
   const [titleSearch, setTitleSearch] = useState('')
-  const ticketId = searchParams.get('ticketId')
+  const { ticketId, drawerOpen, selectTicket, onDrawerOpenChange } =
+    useTicketDetailDrawerSearchParams()
   const { data: columns, isPending, isError, refetch } = useBenchTickets()
   const { data: epics = [] } = useEpicsList()
 
   const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
-
-  const handleSelectTicket = useCallback(
-    (id: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set('ticketId', id)
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
-
-  const handleCreated = useCallback(
-    (id: string) => {
-      handleSelectTicket(id)
-    },
-    [handleSelectTicket],
-  )
-
-  const handleDrawerOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) return
-      const params = new URLSearchParams(searchParams)
-      params.delete('ticketId')
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
 
   const boardColumns = useMemo(
     () =>
@@ -85,7 +64,7 @@ export function BenchHome() {
             <TicketCreateDialog
               defaultStatus="up_next"
               trigger={<Button>Add to Up Next</Button>}
-              onCreated={handleCreated}
+              onCreated={selectTicket}
             />
           </div>
         }
@@ -107,14 +86,10 @@ export function BenchHome() {
         isPending={isPending}
         isError={isError}
         onRetry={() => void refetch()}
-        onSelectTicket={handleSelectTicket}
+        onSelectTicket={selectTicket}
       />
 
-      <TicketDetailDrawer
-        ticketId={ticketId}
-        open={ticketId != null}
-        onOpenChange={handleDrawerOpenChange}
-      />
+      <TicketDetailDrawer ticketId={ticketId} open={drawerOpen} onOpenChange={onDrawerOpenChange} />
     </div>
   )
 }

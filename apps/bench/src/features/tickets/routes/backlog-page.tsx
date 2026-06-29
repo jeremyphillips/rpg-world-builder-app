@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { benchTicketPath } from '@/app/routes'
@@ -10,47 +10,22 @@ import { TicketCreateDialog } from '../components/ticket-create-dialog'
 import { TicketDetailDrawer } from '../components/ticket-detail-drawer'
 import { TicketFilters } from '../components/ticket-filters'
 import { buildEpicCardMetaById, resolveTicketEpicCardMeta, useEpicsList } from '@/features/epics'
+import { useTicketDetailDrawerSearchParams } from '@/features/tickets'
 import { useTicketFiltersFromUrl } from '../hooks/use-ticket-filters-from-url'
 import { useTickets } from '../hooks/use-tickets'
 
 export function BacklogPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const ticketId = searchParams.get('ticketId')
+  const { ticketId, drawerOpen, selectTicket, onDrawerOpenChange } =
+    useTicketDetailDrawerSearchParams()
   const { filters, setFilters } = useTicketFiltersFromUrl()
   const { data: tickets = [], isPending, isError, refetch } = useTickets(filters)
   const { data: epics = [] } = useEpicsList()
 
   const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
 
-  const handleSelectTicket = useCallback(
-    (id: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set('ticketId', id)
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
-
-  const handleCreated = useCallback(
-    (id: string) => {
-      handleSelectTicket(id)
-    },
-    [handleSelectTicket],
-  )
-
-  const handleDrawerOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) return
-      const params = new URLSearchParams(searchParams)
-      params.delete('ticketId')
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
-
   return (
     <div className="space-y-6">
-      <PageHeader heading="Backlog" actions={<TicketCreateDialog onCreated={handleCreated} />} />
+      <PageHeader heading="Backlog" actions={<TicketCreateDialog onCreated={selectTicket} />} />
       <TicketFilters filters={filters} onChange={setFilters} />
 
       {isPending ? <Spinner /> : null}
@@ -76,7 +51,7 @@ export function BacklogPage() {
               <BacklogTicketCard
                 ticket={ticket}
                 epic={resolveTicketEpicCardMeta(ticket, epicMetaById)}
-                onSelect={handleSelectTicket}
+                onSelect={selectTicket}
               />
               <Link to={benchTicketPath(ticket.id)} className="sr-only">
                 Open {ticket.key} full page
@@ -86,11 +61,7 @@ export function BacklogPage() {
         </ul>
       ) : null}
 
-      <TicketDetailDrawer
-        ticketId={ticketId}
-        open={ticketId != null}
-        onOpenChange={handleDrawerOpenChange}
-      />
+      <TicketDetailDrawer ticketId={ticketId} open={drawerOpen} onOpenChange={onDrawerOpenChange} />
     </div>
   )
 }

@@ -1,9 +1,6 @@
-import { useCallback } from 'react'
-import { useSearchParams } from 'react-router-dom'
-
 import { PageHeader } from '@/components/layout/page-header'
 import { Button, Spinner, Text } from '@rpg/ui'
-import { TicketDetailDrawer } from '@/features/tickets'
+import { TicketDetailDrawer, useTicketDetailDrawerSearchParams } from '@/features/tickets'
 
 import { CreateEpicDialog } from '../components/epic-create-dialog'
 import { EpicCard } from '../components/epic-card'
@@ -12,29 +9,10 @@ import { useEpicFiltersFromUrl } from '../hooks/use-epic-filters-from-url'
 import { useEpicsWithCounts } from '../hooks/use-epics-with-counts'
 
 export function EpicsListPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const ticketId = searchParams.get('ticketId')
+  const { ticketId, drawerOpen, selectTicket, onDrawerOpenChange } =
+    useTicketDetailDrawerSearchParams()
   const { filters, setFilters } = useEpicFiltersFromUrl()
   const { epicsWithCounts, isPending, isError, refetch } = useEpicsWithCounts(filters)
-
-  const handleSelectTicket = useCallback(
-    (id: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set('ticketId', id)
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
-
-  const handleDrawerOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) return
-      const params = new URLSearchParams(searchParams)
-      params.delete('ticketId')
-      setSearchParams(params, { replace: true })
-    },
-    [searchParams, setSearchParams],
-  )
 
   return (
     <div className="space-y-6">
@@ -65,18 +43,14 @@ export function EpicsListPage() {
                 epic={epic}
                 counts={counts}
                 recentlyActive={recentlyActive}
-                onSelectTicket={handleSelectTicket}
+                onSelectTicket={selectTicket}
               />
             </li>
           ))}
         </ul>
       ) : null}
 
-      <TicketDetailDrawer
-        ticketId={ticketId}
-        open={ticketId != null}
-        onOpenChange={handleDrawerOpenChange}
-      />
+      <TicketDetailDrawer ticketId={ticketId} open={drawerOpen} onOpenChange={onDrawerOpenChange} />
     </div>
   )
 }

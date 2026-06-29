@@ -13,6 +13,7 @@ import {
 } from '@rpg/contracts/dev-bench'
 
 import { EPIC_FILTER_ALL, EPIC_FILTER_NONE, type TicketListFilters } from './ticket-query-keys'
+import { TICKET_DETAIL_DRAWER_SEARCH_PARAM } from './use-ticket-detail-drawer-search-params'
 
 const FILTER_PARAM = {
   type: 'type',
@@ -89,9 +90,9 @@ export function useTicketFiltersFromUrl() {
 
   const setFilters = useCallback(
     (next: TicketListFilters) => {
-      const ticketId = searchParams.get('ticketId')
+      const ticketId = searchParams.get(TICKET_DETAIL_DRAWER_SEARCH_PARAM)
       const params = filtersToSearchParams(next)
-      if (ticketId) params.set('ticketId', ticketId)
+      if (ticketId) params.set(TICKET_DETAIL_DRAWER_SEARCH_PARAM, ticketId)
       setSearchParams(params, { replace: true })
     },
     [searchParams, setSearchParams],
