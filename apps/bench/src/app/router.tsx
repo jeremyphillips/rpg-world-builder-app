@@ -7,7 +7,6 @@ import {
   BenchHomeRoute,
   EpicsListPageRoute,
   EpicDetailRoute,
-  SearchHomeRoute,
   SettingsHomeRoute,
   TicketDetailRoute,
 } from '@/app/lazy-routes'
@@ -24,7 +23,6 @@ const router = createBrowserRouter(
         { path: BENCH_ROUTE_SEGMENTS.epicDetail, element: <EpicDetailRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.backlog, element: <BacklogPageRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.ticketDetail, element: <TicketDetailRoute /> },
-        { path: BENCH_ROUTE_SEGMENTS.search, element: <SearchHomeRoute /> },
         { path: BENCH_ROUTE_SEGMENTS.settings, element: <SettingsHomeRoute /> },
       ],
     },

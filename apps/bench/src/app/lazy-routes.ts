@@ -28,9 +28,6 @@ export const BacklogPageRoute = withRouteSuspense(
 export const TicketDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/tickets/routes/ticket-detail-page'), 'TicketDetailPage'),
 )
-export const SearchHomeRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/search/routes/search-home'), 'SearchHome'),
-)
 export const SettingsHomeRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/settings/routes/settings-home'), 'SettingsHome'),
 )

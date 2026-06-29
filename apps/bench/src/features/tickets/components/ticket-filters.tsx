@@ -11,7 +11,6 @@ import {
 } from '@rpg/contracts/dev-bench'
 import {
   Button,
-  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -27,6 +26,7 @@ import {
   EPIC_FILTER_NONE,
   type TicketListFilters,
 } from '../hooks/ticket-query-keys'
+import { TicketTitleSearchInput } from './ticket-title-search-input'
 
 interface TicketFiltersProps {
   filters: TicketListFilters
@@ -89,19 +89,12 @@ export function TicketFilters({ filters, onChange }: TicketFiltersProps) {
         Filters
       </Text>
       <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-[12rem] flex-1 space-y-1">
-          <label htmlFor="filter-search" className="text-xs text-muted-foreground">
-            Search
-          </label>
-          <Input
-            id="filter-search"
-            type="search"
-            value={filters.search ?? ''}
-            onChange={(event) => patch({ search: event.target.value || undefined })}
-            placeholder="Search titles…"
-            className="h-8"
-          />
-        </div>
+        <TicketTitleSearchInput
+          id="filter-search"
+          label="Search"
+          value={filters.search ?? ''}
+          onValueChange={(value) => patch({ search: value || undefined })}
+        />
         <FilterSelect
           id="filter-type"
           label="Type"

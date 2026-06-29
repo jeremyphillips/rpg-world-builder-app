@@ -5,9 +5,9 @@ drag-and-drop lane moves, card overflow status moves, and quick create into Up N
 
 ## Route
 
-| Path | Component                                          |
-| ---- | -------------------------------------------------- |
-| `/`  | `BenchHome` — workflow board + `?ticketId=` drawer |
+| Path | Component                                                                |
+| ---- | ------------------------------------------------------------------------ |
+| `/`  | `BenchHome` — workflow board, header title search, + `?ticketId=` drawer |
 
 ## Data access
 

@@ -3,7 +3,6 @@ export const BENCH_ROUTES = {
   bench: '/',
   epics: '/epics',
   backlog: '/backlog',
-  search: '/search',
   settings: '/settings',
   ticketDetail: '/tickets/:ticketId',
   epicDetail: '/epics/:epicId',
@@ -13,7 +12,6 @@ export const BENCH_ROUTES = {
 export const BENCH_ROUTE_SEGMENTS = {
   epics: 'epics',
   backlog: 'backlog',
-  search: 'search',
   settings: 'settings',
   ticketDetail: 'tickets/:ticketId',
   epicDetail: 'epics/:epicId',
@@ -37,6 +35,5 @@ export const BENCH_NAV_ITEMS: BenchNavItem[] = [
   { to: BENCH_ROUTES.bench, label: 'Bench', end: true },
   { to: BENCH_ROUTES.epics, label: 'Epics' },
   { to: BENCH_ROUTES.backlog, label: 'Backlog' },
-  { to: BENCH_ROUTES.search, label: 'Search' },
   { to: BENCH_ROUTES.settings, label: 'Settings' },
 ]

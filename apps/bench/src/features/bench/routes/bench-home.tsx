@@ -1,17 +1,19 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { BENCH_ROUTES } from '@/app/routes'
 import { Button, Text } from '@rpg/ui'
 import { useEpicsList, buildEpicCardMetaById } from '@/features/epics'
-import { TicketCreateDialog, TicketDetailDrawer } from '@/features/tickets'
+import { TicketCreateDialog, TicketDetailDrawer, TicketTitleSearchInput } from '@/features/tickets'
 
 import { BenchBoard } from '../components/bench-board'
+import { filterBenchColumnsBySearch } from '../lib/filter-bench-columns'
 import { useBenchTickets } from '../hooks/use-bench-tickets'
 
 export function BenchHome() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const [titleSearch, setTitleSearch] = useState('')
   const ticketId = searchParams.get('ticketId')
   const { data: columns, isPending, isError, refetch } = useBenchTickets()
   const { data: epics = [] } = useEpicsList()
@@ -51,6 +53,11 @@ export function BenchHome() {
     done: [],
   }
 
+  const filteredColumns = useMemo(
+    () => filterBenchColumnsBySearch(boardColumns, titleSearch),
+    [boardColumns, titleSearch],
+  )
+
   const allEmpty =
     !isPending &&
     !isError &&
@@ -64,11 +71,19 @@ export function BenchHome() {
       <PageHeader
         heading="Bench"
         actions={
-          <TicketCreateDialog
-            defaultStatus="up_next"
-            trigger={<Button>Add to Up Next</Button>}
-            onCreated={handleCreated}
-          />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <TicketTitleSearchInput
+              id="bench-title-search"
+              compact
+              value={titleSearch}
+              onValueChange={setTitleSearch}
+            />
+            <TicketCreateDialog
+              defaultStatus="up_next"
+              trigger={<Button>Add to Up Next</Button>}
+              onCreated={handleCreated}
+            />
+          </div>
         }
       />
 
@@ -83,7 +98,7 @@ export function BenchHome() {
       ) : null}
 
       <BenchBoard
-        columns={boardColumns}
+        columns={filteredColumns}
         epicMetaById={epicMetaById}
         isPending={isPending}
         isError={isError}
