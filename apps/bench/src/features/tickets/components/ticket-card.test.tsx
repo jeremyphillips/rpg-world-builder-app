@@ -4,6 +4,7 @@ import axe from 'axe-core'
 
 import { TicketCard } from './ticket-card'
 import { blockedSampleTicket, sampleTicket } from '../test-fixtures'
+import { BLOCKED_TICKET_ARIA_LABEL } from '../lib/ticket-card-labels'
 
 describe('TicketCard', () => {
   it('renders key, title, and badges', () => {
@@ -18,7 +19,7 @@ describe('TicketCard', () => {
 
   it('shows blocked indicator when blockers exist', () => {
     render(<TicketCard ticket={blockedSampleTicket} onSelect={vi.fn()} />)
-    expect(screen.getByLabelText('Blocked by other tickets')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: BLOCKED_TICKET_ARIA_LABEL })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

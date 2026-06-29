@@ -1,12 +1,43 @@
 import type { KeyboardEvent } from 'react'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
-import { Card, CardContent, cn, Text } from '@rpg/ui'
+import {
+  Card,
+  CardContent,
+  cn,
+  Text,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@rpg/ui'
 import { AlertTriangle } from 'lucide-react'
 
+import { BLOCKED_TICKET_ARIA_LABEL, BLOCKED_TICKET_TOOLTIP } from '../lib/ticket-card-labels'
 import { PriorityBadge } from './priority-badge'
 import { SizeBadge } from './size-badge'
 import { TypeBadge } from './type-badge'
+
+function BlockedIndicator() {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex shrink-0 rounded-sm text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label={BLOCKED_TICKET_ARIA_LABEL}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
+            <AlertTriangle className="size-4" aria-hidden />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top">{BLOCKED_TICKET_TOOLTIP}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
 
 interface TicketCardProps {
   ticket: Ticket
@@ -51,12 +82,7 @@ export function TicketCard({ ticket, epicTitle, onSelect, className }: TicketCar
             </Text>
             <Text className="truncate font-medium">{ticket.title}</Text>
           </div>
-          {blocked ? (
-            <AlertTriangle
-              className="size-4 shrink-0 text-destructive"
-              aria-label="Blocked by other tickets"
-            />
-          ) : null}
+          {blocked ? <BlockedIndicator /> : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <TypeBadge type={ticket.type} />

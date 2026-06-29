@@ -1,4 +1,6 @@
+export { BacklogTicketCard } from './components/backlog-ticket-card'
 export { TicketCard } from './components/ticket-card'
+export { TicketCardBacklogMenu } from './components/ticket-card-backlog-menu'
 export { PriorityBadge } from './components/priority-badge'
 export { SizeBadge } from './components/size-badge'
 export { TypeBadge } from './components/type-badge'

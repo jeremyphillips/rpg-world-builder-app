@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { benchTicketPath } from '@/app/routes'
 import { Button, Spinner, Text } from '@rpg/ui'
 
-import { TicketCard } from '../components/ticket-card'
+import { BacklogTicketCard } from '../components/backlog-ticket-card'
 import { TicketCreateDialog } from '../components/ticket-create-dialog'
 import { TicketDetailDrawer } from '../components/ticket-detail-drawer'
 import { TicketFilters } from '../components/ticket-filters'
@@ -73,7 +73,7 @@ export function BacklogPage() {
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {tickets.map((ticket) => (
             <li key={ticket.id}>
-              <TicketCard
+              <BacklogTicketCard
                 ticket={ticket}
                 epicTitle={ticket.epicId ? epicTitleById.get(ticket.epicId) : null}
                 onSelect={handleSelectTicket}
