@@ -13,6 +13,8 @@ function createEditorMock(isActive = false) {
     toggleItalic: vi.fn(() => chain),
     toggleBulletList: vi.fn(() => chain),
     toggleOrderedList: vi.fn(() => chain),
+    toggleCode: vi.fn(() => chain),
+    toggleCodeBlock: vi.fn(() => chain),
     run,
   }
 
@@ -36,6 +38,7 @@ describe('RichTextEditorToolbar', () => {
         editor={editor}
         disabled={false}
         linkable={false}
+        codeBlocks={false}
         isLinkPickerOpen={false}
         editingLinkContext={null}
         internalLinkOptions={[]}
@@ -53,5 +56,33 @@ describe('RichTextEditorToolbar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Ordered list' }))
     expect(chain.toggleOrderedList).toHaveBeenCalled()
+  })
+
+  it('toggles inline and block code when codeBlocks is enabled', async () => {
+    const user = userEvent.setup()
+    const { editor, chain, run } = createEditorMock()
+
+    render(
+      <RichTextEditorToolbar
+        editor={editor}
+        disabled={false}
+        linkable={false}
+        codeBlocks
+        isLinkPickerOpen={false}
+        editingLinkContext={null}
+        internalLinkOptions={[]}
+        linkPickerMode="internal"
+        onLinkPickerOpenChange={vi.fn()}
+        onInsertLink={vi.fn()}
+        onLinkPickerCancel={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Inline code' }))
+    expect(chain.toggleCode).toHaveBeenCalled()
+    expect(run).toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: 'Code block' }))
+    expect(chain.toggleCodeBlock).toHaveBeenCalled()
   })
 })

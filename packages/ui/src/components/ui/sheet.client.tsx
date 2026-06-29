@@ -75,17 +75,23 @@ const SheetContent = React.forwardRef<
 SheetContent.displayName = 'Sheet.Content'
 
 export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Optional line above the title (e.g. monospace id). */
+  kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
+  /** Merged onto the dialog title element (overrides default heading styles). */
+  headlineClassName?: string
 }
 
 const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
-  ({ className, headline, description, children, ...props }, ref) => (
+  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
     <SheetHeaderBase
       ref={ref}
       className={className}
+      kicker={kicker}
       headline={headline}
       description={description}
+      headlineClassName={headlineClassName}
       {...props}
     >
       {children}

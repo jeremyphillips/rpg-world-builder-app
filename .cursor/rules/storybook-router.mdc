@@ -1,0 +1,21 @@
+---
+description: Dashboard Storybook router — preview already provides MemoryRouter
+globs: apps/dashboard/**/*.stories.tsx
+alwaysApply: false
+---
+
+# Dashboard Storybook routing
+
+`apps/dashboard/.storybook/preview.tsx` wraps **every** story in `MemoryRouter`.
+
+- **Do not** import or render `MemoryRouter`, `BrowserRouter`, `RouterProvider`,
+  `createBrowserRouter`, or `createMemoryRouter` in `*.stories.tsx` decorators.
+- Nested routers cause runtime errors (`You cannot render a <Router> inside another <Router>`)
+  and fail the Storybook test runner.
+- **Vitest** (`*.test.tsx`) has no global router — wrap there only when the component
+  uses `Link`, `NavLink`, `useNavigate`, `useParams`, etc.
+- If the component uses plain `#` anchors or props only, skip routers in both stories and tests.
+- For layout-only decorators, wrap with `<div>` / page shells — not a router.
+- To simulate a URL in a story, extend preview or use story `parameters` — never nest routers.
+
+See [apps/dashboard/docs/feature-conventions.md](../../apps/dashboard/docs/feature-conventions.md#storybook).

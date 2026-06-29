@@ -67,6 +67,22 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * the bottom while scrolling long panels.
    */
   stickyChrome?: boolean
+  /** Extra classes merged onto the sticky tab list wrapper (overrides default surface). */
+  stickyTabsClassName?: string
+  /** Extra classes merged onto the sticky actions bar (overrides default surface). */
+  stickyActionsBarClassName?: string
+  /** Wrap tab chrome and panels (e.g. `<Sheet.Body>` in a drawer layout). */
+  contentWrapper?: (content: React.ReactNode) => React.ReactNode
+  /**
+   * Render the footer outside the sticky actions bar (e.g. `<Sheet.Footer>`).
+   * When set, the internal sticky/inline footer chrome is not used.
+   */
+  footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
+}
+
+export interface TabbedFormFooterWrapperProps {
+  footer: React.ReactNode
+  formError: string | null
 }
 
 /**
@@ -87,6 +103,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   mode,
   collapsibleSections = true,
   stickyChrome = true,
+  stickyTabsClassName,
+  stickyActionsBarClassName,
+  contentWrapper,
+  footerWrapper,
 }: TabbedFormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -114,6 +134,58 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   })
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
+  const hasFooterRegion = Boolean(formError || resolvedFooter)
+
+  const tabsContent = (
+    <Tabs defaultValue={tabs[0]?.id} variant="line">
+      <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      {tabs.map((tab) => (
+        // forceMount keeps all panels mounted so every field is registered
+        // with RHF and validated on global save; inactive panels are hidden
+        // by Radix via the HTML `hidden` attribute.
+        <TabsContent key={tab.id} value={tab.id} forceMount>
+          <div
+            className={cn(
+              fieldGroupStackClasses,
+              stickyChrome && !footerWrapper ? formTabPanelsBottomPaddingClasses : undefined,
+            )}
+          >
+            {tab.header}
+            {tab.fields.length > 0 ? (
+              <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+            ) : null}
+          </div>
+        </TabsContent>
+      ))}
+    </Tabs>
+  )
+
+  const footerRegion = footerWrapper ? (
+    hasFooterRegion ? (
+      footerWrapper({ footer: resolvedFooter, formError: formError ?? null })
+    ) : null
+  ) : stickyChrome ? (
+    <FormActionsBar className={stickyActionsBarClassName} formError={formError}>
+      {resolvedFooter}
+    </FormActionsBar>
+  ) : (
+    <>
+      {formError ? (
+        <Text variant="destructive" role="alert">
+          {formError}
+        </Text>
+      ) : null}
+      {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
+    </>
+  )
 
   return (
     <SchemaFormShell
@@ -122,50 +194,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
       onSubmit={onSubmit}
-      className={cn(stickyChrome ? undefined : 'space-y-6', className)}
+      className={cn(footerWrapper ? undefined : stickyChrome ? undefined : 'space-y-6', className)}
     >
-      <Tabs defaultValue={tabs[0]?.id} variant="line">
-        <div className={cn(stickyChrome ? formStickyTabsClasses : undefined)}>
-          <TabsList>
-            {tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id}>
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-        {tabs.map((tab) => (
-          // forceMount keeps all panels mounted so every field is registered
-          // with RHF and validated on global save; inactive panels are hidden
-          // by Radix via the HTML `hidden` attribute.
-          <TabsContent key={tab.id} value={tab.id} forceMount>
-            <div
-              className={cn(
-                fieldGroupStackClasses,
-                stickyChrome ? formTabPanelsBottomPaddingClasses : undefined,
-              )}
-            >
-              {tab.header}
-              {tab.fields.length > 0 ? (
-                <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-              ) : null}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
-
-      {stickyChrome ? (
-        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
-      ) : (
-        <>
-          {formError ? (
-            <Text variant="destructive" role="alert">
-              {formError}
-            </Text>
-          ) : null}
-          {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
-        </>
-      )}
+      {contentWrapper ? contentWrapper(tabsContent) : tabsContent}
+      {footerRegion}
     </SchemaFormShell>
   )
 }

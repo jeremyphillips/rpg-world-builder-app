@@ -15,6 +15,7 @@ import type {
   RichTextLinkPickerInternalOption,
 } from '../components/ui/rich-text-link-picker.client'
 import type { FieldSize } from '../components/ui/field.client'
+import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import type { FieldRowLayout } from '../components/ui/field.variants'
@@ -31,6 +32,7 @@ export type FieldType =
   | 'switch'
   | 'json'
   | 'richtext'
+  | 'markdown'
   | 'file'
   | 'chips'
   | 'combobox'
@@ -195,10 +197,19 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
+  /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
+  codeBlocks?: boolean
   /** Internal link targets shown in the rich-text link picker. */
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   /** Content type filter options for the rich-text link picker. */
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
+  defaultValue?: string
+}
+
+export interface MarkdownFieldConfig extends BaseFieldConfig {
+  type: 'markdown'
+  placeholder?: string
+  rows?: number
   defaultValue?: string
 }
 
@@ -299,7 +310,11 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
+  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  renderSelectedItem?: ComboboxRenderSelectedItem
 }
+
+export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 
 /** Column definition for `editableGrid` fields (may carry per-column conditionals). */
 export interface EditableGridColumnConfig {
@@ -377,6 +392,7 @@ export type FieldConfig =
   | SwitchFieldConfig
   | JsonFieldConfig
   | RichTextFieldConfig
+  | MarkdownFieldConfig
   | FileFieldConfig
   | ChipsFieldConfig
   | ChooseFromChipsFieldConfig
@@ -517,6 +533,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   switch: false,
   json: '',
   richtext: '',
+  markdown: '',
   file: [],
   chips: [],
   combobox: [],

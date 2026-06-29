@@ -96,6 +96,35 @@ describe('ComboboxField', () => {
     expect(screen.getByRole('button', { name: 'Remove missing-weapon' })).toBeInTheDocument()
   })
 
+  it('renders custom selected items via renderSelectedItem', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={['dagger']}
+        onChange={onChange}
+        renderSelectedItem={(option, { onRemove }) => (
+          <div data-testid={`selected-${option.value}`}>
+            <span>{option.label}</span>
+            <button type="button" onClick={onRemove}>
+              Dismiss {option.label}
+            </button>
+          </div>
+        )}
+      />,
+    )
+
+    expect(screen.getByTestId('selected-dagger')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Selected Specific weapons' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Dismiss Dagger' }))
+    expect(onChange).toHaveBeenCalledWith([])
+  })
+
   it('opens with a chromeless search row that replaces the trigger', async () => {
     const user = userEvent.setup()
     render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)

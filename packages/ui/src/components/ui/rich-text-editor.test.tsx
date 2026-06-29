@@ -34,6 +34,29 @@ describe('RichTextEditor', () => {
     expect(screen.getByRole('button', { name: 'Link' })).toBeInTheDocument()
   })
 
+  it('hides code buttons unless codeBlocks is set', () => {
+    const { rerender } = render(<RichTextEditor aria-label="Biography" />)
+    expect(screen.queryByRole('button', { name: 'Inline code' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Code block' })).not.toBeInTheDocument()
+    rerender(<RichTextEditor aria-label="Biography" codeBlocks />)
+    expect(screen.getByRole('button', { name: 'Inline code' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Code block' })).toBeInTheDocument()
+  })
+
+  it('loads stored code markup when codeBlocks is enabled', async () => {
+    render(
+      <RichTextEditor
+        aria-label="Notes"
+        codeBlocks
+        value="<p>Run <code>pnpm bench</code></p><pre><code>pnpm bench list-tickets</code></pre>"
+      />,
+    )
+
+    const surface = await screen.findByRole('textbox')
+    expect(surface.querySelector('code')).toBeInTheDocument()
+    expect(surface.querySelector('pre')).toBeInTheDocument()
+  })
+
   it('applies prose classes to the editable surface', async () => {
     render(<RichTextEditor aria-label="Biography" />)
     const surface = await screen.findByRole('textbox')

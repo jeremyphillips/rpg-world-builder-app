@@ -2,10 +2,9 @@
 
 import * as React from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
 
 import { cn } from '../../lib/utils'
-import { RichTextLink } from './rich-text-link-extension'
+import { createRichTextEditorExtensions } from './rich-text-editor-extensions'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 import type { RichTextLinkContext } from './rich-text-editor-link.lib'
@@ -27,6 +26,8 @@ export interface RichTextEditorProps {
   onBlur?: () => void
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
+  /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
+  codeBlocks?: boolean
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   onLinkPickerOpen?: (context: RichTextLinkContext) => void
@@ -48,6 +49,7 @@ export function RichTextEditor({
   onChange,
   onBlur,
   linkable = false,
+  codeBlocks = false,
   internalLinkOptions = [],
   contentTypeOptions,
   onLinkPickerOpen,
@@ -72,10 +74,7 @@ export function RichTextEditor({
     {
       immediatelyRender: false,
       editable: !disabled,
-      extensions: [
-        StarterKit.configure({ link: false }),
-        ...(linkable ? [RichTextLink.configure({ openOnClick: false })] : []),
-      ],
+      extensions: createRichTextEditorExtensions({ linkable, codeBlocks }),
       content: value ?? '',
       onUpdate: ({ editor: instance }) => {
         const nextHtml = instance.getHTML()
@@ -92,7 +91,7 @@ export function RichTextEditor({
         },
       },
     },
-    [linkable],
+    [linkable, codeBlocks],
   )
 
   React.useEffect(() => {
@@ -162,6 +161,7 @@ export function RichTextEditor({
         editor={editor}
         disabled={disabled}
         linkable={linkable}
+        codeBlocks={codeBlocks}
         isLinkPickerOpen={isLinkPickerOpen}
         editingLinkContext={editingLinkContext}
         internalLinkOptions={internalLinkOptions}

@@ -1,0 +1,49 @@
+{
+  "name": "@rpg/bench",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@rpg/api-client": "workspace:*",
+    "@rpg/contracts": "workspace:*",
+    "@rpg/dev-bench-core": "workspace:*",
+    "@rpg/ui": "workspace:*",
+    "@tanstack/react-query": "^5.101.0",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.77.0",
+    "react-router-dom": "^7.17.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@rpg/config": "workspace:*",
+    "@storybook/react-vite": "^10.4.2",
+    "@tailwindcss/vite": "^4.3.0",
+    "@testing-library/jest-dom": "^6.9.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.9.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "axe-core": "^4.12.0",
+    "eslint": "^10.4.1",
+    "jsdom": "^26.1.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}

@@ -8,15 +8,23 @@ import type { FieldWidth } from './field-control.variants'
 import { FieldLabelContent } from './field-label-content'
 import {
   ComboboxPanel,
-  ComboboxSelectedChips,
+  ComboboxSelectedItems,
   ComboboxTrigger,
 } from './combobox-field-parts.client'
 import { normalizeSelected } from './combobox-field.lib'
-import type { ComboboxFieldControlProps, ComboboxFieldOption } from './combobox-field.types'
+import type {
+  ComboboxFieldControlProps,
+  ComboboxFieldOption,
+  ComboboxRenderSelectedItem,
+} from './combobox-field.types'
 import type { SelectFieldValueProps } from './select-field-value-props'
 import { useComboboxControl } from './use-combobox-control.client'
 
-export type { ComboboxFieldOption } from './combobox-field.types'
+export type {
+  ComboboxFieldOption,
+  ComboboxRenderSelectedItem,
+  ComboboxSelectedItemRenderContext,
+} from './combobox-field.types'
 
 export interface ComboboxFieldProps extends SelectFieldValueProps {
   id: string
@@ -32,10 +40,13 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   size?: FieldSize
   placeholder?: string
   emptyMessage?: string
+  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  renderSelectedItem?: ComboboxRenderSelectedItem
 }
 
 function ComboboxFieldControl(props: ComboboxFieldControlProps) {
-  const { label, selected, loading, size, emptyMessage, onBlur, multiple } = props
+  const { label, selected, loading, size, emptyMessage, onBlur, multiple, renderSelectedItem } =
+    props
   const control = useComboboxControl(props)
 
   return (
@@ -75,11 +86,12 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
       </PopoverPrimitive.Root>
 
       {multiple ? (
-        <ComboboxSelectedChips
+        <ComboboxSelectedItems
           label={label}
           options={control.selectedOptions}
           disabled={control.isInteractionDisabled}
           onRemove={control.removeValue}
+          renderSelectedItem={renderSelectedItem}
         />
       ) : null}
     </div>
@@ -106,6 +118,7 @@ export function ComboboxField({
   size = 'md',
   placeholder = 'Select…',
   emptyMessage = 'No options found.',
+  renderSelectedItem,
 }: ComboboxFieldProps) {
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
 
@@ -127,6 +140,7 @@ export function ComboboxField({
         size={size}
         placeholder={placeholder}
         emptyMessage={emptyMessage}
+        renderSelectedItem={renderSelectedItem}
       />
       <Field.Hint />
       <Field.Error />

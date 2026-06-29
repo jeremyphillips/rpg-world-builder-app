@@ -25,6 +25,10 @@
     "./platform": {
       "types": "./src/platform/index.ts",
       "default": "./src/platform/index.ts"
+    },
+    "./dev-bench": {
+      "types": "./src/dev-bench/index.ts",
+      "default": "./src/dev-bench/index.ts"
     }
   },
   "scripts": {

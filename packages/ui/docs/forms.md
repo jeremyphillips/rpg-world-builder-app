@@ -62,8 +62,24 @@ fixed while the page scrolls:
 Tab panels get extra bottom padding so the last field is not hidden under the
 actions bar. Pass `stickyChrome={false}` to restore the flat layout.
 
+Override the sticky tab/actions surfaces (e.g. transparent chrome inside a sheet)
+with `stickyTabsClassName` / `stickyActionsBarClassName` — merged after the
+defaults via `cn()`. Presets: `formStickyTabsTransparentClasses` and
+`formStickyActionsBarTransparentClasses` from `@rpg/ui/form`.
+
+For side sheets, prefer `footerWrapper` (e.g. render into `<Sheet.Footer>`) and
+`contentWrapper` (e.g. wrap tabs in `<Sheet.Body>`) so actions pin to the panel
+bottom instead of using a sticky bar inside padded scroll content. Keep the
+`<form>` as the flex column parent (`className="flex min-h-0 flex-1 flex-col"`)
+with header/body/footer as siblings.
+
 Single-page `<Form>` layouts can opt into the same sticky footer with
 `stickyFooter`.
+
+Use `FormFooterActions` for multi-button footers (optional `leading` and
+`secondary` slots plus pending-aware submit). `FormSaveFooter` is a save-only
+wrapper around the same layout. Pair with `FormActionsBar` via `<Form
+stickyFooter>` or `<TabbedForm>` (default sticky chrome).
 
 ## Field anatomy & the a11y contract
 
@@ -414,7 +430,8 @@ If you need a control `<Form>` doesn't support, you have two options:
   `value: string` field contract and drops straight into RHF.
 - Bold, italic, bullet/ordered lists, and hard breaks ship by default. Links are
   **opt-in** via the `linkable` prop (the `Link` extension + toolbar button are
-  gated behind it).
+  gated behind it). Inline/code-block marks are **opt-in** via `codeBlocks` (toolbar
+  buttons plus `` `inline` `` and ` ``` ` fence input rules; off by default).
 - When `linkable` is enabled, the toolbar opens a **link picker popover** instead
   of a browser prompt:
   - **Internal tab** (default): searchable spell/feat targets plus overview pages.
@@ -446,9 +463,24 @@ import { RichTextContent, sanitizeHtml } from '@rpg/ui'
 <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(stored) }} />
 ```
 
-Form config (`FieldType: 'richtext'`) forwards `linkable`, `internalLinkOptions`,
+Form config (`FieldType: 'richtext'`) forwards `linkable`, `codeBlocks`,
+`internalLinkOptions`,
 and `contentTypeOptions` to `RichTextField` / `RichTextEditor` when internal
 linking is required.
+
+### Markdown (`markdown` / `MarkdownField`)
+
+- Use for **plain markdown strings** stored as-is (no HTML conversion at save).
+  Dev Bench ticket `description` is the primary consumer; epic descriptions stay
+  on `richtext`.
+- **Write** tab: monospace `Textarea`. **Preview** tab: `MarkdownContent` (GFM).
+  Legacy HTML values still preview via `RichTextContent` until re-saved.
+- Prefer `richtext` when authors need WYSIWYG editing, internal catalog links, or
+  sanitized HTML output (species traits, epic descriptions). Prefer `markdown`
+  when agents and humans share the same markdown source (CLI JSON, code fences).
+
+Form config (`FieldType: 'markdown'`) forwards `rows` and `placeholder` to
+`MarkdownField`.
 
 ### JSON (`json` / `JsonField`)
 
@@ -544,6 +576,8 @@ where a plain `select` or `chips` field would not scale.
 
 - Client-side filter matches `label`, optional `description`, and `value`.
 - Multi mode renders selected values as removable chips below the trigger.
+- Pass `renderSelectedItem` to replace chips with a custom preview (e.g. linked
+  entity cards); the renderer receives `{ onRemove, disabled }` for dismiss affordances.
 - Already-selected values stay visible even when they are missing from the current
   `options` list (stale slug handling).
 - Default value: `[]` when `multiple` is true (default), `''` when `multiple: false`.

@@ -32,6 +32,10 @@ because CRAP is estimated without Istanbul coverage until we wire `--coverage`).
 
 Any string literal used in 2+ places → extract to a named constant.
 
+## Storybook (dashboard)
+
+No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cursor/rules/storybook-router.mdc](.cursor/rules/storybook-router.mdc). Port **6007**; primitives → `@rpg/ui` Storybook (`:6006`).
+
 ## Components
 
 - Every component gets a co-located `*.stories.tsx` (CSF3); logic-bearing or

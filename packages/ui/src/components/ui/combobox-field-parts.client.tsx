@@ -10,11 +10,12 @@ import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
-import type { ComboboxFieldOption } from './combobox-field.types'
+import type { ComboboxFieldOption, ComboboxRenderSelectedItem } from './combobox-field.types'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxChipRowVariants,
+  comboboxSelectedListVariants,
   comboboxContentVariants,
   comboboxEmptyVariants,
   comboboxListVariants,
@@ -252,31 +253,48 @@ export function ComboboxPanel({
   )
 }
 
-interface ComboboxSelectedChipsProps {
+interface ComboboxSelectedItemsProps {
   label: string
   options: ComboboxFieldOption[]
   disabled?: boolean
   onRemove: (value: string) => void
+  renderSelectedItem?: ComboboxRenderSelectedItem
 }
 
-export function ComboboxSelectedChips({
+export function ComboboxSelectedItems({
   label,
   options,
   disabled,
   onRemove,
-}: ComboboxSelectedChipsProps) {
+  renderSelectedItem,
+}: ComboboxSelectedItemsProps) {
   if (options.length === 0) return null
 
+  const listClassName = renderSelectedItem
+    ? comboboxSelectedListVariants()
+    : comboboxChipRowVariants()
+
   return (
-    <div className={comboboxChipRowVariants()} role="group" aria-label={`Selected ${label}`}>
+    <div className={listClassName} role="list" aria-label={`Selected ${label}`}>
       {options.map((option) => (
-        <DismissibleBadge
-          key={option.value}
-          label={option.label}
-          disabled={disabled}
-          onDismiss={() => onRemove(option.value)}
-        />
+        <div key={option.value} role="listitem">
+          {renderSelectedItem ? (
+            renderSelectedItem(option, {
+              onRemove: () => onRemove(option.value),
+              disabled,
+            })
+          ) : (
+            <DismissibleBadge
+              label={option.label}
+              disabled={disabled}
+              onDismiss={() => onRemove(option.value)}
+            />
+          )}
+        </div>
       ))}
     </div>
   )
 }
+
+/** @deprecated Use {@link ComboboxSelectedItems}. */
+export const ComboboxSelectedChips = ComboboxSelectedItems

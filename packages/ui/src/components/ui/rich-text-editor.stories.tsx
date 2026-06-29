@@ -68,6 +68,15 @@ export const WithLists: Story = {
   },
 }
 
+/** Opt in to inline/code-block marks with toolbar buttons and backtick input rules. */
+export const WithCodeBlocks: Story = {
+  args: {
+    codeBlocks: true,
+    value:
+      '<p>Run <code>pnpm bench add-ticket</code> from the repo root.</p><pre><code>pnpm bench list-tickets --status backlog</code></pre>',
+  },
+}
+
 export const ErrorState: Story = {
   args: { 'aria-invalid': true, value: '<p>Needs more detail.</p>' },
 }

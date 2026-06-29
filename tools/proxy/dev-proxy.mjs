@@ -1,11 +1,12 @@
 // fallow-ignore-file complexity
 // Single-origin dev reverse proxy.
 //
-// Routes one local URL to the three dev servers so the browser only ever talks
+// Routes one local URL to the four dev servers so the browser only ever talks
 // to one origin (no CORS, host-only cookies, same-origin redirects):
-//   /api  -> Express API
-//   /app  -> Vite dashboard
-//   /     -> Next.js public app
+//   /api   -> Express API
+//   /app   -> Vite dashboard
+//   /bench -> Vite Dev Bench app
+//   /      -> Next.js public app
 //
 // Override any target or the listen port via env vars.
 
@@ -17,6 +18,7 @@ const PROXY_PORT = Number(process.env.PROXY_PORT ?? 8080)
 const TARGETS = {
   api: process.env.API_URL ?? 'http://localhost:5001',
   dashboard: process.env.DASHBOARD_URL ?? 'http://localhost:5173',
+  bench: process.env.BENCH_URL ?? 'http://localhost:5174',
   public: process.env.PUBLIC_URL ?? 'http://localhost:3000',
 }
 
@@ -37,6 +39,7 @@ proxy.on('error', (err, _req, res) => {
 
 function resolveTarget(url = '/') {
   if (url === '/api' || url.startsWith('/api/')) return TARGETS.api
+  if (url === '/bench' || url.startsWith('/bench/')) return TARGETS.bench
   if (url === '/app' || url.startsWith('/app/')) return TARGETS.dashboard
   return TARGETS.public
 }
@@ -46,6 +49,11 @@ const server = http.createServer((req, res) => {
   // to `/app/` so it doesn't hit Vite's base-mismatch hint page.
   if (req.url === '/app') {
     res.writeHead(302, { location: '/app/' })
+    res.end()
+    return
+  }
+  if (req.url === '/bench') {
+    res.writeHead(302, { location: '/bench/' })
     res.end()
     return
   }
@@ -60,5 +68,6 @@ server.listen(PROXY_PORT, () => {
   console.log(`[dev-proxy] listening on http://localhost:${PROXY_PORT}`)
   console.log(`[dev-proxy]   /     -> ${TARGETS.public}    (Next public app)`)
   console.log(`[dev-proxy]   /app  -> ${TARGETS.dashboard} (Vite dashboard)`)
+  console.log(`[dev-proxy]   /bench -> ${TARGETS.bench} (Vite bench app)`)
   console.log(`[dev-proxy]   /api  -> ${TARGETS.api}    (Express API)`)
 })

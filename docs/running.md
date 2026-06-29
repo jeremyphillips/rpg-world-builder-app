@@ -19,26 +19,29 @@ stack.
 pnpm dev
 ```
 
-This runs the dev proxy **and** all three app dev servers concurrently (via
+This runs the dev proxy **and** all four app dev servers concurrently (via
 Turbo). Open the single proxy origin:
 
 ```
 http://localhost:8080
 ```
 
-| Route   | Lands on                                        |
-| ------- | ----------------------------------------------- |
-| `/`     | public landing (`/login`, `/signup`)            |
-| `/app/` | dashboard (redirects to `/login` if signed out) |
-| `/api`  | Express API                                     |
+| Route     | Lands on                                        |
+| --------- | ----------------------------------------------- |
+| `/`       | public landing (`/login`, `/signup`)            |
+| `/app/`   | dashboard (redirects to `/login` if signed out) |
+| `/bench/` | Dev Bench (local workbench; no auth)            |
+| `/api`    | Express API                                     |
 
 ### Why go through the proxy?
 
 The apps call the API with **relative** paths and rely on same-origin cookies.
 Visiting an app's own dev port directly (e.g. `http://localhost:3000`) makes
 `/api/...` resolve against that port and **404** — and the dashboard's bare
-`http://localhost:5173/app` will show Vite's base-mismatch hint. Always use the
-proxy origin (`:8080`), and note the dashboard lives at `/app/` (trailing slash).
+`http://localhost:5173/app` (or bench's `http://localhost:5174/bench/`) will
+show Vite's base-mismatch hint if you omit the trailing slash on the proxy path.
+Always use the proxy origin (`:8080`), and note the dashboard lives at `/app/`
+and Dev Bench at `/bench/` (trailing slash).
 
 ## Per-workspace scripts
 
@@ -47,7 +50,8 @@ Run a single workspace with a pnpm filter:
 ```bash
 pnpm --filter @rpg/api dev          # API only (tsx watch on :5001)
 pnpm --filter @rpg/public dev       # Next only (:3000)
-pnpm --filter @rpg/dashboard dev    # Vite only (:5173)
+pnpm --filter @rpg/dashboard dev    # Vite only (:5173 → open /app/)
+pnpm --filter @rpg/bench dev        # Vite only (:5174 → open /bench/)
 pnpm --filter @rpg/dashboard analyze # production build + bundle treemap (opens bundle-stats/stats.html)
 ```
 
@@ -83,6 +87,24 @@ CI runs axe against both Storybooks on PRs via the
 [Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
 `dashboard` matrix jobs).
 
+## Dev Bench CLI
+
+Agent-facing ticket/epic commands via `@rpg/bench-cli`:
+
+```bash
+pnpm bench --help
+pnpm bench seed-epics
+pnpm bench list-tickets --status backlog
+```
+
+The CLI calls the API **directly** at `BENCH_API_URL` (default `http://localhost:5001`) — not through the `:8080` proxy. Start `@rpg/api` first:
+
+```bash
+pnpm --filter @rpg/api dev
+```
+
+See [`tools/bench/README.md`](../tools/bench/README.md) for command reference and [`docs/dev-bench-agent-reference.md`](dev-bench-agent-reference.md) for field authoring detail.
+
 ## Quality gates (Turbo, all workspaces)
 
 ```bash
@@ -96,9 +118,11 @@ pnpm analyze     # fallow code-health report
 
 ## Troubleshooting
 
-| Symptom                                          | Cause / fix                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| "Could not establish a session token." on a form | Loaded an app on its own port — use `http://localhost:8080`. |
-| Vite "public base URL of /app/" hint             | Visit `/app/` (trailing slash); the proxy 302s bare `/app`.  |
-| API exits on boot with an env error              | Fill in `apps/api/.env` (or set `JWT_SECRET` in production). |
-| API can't connect to Mongo                       | Start MongoDB; check `MONGODB_URI`. See root README.         |
+| Symptom                                          | Cause / fix                                                     |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| "Could not establish a session token." on a form | Loaded an app on its own port — use `http://localhost:8080`.    |
+| Vite "public base URL of /app/" hint             | Visit `/app/` (trailing slash); the proxy 302s bare `/app`.     |
+| Vite "public base URL of /bench/" hint           | Visit `/bench/` (trailing slash); the proxy 302s bare `/bench`. |
+| Dev Bench API 404 when testing UI                | Use `http://localhost:8080/bench/`, not bare `:5174`.           |
+| API exits on boot with an env error              | Fill in `apps/api/.env` (or set `JWT_SECRET` in production).    |
+| API can't connect to Mongo                       | Start MongoDB; check `MONGODB_URI`. See root README.            |

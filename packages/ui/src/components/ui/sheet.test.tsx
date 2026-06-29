@@ -37,6 +37,25 @@ describe('Sheet', () => {
     expect(dialog).toHaveTextContent('Update vocabulary details.')
   })
 
+  it('renders an optional kicker above the headline', async () => {
+    const user = userEvent.setup()
+    render(
+      <Sheet.Root>
+        <Sheet.Trigger asChild>
+          <Button>Open sheet</Button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          <Sheet.Header kicker="BENCH-001" headline="Add ticket CRUD UI" />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open sheet' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Add ticket CRUD UI' })
+    expect(dialog).toHaveTextContent('BENCH-001')
+  })
+
   it('closes via a Sheet.Close footer button', async () => {
     const user = userEvent.setup()
     renderSheet()

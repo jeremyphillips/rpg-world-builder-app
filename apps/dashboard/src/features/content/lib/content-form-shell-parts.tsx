@@ -1,8 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Heading, Spinner, Text } from '@rpg/ui'
-import { Form, FormSaveFooter, TabbedForm, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import { Heading, Spinner, Text, Button } from '@rpg/ui'
+import {
+  Form,
+  FormFooterActions,
+  TabbedForm,
+  type FormItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
@@ -47,16 +53,15 @@ export function ContentFormCancelFooter({
   return (
     <>
       <FormUnsavedChangesGuard />
-      <div className="flex items-center gap-3">
-        <FormSaveFooter pending={pending} submitLabel={submitLabel} />
-        <button
-          type="button"
-          onClick={() => navigate(backHref)}
-          className="text-sm text-muted-foreground hover:underline"
-        >
-          Cancel
-        </button>
-      </div>
+      <FormFooterActions
+        pending={pending}
+        submitLabel={submitLabel}
+        secondary={
+          <Button type="button" variant="outline" onClick={() => navigate(backHref)}>
+            Cancel
+          </Button>
+        }
+      />
     </>
   )
 }

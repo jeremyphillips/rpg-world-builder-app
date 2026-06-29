@@ -18,6 +18,8 @@ export interface RichTextFieldProps {
   required?: boolean
   width?: FieldWidth
   linkable?: boolean
+  /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
+  codeBlocks?: boolean
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   disabled?: boolean
@@ -40,6 +42,7 @@ export function RichTextField({
   required,
   width,
   linkable,
+  codeBlocks,
   internalLinkOptions,
   contentTypeOptions,
   disabled,
@@ -56,6 +59,7 @@ export function RichTextField({
         <RichTextEditor
           aria-label={label}
           linkable={linkable}
+          codeBlocks={codeBlocks}
           internalLinkOptions={internalLinkOptions}
           contentTypeOptions={contentTypeOptions}
           disabled={disabled}

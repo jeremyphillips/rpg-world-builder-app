@@ -1,25 +1,10 @@
-import { cn } from '../lib/utils'
-import { Text } from '../components/ui/text'
-import { SubmitButton } from '../components/ui/submit-button'
+import type { FormFooterActionsProps } from './form-footer-actions'
+import { FormFooterActions } from './form-footer-actions'
 
-export interface FormSaveFooterProps {
-  /** Disables the submit button and swaps in `pendingLabel` while truthy. */
-  pending?: boolean
-  /** When true, renders `successMessage` beside the submit button. */
-  isSuccess?: boolean
-  /** Submit button label, e.g. "Save profile". */
-  submitLabel: string
-  /** Label shown while `pending`. Defaults to `"Saving…"`. */
-  pendingLabel?: string
-  /** Confirmation text announced (role="status") after a successful save. */
-  successMessage?: string
-  className?: string
-}
+export type FormSaveFooterProps = Omit<FormFooterActionsProps, 'leading' | 'secondary'>
 
 /**
- * The standard actions row for a save-style form: an optional success
- * confirmation plus a pending-aware submit button. Designed for the `footer`
- * render prop of `<Form>` / `<TabbedForm>`:
+ * Save-only form actions row. Thin wrapper around {@link FormFooterActions}.
  *
  * ```tsx
  * footer={(form) => (
@@ -32,24 +17,6 @@ export interface FormSaveFooterProps {
  * )}
  * ```
  */
-export function FormSaveFooter({
-  pending = false,
-  isSuccess = false,
-  submitLabel,
-  pendingLabel = 'Saving…',
-  successMessage,
-  className,
-}: FormSaveFooterProps) {
-  return (
-    <div className={cn('flex items-center justify-end gap-3 pt-2', className)}>
-      {isSuccess && successMessage ? (
-        <Text variant="small" role="status">
-          {successMessage}
-        </Text>
-      ) : null}
-      <SubmitButton pending={pending} pendingLabel={pendingLabel}>
-        {submitLabel}
-      </SubmitButton>
-    </div>
-  )
+export function FormSaveFooter(props: FormSaveFooterProps) {
+  return <FormFooterActions {...props} />
 }

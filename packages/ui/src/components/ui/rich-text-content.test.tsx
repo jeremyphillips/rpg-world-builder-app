@@ -34,6 +34,20 @@ describe('RichTextContent', () => {
     expect(screen.getByText('Safe')).toBeInTheDocument()
   })
 
+  it('renders code blocks and inline code', () => {
+    render(
+      <RichTextContent
+        html={
+          '<p>Use <code>pnpm bench</code> for tickets.</p><pre><code>pnpm bench list-tickets</code></pre>'
+        }
+        size="sm"
+      />,
+    )
+
+    expect(screen.getByText('pnpm bench')).toBeInTheDocument()
+    expect(screen.getByText('pnpm bench list-tickets')).toBeInTheDocument()
+  })
+
   it('renders internal links with preserved metadata attributes', () => {
     render(
       <RichTextContent
