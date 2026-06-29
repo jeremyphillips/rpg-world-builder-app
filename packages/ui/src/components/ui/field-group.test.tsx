@@ -25,6 +25,19 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
   })
 
+  it('stacks sibling fields with a gap-based column rhythm', () => {
+    render(
+      <FieldGroup legend="Character basics">
+        <TextField id="name" label="Name" />
+        <TextField id="bio" label="Bio" />
+      </FieldGroup>,
+    )
+    const stack = screen
+      .getByRole('group', { name: /Character basics/ })
+      .querySelector(':scope > div')
+    expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldGroup legend="Character basics">

@@ -26,6 +26,7 @@ import {
   fieldInlineControlRowClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
+  fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
 
@@ -118,7 +119,7 @@ export function DiceFormulaField({
       aria-describedby={describedBy}
       aria-invalid={hasError || undefined}
       disabled={disabled}
-      className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
+      className={cn(fieldSetResetClasses, fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
       onBlur={onBlur}
     >
       {labelPosition === 'above' ? (

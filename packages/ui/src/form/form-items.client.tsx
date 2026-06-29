@@ -21,6 +21,7 @@ import {
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
   formSectionStackClasses,
+  fieldSetResetClasses,
 } from '../components/ui/field.variants'
 import { Text } from '../components/ui/text'
 import { FieldRenderer } from './field-renderer.client'
@@ -344,7 +345,7 @@ function CollapsibleFormSection({
           </Text>
         ) : null}
         {item.kind === 'group' ? (
-          <fieldset aria-labelledby={triggerId} className="min-w-0 border-0 p-0">
+          <fieldset aria-labelledby={triggerId} className={fieldSetResetClasses}>
             <legend className="sr-only">{item.legend}</legend>
             <div className={fieldGroupStackClasses}>
               <FormSectionContext.Provider value={childContext}>
@@ -511,7 +512,7 @@ export function ArrayFieldRenderer({
 
   return (
     <fieldset
-      className={cn('min-w-0 border-0 p-0', fieldGroupBottomMarginClasses)}
+      className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses)}
       aria-labelledby={hideLegend ? labelledBy : undefined}
     >
       {hideLegend ? (

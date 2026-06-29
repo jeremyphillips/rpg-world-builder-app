@@ -8,6 +8,7 @@ import {
   fieldAnatomyStackClasses,
   fieldChipWrapGapClasses,
   fieldLabelVariants,
+  fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
@@ -187,7 +188,11 @@ export function ChipsField({
       aria-describedby={describedBy}
       aria-invalid={error ? true : undefined}
       disabled={disabled}
-      className={cn(fieldAnatomyStackClasses, width === 'auto' ? 'w-auto' : 'w-full')}
+      className={cn(
+        fieldSetResetClasses,
+        fieldAnatomyStackClasses,
+        width === 'auto' ? 'w-auto' : 'w-full',
+      )}
       onBlur={onBlur}
     >
       <legend

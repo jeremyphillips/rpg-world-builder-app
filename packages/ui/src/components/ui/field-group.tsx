@@ -6,6 +6,7 @@ import {
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
+  fieldSetResetClasses,
 } from './field.variants'
 import { Text } from './text'
 
@@ -23,7 +24,7 @@ export interface FieldGroupProps {
  */
 export function FieldGroup({ legend, description, className, children }: FieldGroupProps) {
   return (
-    <fieldset className={cn('min-w-0 border-0 p-0', fieldGroupBottomMarginClasses, className)}>
+    <fieldset className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses, className)}>
       <legend className={fieldGroupLegendVariants()}>{legend}</legend>
       {description ? (
         <Text variant="small" className={fieldGroupDescriptionClasses}>

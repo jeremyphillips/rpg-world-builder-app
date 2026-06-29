@@ -134,7 +134,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
 | `fieldAnatomyStackClasses`       | `space-y-2`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
 | `fieldLabelHintStackClasses`     | `gap-1`               | Label + hint cluster when `hintPosition="below-label"` (default)                |
-| `fieldGroupStackClasses`         | `space-y-6`           | Sibling fields inside a group, form column, tab panel, or array item            |
+| `fieldGroupStackClasses`         | `flex flex-col gap-6` | Sibling fields inside a group, form column, tab panel, or array item (24px)     |
 | `fieldGroupBottomMarginClasses`  | `mb-8`                | Space below a field group or array section fieldset (32px)                      |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-8` | Same 32px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
@@ -147,9 +147,11 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
 | `fieldArrayItemClasses`          | `p-4 border`          | Chrome around one repeatable array item                                         |
 | `fieldArrayItemActionsClasses`   | `mt-3`                | Space above array item move/remove controls                                     |
+| `fieldSetResetClasses`           | `m-0 border-0 p-0`    | Strip UA fieldset chrome from leaf field wrappers                               |
 
 Do not sprinkle ad-hoc `space-y-*` or margin utilities on field wrappers in apps — adjust the shared
-tokens in `@rpg/ui` so chips, text inputs, and combobox fields stay aligned.
+tokens in `@rpg/ui` so chips, text inputs, and combobox fields stay aligned. Prefer `gap-*` flex
+stacks over `space-y-*` when stacking sibling `<fieldset>` field wrappers.
 
 Dense chip fields (many options) should stack as full-width siblings, not share a `FieldRow` — rows
 are for short combinations (e.g. a small chip set beside a select).
