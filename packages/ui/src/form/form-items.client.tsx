@@ -20,10 +20,12 @@ import {
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
+  fieldSeparatorVariants,
   fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
   formSectionStackClasses,
   fieldSetResetClasses,
+  type FieldSeparator,
 } from '../components/ui/field.variants'
 import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
 import { Text } from '../components/ui/text'
@@ -396,12 +398,25 @@ function useVisibilityValues(
   return useDependsOnValues(visibility.dependsOn, namePrefix)
 }
 
+/** Applies an optional trailing divider wrapper around a leaf field or row. */
+function withFieldSeparator(separator: FieldSeparator | undefined, content: React.ReactNode) {
+  if (!separator) return content
+  return (
+    <div data-field-separator="" className={fieldSeparatorVariants({ tone: separator })}>
+      {content}
+    </div>
+  )
+}
+
 /** Routes a field to the conditional wrapper when it declares `visibility`. */
 function FieldNode({ config, idPrefix, namePrefix }: FieldNodeProps) {
   if (config.visibility) {
     return <ConditionalField config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
-  return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+  return withFieldSeparator(
+    config.separator,
+    <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />,
+  )
 }
 
 interface GroupFieldSectionProps {
@@ -472,16 +487,21 @@ interface RowFieldSectionProps {
 
 function RowFieldSection({ item, index, idPrefix, namePrefix }: RowFieldSectionProps) {
   return (
-    <FieldRow key={`row-${index}`} layout={item.layout} className={item.className}>
-      {item.fields.map((field) => (
-        <FieldNode
-          key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-          config={field}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-        />
-      ))}
-    </FieldRow>
+    <React.Fragment key={`row-${index}`}>
+      {withFieldSeparator(
+        item.separator,
+        <FieldRow layout={item.layout} className={item.className}>
+          {item.fields.map((field) => (
+            <FieldNode
+              key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+              config={field}
+              idPrefix={idPrefix}
+              namePrefix={namePrefix}
+            />
+          ))}
+        </FieldRow>,
+      )}
+    </React.Fragment>
   )
 }
 
@@ -679,7 +699,10 @@ function ConditionalArrayField({
 function ConditionalField({ config, idPrefix, namePrefix }: FieldNodeProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
   if (!config.visibility!.visibleWhen(values)) return null
-  return <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+  return withFieldSeparator(
+    config.separator,
+    <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />,
+  )
 }
 
 export interface SlotFieldRendererProps {

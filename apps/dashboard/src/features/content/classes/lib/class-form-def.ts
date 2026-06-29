@@ -656,6 +656,7 @@ function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
         name: 'spellcasting.level',
         label: 'Spellcasting level',
         labelPosition: 'settings',
+        separator: 'subtle',
         options: levelOptions,
         required: true,
         digits: levelDigits,

@@ -7,6 +7,7 @@ import type { FormItem } from './field-config'
 
 const stackSchema = z.object({
   advancedEnabled: z.boolean(),
+  advancedLevel: z.string().optional(),
   advancedValue: z.number().optional(),
 })
 
@@ -42,6 +43,22 @@ const toggleDependentStackFields: FormItem[] = [
         name: 'advancedEnabled',
         label: 'Advanced options',
         hint: 'Enable to configure the threshold below.',
+      },
+      {
+        type: 'select',
+        name: 'advancedLevel',
+        label: 'Start level',
+        labelPosition: 'settings',
+        separator: 'subtle',
+        options: [
+          { label: '1', value: '1' },
+          { label: '3', value: '3' },
+        ],
+        defaultValue: '1',
+        visibility: {
+          dependsOn: ['advancedEnabled'],
+          visibleWhen: (values) => values.advancedEnabled === true,
+        },
       },
       {
         type: 'number',
@@ -107,7 +124,7 @@ export const ToggleDependentStack: Story = {
   args: {
     schema: stackSchema,
     fields: toggleDependentStackFields,
-    defaultValues: { advancedEnabled: true, advancedValue: 13 },
+    defaultValues: { advancedEnabled: true, advancedLevel: '1', advancedValue: 13 },
     onSubmit: action('submit'),
     className: 'max-w-lg',
   },

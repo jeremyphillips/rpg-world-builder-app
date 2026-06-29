@@ -26,6 +26,7 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldToggleDependentStackClasses` — outer toggle-dependent stack rhythm
  * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
+ * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
 export const fieldAnatomyStackClasses = 'space-y-2'
 /** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
@@ -62,6 +63,22 @@ export const fieldToggleDependentStackClasses = 'flex flex-col gap-2'
 /** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
 export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
+
+/** Trailing divider tone for leaf fields and rows within a group/stack rhythm. */
+export type FieldSeparator = 'subtle'
+
+export const fieldSeparatorVariants = cva('border-b border-border pb-4', {
+  variants: {
+    tone: {
+      subtle: '',
+    },
+  },
+  defaultVariants: {
+    tone: 'subtle',
+  },
+})
+
+export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 
 export const fieldRowLayoutVariants = cva('', {
   variants: {

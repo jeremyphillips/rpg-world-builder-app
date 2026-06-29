@@ -24,6 +24,7 @@ import type {
   FieldHintPosition,
   FieldGroupLegendSize,
   FieldLabelPosition,
+  FieldSeparator,
   FieldStackLayout,
 } from '../components/ui/field.variants'
 
@@ -157,6 +158,8 @@ interface BaseFieldConfig {
   visibility?: FieldVisibility
   /** Optional helper text derived from other field values. */
   dynamicHint?: FieldDynamicHint
+  /** Trailing divider after this field within a group/stack rhythm. */
+  separator?: FieldSeparator
 }
 
 export interface TextFieldConfig extends BaseFieldConfig {
@@ -487,6 +490,8 @@ export interface RowConfig {
   /** Preferred display recipe. Use `className` only for one-off escape hatches. */
   layout?: FieldRowLayout
   className?: string
+  /** Trailing divider after this row within a group/stack rhythm. */
+  separator?: FieldSeparator
   /** When hidden, the whole row unmounts. */
   visibility?: FieldVisibility
 }

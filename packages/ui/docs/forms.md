@@ -796,6 +796,31 @@ gate prevents rendering an empty chrome shell when the toggle is off.
 Rows inside a stack may declare `visibility` on the `RowConfig` itself (same
 contract as leaf fields).
 
+### Field separators
+
+Use `separator: 'subtle'` on a leaf field or `kind: 'row'` item to draw a trailing
+`border-b` divider before the next sibling within a group or stack rhythm. The wrapper
+adds `pb-4` (16px) between the field content and the line. Token classes live in
+`fieldSeparatorVariants` ([field.variants.ts](../src/components/ui/field.variants.ts)).
+
+```ts
+{
+  type: 'select',
+  name: 'spellcasting.level',
+  label: 'Spellcasting level',
+  labelPosition: 'settings',
+  separator: 'subtle',
+  visibility: visibleWhenSpellcasting(),
+}
+```
+
+Pair with `labelPosition: 'settings'` inside toggle-dependent stacks when the first
+dependent should read as a header row above denser content. Use `dependentsChrome` when
+the whole dependent block needs an inset — separators divide siblings inside that region.
+
+Do **not** use row `className` for recurring separator styling; reserve `className` for
+genuine one-offs.
+
 ## Collapsible sections
 
 By default, top-level `kind: 'group'` and `kind: 'array'` sections render as plain

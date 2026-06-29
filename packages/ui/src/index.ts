@@ -146,12 +146,14 @@ export {
   fieldInlineSentenceClasses,
   fieldLabelHintStackClasses,
   fieldRowLayoutVariants,
+  fieldSeparatorVariants,
   fieldSettingsRowClasses,
   fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
   type FieldHintPosition,
   type FieldLabelPosition,
   type FieldRowLayout,
+  type FieldSeparator,
   type FieldStackLayout,
 } from './components/ui/field.variants'
 export {
