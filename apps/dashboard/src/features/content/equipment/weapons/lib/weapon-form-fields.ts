@@ -36,28 +36,29 @@ const damageTypeOptions = toOptions(
 const damageKindOptions = [
   { value: 'dice', label: 'Dice' },
   { value: 'flat', label: 'Flat amount' },
+  { value: 'none', label: 'None' },
 ]
 
 const WEAPON_SELECT_PLACEHOLDER = 'Choose...'
 
-function visibleWhenHasDamage(): FieldVisibility {
+function visibleWhenDealsDamage(): FieldVisibility {
   return {
-    dependsOn: ['hasDamage'],
-    visibleWhen: (v) => v.hasDamage === true,
+    dependsOn: ['damageKind'],
+    visibleWhen: (v) => v.damageKind !== 'none',
   }
 }
 
 function visibleWhenDiceDamage(): FieldVisibility {
   return {
-    dependsOn: ['hasDamage', 'damageKind'],
-    visibleWhen: (v) => v.hasDamage === true && v.damageKind === 'dice',
+    dependsOn: ['damageKind'],
+    visibleWhen: (v) => v.damageKind === 'dice',
   }
 }
 
 function visibleWhenFlatDamage(): FieldVisibility {
   return {
-    dependsOn: ['hasDamage', 'damageKind'],
-    visibleWhen: (v) => v.hasDamage === true && v.damageKind === 'flat',
+    dependsOn: ['damageKind'],
+    visibleWhen: (v) => v.damageKind === 'flat',
   }
 }
 
@@ -77,17 +78,15 @@ function visibleWhenRanged(): FieldVisibility {
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<EquipmentFormValues, 'hasDamage' | 'damageKind' | 'damageDice' | 'damageAmount'> {
-  if (!damage) return { hasDamage: false }
+): Pick<EquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
+  if (!damage) return { damageKind: 'none' }
   if (damage.kind === 'dice') {
     return {
-      hasDamage: true,
       damageKind: 'dice',
       damageDice: { count: damage.count, faces: damage.faces },
     }
   }
   return {
-    hasDamage: true,
     damageKind: 'flat',
     damageAmount: damage.amount,
   }
@@ -135,22 +134,15 @@ export function weaponFormFieldGroup(): FormItem {
         options: weaponPropertyOptions,
       },
       {
-        type: 'switch',
-        name: 'hasDamage',
-        label: 'Deals damage',
-        defaultValue: true,
-      },
-      {
         kind: 'row',
         fields: [
           {
             type: 'select',
             name: 'damageKind',
-            label: 'Damage kind',
+            label: 'Damage',
             options: damageKindOptions,
             defaultValue: 'dice',
             width: '1/2',
-            visibility: visibleWhenHasDamage(),
           },
           {
             type: 'select',
@@ -159,7 +151,7 @@ export function weaponFormFieldGroup(): FormItem {
             options: damageTypeOptions,
             placeholder: WEAPON_SELECT_PLACEHOLDER,
             width: '1/2',
-            visibility: visibleWhenHasDamage(),
+            visibility: visibleWhenDealsDamage(),
             required: true,
           },
         ],
@@ -234,7 +226,6 @@ export function weaponFormValuesFromEntity(
   EquipmentFormValues,
   | 'category'
   | 'mode'
-  | 'hasDamage'
   | 'damageKind'
   | 'damageDice'
   | 'damageAmount'

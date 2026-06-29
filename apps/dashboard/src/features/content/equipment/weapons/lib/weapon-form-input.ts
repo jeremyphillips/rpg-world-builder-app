@@ -12,7 +12,7 @@ import {
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 function damageFromForm(values: EquipmentInputBuildCtx['values']): WeaponInput['damage'] {
-  if (!values.hasDamage) return undefined
+  if (values.damageKind === 'none' || values.damageKind === undefined) return undefined
   if (values.damageKind === 'flat') {
     return values.damageAmount !== undefined
       ? { kind: 'flat', amount: values.damageAmount }

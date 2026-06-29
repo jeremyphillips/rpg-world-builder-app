@@ -77,8 +77,38 @@ describe('weapon kindFieldGroups', () => {
         name: 'damageType',
         width: '1/2',
         placeholder: 'Choose...',
+        visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
       }),
     ])
+  })
+
+  it('offers none as a damage option for weapons like the net', () => {
+    const weaponGroup = weaponFormFieldGroup()
+    if (!('fields' in weaponGroup)) {
+      throw new Error('expected weapon form group')
+    }
+
+    const damageRow = weaponGroup.fields.find(
+      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'damageKind'),
+    )
+    if (!damageRow || !('fields' in damageRow)) {
+      throw new Error('expected damage kind row')
+    }
+    const damageKindField = damageRow.fields.find(
+      (field) => !('kind' in field) && field.name === 'damageKind',
+    )
+
+    expect(damageKindField).toMatchObject({
+      options: expect.arrayContaining([{ value: 'none', label: 'None' }]),
+    })
+    expect(
+      weaponGroup.fields.find(
+        (field) => !('kind' in field) && field.name === 'hasDamage' && field.type === 'switch',
+      ),
+    ).toBeUndefined()
   })
 
   it('uses Choose... placeholders for required weapon selects', () => {
@@ -103,25 +133,11 @@ describe('weapon kindFieldGroups', () => {
       ).toMatchObject({ placeholder: 'Choose...' })
     }
   })
-
-  it('defaults deals damage to on and damage kind to dice', () => {
-    const weaponGroup = weaponFormFieldGroup()
-    if (!('fields' in weaponGroup)) {
-      throw new Error('expected weapon form group')
-    }
-
-    expect(
-      weaponGroup.fields.find(
-        (field) => !('kind' in field) && field.name === 'hasDamage' && field.type === 'switch',
-      ),
-    ).toMatchObject({ defaultValue: true })
-  })
 })
 
 describe('damageToForm', () => {
   it('maps dice damage to damageDice', () => {
     expect(damageToForm({ kind: 'dice', count: 2, faces: 6 })).toEqual({
-      hasDamage: true,
       damageKind: 'dice',
       damageDice: { count: 2, faces: 6 },
     })
@@ -129,10 +145,13 @@ describe('damageToForm', () => {
 
   it('maps flat damage to damageAmount', () => {
     expect(damageToForm({ kind: 'flat', amount: 1 })).toEqual({
-      hasDamage: true,
       damageKind: 'flat',
       damageAmount: 1,
     })
+  })
+
+  it('maps absent damage to none', () => {
+    expect(damageToForm(undefined)).toEqual({ damageKind: 'none' })
   })
 })
 
@@ -171,4 +190,11 @@ describe('weapon form round-trips', () => {
       })
     })
   }
+
+  it('maps net to damageKind none', () => {
+    const net = WEAPON_SEEDS.find((item) => item.slug === 'net')
+    expect(net).toBeDefined()
+    const formValues = equipmentFormDef.toFormValues(net!) as EquipmentFormValues
+    expect(formValues.damageKind).toBe('none')
+  })
 })
