@@ -4,7 +4,7 @@ import { useFormContext, type UseFormReturn } from 'react-hook-form'
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
 import { Button, Sheet, Text, Textarea } from '@rpg/ui'
-import { FormSaveFooter, TabbedForm, formStickyTabsTransparentClasses } from '@rpg/ui/form'
+import { FormFooterActions, TabbedForm, formStickyTabsTransparentClasses } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -100,7 +100,17 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
   }, 'Could not save ticket.')
 
   const footer = (form: UseFormReturn<TicketDetailFormValues>) => (
-    <FormSaveFooter
+    <FormFooterActions
+      secondary={
+        <Button
+          type="button"
+          variant="link"
+          className="text-foreground hover:text-foreground"
+          onClick={() => form.reset()}
+        >
+          Cancel
+        </Button>
+      }
       pending={isPending || form.formState.isSubmitting}
       isSuccess={isSuccess}
       submitLabel="Save ticket"
