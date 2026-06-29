@@ -198,6 +198,13 @@ function visibleWhenDurationSpecial(): FieldVisibility {
   }
 }
 
+function visibleWhenMaterialEnabled(): FieldVisibility {
+  return {
+    dependsOn: ['components.material.enabled'],
+    visibleWhen: (v) => v['components.material.enabled'] === true,
+  }
+}
+
 function visibleWhenReactionCastingTime(): FieldVisibility {
   return {
     dependsOn: ['castingTime.normal.unit'],
@@ -245,21 +252,39 @@ const spellFormSchema = z
     components: z.object({
       verbal: z.boolean().optional(),
       somatic: z.boolean().optional(),
-      material: z.object({ description: z.string().optional() }).optional(),
+      material: z
+        .object({
+          enabled: z.boolean().optional(),
+          description: z.string().optional(),
+        })
+        .optional(),
     }),
     deliveryMethod: z.string().optional(),
   })
   .superRefine((values, ctx) => {
-    const hasComponent =
-      values.components.verbal === true ||
-      values.components.somatic === true ||
+    const hasMaterial =
+      values.components.material?.enabled === true &&
       Boolean(values.components.material?.description?.trim())
+
+    const hasComponent =
+      values.components.verbal === true || values.components.somatic === true || hasMaterial
 
     if (!hasComponent) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one spell component (verbal, somatic, or material) is required',
         path: ['components'],
+      })
+    }
+
+    if (
+      values.components.material?.enabled === true &&
+      !values.components.material?.description?.trim()
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Material description is required when Material is enabled',
+        path: ['components', 'material', 'description'],
       })
     }
   })
@@ -276,7 +301,7 @@ const spellCreateDefaultValues: Partial<SpellFormValues> = {
   },
   range: { kind: 'self' },
   duration: { kind: 'instantaneous', value: 1, unit: 'round' },
-  components: { verbal: true, somatic: true },
+  components: { verbal: true, somatic: true, material: { enabled: false } },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
 
@@ -470,13 +495,21 @@ function castingFields(): FormItem[] {
               label: 'Somatic (S)',
               width: 'auto',
             },
+            {
+              type: 'switch',
+              name: 'components.material.enabled',
+              label: 'Material (M)',
+              width: 'auto',
+            },
           ],
         },
         {
           type: 'text',
           name: 'components.material.description',
-          label: 'Material (M)',
+          label: 'Material description',
           hint: 'Describe the material component.',
+          visibility: visibleWhenMaterialEnabled(),
+          required: true,
         },
       ],
     },

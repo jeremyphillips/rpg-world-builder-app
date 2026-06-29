@@ -68,7 +68,7 @@ describe('spellFormDef casting fields', () => {
 })
 
 describe('spellFormDef component fields', () => {
-  it('lays out verbal and somatic switches in a flex row at natural width', () => {
+  it('lays out V/S/M switches in a row and conditionally shows material description', () => {
     const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
     const componentsGroup = findGroup(castingTab?.fields ?? [], 'Components')
     const row = findRow(componentsGroup?.fields ?? [])
@@ -78,7 +78,21 @@ describe('spellFormDef component fields', () => {
     expect(row?.fields).toEqual([
       expect.objectContaining({ name: 'components.verbal', width: 'auto' }),
       expect.objectContaining({ name: 'components.somatic', width: 'auto' }),
+      expect.objectContaining({ name: 'components.material.enabled', width: 'auto' }),
     ])
+
+    const descriptionField = componentsGroup?.fields.find(
+      (field) => !('kind' in field) && field.name === 'components.material.description',
+    )
+    expect(descriptionField).toEqual(
+      expect.objectContaining({
+        type: 'text',
+        required: true,
+        visibility: expect.objectContaining({
+          dependsOn: ['components.material.enabled'],
+        }),
+      }),
+    )
   })
 })
 
