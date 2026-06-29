@@ -72,6 +72,7 @@ export {
   type EditableGridFieldConfig,
   type DiceFormulaFieldConfig,
   type InputSelectFieldConfig,
+  type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
   type GroupConfig,

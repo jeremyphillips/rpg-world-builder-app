@@ -162,6 +162,76 @@ describe('Form inputSelect field', () => {
     expect(screen.getByRole('combobox', { name: 'Weight unit' })).toBeDisabled()
   })
 
+  it('renders a static unit label when fixedUnit is set on nested inputSelect', () => {
+    const onSubmit = vi.fn()
+    const fields: FormItem[] = [
+      {
+        type: 'inputSelect',
+        name: 'weight',
+        label: 'Weight',
+        inputType: 'number',
+        fixedUnit: 'lb.',
+        unitValue: 'lb',
+        min: 0,
+        step: 0.5,
+        valueDigits: 2,
+        defaultValue: { value: 3, unit: 'lb' },
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          weight: z.object({ value: z.coerce.number().optional(), unit: z.literal('lb') }),
+        })}
+        fields={fields}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByText('lb.')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Weight unit' })).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Weight value')).toHaveValue(3)
+  })
+
+  it('submits nested value and fixed unitValue through fixedUnit mode', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    const fields: FormItem[] = [
+      {
+        type: 'inputSelect',
+        name: 'weight',
+        label: 'Weight',
+        inputType: 'number',
+        fixedUnit: 'lb.',
+        unitValue: 'lb',
+        min: 0,
+        valueDigits: 2,
+        defaultValue: { value: 0, unit: 'lb' },
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          weight: z.object({ value: z.coerce.number(), unit: z.literal('lb') }),
+        })}
+        fields={fields}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const input = screen.getByLabelText('Weight value')
+    await user.clear(input)
+    await user.type(input, '12')
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.lastCall?.[0]).toEqual({ weight: { value: 12, unit: 'lb' } })
+  })
+
   it('stores plain numbers while displaying grouped cost values', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

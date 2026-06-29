@@ -39,6 +39,7 @@ export type FieldType =
   | 'editableGrid'
   | 'diceFormula'
   | 'inputSelect'
+  | 'inputUnit'
   | 'chooseFromChips'
   | 'inlineChooseCount'
 
@@ -406,7 +407,8 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
 export interface InputSelectFieldConfig extends BaseFieldConfig {
   type: 'inputSelect'
   inputType: 'text' | 'number'
-  options: FieldOption[]
+  /** Required for select mode; omit when `fixedUnit` is set. */
+  options?: FieldOption[]
   valueKey?: string
   unitKey?: string
   searchable?: boolean
@@ -423,7 +425,27 @@ export interface InputSelectFieldConfig extends BaseFieldConfig {
   formatGrouped?: boolean
   /** When true, only the unit segment is disabled (value input stays editable). */
   unitDisabled?: boolean
+  /** Static unit label — renders label mode instead of a unit select (single-option composites). */
+  fixedUnit?: string
+  /** Stored unit enum value written to `unitKey` when `fixedUnit` is set. */
+  unitValue?: string
   defaultValue?: Record<string, unknown>
+}
+
+/** Scalar number + fixed unit label (walk speed, weapon range, spell distance, …). */
+export interface InputUnitFieldConfig extends BaseFieldConfig {
+  type: 'inputUnit'
+  /** Defaults to `number`. */
+  inputType?: 'number'
+  unit: string
+  min?: number
+  max?: number
+  step?: number
+  valueDigits?: FieldDigits
+  valueDigitsDependsOn?: string
+  valueDigitsLookup?: Record<string, FieldDigits>
+  formatGrouped?: boolean
+  defaultValue?: number
 }
 
 /** Discriminated union of every leaf field, keyed by `type`. */
@@ -447,8 +469,7 @@ export type FieldConfig =
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
   | InputSelectFieldConfig
-
-/** A responsive row of fields, mapped to `FieldRow` by the renderer. */
+  | InputUnitFieldConfig
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
@@ -586,6 +607,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   editableGrid: {},
   diceFormula: defaultDiceFormulaForMode('optional'),
   inputSelect: {},
+  inputUnit: undefined,
   chooseFromChips: [],
   inlineChooseCount: undefined,
 }

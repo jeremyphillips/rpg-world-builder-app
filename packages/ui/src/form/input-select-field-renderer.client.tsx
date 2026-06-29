@@ -3,30 +3,13 @@
 import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../components/ui/input-select-field.client'
-import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import { resolveValueDigitsFromConfig } from './input-field-value-digits'
 import { fieldDefaultValue, type InputSelectFieldConfig } from './field-config'
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {}
-}
-
-function maxDigitsFromLookup(lookup: Record<string, FieldDigits>): FieldDigits {
-  return Math.max(...Object.values(lookup).map(Number)) as FieldDigits
-}
-
-function resolveValueDigits(
-  config: InputSelectFieldConfig,
-  watchedKind: unknown,
-): FieldDigits | undefined {
-  if (config.valueDigits != null) return config.valueDigits
-  if (!config.valueDigitsLookup) return undefined
-
-  const lookup = config.valueDigitsLookup
-  if (watchedKind == null || watchedKind === '') return maxDigitsFromLookup(lookup)
-
-  return lookup[String(watchedKind)] ?? maxDigitsFromLookup(lookup)
 }
 
 export interface InputSelectFieldRendererProps {
@@ -55,6 +38,7 @@ export function InputSelectFieldRenderer({
   const valuePath = `${fullName}.${valueKey}`
   const unitPath = `${fullName}.${unitKey}`
   const configDefault = asRecord(fieldDefaultValue(config))
+  const isFixedUnit = Boolean(config.fixedUnit)
 
   const { field: valueField, fieldState: valueFieldState } = useController({
     name: valuePath,
@@ -62,7 +46,7 @@ export function InputSelectFieldRenderer({
   })
   const { field: unitField, fieldState: unitFieldState } = useController({
     name: unitPath,
-    defaultValue: configDefault[unitKey],
+    defaultValue: config.unitValue ?? configDefault[unitKey],
   })
 
   const dependsOn = config.valueDigitsDependsOn
@@ -72,7 +56,7 @@ export function InputSelectFieldRenderer({
       : dependsOn
     : undefined
   const watchedKind = useWatch({ name: prefixedDependsOn ?? '', disabled: !prefixedDependsOn })
-  const valueDigits = resolveValueDigits(config, watchedKind)
+  const valueDigits = resolveValueDigitsFromConfig(config, watchedKind)
 
   const rawValue = valueField.value
   const value =
@@ -97,7 +81,7 @@ export function InputSelectFieldRenderer({
       id={id}
       label={config.label}
       inputType={config.inputType}
-      options={config.options}
+      options={config.options ?? []}
       searchable={config.searchable}
       unitPlaceholder={config.unitPlaceholder}
       error={error}
@@ -107,6 +91,8 @@ export function InputSelectFieldRenderer({
       required={config.required}
       disabled={config.disabled}
       unitDisabled={config.unitDisabled}
+      unitMode={isFixedUnit ? 'label' : 'select'}
+      fixedUnit={config.fixedUnit}
       size={config.size}
       width={config.width}
       min={config.min}
@@ -118,7 +104,7 @@ export function InputSelectFieldRenderer({
       value={value}
       unit={unit}
       onValueChange={valueField.onChange}
-      onUnitChange={unitField.onChange}
+      onUnitChange={isFixedUnit ? () => {} : unitField.onChange}
       onBlur={handleBlur}
     />
   )

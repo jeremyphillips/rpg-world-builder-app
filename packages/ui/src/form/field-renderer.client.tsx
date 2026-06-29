@@ -16,6 +16,7 @@ import { TextField } from '../components/ui/text-field'
 import { MarkdownField } from '../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from './file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
+import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
@@ -349,6 +350,15 @@ const fieldRenderers: {
   ),
   inlineChooseCount: ({ config, field, id, error }) => (
     <InlineChooseCountFieldRenderer config={config} field={field} id={id} error={error} />
+  ),
+  inputUnit: ({ config, field, id, error, namePrefix }) => (
+    <InputUnitFieldRenderer
+      config={config}
+      field={field}
+      id={id}
+      error={error}
+      namePrefix={namePrefix}
+    />
   ),
   combobox: ({ config, field, id, error }) => (
     <ComboboxField
