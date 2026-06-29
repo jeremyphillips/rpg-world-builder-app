@@ -67,6 +67,10 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * the bottom while scrolling long panels.
    */
   stickyChrome?: boolean
+  /** Extra classes merged onto the sticky tab list wrapper (overrides default surface). */
+  stickyTabsClassName?: string
+  /** Extra classes merged onto the sticky actions bar (overrides default surface). */
+  stickyActionsBarClassName?: string
 }
 
 /**
@@ -87,6 +91,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   mode,
   collapsibleSections = true,
   stickyChrome = true,
+  stickyTabsClassName,
+  stickyActionsBarClassName,
 }: TabbedFormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -125,7 +131,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       className={cn(stickyChrome ? undefined : 'space-y-6', className)}
     >
       <Tabs defaultValue={tabs[0]?.id} variant="line">
-        <div className={cn(stickyChrome ? formStickyTabsClasses : undefined)}>
+        <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
           <TabsList>
             {tabs.map((tab) => (
               <TabsTrigger key={tab.id} value={tab.id}>
@@ -155,7 +161,9 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       </Tabs>
 
       {stickyChrome ? (
-        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+        <FormActionsBar className={stickyActionsBarClassName} formError={formError}>
+          {resolvedFooter}
+        </FormActionsBar>
       ) : (
         <>
           {formError ? (

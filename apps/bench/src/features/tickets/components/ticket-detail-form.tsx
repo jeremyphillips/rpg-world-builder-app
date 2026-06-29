@@ -4,7 +4,12 @@ import { useFormContext } from 'react-hook-form'
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
 import { Button, ConfirmDialog, Text, Textarea } from '@rpg/ui'
-import { FormSaveFooter, TabbedForm } from '@rpg/ui/form'
+import {
+  FormSaveFooter,
+  TabbedForm,
+  formStickyActionsBarTransparentClasses,
+  formStickyTabsTransparentClasses,
+} from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -61,9 +66,14 @@ function AcceptanceCriteriaPasteHelper() {
 
 interface TicketDetailFormProps {
   ticket: Ticket
+  /** Transparent sticky chrome for sheet/drawer surfaces. */
+  transparentStickyChrome?: boolean
 }
 
-export function TicketDetailForm({ ticket }: TicketDetailFormProps) {
+export function TicketDetailForm({
+  ticket,
+  transparentStickyChrome = false,
+}: TicketDetailFormProps) {
   const { data: epics = [] } = useEpicsList()
   const { data: allTickets = [] } = useTickets({})
   const { mutateAsync, isPending, isSuccess } = useUpdateTicket(ticket.id)
@@ -108,6 +118,10 @@ export function TicketDetailForm({ ticket }: TicketDetailFormProps) {
         defaultValues={mapTicketToDetailFormValues(ticket)}
         onSubmit={onSubmit}
         formError={formError}
+        stickyTabsClassName={transparentStickyChrome ? formStickyTabsTransparentClasses : undefined}
+        stickyActionsBarClassName={
+          transparentStickyChrome ? formStickyActionsBarTransparentClasses : undefined
+        }
         footer={(form) => (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Button

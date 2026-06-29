@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { formStickyTabsTransparentClasses } from './form-chrome.variants'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -136,6 +137,24 @@ describe('TabbedForm', () => {
     const tablist = screen.getByRole('tablist')
     expect(tablist.parentElement).toHaveClass('sticky')
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('sticky')
+  })
+
+  it('merges stickyTabsClassName and stickyActionsBarClassName onto sticky chrome', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        stickyTabsClassName={formStickyTabsTransparentClasses}
+        stickyActionsBarClassName={formStickyTabsTransparentClasses}
+        footer={<button type="submit">Save changes</button>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    expect(tablist.parentElement).toHaveClass('sticky', 'bg-transparent')
+    expect(tablist.parentElement).not.toHaveClass('bg-background')
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('bg-transparent')
   })
 
   it('renders a flat layout when stickyChrome is false', () => {

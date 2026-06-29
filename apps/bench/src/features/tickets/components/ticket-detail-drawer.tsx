@@ -39,7 +39,7 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
           {ticket ? (
             <>
               <TicketMeta ticket={ticket} />
-              <TicketDetailForm ticket={ticket} />
+              <TicketDetailForm ticket={ticket} transparentStickyChrome />
             </>
           ) : null}
         </Sheet.Body>

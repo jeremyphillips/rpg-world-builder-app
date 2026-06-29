@@ -62,6 +62,11 @@ fixed while the page scrolls:
 Tab panels get extra bottom padding so the last field is not hidden under the
 actions bar. Pass `stickyChrome={false}` to restore the flat layout.
 
+Override the sticky tab/actions surfaces (e.g. transparent chrome inside a sheet)
+with `stickyTabsClassName` / `stickyActionsBarClassName` — merged after the
+defaults via `cn()`. Presets: `formStickyTabsTransparentClasses` and
+`formStickyActionsBarTransparentClasses` from `@rpg/ui/form`.
+
 Single-page `<Form>` layouts can opt into the same sticky footer with
 `stickyFooter`.
 

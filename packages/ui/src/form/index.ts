@@ -11,6 +11,14 @@ export {
 export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
 export { FormActionsBar, type FormActionsBarProps } from './form-actions-bar'
+export {
+  formFooterSpacingClasses,
+  formStickyActionsBarClasses,
+  formStickyActionsBarTransparentClasses,
+  formStickyTabsClasses,
+  formStickyTabsTransparentClasses,
+  formTabPanelsBottomPaddingClasses,
+} from './form-chrome.variants'
 export { WizardStepForm, type WizardStepFormProps } from './wizard-step-form.client'
 
 export {
