@@ -410,6 +410,7 @@ function castingFields(): FormItem[] {
               name: 'duration.value',
               label: 'Duration',
               min: 1,
+              digits: 2,
               visibility: visibleWhenDurationTimed(),
               required: true,
             },
@@ -421,18 +422,19 @@ function castingFields(): FormItem[] {
               visibility: visibleWhenDurationTimed(),
               required: true,
             },
+            {
+              type: 'switch',
+              name: 'duration.upTo',
+              label: 'Up to',
+              labelPosition: 'above',
+              visibility: visibleWhenDurationTimed(),
+            },
           ],
         },
         {
           type: 'switch',
           name: 'duration.concentration',
           label: 'Concentration',
-          visibility: visibleWhenDurationTimed(),
-        },
-        {
-          type: 'switch',
-          name: 'duration.upTo',
-          label: 'Up to',
           visibility: visibleWhenDurationTimed(),
         },
         {
