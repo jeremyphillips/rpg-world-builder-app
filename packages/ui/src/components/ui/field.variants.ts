@@ -13,7 +13,7 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `formSectionStackClasses` — top-level accordion sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutVariants` — display mode for schema-driven rows
- * - `fieldChipWrapGapClasses` — gap between chip pills inside `ChipsField`
+ * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — space below a group/section description
  * - `fieldGroupLegendSpacingClasses` — space below a group legend
  * - `fieldArrayItemClasses` — chrome around one repeatable array item
@@ -29,9 +29,12 @@ export const fieldGroupStackClasses = 'space-y-6'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-6'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
-export const fieldChipWrapGapClasses = 'gap-2'
+export const fieldChipWrapGapClasses = 'gap-2 pt-1'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-4'
+/** Shared legend typography — field groups, array sections, and collapsible accordion triggers. */
+export const fieldGroupLegendTypographyClasses =
+  'text-field-group-legend font-heading leading-none text-foreground'
 export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
 export const fieldArrayItemActionRowClasses = cn(
@@ -78,5 +81,5 @@ export const fieldLabelVariants = cva(
 )
 
 export const fieldGroupLegendVariants = cva(
-  cn(fieldGroupLegendSpacingClasses, 'text-lg font-heading leading-none text-foreground'),
+  cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
 )

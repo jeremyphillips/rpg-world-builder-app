@@ -65,6 +65,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'badge-md',
         'table-body',
         'table-stat',
+        'field-group-legend',
       ],
       'font-weight': [
         'heading-display',

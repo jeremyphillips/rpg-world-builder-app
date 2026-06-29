@@ -80,6 +80,21 @@ describe('Accordion', () => {
     expect(openContent?.className).toContain('data-[state=open]:overflow-visible')
   })
 
+  it('applies field group legend typography on section variant triggers', () => {
+    render(
+      <Accordion type="single" collapsible defaultValue="one" variant="section">
+        <AccordionItem value="one">
+          <AccordionTrigger>Section one</AccordionTrigger>
+          <AccordionContent>Panel one</AccordionContent>
+        </AccordionItem>
+      </Accordion>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Section one' })).toHaveClass(
+      'text-field-group-legend',
+    )
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <Accordion type="multiple" defaultValue={['one']}>

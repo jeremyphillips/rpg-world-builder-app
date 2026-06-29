@@ -86,13 +86,13 @@ export const Disabled: Story = {
   },
 }
 
-export const SizeMedium: Story = {
+export const SizeSmall: Story = {
   args: {
     label: 'Play Style',
     options: playStyleOptions,
     multiple: true,
     value: ['exploration'],
-    chipSize: 'md',
+    chipSize: 'sm',
   },
 }
 

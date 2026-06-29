@@ -756,8 +756,19 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Tools & Skills',
+      legend: 'Skills & Tools',
       fields: [
+        {
+          type: 'chooseFromChips',
+          name: 'proficiencies.skills.from',
+          chooseName: 'proficiencies.skills.choose',
+          label: 'Skill proficiencies',
+          options: skillOptions,
+          info: CLASS_SKILL_OPTIONS_INFO,
+          chooseMin: 0,
+          chooseMax: SKILL_IDS.length,
+          required: true,
+        },
         {
           type: 'chips',
           name: 'proficiencies.tools.categories',
@@ -772,17 +783,6 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           options: ctx.options?.tools ?? [],
           placeholder: 'Choose tools…',
           width: 'xl',
-        },
-        {
-          type: 'chooseFromChips',
-          name: 'proficiencies.skills.from',
-          chooseName: 'proficiencies.skills.choose',
-          label: 'Skill proficiencies',
-          options: skillOptions,
-          info: CLASS_SKILL_OPTIONS_INFO,
-          chooseMin: 0,
-          chooseMax: SKILL_IDS.length,
-          required: true,
         },
       ],
     },

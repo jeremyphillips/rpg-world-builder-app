@@ -64,9 +64,10 @@ export function ChooseFromChipsField({
   required,
   disabled,
   size = 'md',
-  chipSize = 'sm',
+  chipSize,
   width,
 }: ChooseFromChipsFieldProps) {
+  const resolvedChipSize = chipSize ?? size
   return (
     <ChooseCountFieldShell
       id={id}
@@ -112,7 +113,7 @@ export function ChooseFromChipsField({
             onChange={(next) => onChipsChange?.(Array.isArray(next) ? next : next ? [next] : [])}
             onBlur={onChipsBlur}
             disabled={disabled}
-            chipSize={chipSize}
+            chipSize={resolvedChipSize}
           />
         </>
       )}

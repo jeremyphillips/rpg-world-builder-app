@@ -258,7 +258,7 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   multiple?: boolean
   /** Maximum selections when `multiple` is true. */
   max?: number
-  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
   chipSize?: FieldSize
   defaultValue?: string | string[]
 }
@@ -277,7 +277,7 @@ export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
   prefix?: string
   /** Trailing sentence fragment after the count input. Defaults to `skills from:`. */
   suffix?: string
-  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
   chipSize?: FieldSize
   defaultValue?: string[]
   chooseDefaultValue?: number

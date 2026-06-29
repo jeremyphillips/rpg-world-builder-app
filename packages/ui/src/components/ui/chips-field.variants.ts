@@ -1,5 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { fieldSizeTypographyClasses } from './field-sizing.variants'
+
 export const chipPillVariants = cva(
   [
     'inline-flex items-center rounded-full border font-medium transition-colors',
@@ -9,13 +12,13 @@ export const chipPillVariants = cva(
   {
     variants: {
       size: {
-        sm: 'px-2.5 py-0.5 text-xs',
-        md: 'px-2.5 py-0.5 text-xs',
-        lg: 'px-4 py-1.5 text-base',
+        sm: cn('px-2.5 py-0.5', fieldSizeTypographyClasses.sm),
+        md: cn('px-3 py-1.5 text-sm'),
+        lg: cn('px-4 py-2', fieldSizeTypographyClasses.lg),
       },
     },
     defaultVariants: {
-      size: 'sm',
+      size: 'md',
     },
   },
 )

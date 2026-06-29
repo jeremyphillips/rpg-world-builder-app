@@ -141,7 +141,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldRowLayoutVariants`         | —                     | Display recipe for `FieldRow` / `RowConfig.layout` (`flex`, `responsive-2`, …)  |
 | `fieldInlineSentenceClasses`     | `gap-x-2 gap-y-2`     | Inline “Choose [N] from:” sentence rows (`ChooseFromChipsField`, …)             |
 | `fieldInlineControlRowClasses`   | `gap-3`               | Inline label + control rows (e.g. `DiceFormulaField`)                           |
-| `fieldChipWrapGapClasses`        | `gap-2`               | Gap between chip pills inside `ChipsField`                                      |
+| `fieldChipWrapGapClasses`        | `gap-2 pt-1`          | Chip pill row inside `ChipsField`                                               |
 | `fieldGroupDescriptionClasses`   | `mb-3`                | Space below a group or accordion section description                            |
 | `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
 | `fieldArrayItemClasses`          | `p-4 border`          | Chrome around one repeatable array item                                         |
@@ -513,7 +513,7 @@ from a fixed set — suitable for tags, moods, play styles, etc.
 
 - Renders as a `<fieldset>` / `<legend>` (a11y group labelling).
 - `size` — field label type scale (`md` default, same as other fields).
-- `chipSize` — pill padding/type scale (`sm` default).
+- `chipSize` — pill padding/type scale (defaults to `size`).
 - `multiple: true` (default) → each option is `role="checkbox"`; value is `string[]`.
 - `multiple: false` → each option is `role="radio"`; value is a single `string`.
 
@@ -641,8 +641,9 @@ section in an accordion (requires `collapsibleSections` on `<Form>` / `<TabbedFo
 which defaults to `true`). Pass `collapsibleSections={false}` to force flat fieldsets
 for every section, even when `collapsible: true` is set.
 
-Section legends use the shared `fieldGroupLegendVariants` styling
-(`font-display`, `text-lg`, `mb-4`). Collapsible sections **start open**.
+Section legends and collapsible accordion triggers share `fieldGroupLegendTypographyClasses`
+(`text-field-group-legend`, `font-heading`, `mb-4` via `fieldGroupLegendVariants` on
+plain fieldsets). Collapsible sections **start open**.
 
 Fields stay mounted while a section is collapsed, so react-hook-form values are
 preserved (`shouldUnregister` only applies to conditional visibility, not

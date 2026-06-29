@@ -13,6 +13,7 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByRole('group', { name: /Character basics/ })).toBeInTheDocument()
+    expect(screen.getByText('Character basics')).toHaveClass('text-field-group-legend')
   })
 
   it('renders an optional description', () => {

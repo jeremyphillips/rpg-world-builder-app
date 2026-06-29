@@ -78,7 +78,7 @@ export interface ChipsFieldOptionsProps {
   onChange?: (value: string | string[]) => void
   onBlur?: () => void
   disabled?: boolean
-  chipSize?: ChipSize
+  chipSize: ChipSize
 }
 
 /** Chip pill row only — for embedding inside a parent fieldset (e.g. `ChooseFromChipsField`). */
@@ -92,7 +92,7 @@ export function ChipsFieldOptions({
   onChange,
   onBlur,
   disabled,
-  chipSize = 'sm',
+  chipSize,
 }: ChipsFieldOptionsProps) {
   const selected: string[] = React.useMemo(() => {
     if (multiple) {
@@ -146,7 +146,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps {
   options: FieldOption[]
   /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
-  /** Pill padding/type scale (default `sm`). */
+  /** Pill padding/type scale — defaults to `size` when omitted. */
   chipSize?: ChipSize
   width?: FieldWidth
   hintPosition?: FieldHintPosition
@@ -172,9 +172,10 @@ export function ChipsField({
   required,
   disabled,
   size = 'md',
-  chipSize = 'sm',
+  chipSize,
   width,
 }: ChipsFieldProps) {
+  const resolvedChipSize = chipSize ?? size
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
@@ -210,7 +211,7 @@ export function ChipsField({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        chipSize={chipSize}
+        chipSize={resolvedChipSize}
       />
 
       {hintPosition === 'below-label' ? (

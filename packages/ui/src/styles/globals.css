@@ -132,6 +132,10 @@
   --text-heading-label: var(--text-heading-group);
   --text-heading-label--line-height: var(--text-heading-group--line-height);
 
+  /* Form chrome — group/section legend type scale. */
+  --text-field-group-legend: var(--text-2xl);
+  --text-field-group-legend--line-height: var(--text-2xl--line-height);
+
   --tracking-heading: -0.025em;
   --leading-none: 1;
 

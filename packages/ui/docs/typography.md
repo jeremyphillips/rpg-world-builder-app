@@ -147,6 +147,12 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-5xl`            | 48             | Marketing display (responsive hero)             |
 | `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness              |
 
+## Form role aliases
+
+| Role alias / utility      | px @ 16px root | Typical use                                            |
+| ------------------------- | -------------- | ------------------------------------------------------ |
+| `text-field-group-legend` | 24             | Form group/array legends, collapsible section triggers |
+
 ## Heading size tokens
 
 Visual tiers and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
