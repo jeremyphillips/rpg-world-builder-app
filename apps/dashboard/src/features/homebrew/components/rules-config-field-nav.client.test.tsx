@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, beforeAll } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
 
 import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
 
@@ -26,11 +25,7 @@ const defaultNavProps = {
 
 describe('RulesConfigFieldNav', () => {
   it('lists provided sections in the desktop rail', () => {
-    render(
-      <MemoryRouter>
-        <RulesConfigFieldNav {...defaultNavProps} />
-      </MemoryRouter>,
-    )
+    render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     const rail = screen.getByRole('navigation', { name: 'Character configuration sections' })
     expect(rail).toHaveTextContent('Starting level')
@@ -47,11 +42,7 @@ describe('RulesConfigFieldNav', () => {
     document.body.appendChild(target)
 
     const user = userEvent.setup()
-    render(
-      <MemoryRouter>
-        <RulesConfigFieldNav {...defaultNavProps} />
-      </MemoryRouter>,
-    )
+    render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     await user.click(screen.getByRole('combobox', { name: 'Character configuration section' }))
     await user.click(await screen.findByRole('option', { name: 'Creature types' }))

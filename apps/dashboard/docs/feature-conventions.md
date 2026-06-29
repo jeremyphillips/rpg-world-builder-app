@@ -72,6 +72,21 @@ Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
 (`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
 in `@rpg/ui` Storybook (`:6006`) instead.
 
+### Routing in stories
+
+[`preview.tsx`](../.storybook/preview.tsx) wraps every story in `MemoryRouter`.
+Do **not** import or render `MemoryRouter`, `BrowserRouter`, or `RouterProvider`
+in story decorators — nested routers throw at runtime and fail the Storybook
+test runner. ESLint enforces this on `**/*.stories.tsx`.
+
+| Context                                 | Router?                                                |
+| --------------------------------------- | ------------------------------------------------------ |
+| Dashboard `*.stories.tsx`               | No — preview provides it                               |
+| Dashboard `*.test.tsx`                  | Only if the component uses `Link`, `useNavigate`, etc. |
+| Component uses `#` anchors / props only | No router in stories or tests                          |
+
+For layout-only decorators, use page shells or a `<div>` — not a router.
+
 | Story title prefix | Use for                                                          |
 | ------------------ | ---------------------------------------------------------------- |
 | `Content/*`        | Catalog feature stories (detail routes, tables)                  |

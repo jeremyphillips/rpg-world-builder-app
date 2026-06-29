@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
 
 import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
 
@@ -16,11 +15,9 @@ const meta = {
   },
   decorators: [
     (Story: () => React.JSX.Element) => (
-      <MemoryRouter>
-        <div className="max-w-xs">
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div className="max-w-xs">
+        <Story />
+      </div>
     ),
   ],
 } satisfies Meta<typeof RulesConfigFieldNav>

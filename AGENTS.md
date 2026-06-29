@@ -32,6 +32,14 @@ because CRAP is estimated without Istanbul coverage until we wire `--coverage`).
 
 Any string literal used in 2+ places → extract to a named constant.
 
+## Storybook (dashboard)
+
+Co-located dashboard stories run in Storybook on port **6007**. The preview
+(`.storybook/preview.tsx`) already wraps every story in `MemoryRouter` — **do
+not** add another router in `*.stories.tsx` decorators. Use `MemoryRouter` in
+`*.test.tsx` only when the component uses router hooks or `Link`. Detail →
+[apps/dashboard/docs/feature-conventions.md](apps/dashboard/docs/feature-conventions.md#storybook).
+
 ## Components
 
 - Every component gets a co-located `*.stories.tsx` (CSF3); logic-bearing or
