@@ -371,6 +371,7 @@ function castingFields(): FormItem[] {
               label: 'Range kind',
               options: rangeKindOptions,
               required: true,
+              width: 'xl',
             },
             {
               type: 'number',
@@ -406,27 +407,26 @@ function castingFields(): FormItem[] {
           kind: 'row',
           fields: [
             {
-              type: 'number',
-              name: 'duration.value',
+              type: 'inputSelect',
+              name: 'duration',
               label: 'Duration',
-              min: 1,
-              digits: 2,
-              visibility: visibleWhenDurationTimed(),
-              required: true,
-            },
-            {
-              type: 'select',
-              name: 'duration.unit',
-              label: 'Unit',
+              inputType: 'number',
+              valueKey: 'value',
+              unitKey: 'unit',
               options: durationUnitOptions,
+              min: 1,
+              valueDigits: 2,
+              width: 'auto',
               visibility: visibleWhenDurationTimed(),
               required: true,
+              defaultValue: { value: 1, unit: 'minute' },
             },
             {
               type: 'switch',
               name: 'duration.upTo',
               label: 'Up to',
               labelPosition: 'above',
+              width: 'auto',
               visibility: visibleWhenDurationTimed(),
             },
           ],
@@ -481,6 +481,7 @@ function castingFields(): FormItem[] {
       label: 'Delivery method',
       options: deliveryMethodOptions,
       hint: 'Attack-roll delivery for cantrips and spells that use spell attacks.',
+      width: 'xl',
     },
   ]
 }

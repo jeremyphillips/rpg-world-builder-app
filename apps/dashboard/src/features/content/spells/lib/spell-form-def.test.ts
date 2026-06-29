@@ -82,6 +82,29 @@ describe('spellFormDef component fields', () => {
   })
 })
 
+describe('spellFormDef duration fields', () => {
+  it('lays out timed duration inputSelect and upTo switch in a flex row at natural width', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const durationGroup = findGroup(castingTab?.fields ?? [], 'Duration')
+    const row = durationGroup?.fields.find(
+      (field): field is RowConfig => 'kind' in field && field.kind === 'row',
+    )
+
+    expect(row?.kind).toBe('row')
+    expect(row).not.toHaveProperty('layout')
+    expect(row?.fields).toEqual([
+      expect.objectContaining({
+        type: 'inputSelect',
+        name: 'duration',
+        valueKey: 'value',
+        unitKey: 'unit',
+        width: 'auto',
+      }),
+      expect.objectContaining({ name: 'duration.upTo', width: 'auto' }),
+    ])
+  })
+})
+
 describe('spellFormDef create vs update modes', () => {
   it('create: derives slug from name when slug is omitted', () => {
     const formValues = {
