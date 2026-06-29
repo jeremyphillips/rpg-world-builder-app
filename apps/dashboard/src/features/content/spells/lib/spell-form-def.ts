@@ -45,7 +45,7 @@ import {
 } from '@rpg/ui/form'
 
 import {
-  feetInlineCountField,
+  feetInputUnitField,
   identityFields,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/content-form-field-helpers'
@@ -402,10 +402,8 @@ function castingFields(): FormItem[] {
               required: true,
               width: 'lg',
             },
-            feetInlineCountField('range.value.value', 'Distance', {
-              // hideLabel: true,
-              label: 'Distance',
-              digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+            feetInputUnitField('range.value.value', 'Distance', {
+              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
               width: 'auto',
               visibility: visibleWhenRangeDistance(),
               required: true,

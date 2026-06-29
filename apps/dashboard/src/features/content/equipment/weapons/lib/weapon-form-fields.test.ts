@@ -7,6 +7,30 @@ import { damageToForm, weaponFormFieldGroup } from './weapon-form-fields'
 
 const WEAPON_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'weapon')
 
+function damageRowFromWeaponGroup(
+  weaponGroup: Extract<ReturnType<typeof weaponFormFieldGroup>, { kind: 'group' }>,
+) {
+  const damageGroup = weaponGroup.fields.find(
+    (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
+      'kind' in field && field.kind === 'group' && field.legend === 'Damage',
+  )
+  if (!damageGroup || !('fields' in damageGroup)) {
+    throw new Error('expected Damage group')
+  }
+
+  const damageRow = damageGroup.fields.find(
+    (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
+      'kind' in field &&
+      field.kind === 'row' &&
+      field.fields.some((child) => !('kind' in child) && child.name === 'damageKind'),
+  )
+  if (!damageRow || !('fields' in damageRow)) {
+    throw new Error('expected damage row')
+  }
+
+  return damageRow
+}
+
 describe('weapon kindFieldGroups', () => {
   it('buildFields composes identity, economy, and registered weapon group', () => {
     const fields = equipmentFormDef.buildFields({ equipmentKind: 'weapon' })
@@ -27,44 +51,26 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected weapon form group')
     }
 
-    const damageDiceRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'damageDice'),
-    )
-    if (!damageDiceRow || !('fields' in damageDiceRow)) {
-      throw new Error('expected damage dice row')
-    }
+    const damageRow = damageRowFromWeaponGroup(weaponGroup)
 
     expect(
-      damageDiceRow.fields.find((field) => !('kind' in field) && field.name === 'damageDice'),
+      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageDice'),
     ).toMatchObject({
-      label: 'Damage',
+      label: 'Damage Dice',
       modifierMode: 'none',
       size: 'md',
       width: 'auto',
     })
 
-    const versatileRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'versatileDamage'),
-    )
-    if (!versatileRow || !('fields' in versatileRow)) {
-      throw new Error('expected versatile damage row')
-    }
-
-    expect(versatileRow.fields).toEqual([
-      expect.objectContaining({
-        name: 'versatileDamage',
-        label: 'Versatile damage',
-        modifierMode: 'none',
-        size: 'md',
-        width: 'auto',
-      }),
-    ])
+    expect(
+      damageRow.fields.find((field) => !('kind' in field) && field.name === 'versatileDamage'),
+    ).toMatchObject({
+      name: 'versatileDamage',
+      label: 'Versatile damage',
+      modifierMode: 'none',
+      size: 'md',
+      width: 'auto',
+    })
   })
 
   it('composes damage kind, damage type, and dice damage in one row', () => {
@@ -73,30 +79,24 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected weapon form group')
     }
 
-    const damageRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'damageKind'),
-    )
-    if (!damageRow || !('fields' in damageRow)) {
-      throw new Error('expected damage kind/type row')
-    }
+    const damageRow = damageRowFromWeaponGroup(weaponGroup)
 
-    expect(damageRow.fields).toEqual([
-      expect.objectContaining({ name: 'damageKind', width: 'md', defaultValue: 'dice' }),
-      expect.objectContaining({
-        name: 'damageType',
-        width: 'md',
-        placeholder: 'Choose...',
-        visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
-      }),
-      expect.objectContaining({
-        name: 'damageDice',
-        width: 'auto',
-        visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
-      }),
-    ])
+    expect(damageRow.fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'damageKind', width: 'md', defaultValue: 'dice' }),
+        expect.objectContaining({
+          name: 'damageType',
+          width: 'md',
+          placeholder: 'Choose...',
+          visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
+        }),
+        expect.objectContaining({
+          name: 'damageDice',
+          width: 'auto',
+          visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
+        }),
+      ]),
+    )
   })
 
   it('offers none as a damage option for weapons like the net', () => {
@@ -105,15 +105,7 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected weapon form group')
     }
 
-    const damageRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'damageKind'),
-    )
-    if (!damageRow || !('fields' in damageRow)) {
-      throw new Error('expected damage kind row')
-    }
+    const damageRow = damageRowFromWeaponGroup(weaponGroup)
     const damageKindField = damageRow.fields.find(
       (field) => !('kind' in field) && field.name === 'damageKind',
     )
@@ -174,12 +166,11 @@ describe('weapon kindFieldGroups', () => {
       expect(
         rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
       ).toMatchObject({
-        type: 'inlineChooseCount',
+        type: 'inputUnit',
         label,
-        prefix: '',
-        suffix: 'ft.',
-        chooseMin: 0,
-        digits: 3,
+        unit: 'ft.',
+        min: 0,
+        valueDigits: 3,
         width: 'auto',
         visibility: {
           dependsOn: ['mode', 'properties'],

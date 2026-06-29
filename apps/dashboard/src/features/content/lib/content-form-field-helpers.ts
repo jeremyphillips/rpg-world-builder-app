@@ -20,7 +20,7 @@ import {
   type FieldConfig,
   type FieldOption,
   type FormItem,
-  type InlineChooseCountFieldConfig,
+  type InputUnitFieldConfig,
   type RowConfig,
 } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
@@ -51,33 +51,22 @@ export const WALK_SPEED_INLINE_COUNT_DIGITS = 2 satisfies NumberInputDigits
 /** Digit width for spell range distance inline count fields (values such as 120). */
 export const SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS = 3 satisfies NumberInputDigits
 
-/** Inline `[N] ft.` count — walk speed, spell range distance, etc. */
-export function feetInlineCountField(
+/** Grouped scalar number + `ft.` label — walk speed, weapon range, spell distance, etc. */
+export function feetInputUnitField(
   name: string,
   label: string,
-  overrides?: Partial<InlineChooseCountFieldConfig>,
-): InlineChooseCountFieldConfig {
+  overrides?: Partial<InputUnitFieldConfig>,
+): InputUnitFieldConfig {
   return {
-    type: 'inlineChooseCount',
+    type: 'inputUnit',
     name,
     label,
-    prefix: '',
-    suffix: 'ft.',
-    chooseMin: 0,
-    digits: WALK_SPEED_INLINE_COUNT_DIGITS,
+    inputType: 'number',
+    unit: 'ft.',
+    min: 0,
+    valueDigits: WALK_SPEED_INLINE_COUNT_DIGITS,
     ...overrides,
   }
-}
-
-/** Inline walk speed field: visible label with `[N] ft.` on the sentence row. */
-export function walkSpeedInlineCountField(
-  name: string,
-  overrides?: Partial<InlineChooseCountFieldConfig>,
-): InlineChooseCountFieldConfig {
-  return feetInlineCountField(name, 'Walk speed', {
-    digits: WALK_SPEED_INLINE_COUNT_DIGITS,
-    ...overrides,
-  })
 }
 
 /** Identity fields shared by every catalog content type (slug is derived, not authored). */
@@ -134,32 +123,35 @@ export function optionalWeightFields(
 
   return [
     {
-      type: 'inputSelect',
-      name: 'weight',
-      label: 'Weight',
-      inputType: 'number',
-      valueKey: 'value',
-      unitKey: 'unit',
-      options: weightUnitOptions,
-      unitDisabled: true,
-      min: 0,
-      step: 0.5,
-      width,
-      formatGrouped: true,
+      ...scalarUnitInputSelectField({
+        name: 'weight',
+        label: 'Weight',
+        defaultUnit: 'lb',
+        unitOptions: weightUnitOptions,
+        step: 0.5,
+        formatGrouped: true,
+        width,
+        ...(kind && isWeightEquipmentKind(kind)
+          ? { valueDigits: weightValueDigitsForKind(kind) }
+          : {}),
+      }),
+      ...(kind && isWeightEquipmentKind(kind)
+        ? {}
+        : {
+            valueDigitsDependsOn: 'kind',
+            valueDigitsLookup: EQUIPMENT_WEIGHT_VALUE_DIGITS,
+          }),
       hint: 'Leave blank if weightless or not tracked.',
       hintPosition: 'below-control',
-      defaultValue: weightToFormDefaults(),
       ...(kind && isWeightEquipmentKind(kind)
-        ? { valueDigits: weightValueDigitsForKind(kind) }
+        ? {}
         : {
             visibility: {
               dependsOn: ['kind'],
               visibleWhen: (watched) => isWeightEquipmentKind(watched.kind as EquipmentKind),
             },
-            valueDigitsDependsOn: 'kind',
-            valueDigitsLookup: EQUIPMENT_WEIGHT_VALUE_DIGITS,
           }),
-    },
+    } satisfies FieldConfig,
   ]
 }
 
@@ -351,22 +343,38 @@ function scalarUnitInputSelectField<TUnit extends string>(options: {
     width = 'full',
   } = options
 
-  return {
-    type: 'inputSelect',
+  const base = {
+    type: 'inputSelect' as const,
     name,
     label,
-    inputType: 'number',
+    inputType: 'number' as const,
     valueKey: 'value',
     unitKey: 'unit',
-    options: unitOptions,
     min,
     step,
     width,
     required,
     formatGrouped,
-    unitDisabled,
-    valueDigits,
+    ...(valueDigits !== undefined ? { valueDigits } : {}),
     defaultValue: { unit: defaultUnit },
+  }
+
+  if (unitOptions.length === 1) {
+    const singleUnit = unitOptions[0]
+    if (!singleUnit) {
+      throw new Error(`scalarUnitInputSelectField "${name}" received an empty unitOptions entry`)
+    }
+    return {
+      ...base,
+      fixedUnit: singleUnit.label,
+      unitValue: singleUnit.value,
+    }
+  }
+
+  return {
+    ...base,
+    options: unitOptions,
+    unitDisabled,
   }
 }
 

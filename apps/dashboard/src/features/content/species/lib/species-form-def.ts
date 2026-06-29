@@ -18,7 +18,7 @@ import {
   allowedCharacterCreatureTypesFromCtx,
   getCharacterCreatureTypeFieldOptions,
 } from '../../lib/creature-type-field-options'
-import { identityFields, walkSpeedInlineCountField } from '../../lib/content-form-field-helpers'
+import { feetInputUnitField, identityFields } from '../../lib/content-form-field-helpers'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import {
   contentFormRegistry,
@@ -134,7 +134,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           width: 'lg',
         }),
-        walkSpeedInlineCountField('speed.walk', {
+        feetInputUnitField('speed.walk', 'Walk speed', {
           required: true,
           width: 'auto',
           defaultValue: 30,

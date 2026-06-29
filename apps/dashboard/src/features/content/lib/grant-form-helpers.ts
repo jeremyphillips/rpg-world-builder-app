@@ -45,7 +45,7 @@ import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from
 
 import type { ContentFormCtx } from './content-form-registry'
 import { getLevelFieldOptions, levelSelectDigits } from './level-field-options'
-import { walkSpeedInlineCountField } from './content-form-field-helpers'
+import { feetInputUnitField } from './content-form-field-helpers'
 import { titleCase } from './title-case'
 
 // ---------------------------------------------------------------------------
@@ -276,7 +276,7 @@ export function grantItemFields<T extends string>(
       options: senseRangeOptions,
       visibility: visibleFor('senses'),
     },
-    walkSpeedInlineCountField('speedWalkOverride', {
+    feetInputUnitField('speedWalkOverride', 'Walk speed', {
       visibility: visibleFor('speedOverride'),
     }),
     {
