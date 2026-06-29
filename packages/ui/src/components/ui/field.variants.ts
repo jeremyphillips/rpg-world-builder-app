@@ -24,6 +24,8 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
+ * - `fieldToggleDependentStackClasses` — outer toggle-dependent stack rhythm
+ * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
  */
 export const fieldAnatomyStackClasses = 'space-y-2'
 /** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
@@ -55,6 +57,10 @@ export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /** Dense settings row — label + hint column left, compact control right. */
 export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
+/** Outer stack rhythm for toggle-dependent field groups. */
+export const fieldToggleDependentStackClasses = 'flex flex-col gap-2'
+/** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
+export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 export const fieldRowLayoutVariants = cva('', {
@@ -93,6 +99,9 @@ export const fieldLabelVariants = cva(
     },
   },
 )
+
+/** Layout preset for toggle-dependent stacks. */
+export type FieldStackLayout = 'default' | 'toggleDependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection'
 

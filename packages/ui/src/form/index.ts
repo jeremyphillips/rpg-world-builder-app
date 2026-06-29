@@ -77,8 +77,10 @@ export {
   type RowConfig,
   type GroupConfig,
   type GroupFieldItem,
+  type StackConfig,
   type ArrayConfig,
   type SlotConfig,
   type FormItem,
 } from './field-config'
-export type { FieldGroupLegendSize } from '../components/ui/field.variants'
+export type { FieldGroupLegendSize, FieldStackLayout } from '../components/ui/field.variants'
+export type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'

@@ -18,11 +18,13 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
 import type {
   FieldRowLayout,
   FieldHintPosition,
   FieldGroupLegendSize,
   FieldLabelPosition,
+  FieldStackLayout,
 } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
@@ -483,10 +485,23 @@ export interface RowConfig {
   /** Preferred display recipe. Use `className` only for one-off escape hatches. */
   layout?: FieldRowLayout
   className?: string
+  /** When hidden, the whole row unmounts. */
+  visibility?: FieldVisibility
 }
 
-/** Fields allowed inside a `group` — groups may nest one level or more. */
-export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig
+/** Fields allowed inside a `group` or `stack` — may nest one level or more. */
+export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig | StackConfig
+
+/** Layout-only container for toggle + dependent fields (no fieldset legend). */
+export interface StackConfig {
+  kind: 'stack'
+  layout?: FieldStackLayout
+  /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
+  dependentsChrome?: FieldStackDependentsTone
+  fields: GroupFieldItem[]
+  visibility?: FieldVisibility
+  className?: string
+}
 
 /** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
 export interface GroupConfig {
@@ -553,12 +568,12 @@ export interface SlotConfig {
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */
-export type FormItem = FieldConfig | RowConfig | GroupConfig | ArrayConfig | SlotConfig
+export type FormItem = FieldConfig | RowConfig | GroupConfig | StackConfig | ArrayConfig | SlotConfig
 
-/** Narrows a `FormItem` to a container (row/group/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/stack/array/slot) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | ArrayConfig | SlotConfig {
+): item is RowConfig | GroupConfig | StackConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -682,7 +697,7 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       for (const field of item.fields) {
         assignFieldDefaultValues(field, values)
       }
-    } else if (item.kind === 'group') {
+    } else if (item.kind === 'group' || item.kind === 'stack') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
     } else if (item.kind === 'array') {
       values[item.name] = []

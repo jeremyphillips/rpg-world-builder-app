@@ -20,6 +20,7 @@ import {
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
   fieldGroupStackClasses,
+  fieldToggleDependentStackClasses,
   formSectionStackClasses,
   fieldSetResetClasses,
 } from '../components/ui/field.variants'
@@ -33,6 +34,7 @@ import {
   type FormItem,
   type GroupConfig,
   type RowConfig,
+  type StackConfig,
   type FieldConfig,
   type SlotConfig,
   type FieldVisibility,
@@ -233,6 +235,8 @@ function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: str
   switch (item.kind) {
     case 'group':
       return prefixFormItemKey(namePrefix, `group-${index}`)
+    case 'stack':
+      return prefixFormItemKey(namePrefix, `stack-${index}`)
     case 'row':
       return prefixFormItemKey(namePrefix, `row-${index}`)
     case 'slot':
@@ -283,6 +287,17 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     }
     return (
       <GroupFieldSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+    )
+  }
+
+  if (item.kind === 'stack') {
+    if (item.visibility) {
+      return (
+        <ConditionalStack item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+      )
+    }
+    return (
+      <StackPassthroughSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
     )
   }
 
@@ -437,6 +452,55 @@ function ConditionalGroup({ item, idPrefix, namePrefix, depth }: ConditionalGrou
   const values = useVisibilityValues(item.visibility!, namePrefix)
   if (!item.visibility!.visibleWhen(values)) return null
   return <GroupFieldSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+}
+
+interface StackPassthroughSectionProps {
+  item: StackConfig
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+/** Interim stack render until StackSection lands (toggle-dependent layout step 2). */
+function StackPassthroughSection({
+  item,
+  idPrefix,
+  namePrefix,
+  depth,
+}: StackPassthroughSectionProps) {
+  const childContext = React.useMemo(
+    () => ({ collapsibleSections: false, depth: depth + 1 }),
+    [depth],
+  )
+
+  return (
+    <div data-field-stack="" className={cn(fieldToggleDependentStackClasses, item.className)}>
+      <FormSectionContext.Provider value={childContext}>
+        <NestedFormItems
+          items={item.fields}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+          depth={depth + 1}
+        />
+      </FormSectionContext.Provider>
+    </div>
+  )
+}
+
+interface ConditionalStackProps {
+  item: StackConfig
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+/** Hides a stack when its `visibility` predicate is false. */
+function ConditionalStack({ item, idPrefix, namePrefix, depth }: ConditionalStackProps) {
+  const values = useVisibilityValues(item.visibility!, namePrefix)
+  if (!item.visibility!.visibleWhen(values)) return null
+  return (
+    <StackPassthroughSection item={item} idPrefix={idPrefix} namePrefix={namePrefix} depth={depth} />
+  )
 }
 
 interface ConditionalArrayFieldProps {

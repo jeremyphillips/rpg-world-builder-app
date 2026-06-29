@@ -147,10 +147,18 @@ export {
   fieldLabelHintStackClasses,
   fieldRowLayoutVariants,
   fieldSettingsRowClasses,
+  fieldToggleDependentIndentClasses,
+  fieldToggleDependentStackClasses,
   type FieldHintPosition,
   type FieldLabelPosition,
   type FieldRowLayout,
+  type FieldStackLayout,
 } from './components/ui/field.variants'
+export {
+  fieldStackDependentsChromeVariants,
+  type FieldStackDependentsTone,
+  type FieldStackDependentsChromeVariantProps,
+} from './components/ui/field-stack.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'
