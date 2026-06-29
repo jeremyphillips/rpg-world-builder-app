@@ -5,7 +5,7 @@ import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
 import { Button, ConfirmDialog, Text, Textarea } from '@rpg/ui'
 import {
-  FormSaveFooter,
+  FormFooterActions,
   TabbedForm,
   formStickyActionsBarTransparentClasses,
   formStickyTabsTransparentClasses,
@@ -123,27 +123,27 @@ export function TicketDetailForm({
           transparentStickyChrome ? formStickyActionsBarTransparentClasses : undefined
         }
         footer={(form) => (
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={isDeleting}
-              onClick={() => setConfirmDelete(true)}
-            >
-              Delete ticket
-            </Button>
-            <div className="flex flex-wrap items-center gap-2">
+          <FormFooterActions
+            leading={
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isDeleting}
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete ticket
+              </Button>
+            }
+            secondary={
               <Button type="button" variant="outline" onClick={() => form.reset()}>
                 Cancel
               </Button>
-              <FormSaveFooter
-                pending={isPending || form.formState.isSubmitting}
-                isSuccess={isSuccess}
-                submitLabel="Save ticket"
-                successMessage="Ticket saved."
-              />
-            </div>
-          </div>
+            }
+            pending={isPending || form.formState.isSubmitting}
+            isSuccess={isSuccess}
+            submitLabel="Save ticket"
+            successMessage="Ticket saved."
+          />
         )}
       />
       <ConfirmDialog

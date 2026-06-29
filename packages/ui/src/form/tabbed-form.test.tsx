@@ -6,7 +6,10 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
-import { formStickyTabsTransparentClasses } from './form-chrome.variants'
+import {
+  formStickyActionsBarTransparentClasses,
+  formStickyTabsTransparentClasses,
+} from './form-chrome.variants'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -146,7 +149,7 @@ describe('TabbedForm', () => {
         tabs={tabs}
         onSubmit={vi.fn()}
         stickyTabsClassName={formStickyTabsTransparentClasses}
-        stickyActionsBarClassName={formStickyTabsTransparentClasses}
+        stickyActionsBarClassName={formStickyActionsBarTransparentClasses}
         footer={<button type="submit">Save changes</button>}
       />,
     )

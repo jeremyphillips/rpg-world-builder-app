@@ -10,8 +10,12 @@ export {
 } from './form-items.client'
 export { TabbedForm, type TabbedFormProps, type TabbedFormTab } from './tabbed-form.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
+export { FormFooterActions, type FormFooterActionsProps } from './form-footer-actions'
 export { FormActionsBar, type FormActionsBarProps } from './form-actions-bar'
 export {
+  formActionsBarActionsRowClasses,
+  formActionsBarLeadingGroupClasses,
+  formActionsBarPrimaryGroupClasses,
   formFooterSpacingClasses,
   formStickyActionsBarClasses,
   formStickyActionsBarTransparentClasses,

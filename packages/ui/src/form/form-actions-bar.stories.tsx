@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { Button } from '../components/ui/button.client'
 import { FormActionsBar } from './form-actions-bar'
+import { FormFooterActions } from './form-footer-actions'
 import { FormSaveFooter } from './form-save-footer'
 
 const meta = {
@@ -22,5 +24,20 @@ export const WithFormError: Story = {
   args: {
     formError: 'Something went wrong. Please try again.',
     children: <FormSaveFooter submitLabel="Save changes" />,
+  },
+}
+
+export const WithCancel: Story = {
+  args: {
+    children: (
+      <FormFooterActions
+        submitLabel="Save changes"
+        secondary={
+          <Button type="button" variant="outline">
+            Cancel
+          </Button>
+        }
+      />
+    ),
   },
 }

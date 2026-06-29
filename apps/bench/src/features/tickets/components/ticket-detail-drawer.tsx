@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 import { benchTicketPath } from '@/app/routes'
 import { Spinner, Text, Sheet } from '@rpg/ui'
 
@@ -19,16 +17,6 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content side="right" className="w-full max-w-2xl overflow-y-auto">
-        <Sheet.Header
-          headline="Ticket details"
-          description={
-            ticket ? (
-              <Link to={benchTicketPath(ticket.id)} className="text-sm underline">
-                Open full page
-              </Link>
-            ) : undefined
-          }
-        />
         <Sheet.Body className="space-y-4">
           {isPending ? <Spinner /> : null}
           {isError ? (
@@ -38,7 +26,7 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
           ) : null}
           {ticket ? (
             <>
-              <TicketMeta ticket={ticket} />
+              <TicketMeta ticket={ticket} detailHref={benchTicketPath(ticket.id)} />
               <TicketDetailForm ticket={ticket} transparentStickyChrome />
             </>
           ) : null}

@@ -20,3 +20,10 @@ export const formStickyActionsBarTransparentClasses =
 
 /** Top spacing for a non-sticky form footer. */
 export const formFooterSpacingClasses = 'pt-4'
+
+/** Shared flex row for form footer actions (leading + primary group). */
+export const formActionsBarActionsRowClasses = 'flex flex-wrap items-center gap-2'
+
+export const formActionsBarLeadingGroupClasses = 'flex flex-wrap items-center gap-2'
+
+export const formActionsBarPrimaryGroupClasses = 'ml-auto flex flex-wrap items-center gap-2'

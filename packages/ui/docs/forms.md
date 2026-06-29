@@ -70,6 +70,11 @@ defaults via `cn()`. Presets: `formStickyTabsTransparentClasses` and
 Single-page `<Form>` layouts can opt into the same sticky footer with
 `stickyFooter`.
 
+Use `FormFooterActions` for multi-button footers (optional `leading` and
+`secondary` slots plus pending-aware submit). `FormSaveFooter` is a save-only
+wrapper around the same layout. Pair with `FormActionsBar` via `<Form
+stickyFooter>` or `<TabbedForm>` (default sticky chrome).
+
 ## Field anatomy & the a11y contract
 
 Every field — whether composed by hand or emitted by `<Form>` — resolves to the
