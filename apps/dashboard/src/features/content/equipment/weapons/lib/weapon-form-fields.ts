@@ -142,7 +142,7 @@ export function weaponFormFieldGroup(): FormItem {
             label: 'Damage',
             options: damageKindOptions,
             defaultValue: 'dice',
-            width: '1/2',
+            width: 'md',
           },
           {
             type: 'select',
@@ -150,15 +150,10 @@ export function weaponFormFieldGroup(): FormItem {
             label: 'Damage type',
             options: damageTypeOptions,
             placeholder: WEAPON_SELECT_PLACEHOLDER,
-            width: '1/2',
+            width: 'md',
             visibility: visibleWhenDealsDamage(),
             required: true,
           },
-        ],
-      },
-      {
-        kind: 'row',
-        fields: [
           {
             type: 'diceFormula',
             name: 'damageDice',
@@ -170,6 +165,11 @@ export function weaponFormFieldGroup(): FormItem {
             visibility: visibleWhenDiceDamage(),
             required: true,
           },
+        ],
+      },
+      {
+        kind: 'row',
+        fields: [
           {
             type: 'diceFormula',
             name: 'versatileDamage',
