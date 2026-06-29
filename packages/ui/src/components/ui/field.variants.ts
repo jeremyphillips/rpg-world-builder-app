@@ -31,7 +31,7 @@ export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2 pt-1'
 export const fieldGroupDescriptionClasses = 'mb-3'
-export const fieldGroupLegendSpacingClasses = 'mb-4'
+export const fieldGroupLegendSpacingClasses = 'mb-5'
 /** Shared legend typography — field groups, array sections, and collapsible accordion triggers. */
 export const fieldGroupLegendTypographyClasses =
   'text-field-group-legend font-heading leading-none text-foreground'
