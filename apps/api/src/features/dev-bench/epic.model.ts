@@ -12,6 +12,7 @@ const devBenchEpicSchema = new Schema(
     status: { type: String, enum: EPIC_STATUSES, required: true },
     priority: { type: String, enum: TICKET_PRIORITIES },
     area: { type: String, trim: true },
+    badgeColor: { type: String, trim: true },
   },
   { timestamps: true, collection: 'devBenchEpics' },
 )

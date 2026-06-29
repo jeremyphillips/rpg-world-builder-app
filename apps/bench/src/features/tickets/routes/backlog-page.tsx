@@ -9,7 +9,7 @@ import { BacklogTicketCard } from '../components/backlog-ticket-card'
 import { TicketCreateDialog } from '../components/ticket-create-dialog'
 import { TicketDetailDrawer } from '../components/ticket-detail-drawer'
 import { TicketFilters } from '../components/ticket-filters'
-import { useEpicsList } from '@/features/epics'
+import { buildEpicCardMetaById, resolveTicketEpicCardMeta, useEpicsList } from '@/features/epics'
 import { useTicketFiltersFromUrl } from '../hooks/use-ticket-filters-from-url'
 import { useTickets } from '../hooks/use-tickets'
 
@@ -20,7 +20,7 @@ export function BacklogPage() {
   const { data: tickets = [], isPending, isError, refetch } = useTickets(filters)
   const { data: epics = [] } = useEpicsList()
 
-  const epicTitleById = useMemo(() => new Map(epics.map((epic) => [epic.id, epic.title])), [epics])
+  const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
 
   const handleSelectTicket = useCallback(
     (id: string) => {
@@ -75,7 +75,7 @@ export function BacklogPage() {
             <li key={ticket.id}>
               <BacklogTicketCard
                 ticket={ticket}
-                epicTitle={ticket.epicId ? epicTitleById.get(ticket.epicId) : null}
+                epic={resolveTicketEpicCardMeta(ticket, epicMetaById)}
                 onSelect={handleSelectTicket}
               />
               <Link to={benchTicketPath(ticket.id)} className="sr-only">

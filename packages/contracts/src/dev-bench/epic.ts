@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { hexColorSchema } from './hex-color'
 import { ticketAreaSchema } from './ticket-area'
 import { ticketPrioritySchema } from './ticket'
 
@@ -34,6 +35,7 @@ export const epicSchema = z.object({
   status: epicStatusSchema,
   priority: ticketPrioritySchema.optional(),
   area: ticketAreaSchema.optional(),
+  badgeColor: hexColorSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })

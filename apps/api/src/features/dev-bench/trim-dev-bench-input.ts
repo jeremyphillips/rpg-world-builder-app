@@ -86,6 +86,7 @@ export function trimCreateEpicInput(input: CreateEpicInput): CreateEpicInput {
     description: trimOptional(input.description),
     goal: trimOptional(input.goal),
     area: trimOptional(input.area),
+    ...(input.badgeColor !== undefined && { badgeColor: input.badgeColor.trim() }),
   }
 }
 
@@ -97,5 +98,6 @@ export function trimUpdateEpicInput(input: UpdateEpicInput): UpdateEpicInput {
     ...(input.status !== undefined && { status: input.status }),
     ...(input.priority !== undefined && { priority: input.priority }),
     ...(input.area !== undefined && { area: trimOptional(input.area) }),
+    ...(input.badgeColor !== undefined && { badgeColor: input.badgeColor.trim() }),
   }
 }

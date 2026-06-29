@@ -24,7 +24,7 @@ export type TicketType = z.infer<typeof ticketTypeSchema>
 
 export const TICKET_TYPE_LABELS: Record<TicketType, string> = {
   bug: 'Bug',
-  feature: 'Feature',
+  feature: 'Feat',
   test: 'Test',
   refactor: 'Refactor',
   docs: 'Docs',

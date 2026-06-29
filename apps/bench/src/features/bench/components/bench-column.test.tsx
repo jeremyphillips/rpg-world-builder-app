@@ -24,7 +24,7 @@ describe('BenchColumn', () => {
     renderColumn({
       column: 'up_next',
       tickets: [],
-      epicTitleById: new Map(),
+      epicMetaById: new Map(),
       onMoveTicket: () => undefined,
     })
 
@@ -35,7 +35,7 @@ describe('BenchColumn', () => {
     renderColumn({
       column: 'up_next',
       tickets: [upNextTicket],
-      epicTitleById: new Map(),
+      epicMetaById: new Map(),
       onMoveTicket: () => undefined,
     })
 
@@ -46,7 +46,7 @@ describe('BenchColumn', () => {
     const { container } = renderColumn({
       column: 'up_next',
       tickets: [upNextTicket],
-      epicTitleById: new Map(),
+      epicMetaById: new Map(),
       onMoveTicket: () => undefined,
     })
 

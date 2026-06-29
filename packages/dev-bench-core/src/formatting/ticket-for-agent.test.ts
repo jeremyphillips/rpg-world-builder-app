@@ -43,7 +43,7 @@ describe('formatTicketForAgent', () => {
   it('includes metadata, links, and code refs', () => {
     const output = formatTicketForAgent(sampleTicket)
 
-    expect(output).toContain('**Type:** Feature')
+    expect(output).toContain('**Type:** Feat')
     expect(output).toContain('**Priority:** High')
     expect(output).toContain('**Area:** rules')
     expect(output).toContain('**Epic ID:** epic_1')

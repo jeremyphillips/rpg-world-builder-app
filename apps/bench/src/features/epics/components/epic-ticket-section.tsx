@@ -1,3 +1,4 @@
+import { resolveTicketEpicCardMeta, type EpicCardMeta } from '@/features/epics'
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { Text } from '@rpg/ui'
 
@@ -7,6 +8,7 @@ interface EpicTicketSectionProps {
   title: string
   count: number
   tickets: Ticket[]
+  epicMetaById: Map<string, EpicCardMeta>
   onSelectTicket: (ticketId: string) => void
 }
 
@@ -14,6 +16,7 @@ export function EpicTicketSection({
   title,
   count,
   tickets,
+  epicMetaById,
   onSelectTicket,
 }: EpicTicketSectionProps) {
   return (
@@ -27,7 +30,11 @@ export function EpicTicketSection({
         <ul className="grid gap-3 sm:grid-cols-2">
           {tickets.map((ticket) => (
             <li key={ticket.id}>
-              <TicketCard ticket={ticket} onSelect={onSelectTicket} />
+              <TicketCard
+                ticket={ticket}
+                epic={resolveTicketEpicCardMeta(ticket, epicMetaById)}
+                onSelect={onSelectTicket}
+              />
             </li>
           ))}
         </ul>

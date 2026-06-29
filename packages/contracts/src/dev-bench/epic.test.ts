@@ -10,6 +10,7 @@ const validEpic = {
   status: 'active',
   priority: 'high',
   area: 'rules',
+  badgeColor: '#6366f1',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 } as const

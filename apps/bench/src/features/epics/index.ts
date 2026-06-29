@@ -1,3 +1,9 @@
+export {
+  buildEpicCardMetaById,
+  resolveTicketEpicCardMeta,
+  toEpicCardMeta,
+  type EpicCardMeta,
+} from './lib/epic-card-meta'
 export { EpicStatusBadge } from './components/epic-status-badge'
 export { EpicTicketCounts } from './components/epic-ticket-counts'
 export { EpicCard } from './components/epic-card'

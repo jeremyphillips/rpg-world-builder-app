@@ -4,6 +4,7 @@ import {
   createEpicInputSchema,
   EPIC_STATUSES,
   EPIC_STATUS_LABELS,
+  hexColorSchema,
   TICKET_AREA_SUGGESTIONS,
   TICKET_PRIORITIES,
   TICKET_PRIORITY_LABELS,
@@ -22,6 +23,7 @@ export const epicDetailFormSchema = z.object({
   status: z.enum(EPIC_STATUSES),
   priority: z.string(),
   area: z.string(),
+  badgeColor: z.string().optional().or(z.literal('')),
 })
 
 export type EpicDetailFormValues = z.infer<typeof epicDetailFormSchema>
@@ -69,6 +71,13 @@ export const createEpicFields: FormItem[] = [
     label: 'Area',
     options: [{ value: NONE_VALUE, label: 'None' }, ...areaOptions],
   },
+  {
+    type: 'text',
+    name: 'badgeColor',
+    label: 'Badge color',
+    placeholder: '#6366f1',
+    hint: 'Hex color used on ticket card epic badges',
+  },
 ]
 
 export const epicDetailFields: FormItem[] = createEpicFields
@@ -80,6 +89,7 @@ export const createEpicDefaultValues: CreateEpicFormValues = {
   status: 'active',
   priority: NONE_VALUE,
   area: NONE_VALUE,
+  badgeColor: '',
 }
 
 export function mapEpicToDetailFormValues(epic: Epic): EpicDetailFormValues {
@@ -90,6 +100,7 @@ export function mapEpicToDetailFormValues(epic: Epic): EpicDetailFormValues {
     status: epic.status,
     priority: epic.priority ?? NONE_VALUE,
     area: epic.area ?? NONE_VALUE,
+    badgeColor: epic.badgeColor ?? '',
   }
 }
 
@@ -115,6 +126,13 @@ function optionalArea(value: string | undefined): UpdateEpicInput['area'] {
   return parsed.success ? parsed.data : undefined
 }
 
+function optionalBadgeColor(value: string | undefined): UpdateEpicInput['badgeColor'] {
+  const trimmed = value?.trim()
+  if (!trimmed) return undefined
+  const parsed = hexColorSchema.safeParse(trimmed)
+  return parsed.success ? parsed.data : undefined
+}
+
 export function buildCreateEpicInput(values: CreateEpicFormValues) {
   return createEpicInputSchema.parse({
     title: values.title.trim(),
@@ -123,6 +141,7 @@ export function buildCreateEpicInput(values: CreateEpicFormValues) {
     status: values.status,
     priority: optionalPriority(values.priority),
     area: optionalArea(values.area),
+    badgeColor: optionalBadgeColor(values.badgeColor),
   })
 }
 
@@ -134,5 +153,6 @@ export function buildUpdateEpicInput(values: EpicDetailFormValues): UpdateEpicIn
     status: values.status,
     priority: optionalPriority(values.priority),
     area: optionalArea(values.area),
+    badgeColor: optionalBadgeColor(values.badgeColor),
   }
 }

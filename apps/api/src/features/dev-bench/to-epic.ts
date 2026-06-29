@@ -18,6 +18,7 @@ export function toEpic(doc: EpicRecord): Epic {
     status: doc.status,
     priority: doc.priority ?? undefined,
     area: doc.area ?? undefined,
+    badgeColor: doc.badgeColor ?? undefined,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   })

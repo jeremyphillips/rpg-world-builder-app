@@ -12,6 +12,7 @@ import { EpicDetailForm } from '../components/epic-detail-form'
 import { EpicRelatedCodeAreas } from '../components/epic-related-code-areas'
 import { EpicTicketSection } from '../components/epic-ticket-section'
 import { RecommendNextButton } from '../components/recommend-next-button'
+import { buildEpicCardMetaById } from '../lib/epic-card-meta'
 import { useEpic } from '../hooks/use-epic'
 import { useEpicTickets } from '../hooks/use-epic-tickets'
 import { useEpicsList } from '../hooks/use-epics-list'
@@ -30,6 +31,7 @@ export function EpicDetailPage() {
     () => deriveRelatedCodeAreas(ticketsQuery.data ?? []),
     [ticketsQuery.data],
   )
+  const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
 
   const handleSelectTicket = useCallback(
     (id: string) => {
@@ -133,18 +135,21 @@ export function EpicDetailPage() {
             title="Open Tickets"
             count={open.length}
             tickets={open}
+            epicMetaById={epicMetaById}
             onSelectTicket={handleSelectTicket}
           />
           <EpicTicketSection
             title="Blocked"
             count={blocked.length}
             tickets={blocked}
+            epicMetaById={epicMetaById}
             onSelectTicket={handleSelectTicket}
           />
           <EpicTicketSection
             title="Done"
             count={done.length}
             tickets={done}
+            epicMetaById={epicMetaById}
             onSelectTicket={handleSelectTicket}
           />
         </div>

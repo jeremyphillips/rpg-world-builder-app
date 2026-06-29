@@ -18,7 +18,7 @@ function renderBoard(props: ComponentProps<typeof BenchBoard>) {
 
 describe('BenchBoard', () => {
   it('renders four columns when empty', () => {
-    renderBoard({ columns: emptyBenchColumns(), epicTitleById: new Map() })
+    renderBoard({ columns: emptyBenchColumns(), epicMetaById: new Map() })
 
     expect(screen.getByRole('region', { name: 'Up Next' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'In Progress' })).toBeInTheDocument()
@@ -29,7 +29,7 @@ describe('BenchBoard', () => {
   it('has no axe accessibility violations', async () => {
     const { container } = renderBoard({
       columns: emptyBenchColumns(),
-      epicTitleById: new Map(),
+      epicMetaById: new Map(),
     })
 
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })

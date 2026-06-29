@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DndContext } from '@dnd-kit/core'
 
-import { blockedBenchTicket, upNextTicket } from '../test-fixtures'
+import { upNextTicket } from '../test-fixtures'
 import { BenchTicketCard } from './bench-ticket-card'
 
 const meta = {
@@ -26,7 +26,7 @@ export const Default: Story = {
   args: {
     ticket: upNextTicket,
     column: 'up_next',
-    epicTitle: 'Dev Bench MVP',
+    epic: { id: 'epic-1', title: 'Dev Bench MVP', badgeColor: '#6366f1' },
     onSelect: () => undefined,
     onMove: () => undefined,
   },
@@ -35,7 +35,7 @@ export const Default: Story = {
 
 export const Blocked: Story = {
   args: {
-    ticket: blockedBenchTicket,
+    ticket: { ...upNextTicket, blockedByTicketIds: ['blocker-id'] },
     column: 'blocked',
     onSelect: () => undefined,
     onMove: () => undefined,

@@ -15,6 +15,8 @@ import {
 } from '@dnd-kit/core'
 import { Button, ConfirmDialog, Spinner, Text } from '@rpg/ui'
 
+import type { EpicCardMeta } from '@/features/epics'
+import { resolveTicketEpicCardMeta } from '@/features/epics'
 import { TicketCard } from '@/features/tickets'
 
 import { useBenchBoardMoves } from '../hooks/use-bench-board-moves'
@@ -25,7 +27,7 @@ import { BenchColumn } from './bench-column'
 
 interface BenchBoardProps {
   columns: Record<BenchColumnId, Ticket[]>
-  epicTitleById: Map<string, string>
+  epicMetaById: Map<string, EpicCardMeta>
   isPending?: boolean
   isError?: boolean
   onRetry?: () => void
@@ -44,7 +46,7 @@ function buildTicketsById(columns: Record<BenchColumnId, Ticket[]>): Map<string,
 
 export function BenchBoard({
   columns,
-  epicTitleById,
+  epicMetaById,
   isPending = false,
   isError = false,
   onRetry,
@@ -131,7 +133,7 @@ export function BenchBoard({
               key={column}
               column={column}
               tickets={columns[column]}
-              epicTitleById={epicTitleById}
+              epicMetaById={epicMetaById}
               isDragActive={isDragActive}
               onSelectTicket={onSelectTicket}
               onMoveTicket={moveTicket}
@@ -143,7 +145,7 @@ export function BenchBoard({
           {activeTicket ? (
             <TicketCard
               ticket={activeTicket}
-              epicTitle={activeTicket.epicId ? epicTitleById.get(activeTicket.epicId) : null}
+              epic={resolveTicketEpicCardMeta(activeTicket, epicMetaById)}
               interactive={false}
               className={benchDragOverlayCardClasses}
             />

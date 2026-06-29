@@ -50,7 +50,7 @@ function TicketTitle({ title }: { title: string }) {
     <Tooltip>
       <TooltipTrigger asChild>
         <span className="block min-w-0">
-          <Text className="truncate font-medium">{title}</Text>
+          <Text className="line-clamp-2 font-medium">{title}</Text>
         </span>
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-sm">

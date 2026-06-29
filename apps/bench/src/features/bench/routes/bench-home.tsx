@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/page-header'
 import { BENCH_ROUTES } from '@/app/routes'
 import { Button, Text } from '@rpg/ui'
-import { useEpicsList } from '@/features/epics'
+import { useEpicsList, buildEpicCardMetaById } from '@/features/epics'
 import { TicketCreateDialog, TicketDetailDrawer } from '@/features/tickets'
 
 import { BenchBoard } from '../components/bench-board'
@@ -16,7 +16,7 @@ export function BenchHome() {
   const { data: columns, isPending, isError, refetch } = useBenchTickets()
   const { data: epics = [] } = useEpicsList()
 
-  const epicTitleById = useMemo(() => new Map(epics.map((epic) => [epic.id, epic.title])), [epics])
+  const epicMetaById = useMemo(() => buildEpicCardMetaById(epics), [epics])
 
   const handleSelectTicket = useCallback(
     (id: string) => {
@@ -84,7 +84,7 @@ export function BenchHome() {
 
       <BenchBoard
         columns={boardColumns}
-        epicTitleById={epicTitleById}
+        epicMetaById={epicMetaById}
         isPending={isPending}
         isError={isError}
         onRetry={() => void refetch()}

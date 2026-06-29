@@ -12,7 +12,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const epicTitleById = new Map([['epic-1', 'Dev Bench MVP']])
+const epicMetaById = new Map([
+  ['epic-1', { id: 'epic-1', title: 'Dev Bench MVP', badgeColor: '#6366f1' }],
+])
 
 function BoardStory(props: React.ComponentProps<typeof BenchBoard>) {
   return (
@@ -25,7 +27,7 @@ function BoardStory(props: React.ComponentProps<typeof BenchBoard>) {
 export const Empty: Story = {
   args: {
     columns: emptyBenchColumns(),
-    epicTitleById,
+    epicMetaById,
   },
   render: (args) => <BoardStory {...args} />,
 }
@@ -33,7 +35,7 @@ export const Empty: Story = {
 export const Populated: Story = {
   args: {
     columns: populatedBenchColumns(),
-    epicTitleById,
+    epicMetaById,
   },
   render: (args) => <BoardStory {...args} />,
 }
@@ -41,7 +43,7 @@ export const Populated: Story = {
 export const Loading: Story = {
   args: {
     columns: emptyBenchColumns(),
-    epicTitleById,
+    epicMetaById,
     isPending: true,
   },
   render: (args) => <BoardStory {...args} />,
@@ -50,7 +52,7 @@ export const Loading: Story = {
 export const Error: Story = {
   args: {
     columns: emptyBenchColumns(),
-    epicTitleById,
+    epicMetaById,
     isError: true,
     onRetry: () => undefined,
   },

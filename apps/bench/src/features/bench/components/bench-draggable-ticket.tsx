@@ -1,3 +1,4 @@
+import type { EpicCardMeta } from '@/features/epics'
 import type { Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
 import type { BenchColumn } from '@rpg/dev-bench-core'
 import { useDraggable } from '@dnd-kit/core'
@@ -16,7 +17,7 @@ import { TicketCardMoveMenu } from './ticket-card-move-menu'
 interface BenchDraggableTicketProps {
   ticket: Ticket
   column: BenchColumn
-  epicTitle?: string | null
+  epic?: EpicCardMeta | null
   onSelect?: (ticketId: string) => void
   onMove: (nextStatus: TicketStatus) => void
   isMovePending?: boolean
@@ -33,7 +34,7 @@ function benchTicketAriaLabel(ticket: Ticket): string {
 export function BenchDraggableTicket({
   ticket,
   column,
-  epicTitle,
+  epic,
   onSelect,
   onMove,
   isMovePending = false,
@@ -59,7 +60,7 @@ export function BenchDraggableTicket({
         {...listeners}
         {...attributes}
       >
-        <TicketCard ticket={ticket} epicTitle={epicTitle} interactive={false} className="pr-10" />
+        <TicketCard ticket={ticket} epic={epic} interactive={false} className="pr-10" />
       </div>
       <div className="absolute right-2 top-2 z-10">
         <TicketCardMoveMenu ticket={ticket} isPending={isMovePending} onMove={onMove} />

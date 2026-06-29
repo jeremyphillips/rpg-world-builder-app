@@ -1,4 +1,5 @@
 export * from './code-ref'
+export * from './hex-color'
 export * from './epic'
 export * from './epic-input'
 export * from './ticket'

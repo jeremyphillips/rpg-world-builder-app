@@ -1,3 +1,5 @@
+import type { EpicCardMeta } from '@/features/epics'
+import { resolveTicketEpicCardMeta } from '@/features/epics'
 import type { BenchColumn } from '@rpg/dev-bench-core'
 import type { Ticket, TicketStatus } from '@rpg/contracts/dev-bench'
 import { getTicketStatusLabel } from '@rpg/contracts/dev-bench'
@@ -12,7 +14,7 @@ import { BenchDraggableTicket } from './bench-draggable-ticket'
 interface BenchColumnProps {
   column: BenchColumn
   tickets: Ticket[]
-  epicTitleById: Map<string, string>
+  epicMetaById: Map<string, EpicCardMeta>
   isDragActive?: boolean
   onSelectTicket?: (ticketId: string) => void
   onMoveTicket: (ticket: Ticket, nextStatus: TicketStatus) => void
@@ -22,7 +24,7 @@ interface BenchColumnProps {
 export function BenchColumn({
   column,
   tickets,
-  epicTitleById,
+  epicMetaById,
   isDragActive = false,
   onSelectTicket,
   onMoveTicket,
@@ -56,7 +58,7 @@ export function BenchColumn({
               key={ticket.id}
               ticket={ticket}
               column={column}
-              epicTitle={ticket.epicId ? epicTitleById.get(ticket.epicId) : null}
+              epic={resolveTicketEpicCardMeta(ticket, epicMetaById)}
               onSelect={onSelectTicket}
               onMove={(nextStatus) => onMoveTicket(ticket, nextStatus)}
               isMovePending={isMovePending}

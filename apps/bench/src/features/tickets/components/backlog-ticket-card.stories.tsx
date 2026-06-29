@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     ticket: sampleTicket,
-    epicTitle: 'Dev Bench MVP',
+    epic: { id: 'epic-1', title: 'Dev Bench MVP', badgeColor: '#6366f1' },
     onSelect: () => undefined,
   },
 }

@@ -12,7 +12,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const epicTitleById = new Map([['epic-1', 'Dev Bench MVP']])
+const epicMetaById = new Map([
+  ['epic-1', { id: 'epic-1', title: 'Dev Bench MVP', badgeColor: '#6366f1' }],
+])
 
 function ColumnStory(props: React.ComponentProps<typeof BenchColumn>) {
   return (
@@ -26,7 +28,7 @@ export const Empty: Story = {
   args: {
     column: 'up_next',
     tickets: emptyBenchColumns().up_next,
-    epicTitleById,
+    epicMetaById,
     isDragActive: false,
     onMoveTicket: () => undefined,
   },
@@ -37,7 +39,7 @@ export const WithTickets: Story = {
   args: {
     column: 'up_next',
     tickets: [{ ...upNextTicket, epicId: 'epic-1' }],
-    epicTitleById,
+    epicMetaById,
     isDragActive: false,
     onMoveTicket: () => undefined,
   },
