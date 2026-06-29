@@ -10,7 +10,7 @@ import {
   ticketTypeSchema,
 } from '@rpg/contracts/dev-bench'
 
-export const listTicketBucketSchema = z.enum(['open', 'done'])
+export const listTicketBucketSchema = z.enum(['active', 'done'])
 
 export type ListTicketBucket = z.infer<typeof listTicketBucketSchema>
 

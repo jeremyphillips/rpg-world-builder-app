@@ -78,7 +78,7 @@ Match the epic or primary package touched when obvious.
 ### Epic
 
 - Resolve by **`epicName`** or **`epicId`** on list/create flows.
-- `pnpm bench list-tickets --epic-name "Character Builder" --bucket open` for incomplete epic work (API: `GET /api/bench/tickets?epicName=…&bucket=open`).
+- `pnpm bench list-tickets --epic-name "Character Builder" --bucket active` for incomplete epic work (API: `GET /api/bench/tickets?epicName=…&bucket=active`).
 - `pnpm bench list-epics` to see titles and ids.
 - Seed epics: Character Builder, Rules Configuration, Campaign Builder, Content Library, Combat Simulator.
 - Tickets may have **no epic** — do not force assignment.
@@ -88,7 +88,7 @@ Match the epic or primary package touched when obvious.
 
 | Filter                       | Meaning                                                             |
 | ---------------------------- | ------------------------------------------------------------------- |
-| API/CLI `bucket=open`        | Not `done`, not `wont_do` — backlog + on-desk, **includes blocked** |
+| API/CLI `bucket=active`      | Not `done`, not `wont_do` — backlog + on-desk, **includes blocked** |
 | Epic detail **Open Tickets** | UI bucket via `epicTicketBucket` — excludes blocked work            |
 | `bucket=done`                | Completed tickets only                                              |
 

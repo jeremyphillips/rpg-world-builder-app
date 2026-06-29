@@ -127,15 +127,15 @@ describe('listTickets', () => {
     expect(tickets[0]?.epicId).toBe(characterEpic.id)
   })
 
-  it('filters bucket open to incomplete work', async () => {
+  it('filters bucket active to incomplete work', async () => {
     await createTicket({ ...baseTicketInput, status: 'backlog' })
     await createTicket({ ...baseTicketInput, title: 'On desk', status: 'up_next' })
     await createTicket({ ...baseTicketInput, title: 'Blocked item', status: 'blocked' })
     await createTicket({ ...baseTicketInput, title: 'Finished', status: 'done' })
     await createTicket({ ...baseTicketInput, title: 'Declined', status: 'wont_do' })
 
-    const openTickets = await listTickets({ bucket: 'open' })
-    expect(openTickets.map((ticket) => ticket.title).sort()).toEqual([
+    const activeTickets = await listTickets({ bucket: 'active' })
+    expect(activeTickets.map((ticket) => ticket.title).sort()).toEqual([
       'Blocked item',
       'Capture gap',
       'On desk',
@@ -151,7 +151,7 @@ describe('listTickets', () => {
     expect(doneTickets[0]?.title).toBe('Finished')
   })
 
-  it('combines epicName and bucket open', async () => {
+  it('combines epicName and bucket active', async () => {
     const epic = await createEpic(
       createEpicInputSchema.parse({ title: 'Character Builder', area: 'character_builder' }),
     )
@@ -164,7 +164,7 @@ describe('listTickets', () => {
     })
     await createTicket({ ...baseTicketInput, title: 'Other open', status: 'backlog' })
 
-    const tickets = await listTickets({ epicName: 'Character Builder', bucket: 'open' })
+    const tickets = await listTickets({ epicName: 'Character Builder', bucket: 'active' })
     expect(tickets).toHaveLength(1)
     expect(tickets[0]?.title).toBe('Capture gap')
   })

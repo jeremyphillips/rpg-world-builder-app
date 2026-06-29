@@ -6,7 +6,7 @@ describe('listTicketsQuerySchema', () => {
   it('accepts epicName and bucket filters', () => {
     const parsed = listTicketsQuerySchema.safeParse({
       epicName: 'Character Builder',
-      bucket: 'open',
+      bucket: 'active',
     })
 
     expect(parsed.success).toBe(true)
@@ -15,7 +15,7 @@ describe('listTicketsQuerySchema', () => {
   it('rejects bucket and status together', () => {
     const parsed = listTicketsQuerySchema.safeParse({
       status: 'backlog',
-      bucket: 'open',
+      bucket: 'active',
     })
 
     expect(parsed.success).toBe(false)

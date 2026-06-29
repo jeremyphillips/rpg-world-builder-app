@@ -131,7 +131,7 @@ async function validateTicketLinks(
 function buildTicketListFilter(query: ListTicketsQuery): Record<string, unknown> {
   const filter: Record<string, unknown> = {}
 
-  if (query.bucket === 'open') {
+  if (query.bucket === 'active') {
     filter.status = { $nin: [...CLOSED_TICKET_STATUSES] }
   } else if (query.bucket === 'done') {
     filter.status = 'done'

@@ -49,24 +49,24 @@ Global flags:
 ```bash
 pnpm bench list-tickets --status backlog
 pnpm bench list-tickets --area rules
-pnpm bench list-tickets --epic-name "Character Builder" --bucket open --format text
+pnpm bench list-tickets --epic-name "Character Builder" --bucket active --format text
 pnpm bench list-tickets --type feature --priority high
 pnpm bench list-tickets --epic-id <mongoId> --size m --created-by agent
 ```
 
-| Flag           | Values                                                                |
-| -------------- | --------------------------------------------------------------------- |
-| `--status`     | `backlog`, `up_next`, `in_progress`, `blocked`, `done`, `wont_do`     |
-| `--bucket`     | `open` (incomplete work), `done` — mutually exclusive with `--status` |
-| `--area`       | lowercase slug (see agent reference)                                  |
-| `--type`       | ticket type enum                                                      |
-| `--priority`   | `critical`, `high`, `medium`, `low`                                   |
-| `--size`       | `xs`, `s`, `m`, `l`, `xl`                                             |
-| `--epic-id`    | Mongo epic id (wins over `--epic-name`)                               |
-| `--epic-name`  | Resolve epic by title (case-insensitive)                              |
-| `--created-by` | `user`, `agent`                                                       |
+| Flag           | Values                                                                  |
+| -------------- | ----------------------------------------------------------------------- |
+| `--status`     | `backlog`, `up_next`, `in_progress`, `blocked`, `done`, `wont_do`       |
+| `--bucket`     | `active` (incomplete work), `done` — mutually exclusive with `--status` |
+| `--area`       | lowercase slug (see agent reference)                                    |
+| `--type`       | ticket type enum                                                        |
+| `--priority`   | `critical`, `high`, `medium`, `low`                                     |
+| `--size`       | `xs`, `s`, `m`, `l`, `xl`                                               |
+| `--epic-id`    | Mongo epic id (wins over `--epic-name`)                                 |
+| `--epic-name`  | Resolve epic by title (case-insensitive)                                |
+| `--created-by` | `user`, `agent`                                                         |
 
-`bucket=open` returns backlog plus on-desk tickets (excludes only `done` and `wont_do`; includes blocked). Differs from epic detail **Open Tickets** UI sections.
+`bucket=active` returns backlog plus on-desk tickets (excludes only `done` and `wont_do`; includes blocked). Differs from epic detail **Open Tickets** UI sections.
 
 ## suggest-next
 

@@ -41,7 +41,7 @@ When the user says **“add this to Dev Bench”** (see [Trigger phrases](#trigg
 | “move … to done”                                                         | [Mark done](#mark-done)                 |
 | “won’t pursue”                                                           | [Won’t pursue](#wont-pursue)            |
 | “what should I work on next”, “recommend next”, “suggest next ticket”    | [Recommend next](#recommend-next)       |
-| “list open tickets for …”, “what’s open in \<epic\>”                     | [List epic tickets](#list-epic-tickets) |
+| “list active tickets for …”, “what’s open in \<epic\>”                   | [List epic tickets](#list-epic-tickets) |
 
 ---
 
@@ -136,11 +136,11 @@ Use [Required command patterns](#required-command-patterns). Existing CLI only.
 
 ### List epic tickets
 
-- List incomplete work for an epic by title — backlog plus on-desk (`bucket=open` excludes only `done` and `wont_do`; **includes blocked**).
+- List active (incomplete) work for an epic by title — backlog plus on-desk (`bucket=active` excludes only `done` and `wont_do`; **includes blocked**).
 - Not the same as epic detail **Open Tickets** UI (that section splits blocked out via `epicTicketBucket`).
 
 ```bash
-pnpm bench list-tickets --epic-name "Character Builder" --bucket open --format text
+pnpm bench list-tickets --epic-name "Character Builder" --bucket active --format text
 ```
 
 - `epicId` wins over `epicName` when both are set. Do not combine `--bucket` with `--status`.
@@ -212,10 +212,10 @@ pnpm bench update-ticket BENCH-042 --json '{
 
 **Near-term capture:** add `"status": "up_next"` to create JSON, or patch after create.
 
-**List open epic tickets** (`bucket=open` = not done / not wont_do):
+**List active epic tickets** (`bucket=active` = not done / not wont_do):
 
 ```bash
-pnpm bench list-tickets --epic-name "Character Builder" --bucket open --format text
+pnpm bench list-tickets --epic-name "Character Builder" --bucket active --format text
 ```
 
 **Recommend next:**
