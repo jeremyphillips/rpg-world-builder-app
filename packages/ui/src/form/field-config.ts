@@ -22,6 +22,7 @@ import type {
   FieldRowLayout,
   FieldHintPosition,
   FieldGroupLegendSize,
+  FieldLabelPosition,
 } from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
@@ -180,6 +181,8 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   inputWidth?: FieldWidth
   /** Visual digit capacity for the numeric input (sets input width from ch-based tokens). */
   digits?: FieldDigits
+  /** `above` (default) — label over control. `settings` — label + hint left, control right. */
+  labelPosition?: FieldLabelPosition
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {

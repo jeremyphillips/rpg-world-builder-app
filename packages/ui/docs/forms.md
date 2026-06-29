@@ -142,6 +142,7 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | `fieldRowLayoutVariants`         | —                     | Display recipe for `FieldRow` / `RowConfig.layout` (`flex`, `responsive-2`, …)  |
 | `fieldInlineSentenceClasses`     | `gap-x-2 gap-y-2`     | Inline “Choose [N] from:” sentence rows (`ChooseFromChipsField`, …)             |
 | `fieldInlineControlRowClasses`   | `gap-3`               | Inline label + control rows (e.g. `DiceFormulaField`)                           |
+| `fieldSettingsRowClasses`        | —                     | Dense settings rows — label + hint left, compact control right                  |
 | `fieldChipWrapGapClasses`        | `gap-2 pt-1`          | Chip pill row inside `ChipsField`                                               |
 | `fieldGroupDescriptionClasses`   | `mb-3`                | Space below a group or accordion section description                            |
 | `fieldGroupLegendSpacingClasses` | `mb-4`                | Space below a group legend                                                      |
@@ -244,6 +245,32 @@ labels.
 
 Do **not** combine `digits` with mixed-length enum labels (e.g. subclass choice
 level with a `"None"` option) — use full-width container sizing instead.
+
+### Dense settings rows
+
+For advanced/dense settings panels (campaign rules, nested toggles with dependent
+scalars), use `labelPosition: 'settings'` on `number` fields. This renders a
+two-column row: label + hint on the left, a compact digit-sized control on the
+right. Stack to a single column on narrow viewports.
+
+```ts
+{
+  type: 'number',
+  name: 'primaryAbilityMinimumScore',
+  label: 'Minimum ability score',
+  labelPosition: 'settings',
+  digits: 2,
+  hint: 'Applied to every primary ability on the target class and all current classes.',
+  required: true,
+  min: 1,
+  max: 30,
+}
+```
+
+Do **not** use `FieldRow` or fractional `width` for this pattern — those lay out
+**multiple** fields side by side, each with vertical label-over-control anatomy.
+Reserve `labelPosition: 'settings'` for dense panels; default forms stay vertical
+(`above`).
 
 ### Row layout — flex vs responsive grid
 

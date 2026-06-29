@@ -116,6 +116,7 @@ const fieldRenderers: {
       stepperMin={config.min}
       stepperMax={config.max}
       digits={config.digits}
+      labelPosition={config.labelPosition}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={(event) => field.onChange(parseNumber(event.target.value))}

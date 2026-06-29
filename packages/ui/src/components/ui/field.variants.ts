@@ -23,6 +23,7 @@ import { fieldSizeTypographyClasses } from './field-sizing.variants'
  * - `fieldArrayItemActionRowClasses` — action button row inside one array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
+ * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  */
 export const fieldAnatomyStackClasses = 'space-y-2'
 /** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
@@ -51,6 +52,9 @@ export const fieldArrayItemActionRowClasses = cn(
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
+/** Dense settings row — label + hint column left, compact control right. */
+export const fieldSettingsRowClasses =
+  'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 export const fieldRowLayoutVariants = cva('', {
@@ -71,6 +75,9 @@ export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'
+
+/** Label and control arrangement for standard field wrappers. */
+export type FieldLabelPosition = 'above' | 'settings'
 
 export const fieldLabelVariants = cva(
   [

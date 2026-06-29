@@ -146,7 +146,9 @@ export {
   fieldInlineSentenceClasses,
   fieldLabelHintStackClasses,
   fieldRowLayoutVariants,
+  fieldSettingsRowClasses,
   type FieldHintPosition,
+  type FieldLabelPosition,
   type FieldRowLayout,
 } from './components/ui/field.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'

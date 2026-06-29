@@ -27,4 +27,34 @@ describe('NumberField', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  it('renders a settings-row layout when labelPosition is settings', () => {
+    render(
+      <NumberField
+        id="score"
+        label="Minimum ability score"
+        hint="Applied to every primary ability."
+        labelPosition="settings"
+        digits={2}
+        defaultValue={13}
+      />,
+    )
+    const input = screen.getByLabelText('Minimum ability score')
+    expect(input.closest('.grid')).toHaveClass('sm:grid-cols-[minmax(0,1fr)_auto]')
+    expect(screen.getByText('Applied to every primary ability.')).toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations with settings layout', async () => {
+    const { container } = render(
+      <NumberField
+        id="score"
+        label="Minimum ability score"
+        hint="Applied to every primary ability."
+        labelPosition="settings"
+        digits={2}
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
 })
