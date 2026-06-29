@@ -190,4 +190,54 @@ describe('Form inputSelect field', () => {
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
     expect(onSubmit.mock.lastCall?.[0]).toEqual({ cost: { amount: 3000, currency: 'gp' } })
   })
+
+  it('seeds value and unit defaults when a conditional inputSelect becomes visible', async () => {
+    const user = userEvent.setup()
+    const durationSchema = z.object({
+      showTimed: z.boolean(),
+      duration: z.object({
+        value: z.coerce.number().int().min(1),
+        unit: z.enum(['round', 'minute']),
+      }),
+    })
+
+    const fields: FormItem[] = [
+      { type: 'switch', name: 'showTimed', label: 'Timed duration' },
+      {
+        type: 'inputSelect',
+        name: 'duration',
+        label: 'Duration',
+        inputType: 'number',
+        valueKey: 'value',
+        unitKey: 'unit',
+        options: [
+          { value: 'round', label: 'Round' },
+          { value: 'minute', label: 'Minute' },
+        ],
+        min: 1,
+        defaultValue: { value: 1, unit: 'round' },
+        visibility: {
+          dependsOn: ['showTimed'],
+          visibleWhen: (values) => values.showTimed === true,
+        },
+      },
+    ]
+
+    render(
+      <Form
+        schema={durationSchema}
+        fields={fields}
+        defaultValues={{ showTimed: false, duration: { value: 1, unit: 'round' } }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.queryByLabelText('Duration value')).not.toBeInTheDocument()
+
+    await user.click(screen.getByLabelText('Timed duration'))
+
+    expect(screen.getByLabelText('Duration value')).toHaveValue(1)
+    expect(screen.getByRole('combobox', { name: 'Duration unit' })).toHaveTextContent('Round')
+  })
 })

@@ -132,7 +132,7 @@ export function spellDurationFromFormValues(duration: SpellFormDuration): SpellD
       const base = {
         kind: 'timed' as const,
         value: duration.value ?? 1,
-        unit: duration.unit ?? 'minute',
+        unit: duration.unit ?? 'round',
       }
       if (duration.concentration) {
         return spellDurationSchema.parse({

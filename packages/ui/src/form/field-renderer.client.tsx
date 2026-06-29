@@ -67,7 +67,9 @@ interface RenderArgs<K extends FieldType> {
  * `number` coerces to `number | undefined`; `select`/`radio`/`radioCard` use `onValueChange`;
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
-const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactElement } = {
+const fieldRenderers: {
+  [K in Exclude<FieldType, 'inputSelect'>]: (args: RenderArgs<K>) => React.ReactElement
+} = {
   text: ({ config, field, id, error }) => (
     <TextField
       id={id}
@@ -399,15 +401,6 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       onBlur={field.onBlur}
     />
   ),
-  inputSelect: ({ config, field, id, error, namePrefix }) => (
-    <InputSelectFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      error={error}
-      namePrefix={namePrefix}
-    />
-  ),
 }
 
 export interface FieldRendererProps {
@@ -429,8 +422,20 @@ export interface FieldRendererProps {
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
   const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
-  const { field, fieldState } = useController({ name: fullName })
   const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
+
+  if (config.type === 'inputSelect') {
+    return (
+      <InputSelectFieldRenderer
+        config={config}
+        fullName={fullName}
+        id={id}
+        namePrefix={namePrefix}
+      />
+    )
+  }
+
+  const { field, fieldState } = useController({ name: fullName })
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.

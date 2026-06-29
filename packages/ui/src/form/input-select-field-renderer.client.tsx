@@ -1,10 +1,10 @@
 'use client'
 
-import { useWatch, type ControllerRenderProps } from 'react-hook-form'
+import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../components/ui/input-select-field.client'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { InputSelectFieldConfig } from './field-config'
+import { fieldDefaultValue, type InputSelectFieldConfig } from './field-config'
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value)
@@ -31,26 +31,40 @@ function resolveValueDigits(
 
 export interface InputSelectFieldRendererProps {
   config: InputSelectFieldConfig
-  field: ControllerRenderProps
+  /** Full RHF path to the composite object (e.g. `cost`, `duration`, `castingTime.normal`). */
+  fullName: string
   id: string
-  error?: string
   /** Prefix for `valueDigitsDependsOn` paths inside array items (e.g. `traits.0`). */
   namePrefix?: string
 }
 
 /**
- * RHF adapter for `InputSelectField`: binds a nested object (`valueKey` / `unitKey`)
- * to the composite value + unit control.
+ * RHF adapter for `InputSelectField`: binds `valueKey` / `unitKey` as separate
+ * nested paths (e.g. `duration.value`, `duration.unit`) so sibling dot-path
+ * fields (`duration.kind`, …) can coexist and conditional remount restores
+ * per-key defaults via `useController({ defaultValue })`.
  */
 export function InputSelectFieldRenderer({
   config,
-  field,
+  fullName,
   id,
-  error,
   namePrefix,
 }: InputSelectFieldRendererProps) {
   const valueKey = config.valueKey ?? 'value'
   const unitKey = config.unitKey ?? 'unit'
+  const valuePath = `${fullName}.${valueKey}`
+  const unitPath = `${fullName}.${unitKey}`
+  const configDefault = asRecord(fieldDefaultValue(config))
+
+  const { field: valueField, fieldState: valueFieldState } = useController({
+    name: valuePath,
+    defaultValue: configDefault[valueKey],
+  })
+  const { field: unitField, fieldState: unitFieldState } = useController({
+    name: unitPath,
+    defaultValue: configDefault[unitKey],
+  })
+
   const dependsOn = config.valueDigitsDependsOn
   const prefixedDependsOn = dependsOn
     ? namePrefix
@@ -60,9 +74,7 @@ export function InputSelectFieldRenderer({
   const watchedKind = useWatch({ name: prefixedDependsOn ?? '', disabled: !prefixedDependsOn })
   const valueDigits = resolveValueDigits(config, watchedKind)
 
-  const obj = asRecord(field.value)
-  const unit = obj[unitKey] != null ? String(obj[unitKey]) : ''
-  const rawValue = obj[valueKey]
+  const rawValue = valueField.value
   const value =
     config.inputType === 'number'
       ? typeof rawValue === 'number'
@@ -71,9 +83,13 @@ export function InputSelectFieldRenderer({
       : rawValue != null
         ? String(rawValue)
         : undefined
+  const unit = unitField.value != null ? String(unitField.value) : ''
 
-  function updateObject(patch: Record<string, unknown>) {
-    field.onChange({ ...obj, ...patch })
+  const error = valueFieldState.error?.message ?? unitFieldState.error?.message
+
+  function handleBlur() {
+    valueField.onBlur()
+    unitField.onBlur()
   }
 
   return (
@@ -101,9 +117,9 @@ export function InputSelectFieldRenderer({
       formatGrouped={config.formatGrouped}
       value={value}
       unit={unit}
-      onValueChange={(next) => updateObject({ [valueKey]: next })}
-      onUnitChange={(next) => updateObject({ [unitKey]: next })}
-      onBlur={field.onBlur}
+      onValueChange={valueField.onChange}
+      onUnitChange={unitField.onChange}
+      onBlur={handleBlur}
     />
   )
 }

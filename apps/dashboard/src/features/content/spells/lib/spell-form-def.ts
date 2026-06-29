@@ -275,7 +275,7 @@ const spellCreateDefaultValues: Partial<SpellFormValues> = {
     canBeCastAsRitual: false,
   },
   range: { kind: 'self' },
-  duration: { kind: 'instantaneous' },
+  duration: { kind: 'instantaneous', value: 1, unit: 'round' },
   components: { verbal: true, somatic: true },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
@@ -424,7 +424,7 @@ function castingFields(): FormItem[] {
               width: 'auto',
               visibility: visibleWhenDurationTimed(),
               required: true,
-              defaultValue: { value: 1, unit: 'minute' },
+              defaultValue: { value: 1, unit: 'round' },
             },
             {
               type: 'switch',
@@ -476,7 +476,7 @@ function castingFields(): FormItem[] {
           type: 'text',
           name: 'components.material.description',
           label: 'Material (M)',
-          hint: 'Describe the material component; leave blank if none.',
+          hint: 'Describe the material component.',
         },
       ],
     },
