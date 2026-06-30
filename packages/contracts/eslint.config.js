@@ -14,7 +14,6 @@ export default [
         { type: 'content', pattern: 'src/rpg/content/**', mode: 'full' },
         { type: 'campaign', pattern: 'src/rpg/campaign/**', mode: 'full' },
         { type: 'public', pattern: 'src/public/**', mode: 'full' },
-        { type: 'platform-shim', pattern: 'src/platform/**', mode: 'full' },
         { type: 'dev-bench', pattern: 'src/dev-bench/**', mode: 'full' },
         { type: 'barrel', pattern: 'src/index.ts', mode: 'file' },
       ],
@@ -34,7 +33,6 @@ export default [
             { from: ['runtime'], allow: ['vocab', 'primitives', 'content', 'runtime'] },
             { from: ['campaign'], allow: ['vocab', 'primitives', 'campaign', 'shared'] },
             { from: ['public'], allow: ['public'] },
-            { from: ['platform-shim'], allow: ['shared', 'campaign'] },
             { from: ['dev-bench'], allow: ['dev-bench'] },
             {
               from: ['barrel'],

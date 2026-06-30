@@ -115,21 +115,21 @@ Layer boundaries are enforced in [`eslint.config.js`](../eslint.config.js) via
 Prefer the root import for app code unless you want an explicit layer boundary
 in the import path:
 
-| Import path                   | Resolves to                   | Typical use                                    |
-| ----------------------------- | ----------------------------- | ---------------------------------------------- |
-| `@rpg/contracts`              | `src/index.ts`                | Default — all symbols, unchanged API           |
-| `@rpg/contracts/shared`       | `src/shared/index.ts`         | Auth, user, roles, routes, errors              |
-| `@rpg/contracts/vocab`        | `src/rpg/vocab/index.ts`      | Label/format helpers, vocabulary sets          |
-| `@rpg/contracts/primitives`   | `src/rpg/primitives/index.ts` | Dice, levels, ruleset id                       |
-| `@rpg/contracts/content`      | `src/rpg/content/index.ts`    | Content schemas and DTOs                       |
-| `@rpg/contracts/runtime`      | `src/rpg/runtime/index.ts`    | Character sheet runtime contracts              |
-| `@rpg/contracts/rpg/campaign` | `src/rpg/campaign/index.ts`   | Campaign + ruleset patches                     |
-| `@rpg/contracts/platform`     | `src/platform/index.ts`       | **Deprecated** — use `shared` + `rpg/campaign` |
-| `@rpg/contracts/public`       | `src/public/index.ts`         | Public app only (scaffold)                     |
-| `@rpg/contracts/dev-bench`    | `src/dev-bench/index.ts`      | Dev Bench tickets, epics, inputs               |
+| Import path                   | Resolves to                   | Typical use                           |
+| ----------------------------- | ----------------------------- | ------------------------------------- |
+| `@rpg/contracts`              | `src/index.ts`                | Default — all symbols, unchanged API  |
+| `@rpg/contracts/shared`       | `src/shared/index.ts`         | Auth, user, roles, routes, errors     |
+| `@rpg/contracts/vocab`        | `src/rpg/vocab/index.ts`      | Label/format helpers, vocabulary sets |
+| `@rpg/contracts/primitives`   | `src/rpg/primitives/index.ts` | Dice, levels, ruleset id              |
+| `@rpg/contracts/content`      | `src/rpg/content/index.ts`    | Content schemas and DTOs              |
+| `@rpg/contracts/runtime`      | `src/rpg/runtime/index.ts`    | Character sheet runtime contracts     |
+| `@rpg/contracts/rpg/campaign` | `src/rpg/campaign/index.ts`   | Campaign + ruleset patches            |
+| `@rpg/contracts/public`       | `src/public/index.ts`         | Public app only (scaffold)            |
+| `@rpg/contracts/dev-bench`    | `src/dev-bench/index.ts`      | Dev Bench tickets, epics, inputs      |
 
-Legacy `./vocab`, `./content`, `./primitives`, and `./platform` export paths
-remain as backward-compat aliases. Prefer `./rpg/*` and `./shared` in new code.
+Legacy `./vocab`, `./content`, and `./primitives` export paths remain as
+backward-compat aliases pointing at `rpg/*`. Prefer `./shared`, `./rpg/*`, and
+explicit subpaths in new code.
 
 Examples:
 

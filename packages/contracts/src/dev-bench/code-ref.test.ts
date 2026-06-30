@@ -4,14 +4,14 @@ import { codeRefSchema } from './code-ref'
 
 describe('codeRefSchema', () => {
   it('accepts a path-only ref', () => {
-    expect(codeRefSchema.safeParse({ path: 'packages/contracts/src/platform' }).success).toBe(true)
+    expect(codeRefSchema.safeParse({ path: 'packages/contracts/src/shared' }).success).toBe(true)
   })
 
   it('accepts a full ref', () => {
     expect(
       codeRefSchema.safeParse({
         packageName: '@rpg/contracts',
-        path: 'packages/contracts/src/platform/auth.ts',
+        path: 'packages/contracts/src/shared/auth.ts',
         symbol: 'loginInputSchema',
         lineStart: 10,
         lineEnd: 20,

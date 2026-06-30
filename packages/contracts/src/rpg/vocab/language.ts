@@ -35,12 +35,6 @@ export const languageIdSchema = vocabularyOptionIdSchema
 
 export type LanguageId = z.infer<typeof languageIdSchema>
 
-/** @deprecated Use `languageIdSchema`. */
-export const languageSchema = languageIdSchema
-
-/** @deprecated Use `LanguageId`. */
-export type Language = LanguageId
-
 /** Returns a display label — title-cased slug fallback when seed label is unknown. */
 export function getLanguageLabel(id: string): string {
   return formatVocabularySlugLabel(id)

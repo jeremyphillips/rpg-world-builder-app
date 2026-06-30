@@ -50,10 +50,6 @@
       "types": "./src/rpg/campaign/index.ts",
       "default": "./src/rpg/campaign/index.ts"
     },
-    "./platform": {
-      "types": "./src/platform/index.ts",
-      "default": "./src/platform/index.ts"
-    },
     "./public": {
       "types": "./src/public/index.ts",
       "default": "./src/public/index.ts"

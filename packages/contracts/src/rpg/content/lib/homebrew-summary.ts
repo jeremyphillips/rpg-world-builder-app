@@ -21,6 +21,3 @@ export const homebrewContentSummarySchema = z.object({
 })
 
 export type HomebrewContentSummary = z.infer<typeof homebrewContentSummarySchema>
-
-/** @deprecated Use `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`. */
-export const HOMEBREW_SUMMARY_CONTENT_TYPES = HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS

@@ -3,7 +3,7 @@ export { homebrewRouter } from './homebrew.routes'
 export {
   getContentTypeConfig,
   getContentWriteConfig,
-  HOMEBREW_SUMMARY_TYPES,
+  HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
   isContentTypeName,
   isContentWriteType,
   resolveContentForCampaign,

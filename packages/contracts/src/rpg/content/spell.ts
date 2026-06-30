@@ -6,7 +6,7 @@ import {
   spellDeliveryMethodSchema,
   spellDurationSchema,
   spellRangeSchema,
-  spellSchoolSchema,
+  spellSchoolIdSchema,
   spellTagsSchema,
 } from '../vocab/spell'
 import {
@@ -40,7 +40,7 @@ export type SpellContentLevel = z.infer<typeof spellContentLevelSchema>
 
 /** The editable shape: what a form authors and what a patch overrides. */
 export const spellBodySchema = contentBodyBaseSchema.extend({
-  school: spellSchoolSchema,
+  school: spellSchoolIdSchema,
   level: spellContentLevelSchema,
   /** Class slugs that can learn or cast this spell (SRD or homebrew). */
   classIds: z.array(classSlugSchema).min(1),

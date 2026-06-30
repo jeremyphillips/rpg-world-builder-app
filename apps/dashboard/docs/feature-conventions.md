@@ -269,7 +269,7 @@ displays option **labels**, so digit-sized level picks must use compact labels.
 | [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/form-options/level-field-options.ts)                                | Constant `3` for `d6`–`d12` labels                                   |
 
 Contracts SSOT:
-[`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
+[`buildGroupedLevelOptions`](../../../packages/contracts/src/rpg/campaign/campaign-rules.ts)
 (with optional `{ showTierLabels: false }`).
 
 Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/forms/fields/content-identity-form-fields.ts)

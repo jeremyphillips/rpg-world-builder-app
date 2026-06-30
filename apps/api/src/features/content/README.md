@@ -72,9 +72,9 @@ See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.c
 
 Mounted under `/api/campaigns/:campaignId/homebrew`.
 
-| Method | Path       | Role   | Description                                                                            |
-| ------ | ---------- | ------ | -------------------------------------------------------------------------------------- |
-| GET    | `/summary` | member | Resolved catalog counts for hub cards (`HOMEBREW_SUMMARY_TYPES` in `content-types.ts`) |
+| Method | Path       | Role   | Description                                                                                        |
+| ------ | ---------- | ------ | -------------------------------------------------------------------------------------------------- |
+| GET    | `/summary` | member | Resolved catalog counts for hub cards (`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in `content-types.ts`) |
 
 System seed records ship from `@rpg/catalog`; the API never stores a full catalog copy.
 

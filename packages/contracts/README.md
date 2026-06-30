@@ -20,9 +20,8 @@ Source lives under `src/shared/`, `src/rpg/`, and isolated `dev-bench/`:
 | Runtime    | `src/rpg/runtime/`    | Stored character sheets (builder/sheet contracts)     |
 | Campaign   | `src/rpg/campaign/`   | Campaign identity, rules, membership, ruleset patches |
 
-`src/platform/index.ts` is a backward-compat shim re-exporting `shared/` +
-`rpg/campaign/`. Dependency rules, ESLint enforcement, and where to put new
-modules → [docs/structure.md](docs/structure.md).
+Dependency rules, ESLint enforcement, and where to put new modules →
+[docs/structure.md](docs/structure.md).
 
 ## Subpath exports
 
@@ -38,7 +37,7 @@ when you want an explicit boundary in the import path:
 | `@rpg/contracts/content`      | `src/rpg/content/index.ts`    |
 | `@rpg/contracts/runtime`      | `src/rpg/runtime/index.ts`    |
 | `@rpg/contracts/rpg/campaign` | `src/rpg/campaign/index.ts`   |
-| `@rpg/contracts/platform`     | shim → shared + campaign      |
+| `@rpg/contracts/public`       | `src/public/index.ts`         |
 | `@rpg/contracts/dev-bench`    | `src/dev-bench/index.ts`      |
 
 ```ts

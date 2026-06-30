@@ -17,9 +17,3 @@ export const CREATURE_TYPE_SET_ID = 'creature-types' as const satisfies Vocabula
 export const creatureTypeSchema = vocabularyOptionIdSchema
 
 export type CreatureTypeId = z.infer<typeof creatureTypeSchema>
-
-/** @deprecated Import `SeedCreatureType` from `@rpg/catalog/vocabulary`. */
-export type CreatureType = CreatureTypeId
-
-/** @deprecated Import `SeedCreatureType` from `@rpg/catalog/vocabulary`. */
-export type SystemCreatureType = CreatureTypeId

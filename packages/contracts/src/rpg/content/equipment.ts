@@ -290,12 +290,6 @@ export type VehicleEquipment = Extract<Equipment, { kind: 'vehicle' }>
 export type ServiceEquipment = Extract<Equipment, { kind: 'service' }>
 export type MagicItemEquipment = Extract<Equipment, { kind: 'magic_item' }>
 
-/** @deprecated Use {@link WeaponEquipment} or `Equipment` narrowed by `kind: 'weapon'`. */
-export type Weapon = WeaponEquipment
-
-/** @deprecated Use {@link ArmorEquipment} or `Equipment` narrowed by `kind: 'armor'`. */
-export type Armor = ArmorEquipment
-
 export type WeaponBody = z.infer<typeof weaponBodySchema>
 export type ArmorBody = z.infer<typeof armorBodySchema>
 

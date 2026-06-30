@@ -17,12 +17,6 @@ export const spellSchoolIdSchema = vocabularyOptionIdSchema
 
 export type SpellSchoolId = z.infer<typeof spellSchoolIdSchema>
 
-/** @deprecated Use `spellSchoolIdSchema`. */
-export const spellSchoolSchema = spellSchoolIdSchema
-
-/** @deprecated Use `SpellSchoolId`. */
-export type SpellSchool = SpellSchoolId
-
 /** Returns a display label — title-cased slug fallback when seed label is unknown. */
 export function getSpellSchoolLabel(id: string): string {
   return formatVocabularySlugLabel(id)

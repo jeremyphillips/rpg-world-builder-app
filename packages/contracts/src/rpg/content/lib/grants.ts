@@ -254,16 +254,3 @@ export function normalizeContentTrait(input: unknown): unknown {
 export const contentTraitSchema = z.preprocess(normalizeContentTrait, contentTraitUnionSchema)
 
 export type ContentTrait = z.infer<typeof contentTraitSchema>
-
-/** @deprecated Prefer `customContentTraitSchema`. */
-export const speciesCustomTraitSchema = customContentTraitSchema
-
-// --- Backward-compatible aliases (species module re-exports these too) ------
-
-/** @deprecated Prefer `contentProficienciesSchema`. */
-export const speciesProficienciesSchema = contentProficienciesSchema
-export type SpeciesProficiencies = ContentProficiencies
-
-/** @deprecated Prefer `contentGrantsSchema`. */
-export const speciesGrantsSchema = contentGrantsSchema
-export type SpeciesGrants = ContentGrants

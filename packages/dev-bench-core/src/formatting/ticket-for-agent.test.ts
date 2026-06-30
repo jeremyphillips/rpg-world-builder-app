@@ -19,7 +19,7 @@ const sampleTicket: Ticket = {
   acceptanceCriteria: ['Patch write path exists', 'Schema validation is applied'],
   codeRefs: [
     {
-      path: 'packages/contracts/src/platform',
+      path: 'packages/contracts/src/rpg/campaign',
       symbol: 'campaignRulesSchema',
       lineStart: 10,
       lineEnd: 20,
@@ -49,7 +49,7 @@ describe('formatTicketForAgent', () => {
     expect(output).toContain('**Epic ID:** epic_1')
     expect(output).toContain('ticket_blocker')
     expect(output).toContain('ticket_related')
-    expect(output).toContain('packages/contracts/src/platform')
+    expect(output).toContain('packages/contracts/src/rpg/campaign')
     expect(output).toContain('symbol: campaignRulesSchema')
   })
 

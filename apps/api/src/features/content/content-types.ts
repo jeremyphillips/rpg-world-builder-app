@@ -44,9 +44,6 @@ const CONTENT_TYPES = {
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES
 
-/** @deprecated Import `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` from `@rpg/contracts`. */
-export const HOMEBREW_SUMMARY_TYPES = HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS
-
 export function getContentTypeConfig<K extends ContentTypeName>(
   type: K,
 ): (typeof CONTENT_TYPES)[K]['read'] {

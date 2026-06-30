@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { languageSchema } from '../../vocab/language'
+import { languageIdSchema } from '../../vocab/language'
 import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { skillSchema } from '../../content/skill-proficiency'
 import { characterSelectionSourcesSchema } from './selection-sources'
@@ -90,7 +90,7 @@ export const characterProficienciesSchema = z.object({
 export type CharacterProficiencies = z.infer<typeof characterProficienciesSchema>
 
 export const characterLanguageEntrySchema = z.object({
-  language: languageSchema,
+  language: languageIdSchema,
   sources: characterSelectionSourcesSchema,
   notes: z.string().optional(),
 })

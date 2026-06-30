@@ -19,12 +19,6 @@ export const damageTypeIdSchema = vocabularyOptionIdSchema
 
 export type DamageTypeId = z.infer<typeof damageTypeIdSchema>
 
-/** @deprecated Use `damageTypeIdSchema`. */
-export const damageTypeSchema = damageTypeIdSchema
-
-/** @deprecated Use `DamageTypeId`. */
-export type DamageType = DamageTypeId
-
 /** Returns a display label — physical entries first, then title-cased slug fallback. */
 export function getDamageTypeLabel(id: string): string {
   const physicalLabel = getPhysicalDamageTypeLabel(id)

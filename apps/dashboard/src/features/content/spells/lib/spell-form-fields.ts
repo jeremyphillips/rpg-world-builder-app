@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   castingTimeUnitSchema,
-  damageTypeSchema,
+  damageTypeIdSchema,
   durationUnitSchema,
   effectConditionSchema,
   slugSchema,
@@ -9,7 +9,7 @@ import {
   spellFunctionTagSchema,
   spellRangeKindSchema,
   spellRoleTagSchema,
-  spellSchoolSchema,
+  spellSchoolIdSchema,
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
@@ -84,14 +84,14 @@ export const spellFormSchema = z
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
-    school: spellSchoolSchema,
+    school: spellSchoolIdSchema,
     level: spellContentLevelSchema,
     classIds: z.array(z.string()).min(1),
     tags: z
       .object({
         roles: z.array(spellRoleTagSchema).optional(),
         functions: z.array(spellFunctionTagSchema).optional(),
-        damageTypes: z.array(damageTypeSchema).optional(),
+        damageTypes: z.array(damageTypeIdSchema).optional(),
         conditions: z.array(effectConditionSchema).optional(),
       })
       .optional(),

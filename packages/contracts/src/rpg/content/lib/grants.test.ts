@@ -10,7 +10,6 @@ import {
   isGrantEligibleGrants,
   languageChoiceGrantSchema,
   normalizeContentTrait,
-  speciesGrantsSchema,
 } from './grants'
 import { resolveTraitDisplay } from './trait-display'
 
@@ -328,11 +327,5 @@ describe('resolveTraitDisplay', () => {
     )
     expect(display.name).toBe('Superior Darkvision')
     expect(display.descriptionHtml).toBe('<p>Custom homebrew wording.</p>')
-  })
-})
-
-describe('speciesGrantsSchema alias', () => {
-  it('is the same schema as contentGrantsSchema', () => {
-    expect(speciesGrantsSchema).toBe(contentGrantsSchema)
   })
 })

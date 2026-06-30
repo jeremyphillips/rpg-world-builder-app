@@ -17,12 +17,6 @@ export const senseIdSchema = vocabularyOptionIdSchema
 
 export type SenseId = z.infer<typeof senseIdSchema>
 
-/** @deprecated Use `senseIdSchema`. */
-export const senseTypeSchema = senseIdSchema
-
-/** @deprecated Use `SenseId`. */
-export type SenseType = SenseId
-
 /**
  * Preset sense ranges (in feet) shown as a select in authoring UIs. The
  * underlying schema stays numeric — these presets are a UI affordance only.

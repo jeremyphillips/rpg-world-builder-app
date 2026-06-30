@@ -15,8 +15,6 @@ import {
   contentTraitSchema,
   innateSpellEntrySchema,
   innateSpellsSchema,
-  speciesGrantsSchema,
-  speciesProficienciesSchema,
 } from './lib/grants'
 import { speciesCharacterCreationSchema } from './species-character-creation'
 
@@ -27,27 +25,16 @@ import { speciesCharacterCreationSchema } from './species-character-creation'
 // species body, not a separate content type.
 // ---------------------------------------------------------------------------
 
-// Re-export shared grant types for backward compatibility.
-export {
-  contentGrantsSchema,
-  contentTraitSchema,
-  innateSpellEntrySchema,
-  innateSpellsSchema,
-  speciesGrantsSchema,
-  speciesProficienciesSchema,
-}
+// Re-export shared grant types for species authoring.
+export { contentGrantsSchema, contentTraitSchema, innateSpellEntrySchema, innateSpellsSchema }
 export type {
   ContentGrants,
   ContentTrait,
   InnateSpellEntry,
   InnateSpells,
   InnateSpellKind,
-  SpeciesGrants,
-  SpeciesProficiencies,
 } from './lib/grants'
 
-/** @deprecated Prefer `contentTraitSchema`. */
-export const speciesTraitSchema = contentTraitSchema
 export type SpeciesTrait = z.infer<typeof contentTraitSchema>
 
 /**
@@ -56,7 +43,7 @@ export type SpeciesTrait = z.infer<typeof contentTraitSchema>
  * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
 export const speciesHeritageSchema = contentNamedChoiceSchema.extend({
-  options: z.array(speciesTraitSchema).min(1),
+  options: z.array(contentTraitSchema).min(1),
 })
 
 export type SpeciesHeritage = z.infer<typeof speciesHeritageSchema>
@@ -69,7 +56,7 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
   speed: speedSchema,
-  traits: z.array(speciesTraitSchema),
+  traits: z.array(contentTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */
   characterCreation: speciesCharacterCreationSchema.optional(),

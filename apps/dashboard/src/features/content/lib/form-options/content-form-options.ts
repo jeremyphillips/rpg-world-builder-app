@@ -57,6 +57,55 @@ export interface ContentFormOptionSets {
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
 
+interface QueryState {
+  isPending: boolean
+  isError: boolean
+}
+
+function isAnyPending(...queries: QueryState[]): boolean {
+  return queries.some((query) => query.isPending)
+}
+
+function isAnyError(...queries: QueryState[]): boolean {
+  return queries.some((query) => query.isError)
+}
+
+function useContentCatalogLists(campaignId: string | undefined) {
+  const classesQuery = useClasses(campaignId)
+  const spellsQuery = useSpells(campaignId)
+  const featsQuery = useFeats(campaignId)
+  const equipmentQuery = useEquipment(campaignId)
+  const queries = [classesQuery, spellsQuery, featsQuery, equipmentQuery]
+
+  return {
+    classes: classesQuery.data,
+    spells: spellsQuery.data,
+    feats: featsQuery.data,
+    equipment: equipmentQuery.data,
+    isPending: isAnyPending(...queries),
+    isError: isAnyError(...queries),
+  }
+}
+
+function useContentFormVocabulary(campaignId: string | undefined) {
+  const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
+  const damageTypeQuery = useDamageTypeVocabulary(campaignId)
+  const senseQuery = useSenseVocabulary(campaignId)
+  const languageQuery = useLanguageVocabulary(campaignId)
+  const spellSchoolQuery = useSpellSchoolVocabulary(campaignId)
+  const queries = [creatureTypeQuery, damageTypeQuery, senseQuery, languageQuery, spellSchoolQuery]
+
+  return {
+    creatureTypeVocabulary: creatureTypeQuery.vocabulary,
+    damageTypeVocabulary: damageTypeQuery.vocabulary,
+    senseVocabulary: senseQuery.vocabulary,
+    languageVocabulary: languageQuery.vocabulary,
+    spellSchoolVocabulary: spellSchoolQuery.vocabulary,
+    isPending: isAnyPending(...queries),
+    isError: isAnyError(...queries),
+  }
+}
+
 interface ContentOptionEntity {
   slug: string
   name: string
@@ -129,73 +178,39 @@ export function useContentFormOptions(campaignId: string | undefined): {
   isPending: boolean
   isError: boolean
 } {
-  const classesQuery = useClasses(campaignId)
-  const spellsQuery = useSpells(campaignId)
-  const featsQuery = useFeats(campaignId)
-  const equipmentQuery = useEquipment(campaignId)
+  const catalog = useContentCatalogLists(campaignId)
+  const vocabulary = useContentFormVocabulary(campaignId)
   const campaignRules = useCampaignRules(campaignId)
-  const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
-  const damageTypeQuery = useDamageTypeVocabulary(campaignId)
-  const senseQuery = useSenseVocabulary(campaignId)
-  const languageQuery = useLanguageVocabulary(campaignId)
-  const spellSchoolQuery = useSpellSchoolVocabulary(campaignId)
 
   const options = useMemo(
     () =>
       buildContentFormOptionSets({
         campaignId,
-        classes: classesQuery.data,
-        spells: spellsQuery.data,
-        feats: featsQuery.data,
-        equipment: equipmentQuery.data,
+        classes: catalog.classes,
+        spells: catalog.spells,
+        feats: catalog.feats,
+        equipment: catalog.equipment,
       }),
-    [campaignId, classesQuery.data, spellsQuery.data, featsQuery.data, equipmentQuery.data],
+    [campaignId, catalog.classes, catalog.spells, catalog.feats, catalog.equipment],
   )
 
   const ctx = useMemo(
     (): ContentFormCtx => ({
       campaignId,
       campaignRules,
-      creatureTypeVocabulary: creatureTypeQuery.vocabulary,
-      damageTypeVocabulary: damageTypeQuery.vocabulary,
-      senseVocabulary: senseQuery.vocabulary,
-      languageVocabulary: languageQuery.vocabulary,
-      spellSchoolVocabulary: spellSchoolQuery.vocabulary,
+      creatureTypeVocabulary: vocabulary.creatureTypeVocabulary,
+      damageTypeVocabulary: vocabulary.damageTypeVocabulary,
+      senseVocabulary: vocabulary.senseVocabulary,
+      languageVocabulary: vocabulary.languageVocabulary,
+      spellSchoolVocabulary: vocabulary.spellSchoolVocabulary,
       options,
     }),
-    [
-      campaignId,
-      campaignRules,
-      creatureTypeQuery.vocabulary,
-      damageTypeQuery.vocabulary,
-      senseQuery.vocabulary,
-      languageQuery.vocabulary,
-      spellSchoolQuery.vocabulary,
-      options,
-    ],
+    [campaignId, campaignRules, vocabulary, options],
   )
 
   return {
     ctx,
-    isPending:
-      classesQuery.isPending ||
-      spellsQuery.isPending ||
-      featsQuery.isPending ||
-      equipmentQuery.isPending ||
-      creatureTypeQuery.isPending ||
-      damageTypeQuery.isPending ||
-      senseQuery.isPending ||
-      languageQuery.isPending ||
-      spellSchoolQuery.isPending,
-    isError:
-      classesQuery.isError ||
-      spellsQuery.isError ||
-      featsQuery.isError ||
-      equipmentQuery.isError ||
-      creatureTypeQuery.isError ||
-      damageTypeQuery.isError ||
-      senseQuery.isError ||
-      languageQuery.isError ||
-      spellSchoolQuery.isError,
+    isPending: catalog.isPending || vocabulary.isPending,
+    isError: catalog.isError || vocabulary.isError,
   }
 }
