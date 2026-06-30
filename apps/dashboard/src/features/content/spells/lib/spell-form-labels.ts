@@ -1,8 +1,6 @@
 import {
   CASTING_TIME_UNITS,
   CASTING_TIME_UNIT_ENTRIES,
-  DAMAGE_TYPE_ENTRIES,
-  DAMAGE_TYPE_IDS,
   DURATION_UNITS,
   DURATION_UNIT_ENTRIES,
   EFFECT_CONDITION_ENTRIES,
@@ -18,8 +16,6 @@ import {
   SPELL_RANGE_KIND_ENTRIES,
   SPELL_ROLE_TAG_ENTRIES,
   SPELL_ROLE_TAGS,
-  SPELL_SCHOOLS,
-  SPELL_SCHOOL_ENTRIES,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
@@ -34,14 +30,6 @@ export const SPELL_DURATION_KIND_LABELS: Record<(typeof SPELL_DURATION_KINDS)[nu
 }
 
 export const SPELL_DELIVERY_METHOD_NONE = 'none'
-
-export const schoolOptions = toOptions(
-  SPELL_SCHOOLS,
-  Object.fromEntries(SPELL_SCHOOLS.map((s) => [s, SPELL_SCHOOL_ENTRIES[s].label])) as Record<
-    (typeof SPELL_SCHOOLS)[number],
-    string
-  >,
-)
 
 export const spellLevelOptions: FieldOption[] = Array.from(
   { length: MAX_SPELL_CONTENT_LEVEL - MIN_SPELL_CONTENT_LEVEL + 1 },
@@ -101,14 +89,6 @@ export const functionTagOptions = toOptions(
   Object.fromEntries(
     SPELL_FUNCTION_TAGS.map((t) => [t, SPELL_FUNCTION_TAG_ENTRIES[t].label]),
   ) as Record<(typeof SPELL_FUNCTION_TAGS)[number], string>,
-)
-
-export const damageTypeOptions = toOptions(
-  DAMAGE_TYPE_IDS,
-  Object.fromEntries(DAMAGE_TYPE_IDS.map((d) => [d, DAMAGE_TYPE_ENTRIES[d].label])) as Record<
-    (typeof DAMAGE_TYPE_IDS)[number],
-    string
-  >,
 )
 
 export const conditionTagOptions = toOptions(

@@ -4,7 +4,7 @@ import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
 import { createUser } from '../../user'
 import { createCampaign } from '../../campaign'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
-import { HOMEBREW_SUMMARY_TYPES } from '../content-types'
+import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts'
 import { getHomebrewContentSummary } from './homebrew-summary.service'
 
 beforeAll(async () => {
@@ -50,8 +50,10 @@ describe('getHomebrewContentSummary', () => {
 
     const summary = await getHomebrewContentSummary(campaign.id)
 
-    expect(summary.content).toHaveLength(HOMEBREW_SUMMARY_TYPES.length)
-    expect(summary.content.map((item) => item.contentType)).toEqual([...HOMEBREW_SUMMARY_TYPES])
+    expect(summary.content).toHaveLength(HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS.length)
+    expect(summary.content.map((item) => item.contentType)).toEqual([
+      ...HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
+    ])
 
     const classes = summary.content.find((item) => item.contentType === 'classes')
     expect(classes?.totalCount).toBe(13)

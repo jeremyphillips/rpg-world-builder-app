@@ -1,4 +1,4 @@
-import { getClassName, type CharacterClass } from '@rpg/contracts'
+import type { CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 
@@ -50,7 +50,7 @@ export function assertSpeciesClassSlugsExist(
   throw new HttpError(
     400,
     'validation_error',
-    `Unknown ${label}: ${unknown.map((slug) => `"${getClassName(slug)}"`).join(', ')}.`,
+    `Unknown ${label}: ${unknown.map((slug) => `"${slug}"`).join(', ')}.`,
   )
 }
 

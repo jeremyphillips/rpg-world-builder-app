@@ -1,11 +1,11 @@
-import { CLASS_NAMES } from '@rpg/contracts'
+import { seedClassSlugs } from '@rpg/catalog/classes'
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import { loadSeedSpells, loadSeedSpellsByLevel, seedSpellSlugs, SPELL_LEVEL_FILES } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
-const SRD_CLASS_SLUGS = new Set(Object.keys(CLASS_NAMES))
+const SRD_CLASS_SLUGS = seedClassSlugs(RULESET)
 
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)

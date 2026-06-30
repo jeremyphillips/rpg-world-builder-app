@@ -25,6 +25,10 @@ export {
   vocabularySetQueryKey,
 } from './hooks/use-vocabulary-set'
 export { useCreatureTypeVocabulary } from './hooks/use-creature-type-vocabulary'
+export { useDamageTypeVocabulary } from './hooks/use-damage-type-vocabulary'
+export { useSenseVocabulary } from './hooks/use-sense-vocabulary'
+export { useLanguageVocabulary } from './hooks/use-language-vocabulary'
+export { useSpellSchoolVocabulary } from './hooks/use-spell-school-vocabulary'
 export { useEditionPresetVocabulary } from './hooks/use-edition-preset-vocabulary'
 export { useAttackResolutionModeVocabulary } from './hooks/use-attack-resolution-mode-vocabulary'
 export {
@@ -34,6 +38,35 @@ export {
   getCreatureTypeLabel,
   type CreatureTypeVocabulary,
 } from './lib/vocabulary/sets/creature-types'
+export {
+  buildDamageTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
+  buildActiveDamageTypeFieldOptions,
+  getDamageTypeLabelFromVocabulary,
+  type DamageTypeVocabulary,
+} from './lib/vocabulary/sets/damage-types'
+export {
+  buildSenseVocabulary,
+  buildSeedSenseVocabulary,
+  buildActiveSenseFieldOptions,
+  getSenseLabelFromVocabulary,
+  type SenseVocabulary,
+} from './lib/vocabulary/sets/senses'
+export {
+  buildLanguageVocabulary,
+  buildSeedLanguageVocabulary,
+  buildActiveLanguageFieldOptions,
+  getLanguageLabelFromVocabulary,
+  type LanguageVocabulary,
+} from './lib/vocabulary/sets/languages'
+export {
+  buildSpellSchoolVocabulary,
+  buildSeedSpellSchoolVocabulary,
+  buildActiveSpellSchoolFieldOptions,
+  getSpellSchoolLabelFromVocabulary,
+  getSpellSchoolDescriptionFromVocabulary,
+  type SpellSchoolVocabulary,
+} from './lib/vocabulary/sets/spell-schools'
 export {
   buildEditionPresetVocabulary,
   buildSeedEditionPresetVocabulary,

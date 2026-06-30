@@ -1,0 +1,110 @@
+[
+  {
+    "id": "common",
+    "label": "Common",
+    "description": "The Common trade language of the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "common-sign-language",
+    "label": "Common Sign Language",
+    "description": "A sign language used alongside Common in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "draconic",
+    "label": "Draconic",
+    "description": "The language of dragons and dragonborn in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "dwarvish",
+    "label": "Dwarvish",
+    "description": "The language of dwarves in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "elvish",
+    "label": "Elvish",
+    "description": "The language of elves in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "giant",
+    "label": "Giant",
+    "description": "The language of giants in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "gnomish",
+    "label": "Gnomish",
+    "description": "The language of gnomes in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "goblin",
+    "label": "Goblin",
+    "description": "The language of goblinoids in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "halfling",
+    "label": "Halfling",
+    "description": "The language of halflings in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
+    "id": "abyssal",
+    "label": "Abyssal",
+    "description": "The language of demons and the Lower Planes in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "primordial",
+    "label": "Primordial",
+    "description": "Primordial includes the Aquan, Auran, Ignan, and Terran dialects. Creatures that know one of these dialects can communicate with those that know a different one.",
+    "category": "rare"
+  },
+  {
+    "id": "celestial",
+    "label": "Celestial",
+    "description": "The language of celestials and the Upper Planes in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "sylvan",
+    "label": "Sylvan",
+    "description": "The language of fey creatures in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "deep-speech",
+    "label": "Deep Speech",
+    "description": "The alien language of aberrations such as mind flayers in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "thieves-cant",
+    "label": "Thieves' Cant",
+    "description": "A secret mix of dialect, jargon, and code used by rogues and criminals in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "druidic",
+    "label": "Druidic",
+    "description": "The secret language of druids in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "undercommon",
+    "label": "Undercommon",
+    "description": "The trade language of the Underdark in the SRD 5.2.1 setting.",
+    "category": "rare"
+  },
+  {
+    "id": "infernal",
+    "label": "Infernal",
+    "description": "The language of devils and lawful evil outsiders in the SRD 5.2.1 setting.",
+    "category": "rare"
+  }
+]

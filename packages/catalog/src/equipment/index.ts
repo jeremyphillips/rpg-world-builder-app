@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { EQUIPMENT_KINDS, equipmentSchema } from '@rpg/contracts'
-import type { Armor, Equipment, EquipmentKind, SystemRulesetId, Weapon } from '@rpg/contracts'
+import type {
+  ArmorEquipment,
+  Equipment,
+  EquipmentKind,
+  SystemRulesetId,
+  WeaponEquipment,
+} from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
 import adventuringGearRaw from './data/srd-cc-5.2.1/adventuring_gear.json'
@@ -71,13 +77,17 @@ export function getEquipmentBySlug(rulesetId: SystemRulesetId, slug: string): Eq
 }
 
 /** @deprecated Use {@link loadSeedEquipment} filtered by `kind === 'weapon'`. */
-export function loadSeedWeapons(rulesetId: SystemRulesetId): Weapon[] {
-  return loadSeedEquipment(rulesetId).filter((item): item is Weapon => item.kind === 'weapon')
+export function loadSeedWeapons(rulesetId: SystemRulesetId): WeaponEquipment[] {
+  return loadSeedEquipment(rulesetId).filter(
+    (item): item is WeaponEquipment => item.kind === 'weapon',
+  )
 }
 
 /** @deprecated Use {@link loadSeedEquipment} filtered by `kind === 'armor'`. */
-export function loadSeedArmor(rulesetId: SystemRulesetId): Armor[] {
-  return loadSeedEquipment(rulesetId).filter((item): item is Armor => item.kind === 'armor')
+export function loadSeedArmor(rulesetId: SystemRulesetId): ArmorEquipment[] {
+  return loadSeedEquipment(rulesetId).filter(
+    (item): item is ArmorEquipment => item.kind === 'armor',
+  )
 }
 
 /** @deprecated Use {@link seedEquipmentSlugs} — all equipment kinds share one slug namespace. */
@@ -91,7 +101,7 @@ export function seedArmorSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
 }
 
 /** @deprecated Use {@link getEquipmentBySlug} and narrow on `kind === 'weapon'`. */
-export function getWeaponBySlug(rulesetId: SystemRulesetId, slug: string): Weapon {
+export function getWeaponBySlug(rulesetId: SystemRulesetId, slug: string): WeaponEquipment {
   const item = getEquipmentBySlug(rulesetId, slug)
   if (item.kind !== 'weapon') {
     throw new Error(`Equipment slug "${slug}" is not a weapon (kind: ${item.kind})`)
@@ -100,7 +110,7 @@ export function getWeaponBySlug(rulesetId: SystemRulesetId, slug: string): Weapo
 }
 
 /** @deprecated Use {@link getEquipmentBySlug} and narrow on `kind === 'armor'`. */
-export function getArmorBySlug(rulesetId: SystemRulesetId, slug: string): Armor {
+export function getArmorBySlug(rulesetId: SystemRulesetId, slug: string): ArmorEquipment {
   const item = getEquipmentBySlug(rulesetId, slug)
   if (item.kind !== 'armor') {
     throw new Error(`Equipment slug "${slug}" is not armor (kind: ${item.kind})`)

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   castingTimeUnitSchema,
-  damageTypeSchema,
+  damageTypeIdSchema,
   durationUnitSchema,
   effectConditionSchema,
   slugSchema,
@@ -9,9 +9,14 @@ import {
   spellFunctionTagSchema,
   spellRangeKindSchema,
   spellRoleTagSchema,
-  spellSchoolSchema,
+  spellSchoolIdSchema,
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+
+import {
+  buildActiveDamageTypeFieldOptions,
+  buildActiveSpellSchoolFieldOptions,
+} from '@/features/homebrew'
 
 import {
   feetInputUnitField,
@@ -22,14 +27,12 @@ import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   castingTimeUnitOptions,
   conditionTagOptions,
-  damageTypeOptions,
   deliveryMethodOptions,
   durationKindOptions,
   durationUnitOptions,
   functionTagOptions,
   rangeKindOptions,
   roleTagOptions,
-  schoolOptions,
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
@@ -81,14 +84,14 @@ export const spellFormSchema = z
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
-    school: spellSchoolSchema,
+    school: spellSchoolIdSchema,
     level: spellContentLevelSchema,
     classIds: z.array(z.string()).min(1),
     tags: z
       .object({
         roles: z.array(spellRoleTagSchema).optional(),
         functions: z.array(spellFunctionTagSchema).optional(),
-        damageTypes: z.array(damageTypeSchema).optional(),
+        damageTypes: z.array(damageTypeIdSchema).optional(),
         conditions: z.array(effectConditionSchema).optional(),
       })
       .optional(),
@@ -156,6 +159,8 @@ export const spellFormSchema = z
 export type SpellFormValues = z.infer<typeof spellFormSchema>
 
 function basicsFields(ctx: ContentFormCtx): FormItem[] {
+  const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
+
   return [
     ...identityFields(ctx),
     {
@@ -372,7 +377,9 @@ function castingFields(): FormItem[] {
   ]
 }
 
-function tagFields(): FormItem[] {
+function tagFields(ctx: ContentFormCtx): FormItem[] {
+  const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
+
   return [
     {
       type: 'chips',
@@ -405,6 +412,6 @@ export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
     { id: 'casting', label: 'Casting', fields: castingFields() },
-    { id: 'tags', label: 'Tags', fields: tagFields() },
+    { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
   ]
 }

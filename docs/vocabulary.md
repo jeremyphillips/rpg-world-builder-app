@@ -69,17 +69,19 @@ The UI may render `source: 'campaign'` vocabulary rows as **Custom** in tables.
 
 Shared shapes live in `@rpg/contracts`:
 
-| Symbol                                    | Layer                                | Role                                                |
-| ----------------------------------------- | ------------------------------------ | --------------------------------------------------- |
-| `VOCABULARY_OPTION_SET_IDS`               | `vocab/vocabulary.ts`                | Known set ids (not all implemented in UI yet)       |
-| `vocabularyOptionIdSchema`                | `vocab/`                             | Slug shape for stored ids — **not** a closed enum   |
-| `vocabularyOptionSetPatchSchema`          | `vocab/`                             | Per-set delta inside a patch document               |
-| `campaignRulesetPatchSchema`              | `platform/campaign-ruleset-patch.ts` | Full patch document (+ `rulesetId` from primitives) |
-| `createVocabularyMemberSchema(activeIds)` | `vocab/`                             | Validates a value against resolved **active** ids   |
-| `activeVocabularyOptionIds(set)`          | `vocab/`                             | Active id set from a resolved option set            |
+| Symbol                                    | Layer                             | Role                                                |
+| ----------------------------------------- | --------------------------------- | --------------------------------------------------- |
+| `VOCABULARY_OPTION_SET_IDS`               | `rpg/vocab/vocabulary.ts`         | Known set ids (not all implemented in UI yet)       |
+| `vocabularyOptionIdSchema`                | `rpg/vocab/`                      | Slug shape for stored ids — **not** a closed enum   |
+| `vocabularyOptionSetPatchSchema`          | `rpg/vocab/`                      | Per-set delta inside a patch document               |
+| `campaignRulesetPatchSchema`              | `rpg/campaign/patches/ruleset.ts` | Full patch document (+ `rulesetId` from primitives) |
+| `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                      | Validates a value against resolved **active** ids   |
+| `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                      | Active id set from a resolved option set            |
 
-**Closed reference vocab** (senses, damage types in traits, weapon properties)
-remains in `vocab/*_ENTRIES` maps when the set is not campaign-customizable.
+**Closed reference vocab** (physical damage, weapon properties) remains in
+`rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Open sets
+(damage types, senses, languages, spell schools, creature types) use catalog seed
+JSON + campaign patch instead.
 
 **Campaign-customizable sets** (creature types first) use catalog seed JSON +
 patch merge instead of expanding a compile-time enum. Primitive shape validation
@@ -136,7 +138,7 @@ under `lib/hub/` kept in sync with contracts via drift tests.
 ### Content cards (sidebar + hub)
 
 `VISIBLE_SIDEBAR_CONTENT` in `lib/hub/content-registry.ts` must match
-`HOMEBREW_SUMMARY_CONTENT_TYPES` in contracts — same types, same order. The hub
+`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts — same types, same order. The hub
 maps this array to cards; adding a summary content type without updating the
 registry fails CI.
 

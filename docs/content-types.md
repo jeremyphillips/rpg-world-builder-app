@@ -99,7 +99,7 @@ Paladin/Ranger Blessed Warrior and Druidic Warrior alternatives stay in feature
 ## Requirement expressions
 
 Composable eligibility trees (`RequirementExpression` in
-`packages/contracts/src/content/requirement-expression.ts`) model prerequisites
+`packages/contracts/src/rpg/content/lib/requirement-expression.ts`) model prerequisites
 and similar rules as explicit **AND** / **OR** structure. Feats are the first
 consumer; the same module will back invocations, multiclass rules, and the
 character builder.
@@ -226,7 +226,7 @@ Catalog records carry three distinct identifier layers. Authors edit **display n
 | Envelope **`slug`** | `fighter`, `wood-elf`                   | `deriveContentKey(name)` on first POST | **No** — homebrew and system patches  |
 | Nested **`id`**     | `rage`, `darkvision` on traits/features | Same helper, scoped to parent          | **No** — rename display `name` freely |
 
-Shared helpers: `packages/contracts/src/content/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
+Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
 
 **Today:** “publish” means the first successful homebrew **POST**. There is no draft workflow yet; records created under this rule remain locked.
 
@@ -244,8 +244,8 @@ Shared helpers: `packages/contracts/src/content/content-key.ts` (`deriveContentK
 ## Layer overview
 
 ```
-packages/contracts/src/content/<type>.ts   ← Zod schemas, TypeScript types, DTOs
-packages/contracts/src/vocab/            ← closed-set reference terms (when needed)
+packages/contracts/src/rpg/content/<type>.ts   ← Zod schemas, TypeScript types, DTOs
+packages/contracts/src/rpg/vocab/            ← closed-set reference terms (when needed)
 apps/api/src/features/content/
   <type>/
     data/srd-cc-5.2.1/<type>.json  ← System seed data
@@ -275,7 +275,7 @@ apps/dashboard/src/
 
 ## Step-by-step checklist
 
-### 1. Contracts (`packages/contracts/src/content/`)
+### 1. Contracts (`packages/contracts/src/rpg/content/`)
 
 Create `<type>.ts` under `content/` following this pattern:
 
@@ -307,7 +307,7 @@ Rules:
 - Avoid `z.enum` for open lists (items, feature names). Use `z.string()` unless the engine branches on the value.
 - Name the stored type to avoid reserved words or collisions (e.g. `CharacterClass` not `Class`).
 
-Re-export from `packages/contracts/src/content/index.ts` (the root barrel
+Re-export from `packages/contracts/src/rpg/content/index.ts` (the root barrel
 re-exports the content layer automatically):
 
 ```typescript
@@ -326,7 +326,7 @@ Add a co-located `<type>.test.ts` covering:
 
 If the type has a **closed set of ids** used as enums (weapon properties, armor
 categories, skill slugs, etc.), add reference vocabulary under
-`packages/contracts/src/vocab/` and derive the Zod enum from the map keys. Import
+`packages/contracts/src/rpg/vocab/` and derive the Zod enum from the map keys. Import
 the schema into your content module — do not define vocab maps on the entity
 file. See [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
 
@@ -334,7 +334,7 @@ file. See [packages/contracts/docs/structure.md](../packages/contracts/docs/stru
 
 Use this when a closed id set needs both a display label and SRD rule text
 (tooltips, detail pages, form help). Shared shape in `vocab/types.ts`; modules
-live under `packages/contracts/src/vocab/` (nested folders OK, e.g.
+live under `packages/contracts/src/rpg/vocab/` (nested folders OK, e.g.
 `vocab/weapon/property.ts`):
 
 ```typescript
@@ -347,7 +347,7 @@ export type GameTermEntry = {
 Pattern (see `SENSE_ENTRIES`, `ALIGNMENT_ENTRIES`, `CREATURE_SIZE_ENTRIES`,
 `DAMAGE_TYPE_ENTRIES`, `WEAPON_PROPERTY_ENTRIES`, `WEAPON_MASTERY_ENTRIES`, and
 `ARMOR_CATEGORY_ENTRIES` in `vocab/sense.ts`, `vocab/alignment.ts`,
-`vocab/creature-size.ts`, `vocab/damage-type.ts`, `vocab/weapon/property.ts`,
+`rpg/vocab/creature-size.ts`, `rpg/vocab/damage/physical.ts`, `rpg/vocab/weapon/property.ts`,
 `vocab/weapon/mastery.ts`, and `vocab/armor/category.ts`). Campaign-customizable
 sets such as creature types ship seed JSON from `@rpg/catalog/vocabulary` instead
 of a closed `*_ENTRIES` map in contracts — see [vocabulary.md](./vocabulary.md)
@@ -400,9 +400,10 @@ export function getThingName(id: string): string {
 }
 ```
 
-See `SKILLS`/`getSkillName` in `content/skill-proficiency.ts` and
-`CLASS_NAMES`/`getClassName` in `content/class/class.ts`. Prefer `*_ENTRIES`
-when rule text is available or likely soon.
+See `SKILLS`/`getSkillName` in `content/skill-proficiency.ts` for skill display names.
+For **classes**, resolve display names from the campaign catalog (`CharacterClass.name`)
+or use `formatSlugAsLabel` from `@rpg/contracts/primitives` when no record is loaded.
+Prefer `*_ENTRIES` when rule text is available or likely soon.
 
 #### Discriminated-union content types (variant pattern)
 

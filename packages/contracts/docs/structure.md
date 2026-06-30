@@ -1,41 +1,58 @@
 # Contracts package structure
 
 `@rpg/contracts` is organized into layers under `src/`. The RPG game domain uses
-four layers with **downward** imports (see dependency rules below). The root
-barrel (`src/index.ts`) re-exports those four layers so existing
-`import { … } from '@rpg/contracts'` usage stays unchanged.
+five layers with **downward** imports (see dependency rules below). The root
+barrel (`src/index.ts`) re-exports `shared/` plus everything under `rpg/` so
+existing `import { … } from '@rpg/contracts'` usage stays unchanged.
 
-**Dev Bench** (`dev-bench/`) is a fifth, **isolated** layer for the local
-workbench product. It is **not** re-exported from the root barrel — import
-`@rpg/contracts/dev-bench` explicitly.
+**Dev Bench** (`dev-bench/`) is isolated for the local workbench product — import
+`@rpg/contracts/dev-bench` explicitly. **Public** (`public/`) is a scaffold for
+future marketing/CMS contracts — import `@rpg/contracts/public` when added.
 
 ## Layer diagram
 
 ```text
 packages/contracts/src/
-  index.ts              # flat re-export of all layers (public API)
+  index.ts              # flat re-export of shared + rpg (not dev-bench, not public)
 
-  vocab/                # closed-set game terms (labels, SRD text, Zod enums)
-  primitives/           # shared value types (levels, dice, units, ruleset id)
-  content/              # catalog content types (species, weapons, classes, …)
-  platform/             # auth, users, campaigns, uploads, errors, assets
-  dev-bench/            # Dev Bench tickets, epics (isolated — not in root barrel)
+  shared/               # auth, user, roles, routes, errors, csrf, upload, assets
+  rpg/
+    vocab/              # closed-set game terms + open vocabulary set ids
+    primitives/         # shared value types (levels, dice, units, ruleset id)
+    content/            # catalog content types (species, weapons, classes, …)
+      lib/              # envelope, grants, content-key, content-type-keys, …
+      classes/          # class body, spellcasting, subclasses
+    runtime/            # stored character sheets (not catalog content)
+      character/        # sheet schema, provenance, proficiencies, inventory
+    campaign/           # campaign identity, rules, selection, patches/
+  platform/             # backward-compat shim → shared + rpg/campaign
+  public/               # scaffold (marketing/CMS — future)
+  dev-bench/            # Dev Bench tickets, epics (isolated)
 ```
 
 ```mermaid
 flowchart BT
-  platform["platform/"]
-  content["content/"]
-  primitives["primitives/"]
-  vocab["vocab/"]
+  shared["shared/"]
+  campaign["rpg/campaign/"]
+  runtime["rpg/runtime/"]
+  content["rpg/content/"]
+  primitives["rpg/primitives/"]
+  vocab["rpg/vocab/"]
   index["index.ts barrel"]
 
-  platform --> primitives
-  platform --> vocab
+  campaign --> shared
+  campaign --> primitives
+  campaign --> vocab
+  runtime --> content
+  runtime --> primitives
+  runtime --> vocab
   content --> primitives
   content --> vocab
   primitives --> vocab
-  index --> platform
+  shared --> primitives
+  index --> shared
+  index --> campaign
+  index --> runtime
   index --> content
   index --> primitives
   index --> vocab
@@ -43,41 +60,44 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                      | Layer         | Example path                                     |
-| ---------------------------------------------------- | ------------- | ------------------------------------------------ |
-| A closed id set with labels (and optional SRD text)  | `vocab/`      | `vocab/sense.ts`, `vocab/weapon/property.ts`     |
-| A reusable value type used across content types      | `primitives/` | `primitives/dice.ts`, `primitives/level.ts`      |
-| A catalog content type or its DTOs/patches           | `content/`    | `content/species.ts`, `content/class/class.ts`   |
-| Auth, session, campaign, upload, or API error shapes | `platform/`   | `platform/auth.ts`, `platform/campaign.ts`       |
-| Dev Bench ticket/epic schemas and input DTOs         | `dev-bench/`  | `dev-bench/ticket.ts`, `dev-bench/epic-input.ts` |
+| You are adding…                                       | Layer              | Example path                                             |
+| ----------------------------------------------------- | ------------------ | -------------------------------------------------------- |
+| A closed id set with labels (and optional SRD text)   | `rpg/vocab/`       | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`     |
+| A reusable value type used across content types       | `rpg/primitives/`  | `rpg/primitives/dice.ts`, `rpg/primitives/level.ts`      |
+| A catalog content type or its DTOs/patches            | `rpg/content/`     | `rpg/content/species.ts`, `rpg/content/classes/class.ts` |
+| Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/` | `rpg/content/lib/grants.ts`                              |
+| A stored character sheet or builder runtime contract  | `rpg/runtime/`     | `rpg/runtime/character/sheet.ts`                         |
+| Campaign identity, rules, membership, ruleset patches | `rpg/campaign/`    | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`      |
+| Auth, session, upload, or API error shapes            | `shared/`          | `shared/auth.ts`, `shared/errors.ts`                     |
+| Dev Bench ticket/epic schemas and input DTOs          | `dev-bench/`       | `dev-bench/ticket.ts`                                    |
+| Public marketing or CMS schemas                       | `public/`          | (scaffold — add when needed)                             |
 
-Nested folders are fine when a domain splits cleanly (e.g. `content/class/`
-for spellcasting + class body, `vocab/weapon/` for weapon term maps).
+Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
+for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
 
 Each layer has an `index.ts` barrel. Re-export new public symbols from that
-barrel (and from `src/index.ts` only if you add a new top-level layer — the
-root barrel already re-exports all four).
+barrel (the root barrel picks up `shared/` and `rpg/*` automatically).
 
 ## Dependency rules
 
 Acyclic **downward** imports only — lower layers never import higher layers.
 
-| Layer               | May import                           | Must not import                                  |
-| ------------------- | ------------------------------------ | ------------------------------------------------ |
-| `vocab/`            | `vocab/`                             | `primitives/`, `content/`, `platform/`           |
-| `primitives/`       | `vocab/`, `primitives/`              | `content/`, `platform/`                          |
-| `content/`          | `vocab/`, `primitives/`, `content/`  | `platform/`                                      |
-| `platform/`         | `vocab/`, `primitives/`, `platform/` | `content/`                                       |
-| `dev-bench/`        | `dev-bench/` only                    | `vocab/`, `primitives/`, `content/`, `platform/` |
-| `index.ts` (barrel) | RPG layers only                      | `dev-bench/` (use subpath export)                |
+| Layer               | May import                                                      | Must not import                                                               |
+| ------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `shared/`           | `shared/`, `rpg/primitives/`                                    | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                 |
+| `rpg/vocab/`        | `rpg/vocab/`                                                    | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/` |
+| `rpg/primitives/`   | `rpg/vocab/`, `rpg/primitives/`                                 | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                    |
+| `rpg/content/`      | `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                 | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                    |
+| `rpg/runtime/`      | `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/` | `rpg/campaign/`, `shared/`                                                    |
+| `rpg/campaign/`     | `rpg/vocab/`, `rpg/primitives/`, `rpg/campaign/`, `shared/`     | `rpg/content/`, `rpg/runtime/`                                                |
+| `public/`           | `public/` only                                                  | everything else                                                               |
+| `dev-bench/`        | `dev-bench/` only                                               | everything else                                                               |
+| `index.ts` (barrel) | `shared/` + `rpg/*`                                             | `dev-bench/`, `public/` (use subpath exports)                                 |
 
-**Not enforced:** requiring `content/` to reach `vocab/` only via
-`primitives/`. Content types legitimately import vocab schemas directly (e.g.
-`creatureSizeSchema`, `weaponCategorySchema`). The rule blocks upward leaks,
-not “skip a layer” shortcuts.
+**Not enforced:** requiring `rpg/content/` to reach `rpg/vocab/` only via
+`rpg/primitives/`. Content types legitimately import vocab schemas directly.
 
-Deep relative imports (`../vocab/sense`) and barrel imports (`../vocab`) are
-both valid within the allowed graph.
+Deep relative imports and barrel imports are both valid within the allowed graph.
 
 ## ESLint enforcement
 
@@ -90,41 +110,46 @@ Layer boundaries are enforced in [`eslint.config.js`](../eslint.config.js) via
 - Violations fail `pnpm lint --filter @rpg/contracts` with a message pointing
   here.
 
-If lint fails after a move, fix the import or relocate the module to the
-correct layer. Do not add lint exceptions for cross-layer imports.
-
 ## Subpath exports
 
 Prefer the root import for app code unless you want an explicit layer boundary
 in the import path:
 
-| Import path                 | Resolves to               | Typical use                           |
-| --------------------------- | ------------------------- | ------------------------------------- |
-| `@rpg/contracts`            | `src/index.ts`            | Default — all symbols, unchanged API  |
-| `@rpg/contracts/vocab`      | `src/vocab/index.ts`      | Label/format helpers, reference enums |
-| `@rpg/contracts/primitives` | `src/primitives/index.ts` | Dice, levels, ruleset id              |
-| `@rpg/contracts/content`    | `src/content/index.ts`    | Content schemas and DTOs              |
-| `@rpg/contracts/platform`   | `src/platform/index.ts`   | Auth, user, campaign, assets          |
-| `@rpg/contracts/dev-bench`  | `src/dev-bench/index.ts`  | Dev Bench tickets, epics, inputs      |
+| Import path                   | Resolves to                   | Typical use                           |
+| ----------------------------- | ----------------------------- | ------------------------------------- |
+| `@rpg/contracts`              | `src/index.ts`                | Default — all symbols, unchanged API  |
+| `@rpg/contracts/shared`       | `src/shared/index.ts`         | Auth, user, roles, routes, errors     |
+| `@rpg/contracts/vocab`        | `src/rpg/vocab/index.ts`      | Label/format helpers, vocabulary sets |
+| `@rpg/contracts/primitives`   | `src/rpg/primitives/index.ts` | Dice, levels, ruleset id              |
+| `@rpg/contracts/content`      | `src/rpg/content/index.ts`    | Content schemas and DTOs              |
+| `@rpg/contracts/runtime`      | `src/rpg/runtime/index.ts`    | Character sheet runtime contracts     |
+| `@rpg/contracts/rpg/campaign` | `src/rpg/campaign/index.ts`   | Campaign + ruleset patches            |
+| `@rpg/contracts/public`       | `src/public/index.ts`         | Public app only (scaffold)            |
+| `@rpg/contracts/dev-bench`    | `src/dev-bench/index.ts`      | Dev Bench tickets, epics, inputs      |
+
+Legacy `./vocab`, `./content`, and `./primitives` export paths remain as
+backward-compat aliases pointing at `rpg/*`. Prefer `./shared`, `./rpg/*`, and
+explicit subpaths in new code.
 
 Examples:
 
 ```ts
 // Root barrel (recommended default)
-import { speciesSchema, getSenseLabel } from '@rpg/contracts'
+import { speciesSchema, characterSchema } from '@rpg/contracts'
 
 // Layer subpaths (optional — same symbols, explicit boundary)
-import { getSenseLabel, SENSE_ENTRIES } from '@rpg/contracts/vocab'
-import { speciesSchema, contentMetaSchema } from '@rpg/contracts/content'
-import { loginInputSchema } from '@rpg/contracts/platform'
-import { ticketSchema, createTicketInputSchema } from '@rpg/contracts/dev-bench'
+import { getSenseLabel } from '@rpg/contracts/vocab'
+import { speciesSchema } from '@rpg/contracts/content'
+import { characterSchema } from '@rpg/contracts/runtime'
+import { loginInputSchema } from '@rpg/contracts/shared'
+import { campaignSchema } from '@rpg/contracts/rpg/campaign'
 ```
 
 Subpath exports are defined in [`package.json`](../package.json) `exports`.
 
 ## Reference vocabulary (`GameTermEntry`)
 
-Closed game-term maps live in `vocab/`. Shared shape in `vocab/types.ts`:
+Closed game-term maps live in `rpg/vocab/`. Shared shape in `rpg/vocab/types.ts`:
 
 ```ts
 export type GameTermEntry = {
@@ -134,17 +159,10 @@ export type GameTermEntry = {
 ```
 
 Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
-`get*Entry` / `get*Label` helpers. See `vocab/sense.ts`, `vocab/alignment.ts`,
-`vocab/weapon/property.ts`, and `vocab/armor/category.ts`. Co-located
-`*.test.ts` files assert every entry has non-empty `label` and `description`.
+`get*Entry` / `get*Label` helpers. Open vocabulary sets use catalog seeds +
+`vocabularyOptionIdSchema`; see [docs/vocabulary.md](../../../docs/vocabulary.md).
 
-Some vocabularies intentionally define a narrower local entry type when SRD text
-is sparse or policy-driven. For example, `vocab/language.ts` requires `label`
-and `category`, while `description` is optional so only authored language text is
-stored.
-
-Entity-specific fields (e.g. a weapon's `specialRules` text) stay on the
-content schema in `content/`, not in vocab maps.
+Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
 
 ## Adding a schema
 

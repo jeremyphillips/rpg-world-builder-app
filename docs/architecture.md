@@ -127,10 +127,11 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
 ## Shared contracts & UI
 
 - **`@rpg/contracts`** is the single source of truth for domain/DTO shapes:
-  Zod schemas with `z.infer` types (`Role`, `User`, `SessionUser`, `AuthMeResponse`,
-  `LoginInput`, `RegisterInput`) and cross-app route constants (`CROSS_APP_PATHS`).
-  The API validates against them; the public app's forms reuse the same schemas
-  with `@hookform/resolvers/zod`.
+  Zod schemas with `z.infer` types, organized under `shared/` (auth, users),
+  `rpg/content/` (catalog types), `rpg/runtime/` (character sheets),
+  and `rpg/campaign/` (campaign + ruleset patches). The API validates against
+  them; apps reuse the same schemas with `@hookform/resolvers/zod`.
+  Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).
 - **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,

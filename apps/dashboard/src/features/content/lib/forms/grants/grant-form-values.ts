@@ -3,10 +3,10 @@ import type {
   ArmorCategory,
   ContentGrants,
   ContentProficiencies,
-  DamageType,
+  DamageTypeId,
   FeatCategory,
   InnateSpellKind,
-  SenseType,
+  SenseId,
   SkillId,
 } from '@rpg/contracts'
 
@@ -127,7 +127,7 @@ function applySensesFromRows(result: ContentGrants, rows: GrantRowForm[]): void 
   const senseRows = rows.filter((row) => row.grantType === 'senses' && row.senseType)
   if (!senseRows.length) return
   result.senses = senseRows.map((row) => ({
-    type: row.senseType as SenseType,
+    type: row.senseType as SenseId,
     range: row.senseRange ?? 60,
   }))
 }
@@ -135,13 +135,13 @@ function applySensesFromRows(result: ContentGrants, rows: GrantRowForm[]): void 
 function applyResistancesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
   const row = rows.find((r) => r.grantType === 'resistances')
   if (!row?.resistances?.length) return
-  result.resistances = row.resistances as DamageType[]
+  result.resistances = row.resistances as DamageTypeId[]
 }
 
 function applyDamageTypesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
   const row = rows.find((r) => r.grantType === 'damageType')
   if (!row?.damageType?.length) return
-  result.damageType = row.damageType as DamageType[]
+  result.damageType = row.damageType as DamageTypeId[]
 }
 
 function applySpeedOverrideFromRows(result: ContentGrants, rows: GrantRowForm[]): void {

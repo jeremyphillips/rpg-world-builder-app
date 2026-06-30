@@ -1,10 +1,11 @@
-import type { Spell } from '@rpg/contracts'
+import type { CharacterClass, Spell } from '@rpg/contracts'
+import { formatSlugAsLabel, getSpellDeliveryMethodLabel } from '@rpg/contracts'
+
 import {
-  getClassName,
-  getSpellDeliveryMethodLabel,
-  getSpellSchoolEntry,
-  getSpellSchoolLabel,
-} from '@rpg/contracts'
+  getSpellSchoolDescriptionFromVocabulary,
+  getSpellSchoolLabelFromVocabulary,
+  type SpellSchoolVocabulary,
+} from '@/features/homebrew'
 
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 import {
@@ -22,15 +23,39 @@ const SPELL_STAT_RITUAL_INFO =
 const SPELL_STAT_CONCENTRATION_INFO =
   'Some spells require Concentration to maintain. Your Concentration on a spell ends if you cast another Concentration spell, fail a Constitution saving throw after taking damage, or become Incapacitated or die.'
 
+export type BuildSpellStatRowsOptions = {
+  /** Resolved catalog class names keyed by slug; falls back to {@link formatSlugAsLabel}. */
+  classesBySlug?: ReadonlyMap<string, CharacterClass>
+  /** Campaign-resolved spell school labels and descriptions. */
+  spellSchoolVocabulary?: SpellSchoolVocabulary
+}
+
+function resolveClassLabel(
+  slug: string,
+  classesBySlug: ReadonlyMap<string, CharacterClass> | undefined,
+): string {
+  return classesBySlug?.get(slug)?.name ?? formatSlugAsLabel(slug)
+}
+
 /** Builds label/value pairs for the spell detail stat section. */
-export function buildSpellStatRows(spell: Spell): ContentStatRowData[] {
+export function buildSpellStatRows(
+  spell: Spell,
+  options: BuildSpellStatRowsOptions = {},
+): ContentStatRowData[] {
+  const { classesBySlug, spellSchoolVocabulary } = options
+  const schoolLabel = getSpellSchoolLabelFromVocabulary(spellSchoolVocabulary, spell.school)
+  const schoolDescription = getSpellSchoolDescriptionFromVocabulary(
+    spellSchoolVocabulary,
+    spell.school,
+  )
+
   const rows: ContentStatRowData[] = [
     { label: 'Level', value: formatSpellLevelLabel(spell.level) },
     {
       label: 'School',
-      value: getSpellSchoolLabel(spell.school),
-      info: getSpellSchoolEntry(spell.school)?.description,
-      infoAriaLabel: `About ${getSpellSchoolLabel(spell.school)}`,
+      value: schoolLabel,
+      info: schoolDescription,
+      infoAriaLabel: `About ${schoolLabel}`,
     },
     { label: 'Casting Time', value: formatCastingTime(spell.castingTime) },
     { label: 'Range', value: formatSpellRange(spell.range) },
@@ -57,10 +82,12 @@ export function buildSpellStatRows(spell: Spell): ContentStatRowData[] {
     })
   }
 
-  rows.push({
-    label: 'Classes',
-    value: spell.classIds.map(getClassName).join(', '),
-  })
+  if (spell.classIds.length > 0) {
+    rows.push({
+      label: 'Classes',
+      value: spell.classIds.map((slug) => resolveClassLabel(slug, classesBySlug)).join(', '),
+    })
+  }
 
   return rows
 }

@@ -1,4 +1,4 @@
-import { classHasSpellcasting, getClassName, type CharacterClass } from '@rpg/contracts'
+import { classHasSpellcasting, type CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 
@@ -37,7 +37,9 @@ export function assertSpellClassIdsHaveSpellcasting(
   if (withoutSpellcasting.length > 0) {
     const label = withoutSpellcasting.length === 1 ? 'Class' : 'Classes'
     parts.push(
-      `${label} without spellcasting: ${withoutSpellcasting.map((slug) => `"${getClassName(slug)}"`).join(', ')}.`,
+      `${label} without spellcasting: ${withoutSpellcasting
+        .map((slug) => `"${bySlug.get(slug)?.name ?? slug}"`)
+        .join(', ')}.`,
     )
   }
 

@@ -2,7 +2,7 @@ import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
 const { model, models, Schema } = mongoose
 
-import { SPELL_DELIVERY_METHODS, SPELL_SCHOOLS } from '@rpg/contracts'
+import { SPELL_DELIVERY_METHODS } from '@rpg/contracts'
 
 import {
   homebrewCampaignSlugIndex,
@@ -12,7 +12,7 @@ import {
 const homebrewSpellSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
-    school: { type: String, enum: [...SPELL_SCHOOLS], required: true },
+    school: { type: String, required: true, trim: true },
     level: { type: Number, required: true, min: 0, max: 9 },
     classIds: [{ type: String, required: true }],
     tags: { type: Schema.Types.Mixed },

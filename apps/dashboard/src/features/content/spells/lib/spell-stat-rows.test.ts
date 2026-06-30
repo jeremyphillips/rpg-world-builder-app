@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { pickSpell } from '../../lib/fixtures/pick'
+import { buildSeedSpellSchoolVocabulary } from '@/features/homebrew'
 import { DETECT_MAGIC, FIRE_BOLT } from '../fixtures'
 import { buildSpellStatRows } from './spell-stat-rows'
 import {
@@ -69,8 +70,12 @@ describe('formatSpellComponents', () => {
 })
 
 describe('buildSpellStatRows', () => {
+  const spellSchoolVocabulary = buildSeedSpellSchoolVocabulary()
+
   it('includes school description info beside the value', () => {
-    const school = buildSpellStatRows(FIRE_BOLT).find((r) => r.label === 'School')
+    const school = buildSpellStatRows(FIRE_BOLT, { spellSchoolVocabulary }).find(
+      (r) => r.label === 'School',
+    )
 
     expect(school?.value).toBe('Evocation')
     expect(school?.info).toContain('Evocation spells')
@@ -79,7 +84,7 @@ describe('buildSpellStatRows', () => {
   })
 
   it('includes ritual and concentration flags for detect magic', () => {
-    const rows = buildSpellStatRows(DETECT_MAGIC)
+    const rows = buildSpellStatRows(DETECT_MAGIC, { spellSchoolVocabulary })
     const ritual = rows.find((r) => r.label === 'Ritual')
     const concentration = rows.find((r) => r.label === 'Concentration')
 
@@ -95,7 +100,7 @@ describe('buildSpellStatRows', () => {
   })
 
   it('includes delivery method when present', () => {
-    const rows = buildSpellStatRows(FIRE_BOLT)
+    const rows = buildSpellStatRows(FIRE_BOLT, { spellSchoolVocabulary })
     expect(rows.find((r) => r.label === 'Delivery')?.value).toBe('Ranged spell attack')
   })
 })

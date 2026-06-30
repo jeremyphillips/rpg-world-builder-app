@@ -27,7 +27,7 @@ has spellcasting (e.g. a homebrew class edited to drop spellcasting), that slug 
 falls back to showing the raw slug as a removable chip until the user clears it.
 Save is blocked by API validation until all invalid classes are removed.
 
-**Future polish:** Union orphan selected slugs into options with `getClassName` and
+**Future polish:** Union orphan selected slugs into options with `formatSlugAsLabel` and
 a description such as “Does not have spellcasting”.
 
 ## API

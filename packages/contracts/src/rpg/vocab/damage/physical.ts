@@ -1,0 +1,45 @@
+import { z } from 'zod'
+
+import type { GameTermEntry } from '../types'
+
+// ---------------------------------------------------------------------------
+// Physical damage — closed forever (3 SRD types). Weapons use this subset only;
+// elemental and planar types live in the open `damage-types` vocabulary set.
+// ---------------------------------------------------------------------------
+
+export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
+  bludgeoning: {
+    label: 'Bludgeoning',
+    description:
+      'Bludgeoning damage is delivered by a blunt instrument or a blow, fall, or constriction that does not use a cutting or piercing point.',
+  },
+  piercing: {
+    label: 'Piercing',
+    description:
+      'Piercing damage is delivered by a strike that uses a point, such as a fang, arrow, or rapier.',
+  },
+  slashing: {
+    label: 'Slashing',
+    description:
+      'Slashing damage is delivered by a cut from a sharp edge, such as an axe, claw, or greatsword.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type PhysicalDamageType = keyof typeof PHYSICAL_DAMAGE_TYPE_ENTRIES
+
+export const PHYSICAL_DAMAGE_TYPE_IDS = Object.keys(PHYSICAL_DAMAGE_TYPE_ENTRIES) as [
+  PhysicalDamageType,
+  ...PhysicalDamageType[],
+]
+
+export const physicalDamageTypeSchema = z.enum(PHYSICAL_DAMAGE_TYPE_IDS)
+
+/** Returns the reference entry for a physical damage type id, if known. */
+export function getPhysicalDamageTypeEntry(id: string): GameTermEntry | undefined {
+  return PHYSICAL_DAMAGE_TYPE_ENTRIES[id as PhysicalDamageType]
+}
+
+/** Returns the display label for a physical damage type. Falls back to the raw value. */
+export function getPhysicalDamageTypeLabel(id: string): string {
+  return getPhysicalDamageTypeEntry(id)?.label ?? id
+}
