@@ -15,8 +15,11 @@ function lazyNamed<P = Record<string, never>>(
   )
 }
 
-export const CharactersRoute = withRouteSuspense(
-  lazyNamed(() => import('@/routes/characters'), 'Characters'),
+export const CharactersOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/routes/characters-overview'), 'CharactersOverview'),
+)
+export const CharacterDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/routes/character-detail'), 'CharacterDetail'),
 )
 export const AccountSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/user/routes/account-settings'), 'AccountSettings'),

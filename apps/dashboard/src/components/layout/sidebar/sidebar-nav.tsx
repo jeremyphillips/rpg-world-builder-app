@@ -11,7 +11,7 @@ export function SidebarNav() {
     <nav className="flex flex-col overflow-y-auto px-3 pb-4" aria-label="Primary">
       <NavSection label="Main">
         <NavItem to={ROUTES.home} label="Dashboard" end />
-        <NavItem to={ROUTES.characters} label="Characters" />
+        <NavItem to={ROUTES.characters.list} label="Characters" />
       </NavSection>
       <CampaignNavSection />
       <ManageNavSection />

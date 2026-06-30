@@ -4,7 +4,10 @@ import { HOMEBREW_ROUTES } from './homebrew-routes'
 
 export const ROUTES = {
   home: '/',
-  characters: '/characters',
+  characters: {
+    list: '/characters',
+    detail: (characterId: string) => `/characters/${characterId}`,
+  },
   account: '/account',
   campaign: {
     create: '/campaigns/new',

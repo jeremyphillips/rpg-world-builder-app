@@ -4,6 +4,7 @@ import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
 import {
   contentFormRegistry,
@@ -77,6 +78,8 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
   formError,
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
+  useSetBreadcrumbLabel(entity.name)
+
   return (
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
