@@ -45,13 +45,18 @@ Errors share one shape: `{ "error": { "code", "message", "details?" } }`.
 Copy [`.env.example`](.env.example) to `.env`. Variables are validated at
 startup (`src/env.ts`) and the process exits with a clear message if invalid.
 
-| Var              | Default                              | Notes                                   |
-| ---------------- | ------------------------------------ | --------------------------------------- |
-| `NODE_ENV`       | `development`                        | `development` \| `test` \| `production` |
-| `PORT`           | `5001`                               | Matches the dev proxy's `API_URL`       |
-| `MONGODB_URI`    | `mongodb://127.0.0.1:27017/rpg`      | Mongoose connection string              |
-| `JWT_SECRET`     | dev fallback (required in prod, 16+) | Session signing secret                  |
-| `JWT_EXPIRES_IN` | `7d`                                 | Session lifetime                        |
+| Var                 | Default                              | Notes                                            |
+| ------------------- | ------------------------------------ | ------------------------------------------------ |
+| `NODE_ENV`          | `development`                        | `development` \| `test` \| `production`          |
+| `PORT`              | `5001`                               | Matches the dev proxy's `API_URL`                |
+| `MONGODB_URI`       | `mongodb://127.0.0.1:27017/rpg`      | Mongoose connection string                       |
+| `JWT_SECRET`        | dev fallback (required in prod, 16+) | Session signing secret                           |
+| `JWT_EXPIRES_IN`    | `7d`                                 | Session lifetime                                 |
+| `DEV_BENCH_ENABLED` | `true` in dev/test; `false` in prod  | Set `true` to mount unauthenticated `/api/bench` |
+
+Dev Bench routes have **no auth** and are **CSRF-exempt**. They are mounted only when
+`devBenchEnabled` is true (see `src/env.ts`). In production, set
+`DEV_BENCH_ENABLED=true` explicitly only when you intend to expose the bench API.
 
 ## Project layout (feature-first)
 

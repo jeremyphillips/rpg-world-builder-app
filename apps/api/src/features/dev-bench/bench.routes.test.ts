@@ -3,6 +3,7 @@ import request from 'supertest'
 import type { Express } from 'express'
 
 import { createApp } from '../../app'
+import { resetEnv } from '../../env'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 
 let app: Express
@@ -61,5 +62,25 @@ describe('bench routes', () => {
     const list = await request(app).get('/api/bench/epics').expect(200)
     expect(list.body.epics).toHaveLength(1)
     expect(list.body.epics[0].title).toBe('Rules Configuration')
+  })
+})
+
+describe('bench routes when DEV_BENCH_ENABLED=false', () => {
+  let disabledApp: Express
+
+  beforeAll(() => {
+    process.env.DEV_BENCH_ENABLED = 'false'
+    resetEnv()
+    disabledApp = createApp()
+  })
+
+  afterAll(() => {
+    delete process.env.DEV_BENCH_ENABLED
+    resetEnv()
+  })
+
+  it('does not mount bench routes', async () => {
+    await request(disabledApp).get('/api/bench/epics').expect(404)
+    await request(disabledApp).post('/api/bench/tickets').send(baseTicketInput).expect(404)
   })
 })

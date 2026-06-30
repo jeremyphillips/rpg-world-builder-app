@@ -14,9 +14,23 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().min(1).default('./uploads'),
   /** Maximum allowed upload size in bytes. */
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5_242_880),
+  /** Mount unauthenticated `/api/bench` routes. Defaults off in production. */
+  DEV_BENCH_ENABLED: z.enum(['true', 'false']).optional(),
 })
 
-export type Env = z.infer<typeof envSchema> & { isProduction: boolean }
+export type Env = z.infer<typeof envSchema> & {
+  isProduction: boolean
+  devBenchEnabled: boolean
+}
+
+function resolveDevBenchEnabled(
+  nodeEnv: z.infer<typeof envSchema>['NODE_ENV'],
+  raw: z.infer<typeof envSchema>['DEV_BENCH_ENABLED'],
+): boolean {
+  if (raw === 'true') return true
+  if (raw === 'false') return false
+  return nodeEnv !== 'production'
+}
 
 let cached: Env | undefined
 
@@ -34,6 +48,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     JWT_EXPIRES_IN: source.JWT_EXPIRES_IN,
     UPLOAD_DIR: source.UPLOAD_DIR,
     MAX_UPLOAD_BYTES: source.MAX_UPLOAD_BYTES,
+    DEV_BENCH_ENABLED: source.DEV_BENCH_ENABLED,
   })
 
   if (!parsed.success) {
@@ -43,7 +58,11 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     throw new Error(`Invalid environment configuration:\n${issues}`)
   }
 
-  cached = { ...parsed.data, isProduction: parsed.data.NODE_ENV === 'production' }
+  cached = {
+    ...parsed.data,
+    isProduction: parsed.data.NODE_ENV === 'production',
+    devBenchEnabled: resolveDevBenchEnabled(parsed.data.NODE_ENV, parsed.data.DEV_BENCH_ENABLED),
+  }
   return cached
 }
 
