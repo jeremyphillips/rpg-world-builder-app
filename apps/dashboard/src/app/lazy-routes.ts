@@ -126,25 +126,25 @@ export const EquipmentEditRoute = withRouteSuspense(
 
 export const SkillProficienciesOverviewRoute = withRouteSuspense(
   lazyNamed(
-    () => import('@/features/content/skillProficiencies/routes/skill-proficiencies-overview'),
+    () => import('@/features/content/skill-proficiencies/routes/skill-proficiencies-overview'),
     'SkillProficienciesOverview',
   ),
 )
 export const SkillProficiencyDetailRoute = withRouteSuspense(
   lazyNamed(
-    () => import('@/features/content/skillProficiencies/routes/skill-proficiency-detail'),
+    () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-detail'),
     'SkillProficiencyDetail',
   ),
 )
 export const SkillProficiencyCreateRoute = withRouteSuspense(
   lazyNamed(
-    () => import('@/features/content/skillProficiencies/routes/skill-proficiency-create'),
+    () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-create'),
     'SkillProficiencyCreate',
   ),
 )
 export const SkillProficiencyEditRoute = withRouteSuspense(
   lazyNamed(
-    () => import('@/features/content/skillProficiencies/routes/skill-proficiency-edit'),
+    () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-edit'),
     'SkillProficiencyEdit',
   ),
 )

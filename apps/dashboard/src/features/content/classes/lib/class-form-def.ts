@@ -6,7 +6,7 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
-import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
+import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { deriveAsiLevels } from './class-asi-features'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'

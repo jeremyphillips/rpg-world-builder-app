@@ -2,7 +2,7 @@
 
 This guide covers the end-to-end steps for adding a fully wired catalog content type to RPG World Builder. The pattern is contracts-first: the Zod schema is the single source of truth, and every layer derives from it.
 
-**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skillProficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, structured `grants` bag on traits).
+**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skill-proficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, structured `grants` bag on traits).
 
 ---
 
@@ -257,7 +257,7 @@ apps/api/src/features/content/
   content-types.ts                 ← Single-line registry entry
   content.routes.ts                ← GET route declaration
   content.controller.ts            ← Handler function
-apps/dashboard/src/features/content/<camelCasePlural>/
+apps/dashboard/src/features/content/<type>/          ← single-word: spells/; multi-word: skill-proficiencies/
   api/<type>-api.ts                ← fetch wrapper
   hooks/use-<type>.ts              ← TanStack Query hook + query key
   lib/<type>-overview-columns.tsx  ← DataTable column/filter defs + stories
@@ -676,7 +676,7 @@ content: {
 }
 ```
 
-Note: URL segments use kebab-case plural (`skill-proficiencies`); the dashboard folder uses camelCase (`skillProficiencies`).
+Note: URL segments and dashboard/API subfolders use the content type key (kebab-case when multi-word, e.g. `skill-proficiencies/`). `ROUTES.content.*` object keys and JSON response keys stay camelCase (`skillProficiencies`).
 
 ### 16. React Router (`apps/dashboard/src/app/router.tsx`)
 
@@ -715,15 +715,15 @@ Import the two route components from `@/features/content`, then add under `campa
 
 ## Naming conventions
 
-| Concept           | Convention                                       | Example                              |
-| ----------------- | ------------------------------------------------ | ------------------------------------ |
-| Dashboard folder  | camelCase plural                                 | `skillProficiencies/`                |
-| URL segment       | kebab-case plural                                | `/skill-proficiencies`               |
-| API route key     | kebab-case plural                                | `'skill-proficiencies'`              |
-| JSON response key | camelCase plural                                 | `{ skillProficiencies: [...] }`      |
-| Query key         | `['campaigns', id, 'content', '<kebab-plural>']` |                                      |
-| Contract type     | PascalCase, avoid reserved words                 | `CharacterClass`, `SkillProficiency` |
-| Seed file         | `<kebab-plural>.json`                            | `skill-proficiencies.json`           |
+| Concept                 | Convention                                       | Example                              |
+| ----------------------- | ------------------------------------------------ | ------------------------------------ |
+| Dashboard/API subfolder | content type key (kebab-case when multi-word)    | `skill-proficiencies/`, `spells/`    |
+| URL segment             | kebab-case plural                                | `/skill-proficiencies`               |
+| API route key           | kebab-case plural                                | `'skill-proficiencies'`              |
+| JSON response key       | camelCase plural                                 | `{ skillProficiencies: [...] }`      |
+| Query key               | `['campaigns', id, 'content', '<kebab-plural>']` |                                      |
+| Contract type           | PascalCase, avoid reserved words                 | `CharacterClass`, `SkillProficiency` |
+| Seed file               | `<kebab-plural>.json`                            | `skill-proficiencies.json`           |
 
 ---
 

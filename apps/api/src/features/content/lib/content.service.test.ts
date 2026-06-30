@@ -1,15 +1,15 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createUser } from '../user'
-import { createCampaign } from '../campaign'
-import { ClassPatchModel } from './classes/class-patch.model'
-import { HomebrewClassModel } from './classes/homebrew-class.model'
-import { classContentConfig } from './classes/classes.config'
-import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
-import { resolveCatalogForCampaign } from './content.service'
-import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
-import { StartingWealthPatchModel } from './starting-wealth/starting-wealth-patch.model'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { createUser } from '../../user'
+import { createCampaign } from '../../campaign'
+import { ClassPatchModel } from '../classes/class-patch.model'
+import { HomebrewClassModel } from '../classes/homebrew-class.model'
+import { classContentConfig } from '../classes/classes.config'
+import { resolveClassesForCampaign } from '../classes/derive-classes-catalog'
+import { resolveCatalogForCampaign } from '../content.service'
+import { startingWealthContentConfig } from '../starting-wealth/starting-wealth.config'
+import { StartingWealthPatchModel } from '../starting-wealth/starting-wealth-patch.model'
 
 beforeAll(async () => {
   await startTestDb()

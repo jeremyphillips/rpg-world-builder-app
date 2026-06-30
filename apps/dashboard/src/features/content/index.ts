@@ -17,9 +17,9 @@ export {
   SkillProficiencyDetail,
   useSkillProficiencies,
   skillProficienciesQueryKey,
-} from './skillProficiencies'
-export { SkillProficiencyCreate } from './skillProficiencies/routes/skill-proficiency-create'
-export { SkillProficiencyEdit } from './skillProficiencies/routes/skill-proficiency-edit'
+} from './skill-proficiencies'
+export { SkillProficiencyCreate } from './skill-proficiencies/routes/skill-proficiency-create'
+export { SkillProficiencyEdit } from './skill-proficiencies/routes/skill-proficiency-edit'
 export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
 export { SpeciesCreate } from './species/routes/species-create'
 export { SpeciesEdit } from './species/routes/species-edit'

@@ -1,6 +1,6 @@
 import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { createContentMutationHooks } from '../../lib/list/use-content-mutations'
-import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
+import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { listClasses } from '../api/classes-api'
 
 const classesContentList = createContentQueryHook(
