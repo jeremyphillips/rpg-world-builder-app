@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
 import {
-  getClassName,
+  formatSlugAsLabel,
   getDamageTypeLabel,
   getEffectConditionLabel,
   getSpellFunctionTagLabel,
@@ -53,7 +53,7 @@ function SpellClassesList({ campaignId, classIds }: { campaignId: string; classI
                     {cls.name}
                   </Link>
                 ) : (
-                  <span className={CLASS_CHIP_CLASS}>{getClassName(slug)}</span>
+                  <span className={CLASS_CHIP_CLASS}>{formatSlugAsLabel(slug)}</span>
                 )}
               </li>
             )
@@ -102,7 +102,11 @@ type SpellDetailContentProps = {
 
 export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProps) {
   useSetBreadcrumbLabel(spell.name)
-  const statRows = buildSpellStatRows(spell).filter((row) => row.label !== 'Classes')
+  const { data: classes = [] } = useClasses(campaignId)
+  const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
+  const statRows = buildSpellStatRows(spell, { classesBySlug }).filter(
+    (row) => row.label !== 'Classes',
+  )
 
   return (
     <WidePage>

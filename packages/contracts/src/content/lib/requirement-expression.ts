@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { formatSlugAsLabel } from '../../primitives/format-slug'
 import { absoluteLevelSchema } from '../../primitives/level'
 import {
   ABILITY_SCORE_MAX,
@@ -9,7 +10,7 @@ import {
   type Ability,
 } from '../../vocab/ability'
 
-import { classSlugSchema, getClassName } from '../class/class'
+import { classSlugSchema } from '../class/class'
 
 // ---------------------------------------------------------------------------
 // RequirementExpression — composable AND/OR eligibility trees shared by feats,
@@ -95,6 +96,8 @@ export function formatFeatureRequirement(featureId: string): string {
 export type FormatRequirementExpressionOptions = {
   /** Full ability name (default) or uppercase id (`STR`). */
   abilityDisplay?: 'label' | 'id'
+  /** Catalog class name lookup; defaults to {@link formatSlugAsLabel}. */
+  resolveClassName?: (slug: string) => string
 }
 
 function formatAbilityReference(
@@ -139,8 +142,10 @@ export function formatRequirementExpression(
       return `Level ${expr.level}+`
     case 'abilityMinimum':
       return `${formatAbilityReference(expr.ability, abilityDisplay)} ${expr.minimum}+`
-    case 'classLevel':
-      return `${getClassName(expr.classSlug)} level ${expr.minimum}+`
+    case 'classLevel': {
+      const resolveClassName = options.resolveClassName ?? formatSlugAsLabel
+      return `${resolveClassName(expr.classSlug)} level ${expr.minimum}+`
+    }
     case 'feature':
       return formatFeatureRequirement(expr.featureId)
     case 'spellcasting':

@@ -1,6 +1,5 @@
+import { formatSlugAsLabel } from '../../primitives/format-slug'
 import { getAbilityLabel, type Ability } from '../../vocab/ability'
-
-import { getClassName } from '../class/class'
 import {
   DEFAULT_SPECIES_MULTICLASS_POLICY,
   type SpeciesLevelLimits,
@@ -72,6 +71,12 @@ export type ValidateMulticlassInput = {
   currentClasses: MulticlassCurrentClass[]
   abilityScores: Record<Ability, number>
   species?: SpeciesMulticlassData
+  /** Catalog class name lookup; defaults to {@link formatSlugAsLabel}. */
+  resolveClassName?: (slug: string) => string
+}
+
+function resolveClassDisplayName(input: ValidateMulticlassInput, slug: string): string {
+  return input.resolveClassName?.(slug) ?? formatSlugAsLabel(slug)
 }
 
 function collectRequiredAbilities(
@@ -106,7 +111,7 @@ function checkPrimaryAbilityMinimum(
 function checkSpeciesPolicy(input: ValidateMulticlassInput): MulticlassError[] {
   const policy = input.species?.multiclassing?.policy ?? DEFAULT_SPECIES_MULTICLASS_POLICY
   const targetSlug = input.targetClass.slug
-  const className = getClassName(targetSlug)
+  const className = resolveClassDisplayName(input, targetSlug)
 
   if (policy === 'forbidden') {
     return [
@@ -166,7 +171,7 @@ function checkSpeciesLevelLimits(input: ValidateMulticlassInput): MulticlassErro
     errors.push({
       code: 'species_level_limit_class',
       classSlug: targetSlug,
-      message: `This species limits ${getClassName(targetSlug)} to level ${cap.maxLevel}.`,
+      message: `This species limits ${resolveClassDisplayName(input, targetSlug)} to level ${cap.maxLevel}.`,
     })
   }
 

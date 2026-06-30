@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
-import { getAbilityLabel, getClassName } from '@rpg/contracts'
+import { getAbilityLabel, formatSlugAsLabel } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -51,7 +51,7 @@ function SuggestedClassesList({
                     {cls.name}
                   </Link>
                 ) : (
-                  <span className={SUGGESTED_CLASS_CHIP_CLASS}>{getClassName(slug)}</span>
+                  <span className={SUGGESTED_CLASS_CHIP_CLASS}>{formatSlugAsLabel(slug)}</span>
                 )}
               </li>
             )

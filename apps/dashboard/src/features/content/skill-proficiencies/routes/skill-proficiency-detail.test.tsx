@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { getClassName } from '@rpg/contracts'
+import { formatSlugAsLabel } from '@rpg/contracts'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -75,9 +75,9 @@ describe('SkillDetailContent suggested classes', () => {
     const skill = { ...ATHLETICS, suggestedClasses: ['orphan-slug'] }
     renderSkillDetail(skill)
 
-    expect(screen.getByText(getClassName('orphan-slug'))).toBeInTheDocument()
+    expect(screen.getByText(formatSlugAsLabel('orphan-slug'))).toBeInTheDocument()
     expect(
-      screen.queryByRole('link', { name: getClassName('orphan-slug') }),
+      screen.queryByRole('link', { name: formatSlugAsLabel('orphan-slug') }),
     ).not.toBeInTheDocument()
   })
 

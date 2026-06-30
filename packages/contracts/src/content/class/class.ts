@@ -208,46 +208,8 @@ export const subclassCampaignAvailabilitySchema = z.object({
 })
 export type SubclassCampaignAvailability = z.infer<typeof subclassCampaignAvailabilitySchema>
 
-// ---------------------------------------------------------------------------
-// Class taxonomy — SRD 5.2 class slugs -> display names, mirroring the SKILLS
-// and ABILITY_ENTRIES maps. Used for name lookup (e.g. rendering `suggestedClasses`
-// on skill proficiency detail pages). Homebrew classes are not enumerated here;
-// `getClassName` falls back to the raw slug for unknown values.
-// ---------------------------------------------------------------------------
-
-/**
- * SRD 5.2 class slug -> display name. Doubles as form select options
- * (`value: slug`, `label: CLASS_NAMES[slug]`).
- */
-export const CLASS_NAMES = {
-  barbarian: 'Barbarian',
-  bard: 'Bard',
-  cleric: 'Cleric',
-  druid: 'Druid',
-  fighter: 'Fighter',
-  monk: 'Monk',
-  paladin: 'Paladin',
-  ranger: 'Ranger',
-  rogue: 'Rogue',
-  sorcerer: 'Sorcerer',
-  warlock: 'Warlock',
-  wizard: 'Wizard',
-} as const
-
-export type ClassSlug = keyof typeof CLASS_NAMES | (string & {})
-
-/** Class slug reference — SRD keys from `CLASS_NAMES` or any homebrew slug. */
+/** Opaque class slug — resolve display names from resolved catalog `name` at read/UI time. */
 export const classSlugSchema = z.string().min(1)
-
-/**
- * Returns the display name for a class slug.
- * Falls back to the raw slug for homebrew/unknown classes.
- *
- * @example getClassName('paladin') // → 'Paladin'
- */
-export function getClassName(slug: string): string {
-  return slug in CLASS_NAMES ? CLASS_NAMES[slug as keyof typeof CLASS_NAMES] : slug
-}
 
 /** Whether a resolved class record includes a spellcasting block (seed, homebrew, or patch). */
 export function classHasSpellcasting(cls: CharacterClass): boolean {

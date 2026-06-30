@@ -100,6 +100,21 @@ describe('formatRequirementExpression', () => {
     ).toBe('Level 19+, Spellcasting Feature')
   })
 
+  it('formats class level prerequisites with slug fallback', () => {
+    expect(
+      formatRequirementExpression({ kind: 'classLevel', classSlug: 'fighter', minimum: 2 }),
+    ).toBe('Fighter level 2+')
+  })
+
+  it('uses resolveClassName when provided', () => {
+    expect(
+      formatRequirementExpression(
+        { kind: 'classLevel', classSlug: 'custom-fighter', minimum: 1 },
+        { resolveClassName: (slug) => (slug === 'custom-fighter' ? 'My Fighter' : slug) },
+      ),
+    ).toBe('My Fighter level 1+')
+  })
+
   it('joins distinct any branches with or', () => {
     expect(
       formatRequirementExpression({

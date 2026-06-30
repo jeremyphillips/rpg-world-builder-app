@@ -1,6 +1,6 @@
-import type { Spell } from '@rpg/contracts'
+import type { CharacterClass, Spell } from '@rpg/contracts'
 import {
-  getClassName,
+  formatSlugAsLabel,
   getSpellDeliveryMethodLabel,
   getSpellSchoolEntry,
   getSpellSchoolLabel,
@@ -22,8 +22,24 @@ const SPELL_STAT_RITUAL_INFO =
 const SPELL_STAT_CONCENTRATION_INFO =
   'Some spells require Concentration to maintain. Your Concentration on a spell ends if you cast another Concentration spell, fail a Constitution saving throw after taking damage, or become Incapacitated or die.'
 
+export type BuildSpellStatRowsOptions = {
+  /** Resolved catalog class names keyed by slug; falls back to {@link formatSlugAsLabel}. */
+  classesBySlug?: ReadonlyMap<string, CharacterClass>
+}
+
+function resolveClassLabel(
+  slug: string,
+  classesBySlug: ReadonlyMap<string, CharacterClass> | undefined,
+): string {
+  return classesBySlug?.get(slug)?.name ?? formatSlugAsLabel(slug)
+}
+
 /** Builds label/value pairs for the spell detail stat section. */
-export function buildSpellStatRows(spell: Spell): ContentStatRowData[] {
+export function buildSpellStatRows(
+  spell: Spell,
+  options: BuildSpellStatRowsOptions = {},
+): ContentStatRowData[] {
+  const { classesBySlug } = options
   const rows: ContentStatRowData[] = [
     { label: 'Level', value: formatSpellLevelLabel(spell.level) },
     {
@@ -59,7 +75,7 @@ export function buildSpellStatRows(spell: Spell): ContentStatRowData[] {
 
   rows.push({
     label: 'Classes',
-    value: spell.classIds.map(getClassName).join(', '),
+    value: spell.classIds.map((slug) => resolveClassLabel(slug, classesBySlug)).join(', '),
   })
 
   return rows
