@@ -19,6 +19,21 @@ feature owns persistence and serving. `classes` is the first content type;
 A campaign pins a `rulesetId` (see the campaign contract/model); it determines
 which seed version is loaded and which content homebrew/patches validate against.
 
+## Subclasses (nested under classes)
+
+Subclasses are **not** a top-level entry in `content-types.ts`. They live under
+`subclasses/` and are nested under a parent class id.
+
+| Layer             | Source                         | API today                                                  |
+| ----------------- | ------------------------------ | ---------------------------------------------------------- |
+| **System**        | `@rpg/catalog/classes` seed    | `GET …/content/classes/:classId/subclasses` (catalog read) |
+| **Homebrew**      | _Planned_ — campaign-owned     | No write routes yet                                        |
+| **Overlay patch** | _Planned_ — per-campaign edits | No patch model yet                                         |
+
+The dashboard class editor's **Subclasses** tab authors in local component state
+(drafts/edits) and does not persist to the API. Target: nested homebrew/patch
+routes mirroring the class pattern — see [`subclasses/README.md`](subclasses/README.md).
+
 ## Resolve / merge algorithm
 
 `GET /api/campaigns/:campaignId/content/classes` returns the resolved catalog.

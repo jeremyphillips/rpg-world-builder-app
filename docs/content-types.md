@@ -724,6 +724,22 @@ Import the two route components from `@/features/content`, then add under `campa
 
 ---
 
+## Subclass ownership (nested under classes)
+
+Subclasses are **not** registered in `content-types.ts`. They use a nested read route and a dedicated API folder (`apps/api/src/features/content/subclasses/`).
+
+| Layer             | Source                                     | Persistence / API                                    |
+| ----------------- | ------------------------------------------ | ---------------------------------------------------- |
+| **System**        | `@rpg/catalog/classes` (`subclasses.json`) | Read-only seed; `GET …/classes/:classId/subclasses`  |
+| **Homebrew**      | _Planned_                                  | Future: campaign-owned Mongo + nested POST/PATCH     |
+| **Overlay patch** | _Planned_                                  | Future: per-campaign partial edits on system records |
+
+**Dashboard today:** the class editor Subclasses tab keeps drafts and edits in **local React state** only — no save to the API. Contracts already define `Subclass`, `createSubclassInputSchema`, and patch shapes for when persistence lands.
+
+**Follow-on milestone:** `subclasses.config.ts` registration, Mongo models, write hooks, and `POST/PATCH …/classes/:classId/subclasses/:id`. Catalog read behavior must stay unchanged.
+
+---
+
 ## Class spellcasting (reference)
 
 The `classes` type embeds an optional `spellcasting` block (`content/class/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` by progression (`full` / `half` / `pact`); they are not stored on the class record.

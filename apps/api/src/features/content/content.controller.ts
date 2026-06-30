@@ -1,9 +1,6 @@
 import type { Request, Response } from 'express'
 
-import { loadSubclassesByClassId } from '@rpg/catalog/classes'
-
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign'
 import {
   getContentWriteConfig,
   isContentTypeName,
@@ -48,15 +45,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   res.status(200).json({ [writeConfig.responseKey]: items })
 }
 
-export async function listSubclasses(req: Request, res: Response): Promise<void> {
-  const { campaignId, classId } = req.params as { campaignId: string; classId: string }
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-  const subclasses = loadSubclassesByClassId(campaign.rulesetId, classId)
-  res.status(200).json({ subclasses })
-}
+export { listSubclasses } from './subclasses/list-subclasses'
 
 export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
