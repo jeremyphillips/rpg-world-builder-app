@@ -6,7 +6,7 @@ import {
   characterCreationFromFormValues,
   characterCreationToFormValues,
   refineSpeciesCharacterCreationForm,
-} from './species-rules-form-fields'
+} from './species-rules-form-values'
 
 describe('species-rules-form-fields conversions', () => {
   it('maps stored level limits with null max to form shape', () => {

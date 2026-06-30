@@ -14,10 +14,9 @@ import {
   ADD_HERITAGE_OPTION_LABEL,
   HERITAGE_EMPTY_MESSAGE,
   HERITAGE_OPTION_NOUN,
-  heritageDefaultValues,
-  heritageScalarFields,
-  type HeritageForm,
-} from '../lib/species-heritage-form-fields'
+} from '../lib/species-heritage-form-labels'
+import { heritageDefaultValues } from '../lib/species-heritage-form-values'
+import { heritageScalarFields, type HeritageForm } from '../lib/species-heritage-form-fields'
 import {
   traitItemFields,
   traitItemTitle,

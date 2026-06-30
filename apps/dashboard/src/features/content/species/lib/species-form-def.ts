@@ -1,184 +1,24 @@
-import { createElement } from 'react'
-import { z } from 'zod'
-import {
-  CREATURE_SIZES,
-  CREATURE_SIZE_ENTRIES,
-  creatureSizeSchema,
-  creatureTypeSchema,
-  slugSchema,
-  type CreateSpeciesInput,
-  type CreatureTypeId,
-  type Species,
-} from '@rpg/contracts'
-import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 
-import { vocabularySelectField } from '@/features/homebrew'
-
-import {
-  allowedCharacterCreatureTypesFromCtx,
-  getCharacterCreatureTypeFieldOptions,
-} from '../../lib/creature-type-field-options'
-import { feetInputUnitField, identityFields } from '../../lib/content-form-field-helpers'
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
+import { allowedCharacterCreatureTypesFromCtx } from '../../lib/creature-type-field-options'
 import {
   contentFormRegistry,
   contentFormFields,
-  type ContentFormCtx,
   type ContentFormDef,
-  type ContentFormInputCtx,
 } from '../../lib/content-form-registry'
-import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
-import { SpeciesRulesTab } from '../components/species-rules-tab.client'
-import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
+import { finalizeContentInput } from '../../lib/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
-  heritageFormSchema,
-  heritageFromFormValues,
-  heritageToFormRow,
-} from './species-heritage-form-fields'
+  buildSpeciesTabs,
+  createSpeciesFormSchema,
+  speciesFormSchema,
+  type SpeciesFormValues,
+} from './species-form-fields'
 import {
-  characterCreationFromFormValues,
-  characterCreationToFormValues,
-  refineSpeciesCharacterCreationForm,
-  speciesCharacterCreationFormSchema,
-} from './species-rules-form-fields'
-import { traitRowFormSchema } from './species-trait-form-fields'
-import { traitToFormRow, traitsFromFormValues } from './species-trait-form-values'
-
-// ---------------------------------------------------------------------------
-// Vocab option lists
-// ---------------------------------------------------------------------------
-
-const creatureSizeOptions = toOptions(
-  CREATURE_SIZES,
-  Object.fromEntries(CREATURE_SIZES.map((s) => [s, CREATURE_SIZE_ENTRIES[s].label])) as Record<
-    (typeof CREATURE_SIZES)[number],
-    string
-  >,
-)
-
-// ---------------------------------------------------------------------------
-// Form schema
-// ---------------------------------------------------------------------------
-
-function createSpeciesFormSchema(
-  allowedCreatureTypes: readonly CreatureTypeId[],
-  activeCreatureTypes?: ReadonlySet<string>,
-  formCtx: ContentFormCtx = {},
-) {
-  const allowedSet = new Set(allowedCreatureTypes)
-
-  return z
-    .object({
-      name: z.string().min(1),
-      slug: slugSchema.optional(),
-      description: z.string().optional(),
-      creatureType: creatureTypeSchema,
-      sizes: z.array(creatureSizeSchema).min(1),
-      speed: z.object({
-        walk: z.coerce.number().int().min(0),
-      }),
-      traits: z.array(traitRowFormSchema),
-      heritage: heritageFormSchema.optional(),
-      characterCreation: speciesCharacterCreationFormSchema.optional(),
-    })
-    .superRefine((values, ctx) => {
-      if (!allowedSet.has(values.creatureType)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Creature type is not allowed for character sheets in this campaign',
-          path: ['creatureType'],
-        })
-      }
-      if (activeCreatureTypes && !activeCreatureTypes.has(values.creatureType)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Creature type is not available in this campaign vocabulary',
-          path: ['creatureType'],
-        })
-      }
-      refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
-    })
-}
-
-const speciesFormSchema = createSpeciesFormSchema(['humanoid'])
-type SpeciesFormValues = z.infer<typeof speciesFormSchema>
-
-// ---------------------------------------------------------------------------
-// Create-form defaults
-// ---------------------------------------------------------------------------
-
-const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
-  creatureType: 'humanoid',
-  sizes: ['medium'],
-  speed: { walk: 30 },
-  traits: [],
-}
-
-// ---------------------------------------------------------------------------
-// Tab field builders
-// ---------------------------------------------------------------------------
-
-function attributesFields(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'row',
-      fields: [
-        vocabularySelectField({
-          name: 'creatureType',
-          label: 'Creature type',
-          options: getCharacterCreatureTypeFieldOptions(ctx),
-          required: true,
-          width: 'lg',
-        }),
-        feetInputUnitField('speed.walk', 'Walk speed', {
-          required: true,
-          width: 'auto',
-          defaultValue: 30,
-        }),
-      ],
-    },
-    {
-      type: 'chips',
-      name: 'sizes',
-      label: 'Size',
-      options: creatureSizeOptions,
-      required: true,
-    },
-  ]
-}
-
-function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
-  return [
-    {
-      id: 'basics',
-      label: 'Basics',
-      fields: [...identityFields(ctx), ...attributesFields(ctx)],
-    },
-    {
-      id: 'traits',
-      label: 'Traits',
-      fields: [],
-      header: createElement(SpeciesTraitsTab, { formCtx: ctx }),
-    },
-    {
-      id: 'heritage',
-      label: 'Heritage',
-      fields: [],
-      header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
-    },
-    {
-      id: 'rules',
-      label: 'Rules',
-      fields: [],
-      header: createElement(SpeciesRulesTab, { formCtx: ctx }),
-    },
-  ]
-}
-
-// ---------------------------------------------------------------------------
-// Species ContentFormDef
-// ---------------------------------------------------------------------------
+  buildSpeciesCreateInput,
+  speciesCreateDefaultValues,
+  speciesToFormValues,
+} from './species-form-values'
 
 const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> = {
   routeKey: 'species',
@@ -195,36 +35,10 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   buildTabs: buildSpeciesTabs,
   buildFields: (ctx) => contentFormFields(speciesFormDef, ctx),
 
-  toFormValues: (entity) => ({
-    name: entity.name,
-    slug: entity.slug,
-    description: entity.description,
-    creatureType: entity.creatureType,
-    sizes: entity.sizes,
-    speed: { walk: entity.speed.walk },
-    traits: entity.traits.map(traitToFormRow),
-    heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
-    characterCreation: characterCreationToFormValues(entity.characterCreation),
-  }),
+  toFormValues: speciesToFormValues,
 
-  toInput: (values, ctx?: ContentFormInputCtx<Species>) => {
-    const characterCreation = characterCreationFromFormValues(values.characterCreation)
-
-    return finalizeContentInput(
-      {
-        ...envelopeSlugFields(values.name, ctx),
-        name: values.name,
-        description: values.description || undefined,
-        creatureType: values.creatureType,
-        sizes: values.sizes,
-        speed: { walk: values.speed.walk },
-        traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
-        heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
-        ...(characterCreation ? { characterCreation } : {}),
-      },
-      ctx,
-    ) as CreateSpeciesInput
-  },
+  toInput: (values, ctx) =>
+    finalizeContentInput(buildSpeciesCreateInput(values, ctx), ctx) as CreateSpeciesInput,
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,
@@ -237,5 +51,5 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
 contentFormRegistry['species'] = speciesFormDef
 
-export { speciesFormDef }
+export { speciesFormDef, createSpeciesFormSchema }
 export type { SpeciesFormValues }
