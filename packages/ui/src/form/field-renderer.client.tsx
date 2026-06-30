@@ -22,7 +22,7 @@ import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type { FieldConfig, FieldType } from './field-config'
+import type { FieldConfig, FieldType, InputSelectFieldConfig } from './field-config'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -480,6 +480,34 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     )
   }
 
+  return (
+    <StandardFieldRenderer
+      config={config}
+      renderConfig={renderConfig as StandardFieldConfig}
+      fullName={fullName}
+      id={id}
+      namePrefix={namePrefix}
+    />
+  )
+}
+
+type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig>
+
+interface StandardFieldRendererProps {
+  config: FieldConfig
+  renderConfig: StandardFieldConfig
+  fullName: string
+  id: string
+  namePrefix?: string
+}
+
+function StandardFieldRenderer({
+  config,
+  renderConfig,
+  fullName,
+  id,
+  namePrefix,
+}: StandardFieldRendererProps) {
   const { field, fieldState } = useController({ name: fullName })
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element

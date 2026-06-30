@@ -309,6 +309,53 @@ interface FormItemNodeProps {
   depth: number
 }
 
+interface SlotFormItemSectionProps {
+  item: SlotConfig
+  parentContext: FormSectionContextValue
+  depth: number
+}
+
+function SlotFormItemSection({ item, parentContext, depth }: SlotFormItemSectionProps) {
+  const slotChildContext = React.useMemo(
+    () => buildSlotSectionChildContext(parentContext, depth, item),
+    [parentContext, depth, item],
+  )
+
+  return (
+    <FormSectionContext.Provider value={slotChildContext}>
+      <SlotFieldRenderer config={item} />
+    </FormSectionContext.Provider>
+  )
+}
+
+interface ArrayFormItemSectionProps {
+  item: ArrayConfig
+  parentContext: FormSectionContextValue
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+function ArrayFormItemSection({
+  item,
+  parentContext,
+  idPrefix,
+  namePrefix,
+  depth,
+}: ArrayFormItemSectionProps) {
+  const arrayChildContext = React.useMemo(
+    () => buildArraySectionChildContext(parentContext, depth, item),
+    [parentContext, depth, item],
+  )
+
+  const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
+  return (
+    <FormSectionContext.Provider value={arrayChildContext}>
+      <ArrayFieldRenderer config={item} idPrefix={idPrefix} fullName={fullArrayName} />
+    </FormSectionContext.Provider>
+  )
+}
+
 function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNodeProps) {
   const parentContext = useFormSectionContext()
 
@@ -346,16 +393,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
   }
 
   if (item.kind === 'slot') {
-    const slotChildContext = React.useMemo(
-      () => buildSlotSectionChildContext(parentContext, depth, item),
-      [parentContext, depth, item],
-    )
-
-    return (
-      <FormSectionContext.Provider value={slotChildContext}>
-        <SlotFieldRenderer config={item} />
-      </FormSectionContext.Provider>
-    )
+    return <SlotFormItemSection item={item} parentContext={parentContext} depth={depth} />
   }
 
   if (item.visibility) {
@@ -369,16 +407,14 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     )
   }
 
-  const arrayChildContext = React.useMemo(
-    () => buildArraySectionChildContext(parentContext, depth, item),
-    [parentContext, depth, item],
-  )
-
-  const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
   return (
-    <FormSectionContext.Provider value={arrayChildContext}>
-      <ArrayFieldRenderer config={item} idPrefix={idPrefix} fullName={fullArrayName} />
-    </FormSectionContext.Provider>
+    <ArrayFormItemSection
+      item={item}
+      parentContext={parentContext}
+      idPrefix={idPrefix}
+      namePrefix={namePrefix}
+      depth={depth}
+    />
   )
 }
 

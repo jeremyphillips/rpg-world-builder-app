@@ -107,7 +107,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   footerWrapper,
   valueSyncs,
 }: TabbedFormProps<TFieldValues>) {
-  const formId = id ?? React.useId()
+  const generatedFormId = React.useId()
+  const formId = id ?? generatedFormId
   const { form } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
