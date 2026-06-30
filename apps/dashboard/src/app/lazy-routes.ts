@@ -18,17 +18,14 @@ function lazyNamed<P = Record<string, never>>(
 export const CharactersRoute = withRouteSuspense(
   lazyNamed(() => import('@/routes/characters'), 'Characters'),
 )
-export const ProfileRoute = withRouteSuspense(
-  lazyNamed(() => import('@/routes/profile'), 'Profile'),
-)
 export const AccountSettingsRoute = withRouteSuspense(
-  lazyNamed(() => import('@/routes/account'), 'AccountSettings'),
+  lazyNamed(() => import('@/features/user/routes/account-settings'), 'AccountSettings'),
 )
 export const AdminUsersRoute = withRouteSuspense(
-  lazyNamed(() => import('@/routes/admin/admin-users'), 'AdminUsers'),
+  lazyNamed(() => import('@/features/admin/routes/admin-users'), 'AdminUsers'),
 )
 export const AdminSettingsRoute = withRouteSuspense(
-  lazyNamed(() => import('@/routes/admin/admin-settings'), 'AdminSettings'),
+  lazyNamed(() => import('@/features/admin/routes/admin-settings'), 'AdminSettings'),
 )
 
 export const CampaignCreateRoute = withRouteSuspense(

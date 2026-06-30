@@ -1,5 +1,6 @@
 import { NavSection } from '@rpg/ui'
 
+import { ROUTES } from '@/app/routes'
 import { useIsElevatedPlatformRole } from '@/features/auth'
 import { NavItem } from './nav-item'
 
@@ -10,8 +11,8 @@ export function AdminNavSection() {
 
   return (
     <NavSection label="Admin">
-      <NavItem to="/admin/users" label="Users" />
-      <NavItem to="/admin/settings" label="Admin Settings" />
+      <NavItem to={ROUTES.admin.users} label="Users" />
+      <NavItem to={ROUTES.admin.settings} label="Admin Settings" />
     </NavSection>
   )
 }

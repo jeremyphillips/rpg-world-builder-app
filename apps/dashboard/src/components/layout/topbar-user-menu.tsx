@@ -25,7 +25,6 @@ export function TopbarUserMenu({ user }: TopbarUserMenuProps) {
     <DropdownMenu modal={false}>
       <UserMenuTrigger displayName={user.displayName} avatarKey={user.avatarKey} />
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onSelect={() => navigate(ROUTES.profile)}>Profile</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate(ROUTES.account)}>
           Account Settings
         </DropdownMenuItem>

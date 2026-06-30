@@ -39,7 +39,7 @@ src/
   components/    layout shells (AppShell, NarrowPage, WidePage, PageHeader, …)
   features/      feature-first domains (see status table below)
   lib/           shared data-table helpers, form guards, api utilities
-  routes/        top-level screens (home, profile, admin, character stub, …)
+  routes/        bootstrap screens (dashboard home, landing redirect)
 ```
 
 Route screens lazy-load via [`src/app/lazy-routes.ts`](src/app/lazy-routes.ts).
@@ -63,7 +63,7 @@ locally (e.g. `useSession`, `useLogout`).
 
 | Feature / area                                                                               | Status      |
 | -------------------------------------------------------------------------------------------- | ----------- |
-| `auth`, `user`, `campaign`                                                                   | Implemented |
+| `auth`, `user`, `campaign`, `admin` (stub screens)                                           | Implemented |
 | `content` — classes, species, feats, spells, equipment (family modules), skill proficiencies | Implemented |
 | `homebrew` — vocabulary sets, rules configuration                                            | Implemented |
 | `character`, `message`, `notification`                                                       | Scaffold    |

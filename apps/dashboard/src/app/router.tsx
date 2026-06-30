@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 
+import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
 import type { CrumbHandle } from '@/app/breadcrumbs'
@@ -29,7 +30,6 @@ import {
   FeatDetailRoute,
   FeatEditRoute,
   FeatsOverviewRoute,
-  ProfileRoute,
   SkillProficienciesOverviewRoute,
   SkillProficiencyCreateRoute,
   SkillProficiencyDetailRoute,
@@ -69,18 +69,13 @@ const router = createBrowserRouter(
               handle: { crumb: () => ({ label: 'Characters' }) } satisfies CrumbHandle,
             },
             {
-              path: 'profile',
-              element: <ProfileRoute />,
-              handle: { crumb: () => ({ label: 'Profile' }) } satisfies CrumbHandle,
-            },
-            {
               path: 'account',
               element: <AccountSettingsRoute />,
               handle: { crumb: () => ({ label: 'Account Settings' }) } satisfies CrumbHandle,
             },
             {
               path: 'admin',
-              element: <Outlet />,
+              element: <AdminRouteGuard />,
               children: [
                 {
                   path: 'users',
