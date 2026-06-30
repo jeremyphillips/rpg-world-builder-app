@@ -48,8 +48,8 @@ import {
   conditionSetAriaLabel,
   removeConditionLabel,
   removeConditionSetLabel,
-} from '../lib/forms/requirement-editor-constants'
-import { formatRequirementEditorPreview } from '../lib/forms/requirement-editor-form'
+} from '../lib/requirement-editor-constants'
+import { formatRequirementEditorPreview } from '../lib/requirement-editor-form'
 import {
   newRequirementDraftLeaf,
   newRequirementGroup,
@@ -58,7 +58,7 @@ import {
   type RequirementLeafForm,
   type RequirementLeafType,
   type RequirementLeafTypedForm,
-} from '../lib/forms/requirement-editor-form-schema'
+} from '../lib/requirement-editor-form-schema'
 
 export interface RequirementEditorProps {
   /** Parent form field path, e.g. `prerequisiteEditor`. */

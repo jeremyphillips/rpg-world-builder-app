@@ -34,10 +34,10 @@ builders (`*-stat-rows.ts`).
 ```text
 lib/
   fixtures/       # STORY_* IDs, pick*() catalog helpers
-  forms/            # ContentFormDef registry, shells, grant/requirement splits, field builders
-  form-options/     # Level, creature-type, rich-text link options
+  forms/            # ContentFormDef registry, shells, grant splits, field builders
+  form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge
-  detail/           # Detail layout, stat rows, FeatureItem, edit href
+  detail/           # Detail layout, stat rows, edit href
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
   utils/            # title-case and other small helpers
@@ -51,7 +51,7 @@ through [`createContentListApi`](./lib/list/create-content-list.ts) and
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
 
-Class [`FeatureItem`](./lib/detail/feature-item.tsx) rows render level + name headings inline
+Class [`FeatureItem`](./classes/lib/feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature
 descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 

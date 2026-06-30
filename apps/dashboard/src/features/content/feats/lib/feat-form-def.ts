@@ -12,7 +12,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import { RequirementEditor } from '../../components/requirement-editor.client'
+import { RequirementEditor } from '../components/requirement-editor.client'
 import { identityFields } from '../../lib/forms/content-identity-form-fields'
 import {
   contentFormRegistry,
@@ -21,15 +21,15 @@ import {
   type ContentFormCtx,
 } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
-import { refineRequirementEditor } from '../../lib/forms/requirement-editor-form'
+import { refineRequirementEditor } from './requirement-editor-form'
 import {
   prerequisiteEditorSchema,
   requirementEditorDefaultValue,
-} from '../../lib/forms/requirement-editor-form-schema'
+} from './requirement-editor-form-schema'
 import {
   requirementEditorToExpression,
   requirementExpressionToEditor,
-} from '../../lib/forms/requirement-editor-form-values'
+} from './requirement-editor-form-values'
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
 
 const featCategoryOptions = toOptions(

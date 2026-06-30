@@ -11,7 +11,7 @@ import {
 } from '@/features/homebrew'
 
 import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
-import { getCreatureTypeLabel } from '../../lib/form-options/creature-type-field-options'
+import { getCreatureTypeLabel } from './creature-type-field-options'
 
 function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Species>[] {
   return [

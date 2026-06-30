@@ -7,8 +7,8 @@ import {
   type CreatureTypeVocabulary,
 } from '@/features/homebrew'
 
-import type { ContentFormCtx } from '../forms/content-form-registry'
-import { campaignRulesFromCtx } from './level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { campaignRulesFromCtx } from '../../lib/form-options/level-field-options'
 
 const seedCreatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 

@@ -29,5 +29,6 @@ The **Subclasses** tab uses a list + editor layout: seed subclasses load from th
 | Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                         |
 | Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                 |
 | Read-only progression table          | `components/class-progression-table.tsx`                                   |
+| Detail feature list item             | `lib/feature-item.tsx`                                                     |
 
 Spellcasting contract shape, preparation modes, and the sparse/dense progression model are documented in [content-types.md](../../../../../docs/content-types.md#class-spellcasting-reference).

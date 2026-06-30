@@ -14,7 +14,7 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
-import { FeatureItem } from '../../lib/detail/feature-item'
+import { FeatureItem } from '../lib/feature-item'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
 

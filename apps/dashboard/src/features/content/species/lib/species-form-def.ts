@@ -1,6 +1,6 @@
 import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 
-import { allowedCharacterCreatureTypesFromCtx } from '../../lib/form-options/creature-type-field-options'
+import { allowedCharacterCreatureTypesFromCtx } from './creature-type-field-options'
 import {
   contentFormRegistry,
   contentFormFields,

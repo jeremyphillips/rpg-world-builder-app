@@ -4,20 +4,20 @@ import axe from 'axe-core'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
-import { GRAPPLER } from '../feats/fixtures'
+import { GRAPPLER } from '../fixtures'
 import {
   ADD_CONDITION_LABEL,
   ADD_CONDITION_SET_LABEL,
   CONDITION_SETS_HEADING,
   CONDITION_TYPE_LABEL,
   CONDITION_TYPE_PLACEHOLDER,
-} from '../lib/forms/requirement-editor-constants'
-import { formatRequirementEditorPreview } from '../lib/forms/requirement-editor-form'
+} from '../lib/requirement-editor-constants'
+import { formatRequirementEditorPreview } from '../lib/requirement-editor-form'
 import {
   requirementEditorDefaultValue,
   type PrerequisiteEditorValue,
-} from '../lib/forms/requirement-editor-form-schema'
-import { requirementExpressionToEditor } from '../lib/forms/requirement-editor-form-values'
+} from '../lib/requirement-editor-form-schema'
+import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { FormSectionProvider } from '@rpg/ui/form'
 import { RequirementEditor } from './requirement-editor.client'
 

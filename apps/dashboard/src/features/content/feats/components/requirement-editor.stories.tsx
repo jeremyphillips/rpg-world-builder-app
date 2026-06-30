@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 import { FormSectionProvider } from '@rpg/ui/form'
 
-import { GRAPPLER } from '../feats/fixtures'
+import { GRAPPLER } from '../fixtures'
 import {
   requirementEditorDefaultValue,
   type PrerequisiteEditorValue,
-} from '../lib/forms/requirement-editor-form-schema'
-import { requirementExpressionToEditor } from '../lib/forms/requirement-editor-form-values'
+} from '../lib/requirement-editor-form-schema'
+import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { RequirementEditor } from './requirement-editor.client'
 
 const meta = {

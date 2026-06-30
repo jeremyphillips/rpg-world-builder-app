@@ -147,9 +147,9 @@ pattern picker. A live preview at the top summarizes requirements in player-faci
 prose; below it, **condition sets** (internally `groups`) hold horizontal
 **condition** rows (internally `requirements`) with visible AND/OR connector chips.
 Shared serialization lives in
-`apps/dashboard/src/features/content/lib/requirement-editor-form.ts`; the UI is
+`apps/dashboard/src/features/content/feats/lib/requirement-editor-form.ts`; the UI is
 `RequirementEditor` in
-`apps/dashboard/src/features/content/components/requirement-editor.client.tsx`,
+`apps/dashboard/src/features/content/feats/components/requirement-editor.client.tsx`,
 wired into `feat-form-def.ts` via a `kind: 'slot'` form field.
 
 **User-facing terminology:**

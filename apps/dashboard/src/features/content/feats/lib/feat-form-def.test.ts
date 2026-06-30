@@ -10,7 +10,7 @@ import {
 import {
   requirementEditorToExpression,
   requirementExpressionToEditor,
-} from '../../lib/forms/requirement-editor-form-values'
+} from './requirement-editor-form-values'
 import { featFormDef, type FeatFormValues } from './feat-form-def'
 
 const SRD_FEATS = loadSeedFeats('srd-cc-5.2.1')
