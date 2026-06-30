@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { abilitySchema, ABILITY_ENTRIES, ABILITY_IDS, slugSchema } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/forms/content-identity-form-fields'
+import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 
 const abilityOptions = toOptions(

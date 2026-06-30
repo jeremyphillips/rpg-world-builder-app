@@ -8,7 +8,7 @@ import {
   massFromForm,
   massToForm,
   speedRateFromForm,
-} from '../../../lib/forms/content-speed-form-fields'
+} from '../../../lib/forms/fields/content-speed-form-fields'
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,

@@ -1,4 +1,4 @@
-import type { ContentFormCtx } from './content-form-registry'
+import type { ContentFormCtx } from '../content-form-registry'
 
 /** Reads `kind` from list-query entities that carry an equipment kind. */
 export function entityEquipmentKind(entity: unknown): ContentFormCtx['equipmentKind'] | undefined {

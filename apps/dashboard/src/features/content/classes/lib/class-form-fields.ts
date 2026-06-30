@@ -36,7 +36,7 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/forms/content-identity-form-fields'
+import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import {
   getLevelFieldOptions,
   HIT_DIE_SELECT_DIGITS,

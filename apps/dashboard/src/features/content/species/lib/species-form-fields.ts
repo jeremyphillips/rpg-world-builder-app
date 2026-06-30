@@ -13,7 +13,10 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
-import { feetInputUnitField, identityFields } from '../../lib/forms/content-identity-form-fields'
+import {
+  feetInputUnitField,
+  identityFields,
+} from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
 import { SpeciesRulesTab } from '../components/species-rules-tab.client'

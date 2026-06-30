@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { ContentEditShell } from '../../lib/forms/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 import { useFeats } from '../hooks/use-feats'
 // Registers the feat form def into the content form registry on module load.
 import '../lib/feat-form-def'

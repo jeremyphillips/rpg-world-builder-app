@@ -4,12 +4,12 @@ import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { useContentWriteMutation } from '../list/use-content-mutations'
+import { useContentWriteMutation } from '../../list/use-content-mutations'
 import {
   contentFormRegistry,
   type AnyContentFormDef,
   type ContentFormCtx,
-} from './content-form-registry'
+} from '../content-form-registry'
 import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
 import {
   ContentFormNotRegistered,

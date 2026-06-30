@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
 import { entityEquipmentKind, mergeEditLayoutCtx } from './content-edit-form-ctx'
-import type { ContentFormCtx } from './content-form-registry'
+import type { ContentFormCtx } from '../content-form-registry'
 
 const baseOptionsCtx: ContentFormCtx = {
   campaignRules: {

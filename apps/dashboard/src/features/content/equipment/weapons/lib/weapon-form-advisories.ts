@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { UseFormReturn } from 'react-hook-form'
 
-import type { AdvisoryFormSubmitOptions } from '../../../lib/forms/use-advisory-form-submit'
+import type { AdvisoryFormSubmitOptions } from '../../../lib/forms/shells/use-advisory-form-submit'
 import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
 
 /** Soft advisories for incompatible property selections at save time (tier 3). */

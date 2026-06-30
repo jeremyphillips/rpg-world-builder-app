@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { useContentWriteMutation } from '../list/use-content-mutations'
+import { useContentWriteMutation } from '../../list/use-content-mutations'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,
@@ -13,7 +13,7 @@ import {
   contentFormRegistry,
   type AnyContentFormDef,
   type ContentFormCtx,
-} from './content-form-registry'
+} from '../content-form-registry'
 
 import { resolveContentFormSchema } from './content-edit-load'
 

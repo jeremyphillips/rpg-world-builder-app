@@ -2,7 +2,7 @@ import type { InputUnitFieldConfig } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
 import type { FieldConfig, RowConfig } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from './content-form-registry'
+import type { ContentFormCtx } from '../content-form-registry'
 
 type GroupField = FieldConfig | RowConfig
 

@@ -1,9 +1,9 @@
 import type { DefaultValues, FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
+import { stripEditEnvelopeFromFormDefaults } from '../content-form-key-helpers'
 import { mergeEditLayoutCtx } from './content-edit-form-ctx'
-import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
+import type { AnyContentFormDef, ContentFormCtx } from '../content-form-registry'
 
 export function resolveContentFormSchema(
   def: Pick<AnyContentFormDef, 'schema' | 'resolveSchema'>,

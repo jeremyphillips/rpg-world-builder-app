@@ -14,10 +14,10 @@ import {
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
-import { weaponAdvisorySubmitOptions, weaponFormValueSyncs } from '../../equipment/weapons'
-import { useContentFormOptions } from '../form-options/content-form-options'
-import type { AnyContentFormDef, ContentFormCtx } from './content-form-registry'
-import { contentFormFields } from './content-form-registry'
+import { weaponAdvisorySubmitOptions, weaponFormValueSyncs } from '../../../equipment/weapons'
+import { useContentFormOptions } from '../../form-options/content-form-options'
+import type { AnyContentFormDef, ContentFormCtx } from '../content-form-registry'
+import { contentFormFields } from '../content-form-registry'
 import {
   CONTENT_CATALOG_OPTIONS_ERROR,
   ContentFormShellResolver,

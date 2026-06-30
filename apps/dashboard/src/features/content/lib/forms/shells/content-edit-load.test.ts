@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import type { ContentFormDef, ContentFormCtx } from './content-form-registry'
+import type { ContentFormDef, ContentFormCtx } from '../content-form-registry'
 import {
   findContentEditEntity,
   loadContentEditFormState,

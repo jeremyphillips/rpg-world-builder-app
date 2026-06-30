@@ -93,15 +93,16 @@ this table when completing a form-lib alignment phase.
 
 These modules support many content types but are **not** per-type form splits:
 
-| Module                    | Path                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Identity field builders   | `content/lib/forms/content-identity-form-fields.ts`                                      |
-| Economy field builders    | `content/lib/forms/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`) |
-| Speed/mass field builders | `content/lib/forms/content-speed-form-fields.ts`                                         |
-| Grant row helpers         | `content/lib/forms/grant-form-schema.ts`, `grant-form-fields.ts`, `grant-form-values.ts` |
-| Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                     |
-| Level select builders     | `content/lib/form-options/level-field-options.ts`                                        |
-| Content form registry     | `content/lib/forms/content-form-registry.ts`                                             |
+| Module                    | Path                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| Identity field builders   | `content/lib/forms/fields/content-identity-form-fields.ts`                                      |
+| Economy field builders    | `content/lib/forms/fields/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`) |
+| Speed/mass field builders | `content/lib/forms/fields/content-speed-form-fields.ts`                                         |
+| Grant row helpers         | `content/lib/forms/grants/grant-form-schema.ts`, `grant-form-fields.ts`, `grant-form-values.ts` |
+| Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                            |
+| Level select builders     | `content/lib/form-options/level-field-options.ts`                                               |
+| Content form registry     | `content/lib/forms/content-form-registry.ts`                                                    |
+| Create/edit shells        | `content/lib/forms/shells/` (create/edit shells, layout, load, authoring gate)                  |
 
 Feat- and species-specific helpers (not cross-type shared infra):
 

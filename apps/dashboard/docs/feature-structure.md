@@ -82,16 +82,16 @@ Cross-type helpers live under `src/features/content/lib/` in concern subfolders
 (mirror `equipment/lib/shared/`). Sub-area `lib/` keeps per-type form and table
 config; parent `lib/` is the shared layer only.
 
-| Subfolder        | Responsibility                                                                     |
-| ---------------- | ---------------------------------------------------------------------------------- |
-| `fixtures/`      | Story/test IDs and `pick*()` catalog helpers                                       |
-| `forms/`         | `ContentFormDef` registry, create/edit shells, grant splits, shared field builders |
-| `form-options/`  | Cross-type select options (levels, rich-text link targets)                         |
-| `overview/`      | List route shell, table column/filter builders, source badge                       |
-| `detail/`        | Detail layout/resolver, stat rows, edit href, image URL                            |
-| `master-detail/` | Embedded array editor hooks, row meta, campaign availability, validation           |
-| `list/`          | Content list API/query factories, client, mutation hooks                           |
-| `utils/`         | Small shared helpers (e.g. `title-case`)                                           |
+| Subfolder        | Responsibility                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `fixtures/`      | Story/test IDs and `pick*()` catalog helpers                                                                           |
+| `forms/`         | `ContentFormDef` registry, create/edit shells (`shells/`), grant splits (`grants/`), shared field builders (`fields/`) |
+| `form-options/`  | Cross-type select options (levels, rich-text link targets)                                                             |
+| `overview/`      | List route shell, table column/filter builders, source badge                                                           |
+| `detail/`        | Detail layout/resolver, stat rows, edit href, image URL                                                                |
+| `master-detail/` | Embedded array editor hooks, row meta, campaign availability, validation                                               |
+| `list/`          | Content list API/query factories, client, mutation hooks                                                               |
+| `utils/`         | Small shared helpers (e.g. `title-case`)                                                                               |
 
 Interactive widgets (master-detail panels) stay in `content/components/`; feat
 prerequisite editing lives under `feats/components/`.

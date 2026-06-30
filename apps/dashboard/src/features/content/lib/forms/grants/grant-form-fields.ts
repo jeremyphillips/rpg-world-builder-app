@@ -23,10 +23,10 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from './content-form-registry'
-import { feetInputUnitField } from './content-identity-form-fields'
-import { getLevelFieldOptions, levelSelectDigits } from '../form-options/level-field-options'
-import { titleCase } from '../utils/title-case'
+import type { ContentFormCtx } from '../content-form-registry'
+import { feetInputUnitField } from '../fields/content-identity-form-fields'
+import { getLevelFieldOptions, levelSelectDigits } from '../../form-options/level-field-options'
+import { titleCase } from '../../utils/title-case'
 
 const senseTypeOptions = toOptions(
   SENSE_TYPES,
