@@ -4,10 +4,10 @@ import type { Express } from 'express'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { createApp } from '../../app'
-import { CSRF_HEADER } from '../../lib/cookies'
-import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { createApp } from '../../../app'
+import { CSRF_HEADER } from '../../../lib/cookies'
+import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
 
 let app: Express
 
@@ -103,18 +103,6 @@ describe('vocabulary routes', () => {
       .delete(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/humanoid`)
       .set(CSRF_HEADER, csrfToken)
       .expect(403)
-  })
-
-  it('returns the homebrew content summary for campaign members', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createCampaign(agent, csrfToken)
-
-    const summaryRes = await agent
-      .get(`/api/campaigns/${campaignId}/homebrew/summary`)
-      .set(CSRF_HEADER, csrfToken)
-      .expect(200)
-
-    expect(summaryRes.body.summary.content).toHaveLength(6)
   })
 
   it('requires authentication for vocabulary reads', async () => {

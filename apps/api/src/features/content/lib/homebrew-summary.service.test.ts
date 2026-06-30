@@ -1,9 +1,10 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createUser } from '../user'
-import { createCampaign } from '../campaign'
-import { HomebrewClassModel } from '../content'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { createUser } from '../../user'
+import { createCampaign } from '../../campaign'
+import { HomebrewClassModel } from '../classes/homebrew-class.model'
+import { HOMEBREW_SUMMARY_TYPES } from '../content-types'
 import { getHomebrewContentSummary } from './homebrew-summary.service'
 
 beforeAll(async () => {
@@ -49,15 +50,8 @@ describe('getHomebrewContentSummary', () => {
 
     const summary = await getHomebrewContentSummary(campaign.id)
 
-    expect(summary.content).toHaveLength(6)
-    expect(summary.content.map((item) => item.contentType)).toEqual([
-      'classes',
-      'spells',
-      'species',
-      'feats',
-      'equipment',
-      'skill-proficiencies',
-    ])
+    expect(summary.content).toHaveLength(HOMEBREW_SUMMARY_TYPES.length)
+    expect(summary.content.map((item) => item.contentType)).toEqual([...HOMEBREW_SUMMARY_TYPES])
 
     const classes = summary.content.find((item) => item.contentType === 'classes')
     expect(classes?.totalCount).toBe(13)

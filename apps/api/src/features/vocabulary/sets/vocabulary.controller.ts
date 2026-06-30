@@ -11,8 +11,7 @@ import type {
   VocabularyOptionSetId,
 } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { getHomebrewContentSummary } from './homebrew-summary.service'
+import { HttpError } from '../../../lib/http-error'
 import {
   createCampaignVocabularyEntry,
   deleteCampaignVocabularyEntry,
@@ -87,10 +86,4 @@ export async function removeVocabularyEntry(req: Request, res: Response): Promis
   }
   const set = await deleteCampaignVocabularyEntry(campaignId, parseSetId(rawSetId), entryId)
   res.status(200).json({ set })
-}
-
-export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {
-  const { campaignId } = req.params as { campaignId: string }
-  const summary = await getHomebrewContentSummary(campaignId)
-  res.status(200).json({ summary })
 }

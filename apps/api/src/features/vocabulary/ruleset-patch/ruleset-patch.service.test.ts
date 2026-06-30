@@ -8,19 +8,19 @@ import {
   defaultMulticlassingRules,
 } from '@rpg/contracts'
 
-import { createApp } from '../../app'
-import { CSRF_HEADER } from '../../lib/cookies'
-import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
+import { createApp } from '../../../app'
+import { CSRF_HEADER } from '../../../lib/cookies'
+import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
   getRulesetPatchRead,
   updateCharacterCreationPatch,
   updateMechanicsPatch,
 } from './ruleset-patch.service'
-import { updateVocabularyEntry } from './vocabulary.service'
-import { createCampaign } from '../campaign'
-import { createUser } from '../user'
+import { updateVocabularyEntry } from '../sets/vocabulary.service'
+import { createCampaign } from '../../campaign'
+import { createUser } from '../../user'
 
 let app: Express
 

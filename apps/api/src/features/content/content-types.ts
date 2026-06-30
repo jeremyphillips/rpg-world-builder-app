@@ -1,3 +1,4 @@
+import type { HomebrewSummaryContentType } from '@rpg/contracts'
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { classContentConfig } from './classes/classes.config'
 import { equipmentContentConfig } from './equipment/equipment.config'
@@ -23,6 +24,16 @@ const CONTENT_TYPES = {
 } as const satisfies Record<string, ContentTypeConfig>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES
+
+/** Content types included in the homebrew hub summary (excludes starting-wealth). */
+export const HOMEBREW_SUMMARY_TYPES = [
+  'classes',
+  'spells',
+  'species',
+  'feats',
+  'equipment',
+  'skill-proficiencies',
+] as const satisfies readonly HomebrewSummaryContentType[]
 
 export function getContentTypeConfig<K extends ContentTypeName>(
   type: K,

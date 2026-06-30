@@ -2,14 +2,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createCampaign } from '../campaign'
-import { createUser } from '../user'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { createCampaign } from '../../campaign'
+import { createUser } from '../../user'
 import {
   assertCreatureTypesActiveInCampaign,
   getActiveCreatureTypeIdsForCampaign,
 } from './assert-campaign-creature-types'
-import { updateVocabularyEntry } from './vocabulary.service'
+import { updateVocabularyEntry } from '../sets/vocabulary.service'
 
 beforeAll(async () => {
   await startTestDb()

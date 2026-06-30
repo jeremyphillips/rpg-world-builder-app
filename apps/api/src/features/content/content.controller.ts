@@ -9,6 +9,7 @@ import { startingWealthContentConfig } from './starting-wealth/starting-wealth.c
 import { loadSubclassesByClassId } from '@rpg/catalog/classes'
 import { findCampaignById } from '../campaign'
 import { HttpError } from '../../lib/http-error'
+import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -90,4 +91,10 @@ export async function listStartingWealth(req: Request, res: Response): Promise<v
   const { campaignId } = req.params as { campaignId: string }
   const startingWealth = await resolveCatalogForCampaign(startingWealthContentConfig, campaignId)
   res.status(200).json({ startingWealth })
+}
+
+export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const summary = await getHomebrewContentSummary(campaignId)
+  res.status(200).json({ summary })
 }

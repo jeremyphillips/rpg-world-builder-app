@@ -1,4 +1,4 @@
-import { HttpError } from '../../lib/http-error'
+import { HttpError } from '../../../lib/http-error'
 
 interface VocabularyIdAvailabilityInput {
   /** Proposed vocabulary option id (slug shape). */

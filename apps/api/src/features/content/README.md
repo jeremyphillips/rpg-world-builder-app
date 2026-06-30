@@ -35,13 +35,13 @@ which seed version is loaded and which content homebrew/patches validate against
 
 ## Kernel (`lib/`) — type-agnostic, reused by every content type
 
-| Module                             | Responsibility                                                              |
-| ---------------------------------- | --------------------------------------------------------------------------- |
-| `deep-merge.ts`                    | Deep-merge objects; arrays/primitives replace                               |
-| `resolve-catalog.ts`               | Merge system + patches + homebrew into the effective list                   |
-| `assert-slug-available.ts`         | Homebrew slug guard (no campaign dupes; no system shadowing)                |
-| `spells/assert-spell-class-ids.ts` | Spell write guard — `classIds` must reference resolved spellcasting classes |
-| `content-type-config.ts`           | `ContentTypeConfig` — the per-type wiring the kernel consumes               |
+| Module                        | Responsibility                                                |
+| ----------------------------- | ------------------------------------------------------------- |
+| `deep-merge.ts`               | Deep-merge objects; arrays/primitives replace                 |
+| `resolve-catalog.ts`          | Merge system + patches + homebrew into the effective list     |
+| `assert-slug-available.ts`    | Homebrew slug guard (no campaign dupes; no system shadowing)  |
+| `homebrew-summary.service.ts` | Hub card counts — one round trip over resolved catalogs       |
+| `content-type-config.ts`      | `ContentTypeConfig` — the per-type wiring the kernel consumes |
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
 `*.config.ts` wiring its seed loader and Mongo models, registered in
@@ -52,6 +52,16 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
   homebrew or upsert a system overlay patch (owner/co-owner only)
 
 See `lib/content-write.service.ts` and each type's `*WriteConfig` in `*.config.ts`.
+
+## Homebrew hub summary
+
+Mounted under `/api/campaigns/:campaignId/homebrew`.
+
+| Method | Path       | Role   | Description                                                                            |
+| ------ | ---------- | ------ | -------------------------------------------------------------------------------------- |
+| GET    | `/summary` | member | Resolved catalog counts for hub cards (`HOMEBREW_SUMMARY_TYPES` in `content-types.ts`) |
+
+System seed records ship from `@rpg/catalog`; the API never stores a full catalog copy.
 
 ## Attribution
 

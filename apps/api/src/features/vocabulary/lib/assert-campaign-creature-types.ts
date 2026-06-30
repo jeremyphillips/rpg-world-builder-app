@@ -1,7 +1,7 @@
 import { CREATURE_TYPE_SET_ID, activeVocabularyOptionIds } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { resolveVocabularySetForCampaign } from './vocabulary.service'
+import { HttpError } from '../../../lib/http-error'
+import { resolveVocabularySetForCampaign } from '../sets/vocabulary.service'
 
 /** Active creature type ids for a campaign's resolved vocabulary set. */
 export async function getActiveCreatureTypeIdsForCampaign(
