@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { Switch } from './switch.client'
@@ -17,6 +17,7 @@ export interface SwitchFieldProps extends Omit<ComponentProps<typeof Switch>, 'i
   info?: ReactNode
   required?: boolean
   width?: FieldWidth
+  size?: FieldSize
   /** `inline` (default) — switch and label on one row. `above` — label over the switch. */
   labelPosition?: 'above' | 'inline'
 }
@@ -31,6 +32,7 @@ export function SwitchField({
   info,
   required,
   width,
+  size = 'md',
   labelPosition = 'inline',
   ...switchProps
 }: SwitchFieldProps) {
@@ -44,7 +46,7 @@ export function SwitchField({
 
   if (labelPosition === 'above') {
     return (
-      <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+      <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
         <FieldLayout
           hintPosition={resolvedHintPosition}
           label={labelNode}
@@ -55,7 +57,7 @@ export function SwitchField({
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
       <div className="flex items-start gap-2">
         <Field.Control>
           <Switch {...switchProps} />

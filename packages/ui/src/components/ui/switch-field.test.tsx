@@ -6,6 +6,11 @@ import axe from 'axe-core'
 import { SwitchField } from './switch-field'
 
 describe('SwitchField', () => {
+  it('applies field size to the label', () => {
+    render(<SwitchField id="notify" label="Email reminders" size="sm" />)
+    expect(screen.getByText('Email reminders')).toHaveClass('text-xs')
+  })
+
   it('toggles via its associated label', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()
@@ -49,7 +54,9 @@ describe('SwitchField', () => {
     expect(textColumn).not.toBeNull()
     expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
     expect(textColumn).toContainElement(hint)
-    expect(textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
   })
 })
