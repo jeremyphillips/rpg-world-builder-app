@@ -1,10 +1,8 @@
-export const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
-
 export {
   ACTIVE_IN_CAMPAIGN_LABEL,
   ACTIVE_IN_CAMPAIGN_TOOLTIP,
   isContentRowActive as isSubclassActive,
-} from '../../lib/content-campaign-availability'
+} from '../../../lib/content-campaign-availability'
 
 export const UNTITLED_SUBCLASS_LABEL = 'Untitled subclass'
 

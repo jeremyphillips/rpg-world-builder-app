@@ -13,12 +13,12 @@ import {
   ACTIVE_IN_CAMPAIGN_TOOLTIP,
   isDraftSubclassId,
   isSubclassDeletable,
-} from '../lib/subclass-editor-constants'
+} from '../lib/subclasses/subclass-editor-constants'
 import {
   buildSubclassFields,
-  subclassFormDef,
   type SubclassFormValues,
-} from '../lib/subclass-form-def'
+} from '../lib/subclasses/subclass-form-fields'
+import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 
 export interface SubclassEditorPanelProps {
   subclassId: string

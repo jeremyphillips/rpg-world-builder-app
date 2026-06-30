@@ -1,6 +1,6 @@
 import type { Subclass } from '@rpg/contracts'
 
-import type { SubclassFormValues } from './subclass-form-def'
+import type { SubclassFormValues } from './subclass-form-fields'
 import { getMergedSubclassFormValues, type SubclassDraft } from './subclass-editor-state'
 
 export function applySubclassFormEdits(

@@ -5,8 +5,3 @@ export const SUBCLASS_CHOICE_LEVEL_NONE = 'none'
 export const WEAPON_PROFICIENCY_MODES = ['categories', 'individual'] as const
 
 export type WeaponProficiencyMode = (typeof WEAPON_PROFICIENCY_MODES)[number]
-
-export const WEAPON_PROFICIENCY_MODE_LABELS = {
-  categories: 'Categories',
-  individual: 'Individual weapons',
-} as const satisfies Record<WeaponProficiencyMode, string>

@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass } from '../../lib/fixtures/pick'
+import { pickClass } from '../../../lib/fixtures/pick'
 import {
   startingEquipmentChoiceItemFormSchema,
   startingEquipmentFormSchema,
-  startingEquipmentFromFormValues,
   startingEquipmentItemFields,
   startingEquipmentOptionFormSchema,
+} from './class-starting-equipment-form-fields'
+import {
+  startingEquipmentFromFormValues,
   startingEquipmentToFormValues,
-} from './class-starting-equipment-form-def'
+} from './class-starting-equipment-form-values'
 
 describe('startingEquipment round-trip', () => {
   it('preserves Monk prose-only standard package without pool choice items', () => {

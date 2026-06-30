@@ -1,7 +1,7 @@
 import type { ContentSource, Subclass } from '@rpg/contracts'
 
-import type { SubclassFormValues } from './subclass-form-def'
-import { subclassFormDef } from './subclass-form-def'
+import type { SubclassFormValues } from './subclass-form-fields'
+import { subclassFormDef } from './subclass-form-values'
 import {
   createDraftSubclassId,
   isDraftSubclassId,
