@@ -267,6 +267,7 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
+        size={config.size}
         linkable={config.linkable}
         codeBlocks={config.codeBlocks}
         internalLinkOptions={config.internalLinkOptions}

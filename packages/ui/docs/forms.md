@@ -766,10 +766,13 @@ on nested groups for the smaller scale (`text-field-subgroup-legend`, 20px):
 ```
 
 `FieldGroup` (standalone usage outside `<Form>`) accepts the same `legendSize`
-prop. Array section legends default to the `array` scale (18px,
-`text-field-array-legend`); pass `legendSize: 'section'` when the array is the
-primary top-level heading. Collapsible array sections use the accordion trigger
-for the visible heading (section scale) and hide the fieldset legend.
+prop. Array section legends default to the `array` hierarchy scale; when the
+array section field size is `sm` (the default inside `<Form>` arrays), legend
+typography follows `text-sm` via `fieldGroupLegendVariants` compound variants.
+Pass `size: 'md'` on the `ArrayConfig` to keep the 18px `text-field-array-legend`
+scale. Pass `legendSize: 'section'` when the array is the primary top-level
+heading. Collapsible array sections use the accordion trigger for the visible
+heading (section scale) and hide the fieldset legend.
 
 Nested groups may declare `visibility` (same contract as leaf fields). When hidden,
 the whole subgroup — legend and fields — unmounts and nested values clear.
@@ -872,8 +875,10 @@ for every section, even when `collapsible: true` is set.
 
 Section legends and collapsible accordion triggers share `fieldGroupLegendTypographyClasses`
 (`text-field-group-legend`, `font-heading`, `mb-5` via `fieldGroupLegendVariants` on
-plain group fieldsets). Array fieldset legends use the `array` scale by default
-(`text-field-array-legend`, 18px). Collapsible sections **start open**.
+plain group fieldsets). Array fieldset legends use the `array` hierarchy scale;
+when the array section inherits `size: 'sm'`, legend typography is `text-sm`
+(14px). Pass `size: 'md'` on the array to keep `text-field-array-legend` (18px).
+Collapsible sections **start open**.
 
 Fields stay mounted while a section is collapsed, so react-hook-form values are
 preserved (`shouldUnregister` only applies to conditional visibility, not

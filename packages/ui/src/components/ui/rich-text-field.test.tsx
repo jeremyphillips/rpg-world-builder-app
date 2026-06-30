@@ -11,6 +11,12 @@ describe('RichTextField', () => {
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument()
   })
 
+  it('applies field size to the label without resizing the editor prose', () => {
+    render(<RichTextField id="bio" label="Biography" size="sm" />)
+    expect(screen.getByText('Biography')).toHaveClass('text-xs')
+    expect(screen.getByRole('textbox', { name: 'Biography' })).toHaveClass('prose-sm')
+  })
+
   it('renders the error message', () => {
     render(<RichTextField id="bio" label="Biography" hint="Optional." error="Required." />)
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')

@@ -51,6 +51,9 @@ export const fieldArrayLegendSpacingClasses = 'mb-4'
 /** Repeatable array section legend — between subgroup and field labels. */
 export const fieldArrayLegendTypographyClasses =
   'text-field-array-legend font-heading leading-none text-foreground'
+/** Compact array section legend — follows section `size: 'sm'` (14px). */
+export const fieldArrayLegendSmTypographyClasses =
+  'text-sm font-heading leading-none text-foreground'
 export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
 export const fieldArrayItemActionRowClasses = cn(
@@ -190,15 +193,40 @@ export type FieldStackLayout = 'default' | 'toggleDependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 
+/** Legend type scale for array sections — `sm` when section field size is compact. */
+export type FieldGroupLegendScale = 'default' | 'sm'
+
+/** Maps array section field size to legend typography scale. */
+export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
+  return size === 'sm' ? 'sm' : 'default'
+}
+
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
       section: cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
       subsection: cn(fieldSubgroupLegendSpacingClasses, fieldSubgroupLegendTypographyClasses),
-      array: cn(fieldArrayLegendSpacingClasses, fieldArrayLegendTypographyClasses),
+      array: fieldArrayLegendSpacingClasses,
+    },
+    scale: {
+      default: '',
+      sm: '',
     },
   },
+  compoundVariants: [
+    {
+      size: 'array',
+      scale: 'default',
+      class: fieldArrayLegendTypographyClasses,
+    },
+    {
+      size: 'array',
+      scale: 'sm',
+      class: fieldArrayLegendSmTypographyClasses,
+    },
+  ],
   defaultVariants: {
     size: 'section',
+    scale: 'default',
   },
 })

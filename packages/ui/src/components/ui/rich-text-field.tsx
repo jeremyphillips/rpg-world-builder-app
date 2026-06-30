@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { RichTextEditor } from './rich-text-editor.client'
@@ -20,6 +20,7 @@ export interface RichTextFieldProps {
   info?: ReactNode
   required?: boolean
   width?: FieldWidth
+  size?: FieldSize
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
@@ -45,6 +46,7 @@ export function RichTextField({
   info,
   required,
   width,
+  size = 'md',
   linkable,
   codeBlocks,
   internalLinkOptions,
@@ -55,7 +57,7 @@ export function RichTextField({
   onBlur,
 }: RichTextFieldProps) {
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
       <FieldLayout
         hintPosition={hintPosition}
         label={

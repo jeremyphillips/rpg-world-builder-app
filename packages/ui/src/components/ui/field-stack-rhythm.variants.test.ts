@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  fieldGroupLegendVariants,
   fieldStackRhythmVariants,
+  resolveArrayLegendScale,
   resolveArraySectionSize,
   resolveFieldStackRhythm,
   resolveFormFieldSize,
@@ -87,5 +89,31 @@ describe('resolveInheritedFieldSize', () => {
 
   it('inherits context size when field config omits size', () => {
     expect(resolveInheritedFieldSize({ inherited: 'sm' })).toBe('sm')
+  })
+})
+
+describe('resolveArrayLegendScale', () => {
+  it('maps sm section size to compact array legend scale', () => {
+    expect(resolveArrayLegendScale('sm')).toBe('sm')
+  })
+
+  it('keeps default array legend scale for md and lg section sizes', () => {
+    expect(resolveArrayLegendScale('md')).toBe('default')
+    expect(resolveArrayLegendScale('lg')).toBe('default')
+  })
+})
+
+describe('fieldGroupLegendVariants', () => {
+  it('uses text-sm for array legends in sm sections', () => {
+    expect(fieldGroupLegendVariants({ size: 'array', scale: 'sm' })).toContain('text-sm')
+    expect(fieldGroupLegendVariants({ size: 'array', scale: 'sm' })).not.toContain(
+      'text-field-array-legend',
+    )
+  })
+
+  it('keeps the token scale for default array legends', () => {
+    expect(fieldGroupLegendVariants({ size: 'array', scale: 'default' })).toContain(
+      'text-field-array-legend',
+    )
   })
 })

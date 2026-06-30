@@ -56,7 +56,8 @@ describe('ArrayFieldRenderer', () => {
   it('renders the add button and legend for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
-    expect(screen.getByText('Traits')).toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Traits')).toHaveClass('text-sm')
+    expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
       'gap-2',

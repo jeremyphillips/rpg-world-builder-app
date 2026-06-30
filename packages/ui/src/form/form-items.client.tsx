@@ -19,6 +19,7 @@ import {
   fieldGroupBottomMarginClasses,
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
+  resolveArrayLegendScale,
   fieldStackRhythmVariants,
   fieldSeparatorVariants,
   fieldToggleDependentIndentClasses,
@@ -832,8 +833,9 @@ export function ArrayFieldRenderer({
   labelledBy,
 }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
-  const { rhythm } = useFormSectionContext()
+  const { rhythm, size } = useFormSectionContext()
   const { addLabel = 'Add item', min = 0, max, legend, legendSize = 'array', itemTitle } = config
+  const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
   const stackClasses = fieldStackRhythmVariants({ rhythm })
 
   const canRemove = fields.length > min
@@ -849,7 +851,9 @@ export function ArrayFieldRenderer({
       {hideLegend ? (
         <legend className="sr-only">{legend}</legend>
       ) : (
-        <legend className={fieldGroupLegendVariants({ size: legendSize })}>{legend}</legend>
+        <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
+          {legend}
+        </legend>
       )}
       <div className={stackClasses}>
         {fields.map((rhfField, index) => {
