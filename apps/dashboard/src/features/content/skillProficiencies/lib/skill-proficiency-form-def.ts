@@ -10,7 +10,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-form-field-helpers'
+import { identityFields } from '../../lib/content-identity-form-fields'
 import {
   contentFormRegistry,
   type ContentFormDef,

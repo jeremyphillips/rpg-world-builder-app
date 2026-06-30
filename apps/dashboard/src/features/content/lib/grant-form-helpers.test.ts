@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { pickClass } from './fixtures/pick'
-import {
-  formRowsToGrants,
-  formatInnateSpellEntryTitle,
-  grantsToFormRows,
-} from './grant-form-helpers'
+import { formatInnateSpellEntryTitle } from './grant-form-fields'
+import { formRowsToGrants, grantsToFormRows } from './grant-form-values'
 
 describe('grantsToFormRows / formRowsToGrants', () => {
   it('round-trips proficiency tool and weapon slug arrays', () => {

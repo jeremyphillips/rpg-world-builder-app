@@ -5,9 +5,9 @@ import { FormSectionProvider } from '@rpg/ui/form'
 import { GRAPPLER } from '../feats/fixtures'
 import {
   requirementEditorDefaultValue,
-  requirementExpressionToEditor,
   type PrerequisiteEditorValue,
-} from '../lib/requirement-editor-form'
+} from '../lib/requirement-editor-form-schema'
+import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { RequirementEditor } from './requirement-editor.client'
 
 const meta = {

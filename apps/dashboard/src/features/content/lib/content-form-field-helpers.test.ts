@@ -3,18 +3,17 @@ import { describe, expect, it } from 'vitest'
 import {
   costFields,
   economyFields,
-  feetInputUnitField,
-  mountCapacitySpeedFields,
   optionalWeightFields,
-  vehicleCargoSpeedFields,
   wealthGrantFields,
   wealthGrantFromForm,
   wealthGrantToForm,
   weightFromForm,
   weightToForm,
-} from './content-form-field-helpers'
-import { EQUIPMENT_COST_VALUE_DIGITS } from './equipment-cost-config'
-import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from './equipment-weight-config'
+} from './content-economy-form-fields'
+import { feetInputUnitField } from './content-identity-form-fields'
+import { mountCapacitySpeedFields, vehicleCargoSpeedFields } from './content-speed-form-fields'
+import { EQUIPMENT_COST_VALUE_DIGITS } from '../equipment/lib/equipment-cost-config'
+import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../equipment/lib/equipment-weight-config'
 
 describe('costFields', () => {
   it('uses static valueDigits when equipment kind is known', () => {

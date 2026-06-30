@@ -1,6 +1,6 @@
 import type { Equipment } from '@rpg/contracts'
 
-import type { weightFromForm } from '../../lib/content-form-field-helpers'
+import { weightFromForm } from '../../lib/content-economy-form-fields'
 import { slugForInputParse } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
 

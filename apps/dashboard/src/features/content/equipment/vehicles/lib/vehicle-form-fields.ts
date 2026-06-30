@@ -1,7 +1,7 @@
 import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { vehicleCargoSpeedFields } from '../../../lib/content-form-field-helpers'
+import { vehicleCargoSpeedFields } from '../../../lib/content-speed-form-fields'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const vehicleCategoryOptions = toOptions(

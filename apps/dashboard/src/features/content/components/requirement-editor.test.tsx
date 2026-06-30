@@ -12,12 +12,12 @@ import {
   CONDITION_TYPE_LABEL,
   CONDITION_TYPE_PLACEHOLDER,
 } from '../lib/requirement-editor-constants'
+import { formatRequirementEditorPreview } from '../lib/requirement-editor-form'
 import {
-  formatRequirementEditorPreview,
   requirementEditorDefaultValue,
-  requirementExpressionToEditor,
   type PrerequisiteEditorValue,
-} from '../lib/requirement-editor-form'
+} from '../lib/requirement-editor-form-schema'
+import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { FormSectionProvider } from '@rpg/ui/form'
 import { RequirementEditor } from './requirement-editor.client'
 

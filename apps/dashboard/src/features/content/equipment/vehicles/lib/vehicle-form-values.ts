@@ -4,11 +4,7 @@ import {
   type VehicleEquipment,
 } from '@rpg/contracts'
 
-import {
-  massFromForm,
-  massToForm,
-  speedRateFromForm,
-} from '../../../lib/content-form-field-helpers'
+import { massFromForm, massToForm, speedRateFromForm } from '../../../lib/content-speed-form-fields'
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,

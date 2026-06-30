@@ -2,16 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { loadSeedFeats } from '@rpg/catalog/feats'
 import { formatRequirementExpression, type RequirementExpression } from '@rpg/contracts'
 
+import { formatRequirementEditorPreview } from './requirement-editor-form'
 import {
-  formatRequirementEditorPreview,
   newRequirementGroup,
   newRequirementLeaf,
   prerequisiteEditorSchema,
   requirementEditorDefaultValue,
+  type PrerequisiteEditorValue,
+} from './requirement-editor-form-schema'
+import {
   requirementEditorToExpression,
   requirementExpressionToEditor,
-  type PrerequisiteEditorValue,
-} from './requirement-editor-form'
+} from './requirement-editor-form-values'
 
 const SRD_FEATS = loadSeedFeats('srd-cc-5.2.1')
 

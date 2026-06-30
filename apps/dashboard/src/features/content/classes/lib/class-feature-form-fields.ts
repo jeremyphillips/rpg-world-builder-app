@@ -2,14 +2,13 @@ import { z } from 'zod'
 import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
+import { grantArrayFields } from '../../lib/grant-form-fields'
 import {
   CLASS_GRANT_TYPES,
   CLASS_GRANT_TYPE_LABELS,
-  formRowsToGrants,
-  grantArrayFields,
   createGrantRowFormSchema,
-  grantsToFormRows,
-} from '../../lib/grant-form-helpers'
+} from '../../lib/grant-form-schema'
+import { formRowsToGrants, grantsToFormRows } from '../../lib/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import {

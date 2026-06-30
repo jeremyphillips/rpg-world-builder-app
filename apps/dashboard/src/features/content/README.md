@@ -37,8 +37,7 @@ through [`createContentListApi`](./lib/create-content-list.ts) and
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
 
-Class and subclass [`FeatureItem`](./lib/feature-item.tsx) rows compose SRD-style
-headings at render time via [`formatFeatureHtml`](./lib/format-feature-html.ts);
+Class [`FeatureItem`](./lib/feature-item.tsx) rows render level + name headings inline;
 stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 
 ## Tabbed create/edit forms

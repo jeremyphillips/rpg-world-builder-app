@@ -7,13 +7,13 @@ import {
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import { grantArrayFields } from '../../lib/grant-form-fields'
 import {
   SPECIES_GRANT_TYPES,
   SPECIES_GRANT_TYPE_LABELS,
-  formRowsToGrants,
-  grantArrayFields,
   grantRowFormSchema,
-} from '../../lib/grant-form-helpers'
+} from '../../lib/grant-form-schema'
+import { formRowsToGrants } from '../../lib/grant-form-values'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { traitKindOptions } from './species-trait-form-labels'
 

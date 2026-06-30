@@ -113,7 +113,7 @@ naming:
 | `homebrew/lib/vocabulary/` | Vocabulary set editors          | See [vocabulary.md](../../../docs/vocabulary.md) |
 | `auth/`                    | No `lib/` folder                | Session gate + thin hooks only                   |
 
-Shared content infra (`content-form-field-helpers.ts`, `content-form-registry.ts`,
+Shared content infra (`content-*-form-fields.ts`, `grant-form-*.ts`, `requirement-editor-form-*.ts`, `content-form-registry.ts`,
 etc.) is listed as **exception** rows in the form-lib inventory — not per-type
 form splits.
 

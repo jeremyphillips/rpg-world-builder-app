@@ -5,7 +5,7 @@ import {
   type EquipmentKind,
 } from '@rpg/contracts'
 
-import { weightFromForm, weightToForm } from '../../lib/content-form-field-helpers'
+import { weightFromForm, weightToForm } from '../../lib/content-economy-form-fields'
 import { finalizeContentInput } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
 import { armorFormValuesFromEntity, buildArmorInput } from '../armor/lib/armor-form-values'

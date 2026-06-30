@@ -272,9 +272,9 @@ Contracts SSOT:
 [`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
 (with optional `{ showTierLabels: false }`).
 
-Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/content-form-field-helpers.ts)
+Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/content-identity-form-fields.ts)
 (`type: 'inputUnit'`, `unit: 'ft.'`). Fixed-pound weight uses auto-switched
-[`scalarUnitInputSelectField`](../src/features/content/lib/content-form-field-helpers.ts)
+[`scalarUnitInputSelectField`](../src/features/content/lib/content-speed-form-fields.ts)
 (`fixedUnit: 'lb.'` when only one unit option).
 
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)

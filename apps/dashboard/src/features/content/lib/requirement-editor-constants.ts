@@ -1,6 +1,6 @@
 import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
 
-import { REQUIREMENT_LEAF_TYPES, type RequirementLeafType } from './requirement-editor-form'
+import { REQUIREMENT_LEAF_TYPES, type RequirementLeafType } from './requirement-editor-form-schema'
 
 export const ADD_CONDITION_SET_LABEL = 'Add condition set'
 export const ADD_CONDITION_LABEL = 'Add condition'

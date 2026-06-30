@@ -13,7 +13,7 @@ import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from
 import {
   wealthGrantMoneyField,
   wealthGrantMoneyFromForm,
-} from '../../../lib/content-form-field-helpers'
+} from '../../../lib/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/content-form-registry'
 import {
   STARTING_EQUIPMENT_ITEM_KIND_LABELS,
