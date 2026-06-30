@@ -2,17 +2,17 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createUser } from '../user'
-import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
+import { HttpError } from '../../../lib/http-error'
+import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { createUser } from '../../user'
+import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
   createCampaignVocabularyEntry,
   deleteCampaignVocabularyEntry,
   resolveVocabularySetForCampaign,
   updateVocabularyEntry,
 } from './vocabulary.service'
-import { createCampaign } from '../campaign'
+import { createCampaign } from '../../campaign'
 
 beforeAll(async () => {
   await startTestDb()

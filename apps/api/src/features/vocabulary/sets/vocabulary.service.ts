@@ -12,16 +12,16 @@ import type {
   VocabularyOptionSetPatch,
 } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { assertVocabularyIdAvailable } from './assert-vocabulary-id-available'
-import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
+import { HttpError } from '../../../lib/http-error'
+import { assertVocabularyIdAvailable } from '../lib/assert-vocabulary-id-available'
+import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
   getOrCreatePatchDocument,
   loadPatchDocument,
   requireCampaignRuleset,
   type PatchDocument,
-} from './patch-document'
-import { resolveVocabularySet } from './resolve-vocabulary'
+} from '../lib/patch-document'
+import { resolveVocabularySet } from '../lib/resolve-vocabulary'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {

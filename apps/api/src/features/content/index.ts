@@ -1,15 +1,15 @@
-export * from './content.routes'
-export * from './content.service'
-export { getContentTypeConfig, type ContentTypeName } from './content-types'
-export type { ContentTypeConfig } from './lib/content-type-config'
-export * from './classes/classes.config'
-export * from './classes/homebrew-class.model'
-export * from './classes/class-patch.model'
+export { contentRouter } from './content.routes'
+export { homebrewRouter } from './homebrew.routes'
 export {
-  getClassBySlug,
-  getSubclassBySlug,
-  loadSeedClasses,
-  loadSeedSubclasses,
-  loadSubclassesByClassId,
-  seedClassSlugs,
-} from '@rpg/catalog/classes'
+  getContentTypeConfig,
+  getContentWriteConfig,
+  HOMEBREW_SUMMARY_TYPES,
+  isContentTypeName,
+  isContentWriteType,
+  resolveContentForCampaign,
+  type ContentTypeName,
+  type ContentTypeRegistration,
+} from './content-types'
+export { resolveCatalogForCampaign } from './content.service'
+export type { ContentTypeConfig } from './lib/content-type-config'
+export { getHomebrewContentSummary } from './lib/homebrew-summary.service'

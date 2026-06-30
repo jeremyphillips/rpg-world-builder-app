@@ -10,6 +10,7 @@ import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { loadSeedSpecies, seedSpeciesSlugs } from '@rpg/catalog/species'
+import { speciesValidateBeforeWrite } from './species-write-hooks'
 import { HomebrewSpeciesModel, type HomebrewSpeciesSchemaType } from './homebrew-species.model'
 import { SpeciesPatchModel } from './species-patch.model'
 
@@ -79,4 +80,10 @@ export const speciesWriteConfig: ContentWriteConfig<Species> = {
   patchModel: SpeciesPatchModel,
   toHomebrewEntity: toHomebrewSpecies,
   bodyFromCreateInput,
+  validateBeforeWrite: speciesValidateBeforeWrite,
 }
+
+export const speciesRegistration = {
+  read: speciesContentConfig,
+  write: speciesWriteConfig,
+} as const

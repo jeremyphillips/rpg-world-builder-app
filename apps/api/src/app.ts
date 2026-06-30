@@ -3,14 +3,14 @@ import cookieParser from 'cookie-parser'
 
 import { verifyCsrf } from './middleware/csrf'
 import { errorHandler, notFound } from './middleware/error-handler'
+import { loadEnv } from './env'
 import { authRouter } from './features/auth'
-import { campaignRouter } from './features/campaign/campaign.routes'
-import { contentRouter } from './features/content'
-import { homebrewRouter, vocabularyRouter } from './features/vocabulary/vocabulary.routes'
-import { rulesetPatchRouter } from './features/vocabulary/ruleset-patch.routes'
-import { uploadsRouter, ensureUploadDir } from './features/uploads'
-import { userRouter } from './features/user/user.routes'
+import { campaignRouter } from './features/campaign'
+import { contentRouter, homebrewRouter } from './features/content'
 import { benchRouter } from './features/dev-bench'
+import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
+import { uploadsRouter, ensureUploadDir } from './features/uploads'
+import { userRouter } from './features/user'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
@@ -18,6 +18,7 @@ import { benchRouter } from './features/dev-bench'
  * No CORS is configured — the browser only ever talks to one origin.
  */
 export function createApp(): Express {
+  const { devBenchEnabled } = loadEnv()
   const app = express()
 
   // Ensure the upload directory exists before any requests are handled.
@@ -43,7 +44,9 @@ export function createApp(): Express {
   api.use('/campaigns/:campaignId/homebrew', homebrewRouter)
   api.use('/uploads', uploadsRouter)
   api.use('/users', userRouter)
-  api.use('/bench', benchRouter)
+  if (devBenchEnabled) {
+    api.use('/bench', benchRouter)
+  }
 
   app.use('/api', api)
 

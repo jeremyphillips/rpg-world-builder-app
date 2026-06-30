@@ -1,22 +1,13 @@
-import type { ClassStored, ContentSource } from '@rpg/contracts'
+import type { ContentSource, SystemRulesetId } from '@rpg/contracts'
 import { ContentKeyError, stripClassSkillFromFromInput } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
-import { assertCreatureTypesActiveInCampaign } from '../../vocabulary'
-import { enrichClassWithDerivedSkills } from '../classes/derive-classes-catalog'
-import { classContentConfig } from '../classes/classes.config'
 import { resolveCatalogForCampaign } from '../content.service'
-import { assertSpellClassIdsHaveSpellcasting } from '../spells/assert-spell-class-ids'
-import { assertSpeciesClassSlugsFromInput } from '../species/assert-species-class-slugs'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
-import type { ContentWriteConfig, HomebrewDoc } from './content-write-config'
-import {
-  extractSkillsFromFromUpdate,
-  syncSuggestedClassesFromClass,
-} from './sync-suggested-classes-from-class'
+import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 
 type StoredEntity = {
   id: string
@@ -106,16 +97,33 @@ function parsePersistedWriteInput<T extends StoredEntity>(
   return schema.parse(forParse) as Record<string, unknown>
 }
 
+function buildWriteContext(
+  campaignId: string,
+  rulesetId: SystemRulesetId,
+  mode: 'create' | 'update',
+  input: Record<string, unknown>,
+  normalized: Record<string, unknown>,
+  existing?: StoredEntity,
+): ContentWriteContext {
+  return { campaignId, rulesetId, mode, input, normalized, existing }
+}
+
+async function runValidateBeforeWrite<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  ctx: ContentWriteContext,
+): Promise<void> {
+  await config.validateBeforeWrite?.(ctx)
+}
+
 async function finalizeWriteResult<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
-  campaignId: string,
-  stored: T,
+  ctx: ContentWriteContext,
+  entity: T,
 ): Promise<T> {
-  if (config.typeName !== 'classes') return stored
-  return (await enrichClassWithDerivedSkills(
-    campaignId,
-    stored as unknown as ClassStored,
-  )) as unknown as T
+  if (config.afterWrite) {
+    return config.afterWrite({ ...ctx, entity }) as Promise<T>
+  }
+  return entity
 }
 
 async function updateHomebrewRecord<T extends StoredEntity>(
@@ -186,49 +194,6 @@ async function updateSystemPatch<T extends StoredEntity>(
   return config.storedSchema.parse(entity)
 }
 
-async function syncClassSkillEdgesIfNeeded<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
-  campaignId: string,
-  classSlug: string,
-  rawInput: Record<string, unknown>,
-): Promise<void> {
-  if (config.typeName !== 'classes') return
-  const nextSkillSlugs = extractSkillsFromFromUpdate(rawInput)
-  if (!nextSkillSlugs) return
-  await syncSuggestedClassesFromClass(campaignId, classSlug, nextSkillSlugs)
-}
-
-async function assertSpellClassIdsForCampaign<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
-  campaignId: string,
-  classIds: string[],
-): Promise<void> {
-  if (config.typeName !== 'spells') return
-  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
-  assertSpellClassIdsHaveSpellcasting(classIds, classes)
-}
-
-async function assertSpeciesClassSlugsForCampaign<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
-  campaignId: string,
-  input: Record<string, unknown>,
-): Promise<void> {
-  if (config.typeName !== 'species') return
-  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
-  assertSpeciesClassSlugsFromInput(input, classes)
-}
-
-async function assertSpeciesCreatureTypeForCampaign<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
-  campaignId: string,
-  input: Record<string, unknown>,
-): Promise<void> {
-  if (config.typeName !== 'species') return
-  const creatureType = input.creatureType
-  if (typeof creatureType !== 'string') return
-  await assertCreatureTypesActiveInCampaign(campaignId, [creatureType])
-}
-
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -243,10 +208,10 @@ export async function createHomebrewContent<T extends StoredEntity>(
   }
 
   const { rulesetId } = campaign
+  const writeCtx = buildWriteContext(campaignId, rulesetId, 'create', input, normalized)
+  await runValidateBeforeWrite(config, writeCtx)
+
   const slug = input.slug as string
-  await assertSpellClassIdsForCampaign(config, campaignId, input.classIds as string[])
-  await assertSpeciesCreatureTypeForCampaign(config, campaignId, input)
-  await assertSpeciesClassSlugsForCampaign(config, campaignId, input)
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
@@ -264,8 +229,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
 
   const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
   const parsed = config.storedSchema.parse(entity)
-  await syncClassSkillEdgesIfNeeded(config, campaignId, parsed.slug, normalized)
-  return finalizeWriteResult(config, campaignId, parsed)
+  return finalizeWriteResult(config, writeCtx, parsed)
 }
 
 /** Update a homebrew record or upsert a system overlay patch. */
@@ -288,18 +252,26 @@ export async function updateContentEntity<T extends StoredEntity>(
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
-  await syncClassSkillEdgesIfNeeded(config, campaignId, existing.slug, normalized)
+  const preParseCtx = buildWriteContext(
+    campaignId,
+    campaign.rulesetId,
+    'update',
+    {},
+    normalized,
+    existing,
+  )
+  await config.beforeUpdateParse?.(preParseCtx)
+
   const update = parsePersistedWriteInput(config, normalized, 'update')
-  if (config.typeName === 'spells') {
-    const effectiveClassIds = (update.classIds ??
-      (existing as unknown as { classIds: string[] }).classIds) as string[]
-    await assertSpellClassIdsForCampaign(config, campaignId, effectiveClassIds)
-  }
-  await assertSpeciesCreatureTypeForCampaign(config, campaignId, update)
-  await assertSpeciesClassSlugsForCampaign(config, campaignId, {
-    ...entityBody(existing as unknown as Record<string, unknown>),
-    ...update,
-  })
+  const writeCtx = buildWriteContext(
+    campaignId,
+    campaign.rulesetId,
+    'update',
+    update,
+    normalized,
+    existing,
+  )
+  await runValidateBeforeWrite(config, writeCtx)
 
   if (existing.source === 'homebrew') {
     if (existing.campaignId !== campaignId) {
@@ -313,7 +285,7 @@ export async function updateContentEntity<T extends StoredEntity>(
       existing,
       update,
     )
-    return finalizeWriteResult(config, campaignId, updated)
+    return finalizeWriteResult(config, writeCtx, updated)
   }
 
   const patched = await updateSystemPatch(
@@ -324,5 +296,5 @@ export async function updateContentEntity<T extends StoredEntity>(
     existing,
     update,
   )
-  return finalizeWriteResult(config, campaignId, patched)
+  return finalizeWriteResult(config, writeCtx, patched)
 }

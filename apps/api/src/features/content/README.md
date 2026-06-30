@@ -19,6 +19,21 @@ feature owns persistence and serving. `classes` is the first content type;
 A campaign pins a `rulesetId` (see the campaign contract/model); it determines
 which seed version is loaded and which content homebrew/patches validate against.
 
+## Subclasses (nested under classes)
+
+Subclasses are **not** a top-level entry in `content-types.ts`. They live under
+`subclasses/` and are nested under a parent class id.
+
+| Layer             | Source                         | API today                                                  |
+| ----------------- | ------------------------------ | ---------------------------------------------------------- |
+| **System**        | `@rpg/catalog/classes` seed    | `GET …/content/classes/:classId/subclasses` (catalog read) |
+| **Homebrew**      | _Planned_ — campaign-owned     | No write routes yet                                        |
+| **Overlay patch** | _Planned_ — per-campaign edits | No patch model yet                                         |
+
+The dashboard class editor's **Subclasses** tab authors in local component state
+(drafts/edits) and does not persist to the API. Target: nested homebrew/patch
+routes mirroring the class pattern — see [`subclasses/README.md`](subclasses/README.md).
+
 ## Resolve / merge algorithm
 
 `GET /api/campaigns/:campaignId/content/classes` returns the resolved catalog.
@@ -35,23 +50,33 @@ which seed version is loaded and which content homebrew/patches validate against
 
 ## Kernel (`lib/`) — type-agnostic, reused by every content type
 
-| Module                             | Responsibility                                                              |
-| ---------------------------------- | --------------------------------------------------------------------------- |
-| `deep-merge.ts`                    | Deep-merge objects; arrays/primitives replace                               |
-| `resolve-catalog.ts`               | Merge system + patches + homebrew into the effective list                   |
-| `assert-slug-available.ts`         | Homebrew slug guard (no campaign dupes; no system shadowing)                |
-| `spells/assert-spell-class-ids.ts` | Spell write guard — `classIds` must reference resolved spellcasting classes |
-| `content-type-config.ts`           | `ContentTypeConfig` — the per-type wiring the kernel consumes               |
+| Module                        | Responsibility                                                |
+| ----------------------------- | ------------------------------------------------------------- |
+| `deep-merge.ts`               | Deep-merge objects; arrays/primitives replace                 |
+| `resolve-catalog.ts`          | Merge system + patches + homebrew into the effective list     |
+| `assert-slug-available.ts`    | Homebrew slug guard (no campaign dupes; no system shadowing)  |
+| `homebrew-summary.service.ts` | Hub card counts — one round trip over resolved catalogs       |
+| `content-type-config.ts`      | `ContentTypeConfig` — the per-type wiring the kernel consumes |
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
-`*.config.ts` wiring its seed loader and Mongo models, registered in
-`content-types.ts` (one entry, the single extension point). Write endpoints:
+`*.config.ts` exporting a `*Registration` (`read` + `write`, optional
+`resolveForCampaign`), registered once in `content-types.ts`.
 
 - `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update
   homebrew or upsert a system overlay patch (owner/co-owner only)
 
-See `lib/content-write.service.ts` and each type's `*WriteConfig` in `*.config.ts`.
+See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.config.ts`.
+
+## Homebrew hub summary
+
+Mounted under `/api/campaigns/:campaignId/homebrew`.
+
+| Method | Path       | Role   | Description                                                                            |
+| ------ | ---------- | ------ | -------------------------------------------------------------------------------------- |
+| GET    | `/summary` | member | Resolved catalog counts for hub cards (`HOMEBREW_SUMMARY_TYPES` in `content-types.ts`) |
+
+System seed records ship from `@rpg/catalog`; the API never stores a full catalog copy.
 
 ## Attribution
 

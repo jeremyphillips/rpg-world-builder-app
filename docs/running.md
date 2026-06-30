@@ -26,12 +26,12 @@ Turbo). Open the single proxy origin:
 http://localhost:8080
 ```
 
-| Route     | Lands on                                        |
-| --------- | ----------------------------------------------- |
-| `/`       | public landing (`/login`, `/signup`)            |
-| `/app/`   | dashboard (redirects to `/login` if signed out) |
-| `/bench/` | Dev Bench (local workbench; no auth)            |
-| `/api`    | Express API                                     |
+| Route     | Lands on                                                      |
+| --------- | ------------------------------------------------------------- |
+| `/`       | public landing (`/login`, `/signup`)                          |
+| `/app/`   | dashboard (redirects to `/login` if signed out)               |
+| `/bench/` | Dev Bench (local workbench; no auth; API gated in production) |
+| `/api`    | Express API                                                   |
 
 ### Why go through the proxy?
 
@@ -103,6 +103,9 @@ The CLI calls the API **directly** at `BENCH_API_URL` (default `http://localhost
 pnpm --filter @rpg/api dev
 ```
 
+In **production**, `/api/bench` is **not mounted** unless `DEV_BENCH_ENABLED=true` in
+`apps/api/.env` (Dev Bench has no auth — keep it off on public deployments).
+
 See [`tools/bench/README.md`](../tools/bench/README.md) for command reference and [`docs/dev-bench-agent-reference.md`](dev-bench-agent-reference.md) for field authoring detail.
 
 ## Quality gates (Turbo, all workspaces)
@@ -124,5 +127,6 @@ pnpm analyze     # fallow code-health report
 | Vite "public base URL of /app/" hint             | Visit `/app/` (trailing slash); the proxy 302s bare `/app`.     |
 | Vite "public base URL of /bench/" hint           | Visit `/bench/` (trailing slash); the proxy 302s bare `/bench`. |
 | Dev Bench API 404 when testing UI                | Use `http://localhost:8080/bench/`, not bare `:5174`.           |
+| Dev Bench API 404 in production                  | Expected unless `DEV_BENCH_ENABLED=true` on the API.            |
 | API exits on boot with an env error              | Fill in `apps/api/.env` (or set `JWT_SECRET` in production).    |
 | API can't connect to Mongo                       | Start MongoDB; check `MONGODB_URI`. See root README.            |

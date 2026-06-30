@@ -2,7 +2,7 @@
 
 This guide covers the end-to-end steps for adding a fully wired catalog content type to RPG World Builder. The pattern is contracts-first: the Zod schema is the single source of truth, and every layer derives from it.
 
-**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skillProficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, structured `grants` bag on traits).
+**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skill-proficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, structured `grants` bag on traits).
 
 ---
 
@@ -251,13 +251,13 @@ apps/api/src/features/content/
     data/srd-cc-5.2.1/<type>.json  ← System seed data
     seed.ts                        ← Validates JSON at module load, exports loaders
     seed.test.ts                   ← Count + structural assertions
-    <type>.config.ts               ← ContentTypeConfig wiring
+    <type>.config.ts               ← *Registration (read + write wiring)
     homebrew-<type>.model.ts       ← (when homebrew is needed) Mongoose schema
     <type>-patch.model.ts          ← (when patches are needed) Mongoose schema
-  content-types.ts                 ← Single-line registry entry
-  content.routes.ts                ← GET route declaration
-  content.controller.ts            ← Handler function
-apps/dashboard/src/features/content/<camelCasePlural>/
+  content-types.ts                 ← Single-line registry entry (*Registration)
+  content.routes.ts                ← GET /:contentType (registry-driven list)
+  content.controller.ts            ← listContent + write handlers
+apps/dashboard/src/features/content/<type>/          ← single-word: spells/; multi-word: skill-proficiencies/
   api/<type>-api.ts                ← fetch wrapper
   hooks/use-<type>.ts              ← TanStack Query hook + query key
   lib/<type>-overview-columns.tsx  ← DataTable column/filter defs + stories
@@ -544,37 +544,21 @@ loadPatches: async (_campaignId) => [],
 
 ### 6. Registry (`apps/api/src/features/content/content-types.ts`)
 
-Add one entry:
+Add one entry bundling the type's `*Registration`:
 
 ```typescript
-'<kebab-plural>': <type>ContentConfig,
+'<kebab-plural>': <type>Registration,
 ```
 
-### 7. Route + controller
+Optional: set `resolveForCampaign` on the entry when read logic differs from the default kernel (classes today — derived skill proficiencies).
 
-In `content.routes.ts`:
+### 7. List route (no new controller function)
 
-```typescript
-contentRouter.get(
-  '/<kebab-plural>',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.list < TypeName > s,
-)
-```
+List GET is registry-driven. After step 6, `GET /api/campaigns/:campaignId/content/<kebab-plural>` is served by the shared `listContent` handler — no change to `content.routes.ts` or `content.controller.ts`.
 
-In `content.controller.ts`:
+Ensure the registration's `write.responseKey` matches what the dashboard API client destructures (camelCase JSON key, e.g. `skillProficiencies` for `skill-proficiencies`).
 
-```typescript
-export async function list<TypeName>s(req: Request, res: Response): Promise<void> {
-  const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('<kebab-plural>')
-  const <camelPlural> = await resolveCatalogForCampaign(config, campaignId)
-  res.status(200).json({ <camelPlural> })
-}
-```
-
-Note: The JSON key in the response must match what the dashboard API client destructures.
+Bespoke list routes are reserved for shapes that differ from the catalog list (today: `GET …/classes/:classId/subclasses` only).
 
 ### 8. Dashboard API client (`apps/dashboard/src/features/content/<camelPlural>/api/<kebab-plural>-api.ts`)
 
@@ -676,7 +660,7 @@ content: {
 }
 ```
 
-Note: URL segments use kebab-case plural (`skill-proficiencies`); the dashboard folder uses camelCase (`skillProficiencies`).
+Note: URL segments and dashboard/API subfolders use the content type key (kebab-case when multi-word, e.g. `skill-proficiencies/`). `ROUTES.content.*` object keys and JSON response keys stay camelCase (`skillProficiencies`).
 
 ### 16. React Router (`apps/dashboard/src/app/router.tsx`)
 
@@ -715,15 +699,15 @@ Import the two route components from `@/features/content`, then add under `campa
 
 ## Naming conventions
 
-| Concept           | Convention                                       | Example                              |
-| ----------------- | ------------------------------------------------ | ------------------------------------ |
-| Dashboard folder  | camelCase plural                                 | `skillProficiencies/`                |
-| URL segment       | kebab-case plural                                | `/skill-proficiencies`               |
-| API route key     | kebab-case plural                                | `'skill-proficiencies'`              |
-| JSON response key | camelCase plural                                 | `{ skillProficiencies: [...] }`      |
-| Query key         | `['campaigns', id, 'content', '<kebab-plural>']` |                                      |
-| Contract type     | PascalCase, avoid reserved words                 | `CharacterClass`, `SkillProficiency` |
-| Seed file         | `<kebab-plural>.json`                            | `skill-proficiencies.json`           |
+| Concept                 | Convention                                       | Example                              |
+| ----------------------- | ------------------------------------------------ | ------------------------------------ |
+| Dashboard/API subfolder | content type key (kebab-case when multi-word)    | `skill-proficiencies/`, `spells/`    |
+| URL segment             | kebab-case plural                                | `/skill-proficiencies`               |
+| API route key           | kebab-case plural                                | `'skill-proficiencies'`              |
+| JSON response key       | camelCase plural                                 | `{ skillProficiencies: [...] }`      |
+| Query key               | `['campaigns', id, 'content', '<kebab-plural>']` |                                      |
+| Contract type           | PascalCase, avoid reserved words                 | `CharacterClass`, `SkillProficiency` |
+| Seed file               | `<kebab-plural>.json`                            | `skill-proficiencies.json`           |
 
 ---
 
@@ -737,6 +721,22 @@ Import the two route components from `@/features/content`, then add under `campa
 | **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                      |
 | **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                             |
 | **Dual-ownership fields?**       | If another type references this type's entities, keep the authoritative list on the owning type. Derive reverse views at read time when possible (see [Skill ↔ class association](#skill-class-association)).                     |
+
+---
+
+## Subclass ownership (nested under classes)
+
+Subclasses are **not** registered in `content-types.ts`. They use a nested read route and a dedicated API folder (`apps/api/src/features/content/subclasses/`).
+
+| Layer             | Source                                     | Persistence / API                                    |
+| ----------------- | ------------------------------------------ | ---------------------------------------------------- |
+| **System**        | `@rpg/catalog/classes` (`subclasses.json`) | Read-only seed; `GET …/classes/:classId/subclasses`  |
+| **Homebrew**      | _Planned_                                  | Future: campaign-owned Mongo + nested POST/PATCH     |
+| **Overlay patch** | _Planned_                                  | Future: per-campaign partial edits on system records |
+
+**Dashboard today:** the class editor Subclasses tab keeps drafts and edits in **local React state** only — no save to the API. Contracts already define `Subclass`, `createSubclassInputSchema`, and patch shapes for when persistence lands.
+
+**Follow-on milestone:** `subclasses.config.ts` registration, Mongo models, write hooks, and `POST/PATCH …/classes/:classId/subclasses/:id`. Catalog read behavior must stay unchanged.
 
 ---
 

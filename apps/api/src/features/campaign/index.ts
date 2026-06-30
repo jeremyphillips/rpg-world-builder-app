@@ -1,3 +1,4 @@
+export { campaignRouter } from './campaign.routes'
 export * from './campaign.model'
 export * from './find-campaign-by-id'
 export * from './campaign.service'

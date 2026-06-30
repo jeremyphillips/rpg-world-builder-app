@@ -79,3 +79,8 @@ export const featWriteConfig: ContentWriteConfig<Feat> = {
   toHomebrewEntity: toHomebrewFeat,
   bodyFromCreateInput,
 }
+
+export const featRegistration = {
+  read: featContentConfig,
+  write: featWriteConfig,
+} as const

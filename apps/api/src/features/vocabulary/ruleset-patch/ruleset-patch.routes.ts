@@ -6,9 +6,9 @@ import {
   updateCampaignMechanicsInputSchema,
 } from '@rpg/contracts'
 
-import { requireAuth } from '../../middleware/require-auth'
-import { requireCampaignRole } from '../../middleware/require-role'
-import { validate } from '../../middleware/validate'
+import { requireAuth } from '../../../middleware/require-auth'
+import { requireCampaignRole } from '../../../middleware/require-role'
+import { validate } from '../../../middleware/validate'
 import * as controller from './ruleset-patch.controller'
 
 export const rulesetPatchRouter: Router = Router({ mergeParams: true })

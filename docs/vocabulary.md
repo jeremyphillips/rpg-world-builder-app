@@ -27,10 +27,10 @@ flowchart LR
   api --> ui
 ```
 
-| Layer              | Location                                                     | What it stores                                                                                     |
-| ------------------ | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| **System seed**    | `packages/catalog/src/vocabulary/data/<rulesetId>/`          | SRD rows: `id`, `label`, `description`. Validated at module load via `vocabularySeedOptionSchema`. |
-| **Campaign patch** | `CampaignRulesetPatch` (`apps/api/src/features/vocabulary/`) | Deltas only — never a full copy of the seed list. One document per `(campaignId, rulesetId)`.      |
+| Layer              | Location                                                         | What it stores                                                                                     |
+| ------------------ | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **System seed**    | `packages/catalog/src/vocabulary/data/<rulesetId>/`              | SRD rows: `id`, `label`, `description`. Validated at module load via `vocabularySeedOptionSchema`. |
+| **Campaign patch** | `CampaignRulesetPatch` (`apps/api/src/features/vocabulary/lib/`) | Deltas only — never a full copy of the seed list. One document per `(campaignId, rulesetId)`.      |
 
 The API loads the campaign's `rulesetId` from the campaign record, reads seed
 from catalog, merges any stored patch, and returns a **resolved set** with
@@ -100,12 +100,12 @@ Catalog loader pattern (`packages/catalog/src/vocabulary/index.ts`):
 
 Detail: [apps/api/src/features/vocabulary/README.md](../apps/api/src/features/vocabulary/README.md).
 
-| Concern                   | Module                                      |
-| ------------------------- | ------------------------------------------- |
-| Merge logic               | `resolve-vocabulary.ts` (pure; unit-tested) |
-| Persistence + CRUD        | `vocabulary.service.ts`                     |
-| Campaign field validation | e.g. `assert-campaign-creature-types.ts`    |
-| Hub card counts           | `homebrew-summary.service.ts`               |
+| Concern                   | Module                                            |
+| ------------------------- | ------------------------------------------------- |
+| Merge logic               | `lib/resolve-vocabulary.ts` (pure; unit-tested)   |
+| Persistence + CRUD        | `sets/vocabulary.service.ts`                      |
+| Campaign field validation | e.g. `lib/assert-campaign-creature-types.ts`      |
+| Ruleset patch             | `ruleset-patch/` (character-creation + mechanics) |
 
 Routes (under `/api/campaigns/:campaignId`):
 
@@ -116,7 +116,12 @@ Routes (under `/api/campaigns/:campaignId`):
 | POST   | `/vocabulary/:setId/entries`          | owner / co-owner |
 | PATCH  | `/vocabulary/:setId/entries/:entryId` | owner / co-owner |
 | DELETE | `/vocabulary/:setId/entries/:entryId` | owner / co-owner |
-| GET    | `/homebrew/summary`                   | member           |
+| GET    | `/ruleset-patch`                      | member           |
+| PATCH  | `/ruleset-patch/character-creation`   | owner / co-owner |
+| PATCH  | `/ruleset-patch/mechanics`            | owner / co-owner |
+
+Hub catalog counts (`GET /homebrew/summary`) live in the **content** feature —
+see [content README](../apps/api/src/features/content/README.md).
 
 Duplicate ids (shadowing seed or an existing campaign entry) return **409** via
 `assertVocabularyIdAvailable`.

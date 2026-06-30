@@ -112,8 +112,11 @@ src/features/content/
 Imports within a feature (including across sub-areas) are unrestricted. Code
 outside the feature imports only through the parent `index.ts`.
 
-Examples: `content/spells/`, `content/equipment/weapons/`,
+Examples: `content/spells/`, `content/skill-proficiencies/`, `content/equipment/weapons/`,
 `campaign/lib/rules/`.
+
+Multi-word content types use kebab-case subfolder names matching the API content
+type key (`skill-proficiencies/`, not camelCase).
 
 ## Fixtures
 

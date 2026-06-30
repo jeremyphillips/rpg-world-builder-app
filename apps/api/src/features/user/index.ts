@@ -1,3 +1,4 @@
+export { userRouter } from './user.routes'
 export {
   createUser,
   findUserByEmailWithSecret,

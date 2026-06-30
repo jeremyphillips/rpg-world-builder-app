@@ -9,7 +9,7 @@ import type {
   UpdateCampaignMechanicsInput,
 } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
+import { HttpError } from '../../../lib/http-error'
 import {
   getRulesetPatchRead,
   updateCharacterCreationPatch,

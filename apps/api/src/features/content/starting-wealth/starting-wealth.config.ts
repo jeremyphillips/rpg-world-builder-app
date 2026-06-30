@@ -77,3 +77,8 @@ export const startingWealthWriteConfig: ContentWriteConfig<StartingWealth> = {
   toHomebrewEntity: toHomebrewStartingWealth,
   bodyFromCreateInput,
 }
+
+export const startingWealthRegistration = {
+  read: startingWealthContentConfig,
+  write: startingWealthWriteConfig,
+} as const

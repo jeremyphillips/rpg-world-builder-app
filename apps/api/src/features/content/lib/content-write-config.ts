@@ -1,7 +1,7 @@
 import type { Model } from 'mongoose'
 import type { ZodType } from 'zod'
 
-import type { ContentSource } from '@rpg/contracts'
+import type { ContentSource, SystemRulesetId } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from './content-type-config'
 import type { ContentPatchSchemaType } from './content-patch-model'
@@ -18,13 +18,36 @@ export interface HomebrewDoc {
   [key: string]: unknown
 }
 
+/** Minimal entity shape every write/read registration must satisfy. */
+export type WriteEntityBase = {
+  id: string
+  slug: string
+  source: ContentSource
+  campaignId: string | null
+}
+
+/** Context passed to per-type write hooks. */
+export interface ContentWriteContext {
+  campaignId: string
+  rulesetId: SystemRulesetId
+  mode: 'create' | 'update'
+  /** Parsed create/update DTO fields. */
+  input: Record<string, unknown>
+  /** Normalized payload before schema parse. */
+  normalized: Record<string, unknown>
+  /** Set on update after catalog lookup. */
+  existing?: WriteEntityBase
+}
+
+export interface ContentWriteAfterContext extends ContentWriteContext {
+  entity: WriteEntityBase
+}
+
 /**
  * Per-type wiring for create/update authoring endpoints. Pairs with the
  * read-side `ContentTypeConfig` in each `*.config.ts`.
  */
-export interface ContentWriteConfig<
-  T extends { id: string; slug: string; source: ContentSource; campaignId: string | null },
-> {
+export interface ContentWriteConfig<T extends WriteEntityBase> {
   typeName: ContentTypeName
   readConfig: ContentTypeConfig<T>
   /** JSON response key (e.g. `'armor'`, `'skillProficiencies'`). */
@@ -47,4 +70,10 @@ export interface ContentWriteConfig<
     doc: HomebrewDoc,
     update: Record<string, unknown>,
   ) => Record<string, unknown>
+  /** Runs after normalized input is ready, before parse on update (e.g. class skill edge sync). */
+  beforeUpdateParse?: (ctx: ContentWriteContext) => Promise<void>
+  /** Runs after input is parsed, before slug checks and persistence. */
+  validateBeforeWrite?: (ctx: ContentWriteContext) => Promise<void>
+  /** Runs after a successful write; may return an enriched entity (e.g. derived class skills). */
+  afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
 }

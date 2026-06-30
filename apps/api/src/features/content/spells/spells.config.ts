@@ -10,6 +10,7 @@ import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { loadSeedSpells, seedSpellSlugs } from '@rpg/catalog/spells'
+import { spellValidateBeforeWrite } from './spell-write-hooks'
 import { HomebrewSpellModel, type HomebrewSpellSchemaType } from './homebrew-spell.model'
 import { SpellPatchModel } from './spell-patch.model'
 
@@ -78,4 +79,10 @@ export const spellWriteConfig: ContentWriteConfig<Spell> = {
   patchModel: SpellPatchModel,
   toHomebrewEntity: toHomebrewSpell,
   bodyFromCreateInput,
+  validateBeforeWrite: spellValidateBeforeWrite,
 }
+
+export const spellRegistration = {
+  read: spellContentConfig,
+  write: spellWriteConfig,
+} as const

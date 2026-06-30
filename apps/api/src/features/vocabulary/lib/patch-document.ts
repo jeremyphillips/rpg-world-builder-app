@@ -1,7 +1,7 @@
 import type { SystemRulesetId } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign'
+import { HttpError } from '../../../lib/http-error'
+import { findCampaignById } from '../../campaign'
 import {
   CampaignRulesetPatchModel,
   type CampaignRulesetPatchSchemaType,

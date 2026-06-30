@@ -10,14 +10,7 @@ import * as controller from './content.controller'
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
 export const contentRouter: Router = Router({ mergeParams: true })
 
-// Any campaign member may read the resolved catalog (characters consume it).
-contentRouter.get(
-  '/classes',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listClasses,
-)
-
+// Bespoke nested read — catalog seed subclasses (Phase 8 may extend with homebrew).
 contentRouter.get(
   '/classes/:classId/subclasses',
   requireAuth,
@@ -25,46 +18,12 @@ contentRouter.get(
   controller.listSubclasses,
 )
 
+// Any campaign member may read the resolved catalog (characters consume it).
 contentRouter.get(
-  '/skill-proficiencies',
+  '/:contentType',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listSkillProficiencies,
-)
-
-contentRouter.get(
-  '/equipment',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listEquipment,
-)
-
-contentRouter.get(
-  '/species',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listSpecies,
-)
-
-contentRouter.get(
-  '/spells',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listSpells,
-)
-
-contentRouter.get(
-  '/feats',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listFeats,
-)
-
-contentRouter.get(
-  '/starting-wealth',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listStartingWealth,
+  controller.listContent,
 )
 
 // Authoring — owner/co-owner only. Body validation happens in the write service
