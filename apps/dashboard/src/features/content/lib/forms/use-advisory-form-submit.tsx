@@ -25,7 +25,7 @@ export interface UseAdvisoryFormSubmitResult<TValues extends FieldValues> {
 
 /**
  * Wraps a form submit handler with optional hard blocks and a confirm dialog for
- * soft advisories. Use with `ContentSchemaForm` / `ContentFormLayout` — pass
+ * soft advisories. Use with `ContentFormLayout` — pass
  * `onSubmit` and render `confirmDialog` as a sibling of the form.
  */
 export function useAdvisoryFormSubmit<TValues extends FieldValues>(

@@ -8,16 +8,14 @@ import {
   ContentFormComingSoon,
   ContentFormOptionsGate,
   ContentFormLayout,
-} from './content-form-shell-parts'
+} from './content-form-shell-layout'
 import {
   contentFormRegistry,
   type AnyContentFormDef,
   type ContentFormCtx,
 } from './content-form-registry'
 
-function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
-  return def.resolveSchema?.(ctx) ?? def.schema
-}
+import { resolveContentFormSchema } from './content-edit-load'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -133,4 +131,4 @@ export function ContentCreateShell({
 export {
   ContentFormShellResolver,
   type ContentFormShellResolverProps,
-} from './content-form-shell-parts'
+} from './content-form-shell-resolver'

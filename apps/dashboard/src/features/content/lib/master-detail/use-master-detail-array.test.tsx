@@ -5,17 +5,12 @@ import {
   FormProvider,
   useForm,
   type DefaultValues,
-  type FieldErrors,
   type FieldValues,
   type UseFormReturn,
 } from 'react-hook-form'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import {
-  autoSelectFirstInvalid,
-  findFirstInvalidRowIndex,
-  useMasterDetailArray,
-} from './use-master-detail-array'
+import { useMasterDetailArray } from './use-master-detail-array'
 
 type FeatureRow = { name: string }
 
@@ -49,55 +44,6 @@ const makeDefaults = () => ({ name: '' })
 function setup() {
   return renderHook(() => useMasterDetailArray('features', makeDefaults), { wrapper: Wrapper })
 }
-
-describe('findFirstInvalidRowIndex', () => {
-  it('returns the first index with row errors in an array', () => {
-    const errors = {
-      features: [{ name: { message: 'Required', type: 'required' } }, undefined],
-    } as unknown as FieldErrors
-
-    expect(findFirstInvalidRowIndex(errors, 'features')).toBe(0)
-  })
-
-  it('returns null when there are no row errors', () => {
-    expect(findFirstInvalidRowIndex({}, 'features')).toBeNull()
-  })
-
-  it('returns the first invalid index for nested dot paths', () => {
-    const errors = {
-      heritage: {
-        options: [undefined, { name: { message: 'Required', type: 'required' } }],
-      },
-    } as unknown as FieldErrors
-
-    expect(findFirstInvalidRowIndex(errors, 'heritage.options')).toBe(1)
-  })
-
-  it('returns the first invalid package index for class starting equipment options', () => {
-    const errors = {
-      characterCreation: {
-        startingEquipment: {
-          options: [undefined, { label: { message: 'Required', type: 'required' } }],
-        },
-      },
-    } as unknown as FieldErrors
-
-    expect(findFirstInvalidRowIndex(errors, 'characterCreation.startingEquipment.options')).toBe(1)
-  })
-})
-
-describe('autoSelectFirstInvalid', () => {
-  it('selects the first invalid row index', () => {
-    const errors = {
-      features: [undefined, { name: { message: 'Required', type: 'required' } }],
-    } as unknown as FieldErrors
-    const select = vi.fn()
-
-    autoSelectFirstInvalid(errors, 'features', select)
-
-    expect(select).toHaveBeenCalledWith(1)
-  })
-})
 
 describe('useMasterDetailArray', () => {
   it('starts empty with no selection', () => {

@@ -5,23 +5,18 @@ import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useContentWriteMutation } from '../list/use-content-mutations'
-import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
 import {
   contentFormRegistry,
   type AnyContentFormDef,
   type ContentFormCtx,
 } from './content-form-registry'
-import { mergeEditLayoutCtx } from './content-edit-form-ctx'
+import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
   ContentFormLayout,
-} from './content-form-shell-parts'
+} from './content-form-shell-layout'
 import { ContentAuthoringGate } from './content-authoring-gate'
-
-function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
-  return def.resolveSchema?.(ctx) ?? def.schema
-}
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -117,7 +112,7 @@ function ContentEditFormReady({
   ctx,
 }: ContentEditFormReadyProps) {
   const navigate = useNavigate()
-  const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
+  const entity = findContentEditEntity(def.useListQuery(campaignId).data, entityId)
   const mutation = useContentWriteMutation(def, campaignId, entityId)
 
   if (!entity) {
@@ -128,7 +123,14 @@ function ContentEditFormReady({
     )
   }
 
-  const layoutCtx = mergeEditLayoutCtx(ctx, formCtx, campaignId, entityId, entity)
+  const { layoutCtx, schema, defaultValues } = loadContentEditFormState({
+    def,
+    entity,
+    optionsCtx: ctx,
+    formCtx,
+    campaignId,
+    entityId,
+  })
 
   return (
     <ContentEditEntityForm
@@ -137,14 +139,9 @@ function ContentEditFormReady({
       campaignId={campaignId}
       backHref={backHref}
       headingFn={headingFn}
-      layoutCtx={{
-        ...layoutCtx,
-        embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
-      }}
-      schema={resolveContentFormSchema(def, layoutCtx)}
-      defaultValues={stripEditEnvelopeFromFormDefaults(def.toFormValues(entity), {
-        stripKind: layoutCtx.equipmentKind != null,
-      })}
+      layoutCtx={layoutCtx}
+      schema={schema}
+      defaultValues={defaultValues}
       submitPending={mutation.isPending}
       formError={mutation.isError ? String(mutation.error) : null}
       onSubmit={async (values, form) => {
