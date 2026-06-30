@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass } from './fixtures/pick'
+import { pickClass } from '../fixtures/pick'
 import { formatInnateSpellEntryTitle } from './grant-form-fields'
 import { formRowsToGrants, grantsToFormRows } from './grant-form-values'
 

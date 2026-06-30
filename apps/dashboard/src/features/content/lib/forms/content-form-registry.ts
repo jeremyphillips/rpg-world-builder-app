@@ -7,8 +7,8 @@ import type { ResolvedCampaignRules } from '@rpg/contracts'
 
 import type { CreatureTypeVocabulary } from '@/features/homebrew'
 
-import type { ContentListQueryResult } from './content-client'
-import type { ContentFormOptionSets } from './content-form-options'
+import type { ContentListQueryResult } from '../list/content-client'
+import type { ContentFormOptionSets } from '../form-options/content-form-options'
 
 /**
  * Context passed to `buildFields` / `buildTabs`. Carries campaign-scoped catalog

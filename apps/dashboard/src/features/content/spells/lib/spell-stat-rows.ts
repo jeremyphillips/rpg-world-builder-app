@@ -6,7 +6,7 @@ import {
   getSpellSchoolLabel,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../lib/content-stat-rows'
+import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 import {
   formatCastingTime,
   formatSpellComponents,

@@ -16,11 +16,11 @@ import type { FieldOption } from '@rpg/ui/form'
 import { useCampaignRules } from '@/features/campaign'
 import { useCreatureTypeVocabulary } from '@/features/homebrew'
 
-import { useClasses } from '../classes/hooks/use-classes'
-import { useEquipment } from '../equipment/hooks/use-equipment'
-import { useFeats } from '../feats/hooks/use-feats'
-import { useSpells } from '../spells/hooks/use-spells'
-import type { ContentFormCtx } from './content-form-registry'
+import { useClasses } from '../../classes/hooks/use-classes'
+import { useEquipment } from '../../equipment/hooks/use-equipment'
+import { useFeats } from '../../feats/hooks/use-feats'
+import { useSpells } from '../../spells/hooks/use-spells'
+import type { ContentFormCtx } from '../forms/content-form-registry'
 import {
   buildRichTextInternalLinkOptions,
   RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,

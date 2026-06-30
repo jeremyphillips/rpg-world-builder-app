@@ -1,6 +1,6 @@
 import type { FormItem } from '@rpg/ui/form'
 
-import { mountCapacitySpeedFields } from '../../../lib/content-speed-form-fields'
+import { mountCapacitySpeedFields } from '../../../lib/forms/content-speed-form-fields'
 
 /** Mount-specific form field group for the unified equipment form. */
 export function mountFormFieldGroup(): FormItem {

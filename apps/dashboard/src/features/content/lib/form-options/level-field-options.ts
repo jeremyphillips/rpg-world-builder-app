@@ -9,7 +9,7 @@ import {
 import type { SelectFieldConfig } from '@rpg/ui/form'
 import { type FieldOption, type SelectFieldOptionListItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from './content-form-registry'
+import type { ContentFormCtx } from '../forms/content-form-registry'
 
 type LevelSelectDigits = NonNullable<SelectFieldConfig['digits']>
 

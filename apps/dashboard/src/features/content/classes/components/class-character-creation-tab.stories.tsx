@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'

@@ -12,8 +12,8 @@ import {
 } from './content-economy-form-fields'
 import { feetInputUnitField } from './content-identity-form-fields'
 import { mountCapacitySpeedFields, vehicleCargoSpeedFields } from './content-speed-form-fields'
-import { EQUIPMENT_COST_VALUE_DIGITS } from '../equipment/lib/equipment-cost-config'
-import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../equipment/lib/equipment-weight-config'
+import { EQUIPMENT_COST_VALUE_DIGITS } from '../../equipment/lib/equipment-cost-config'
+import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../../equipment/lib/equipment-weight-config'
 
 describe('costFields', () => {
   it('uses static valueDigits when equipment kind is known', () => {

@@ -5,8 +5,8 @@ import axe from 'axe-core'
 import { describe, expect, it, vi } from 'vitest'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/level-field-options'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { defaultCampaignRules } from '../../lib/form-options/level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

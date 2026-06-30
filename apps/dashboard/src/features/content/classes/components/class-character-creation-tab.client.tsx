@@ -6,8 +6,8 @@ import { Button, Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/form-embedded-master-detail-editor.client'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
-import { useMasterDetailArray } from '../../lib/use-master-detail-array'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
   ADD_STARTING_EQUIPMENT_LABEL,
   ADD_STARTING_EQUIPMENT_OPTION_LABEL,

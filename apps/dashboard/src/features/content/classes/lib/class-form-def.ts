@@ -4,8 +4,8 @@ import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
-} from '../../lib/content-form-registry'
-import { finalizeContentInput } from '../../lib/content-form-key-helpers'
+} from '../../lib/forms/content-form-registry'
+import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { deriveAsiLevels } from './class-asi-features'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'

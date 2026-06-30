@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass, pickEquipment, pickSpell } from './fixtures/pick'
+import { pickClass, pickEquipment, pickSpell } from '../fixtures/pick'
 import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
 
 describe('toContentFieldOption', () => {

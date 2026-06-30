@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const magicItemRarityOptions = toOptions(

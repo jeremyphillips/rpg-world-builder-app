@@ -3,8 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { createContent } from './content-client'
-import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
+import { createContent } from '../list/content-client'
+import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,

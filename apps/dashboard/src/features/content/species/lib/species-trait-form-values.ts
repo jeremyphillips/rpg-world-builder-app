@@ -1,7 +1,7 @@
 import { getTraitGrants, type ContentTrait } from '@rpg/contracts'
 
-import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/grant-form-values'
+import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
+import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
 
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {

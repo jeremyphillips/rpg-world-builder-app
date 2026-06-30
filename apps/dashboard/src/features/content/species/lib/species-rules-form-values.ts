@@ -7,7 +7,7 @@ import {
   type SpeciesCharacterCreation,
 } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
 
 export function defaultSpeciesCharacterCreationFormValues(): SpeciesCharacterCreationForm {

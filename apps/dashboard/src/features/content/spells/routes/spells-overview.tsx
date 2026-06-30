@@ -5,8 +5,8 @@ import type { Spell } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { useSpells } from '../hooks/use-spells'
 import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
-import { ContentOverviewShell } from '../../lib/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
+import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
 
 function SpellRowActions({ row, campaignId }: { row: Spell; campaignId: string }) {
   return (

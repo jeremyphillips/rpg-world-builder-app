@@ -4,7 +4,7 @@ import axe from 'axe-core'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'

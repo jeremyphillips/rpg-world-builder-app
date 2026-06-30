@@ -5,8 +5,8 @@ import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { updateContent } from './content-client'
-import { skillProficienciesQueryKey } from '../skillProficiencies/hooks/use-skill-proficiencies'
+import { updateContent } from '../list/content-client'
+import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
 import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
 import {
   contentFormRegistry,

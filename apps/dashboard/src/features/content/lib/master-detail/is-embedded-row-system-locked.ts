@@ -1,4 +1,4 @@
-import type { ContentFormCtx } from './content-form-registry'
+import type { ContentFormCtx } from '../forms/content-form-registry'
 import { resolveEmbeddedRowSource } from './resolve-embedded-row-meta'
 
 /**

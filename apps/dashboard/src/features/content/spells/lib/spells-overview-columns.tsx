@@ -9,7 +9,7 @@ import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 import { formatCastingTime, formatSpellLevelLabel } from '../lib/format-spell-metadata'
 
 const SPELL_LEVEL_FILTER_OPTIONS = Array.from(

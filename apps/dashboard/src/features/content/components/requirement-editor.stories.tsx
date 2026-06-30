@@ -6,8 +6,8 @@ import { GRAPPLER } from '../feats/fixtures'
 import {
   requirementEditorDefaultValue,
   type PrerequisiteEditorValue,
-} from '../lib/requirement-editor-form-schema'
-import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
+} from '../lib/forms/requirement-editor-form-schema'
+import { requirementExpressionToEditor } from '../lib/forms/requirement-editor-form-values'
 import { RequirementEditor } from './requirement-editor.client'
 
 const meta = {

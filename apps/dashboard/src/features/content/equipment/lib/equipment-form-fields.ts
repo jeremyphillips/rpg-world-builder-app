@@ -29,9 +29,9 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { economyFields } from '../../lib/content-economy-form-fields'
-import { identityFields } from '../../lib/content-identity-form-fields'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { economyFields } from '../../lib/forms/content-economy-form-fields'
+import { identityFields } from '../../lib/forms/content-identity-form-fields'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   allRegisteredKindFieldGroups,
   fieldGroupsForEquipmentKind,

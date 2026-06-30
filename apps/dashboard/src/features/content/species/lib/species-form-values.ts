@@ -1,7 +1,7 @@
 import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/content-form-registry'
+import { envelopeSlugFields, finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'
 import {
   characterCreationFromFormValues,

@@ -8,7 +8,7 @@ import {
   stampDataColumns,
 } from '@/lib/data-table/column-builders'
 
-import { getContentImageUrl } from './content-image-url'
+import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 
 /**

@@ -6,8 +6,8 @@ import { ROUTES } from '@/app/routes'
 import { useCreatureTypeVocabulary } from '@/features/homebrew'
 import { useSpecies } from '../hooks/use-species'
 import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
-import { ContentOverviewShell } from '../../lib/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
+import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
 
 function SpeciesRowActions({ row, campaignId }: { row: Species; campaignId: string }) {
   return (

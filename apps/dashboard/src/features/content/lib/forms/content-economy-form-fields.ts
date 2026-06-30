@@ -16,12 +16,12 @@ import {
 import {
   EQUIPMENT_COST_VALUE_DIGITS,
   costValueDigitsForKind,
-} from '../equipment/lib/equipment-cost-config'
+} from '../../equipment/lib/equipment-cost-config'
 import {
   EQUIPMENT_WEIGHT_VALUE_DIGITS,
   isWeightEquipmentKind,
   weightValueDigitsForKind,
-} from '../equipment/lib/equipment-weight-config'
+} from '../../equipment/lib/equipment-weight-config'
 import { scalarUnitInputSelectField } from './content-speed-form-fields'
 
 type GroupField = FieldConfig | RowConfig

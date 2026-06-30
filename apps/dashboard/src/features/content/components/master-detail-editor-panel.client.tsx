@@ -3,8 +3,8 @@
 import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
-import type { UseMasterDetailArrayResult } from '../lib/use-master-detail-array'
-import { resolveMasterDetailRowKey } from '../lib/content-campaign-availability'
+import type { UseMasterDetailArrayResult } from '../lib/master-detail/use-master-detail-array'
+import { resolveMasterDetailRowKey } from '../lib/master-detail/content-campaign-availability'
 import { MasterDetailActiveToggle } from './master-detail-active-toggle.client'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
 

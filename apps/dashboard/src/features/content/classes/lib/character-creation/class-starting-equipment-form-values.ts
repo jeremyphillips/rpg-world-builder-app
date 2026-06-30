@@ -10,9 +10,9 @@ import { buildItemDefaultValues } from '@rpg/ui/form'
 import {
   wealthGrantMoneyFromForm,
   wealthGrantMoneyToForm,
-} from '../../../lib/content-economy-form-fields'
-import { applyStableIdsForChoiceOptions } from '../../../lib/content-form-key-helpers'
-import type { ContentFormCtx } from '../../../lib/content-form-registry'
+} from '../../../lib/forms/content-economy-form-fields'
+import { applyStableIdsForChoiceOptions } from '../../../lib/forms/content-form-key-helpers'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
   startingEquipmentOptionItemFields,
   type StartingEquipmentForm,

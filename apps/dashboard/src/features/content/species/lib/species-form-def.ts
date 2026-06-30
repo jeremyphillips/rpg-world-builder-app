@@ -1,12 +1,12 @@
 import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 
-import { allowedCharacterCreatureTypesFromCtx } from '../../lib/creature-type-field-options'
+import { allowedCharacterCreatureTypesFromCtx } from '../../lib/form-options/creature-type-field-options'
 import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
-} from '../../lib/content-form-registry'
-import { finalizeContentInput } from '../../lib/content-form-key-helpers'
+} from '../../lib/forms/content-form-registry'
+import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
   buildSpeciesTabs,

@@ -1,4 +1,4 @@
-import { createContentListApi } from '../../lib/create-content-list'
+import { createContentListApi } from '../../lib/list/create-content-list'
 import type { Feat } from '@rpg/contracts'
 
 /** List all feats (system + homebrew) available in a campaign's ruleset. */

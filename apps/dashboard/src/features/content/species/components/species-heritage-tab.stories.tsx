@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesHeritageTab } from './species-heritage-tab.client'
 
 const meta = {

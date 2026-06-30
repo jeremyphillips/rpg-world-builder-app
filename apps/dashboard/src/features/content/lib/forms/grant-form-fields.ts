@@ -25,8 +25,8 @@ import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from
 
 import type { ContentFormCtx } from './content-form-registry'
 import { feetInputUnitField } from './content-identity-form-fields'
-import { getLevelFieldOptions, levelSelectDigits } from './level-field-options'
-import { titleCase } from './title-case'
+import { getLevelFieldOptions, levelSelectDigits } from '../form-options/level-field-options'
+import { titleCase } from '../utils/title-case'
 
 const senseTypeOptions = toOptions(
   SENSE_TYPES,

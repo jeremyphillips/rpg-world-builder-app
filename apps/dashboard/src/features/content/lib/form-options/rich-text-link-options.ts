@@ -4,8 +4,8 @@ import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOpt
 
 import { CONTENT_ROUTES } from '@/app/content-routes'
 
-import { useFeats } from '../feats/hooks/use-feats'
-import { useSpells } from '../spells/hooks/use-spells'
+import { useFeats } from '../../feats/hooks/use-feats'
+import { useSpells } from '../../spells/hooks/use-spells'
 
 export type LinkableContentType = 'spell' | 'feat'
 

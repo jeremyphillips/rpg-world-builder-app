@@ -9,8 +9,8 @@ import {
   type Spellcasting,
 } from '@rpg/contracts'
 
-import { envelopeSlugFields } from '../../lib/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/content-form-registry'
+import { envelopeSlugFields } from '../../lib/forms/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import type { ClassFormValues } from './class-form-fields'
 import { syncAsiFeatures } from './class-asi-features'

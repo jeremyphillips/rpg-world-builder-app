@@ -13,23 +13,23 @@ import {
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { RequirementEditor } from '../../components/requirement-editor.client'
-import { identityFields } from '../../lib/content-identity-form-fields'
+import { identityFields } from '../../lib/forms/content-identity-form-fields'
 import {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormInputCtx,
   type ContentFormCtx,
-} from '../../lib/content-form-registry'
-import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
-import { refineRequirementEditor } from '../../lib/requirement-editor-form'
+} from '../../lib/forms/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
+import { refineRequirementEditor } from '../../lib/forms/requirement-editor-form'
 import {
   prerequisiteEditorSchema,
   requirementEditorDefaultValue,
-} from '../../lib/requirement-editor-form-schema'
+} from '../../lib/forms/requirement-editor-form-schema'
 import {
   requirementEditorToExpression,
   requirementExpressionToEditor,
-} from '../../lib/requirement-editor-form-values'
+} from '../../lib/forms/requirement-editor-form-values'
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
 
 const featCategoryOptions = toOptions(

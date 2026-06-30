@@ -5,8 +5,8 @@ import type { Feat } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { useFeats } from '../hooks/use-feats'
 import { featsColumns, featsFilters } from '../lib/feats-overview-columns'
-import { ContentOverviewShell } from '../../lib/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
+import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
+import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
 
 function FeatRowActions({ row, campaignId }: { row: Feat; campaignId: string }) {
   return (

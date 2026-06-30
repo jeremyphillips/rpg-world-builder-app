@@ -1,4 +1,4 @@
-import { createContentQueryHook } from '../../lib/create-content-list'
+import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { listSpells } from '../api/spells-api'
 
 const spellsContentList = createContentQueryHook(

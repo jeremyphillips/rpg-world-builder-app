@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickFeat, pickSpell } from './fixtures/pick'
+import { pickFeat, pickSpell } from '../fixtures/pick'
 import {
   RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,
   buildRichTextInternalLinkOptions,

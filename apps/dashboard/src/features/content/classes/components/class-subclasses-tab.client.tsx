@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form'
 
 import type { Subclass } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from '../lib/class-form-constants'

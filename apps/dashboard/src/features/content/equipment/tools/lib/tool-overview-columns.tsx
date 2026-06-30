@@ -8,7 +8,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 
 const TOOL_MIDDLE_COLUMNS: ColumnDef<ToolEquipment>[] = [
   {

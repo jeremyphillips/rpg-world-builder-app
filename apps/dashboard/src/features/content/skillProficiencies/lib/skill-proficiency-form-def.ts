@@ -10,13 +10,13 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-identity-form-fields'
+import { identityFields } from '../../lib/forms/content-identity-form-fields'
 import {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormInputCtx,
-} from '../../lib/content-form-registry'
-import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
+} from '../../lib/forms/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 
 const abilityOptions = toOptions(

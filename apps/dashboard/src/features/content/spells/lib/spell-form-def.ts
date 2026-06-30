@@ -4,7 +4,7 @@ import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
-} from '../../lib/content-form-registry'
+} from '../../lib/forms/content-form-registry'
 import { useSpells, spellsQueryKey } from '../hooks/use-spells'
 import { buildSpellTabs, spellFormSchema, type SpellFormValues } from './spell-form-fields'
 import {

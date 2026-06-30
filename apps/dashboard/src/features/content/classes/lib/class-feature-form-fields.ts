@@ -2,20 +2,20 @@ import { z } from 'zod'
 import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
-import { grantArrayFields } from '../../lib/grant-form-fields'
+import { grantArrayFields } from '../../lib/forms/grant-form-fields'
 import {
   CLASS_GRANT_TYPES,
   CLASS_GRANT_TYPE_LABELS,
   createGrantRowFormSchema,
-} from '../../lib/grant-form-schema'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/grant-form-values'
-import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+} from '../../lib/forms/grant-form-schema'
+import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grant-form-values'
+import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   effectiveMaxFromCtx,
   getLevelFieldOptions,
   levelSelectDigits,
-} from '../../lib/level-field-options'
+} from '../../lib/form-options/level-field-options'
 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
