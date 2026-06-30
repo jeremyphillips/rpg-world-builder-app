@@ -1,12 +1,12 @@
 # content / spells
 
-Spell catalog: overview table, detail pages, and create/edit authoring for system seed + homebrew spells. Part of the [`content`](../README.md) feature; see [feature-conventions](../../../../docs/feature-conventions.md) for layout.
+Spell catalog: overview table, detail pages, and create/edit authoring for system seed + homebrew spells. Part of the [`content`](../README.md) feature; see [feature-structure.md](../../../../docs/feature-structure.md) for layout.
 
 ## Scope
 
 - **In:** list (`useSpells`), overview table (level/school filters), detail stat rows,
-  HTML description, class links, tag chips, create/edit routes, `spell-form-def.ts`,
-  row actions.
+  HTML description, class links, tag chips, create/edit routes, form modules under
+  `lib/spell-form-*.ts`, row actions.
 - **Form:** tabbed shell (Basics / Casting / Tags); class availability via combobox
   (spellcasting classes only — see below); tag vocabularies via chips.
 
@@ -38,9 +38,15 @@ a description such as “Does not have spellcasting”.
 
 ## Key files
 
-| Piece         | Path                              |
-| ------------- | --------------------------------- |
-| Form def      | `lib/spell-form-def.ts`           |
-| Field helpers | `lib/spell-form-field-helpers.ts` |
-| Create route  | `routes/spell-create.tsx`         |
-| Edit route    | `routes/spell-edit.tsx`           |
+| Piece        | Path                       |
+| ------------ | -------------------------- |
+| Form def     | `lib/spell-form-def.ts`    |
+| Form fields  | `lib/spell-form-fields.ts` |
+| Form values  | `lib/spell-form-values.ts` |
+| Form labels  | `lib/spell-form-labels.ts` |
+| Create route | `routes/spell-create.tsx`  |
+| Edit route   | `routes/spell-edit.tsx`    |
+
+## Related docs
+
+- [form-lib-conventions.md](../../../../docs/form-lib-conventions.md) — form module splits and inventory

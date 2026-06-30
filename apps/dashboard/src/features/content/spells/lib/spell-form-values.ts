@@ -4,6 +4,9 @@ import {
   spellDurationSchema,
   spellRangeSchema,
   spellTagsSchema,
+  createSpellInputSchema,
+  spellDeliveryMethodSchema,
+  type CreateSpellInput,
   type Spell,
   type SpellCastingTime,
   type SpellComponents,
@@ -11,6 +14,11 @@ import {
   type SpellRange,
   type SpellTags,
 } from '@rpg/contracts'
+
+import { finalizeContentInput, slugForInputParse } from '../../lib/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/content-form-registry'
+import { SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
+import type { SpellFormValues } from './spell-form-fields'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -49,11 +57,25 @@ export type SpellFormTags = {
   conditions?: NonNullable<SpellTags['conditions']>
 }
 
-const EMPTY_SPELL_TAGS: SpellFormTags = {
+export const EMPTY_SPELL_TAGS: SpellFormTags = {
   roles: [],
   functions: [],
   damageTypes: [],
   conditions: [],
+}
+
+export const spellCreateDefaultValues: Partial<SpellFormValues> = {
+  level: 0,
+  classIds: [],
+  tags: { ...EMPTY_SPELL_TAGS },
+  castingTime: {
+    normal: { value: 1, unit: 'action' },
+    canBeCastAsRitual: false,
+  },
+  range: { kind: 'self' },
+  duration: { kind: 'instantaneous', value: 1, unit: 'round' },
+  components: { verbal: true, somatic: true, material: { enabled: false } },
+  deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
 
 export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): SpellFormCastingTime {
@@ -205,4 +227,47 @@ export function spellTagsFromFormValues(tags: SpellFormTags | undefined): SpellT
   return spellTagsSchema.parse(result)
 }
 
-export { EMPTY_SPELL_TAGS }
+export function spellToFormValues(entity: Spell): SpellFormValues {
+  return {
+    name: entity.name,
+    slug: entity.slug,
+    description: entity.description,
+    school: entity.school,
+    level: entity.level,
+    classIds: entity.classIds,
+    castingTime: spellCastingTimeToFormValues(entity.castingTime),
+    range: spellRangeToFormValues(entity.range),
+    duration: spellDurationToFormValues(entity.duration),
+    components: spellComponentsToFormValues(entity.components),
+    tags: spellTagsToFormValues(entity.tags),
+    deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
+  }
+}
+
+export function buildSpellCreateInput(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+): CreateSpellInput {
+  const rawDelivery = values.deliveryMethod?.trim()
+  const deliveryMethod =
+    rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
+      ? spellDeliveryMethodSchema.parse(rawDelivery)
+      : undefined
+
+  const input = createSpellInputSchema.parse({
+    slug: slugForInputParse(values.name, ctx),
+    name: values.name,
+    description: values.description || undefined,
+    school: values.school,
+    level: values.level,
+    classIds: values.classIds,
+    castingTime: spellCastingTimeFromFormValues(values.castingTime as SpellFormCastingTime),
+    range: spellRangeFromFormValues(values.range as SpellFormRange),
+    duration: spellDurationFromFormValues(values.duration as SpellFormDuration),
+    components: spellComponentsFromFormValues(values.components as SpellFormComponents),
+    tags: spellTagsFromFormValues(values.tags),
+    ...(deliveryMethod !== undefined && { deliveryMethod }),
+  })
+
+  return finalizeContentInput(input, ctx) as CreateSpellInput
+}

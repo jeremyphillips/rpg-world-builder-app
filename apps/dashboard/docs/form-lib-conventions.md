@@ -58,6 +58,7 @@ Defer subfolders until a concern outgrows flat prefixes.
 | Content — classes        | [`content/classes/README.md`](../src/features/content/classes/README.md)                       |
 | Content — species traits | `species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts` |
 | Content — species hub    | `species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`                      |
+| Content — spells         | `spell-form-def.ts`, `spell-form-fields.ts`, `spell-form-values.ts`, `spell-form-labels.ts`    |
 | Campaign — mechanics     | `campaign/lib/rules/mechanics/mechanics-form-*.ts`                                             |
 
 Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
@@ -78,8 +79,7 @@ this table when completing a form-lib alignment phase.
 | Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts` | aligned                                                                      |
 | Species heritage         | `species/lib/species-heritage-form-*.ts`                                              | aligned                                                                      |
 | Species rules            | `species/lib/species-rules-form-*.ts`                                                 | aligned                                                                      |
-| Spells                   | `spells/lib/spell-form-def.ts`                                                        | pending — split def / fields / values / labels                               |
-| Spell helpers            | `spells/lib/spell-form-field-helpers.ts`                                              | pending — merge into `spell-form-values.ts`                                  |
+| Spells                   | `spells/lib/spell-form-*.ts`                                                          | aligned                                                                      |
 | Equipment (hub)          | `equipment/lib/equipment-form-def.ts`                                                 | pending — thin def + `equipment-form-fields.ts`                              |
 | Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-input.ts`                                 | pending — rename `*-form-input.ts` → `*-form-values.ts`; move entity mappers |
 | Feats                    | `feats/lib/feat-form-def.ts`                                                          | pending (optional)                                                           |
