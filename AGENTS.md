@@ -47,7 +47,9 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
 - Forms: prefer the schema-driven `<Form>` (`@rpg/ui/form`) — the only
   `react-hook-form`-aware surface — over hand-wiring primitives. Layer choice,
   the a11y contract, `size`/`width` tokens, and conditional fields are documented
-  in [packages/ui/docs/forms.md](packages/ui/docs/forms.md).
+  in [packages/ui/docs/forms.md](packages/ui/docs/forms.md). Dashboard feature
+  `lib/` form modules (`*-form-fields`, `*-form-values`, …) →
+  [apps/dashboard/docs/form-lib-conventions.md](apps/dashboard/docs/form-lib-conventions.md).
 
 ## Accessibility
 

@@ -43,6 +43,12 @@ src/features/<feature>/
 Nested folders (e.g. `content/spells/`) are part of their parent feature, not
 separate boundary elements, so imports within a feature are unrestricted.
 
+## Form lib
+
+Schema-driven form modules under `lib/` use the suffix and split rules in
+[form-lib-conventions.md](./form-lib-conventions.md) (`*-form-def`, `*-form-fields`,
+`*-form-values`, `*-form-labels`).
+
 ## Typography
 
 Content catalog detail routes (`src/features/content/**/routes/*-detail.tsx`)

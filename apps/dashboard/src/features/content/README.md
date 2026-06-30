@@ -39,7 +39,8 @@ stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 ## Tabbed create/edit forms
 
 Class and species create/edit shells use [`TabbedForm`](../../../packages/ui/docs/forms.md)
-when a `ContentFormDef` exposes `buildTabs`. Other content types still use a
+when a `ContentFormDef` exposes `buildTabs`. Form `lib/` file naming and split
+rules: [form-lib-conventions.md](../../../docs/form-lib-conventions.md). Other content types still use a
 single-page `<Form>`. See the TabbedForm validation note in `forms.md` if Save
 fails without a visible error — check inactive tabs.
 
