@@ -4,6 +4,7 @@ export {
   getContentTypeConfig,
   getContentWriteConfig,
   HOMEBREW_SUMMARY_TYPES,
+  isContentTypeName,
   isContentWriteType,
   resolveContentForCampaign,
   type ContentTypeName,

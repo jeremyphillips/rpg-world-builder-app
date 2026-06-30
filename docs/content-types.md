@@ -251,12 +251,12 @@ apps/api/src/features/content/
     data/srd-cc-5.2.1/<type>.json  ← System seed data
     seed.ts                        ← Validates JSON at module load, exports loaders
     seed.test.ts                   ← Count + structural assertions
-    <type>.config.ts               ← ContentTypeConfig wiring
+    <type>.config.ts               ← *Registration (read + write wiring)
     homebrew-<type>.model.ts       ← (when homebrew is needed) Mongoose schema
     <type>-patch.model.ts          ← (when patches are needed) Mongoose schema
-  content-types.ts                 ← Single-line registry entry
-  content.routes.ts                ← GET route declaration
-  content.controller.ts            ← Handler function
+  content-types.ts                 ← Single-line registry entry (*Registration)
+  content.routes.ts                ← GET /:contentType (registry-driven list)
+  content.controller.ts            ← listContent + write handlers
 apps/dashboard/src/features/content/<type>/          ← single-word: spells/; multi-word: skill-proficiencies/
   api/<type>-api.ts                ← fetch wrapper
   hooks/use-<type>.ts              ← TanStack Query hook + query key
@@ -544,37 +544,21 @@ loadPatches: async (_campaignId) => [],
 
 ### 6. Registry (`apps/api/src/features/content/content-types.ts`)
 
-Add one entry:
+Add one entry bundling the type's `*Registration`:
 
 ```typescript
-'<kebab-plural>': <type>ContentConfig,
+'<kebab-plural>': <type>Registration,
 ```
 
-### 7. Route + controller
+Optional: set `resolveForCampaign` on the entry when read logic differs from the default kernel (classes today — derived skill proficiencies).
 
-In `content.routes.ts`:
+### 7. List route (no new controller function)
 
-```typescript
-contentRouter.get(
-  '/<kebab-plural>',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.list < TypeName > s,
-)
-```
+List GET is registry-driven. After step 6, `GET /api/campaigns/:campaignId/content/<kebab-plural>` is served by the shared `listContent` handler — no change to `content.routes.ts` or `content.controller.ts`.
 
-In `content.controller.ts`:
+Ensure the registration's `write.responseKey` matches what the dashboard API client destructures (camelCase JSON key, e.g. `skillProficiencies` for `skill-proficiencies`).
 
-```typescript
-export async function list<TypeName>s(req: Request, res: Response): Promise<void> {
-  const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('<kebab-plural>')
-  const <camelPlural> = await resolveCatalogForCampaign(config, campaignId)
-  res.status(200).json({ <camelPlural> })
-}
-```
-
-Note: The JSON key in the response must match what the dashboard API client destructures.
+Bespoke list routes are reserved for shapes that differ from the catalog list (today: `GET …/classes/:classId/subclasses` only).
 
 ### 8. Dashboard API client (`apps/dashboard/src/features/content/<camelPlural>/api/<kebab-plural>-api.ts`)
 

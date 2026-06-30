@@ -64,6 +64,10 @@ export function isContentWriteType(type: string): type is ContentTypeName {
   return type in CONTENT_TYPES
 }
 
+export function isContentTypeName(type: string): type is ContentTypeName {
+  return isContentWriteType(type)
+}
+
 /** Resolve a campaign catalog for one content type (uses per-type override when set). */
 export async function resolveContentForCampaign(
   type: ContentTypeName,
