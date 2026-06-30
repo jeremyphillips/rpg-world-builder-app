@@ -4,7 +4,12 @@ import * as React from 'react'
 import { FormProvider, type FieldValues, type UseFormReturn } from 'react-hook-form'
 
 import { FileFieldPropsProvider } from './file-field-props.context'
-import { DEFAULT_FORM_RHYTHM, type FieldStackRhythm } from '../components/ui/field.variants'
+import {
+  DEFAULT_FORM_RHYTHM,
+  resolveFormFieldSize,
+  type FieldStackRhythm,
+} from '../components/ui/field.variants'
+import type { FieldSize } from '../components/ui/field.client'
 import { FormSectionContext } from './form-section-context.client'
 import type { FileFieldPropsMap } from './field-config'
 
@@ -15,6 +20,11 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   collapsibleSections: boolean
   /** Vertical gap between top-level fields/groups. Defaults to `comfortable` (`gap-6`). */
   rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
+   * `sm` and `comfortable` maps to `md`.
+   */
+  size?: FieldSize
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   className?: string | undefined
   children: React.ReactNode
@@ -27,13 +37,15 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   fileFieldProps,
   collapsibleSections,
   rhythm = DEFAULT_FORM_RHYTHM,
+  size,
   onSubmit,
   className,
   children,
 }: SchemaFormShellProps<TFieldValues>) {
+  const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
   const sectionContext = React.useMemo(
-    () => ({ collapsibleSections, depth: 0, rhythm }),
-    [collapsibleSections, rhythm],
+    () => ({ collapsibleSections, depth: 0, rhythm, size: resolvedSize }),
+    [collapsibleSections, rhythm, resolvedSize],
   )
 
   return (

@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldSizeTypographyClasses } from './field-sizing.variants'
+import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
  * Form layout spacing — single source of truth.
@@ -79,6 +79,25 @@ export function resolveFieldStackRhythm(options: {
   sectionDefault?: FieldStackRhythm | undefined
 }): FieldStackRhythm {
   return options.explicit ?? options.sectionDefault ?? options.inherited
+}
+
+/** Default control scale for form fields (`md`). */
+export const DEFAULT_FORM_FIELD_SIZE: FieldSizeToken = 'md'
+
+/** Resolves form-level field size: explicit prop → rhythm-derived (`compact` → `sm`). */
+export function resolveFormFieldSize(options: {
+  explicit?: FieldSizeToken | undefined
+  rhythm: FieldStackRhythm
+}): FieldSizeToken {
+  return options.explicit ?? (options.rhythm === 'compact' ? 'sm' : 'md')
+}
+
+/** Resolves leaf field size: per-field config overrides inherited form context. */
+export function resolveInheritedFieldSize(options: {
+  explicit?: FieldSizeToken | undefined
+  inherited: FieldSizeToken
+}): FieldSizeToken {
+  return options.explicit ?? options.inherited
 }
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {

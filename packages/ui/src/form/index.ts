@@ -8,6 +8,7 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './form-items.client'
+export { FormSectionProvider, type FormSectionProviderProps } from './form-section-context.client'
 export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldStackRhythmVariants, resolveFieldStackRhythm } from './field.variants'
+import {
+  fieldStackRhythmVariants,
+  resolveFieldStackRhythm,
+  resolveFormFieldSize,
+  resolveInheritedFieldSize,
+} from './field.variants'
 
 describe('fieldStackRhythmVariants', () => {
   it('applies compact gap by default', () => {
@@ -36,5 +41,29 @@ describe('resolveFieldStackRhythm', () => {
 
   it('inherits form rhythm when no override or section default', () => {
     expect(resolveFieldStackRhythm({ inherited: 'comfortable' })).toBe('comfortable')
+  })
+})
+
+describe('resolveFormFieldSize', () => {
+  it('maps compact rhythm to sm when size is omitted', () => {
+    expect(resolveFormFieldSize({ rhythm: 'compact' })).toBe('sm')
+  })
+
+  it('maps comfortable rhythm to md when size is omitted', () => {
+    expect(resolveFormFieldSize({ rhythm: 'comfortable' })).toBe('md')
+  })
+
+  it('prefers an explicit form size over rhythm mapping', () => {
+    expect(resolveFormFieldSize({ explicit: 'lg', rhythm: 'compact' })).toBe('lg')
+  })
+})
+
+describe('resolveInheritedFieldSize', () => {
+  it('prefers explicit field config size', () => {
+    expect(resolveInheritedFieldSize({ explicit: 'lg', inherited: 'sm' })).toBe('lg')
+  })
+
+  it('inherits context size when field config omits size', () => {
+    expect(resolveInheritedFieldSize({ inherited: 'sm' })).toBe('sm')
   })
 })

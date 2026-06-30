@@ -167,6 +167,12 @@ each item, and for nested groups within items — even when the form is
 `comfortable`. Pass `rhythm: 'comfortable'` on `ArrayConfig` for dense
 multi-field item blocks (e.g. grant rows with many dependents).
 
+**Field size follows rhythm unless overridden.** `rhythm: 'compact'` maps to
+`size: 'sm'` (`h-8`, `text-xs` labels) for leaf fields; `comfortable` maps to
+`md`. Pass an explicit `size` on `<Form>` / `<TabbedForm>` to override the
+whole form, or `size: 'md'` on individual `FieldConfig` entries (e.g.
+richtext, file, editable grid) that should stay larger in compact layouts.
+
 Dense chip fields (many options) should stack as full-width siblings, not share a `FieldRow` — rows
 are for short combinations (e.g. a small chip set beside a select).
 

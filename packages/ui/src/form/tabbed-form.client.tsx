@@ -6,6 +6,7 @@ import type { ZodType } from 'zod'
 
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { type FileFieldPropsMap, type FormValueSync } from './field-config'
+import type { FieldSize } from '../components/ui/field.client'
 import type { FieldStackRhythm } from '../components/ui/field.variants'
 import { FormValueSyncEffects } from './form-value-sync-effects.client'
 import {
@@ -56,6 +57,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    */
   rhythm?: FieldStackRhythm
   /**
+   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
+   * `sm` and `comfortable` maps to `md`.
+   */
+  size?: FieldSize
+  /**
    * When true (default), the tab list sticks to the top and the footer sticks to
    * the bottom while scrolling long panels.
    */
@@ -93,6 +99,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   mode,
   collapsibleSections = true,
   rhythm,
+  size,
   stickyChrome = true,
   stickyTabsClassName,
   stickyActionsBarClassName,
@@ -122,6 +129,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
       rhythm={rhythm}
+      size={size}
       onSubmit={onSubmit}
       className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >

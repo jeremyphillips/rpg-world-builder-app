@@ -332,7 +332,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
   })
   const arrayChildContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, arrayRhythm),
+    () => buildFormSectionChildContext(parentContext, depth, { rhythm: arrayRhythm }),
     [parentContext, depth, arrayRhythm],
   )
 
@@ -367,7 +367,7 @@ function CollapsibleFormSection({
         })
       : resolveFieldStackRhythm({ explicit: item.rhythm, inherited: parentContext.rhythm })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, 0, sectionRhythm),
+    () => buildFormSectionChildContext(parentContext, 0, { rhythm: sectionRhythm }),
     [parentContext, sectionRhythm],
   )
   const sectionValue = getSectionValue(item, index)
@@ -463,7 +463,7 @@ function GroupFieldSection({ item, idPrefix, namePrefix, depth }: GroupFieldSect
     inherited: parentContext.rhythm,
   })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, groupRhythm),
+    () => buildFormSectionChildContext(parentContext, depth, { rhythm: groupRhythm }),
     [parentContext, depth, groupRhythm],
   )
 
@@ -567,7 +567,7 @@ function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) 
   const parentContext = useFormSectionContext()
   const rhythm = item.rhythm ?? 'compact'
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, rhythm),
+    () => buildFormSectionChildContext(parentContext, depth, { rhythm }),
     [parentContext, depth, rhythm],
   )
   const layout = item.layout ?? 'default'
@@ -724,7 +724,7 @@ function ConditionalArrayField({
     sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
   })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, arrayRhythm),
+    () => buildFormSectionChildContext(parentContext, depth, { rhythm: arrayRhythm }),
     [parentContext, depth, arrayRhythm],
   )
 

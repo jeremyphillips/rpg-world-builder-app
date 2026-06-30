@@ -29,6 +29,8 @@ import {
   resolveFieldHint,
 } from './field-config'
 import { useDependsOnValues } from './form-depends-on.client'
+import { useFormSectionContext } from './form-section-context.client'
+import { resolveInheritedFieldSize } from '../components/ui/field.variants'
 import type { JsonFieldProps } from '../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../components/ui/rich-text-field'
 import type { FileFieldProps } from '../components/ui/file-field.client'
@@ -438,6 +440,7 @@ export interface FieldRendererProps {
  * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
+  const { size: inheritedSize } = useFormSectionContext()
   const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
   const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
 
@@ -448,7 +451,11 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
 
-  let renderConfig: FieldConfig = config
+  const resolvedSize = resolveInheritedFieldSize({
+    explicit: config.size,
+    inherited: inheritedSize,
+  })
+  let renderConfig: FieldConfig = { ...config, size: resolvedSize }
   if (resolvedHint !== config.hint) {
     renderConfig = { ...renderConfig, hint: resolvedHint }
   }

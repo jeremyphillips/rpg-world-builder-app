@@ -5,6 +5,7 @@ import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } fro
 import type { ZodType } from 'zod'
 
 import { Text } from '../components/ui/text'
+import type { FieldSize } from '../components/ui/field.client'
 import type { FieldStackRhythm } from '../components/ui/field.variants'
 import { FormItems } from './form-items.client'
 import { FormRhythmStack } from './form-section-context.client'
@@ -70,6 +71,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * (`gap-6`). Array sections default to `compact` regardless.
    */
   rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
+   * `sm` and `comfortable` maps to `md`.
+   */
+  size?: FieldSize
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
 }
@@ -96,6 +102,7 @@ export function Form<TFieldValues extends FieldValues>({
   collapsibleSections = true,
   stickyFooter = false,
   rhythm,
+  size,
   valueSyncs,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
@@ -125,6 +132,7 @@ export function Form<TFieldValues extends FieldValues>({
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
       rhythm={rhythm}
+      size={size}
       onSubmit={onSubmit}
       className={className}
     >

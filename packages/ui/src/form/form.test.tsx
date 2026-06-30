@@ -94,6 +94,41 @@ describe('Form', () => {
     expect(results.violations).toEqual([])
   })
 
+  it('uses sm control scale when rhythm is compact', () => {
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+        rhythm="compact"
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-8')
+  })
+
+  it('keeps md control scale on comfortable rhythm by default', () => {
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+  })
+
+  it('allows per-field size override in compact forms', () => {
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name', size: 'md' }]}
+        rhythm="compact"
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+  })
+
   it('renders schema rows with responsive grid layout without flex classes', () => {
     const rowSchema = z.object({
       first: z.string(),
