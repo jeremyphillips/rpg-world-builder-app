@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
 
 const walkSpeedSchema = z.object({
   speed: z.object({

@@ -1,4 +1,4 @@
-import type { ArrayConfig, GroupConfig } from './field-config'
+import type { ArrayConfig, GroupConfig } from '../field-config'
 
 /** In-memory fallback (tests / SSR). */
 const accordionOpenByBatchKey = new Map<string, string[]>()

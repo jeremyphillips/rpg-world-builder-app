@@ -8,13 +8,13 @@ For before/after size history, see [bundle-baseline.md](./bundle-baseline.md).
 
 ## Where splitting lives
 
-| Layer                      | Location                                                                                                    | Loads when                                                                       |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Route screens              | [`src/app/lazy-routes.ts`](../src/app/lazy-routes.ts)                                                       | First visit to that route                                                        |
-| Route Suspense fallback    | [`src/app/route-suspense.tsx`](../src/app/route-suspense.tsx)                                               | While a lazy route chunk resolves                                                |
-| Heavy form fields          | [`packages/ui/src/form/field-renderer.client.tsx`](../../../packages/ui/src/form/field-renderer.client.tsx) | First render of `json`, `richtext`, `file`, or `editableGrid` fields             |
-| Equipment overview columns | [`equipment-family-columns.ts`](../src/features/content/equipment/lib/shared/equipment-family-columns.ts)   | Per-family overview route                                                        |
-| Vendor libraries           | [`vite.config.ts`](../vite.config.ts) → `manualChunks`                                                      | First use (React/router/query at bootstrap; TipTap, table, dnd, Radix on demand) |
+| Layer                      | Location                                                                                                                        | Loads when                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Route screens              | [`src/app/lazy-routes.ts`](../src/app/lazy-routes.ts)                                                                           | First visit to that route                                                        |
+| Route Suspense fallback    | [`src/app/route-suspense.tsx`](../src/app/route-suspense.tsx)                                                                   | While a lazy route chunk resolves                                                |
+| Heavy form fields          | [`packages/ui/src/form/renderers/field-renderer.client.tsx`](../../../packages/ui/src/form/renderers/field-renderer.client.tsx) | First render of `json`, `richtext`, `file`, or `editableGrid` fields             |
+| Equipment overview columns | [`equipment-family-columns.ts`](../src/features/content/equipment/lib/shared/equipment-family-columns.ts)                       | Per-family overview route                                                        |
+| Vendor libraries           | [`vite.config.ts`](../vite.config.ts) → `manualChunks`                                                                          | First use (React/router/query at bootstrap; TipTap, table, dnd, Radix on demand) |
 
 ## Eager vs lazy routes
 

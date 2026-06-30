@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
-import { FormSaveFooter } from './form-save-footer'
+import { FormSaveFooter } from '../chrome/form-save-footer'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

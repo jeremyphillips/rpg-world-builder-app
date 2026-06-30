@@ -3,10 +3,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
-import { CardFooter } from '../components/ui/card'
-import { SubmitButton } from '../components/ui/submit-button'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
+import { CardFooter } from '../../components/ui/card'
+import { SubmitButton } from '../../components/ui/submit-button'
 
 function NotesSlot() {
   const { register } = useFormContext<{ notes: string }>()

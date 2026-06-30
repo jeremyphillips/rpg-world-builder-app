@@ -4,22 +4,22 @@ import * as React from 'react'
 import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { Text } from '../components/ui/text'
-import type { FieldSize } from '../components/ui/field.client'
-import type { FieldStackRhythm } from '../components/ui/field.variants'
-import { FormItems } from './form-items.client'
-import { FormRhythmStack } from './form-section-context.client'
+import { Text } from '../../components/ui/text'
+import type { FieldSize } from '../../components/ui/field.client'
+import type { FieldStackRhythm } from '../../components/ui/field.variants'
+import { FormItems } from '../containers/form-items.client'
+import { FormRhythmStack } from '../context/form-section.context'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { makeResolver } from './resolver'
+import { makeResolver } from '../config/form-resolver'
 import {
   buildDefaultValues,
   type FileFieldPropsMap,
   type FormItem,
   type FormValueSync,
-} from './field-config'
-import { FormActionsBar } from './form-actions-bar'
-import { formFooterSpacingClasses } from './form-chrome.variants'
-import { FormValueSyncEffects } from './form-value-sync-effects.client'
+} from '../field-config'
+import { FormActionsBar } from '../chrome/form-actions-bar'
+import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
+import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */

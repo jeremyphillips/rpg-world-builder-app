@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { FileFieldPropsMap, FileFieldRemotePreview } from './field-config'
+import type { FileFieldPropsMap, FileFieldRemotePreview } from '../field-config'
 
 const FileFieldPropsContext = React.createContext<FileFieldPropsMap>({})
 

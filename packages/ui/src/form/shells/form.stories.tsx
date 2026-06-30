@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
 import { Form } from './form.client'
-import type { FormItem } from './field-config'
-import { CardFooter } from '../components/ui/card'
-import { SubmitButton } from '../components/ui/submit-button'
+import type { FormItem } from '../field-config'
+import { CardFooter } from '../../components/ui/card'
+import { SubmitButton } from '../../components/ui/submit-button'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

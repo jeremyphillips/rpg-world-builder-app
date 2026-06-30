@@ -2,12 +2,17 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
-import { Wizard, WizardFooter, useWizard, type WizardStepDef } from '../components/ui/wizard.client'
-import { cn } from '../lib/utils'
-import { Text } from '../components/ui/text'
-import { fieldLabelVariants } from '../components/ui/field.variants'
+import {
+  Wizard,
+  WizardFooter,
+  useWizard,
+  type WizardStepDef,
+} from '../../components/ui/wizard.client'
+import { cn } from '../../lib/utils'
+import { Text } from '../../components/ui/text'
+import { fieldLabelVariants } from '../../components/ui/field.variants'
 import { WizardStepForm } from './wizard-step-form.client'
-import type { FormItem } from './field-config'
+import type { FormItem } from '../field-config'
 
 const meta = {
   title: 'Forms/WizardStepForm',

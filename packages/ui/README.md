@@ -36,7 +36,7 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `SubmitButton`, `SubmitButtonProps`          | component  | `type="submit"` button with pending state + label                                                                                                            |
 | `Spinner`, `SpinnerProps`, `spinnerVariants` | component  | Accessible loading indicator; `variant` (`muted` default, `foreground`); `size` (`sm` … `xl`)                                                                |
 | `Wizard`, `WizardFooter`, `useWizard`        | component  | Multi-step form wizard; schema-agnostic; per-step `<Form>` pattern; see [Wizard pattern](#wizard-pattern) below                                              |
-| `@rpg/ui/form`                               | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer)                                                                                     |
+| `@rpg/ui/form`                               | subpath    | Schema-driven `<Form>` renderer (the only `react-hook-form`-aware layer); source layout → [`src/form/README.md`](src/form/README.md)                         |
 | `@rpg/ui/styles.css`                         | stylesheet | Tailwind + design tokens (the shared "preset")                                                                                                               |
 | `@rpg/ui/lib/utils`                          | util       | Direct path to `cn` for shadcn's CLI alias                                                                                                                   |
 

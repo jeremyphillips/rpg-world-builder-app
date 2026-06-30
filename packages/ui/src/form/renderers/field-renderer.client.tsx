@@ -3,53 +3,53 @@
 import * as React from 'react'
 import { useController, type ControllerRenderProps } from 'react-hook-form'
 
-import { CheckboxField } from '../components/ui/checkbox-field'
-import { ChipsField } from '../components/ui/chips-field.client'
-import { ComboboxField } from '../components/ui/combobox-field.client'
-import { NumberField } from '../components/ui/number-field'
-import { RadioCardField } from '../components/ui/radio-card-field'
-import { RadioGroupField } from '../components/ui/radio-group-field'
-import { SelectField } from '../components/ui/select-field'
-import { SwitchField } from '../components/ui/switch-field'
-import { TextareaField } from '../components/ui/textarea-field'
-import { TextField } from '../components/ui/text-field'
-import { MarkdownField } from '../components/ui/markdown-field.client'
-import { useFileFieldRemotePreview } from './file-field-props.context'
+import { CheckboxField } from '../../components/ui/checkbox-field'
+import { ChipsField } from '../../components/ui/chips-field.client'
+import { ComboboxField } from '../../components/ui/combobox-field.client'
+import { NumberField } from '../../components/ui/number-field'
+import { RadioCardField } from '../../components/ui/radio-card-field'
+import { RadioGroupField } from '../../components/ui/radio-group-field'
+import { SelectField } from '../../components/ui/select-field'
+import { SwitchField } from '../../components/ui/switch-field'
+import { TextareaField } from '../../components/ui/textarea-field'
+import { TextField } from '../../components/ui/text-field'
+import { MarkdownField } from '../../components/ui/markdown-field.client'
+import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
-import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
-import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
+import { DiceFormulaField } from '../../components/ui/dice-formula-field.client'
+import type { DiceFormulaValue } from '../../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type { FieldConfig, FieldType, InputSelectFieldConfig } from './field-config'
+import type { FieldConfig, FieldType, InputSelectFieldConfig } from '../field-config'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   resolveFieldHint,
-} from './field-config'
-import { useDependsOnValues } from './form-depends-on.client'
-import { useFormSectionContext } from './form-section-context.client'
-import { resolveInheritedFieldSize } from '../components/ui/field.variants'
-import type { JsonFieldProps } from '../components/ui/json-field.client'
-import type { RichTextFieldProps } from '../components/ui/rich-text-field'
-import type { FileFieldProps } from '../components/ui/file-field.client'
-import type { EditableGridFieldRendererProps } from './editable-grid-field.client'
+} from '../field-config'
+import { useDependsOnValues } from '../config/form-depends-on.client'
+import { useFormSectionContext } from '../context/form-section.context'
+import { resolveInheritedFieldSize } from '../../components/ui/field.variants'
+import type { JsonFieldProps } from '../../components/ui/json-field.client'
+import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
+import type { FileFieldProps } from '../../components/ui/file-field.client'
+import type { EditableGridFieldRendererProps } from './editable-grid-field-renderer.client'
 
 const LazyJsonField = lazyFieldComponent<JsonFieldProps>(
-  () => import('../components/ui/json-field.client'),
+  () => import('../../components/ui/json-field.client'),
   'JsonField',
 )
 const LazyRichTextField = lazyFieldComponent<RichTextFieldProps>(
-  () => import('../components/ui/rich-text-field'),
+  () => import('../../components/ui/rich-text-field'),
   'RichTextField',
 )
 const LazyFileField = lazyFieldComponent<FileFieldProps>(
-  () => import('../components/ui/file-field.client'),
+  () => import('../../components/ui/file-field.client'),
   'FileField',
 )
 const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRendererProps>(
-  () => import('./editable-grid-field.client'),
+  () => import('./editable-grid-field-renderer.client'),
   'EditableGridFieldRenderer',
 )
 

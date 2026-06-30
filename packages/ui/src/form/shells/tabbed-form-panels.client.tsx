@@ -4,20 +4,20 @@ import * as React from 'react'
 import { useForm, type DefaultValues, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { cn } from '../lib/utils'
-import { fieldStackRhythmVariants } from '../components/ui/field.variants'
-import { Text } from '../components/ui/text'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
-import { FormItems } from './form-items.client'
-import { useFormSectionContext } from './form-section-context.client'
-import { makeResolver } from './resolver'
-import { buildDefaultValues, type FormItem } from './field-config'
-import { FormActionsBar } from './form-actions-bar'
+import { cn } from '../../lib/utils'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
+import { Text } from '../../components/ui/text'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs.client'
+import { FormItems } from '../containers/form-items.client'
+import { useFormSectionContext } from '../context/form-section.context'
+import { makeResolver } from '../config/form-resolver'
+import { buildDefaultValues, type FormItem } from '../field-config'
+import { FormActionsBar } from '../chrome/form-actions-bar'
 import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
   formTabPanelsBottomPaddingClasses,
-} from './form-chrome.variants'
+} from '../chrome/form-chrome.variants'
 
 /** A single tab definition: an id, a display label, and its ordered fields. */
 export interface TabbedFormTab {

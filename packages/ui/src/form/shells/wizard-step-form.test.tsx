@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
 
-import { Wizard, type WizardStepDef } from '../components/ui/wizard.client'
+import { Wizard, type WizardStepDef } from '../../components/ui/wizard.client'
 import { WizardStepForm } from './wizard-step-form.client'
-import type { FormItem } from './field-config'
+import type { FormItem } from '../field-config'
 
 const steps: WizardStepDef[] = [
   { id: 'one', label: 'One' },

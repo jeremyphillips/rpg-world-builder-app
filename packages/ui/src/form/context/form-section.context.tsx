@@ -2,15 +2,15 @@
 
 import * as React from 'react'
 
-import type { FieldSize } from '../components/ui/field.client'
+import type { FieldSize } from '../../components/ui/field.client'
 import {
   DEFAULT_FORM_FIELD_SIZE,
   DEFAULT_FORM_RHYTHM,
   fieldStackRhythmVariants,
   resolveFormFieldSize,
   type FieldStackRhythm,
-} from '../components/ui/field.variants'
-import { cn } from '../lib/utils'
+} from '../../components/ui/field.variants'
+import { cn } from '../../lib/utils'
 
 export interface FormSectionContextValue {
   /** When false, sections render as plain fieldsets. Defaults to true on `<Form>`. */

@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
 
 const schema = z.object({
   mode: z.enum(['melee', 'ranged']),

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import axe from 'axe-core'
-import { Text } from '../components/ui/text'
+import { Text } from '../../components/ui/text'
 
 import { LazyFieldSuspense } from './lazy-field.client'
 

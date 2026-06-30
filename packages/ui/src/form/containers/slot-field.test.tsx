@@ -5,9 +5,9 @@ import { useFormContext } from 'react-hook-form'
 import axe from 'axe-core'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import { useFormSectionContext } from './form-section-context.client'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import { useFormSectionContext } from '../context/form-section.context'
+import type { FormItem } from '../field-config'
 
 function SlotSizeProbe() {
   const { size } = useFormSectionContext()

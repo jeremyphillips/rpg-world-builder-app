@@ -4,9 +4,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import { resetAccordionBatchStateForTests } from './form-accordion-state'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import { resetAccordionBatchStateForTests } from '../config/form-accordion-state'
+import type { FormItem } from '../field-config'
 
 const schema = z.object({
   title: z.string(),

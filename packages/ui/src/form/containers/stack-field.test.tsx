@@ -4,13 +4,13 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
 
-import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
+import { fieldStackDependentsChromeVariants } from '../../components/ui/field-stack.variants'
 import {
   fieldStackRhythmVariants,
   fieldToggleDependentIndentClasses,
-} from '../components/ui/field.variants'
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
+} from '../../components/ui/field.variants'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
 
 const schema = z.object({
   featureEnabled: z.boolean(),

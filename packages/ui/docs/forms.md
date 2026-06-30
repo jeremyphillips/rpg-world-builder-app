@@ -179,9 +179,9 @@ Array item conditionals use **relative** `dependsOn` names — see
 **Primitives never import `react-hook-form`.** They take `error?: string` and standard
 `value`/`onChange`.
 
-`<Form>` ([form.client.tsx](../src/form/form.client.tsx)) owns RHF: `<form>` + `FormProvider`,
+`<Form>` ([form.client.tsx](../src/form/shells/form.client.tsx)) owns RHF: `<form>` + `FormProvider`,
 synthesized `defaultValues`, per-field `FieldRenderer` (`useController`), and a
-`type → wrapper` registry ([field-renderer.client.tsx](../src/form/field-renderer.client.tsx)).
+`type → wrapper` registry ([field-renderer.client.tsx](../src/form/renderers/field-renderer.client.tsx)).
 
 **Custom controls:**
 

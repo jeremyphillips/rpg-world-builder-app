@@ -3,9 +3,9 @@
 import type { DefaultValues, FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { WizardFooter, useWizard } from '../components/ui/wizard.client'
+import { WizardFooter, useWizard } from '../../components/ui/wizard.client'
 import { Form } from './form.client'
-import type { FileFieldPropsMap, FormItem } from './field-config'
+import type { FileFieldPropsMap, FormItem } from '../field-config'
 
 export interface WizardStepFormProps<TFieldValues extends FieldValues> {
   /** Zod schema for this step's fields only. */

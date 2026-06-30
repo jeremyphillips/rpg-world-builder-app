@@ -6,12 +6,12 @@ import {
   EditableGrid,
   type EditableGridColumn,
   type EditableGridValue,
-} from '../components/ui/editable-grid.client'
+} from '../../components/ui/editable-grid.client'
 import {
   editableGridDependsOn,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
-} from './field-config'
+} from '../field-config'
 
 function watchedRecord(dependsOn: string[], watched: unknown[]): Record<string, unknown> {
   const values: Record<string, unknown> = {}

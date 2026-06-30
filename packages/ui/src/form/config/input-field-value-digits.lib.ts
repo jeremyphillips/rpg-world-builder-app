@@ -1,4 +1,4 @@
-import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import type { FieldDigits } from '../../components/ui/field-digit-metrics'
 
 export interface ValueDigitsFieldConfig {
   valueDigits?: FieldDigits

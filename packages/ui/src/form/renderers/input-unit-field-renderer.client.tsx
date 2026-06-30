@@ -3,9 +3,9 @@
 import type { ControllerRenderProps } from 'react-hook-form'
 import { useWatch } from 'react-hook-form'
 
-import { InputUnitField } from '../components/ui/input-select-field.client'
-import { resolveValueDigitsFromConfig } from './input-field-value-digits'
-import type { InputUnitFieldConfig } from './field-config'
+import { InputUnitField } from '../../components/ui/input-select-field.client'
+import { resolveValueDigitsFromConfig } from '../config/input-field-value-digits.lib'
+import type { InputUnitFieldConfig } from '../field-config'
 
 export interface InputUnitFieldRendererProps {
   config: InputUnitFieldConfig

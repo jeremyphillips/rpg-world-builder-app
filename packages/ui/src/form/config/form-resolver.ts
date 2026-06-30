@@ -2,7 +2,7 @@ import type { FieldValues, Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
-import { hiddenFieldNames, type FormItem } from './field-config'
+import { hiddenFieldNames, type FormItem } from '../field-config'
 
 /**
  * A schema as duck-typed for the hidden-field omission below. We avoid

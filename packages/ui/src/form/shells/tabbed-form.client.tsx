@@ -5,10 +5,10 @@ import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { type FileFieldPropsMap, type FormValueSync } from './field-config'
-import type { FieldSize } from '../components/ui/field.client'
-import type { FieldStackRhythm } from '../components/ui/field.variants'
-import { FormValueSyncEffects } from './form-value-sync-effects.client'
+import { type FileFieldPropsMap, type FormValueSync } from '../field-config'
+import type { FieldSize } from '../../components/ui/field.client'
+import type { FieldStackRhythm } from '../../components/ui/field.variants'
+import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -16,7 +16,7 @@ import {
   useTabbedFormSetup,
   type TabbedFormFooterWrapperProps,
   type TabbedFormTab,
-} from './tabbed-form-parts.client'
+} from './tabbed-form-panels.client'
 
 export type { TabbedFormFooterWrapperProps, TabbedFormTab }
 

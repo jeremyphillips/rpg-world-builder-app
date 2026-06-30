@@ -9,9 +9,9 @@ import {
   fieldDefaultValue,
   type EditableGridFieldConfig,
   type FormItem,
-} from './field-config'
-import { resolveEditableGridColumns } from './editable-grid-field.client'
-import { Form } from './form.client'
+} from '../field-config'
+import { resolveEditableGridColumns } from './editable-grid-field-renderer.client'
+import { Form } from '../shells/form.client'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

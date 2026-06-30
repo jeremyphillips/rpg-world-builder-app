@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
 import {
   DEFAULT_DICE_FORMULA_VALUE,
   DEFAULT_DICE_FORMULA_WITH_MODIFIER,
-} from '../components/ui/dice-formula-field.lib'
+} from '../../components/ui/dice-formula-field.lib'
 
 const schema = z.object({
   roll: z.object({

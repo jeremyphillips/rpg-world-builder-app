@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import axe from 'axe-core'
 
-import { Button } from '../components/ui/button.client'
+import { Button } from '../../components/ui/button.client'
 import { FormFooterActions } from './form-footer-actions'
 
 describe('FormFooterActions', () => {

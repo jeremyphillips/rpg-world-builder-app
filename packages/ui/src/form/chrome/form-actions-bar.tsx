@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '../lib/utils'
-import { Text } from '../components/ui/text'
+import { cn } from '../../lib/utils'
+import { Text } from '../../components/ui/text'
 import { formStickyActionsBarClasses } from './form-chrome.variants'
 
 export interface FormActionsBarProps {

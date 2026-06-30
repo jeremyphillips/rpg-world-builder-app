@@ -79,10 +79,10 @@ Keep step values **flat**; map to API shape in `onComplete`. Review step: plain 
 
 Copy runnable examples from Storybook rather than docs:
 
-| Recipe           | Storybook path                                                     |
-| ---------------- | ------------------------------------------------------------------ |
-| Multi-group form | `Forms/Form` — [form.stories.tsx](../../src/form/form.stories.tsx) |
-| XdY dice         | `Recipes/DiceNotation`, `Forms/DiceFormulaField`                   |
-| Input unit row   | `FieldRow/LabeledRowWithInputUnit`                                 |
-| Input select row | `FieldRow/LabeledRowWithInputSelect`                               |
-| Dice formula row | `FieldRow/LabeledRowWithDiceFormula`                               |
+| Recipe           | Storybook path                                                            |
+| ---------------- | ------------------------------------------------------------------------- |
+| Multi-group form | `Forms/Form` — [form.stories.tsx](../../src/form/shells/form.stories.tsx) |
+| XdY dice         | `Recipes/DiceNotation`, `Forms/DiceFormulaField`                          |
+| Input unit row   | `FieldRow/LabeledRowWithInputUnit`                                        |
+| Input select row | `FieldRow/LabeledRowWithInputSelect`                                      |
+| Dice formula row | `FieldRow/LabeledRowWithDiceFormula`                                      |

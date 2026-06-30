@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '../lib/utils'
-import { Text } from '../components/ui/text'
-import { SubmitButton } from '../components/ui/submit-button'
+import { cn } from '../../lib/utils'
+import { Text } from '../../components/ui/text'
+import { SubmitButton } from '../../components/ui/submit-button'
 import {
   formActionsBarActionsRowClasses,
   formActionsBarLeadingGroupClasses,

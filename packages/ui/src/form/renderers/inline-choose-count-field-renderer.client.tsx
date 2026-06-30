@@ -2,8 +2,8 @@
 
 import type { ControllerRenderProps } from 'react-hook-form'
 
-import { InlineChooseCountField } from '../components/ui/inline-choose-count-field.client'
-import type { InlineChooseCountFieldConfig } from './field-config'
+import { InlineChooseCountField } from '../../components/ui/inline-choose-count-field.client'
+import type { InlineChooseCountFieldConfig } from '../field-config'
 
 export interface InlineChooseCountFieldRendererProps {
   config: InlineChooseCountFieldConfig

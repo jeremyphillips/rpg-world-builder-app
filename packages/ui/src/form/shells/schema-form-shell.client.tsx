@@ -3,15 +3,15 @@
 import * as React from 'react'
 import { FormProvider, type FieldValues, type UseFormReturn } from 'react-hook-form'
 
-import { FileFieldPropsProvider } from './file-field-props.context'
+import { FileFieldPropsProvider } from '../context/file-field-props.context'
 import {
   DEFAULT_FORM_RHYTHM,
   resolveFormFieldSize,
   type FieldStackRhythm,
-} from '../components/ui/field.variants'
-import type { FieldSize } from '../components/ui/field.client'
-import { FormSectionContext } from './form-section-context.client'
-import type { FileFieldPropsMap } from './field-config'
+} from '../../components/ui/field.variants'
+import type { FieldSize } from '../../components/ui/field.client'
+import { FormSectionContext } from '../context/form-section.context'
+import type { FileFieldPropsMap } from '../field-config'
 
 interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>

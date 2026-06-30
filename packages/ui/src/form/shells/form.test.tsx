@@ -5,7 +5,7 @@ import axe from 'axe-core'
 import { z } from 'zod'
 
 import { Form } from './form.client'
-import type { FormItem } from './field-config'
+import type { FormItem } from '../field-config'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

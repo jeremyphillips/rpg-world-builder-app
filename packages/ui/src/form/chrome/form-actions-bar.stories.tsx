@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Button } from '../components/ui/button.client'
+import { Button } from '../../components/ui/button.client'
 import { FormActionsBar } from './form-actions-bar'
 import { FormFooterActions } from './form-footer-actions'
 import { FormSaveFooter } from './form-save-footer'

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { Spinner } from '../components/ui/spinner'
+import { Spinner } from '../../components/ui/spinner'
 
 /** Suspense boundary for lazily loaded form field controls. */
 export function LazyFieldSuspense({ children }: { children: React.ReactNode }) {

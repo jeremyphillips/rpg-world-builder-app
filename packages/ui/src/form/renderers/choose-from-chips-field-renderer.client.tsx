@@ -2,8 +2,8 @@
 
 import { useController, type ControllerRenderProps } from 'react-hook-form'
 
-import { ChooseFromChipsField } from '../components/ui/choose-from-chips-field.client'
-import type { ChooseFromChipsFieldConfig } from './field-config'
+import { ChooseFromChipsField } from '../../components/ui/choose-from-chips-field.client'
+import type { ChooseFromChipsFieldConfig } from '../field-config'
 
 export interface ChooseFromChipsFieldRendererProps {
   config: ChooseFromChipsFieldConfig

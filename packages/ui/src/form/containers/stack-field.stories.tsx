@@ -2,8 +2,8 @@ import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
-import { Form } from './form.client'
-import type { FormItem } from './field-config'
+import { Form } from '../shells/form.client'
+import type { FormItem } from '../field-config'
 
 const stackSchema = z.object({
   advancedEnabled: z.boolean(),

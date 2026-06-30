@@ -2,9 +2,9 @@
 
 import { useController, useWatch } from 'react-hook-form'
 
-import { InputSelectField } from '../components/ui/input-select-field.client'
-import { resolveValueDigitsFromConfig } from './input-field-value-digits'
-import { fieldDefaultValue, type InputSelectFieldConfig } from './field-config'
+import { InputSelectField } from '../../components/ui/input-select-field.client'
+import { resolveValueDigitsFromConfig } from '../config/input-field-value-digits.lib'
+import { fieldDefaultValue, type InputSelectFieldConfig } from '../field-config'
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value)

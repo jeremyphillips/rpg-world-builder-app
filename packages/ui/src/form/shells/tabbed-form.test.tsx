@@ -9,7 +9,7 @@ import type { TabbedFormTab } from './tabbed-form.client'
 import {
   formStickyActionsBarTransparentClasses,
   formStickyTabsTransparentClasses,
-} from './form-chrome.variants'
+} from '../chrome/form-chrome.variants'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

@@ -9,8 +9,8 @@ import {
   fieldDefaultValue,
   type ComboboxFieldConfig,
   type FormItem,
-} from './field-config'
-import { Form } from './form.client'
+} from '../field-config'
+import { Form } from '../shells/form.client'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
