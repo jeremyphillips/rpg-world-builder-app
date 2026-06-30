@@ -8,7 +8,9 @@ import {
   EDITION_PRESET_ENTRIES,
   EDITION_PRESET_IDS,
   EDITION_PRESET_SET_ID,
+  LANGUAGE_SET_ID,
   SENSE_SET_ID,
+  SPELL_SCHOOL_SET_ID,
 } from '@rpg/contracts'
 
 import {
@@ -16,7 +18,9 @@ import {
   CREATURE_TYPES,
   DAMAGE_TYPES,
   EDITION_PRESETS,
+  LANGUAGES,
   SENSES,
+  SPELL_SCHOOLS,
   getSeedAttackResolutionModeEntry,
   getSeedAttackResolutionModeLabel,
   getSeedCreatureTypeEntry,
@@ -25,21 +29,31 @@ import {
   getSeedDamageTypeLabel,
   getSeedEditionPresetEntry,
   getSeedEditionPresetLabel,
+  getSeedLanguageCategory,
+  getSeedLanguageEntry,
+  getSeedLanguageLabel,
   getSeedSenseEntry,
   getSeedSenseLabel,
+  getSeedSpellSchoolEntry,
+  getSeedSpellSchoolLabel,
   getVocabularyOptionById,
   listSeedVocabularySetIds,
   loadSeedAttackResolutionModes,
   loadSeedCreatureTypes,
   loadSeedDamageTypes,
   loadSeedEditionPresets,
+  loadSeedLanguages,
   loadSeedSenses,
+  loadSeedSpellSchools,
   loadSeedVocabularyOptionSet,
   seedAttackResolutionModeIds,
   seedCreatureTypeIds,
   seedDamageTypeIds,
   seedEditionPresetIds,
+  seedLanguageIds,
+  seedLanguageIdsByCategory,
   seedSenseIds,
+  seedSpellSchoolIds,
   seedVocabularyOptionIds,
 } from './index'
 
@@ -164,6 +178,75 @@ describe('SRD 5.2.1 sense vocabulary seed', () => {
   })
 })
 
+describe('SRD 5.2.1 language vocabulary seed', () => {
+  const languages = loadSeedLanguages(RULESET)
+
+  it('loads the languages set', () => {
+    expect(languages.id).toBe(LANGUAGE_SET_ID)
+    expect(languages.options.length).toBe(18)
+  })
+
+  it('has unique ids and standard/rare categories on seed rows', () => {
+    const ids = languages.options.map((option) => option.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(seedLanguageIds(RULESET).size).toBe(18)
+    expect(seedLanguageIdsByCategory(RULESET, 'standard').length).toBe(9)
+    expect(seedLanguageIdsByCategory(RULESET, 'rare').length).toBe(9)
+    expect(getSeedLanguageCategory(RULESET, 'common')).toBe('standard')
+    expect(getSeedLanguageCategory(RULESET, 'druidic')).toBe('rare')
+  })
+
+  it('derives LANGUAGES from the seed list', () => {
+    expect([...LANGUAGES].sort()).toEqual([...seedLanguageIds(RULESET)].sort())
+  })
+
+  it('has a label and description for every seed language', () => {
+    for (const id of LANGUAGES) {
+      const entry = getSeedLanguageEntry(RULESET, id)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+      expect(entry?.category).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedLanguageLabel(RULESET, 'common')).toBe('Common')
+    expect(getSeedLanguageLabel(RULESET, 'custom')).toBe('custom')
+  })
+})
+
+describe('SRD 5.2.1 spell school vocabulary seed', () => {
+  const spellSchools = loadSeedSpellSchools(RULESET)
+
+  it('loads the spell-schools set', () => {
+    expect(spellSchools.id).toBe(SPELL_SCHOOL_SET_ID)
+    expect(spellSchools.options.length).toBe(8)
+  })
+
+  it('has unique ids', () => {
+    const ids = spellSchools.options.map((option) => option.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(seedSpellSchoolIds(RULESET).size).toBe(8)
+  })
+
+  it('derives SPELL_SCHOOLS from the seed list', () => {
+    expect([...SPELL_SCHOOLS].sort()).toEqual([...seedSpellSchoolIds(RULESET)].sort())
+  })
+
+  it('has a label and description for every seed school', () => {
+    for (const id of SPELL_SCHOOLS) {
+      const entry = getSeedSpellSchoolEntry(RULESET, id)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedSpellSchoolLabel(RULESET, 'evocation')).toBe('Evocation')
+    expect(getSeedSpellSchoolLabel(RULESET, 'custom')).toBe('custom')
+  })
+})
+
 describe('SRD 5.2.1 edition preset vocabulary seed', () => {
   const editionPresets = loadSeedEditionPresets(RULESET)
 
@@ -226,7 +309,9 @@ describe('seeded vocabulary set registry', () => {
         CREATURE_TYPE_SET_ID,
         DAMAGE_TYPE_SET_ID,
         EDITION_PRESET_SET_ID,
+        LANGUAGE_SET_ID,
         SENSE_SET_ID,
+        SPELL_SCHOOL_SET_ID,
       ].sort(),
     )
   })

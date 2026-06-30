@@ -8,7 +8,9 @@ import type { ResolvedCampaignRules } from '@rpg/contracts'
 import type {
   CreatureTypeVocabulary,
   DamageTypeVocabulary,
+  LanguageVocabulary,
   SenseVocabulary,
+  SpellSchoolVocabulary,
 } from '@/features/homebrew'
 
 import type { ContentListQueryResult } from '../list/content-client'
@@ -38,6 +40,10 @@ export type ContentFormCtx = {
   damageTypeVocabulary?: DamageTypeVocabulary
   /** Campaign-resolved sense labels and active ids. */
   senseVocabulary?: SenseVocabulary
+  /** Campaign-resolved language labels and active ids. */
+  languageVocabulary?: LanguageVocabulary
+  /** Campaign-resolved spell school labels, descriptions, and active ids. */
+  spellSchoolVocabulary?: SpellSchoolVocabulary
   options?: Partial<ContentFormOptionSets>
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind

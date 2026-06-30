@@ -3,6 +3,7 @@ import { DataTable } from '@rpg/ui'
 import type { Spell } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { useSpellSchoolVocabulary } from '@/features/homebrew'
 import { useSpells } from '../hooks/use-spells'
 import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -23,6 +24,7 @@ function SpellRowActions({ row, campaignId }: { row: Spell; campaignId: string }
 export function SpellsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: spells = [], isPending, isError } = useSpells(campaignId)
+  const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(campaignId)
 
   return (
     <ContentOverviewShell
@@ -34,9 +36,9 @@ export function SpellsOverview() {
       newLabel="New Spell"
     >
       <DataTable
-        columns={spellsColumns(campaignId)}
+        columns={spellsColumns(campaignId, spellSchoolVocabulary)}
         data={spells}
-        filters={spellsFilters}
+        filters={spellsFilters(spellSchoolVocabulary)}
         rowActions={(row) => <SpellRowActions row={row} campaignId={campaignId} />}
         caption="Spells available in this campaign"
       />

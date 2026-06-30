@@ -6,8 +6,6 @@ import {
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
   INNATE_SPELL_KINDS,
-  LANGUAGE_ENTRIES,
-  LANGUAGE_IDS,
   SENSE_RANGES,
   SKILL_IDS,
   SKILLS,
@@ -15,12 +13,12 @@ import {
   USAGE_FREQUENCY_ENTRIES,
   type UsageFrequency,
   type FeatCategory,
-  type Language,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   buildActiveDamageTypeFieldOptions,
+  buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
 } from '@/features/homebrew'
 
@@ -74,14 +72,6 @@ const featCategoryOptions = toOptions(
   ) as Record<FeatCategory, string>,
 )
 
-const languageOptions = toOptions(
-  LANGUAGE_IDS,
-  Object.fromEntries(LANGUAGE_IDS.map((id) => [id, LANGUAGE_ENTRIES[id].label])) as Record<
-    Language,
-    string
-  >,
-)
-
 function visibleFor<T extends string>(value: T): FieldVisibility {
   return {
     dependsOn: ['grantType'],
@@ -119,6 +109,7 @@ export function grantItemFields<T extends string>(
   const featOptions = ctx.options?.feats ?? []
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
+  const languageOptions = buildActiveLanguageFieldOptions(ctx.languageVocabulary)
 
   return [
     {

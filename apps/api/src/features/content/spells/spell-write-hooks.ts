@@ -2,7 +2,9 @@ import type { Spell } from '@rpg/contracts'
 
 import {
   assertDamageTypesActiveInCampaign,
+  assertSpellSchoolsActiveInCampaign,
   collectDamageTypeIdsFromSpellBody,
+  collectSpellSchoolIdFromSpellBody,
 } from '../../vocabulary'
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
@@ -35,6 +37,10 @@ export async function spellValidateBeforeWrite(ctx: ContentWriteContext): Promis
   await assertDamageTypesActiveInCampaign(
     ctx.campaignId,
     collectDamageTypeIdsFromSpellBody(inputForVocab),
+  )
+  await assertSpellSchoolsActiveInCampaign(
+    ctx.campaignId,
+    collectSpellSchoolIdFromSpellBody(inputForVocab),
   )
 
   const classIds =

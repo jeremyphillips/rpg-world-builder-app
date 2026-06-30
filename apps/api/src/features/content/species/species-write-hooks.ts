@@ -1,8 +1,10 @@
 import {
   assertCreatureTypesActiveInCampaign,
   assertDamageTypesActiveInCampaign,
+  assertLanguagesActiveInCampaign,
   assertSensesActiveInCampaign,
   collectDamageTypeIdsFromBody,
+  collectLanguageIdsFromBody,
   collectSenseTypeIdsFromBody,
 } from '../../vocabulary'
 import { resolveCatalogForCampaign } from '../content.service'
@@ -43,6 +45,7 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
     collectDamageTypeIdsFromBody(inputForVocab),
   )
   await assertSensesActiveInCampaign(ctx.campaignId, collectSenseTypeIdsFromBody(inputForVocab))
+  await assertLanguagesActiveInCampaign(ctx.campaignId, collectLanguageIdsFromBody(inputForVocab))
 
   const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
   assertSpeciesClassSlugsFromInput(inputForVocab, classes)

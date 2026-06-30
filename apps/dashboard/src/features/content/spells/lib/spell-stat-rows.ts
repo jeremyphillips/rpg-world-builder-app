@@ -1,10 +1,11 @@
 import type { CharacterClass, Spell } from '@rpg/contracts'
+import { formatSlugAsLabel, getSpellDeliveryMethodLabel } from '@rpg/contracts'
+
 import {
-  formatSlugAsLabel,
-  getSpellDeliveryMethodLabel,
-  getSpellSchoolEntry,
-  getSpellSchoolLabel,
-} from '@rpg/contracts'
+  getSpellSchoolDescriptionFromVocabulary,
+  getSpellSchoolLabelFromVocabulary,
+  type SpellSchoolVocabulary,
+} from '@/features/homebrew'
 
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 import {
@@ -25,6 +26,8 @@ const SPELL_STAT_CONCENTRATION_INFO =
 export type BuildSpellStatRowsOptions = {
   /** Resolved catalog class names keyed by slug; falls back to {@link formatSlugAsLabel}. */
   classesBySlug?: ReadonlyMap<string, CharacterClass>
+  /** Campaign-resolved spell school labels and descriptions. */
+  spellSchoolVocabulary?: SpellSchoolVocabulary
 }
 
 function resolveClassLabel(
@@ -39,14 +42,20 @@ export function buildSpellStatRows(
   spell: Spell,
   options: BuildSpellStatRowsOptions = {},
 ): ContentStatRowData[] {
-  const { classesBySlug } = options
+  const { classesBySlug, spellSchoolVocabulary } = options
+  const schoolLabel = getSpellSchoolLabelFromVocabulary(spellSchoolVocabulary, spell.school)
+  const schoolDescription = getSpellSchoolDescriptionFromVocabulary(
+    spellSchoolVocabulary,
+    spell.school,
+  )
+
   const rows: ContentStatRowData[] = [
     { label: 'Level', value: formatSpellLevelLabel(spell.level) },
     {
       label: 'School',
-      value: getSpellSchoolLabel(spell.school),
-      info: getSpellSchoolEntry(spell.school)?.description,
-      infoAriaLabel: `About ${getSpellSchoolLabel(spell.school)}`,
+      value: schoolLabel,
+      info: schoolDescription,
+      infoAriaLabel: `About ${schoolLabel}`,
     },
     { label: 'Casting Time', value: formatCastingTime(spell.castingTime) },
     { label: 'Range', value: formatSpellRange(spell.range) },
@@ -73,10 +82,12 @@ export function buildSpellStatRows(
     })
   }
 
-  rows.push({
-    label: 'Classes',
-    value: spell.classIds.map((slug) => resolveClassLabel(slug, classesBySlug)).join(', '),
-  })
+  if (spell.classIds.length > 0) {
+    rows.push({
+      label: 'Classes',
+      value: spell.classIds.map((slug) => resolveClassLabel(slug, classesBySlug)).join(', '),
+    })
+  }
 
   return rows
 }

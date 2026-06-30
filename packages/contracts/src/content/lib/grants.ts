@@ -9,7 +9,7 @@ import { speedSchema } from '../../vocab/movement-mode'
 import { senseSchema } from '../../vocab/sense'
 import { usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema } from '../../vocab/feat'
-import { languageCategorySchema, languageSchema } from '../../vocab/language'
+import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 import { skillSchema } from '../skill-proficiency'
 
 // ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ export type ContentProficiencies = z.infer<typeof contentProficienciesSchema>
  */
 export const languageChoiceGrantSchema = contentPoolChoiceSchema
   .extend({
-    from: z.array(languageSchema).min(1).optional(),
+    from: z.array(languageIdSchema).min(1).optional(),
     categories: z.array(languageCategorySchema).min(1).optional(),
   })
   .superRefine((val, ctx) => {
@@ -140,7 +140,7 @@ export const contentGrantsSchema = z.object({
   damageType: z.array(damageTypeIdSchema).optional(),
   resistances: z.array(damageTypeIdSchema).optional(),
   proficiencies: contentProficienciesSchema.optional(),
-  languages: z.array(languageSchema).optional(),
+  languages: z.array(languageIdSchema).optional(),
   languageChoices: z.array(languageChoiceGrantSchema).optional(),
   innateSpells: innateSpellsSchema.optional(),
   featChoice: featChoiceGrantSchema.optional(),

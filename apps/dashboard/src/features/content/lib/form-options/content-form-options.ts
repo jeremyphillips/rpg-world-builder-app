@@ -17,7 +17,9 @@ import { useCampaignRules } from '@/features/campaign'
 import {
   useCreatureTypeVocabulary,
   useDamageTypeVocabulary,
+  useLanguageVocabulary,
   useSenseVocabulary,
+  useSpellSchoolVocabulary,
 } from '@/features/homebrew'
 
 import { useClasses } from '../../classes/hooks/use-classes'
@@ -135,6 +137,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
   const damageTypeQuery = useDamageTypeVocabulary(campaignId)
   const senseQuery = useSenseVocabulary(campaignId)
+  const languageQuery = useLanguageVocabulary(campaignId)
+  const spellSchoolQuery = useSpellSchoolVocabulary(campaignId)
 
   const options = useMemo(
     () =>
@@ -155,6 +159,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
       creatureTypeVocabulary: creatureTypeQuery.vocabulary,
       damageTypeVocabulary: damageTypeQuery.vocabulary,
       senseVocabulary: senseQuery.vocabulary,
+      languageVocabulary: languageQuery.vocabulary,
+      spellSchoolVocabulary: spellSchoolQuery.vocabulary,
       options,
     }),
     [
@@ -163,6 +169,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
       creatureTypeQuery.vocabulary,
       damageTypeQuery.vocabulary,
       senseQuery.vocabulary,
+      languageQuery.vocabulary,
+      spellSchoolQuery.vocabulary,
       options,
     ],
   )
@@ -176,7 +184,9 @@ export function useContentFormOptions(campaignId: string | undefined): {
       equipmentQuery.isPending ||
       creatureTypeQuery.isPending ||
       damageTypeQuery.isPending ||
-      senseQuery.isPending,
+      senseQuery.isPending ||
+      languageQuery.isPending ||
+      spellSchoolQuery.isPending,
     isError:
       classesQuery.isError ||
       spellsQuery.isError ||
@@ -184,6 +194,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
       equipmentQuery.isError ||
       creatureTypeQuery.isError ||
       damageTypeQuery.isError ||
-      senseQuery.isError,
+      senseQuery.isError ||
+      languageQuery.isError ||
+      spellSchoolQuery.isError,
   }
 }

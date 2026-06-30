@@ -1,52 +1,48 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  LANGUAGE_ENTRIES,
-  LANGUAGE_IDS,
-  RARE_LANGUAGE_IDS,
-  STANDARD_LANGUAGE_IDS,
-  getLanguageEntry,
+  LANGUAGE_SET_ID,
   getLanguageLabel,
-  languageIdsByCategory,
-  languageSchema,
+  languageCategorySchema,
+  languageIdSchema,
+  languageSeedOptionSchema,
 } from './language'
 
-describe('languageSchema', () => {
-  it('accepts every known language', () => {
-    for (const id of LANGUAGE_IDS) {
-      expect(languageSchema.parse(id)).toBe(id)
-    }
+describe('languageIdSchema', () => {
+  it('accepts slug-shaped ids including campaign custom terms', () => {
+    expect(languageIdSchema.parse('common')).toBe('common')
+    expect(languageIdSchema.parse('custom-tongue')).toBe('custom-tongue')
   })
 
-  it('rejects display labels and unknown languages', () => {
-    expect(languageSchema.safeParse('Common').success).toBe(false)
-    expect(languageSchema.safeParse('telepathy').success).toBe(false)
-    expect(languageSchema.safeParse('common').success).toBe(true)
+  it('rejects invalid slug shapes', () => {
+    expect(languageIdSchema.safeParse('Common').success).toBe(false)
+    expect(languageIdSchema.safeParse('common').success).toBe(true)
+  })
+})
+
+describe('languageSeedOptionSchema', () => {
+  it('requires a standard or rare category', () => {
+    expect(
+      languageSeedOptionSchema.parse({
+        id: 'common',
+        label: 'Common',
+        description: 'Trade language.',
+        category: 'standard',
+      }),
+    ).toMatchObject({ id: 'common', category: 'standard' })
+
+    expect(languageCategorySchema.safeParse('exotic').success).toBe(false)
   })
 })
 
 describe('language vocabulary', () => {
-  it('derives LANGUAGE_IDS from the entry map', () => {
-    expect([...LANGUAGE_IDS].sort()).toEqual(Object.keys(LANGUAGE_ENTRIES).sort())
+  it('registers the language option set id', () => {
+    expect(LANGUAGE_SET_ID).toBe('languages')
   })
 
-  it('groups standard and rare languages by category', () => {
-    expect(languageIdsByCategory('standard').sort()).toEqual([...STANDARD_LANGUAGE_IDS].sort())
-    expect(languageIdsByCategory('rare').sort()).toEqual([...RARE_LANGUAGE_IDS].sort())
-    expect(STANDARD_LANGUAGE_IDS).toContain('common')
-    expect(RARE_LANGUAGE_IDS).toContain('druidic')
-  })
-
-  it('only includes the authored description on Primordial', () => {
-    expect(getLanguageEntry('primordial')?.description).toBe(
-      'Primordial includes the Aquan, Auran, Ignan, and Terran dialects. Creatures that know one of these dialects can communicate with those that know a different one.',
-    )
-    expect(getLanguageEntry('common')?.description).toBeUndefined()
-  })
-
-  it('returns labels and falls back for unknown ids', () => {
+  it('returns title-cased slug labels', () => {
     expect(getLanguageLabel('common-sign-language')).toBe('Common Sign Language')
-    expect(getLanguageLabel('thieves-cant')).toBe("Thieves' Cant")
-    expect(getLanguageLabel('custom')).toBe('custom')
+    expect(getLanguageLabel('thieves-cant')).toBe('Thieves Cant')
+    expect(getLanguageLabel('custom-tongue')).toBe('Custom Tongue')
   })
 })

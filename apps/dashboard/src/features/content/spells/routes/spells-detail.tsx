@@ -12,7 +12,11 @@ import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
-import { useDamageTypeVocabulary, getDamageTypeLabelFromVocabulary } from '@/features/homebrew'
+import {
+  getDamageTypeLabelFromVocabulary,
+  useDamageTypeVocabulary,
+  useSpellSchoolVocabulary,
+} from '@/features/homebrew'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
@@ -115,8 +119,9 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   useSetBreadcrumbLabel(spell.name)
   const { data: classes = [] } = useClasses(campaignId)
   const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(campaignId)
+  const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(campaignId)
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
-  const statRows = buildSpellStatRows(spell, { classesBySlug }).filter(
+  const statRows = buildSpellStatRows(spell, { classesBySlug, spellSchoolVocabulary }).filter(
     (row) => row.label !== 'Classes',
   )
 

@@ -4,10 +4,15 @@ import {
   CREATURE_TYPE_SET_ID,
   DAMAGE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
+  LANGUAGE_SET_ID,
   SENSE_SET_ID,
+  SPELL_SCHOOL_SET_ID,
+  languageSeedOptionSchema,
   vocabularySeedOptionSchema,
 } from '@rpg/contracts'
 import type {
+  LanguageCategory,
+  LanguageSeedOption,
   SystemRulesetId,
   VocabularyOption,
   VocabularyOptionSet,
@@ -20,7 +25,9 @@ import attackResolutionModesRaw from './data/srd-cc-5.2.1/attack-resolution-mode
 import creatureTypesRaw from './data/srd-cc-5.2.1/creature-types.json'
 import damageTypesRaw from './data/srd-cc-5.2.1/damage-types.json'
 import editionPresetsRaw from './data/srd-cc-5.2.1/edition-presets.json'
+import languagesRaw from './data/srd-cc-5.2.1/languages.json'
 import sensesRaw from './data/srd-cc-5.2.1/senses.json'
+import spellSchoolsRaw from './data/srd-cc-5.2.1/spell-schools.json'
 
 function assertUniqueOptionIds(options: readonly VocabularySeedOption[], label: string): void {
   const ids = options.map((option) => option.id)
@@ -35,11 +42,19 @@ function parseSeedOptions(raw: unknown, label: string): VocabularySeedOption[] {
   return options
 }
 
+function parseLanguageSeedOptions(raw: unknown, label: string): LanguageSeedOption[] {
+  const options = z.array(languageSeedOptionSchema).parse(raw)
+  assertUniqueOptionIds(options, label)
+  return options
+}
+
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.
 const SRD_521_CREATURE_TYPES = parseSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
 const SRD_521_DAMAGE_TYPES = parseSeedOptions(damageTypesRaw, DAMAGE_TYPE_SET_ID)
 const SRD_521_SENSES = parseSeedOptions(sensesRaw, SENSE_SET_ID)
+const SRD_521_LANGUAGES = parseLanguageSeedOptions(languagesRaw, LANGUAGE_SET_ID)
+const SRD_521_SPELL_SCHOOLS = parseSeedOptions(spellSchoolsRaw, SPELL_SCHOOL_SET_ID)
 const SRD_521_EDITION_PRESETS = parseSeedOptions(editionPresetsRaw, EDITION_PRESET_SET_ID)
 const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
   attackResolutionModesRaw,
@@ -51,6 +66,8 @@ const SEED_SETS_BY_RULESET = {
     [CREATURE_TYPE_SET_ID]: SRD_521_CREATURE_TYPES,
     [DAMAGE_TYPE_SET_ID]: SRD_521_DAMAGE_TYPES,
     [SENSE_SET_ID]: SRD_521_SENSES,
+    [LANGUAGE_SET_ID]: SRD_521_LANGUAGES,
+    [SPELL_SCHOOL_SET_ID]: SRD_521_SPELL_SCHOOLS,
     [EDITION_PRESET_SET_ID]: SRD_521_EDITION_PRESETS,
     [ATTACK_RESOLUTION_MODE_SET_ID]: SRD_521_ATTACK_RESOLUTION_MODES,
   },
@@ -236,6 +253,104 @@ export function getSeedSenseEntry(
 ): VocabularySeedOption | undefined {
   try {
     return getById(loadSeedOptions(rulesetId, SENSE_SET_ID), rulesetId, SENSE_SET_ID, id, 'Sense')
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Languages — open vocabulary with standard/rare category on seed rows
+// ---------------------------------------------------------------------------
+
+export const LANGUAGES = SRD_521_LANGUAGES.map((option) => option.id) as [
+  (typeof SRD_521_LANGUAGES)[number]['id'],
+  ...(typeof SRD_521_LANGUAGES)[number]['id'][],
+]
+
+export type SeedLanguage = (typeof LANGUAGES)[number]
+
+function loadLanguageSeedOptions(rulesetId: SystemRulesetId): readonly LanguageSeedOption[] {
+  const seeds = SEED_SETS_BY_RULESET[rulesetId][LANGUAGE_SET_ID]
+  if (seeds === undefined) {
+    throw new Error(`Vocabulary set "${LANGUAGE_SET_ID}" not found for ruleset "${rulesetId}"`)
+  }
+  return seeds
+}
+
+export function loadSeedLanguages(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, LANGUAGE_SET_ID)
+}
+
+export function seedLanguageIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, LANGUAGE_SET_ID)
+}
+
+export function seedLanguageIdsByCategory(
+  rulesetId: SystemRulesetId,
+  category: LanguageCategory,
+): readonly string[] {
+  return loadLanguageSeedOptions(rulesetId)
+    .filter((option) => option.category === category)
+    .map((option) => option.id)
+}
+
+export function getSeedLanguageLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, LANGUAGE_SET_ID, id)
+}
+
+export function getSeedLanguageCategory(
+  rulesetId: SystemRulesetId,
+  id: string,
+): LanguageCategory | undefined {
+  return getSeedLanguageEntry(rulesetId, id)?.category
+}
+
+export function getSeedLanguageEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): LanguageSeedOption | undefined {
+  try {
+    return getById(loadLanguageSeedOptions(rulesetId), rulesetId, LANGUAGE_SET_ID, id, 'Language')
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Spell schools — open vocabulary set
+// ---------------------------------------------------------------------------
+
+export const SPELL_SCHOOLS = SRD_521_SPELL_SCHOOLS.map((option) => option.id) as [
+  (typeof SRD_521_SPELL_SCHOOLS)[number]['id'],
+  ...(typeof SRD_521_SPELL_SCHOOLS)[number]['id'][],
+]
+
+export type SeedSpellSchool = (typeof SPELL_SCHOOLS)[number]
+
+export function loadSeedSpellSchools(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, SPELL_SCHOOL_SET_ID)
+}
+
+export function seedSpellSchoolIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, SPELL_SCHOOL_SET_ID)
+}
+
+export function getSeedSpellSchoolLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, SPELL_SCHOOL_SET_ID, id)
+}
+
+export function getSeedSpellSchoolEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, SPELL_SCHOOL_SET_ID),
+      rulesetId,
+      SPELL_SCHOOL_SET_ID,
+      id,
+      'Spell school',
+    )
   } catch {
     return undefined
   }

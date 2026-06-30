@@ -13,7 +13,10 @@ import {
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { buildActiveDamageTypeFieldOptions } from '@/features/homebrew'
+import {
+  buildActiveDamageTypeFieldOptions,
+  buildActiveSpellSchoolFieldOptions,
+} from '@/features/homebrew'
 
 import {
   feetInputUnitField,
@@ -30,7 +33,6 @@ import {
   functionTagOptions,
   rangeKindOptions,
   roleTagOptions,
-  schoolOptions,
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
@@ -157,6 +159,8 @@ export const spellFormSchema = z
 export type SpellFormValues = z.infer<typeof spellFormSchema>
 
 function basicsFields(ctx: ContentFormCtx): FormItem[] {
+  const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
+
   return [
     ...identityFields(ctx),
     {
