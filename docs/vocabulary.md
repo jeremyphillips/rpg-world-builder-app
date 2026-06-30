@@ -148,7 +148,7 @@ mobile select as not-yet-implemented.
 configuration pages on the hub. In-page section anchors for character
 configuration are derived from the campaign field registry
 (`CHARACTER_CONFIGURATION_SECTIONS` in
-`features/campaign/lib/character-configuration-field-registry.ts`).
+`features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts`).
 
 Shared UI for all sets:
 

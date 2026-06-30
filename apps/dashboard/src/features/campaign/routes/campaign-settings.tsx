@@ -8,13 +8,13 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
 
-import { flavorFields, identityFields } from '../lib/campaign-fields'
+import { flavorFields, identityFields } from '../lib/profile/campaign-profile-form-fields'
 import {
   buildUpdateCampaignInput,
   campaignSettingsSchema,
   mapCampaignToSettingsValues,
   type CampaignSettingsValues,
-} from '../lib/campaign-settings-values'
+} from '../lib/campaign-settings-form-values'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 import { useUpdateCampaign } from '../hooks/use-update-campaign'

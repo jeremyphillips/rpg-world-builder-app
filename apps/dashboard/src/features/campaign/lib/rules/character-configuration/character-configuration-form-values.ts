@@ -1,9 +1,5 @@
-import type { z } from 'zod'
 import type {
-  Campaign,
-  CreateCampaignInput,
   ResolvedCampaignCharacterCreationPatch,
-  UpdateCampaignInput,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
 import {
@@ -18,22 +14,7 @@ import {
 } from '@rpg/contracts'
 import type { CampaignMulticlassingPatch } from '@rpg/contracts'
 
-import { identitySchema, flavorSchema } from './campaign-fields'
-import {
-  createRulesSchema,
-  type CreateRulesValues,
-  type RulesValues,
-} from './character-configuration-fields'
-
-export type { CreateRulesValues, RulesValues }
-
-export const campaignSettingsSchema = identitySchema.and(flavorSchema)
-
-export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
-
-export const campaignCreateSchema = identitySchema.and(createRulesSchema).and(flavorSchema)
-
-export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
+import type { CreateRulesValues, RulesValues } from './character-configuration-form-fields'
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
   const defined = Object.fromEntries(
@@ -183,57 +164,5 @@ export function mapRulesetPatchToRulesValues(
       characterCreation.multiclassing.requirements.speciesPolicy.enabled,
     speciesLevelLimitsEnabled:
       characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
-  }
-}
-
-/** Maps a `Campaign` document to the flat shape used by the settings form. */
-export function mapCampaignToSettingsValues(campaign: Campaign): CampaignSettingsValues {
-  const flavor = campaign.configuration.flavor
-
-  return {
-    name: campaign.identity.name,
-    description: campaign.identity.description ?? '',
-    banner: [],
-    playStyle: flavor?.playStyle,
-    mood: flavor?.mood,
-    magicLevel: flavor?.magicLevel,
-    difficulty: flavor?.difficulty,
-  }
-}
-
-/** Builds the create payload from the flat values accumulated by the wizard. */
-export function buildCreateCampaignInput(
-  values: CampaignCreateValues,
-  imageKey?: string,
-): CreateCampaignInput {
-  return {
-    name: values.name,
-    description: values.description,
-    ...(imageKey !== undefined && { imageKey }),
-    characterCreation: buildCharacterCreationPatchInputFromCreateWizard(values),
-    flavor: {
-      playStyle: values.playStyle,
-      mood: values.mood,
-      magicLevel: values.magicLevel,
-      difficulty: values.difficulty,
-    },
-  }
-}
-
-/** Builds the API patch payload from validated settings form values. */
-export function buildUpdateCampaignInput(
-  values: CampaignSettingsValues,
-  imageKey?: string,
-): UpdateCampaignInput {
-  return {
-    name: values.name,
-    description: values.description,
-    ...(imageKey !== undefined && { imageKey }),
-    flavor: {
-      playStyle: values.playStyle,
-      mood: values.mood,
-      magicLevel: values.magicLevel,
-      difficulty: values.difficulty,
-    },
   }
 }

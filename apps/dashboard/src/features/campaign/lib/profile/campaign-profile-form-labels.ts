@@ -1,13 +1,7 @@
-import type {
-  Difficulty,
-  ImportedCharactersPolicy,
-  MagicLevel,
-  Mood,
-  PlayStyle,
-} from '@rpg/contracts'
+import type { Difficulty, MagicLevel, Mood, PlayStyle } from '@rpg/contracts'
 
-// Display labels for the campaign contract enums. Keyed by the contract types
-// so adding an enum member without a label is a type error.
+// Display labels for campaign flavor enums. Keyed by contract types so adding an
+// enum member without a label is a type error.
 
 export const PLAY_STYLE_LABELS: Record<PlayStyle, string> = {
   dungeon_crawl: 'Dungeon Crawl',
@@ -42,9 +36,4 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   casual: 'Casual',
   dangerous: 'Dangerous',
   brutal: 'Brutal',
-}
-
-export const IMPORTED_CHARACTERS_POLICY_LABELS: Record<ImportedCharactersPolicy, string> = {
-  approval_required: 'Yes, with DM approval',
-  disabled: 'No, players must roll new characters',
 }

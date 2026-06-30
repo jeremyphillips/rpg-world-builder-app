@@ -5,8 +5,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { sessionQueryKey } from '@/features/auth'
 
 import { rememberSelectedCampaign } from '../api/campaign-client'
-import { resolveTargetPathOnSwitch } from '../lib/campaign-selection'
-import { writeStoredCampaignId } from '../lib/selected-campaign-storage'
+import { resolveTargetPathOnSwitch } from '../lib/navigation/campaign-selection'
+import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
 import { useCampaignStore } from '../store/campaign-store'
 
 /**

@@ -17,7 +17,7 @@ import {
 
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
-import { getCampaignSwitcherLabel } from '../lib/campaign-selection'
+import { getCampaignSwitcherLabel } from '../lib/navigation/campaign-selection'
 import { useCampaignStore } from '../store/campaign-store'
 
 interface CampaignSwitcherProps {

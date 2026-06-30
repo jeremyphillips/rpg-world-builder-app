@@ -11,9 +11,9 @@ import {
   buildRulesSchemaForSurface,
   CHARACTER_CONFIGURATION_SECTIONS,
   CREATE_WIZARD_RULE_FIELD_IDS,
-} from './character-configuration-field-registry'
+} from './character-configuration-form-fields'
 
-describe('character-configuration-field-registry', () => {
+describe('character-configuration-form-fields', () => {
   describe('buildRulesSchemaForSurface', () => {
     it('accepts create-wizard input with basic fields only', () => {
       const result = buildRulesSchemaForSurface('create').safeParse({

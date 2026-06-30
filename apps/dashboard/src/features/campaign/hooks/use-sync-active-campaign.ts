@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useCampaigns } from '../hooks/use-campaigns'
-import { readStoredCampaignId } from '../lib/selected-campaign-storage'
-import { resolveLandingCampaignId } from '../lib/campaign-selection'
+import { readStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
+import { resolveLandingCampaignId } from '../lib/navigation/campaign-selection'
 import { useCampaignStore } from '../store/campaign-store'
 
 /**

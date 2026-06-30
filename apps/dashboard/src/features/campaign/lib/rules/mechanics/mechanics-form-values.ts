@@ -5,7 +5,7 @@ import type {
 } from '@rpg/contracts'
 import { DEFAULT_EDITION_PRESET_ID, getEditionPresetMechanics } from '@rpg/contracts'
 
-import type { MechanicsValues } from './mechanics-configuration-field-registry'
+import type { MechanicsValues } from './mechanics-form-fields'
 
 /** Maps resolved ruleset-patch mechanics to flat mechanics form values. */
 export function mapRulesetPatchToMechanicsValues(
