@@ -42,11 +42,8 @@ import {
   refineSpeciesCharacterCreationForm,
   speciesCharacterCreationFormSchema,
 } from './species-rules-form-fields'
-import {
-  traitRowFormSchema,
-  traitToFormRow,
-  traitsFromFormValues,
-} from './species-trait-form-fields'
+import { traitRowFormSchema } from './species-trait-form-fields'
+import { traitToFormRow, traitsFromFormValues } from './species-trait-form-values'
 
 // ---------------------------------------------------------------------------
 // Vocab option lists

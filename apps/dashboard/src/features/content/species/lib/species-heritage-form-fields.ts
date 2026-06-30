@@ -4,14 +4,12 @@ import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { traitItemFields, traitRowFormSchema, type TraitRowForm } from './species-trait-form-fields'
 import {
   traitFromFormRow,
-  traitItemFields,
-  traitRowFormSchema,
   traitRowsWithNamesForIdAssignment,
   traitToFormRow,
-  type TraitRowForm,
-} from './species-trait-form-fields'
+} from './species-trait-form-values'
 
 export const ADD_HERITAGE_LABEL = 'Add heritage'
 export const HERITAGE_OPTION_NOUN = 'option'

@@ -13,11 +13,12 @@ Delete-locking is **derived** because species traits and heritage have no per-ro
 
 ## Key files
 
-| Area                             | Path                                                                                      |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| Form def                         | `lib/species-form-def.ts`                                                                 |
-| Shared trait row fields          | `lib/species-trait-form-fields.ts`                                                        |
-| Heritage row fields              | `lib/species-heritage-form-fields.ts`                                                     |
-| Shared master-detail lock helper | [`content/lib/is-embedded-row-system-locked.ts`](../lib/is-embedded-row-system-locked.ts) |
-| Traits tab (master-detail)       | `components/species-traits-tab.client.tsx`                                                |
-| Heritage tab (master-detail)     | `components/species-heritage-tab.client.tsx`                                              |
+| Area                               | Path                                                                                               |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Form def                           | `lib/species-form-def.ts`                                                                          |
+| Trait row fields / values / labels | `lib/species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts` |
+| Heritage row fields                | `lib/species-heritage-form-fields.ts`                                                              |
+| Rules tab (character creation)     | `lib/species-rules-form-fields.ts`                                                                 |
+| Shared master-detail lock helper   | [`content/lib/is-embedded-row-system-locked.ts`](../lib/is-embedded-row-system-locked.ts)          |
+| Traits tab (master-detail)         | `components/species-traits-tab.client.tsx`                                                         |
+| Heritage tab (master-detail)       | `components/species-heritage-tab.client.tsx`                                                       |

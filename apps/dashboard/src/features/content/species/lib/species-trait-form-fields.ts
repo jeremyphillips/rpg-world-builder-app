@@ -1,13 +1,11 @@
 import { z } from 'zod'
 import {
-  CONTENT_TRAIT_KINDS,
   contentTraitKindSchema,
-  getTraitGrants,
   isGrantEligibleGrants,
   resolveTraitName,
-  type ContentTrait,
+  type ContentTraitKind,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   SPECIES_GRANT_TYPES,
@@ -15,17 +13,11 @@ import {
   formRowsToGrants,
   grantArrayFields,
   grantRowFormSchema,
-  grantsToFormRows,
 } from '../../lib/grant-form-helpers'
-import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { traitKindOptions } from './species-trait-form-labels'
 
-export const traitKindOptions = toOptions(CONTENT_TRAIT_KINDS, {
-  custom: 'Custom',
-  grant: 'From grants',
-} as Record<(typeof CONTENT_TRAIT_KINDS)[number], string>)
-
-export function visibleForTraitKind(kind: (typeof CONTENT_TRAIT_KINDS)[number]): FieldVisibility {
+export function visibleForTraitKind(kind: ContentTraitKind): FieldVisibility {
   return {
     dependsOn: ['kind'],
     visibleWhen: (watched) => watched['kind'] === kind,
@@ -144,72 +136,4 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
 export function traitItemEyebrow(row: TraitRowForm | undefined): string | undefined {
   if (!row?.kind) return undefined
   return row.kind === 'grant' ? 'Grant' : 'Custom'
-}
-
-export function traitToFormRow(trait: ContentTrait): TraitRowForm {
-  const grants = grantsToFormRows(getTraitGrants(trait))
-  if (trait.kind === 'grant') {
-    const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
-    return {
-      id: trait.id,
-      kind: 'grant',
-      overrideDisplay: hasOverrides,
-      nameOverride: trait.nameOverride,
-      descriptionOverride: trait.descriptionOverride,
-      grants,
-    }
-  }
-  return {
-    id: trait.id,
-    kind: 'custom',
-    overrideDisplay: false,
-    name: trait.name,
-    description: trait.description,
-    grants,
-  }
-}
-
-export function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
-  const grants = formRowsToGrants(row.grants)
-  if (row.kind === 'grant') {
-    return {
-      kind: 'grant',
-      id: row.id,
-      grants: grants!,
-      nameOverride: row.nameOverride || undefined,
-      descriptionOverride: row.descriptionOverride || undefined,
-    }
-  }
-  return {
-    kind: 'custom',
-    id: row.id,
-    name: row.name!,
-    description: row.description || undefined,
-    grants,
-  }
-}
-
-export function traitRowNameForIdAssignment(row: TraitRowForm, index: number): string {
-  if (row.kind === 'grant') {
-    return row.nameOverride?.trim() || traitItemTitle(row, index)
-  }
-  return row.name?.trim() || `Trait ${index + 1}`
-}
-
-export function traitRowsWithNamesForIdAssignment(
-  rows: TraitRowForm[],
-): Array<TraitRowForm & { name: string }> {
-  return rows.map((row, index) => ({
-    ...row,
-    name: traitRowNameForIdAssignment(row, index),
-  }))
-}
-
-export function traitsFromFormValues(
-  rows: TraitRowForm[],
-  existing?: readonly ContentTrait[],
-): ContentTrait[] {
-  return applyStableIdsForUpdate(traitRowsWithNamesForIdAssignment(rows), existing).map(
-    traitFromFormRow,
-  )
 }
