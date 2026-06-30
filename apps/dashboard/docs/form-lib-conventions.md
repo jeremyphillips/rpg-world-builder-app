@@ -59,6 +59,7 @@ Defer subfolders until a concern outgrows flat prefixes.
 | Content — species traits | `species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts` |
 | Content — species hub    | `species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`                      |
 | Content — spells         | `spell-form-def.ts`, `spell-form-fields.ts`, `spell-form-values.ts`, `spell-form-labels.ts`    |
+| Content — equipment hub  | `equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts`                |
 | Campaign — mechanics     | `campaign/lib/rules/mechanics/mechanics-form-*.ts`                                             |
 
 Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
@@ -69,24 +70,24 @@ Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
 Status of schema-driven form modules under `src/features/content/`. Refresh
 this table when completing a form-lib alignment phase.
 
-| Module / area            | Primary path                                                                          | Status                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Classes (hub)            | `classes/lib/class-form-*.ts`                                                         | aligned                                                                      |
-| Class features           | `classes/lib/class-feature-form-fields.ts`                                            | aligned                                                                      |
-| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                   | aligned                                                                      |
-| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                           | aligned                                                                      |
-| Species traits           | `species/lib/species-trait-form-*.ts`                                                 | aligned                                                                      |
-| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts` | aligned                                                                      |
-| Species heritage         | `species/lib/species-heritage-form-*.ts`                                              | aligned                                                                      |
-| Species rules            | `species/lib/species-rules-form-*.ts`                                                 | aligned                                                                      |
-| Spells                   | `spells/lib/spell-form-*.ts`                                                          | aligned                                                                      |
-| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`                                                 | pending — thin def + `equipment-form-fields.ts`                              |
-| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-input.ts`                                 | pending — rename `*-form-input.ts` → `*-form-values.ts`; move entity mappers |
-| Feats                    | `feats/lib/feat-form-def.ts`                                                          | pending (optional)                                                           |
-| Skill proficiencies      | `skillProficiencies/lib/skill-proficiency-form-def.ts`                                | pending (optional)                                                           |
+| Module / area            | Primary path                                                                                  | Status             |
+| ------------------------ | --------------------------------------------------------------------------------------------- | ------------------ |
+| Classes (hub)            | `classes/lib/class-form-*.ts`                                                                 | aligned            |
+| Class features           | `classes/lib/class-feature-form-fields.ts`                                                    | aligned            |
+| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                           | aligned            |
+| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                                   | aligned            |
+| Species traits           | `species/lib/species-trait-form-*.ts`                                                         | aligned            |
+| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`         | aligned            |
+| Species heritage         | `species/lib/species-heritage-form-*.ts`                                                      | aligned            |
+| Species rules            | `species/lib/species-rules-form-*.ts`                                                         | aligned            |
+| Spells                   | `spells/lib/spell-form-*.ts`                                                                  | aligned            |
+| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts` | aligned            |
+| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                        | aligned            |
+| Feats                    | `feats/lib/feat-form-def.ts`                                                                  | pending (optional) |
+| Skill proficiencies      | `skillProficiencies/lib/skill-proficiency-form-def.ts`                                        | pending (optional) |
 
-**Legacy rename:** equipment modules use `*-form-input.ts` today; target suffix
-is `*-form-values.ts` (same responsibility as other content types).
+**Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
+`*-form-values.ts` (completed).
 
 ### Shared infra (exceptions)
 

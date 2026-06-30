@@ -13,8 +13,6 @@ import {
   WEAPON_PROPERTIES,
   WEAPON_PROPERTY_ENTRIES,
   weaponFormValuesHaveRange,
-  type WeaponDamage,
-  type WeaponEquipment,
   type WeaponMastery,
   type WeaponMode,
   type WeaponProperty,
@@ -27,7 +25,6 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {
   feetInputUnitField,
@@ -125,22 +122,6 @@ const weaponPropertyDynamicHint: FieldDynamicHint = {
 const weaponMasteryDynamicHint: FieldDynamicHint = {
   dependsOn: ['mode'],
   hintWhen: (values) => formatWeaponMasteryModeHint(values.mode as WeaponMode | undefined),
-}
-
-export function damageToForm(
-  damage: WeaponDamage | undefined,
-): Pick<EquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
-  if (!damage) return { damageKind: 'none' }
-  if (damage.kind === 'dice') {
-    return {
-      damageKind: 'dice',
-      damageDice: { count: damage.count, faces: damage.faces },
-    }
-  }
-  return {
-    damageKind: 'flat',
-    damageAmount: damage.amount,
-  }
 }
 
 /** Weapon-specific form field group for the unified equipment form. */
@@ -278,38 +259,5 @@ export function weaponFormFieldGroup(): FormItem {
         hint: 'Prose for special properties (lance, net, etc.)',
       },
     ],
-  }
-}
-
-export function weaponFormValuesFromEntity(
-  item: WeaponEquipment,
-): Pick<
-  EquipmentFormValues,
-  | 'category'
-  | 'mode'
-  | 'damageKind'
-  | 'damageDice'
-  | 'damageAmount'
-  | 'damageType'
-  | 'versatileDamage'
-  | 'properties'
-  | 'mastery'
-  | 'rangeNormal'
-  | 'rangeLong'
-  | 'specialRules'
-> {
-  return {
-    category: item.category,
-    mode: item.mode,
-    ...damageToForm(item.damage),
-    damageType: item.damageType,
-    versatileDamage: item.versatileDamage
-      ? { count: item.versatileDamage.count, faces: item.versatileDamage.faces }
-      : undefined,
-    properties: item.properties,
-    mastery: item.mastery,
-    rangeNormal: item.range?.normal,
-    rangeLong: item.range?.long,
-    specialRules: item.specialRules,
   }
 }

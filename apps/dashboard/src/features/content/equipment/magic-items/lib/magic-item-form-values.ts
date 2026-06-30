@@ -1,9 +1,33 @@
-import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  type CreateEquipmentInput,
+  type MagicItemEquipment,
+} from '@rpg/contracts'
 
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
-} from '../../lib/equipment-form-input-base'
+} from '../../lib/equipment-form-values-base'
+import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+
+export function magicItemFormValuesFromEntity(
+  item: MagicItemEquipment,
+): Pick<
+  EquipmentFormValues,
+  | 'rarity'
+  | 'requiresAttunement'
+  | 'attunementRequirement'
+  | 'magicItemCategory'
+  | 'baseEquipmentId'
+> {
+  return {
+    rarity: item.rarity,
+    requiresAttunement: item.requiresAttunement,
+    attunementRequirement: item.attunementRequirement,
+    magicItemCategory: item.magicItemCategory,
+    baseEquipmentId: item.baseEquipmentId,
+  }
+}
 
 /** Maps magic item form values to a create/update API input fragment. */
 export function buildMagicItemInput({

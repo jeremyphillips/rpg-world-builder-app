@@ -3,13 +3,9 @@ import {
   SERVICE_CATEGORY_ENTRIES,
   SERVICE_DURATION_UNITS,
   SERVICE_DURATION_UNIT_ENTRIES,
-  type ServiceDuration,
   type ServiceDurationUnit,
-  type ServiceEquipment,
 } from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FormItem } from '@rpg/ui/form'
-
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 
 const serviceCategoryOptions = toOptions(
   SERVICE_CATEGORIES,
@@ -24,21 +20,6 @@ const serviceDurationUnitOptions = toOptions(
     SERVICE_DURATION_UNITS.map((unit) => [unit, SERVICE_DURATION_UNIT_ENTRIES[unit].label]),
   ) as Record<ServiceDurationUnit, string>,
 )
-
-export function durationFromForm(
-  duration: { value?: number; unit?: ServiceDurationUnit } | undefined,
-): ServiceDuration | undefined {
-  const value = duration?.value
-  const unit = duration?.unit
-  if (value === undefined || Number.isNaN(value) || !unit) return undefined
-  return { value, unit }
-}
-
-export function durationToForm(
-  duration: ServiceDuration | undefined,
-): EquipmentFormValues['duration'] {
-  return duration ? { value: duration.value, unit: duration.unit } : undefined
-}
 
 function serviceDurationField(): FieldConfig {
   return {
@@ -84,15 +65,5 @@ export function serviceFormFieldGroup(): FormItem {
         label: 'Notes',
       },
     ],
-  }
-}
-
-export function serviceFormValuesFromEntity(
-  item: ServiceEquipment,
-): Pick<EquipmentFormValues, 'serviceCategory' | 'duration' | 'notes'> {
-  return {
-    serviceCategory: item.serviceCategory,
-    duration: durationToForm(item.duration),
-    notes: item.notes,
   }
 }

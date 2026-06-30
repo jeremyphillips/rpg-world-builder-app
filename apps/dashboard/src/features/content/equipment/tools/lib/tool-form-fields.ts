@@ -3,11 +3,9 @@ import {
   ABILITY_IDS,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
-  type ToolEquipment,
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const toolCategoryOptions = toOptions(TOOL_CATEGORIES, labelsFromEntries(TOOL_CATEGORY_ENTRIES))
@@ -19,11 +17,6 @@ const abilityOptions = toOptions(
     string
   >,
 )
-
-/** Joins craft item lines for the unified equipment form textarea. */
-export function formatCraftsText(items: string[] | undefined): string | undefined {
-  return items?.length ? items.join('\n') : undefined
-}
 
 /** Tool-specific form fields for the unified equipment form. */
 export function toolFormFieldGroup(): FormItem[] {
@@ -95,15 +88,4 @@ export function toolFormFieldGroup(): FormItem[] {
       ],
     },
   ]
-}
-
-export function toolFormValuesFromEntity(
-  item: ToolEquipment,
-): Pick<EquipmentFormValues, 'toolCategory' | 'ability' | 'utilizes' | 'craftsText'> {
-  return {
-    toolCategory: item.toolCategory,
-    ability: item.ability,
-    utilizes: item.utilizes,
-    craftsText: formatCraftsText(item.crafts),
-  }
 }

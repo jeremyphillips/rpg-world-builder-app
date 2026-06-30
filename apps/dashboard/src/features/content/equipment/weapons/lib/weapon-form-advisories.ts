@@ -7,7 +7,7 @@ import {
 import type { UseFormReturn } from 'react-hook-form'
 
 import type { AdvisoryFormSubmitOptions } from '../../../lib/use-advisory-form-submit'
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
+import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
 
 /** Soft advisories for incompatible property selections at save time (tier 3). */
 export function getWeaponFormPropertyAdvisories(

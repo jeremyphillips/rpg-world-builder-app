@@ -3,7 +3,7 @@ import type { WeaponPropertyModeAdvisory } from '@rpg/contracts'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
+import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
 import {
   blockWeaponSaveForInvalidMastery,
   formatWeaponPropertyAdvisoryConfirmMessage,

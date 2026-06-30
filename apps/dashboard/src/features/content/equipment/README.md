@@ -19,12 +19,16 @@ form fields, stat rows, and overview columns.
 
 Shared wiring lives under [`lib/`](./lib/):
 
-- [`equipment-form-def.ts`](./lib/equipment-form-def.ts) — schema, hub vs family compose
-- [`equipment-form-input.ts`](./lib/equipment-form-input.ts) — kind-aware `toInput` dispatch
+- [`equipment-form-def.ts`](./lib/equipment-form-def.ts) — registry + `ContentFormDef` wiring
+- [`equipment-form-fields.ts`](./lib/equipment-form-fields.ts) — unified schema and field builders
+- [`equipment-form-values.ts`](./lib/equipment-form-values.ts) — hub `toFormValues` / `toInput` dispatch
+- [`equipment-form-values-base.ts`](./lib/equipment-form-values-base.ts) — shared identity fields for kind builders
 - [`lib/shared/equipment-form-registry.ts`](./lib/shared/equipment-form-registry.ts) — `kindFieldGroups` registry
 - [`lib/shared/equipment-family-paths.ts`](./lib/shared/equipment-family-paths.ts) — URL segment ↔ kind mapping
 - [`lib/shared/equipment-family-columns.ts`](./lib/shared/equipment-family-columns.ts) — lazy-loaded family overview table config (`loadFamilyTableConfig`)
 - [`lib/shared/equipment-detail-stat-rows.ts`](./lib/shared/equipment-detail-stat-rows.ts) — detail stat rows by kind
+
+Each family uses `*-form-fields.ts` (UI) and `*-form-values.ts` (entity ↔ form mapping + `build*Input`).
 
 ## Dashboard URLs
 
@@ -51,4 +55,8 @@ campaign equipment whose kinds are listed in `MAGIC_ITEM_BASE_EQUIPMENT_KINDS`
 (`weapon`, `armor`, `adventuring_gear`) in `@rpg/contracts`.
 
 Part of the [`content`](../README.md) feature; see
-[feature-conventions](../../../../docs/feature-conventions.md) for layout.
+[feature-structure.md](../../../../docs/feature-structure.md) for layout.
+
+## Related docs
+
+- [form-lib-conventions.md](../../../../docs/form-lib-conventions.md) — form module splits and inventory

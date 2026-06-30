@@ -7,11 +7,11 @@ export {
   weaponAdvisorySubmitOptions,
   weaponFormHasInvalidMastery,
 } from './lib/weapon-form-advisories'
+export { weaponFormFieldGroup } from './lib/weapon-form-fields'
 export {
+  buildWeaponInput,
   damageToForm,
-  weaponFormFieldGroup,
   weaponFormValuesFromEntity,
-} from './lib/weapon-form-fields'
+} from './lib/weapon-form-values'
 export { applyWeaponModeValueSync, weaponFormValueSyncs } from './lib/weapon-form-sync'
-export { buildWeaponInput } from './lib/weapon-form-input'
 export { getWeaponStatRows } from './lib/weapon-stat-rows'

@@ -1,10 +1,43 @@
-import { createEquipmentInputSchema, type CreateEquipmentInput } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  type AdventuringGearEquipment,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
-} from '../../lib/equipment-form-input-base'
+} from '../../lib/equipment-form-values-base'
 import { parseNewlineList } from '../../lib/parse-newline-list'
+import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+
+/** Joins mechanical property lines for the unified equipment form textarea. */
+export function formatPropertiesText(items: string[] | undefined): string | undefined {
+  return items?.length ? items.join('\n') : undefined
+}
+
+export function adventuringGearFormValuesFromEntity(
+  item: AdventuringGearEquipment,
+): Pick<
+  EquipmentFormValues,
+  | 'gearKind'
+  | 'bundleSize'
+  | 'storage'
+  | 'propertiesText'
+  | 'capacity'
+  | 'holySymbolUsage'
+  | 'alsoWeaponSlug'
+> {
+  return {
+    gearKind: item.gearKind,
+    bundleSize: item.bundleSize,
+    storage: item.storage,
+    propertiesText: formatPropertiesText(item.properties),
+    capacity: item.capacity,
+    holySymbolUsage: item.holySymbolUsage,
+    alsoWeaponSlug: item.alsoWeaponSlug,
+  }
+}
 
 /** Maps adventuring gear form values to a create/update API input fragment. */
 export function buildAdventuringGearInput({

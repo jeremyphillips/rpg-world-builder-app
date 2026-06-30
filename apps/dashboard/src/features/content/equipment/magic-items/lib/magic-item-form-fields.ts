@@ -3,12 +3,10 @@ import {
   MAGIC_ITEM_CATEGORY_ENTRIES,
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
-  type MagicItemEquipment,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/content-form-registry'
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const magicItemRarityOptions = toOptions(
@@ -77,24 +75,5 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
         ],
       },
     ],
-  }
-}
-
-export function magicItemFormValuesFromEntity(
-  item: MagicItemEquipment,
-): Pick<
-  EquipmentFormValues,
-  | 'rarity'
-  | 'requiresAttunement'
-  | 'attunementRequirement'
-  | 'magicItemCategory'
-  | 'baseEquipmentId'
-> {
-  return {
-    rarity: item.rarity,
-    requiresAttunement: item.requiresAttunement,
-    attunementRequirement: item.attunementRequirement,
-    magicItemCategory: item.magicItemCategory,
-    baseEquipmentId: item.baseEquipmentId,
   }
 }

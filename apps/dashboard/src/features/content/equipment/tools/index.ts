@@ -1,5 +1,5 @@
 export { toolColumns, toolFilters } from './components/tool-columns'
 export { LUTE, THIEVES_TOOLS, TOOL_LIST } from './fixtures'
-export { toolFormFieldGroup, toolFormValuesFromEntity } from './lib/tool-form-fields'
-export { buildToolInput } from './lib/tool-form-input'
+export { toolFormFieldGroup } from './lib/tool-form-fields'
+export { buildToolInput, formatCraftsText, toolFormValuesFromEntity } from './lib/tool-form-values'
 export { getToolStatRows } from './lib/tool-stat-rows'
