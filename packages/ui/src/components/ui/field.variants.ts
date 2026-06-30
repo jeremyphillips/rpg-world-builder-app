@@ -67,6 +67,20 @@ export const fieldSettingsRowClasses =
 /** Vertical gap between siblings in a stack or dependents region. */
 export type FieldStackRhythm = 'compact' | 'comfortable'
 
+/** Default vertical gap for form columns and groups (`gap-6`). */
+export const DEFAULT_FORM_RHYTHM: FieldStackRhythm = 'comfortable'
+/** Default vertical gap for repeatable array sections (`gap-2`). */
+export const DEFAULT_ARRAY_SECTION_RHYTHM: FieldStackRhythm = 'compact'
+
+/** Resolves stack rhythm: explicit config → section default → inherited context. */
+export function resolveFieldStackRhythm(options: {
+  explicit?: FieldStackRhythm | undefined
+  inherited: FieldStackRhythm
+  sectionDefault?: FieldStackRhythm | undefined
+}): FieldStackRhythm {
+  return options.explicit ?? options.sectionDefault ?? options.inherited
+}
+
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
     rhythm: {

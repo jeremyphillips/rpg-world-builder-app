@@ -2,12 +2,14 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import {
+  DEFAULT_FORM_RHYTHM,
   fieldGroupBottomMarginClasses,
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
-  fieldGroupStackClasses,
+  fieldStackRhythmVariants,
   fieldSetResetClasses,
   type FieldGroupLegendSize,
+  type FieldStackRhythm,
 } from './field.variants'
 import { Text } from './text'
 
@@ -18,6 +20,8 @@ export interface FieldGroupProps {
   legend: string
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
+  /** Vertical gap between sibling fields — defaults to `comfortable` (`gap-6`). */
+  rhythm?: FieldStackRhythm
   description?: string
   className?: string
   children: ReactNode
@@ -30,6 +34,7 @@ export interface FieldGroupProps {
 export function FieldGroup({
   legend,
   legendSize = 'section',
+  rhythm = DEFAULT_FORM_RHYTHM,
   description,
   className,
   children,
@@ -42,7 +47,7 @@ export function FieldGroup({
           {description}
         </Text>
       ) : null}
-      <div className={fieldGroupStackClasses}>{children}</div>
+      <div className={fieldStackRhythmVariants({ rhythm })}>{children}</div>
     </fieldset>
   )
 }

@@ -58,6 +58,9 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
     expect(screen.getByText('Traits')).toHaveClass('text-field-array-legend')
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
+    expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
+      'gap-2',
+    )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })

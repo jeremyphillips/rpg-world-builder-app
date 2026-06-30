@@ -525,6 +525,11 @@ export interface GroupConfig {
   className?: string
   /** Legend scale — `subsection` (20px) for nested groups inside another group. */
   legendSize?: FieldGroupLegendSize
+  /**
+   * Vertical gap between sibling fields. Inherits form rhythm when omitted;
+   * defaults to `comfortable` on standalone `FieldGroup`.
+   */
+  rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
   /** When true, renders inside an accordion when form collapsible sections are enabled. */
@@ -547,6 +552,11 @@ export interface ArrayConfig {
    * the primary top-level section heading.
    */
   legendSize?: FieldGroupLegendSize
+  /**
+   * Vertical gap between array items and inside each item. Defaults to `compact`
+   * (`gap-2`); pass `comfortable` for multi-field item blocks.
+   */
+  rhythm?: FieldStackRhythm
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
   /** Label for the "Add" button. Defaults to `"Add item"`. */

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { FormProvider, type FieldValues, type UseFormReturn } from 'react-hook-form'
 
 import { FileFieldPropsProvider } from './file-field-props.context'
+import { DEFAULT_FORM_RHYTHM, type FieldStackRhythm } from '../components/ui/field.variants'
 import { FormSectionContext } from './form-section-context.client'
 import type { FileFieldPropsMap } from './field-config'
 
@@ -12,6 +13,8 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   formId: string
   fileFieldProps?: FileFieldPropsMap
   collapsibleSections: boolean
+  /** Vertical gap between top-level fields/groups. Defaults to `comfortable` (`gap-6`). */
+  rhythm?: FieldStackRhythm
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   className?: string | undefined
   children: React.ReactNode
@@ -23,13 +26,14 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   formId,
   fileFieldProps,
   collapsibleSections,
+  rhythm = DEFAULT_FORM_RHYTHM,
   onSubmit,
   className,
   children,
 }: SchemaFormShellProps<TFieldValues>) {
   const sectionContext = React.useMemo(
-    () => ({ collapsibleSections, depth: 0 }),
-    [collapsibleSections],
+    () => ({ collapsibleSections, depth: 0, rhythm }),
+    [collapsibleSections, rhythm],
   )
 
   return (

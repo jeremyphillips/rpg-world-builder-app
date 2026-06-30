@@ -5,10 +5,11 @@ import { useForm, type DefaultValues, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { cn } from '../lib/utils'
-import { fieldGroupStackClasses } from '../components/ui/field.variants'
+import { fieldStackRhythmVariants } from '../components/ui/field.variants'
 import { Text } from '../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
 import { FormItems } from './form-items.client'
+import { useFormSectionContext } from './form-section-context.client'
 import { makeResolver } from './resolver'
 import { buildDefaultValues, type FormItem } from './field-config'
 import { FormActionsBar } from './form-actions-bar'
@@ -111,8 +112,9 @@ export function TabbedFormPanels({
   stickyTabsClassName,
   omitPanelBottomPadding,
 }: TabbedFormPanelsProps) {
+  const { rhythm } = useFormSectionContext()
   const panelClassName = cn(
-    fieldGroupStackClasses,
+    fieldStackRhythmVariants({ rhythm }),
     stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
   )
 

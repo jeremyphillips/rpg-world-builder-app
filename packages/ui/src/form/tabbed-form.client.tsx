@@ -6,6 +6,7 @@ import type { ZodType } from 'zod'
 
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { type FileFieldPropsMap, type FormValueSync } from './field-config'
+import type { FieldStackRhythm } from '../components/ui/field.variants'
 import { FormValueSyncEffects } from './form-value-sync-effects.client'
 import {
   resolveTabbedFormShellClassName,
@@ -50,6 +51,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** When true (default), sections may render in accordions when `collapsible: true` is set. */
   collapsibleSections?: boolean
   /**
+   * Vertical gap between top-level fields/groups. Defaults to `comfortable`
+   * (`gap-6`). Array sections default to `compact` regardless.
+   */
+  rhythm?: FieldStackRhythm
+  /**
    * When true (default), the tab list sticks to the top and the footer sticks to
    * the bottom while scrolling long panels.
    */
@@ -86,6 +92,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   className,
   mode,
   collapsibleSections = true,
+  rhythm,
   stickyChrome = true,
   stickyTabsClassName,
   stickyActionsBarClassName,
@@ -114,6 +121,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       formId={formId}
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
+      rhythm={rhythm}
       onSubmit={onSubmit}
       className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >

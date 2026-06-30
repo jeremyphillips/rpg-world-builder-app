@@ -19,19 +19,25 @@ import {
   fieldGroupBottomMarginClasses,
   fieldGroupDescriptionClasses,
   fieldGroupLegendVariants,
-  fieldGroupStackClasses,
-  fieldSeparatorVariants,
   fieldStackRhythmVariants,
+  fieldSeparatorVariants,
   fieldToggleDependentIndentClasses,
   formSectionStackClasses,
   fieldSetResetClasses,
+  DEFAULT_ARRAY_SECTION_RHYTHM,
+  resolveFieldStackRhythm,
   type FieldSeparator,
   type FieldStackRhythm,
 } from '../components/ui/field.variants'
 import { fieldStackDependentsChromeVariants } from '../components/ui/field-stack.variants'
 import { Text } from '../components/ui/text'
 import { FieldRenderer } from './field-renderer.client'
-import { FormSectionContext } from './form-section-context.client'
+import {
+  buildFormSectionChildContext,
+  FormRhythmStack,
+  FormSectionContext,
+  useFormSectionContext,
+} from './form-section-context.client'
 import {
   buildItemDefaultValues,
   isContainer,
@@ -262,9 +268,10 @@ interface FormItemNodeProps {
 }
 
 function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNodeProps) {
-  const childContext = React.useMemo(
-    () => ({ collapsibleSections: false, depth: depth + 1 }),
-    [depth],
+  const parentContext = useFormSectionContext()
+  const defaultChildContext = React.useMemo(
+    () => buildFormSectionChildContext(parentContext, depth),
+    [parentContext, depth],
   )
 
   if (!isContainer(item)) {
@@ -302,7 +309,7 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
 
   if (item.kind === 'slot') {
     return (
-      <FormSectionContext.Provider value={childContext}>
+      <FormSectionContext.Provider value={defaultChildContext}>
         <SlotFieldRenderer config={item} />
       </FormSectionContext.Provider>
     )
@@ -319,9 +326,19 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     )
   }
 
+  const arrayRhythm = resolveFieldStackRhythm({
+    explicit: item.rhythm,
+    inherited: parentContext.rhythm,
+    sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
+  })
+  const arrayChildContext = React.useMemo(
+    () => buildFormSectionChildContext(parentContext, depth, arrayRhythm),
+    [parentContext, depth, arrayRhythm],
+  )
+
   const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
   return (
-    <FormSectionContext.Provider value={childContext}>
+    <FormSectionContext.Provider value={arrayChildContext}>
       <ArrayFieldRenderer config={item} idPrefix={idPrefix} fullName={fullArrayName} />
     </FormSectionContext.Provider>
   )
@@ -340,9 +357,21 @@ function CollapsibleFormSection({
   idPrefix,
   namePrefix,
 }: CollapsibleFormSectionProps) {
+  const parentContext = useFormSectionContext()
+  const sectionRhythm =
+    item.kind === 'array'
+      ? resolveFieldStackRhythm({
+          explicit: item.rhythm,
+          inherited: parentContext.rhythm,
+          sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
+        })
+      : resolveFieldStackRhythm({ explicit: item.rhythm, inherited: parentContext.rhythm })
+  const childContext = React.useMemo(
+    () => buildFormSectionChildContext(parentContext, 0, sectionRhythm),
+    [parentContext, sectionRhythm],
+  )
   const sectionValue = getSectionValue(item, index)
   const triggerId = `${idPrefix}-${sectionValue}-trigger`
-  const childContext = React.useMemo(() => ({ collapsibleSections: false, depth: 1 }), [])
 
   return (
     <AccordionItem value={sectionValue} variant="section">
@@ -358,7 +387,7 @@ function CollapsibleFormSection({
         {item.kind === 'group' ? (
           <fieldset aria-labelledby={triggerId} className={fieldSetResetClasses}>
             <legend className="sr-only">{item.legend}</legend>
-            <div className={fieldGroupStackClasses}>
+            <FormRhythmStack rhythm={sectionRhythm}>
               <FormSectionContext.Provider value={childContext}>
                 <NestedFormItems
                   items={item.fields}
@@ -367,7 +396,7 @@ function CollapsibleFormSection({
                   depth={1}
                 />
               </FormSectionContext.Provider>
-            </div>
+            </FormRhythmStack>
           </fieldset>
         ) : (
           <FormSectionContext.Provider value={childContext}>
@@ -428,15 +457,21 @@ interface GroupFieldSectionProps {
 }
 
 function GroupFieldSection({ item, idPrefix, namePrefix, depth }: GroupFieldSectionProps) {
+  const parentContext = useFormSectionContext()
+  const groupRhythm = resolveFieldStackRhythm({
+    explicit: item.rhythm,
+    inherited: parentContext.rhythm,
+  })
   const childContext = React.useMemo(
-    () => ({ collapsibleSections: false, depth: depth + 1 }),
-    [depth],
+    () => buildFormSectionChildContext(parentContext, depth, groupRhythm),
+    [parentContext, depth, groupRhythm],
   )
 
   return (
     <FieldGroup
       legend={item.legend}
       legendSize={item.legendSize}
+      rhythm={groupRhythm}
       description={item.description}
       className={item.className}
     >
@@ -529,12 +564,13 @@ interface StackSectionProps {
 
 /** Layout-only stack; toggle-dependent preset splits the switch from indented dependents. */
 function StackSection({ item, idPrefix, namePrefix, depth }: StackSectionProps) {
+  const parentContext = useFormSectionContext()
+  const rhythm = item.rhythm ?? 'compact'
   const childContext = React.useMemo(
-    () => ({ collapsibleSections: false, depth: depth + 1 }),
-    [depth],
+    () => buildFormSectionChildContext(parentContext, depth, rhythm),
+    [parentContext, depth, rhythm],
   )
   const layout = item.layout ?? 'default'
-  const rhythm = item.rhythm ?? 'compact'
 
   if (layout !== 'toggleDependent') {
     return (
@@ -681,9 +717,15 @@ function ConditionalArrayField({
   depth,
 }: ConditionalArrayFieldProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
+  const parentContext = useFormSectionContext()
+  const arrayRhythm = resolveFieldStackRhythm({
+    explicit: config.rhythm,
+    inherited: parentContext.rhythm,
+    sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
+  })
   const childContext = React.useMemo(
-    () => ({ collapsibleSections: false, depth: depth + 1 }),
-    [depth],
+    () => buildFormSectionChildContext(parentContext, depth, arrayRhythm),
+    [parentContext, depth, arrayRhythm],
   )
 
   if (!config.visibility!.visibleWhen(values)) return null
@@ -721,25 +763,31 @@ export interface SlotFieldRendererProps {
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
 export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
+  const { rhythm } = useFormSectionContext()
   const content = config.render()
 
   if (config.label) {
     return (
-      <FieldGroup legend={config.label} description={config.hint} className={config.className}>
+      <FieldGroup
+        legend={config.label}
+        description={config.hint}
+        rhythm={rhythm}
+        className={config.className}
+      >
         {content}
       </FieldGroup>
     )
   }
 
   return (
-    <div className={cn(fieldGroupStackClasses, config.className)}>
+    <FormRhythmStack className={config.className}>
       {config.hint ? (
         <Text variant="small" className={fieldGroupDescriptionClasses}>
           {config.hint}
         </Text>
       ) : null}
       {content}
-    </div>
+    </FormRhythmStack>
   )
 }
 
@@ -769,7 +817,9 @@ export function ArrayFieldRenderer({
   labelledBy,
 }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
+  const { rhythm } = useFormSectionContext()
   const { addLabel = 'Add item', min = 0, max, legend, legendSize = 'array', itemTitle } = config
+  const stackClasses = fieldStackRhythmVariants({ rhythm })
 
   const canRemove = fields.length > min
   const canAdd = max === undefined || fields.length < max
@@ -786,7 +836,7 @@ export function ArrayFieldRenderer({
       ) : (
         <legend className={fieldGroupLegendVariants({ size: legendSize })}>{legend}</legend>
       )}
-      <div className={fieldGroupStackClasses}>
+      <div className={stackClasses}>
         {fields.map((rhfField, index) => {
           const itemPrefix = `${fullName}.${index}`
           const title = itemTitle
@@ -802,7 +852,7 @@ export function ArrayFieldRenderer({
               {title ? (
                 <legend className="px-1 text-xs text-muted-foreground">{title}</legend>
               ) : null}
-              <div className={fieldGroupStackClasses}>
+              <div className={stackClasses}>
                 <FormItems
                   items={config.fields}
                   idPrefix={idPrefix}

@@ -134,7 +134,8 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 | -------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
 | `fieldAnatomyStackClasses`       | `space-y-2`           | Label, control, and hint/error inside one field (`Field.Root`, `ChipsField`, …) |
 | `fieldLabelHintStackClasses`     | `gap-1`               | Label + hint cluster when `hintPosition="below-label"` (default)                |
-| `fieldGroupStackClasses`         | `flex flex-col gap-6` | Sibling fields inside a group, form column, tab panel, or array item (24px)     |
+| `fieldGroupStackClasses`         | `flex flex-col gap-6` | Alias for `comfortable` rhythm — prefer `fieldStackRhythmVariants` in new code  |
+| `fieldStackRhythmVariants`       | `gap-2` / `gap-6`     | Form column, groups, arrays — `compact` (8px) or `comfortable` (24px)           |
 | `fieldGroupBottomMarginClasses`  | `mb-8`                | Space below a field group or array section fieldset (32px)                      |
 | `fieldGroupFlexStackClasses`     | `flex flex-col gap-8` | Same 32px rhythm when stacking fieldsets or other collapse-prone siblings       |
 | `formSectionStackClasses`        | `flex flex-col gap-7` | Top-level accordion sections on `<Form>`                                        |
@@ -153,6 +154,18 @@ Vertical rhythm is centralized in [`field.variants.ts`](../src/components/ui/fie
 Do not sprinkle ad-hoc `space-y-*` or margin utilities on field wrappers in apps — adjust the shared
 tokens in `@rpg/ui` so chips, text inputs, and combobox fields stay aligned. Prefer `gap-*` flex
 stacks over `space-y-*` when stacking sibling `<fieldset>` field wrappers.
+
+### Form rhythm
+
+`<Form>` and `<TabbedForm>` accept `rhythm?: 'compact' | 'comfortable'` (default
+`comfortable`). This sets vertical gap between top-level siblings via
+`fieldStackRhythmVariants`. Nested `kind: 'group'` sections inherit the form
+rhythm unless `GroupConfig.rhythm` overrides it.
+
+**Array sections always default to `compact`** (`gap-2`) — between items, inside
+each item, and for nested groups within items — even when the form is
+`comfortable`. Pass `rhythm: 'comfortable'` on `ArrayConfig` for dense
+multi-field item blocks (e.g. grant rows with many dependents).
 
 Dense chip fields (many options) should stack as full-width siblings, not share a `FieldRow` — rows
 are for short combinations (e.g. a small chip set beside a select).
@@ -882,9 +895,12 @@ const fields: FormItem[] = [
     min: 0, // floor — Remove is disabled below this count
     max: 10, // ceiling — Add button disappears at this count
     itemTitle: (_v, i) => `Trait ${i + 1}`, // optional per-item heading
+    // rhythm: 'comfortable', // optional — default compact (gap-2)
   },
 ]
 ```
+
+Array legends use the `array` type scale (18px) by default; see [Nested groups](#nested-groups).
 
 ### Zod schema
 
