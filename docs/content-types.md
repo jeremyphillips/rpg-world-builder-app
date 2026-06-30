@@ -226,7 +226,7 @@ Catalog records carry three distinct identifier layers. Authors edit **display n
 | Envelope **`slug`** | `fighter`, `wood-elf`                   | `deriveContentKey(name)` on first POST | **No** — homebrew and system patches  |
 | Nested **`id`**     | `rage`, `darkvision` on traits/features | Same helper, scoped to parent          | **No** — rename display `name` freely |
 
-Shared helpers: `packages/contracts/src/content/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
+Shared helpers: `packages/contracts/src/content/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
 
 **Today:** “publish” means the first successful homebrew **POST**. There is no draft workflow yet; records created under this rule remain locked.
 
@@ -613,7 +613,7 @@ export function use<TypeName>s(campaignId: string | undefined) {
 ### 10. Column/filter definitions (`lib/<kebab-plural>-overview-columns.tsx`)
 
 ```typescript
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 import { ROUTES } from '@/app/routes'
 
 const TYPE_MIDDLE_COLUMNS: ColumnDef<<TypeName>>[] = [ /* type-specific columns */ ]

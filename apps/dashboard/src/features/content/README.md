@@ -1,7 +1,5 @@
 # content (dashboard feature)
 
-> Scaffold only — no implementation yet.
-
 World-building content the DM authors and reuses across campaigns. This is one
 feature (one ESLint boundary element) made of several content-type sub-areas:
 
