@@ -47,6 +47,10 @@ export const fieldGroupLegendTypographyClasses =
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
 export const fieldSubgroupLegendTypographyClasses =
   'text-field-subgroup-legend font-heading leading-none text-foreground'
+export const fieldArrayLegendSpacingClasses = 'mb-4'
+/** Repeatable array section legend — between subgroup and field labels. */
+export const fieldArrayLegendTypographyClasses =
+  'text-field-array-legend font-heading leading-none text-foreground'
 export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
 export const fieldArrayItemActionsClasses = 'mt-3'
 export const fieldArrayItemActionRowClasses = cn(
@@ -140,13 +144,14 @@ export const fieldLabelVariants = cva(
 /** Layout preset for toggle-dependent stacks. */
 export type FieldStackLayout = 'default' | 'toggleDependent'
 
-export type FieldGroupLegendSize = 'section' | 'subsection'
+export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
       section: cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
       subsection: cn(fieldSubgroupLegendSpacingClasses, fieldSubgroupLegendTypographyClasses),
+      array: cn(fieldArrayLegendSpacingClasses, fieldArrayLegendTypographyClasses),
     },
   },
   defaultVariants: {

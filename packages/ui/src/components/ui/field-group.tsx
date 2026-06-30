@@ -16,7 +16,7 @@ export type { FieldGroupLegendSize }
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. */
   legend: string
-  /** Legend type scale — use `subsection` for nested groups inside another group. */
+  /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
   description?: string
   className?: string

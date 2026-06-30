@@ -56,6 +56,8 @@ describe('ArrayFieldRenderer', () => {
   it('renders the add button and legend for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
+    expect(screen.getByText('Traits')).toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })

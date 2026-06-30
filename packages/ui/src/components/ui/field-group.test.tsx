@@ -48,6 +48,16 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Damage')).not.toHaveClass('text-field-group-legend')
   })
 
+  it('renders an array legend at the repeatable-list type scale', () => {
+    render(
+      <FieldGroup legend="Grants" legendSize="array">
+        <TextField id="grant-type" label="Grant type" />
+      </FieldGroup>,
+    )
+    expect(screen.getByText('Grants')).toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Grants')).not.toHaveClass('text-field-group-legend')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldGroup legend="Character basics">

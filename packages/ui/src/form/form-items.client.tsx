@@ -769,7 +769,7 @@ export function ArrayFieldRenderer({
   labelledBy,
 }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
-  const { addLabel = 'Add item', min = 0, max, legend, itemTitle } = config
+  const { addLabel = 'Add item', min = 0, max, legend, legendSize = 'array', itemTitle } = config
 
   const canRemove = fields.length > min
   const canAdd = max === undefined || fields.length < max
@@ -784,7 +784,7 @@ export function ArrayFieldRenderer({
       {hideLegend ? (
         <legend className="sr-only">{legend}</legend>
       ) : (
-        <legend className={fieldGroupLegendVariants()}>{legend}</legend>
+        <legend className={fieldGroupLegendVariants({ size: legendSize })}>{legend}</legend>
       )}
       <div className={fieldGroupStackClasses}>
         {fields.map((rhfField, index) => {

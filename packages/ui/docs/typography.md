@@ -149,10 +149,11 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 
 ## Form role aliases
 
-| Role alias / utility         | px @ 16px root | Typical use                                                      |
-| ---------------------------- | -------------- | ---------------------------------------------------------------- |
-| `text-field-group-legend`    | 24             | Top-level form group/array legends, collapsible section triggers |
-| `text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`)      |
+| Role alias / utility         | px @ 16px root | Typical use                                                 |
+| ---------------------------- | -------------- | ----------------------------------------------------------- |
+| `text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
+| `text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
+| `text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
 
 ## Heading size tokens
 

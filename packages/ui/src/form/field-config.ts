@@ -542,6 +542,11 @@ export interface ArrayConfig {
   name: string
   /** Heading rendered as the `<fieldset>` legend for the whole array. */
   legend: string
+  /**
+   * Legend scale — defaults to `array` (18px). Use `section` when the array is
+   * the primary top-level section heading.
+   */
+  legendSize?: FieldGroupLegendSize
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
   /** Label for the "Add" button. Defaults to `"Add item"`. */
