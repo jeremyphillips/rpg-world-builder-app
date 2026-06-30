@@ -7,9 +7,10 @@ unauthenticated visit bounces back to the public `/login`.
 ## Base path
 
 The app is built and served with `base: "/app/"` (`vite.config.ts`) so it sits
-behind the single-origin dev proxy next to the public app (`/`) and the API
-(`/api`). React Router uses the matching `basename` (derived from
-`import.meta.env.BASE_URL`), so in-app routes resolve under `/app`.
+behind the single-origin dev proxy next to the public app (`/`), Dev Bench
+(`/bench`), and the API (`/api`). React Router uses the matching `basename`
+(derived from `import.meta.env.BASE_URL`), so in-app routes resolve under
+`/app`.
 
 ## Single-origin / proxy assumption
 
@@ -20,71 +21,91 @@ equivalent), which routes `/api` to the Express server — see the
 [root README](../../README.md). Running `vite` alone will 404 on `/api`; use
 `pnpm dev` from the repo root to bring up the proxy + all apps.
 
-## Auth-guard behavior
+## Auth
 
-`AuthGuard` (`src/features/auth`) wraps the routed app:
+`AuthGuard` (`src/features/auth`) wraps the routed app: it queries
+`GET /api/auth/me` (TanStack Query, no retry), shows a loading state while
+in flight, renders the shell on success, or redirects to `/login` on `401`.
+Logout calls `POST /api/auth/logout` with the CSRF header, then redirects to
+`/login`.
 
-1. On mount it queries `GET /api/auth/me` (via TanStack Query, no retry).
-2. While the request is in flight it renders a loading state.
-3. On success it renders the app shell + routes.
-4. On a `401` (or any session error) it redirects the browser to the public
-   app's `/login` (`window.location.assign("/login")`, same origin).
+See [`docs/auth-guard.md`](./docs/auth-guard.md) for the full data-flow diagram.
 
-Logging out (`useLogout`) calls `POST /api/auth/logout` with the CSRF header,
-then redirects to `/login`.
-
-## Layout
+## Architecture
 
 ```text
 src/
-  main.tsx                # mounts <App />, imports index.css
-  index.css               # @rpg/ui preset + @source for class scanning
-  app/
-    app.tsx               # providers + router
-    providers.tsx         # TanStack Query provider
-    query-client.ts       # QueryClient factory
-    router.tsx            # BrowserRouter (basename "/app") + routes
-  components/
-    layout/               # AppShell, Sidebar, Topbar (workspace chrome)
-  features/
-    auth/                 # feature-first: guard + session/logout hooks + api client
-      index.ts            # public barrel (imports cross-feature go through here)
-      api/auth-client.ts  # /auth/me, /auth/csrf, /auth/logout fetch wrappers
-      components/auth-guard.tsx
-      hooks/use-session.ts
-      hooks/use-logout.ts
-  routes/
-    dashboard-home.tsx    # placeholder workspace landing
+  app/           providers, router, routes.ts, lazy-routes, breadcrumbs
+  components/    layout shells (AppShell, NarrowPage, WidePage, PageHeader, …)
+  features/      feature-first domains (see status table below)
+  lib/           shared data-table helpers, form guards, api utilities
+  routes/        top-level screens (home, profile, admin, character stub, …)
 ```
 
-Tailwind v4 is wired through the `@tailwindcss/vite` plugin; UI primitives and
-design tokens come from [`@rpg/ui`](../../packages/ui) and session types from
-[`@rpg/contracts`](../../packages/contracts).
+Route screens lazy-load via [`src/app/lazy-routes.ts`](src/app/lazy-routes.ts).
+Cross-feature imports must go through each feature's `index.ts` barrel (ESLint
+enforced). Navigation paths live in [`src/app/routes.ts`](src/app/routes.ts) —
+see [routing conventions](../../docs/routing.md).
 
-### Feature slots
+Tailwind v4 is wired through the `@tailwindcss/vite` plugin. Shared packages:
 
-Beyond the implemented `auth` feature, `src/features/` holds documented
-scaffolds (`README.md` + placeholder `index.ts`) for the workspace's domain
-areas: `user`, `campaign`, `character`, `notification`, `message`, and `content`
-(with `species`, `classes`, `spells`, `skillProficiencies`,
-`equipment` (family modules: weapons, armor, adventuring-gear, magic-items, tools,
-mounts, vehicles, services), `locations`, `monsters`). Each is
-built out in a later phase. See
-[`docs/feature-conventions.md`](./docs/feature-conventions.md) for the folder
-layout and the ESLint feature-boundary rule.
+| Package           | Role                                              |
+| ----------------- | ------------------------------------------------- |
+| `@rpg/ui`         | primitives, design tokens, schema-driven `<Form>` |
+| `@rpg/contracts`  | domain/DTO types (Zod-inferred)                   |
+| `@rpg/api-client` | CSRF-aware fetch helpers (`fetchSession`, …)      |
+| `@rpg/catalog`    | SRD seed data for Storybook fixtures and tests    |
+
+Server state uses TanStack Query; apps wrap `@rpg/api-client` in feature hooks
+locally (e.g. `useSession`, `useLogout`).
+
+### Feature status
+
+| Feature / area                                                                               | Status      |
+| -------------------------------------------------------------------------------------------- | ----------- |
+| `auth`, `user`, `campaign`                                                                   | Implemented |
+| `content` — classes, species, feats, spells, equipment (family modules), skill proficiencies | Implemented |
+| `homebrew` — vocabulary sets, rules configuration                                            | Implemented |
+| `character`, `message`, `notification`                                                       | Scaffold    |
+| `content/monsters`, `content/locations`                                                      | Scaffold    |
+
+Campaign-scoped catalog routes live under `/campaigns/:campaignId/…`. The home
+route is a campaign picker with a one-shot landing redirect
+([`src/routes/dashboard-home.tsx`](src/routes/dashboard-home.tsx)).
+
+Folder layout, layout shells, Storybook rules, and catalog UI recipes:
+[`docs/feature-conventions.md`](./docs/feature-conventions.md).
+
+## Storybook
+
+Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
+(`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
+in `@rpg/ui` Storybook (`pnpm storybook:ui`, port \*\*6006`) instead.
+
+The dashboard preview wraps every story in `MemoryRouter` — do not nest another
+router in story decorators. Detail in the Storybook section of
+[`docs/feature-conventions.md`](./docs/feature-conventions.md).
 
 ## Commands
 
 ```sh
-pnpm --filter @rpg/dashboard dev        # vite dev on :5173 (use root `pnpm dev` for the proxy)
-pnpm --filter @rpg/dashboard build      # vite build under the /app/ base
-pnpm --filter @rpg/dashboard preview    # preview the production build
-pnpm --filter @rpg/dashboard test       # vitest (auth-guard redirect unit test)
+pnpm --filter @rpg/dashboard dev           # vite dev on :5173 (use root `pnpm dev` for the proxy)
+pnpm --filter @rpg/dashboard build         # vite build under the /app/ base
+pnpm --filter @rpg/dashboard preview       # preview the production build
+pnpm --filter @rpg/dashboard test          # vitest unit tests
 pnpm --filter @rpg/dashboard typecheck
 pnpm --filter @rpg/dashboard lint
+pnpm --filter @rpg/dashboard storybook     # composition stories on :6007
+pnpm --filter @rpg/dashboard analyze       # production build + bundle treemap
 ```
 
-See [`docs/auth-guard.md`](./docs/auth-guard.md) for the auth-guard data flow,
-[`docs/feature-conventions.md`](./docs/feature-conventions.md) for the
-feature-folder convention, and [`docs/code-splitting.md`](./docs/code-splitting.md)
-for route lazy loading and bundle conventions.
+Root shorthands: `pnpm storybook:dashboard`, `pnpm storybook` (UI + dashboard).
+
+## Documentation
+
+- [feature-conventions.md](./docs/feature-conventions.md) — feature folders, layout shells, Storybook, catalog UI recipes
+- [code-splitting.md](./docs/code-splitting.md) — lazy routes, bundle analyzer
+- [auth-guard.md](./docs/auth-guard.md) — session gate and redirect flow
+- [content-types.md](../../docs/content-types.md) — adding a new catalog content type (contracts-first)
+- [vocabulary.md](../../docs/vocabulary.md) — homebrew vocabulary sets
+- [routing.md](../../docs/routing.md) — `ROUTES` constants and navigation conventions

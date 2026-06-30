@@ -2,8 +2,10 @@
 
 The dashboard is organized feature-first: each domain area lives in its own
 folder under `src/features/<feature>/` and owns its UI, state, and data access.
-Most feature folders here are **scaffolds** — a `README.md` describing intent
-plus a placeholder `index.ts` — until their phase is built.
+Several domains are fully built (auth, campaign, content catalog, homebrew);
+others remain **scaffolds** — a `README.md` describing intent plus a placeholder
+`index.ts` — until their phase is built. See the feature status table in
+[apps/dashboard/README.md](../README.md#feature-status).
 
 ## Layout
 
