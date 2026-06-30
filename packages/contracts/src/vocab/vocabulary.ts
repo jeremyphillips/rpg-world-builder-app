@@ -85,33 +85,6 @@ export const resolvedVocabularyOptionSetSchema = z.object({
 
 export type ResolvedVocabularyOptionSet = z.infer<typeof resolvedVocabularyOptionSetSchema>
 
-/** Visible-sidebar content types summarized on the Homebrew hub. */
-export const HOMEBREW_SUMMARY_CONTENT_TYPES = [
-  'classes',
-  'spells',
-  'species',
-  'feats',
-  'equipment',
-  'skill-proficiencies',
-] as const
-
-export const homebrewSummaryContentTypeSchema = z.enum(HOMEBREW_SUMMARY_CONTENT_TYPES)
-
-export type HomebrewSummaryContentType = z.infer<typeof homebrewSummaryContentTypeSchema>
-
-export const homebrewContentSummaryItemSchema = z.object({
-  contentType: homebrewSummaryContentTypeSchema,
-  totalCount: z.number().int().min(0),
-})
-
-export type HomebrewContentSummaryItem = z.infer<typeof homebrewContentSummaryItemSchema>
-
-export const homebrewContentSummarySchema = z.object({
-  content: z.array(homebrewContentSummaryItemSchema),
-})
-
-export type HomebrewContentSummary = z.infer<typeof homebrewContentSummarySchema>
-
 /** Usage summary for delete/disable guards — `usedBy` may be stubbed until wired. */
 export const vocabularyOptionUsageSchema = z.object({
   id: vocabularyOptionIdSchema,

@@ -1,16 +1,16 @@
 import { z } from 'zod'
 
 import { contentPoolChoiceSchema } from './choice'
-import { abilitySchema } from '../vocab/ability'
-import { armorCategorySchema } from '../vocab/armor/category'
-import { damageTypeSchema } from '../vocab/damage-type'
-import { absoluteLevelSchema } from '../primitives/level'
-import { speedSchema } from '../vocab/movement-mode'
-import { senseSchema } from '../vocab/sense'
-import { usageFrequencySchema } from '../vocab/usage-frequency'
-import { featCategorySchema } from '../vocab/feat'
-import { languageCategorySchema, languageSchema } from '../vocab/language'
-import { skillSchema } from './skill-proficiency'
+import { abilitySchema } from '../../vocab/ability'
+import { armorCategorySchema } from '../../vocab/armor/category'
+import { damageTypeSchema } from '../../vocab/damage-type'
+import { absoluteLevelSchema } from '../../primitives/level'
+import { speedSchema } from '../../vocab/movement-mode'
+import { senseSchema } from '../../vocab/sense'
+import { usageFrequencySchema } from '../../vocab/usage-frequency'
+import { featCategorySchema } from '../../vocab/feat'
+import { languageCategorySchema, languageSchema } from '../../vocab/language'
+import { skillSchema } from '../skill-proficiency'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,

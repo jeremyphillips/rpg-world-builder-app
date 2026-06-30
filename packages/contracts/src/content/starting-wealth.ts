@@ -8,7 +8,7 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
+} from './lib/envelope'
 
 // ---------------------------------------------------------------------------
 // Starting wealth — ruleset-scoped tier table for higher-level character creation.

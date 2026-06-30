@@ -6,7 +6,7 @@ import { serviceDurationSchema } from '../vocab/equipment/service-duration'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
-import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './envelope'
+import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
 import { equipmentBaseSchema } from './equipment/base'
 import {
   adventuringGearEquipmentKindFields,

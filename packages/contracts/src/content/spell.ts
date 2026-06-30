@@ -14,7 +14,7 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
+} from './lib/envelope'
 import { classSlugSchema } from './class/class'
 
 // ---------------------------------------------------------------------------

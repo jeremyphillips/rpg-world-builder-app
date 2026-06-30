@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { gearKindSchema } from '../../vocab/equipment/gear-kind'
 import { holySymbolUsageSchema } from '../../vocab/equipment/holy-symbol-usage'
-import { slugSchema } from '../envelope'
+import { slugSchema } from '../lib/envelope'
 import type { EquipmentBaseFields } from './base'
 
 /** Kind-specific fields for `kind: adventuring_gear`. Spread onto {@link EquipmentBaseFields}. */
@@ -48,7 +48,11 @@ export function refineAdventuringGearEquipment(
     })
   }
 
-  if (val.alsoWeaponSlug !== undefined && val.gearKind !== 'arcane_focus' && val.gearKind !== 'druidic_focus') {
+  if (
+    val.alsoWeaponSlug !== undefined &&
+    val.gearKind !== 'arcane_focus' &&
+    val.gearKind !== 'druidic_focus'
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['alsoWeaponSlug'],

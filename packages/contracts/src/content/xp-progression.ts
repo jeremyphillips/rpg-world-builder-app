@@ -6,7 +6,7 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
+} from './lib/envelope'
 
 // ---------------------------------------------------------------------------
 // XP progression — authored level thresholds. System records provide the SRD

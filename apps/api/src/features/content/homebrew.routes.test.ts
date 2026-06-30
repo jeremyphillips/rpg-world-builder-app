@@ -6,7 +6,7 @@ import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { HOMEBREW_SUMMARY_TYPES } from './content-types'
+import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts'
 
 let app: Express
 
@@ -37,6 +37,6 @@ describe('homebrew routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .expect(200)
 
-    expect(summaryRes.body.summary.content).toHaveLength(HOMEBREW_SUMMARY_TYPES.length)
+    expect(summaryRes.body.summary.content).toHaveLength(HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS.length)
   })
 })

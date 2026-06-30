@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from './roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
-import { updateCampaignCharacterCreationInputSchema } from './campaign-character-creation-patch'
+import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
@@ -10,7 +10,7 @@ export {
   IMPORTED_CHARACTERS_POLICIES,
   importedCharactersPolicySchema,
   type ImportedCharactersPolicy,
-} from './campaign-character-creation-patch'
+} from './patches/campaign-character-creation-patch'
 
 // ---------------------------------------------------------------------------
 // Campaign identity

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveMulticlassingRules } from '../platform/campaign-multiclassing-patch'
+import { resolveMulticlassingRules } from '../../platform/patches/campaign-multiclassing-patch'
 import {
   validateMulticlass,
   type MulticlassingRulesInput,

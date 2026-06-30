@@ -1,6 +1,6 @@
-import { getDamageTypeLabel } from '../vocab/damage-type'
-import { getLanguageLabel } from '../vocab/language'
-import { getSenseLabel } from '../vocab/sense'
+import { getDamageTypeLabel } from '../../vocab/damage-type'
+import { getLanguageLabel } from '../../vocab/language'
+import { getSenseLabel } from '../../vocab/sense'
 import type { ContentGrants, ContentTrait, CustomContentTrait, GrantContentTrait } from './grants'
 
 export type TraitDisplay = {

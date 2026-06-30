@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
 import { toolCategorySchema } from '../vocab/equipment/tool-category'
-import { contentChoiceOptionSchema, contentChoiceSchema, contentPoolChoiceSchema } from './choice'
+import {
+  contentChoiceOptionSchema,
+  contentChoiceSchema,
+  contentPoolChoiceSchema,
+} from './lib/choice'
 import { characterWealthGrantSchema } from './character'
 import { equipmentModifierSchema } from './equipment/modifier'
 

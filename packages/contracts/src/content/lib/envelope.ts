@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { systemRulesetIdSchema } from '../primitives/ruleset'
+import { systemRulesetIdSchema } from '../../primitives/ruleset'
 
 // ---------------------------------------------------------------------------
 // Content ownership — the reusable envelope every catalog content type extends

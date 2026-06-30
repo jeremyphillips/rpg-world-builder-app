@@ -5,11 +5,11 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
+} from './lib/envelope'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { speedSchema } from '../vocab/movement-mode'
-import { contentNamedChoiceSchema } from './choice'
+import { contentNamedChoiceSchema } from './lib/choice'
 import {
   contentGrantsSchema,
   contentTraitSchema,
@@ -17,7 +17,7 @@ import {
   innateSpellsSchema,
   speciesGrantsSchema,
   speciesProficienciesSchema,
-} from './grants'
+} from './lib/grants'
 import { speciesCharacterCreationSchema } from './species-character-creation'
 
 // ---------------------------------------------------------------------------
@@ -44,7 +44,7 @@ export type {
   InnateSpellKind,
   SpeciesGrants,
   SpeciesProficiencies,
-} from './grants'
+} from './lib/grants'
 
 /** @deprecated Prefer `contentTraitSchema`. */
 export const speciesTraitSchema = contentTraitSchema

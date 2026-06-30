@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { systemRulesetIdSchema } from '../primitives/ruleset'
-import { vocabularyOptionSetPatchSchema } from '../vocab/vocabulary'
+import { systemRulesetIdSchema } from '../../primitives/ruleset'
+import { vocabularyOptionSetPatchSchema } from '../../vocab/vocabulary'
 import {
   campaignCharacterCreationPatchSchema,
   resolvedCampaignCharacterCreationPatchSchema,

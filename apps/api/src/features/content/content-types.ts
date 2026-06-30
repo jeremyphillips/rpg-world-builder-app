@@ -1,4 +1,9 @@
-import type { HomebrewSummaryContentType } from '@rpg/contracts'
+import {
+  API_CONTENT_TYPE_KEYS,
+  HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
+  type ApiContentTypeKey,
+  type HomebrewSummaryContentType,
+} from '@rpg/contracts'
 
 import { classRegistration } from './classes/classes.config'
 import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
@@ -35,19 +40,12 @@ const CONTENT_TYPES = {
   spells: spellRegistration,
   feats: featRegistration,
   'starting-wealth': startingWealthRegistration,
-} as const satisfies Record<string, ContentTypeRegistration>
+} as const satisfies Record<ApiContentTypeKey, ContentTypeRegistration>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES
 
-/** Content types included in the homebrew hub summary (excludes starting-wealth). */
-export const HOMEBREW_SUMMARY_TYPES = [
-  'classes',
-  'spells',
-  'species',
-  'feats',
-  'equipment',
-  'skill-proficiencies',
-] as const satisfies readonly HomebrewSummaryContentType[]
+/** @deprecated Import `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` from `@rpg/contracts`. */
+export const HOMEBREW_SUMMARY_TYPES = HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS
 
 export function getContentTypeConfig<K extends ContentTypeName>(
   type: K,
@@ -79,3 +77,6 @@ export async function resolveContentForCampaign(
   }
   return resolveCatalogForCampaign(reg.read, campaignId)
 }
+
+export { API_CONTENT_TYPE_KEYS, HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS }
+export type { HomebrewSummaryContentType }

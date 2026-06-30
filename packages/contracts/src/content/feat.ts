@@ -6,8 +6,8 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
-import { requirementExpressionSchema } from './requirement-expression'
+} from './lib/envelope'
+import { requirementExpressionSchema } from './lib/requirement-expression'
 
 // ---------------------------------------------------------------------------
 // Feat — prose-first catalog content. Benefit prose lives in `description` for

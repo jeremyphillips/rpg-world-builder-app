@@ -5,7 +5,7 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from './envelope'
+} from './lib/envelope'
 
 // ---------------------------------------------------------------------------
 // Skill taxonomy — the SRD 5.2 skills as id -> display label. Previously in

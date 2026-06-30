@@ -6,13 +6,13 @@ import {
   editionPresetIdSchema,
   getEditionPresetMechanics,
   type EditionPresetId,
-} from '../vocab/mechanics'
+} from '../../vocab/mechanics'
 import {
   ARMOR_CLASS_BASES,
   ARMOR_CLASS_MODES,
   type ArmorClassBase,
   type ArmorClassMode,
-} from '../vocab/mechanics/edition-preset-mechanics'
+} from '../../vocab/mechanics/edition-preset-mechanics'
 
 export const armorClassModeSchema = z.enum(ARMOR_CLASS_MODES)
 

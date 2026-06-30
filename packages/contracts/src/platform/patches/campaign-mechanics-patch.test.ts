@@ -6,7 +6,7 @@ import {
   resolveMechanicsPatch,
   updateCampaignMechanicsInputSchema,
 } from './campaign-mechanics-patch'
-import { getEditionPresetMechanics } from '../vocab/mechanics'
+import { getEditionPresetMechanics } from '../../vocab/mechanics'
 
 describe('resolveMechanicsPatch', () => {
   it('returns 5e SRD defaults when patch is absent', () => {

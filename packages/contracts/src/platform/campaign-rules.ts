@@ -1,11 +1,11 @@
 import type {
   CampaignCharacterCreationPatch,
   CreatureTypePolicy,
-} from './campaign-character-creation-patch'
+} from './patches/campaign-character-creation-patch'
 import {
   resolveMulticlassingRules,
   type ResolvedCampaignMulticlassingPatch,
-} from './campaign-multiclassing-patch'
+} from './patches/campaign-multiclassing-patch'
 import type { CreatureTypeId } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../primitives/level'
-import { creatureTypeSchema, type CreatureTypeId } from '../vocab/creature-type'
-import { validateExtendedMaxLevel } from './campaign-level-validation'
+import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primitives/level'
+import { creatureTypeSchema, type CreatureTypeId } from '../../vocab/creature-type'
+import { validateExtendedMaxLevel } from '../campaign-level-validation'
 import {
   campaignMulticlassingPatchSchema,
   resolveMulticlassingRules,

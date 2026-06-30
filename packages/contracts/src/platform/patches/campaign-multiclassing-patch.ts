@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX } from '../vocab/ability'
+import { ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX } from '../../vocab/ability'
 
 // ---------------------------------------------------------------------------
 // Multiclassing — campaign-configurable rules controlling whether characters

@@ -10,8 +10,8 @@ import {
   contentMetaSchema,
   contentPatchBaseSchema,
   slugSchema,
-} from '../envelope'
-import { customContentTraitSchema, normalizeContentTrait } from '../grants'
+} from '../lib/envelope'
+import { customContentTraitSchema, normalizeContentTrait } from '../lib/grants'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
 import { skillSchema } from '../skill-proficiency'
 

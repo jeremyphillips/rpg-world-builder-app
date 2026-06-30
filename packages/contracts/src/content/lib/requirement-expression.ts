@@ -1,15 +1,15 @@
 import { z } from 'zod'
 
-import { absoluteLevelSchema } from '../primitives/level'
+import { absoluteLevelSchema } from '../../primitives/level'
 import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   abilitySchema,
   getAbilityLabel,
   type Ability,
-} from '../vocab/ability'
+} from '../../vocab/ability'
 
-import { classSlugSchema, getClassName } from './class/class'
+import { classSlugSchema, getClassName } from '../class/class'
 
 // ---------------------------------------------------------------------------
 // RequirementExpression — composable AND/OR eligibility trees shared by feats,

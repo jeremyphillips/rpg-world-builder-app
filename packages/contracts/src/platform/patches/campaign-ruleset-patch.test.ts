@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { campaignRulesetPatchSchema } from './campaign-ruleset-patch'
+import { campaignRulesetPatchSchema } from './ruleset'
 
 describe('campaignRulesetPatchSchema', () => {
   it('parses a campaign ruleset patch document', () => {

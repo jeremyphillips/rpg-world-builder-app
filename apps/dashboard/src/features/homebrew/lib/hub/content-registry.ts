@@ -13,7 +13,7 @@ export type VisibleSidebarContentEntry = {
 
 /**
  * Parent content types shown in the campaign sidebar and Homebrew hub Content
- * section — keep in sync with `HOMEBREW_SUMMARY_CONTENT_TYPES` in contracts.
+ * section — keep in sync with `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts.
  */
 export const VISIBLE_SIDEBAR_CONTENT: readonly VisibleSidebarContentEntry[] = [
   {

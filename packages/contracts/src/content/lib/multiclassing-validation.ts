@@ -1,11 +1,11 @@
-import { getAbilityLabel, type Ability } from '../vocab/ability'
+import { getAbilityLabel, type Ability } from '../../vocab/ability'
 
-import { getClassName } from './class/class'
+import { getClassName } from '../class/class'
 import {
   DEFAULT_SPECIES_MULTICLASS_POLICY,
   type SpeciesLevelLimits,
   type SpeciesMulticlassing,
-} from './species-character-creation'
+} from '../species-character-creation'
 
 // ---------------------------------------------------------------------------
 // Multiclassing validation — a pure eligibility check shared by the future
