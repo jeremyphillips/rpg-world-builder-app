@@ -11,8 +11,8 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
-import { EditionPresetEffects } from '../components/edition-preset-effects.client'
-import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-labels'
+import { EditionPresetEffects } from '../../../components/edition-preset-effects.client'
+import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-form-labels'
 
 export const mechanicsValuesSchema = z.object({
   editionPresetId: editionPresetIdSchema,

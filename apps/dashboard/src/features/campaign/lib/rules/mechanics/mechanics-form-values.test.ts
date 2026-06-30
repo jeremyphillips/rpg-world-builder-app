@@ -5,7 +5,7 @@ import {
   buildMechanicsPatchInput,
   defaultMechanicsValues,
   mapRulesetPatchToMechanicsValues,
-} from './mechanics-settings-values'
+} from './mechanics-form-values'
 
 describe('mapRulesetPatchToMechanicsValues', () => {
   it('maps resolved mechanics to flat form values', () => {

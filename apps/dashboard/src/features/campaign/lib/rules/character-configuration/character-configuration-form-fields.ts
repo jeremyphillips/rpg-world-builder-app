@@ -24,12 +24,12 @@ import {
 
 import { vocabularyComboboxField } from '@/features/homebrew'
 
-import { ExtendedProgressionEffects } from '../components/extended-progression-effects.client'
+import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects.client'
 import {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
-} from '../components/level-range-summary.client'
-import { IMPORTED_CHARACTERS_POLICY_LABELS } from './labels'
+} from '../../../components/level-range-summary.client'
+import { IMPORTED_CHARACTERS_POLICY_LABELS } from './character-configuration-form-labels'
 
 export type CharacterRuleSurface = 'create' | 'config'
 

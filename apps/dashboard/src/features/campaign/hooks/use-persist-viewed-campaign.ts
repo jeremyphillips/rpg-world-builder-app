@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { writeStoredCampaignId } from '../lib/selected-campaign-storage'
+import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
 
 /**
  * Remember the campaign currently shown in the URL so direct visits/bookmarks

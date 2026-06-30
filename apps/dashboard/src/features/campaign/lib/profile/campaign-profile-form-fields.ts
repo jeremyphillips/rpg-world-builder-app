@@ -2,7 +2,12 @@ import { z } from 'zod'
 import { PLAY_STYLES, MOODS, MAGIC_LEVELS, DIFFICULTIES } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { PLAY_STYLE_LABELS, MOOD_LABELS, MAGIC_LEVEL_LABELS, DIFFICULTY_LABELS } from './labels'
+import {
+  PLAY_STYLE_LABELS,
+  MOOD_LABELS,
+  MAGIC_LEVEL_LABELS,
+  DIFFICULTY_LABELS,
+} from './campaign-profile-form-labels'
 
 // ---------------------------------------------------------------------------
 // Identity

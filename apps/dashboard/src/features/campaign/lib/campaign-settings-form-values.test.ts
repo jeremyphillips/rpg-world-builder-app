@@ -11,14 +11,18 @@ import {
 } from '@rpg/contracts'
 
 import {
-  buildCharacterCreationPatchInput,
-  buildCharacterCreationPatchInputFromCreateWizard,
   buildCreateCampaignInput,
+  type CampaignCreateValues,
+} from './campaign-settings-form-values'
+import {
   buildUpdateCampaignInput,
   mapCampaignToSettingsValues,
+} from './profile/campaign-profile-form-values'
+import {
+  buildCharacterCreationPatchInput,
+  buildCharacterCreationPatchInputFromCreateWizard,
   mapRulesetPatchToRulesValues,
-  type CampaignCreateValues,
-} from './campaign-settings-values'
+} from './rules/character-configuration/character-configuration-form-values'
 
 const campaign: Campaign = {
   id: 'c1',

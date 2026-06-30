@@ -1,6 +1,6 @@
 import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
 
-import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-form-values'
 import {
   buildFlavorRows,
   buildIdentityRows,

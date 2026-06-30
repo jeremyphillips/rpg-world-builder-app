@@ -1,11 +1,11 @@
-import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
-import { buildRulesReviewRowsForSurface } from '../../lib/character-configuration-fields'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-form-values'
+import { buildRulesReviewRowsForSurface } from '../../lib/rules/character-configuration/character-configuration-form'
 import {
   DIFFICULTY_LABELS,
   MAGIC_LEVEL_LABELS,
   MOOD_LABELS,
   PLAY_STYLE_LABELS,
-} from '../../lib/labels'
+} from '../../lib/profile/campaign-profile-form-labels'
 
 export type ReviewRowData = {
   label: string

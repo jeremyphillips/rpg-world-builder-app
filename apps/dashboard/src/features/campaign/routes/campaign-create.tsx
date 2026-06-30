@@ -9,7 +9,7 @@ import {
   createRulesFields,
   createRulesSchema,
   type CreateRulesValues,
-} from '../lib/character-configuration-fields'
+} from '../lib/rules/character-configuration/character-configuration-form'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import {
@@ -19,11 +19,11 @@ import {
   flavorFields,
   type IdentityValues,
   type FlavorValues,
-} from '../lib/campaign-fields'
+} from '../lib/profile/campaign-profile-form-fields'
 import {
   buildCreateCampaignInput,
   type CampaignCreateValues,
-} from '../lib/campaign-settings-values'
+} from '../lib/campaign-settings-form-values'
 import { ReviewStep } from '../components/steps/review-step'
 
 const STEPS: WizardStepDef[] = [

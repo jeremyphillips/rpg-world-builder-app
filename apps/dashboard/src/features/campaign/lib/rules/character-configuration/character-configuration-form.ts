@@ -9,7 +9,7 @@ import {
   buildRulesConfigLayoutFields,
   buildRulesFieldsForSurface,
   buildRulesSchemaForSurface,
-} from './character-configuration-field-registry'
+} from './character-configuration-form-fields'
 
 const defaultCreatureTypeOptions = buildActiveCreatureTypeFieldOptions(
   buildSeedCreatureTypeVocabulary(),
@@ -27,7 +27,7 @@ export {
   type CreateWizardRuleFieldId,
   type RulesReviewRow,
   type RulesValues,
-} from './character-configuration-field-registry'
+} from './character-configuration-form-fields'
 
 export const createRulesSchema = buildRulesSchemaForSurface('create')
 export const rulesSchema = buildRulesSchemaForSurface('config')

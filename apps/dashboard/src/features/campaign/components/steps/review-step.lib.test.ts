@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CampaignCreateValues } from '../../lib/campaign-settings-values'
+import type { CampaignCreateValues } from '../../lib/campaign-settings-form-values'
 import { buildFlavorRows, buildIdentityRows, buildRulesRows } from './review-step.lib'
 
 describe('review-step row builders', () => {
