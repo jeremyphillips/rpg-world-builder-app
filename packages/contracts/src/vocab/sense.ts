@@ -1,51 +1,27 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from './types'
+import { formatVocabularySlugLabel } from './format-slug-label'
+import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
-// Senses — the closed SRD 5.2.1 special sense types shared by species,
-// monsters, and any creature with a sense block. Range in feet is modeled
-// separately on `senseSchema`.
+// Senses — open vocabulary set. Range in feet stays on `senseSchema`.
 // ---------------------------------------------------------------------------
 
-export const SENSE_ENTRIES = {
-  darkvision: {
-    label: 'Darkvision',
-    description:
-      'You can see in Dim Light within the specified range as if it were Bright Light, and in Darkness within that range as if it were Dim Light.',
-  },
-  blindsight: {
-    label: 'Blindsight',
-    description:
-      'You can perceive your surroundings without relying on sight within the specified range. Blindsight can’t perceive color or read writing.',
-  },
-  tremorsense: {
-    label: 'Tremorsense',
-    description:
-      'You can detect and pinpoint the origin of vibrations within the specified range, provided the source is in contact with the same ground or substance.',
-  },
-  truesight: {
-    label: 'Truesight',
-    description:
-      'You can see in normal and magical Darkness, see Invisible creatures and objects, automatically detect visual illusions and succeed on saves against them, and perceive the true form of a shape-changer or a creature transformed by magic.',
-  },
-} as const satisfies Record<string, GameTermEntry>
+export const SENSE_SET_ID = 'senses' as const satisfies VocabularyOptionSetId
 
-export type SenseType = keyof typeof SENSE_ENTRIES
+/**
+ * Primitive shape for stored sense type ids. Catalog membership is validated
+ * against the campaign-resolved vocabulary.
+ */
+export const senseIdSchema = vocabularyOptionIdSchema
 
-export const SENSE_TYPES = Object.keys(SENSE_ENTRIES) as [SenseType, ...SenseType[]]
+export type SenseId = z.infer<typeof senseIdSchema>
 
-export const senseTypeSchema = z.enum(SENSE_TYPES)
+/** @deprecated Use `senseIdSchema`. */
+export const senseTypeSchema = senseIdSchema
 
-/** Returns the reference entry for a sense type id, if known. */
-export function getSenseEntry(id: string): GameTermEntry | undefined {
-  return SENSE_ENTRIES[id as SenseType]
-}
-
-/** Returns the display label for a sense type. Falls back to the raw value. */
-export function getSenseLabel(type: string): string {
-  return getSenseEntry(type)?.label ?? type
-}
+/** @deprecated Use `SenseId`. */
+export type SenseType = SenseId
 
 /**
  * Preset sense ranges (in feet) shown as a select in authoring UIs. The
@@ -56,8 +32,13 @@ export type StandardSenseRange = (typeof SENSE_RANGES)[number]
 
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */
 export const senseSchema = z.object({
-  type: senseTypeSchema,
+  type: senseIdSchema,
   range: z.number().int().min(0),
 })
 
 export type Sense = z.infer<typeof senseSchema>
+
+/** Returns a display label — title-cased slug fallback when seed label is unknown. */
+export function getSenseLabel(type: string): string {
+  return formatVocabularySlugLabel(type)
+}

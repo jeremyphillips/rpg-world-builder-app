@@ -2,7 +2,9 @@ import { z } from 'zod'
 import {
   ATTACK_RESOLUTION_MODE_SET_ID,
   CREATURE_TYPE_SET_ID,
+  DAMAGE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
+  SENSE_SET_ID,
   vocabularySeedOptionSchema,
 } from '@rpg/contracts'
 import type {
@@ -16,7 +18,9 @@ import type {
 import { getById } from '../lib/get-by-id'
 import attackResolutionModesRaw from './data/srd-cc-5.2.1/attack-resolution-modes.json'
 import creatureTypesRaw from './data/srd-cc-5.2.1/creature-types.json'
+import damageTypesRaw from './data/srd-cc-5.2.1/damage-types.json'
 import editionPresetsRaw from './data/srd-cc-5.2.1/edition-presets.json'
+import sensesRaw from './data/srd-cc-5.2.1/senses.json'
 
 function assertUniqueOptionIds(options: readonly VocabularySeedOption[], label: string): void {
   const ids = options.map((option) => option.id)
@@ -34,6 +38,8 @@ function parseSeedOptions(raw: unknown, label: string): VocabularySeedOption[] {
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.
 const SRD_521_CREATURE_TYPES = parseSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
+const SRD_521_DAMAGE_TYPES = parseSeedOptions(damageTypesRaw, DAMAGE_TYPE_SET_ID)
+const SRD_521_SENSES = parseSeedOptions(sensesRaw, SENSE_SET_ID)
 const SRD_521_EDITION_PRESETS = parseSeedOptions(editionPresetsRaw, EDITION_PRESET_SET_ID)
 const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
   attackResolutionModesRaw,
@@ -43,6 +49,8 @@ const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
 const SEED_SETS_BY_RULESET = {
   'srd-cc-5.2.1': {
     [CREATURE_TYPE_SET_ID]: SRD_521_CREATURE_TYPES,
+    [DAMAGE_TYPE_SET_ID]: SRD_521_DAMAGE_TYPES,
+    [SENSE_SET_ID]: SRD_521_SENSES,
     [EDITION_PRESET_SET_ID]: SRD_521_EDITION_PRESETS,
     [ATTACK_RESOLUTION_MODE_SET_ID]: SRD_521_ATTACK_RESOLUTION_MODES,
   },
@@ -154,6 +162,80 @@ export function getSeedCreatureTypeEntry(
       id,
       'Creature type',
     )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Damage types — elemental + planar vocabulary (physical types stay closed)
+// ---------------------------------------------------------------------------
+
+export const DAMAGE_TYPES = SRD_521_DAMAGE_TYPES.map((option) => option.id) as [
+  (typeof SRD_521_DAMAGE_TYPES)[number]['id'],
+  ...(typeof SRD_521_DAMAGE_TYPES)[number]['id'][],
+]
+
+export type SeedDamageType = (typeof DAMAGE_TYPES)[number]
+
+export function loadSeedDamageTypes(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, DAMAGE_TYPE_SET_ID)
+}
+
+export function seedDamageTypeIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, DAMAGE_TYPE_SET_ID)
+}
+
+export function getSeedDamageTypeLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, DAMAGE_TYPE_SET_ID, id)
+}
+
+export function getSeedDamageTypeEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, DAMAGE_TYPE_SET_ID),
+      rulesetId,
+      DAMAGE_TYPE_SET_ID,
+      id,
+      'Damage type',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Senses — open vocabulary set
+// ---------------------------------------------------------------------------
+
+export const SENSES = SRD_521_SENSES.map((option) => option.id) as [
+  (typeof SRD_521_SENSES)[number]['id'],
+  ...(typeof SRD_521_SENSES)[number]['id'][],
+]
+
+export type SeedSense = (typeof SENSES)[number]
+
+export function loadSeedSenses(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, SENSE_SET_ID)
+}
+
+export function seedSenseIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, SENSE_SET_ID)
+}
+
+export function getSeedSenseLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, SENSE_SET_ID, id)
+}
+
+export function getSeedSenseEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(loadSeedOptions(rulesetId, SENSE_SET_ID), rulesetId, SENSE_SET_ID, id, 'Sense')
   } catch {
     return undefined
   }

@@ -2,7 +2,6 @@ import { Link, useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
 import {
   formatSlugAsLabel,
-  getDamageTypeLabel,
   getEffectConditionLabel,
   getSpellFunctionTagLabel,
   getSpellRoleTagLabel,
@@ -13,6 +12,7 @@ import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
+import { useDamageTypeVocabulary, getDamageTypeLabelFromVocabulary } from '@/features/homebrew'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
@@ -64,19 +64,30 @@ function SpellClassesList({ campaignId, classIds }: { campaignId: string; classI
   )
 }
 
-function collectTagLabels(tags: SpellTags): string[] {
+function collectTagLabels(
+  tags: SpellTags,
+  damageTypeVocabulary: ReturnType<typeof useDamageTypeVocabulary>['vocabulary'],
+): string[] {
   const labels: string[] = []
   tags.roles?.forEach((role) => labels.push(getSpellRoleTagLabel(role)))
   tags.functions?.forEach((fn) => labels.push(getSpellFunctionTagLabel(fn)))
-  tags.damageTypes?.forEach((type) => labels.push(getDamageTypeLabel(type)))
+  tags.damageTypes?.forEach((type) =>
+    labels.push(getDamageTypeLabelFromVocabulary(damageTypeVocabulary, type)),
+  )
   tags.conditions?.forEach((condition) => labels.push(getEffectConditionLabel(condition)))
   return labels
 }
 
-function SpellTagsSection({ tags }: { tags?: SpellTags }) {
+function SpellTagsSection({
+  tags,
+  damageTypeVocabulary,
+}: {
+  tags?: SpellTags
+  damageTypeVocabulary: ReturnType<typeof useDamageTypeVocabulary>['vocabulary']
+}) {
   if (!tags) return null
 
-  const labels = collectTagLabels(tags)
+  const labels = collectTagLabels(tags, damageTypeVocabulary)
   if (labels.length === 0) return null
 
   return (
@@ -103,6 +114,7 @@ type SpellDetailContentProps = {
 export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProps) {
   useSetBreadcrumbLabel(spell.name)
   const { data: classes = [] } = useClasses(campaignId)
+  const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(campaignId)
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
   const statRows = buildSpellStatRows(spell, { classesBySlug }).filter(
     (row) => row.label !== 'Classes',
@@ -124,7 +136,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
         }
       >
         <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
-        <SpellTagsSection tags={spell.tags} />
+        <SpellTagsSection tags={spell.tags} damageTypeVocabulary={damageTypeVocabulary} />
       </ContentDetailLayout>
     </WidePage>
   )

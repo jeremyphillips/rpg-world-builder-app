@@ -13,6 +13,8 @@ import {
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
+import { buildActiveDamageTypeFieldOptions } from '@/features/homebrew'
+
 import {
   feetInputUnitField,
   identityFields,
@@ -22,7 +24,6 @@ import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   castingTimeUnitOptions,
   conditionTagOptions,
-  damageTypeOptions,
   deliveryMethodOptions,
   durationKindOptions,
   durationUnitOptions,
@@ -372,7 +373,9 @@ function castingFields(): FormItem[] {
   ]
 }
 
-function tagFields(): FormItem[] {
+function tagFields(ctx: ContentFormCtx): FormItem[] {
+  const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
+
   return [
     {
       type: 'chips',
@@ -405,6 +408,6 @@ export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
     { id: 'casting', label: 'Casting', fields: castingFields() },
-    { id: 'tags', label: 'Tags', fields: tagFields() },
+    { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
   ]
 }

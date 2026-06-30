@@ -14,7 +14,11 @@ import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOpt
 import type { FieldOption } from '@rpg/ui/form'
 
 import { useCampaignRules } from '@/features/campaign'
-import { useCreatureTypeVocabulary } from '@/features/homebrew'
+import {
+  useCreatureTypeVocabulary,
+  useDamageTypeVocabulary,
+  useSenseVocabulary,
+} from '@/features/homebrew'
 
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
@@ -129,6 +133,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const equipmentQuery = useEquipment(campaignId)
   const campaignRules = useCampaignRules(campaignId)
   const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
+  const damageTypeQuery = useDamageTypeVocabulary(campaignId)
+  const senseQuery = useSenseVocabulary(campaignId)
 
   const options = useMemo(
     () =>
@@ -147,9 +153,18 @@ export function useContentFormOptions(campaignId: string | undefined): {
       campaignId,
       campaignRules,
       creatureTypeVocabulary: creatureTypeQuery.vocabulary,
+      damageTypeVocabulary: damageTypeQuery.vocabulary,
+      senseVocabulary: senseQuery.vocabulary,
       options,
     }),
-    [campaignId, campaignRules, creatureTypeQuery.vocabulary, options],
+    [
+      campaignId,
+      campaignRules,
+      creatureTypeQuery.vocabulary,
+      damageTypeQuery.vocabulary,
+      senseQuery.vocabulary,
+      options,
+    ],
   )
 
   return {
@@ -159,12 +174,16 @@ export function useContentFormOptions(campaignId: string | undefined): {
       spellsQuery.isPending ||
       featsQuery.isPending ||
       equipmentQuery.isPending ||
-      creatureTypeQuery.isPending,
+      creatureTypeQuery.isPending ||
+      damageTypeQuery.isPending ||
+      senseQuery.isPending,
     isError:
       classesQuery.isError ||
       spellsQuery.isError ||
       featsQuery.isError ||
       equipmentQuery.isError ||
-      creatureTypeQuery.isError,
+      creatureTypeQuery.isError ||
+      damageTypeQuery.isError ||
+      senseQuery.isError,
   }
 }

@@ -1,8 +1,6 @@
 import {
   CASTING_TIME_UNITS,
   CASTING_TIME_UNIT_ENTRIES,
-  DAMAGE_TYPE_ENTRIES,
-  DAMAGE_TYPE_IDS,
   DURATION_UNITS,
   DURATION_UNIT_ENTRIES,
   EFFECT_CONDITION_ENTRIES,
@@ -101,14 +99,6 @@ export const functionTagOptions = toOptions(
   Object.fromEntries(
     SPELL_FUNCTION_TAGS.map((t) => [t, SPELL_FUNCTION_TAG_ENTRIES[t].label]),
   ) as Record<(typeof SPELL_FUNCTION_TAGS)[number], string>,
-)
-
-export const damageTypeOptions = toOptions(
-  DAMAGE_TYPE_IDS,
-  Object.fromEntries(DAMAGE_TYPE_IDS.map((d) => [d, DAMAGE_TYPE_ENTRIES[d].label])) as Record<
-    (typeof DAMAGE_TYPE_IDS)[number],
-    string
-  >,
 )
 
 export const conditionTagOptions = toOptions(

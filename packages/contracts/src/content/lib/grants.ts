@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../vocab/ability'
 import { armorCategorySchema } from '../../vocab/armor/category'
-import { damageTypeSchema } from '../../vocab/damage-type'
+import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { speedSchema } from '../../vocab/movement-mode'
 import { senseSchema } from '../../vocab/sense'
@@ -137,8 +137,8 @@ export const contentGrantsSchema = z.object({
   /** Replaces or adds movement modes (e.g. Wood Elf walk 35). Partial of `speedSchema`. */
   speedOverride: speedSchema.partial().optional(),
   /** Chosen damage type(s), e.g. a Dragonborn's breath or a Goliath's ancestry. */
-  damageType: z.array(damageTypeSchema).optional(),
-  resistances: z.array(damageTypeSchema).optional(),
+  damageType: z.array(damageTypeIdSchema).optional(),
+  resistances: z.array(damageTypeIdSchema).optional(),
   proficiencies: contentProficienciesSchema.optional(),
   languages: z.array(languageSchema).optional(),
   languageChoices: z.array(languageChoiceGrantSchema).optional(),

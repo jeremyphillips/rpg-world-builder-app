@@ -4,30 +4,42 @@ import {
   ATTACK_RESOLUTION_MODE_IDS,
   ATTACK_RESOLUTION_MODE_SET_ID,
   CREATURE_TYPE_SET_ID,
+  DAMAGE_TYPE_SET_ID,
   EDITION_PRESET_ENTRIES,
   EDITION_PRESET_IDS,
   EDITION_PRESET_SET_ID,
+  SENSE_SET_ID,
 } from '@rpg/contracts'
 
 import {
   ATTACK_RESOLUTION_MODES,
   CREATURE_TYPES,
+  DAMAGE_TYPES,
   EDITION_PRESETS,
+  SENSES,
   getSeedAttackResolutionModeEntry,
   getSeedAttackResolutionModeLabel,
   getSeedCreatureTypeEntry,
   getSeedCreatureTypeLabel,
+  getSeedDamageTypeEntry,
+  getSeedDamageTypeLabel,
   getSeedEditionPresetEntry,
   getSeedEditionPresetLabel,
+  getSeedSenseEntry,
+  getSeedSenseLabel,
   getVocabularyOptionById,
   listSeedVocabularySetIds,
   loadSeedAttackResolutionModes,
   loadSeedCreatureTypes,
+  loadSeedDamageTypes,
   loadSeedEditionPresets,
+  loadSeedSenses,
   loadSeedVocabularyOptionSet,
   seedAttackResolutionModeIds,
   seedCreatureTypeIds,
+  seedDamageTypeIds,
   seedEditionPresetIds,
+  seedSenseIds,
   seedVocabularyOptionIds,
 } from './index'
 
@@ -83,6 +95,72 @@ describe('SRD 5.2.1 creature type vocabulary seed', () => {
         (entry) => entry.id === option.id,
       ),
     ).toBe(true)
+  })
+})
+
+describe('SRD 5.2.1 damage type vocabulary seed', () => {
+  const damageTypes = loadSeedDamageTypes(RULESET)
+
+  it('loads the damage-types set (elemental + planar only)', () => {
+    expect(damageTypes.id).toBe(DAMAGE_TYPE_SET_ID)
+    expect(damageTypes.options.length).toBe(10)
+  })
+
+  it('has unique ids', () => {
+    const ids = damageTypes.options.map((option) => option.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(seedDamageTypeIds(RULESET).size).toBe(10)
+    expect(seedVocabularyOptionIds(RULESET, DAMAGE_TYPE_SET_ID).size).toBe(10)
+  })
+
+  it('derives DAMAGE_TYPES from the seed list', () => {
+    expect([...DAMAGE_TYPES].sort()).toEqual([...seedDamageTypeIds(RULESET)].sort())
+  })
+
+  it('has a label and description for every seed type', () => {
+    for (const type of DAMAGE_TYPES) {
+      const entry = getSeedDamageTypeEntry(RULESET, type)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedDamageTypeLabel(RULESET, 'fire')).toBe('Fire')
+    expect(getSeedDamageTypeLabel(RULESET, 'custom')).toBe('custom')
+  })
+})
+
+describe('SRD 5.2.1 sense vocabulary seed', () => {
+  const senses = loadSeedSenses(RULESET)
+
+  it('loads the senses set', () => {
+    expect(senses.id).toBe(SENSE_SET_ID)
+    expect(senses.options.length).toBe(4)
+  })
+
+  it('has unique ids', () => {
+    const ids = senses.options.map((option) => option.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(seedSenseIds(RULESET).size).toBe(4)
+    expect(seedVocabularyOptionIds(RULESET, SENSE_SET_ID).size).toBe(4)
+  })
+
+  it('derives SENSES from the seed list', () => {
+    expect([...SENSES].sort()).toEqual([...seedSenseIds(RULESET)].sort())
+  })
+
+  it('has a label and description for every seed type', () => {
+    for (const type of SENSES) {
+      const entry = getSeedSenseEntry(RULESET, type)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns labels and falls back for unknown ids', () => {
+    expect(getSeedSenseLabel(RULESET, 'darkvision')).toBe('Darkvision')
+    expect(getSeedSenseLabel(RULESET, 'custom')).toBe('custom')
   })
 })
 
@@ -143,7 +221,13 @@ describe('SRD 5.2.1 attack resolution mode vocabulary seed', () => {
 describe('seeded vocabulary set registry', () => {
   it('lists every seeded vocabulary set id for a ruleset', () => {
     expect(listSeedVocabularySetIds(RULESET).sort()).toEqual(
-      [CREATURE_TYPE_SET_ID, EDITION_PRESET_SET_ID, ATTACK_RESOLUTION_MODE_SET_ID].sort(),
+      [
+        ATTACK_RESOLUTION_MODE_SET_ID,
+        CREATURE_TYPE_SET_ID,
+        DAMAGE_TYPE_SET_ID,
+        EDITION_PRESET_SET_ID,
+        SENSE_SET_ID,
+      ].sort(),
     )
   })
 })

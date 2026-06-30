@@ -1,0 +1,52 @@
+[
+  {
+    "id": "fire",
+    "label": "Fire",
+    "description": "Fire damage is delivered by heat and flame, whether mundane or magical (e.g. red dragon breath, Fire Bolt)."
+  },
+  {
+    "id": "cold",
+    "label": "Cold",
+    "description": "Cold damage is delivered by ice, freezing vapor, and other numbing, frostbite-inducing effects."
+  },
+  {
+    "id": "acid",
+    "label": "Acid",
+    "description": "Acid damage is delivered by corrosive substances and dissolving attacks (e.g. black dragon breath, some oozes)."
+  },
+  {
+    "id": "lightning",
+    "label": "Lightning",
+    "description": "Lightning damage is delivered by raw electrical energy (e.g. blue dragon breath, Lightning Bolt)."
+  },
+  {
+    "id": "thunder",
+    "label": "Thunder",
+    "description": "Thunder damage is delivered by concussive sound and vibratory force (e.g. Thunderwave)."
+  },
+  {
+    "id": "poison",
+    "label": "Poison",
+    "description": "Poison damage is delivered by venom, toxic gas, and other caustic or biological toxins."
+  },
+  {
+    "id": "radiant",
+    "label": "Radiant",
+    "description": "Radiant damage is searing light and holy or celestial power (e.g. Moonbeam, a deva's weapon)."
+  },
+  {
+    "id": "necrotic",
+    "label": "Necrotic",
+    "description": "Necrotic damage withers life, flesh, and souls—often from undeath, decay, or void-like magic."
+  },
+  {
+    "id": "force",
+    "label": "Force",
+    "description": "Force damage is pure magical energy, forming invisible walls and unerring blasts (e.g. Magic Missile)."
+  },
+  {
+    "id": "psychic",
+    "label": "Psychic",
+    "description": "Psychic damage assails the mind, emotions, and sanity (e.g. mind flayer attacks, Dissonant Whispers)."
+  }
+]

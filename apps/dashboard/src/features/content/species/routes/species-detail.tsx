@@ -3,7 +3,6 @@ import { Heading, RichTextContent } from '@rpg/ui'
 import {
   formatSpeed,
   getCreatureSizeLabel,
-  getSenseLabel,
   getTraitGrants,
   resolveTraitDisplay,
 } from '@rpg/contracts'
@@ -11,7 +10,11 @@ import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
-import { useCreatureTypeVocabulary } from '@/features/homebrew'
+import {
+  useCreatureTypeVocabulary,
+  useSenseVocabulary,
+  getSenseLabelFromVocabulary,
+} from '@/features/homebrew'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
@@ -24,10 +27,15 @@ import { getContentImageUrl } from '../../lib/detail/content-image-url'
 // Helpers
 // ---------------------------------------------------------------------------
 
-function collectSenses(traits: SpeciesTrait[]): string {
+function collectSenses(
+  traits: SpeciesTrait[],
+  senseVocabulary: ReturnType<typeof useSenseVocabulary>['vocabulary'],
+): string {
   const senses = traits.flatMap((t) => getTraitGrants(t)?.senses ?? [])
   if (senses.length === 0) return 'None'
-  return senses.map((s) => `${getSenseLabel(s.type)} ${s.range} ft.`).join(', ')
+  return senses
+    .map((s) => `${getSenseLabelFromVocabulary(senseVocabulary, s.type)} ${s.range} ft.`)
+    .join(', ')
 }
 
 // ---------------------------------------------------------------------------
@@ -99,8 +107,9 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
 
 function SpeciesStatsSection({ species, campaignId }: { species: Species; campaignId: string }) {
   const { vocabulary } = useCreatureTypeVocabulary(campaignId)
+  const { vocabulary: senseVocabulary } = useSenseVocabulary(campaignId)
   const sizeLabel = species.sizes.map(getCreatureSizeLabel).join(' or ')
-  const sensesLabel = collectSenses(species.traits)
+  const sensesLabel = collectSenses(species.traits, senseVocabulary)
 
   return (
     <div className="space-y-3">

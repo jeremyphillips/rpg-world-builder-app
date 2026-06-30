@@ -3,16 +3,12 @@ import {
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  DAMAGE_TYPE_IDS,
-  DAMAGE_TYPE_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
   INNATE_SPELL_KINDS,
   LANGUAGE_ENTRIES,
   LANGUAGE_IDS,
   SENSE_RANGES,
-  SENSE_TYPES,
-  SENSE_ENTRIES,
   SKILL_IDS,
   SKILLS,
   USAGE_FREQUENCIES,
@@ -23,31 +19,20 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import {
+  buildActiveDamageTypeFieldOptions,
+  buildActiveSenseFieldOptions,
+} from '@/features/homebrew'
+
 import type { ContentFormCtx } from '../content-form-registry'
 import { feetInputUnitField } from '../fields/content-identity-form-fields'
 import { getLevelFieldOptions, levelSelectDigits } from '../../form-options/level-field-options'
 import { titleCase } from '../../utils/title-case'
 
-const senseTypeOptions = toOptions(
-  SENSE_TYPES,
-  Object.fromEntries(SENSE_TYPES.map((t) => [t, SENSE_ENTRIES[t].label])) as Record<
-    (typeof SENSE_TYPES)[number],
-    string
-  >,
-)
-
 const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
   value: String(r),
   label: `${r} ft.`,
 }))
-
-const damageTypeOptions = toOptions(
-  DAMAGE_TYPE_IDS,
-  Object.fromEntries(DAMAGE_TYPE_IDS.map((t) => [t, DAMAGE_TYPE_ENTRIES[t].label])) as Record<
-    (typeof DAMAGE_TYPE_IDS)[number],
-    string
-  >,
-)
 
 const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
 
@@ -132,6 +117,8 @@ export function grantItemFields<T extends string>(
   const toolOptions = ctx.options?.tools ?? []
   const weaponOptions = ctx.options?.weapons ?? []
   const featOptions = ctx.options?.feats ?? []
+  const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
+  const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
 
   return [
     {

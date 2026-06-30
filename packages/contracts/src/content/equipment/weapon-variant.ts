@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { averageDiceRoll, dieFaceSchema } from '../../primitives/dice'
-import { PHYSICAL_DAMAGE_TYPE_IDS } from '../../vocab/damage-type'
+import { PHYSICAL_DAMAGE_TYPE_IDS } from '../../vocab/damage/physical'
 import {
   getWeaponPropertyLabel,
   weaponCategorySchema,

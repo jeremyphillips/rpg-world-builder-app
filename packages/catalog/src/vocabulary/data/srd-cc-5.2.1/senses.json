@@ -1,0 +1,22 @@
+[
+  {
+    "id": "darkvision",
+    "label": "Darkvision",
+    "description": "You can see in Dim Light within the specified range as if it were Bright Light, and in Darkness within that range as if it were Dim Light."
+  },
+  {
+    "id": "blindsight",
+    "label": "Blindsight",
+    "description": "You can perceive your surroundings without relying on sight within the specified range. Blindsight can't perceive color or read writing."
+  },
+  {
+    "id": "tremorsense",
+    "label": "Tremorsense",
+    "description": "You can detect and pinpoint the origin of vibrations within the specified range, provided the source is in contact with the same ground or substance."
+  },
+  {
+    "id": "truesight",
+    "label": "Truesight",
+    "description": "You can see in normal and magical Darkness, see Invisible creatures and objects, automatically detect visual illusions and succeed on saves against them, and perceive the true form of a shape-changer or a creature transformed by magic."
+  }
+]

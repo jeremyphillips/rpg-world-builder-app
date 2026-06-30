@@ -25,6 +25,8 @@ export {
   vocabularySetQueryKey,
 } from './hooks/use-vocabulary-set'
 export { useCreatureTypeVocabulary } from './hooks/use-creature-type-vocabulary'
+export { useDamageTypeVocabulary } from './hooks/use-damage-type-vocabulary'
+export { useSenseVocabulary } from './hooks/use-sense-vocabulary'
 export { useEditionPresetVocabulary } from './hooks/use-edition-preset-vocabulary'
 export { useAttackResolutionModeVocabulary } from './hooks/use-attack-resolution-mode-vocabulary'
 export {
@@ -34,6 +36,20 @@ export {
   getCreatureTypeLabel,
   type CreatureTypeVocabulary,
 } from './lib/vocabulary/sets/creature-types'
+export {
+  buildDamageTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
+  buildActiveDamageTypeFieldOptions,
+  getDamageTypeLabelFromVocabulary,
+  type DamageTypeVocabulary,
+} from './lib/vocabulary/sets/damage-types'
+export {
+  buildSenseVocabulary,
+  buildSeedSenseVocabulary,
+  buildActiveSenseFieldOptions,
+  getSenseLabelFromVocabulary,
+  type SenseVocabulary,
+} from './lib/vocabulary/sets/senses'
 export {
   buildEditionPresetVocabulary,
   buildSeedEditionPresetVocabulary,

@@ -1,38 +1,41 @@
 import { describe, expect, it } from 'vitest'
 
+import { DAMAGE_TYPE_SET_ID, damageTypeIdSchema, getDamageTypeLabel } from './damage/vocabulary'
 import {
-  DAMAGE_TYPE_ENTRIES,
-  DAMAGE_TYPE_IDS,
+  getPhysicalDamageTypeEntry,
   PHYSICAL_DAMAGE_TYPE_IDS,
-  damageTypeIdsByCategory,
-  damageTypeSchema,
-  getDamageTypeEntry,
-  getDamageTypeLabel,
-} from './damage-type'
+  physicalDamageTypeSchema,
+} from './damage/physical'
 
-describe('damageTypeSchema', () => {
-  it('accepts every known damage type', () => {
-    for (const id of DAMAGE_TYPE_IDS) {
-      expect(damageTypeSchema.parse(id)).toBe(id)
-    }
+describe('damageTypeIdSchema', () => {
+  it('accepts slug-shaped ids including campaign custom terms', () => {
+    expect(damageTypeIdSchema.parse('fire')).toBe('fire')
+    expect(damageTypeIdSchema.parse('custom-sonic')).toBe('custom-sonic')
   })
 
-  it('rejects unknown damage types and the removed "none" sentinel', () => {
-    expect(damageTypeSchema.safeParse('none').success).toBe(false)
-    expect(damageTypeSchema.safeParse('sonic').success).toBe(false)
-    expect(damageTypeSchema.safeParse('fire').success).toBe(true)
+  it('rejects invalid slug shapes', () => {
+    expect(damageTypeIdSchema.safeParse('Bad Slug').success).toBe(false)
+    expect(damageTypeIdSchema.safeParse('fire').success).toBe(true)
+  })
+})
+
+describe('physicalDamageTypeSchema', () => {
+  it('accepts only the three physical damage types', () => {
+    for (const id of PHYSICAL_DAMAGE_TYPE_IDS) {
+      expect(physicalDamageTypeSchema.parse(id)).toBe(id)
+    }
+    expect(physicalDamageTypeSchema.safeParse('fire').success).toBe(false)
   })
 })
 
 describe('damage type vocabulary', () => {
-  it('derives DAMAGE_TYPE_IDS from the entry map', () => {
-    expect([...DAMAGE_TYPE_IDS].sort()).toEqual(Object.keys(DAMAGE_TYPE_ENTRIES).sort())
+  it('registers the damage type option set id', () => {
+    expect(DAMAGE_TYPE_SET_ID).toBe('damage-types')
   })
 
-  it('has a category, label, and description for every type', () => {
-    for (const id of DAMAGE_TYPE_IDS) {
-      const entry = getDamageTypeEntry(id)
-      expect(entry?.category).toBeTruthy()
+  it('has a label and description for every physical type', () => {
+    for (const id of PHYSICAL_DAMAGE_TYPE_IDS) {
+      const entry = getPhysicalDamageTypeEntry(id)
       expect(entry?.label).toBeTruthy()
       expect(entry?.description).toBeTruthy()
     }
@@ -40,20 +43,7 @@ describe('damage type vocabulary', () => {
 
   it('returns labels and falls back for unknown ids', () => {
     expect(getDamageTypeLabel('fire')).toBe('Fire')
-    expect(getDamageTypeLabel('custom')).toBe('custom')
-  })
-})
-
-describe('damageTypeIdsByCategory', () => {
-  it('groups types by category', () => {
-    expect(damageTypeIdsByCategory('physical').sort()).toEqual(
-      ['bludgeoning', 'piercing', 'slashing'].sort(),
-    )
-    expect(damageTypeIdsByCategory('elemental')).toContain('fire')
-    expect(damageTypeIdsByCategory('planar')).toContain('necrotic')
-  })
-
-  it('exposes the physical subset as a non-empty tuple matching the category filter', () => {
-    expect([...PHYSICAL_DAMAGE_TYPE_IDS].sort()).toEqual(damageTypeIdsByCategory('physical').sort())
+    expect(getDamageTypeLabel('bludgeoning')).toBe('Bludgeoning')
+    expect(getDamageTypeLabel('custom-sonic')).toBe('Custom Sonic')
   })
 })

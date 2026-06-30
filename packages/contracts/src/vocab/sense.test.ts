@@ -1,28 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  SENSE_ENTRIES,
-  SENSE_TYPES,
-  getSenseEntry,
-  getSenseLabel,
-  senseSchema,
-  senseTypeSchema,
-} from './sense'
+import { SENSE_RANGES, SENSE_SET_ID, getSenseLabel, senseIdSchema, senseSchema } from './sense'
 
-describe('senseTypeSchema', () => {
-  it('accepts every known sense type', () => {
-    for (const type of SENSE_TYPES) {
-      expect(senseTypeSchema.parse(type)).toBe(type)
-    }
+describe('senseIdSchema', () => {
+  it('accepts slug-shaped ids including campaign custom terms', () => {
+    expect(senseIdSchema.parse('darkvision')).toBe('darkvision')
+    expect(senseIdSchema.parse('custom-sense')).toBe('custom-sense')
   })
 
-  it('rejects unknown sense types', () => {
-    expect(senseTypeSchema.safeParse('echolocation').success).toBe(false)
+  it('rejects invalid slug shapes', () => {
+    expect(senseIdSchema.safeParse('Bad Slug').success).toBe(false)
+    expect(senseIdSchema.safeParse('darkvision').success).toBe(true)
   })
 })
 
 describe('senseSchema', () => {
-  it('accepts a sense with range', () => {
+  it('accepts a sense type slug and numeric range', () => {
     expect(senseSchema.parse({ type: 'darkvision', range: 60 })).toEqual({
       type: 'darkvision',
       range: 60,
@@ -31,20 +24,16 @@ describe('senseSchema', () => {
 })
 
 describe('sense vocabulary', () => {
-  it('derives SENSE_TYPES from the entry map', () => {
-    expect([...SENSE_TYPES].sort()).toEqual(Object.keys(SENSE_ENTRIES).sort())
+  it('registers the sense option set id', () => {
+    expect(SENSE_SET_ID).toBe('senses')
   })
 
-  it('has a label and description for every sense type', () => {
-    for (const type of SENSE_TYPES) {
-      const entry = getSenseEntry(type)
-      expect(entry?.label).toBeTruthy()
-      expect(entry?.description).toBeTruthy()
-    }
+  it('exposes standard sense range presets for UI', () => {
+    expect(SENSE_RANGES).toEqual([10, 30, 60, 90, 120])
   })
 
-  it('returns labels and falls back for unknown ids', () => {
+  it('returns title-cased slug labels', () => {
     expect(getSenseLabel('darkvision')).toBe('Darkvision')
-    expect(getSenseLabel('custom')).toBe('custom')
+    expect(getSenseLabel('custom-sense')).toBe('Custom Sense')
   })
 })

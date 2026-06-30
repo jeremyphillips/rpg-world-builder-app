@@ -5,7 +5,11 @@ import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 import type { ContentSource, EquipmentKind, WeaponCategory } from '@rpg/contracts'
 import type { ResolvedCampaignRules } from '@rpg/contracts'
 
-import type { CreatureTypeVocabulary } from '@/features/homebrew'
+import type {
+  CreatureTypeVocabulary,
+  DamageTypeVocabulary,
+  SenseVocabulary,
+} from '@/features/homebrew'
 
 import type { ContentListQueryResult } from '../list/content-client'
 import type { ContentFormOptionSets } from '../form-options/content-form-options'
@@ -30,6 +34,10 @@ export type ContentFormCtx = {
   campaignRules?: ResolvedCampaignRules
   /** Campaign-resolved creature type labels and active ids. */
   creatureTypeVocabulary?: CreatureTypeVocabulary
+  /** Campaign-resolved damage type labels and active ids (elemental + planar). */
+  damageTypeVocabulary?: DamageTypeVocabulary
+  /** Campaign-resolved sense labels and active ids. */
+  senseVocabulary?: SenseVocabulary
   options?: Partial<ContentFormOptionSets>
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind

@@ -1,4 +1,10 @@
-import { assertCreatureTypesActiveInCampaign } from '../../vocabulary'
+import {
+  assertCreatureTypesActiveInCampaign,
+  assertDamageTypesActiveInCampaign,
+  assertSensesActiveInCampaign,
+  collectDamageTypeIdsFromBody,
+  collectSenseTypeIdsFromBody,
+} from '../../vocabulary'
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
@@ -24,13 +30,20 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
     await assertCreatureTypesActiveInCampaign(ctx.campaignId, [creatureType])
   }
 
-  const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
-  const inputForSlugs =
+  const inputForVocab =
     ctx.mode === 'update' && ctx.existing
       ? {
           ...entityBody(ctx.existing as unknown as Record<string, unknown>),
           ...ctx.input,
         }
       : ctx.input
-  assertSpeciesClassSlugsFromInput(inputForSlugs, classes)
+
+  await assertDamageTypesActiveInCampaign(
+    ctx.campaignId,
+    collectDamageTypeIdsFromBody(inputForVocab),
+  )
+  await assertSensesActiveInCampaign(ctx.campaignId, collectSenseTypeIdsFromBody(inputForVocab))
+
+  const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
+  assertSpeciesClassSlugsFromInput(inputForVocab, classes)
 }

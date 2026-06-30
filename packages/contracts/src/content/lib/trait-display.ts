@@ -1,4 +1,4 @@
-import { getDamageTypeLabel } from '../../vocab/damage-type'
+import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import { getLanguageLabel } from '../../vocab/language'
 import { getSenseLabel } from '../../vocab/sense'
 import type { ContentGrants, ContentTrait, CustomContentTrait, GrantContentTrait } from './grants'
