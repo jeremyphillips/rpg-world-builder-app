@@ -6,7 +6,13 @@ import axe from 'axe-core'
 import { z } from 'zod'
 
 import { Form } from './form.client'
+import { useFormSectionContext } from './form-section-context.client'
 import type { FormItem } from './field-config'
+
+function SlotSizeProbe() {
+  const { size } = useFormSectionContext()
+  return <span data-testid="slot-size">{size}</span>
+}
 
 function NotesSlot() {
   const { register } = useFormContext<{ notes: string }>()
@@ -69,5 +75,58 @@ describe('SlotFieldRenderer', () => {
     const { container } = renderForm()
     const results = await axe.run(container)
     expect(results.violations.filter((v) => v.impact === 'critical')).toEqual([])
+  })
+
+  it('passes explicit size sm into slot child context', () => {
+    const sizedFields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      {
+        kind: 'slot',
+        name: 'notes',
+        label: 'Notes',
+        size: 'sm',
+        render: () => <SlotSizeProbe />,
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={sizedFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        collapsibleSections={false}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
+  })
+
+  it('defaults slot child context to sm when size is omitted', () => {
+    const probeFields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      {
+        kind: 'slot',
+        name: 'notes',
+        label: 'Notes',
+        hint: 'Optional author notes.',
+        render: () => <SlotSizeProbe />,
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={probeFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        collapsibleSections={false}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
   })
 })

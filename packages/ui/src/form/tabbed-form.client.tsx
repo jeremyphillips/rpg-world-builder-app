@@ -1,35 +1,24 @@
 'use client'
 
 import * as React from 'react'
-import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
+import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { cn } from '../lib/utils'
-import { fieldGroupStackClasses } from '../components/ui/field.variants'
-import { Text } from '../components/ui/text'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs.client'
-import { FormItems } from './form-items.client'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { makeResolver } from './resolver'
-import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
-import { FormActionsBar } from './form-actions-bar'
+import { type FileFieldPropsMap, type FormValueSync } from './field-config'
+import type { FieldSize } from '../components/ui/field.client'
+import type { FieldStackRhythm } from '../components/ui/field.variants'
+import { FormValueSyncEffects } from './form-value-sync-effects.client'
 import {
-  formFooterSpacingClasses,
-  formStickyTabsClasses,
-  formTabPanelsBottomPaddingClasses,
-} from './form-chrome.variants'
+  resolveTabbedFormShellClassName,
+  TabbedFormFooterRegion,
+  TabbedFormPanels,
+  useTabbedFormSetup,
+  type TabbedFormFooterWrapperProps,
+  type TabbedFormTab,
+} from './tabbed-form-parts.client'
 
-/** A single tab definition: an id, a display label, and its ordered fields. */
-export interface TabbedFormTab {
-  id: string
-  label: string
-  fields: FormItem[]
-  /**
-   * Optional non-field UI rendered above this tab's fields (intro copy, links,
-   * placeholders). Omit fields for a panel that is entirely non-input content.
-   */
-  header?: React.ReactNode
-}
+export type { TabbedFormFooterWrapperProps, TabbedFormTab }
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Merged Zod schema covering all tabs' fields combined. */
@@ -60,8 +49,18 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /** When true (default), top-level groups/arrays render in collapsible accordions. */
+  /** When true (default), sections may render in accordions when `collapsible: true` is set. */
   collapsibleSections?: boolean
+  /**
+   * Vertical gap between top-level fields/groups. Defaults to `comfortable`
+   * (`gap-6`). Array sections default to `compact` regardless.
+   */
+  rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
+   * `sm` and `comfortable` maps to `md`.
+   */
+  size?: FieldSize
   /**
    * When true (default), the tab list sticks to the top and the footer sticks to
    * the bottom while scrolling long panels.
@@ -78,11 +77,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * When set, the internal sticky/inline footer chrome is not used.
    */
   footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
-}
-
-export interface TabbedFormFooterWrapperProps {
-  footer: React.ReactNode
-  formError: string | null
+  /** Patches form values when configured driver fields change after initial mount. */
+  valueSyncs?: FormValueSync[]
 }
 
 /**
@@ -102,89 +98,29 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   className,
   mode,
   collapsibleSections = true,
+  rhythm,
+  size,
   stickyChrome = true,
   stickyTabsClassName,
   stickyActionsBarClassName,
   contentWrapper,
   footerWrapper,
+  valueSyncs,
 }: TabbedFormProps<TFieldValues>) {
-  const generatedId = React.useId()
-  const formId = id ?? generatedId
-
-  const allItems = React.useMemo(() => tabs.flatMap((t) => t.fields), [tabs])
-
-  const resolver = React.useMemo(
-    () => makeResolver<TFieldValues>(schema, allItems),
-    [schema, allItems],
-  )
-
-  const resolvedDefaults = React.useMemo(
-    () => ({ ...buildDefaultValues(allItems), ...defaultValues }) as DefaultValues<TFieldValues>,
-    [allItems, defaultValues],
-  )
-
-  // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
-  // changes reference; callers use the `key` prop to remount when defaults change.
-  const [formDefaults] = React.useState(() => resolvedDefaults)
-
-  const form = useForm<TFieldValues>({
-    resolver,
-    defaultValues: formDefaults,
-    mode,
-  })
-
+  const generatedFormId = React.useId()
+  const formId = id ?? generatedFormId
+  const { form } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
 
-  const tabsContent = (
-    <Tabs defaultValue={tabs[0]?.id} variant="line">
-      <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
-        <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </div>
-      {tabs.map((tab) => (
-        // forceMount keeps all panels mounted so every field is registered
-        // with RHF and validated on global save; inactive panels are hidden
-        // by Radix via the HTML `hidden` attribute.
-        <TabsContent key={tab.id} value={tab.id} forceMount>
-          <div
-            className={cn(
-              fieldGroupStackClasses,
-              stickyChrome && !footerWrapper ? formTabPanelsBottomPaddingClasses : undefined,
-            )}
-          >
-            {tab.header}
-            {tab.fields.length > 0 ? (
-              <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-            ) : null}
-          </div>
-        </TabsContent>
-      ))}
-    </Tabs>
-  )
-
-  const footerRegion = footerWrapper ? (
-    hasFooterRegion ? (
-      footerWrapper({ footer: resolvedFooter, formError: formError ?? null })
-    ) : null
-  ) : stickyChrome ? (
-    <FormActionsBar className={stickyActionsBarClassName} formError={formError}>
-      {resolvedFooter}
-    </FormActionsBar>
-  ) : (
-    <>
-      {formError ? (
-        <Text variant="destructive" role="alert">
-          {formError}
-        </Text>
-      ) : null}
-      {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
-    </>
+  const panels = (
+    <TabbedFormPanels
+      tabs={tabs}
+      formId={formId}
+      stickyChrome={stickyChrome}
+      stickyTabsClassName={stickyTabsClassName}
+      omitPanelBottomPadding={Boolean(footerWrapper)}
+    />
   )
 
   return (
@@ -193,11 +129,23 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       formId={formId}
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
+      rhythm={rhythm}
+      size={size}
       onSubmit={onSubmit}
-      className={cn(footerWrapper ? undefined : stickyChrome ? undefined : 'space-y-6', className)}
+      className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >
-      {contentWrapper ? contentWrapper(tabsContent) : tabsContent}
-      {footerRegion}
+      {valueSyncs && valueSyncs.length > 0 ? (
+        <FormValueSyncEffects valueSyncs={valueSyncs} />
+      ) : null}
+      {contentWrapper ? contentWrapper(panels) : panels}
+      <TabbedFormFooterRegion
+        footerWrapper={footerWrapper}
+        hasFooterRegion={hasFooterRegion}
+        stickyChrome={stickyChrome}
+        stickyActionsBarClassName={stickyActionsBarClassName}
+        formError={formError}
+        resolvedFooter={resolvedFooter}
+      />
     </SchemaFormShell>
   )
 }

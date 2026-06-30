@@ -6,6 +6,11 @@ import axe from 'axe-core'
 import { SwitchField } from './switch-field'
 
 describe('SwitchField', () => {
+  it('applies field size to the label', () => {
+    render(<SwitchField id="notify" label="Email reminders" size="sm" />)
+    expect(screen.getByText('Email reminders')).toHaveClass('text-xs')
+  })
+
   it('toggles via its associated label', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()
@@ -32,5 +37,63 @@ describe('SwitchField', () => {
     expect(
       label.compareDocumentPosition(switchControl) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
+  })
+
+  it('stacks inline label and hint in the same column beside the switch', () => {
+    render(
+      <SwitchField
+        id="multiclass"
+        label="Allow multiclassing"
+        hint="When off, characters cannot take levels in additional classes."
+      />,
+    )
+    const label = screen.getByText('Allow multiclassing')
+    const hint = screen.getByText('When off, characters cannot take levels in additional classes.')
+    const textColumn = label.parentElement
+
+    expect(textColumn).not.toBeNull()
+    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
+    expect(textColumn).toContainElement(hint)
+    expect(
+      textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
+  })
+
+  it('renders label and hint in the left column when labelPosition is settings', () => {
+    const hint = 'Cap total character level for this species.'
+    render(
+      <SwitchField
+        id="level-cap"
+        label="Limit max character level"
+        hint={hint}
+        labelPosition="settings"
+      />,
+    )
+
+    const switchControl = screen.getByRole('switch', { name: 'Limit max character level' })
+    const row = switchControl.closest('.grid')
+    expect(row).toHaveClass('sm:grid-cols-[minmax(0,1fr)_auto]')
+    const label = screen.getByText('Limit max character level')
+    expect(
+      label.compareDocumentPosition(screen.getByText(hint)) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      screen.getByText(hint).compareDocumentPosition(switchControl) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('has no axe accessibility violations with settings layout', async () => {
+    const { container } = render(
+      <SwitchField
+        id="level-cap"
+        label="Limit max character level"
+        hint="Cap total character level for this species."
+        labelPosition="settings"
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
   })
 })

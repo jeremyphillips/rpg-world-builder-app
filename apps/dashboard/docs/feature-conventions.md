@@ -2,8 +2,10 @@
 
 The dashboard is organized feature-first: each domain area lives in its own
 folder under `src/features/<feature>/` and owns its UI, state, and data access.
-Most feature folders here are **scaffolds** — a `README.md` describing intent
-plus a placeholder `index.ts` — until their phase is built.
+Several domains are fully built (auth, campaign, content catalog, homebrew);
+others remain **scaffolds** — a `README.md` describing intent plus a placeholder
+`index.ts` — until their phase is built. See the feature status table in
+[apps/dashboard/README.md](../README.md#feature-status).
 
 ## Layout
 
@@ -53,10 +55,10 @@ Standard pattern:
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
 <Heading variant="display" as="h1">{item.name}</Heading>
-<RichTextContent html={item.description} size="sm" tone="muted" />
+<RichTextContent html={item.description} size="md" tone="muted" />
 <Heading variant="section" as="h2" id="traits-heading">Traits</Heading>
 <Heading variant="subsection" as="h3">Heritage name</Heading>
-<RichTextContent html={trait.description} size="sm" tone="muted" />
+<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 Use **one h1 per page** (`page` on list/settings routes, `display` on detail entity
@@ -98,7 +100,7 @@ Every route picks **one width shell** from `components/layout/`:
 
 | Shell                                                    | Width                | Typical routes                                                      |
 | -------------------------------------------------------- | -------------------- | ------------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-3xl` | Settings, wizards, account/profile stubs, content create/edit forms |
+| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account/profile stubs, content create/edit forms |
 | [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                                   |
 
 Nested readable columns inside `WidePage` use
@@ -163,7 +165,7 @@ import { ContentDetailLayout } from '@/features/content/lib/content-detail-layou
     imageName={item.name}
     campaignId={campaignId}
     editHref={contentEditHref('feats', campaignId, item.id)}
-    descriptionContent={<RichTextContent html={item.description} size="sm" tone="muted" />}
+    descriptionContent={<RichTextContent html={item.description} size="md" tone="muted" />}
   >
     {/* narrow sections */}
   </ContentDetailLayout>
@@ -240,21 +242,21 @@ Narrow numeric selects use `digits` on the `@rpg/ui` field config (see
 [`packages/ui/docs/forms.md`](../../../packages/ui/docs/forms.md)). The trigger
 displays option **labels**, so digit-sized level picks must use compact labels.
 
-| Helper                                                                                          | Use                                                      |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [`getCompactLevelFieldOptions(ctx)`](../src/features/content/lib/level-field-options.ts)        | Flat level list with `"1"`, `"2"`, … labels              |
-| [`getCompactLevelFieldOptionsGrouped(ctx)`](../src/features/content/lib/level-field-options.ts) | Same labels, grouped when extended progression is active |
-| [`levelSelectDigits(ctx)`](../src/features/content/lib/level-field-options.ts)                  | `digits` slot count from campaign max level              |
-| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/level-field-options.ts)                   | Constant `3` for `d6`–`d12` labels                       |
+| Helper                                                                                                       | Use                                                                  |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| [`getLevelFieldOptions(ctx)`](../src/features/content/lib/level-field-options.ts)                            | Level selects — numeric labels; grouped when extended tier is active |
+| [`getLevelFieldOptions(ctx, { showTierLabels: false })`](../src/features/content/lib/level-field-options.ts) | Flat level list (chips, controls without option groups)              |
+| [`levelSelectDigits(ctx)`](../src/features/content/lib/level-field-options.ts)                               | `digits` slot count from campaign max level                          |
+| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/level-field-options.ts)                                | Constant `3` for `d6`–`d12` labels                                   |
 
-Keep [`getLevelFieldOptions`](../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
-(with `"Level N"` labels) for full-width selects that include non-numeric
-options (e.g. subclass choice level with `"None"`). Standalone fields with hints
-use default `width: 'full'`; row fields pair `digits` with `width: 'auto'`.
+Contracts SSOT:
+[`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
+(with optional `{ showTierLabels: false }`).
 
-Walk speed fields use [`walkSpeedInlineCountField`](../src/features/content/lib/content-form-field-helpers.ts)
-(`inlineChooseCount` with `prefix: ''`, `suffix: 'ft.'`, `digits: 2`) in species
-and grant authoring.
+Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`type: 'inputUnit'`, `unit: 'ft.'`). Fixed-pound weight uses auto-switched
+[`scalarUnitInputSelectField`](../src/features/content/lib/content-form-field-helpers.ts)
+(`fixedUnit: 'lb.'` when only one unit option).
 
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to

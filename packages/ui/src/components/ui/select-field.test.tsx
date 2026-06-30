@@ -81,4 +81,33 @@ describe('SelectField', () => {
     expect(container.firstChild).toHaveClass('w-full')
     expect(screen.getByText(hint)).toBeInTheDocument()
   })
+
+  it('renders label and hint in the left column when labelPosition is settings', () => {
+    const hint = 'First class level at which this class gains spellcasting'
+    render(
+      <SelectField
+        id="level"
+        label="Spellcasting level"
+        hint={hint}
+        labelPosition="settings"
+        digits={2}
+        defaultValue="3"
+        options={[
+          { label: '1', value: '1' },
+          { label: '3', value: '3' },
+        ]}
+      />,
+    )
+
+    const trigger = screen.getByLabelText('Spellcasting level')
+    const row = trigger.closest('.grid')
+    expect(row).toHaveClass('sm:grid-cols-[minmax(0,1fr)_auto]')
+    const label = screen.getByText('Spellcasting level')
+    expect(
+      label.compareDocumentPosition(screen.getByText(hint)) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      screen.getByText(hint).compareDocumentPosition(trigger) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
 })

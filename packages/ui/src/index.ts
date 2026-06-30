@@ -17,6 +17,8 @@ export { RichTextContent, type RichTextContentProps } from './components/ui/rich
 export { MarkdownContent, type MarkdownContentProps } from './components/ui/markdown-content'
 export {
   richTextContentVariants,
+  richTextEditorProseClasses,
+  richTextProseSizeClasses,
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
 export {
@@ -63,6 +65,9 @@ export {
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
+  fieldSizeToBadgeSize,
+  fieldSizeTypographyClasses,
+  fieldTextareaSizeClasses,
   type FieldSizeToken,
 } from './components/ui/field-sizing.variants'
 export {
@@ -82,6 +87,7 @@ export {
   type FieldRadiogroupLabelProps,
 } from './components/ui/field-label-content'
 export { FormField } from './components/ui/form-field'
+export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export { NumberField, type NumberFieldProps } from './components/ui/number-field'
@@ -127,17 +133,39 @@ export { JsonField, type JsonFieldProps } from './components/ui/json-field.clien
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown-field.client'
 
-export { FieldGroup, type FieldGroupProps } from './components/ui/field-group'
+export {
+  FieldGroup,
+  type FieldGroupLegendSize,
+  type FieldGroupProps,
+} from './components/ui/field-group'
 export {
   fieldArrayItemActionRowClasses,
   fieldArrayItemClasses,
+  fieldGroupBottomMarginClasses,
   fieldGroupFlexStackClasses,
   fieldGroupStackClasses,
   fieldInlineControlRowClasses,
   fieldInlineSentenceClasses,
+  fieldLabelHintStackClasses,
+  fieldLabelVariants,
   fieldRowLayoutVariants,
+  fieldSeparatorVariants,
+  fieldStackRhythmVariants,
+  fieldSettingsRowClasses,
+  fieldToggleDependentIndentClasses,
+  fieldToggleDependentStackClasses,
+  type FieldHintPosition,
+  type FieldLabelPosition,
   type FieldRowLayout,
+  type FieldSeparator,
+  type FieldStackLayout,
+  type FieldStackRhythm,
 } from './components/ui/field.variants'
+export {
+  fieldStackDependentsChromeVariants,
+  type FieldStackDependentsTone,
+  type FieldStackDependentsChromeVariantProps,
+} from './components/ui/field-stack.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'
@@ -297,6 +325,7 @@ export {
   dismissibleBadgeVariants,
   badgeDismissButtonVariants,
   type BadgeProps,
+  type BadgeSize,
 } from './components/ui/badge'
 export {
   DismissibleBadge,

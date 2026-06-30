@@ -24,11 +24,15 @@ import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
 import {
   masterDetailListDragHandleClasses,
+  masterDetailListDragHandleVisibleClasses,
   masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
   masterDetailListRowInactiveClasses,
   masterDetailListRowInactiveTitleClasses,
   masterDetailListRowSelectClasses,
+  masterDetailListRowSelectDefaultPaddingClasses,
+  masterDetailListRowSelectWithDragClasses,
+  masterDetailListRowSortableClasses,
   masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
 import { resolveMasterDetailListMove } from './master-detail-list-move'
@@ -78,6 +82,7 @@ interface MasterDetailListRowContentProps {
   item: MasterDetailListItem
   index: number
   isSelected: boolean
+  isDragging?: boolean
   showDragHandle: boolean
   dragHandleProps?: {
     attributes: ReturnType<typeof useSortable>['attributes']
@@ -106,9 +111,14 @@ function MasterDetailListRowStatus({
   )
 }
 
-function masterDetailListRowClassName(active: boolean, isSelected: boolean) {
+function masterDetailListRowClassName(
+  active: boolean,
+  isSelected: boolean,
+  showDragHandle: boolean,
+) {
   return cn(
     masterDetailListRowClasses,
+    showDragHandle && masterDetailListRowSortableClasses,
     !active && masterDetailListRowInactiveClasses,
     isSelected && masterDetailListRowSelectedClasses,
   )
@@ -116,20 +126,28 @@ function masterDetailListRowClassName(active: boolean, isSelected: boolean) {
 
 type MasterDetailListDragHandleProps = {
   title: string
+  isDragging?: boolean
   dragHandleProps: NonNullable<MasterDetailListRowContentProps['dragHandleProps']>
 }
 
-function MasterDetailListDragHandle({ title, dragHandleProps }: MasterDetailListDragHandleProps) {
+function MasterDetailListDragHandle({
+  title,
+  isDragging = false,
+  dragHandleProps,
+}: MasterDetailListDragHandleProps) {
   return (
     <button
       type="button"
-      className={masterDetailListDragHandleClasses}
+      className={cn(
+        masterDetailListDragHandleClasses,
+        isDragging && masterDetailListDragHandleVisibleClasses,
+      )}
       aria-label={`Drag to reorder ${title}`}
       onClick={(event) => event.stopPropagation()}
       {...dragHandleProps.attributes}
       {...dragHandleProps.listeners}
     >
-      <GripVertical className="size-4" aria-hidden />
+      <GripVertical className="size-3.5" aria-hidden />
     </button>
   )
 }
@@ -139,6 +157,7 @@ type MasterDetailListRowSelectButtonProps = {
   index: number
   isSelected: boolean
   active: boolean
+  showDragHandle: boolean
   onSelect: (index: number) => void
 }
 
@@ -147,6 +166,7 @@ function MasterDetailListRowSelectButton({
   index,
   isSelected,
   active,
+  showDragHandle,
   onSelect,
 }: MasterDetailListRowSelectButtonProps) {
   return (
@@ -155,7 +175,12 @@ function MasterDetailListRowSelectButton({
       aria-current={isSelected ? 'true' : undefined}
       aria-invalid={item.hasError ? true : undefined}
       onClick={() => onSelect(index)}
-      className={masterDetailListRowSelectClasses}
+      className={cn(
+        masterDetailListRowSelectClasses,
+        showDragHandle
+          ? masterDetailListRowSelectWithDragClasses
+          : masterDetailListRowSelectDefaultPaddingClasses,
+      )}
     >
       {item.eyebrow ? (
         <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -204,6 +229,7 @@ function MasterDetailListRowContent({
   item,
   index,
   isSelected,
+  isDragging = false,
   showDragHandle,
   dragHandleProps,
   onSelect,
@@ -213,15 +239,20 @@ function MasterDetailListRowContent({
   const active = item.active !== false
 
   return (
-    <div className={masterDetailListRowClassName(active, isSelected)}>
+    <div className={masterDetailListRowClassName(active, isSelected, showDragHandle)}>
       {showDragHandle && dragHandleProps ? (
-        <MasterDetailListDragHandle title={item.title} dragHandleProps={dragHandleProps} />
+        <MasterDetailListDragHandle
+          title={item.title}
+          isDragging={isDragging}
+          dragHandleProps={dragHandleProps}
+        />
       ) : null}
       <MasterDetailListRowSelectButton
         item={item}
         index={index}
         isSelected={isSelected}
         active={active}
+        showDragHandle={showDragHandle}
         onSelect={onSelect}
       />
       {deletable ? (
@@ -284,6 +315,7 @@ function SortableMasterDetailListRow(props: SortableMasterDetailListRowProps) {
         item={props.item}
         index={props.index}
         isSelected={props.isSelected}
+        isDragging={isDragging}
         showDragHandle={props.showDragHandle}
         dragHandleProps={{ attributes, listeners }}
         onSelect={props.onSelect}

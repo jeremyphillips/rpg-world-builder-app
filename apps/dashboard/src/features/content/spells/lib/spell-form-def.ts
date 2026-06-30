@@ -44,7 +44,11 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-form-field-helpers'
+import {
+  feetInputUnitField,
+  identityFields,
+  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+} from '../../lib/content-form-field-helpers'
 import {
   contentFormRegistry,
   contentFormFields,
@@ -194,6 +198,13 @@ function visibleWhenDurationSpecial(): FieldVisibility {
   }
 }
 
+function visibleWhenMaterialEnabled(): FieldVisibility {
+  return {
+    dependsOn: ['components.material.enabled'],
+    visibleWhen: (v) => v['components.material.enabled'] === true,
+  }
+}
+
 function visibleWhenReactionCastingTime(): FieldVisibility {
   return {
     dependsOn: ['castingTime.normal.unit'],
@@ -241,21 +252,39 @@ const spellFormSchema = z
     components: z.object({
       verbal: z.boolean().optional(),
       somatic: z.boolean().optional(),
-      material: z.object({ description: z.string().optional() }).optional(),
+      material: z
+        .object({
+          enabled: z.boolean().optional(),
+          description: z.string().optional(),
+        })
+        .optional(),
     }),
     deliveryMethod: z.string().optional(),
   })
   .superRefine((values, ctx) => {
-    const hasComponent =
-      values.components.verbal === true ||
-      values.components.somatic === true ||
+    const hasMaterial =
+      values.components.material?.enabled === true &&
       Boolean(values.components.material?.description?.trim())
+
+    const hasComponent =
+      values.components.verbal === true || values.components.somatic === true || hasMaterial
 
     if (!hasComponent) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one spell component (verbal, somatic, or material) is required',
         path: ['components'],
+      })
+    }
+
+    if (
+      values.components.material?.enabled === true &&
+      !values.components.material?.description?.trim()
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Material description is required when Material is enabled',
+        path: ['components', 'material', 'description'],
       })
     }
   })
@@ -271,8 +300,8 @@ const spellCreateDefaultValues: Partial<SpellFormValues> = {
     canBeCastAsRitual: false,
   },
   range: { kind: 'self' },
-  duration: { kind: 'instantaneous' },
-  components: { verbal: true, somatic: true },
+  duration: { kind: 'instantaneous', value: 1, unit: 'round' },
+  components: { verbal: true, somatic: true, material: { enabled: false } },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
 
@@ -299,13 +328,19 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
       ],
     },
     {
-      type: 'combobox',
-      name: 'classIds',
-      label: 'Classes',
-      multiple: true,
-      options: ctx.options?.spellcastingClasses ?? [],
-      placeholder: 'Choose classes…',
-      required: true,
+      kind: 'row',
+      fields: [
+        {
+          type: 'combobox',
+          name: 'classIds',
+          label: 'Classes',
+          multiple: true,
+          options: ctx.options?.spellcastingClasses ?? [],
+          placeholder: 'Choose classes…',
+          required: true,
+          width: '1/2',
+        },
+      ],
     },
   ]
 }
@@ -362,18 +397,17 @@ function castingFields(): FormItem[] {
             {
               type: 'select',
               name: 'range.kind',
-              label: 'Range kind',
+              label: 'Kind',
               options: rangeKindOptions,
               required: true,
+              width: 'lg',
             },
-            {
-              type: 'number',
-              name: 'range.value.value',
-              label: 'Distance (ft)',
-              min: 0,
+            feetInputUnitField('range.value.value', 'Distance', {
+              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+              width: 'auto',
               visibility: visibleWhenRangeDistance(),
               required: true,
-            },
+            }),
           ],
         },
         {
@@ -390,30 +424,38 @@ function castingFields(): FormItem[] {
       legend: 'Duration',
       fields: [
         {
-          type: 'select',
-          name: 'duration.kind',
-          label: 'Duration kind',
-          options: durationKindOptions,
-          required: true,
-        },
-        {
           kind: 'row',
           fields: [
             {
-              type: 'number',
-              name: 'duration.value',
-              label: 'Duration',
-              min: 1,
-              visibility: visibleWhenDurationTimed(),
+              type: 'select',
+              name: 'duration.kind',
+              label: 'Duration kind',
+              options: durationKindOptions,
               required: true,
+              width: 'lg',
             },
             {
-              type: 'select',
-              name: 'duration.unit',
-              label: 'Unit',
+              type: 'inputSelect',
+              name: 'duration',
+              label: 'Duration',
+              inputType: 'number',
+              valueKey: 'value',
+              unitKey: 'unit',
               options: durationUnitOptions,
+              min: 1,
+              valueDigits: 2,
+              width: 'auto',
               visibility: visibleWhenDurationTimed(),
               required: true,
+              defaultValue: { value: 1, unit: 'round' },
+            },
+            {
+              type: 'switch',
+              name: 'duration.upTo',
+              label: 'Up to',
+              labelPosition: 'above',
+              width: 'auto',
+              visibility: visibleWhenDurationTimed(),
             },
           ],
         },
@@ -421,12 +463,6 @@ function castingFields(): FormItem[] {
           type: 'switch',
           name: 'duration.concentration',
           label: 'Concentration',
-          visibility: visibleWhenDurationTimed(),
-        },
-        {
-          type: 'switch',
-          name: 'duration.upTo',
-          label: 'Up to',
           visibility: visibleWhenDurationTimed(),
         },
         {
@@ -457,13 +493,21 @@ function castingFields(): FormItem[] {
               label: 'Somatic (S)',
               width: 'auto',
             },
+            {
+              type: 'switch',
+              name: 'components.material.enabled',
+              label: 'Material (M)',
+              width: 'auto',
+            },
           ],
         },
         {
           type: 'text',
           name: 'components.material.description',
-          label: 'Material (M)',
-          hint: 'Describe the material component; leave blank if none.',
+          label: 'Material description',
+          hint: 'Describe the material component.',
+          visibility: visibleWhenMaterialEnabled(),
+          required: true,
         },
       ],
     },
@@ -473,6 +517,7 @@ function castingFields(): FormItem[] {
       label: 'Delivery method',
       options: deliveryMethodOptions,
       hint: 'Attack-roll delivery for cantrips and spells that use spell attacks.',
+      width: 'xl',
     },
   ]
 }

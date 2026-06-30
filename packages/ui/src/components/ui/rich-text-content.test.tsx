@@ -7,15 +7,22 @@ import { RichTextContent } from './rich-text-content'
 describe('RichTextContent', () => {
   it('renders sanitized HTML with prose classes', () => {
     const { container } = render(
-      <RichTextContent html="<p>Hello <strong>world</strong></p>" size="sm" tone="muted" />,
+      <RichTextContent html="<p>Hello <strong>world</strong></p>" size="md" tone="muted" />,
     )
     expect(container.querySelector('p')).toHaveTextContent('Hello world')
+    expect(container.firstChild).toHaveClass('prose', 'prose-md', 'max-w-none')
+  })
+
+  it('renders compact prose when size is sm', () => {
+    const { container } = render(
+      <RichTextContent html="<p>Compact copy.</p>" size="sm" tone="muted" />,
+    )
     expect(container.firstChild).toHaveClass('prose', 'prose-sm', 'max-w-none')
   })
 
   it('renders multiple paragraphs inside prose', () => {
     const { container } = render(
-      <RichTextContent html="<p>First paragraph.</p><p>Second paragraph.</p>" size="sm" />,
+      <RichTextContent html="<p>First paragraph.</p><p>Second paragraph.</p>" size="md" />,
     )
     expect(container.querySelectorAll('p')).toHaveLength(2)
     expect(container.firstChild).toHaveClass('prose')
@@ -40,7 +47,7 @@ describe('RichTextContent', () => {
         html={
           '<p>Use <code>pnpm bench</code> for tickets.</p><pre><code>pnpm bench list-tickets</code></pre>'
         }
-        size="sm"
+        size="md"
       />,
     )
 
@@ -54,7 +61,7 @@ describe('RichTextContent', () => {
         html={
           '<p>See <a href="/campaigns/demo/spells/fire-bolt" data-content-type="spell" data-content-id="fire-bolt" data-content-title="Fire Bolt" data-link-kind="detail">Fire Bolt</a>.</p>'
         }
-        size="sm"
+        size="md"
       />,
     )
 

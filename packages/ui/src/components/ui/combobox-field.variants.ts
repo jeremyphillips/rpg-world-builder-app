@@ -6,7 +6,7 @@ import type { FieldSizeToken } from './field-sizing.variants'
 export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
   sm: 32,
   md: 36,
-  lg: 52,
+  lg: 44,
 } as const satisfies Record<FieldSizeToken, number>
 
 /** Popover panel wrapping the search field and scrollable option list. */
@@ -24,8 +24,8 @@ export const comboboxSearchRowVariants = cva(
     variants: {
       size: {
         sm: 'h-8 text-xs',
-        md: 'h-9 text-sm',
-        lg: 'h-13 text-lg',
+        md: 'h-9 text-md',
+        lg: 'h-11 text-base',
       },
     },
     defaultVariants: {
@@ -50,8 +50,11 @@ export const comboboxOptionVariants = cva(
 /** Empty-state message when the filter matches nothing. */
 export const comboboxEmptyVariants = cva('px-2 py-4 text-center text-sm text-muted-foreground')
 
-/** Chip row shown below the trigger in multi-select mode. */
-export const comboboxChipRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
+/** Dismissible-badge row shown below the trigger in multi-select mode. */
+export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
+
+/** @deprecated Use {@link comboboxSelectedItemsRowVariants}. */
+export const comboboxChipRowVariants = comboboxSelectedItemsRowVariants
 
 /** Vertical list for custom selected-item renderers in multi-select mode. */
 export const comboboxSelectedListVariants = cva('flex flex-col gap-2 pt-2')

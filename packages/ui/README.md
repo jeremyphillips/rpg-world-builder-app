@@ -91,7 +91,7 @@ import { Heading, Text, RichTextContent } from '@rpg/ui'
 
 <Heading variant="page" as="h1">{item.name}</Heading>
 <Text variant="muted">{item.description}</Text>
-<RichTextContent html={trait.description} size="sm" tone="muted" />
+<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 ## Importing components
@@ -162,10 +162,9 @@ import { Form } from '@rpg/ui/form'
 ;<Form schema={schema} fields={fields} onSubmit={onSubmit} />
 ```
 
-See **[docs/forms.md](docs/forms.md)** for the full guide: when to use which layer,
-the field anatomy + a11y contract, the `size`/`width` token scales (with the XdY
-recipe), contracts-first validation, the RHF boundary, rich-text/JSON handling,
-combobox/chips field types, and conditional fields.
+See **[docs/forms.md](docs/forms.md)** for the hub guide (layers, a11y, rhythm, validation,
+RHF boundary). Deep reference lives in **[docs/forms/](docs/forms/)** — field types,
+containers, sizing tokens, and layout patterns.
 
 ## File uploads
 

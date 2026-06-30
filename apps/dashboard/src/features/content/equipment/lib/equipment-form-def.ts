@@ -139,8 +139,7 @@ const equipmentFormSchema = z.object({
   // weapon variant fields
   category: weaponCategorySchema.optional(),
   mode: weaponModeSchema.optional(),
-  hasDamage: z.boolean().optional(),
-  damageKind: z.enum(['dice', 'flat']).optional(),
+  damageKind: z.enum(['dice', 'flat', 'none']).optional(),
   damageDice: diceSchema.optional(),
   damageAmount: z.coerce.number().int().min(1).optional(),
   damageType: weaponDamageTypeSchema.optional(),

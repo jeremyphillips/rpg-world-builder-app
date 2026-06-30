@@ -7,10 +7,17 @@
  */
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
 
+/** Shared type scale for labels and controls at each field size. */
+export const fieldSizeTypographyClasses = {
+  sm: 'text-xs',
+  md: 'text-md',
+  lg: 'text-base',
+} as const satisfies Record<FieldSizeToken, string>
+
 export const fieldControlSizeClasses = {
   sm: 'h-8 px-2.5 py-1 text-xs',
-  md: 'h-9 px-3 py-1.5 text-sm',
-  lg: 'h-13 px-4 py-2.5 text-lg',
+  md: 'h-9 px-3 py-1.5 text-md',
+  lg: 'h-11 px-4 py-2 text-base',
 } as const satisfies Record<FieldSizeToken, string>
 
 /**
@@ -19,8 +26,15 @@ export const fieldControlSizeClasses = {
  */
 export const fieldGroupedControlSizeClasses = {
   sm: 'h-8 pl-2.5 py-1 text-xs',
-  md: 'h-9 pl-3 py-1.5 text-sm',
-  lg: 'h-13 pl-4 py-2.5 text-lg',
+  md: 'h-9 pl-3 py-1.5 text-md',
+  lg: 'h-11 pl-4 py-2 text-base',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** Multi-line controls (Textarea, JSON editor): min-height + padding + type scale. */
+export const fieldTextareaSizeClasses = {
+  sm: 'min-h-16 px-2.5 py-1.5 text-xs',
+  md: 'min-h-20 px-3 py-2 text-md',
+  lg: 'min-h-28 px-4 py-3 text-base',
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Right-side reserve for digit controls with a trailing stepper/caret column. */
@@ -43,6 +57,13 @@ export const fieldDigitTrailingColumnClasses = {
   md: 'w-5',
   lg: 'w-7',
 } as const satisfies Record<FieldSizeToken, string>
+
+/** Maps field control size to badge size (`Badge` / `DismissibleBadge` only define `sm` | `md`). */
+export const fieldSizeToBadgeSize = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'md',
+} as const satisfies Record<FieldSizeToken, 'sm' | 'md'>
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
 export const fieldDigitTrailingIconClasses = {

@@ -16,7 +16,7 @@
  *
  * Type scale: `--text-xs` … `--text-9xl` in `@theme inline` are the SSOT for
  * Tailwind `text-*` font sizes (defaults at 16px root). `--text-md` (15px) is
- * secondary body for prose-sm and `Text` small/destructive/emphasis. Heading tiers
+ * secondary body for prose-md and `Text` small/destructive/emphasis. Heading tiers
  * (`--text-heading-1` … `--text-heading-5`) and role aliases
  * (`--text-heading-display`, …) map variants to that scale. Font-weight roles
  * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
@@ -74,7 +74,7 @@
   --text-xs--line-height: 1rem; /* 16px */
   --text-sm: 0.875rem; /* 14px */
   --text-sm--line-height: 1.25rem; /* 20px */
-  --text-md: 0.9375rem; /* 15px — secondary body (prose-sm, Text small, …) */
+  --text-md: 0.9375rem; /* 15px — secondary body (prose-md, Text small, …) */
   --text-md--line-height: 1.375rem; /* 22px */
   --text-base: 1rem; /* 16px */
   --text-base--line-height: 1.5rem; /* 24px */
@@ -132,6 +132,14 @@
   --text-heading-label: var(--text-heading-group);
   --text-heading-label--line-height: var(--text-heading-group--line-height);
 
+  /* Form chrome — group/section legend type scale. */
+  --text-field-group-legend: var(--text-2xl);
+  --text-field-group-legend--line-height: var(--text-2xl--line-height);
+  --text-field-subgroup-legend: var(--text-xl);
+  --text-field-subgroup-legend--line-height: var(--text-xl--line-height);
+  --text-field-array-legend: var(--text-lg);
+  --text-field-array-legend--line-height: var(--text-lg--line-height);
+
   --tracking-heading: -0.025em;
   --leading-none: 1;
 
@@ -144,8 +152,9 @@
   --text-eyebrow-sm: var(--text-xs-meta);
   --text-eyebrow-md: var(--text-sm-meta);
 
-  --text-badge-sm: var(--text-xs-meta);
-  --text-badge-md: var(--text-sm-meta);
+  /* Badge type scale — sm aligns with field sm; md aligns with field control body (`text-md`). */
+  --text-badge-sm: var(--text-xs);
+  --text-badge-md: var(--text-md);
 
   --text-table-body: var(--text-sm-meta);
   --text-table-stat: var(--text-xs);
@@ -170,6 +179,7 @@
   /* Body / UI weight roles */
   --font-weight-body: var(--font-weight-normal);
   --font-weight-body-emphasis: var(--font-weight-medium);
+  --font-weight-field-label: var(--font-weight-semibold);
   --font-weight-meta: var(--font-weight-light);
   --font-weight-data-name: var(--font-weight-semibold);
   --font-weight-data-stat: var(--font-weight-medium);
@@ -271,8 +281,14 @@
   }
 }
 
-/* Secondary body — catalog prose-sm uses --text-md (15px), not plugin default 14px. */
+/* Compact prose — aligns with compact UI (`text-sm`, 14px). */
 .prose.prose-sm {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+
+/* Secondary body — catalog + form md richtext (`text-md`, 15px). */
+.prose.prose-md {
   font-size: var(--text-md);
   line-height: var(--text-md--line-height);
 }

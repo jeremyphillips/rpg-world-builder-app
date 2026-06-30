@@ -6,6 +6,7 @@ import { EditorContent, useEditor } from '@tiptap/react'
 import { cn } from '../../lib/utils'
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
+import type { FieldSize } from './field.client'
 import { normalizeRichTextHtml, richTextHtmlEquals } from './rich-text-html'
 import type { RichTextLinkContext } from './rich-text-editor-link.lib'
 import { RichTextEditorToolbar } from './rich-text-editor-toolbar.client'
@@ -32,6 +33,7 @@ export interface RichTextEditorProps {
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   onLinkPickerOpen?: (context: RichTextLinkContext) => void
   disabled?: boolean
+  size?: FieldSize
   id?: string
   className?: string
   'aria-label'?: string
@@ -54,6 +56,7 @@ export function RichTextEditor({
   contentTypeOptions,
   onLinkPickerOpen,
   disabled = false,
+  size = 'md',
   id,
   className,
   'aria-label': ariaLabel,
@@ -69,6 +72,8 @@ export function RichTextEditor({
     valueRef.current = value
     onChangeRef.current = onChange
   })
+
+  const proseClasses = richTextEditorProseClasses(size)
 
   const editor = useEditor(
     {
@@ -87,11 +92,11 @@ export function RichTextEditor({
         attributes: {
           role: 'textbox',
           'aria-multiline': 'true',
-          class: richTextEditorProseClasses,
+          class: proseClasses,
         },
       },
     },
-    [linkable, codeBlocks],
+    [linkable, codeBlocks, proseClasses],
   )
 
   React.useEffect(() => {
@@ -124,7 +129,7 @@ export function RichTextEditor({
         attributes: {
           role: 'textbox',
           'aria-multiline': 'true',
-          class: richTextEditorProseClasses,
+          class: proseClasses,
           ...(id ? { id } : {}),
           ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
           ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
@@ -132,7 +137,7 @@ export function RichTextEditor({
         },
       },
     })
-  }, [editor, id, ariaLabel, ariaDescribedBy, ariaInvalid])
+  }, [editor, id, ariaLabel, ariaDescribedBy, ariaInvalid, proseClasses])
 
   const {
     isLinkPickerOpen,

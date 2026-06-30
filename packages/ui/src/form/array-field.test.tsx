@@ -55,7 +55,13 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
 describe('ArrayFieldRenderer', () => {
   it('renders the add button and legend for an empty array', () => {
     renderForm()
-    expect(screen.getByRole('button', { name: 'Traits' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
+    expect(screen.getByText('Traits')).toHaveClass('text-sm')
+    expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
+    expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
+      'gap-2',
+    )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })
@@ -63,8 +69,10 @@ describe('ArrayFieldRenderer', () => {
   it('adds an item when the add button is clicked', async () => {
     const user = userEvent.setup()
     renderForm()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
     expect(screen.getByRole('group', { name: 'Traits item 1' })).toHaveClass(
       'rounded-md',
       'border',
@@ -174,7 +182,6 @@ describe('ArrayFieldRenderer', () => {
         name: 'grants',
         legend: 'Grants',
         addLabel: 'Add grant',
-        collapsible: false,
         fields: [
           {
             type: 'text',

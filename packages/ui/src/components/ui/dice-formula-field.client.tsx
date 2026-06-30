@@ -5,10 +5,10 @@ import * as React from 'react'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
-import { Text } from './text'
+import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import {
@@ -21,10 +21,13 @@ import {
   resolveDiceFormulaValue,
   shouldShowModifierFields,
 } from './dice-formula-field.lib'
+import { FieldLayout } from './field-layout'
 import {
   fieldAnatomyStackClasses,
   fieldInlineControlRowClasses,
+  fieldLabelHintStackClasses,
   fieldLabelVariants,
+  type FieldHintPosition,
 } from './field.variants'
 
 export interface DiceFormulaFieldProps {
@@ -35,6 +38,7 @@ export interface DiceFormulaFieldProps {
   onBlur?: () => void
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -58,10 +62,11 @@ export function DiceFormulaField({
   onBlur,
   error,
   hint,
+  hintPosition = 'below-label',
   info,
   required = false,
   disabled = false,
-  size = 'sm',
+  size = 'md',
   width = 'full',
   labelPosition = 'above',
   modifierMode = 'optional',
@@ -108,43 +113,63 @@ export function DiceFormulaField({
     />
   )
 
-  return (
-    <fieldset
-      id={id}
-      aria-describedby={describedBy}
-      aria-invalid={hasError || undefined}
-      disabled={disabled}
-      className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
-      onBlur={onBlur}
-    >
-      {labelPosition === 'above' ? (
-        <legend id={`${id}-legend`} className={fieldLabelVariants({ size })}>
-          <FieldLabelContent label={label} required={required} info={info} />
-        </legend>
-      ) : (
-        <legend className="sr-only">{label}</legend>
-      )}
-
-      {labelPosition === 'inline' ? (
+  if (labelPosition === 'inline') {
+    return (
+      <div
+        id={id}
+        aria-describedby={describedBy}
+        aria-invalid={hasError || undefined}
+        className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
+        onBlur={onBlur}
+      >
         <div className={fieldInlineControlRowClasses}>
-          <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
-            <FieldLabelContent label={label} required={required} info={info} />
-          </span>
+          {hintPosition === 'below-label' ? (
+            <div className={fieldLabelHintStackClasses}>
+              <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
+                <FieldLabelContent label={label} required={required} info={info} />
+              </span>
+              <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+            </div>
+          ) : (
+            <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
+              <FieldLabelContent label={label} required={required} info={info} />
+            </span>
+          )}
           {controls}
         </div>
-      ) : (
-        controls
-      )}
 
-      {error ? (
-        <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
-          {error}
-        </Text>
-      ) : hint ? (
-        <Text id={hintId} variant="caption">
-          {hint}
-        </Text>
-      ) : null}
-    </fieldset>
+        {hintPosition === 'below-label' ? (
+          error ? (
+            <FieldErrorText id={errorId}>{error}</FieldErrorText>
+          ) : null
+        ) : (
+          <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <Field.Label id={`${id}-label`} htmlFor={`${id}-count`}>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <div
+            role="group"
+            aria-labelledby={`${id}-label`}
+            aria-describedby={describedBy}
+            aria-invalid={hasError || undefined}
+          >
+            {controls}
+          </div>
+        }
+      />
+    </Field.Root>
   )
 }

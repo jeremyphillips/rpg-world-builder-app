@@ -34,9 +34,11 @@ import {
 } from '@rpg/contracts'
 import {
   toOptions,
+  type EditableGridFieldConfig,
   type FieldOption,
   type FieldVisibility,
   type FormItem,
+  type StackConfig,
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
@@ -51,8 +53,6 @@ import { identityFields } from '../../lib/content-form-field-helpers'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/content-form-key-helpers'
 import {
   getLevelFieldOptions,
-  getFlatLevelFieldOptions,
-  getCompactLevelFieldOptionsGrouped,
   HIT_DIE_SELECT_DIGITS,
   levelSelectDigits,
   effectiveMaxFromCtx,
@@ -272,7 +272,7 @@ function visibleWhenIndividualWeapons(): FieldVisibility {
   }
 }
 
-function buildSpellProgressionGridField(rowCount: number): FormItem {
+function buildSpellProgressionGridField(rowCount: number): EditableGridFieldConfig {
   return {
     type: 'editableGrid',
     name: 'spellcasting.progressionTable',
@@ -314,7 +314,7 @@ function buildSpellProgressionGridField(rowCount: number): FormItem {
 // ---------------------------------------------------------------------------
 
 function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
   return [
     { type: 'text', name: 'name', label: 'Name', required: true },
@@ -595,7 +595,7 @@ const classCreateDefaultValues: Partial<ClassFormValues> = {
 // ---------------------------------------------------------------------------
 
 function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
-  const flatLevelOptions = getFlatLevelFieldOptions(ctx)
+  const flatLevelOptions = getLevelFieldOptions(ctx, { showTierLabels: false })
   return [
     {
       kind: 'row',
@@ -639,65 +639,72 @@ function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
-  return [
-    {
-      type: 'switch',
-      name: 'hasSpellcasting',
-      label: 'Has spellcasting',
-    },
-    {
-      type: 'select',
-      name: 'spellcasting.level',
-      label: 'Spellcasting level',
-      options: levelOptions,
-      visibility: visibleWhenSpellcasting(),
-      required: true,
-      hint: 'First class level at which this class gains spellcasting',
-      digits: levelDigits,
-    },
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'spellcasting.progression',
-          label: 'Progression',
-          options: spellcastingProgressionOptions,
-          visibility: visibleWhenSpellcasting(),
-          required: true,
-        },
-        {
-          type: 'select',
-          name: 'spellcasting.ability',
-          label: 'Spellcasting ability',
-          options: abilityOptions,
-          visibility: visibleWhenSpellcasting(),
-          required: true,
-        },
-        {
-          type: 'select',
-          name: 'spellcasting.preparation',
-          label: 'Preparation',
-          options: spellPreparationOptions,
-          visibility: visibleWhenSpellcasting(),
-          required: true,
-        },
-      ],
-    },
-    {
-      type: 'richtext',
-      name: 'spellcasting.description',
-      label: 'Rules description',
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenSpellcasting(),
-      hint: 'SRD spellcasting feature prose (shown on the class detail view)',
-    },
-    buildSpellProgressionGridField(effectiveMaxFromCtx(ctx)),
-  ]
+  const stack: StackConfig = {
+    kind: 'stack',
+    layout: 'toggleDependent',
+    dependentsChrome: 'subtle',
+    rhythm: 'comfortable',
+    fields: [
+      {
+        type: 'switch',
+        name: 'hasSpellcasting',
+        label: 'Has spellcasting',
+      },
+      {
+        type: 'select',
+        name: 'spellcasting.level',
+        label: 'Spellcasting level',
+        labelPosition: 'settings',
+        separator: 'subtle',
+        options: levelOptions,
+        required: true,
+        digits: levelDigits,
+        hint: 'First class level at which this class gains spellcasting',
+        visibility: visibleWhenSpellcasting(),
+      },
+      {
+        kind: 'row',
+        visibility: visibleWhenSpellcasting(),
+        fields: [
+          {
+            type: 'select',
+            name: 'spellcasting.progression',
+            label: 'Progression',
+            options: spellcastingProgressionOptions,
+            required: true,
+          },
+          {
+            type: 'select',
+            name: 'spellcasting.ability',
+            label: 'Spellcasting ability',
+            options: abilityOptions,
+            required: true,
+          },
+          {
+            type: 'select',
+            name: 'spellcasting.preparation',
+            label: 'Preparation',
+            options: spellPreparationOptions,
+            required: true,
+          },
+        ],
+      },
+      {
+        type: 'richtext',
+        name: 'spellcasting.description',
+        label: 'Rules description',
+        linkable: true,
+        internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+        contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+        visibility: visibleWhenSpellcasting(),
+        hint: 'SRD spellcasting feature prose (shown on the class detail view)',
+      },
+      buildSpellProgressionGridField(effectiveMaxFromCtx(ctx)),
+    ],
+  }
+  return [stack]
 }
 
 function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
@@ -758,8 +765,19 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Tools & Skills',
+      legend: 'Skills & Tools',
       fields: [
+        {
+          type: 'chooseFromChips',
+          name: 'proficiencies.skills.from',
+          chooseName: 'proficiencies.skills.choose',
+          label: 'Skill proficiencies',
+          options: skillOptions,
+          info: CLASS_SKILL_OPTIONS_INFO,
+          chooseMin: 0,
+          chooseMax: SKILL_IDS.length,
+          required: true,
+        },
         {
           type: 'chips',
           name: 'proficiencies.tools.categories',
@@ -774,17 +792,6 @@ function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           options: ctx.options?.tools ?? [],
           placeholder: 'Choose tools…',
           width: 'xl',
-        },
-        {
-          type: 'chooseFromChips',
-          name: 'proficiencies.skills.from',
-          chooseName: 'proficiencies.skills.choose',
-          label: 'Skill proficiencies',
-          options: skillOptions,
-          info: CLASS_SKILL_OPTIONS_INFO,
-          chooseMin: 0,
-          chooseMax: SKILL_IDS.length,
-          required: true,
         },
       ],
     },

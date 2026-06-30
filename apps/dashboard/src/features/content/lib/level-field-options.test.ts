@@ -3,41 +3,34 @@ import { defaultMulticlassingRules } from '@rpg/contracts'
 import { isFieldOptionGroup } from '@rpg/ui/form'
 
 import {
-  getCompactLevelFieldOptions,
-  getCompactLevelFieldOptionsGrouped,
-  getFlatLevelFieldOptions,
   getLevelFieldOptions,
   HIT_DIE_SELECT_DIGITS,
   levelSelectDigits,
 } from './level-field-options'
 
+const extendedRulesCtx = {
+  campaignRules: {
+    maxCharacterLevel: 25,
+    standardMaxCharacterLevel: 20,
+    allowedCharacterCreatureTypes: ['humanoid'] as const,
+    multiclassing: defaultMulticlassingRules(),
+    extendedProgression: {
+      tierName: 'Epic Destiny',
+      startsAt: 21,
+      maxLevel: 25,
+    },
+  },
+}
+
 describe('level-field-options', () => {
-  it('uses verbose labels in getLevelFieldOptions by default', () => {
+  it('returns numeric labels from getLevelFieldOptions', () => {
     const options = getLevelFieldOptions()
-    expect(options[0]).toMatchObject({ value: '1', label: 'Level 1' })
-  })
-
-  it('strips Level prefix in compact options', () => {
-    const options = getCompactLevelFieldOptions()
     expect(options[0]).toMatchObject({ value: '1', label: '1' })
-    expect(getFlatLevelFieldOptions()[9]).toMatchObject({ value: '10', label: 'Level 10' })
-    expect(getCompactLevelFieldOptions()[9]).toMatchObject({ value: '10', label: '10' })
+    expect(options[9]).toMatchObject({ value: '10', label: '10' })
   })
 
-  it('returns grouped compact options when extended progression is active', () => {
-    const options = getCompactLevelFieldOptionsGrouped({
-      campaignRules: {
-        maxCharacterLevel: 25,
-        standardMaxCharacterLevel: 20,
-        allowedCharacterCreatureTypes: ['humanoid'],
-        multiclassing: defaultMulticlassingRules(),
-        extendedProgression: {
-          tierName: 'Epic Destiny',
-          startsAt: 21,
-          maxLevel: 25,
-        },
-      },
-    })
+  it('returns grouped options when extended progression is active', () => {
+    const options = getLevelFieldOptions(extendedRulesCtx)
 
     expect(options).toHaveLength(2)
 
@@ -55,6 +48,15 @@ describe('level-field-options', () => {
     expect(standardGroup.options[0]).toMatchObject({ value: '1', label: '1' })
     expect(standardGroup.options.at(-1)).toMatchObject({ value: '20', label: '20' })
     expect(extendedGroup.options[0]).toMatchObject({ value: '21', label: '21' })
+  })
+
+  it('flattens extended tiers when showTierLabels is false', () => {
+    const options = getLevelFieldOptions(extendedRulesCtx, { showTierLabels: false })
+
+    expect(options).toHaveLength(25)
+    expect(options[0]).toMatchObject({ value: '1', label: '1' })
+    expect(options.at(-1)).toMatchObject({ value: '25', label: '25' })
+    expect(options.every((option) => !isFieldOptionGroup(option))).toBe(true)
   })
 
   it('derives digit slots from campaign max level', () => {

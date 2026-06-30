@@ -1,8 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import { Field } from './field.client'
-import { Checkbox } from './checkbox.client'
 import { FieldLabelContent } from './field-label-content'
+import { Checkbox } from './checkbox.client'
+import { fieldLabelHintStackClasses } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 
 export interface CheckboxFieldProps extends Omit<ComponentProps<typeof Checkbox>, 'id'> {
@@ -26,17 +27,23 @@ export function CheckboxField({
   width,
   ...checkboxProps
 }: CheckboxFieldProps) {
+  const labelNode = (
+    <Field.Label className="font-normal">
+      <FieldLabelContent label={label} info={info} />
+    </Field.Label>
+  )
+
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2">
         <Field.Control>
           <Checkbox {...checkboxProps} />
         </Field.Control>
-        <Field.Label className="font-normal">
-          <FieldLabelContent label={label} info={info} />
-        </Field.Label>
+        <div className={fieldLabelHintStackClasses}>
+          {labelNode}
+          <Field.Hint />
+        </div>
       </div>
-      <Field.Hint />
       <Field.Error />
     </Field.Root>
   )

@@ -31,8 +31,10 @@ export function RadioGroupField({
   options,
   error,
   hint,
+  hintPosition,
   info,
   required,
+  size,
   width,
   name,
   disabled,
@@ -49,8 +51,10 @@ export function RadioGroupField({
       label={label}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       info={info}
       required={required}
+      size={size}
       width={width}
       labelHidden={labelHidden}
     >

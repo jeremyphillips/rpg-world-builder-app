@@ -4,7 +4,9 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 
 import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 import {
   ComboboxPanel,
@@ -31,7 +33,7 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   label: string
   options: ComboboxFieldOption[]
   /**
-   * `true` (default) — value is `string[]`; selected values render as removable chips.
+   * `true` (default) — value is `string[]`; selected values render as removable badges.
    * `false` — value is `string`; picking an option closes the panel.
    */
   multiple?: boolean
@@ -40,8 +42,9 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   size?: FieldSize
   placeholder?: string
   emptyMessage?: string
-  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  hintPosition?: FieldHintPosition
 }
 
 function ComboboxFieldControl(props: ComboboxFieldControlProps) {
@@ -89,6 +92,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
         <ComboboxSelectedItems
           label={label}
           options={control.selectedOptions}
+          size={size}
           disabled={control.isInteractionDisabled}
           onRemove={control.removeValue}
           renderSelectedItem={renderSelectedItem}
@@ -119,31 +123,38 @@ export function ComboboxField({
   placeholder = 'Select…',
   emptyMessage = 'No options found.',
   renderSelectedItem,
+  hintPosition,
 }: ComboboxFieldProps) {
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
-      <Field.Label>
-        <FieldLabelContent label={label} info={info} />
-      </Field.Label>
-      <ComboboxFieldControl
-        label={label}
-        options={options}
-        multiple={multiple}
-        max={max}
-        selected={selected}
-        onChange={onChange}
-        onBlur={onBlur}
-        disabled={disabled}
-        loading={loading}
-        size={size}
-        placeholder={placeholder}
-        emptyMessage={emptyMessage}
-        renderSelectedItem={renderSelectedItem}
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <Field.Label>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <ComboboxFieldControl
+            label={label}
+            options={options}
+            multiple={multiple}
+            max={max}
+            selected={selected}
+            onChange={onChange}
+            onBlur={onBlur}
+            disabled={disabled}
+            loading={loading}
+            size={size}
+            placeholder={placeholder}
+            emptyMessage={emptyMessage}
+            renderSelectedItem={renderSelectedItem}
+          />
+        }
       />
-      <Field.Hint />
-      <Field.Error />
     </Field.Root>
   )
 }

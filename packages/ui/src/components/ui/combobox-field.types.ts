@@ -13,9 +13,10 @@ export interface ComboboxFieldOption {
 export interface ComboboxSelectedItemRenderContext {
   onRemove: () => void
   disabled?: boolean
+  size: FieldSize
 }
 
-/** Custom renderer for a selected value in multi-select mode (replaces the default chip). */
+/** Custom renderer for a selected value in multi-select mode (replaces the default badge). */
 export type ComboboxRenderSelectedItem = (
   option: ComboboxFieldOption,
   context: ComboboxSelectedItemRenderContext,

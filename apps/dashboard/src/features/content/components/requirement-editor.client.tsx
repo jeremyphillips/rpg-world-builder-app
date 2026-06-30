@@ -5,7 +5,9 @@ import { useController, useFieldArray, useFormContext, useWatch } from 'react-ho
 import {
   Badge,
   Button,
+  cn,
   Field,
+  FieldGroup,
   Input,
   RadioGroupField,
   Select,
@@ -14,9 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
+  fieldArrayItemClasses,
   fieldInlineSentenceClasses,
+  fieldLabelVariants,
   fieldWidthVariants,
+  type FieldSize,
 } from '@rpg/ui'
+import { useFormSectionContext } from '@rpg/ui/form'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
 
@@ -63,8 +69,6 @@ export interface RequirementEditorProps {
 
 /** Flat field stack keeps sentence operands on one baseline inside the inline row. */
 const SENTENCE_FIELD_STACK = 'space-y-0'
-const SENTENCE_TYPE_LABEL_CLASS =
-  "flex items-center gap-1.5 text-xs font-medium leading-none after:text-destructive data-[required]:after:ml-0.5 data-[required]:after:content-['*']"
 const SENTENCE_OPERATOR_CLASS = 'text-sm text-muted-foreground'
 
 function parseNumberInput(raw: string): number | '' {
@@ -101,9 +105,10 @@ interface MinLevelSegmentsProps {
   idPrefix: string
   leafPath: string
   maxCharacterLevel: number
+  size: FieldSize
 }
 
-function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel }: MinLevelSegmentsProps) {
+function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel, size }: MinLevelSegmentsProps) {
   const { field: levelField, fieldState: levelFieldState } = useController({
     name: `${leafPath}.level`,
   })
@@ -116,7 +121,7 @@ function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel }: MinLevelSeg
       <Field.Root
         id={`${idPrefix}-level`}
         width="xs"
-        size="sm"
+        size={size}
         required
         className={SENTENCE_FIELD_STACK}
         error={levelFieldState.error?.message}
@@ -128,7 +133,7 @@ function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel }: MinLevelSeg
             inputMode="numeric"
             min={1}
             max={maxCharacterLevel}
-            size="sm"
+            size={size}
             className={fieldWidthVariants({ width: 'xs' })}
             value={levelField.value ?? ''}
             onChange={(event) => levelField.onChange(parseNumberInput(event.target.value))}
@@ -144,9 +149,10 @@ function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel }: MinLevelSeg
 interface AbilityMinimumSegmentsProps {
   idPrefix: string
   leafPath: string
+  size: FieldSize
 }
 
-function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsProps) {
+function AbilityMinimumSegments({ idPrefix, leafPath, size }: AbilityMinimumSegmentsProps) {
   const { field: abilityField, fieldState: abilityFieldState } = useController({
     name: `${leafPath}.ability`,
   })
@@ -162,7 +168,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
       <Field.Root
         id={`${idPrefix}-ability`}
         width="sm"
-        size="sm"
+        size={size}
         required
         className={SENTENCE_FIELD_STACK}
         error={abilityFieldState.error?.message}
@@ -174,7 +180,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
           name={abilityField.name}
         >
           <Field.Control>
-            <SelectTrigger size="sm" onBlur={abilityField.onBlur}>
+            <SelectTrigger size={size} onBlur={abilityField.onBlur}>
               <SelectValue />
             </SelectTrigger>
           </Field.Control>
@@ -194,7 +200,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
       <Field.Root
         id={`${idPrefix}-minimum`}
         width="xs"
-        size="sm"
+        size={size}
         required
         className={SENTENCE_FIELD_STACK}
         error={minimumFieldState.error?.message}
@@ -206,7 +212,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath }: AbilityMinimumSegmentsPr
             inputMode="numeric"
             min={ABILITY_SCORE_MIN}
             max={ABILITY_SCORE_MAX}
-            size="sm"
+            size={size}
             className={fieldWidthVariants({ width: 'xs' })}
             value={minimumField.value ?? ''}
             onChange={(event) => minimumField.onChange(parseNumberInput(event.target.value))}
@@ -226,6 +232,7 @@ interface ConditionSentenceRowProps {
   conditionIndex: number
   canRemove: boolean
   maxCharacterLevel: number
+  size: FieldSize
   onRemove: () => void
 }
 
@@ -236,6 +243,7 @@ function ConditionSentenceRow({
   conditionIndex,
   canRemove,
   maxCharacterLevel,
+  size,
   onRemove,
 }: ConditionSentenceRowProps) {
   const { setValue, getValues } = useFormContext()
@@ -262,7 +270,7 @@ function ConditionSentenceRow({
       <label
         id={`${typeControlId}-label`}
         htmlFor={typeControlId}
-        className={SENTENCE_TYPE_LABEL_CLASS}
+        className={fieldLabelVariants({ size })}
         data-required
       >
         {CONDITION_TYPE_LABEL}
@@ -272,7 +280,7 @@ function ConditionSentenceRow({
         <Field.Root
           id={typeControlId}
           width="md"
-          size="sm"
+          size={size}
           required
           className={SENTENCE_FIELD_STACK}
           error={typeFieldState.error?.message}
@@ -281,7 +289,7 @@ function ConditionSentenceRow({
           <Select value={leafType} onValueChange={handleTypeChange} name={typeField.name}>
             <Field.Control>
               <SelectTrigger
-                size="sm"
+                size={size}
                 onBlur={typeField.onBlur}
                 aria-labelledby={`${typeControlId}-label`}
               >
@@ -304,10 +312,11 @@ function ConditionSentenceRow({
             idPrefix={idPrefix}
             leafPath={leafPath}
             maxCharacterLevel={maxCharacterLevel}
+            size={size}
           />
         ) : null}
         {leafType === 'abilityMinimum' ? (
-          <AbilityMinimumSegments idPrefix={idPrefix} leafPath={leafPath} />
+          <AbilityMinimumSegments idPrefix={idPrefix} leafPath={leafPath} size={size} />
         ) : null}
         {leafType === 'spellcasting' ? (
           <span className={SENTENCE_OPERATOR_CLASS}>{SPELLCASTING_SENTENCE_LABEL}</span>
@@ -335,6 +344,7 @@ interface ConditionSetEditorProps {
   setPath: string
   setIndex: number
   maxCharacterLevel: number
+  size: FieldSize
   onRemove: () => void
 }
 
@@ -343,6 +353,7 @@ function ConditionSetEditor({
   setPath,
   setIndex,
   maxCharacterLevel,
+  size,
   onRemove,
 }: ConditionSetEditorProps) {
   const { fields, append, remove } = useFieldArray({ name: `${setPath}.requirements` })
@@ -352,9 +363,9 @@ function ConditionSetEditor({
   const groupKind = kindField.value as 'all' | 'any' | undefined
 
   return (
-    <section
+    <fieldset
       aria-label={conditionSetAriaLabel(setIndex)}
-      className="space-y-4 rounded-md border border-border p-4"
+      className={cn(fieldArrayItemClasses, 'space-y-4')}
     >
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
@@ -366,6 +377,7 @@ function ConditionSetEditor({
             onValueChange={kindField.onChange}
             onBlur={kindField.onBlur}
             error={kindFieldState.error?.message}
+            size={size}
           />
         </div>
         <Button
@@ -393,6 +405,7 @@ function ConditionSetEditor({
               conditionIndex={conditionIndex}
               canRemove={fields.length > 1}
               maxCharacterLevel={maxCharacterLevel}
+              size={size}
               onRemove={() => remove(conditionIndex)}
             />
           </Fragment>
@@ -407,7 +420,7 @@ function ConditionSetEditor({
       >
         {ADD_CONDITION_LABEL}
       </Button>
-    </section>
+    </fieldset>
   )
 }
 
@@ -419,6 +432,7 @@ export function RequirementEditor({
   name,
   maxCharacterLevel = MAX_CHARACTER_LEVEL,
 }: RequirementEditorProps) {
+  const { size, rhythm } = useFormSectionContext()
   const groupsPath = `${name}.groups`
   const { fields, append, remove } = useFieldArray({ name: groupsPath })
   const editorValue = useWatch({ name }) as PrerequisiteEditorValue | undefined
@@ -431,37 +445,38 @@ export function RequirementEditor({
         <Text variant="lead">{preview}</Text>
       </div>
 
-      <Text variant="emphasis">{CONDITION_SETS_HEADING}</Text>
+      <FieldGroup legend={CONDITION_SETS_HEADING} legendSize="array" size={size} rhythm={rhythm}>
+        {fields.length === 0 ? (
+          <Text variant="muted" className="text-sm">
+            {EMPTY_CONDITION_SETS_HINT}
+          </Text>
+        ) : (
+          <div className="space-y-2">
+            {fields.map((field, setIndex) => (
+              <Fragment key={field.id}>
+                {setIndex > 0 ? <LogicConnectorChip operator="AND" /> : null}
+                <ConditionSetEditor
+                  idPrefix={`requirement-editor-set-${setIndex}`}
+                  setPath={`${groupsPath}.${setIndex}`}
+                  setIndex={setIndex}
+                  maxCharacterLevel={maxCharacterLevel}
+                  size={size}
+                  onRemove={() => remove(setIndex)}
+                />
+              </Fragment>
+            ))}
+          </div>
+        )}
 
-      {fields.length === 0 ? (
-        <Text variant="muted" className="text-sm">
-          {EMPTY_CONDITION_SETS_HINT}
-        </Text>
-      ) : (
-        <div className="space-y-2">
-          {fields.map((field, setIndex) => (
-            <Fragment key={field.id}>
-              {setIndex > 0 ? <LogicConnectorChip operator="AND" /> : null}
-              <ConditionSetEditor
-                idPrefix={`requirement-editor-set-${setIndex}`}
-                setPath={`${groupsPath}.${setIndex}`}
-                setIndex={setIndex}
-                maxCharacterLevel={maxCharacterLevel}
-                onRemove={() => remove(setIndex)}
-              />
-            </Fragment>
-          ))}
-        </div>
-      )}
-
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => append(newRequirementGroup())}
-      >
-        {ADD_CONDITION_SET_LABEL}
-      </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => append(newRequirementGroup())}
+        >
+          {ADD_CONDITION_SET_LABEL}
+        </Button>
+      </FieldGroup>
     </div>
   )
 }

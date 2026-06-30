@@ -31,7 +31,7 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
         statRows={statRows}
         descriptionContent={
           feat.description ? (
-            <RichTextContent html={feat.description} size="sm" tone="muted" />
+            <RichTextContent html={feat.description} size="md" tone="muted" />
           ) : undefined
         }
       >
@@ -40,7 +40,7 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
             <Heading variant="section" as="h2" id="feat-repeatable-notes-heading" className="mb-3">
               Repeatable
             </Heading>
-            <RichTextContent html={feat.repeatable.notes} size="sm" tone="muted" />
+            <RichTextContent html={feat.repeatable.notes} size="md" tone="muted" />
           </section>
         )}
       </ContentDetailLayout>

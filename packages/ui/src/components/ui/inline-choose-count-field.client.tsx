@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
 import { fieldInlineSentenceClasses } from './field.variants'
 import { NumberInput } from './number-input.client'
@@ -27,6 +28,7 @@ export interface InlineChooseCountFieldProps {
   digits?: FieldDigits
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -52,6 +54,7 @@ export function InlineChooseCountField({
   digits = 1,
   error,
   hint,
+  hintPosition,
   info,
   required,
   disabled,
@@ -65,6 +68,7 @@ export function InlineChooseCountField({
       label={label}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       info={info}
       required={required}
       disabled={disabled}
@@ -72,40 +76,28 @@ export function InlineChooseCountField({
       width={width}
       hideLabel={hideLabel}
     >
-      {({ chooseId, hintId, errorId }) => (
-        <>
-          <div className={fieldInlineSentenceClasses}>
-            {prefix ? <Text variant="body">{prefix}</Text> : null}
-            <label htmlFor={chooseId} className="sr-only">
-              {label} count
-            </label>
-            <NumberInput
-              id={chooseId}
-              size={size}
-              digits={digits}
-              stepperMin={chooseMin}
-              stepperMax={chooseMax}
-              min={chooseMin}
-              max={chooseMax}
-              disabled={disabled}
-              aria-invalid={error ? true : undefined}
-              value={value ?? ''}
-              onChange={(event) => onChange?.(parseChooseCount(event.target.value))}
-              onBlur={onBlur}
-            />
-            <Text variant="body">{suffix}</Text>
-          </div>
-
-          {error ? (
-            <Text id={errorId} variant="destructive" role="alert" aria-live="polite">
-              {error}
-            </Text>
-          ) : hint ? (
-            <Text id={hintId} variant="caption">
-              {hint}
-            </Text>
-          ) : null}
-        </>
+      {({ chooseId }) => (
+        <div className={fieldInlineSentenceClasses}>
+          {prefix ? <Text variant="body">{prefix}</Text> : null}
+          <label htmlFor={chooseId} className="sr-only">
+            {label} count
+          </label>
+          <NumberInput
+            id={chooseId}
+            size={size}
+            digits={digits}
+            stepperMin={chooseMin}
+            stepperMax={chooseMax}
+            min={chooseMin}
+            max={chooseMax}
+            disabled={disabled}
+            aria-invalid={error ? true : undefined}
+            value={value ?? ''}
+            onChange={(event) => onChange?.(parseChooseCount(event.target.value))}
+            onBlur={onBlur}
+          />
+          <Text variant="body">{suffix}</Text>
+        </div>
       )}
     </ChooseCountFieldShell>
   )

@@ -37,7 +37,15 @@ export const Default: Story = {
   },
 }
 
-/** Smaller prose for nested or secondary rich-text blocks. */
+/** Secondary-body prose for catalog rich-text (15px). */
+export const Md: Story = {
+  args: {
+    size: 'md',
+    tone: 'default',
+  },
+}
+
+/** Compact prose (14px) for nested or secondary rich-text blocks. */
 export const Small: Story = {
   args: {
     size: 'sm',
@@ -48,7 +56,7 @@ export const Small: Story = {
 /** Muted tone for supplementary rich-text under section headings. */
 export const Muted: Story = {
   args: {
-    size: 'sm',
+    size: 'md',
     tone: 'muted',
   },
 }

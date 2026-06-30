@@ -65,6 +65,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'badge-md',
         'table-body',
         'table-stat',
+        'field-group-legend',
+        'field-subgroup-legend',
+        'field-array-legend',
       ],
       'font-weight': [
         'heading-display',
@@ -74,6 +77,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'heading-label',
         'body',
         'body-emphasis',
+        'field-label',
         'meta',
         'data-name',
         'data-stat',

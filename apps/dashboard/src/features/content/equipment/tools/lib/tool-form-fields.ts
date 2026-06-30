@@ -78,6 +78,7 @@ export function toolFormFieldGroup(): FormItem[] {
               name: 'description',
               label: 'Description',
               required: true,
+              width: 'xl',
             },
             {
               type: 'number',

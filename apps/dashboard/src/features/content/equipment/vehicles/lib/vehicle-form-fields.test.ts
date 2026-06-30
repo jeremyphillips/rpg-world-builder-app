@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { createEquipmentInputSchema } from '@rpg/contracts'
-import type { RowConfig } from '@rpg/ui/form'
+import type { GroupConfig, RowConfig } from '@rpg/ui/form'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
 import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-registry'
@@ -23,7 +23,7 @@ describe('vehicle kindFieldGroups', () => {
     expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
   })
 
-  it('uses flex auto-width for cargo/speed and responsive grid for crew/passengers', () => {
+  it('uses one responsive-4 grid row for cargo, speed, crew, and passengers', () => {
     const group = vehicleFormFieldGroup()
     if (!('kind' in group) || group.kind !== 'group') {
       throw new Error('Expected vehicle group fields')
@@ -32,22 +32,43 @@ describe('vehicle kindFieldGroups', () => {
     const rows: RowConfig[] = group.fields.filter(
       (field): field is RowConfig => 'kind' in field && field.kind === 'row',
     )
+    const combatGroup = group.fields.find(
+      (field): field is GroupConfig =>
+        'kind' in field && field.kind === 'group' && field.legend === 'Combat',
+    )
 
-    const [cargoSpeedRow, crewPassengersRow] = rows
-    if (!cargoSpeedRow || !crewPassengersRow) {
-      throw new Error('Expected cargo/speed and crew/passengers rows')
+    const [statsRow] = rows
+    if (!statsRow || !combatGroup) {
+      throw new Error('Expected vehicle stats row and combat subgroup')
     }
 
-    expect(cargoSpeedRow).toMatchObject({ kind: 'row' })
-    expect(cargoSpeedRow).not.toHaveProperty('layout')
-    expect(cargoSpeedRow).not.toHaveProperty('className')
-    expect(cargoSpeedRow.fields).toEqual([
+    expect(statsRow).toMatchObject({
+      kind: 'row',
+      layout: 'responsive-4',
+      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
+    })
+    expect(statsRow.fields).toEqual([
       expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
       expect.objectContaining({ name: 'speed', width: 'auto' }),
+      expect.objectContaining({ name: 'crew', width: 'auto' }),
+      expect.objectContaining({ name: 'passengers', width: 'auto' }),
     ])
 
-    expect(crewPassengersRow).toMatchObject({ layout: 'responsive-3' })
-    expect(crewPassengersRow).not.toHaveProperty('className')
+    expect(combatGroup).toMatchObject({
+      kind: 'group',
+      legend: 'Combat',
+      legendSize: 'subsection',
+    })
+    expect(combatGroup.fields).toEqual([
+      expect.objectContaining({
+        kind: 'row',
+        fields: [
+          expect.objectContaining({ name: 'ac', label: 'AC' }),
+          expect.objectContaining({ name: 'hp', label: 'HP' }),
+          expect.objectContaining({ name: 'damageThreshold', label: 'Damage threshold' }),
+        ],
+      }),
+    ])
   })
 })
 

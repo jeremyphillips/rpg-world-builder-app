@@ -16,12 +16,21 @@ import { TextField } from '../components/ui/text-field'
 import { MarkdownField } from '../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from './file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
+import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { DiceFormulaField } from '../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../components/ui/dice-formula-field.lib'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type { FieldConfig, FieldType } from './field-config'
+import type { FieldConfig, FieldType, InputSelectFieldConfig } from './field-config'
+import {
+  applyOptionAvailabilityToFieldOptions,
+  applyOptionAvailabilityToSelectOptions,
+  resolveFieldHint,
+} from './field-config'
+import { useDependsOnValues } from './form-depends-on.client'
+import { useFormSectionContext } from './form-section-context.client'
+import { resolveInheritedFieldSize } from '../components/ui/field.variants'
 import type { JsonFieldProps } from '../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../components/ui/rich-text-field'
 import type { FileFieldProps } from '../components/ui/file-field.client'
@@ -67,13 +76,16 @@ interface RenderArgs<K extends FieldType> {
  * `number` coerces to `number | undefined`; `select`/`radio`/`radioCard` use `onValueChange`;
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
-const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactElement } = {
+const fieldRenderers: {
+  [K in Exclude<FieldType, 'inputSelect'>]: (args: RenderArgs<K>) => React.ReactElement
+} = {
   text: ({ config, field, id, error }) => (
     <TextField
       id={id}
       label={config.label}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -94,6 +106,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       label={config.label}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -105,6 +118,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       stepperMin={config.min}
       stepperMax={config.max}
       digits={config.digits}
+      labelPosition={config.labelPosition}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={(event) => field.onChange(parseNumber(event.target.value))}
@@ -117,6 +131,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       label={config.label}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -137,11 +152,13 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       options={config.options}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
       size={config.size}
       digits={config.digits}
+      labelPosition={config.labelPosition}
       placeholder={config.placeholder}
       disabled={config.disabled}
       value={field.value != null && field.value !== '' ? String(field.value) : ''}
@@ -156,6 +173,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       options={config.options}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -174,6 +192,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       options={config.options}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -206,9 +225,11 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       labelPosition={config.labelPosition}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
+      size={config.size}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={field.onChange}
@@ -222,6 +243,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
         label={config.label}
         error={error}
         hint={config.hint}
+        hintPosition={config.hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -242,9 +264,11 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
         label={config.label}
         error={error}
         hint={config.hint}
+        hintPosition={config.hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
+        size={config.size}
         linkable={config.linkable}
         codeBlocks={config.codeBlocks}
         internalLinkOptions={config.internalLinkOptions}
@@ -262,6 +286,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       label={config.label}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -281,6 +306,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
         label={config.label}
         error={error}
         hint={config.hint}
+        hintPosition={config.hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -306,6 +332,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       max={config.max}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       size={config.size}
@@ -329,6 +356,15 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
   inlineChooseCount: ({ config, field, id, error }) => (
     <InlineChooseCountFieldRenderer config={config} field={field} id={id} error={error} />
   ),
+  inputUnit: ({ config, field, id, error, namePrefix }) => (
+    <InputUnitFieldRenderer
+      config={config}
+      field={field}
+      id={id}
+      error={error}
+      namePrefix={namePrefix}
+    />
+  ),
   combobox: ({ config, field, id, error }) => (
     <ComboboxField
       id={id}
@@ -339,6 +375,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       placeholder={config.placeholder}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -367,6 +404,7 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       label={config.label}
       error={error}
       hint={config.hint}
+      hintPosition={config.hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -382,15 +420,6 @@ const fieldRenderers: { [K in FieldType]: (args: RenderArgs<K>) => React.ReactEl
       value={(field.value as DiceFormulaValue | undefined) ?? undefined}
       onChange={field.onChange}
       onBlur={field.onBlur}
-    />
-  ),
-  inputSelect: ({ config, field, id, error, namePrefix }) => (
-    <InputSelectFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      error={error}
-      namePrefix={namePrefix}
     />
   ),
 }
@@ -413,12 +442,85 @@ export interface FieldRendererProps {
  * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
+  const { size: inheritedSize } = useFormSectionContext()
   const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
-  const { field, fieldState } = useController({ name: fullName })
   const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
+
+  const hintValues = useDependsOnValues(config.dynamicHint?.dependsOn ?? [], namePrefix)
+  const resolvedHint = resolveFieldHint(config, hintValues)
+
+  const optionAvailability =
+    config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
+  const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
+
+  const resolvedSize = resolveInheritedFieldSize({
+    explicit: config.size,
+    inherited: inheritedSize,
+  })
+  let renderConfig: FieldConfig = { ...config, size: resolvedSize }
+  if (resolvedHint !== config.hint) {
+    renderConfig = { ...renderConfig, hint: resolvedHint }
+  }
+  if (optionAvailability && (config.type === 'chips' || config.type === 'select')) {
+    const options =
+      config.type === 'chips'
+        ? applyOptionAvailabilityToFieldOptions(config.options, optionAvailability, optionValues)
+        : applyOptionAvailabilityToSelectOptions(config.options, optionAvailability, optionValues)
+    renderConfig = { ...renderConfig, options } as FieldConfig
+  }
+
+  if (renderConfig.type === 'inputSelect') {
+    return (
+      <InputSelectFieldRenderer
+        config={renderConfig}
+        fullName={fullName}
+        id={id}
+        namePrefix={namePrefix}
+      />
+    )
+  }
+
+  return (
+    <StandardFieldRenderer
+      config={config}
+      renderConfig={renderConfig as StandardFieldConfig}
+      fullName={fullName}
+      id={id}
+      namePrefix={namePrefix}
+    />
+  )
+}
+
+type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig>
+
+interface StandardFieldRendererProps {
+  config: FieldConfig
+  renderConfig: StandardFieldConfig
+  fullName: string
+  id: string
+  namePrefix?: string
+}
+
+function StandardFieldRenderer({
+  config,
+  renderConfig,
+  fullName,
+  id,
+  namePrefix,
+}: StandardFieldRendererProps) {
+  const { field, fieldState } = useController({ name: fullName })
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
-  const render = fieldRenderers[config.type] as (args: RenderArgs<FieldType>) => React.ReactElement
-  return render({ config, field, id, error: fieldState.error?.message, remotePreview, namePrefix })
+  const render = fieldRenderers[renderConfig.type] as (
+    args: RenderArgs<FieldType>,
+  ) => React.ReactElement
+  return render({
+    config: renderConfig,
+    field,
+    id,
+    error: fieldState.error?.message,
+    remotePreview,
+    namePrefix,
+  })
 }

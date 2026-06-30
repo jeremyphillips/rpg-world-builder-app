@@ -29,3 +29,18 @@ export const Disabled: Story = { args: { disabled: true } }
 export const WithInputWidth: Story = {
   args: { hint: 'Container is full-width; input is capped at sm.', inputWidth: 'sm' },
 }
+
+/** Dense settings row — label + hint left, compact control right (campaign rules, advanced panels). */
+export const SettingsRow: Story = {
+  args: {
+    id: 'min-score',
+    label: 'Minimum ability score',
+    hint: 'Applied to every primary ability on the target class and all current classes.',
+    labelPosition: 'settings',
+    digits: 2,
+    min: 1,
+    max: 30,
+    defaultValue: 13,
+    required: true,
+  },
+}

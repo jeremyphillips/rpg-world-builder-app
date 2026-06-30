@@ -18,7 +18,16 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { FieldRowLayout } from '../components/ui/field.variants'
+import type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
+import type {
+  FieldRowLayout,
+  FieldHintPosition,
+  FieldGroupLegendSize,
+  FieldLabelPosition,
+  FieldSeparator,
+  FieldStackLayout,
+  FieldStackRhythm,
+} from '../components/ui/field.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -39,6 +48,7 @@ export type FieldType =
   | 'editableGrid'
   | 'diceFormula'
   | 'inputSelect'
+  | 'inputUnit'
   | 'chooseFromChips'
   | 'inlineChooseCount'
 
@@ -93,6 +103,44 @@ export interface FieldVisibility {
   visibleWhen: (watched: Record<string, unknown>) => boolean
 }
 
+/** Merges two visibility predicates with OR semantics and a deduped `dependsOn` list. */
+export function combineFieldVisibility(a: FieldVisibility, b: FieldVisibility): FieldVisibility {
+  return {
+    dependsOn: [...new Set([...a.dependsOn, ...b.dependsOn])],
+    visibleWhen: (values) => a.visibleWhen(values) || b.visibleWhen(values),
+  }
+}
+
+/**
+ * Per-option enablement keyed on other field values. Disabled options stay
+ * selectable in the current value but cannot be toggled on (tier-2 UX).
+ */
+export interface FieldOptionAvailability {
+  dependsOn: string[]
+  enabledWhen: (values: Record<string, unknown>, optionValue: string) => boolean
+}
+
+/**
+ * Contextual helper text derived from other field values. When `hintWhen`
+ * returns `undefined`, the static `hint` on the field config is used instead.
+ */
+export interface FieldDynamicHint {
+  dependsOn: string[]
+  hintWhen: (values: Record<string, unknown>) => string | undefined
+}
+
+/**
+ * Patches form values when watched driver fields change (after initial mount).
+ * Used to remove dependent selections when a mode or category changes.
+ */
+export interface FormValueSync {
+  dependsOn: string[]
+  apply: (
+    values: Record<string, unknown>,
+    changedKeys: string[],
+  ) => Partial<Record<string, unknown>> | undefined
+}
+
 /** Properties shared by every leaf field config. */
 interface BaseFieldConfig {
   /** Form value key; also the basis of the generated control id. */
@@ -101,12 +149,18 @@ interface BaseFieldConfig {
   size?: FieldSize
   width?: FieldWidth
   hint?: string
+  /** Helper text placement relative to the label and control. Default `below-label`. */
+  hintPosition?: FieldHintPosition
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean
   disabled?: boolean
   /** Optional conditional rendering; omit for always-visible fields. */
   visibility?: FieldVisibility
+  /** Optional helper text derived from other field values. */
+  dynamicHint?: FieldDynamicHint
+  /** Trailing divider after this field within a group/stack rhythm. */
+  separator?: FieldSeparator
 }
 
 export interface TextFieldConfig extends BaseFieldConfig {
@@ -133,6 +187,8 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   inputWidth?: FieldWidth
   /** Visual digit capacity for the numeric input (sets input width from ch-based tokens). */
   digits?: FieldDigits
+  /** `above` (default) — label over control. `settings` — label + hint left, control right. */
+  labelPosition?: FieldLabelPosition
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {
@@ -147,12 +203,16 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
+  /** Disables individual options when `enabledWhen` is false for the current values. */
+  optionAvailability?: FieldOptionAvailability
   /**
    * Visual digit capacity for the select trigger (sets width from ch-based tokens).
    * Keep `width` at `full` (default) on standalone fields so label and hint are not
    * compressed; use row `width` tokens only when sharing a `FieldRow`.
    */
   digits?: FieldDigits
+  /** `above` (default) — label over control. `settings` — label + hint left, control right. */
+  labelPosition?: FieldLabelPosition
 }
 
 export interface RadioFieldConfig extends BaseFieldConfig {
@@ -181,8 +241,12 @@ export interface CheckboxFieldConfig extends BaseFieldConfig {
 export interface SwitchFieldConfig extends BaseFieldConfig {
   type: 'switch'
   defaultValue?: boolean
-  /** `inline` (default) — switch and label on one row. `above` — label over the switch. */
-  labelPosition?: 'above' | 'inline'
+  /**
+   * `inline` (default) — switch left, label right.
+   * `above` — label over the switch.
+   * `settings` — label + hint left, switch right (dense settings panels).
+   */
+  labelPosition?: 'above' | 'inline' | 'settings'
 }
 
 export interface JsonFieldConfig extends BaseFieldConfig {
@@ -249,6 +313,8 @@ export interface FileFieldConfig extends BaseFieldConfig {
 export interface ChipsFieldConfig extends BaseFieldConfig {
   type: 'chips'
   options: FieldOption[]
+  /** Disables individual options when `enabledWhen` is false for the current values. */
+  optionAvailability?: FieldOptionAvailability
   /**
    * Allow selecting more than one option. Defaults to `true`.
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
@@ -256,7 +322,7 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   multiple?: boolean
   /** Maximum selections when `multiple` is true. */
   max?: number
-  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
   chipSize?: FieldSize
   defaultValue?: string | string[]
 }
@@ -275,7 +341,7 @@ export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
   prefix?: string
   /** Trailing sentence fragment after the count input. Defaults to `skills from:`. */
   suffix?: string
-  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `sm`. */
+  /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
   chipSize?: FieldSize
   defaultValue?: string[]
   chooseDefaultValue?: number
@@ -299,7 +365,7 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
 
 /**
  * Searchable dropdown for picking one or many values from a large option list.
- * `multiple: true` (default) → value is `string[]`; selected values render as removable chips.
+ * `multiple: true` (default) → value is `string[]`; selected values render as removable badges.
  * `multiple: false` → value is `string`; picking an option closes the panel.
  */
 export interface ComboboxFieldConfig extends BaseFieldConfig {
@@ -310,7 +376,7 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
-  /** Custom selected-value renderer in multi-select mode; defaults to removable chips. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
 }
 
@@ -360,7 +426,8 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
 export interface InputSelectFieldConfig extends BaseFieldConfig {
   type: 'inputSelect'
   inputType: 'text' | 'number'
-  options: FieldOption[]
+  /** Required for select mode; omit when `fixedUnit` is set. */
+  options?: FieldOption[]
   valueKey?: string
   unitKey?: string
   searchable?: boolean
@@ -377,7 +444,27 @@ export interface InputSelectFieldConfig extends BaseFieldConfig {
   formatGrouped?: boolean
   /** When true, only the unit segment is disabled (value input stays editable). */
   unitDisabled?: boolean
+  /** Static unit label — renders label mode instead of a unit select (single-option composites). */
+  fixedUnit?: string
+  /** Stored unit enum value written to `unitKey` when `fixedUnit` is set. */
+  unitValue?: string
   defaultValue?: Record<string, unknown>
+}
+
+/** Scalar number + fixed unit label (walk speed, weapon range, spell distance, …). */
+export interface InputUnitFieldConfig extends BaseFieldConfig {
+  type: 'inputUnit'
+  /** Defaults to `number`. */
+  inputType?: 'number'
+  unit: string
+  min?: number
+  max?: number
+  step?: number
+  valueDigits?: FieldDigits
+  valueDigitsDependsOn?: string
+  valueDigitsLookup?: Record<string, FieldDigits>
+  formatGrouped?: boolean
+  defaultValue?: number
 }
 
 /** Discriminated union of every leaf field, keyed by `type`. */
@@ -401,18 +488,37 @@ export type FieldConfig =
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
   | InputSelectFieldConfig
-
-/** A responsive row of fields, mapped to `FieldRow` by the renderer. */
+  | InputUnitFieldConfig
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
   /** Preferred display recipe. Use `className` only for one-off escape hatches. */
   layout?: FieldRowLayout
   className?: string
+  /** Trailing divider after this row within a group/stack rhythm. */
+  separator?: FieldSeparator
+  /** When hidden, the whole row unmounts. */
+  visibility?: FieldVisibility
 }
 
-/** Fields allowed inside a `group` — groups may nest one level or more. */
-export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig
+/** Fields allowed inside a `group` or `stack` — may nest one level or more. */
+export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig | StackConfig
+
+/** Layout-only container for toggle + dependent fields (no fieldset legend). */
+export interface StackConfig {
+  kind: 'stack'
+  layout?: FieldStackLayout
+  /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
+  dependentsChrome?: FieldStackDependentsTone
+  /**
+   * Vertical gap between stack siblings. `compact` (default) — dense settings panels;
+   * `comfortable` — matches `fieldGroupStackClasses` rhythm for multi-field blocks.
+   */
+  rhythm?: FieldStackRhythm
+  fields: GroupFieldItem[]
+  visibility?: FieldVisibility
+  className?: string
+}
 
 /** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
 export interface GroupConfig {
@@ -421,7 +527,16 @@ export interface GroupConfig {
   description?: string
   fields: GroupFieldItem[]
   className?: string
-  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  /** Legend scale — `subsection` (20px) for nested groups inside another group. */
+  legendSize?: FieldGroupLegendSize
+  /**
+   * Vertical gap between sibling fields. Inherits form rhythm when omitted;
+   * defaults to `comfortable` on standalone `FieldGroup`.
+   */
+  rhythm?: FieldStackRhythm
+  /** When hidden, the whole group unmounts and nested field values clear. */
+  visibility?: FieldVisibility
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }
 
@@ -436,6 +551,21 @@ export interface ArrayConfig {
   name: string
   /** Heading rendered as the `<fieldset>` legend for the whole array. */
   legend: string
+  /**
+   * Legend scale — defaults to `array` (18px). Use `section` when the array is
+   * the primary top-level section heading.
+   */
+  legendSize?: FieldGroupLegendSize
+  /**
+   * Vertical gap between array items and inside each item. Defaults to `compact`
+   * (`gap-2`); pass `comfortable` for multi-field item blocks.
+   */
+  rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for fields inside the array. Defaults to `sm`; pass
+   * `md` or `lg` when item fields should match the parent form scale.
+   */
+  size?: FieldSize
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
   /** Label for the "Add" button. Defaults to `"Add item"`. */
@@ -449,7 +579,7 @@ export interface ArrayConfig {
    * by relative field names) and the 0-based index.
    */
   itemTitle?: (values: Record<string, unknown>, index: number) => string
-  /** When false, renders as a plain fieldset even when form collapsible sections are enabled. */
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
   /**
    * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
@@ -470,17 +600,32 @@ export interface SlotConfig {
   hint?: string
   className?: string
   render: () => ReactNode
-  /** When false, renders inline even when form collapsible sections are enabled. */
+  /**
+   * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
+   * (`gap-2`).
+   */
+  rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for slot content. Defaults to `sm` (array section default).
+   */
+  size?: FieldSize
+  /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */
-export type FormItem = FieldConfig | RowConfig | GroupConfig | ArrayConfig | SlotConfig
+export type FormItem =
+  | FieldConfig
+  | RowConfig
+  | GroupConfig
+  | StackConfig
+  | ArrayConfig
+  | SlotConfig
 
-/** Narrows a `FormItem` to a container (row/group/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/stack/array/slot) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | ArrayConfig | SlotConfig {
+): item is RowConfig | GroupConfig | StackConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -540,6 +685,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   editableGrid: {},
   diceFormula: defaultDiceFormulaForMode('optional'),
   inputSelect: {},
+  inputUnit: undefined,
   chooseFromChips: [],
   inlineChooseCount: undefined,
 }
@@ -603,7 +749,7 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       for (const field of item.fields) {
         assignFieldDefaultValues(field, values)
       }
-    } else if (item.kind === 'group') {
+    } else if (item.kind === 'group' || item.kind === 'stack') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
     } else if (item.kind === 'array') {
       values[item.name] = []
@@ -624,4 +770,40 @@ export function hiddenFieldNames(items: FormItem[], values: Record<string, unkno
   return flattenFields(items)
     .filter((field) => !isFieldVisible(field, values))
     .map((field) => field.name)
+}
+
+/** Resolves static and dynamic hint text for a field config. */
+export function resolveFieldHint(
+  field: Pick<BaseFieldConfig, 'hint' | 'dynamicHint'>,
+  values: Record<string, unknown>,
+): string | undefined {
+  return field.dynamicHint?.hintWhen(values) ?? field.hint
+}
+
+/** Applies `optionAvailability` to a flat option list without mutating the source. */
+export function applyOptionAvailabilityToFieldOptions(
+  options: readonly FieldOption[],
+  availability: FieldOptionAvailability,
+  values: Record<string, unknown>,
+): FieldOption[] {
+  return options.map((option) => ({
+    ...option,
+    disabled: Boolean(option.disabled) || !availability.enabledWhen(values, option.value),
+  }))
+}
+
+/** Applies `optionAvailability` to select options, including grouped sections. */
+export function applyOptionAvailabilityToSelectOptions(
+  options: readonly SelectFieldOptionListItem[],
+  availability: FieldOptionAvailability,
+  values: Record<string, unknown>,
+): SelectFieldOptionListItem[] {
+  return options.map((item) =>
+    isFieldOptionGroup(item)
+      ? {
+          ...item,
+          options: applyOptionAvailabilityToFieldOptions(item.options, availability, values),
+        }
+      : applyOptionAvailabilityToFieldOptions([item], availability, values)[0]!,
+  )
 }

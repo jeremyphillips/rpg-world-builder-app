@@ -9,6 +9,11 @@ export {
   type SlotFieldRendererProps,
 } from './form-items.client'
 export {
+  FormSectionProvider,
+  useFormSectionContext,
+  type FormSectionProviderProps,
+} from './form-section-context.client'
+export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,
   type TabbedFormProps,
@@ -38,12 +43,19 @@ export {
   editableGridDependsOn,
   isContainer,
   toOptions,
+  combineFieldVisibility,
+  resolveFieldHint,
+  applyOptionAvailabilityToFieldOptions,
+  applyOptionAvailabilityToSelectOptions,
   type FieldType,
   type FieldOption,
   type FieldOptionGroup,
   type SelectFieldOptionListItem,
   isFieldOptionGroup,
   type FieldVisibility,
+  type FieldOptionAvailability,
+  type FieldDynamicHint,
+  type FormValueSync,
   type TextFieldConfig,
   type NumberFieldConfig,
   type TextareaFieldConfig,
@@ -65,11 +77,20 @@ export {
   type EditableGridFieldConfig,
   type DiceFormulaFieldConfig,
   type InputSelectFieldConfig,
+  type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
   type GroupConfig,
   type GroupFieldItem,
+  type StackConfig,
   type ArrayConfig,
   type SlotConfig,
   type FormItem,
 } from './field-config'
+export type {
+  FieldGroupLegendSize,
+  FieldSeparator,
+  FieldStackLayout,
+  FieldStackRhythm,
+} from '../components/ui/field.variants'
+export type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'

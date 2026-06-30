@@ -11,6 +11,17 @@ describe('RichTextField', () => {
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument()
   })
 
+  it('applies field size to the label and matching prose scale', () => {
+    render(<RichTextField id="bio" label="Biography" size="sm" />)
+    expect(screen.getByText('Biography')).toHaveClass('text-xs')
+    expect(screen.getByRole('textbox', { name: 'Biography' })).toHaveClass('prose-sm')
+  })
+
+  it('defaults the editor to prose-md', () => {
+    render(<RichTextField id="bio" label="Biography" />)
+    expect(screen.getByRole('textbox', { name: 'Biography' })).toHaveClass('prose-md')
+  })
+
   it('renders the error message', () => {
     render(<RichTextField id="bio" label="Biography" hint="Optional." error="Required." />)
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')

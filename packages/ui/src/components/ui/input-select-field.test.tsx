@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 
-import { InputSelectField } from './input-select-field.client'
+import { InputSelectField, InputUnitField } from './input-select-field.client'
 
 const options = [
   { label: 'GP', value: 'gp' },
@@ -163,6 +163,14 @@ describe('InputSelectField', () => {
     expect(label?.querySelector('span.text-destructive')).toBeNull()
   })
 
+  it('wires the visible label through Field.Label for row alignment', () => {
+    render(<ControlledField required />)
+    const label = screen.getByText('Cost').closest('label')
+    expect(label).toHaveAttribute('id', 'cost-label')
+    expect(label).toHaveAttribute('for', 'cost-value')
+    expect(label).not.toHaveAttribute('for', 'cost')
+  })
+
   it('disables only the unit segment when unitDisabled is true', () => {
     render(
       <ControlledField
@@ -178,6 +186,78 @@ describe('InputSelectField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledField min={0} />)
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+
+  it('renders a static unit label without a combobox when unitMode is label', () => {
+    const { container } = render(
+      <ControlledField
+        unitMode="label"
+        fixedUnit="ft."
+        options={[]}
+        onUnitChange={undefined}
+        width="auto"
+        valueDigits={2}
+      />,
+    )
+
+    expect(screen.queryByRole('combobox', { name: 'Cost unit' })).not.toBeInTheDocument()
+    expect(screen.getByText('ft.')).toBeInTheDocument()
+
+    const unitLabel = container.querySelector('[aria-hidden].rounded-r-md')
+    expect(unitLabel).toHaveTextContent('ft.')
+    expect(unitLabel).not.toHaveClass('min-w-[5rem]')
+  })
+
+  it('uses intrinsic grouped layout for label mode with valueDigits', () => {
+    const { container } = render(
+      <ControlledField unitMode="label" fixedUnit="ft." valueDigits={2} width="auto" />,
+    )
+    const group = container.querySelector('[role="group"]')
+    expect(group).toHaveClass('w-fit', 'items-center', 'grid-cols-[auto_1px_auto]')
+    expect(screen.getByLabelText('Cost value')).toHaveClass('h-9')
+  })
+})
+
+function ControlledUnitField(
+  props: Partial<React.ComponentProps<typeof InputUnitField>> & { initialValue?: number },
+) {
+  const { initialValue = 30, ...rest } = props
+  const [value, setValue] = React.useState<number | undefined>(initialValue)
+
+  return (
+    <InputUnitField
+      id="walk-speed"
+      label="Walk speed"
+      inputType="number"
+      unit="ft."
+      value={value}
+      onValueChange={(next) => setValue(typeof next === 'number' ? next : undefined)}
+      min={0}
+      width="auto"
+      valueDigits={2}
+      {...rest}
+    />
+  )
+}
+
+describe('InputUnitField', () => {
+  it('renders a grouped value input and static unit label', () => {
+    render(<ControlledUnitField />)
+    expect(screen.getByLabelText('Walk speed value')).toHaveAttribute('id', 'walk-speed-value')
+    expect(screen.getByText('ft.')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  })
+
+  it('wires Field.Label htmlFor to the value input', () => {
+    render(<ControlledUnitField required />)
+    const label = screen.getByText('Walk speed').closest('label')
+    expect(label).toHaveAttribute('for', 'walk-speed-value')
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(<ControlledUnitField />)
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })

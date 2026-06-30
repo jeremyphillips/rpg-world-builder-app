@@ -6,8 +6,9 @@ import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import type { FieldWidth } from './field-control.variants'
-import { fieldLabelVariants } from './field.variants'
+import type { FieldHintPosition } from './field.variants'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
@@ -27,6 +28,7 @@ import {
   inputSelectDividerVariants,
   inputSelectGroupVariants,
   inputSelectSearchablePanelVariants,
+  inputSelectUnitLabelSegmentVariants,
   inputSelectUnitSegmentVariants,
   inputSelectValueSegmentVariants,
   inputSelectValueWrapperVariants,
@@ -40,19 +42,27 @@ const EMPTY_UNIT_MESSAGE = 'No units match your search.'
 
 export type { InputSelectOption }
 
+export type InputSelectUnitMode = 'select' | 'label'
+
 export interface InputSelectFieldProps {
   id: string
   label: string
   inputType: 'text' | 'number'
   value: string | number | undefined
   unit: string
-  options: InputSelectOption[]
   onValueChange: (value: string | number | undefined) => void
-  onUnitChange: (unit: string) => void
+  /** When `unitMode` is `select`, lists unit choices. Ignored in `label` mode. */
+  options?: InputSelectOption[]
+  onUnitChange?: (unit: string) => void
+  /** `select` (default) renders a unit dropdown; `label` renders a static unit suffix. */
+  unitMode?: InputSelectUnitMode
+  /** Display text for the unit segment when `unitMode` is `label`. */
+  fixedUnit?: string
   searchable?: boolean
   unitPlaceholder?: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
@@ -233,6 +243,25 @@ function UnitSelectSegment({ searchable, hasError: _hasError, ...rest }: UnitSel
   return <RadixUnitSelect {...radixProps} />
 }
 
+interface UnitLabelSegmentProps {
+  label: string
+  fixedUnit: string
+  size: FieldSize
+}
+
+function UnitLabelSegment({ label, fixedUnit, size }: UnitLabelSegmentProps) {
+  return (
+    <>
+      <span className="sr-only">
+        {label} unit: {fixedUnit}
+      </span>
+      <span aria-hidden className={inputSelectUnitLabelSegmentVariants({ size })}>
+        {fixedUnit}
+      </span>
+    </>
+  )
+}
+
 function parseNumberValue(raw: string): number | undefined {
   if (raw.trim() === '') return undefined
   const parsed = Number(raw)
@@ -339,13 +368,16 @@ export function InputSelectField({
   inputType,
   value,
   unit,
-  options,
+  options = [],
   onValueChange,
   onUnitChange,
+  unitMode = 'select',
+  fixedUnit,
   searchable = false,
   unitPlaceholder,
   error,
   hint,
+  hintPosition,
   info,
   required = false,
   disabled = false,
@@ -360,72 +392,103 @@ export function InputSelectField({
   formatGrouped = false,
   onBlur,
 }: InputSelectFieldProps) {
+  if (unitMode === 'label' && !fixedUnit) {
+    throw new Error('InputSelectField: fixedUnit is required when unitMode is "label".')
+  }
+
   const valueId = `${id}-value`
   const unitId = `${id}-unit`
   const hasError = Boolean(error)
   const describedBy = hasError ? `${id}-error` : hint ? `${id}-hint` : undefined
   const layout = inputType === 'number' && valueDigits != null ? 'intrinsic' : 'stretch'
+  const isLabelUnit = unitMode === 'label'
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
-      <label
-        id={`${id}-label`}
-        htmlFor={valueId}
-        data-required={required || undefined}
-        className={fieldLabelVariants({ size })}
-      >
-        <FieldLabelContent label={label} info={info} />
-      </label>
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        label={
+          <Field.Label id={`${id}-label`} htmlFor={valueId}>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <div
+            role="group"
+            aria-labelledby={`${id}-label`}
+            className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
+          >
+            <label htmlFor={valueId} className="sr-only">
+              {label} value
+            </label>
+            <ValueSegment
+              id={valueId}
+              inputType={inputType}
+              value={value}
+              size={size}
+              disabled={disabled}
+              placeholder={placeholder}
+              min={min}
+              max={max}
+              step={step}
+              hasError={hasError}
+              describedBy={describedBy}
+              valueDigits={valueDigits}
+              formatGrouped={formatGrouped}
+              onValueChange={onValueChange}
+              onBlur={onBlur}
+            />
 
-      <div
-        role="group"
-        aria-labelledby={`${id}-label`}
-        className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
-      >
-        <label htmlFor={valueId} className="sr-only">
-          {label} value
-        </label>
-        <ValueSegment
-          id={valueId}
-          inputType={inputType}
-          value={value}
-          size={size}
-          disabled={disabled}
-          placeholder={placeholder}
-          min={min}
-          max={max}
-          step={step}
-          hasError={hasError}
-          describedBy={describedBy}
-          valueDigits={valueDigits}
-          formatGrouped={formatGrouped}
-          onValueChange={onValueChange}
-          onBlur={onBlur}
-        />
+            <div aria-hidden className={inputSelectDividerVariants()} />
 
-        <div aria-hidden className={inputSelectDividerVariants()} />
-
-        <label htmlFor={unitId} className="sr-only">
-          {label} unit
-        </label>
-        <UnitSelectSegment
-          id={unitId}
-          label={label}
-          unit={unit}
-          options={options}
-          searchable={searchable}
-          unitPlaceholder={unitPlaceholder}
-          disabled={disabled || unitDisabled}
-          size={size}
-          hasError={hasError}
-          describedBy={describedBy}
-          onUnitChange={onUnitChange}
-          onBlur={onBlur}
-        />
-      </div>
-
-      <Field.Hint />
-      <Field.Error />
+            {isLabelUnit ? (
+              <UnitLabelSegment label={label} fixedUnit={fixedUnit!} size={size} />
+            ) : (
+              <>
+                <label htmlFor={unitId} className="sr-only">
+                  {label} unit
+                </label>
+                <UnitSelectSegment
+                  id={unitId}
+                  label={label}
+                  unit={unit}
+                  options={options}
+                  searchable={searchable}
+                  unitPlaceholder={unitPlaceholder}
+                  disabled={disabled || unitDisabled}
+                  size={size}
+                  hasError={hasError}
+                  describedBy={describedBy}
+                  onUnitChange={onUnitChange ?? (() => {})}
+                  onBlur={onBlur}
+                />
+              </>
+            )}
+          </div>
+        }
+      />
     </Field.Root>
+  )
+}
+
+export type InputUnitFieldProps = Omit<
+  InputSelectFieldProps,
+  'unitMode' | 'fixedUnit' | 'options' | 'onUnitChange' | 'unit' | 'searchable' | 'unitPlaceholder' | 'unitDisabled'
+> & {
+  /** Display text for the fixed unit suffix (e.g. `ft.`, `lb.`). */
+  unit: string
+}
+
+/** Grouped number/text input with a static unit label — shares InputSelectField tokens. */
+export function InputUnitField({ unit, ...props }: InputUnitFieldProps) {
+  return (
+    <InputSelectField
+      {...props}
+      unit=""
+      unitMode="label"
+      fixedUnit={unit}
+      options={[]}
+    />
   )
 }

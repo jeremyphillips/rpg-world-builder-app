@@ -25,4 +25,20 @@ describe('CheckboxField', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
   })
+
+  it('stacks inline label and hint in the same column beside the checkbox', () => {
+    render(
+      <CheckboxField
+        id="homebrew"
+        label="Allow homebrew"
+        hint="Includes third-party content in search results."
+      />,
+    )
+    const label = screen.getByText('Allow homebrew')
+    const hint = screen.getByText('Includes third-party content in search results.')
+    const textColumn = label.parentElement
+
+    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
+    expect(textColumn).toContainElement(hint)
+  })
 })

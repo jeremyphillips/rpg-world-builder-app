@@ -13,10 +13,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import {
-  getCompactLevelFieldOptionsGrouped,
-  levelSelectDigits,
-} from '../../lib/level-field-options'
+import { getLevelFieldOptions, levelSelectDigits } from '../../lib/level-field-options'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 
 export const SPECIES_MULTICLASS_POLICY_LABELS = {
@@ -97,14 +94,20 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
       type: 'select',
       name: 'policy',
       label: 'Multiclass policy',
+      labelPosition: 'settings',
+      separator: 'subtle',
       options: speciesMulticlassPolicyOptions,
       required: true,
+      width: 'full',
       hint: 'How this species interacts with multiclassing when the campaign allows it.',
     },
     {
       type: 'select',
       name: 'classPolicy.mode',
+      labelPosition: 'settings',
+      separator: 'subtle',
       label: 'Class policy',
+      width: 'full',
       options: speciesClassPolicyModeOptions,
       required: true,
       hint: 'Which classes this species may multiclass into when policy is restricted.',
@@ -123,7 +126,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
 
   return [
@@ -147,6 +150,7 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           digits: levelDigits,
           width: 'auto',
+          separator: 'subtle',
         },
       ],
     },
@@ -154,7 +158,7 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptionsGrouped(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
   const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? 20
 
@@ -165,6 +169,8 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Limit max character level',
       hint: 'Cap total character level for this species (campaign max is ' + maxLevel + ').',
       defaultValue: false,
+      labelPosition: 'settings',
+      separator: 'subtle',
     },
     {
       type: 'select',
@@ -174,6 +180,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       required: true,
       digits: levelDigits,
       width: 'auto',
+      separator: 'subtle',
       visibility: visibleWhenCharacterLevelCapEnabled(),
     },
     {

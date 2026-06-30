@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   costFields,
   economyFields,
+  feetInputUnitField,
   mountCapacitySpeedFields,
   optionalWeightFields,
   vehicleCargoSpeedFields,
   wealthGrantFields,
   wealthGrantFromForm,
   wealthGrantToForm,
-  walkSpeedInlineCountField,
   weightFromForm,
   weightToForm,
 } from './content-form-field-helpers'
@@ -55,12 +55,14 @@ describe('optionalWeightFields', () => {
       name: 'weight',
       valueKey: 'value',
       unitKey: 'unit',
-      unitDisabled: true,
+      fixedUnit: 'lb.',
+      unitValue: 'lb',
       valueDigits: 2,
       step: 0.5,
       formatGrouped: true,
     })
-    expect(field).not.toHaveProperty('valueDigitsDependsOn')
+    expect(field).not.toHaveProperty('unitDisabled')
+    expect(field).not.toHaveProperty('options')
   })
 
   it('returns no fields for service', () => {
@@ -159,15 +161,19 @@ describe('scalar unit rows', () => {
     }
   })
 
-  it('uses a flex row at intrinsic width for vehicle cargo and speed', () => {
+  it('uses a responsive-4 grid row for cargo, speed, crew, and passengers', () => {
     const row = vehicleCargoSpeedFields()[0]
-    expect(row).toMatchObject({ kind: 'row' })
+    expect(row).toMatchObject({
+      kind: 'row',
+      layout: 'responsive-4',
+      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
+    })
     if (row && 'kind' in row && row.kind === 'row') {
-      expect(row).not.toHaveProperty('layout')
-      expect(row).not.toHaveProperty('className')
       expect(row.fields).toEqual([
         expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
         expect.objectContaining({ name: 'speed', width: 'auto' }),
+        expect.objectContaining({ name: 'crew', width: 'auto' }),
+        expect.objectContaining({ name: 'passengers', width: 'auto' }),
       ])
     }
   })
@@ -187,16 +193,26 @@ describe('wealthGrantToForm', () => {
   })
 })
 
-describe('walkSpeedInlineCountField', () => {
-  it('builds an inlineChooseCount field with a suffix-only ft sentence', () => {
-    expect(walkSpeedInlineCountField('speed.walk')).toMatchObject({
-      type: 'inlineChooseCount',
+describe('feetInputUnitField', () => {
+  it('builds an inputUnit field with a fixed ft. label', () => {
+    expect(feetInputUnitField('range.value.value', 'Distance')).toMatchObject({
+      type: 'inputUnit',
+      name: 'range.value.value',
+      label: 'Distance',
+      unit: 'ft.',
+      min: 0,
+      valueDigits: 2,
+    })
+  })
+
+  it('defaults walk speed label when building speed fields', () => {
+    expect(feetInputUnitField('speed.walk', 'Walk speed')).toMatchObject({
+      type: 'inputUnit',
       name: 'speed.walk',
       label: 'Walk speed',
-      prefix: '',
-      suffix: 'ft.',
-      chooseMin: 0,
-      digits: 2,
+      unit: 'ft.',
+      min: 0,
+      valueDigits: 2,
     })
   })
 })

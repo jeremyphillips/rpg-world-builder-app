@@ -34,7 +34,15 @@ export const Default: Story = {
 }
 
 /** Default for catalog rich-text (species traits, heritage choice descriptions). */
-export const SmallMuted: Story = {
+export const MdMuted: Story = {
+  args: {
+    size: 'md',
+    tone: 'muted',
+  },
+}
+
+/** Compact prose for dense nested rich-text blocks. */
+export const SmMuted: Story = {
   args: {
     size: 'sm',
     tone: 'muted',

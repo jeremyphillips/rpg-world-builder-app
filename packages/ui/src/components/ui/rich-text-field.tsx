@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
 
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
+import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { RichTextEditor } from './rich-text-editor.client'
 import type { FieldWidth } from './field-control.variants'
+import type { FieldHintPosition } from './field.variants'
 import type {
   RichTextLinkPickerContentTypeOption,
   RichTextLinkPickerInternalOption,
@@ -14,9 +16,11 @@ export interface RichTextFieldProps {
   label: string
   error?: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: ReactNode
   required?: boolean
   width?: FieldWidth
+  size?: FieldSize
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
@@ -38,9 +42,11 @@ export function RichTextField({
   label,
   error,
   hint,
+  hintPosition,
   info,
   required,
   width,
+  size = 'md',
   linkable,
   codeBlocks,
   internalLinkOptions,
@@ -51,25 +57,29 @@ export function RichTextField({
   onBlur,
 }: RichTextFieldProps) {
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
-      <Field.Label>
-        <FieldLabelContent label={label} info={info} />
-      </Field.Label>
-      <Field.Control>
-        <RichTextEditor
-          aria-label={label}
-          linkable={linkable}
-          codeBlocks={codeBlocks}
-          internalLinkOptions={internalLinkOptions}
-          contentTypeOptions={contentTypeOptions}
-          disabled={disabled}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
-      </Field.Control>
-      <Field.Hint />
-      <Field.Error />
+    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+      <FieldLayout
+        hintPosition={hintPosition}
+        label={
+          <Field.Label>
+            <FieldLabelContent label={label} info={info} />
+          </Field.Label>
+        }
+        control={
+          <RichTextEditor
+            aria-label={label}
+            size={size}
+            linkable={linkable}
+            codeBlocks={codeBlocks}
+            internalLinkOptions={internalLinkOptions}
+            contentTypeOptions={contentTypeOptions}
+            disabled={disabled}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        }
+      />
     </Field.Root>
   )
 }

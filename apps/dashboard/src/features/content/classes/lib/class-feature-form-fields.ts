@@ -13,9 +13,7 @@ import {
 import { applyStableIdsForUpdate } from '../../lib/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import {
-  defaultCampaignRules,
   effectiveMaxFromCtx,
-  getCompactLevelFieldOptions,
   getLevelFieldOptions,
   levelSelectDigits,
 } from '../../lib/level-field-options'
@@ -54,7 +52,7 @@ export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
-  const levelOptions = getCompactLevelFieldOptions(ctx)
+  const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
 
   return [
@@ -115,18 +113,6 @@ export function featuresFromFormValues(
 ): ClassFeature[] {
   return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
 }
-
-/** @deprecated Use `getLevelFieldOptions(ctx)` from `level-field-options`. */
-export function getLevelOptions(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  return getLevelFieldOptions({
-    campaignRules: {
-      ...defaultCampaignRules(),
-      maxCharacterLevel: maxLevel,
-      standardMaxCharacterLevel: maxLevel,
-    },
-  })
-}
-
 export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)
 }

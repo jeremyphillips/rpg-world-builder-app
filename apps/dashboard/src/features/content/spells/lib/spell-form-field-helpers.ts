@@ -39,7 +39,7 @@ export type SpellFormDuration = {
 export type SpellFormComponents = {
   verbal?: boolean
   somatic?: boolean
-  material?: { description?: string }
+  material?: { enabled?: boolean; description?: string }
 }
 
 export type SpellFormTags = {
@@ -132,7 +132,7 @@ export function spellDurationFromFormValues(duration: SpellFormDuration): SpellD
       const base = {
         kind: 'timed' as const,
         value: duration.value ?? 1,
-        unit: duration.unit ?? 'minute',
+        unit: duration.unit ?? 'round',
       }
       if (duration.concentration) {
         return spellDurationSchema.parse({
@@ -160,9 +160,12 @@ export function spellComponentsToFormValues(components: SpellComponents): SpellF
   return {
     verbal: components.verbal === true,
     somatic: components.somatic === true,
-    ...(components.material !== undefined && {
-      material: { description: components.material.description },
-    }),
+    material: {
+      enabled: components.material !== undefined,
+      ...(components.material !== undefined && {
+        description: components.material.description,
+      }),
+    },
   }
 }
 
@@ -170,9 +173,11 @@ export function spellComponentsFromFormValues(components: SpellFormComponents): 
   const parsed: SpellComponents = {}
   if (components.verbal) parsed.verbal = true
   if (components.somatic) parsed.somatic = true
-  const materialDescription = components.material?.description?.trim()
-  if (materialDescription) {
-    parsed.material = { description: materialDescription }
+  if (components.material?.enabled) {
+    const materialDescription = components.material.description?.trim()
+    if (materialDescription) {
+      parsed.material = { description: materialDescription }
+    }
   }
   return spellComponentsSchema.parse(parsed)
 }

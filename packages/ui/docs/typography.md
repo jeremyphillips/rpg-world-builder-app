@@ -34,7 +34,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                       |
 | `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"` |
 | `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels                 |
-| `RichTextContent` `size="sm"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
+| `RichTextContent` `size="md"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
 | `CardDescription`             | `div`  | 15   | 400    | Card header secondary line               |
 
 Preserve semantic headings and existing `id`s — content detail routes use
@@ -68,7 +68,7 @@ Polymorphic via `as`. All Tailwind lives in `text.variants.ts`.
 ```tsx
 import { Text } from '@rpg/ui'
 
-<RichTextContent html={species.description} size="sm" tone="muted" />
+<RichTextContent html={species.description} size="md" tone="muted" />
 <Text variant="destructive" role="alert">
   Could not load species.
 </Text>
@@ -85,15 +85,15 @@ Form hints and errors inside `Field.*`, `Form`, and field wrappers already compo
 Always use this instead of raw `dangerouslySetInnerHTML`. Sanitization via
 `sanitizeHtml` is built in.
 
-| Prop   | Values               | Default   | Notes                                                           |
-| ------ | -------------------- | --------- | --------------------------------------------------------------- |
-| `html` | `string`             | required  | Sanitized before render                                         |
-| `size` | `sm` \| `base`       | `base`    | `sm` → `prose-sm` at `--text-md` (15px) for catalog detail copy |
-| `tone` | `default` \| `muted` | `default` | `muted` maps prose tokens to muted foreground                   |
+| Prop   | Values                 | Default   | Notes                                                                 |
+| ------ | ---------------------- | --------- | --------------------------------------------------------------------- |
+| `html` | `string`               | required  | Sanitized before render                                               |
+| `size` | `sm` \| `md` \| `base` | `base`    | `md` → `prose-md` (15px) for catalog detail; `sm` → `prose-sm` (14px) |
+| `tone` | `default` \| `muted`   | `default` | `muted` maps prose tokens to muted foreground                         |
 
 ```tsx
 import { RichTextContent } from '@rpg/ui'
-;<RichTextContent html={trait.description} size="sm" tone="muted" />
+;<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 Do not add `[&>p]:my-0` overrides — let the typography plugin manage paragraph
@@ -116,14 +116,19 @@ per-theme prose classes are required in components.
 At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`,
 14px) and primary body (`text-base`, 16px).
 
-| Surface                                             | Size                                |
-| --------------------------------------------------- | ----------------------------------- |
-| `RichTextContent` `size="sm"` (`prose-sm`)          | 15px via `.prose.prose-sm` override |
-| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                           |
-| `CardDescription`                                   | `text-md` (via `Text` small)        |
-| Rich-text editor                                    | `text-md` (matches read view)       |
+| Surface                                             | Size                              |
+| --------------------------------------------------- | --------------------------------- |
+| `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
+| `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
+| `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
+| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                         |
+| `CardDescription`                                   | `text-md` (via `Text` small)      |
+| Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
+| Rich-text editor (`size="sm"`)                      | `prose-sm`                        |
+| Form fields (`size="md"`)                           | `text-md` labels + controls       |
+| Form fields (`size="lg"`)                           | `text-base` labels + controls     |
 
-Compact UI chrome (buttons, menus, inputs, data tables) stays on **`text-sm` (14px)**.
+Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
 ## Type scale
 
@@ -131,19 +136,27 @@ Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@them
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility       | px @ 16px root | Typical use                                  |
-| --------------------- | -------------- | -------------------------------------------- |
-| `text-xs`             | 12             | Captions, table stat columns                 |
-| `text-sm`             | 14             | Compact UI chrome (buttons, menus, inputs)   |
-| `text-md`             | 15             | Secondary body (`Text` small, `prose-sm`, …) |
-| `text-base`           | 16             | Primary body default                         |
-| `text-lg`             | 18             | Card titles, lead copy                       |
-| `text-xl`             | 20             | Section headings                             |
-| `text-2xl`            | 24             | Page titles                                  |
-| `text-3xl`            | 30             | Content detail titles                        |
-| `text-4xl`            | 36             | Marketing display (e.g. public hero)         |
-| `text-5xl`            | 48             | Marketing display (responsive hero)          |
-| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness           |
+| Token / utility       | px @ 16px root | Typical use                                     |
+| --------------------- | -------------- | ----------------------------------------------- |
+| `text-xs`             | 12             | Captions, table stat columns                    |
+| `text-sm`             | 14             | Compact UI chrome (buttons, menus, data tables) |
+| `text-md`             | 15             | Secondary body (`Text` small, `prose-md`, …)    |
+| `text-base`           | 16             | Primary body default                            |
+| `text-lg`             | 18             | Card titles, lead copy                          |
+| `text-xl`             | 20             | Section headings                                |
+| `text-2xl`            | 24             | Page titles                                     |
+| `text-3xl`            | 30             | Content detail titles                           |
+| `text-4xl`            | 36             | Marketing display (e.g. public hero)            |
+| `text-5xl`            | 48             | Marketing display (responsive hero)             |
+| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness              |
+
+## Form role aliases
+
+| Role alias / utility         | px @ 16px root | Typical use                                                 |
+| ---------------------------- | -------------- | ----------------------------------------------------------- |
+| `text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
+| `text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
+| `text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
 
 ## Heading size tokens
 
@@ -176,30 +189,33 @@ for token inspection and docs — components use composites via `headingVariants
 
 Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
 
-| Role utility / token            | Value | Typical use                                 |
-| ------------------------------- | ----- | ------------------------------------------- |
-| `--font-weight-heading-display` | 700   | `Heading` display                           |
-| `--font-weight-heading`         | 600   | page, subsection, card, nav, brand, alert   |
-| `--font-weight-heading-section` | 300   | `Heading` section                           |
-| `--font-weight-heading-group`   | 500   | `Heading` group                             |
-| `--font-weight-heading-label`   | 500   | `Heading` label                             |
-| `font-body-emphasis`            | 500   | Button, badge, field label, `Text` emphasis |
-| `font-body`                     | 400   | `Text` body default                         |
-| `font-meta`                     | 300   | Eyebrow, data-table meta cells              |
-| `font-data-name`                | 600   | Data-table name cells                       |
-| `font-data-stat`                | 500   | Data-table stat columns                     |
+| Role utility / token            | Value | Typical use                               |
+| ------------------------------- | ----- | ----------------------------------------- |
+| `--font-weight-heading-display` | 700   | `Heading` display                         |
+| `--font-weight-heading`         | 600   | page, subsection, card, nav, brand, alert |
+| `--font-weight-heading-section` | 300   | `Heading` section                         |
+| `--font-weight-heading-group`   | 500   | `Heading` group                           |
+| `--font-weight-heading-label`   | 500   | `Heading` label                           |
+| `font-field-label`              | 600   | Form field labels (`fieldLabelVariants`)  |
+| `font-body-emphasis`            | 500   | Button, badge, `Text` emphasis            |
+| `font-body`                     | 400   | `Text` body default                       |
+| `font-meta`                     | 300   | Eyebrow, data-table meta cells            |
+| `font-data-name`                | 600   | Data-table name cells                     |
+| `font-data-stat`                | 500   | Data-table stat columns                   |
 
 ## Meta typography tokens
 
 Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
 
-| Token / utility       | px @ 16px root | Use                                                                                |
-| --------------------- | -------------- | ---------------------------------------------------------------------------------- |
-| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                                   |
-| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-badge-sm`, `text-eyebrow-sm`                    |
-| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-badge-md`, `text-eyebrow-md`, `text-table-body` |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                           |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                             |
+| Token / utility       | px @ 16px root | Use                                                               |
+| --------------------- | -------------- | ----------------------------------------------------------------- |
+| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                  |
+| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-eyebrow-sm`                    |
+| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-eyebrow-md`, `text-table-body` |
+| `text-badge-sm`       | 12             | Badge / dismissible-badge `size="sm"` — aliases `--text-xs`       |
+| `text-badge-md`       | 15             | Badge / dismissible-badge `size="md"` — aliases `--text-md`       |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                          |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`            |
 
 Prefer semantic aliases (`text-eyebrow-sm`, `text-badge-sm`) in component variants; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).

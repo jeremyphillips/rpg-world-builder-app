@@ -139,7 +139,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     const leading = screen.getByText('Choose how many traits apply.')
     const stack = leading.parentElement
     const grid = stack?.querySelector('.grid')
-    expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
+    expect(stack).toHaveClass('flex', 'flex-col', 'gap-8')
     expect(grid?.parentElement).toBe(stack)
   })
 })

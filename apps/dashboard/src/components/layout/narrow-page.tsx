@@ -15,7 +15,7 @@ export interface NarrowPageProps {
   className?: string
 }
 
-/** Centered max-w-3xl page column for settings, forms, and simple routes. */
+/** Centered max-w-4xl page column for settings, forms, and simple routes. */
 export function NarrowPage({ children, spacing = 'compact', className }: NarrowPageProps) {
   return (
     <div className={cn(narrowPageBaseClasses, narrowPageSpacingClasses[spacing], className)}>

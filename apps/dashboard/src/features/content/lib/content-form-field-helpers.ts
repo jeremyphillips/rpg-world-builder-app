@@ -20,7 +20,7 @@ import {
   type FieldConfig,
   type FieldOption,
   type FormItem,
-  type InlineChooseCountFieldConfig,
+  type InputUnitFieldConfig,
   type RowConfig,
 } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
@@ -48,19 +48,23 @@ const weightUnitOptions: FieldOption[] = [{ value: 'lb', label: 'lb.' }]
 /** Digit width for walk-speed inline count fields (values such as 30 or 35). */
 export const WALK_SPEED_INLINE_COUNT_DIGITS = 2 satisfies NumberInputDigits
 
-/** Inline walk speed field: visible label with `[N] ft.` on the sentence row. */
-export function walkSpeedInlineCountField(
+/** Digit width for spell range distance inline count fields (values such as 120). */
+export const SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS = 3 satisfies NumberInputDigits
+
+/** Grouped scalar number + `ft.` label — walk speed, weapon range, spell distance, etc. */
+export function feetInputUnitField(
   name: string,
-  overrides?: Partial<InlineChooseCountFieldConfig>,
-): InlineChooseCountFieldConfig {
+  label: string,
+  overrides?: Partial<InputUnitFieldConfig>,
+): InputUnitFieldConfig {
   return {
-    type: 'inlineChooseCount',
+    type: 'inputUnit',
     name,
-    label: 'Walk speed',
-    prefix: '',
-    suffix: 'ft.',
-    chooseMin: 0,
-    digits: WALK_SPEED_INLINE_COUNT_DIGITS,
+    label,
+    inputType: 'number',
+    unit: 'ft.',
+    min: 0,
+    valueDigits: WALK_SPEED_INLINE_COUNT_DIGITS,
     ...overrides,
   }
 }
@@ -119,31 +123,35 @@ export function optionalWeightFields(
 
   return [
     {
-      type: 'inputSelect',
-      name: 'weight',
-      label: 'Weight',
-      inputType: 'number',
-      valueKey: 'value',
-      unitKey: 'unit',
-      options: weightUnitOptions,
-      unitDisabled: true,
-      min: 0,
-      step: 0.5,
-      width,
-      formatGrouped: true,
-      hint: 'Leave blank for no weight',
-      defaultValue: weightToFormDefaults(),
+      ...scalarUnitInputSelectField({
+        name: 'weight',
+        label: 'Weight',
+        defaultUnit: 'lb',
+        unitOptions: weightUnitOptions,
+        step: 0.5,
+        formatGrouped: true,
+        width,
+        ...(kind && isWeightEquipmentKind(kind)
+          ? { valueDigits: weightValueDigitsForKind(kind) }
+          : {}),
+      }),
       ...(kind && isWeightEquipmentKind(kind)
-        ? { valueDigits: weightValueDigitsForKind(kind) }
+        ? {}
+        : {
+            valueDigitsDependsOn: 'kind',
+            valueDigitsLookup: EQUIPMENT_WEIGHT_VALUE_DIGITS,
+          }),
+      hint: 'Leave blank if weightless or not tracked.',
+      hintPosition: 'below-control',
+      ...(kind && isWeightEquipmentKind(kind)
+        ? {}
         : {
             visibility: {
               dependsOn: ['kind'],
               visibleWhen: (watched) => isWeightEquipmentKind(watched.kind as EquipmentKind),
             },
-            valueDigitsDependsOn: 'kind',
-            valueDigitsLookup: EQUIPMENT_WEIGHT_VALUE_DIGITS,
           }),
-    },
+    } satisfies FieldConfig,
   ]
 }
 
@@ -335,22 +343,38 @@ function scalarUnitInputSelectField<TUnit extends string>(options: {
     width = 'full',
   } = options
 
-  return {
-    type: 'inputSelect',
+  const base = {
+    type: 'inputSelect' as const,
     name,
     label,
-    inputType: 'number',
+    inputType: 'number' as const,
     valueKey: 'value',
     unitKey: 'unit',
-    options: unitOptions,
     min,
     step,
     width,
     required,
     formatGrouped,
-    unitDisabled,
-    valueDigits,
+    ...(valueDigits !== undefined ? { valueDigits } : {}),
     defaultValue: { unit: defaultUnit },
+  }
+
+  if (unitOptions.length === 1) {
+    const singleUnit = unitOptions[0]
+    if (!singleUnit) {
+      throw new Error(`scalarUnitInputSelectField "${name}" received an empty unitOptions entry`)
+    }
+    return {
+      ...base,
+      fixedUnit: singleUnit.label,
+      unitValue: singleUnit.value,
+    }
+  }
+
+  return {
+    ...base,
+    options: unitOptions,
+    unitDisabled,
   }
 }
 
@@ -432,11 +456,13 @@ export function mountCapacitySpeedFields(): GroupField[] {
   ]
 }
 
-/** Cargo and speed side-by-side at intrinsic width in the Vehicle group. */
+/** Cargo, speed, crew, and passengers in one compact grid row for the Vehicle group. */
 export function vehicleCargoSpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
+      layout: 'responsive-4',
+      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
       fields: [
         massInputSelectField({
           name: 'cargoCapacity',
@@ -451,6 +477,22 @@ export function vehicleCargoSpeedFields(): GroupField[] {
           valueDigits: 3,
           width: 'auto',
         }),
+        {
+          type: 'number',
+          name: 'crew',
+          label: 'Crew',
+          min: 0,
+          digits: 2,
+          width: 'auto',
+        },
+        {
+          type: 'number',
+          name: 'passengers',
+          label: 'Passengers',
+          min: 0,
+          digits: 2,
+          width: 'auto',
+        },
       ],
     },
   ]

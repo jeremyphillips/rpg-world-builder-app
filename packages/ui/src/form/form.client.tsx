@@ -4,15 +4,22 @@ import * as React from 'react'
 import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { cn } from '../lib/utils'
 import { Text } from '../components/ui/text'
-import { fieldGroupStackClasses } from '../components/ui/field.variants'
+import type { FieldSize } from '../components/ui/field.client'
+import type { FieldStackRhythm } from '../components/ui/field.variants'
 import { FormItems } from './form-items.client'
+import { FormRhythmStack } from './form-section-context.client'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { makeResolver } from './resolver'
-import { buildDefaultValues, type FileFieldPropsMap, type FormItem } from './field-config'
+import {
+  buildDefaultValues,
+  type FileFieldPropsMap,
+  type FormItem,
+  type FormValueSync,
+} from './field-config'
 import { FormActionsBar } from './form-actions-bar'
 import { formFooterSpacingClasses } from './form-chrome.variants'
+import { FormValueSyncEffects } from './form-value-sync-effects.client'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -52,12 +59,25 @@ export interface FormProps<TFieldValues extends FieldValues> {
    */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /**
-   * When true (default), top-level groups and array sections render inside
-   * collapsible accordions that start open. Set false for a flat layout.
+   * When true (default), sections may render inside collapsible accordions when
+   * `collapsible: true` is set on a group or array. Set false to force flat
+   * fieldsets for every section.
    */
   collapsibleSections?: boolean
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
+  /**
+   * Vertical gap between top-level fields/groups. Defaults to `comfortable`
+   * (`gap-6`). Array sections default to `compact` regardless.
+   */
+  rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
+   * `sm` and `comfortable` maps to `md`.
+   */
+  size?: FieldSize
+  /** Patches form values when configured driver fields change after initial mount. */
+  valueSyncs?: FormValueSync[]
 }
 
 /**
@@ -81,6 +101,9 @@ export function Form<TFieldValues extends FieldValues>({
   mode,
   collapsibleSections = true,
   stickyFooter = false,
+  rhythm,
+  size,
+  valueSyncs,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -108,17 +131,22 @@ export function Form<TFieldValues extends FieldValues>({
       formId={formId}
       fileFieldProps={fileFieldProps}
       collapsibleSections={collapsibleSections}
+      rhythm={rhythm}
+      size={size}
       onSubmit={onSubmit}
       className={className}
     >
-      <div className={cn(fieldGroupStackClasses, contentClassName)}>
+      <FormRhythmStack className={contentClassName}>
         {!stickyFooter && formError ? (
           <Text variant="destructive" role="alert">
             {formError}
           </Text>
         ) : null}
+        {valueSyncs && valueSyncs.length > 0 ? (
+          <FormValueSyncEffects valueSyncs={valueSyncs} />
+        ) : null}
         <FormItems items={fields} idPrefix={formId} />
-      </div>
+      </FormRhythmStack>
       {stickyFooter ? (
         <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
       ) : resolvedFooter ? (

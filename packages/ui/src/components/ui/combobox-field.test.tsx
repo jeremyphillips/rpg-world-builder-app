@@ -125,6 +125,21 @@ describe('ComboboxField', () => {
     expect(onChange).toHaveBeenCalledWith([])
   })
 
+  it('threads field size into dismissible badge size', () => {
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        size="sm"
+        value={['dagger']}
+      />,
+    )
+
+    expect(screen.getByText('Dagger').parentElement).toHaveClass('text-badge-sm')
+  })
+
   it('opens with a chromeless search row that replaces the trigger', async () => {
     const user = userEvent.setup()
     render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)
@@ -190,7 +205,7 @@ describe('ComboboxField', () => {
     expect(onChange).toHaveBeenCalledWith(['dagger', 'rapier'])
   })
 
-  it('removes a chip in multi mode', async () => {
+  it('removes a selected badge in multi mode', async () => {
     const onChange = vi.fn()
     const user = userEvent.setup()
     render(
