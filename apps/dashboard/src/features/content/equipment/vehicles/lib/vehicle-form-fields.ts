@@ -1,8 +1,7 @@
-import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES, type VehicleEquipment } from '@rpg/contracts'
+import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { massToForm, vehicleCargoSpeedFields } from '../../../lib/content-form-field-helpers'
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
+import { vehicleCargoSpeedFields } from '../../../lib/content-form-field-helpers'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const vehicleCategoryOptions = toOptions(
@@ -62,30 +61,5 @@ export function vehicleFormFieldGroup(): FormItem {
         ],
       },
     ],
-  }
-}
-
-export function vehicleFormValuesFromEntity(
-  item: VehicleEquipment,
-): Pick<
-  EquipmentFormValues,
-  | 'vehicleCategory'
-  | 'speed'
-  | 'cargoCapacity'
-  | 'crew'
-  | 'passengers'
-  | 'ac'
-  | 'hp'
-  | 'damageThreshold'
-> {
-  return {
-    vehicleCategory: item.vehicleCategory,
-    speed: item.speed,
-    cargoCapacity: massToForm(item.cargoCapacity),
-    crew: item.crew,
-    passengers: item.passengers,
-    ac: item.ac,
-    hp: item.hp,
-    damageThreshold: item.damageThreshold,
   }
 }

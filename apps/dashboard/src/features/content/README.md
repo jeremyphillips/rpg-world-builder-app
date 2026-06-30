@@ -20,6 +20,7 @@ imports between them are unrestricted. Anything outside `content` must import
 through this folder's `index.ts`.
 
 Folder layout and the feature-boundary rule are documented in
+[feature-structure.md](../../../docs/feature-structure.md) and
 [feature-conventions](../../../docs/feature-conventions.md).
 
 ## `lib/`
@@ -39,9 +40,10 @@ stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 ## Tabbed create/edit forms
 
 Class and species create/edit shells use [`TabbedForm`](../../../packages/ui/docs/forms.md)
-when a `ContentFormDef` exposes `buildTabs`. Form `lib/` file naming and split
-rules: [form-lib-conventions.md](../../../docs/form-lib-conventions.md). Other content types still use a
-single-page `<Form>`. See the TabbedForm validation note in `forms.md` if Save
+when a `ContentFormDef` exposes `buildTabs`. Form `lib/` file naming, split
+rules, and per-type alignment status:
+[form-lib-conventions.md § Inventory](../../../docs/form-lib-conventions.md#content-catalog-inventory).
+Other content types still use a single-page `<Form>`. See the TabbedForm validation note in `forms.md` if Save
 fails without a visible error — check inactive tabs.
 
 Detail and overview authoring controls (Edit, New, row actions) are gated by

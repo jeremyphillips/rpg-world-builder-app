@@ -7,9 +7,12 @@ others remain **scaffolds** — a `README.md` describing intent plus a placehold
 `index.ts` — until their phase is built. See the feature status table in
 [apps/dashboard/README.md](../README.md#feature-status).
 
+**Folder layout SSOT** → [feature-structure.md](./feature-structure.md).
+
 ## Layout
 
-Add these folders within a feature as it grows (none are required up front):
+Add these folders within a feature as it grows (none are required up front).
+Canonical tree and per-folder rules → [feature-structure.md](./feature-structure.md).
 
 | Folder        | Responsibility                                           |
 | ------------- | -------------------------------------------------------- |
@@ -18,6 +21,7 @@ Add these folders within a feature as it grows (none are required up front):
 | `hooks/`      | React hooks (data access via TanStack Query)             |
 | `domain/`     | Pure domain types/logic, framework-agnostic              |
 | `api/`        | Same-origin API client wrappers (`fetch("/api/...")`)    |
+| `lib/`        | Non-route helpers — concern index in feature-structure   |
 | `index.ts`    | Public barrel — the **only** entry other features import |
 
 Do **not** re-export route screens from `index.ts`. The app router lazy-loads
@@ -45,9 +49,16 @@ separate boundary elements, so imports within a feature are unrestricted.
 
 ## Form lib
 
-Schema-driven form modules under `lib/` use the suffix and split rules in
-[form-lib-conventions.md](./form-lib-conventions.md) (`*-form-def`, `*-form-fields`,
-`*-form-values`, `*-form-labels`).
+Schema-driven form modules under `lib/` — suffixes, split rules, and the
+content catalog inventory → [feature-structure.md § lib](./feature-structure.md#lib-concern-index)
+and [form-lib-conventions.md](./form-lib-conventions.md).
+
+## Content catalog UI
+
+Rules below apply to the `content` feature and its sub-areas. Overview,
+master-detail abstraction, and tabbed forms →
+[content/README.md](../src/features/content/README.md). Form module alignment
+status → [form-lib inventory](./form-lib-conventions.md#content-catalog-inventory).
 
 ## Typography
 

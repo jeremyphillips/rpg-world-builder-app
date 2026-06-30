@@ -2,14 +2,66 @@ import {
   createEquipmentInputSchema,
   dieFaceSchema,
   type CreateEquipmentInput,
+  type WeaponDamage,
+  type WeaponEquipment,
 } from '@rpg/contracts'
 
 import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
-} from '../../lib/equipment-form-input-base'
+} from '../../lib/equipment-form-values-base'
+import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
+
+export function damageToForm(
+  damage: WeaponDamage | undefined,
+): Pick<EquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
+  if (!damage) return { damageKind: 'none' }
+  if (damage.kind === 'dice') {
+    return {
+      damageKind: 'dice',
+      damageDice: { count: damage.count, faces: damage.faces },
+    }
+  }
+  return {
+    damageKind: 'flat',
+    damageAmount: damage.amount,
+  }
+}
+
+export function weaponFormValuesFromEntity(
+  item: WeaponEquipment,
+): Pick<
+  EquipmentFormValues,
+  | 'category'
+  | 'mode'
+  | 'damageKind'
+  | 'damageDice'
+  | 'damageAmount'
+  | 'damageType'
+  | 'versatileDamage'
+  | 'properties'
+  | 'mastery'
+  | 'rangeNormal'
+  | 'rangeLong'
+  | 'specialRules'
+> {
+  return {
+    category: item.category,
+    mode: item.mode,
+    ...damageToForm(item.damage),
+    damageType: item.damageType,
+    versatileDamage: item.versatileDamage
+      ? { count: item.versatileDamage.count, faces: item.versatileDamage.faces }
+      : undefined,
+    properties: item.properties,
+    mastery: item.mastery,
+    rangeNormal: item.range?.normal,
+    rangeLong: item.range?.long,
+    specialRules: item.specialRules,
+  }
+}
 
 function damageFromForm(values: EquipmentInputBuildCtx['values']): WeaponInput['damage'] {
   if (values.damageKind === 'none' || values.damageKind === undefined) return undefined

@@ -4,7 +4,7 @@ import type { weightFromForm } from '../../lib/content-form-field-helpers'
 import { slugForInputParse } from '../../lib/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/content-form-registry'
 
-import type { EquipmentFormValues } from './equipment-form-def'
+import type { EquipmentFormValues } from './equipment-form-fields'
 
 export type EquipmentInputBuildCtx = {
   values: EquipmentFormValues

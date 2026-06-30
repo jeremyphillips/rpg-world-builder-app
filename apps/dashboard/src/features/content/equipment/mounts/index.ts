@@ -1,5 +1,5 @@
 export { mountColumns, mountFilters } from './components/mount-columns'
 export { MOUNT_LIST, MULE, RIDING_HORSE } from './fixtures'
-export { mountFormFieldGroup, mountFormValuesFromEntity } from './lib/mount-form-fields'
-export { buildMountInput } from './lib/mount-form-input'
+export { mountFormFieldGroup } from './lib/mount-form-fields'
+export { buildMountInput, mountFormValuesFromEntity } from './lib/mount-form-values'
 export { getMountStatRows } from './lib/mount-stat-rows'

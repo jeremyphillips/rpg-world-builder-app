@@ -12,13 +12,13 @@ import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/level-field-options'
 import {
   characterConfigurationMulticlassingHref,
-  defaultSpeciesCharacterCreationFormValues,
   LEVEL_LIMITS_FIELD_PREFIX,
   multiclassingPolicyFields,
   MULTICLASSING_FIELD_PREFIX,
   speciesLevelLimitsFields,
-  type SpeciesCharacterCreationForm,
 } from '../lib/species-rules-form-fields'
+import { defaultSpeciesCharacterCreationFormValues } from '../lib/species-rules-form-values'
+import type { SpeciesCharacterCreationForm } from '../lib/species-rules-form-fields'
 
 export interface SpeciesRulesTabProps {
   formCtx: ContentFormCtx

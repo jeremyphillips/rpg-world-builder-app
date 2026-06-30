@@ -5,11 +5,9 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
   ARMOR_MATERIAL_ENTRIES,
-  type ArmorEquipment,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const armorCategoryOptions = toOptions(ARMOR_CATEGORIES, labelsFromEntries(ARMOR_CATEGORY_ENTRIES))
@@ -128,30 +126,5 @@ export function armorFormFieldGroup(): FormItem {
         visibility: visibleWhenArmorHeavy(),
       },
     ],
-  }
-}
-
-export function armorFormValuesFromEntity(
-  item: ArmorEquipment,
-): Pick<
-  EquipmentFormValues,
-  | 'armorCategory'
-  | 'material'
-  | 'baseAc'
-  | 'acBonus'
-  | 'addDexModifier'
-  | 'maxDexBonus'
-  | 'stealthDisadvantage'
-  | 'strengthRequirement'
-> {
-  return {
-    armorCategory: item.category,
-    material: item.material,
-    baseAc: item.baseAc,
-    acBonus: item.acBonus,
-    addDexModifier: item.addDexModifier,
-    maxDexBonus: item.maxDexBonus,
-    stealthDisadvantage: item.stealthDisadvantage,
-    strengthRequirement: item.strengthRequirement,
   }
 }

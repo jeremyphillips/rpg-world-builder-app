@@ -1,7 +1,7 @@
 # content / species
 
 Playable species / ancestries. Part of the [`content`](../README.md) feature;
-see [feature-conventions](../../../../docs/feature-conventions.md) for layout.
+see [feature-structure.md](../../../../docs/feature-structure.md) for layout.
 
 Create/edit forms use [`TabbedForm`](../../../../../packages/ui/docs/forms.md) with tabs: **Basics**, **Traits**, and **Heritage**.
 
@@ -13,12 +13,17 @@ Delete-locking is **derived** because species traits and heritage have no per-ro
 
 ## Key files
 
-| Area                               | Path                                                                                               |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Form def                           | `lib/species-form-def.ts`                                                                          |
-| Trait row fields / values / labels | `lib/species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts` |
-| Heritage row fields                | `lib/species-heritage-form-fields.ts`                                                              |
-| Rules tab (character creation)     | `lib/species-rules-form-fields.ts`                                                                 |
-| Shared master-detail lock helper   | [`content/lib/is-embedded-row-system-locked.ts`](../lib/is-embedded-row-system-locked.ts)          |
-| Traits tab (master-detail)         | `components/species-traits-tab.client.tsx`                                                         |
-| Heritage tab (master-detail)       | `components/species-heritage-tab.client.tsx`                                                       |
+| Area                               | Path                                                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Form def                           | `lib/species-form-def.ts`                                                                                   |
+| Form fields / values               | `lib/species-form-fields.ts`, `species-form-values.ts`                                                      |
+| Trait row fields / values / labels | `lib/species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts`          |
+| Heritage fields / values / labels  | `lib/species-heritage-form-fields.ts`, `species-heritage-form-values.ts`, `species-heritage-form-labels.ts` |
+| Rules tab fields / values / labels | `lib/species-rules-form-fields.ts`, `species-rules-form-values.ts`, `species-rules-form-labels.ts`          |
+| Shared master-detail lock helper   | [`content/lib/is-embedded-row-system-locked.ts`](../lib/is-embedded-row-system-locked.ts)                   |
+| Traits tab (master-detail)         | `components/species-traits-tab.client.tsx`                                                                  |
+| Heritage tab (master-detail)       | `components/species-heritage-tab.client.tsx`                                                                |
+
+## Related docs
+
+- [form-lib-conventions.md](../../../../docs/form-lib-conventions.md) — form module splits and inventory

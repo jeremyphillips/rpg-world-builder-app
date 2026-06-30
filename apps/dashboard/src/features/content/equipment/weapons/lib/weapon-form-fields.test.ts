@@ -4,7 +4,8 @@ import { createEquipmentInputSchema } from '@rpg/contracts'
 import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
-import { damageToForm, weaponFormFieldGroup } from './weapon-form-fields'
+import { weaponFormFieldGroup } from './weapon-form-fields'
+import { damageToForm } from './weapon-form-values'
 
 const WEAPON_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'weapon')
 

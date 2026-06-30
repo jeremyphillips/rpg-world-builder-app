@@ -3,11 +3,9 @@ import {
   GEAR_KIND_ENTRIES,
   HOLY_SYMBOL_USAGES,
   HOLY_SYMBOL_USAGE_ENTRIES,
-  type AdventuringGearEquipment,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-def'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const gearKindOptions = toOptions(GEAR_KINDS, labelsFromEntries(GEAR_KIND_ENTRIES))
@@ -25,11 +23,6 @@ const visibleWhenFocusStaff: FieldVisibility = {
   dependsOn: ['gearKind'],
   visibleWhen: (values) =>
     values.gearKind === 'arcane_focus' || values.gearKind === 'druidic_focus',
-}
-
-/** Joins mechanical property lines for the unified equipment form textarea. */
-export function formatPropertiesText(items: string[] | undefined): string | undefined {
-  return items?.length ? items.join('\n') : undefined
 }
 
 /** Adventuring gear-specific form field group for the unified equipment form. */
@@ -89,28 +82,5 @@ export function adventuringGearFormFieldGroup(): FormItem {
         label: 'Capacity',
       },
     ],
-  }
-}
-
-export function adventuringGearFormValuesFromEntity(
-  item: AdventuringGearEquipment,
-): Pick<
-  EquipmentFormValues,
-  | 'gearKind'
-  | 'bundleSize'
-  | 'storage'
-  | 'propertiesText'
-  | 'capacity'
-  | 'holySymbolUsage'
-  | 'alsoWeaponSlug'
-> {
-  return {
-    gearKind: item.gearKind,
-    bundleSize: item.bundleSize,
-    storage: item.storage,
-    propertiesText: formatPropertiesText(item.properties),
-    capacity: item.capacity,
-    holySymbolUsage: item.holySymbolUsage,
-    alsoWeaponSlug: item.alsoWeaponSlug,
   }
 }
