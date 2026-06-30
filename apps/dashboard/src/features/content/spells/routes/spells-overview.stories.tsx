@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
-import { spellsColumns, spellsFilters } from '../components/spells-columns'
+import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
 
 const meta = {
   title: 'Content/Spells/SpellsOverview',

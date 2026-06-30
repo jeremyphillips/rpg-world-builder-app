@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { SPELL_LIST } from '../fixtures'
-import { spellsColumns, spellsFilters } from './spells-columns'
+import { FEAT_LIST } from '../fixtures'
+import { featsColumns, featsFilters } from './feats-overview-columns'
 
 const meta = {
-  title: 'Content/Spells/SpellsColumns',
+  title: 'Content/Feats/FeatsOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>
@@ -17,10 +17,10 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => (
     <DataTable
-      columns={spellsColumns(STORY_CAMPAIGN_ID)}
-      data={[...SPELL_LIST]}
-      filters={spellsFilters}
-      caption="Spells available in this campaign"
+      columns={featsColumns(STORY_CAMPAIGN_ID)}
+      data={[...FEAT_LIST]}
+      filters={featsFilters}
+      caption="Feats available in this campaign"
     />
   ),
 }

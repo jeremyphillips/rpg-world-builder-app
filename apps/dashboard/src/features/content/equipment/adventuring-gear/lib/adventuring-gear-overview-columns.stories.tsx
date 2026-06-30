@@ -3,10 +3,10 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { ADVENTURING_GEAR_LIST } from '../fixtures'
-import { adventuringGearColumns, adventuringGearFilters } from './adventuring-gear-columns'
+import { adventuringGearColumns, adventuringGearFilters } from './adventuring-gear-overview-columns'
 
 const meta = {
-  title: 'Content/Equipment/Adventuring Gear/AdventuringGearColumns',
+  title: 'Content/Equipment/Adventuring Gear/AdventuringGearOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>

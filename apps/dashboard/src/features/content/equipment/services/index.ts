@@ -1,4 +1,4 @@
-export { serviceColumns, serviceFilters } from './components/service-columns'
+export { serviceColumns, serviceFilters } from './lib/service-overview-columns'
 export { SERVICE_LIST, SKILLED_HIRELING, STABLING } from './fixtures'
 export { serviceFormFieldGroup } from './lib/service-form-fields'
 export {

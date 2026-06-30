@@ -7,7 +7,7 @@ import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import {
   skillProficienciesColumns,
   skillProficienciesFilters,
-} from '../components/skill-proficiencies-columns'
+} from '../lib/skill-proficiencies-overview-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 

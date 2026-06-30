@@ -4,7 +4,7 @@ import type { CharacterClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../hooks/use-classes'
-import { classColumns, classFilters } from '../components/classes-columns'
+import { classColumns, classFilters } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 

@@ -3,10 +3,13 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SKILLS_LIST } from '../fixtures'
-import { skillProficienciesColumns, skillProficienciesFilters } from './skill-proficiencies-columns'
+import {
+  skillProficienciesColumns,
+  skillProficienciesFilters,
+} from './skill-proficiencies-overview-columns'
 
 const meta = {
-  title: 'Content/SkillProficiencies/SkillProficienciesColumns',
+  title: 'Content/SkillProficiencies/SkillProficienciesOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>

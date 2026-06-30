@@ -65,13 +65,13 @@ CSRF on state-changing requests.
 has **3+ related files** (e.g. `classes/lib/subclasses/`,
 `campaign/lib/rules/character-configuration/`).
 
-| Concern                   | Pattern                                                         | Deep dive                                                                          |
-| ------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Schema-driven forms       | `*-form-def`, `*-form-fields`, `*-form-values`, `*-form-labels` | [form-lib-conventions.md](./form-lib-conventions.md)                               |
-| Detail/list UI data       | `*-stat-rows.ts`, `*-columns.ts`                                | [feature-conventions.md](./feature-conventions.md#content-catalog-ui)              |
-| Navigation / storage keys | Plain names (`*-routes.ts`, `*-storage.ts`)                     | Feature README                                                                     |
-| Registries                | `*-registry.ts`                                                 | `homebrew/lib/hub/*-registry.ts`; see [vocabulary.md](../../../docs/vocabulary.md) |
-| Cross-type shared helpers | Parent `content/lib/`                                           | [content/README.md](../src/features/content/README.md)                             |
+| Concern                   | Pattern                                                                 | Deep dive                                                                          |
+| ------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Schema-driven forms       | `*-form-def`, `*-form-fields`, `*-form-values`, `*-form-labels`         | [form-lib-conventions.md](./form-lib-conventions.md)                               |
+| Detail/list UI data       | `*-stat-rows.ts`, `*-overview-columns.tsx` (co-located `*.stories.tsx`) | [feature-conventions.md](./feature-conventions.md#content-catalog-ui)              |
+| Navigation / storage keys | Plain names (`*-routes.ts`, `*-storage.ts`)                             | Feature README                                                                     |
+| Registries                | `*-registry.ts`                                                         | `homebrew/lib/hub/*-registry.ts`; see [vocabulary.md](../../../docs/vocabulary.md) |
+| Cross-type shared helpers | Parent `content/lib/`                                                   | [content/README.md](../src/features/content/README.md)                             |
 
 Content catalog form module inventory (aligned / pending / exception) →
 [form-lib-conventions.md § Inventory](./form-lib-conventions.md#content-catalog-inventory).

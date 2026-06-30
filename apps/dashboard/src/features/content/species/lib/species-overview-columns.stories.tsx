@@ -5,12 +5,12 @@ import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPECIES_LIST } from '../fixtures'
-import { speciesColumns, speciesFilters } from './species-columns'
+import { speciesColumns, speciesFilters } from './species-overview-columns'
 
 const storyVocabulary = buildSeedCreatureTypeVocabulary()
 
 const meta = {
-  title: 'Content/Species/SpeciesColumns',
+  title: 'Content/Species/SpeciesOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>

@@ -5,7 +5,7 @@ import type { Species } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { useCreatureTypeVocabulary } from '@/features/homebrew'
 import { useSpecies } from '../hooks/use-species'
-import { speciesColumns, speciesFilters } from '../components/species-columns'
+import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 

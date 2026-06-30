@@ -3,10 +3,10 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { EQUIPMENT_LIST } from '../fixtures'
-import { equipmentColumns, equipmentFilters } from './equipment-columns'
+import { equipmentColumns, equipmentFilters } from './equipment-overview-columns'
 
 const meta = {
-  title: 'Content/Equipment/EquipmentColumns',
+  title: 'Content/Equipment/EquipmentOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>
