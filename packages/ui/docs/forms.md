@@ -173,6 +173,13 @@ repeaters (grants inside features) inherit the same scale. Pass `size: 'md'` or
 `size: 'lg'` on `ArrayConfig` to match the parent form scale for a specific
 repeater.
 
+**Slot regions default to the same compact array rhythm and `sm` scale** as
+`ArrayConfig` — even when the parent form is `comfortable` / `md`. Pass
+`rhythm: 'comfortable'` or `size: 'md'` on `SlotConfig` when a custom slot
+editor should match the parent form scale. Slot `render()` components read
+`useFormSectionContext()` from `@rpg/ui/form` to thread size into hand-built
+controls (e.g. `RequirementEditor`).
+
 **Form-level field size** follows rhythm unless overridden: `rhythm: 'compact'`
 on `<Form>` / `<TabbedForm>` maps to `sm` for top-level fields; `comfortable`
 maps to `md`. Pass an explicit `size` on the form to override, or `size: 'md'`
@@ -766,13 +773,13 @@ on nested groups for the smaller scale (`text-field-subgroup-legend`, 20px):
 ```
 
 `FieldGroup` (standalone usage outside `<Form>`) accepts the same `legendSize`
-prop. Array section legends default to the `array` hierarchy scale; when the
-array section field size is `sm` (the default inside `<Form>` arrays), legend
+and optional `size` props. Array section legends default to the `array` hierarchy
+scale; when `size` is `sm` (the default inside slots and `<Form>` arrays), legend
 typography follows `text-sm` via `fieldGroupLegendVariants` compound variants.
-Pass `size: 'md'` on the `ArrayConfig` to keep the 18px `text-field-array-legend`
-scale. Pass `legendSize: 'section'` when the array is the primary top-level
-heading. Collapsible array sections use the accordion trigger for the visible
-heading (section scale) and hide the fieldset legend.
+Pass `size: 'md'` to keep the 18px `text-field-array-legend` scale. Pass
+`legendSize: 'section'` when the array is the primary top-level heading. Collapsible
+array sections use the accordion trigger for the visible heading (section scale)
+and hide the fieldset legend.
 
 Nested groups may declare `visibility` (same contract as leaf fields). When hidden,
 the whole subgroup — legend and fields — unmounts and nested values clear.
@@ -979,6 +986,31 @@ hidden, the whole nested array unmounts and its values are cleared via
 arrays-of-arrays. Name scoping cascades correctly at each level
 (`root.0.subarray.1.name`). Deeply-nested arrays (three or more levels) should
 be avoided for UX reasons.
+
+## Slot fields
+
+Use `SlotConfig` (`kind: 'slot'`) for custom form regions rendered inside
+`FormProvider`. The slot `name` aligns with a form value key; defaults come from
+the form's `defaultValues`. The `render()` callback returns the custom UI.
+
+```ts
+import type { FormItem, SlotConfig } from '@rpg/ui/form'
+
+const fields: FormItem[] = [
+  {
+    kind: 'slot',
+    name: 'prerequisiteEditor',
+    render: () => <RequirementEditor name="prerequisiteEditor" />,
+  },
+]
+```
+
+`rhythm` and `size` mirror `ArrayConfig`: both default to compact array rhythm
+(`gap-2`) and `sm` field scale at the slot boundary — independent of the parent
+form's `comfortable` / `md` defaults. Pass `size: 'md'` when slot content should
+match the parent form scale. Custom slot components should call
+`useFormSectionContext()` and thread `size` / `rhythm` into `FieldGroup`,
+`Field.Root`, and labelled controls.
 
 ## Conditional fields
 

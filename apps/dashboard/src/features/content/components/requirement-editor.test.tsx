@@ -18,6 +18,7 @@ import {
   requirementExpressionToEditor,
   type PrerequisiteEditorValue,
 } from '../lib/requirement-editor-form'
+import { FormSectionProvider } from '@rpg/ui/form'
 import { RequirementEditor } from './requirement-editor.client'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
@@ -30,7 +31,9 @@ function EditorShell({
   const form = useForm({ defaultValues: { prerequisiteEditor } })
   return (
     <FormProvider {...form}>
-      <RequirementEditor name="prerequisiteEditor" />
+      <FormSectionProvider rhythm="compact">
+        <RequirementEditor name="prerequisiteEditor" />
+      </FormSectionProvider>
     </FormProvider>
   )
 }
@@ -41,7 +44,7 @@ describe('RequirementEditor', () => {
 
     expect(screen.getByRole('button', { name: ADD_CONDITION_SET_LABEL })).toBeInTheDocument()
     expect(screen.getByText('No prerequisites')).toBeInTheDocument()
-    expect(screen.getByText(CONDITION_SETS_HEADING)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: CONDITION_SETS_HEADING })).toBeInTheDocument()
   })
 
   it('renders preview before condition sets heading in DOM order', () => {
@@ -60,7 +63,7 @@ describe('RequirementEditor', () => {
     await user.click(screen.getByRole('button', { name: ADD_CONDITION_SET_LABEL }))
 
     await waitFor(() => {
-      expect(screen.getByRole('region', { name: 'Condition set 1' })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Condition set 1' })).toBeInTheDocument()
     })
     expect(screen.getByLabelText(CONDITION_TYPE_LABEL)).toHaveTextContent(
       CONDITION_TYPE_PLACEHOLDER,
@@ -155,7 +158,7 @@ describe('RequirementEditor', () => {
     await user.click(screen.getByRole('button', { name: /Remove condition set 2/i }))
 
     await waitFor(() => {
-      expect(screen.queryByRole('region', { name: 'Condition set 2' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('group', { name: 'Condition set 2' })).not.toBeInTheDocument()
     })
   })
 

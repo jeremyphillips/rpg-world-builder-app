@@ -600,6 +600,15 @@ export interface SlotConfig {
   hint?: string
   className?: string
   render: () => ReactNode
+  /**
+   * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
+   * (`gap-2`).
+   */
+  rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for slot content. Defaults to `sm` (array section default).
+   */
+  size?: FieldSize
   /** When true, renders inside an accordion when form collapsible sections are enabled. */
   collapsible?: boolean
 }

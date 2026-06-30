@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldRadiogroupLabel } from './field-label-content'
+import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
@@ -14,6 +15,7 @@ export interface BaseRadioFieldProps {
   hintPosition?: FieldHintPosition
   info?: ReactNode
   required?: boolean
+  size?: FieldSize
   width?: FieldWidth
   labelHidden?: boolean
 }
@@ -31,6 +33,7 @@ export function RadioFieldShell({
   hintPosition,
   info,
   required,
+  size,
   width,
   labelHidden,
   children,
@@ -38,7 +41,7 @@ export function RadioFieldShell({
   const labelId = `${id}-label`
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
       <FieldLayout
         hintPosition={hintPosition}
         label={
@@ -47,6 +50,7 @@ export function RadioFieldShell({
             label={label}
             required={required}
             info={info}
+            size={size}
             labelHidden={labelHidden}
           />
         }

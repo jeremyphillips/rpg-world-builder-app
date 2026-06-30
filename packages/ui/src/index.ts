@@ -147,6 +147,7 @@ export {
   fieldInlineControlRowClasses,
   fieldInlineSentenceClasses,
   fieldLabelHintStackClasses,
+  fieldLabelVariants,
   fieldRowLayoutVariants,
   fieldSeparatorVariants,
   fieldStackRhythmVariants,

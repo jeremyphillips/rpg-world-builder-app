@@ -48,14 +48,34 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Damage')).not.toHaveClass('text-field-group-legend')
   })
 
-  it('renders an array legend at the repeatable-list type scale', () => {
+  it('renders an array legend at the repeatable-list type scale when size is md', () => {
     render(
-      <FieldGroup legend="Grants" legendSize="array">
+      <FieldGroup legend="Grants" legendSize="array" size="md">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
     expect(screen.getByText('Grants')).toHaveClass('text-field-array-legend')
     expect(screen.getByText('Grants')).not.toHaveClass('text-field-group-legend')
+  })
+
+  it('defaults array legend to sm scale when size is omitted', () => {
+    render(
+      <FieldGroup legend="Grants" legendSize="array">
+        <TextField id="grant-type" label="Grant type" />
+      </FieldGroup>,
+    )
+    expect(screen.getByText('Grants')).toHaveClass('text-sm')
+    expect(screen.getByText('Grants')).not.toHaveClass('text-field-array-legend')
+  })
+
+  it('renders an array legend at sm scale when size is sm', () => {
+    render(
+      <FieldGroup legend="Grants" legendSize="array" size="sm">
+        <TextField id="grant-type" label="Grant type" />
+      </FieldGroup>,
+    )
+    expect(screen.getByText('Grants')).toHaveClass('text-sm')
+    expect(screen.getByText('Grants')).not.toHaveClass('text-field-array-legend')
   })
 
   it('has no axe accessibility violations', async () => {

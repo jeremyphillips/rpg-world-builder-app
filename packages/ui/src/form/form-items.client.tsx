@@ -114,6 +114,25 @@ function buildArraySectionChildContext(
   })
 }
 
+function buildSlotSectionChildContext(
+  parent: FormSectionContextValue,
+  depth: number,
+  config: SlotConfig,
+): FormSectionContextValue {
+  return buildFormSectionChildContext(parent, depth, {
+    rhythm: resolveFieldStackRhythm({
+      explicit: config.rhythm,
+      inherited: parent.rhythm,
+      sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
+    }),
+    size: resolveArraySectionSize({
+      explicit: config.size,
+      inherited: parent.size,
+      sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
+    }),
+  })
+}
+
 /** Renders an ordered list of fields/rows/groups/arrays, recursing into containers. */
 export function FormItems({ items, idPrefix, namePrefix, plainSections }: FormItemsProps) {
   const { collapsibleSections, depth } = React.useContext(FormSectionContext)
@@ -292,10 +311,6 @@ interface FormItemNodeProps {
 
 function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNodeProps) {
   const parentContext = useFormSectionContext()
-  const defaultChildContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth),
-    [parentContext, depth],
-  )
 
   if (!isContainer(item)) {
     return <FieldNode config={item} idPrefix={idPrefix} namePrefix={namePrefix} />
@@ -331,8 +346,13 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
   }
 
   if (item.kind === 'slot') {
+    const slotChildContext = React.useMemo(
+      () => buildSlotSectionChildContext(parentContext, depth, item),
+      [parentContext, depth, item],
+    )
+
     return (
-      <FormSectionContext.Provider value={defaultChildContext}>
+      <FormSectionContext.Provider value={slotChildContext}>
         <SlotFieldRenderer config={item} />
       </FormSectionContext.Provider>
     )
@@ -779,7 +799,7 @@ export interface SlotFieldRendererProps {
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
 export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
-  const { rhythm } = useFormSectionContext()
+  const { rhythm, size } = useFormSectionContext()
   const content = config.render()
 
   if (config.label) {
@@ -788,6 +808,7 @@ export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
         legend={config.label}
         description={config.hint}
         rhythm={rhythm}
+        size={size}
         className={config.className}
       >
         {content}
