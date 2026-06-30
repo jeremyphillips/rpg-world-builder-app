@@ -25,9 +25,23 @@ Folder layout and the feature-boundary rule are documented in
 
 ## `lib/`
 
-Shared content UI and data helpers live under [`lib/`](./lib/). Each sub-area
-also keeps domain UI config in its own `lib/` — overview table column recipes
-(`*-overview-columns.tsx`, co-located stories) alongside stat-row builders (`*-stat-rows.ts`).
+Shared content UI and data helpers live under [`lib/`](./lib/) in concern
+subfolders (see [feature-structure § Parent `content/lib/`](../../../docs/feature-structure.md#parent-contentlib-subfolders)).
+Each sub-area also keeps domain UI config in its own `lib/` — overview table
+column recipes (`*-overview-columns.tsx`, co-located stories) alongside stat-row
+builders (`*-stat-rows.ts`).
+
+```text
+lib/
+  fixtures/       # STORY_* IDs, pick*() catalog helpers
+  forms/            # ContentFormDef registry, shells, grant/requirement splits, field builders
+  form-options/     # Level, creature-type, rich-text link options
+  overview/         # List shell, table config, source badge
+  detail/           # Detail layout, stat rows, FeatureItem, edit href
+  master-detail/    # Embedded array editor infra
+  list/             # List API/query factories, content client
+  utils/            # title-case and other small helpers
+```
 
 Catalog list
 fetching for top-level content types (classes, species, weapons, etc.) is wired
@@ -37,8 +51,9 @@ through [`createContentListApi`](./lib/list/create-content-list.ts) and
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
 
-Class [`FeatureItem`](./lib/detail/feature-item.tsx) rows render level + name headings inline;
-stored feature descriptions are body-only HTML (`<p>`, `<strong>` subsections).
+Class [`FeatureItem`](./lib/detail/feature-item.tsx) rows render level + name headings inline
+via local `featureHeading()` (no separate formatter module); stored feature
+descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 
 ## Tabbed create/edit forms
 
