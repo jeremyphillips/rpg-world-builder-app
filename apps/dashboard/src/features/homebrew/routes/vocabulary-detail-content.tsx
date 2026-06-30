@@ -15,7 +15,7 @@ import { WidePage } from '@/components/layout/wide-page'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 
-import { vocabularyColumns } from '../components/vocabulary-columns'
+import { vocabularyColumns } from '../lib/vocabulary/vocabulary-overview-columns'
 import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
