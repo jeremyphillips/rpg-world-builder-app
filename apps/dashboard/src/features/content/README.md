@@ -49,6 +49,14 @@ through [`createContentListApi`](./lib/list/create-content-list.ts) and
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
 
+Create/update mutations use [`createContentMutationHooks`](./lib/list/use-content-mutations.ts)
+the same way: each sub-area's `hooks/use-*.ts` exports aliased
+`useCreate*` / `useUpdate*` hooks at module level. Generic create/edit shells
+call [`useContentWriteMutation`](./lib/list/use-content-mutations.ts) with the
+registered `ContentFormDef` (including optional `invalidateQueryKeys` — classes
+also refresh skill proficiencies). Future sub-areas (`locations/`, `monsters/`)
+should follow the same list + mutation factory pattern in their `hooks/use-*.ts`.
+
 Class [`FeatureItem`](./classes/lib/feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature
 descriptions are body-only HTML (`<p>`, `<strong>` subsections).

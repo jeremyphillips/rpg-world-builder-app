@@ -101,6 +101,11 @@ export interface ContentFormDef<
   /** Query key factory; used to invalidate the list after a successful mutation. */
   queryKey: (campaignId: string) => readonly unknown[]
   /**
+   * Additional query keys to invalidate after a successful create/update (e.g.
+   * classes also refresh skill proficiencies when class names change).
+   */
+  invalidateQueryKeys?: (campaignId: string) => readonly (readonly unknown[])[]
+  /**
    * Maps a saved entity to seed row domain ids for embedded master-detail
    * delete-lock and source badge derivation on edit.
    */

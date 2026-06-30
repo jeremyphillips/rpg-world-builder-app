@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { createContent } from '../list/content-client'
-import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
+import { useContentWriteMutation } from '../list/use-content-mutations'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
   ContentFormComingSoon,
@@ -51,17 +49,7 @@ function ContentCreateForm({
   formCtx,
 }: ContentCreateFormProps) {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation({
-    mutationFn: (input: unknown) => createContent(campaignId, def.routeKey, input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
-      if (def.routeKey === 'classes') {
-        void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
-      }
-    },
-  })
+  const mutation = useContentWriteMutation(def, campaignId)
 
   return (
     <ContentFormOptionsGate campaignId={campaignId}>

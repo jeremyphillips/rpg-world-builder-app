@@ -40,4 +40,7 @@ export {
   useContentFormOptions,
   type ContentFormOptionSets,
 } from './lib/form-options/content-form-options'
-export { createContentMutationHooks } from './lib/list/use-content-mutations'
+export {
+  createContentMutationHooks,
+  useContentWriteMutation,
+} from './lib/list/use-content-mutations'

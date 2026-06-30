@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { updateContent } from '../list/content-client'
-import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
+import { useContentWriteMutation } from '../list/use-content-mutations'
 import { stripEditEnvelopeFromFormDefaults } from './content-form-key-helpers'
 import {
   contentFormRegistry,
@@ -23,17 +21,6 @@ import { ContentAuthoringGate } from './content-authoring-gate'
 
 function resolveContentFormSchema(def: AnyContentFormDef, ctx: ContentFormCtx) {
   return def.resolveSchema?.(ctx) ?? def.schema
-}
-
-function invalidateContentQueries(
-  queryClient: QueryClient,
-  def: AnyContentFormDef,
-  campaignId: string,
-) {
-  void queryClient.invalidateQueries({ queryKey: def.queryKey(campaignId) })
-  if (def.routeKey === 'classes') {
-    void queryClient.invalidateQueries({ queryKey: skillProficienciesQueryKey(campaignId) })
-  }
 }
 
 export interface ContentEditShellProps {
@@ -130,13 +117,8 @@ function ContentEditFormReady({
   ctx,
 }: ContentEditFormReadyProps) {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const entity = def.useListQuery(campaignId).data?.find((e: { id: string }) => e.id === entityId)
-
-  const mutation = useMutation({
-    mutationFn: (input: unknown) => updateContent(campaignId, def.routeKey, entityId, input),
-    onSuccess: () => invalidateContentQueries(queryClient, def, campaignId),
-  })
+  const mutation = useContentWriteMutation(def, campaignId, entityId)
 
   if (!entity) {
     return (
