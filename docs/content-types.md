@@ -781,7 +781,7 @@ The class form (`class-form-def.ts`) binds a form-only composite `spellcasting.p
 - **Cantrips known** — select (blank or 1–6); optional **Load template** presets from `cantrips-profiles.ts` (`CANTRIPS_KNOWN_PROFILES`, seed-only, not in the contract).
 - **Spells available** — number input; visible when `preparation` is `prepared` or `known`; dynamic column label.
 
-See [packages/ui/docs/forms.md](../packages/ui/docs/forms.md) for the `editableGrid` field config shape.
+See [packages/ui/docs/forms/field-types.md](../packages/ui/docs/forms/field-types.md#editable-grid-editablegrid) for the `editableGrid` field config shape.
 
 ### Read-only detail view
 
