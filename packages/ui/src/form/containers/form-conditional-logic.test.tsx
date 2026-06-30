@@ -34,8 +34,7 @@ const propertyField: FormItem = {
   ],
   optionAvailability: {
     dependsOn: ['mode'],
-    enabledWhen: (values, optionValue) =>
-      values.mode !== 'ranged' || optionValue !== 'reach',
+    enabledWhen: (values, optionValue) => values.mode !== 'ranged' || optionValue !== 'reach',
   },
   dynamicHint: {
     dependsOn: ['mode'],

@@ -8,7 +8,10 @@ export function useDependsOnValues(
   namePrefix?: string,
 ): Record<string, unknown> {
   const prefixedDeps = namePrefix ? dependsOn.map((dep) => `${namePrefix}.${dep}`) : [...dependsOn]
-  const watched = useWatch({ name: prefixedDeps.length > 0 ? prefixedDeps : [], disabled: dependsOn.length === 0 })
+  const watched = useWatch({
+    name: prefixedDeps.length > 0 ? prefixedDeps : [],
+    disabled: dependsOn.length === 0,
+  })
   const values: Record<string, unknown> = {}
   const watchedValues = Array.isArray(watched) ? watched : dependsOn.length === 1 ? [watched] : []
   dependsOn.forEach((name, index) => {

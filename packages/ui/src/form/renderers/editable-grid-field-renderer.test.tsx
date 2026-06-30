@@ -127,9 +127,7 @@ describe('EditableGrid in Form', () => {
       />,
     )
 
-    expect(
-      await screen.findByRole('columnheader', { name: /Spells prepared/ }),
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('columnheader', { name: /Spells prepared/ })).toBeInTheDocument()
 
     await user.click(screen.getByLabelText('Preparation'))
     await user.click(screen.getByRole('option', { name: 'Known' }))

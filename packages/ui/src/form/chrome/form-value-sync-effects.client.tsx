@@ -5,10 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { FormValueSync } from './field-config'
 
-function buildValuesMap(
-  dependsOn: readonly string[],
-  watched: unknown,
-): Record<string, unknown> {
+function buildValuesMap(dependsOn: readonly string[], watched: unknown): Record<string, unknown> {
   const watchedValues = Array.isArray(watched) ? watched : dependsOn.length === 1 ? [watched] : []
   const values: Record<string, unknown> = {}
   dependsOn.forEach((name, index) => {
