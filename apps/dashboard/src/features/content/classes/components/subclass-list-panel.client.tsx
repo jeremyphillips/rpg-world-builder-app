@@ -5,8 +5,8 @@ import {
   isSubclassActive,
   isSubclassDeletable,
   UNTITLED_SUBCLASS_LABEL,
-} from '../lib/subclass-editor-constants'
-import type { SubclassListItem } from '../lib/subclass-editor-state'
+} from '../lib/subclasses/subclass-editor-constants'
+import type { SubclassListItem } from '../lib/subclasses/subclass-editor-state'
 
 export interface SubclassListPanelProps {
   items: SubclassListItem[]

@@ -12,16 +12,18 @@ import {
   ADD_STARTING_EQUIPMENT_LABEL,
   ADD_STARTING_EQUIPMENT_OPTION_LABEL,
   STARTING_EQUIPMENT_EMPTY_MESSAGE,
-  STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTION_NOUN,
+} from '../lib/character-creation/class-starting-equipment-form-labels'
+import {
+  STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
   startingEquipmentChooseFields,
-  startingEquipmentDefaultValues,
   startingEquipmentOptionItemFields,
   startingEquipmentOptionTitle,
   type StartingEquipmentForm,
   type StartingEquipmentOptionForm,
-} from '../lib/class-starting-equipment-form-def'
+} from '../lib/character-creation/class-starting-equipment-form-fields'
+import { startingEquipmentDefaultValues } from '../lib/character-creation/class-starting-equipment-form-values'
 
 export interface ClassCharacterCreationTabProps {
   formCtx: ContentFormCtx

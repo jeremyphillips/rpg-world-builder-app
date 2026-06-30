@@ -1,12 +1,13 @@
 /**
- * Subclass form def — round-trip and type-level drift guard.
+ * Subclass form — round-trip and type-level drift guard.
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 import { createSubclassInputSchema, type CreateSubclassInput } from '@rpg/contracts'
 
-import { CHAMPION } from '../fixtures'
-import { subclassFormDef, type SubclassFormValues } from './subclass-form-def'
+import { CHAMPION } from '../../fixtures'
+import type { SubclassFormValues } from './subclass-form-fields'
+import { subclassFormDef } from './subclass-form-values'
 
 const SRD_SUBCLASSES = loadSeedSubclasses('srd-cc-5.2.1')
 

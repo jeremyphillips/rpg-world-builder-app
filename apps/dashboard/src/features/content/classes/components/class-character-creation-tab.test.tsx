@@ -6,10 +6,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
-import {
-  startingEquipmentToFormValues,
-  type StartingEquipmentForm,
-} from '../lib/class-starting-equipment-form-def'
+import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
+import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }

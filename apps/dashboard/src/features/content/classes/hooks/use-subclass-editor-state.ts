@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { Subclass } from '@rpg/contracts'
 
-import { applySubclassFormEdits } from '../lib/apply-subclass-form-edits'
+import { applySubclassFormEdits } from '../lib/subclasses/apply-subclass-form-edits'
 import {
   buildSubclassListItems,
   createSubclassDraft,
@@ -11,8 +11,8 @@ import {
   selectNextSubclassId,
   type SubclassDraft,
   type SubclassListItem,
-} from '../lib/subclass-editor-state'
-import type { SubclassFormValues } from '../lib/subclass-form-def'
+} from '../lib/subclasses/subclass-editor-state'
+import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
 
 function collectModifiedSubclassIds(
   listItems: SubclassListItem[],

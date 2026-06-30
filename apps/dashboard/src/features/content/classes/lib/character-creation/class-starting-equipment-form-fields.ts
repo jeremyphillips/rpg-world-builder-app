@@ -7,44 +7,20 @@ import {
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   toolCategorySchema,
-  type StartingEquipmentChoice,
-  type StartingEquipmentFixedItem,
-  type StartingEquipmentItem,
-  type StartingEquipmentItemChoice,
-  type StartingEquipmentOption,
 } from '@rpg/contracts'
-import {
-  buildItemDefaultValues,
-  toOptions,
-  type FieldOption,
-  type FieldVisibility,
-  type FormItem,
-} from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
   wealthGrantMoneyFromForm,
-  wealthGrantMoneyToForm,
-} from '../../lib/content-form-field-helpers'
-import { applyStableIdsForChoiceOptions } from '../../lib/content-form-key-helpers'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+} from '../../../lib/content-form-field-helpers'
+import type { ContentFormCtx } from '../../../lib/content-form-registry'
+import {
+  STARTING_EQUIPMENT_ITEM_KIND_LABELS,
+  STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
+} from './class-starting-equipment-form-labels'
 
 export const STARTING_EQUIPMENT_ITEM_KINDS = ['fixed', 'choice'] as const
-
-export const STARTING_EQUIPMENT_ITEM_KIND_LABELS = {
-  fixed: 'Fixed item',
-  choice: 'Pool choice',
-} as const satisfies Record<(typeof STARTING_EQUIPMENT_ITEM_KINDS)[number], string>
-
-export const STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT =
-  'For cross-references tied to another proficiency pick (e.g. Monk tool/instrument), describe the choice in prose and include FOLLOWUP: proficiencyLinkedChoice when structured support is deferred.'
-
-export const ADD_STARTING_EQUIPMENT_LABEL = 'Add starting equipment'
-export const STARTING_EQUIPMENT_EMPTY_MESSAGE =
-  'No starting equipment yet. Add packages players choose from at character creation.'
-export const STARTING_EQUIPMENT_OPTION_NOUN = 'package'
-export const ADD_STARTING_EQUIPMENT_OPTION_LABEL = 'Add package'
-export const REMOVE_STARTING_EQUIPMENT_LABEL = 'Remove starting equipment'
 
 export const STARTING_EQUIPMENT_OPTIONS_FIELD_NAME =
   'characterCreation.startingEquipment.options' as const
@@ -338,152 +314,4 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       fields: startingEquipmentItemFields(ctx),
     },
   ]
-}
-
-function fixedItemToFormRow(item: StartingEquipmentFixedItem): StartingEquipmentItemForm {
-  return {
-    itemKind: 'fixed',
-    equipmentSlug: item.equipmentSlug,
-    quantity: item.quantity,
-    equipped: item.equipped,
-    modifiers: item.modifiers?.map((modifier) => ({
-      kind: modifier.kind,
-      focusKind: modifier.focusKind,
-    })),
-  }
-}
-
-function choiceItemToFormRow(item: StartingEquipmentItemChoice): StartingEquipmentItemForm {
-  return {
-    itemKind: 'choice',
-    label: item.label,
-    choose: item.choose,
-    fromEquipmentSlugs: item.from.equipmentSlugs,
-    fromToolCategories: item.from.toolCategories,
-  }
-}
-
-function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
-  return item.kind === 'fixed' ? fixedItemToFormRow(item) : choiceItemToFormRow(item)
-}
-
-function fixedItemFromFormRow(
-  row: z.infer<typeof startingEquipmentFixedItemFormSchema>,
-): StartingEquipmentFixedItem {
-  const item: StartingEquipmentFixedItem = {
-    kind: 'fixed',
-    equipmentSlug: row.equipmentSlug,
-    quantity: row.quantity ?? 1,
-  }
-  if (row.equipped !== undefined) {
-    item.equipped = row.equipped
-  }
-  if (row.modifiers?.length) {
-    item.modifiers = row.modifiers
-  }
-  return item
-}
-
-function choiceItemFromFormRow(
-  row: z.infer<typeof startingEquipmentChoiceItemFormSchema>,
-): StartingEquipmentItemChoice {
-  const from: StartingEquipmentItemChoice['from'] = {}
-  if (row.fromEquipmentSlugs?.length) {
-    from.equipmentSlugs = row.fromEquipmentSlugs
-  }
-  if (row.fromToolCategories?.length) {
-    from.toolCategories = row.fromToolCategories
-  }
-
-  return {
-    kind: 'choice',
-    label: row.label,
-    choose: row.choose ?? 1,
-    from,
-  }
-}
-
-function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
-  return row.itemKind === 'fixed' ? fixedItemFromFormRow(row) : choiceItemFromFormRow(row)
-}
-
-export function startingEquipmentOptionToFormRow(
-  option: StartingEquipmentOption,
-): StartingEquipmentOptionForm {
-  return {
-    id: option.id,
-    label: option.label,
-    description: option.description,
-    wealth: wealthGrantMoneyToForm(option.wealth),
-    items: option.items.map(startingEquipmentItemToFormRow),
-  }
-}
-
-export function startingEquipmentOptionFromFormRow(
-  row: StartingEquipmentOptionForm & { id: string },
-): StartingEquipmentOption {
-  const option: StartingEquipmentOption = {
-    id: row.id,
-    label: row.label,
-    items: row.items.map(startingEquipmentItemFromFormRow),
-  }
-  if (row.description) {
-    option.description = row.description
-  }
-  const wealth = wealthGrantMoneyFromForm(row.wealth)
-  if (wealth) {
-    option.wealth = wealth
-  }
-  return option
-}
-
-export function startingEquipmentToFormValues(
-  startingEquipment: StartingEquipmentChoice,
-): StartingEquipmentForm {
-  return {
-    choose: startingEquipment.choose,
-    options: startingEquipment.options.map(startingEquipmentOptionToFormRow),
-  }
-}
-
-export function startingEquipmentFromFormValues(
-  row: StartingEquipmentForm | undefined,
-  existing?: StartingEquipmentChoice,
-): StartingEquipmentChoice | undefined {
-  if (!row?.options?.length) return undefined
-
-  const options = applyStableIdsForChoiceOptions(
-    row.options.filter((option) => option.label.trim()),
-    existing?.options,
-  ).map((option) => startingEquipmentOptionFromFormRow(option))
-
-  if (!options.length) return undefined
-
-  return {
-    choose: row.choose ?? existing?.choose ?? 1,
-    options,
-  }
-}
-
-export function startingEquipmentDefaultValues(ctx: ContentFormCtx): StartingEquipmentForm {
-  const standardOption = {
-    ...(buildItemDefaultValues(
-      startingEquipmentOptionItemFields(ctx),
-    ) as StartingEquipmentOptionForm),
-    id: 'standard',
-    label: 'Standard Equipment',
-    items: [],
-  }
-
-  const goldOption: StartingEquipmentOptionForm = {
-    id: 'gold',
-    label: 'Starting Gold',
-    description: '',
-    items: [],
-  }
-
-  return {
-    choose: 1,
-    options: [standardOption, goldOption],
-  }
 }
