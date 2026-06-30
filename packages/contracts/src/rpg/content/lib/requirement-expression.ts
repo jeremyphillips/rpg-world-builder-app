@@ -10,7 +10,7 @@ import {
   type Ability,
 } from '../../vocab/ability'
 
-import { classSlugSchema } from '../class/class'
+import { classSlugSchema } from '../classes/class'
 
 // ---------------------------------------------------------------------------
 // RequirementExpression — composable AND/OR eligibility trees shared by feats,

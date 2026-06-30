@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { campaignRoleSchema } from './roles'
+import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
 

@@ -15,7 +15,7 @@ import { skillSchema } from './skill-proficiency'
  * record: `contentMetaSchema.extend(monsterBodySchema.shape)`, with stat-block
  * fields such as size, creatureType, speed, senses, challenge rating, actions,
  * and explicit skill/save modifiers. Do not model monsters by extending
- * `characterSchema`; characters are owned sheets, monsters are content records.
+ * `characterSchema`; characters are owned sheets (see `rpg/runtime/`), monsters are content records.
  */
 
 // ---------------------------------------------------------------------------

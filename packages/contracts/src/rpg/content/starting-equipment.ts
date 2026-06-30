@@ -6,7 +6,7 @@ import {
   contentChoiceSchema,
   contentPoolChoiceSchema,
 } from './lib/choice'
-import { characterWealthGrantSchema } from './character'
+import { characterWealthGrantSchema } from './lib/wealth-grant'
 import { equipmentModifierSchema } from './equipment/modifier'
 
 // ---------------------------------------------------------------------------

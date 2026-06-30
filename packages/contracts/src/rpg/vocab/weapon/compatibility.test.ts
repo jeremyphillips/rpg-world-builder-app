@@ -68,9 +68,9 @@ describe('weaponFormValuesHaveRange', () => {
 
   it('is true for melee weapons with thrown', () => {
     expect(weaponFormValuesHaveRange({ mode: 'melee', properties: ['thrown'] })).toBe(true)
-    expect(
-      weaponFormValuesHaveRange({ mode: 'melee', properties: ['finesse', 'thrown'] }),
-    ).toBe(true)
+    expect(weaponFormValuesHaveRange({ mode: 'melee', properties: ['finesse', 'thrown'] })).toBe(
+      true,
+    )
   })
 
   it('is false for melee without thrown', () => {
@@ -120,8 +120,6 @@ describe('formatWeaponMasteryModeHint', () => {
   })
 
   it('lists disabled mastery labels for ranged mode', () => {
-    expect(formatWeaponMasteryModeHint('ranged')).toBe(
-      "Cleave isn't available for ranged weapons.",
-    )
+    expect(formatWeaponMasteryModeHint('ranged')).toBe("Cleave isn't available for ranged weapons.")
   })
 })

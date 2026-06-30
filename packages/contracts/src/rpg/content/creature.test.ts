@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { characterSchema } from './character'
+import { characterSchema } from '../runtime/character/sheet'
 import {
   creatureAbilityScoresSchema,
   creatureRuntimeHitPointsSchema,

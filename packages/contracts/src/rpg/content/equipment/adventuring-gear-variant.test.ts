@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  adventuringGearBodySchema,
-  formatHolySymbolUsage,
-  HOLY_SYMBOL_USAGES,
-} from '../equipment'
+import { adventuringGearBodySchema, formatHolySymbolUsage, HOLY_SYMBOL_USAGES } from '../equipment'
 import { refineAdventuringGearEquipment } from './adventuring-gear-variant'
 
 const BASE = {

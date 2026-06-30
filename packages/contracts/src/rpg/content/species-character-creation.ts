@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../primitives/level'
-import { classSlugSchema } from './class/class'
+import { classSlugSchema } from './classes/class'
 
 // ---------------------------------------------------------------------------
 // Species character-creation data — optional, species-authored inputs consumed

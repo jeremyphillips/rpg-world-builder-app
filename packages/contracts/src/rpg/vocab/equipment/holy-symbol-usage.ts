@@ -6,12 +6,7 @@ import type { GameTermEntry } from '../types'
 // Holy symbol usage — how a divine focus must be carried (SRD Holy Symbols table).
 // ---------------------------------------------------------------------------
 
-export const HOLY_SYMBOL_USAGES = [
-  'worn',
-  'held',
-  'borne_on_fabric',
-  'borne_on_shield',
-] as const
+export const HOLY_SYMBOL_USAGES = ['worn', 'held', 'borne_on_fabric', 'borne_on_shield'] as const
 
 export const holySymbolUsageSchema = z.enum(HOLY_SYMBOL_USAGES)
 

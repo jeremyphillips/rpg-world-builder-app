@@ -1,4 +1,4 @@
-import type { CharacterClass, ClassStored } from './class/class'
+import type { CharacterClass, ClassStored } from './classes/class'
 import type { SkillId, SkillProficiency } from './skill-proficiency'
 
 /** Minimal skill fields needed for class↔skill association helpers. */

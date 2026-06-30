@@ -15,7 +15,7 @@ import {
   contentPatchBaseSchema,
   slugSchema,
 } from './lib/envelope'
-import { classSlugSchema } from './class/class'
+import { classSlugSchema } from './classes/class'
 
 // ---------------------------------------------------------------------------
 // Spell level — 0 (cantrip) through 9. Distinct from `spellLevelSchema` in

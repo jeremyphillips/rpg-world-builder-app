@@ -7,7 +7,7 @@ import {
   withDerivedClassSkillFrom,
 } from './skill-class-association'
 import type { SkillClassAssociationSkill } from './skill-class-association'
-import type { ClassStored } from './class/class'
+import type { ClassStored } from './classes/class'
 
 const skills: SkillClassAssociationSkill[] = [
   { slug: 'athletics', suggestedClasses: ['barbarian', 'fighter'] },

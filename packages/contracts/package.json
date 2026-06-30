@@ -10,21 +10,53 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./shared": {
+      "types": "./src/shared/index.ts",
+      "default": "./src/shared/index.ts"
+    },
     "./vocab": {
-      "types": "./src/vocab/index.ts",
-      "default": "./src/vocab/index.ts"
+      "types": "./src/rpg/vocab/index.ts",
+      "default": "./src/rpg/vocab/index.ts"
     },
     "./primitives": {
-      "types": "./src/primitives/index.ts",
-      "default": "./src/primitives/index.ts"
+      "types": "./src/rpg/primitives/index.ts",
+      "default": "./src/rpg/primitives/index.ts"
     },
     "./content": {
-      "types": "./src/content/index.ts",
-      "default": "./src/content/index.ts"
+      "types": "./src/rpg/content/index.ts",
+      "default": "./src/rpg/content/index.ts"
+    },
+    "./runtime": {
+      "types": "./src/rpg/runtime/index.ts",
+      "default": "./src/rpg/runtime/index.ts"
+    },
+    "./rpg/vocab": {
+      "types": "./src/rpg/vocab/index.ts",
+      "default": "./src/rpg/vocab/index.ts"
+    },
+    "./rpg/primitives": {
+      "types": "./src/rpg/primitives/index.ts",
+      "default": "./src/rpg/primitives/index.ts"
+    },
+    "./rpg/content": {
+      "types": "./src/rpg/content/index.ts",
+      "default": "./src/rpg/content/index.ts"
+    },
+    "./rpg/runtime": {
+      "types": "./src/rpg/runtime/index.ts",
+      "default": "./src/rpg/runtime/index.ts"
+    },
+    "./rpg/campaign": {
+      "types": "./src/rpg/campaign/index.ts",
+      "default": "./src/rpg/campaign/index.ts"
     },
     "./platform": {
       "types": "./src/platform/index.ts",
       "default": "./src/platform/index.ts"
+    },
+    "./public": {
+      "types": "./src/public/index.ts",
+      "default": "./src/public/index.ts"
     },
     "./dev-bench": {
       "types": "./src/dev-bench/index.ts",
