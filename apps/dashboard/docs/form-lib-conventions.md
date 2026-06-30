@@ -1,5 +1,7 @@
 # Form lib conventions (dashboard features)
 
+Part of feature layout — see [feature-structure.md](./feature-structure.md).
+
 How to organize `lib/` modules that back schema-driven forms (`ContentFormDef`,
 campaign settings, homebrew rules). UI layer detail lives in
 [packages/ui/docs/forms.md](../../../packages/ui/docs/forms.md).
@@ -59,3 +61,39 @@ Defer subfolders until a concern outgrows flat prefixes.
 
 Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
 [code-splitting.md](./code-splitting.md).
+
+## Content catalog inventory
+
+Status of schema-driven form modules under `src/features/content/`. Refresh
+this table when completing a form-lib alignment phase.
+
+| Module / area            | Primary path                                                        | Status                                                                       |
+| ------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Classes (hub)            | `classes/lib/class-form-*.ts`                                       | aligned                                                                      |
+| Class features           | `classes/lib/class-feature-form-fields.ts`                          | aligned                                                                      |
+| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts` | aligned                                                                      |
+| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                         | aligned                                                                      |
+| Species traits           | `species/lib/species-trait-form-*.ts`                               | aligned                                                                      |
+| Species (hub)            | `species/lib/species-form-def.ts`                                   | pending — split fields + values                                              |
+| Species heritage         | `species/lib/species-heritage-form-fields.ts`                       | pending — extract labels + values                                            |
+| Species rules            | `species/lib/species-rules-form-fields.ts`                          | pending — extract labels + values                                            |
+| Spells                   | `spells/lib/spell-form-def.ts`                                      | pending — split def / fields / values / labels                               |
+| Spell helpers            | `spells/lib/spell-form-field-helpers.ts`                            | pending — merge into `spell-form-values.ts`                                  |
+| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`                               | pending — thin def + `equipment-form-fields.ts`                              |
+| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-input.ts`               | pending — rename `*-form-input.ts` → `*-form-values.ts`; move entity mappers |
+| Feats                    | `feats/lib/feat-form-def.ts`                                        | pending (optional)                                                           |
+| Skill proficiencies      | `skillProficiencies/lib/skill-proficiency-form-def.ts`              | pending (optional)                                                           |
+
+**Legacy rename:** equipment modules use `*-form-input.ts` today; target suffix
+is `*-form-values.ts` (same responsibility as other content types).
+
+### Shared infra (exceptions)
+
+These modules support many content types but are **not** per-type form splits:
+
+| Module                            | Path                                        |
+| --------------------------------- | ------------------------------------------- |
+| Field builders (units, grants, …) | `content/lib/content-form-field-helpers.ts` |
+| Grant row helpers                 | `content/lib/grant-form-helpers.ts`         |
+| Requirement editor                | `content/lib/requirement-editor-form.ts`    |
+| Content form registry             | `content/lib/content-form-registry.ts`      |

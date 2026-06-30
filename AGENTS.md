@@ -64,6 +64,8 @@ classes belong in `*.variants.ts` via CVA, not long inline strings.
 
 ## Feature boundaries
 
+- Feature folder layout (`routes/`, `components/`, `hooks/`, `api/`, `lib/`, …) →
+  [apps/dashboard/docs/feature-structure.md](apps/dashboard/docs/feature-structure.md).
 - Cross-feature imports go only through the feature's `index.ts` barrel
   (ESLint-enforced). Detail →
   [apps/dashboard/docs/feature-conventions.md](apps/dashboard/docs/feature-conventions.md).

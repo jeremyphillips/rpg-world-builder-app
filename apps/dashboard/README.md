@@ -74,7 +74,8 @@ route is a campaign picker with a one-shot landing redirect
 ([`src/routes/dashboard-home.tsx`](src/routes/dashboard-home.tsx)).
 
 Folder layout, layout shells, Storybook rules, and catalog UI recipes:
-[`docs/feature-conventions.md`](./docs/feature-conventions.md).
+[`docs/feature-structure.md`](./docs/feature-structure.md) (layout) and
+[`docs/feature-conventions.md`](./docs/feature-conventions.md) (UI recipes).
 
 ## Storybook
 
@@ -103,7 +104,9 @@ Root shorthands: `pnpm storybook:dashboard`, `pnpm storybook` (UI + dashboard).
 
 ## Documentation
 
-- [feature-conventions.md](./docs/feature-conventions.md) — feature folders, layout shells, Storybook, catalog UI recipes
+- [feature-structure.md](./docs/feature-structure.md) — feature folder layout, `lib/` concern index, README template
+- [feature-conventions.md](./docs/feature-conventions.md) — boundary rule, layout shells, Storybook, catalog UI recipes
+- [form-lib-conventions.md](./docs/form-lib-conventions.md) — schema-driven form module splits and content inventory
 - [code-splitting.md](./docs/code-splitting.md) — lazy routes, bundle analyzer
 - [auth-guard.md](./docs/auth-guard.md) — session gate and redirect flow
 - [content-types.md](../../docs/content-types.md) — adding a new catalog content type (contracts-first)
