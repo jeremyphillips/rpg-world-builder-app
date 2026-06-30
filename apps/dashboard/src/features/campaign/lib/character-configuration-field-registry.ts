@@ -181,6 +181,7 @@ function startingLevelField(width?: '1/2'): FieldConfig {
     defaultValue: 1,
     required: true,
     hint: 'The level at which new player characters begin.',
+    labelPosition: 'settings',
     ...(width ? { width } : {}),
     digits: 2,
   }
@@ -202,12 +203,13 @@ function maxCharacterLevelField(): FormItem {
     type: 'number',
     name: 'maxCharacterLevel',
     label: 'Standard max level',
+    labelPosition: 'settings',
     min: 1,
     max: ABSOLUTE_MAX_CHARACTER_LEVEL,
     defaultValue: MAX_CHARACTER_LEVEL,
     required: true,
     hint: 'Normal cap before any extended tier.',
-    width: '1/2',
+    width: 'full',
     digits: 2,
   }
 }

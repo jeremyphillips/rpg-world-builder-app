@@ -13,7 +13,7 @@ export const chipPillVariants = cva(
     variants: {
       size: {
         sm: cn('px-2.5 py-0.5', fieldSizeTypographyClasses.sm),
-        md: cn('px-3 py-1.5 text-sm'),
+        md: cn('px-2.5 py-1 text-sm-meta'),
         lg: cn('px-4 py-2', fieldSizeTypographyClasses.lg),
       },
     },

@@ -241,8 +241,12 @@ export interface CheckboxFieldConfig extends BaseFieldConfig {
 export interface SwitchFieldConfig extends BaseFieldConfig {
   type: 'switch'
   defaultValue?: boolean
-  /** `inline` (default) — switch and label on one row. `above` — label over the switch. */
-  labelPosition?: 'above' | 'inline'
+  /**
+   * `inline` (default) — switch left, label right.
+   * `above` — label over the switch.
+   * `settings` — label + hint left, switch right (dense settings panels).
+   */
+  labelPosition?: 'above' | 'inline' | 'settings'
 }
 
 export interface JsonFieldConfig extends BaseFieldConfig {

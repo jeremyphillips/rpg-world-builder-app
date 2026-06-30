@@ -200,8 +200,8 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm')
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-3')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm-meta')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-2.5')
   })
 
   it('applies sm pill classes when chipSize is sm', () => {

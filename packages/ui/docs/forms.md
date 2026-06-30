@@ -273,9 +273,9 @@ level with a `"None"` option) — use full-width container sizing instead.
 ### Dense settings rows
 
 For advanced/dense settings panels (campaign rules, nested toggles with dependent
-scalars), use `labelPosition: 'settings'` on `number` fields. This renders a
-two-column row: label + hint on the left, a compact digit-sized control on the
-right. Stack to a single column on narrow viewports.
+scalars), use `labelPosition: 'settings'` on `number`, `select`, and `switch`
+fields. This renders a two-column row: label + hint on the left, a compact control on
+the right. Stack to a single column on narrow viewports.
 
 ```ts
 {

@@ -23,3 +23,10 @@ export const WithHint: Story = { args: { hint: 'Sent the day before each session
 export const Disabled: Story = { args: { disabled: true, defaultChecked: true } }
 
 export const LabelAbove: Story = { args: { labelPosition: 'above' } }
+
+export const SettingsRow: Story = {
+  args: {
+    labelPosition: 'settings',
+    hint: 'Cap total character level for this species.',
+  },
+}

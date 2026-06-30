@@ -3,10 +3,16 @@ import type { ComponentProps, ReactNode } from 'react'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
+import { FormField } from './form-field'
 import { Switch } from './switch.client'
-import { fieldLabelHintStackClasses } from './field.variants'
+import {
+  fieldLabelHintStackClasses,
+  type FieldHintPosition,
+  type FieldLabelPosition,
+} from './field.variants'
 import type { FieldWidth } from './field-control.variants'
-import type { FieldHintPosition } from './field.variants'
+
+export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
 export interface SwitchFieldProps extends Omit<ComponentProps<typeof Switch>, 'id'> {
   id: string
@@ -18,8 +24,12 @@ export interface SwitchFieldProps extends Omit<ComponentProps<typeof Switch>, 'i
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
-  /** `inline` (default) — switch and label on one row. `above` — label over the switch. */
-  labelPosition?: 'above' | 'inline'
+  /**
+   * `inline` (default) — switch left, label right.
+   * `above` — label over the switch.
+   * `settings` — label + hint left, switch right (dense settings panels).
+   */
+  labelPosition?: SwitchLabelPosition
 }
 
 /** A labelled toggle switch bound to the compound `Field`. */
@@ -43,6 +53,25 @@ export function SwitchField({
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )
+
+  if (labelPosition === 'settings') {
+    return (
+      <FormField
+        id={id}
+        label={label}
+        error={error}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={info}
+        required={required}
+        width={width}
+        size={size}
+        labelPosition="settings"
+      >
+        <Switch {...switchProps} />
+      </FormField>
+    )
+  }
 
   if (labelPosition === 'above') {
     return (
