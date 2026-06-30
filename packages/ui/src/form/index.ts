@@ -1,27 +1,27 @@
 // Public surface of the `@rpg/ui/form` subpath: the schema-driven, RHF-aware
 // form layer — the `<Form>` renderer plus the config types + pure helpers.
 
-export { Form, type FormProps } from './form.client'
+export { Form, type FormProps } from './shells/form.client'
 export {
   FormItems,
   type FormItemsProps,
   SlotFieldRenderer,
   type SlotFieldRendererProps,
-} from './form-items.client'
+} from './containers/form-items.client'
 export {
   FormSectionProvider,
   useFormSectionContext,
   type FormSectionProviderProps,
-} from './form-section-context.client'
+} from './context/form-section.context'
 export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,
   type TabbedFormProps,
   type TabbedFormTab,
-} from './tabbed-form.client'
-export { FormSaveFooter, type FormSaveFooterProps } from './form-save-footer'
-export { FormFooterActions, type FormFooterActionsProps } from './form-footer-actions'
-export { FormActionsBar, type FormActionsBarProps } from './form-actions-bar'
+} from './shells/tabbed-form.client'
+export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
+export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
+export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
 export {
   formActionsBarActionsRowClasses,
   formActionsBarLeadingGroupClasses,
@@ -32,8 +32,8 @@ export {
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
   formTabPanelsBottomPaddingClasses,
-} from './form-chrome.variants'
-export { WizardStepForm, type WizardStepFormProps } from './wizard-step-form.client'
+} from './chrome/form-chrome.variants'
+export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 
 export {
   flattenFields,

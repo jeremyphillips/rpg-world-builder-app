@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { CardFooter } from './card'
 import { FormCard, formCardContentClass } from './form-card'
 import { SubmitButton } from './submit-button'
-import { Form } from '../../form/form.client'
+import { Form } from '../../form/shells/form.client'
 import type { FormItem } from '../../form/field-config'
 
 const schema = z.object({
