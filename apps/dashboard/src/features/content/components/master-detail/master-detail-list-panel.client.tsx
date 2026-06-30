@@ -35,7 +35,7 @@ import {
   masterDetailListRowSortableClasses,
   masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
-import { resolveMasterDetailListMove } from './master-detail-list-move'
+import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
 import { MasterDetailRowBadges } from './master-detail-row-badges.client'
 
 export interface MasterDetailListBadge {

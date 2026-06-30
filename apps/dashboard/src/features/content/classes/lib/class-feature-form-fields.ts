@@ -4,8 +4,8 @@ import { type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
 import {
-  CLASS_GRANT_TYPES,
-  CLASS_GRANT_TYPE_LABELS,
+  GRANT_TYPES,
+  GRANT_TYPE_LABELS,
   createGrantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
 import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
@@ -78,7 +78,7 @@ export function classFeatureItemFields(
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
     },
-    ...grantArrayFields(CLASS_GRANT_TYPES, CLASS_GRANT_TYPE_LABELS, ctx),
+    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
   ]
 }
 

@@ -2,7 +2,7 @@ import type { ContentSource } from '@rpg/contracts'
 
 import { INACTIVE_ROW_BADGE_LABEL, isContentRowActive } from './content-campaign-availability'
 import type { ContentFormCtx } from '../forms/content-form-registry'
-import type { MasterDetailListBadge } from '../../components/master-detail-list-panel.client'
+import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 

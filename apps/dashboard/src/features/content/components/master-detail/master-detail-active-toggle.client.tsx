@@ -5,7 +5,7 @@ import { Switch, InfoTooltip } from '@rpg/ui'
 import {
   ACTIVE_IN_CAMPAIGN_LABEL,
   ACTIVE_IN_CAMPAIGN_TOOLTIP,
-} from '../lib/master-detail/content-campaign-availability'
+} from '../../lib/master-detail/content-campaign-availability'
 
 export interface MasterDetailActiveToggleProps {
   controlId: string

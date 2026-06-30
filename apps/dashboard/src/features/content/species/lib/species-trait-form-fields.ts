@@ -9,8 +9,8 @@ import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
 import {
-  SPECIES_GRANT_TYPES,
-  SPECIES_GRANT_TYPE_LABELS,
+  GRANT_TYPES,
+  GRANT_TYPE_LABELS,
   grantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
 import { formRowsToGrants } from '../../lib/forms/grants/grant-form-values'
@@ -111,7 +111,7 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
       hint: 'Leave blank to use the default',
       visibility: visibleForGrantOverrides(),
     },
-    ...grantArrayFields(SPECIES_GRANT_TYPES, SPECIES_GRANT_TYPE_LABELS, ctx),
+    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
   ]
 }
 

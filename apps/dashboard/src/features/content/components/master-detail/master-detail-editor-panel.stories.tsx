@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { masterDetailEmptySelectionLabel } from '../lib/master-detail/master-detail-constants'
-import type { UseMasterDetailArrayResult } from '../lib/master-detail/use-master-detail-array'
+import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
+import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel.client'
 
 const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]

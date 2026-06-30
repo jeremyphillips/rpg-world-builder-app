@@ -2,7 +2,7 @@
 
 import { Text } from '@rpg/ui'
 
-import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../lib/master-detail/master-detail-constants'
+import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../../lib/master-detail/master-detail-constants'
 
 export interface MasterDetailValidationBannerProps {
   visible: boolean

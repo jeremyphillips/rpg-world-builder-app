@@ -6,14 +6,14 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../lib/forms/content-form-registry'
-import { buildEmbeddedMasterDetailListItem } from '../lib/master-detail/build-embedded-master-detail-list-item'
-import { masterDetailEmptySelectionLabel } from '../lib/master-detail/master-detail-constants'
-import { showMasterDetailUnselectedRowErrors } from '../lib/master-detail/master-detail-validation'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
+import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
+import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
 import {
   useMasterDetailArray,
   type UseMasterDetailArrayResult,
-} from '../lib/master-detail/use-master-detail-array'
+} from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailDeleteDialog } from './master-detail-delete-dialog.client'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel.client'
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel.client'

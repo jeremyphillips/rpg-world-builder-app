@@ -10,9 +10,9 @@ import type {
   SkillId,
 } from '@rpg/contracts'
 
-import { type ClassGrantType, type GrantRowForm } from './grant-form-schema'
+import { type GrantRowForm, type GrantType } from './grant-form-schema'
 
-function emptyGrantRow(grantType: ClassGrantType): GrantRowForm {
+function emptyGrantRow(grantType: GrantType): GrantRowForm {
   return {
     grantType,
     resistances: [],

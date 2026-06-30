@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
-import { masterDetailEmptySelectionLabel } from '../lib/master-detail/master-detail-constants'
+import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

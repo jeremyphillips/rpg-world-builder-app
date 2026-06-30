@@ -22,12 +22,10 @@ const BASE_GRANT_TYPES = [
   'languages',
 ] as const
 
-export const CLASS_GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells', 'featChoice'] as const
-
-export const SPECIES_GRANT_TYPES = [...CLASS_GRANT_TYPES] as const
+export const GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells', 'featChoice'] as const
 
 type BaseGrantType = (typeof BASE_GRANT_TYPES)[number]
-export type ClassGrantType = (typeof CLASS_GRANT_TYPES)[number]
+export type GrantType = (typeof GRANT_TYPES)[number]
 
 const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
   resistances: 'Damage resistances',
@@ -38,7 +36,7 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
   languages: 'Language',
 }
 
-const CLASS_GRANT_TYPE_LABELS: Record<ClassGrantType, string> = {
+export const GRANT_TYPE_LABELS: Record<GrantType, string> = {
   ...BASE_GRANT_TYPE_LABELS,
   innateSpells: 'Innate spells',
   featChoice: 'Feat choice',
@@ -55,7 +53,7 @@ function createInnateSpellEntryFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL
 
 export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z.object({
-    grantType: z.enum(CLASS_GRANT_TYPES),
+    grantType: z.enum(GRANT_TYPES),
     resistances: z.array(damageTypeSchema).optional(),
     damageType: z.array(damageTypeSchema).optional(),
     senseType: senseTypeSchema.optional(),
@@ -79,5 +77,3 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
 export const grantRowFormSchema = createGrantRowFormSchema()
 
 export type GrantRowForm = z.infer<typeof grantRowFormSchema>
-
-export { CLASS_GRANT_TYPE_LABELS as SPECIES_GRANT_TYPE_LABELS, CLASS_GRANT_TYPE_LABELS }
