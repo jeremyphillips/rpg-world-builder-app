@@ -1,36 +1,13 @@
-import {
-  buildGroupedLevelOptions,
-  DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
-  defaultMulticlassingRules,
-  MAX_CHARACTER_LEVEL,
-  type BuildGroupedLevelOptionsConfig,
-  type ResolvedCampaignRules,
-} from '@rpg/contracts'
+import { buildGroupedLevelOptions, type BuildGroupedLevelOptionsConfig } from '@rpg/contracts'
 import type { SelectFieldConfig } from '@rpg/ui/form'
 import { type FieldOption, type SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../forms/content-form-registry'
+import { campaignRulesFromCtx, effectiveMaxFromCtx } from './content-campaign-rules'
 
 type LevelSelectDigits = NonNullable<SelectFieldConfig['digits']>
 
 export type LevelFieldOptionsConfig = BuildGroupedLevelOptionsConfig
-
-export function defaultCampaignRules(): ResolvedCampaignRules {
-  return {
-    maxCharacterLevel: MAX_CHARACTER_LEVEL,
-    standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
-    allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
-    multiclassing: defaultMulticlassingRules(),
-  }
-}
-
-export function campaignRulesFromCtx(ctx?: ContentFormCtx): ResolvedCampaignRules {
-  return ctx?.campaignRules ?? defaultCampaignRules()
-}
-
-export function effectiveMaxFromCtx(ctx?: ContentFormCtx): number {
-  return campaignRulesFromCtx(ctx).maxCharacterLevel
-}
 
 /** Digit slot count for level selects from campaign max level (1–9 → 1, 10–99 → 2, …). */
 export function levelSelectDigits(ctx?: ContentFormCtx): LevelSelectDigits {

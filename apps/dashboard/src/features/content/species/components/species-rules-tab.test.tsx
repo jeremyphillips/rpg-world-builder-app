@@ -5,7 +5,7 @@ import axe from 'axe-core'
 import { describe, expect, it, vi } from 'vitest'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/form-options/level-field-options'
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 

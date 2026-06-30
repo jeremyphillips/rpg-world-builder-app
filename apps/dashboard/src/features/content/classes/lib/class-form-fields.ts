@@ -41,8 +41,8 @@ import {
   getLevelFieldOptions,
   HIT_DIE_SELECT_DIGITS,
   levelSelectDigits,
-  effectiveMaxFromCtx,
 } from '../../lib/form-options/level-field-options'
+import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { titleCase } from '../../lib/utils/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'

@@ -99,6 +99,8 @@ These modules support many content types but are **not** per-type form splits:
 | Economy field builders    | `content/lib/forms/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`) |
 | Speed/mass field builders | `content/lib/forms/content-speed-form-fields.ts`                                         |
 | Grant row helpers         | `content/lib/forms/grant-form-schema.ts`, `grant-form-fields.ts`, `grant-form-values.ts` |
+| Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                     |
+| Level select builders     | `content/lib/form-options/level-field-options.ts`                                        |
 | Content form registry     | `content/lib/forms/content-form-registry.ts`                                             |
 
 Feat- and species-specific helpers (not cross-type shared infra):

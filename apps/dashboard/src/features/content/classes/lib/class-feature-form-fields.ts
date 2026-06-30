@@ -11,11 +11,8 @@ import {
 import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import {
-  effectiveMaxFromCtx,
-  getLevelFieldOptions,
-  levelSelectDigits,
-} from '../../lib/form-options/level-field-options'
+import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
+import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))

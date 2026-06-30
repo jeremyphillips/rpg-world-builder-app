@@ -9,7 +9,7 @@ import { FormItems } from '@rpg/ui/form'
 import { disableFormItems } from '@/lib/disable-form-items'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { campaignRulesFromCtx } from '../../lib/form-options/level-field-options'
+import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import {
   characterConfigurationMulticlassingHref,
   LEVEL_LIMITS_FIELD_PREFIX,

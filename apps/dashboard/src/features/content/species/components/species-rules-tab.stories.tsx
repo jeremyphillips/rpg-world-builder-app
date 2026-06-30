@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/form-options/level-field-options'
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
