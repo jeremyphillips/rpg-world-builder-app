@@ -557,6 +557,11 @@ export interface ArrayConfig {
    * (`gap-2`); pass `comfortable` for multi-field item blocks.
    */
   rhythm?: FieldStackRhythm
+  /**
+   * Control + label scale for fields inside the array. Defaults to `sm`; pass
+   * `md` or `lg` when item fields should match the parent form scale.
+   */
+  size?: FieldSize
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
   /** Label for the "Add" button. Defaults to `"Add item"`. */

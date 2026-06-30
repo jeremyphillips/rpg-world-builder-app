@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge, Button, InfoTooltip, Switch, Text } from '@rpg/ui'
-import { FormItems, FormSectionProvider } from '@rpg/ui/form'
+import { FormItems } from '@rpg/ui/form'
 import type { Subclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/content-form-registry'
@@ -98,9 +98,7 @@ export function SubclassEditorPanel({
           {entity?.source === 'system' ? <Badge variant="secondary">System</Badge> : null}
         </div>
 
-        <FormSectionProvider rhythm="compact" collapsibleSections={false}>
-          <FormItems items={fields} idPrefix={`subclass-editor-${subclassId}`} />
-        </FormSectionProvider>
+        <FormItems items={fields} idPrefix={`subclass-editor-${subclassId}`} />
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
           <Text variant="muted" className="text-sm">

@@ -167,11 +167,16 @@ each item, and for nested groups within items — even when the form is
 `comfortable`. Pass `rhythm: 'comfortable'` on `ArrayConfig` for dense
 multi-field item blocks (e.g. grant rows with many dependents).
 
-**Field size follows rhythm unless overridden.** `rhythm: 'compact'` maps to
-`size: 'sm'` (`h-8`, `text-xs` labels) for leaf fields; `comfortable` maps to
-`md`. Pass an explicit `size` on `<Form>` / `<TabbedForm>` to override the
-whole form, or `size: 'md'` on individual `FieldConfig` entries (e.g.
-richtext, file, editable grid) that should stay larger in compact layouts.
+**Array item fields default to `sm`** (`h-8`, `text-xs` labels) at the array
+section boundary — even when the parent form is `comfortable` / `md`. Nested
+repeaters (grants inside features) inherit the same scale. Pass `size: 'md'` or
+`size: 'lg'` on `ArrayConfig` to match the parent form scale for a specific
+repeater.
+
+**Form-level field size** follows rhythm unless overridden: `rhythm: 'compact'`
+on `<Form>` / `<TabbedForm>` maps to `sm` for top-level fields; `comfortable`
+maps to `md`. Pass an explicit `size` on the form to override, or `size: 'md'`
+on individual `FieldConfig` entries (e.g. richtext, file, editable grid).
 
 Dense chip fields (many options) should stack as full-width siblings, not share a `FieldRow` — rows
 are for short combinations (e.g. a small chip set beside a select).
@@ -902,6 +907,7 @@ const fields: FormItem[] = [
     max: 10, // ceiling — Add button disappears at this count
     itemTitle: (_v, i) => `Trait ${i + 1}`, // optional per-item heading
     // rhythm: 'comfortable', // optional — default compact (gap-2)
+    // size: 'md', // optional — default sm inside arrays
   },
 ]
 ```

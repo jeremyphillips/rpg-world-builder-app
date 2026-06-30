@@ -71,6 +71,8 @@ export type FieldStackRhythm = 'compact' | 'comfortable'
 export const DEFAULT_FORM_RHYTHM: FieldStackRhythm = 'comfortable'
 /** Default vertical gap for repeatable array sections (`gap-2`). */
 export const DEFAULT_ARRAY_SECTION_RHYTHM: FieldStackRhythm = 'compact'
+/** Default control scale inside repeatable array sections (`sm`). */
+export const DEFAULT_ARRAY_SECTION_SIZE: FieldSizeToken = 'sm'
 
 /** Resolves stack rhythm: explicit config → section default → inherited context. */
 export function resolveFieldStackRhythm(options: {
@@ -78,6 +80,15 @@ export function resolveFieldStackRhythm(options: {
   inherited: FieldStackRhythm
   sectionDefault?: FieldStackRhythm | undefined
 }): FieldStackRhythm {
+  return options.explicit ?? options.sectionDefault ?? options.inherited
+}
+
+/** Resolves field size inside array sections: explicit config → section default → inherited. */
+export function resolveArraySectionSize(options: {
+  explicit?: FieldSizeToken | undefined
+  inherited: FieldSizeToken
+  sectionDefault?: FieldSizeToken | undefined
+}): FieldSizeToken {
   return options.explicit ?? options.sectionDefault ?? options.inherited
 }
 

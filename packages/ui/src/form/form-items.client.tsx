@@ -25,6 +25,8 @@ import {
   formSectionStackClasses,
   fieldSetResetClasses,
   DEFAULT_ARRAY_SECTION_RHYTHM,
+  DEFAULT_ARRAY_SECTION_SIZE,
+  resolveArraySectionSize,
   resolveFieldStackRhythm,
   type FieldSeparator,
   type FieldStackRhythm,
@@ -36,6 +38,7 @@ import {
   buildFormSectionChildContext,
   FormRhythmStack,
   FormSectionContext,
+  type FormSectionContextValue,
   useFormSectionContext,
 } from './form-section-context.client'
 import {
@@ -89,6 +92,25 @@ function isCollapsibleSection(
 ): item is GroupConfig | ArrayConfig {
   if (!collapsibleSections || !isSectionItem(item)) return false
   return item.collapsible === true
+}
+
+function buildArraySectionChildContext(
+  parent: FormSectionContextValue,
+  depth: number,
+  config: ArrayConfig,
+): FormSectionContextValue {
+  return buildFormSectionChildContext(parent, depth, {
+    rhythm: resolveFieldStackRhythm({
+      explicit: config.rhythm,
+      inherited: parent.rhythm,
+      sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
+    }),
+    size: resolveArraySectionSize({
+      explicit: config.size,
+      inherited: parent.size,
+      sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
+    }),
+  })
 }
 
 /** Renders an ordered list of fields/rows/groups/arrays, recursing into containers. */
@@ -326,14 +348,9 @@ function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNode
     )
   }
 
-  const arrayRhythm = resolveFieldStackRhythm({
-    explicit: item.rhythm,
-    inherited: parentContext.rhythm,
-    sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
-  })
   const arrayChildContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, { rhythm: arrayRhythm }),
-    [parentContext, depth, arrayRhythm],
+    () => buildArraySectionChildContext(parentContext, depth, item),
+    [parentContext, depth, item],
   )
 
   const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
@@ -367,8 +384,11 @@ function CollapsibleFormSection({
         })
       : resolveFieldStackRhythm({ explicit: item.rhythm, inherited: parentContext.rhythm })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, 0, { rhythm: sectionRhythm }),
-    [parentContext, sectionRhythm],
+    () =>
+      item.kind === 'array'
+        ? buildArraySectionChildContext(parentContext, 0, item)
+        : buildFormSectionChildContext(parentContext, 0, { rhythm: sectionRhythm }),
+    [parentContext, item, sectionRhythm],
   )
   const sectionValue = getSectionValue(item, index)
   const triggerId = `${idPrefix}-${sectionValue}-trigger`
@@ -718,14 +738,9 @@ function ConditionalArrayField({
 }: ConditionalArrayFieldProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
   const parentContext = useFormSectionContext()
-  const arrayRhythm = resolveFieldStackRhythm({
-    explicit: config.rhythm,
-    inherited: parentContext.rhythm,
-    sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
-  })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, { rhythm: arrayRhythm }),
-    [parentContext, depth, arrayRhythm],
+    () => buildArraySectionChildContext(parentContext, depth, config),
+    [parentContext, depth, config],
   )
 
   if (!config.visibility!.visibleWhen(values)) return null

@@ -68,8 +68,10 @@ describe('ArrayFieldRenderer', () => {
   it('adds an item when the add button is clicked', async () => {
     const user = userEvent.setup()
     renderForm()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
     expect(screen.getByRole('group', { name: 'Traits item 1' })).toHaveClass(
       'rounded-md',
       'border',

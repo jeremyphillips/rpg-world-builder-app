@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   fieldStackRhythmVariants,
+  resolveArraySectionSize,
   resolveFieldStackRhythm,
   resolveFormFieldSize,
   resolveInheritedFieldSize,
@@ -55,6 +56,27 @@ describe('resolveFormFieldSize', () => {
 
   it('prefers an explicit form size over rhythm mapping', () => {
     expect(resolveFormFieldSize({ explicit: 'lg', rhythm: 'compact' })).toBe('lg')
+  })
+})
+
+describe('resolveArraySectionSize', () => {
+  it('defaults array item fields to sm', () => {
+    expect(
+      resolveArraySectionSize({
+        inherited: 'md',
+        sectionDefault: 'sm',
+      }),
+    ).toBe('sm')
+  })
+
+  it('prefers explicit ArrayConfig size', () => {
+    expect(
+      resolveArraySectionSize({
+        explicit: 'md',
+        inherited: 'md',
+        sectionDefault: 'sm',
+      }),
+    ).toBe('md')
   })
 })
 
