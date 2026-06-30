@@ -4,12 +4,12 @@ import cookieParser from 'cookie-parser'
 import { verifyCsrf } from './middleware/csrf'
 import { errorHandler, notFound } from './middleware/error-handler'
 import { authRouter } from './features/auth'
-import { campaignRouter } from './features/campaign/campaign.routes'
+import { campaignRouter } from './features/campaign'
 import { contentRouter, homebrewRouter } from './features/content'
+import { benchRouter } from './features/dev-bench'
 import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
-import { userRouter } from './features/user/user.routes'
-import { benchRouter } from './features/dev-bench'
+import { userRouter } from './features/user'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
