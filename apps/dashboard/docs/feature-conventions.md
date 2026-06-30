@@ -219,11 +219,13 @@ export const NoHeritageChoices: Story = {
 }
 ```
 
-Column story pattern — use `STORY_CAMPAIGN_ID` and a fixture list:
+Column story pattern — use `STORY_CAMPAIGN_ID` and a fixture list; column
+recipes live in sub-area `lib/` (not `components/`):
 
 ```tsx
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPECIES_LIST } from '../fixtures'
+import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
 ;<DataTable columns={speciesColumns(STORY_CAMPAIGN_ID)} data={[...SPECIES_LIST]} />
 ```
 

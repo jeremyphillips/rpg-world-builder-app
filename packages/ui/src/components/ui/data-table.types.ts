@@ -60,7 +60,7 @@ export interface BooleanFilterDef {
 export type FilterDef = TextFilterDef | SelectFilterDef | BooleanFilterDef
 
 export interface DataTableProps<TData> {
-  /** Column definitions — define in a colocated `*-columns.tsx` per the shadcn convention. */
+  /** Column definitions — define in a colocated `*-overview-columns.tsx` for catalog overviews. */
   columns: ColumnDef<TData>[]
   data: TData[]
   /**

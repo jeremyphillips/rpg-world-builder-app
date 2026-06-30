@@ -1,4 +1,4 @@
-export { weaponColumns, weaponFilters } from './components/weapon-columns'
+export { weaponColumns, weaponFilters } from './lib/weapon-overview-columns'
 export { DAGGER, LONGSWORD, SHORTBOW, WEAPON_LIST } from './fixtures'
 export {
   blockWeaponSaveForInvalidMastery,

@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
-import { MOUNT_LIST } from '../fixtures'
-import { mountColumns, mountFilters } from './mount-columns'
+import { VEHICLE_LIST } from '../fixtures'
+import { vehicleColumns, vehicleFilters } from './vehicle-overview-columns'
 
 const meta = {
-  title: 'Content/Equipment/Mounts/MountColumns',
+  title: 'Content/Equipment/Vehicles/VehicleOverviewColumns',
   component: DataTable,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DataTable>
@@ -17,10 +17,10 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => (
     <DataTable
-      columns={mountColumns(STORY_CAMPAIGN_ID)}
-      data={[...MOUNT_LIST]}
-      filters={mountFilters}
-      caption="Mounts available in this campaign"
+      columns={vehicleColumns(STORY_CAMPAIGN_ID)}
+      data={[...VEHICLE_LIST]}
+      filters={vehicleFilters}
+      caption="Vehicles available in this campaign"
     />
   ),
 }

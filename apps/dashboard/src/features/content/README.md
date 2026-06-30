@@ -25,7 +25,11 @@ Folder layout and the feature-boundary rule are documented in
 
 ## `lib/`
 
-Shared content UI and data helpers live under [`lib/`](./lib/). Catalog list
+Shared content UI and data helpers live under [`lib/`](./lib/). Each sub-area
+also keeps domain UI config in its own `lib/` — overview table column recipes
+(`*-overview-columns.tsx`, co-located stories) alongside stat-row builders (`*-stat-rows.ts`).
+
+Catalog list
 fetching for top-level content types (classes, species, weapons, etc.) is wired
 through [`createContentListApi`](./lib/create-content-list.ts) and
 [`createContentQueryHook`](./lib/create-content-list.ts) — each sub-area's

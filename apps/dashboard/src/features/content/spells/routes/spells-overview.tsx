@@ -4,7 +4,7 @@ import type { Spell } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSpells } from '../hooks/use-spells'
-import { spellsColumns, spellsFilters } from '../components/spells-columns'
+import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 

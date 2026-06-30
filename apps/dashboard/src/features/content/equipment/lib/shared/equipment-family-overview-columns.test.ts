@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { loadFamilyTableConfig } from './equipment-family-columns'
+import { loadFamilyTableConfig } from './equipment-family-overview-columns'
 
-vi.mock('../../weapons/components/weapon-columns', () => ({
+vi.mock('../../weapons/lib/weapon-overview-columns', () => ({
   weaponColumns: () => [
     { accessorKey: 'name', header: 'Name' },
     { accessorKey: 'category', header: 'Category' },

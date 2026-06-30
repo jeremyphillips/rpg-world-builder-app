@@ -260,7 +260,7 @@ apps/api/src/features/content/
 apps/dashboard/src/features/content/<camelCasePlural>/
   api/<type>-api.ts                ← fetch wrapper
   hooks/use-<type>.ts              ← TanStack Query hook + query key
-  components/<type>-columns.tsx    ← DataTable column/filter defs + stories
+  lib/<type>-overview-columns.tsx  ← DataTable column/filter defs + stories
   routes/<type>-overview.tsx       ← Overview (list) page
   routes/<type>-detail.tsx         ← Detail page + stories
   index.ts                         ← Sub-area barrel
@@ -610,7 +610,7 @@ export function use<TypeName>s(campaignId: string | undefined) {
 }
 ```
 
-### 10. Column/filter definitions (`components/<kebab-plural>-columns.tsx`)
+### 10. Column/filter definitions (`lib/<kebab-plural>-overview-columns.tsx`)
 
 ```typescript
 import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
@@ -627,7 +627,7 @@ export function <camelPlural>Columns(campaignId: string) {
 export const <camelPlural>Filters = buildContentFilters(TYPE_SPECIFIC_FILTERS)
 ```
 
-Add co-located `*.stories.tsx` (CSF3, `title: 'Content/<TypeName>s/<TypeName>sColumns'`).
+Add co-located `*.stories.tsx` (CSF3, `title: 'Content/<TypeName>s/<TypeName>sOverviewColumns'`).
 
 ### 11. Overview route (`routes/<kebab-plural>-overview.tsx`)
 

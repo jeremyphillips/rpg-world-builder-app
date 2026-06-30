@@ -1,7 +1,7 @@
 export {
   adventuringGearColumns,
   adventuringGearFilters,
-} from './components/adventuring-gear-columns'
+} from './lib/adventuring-gear-overview-columns'
 export { ADVENTURING_GEAR_LIST, ARROWS, TORCH } from './fixtures'
 export { adventuringGearFormFieldGroup } from './lib/adventuring-gear-form-fields'
 export {

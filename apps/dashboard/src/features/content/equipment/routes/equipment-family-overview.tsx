@@ -4,7 +4,7 @@ import type { Equipment } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
-import type { FamilyTableConfig } from '../lib/shared/equipment-family-columns'
+import type { FamilyTableConfig } from '../lib/shared/equipment-family-overview-columns'
 import { ContentOverviewShell } from '../../lib/content-overview-shell'
 import { ContentOverviewRowActions } from '../../lib/content-overview-row-actions'
 import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'

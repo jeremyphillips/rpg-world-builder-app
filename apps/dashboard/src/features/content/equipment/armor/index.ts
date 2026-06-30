@@ -1,4 +1,4 @@
-export { armorColumns, armorFilters } from './components/armor-columns'
+export { armorColumns, armorFilters } from './lib/armor-overview-columns'
 export { ARMOR_LIST, LEATHER, PLATE, SHIELD } from './fixtures'
 export { armorFormFieldGroup } from './lib/armor-form-fields'
 export { armorFormValuesFromEntity, buildArmorInput } from './lib/armor-form-values'

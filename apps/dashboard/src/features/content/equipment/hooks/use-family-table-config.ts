@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import {
   loadFamilyTableConfig,
   type FamilyTableConfig,
-} from '../lib/shared/equipment-family-columns'
+} from '../lib/shared/equipment-family-overview-columns'
 import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'
 
 type FamilyTableLoadState = {
