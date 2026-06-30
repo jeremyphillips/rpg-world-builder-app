@@ -3,7 +3,7 @@ import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeade
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 
 const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
   {

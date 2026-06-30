@@ -14,7 +14,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 
 function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)

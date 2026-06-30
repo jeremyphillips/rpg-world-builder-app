@@ -93,9 +93,17 @@ this table when completing a form-lib alignment phase.
 
 These modules support many content types but are **not** per-type form splits:
 
-| Module                            | Path                                        |
-| --------------------------------- | ------------------------------------------- |
-| Field builders (units, grants, …) | `content/lib/content-form-field-helpers.ts` |
-| Grant row helpers                 | `content/lib/grant-form-helpers.ts`         |
-| Requirement editor                | `content/lib/requirement-editor-form.ts`    |
-| Content form registry             | `content/lib/content-form-registry.ts`      |
+| Module                    | Path                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| Identity field builders   | `content/lib/forms/content-identity-form-fields.ts`                                      |
+| Economy field builders    | `content/lib/forms/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`) |
+| Speed/mass field builders | `content/lib/forms/content-speed-form-fields.ts`                                         |
+| Grant row helpers         | `content/lib/forms/grant-form-schema.ts`, `grant-form-fields.ts`, `grant-form-values.ts` |
+| Content form registry     | `content/lib/forms/content-form-registry.ts`                                             |
+
+Feat- and species-specific helpers (not cross-type shared infra):
+
+| Module             | Path                                                                                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Requirement editor | `feats/lib/requirement-editor-form-schema.ts`, `-values.ts`, `-form.ts` (+ `-constants.ts`); UI in `feats/components/requirement-editor.client.tsx` |
+| Creature type opts | `species/lib/creature-type-field-options.ts`                                                                                                        |

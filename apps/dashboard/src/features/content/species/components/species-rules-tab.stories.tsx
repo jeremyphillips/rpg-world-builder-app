@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/level-field-options'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { defaultCampaignRules } from '../../lib/form-options/level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
 const meta = {

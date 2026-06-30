@@ -4,8 +4,8 @@ import type { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
-import { masterDetailEmptySelectionLabel } from '../lib/master-detail-constants'
-import type { UseMasterDetailArrayResult } from '../lib/use-master-detail-array'
+import { masterDetailEmptySelectionLabel } from '../lib/master-detail/master-detail-constants'
+import type { UseMasterDetailArrayResult } from '../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

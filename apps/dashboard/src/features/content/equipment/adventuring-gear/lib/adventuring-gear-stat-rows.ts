@@ -5,7 +5,7 @@ import {
   type AdventuringGearEquipment,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
 
 /** Stat rows for adventuring gear equipment detail (excludes kind and cost). */
 export function getAdventuringGearStatRows(item: AdventuringGearEquipment): ContentStatRowData[] {
@@ -14,9 +14,7 @@ export function getAdventuringGearStatRows(item: AdventuringGearEquipment): Cont
     ...(item.holySymbolUsage?.length
       ? [{ label: 'Holy symbol usage', value: formatHolySymbolUsage(item.holySymbolUsage) }]
       : []),
-    ...(item.alsoWeaponSlug
-      ? [{ label: 'Also weapon', value: item.alsoWeaponSlug }]
-      : []),
+    ...(item.alsoWeaponSlug ? [{ label: 'Also weapon', value: item.alsoWeaponSlug }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
     ...(item.bundleSize !== undefined
       ? [{ label: 'Bundle size', value: String(item.bundleSize) }]

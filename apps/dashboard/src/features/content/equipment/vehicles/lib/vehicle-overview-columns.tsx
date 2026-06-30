@@ -6,7 +6,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 import { equipmentSpeedColumn } from '../../lib/equipment-form-field-helpers'
 
 const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [

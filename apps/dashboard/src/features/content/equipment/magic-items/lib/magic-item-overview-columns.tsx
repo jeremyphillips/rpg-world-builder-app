@@ -13,7 +13,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 
 function formatAttunement(requiresAttunement: boolean | undefined): string {
   if (requiresAttunement === undefined) return '—'

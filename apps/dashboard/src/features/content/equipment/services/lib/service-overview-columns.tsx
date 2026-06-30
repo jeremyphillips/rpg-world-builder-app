@@ -8,7 +8,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 
 const SERVICE_MIDDLE_COLUMNS: ColumnDef<ServiceEquipment>[] = [
   {

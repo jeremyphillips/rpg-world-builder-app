@@ -1,7 +1,7 @@
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
-import { costToFormDefaults } from '../../lib/content-form-field-helpers'
-import { contentFormRegistry, type ContentFormDef } from '../../lib/content-form-registry'
+import { costToFormDefaults } from '../../lib/forms/content-economy-form-fields'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import {
   buildEquipmentFields,

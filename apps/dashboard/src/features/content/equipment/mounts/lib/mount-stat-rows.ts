@@ -5,7 +5,7 @@ import {
   type MountEquipment,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
 
 /** Stat rows for mount equipment detail (excludes kind and cost). */
 export function getMountStatRows(item: MountEquipment): ContentStatRowData[] {

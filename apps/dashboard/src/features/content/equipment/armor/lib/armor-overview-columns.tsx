@@ -8,7 +8,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../../lib/content-table-config'
+} from '../../../lib/overview/content-table-config'
 
 function armorAcSortValue(item: ArmorEquipment): number {
   if (item.category === 'shields') return 999

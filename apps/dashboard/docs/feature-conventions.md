@@ -158,10 +158,10 @@ import { WidePage } from '@/components/layout/wide-page'
 
 ### Domain layouts (feature-specific, nest inside a width shell)
 
-- [`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
+- [`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
   — managed catalog **list** recipe: `WidePage` + `PageHeader` + `PageLoadState`
   - campaign-manager "New" gating. Use for catalog list routes only.
-- [`ContentDetailLayout`](../src/features/content/lib/content-detail-layout.tsx)
+- [`ContentDetailLayout`](../src/features/content/lib/detail/content-detail-layout.tsx)
   — catalog **detail** recipe inside `WidePage`: edit toolbar, full-width hero
   card (name + metadata + artwork), then a `narrowPageContentClasses` body column
   for description and sections. Pass static rows via `statRows` or hook-driven
@@ -173,7 +173,7 @@ import { WidePage } from '@/components/layout/wide-page'
 
 ```tsx
 import { WidePage } from '@/components/layout/wide-page'
-import { ContentDetailLayout } from '@/features/content/lib/content-detail-layout'
+import { ContentDetailLayout } from '@/features/content/lib/detail/content-detail-layout'
 ;<WidePage spacing="relaxed">
   <ContentDetailLayout
     name={item.name}
@@ -261,25 +261,25 @@ Narrow numeric selects use `digits` on the `@rpg/ui` field config (see
 [`packages/ui/docs/forms.md`](../../../packages/ui/docs/forms.md)). The trigger
 displays option **labels**, so digit-sized level picks must use compact labels.
 
-| Helper                                                                                                       | Use                                                                  |
-| ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| [`getLevelFieldOptions(ctx)`](../src/features/content/lib/level-field-options.ts)                            | Level selects — numeric labels; grouped when extended tier is active |
-| [`getLevelFieldOptions(ctx, { showTierLabels: false })`](../src/features/content/lib/level-field-options.ts) | Flat level list (chips, controls without option groups)              |
-| [`levelSelectDigits(ctx)`](../src/features/content/lib/level-field-options.ts)                               | `digits` slot count from campaign max level                          |
-| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/level-field-options.ts)                                | Constant `3` for `d6`–`d12` labels                                   |
+| Helper                                                                                                                    | Use                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [`getLevelFieldOptions(ctx)`](../src/features/content/lib/form-options/level-field-options.ts)                            | Level selects — numeric labels; grouped when extended tier is active |
+| [`getLevelFieldOptions(ctx, { showTierLabels: false })`](../src/features/content/lib/form-options/level-field-options.ts) | Flat level list (chips, controls without option groups)              |
+| [`levelSelectDigits(ctx)`](../src/features/content/lib/form-options/level-field-options.ts)                               | `digits` slot count from campaign max level                          |
+| [`HIT_DIE_SELECT_DIGITS`](../src/features/content/lib/form-options/level-field-options.ts)                                | Constant `3` for `d6`–`d12` labels                                   |
 
 Contracts SSOT:
 [`buildGroupedLevelOptions`](../../../packages/contracts/src/platform/campaign-rules.ts)
 (with optional `{ showTierLabels: false }`).
 
-Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/content-form-field-helpers.ts)
+Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/features/content/lib/forms/content-identity-form-fields.ts)
 (`type: 'inputUnit'`, `unit: 'ft.'`). Fixed-pound weight uses auto-switched
-[`scalarUnitInputSelectField`](../src/features/content/lib/content-form-field-helpers.ts)
+[`scalarUnitInputSelectField`](../src/features/content/lib/forms/content-speed-form-fields.ts)
 (`fixedUnit: 'lb.'` when only one unit option).
 
-Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/content-detail-resolver.tsx)
+Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/detail/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to
-[`ContentOverviewShell`](../src/features/content/lib/content-overview-shell.tsx)
+[`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
 on list pages).
 
 For route shells that need TanStack Query (loading, error, not-found), add

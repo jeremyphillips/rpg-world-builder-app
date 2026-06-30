@@ -8,8 +8,8 @@ import { FormItems } from '@rpg/ui/form'
 
 import { disableFormItems } from '@/lib/disable-form-items'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
-import { campaignRulesFromCtx } from '../../lib/level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { campaignRulesFromCtx } from '../../lib/form-options/level-field-options'
 import {
   characterConfigurationMulticlassingHref,
   LEVEL_LIMITS_FIELD_PREFIX,

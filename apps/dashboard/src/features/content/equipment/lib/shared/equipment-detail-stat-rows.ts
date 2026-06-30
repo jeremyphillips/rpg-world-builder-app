@@ -2,7 +2,7 @@ import type { Equipment } from '@rpg/contracts'
 import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 
 import { getArmorStatRows } from '../../armor/lib/armor-stat-rows'
-import type { ContentStatRowData } from '../../../lib/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
 import { getWeaponStatRows } from '../../weapons/lib/weapon-stat-rows'
 import { getServiceStatRows } from '../../services/lib/service-stat-rows'
 import { getMountStatRows } from '../../mounts/lib/mount-stat-rows'

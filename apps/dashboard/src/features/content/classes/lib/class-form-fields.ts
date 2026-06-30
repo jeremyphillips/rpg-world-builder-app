@@ -36,15 +36,15 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { identityFields } from '../../lib/content-form-field-helpers'
+import { identityFields } from '../../lib/forms/content-identity-form-fields'
 import {
   getLevelFieldOptions,
   HIT_DIE_SELECT_DIGITS,
   levelSelectDigits,
   effectiveMaxFromCtx,
-} from '../../lib/level-field-options'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
-import { titleCase } from '../../lib/title-case'
+} from '../../lib/form-options/level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { titleCase } from '../../lib/utils/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'

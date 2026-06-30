@@ -8,7 +8,7 @@ import {
   buildContentColumns,
   buildContentFilters,
   costColumn,
-} from '../../lib/content-table-config'
+} from '../../lib/overview/content-table-config'
 import { equipmentKindToFamilyPath } from '../lib/shared/equipment-family-paths'
 
 const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [

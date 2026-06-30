@@ -6,8 +6,8 @@ import {
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
-import { getLevelFieldOptions, levelSelectDigits } from '../../lib/level-field-options'
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   speciesClassPolicyModeOptions,
   speciesMulticlassPolicyOptions,

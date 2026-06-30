@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import axe from 'axe-core'
 import { describe, expect, it } from 'vitest'
 
-import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../lib/master-detail-constants'
+import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../lib/master-detail/master-detail-constants'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
 
 const axeOptions = { rules: { 'color-contrast': { enabled: false } } }

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { ClassFeaturesTab } from './class-features-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

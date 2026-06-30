@@ -4,7 +4,7 @@ import { BooleanCell, dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 import { formatFeatCategoryTableLabel, formatFeatPrerequisiteSummary } from '../lib/feat-stat-rows'
 
 const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [

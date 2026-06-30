@@ -1,8 +1,8 @@
 import type { ArmorEquipment } from '@rpg/contracts'
 import { formatMoney, formatWeight, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/content-stat-rows'
-import { titleCase } from '../../../lib/title-case'
+import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import { titleCase } from '../../../lib/utils/title-case'
 
 /** Stat rows for armor equipment detail (excludes kind; includes cost). */
 export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {

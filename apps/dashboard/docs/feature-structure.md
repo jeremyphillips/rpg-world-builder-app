@@ -71,10 +71,30 @@ has **3+ related files** (e.g. `classes/lib/subclasses/`,
 | Detail/list UI data       | `*-stat-rows.ts`, `*-overview-columns.tsx` (co-located `*.stories.tsx`) | [feature-conventions.md](./feature-conventions.md#content-catalog-ui)              |
 | Navigation / storage keys | Plain names (`*-routes.ts`, `*-storage.ts`)                             | Feature README                                                                     |
 | Registries                | `*-registry.ts`                                                         | `homebrew/lib/hub/*-registry.ts`; see [vocabulary.md](../../../docs/vocabulary.md) |
-| Cross-type shared helpers | Parent `content/lib/`                                                   | [content/README.md](../src/features/content/README.md)                             |
+| Cross-type shared helpers | Parent `content/lib/` — concern subfolders below                        | [content/README.md § `lib/`](../src/features/content/README.md)                    |
 
 Content catalog form module inventory (aligned / pending / exception) →
 [form-lib-conventions.md § Inventory](./form-lib-conventions.md#content-catalog-inventory).
+
+### Parent `content/lib/` subfolders
+
+Cross-type helpers live under `src/features/content/lib/` in concern subfolders
+(mirror `equipment/lib/shared/`). Sub-area `lib/` keeps per-type form and table
+config; parent `lib/` is the shared layer only.
+
+| Subfolder        | Responsibility                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `fixtures/`      | Story/test IDs and `pick*()` catalog helpers                                       |
+| `forms/`         | `ContentFormDef` registry, create/edit shells, grant splits, shared field builders |
+| `form-options/`  | Cross-type select options (levels, rich-text link targets)                         |
+| `overview/`      | List route shell, table column/filter builders, source badge                       |
+| `detail/`        | Detail layout/resolver, stat rows, edit href, image URL                            |
+| `master-detail/` | Embedded array editor hooks, row meta, campaign availability, validation           |
+| `list/`          | Content list API/query factories, client, mutation hooks                           |
+| `utils/`         | Small shared helpers (e.g. `title-case`)                                           |
+
+Interactive widgets (master-detail panels) stay in `content/components/`; feat
+prerequisite editing lives under `feats/components/`.
 
 ## Nested sub-features
 
@@ -113,9 +133,10 @@ naming:
 | `homebrew/lib/vocabulary/` | Vocabulary set editors          | See [vocabulary.md](../../../docs/vocabulary.md) |
 | `auth/`                    | No `lib/` folder                | Session gate + thin hooks only                   |
 
-Shared content infra (`content-form-field-helpers.ts`, `content-form-registry.ts`,
+Shared content infra (`content-*-form-fields.ts`, `grant-form-*.ts`, `content-form-registry.ts`,
 etc.) is listed as **exception** rows in the form-lib inventory — not per-type
-form splits.
+form splits. Feat prerequisite editing (`requirement-editor-*`, `RequirementEditor`)
+and species creature-type options live under `feats/lib/` and `species/lib/` respectively.
 
 ## Feature README template
 

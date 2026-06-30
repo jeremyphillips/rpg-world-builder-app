@@ -10,8 +10,8 @@ import {
   getCreatureTypeLabel as getVocabularyCreatureTypeLabel,
 } from '@/features/homebrew'
 
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
-import { getCreatureTypeLabel } from '../../lib/creature-type-field-options'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
+import { getCreatureTypeLabel } from './creature-type-field-options'
 
 function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Species>[] {
   return [

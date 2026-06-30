@@ -1,7 +1,10 @@
 import { type CreateSubclassInput, type Subclass, type SubclassFeature } from '@rpg/contracts'
 
-import { envelopeSlugFields, finalizeContentInput } from '../../../lib/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../../lib/content-form-registry'
+import {
+  envelopeSlugFields,
+  finalizeContentInput,
+} from '../../../lib/forms/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../../lib/forms/content-form-registry'
 import { featuresFromFormValues, featureToFormRow } from '../class-feature-form-fields'
 import { subclassFormSchema, type SubclassFormValues } from './subclass-form-fields'
 

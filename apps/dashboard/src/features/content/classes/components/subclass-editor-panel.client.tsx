@@ -7,7 +7,7 @@ import { Badge, Button, InfoTooltip, Switch, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 import type { Subclass } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../lib/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   ACTIVE_IN_CAMPAIGN_LABEL,
   ACTIVE_IN_CAMPAIGN_TOOLTIP,

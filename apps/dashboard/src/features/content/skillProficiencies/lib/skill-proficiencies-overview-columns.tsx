@@ -4,7 +4,7 @@ import { dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rp
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/content-table-config'
+import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 
 const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
   {

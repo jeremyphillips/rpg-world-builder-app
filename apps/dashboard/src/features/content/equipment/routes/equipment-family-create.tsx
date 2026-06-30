@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { ContentCreateShell } from '../../lib/content-create-shell'
+import { ContentCreateShell } from '../../lib/forms/content-create-shell'
 // Registers the equipment form def into the content form registry on module load.
 import '../lib/equipment-form-def'
 import {
