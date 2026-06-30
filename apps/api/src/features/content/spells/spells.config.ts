@@ -81,3 +81,8 @@ export const spellWriteConfig: ContentWriteConfig<Spell> = {
   bodyFromCreateInput,
   validateBeforeWrite: spellValidateBeforeWrite,
 }
+
+export const spellRegistration = {
+  read: spellContentConfig,
+  write: spellWriteConfig,
+} as const

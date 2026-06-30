@@ -8,7 +8,7 @@ import {
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveCatalogForCampaign } from '../content.service'
-import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-proficiencies.config'
+import { getContentTypeConfig } from '../content-types'
 import { HomebrewSkillProficiencyModel } from '../skill-proficiencies/homebrew-skill-proficiency.model'
 import { SkillProficiencyPatchModel } from '../skill-proficiencies/skill-proficiency-patch.model'
 import { deepMerge } from './deep-merge'
@@ -85,7 +85,10 @@ export async function syncSuggestedClassesFromClass(
   classSlug: string,
   nextSkillSlugs: readonly string[],
 ): Promise<void> {
-  const skills = await resolveCatalogForCampaign(skillProficiencyWriteConfig.readConfig, campaignId)
+  const skills = await resolveCatalogForCampaign(
+    getContentTypeConfig('skill-proficiencies'),
+    campaignId,
+  )
   const previousSkillSlugs = skillSlugsSuggestingClass(classSlug, skills)
   const { added, removed } = diffClassSkillEdges(previousSkillSlugs, nextSkillSlugs)
 

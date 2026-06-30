@@ -84,3 +84,8 @@ export const equipmentWriteConfig: ContentWriteConfig<Equipment> = {
   toHomebrewEntity: toHomebrewEquipment,
   bodyFromCreateInput,
 }
+
+export const equipmentRegistration = {
+  read: equipmentContentConfig,
+  write: equipmentWriteConfig,
+} as const

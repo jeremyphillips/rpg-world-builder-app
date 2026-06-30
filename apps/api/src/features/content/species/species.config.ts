@@ -82,3 +82,8 @@ export const speciesWriteConfig: ContentWriteConfig<Species> = {
   bodyFromCreateInput,
   validateBeforeWrite: speciesValidateBeforeWrite,
 }
+
+export const speciesRegistration = {
+  read: speciesContentConfig,
+  write: speciesWriteConfig,
+} as const

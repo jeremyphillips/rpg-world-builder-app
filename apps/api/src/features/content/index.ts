@@ -1,6 +1,14 @@
 export { contentRouter } from './content.routes'
 export { homebrewRouter } from './homebrew.routes'
-export { getContentTypeConfig, HOMEBREW_SUMMARY_TYPES, type ContentTypeName } from './content-types'
+export {
+  getContentTypeConfig,
+  getContentWriteConfig,
+  HOMEBREW_SUMMARY_TYPES,
+  isContentWriteType,
+  resolveContentForCampaign,
+  type ContentTypeName,
+  type ContentTypeRegistration,
+} from './content-types'
 export { resolveCatalogForCampaign } from './content.service'
 export type { ContentTypeConfig } from './lib/content-type-config'
 export { getHomebrewContentSummary } from './lib/homebrew-summary.service'

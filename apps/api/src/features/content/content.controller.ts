@@ -1,14 +1,15 @@
 import type { Request, Response } from 'express'
 
-import { getContentTypeConfig } from './content-types'
-import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
-import { resolveCatalogForCampaign } from './content.service'
-import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
-import { getContentWriteConfig, isContentWriteType } from './lib/content-write-types'
-import { startingWealthContentConfig } from './starting-wealth/starting-wealth.config'
 import { loadSubclassesByClassId } from '@rpg/catalog/classes'
-import { findCampaignById } from '../campaign'
+
 import { HttpError } from '../../lib/http-error'
+import { findCampaignById } from '../campaign'
+import {
+  getContentWriteConfig,
+  isContentWriteType,
+  resolveContentForCampaign,
+} from './content-types'
+import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
@@ -36,9 +37,8 @@ export async function updateContentItem(req: Request, res: Response): Promise<vo
 }
 
 export async function listClasses(req: Request, res: Response): Promise<void> {
-  // `campaignId` is validated by `requireCampaignRole` (membership) upstream.
   const { campaignId } = req.params as { campaignId: string }
-  const classes = await resolveClassesForCampaign(campaignId)
+  const classes = await resolveContentForCampaign('classes', campaignId)
   res.status(200).json({ classes })
 }
 
@@ -54,42 +54,37 @@ export async function listSubclasses(req: Request, res: Response): Promise<void>
 
 export async function listSkillProficiencies(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('skill-proficiencies')
-  const skillProficiencies = await resolveCatalogForCampaign(config, campaignId)
+  const skillProficiencies = await resolveContentForCampaign('skill-proficiencies', campaignId)
   res.status(200).json({ skillProficiencies })
 }
 
 export async function listEquipment(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('equipment')
-  const equipment = await resolveCatalogForCampaign(config, campaignId)
+  const equipment = await resolveContentForCampaign('equipment', campaignId)
   res.status(200).json({ equipment })
 }
 
 export async function listSpecies(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('species')
-  const species = await resolveCatalogForCampaign(config, campaignId)
+  const species = await resolveContentForCampaign('species', campaignId)
   res.status(200).json({ species })
 }
 
 export async function listSpells(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('spells')
-  const spells = await resolveCatalogForCampaign(config, campaignId)
+  const spells = await resolveContentForCampaign('spells', campaignId)
   res.status(200).json({ spells })
 }
 
 export async function listFeats(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const config = getContentTypeConfig('feats')
-  const feats = await resolveCatalogForCampaign(config, campaignId)
+  const feats = await resolveContentForCampaign('feats', campaignId)
   res.status(200).json({ feats })
 }
 
 export async function listStartingWealth(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const startingWealth = await resolveCatalogForCampaign(startingWealthContentConfig, campaignId)
+  const startingWealth = await resolveContentForCampaign('starting-wealth', campaignId)
   res.status(200).json({ startingWealth })
 }
 

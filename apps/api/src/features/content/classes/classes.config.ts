@@ -96,3 +96,8 @@ export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
   beforeUpdateParse: classBeforeUpdateParse,
   afterWrite: classAfterWrite,
 }
+
+export const classRegistration = {
+  read: classContentConfig,
+  write: classWriteConfig,
+} as const

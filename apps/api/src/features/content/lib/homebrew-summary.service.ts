@@ -2,9 +2,7 @@ import type { HomebrewContentSummary } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
-import { getContentTypeConfig, HOMEBREW_SUMMARY_TYPES } from '../content-types'
-import { resolveCatalogForCampaign } from '../content.service'
-import type { ContentTypeConfig } from './content-type-config'
+import { HOMEBREW_SUMMARY_TYPES, resolveContentForCampaign } from '../content-types'
 
 /** Resolved catalog counts for Homebrew hub cards — one round trip instead of N list calls. */
 export async function getHomebrewContentSummary(
@@ -17,8 +15,7 @@ export async function getHomebrewContentSummary(
 
   const counts = await Promise.all(
     HOMEBREW_SUMMARY_TYPES.map(async (contentType) => {
-      const config = getContentTypeConfig(contentType) as ContentTypeConfig<{ id: string }>
-      const items = await resolveCatalogForCampaign(config, campaignId)
+      const items = await resolveContentForCampaign(contentType, campaignId)
       return { contentType, totalCount: items.length }
     }),
   )

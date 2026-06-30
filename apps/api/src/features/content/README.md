@@ -44,14 +44,14 @@ which seed version is loaded and which content homebrew/patches validate against
 | `content-type-config.ts`      | `ContentTypeConfig` — the per-type wiring the kernel consumes |
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
-`*.config.ts` wiring its seed loader and Mongo models, registered in
-`content-types.ts` (one entry, the single extension point). Write endpoints:
+`*.config.ts` exporting a `*Registration` (`read` + `write`, optional
+`resolveForCampaign`), registered once in `content-types.ts`.
 
 - `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update
   homebrew or upsert a system overlay patch (owner/co-owner only)
 
-See `lib/content-write.service.ts` and each type's `*WriteConfig` in `*.config.ts`.
+See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.config.ts`.
 
 ## Homebrew hub summary
 

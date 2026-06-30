@@ -82,3 +82,8 @@ export const skillProficiencyWriteConfig: ContentWriteConfig<SkillProficiency> =
   toHomebrewEntity: toHomebrewSkillProficiency,
   bodyFromCreateInput,
 }
+
+export const skillProficiencyRegistration = {
+  read: skillProficiencyContentConfig,
+  write: skillProficiencyWriteConfig,
+} as const

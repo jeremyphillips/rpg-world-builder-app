@@ -18,7 +18,8 @@ export interface HomebrewDoc {
   [key: string]: unknown
 }
 
-type WriteEntityBase = {
+/** Minimal entity shape every write/read registration must satisfy. */
+export type WriteEntityBase = {
   id: string
   slug: string
   source: ContentSource
