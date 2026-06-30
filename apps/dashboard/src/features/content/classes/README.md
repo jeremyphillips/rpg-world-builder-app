@@ -16,19 +16,20 @@ The **Subclasses** tab uses a list + editor layout: seed subclasses load from th
 
 ## Key files
 
-| Area                                 | Path                                                                       |
-| ------------------------------------ | -------------------------------------------------------------------------- |
-| Class form def                       | `lib/class-form-def.ts`                                                    |
-| Class form fields / values / labels  | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts` |
-| Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`        |
-| Shared feature row fields            | `lib/class-feature-form-fields.ts`                                         |
-| Features tab (master-detail)         | `components/class-features-tab.client.tsx`                                 |
-| Character creation tab               | `components/class-character-creation-tab.client.tsx`                       |
-| Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                |
-| Subclasses tab                       | `components/class-subclasses-tab.client.tsx`                               |
-| Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                         |
-| Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                 |
-| Read-only progression table          | `components/class-progression-table.tsx`                                   |
-| Detail feature list item             | `lib/feature-item.tsx`                                                     |
+| Area                                 | Path                                                                                                                                           |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Class form def                       | `lib/class-form-def.ts`                                                                                                                        |
+| Class form hub / values / labels     | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts`                                                                     |
+| Class form tab field modules         | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts` |
+| Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                            |
+| Shared feature row fields            | `lib/class-feature-form-fields.ts`                                                                                                             |
+| Features tab (master-detail)         | `components/class-features-tab.client.tsx`                                                                                                     |
+| Character creation tab               | `components/class-character-creation-tab.client.tsx`                                                                                           |
+| Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                    |
+| Subclasses tab                       | `components/class-subclasses-tab.client.tsx`                                                                                                   |
+| Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                             |
+| Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                     |
+| Read-only progression table          | `components/class-progression-table.tsx`                                                                                                       |
+| Detail feature list item             | `lib/feature-item.tsx`                                                                                                                         |
 
 Spellcasting contract shape, preparation modes, and the sparse/dense progression model are documented in [content-types.md](../../../../../docs/content-types.md#class-spellcasting-reference).

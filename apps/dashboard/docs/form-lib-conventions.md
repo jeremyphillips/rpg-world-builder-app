@@ -70,21 +70,21 @@ Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
 Status of schema-driven form modules under `src/features/content/`. Refresh
 this table when completing a form-lib alignment phase.
 
-| Module / area            | Primary path                                                                                  | Status             |
-| ------------------------ | --------------------------------------------------------------------------------------------- | ------------------ |
-| Classes (hub)            | `classes/lib/class-form-*.ts`                                                                 | aligned            |
-| Class features           | `classes/lib/class-feature-form-fields.ts`                                                    | aligned            |
-| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                           | aligned            |
-| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                                   | aligned            |
-| Species traits           | `species/lib/species-trait-form-*.ts`                                                         | aligned            |
-| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`         | aligned            |
-| Species heritage         | `species/lib/species-heritage-form-*.ts`                                                      | aligned            |
-| Species rules            | `species/lib/species-rules-form-*.ts`                                                         | aligned            |
-| Spells                   | `spells/lib/spell-form-*.ts`                                                                  | aligned            |
-| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts` | aligned            |
-| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                        | aligned            |
-| Feats                    | `feats/lib/feat-form-def.ts`                                                                  | pending (optional) |
-| Skill proficiencies      | `skillProficiencies/lib/skill-proficiency-form-def.ts`                                        | pending (optional) |
+| Module / area            | Primary path                                                                                                                                                                                               | Status  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Classes (hub)            | `classes/lib/class-form-fields.ts` (schema + tabs); tab modules `class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts` | aligned |
+| Class features           | `classes/lib/class-feature-form-fields.ts`                                                                                                                                                                 | aligned |
+| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                                                        | aligned |
+| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                                                                                                                                                | aligned |
+| Species traits           | `species/lib/species-trait-form-*.ts`                                                                                                                                                                      | aligned |
+| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`                                                                                                                      | aligned |
+| Species heritage         | `species/lib/species-heritage-form-*.ts`                                                                                                                                                                   | aligned |
+| Species rules            | `species/lib/species-rules-form-*.ts`                                                                                                                                                                      | aligned |
+| Spells                   | `spells/lib/spell-form-*.ts`                                                                                                                                                                               | aligned |
+| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts`                                                                                                              | aligned |
+| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                     | aligned |
+| Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                                                 | aligned |
+| Skill proficiencies      | `skillProficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                                             | aligned |
 
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).
@@ -93,13 +93,16 @@ this table when completing a form-lib alignment phase.
 
 These modules support many content types but are **not** per-type form splits:
 
-| Module                    | Path                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| Identity field builders   | `content/lib/forms/content-identity-form-fields.ts`                                      |
-| Economy field builders    | `content/lib/forms/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`) |
-| Speed/mass field builders | `content/lib/forms/content-speed-form-fields.ts`                                         |
-| Grant row helpers         | `content/lib/forms/grant-form-schema.ts`, `grant-form-fields.ts`, `grant-form-values.ts` |
-| Content form registry     | `content/lib/forms/content-form-registry.ts`                                             |
+| Module                    | Path                                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity field builders   | `content/lib/forms/fields/content-identity-form-fields.ts`                                                                                        |
+| Economy field builders    | `content/lib/forms/fields/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`)                                                   |
+| Speed/mass field builders | `content/lib/forms/fields/content-speed-form-fields.ts`                                                                                           |
+| Grant row helpers         | `content/lib/forms/grants/grant-form-schema.ts` (`GRANT_TYPES`, `GrantType`, `GRANT_TYPE_LABELS`), `grant-form-fields.ts`, `grant-form-values.ts` |
+| Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                                                                              |
+| Level select builders     | `content/lib/form-options/level-field-options.ts`                                                                                                 |
+| Content form registry     | `content/lib/forms/content-form-registry.ts`                                                                                                      |
+| Create/edit shells        | `content/lib/forms/shells/` (create/edit shells, layout, load, authoring gate)                                                                    |
 
 Feat- and species-specific helpers (not cross-type shared infra):
 

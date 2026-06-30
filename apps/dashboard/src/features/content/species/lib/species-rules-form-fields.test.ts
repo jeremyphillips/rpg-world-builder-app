@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { defaultSpeciesLevelLimits, defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/form-options/level-field-options'
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import {
   characterCreationFromFormValues,
   characterCreationToFormValues,

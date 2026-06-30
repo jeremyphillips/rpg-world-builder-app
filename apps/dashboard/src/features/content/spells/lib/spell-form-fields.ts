@@ -17,7 +17,7 @@ import {
   feetInputUnitField,
   identityFields,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../lib/forms/content-identity-form-fields'
+} from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   castingTimeUnitOptions,

@@ -1,6 +1,32 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
+import type { AnyContentFormDef } from '../forms/content-form-registry'
 import { createContent, updateContent } from './content-client'
+
+export type ContentMutationHooksOptions = {
+  /** Additional query keys to invalidate after a successful write. */
+  invalidateQueryKeys?: (campaignId: string) => readonly (readonly unknown[])[]
+}
+
+export function invalidateContentWriteQueries(
+  queryClient: QueryClient,
+  campaignId: string,
+  queryKeyFn: (campaignId: string) => readonly unknown[],
+  extraInvalidationKeys?: ContentMutationHooksOptions['invalidateQueryKeys'],
+) {
+  void queryClient.invalidateQueries({ queryKey: queryKeyFn(campaignId) })
+  for (const queryKey of extraInvalidationKeys?.(campaignId) ?? []) {
+    void queryClient.invalidateQueries({ queryKey })
+  }
+}
+
+export function invalidateContentFormDefQueries(
+  queryClient: QueryClient,
+  campaignId: string,
+  def: Pick<AnyContentFormDef, 'queryKey' | 'invalidateQueryKeys'>,
+) {
+  invalidateContentWriteQueries(queryClient, campaignId, def.queryKey, def.invalidateQueryKeys)
+}
 
 /**
  * Factory that produces `useCreateContent` and `useUpdateContent` hooks for a
@@ -21,13 +47,19 @@ import { createContent, updateContent } from './content-client'
 export function createContentMutationHooks(
   routeKey: string,
   queryKeyFn: (campaignId: string) => readonly unknown[],
+  options?: ContentMutationHooksOptions,
 ) {
   function useCreateContent(campaignId: string) {
     const queryClient = useQueryClient()
     return useMutation({
       mutationFn: (input: unknown) => createContent(campaignId, routeKey, input),
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: queryKeyFn(campaignId) })
+        invalidateContentWriteQueries(
+          queryClient,
+          campaignId,
+          queryKeyFn,
+          options?.invalidateQueryKeys,
+        )
       },
     })
   }
@@ -37,10 +69,38 @@ export function createContentMutationHooks(
     return useMutation({
       mutationFn: (input: unknown) => updateContent(campaignId, routeKey, entityId, input),
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: queryKeyFn(campaignId) })
+        invalidateContentWriteQueries(
+          queryClient,
+          campaignId,
+          queryKeyFn,
+          options?.invalidateQueryKeys,
+        )
       },
     })
   }
 
   return { useCreateContent, useUpdateContent }
+}
+
+/**
+ * Generic create/update mutation for schema-driven shells. Uses the form def's
+ * `routeKey`, `queryKey`, and optional `invalidateQueryKeys`.
+ */
+export function useContentWriteMutation(
+  def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>,
+  campaignId: string,
+  entityId?: string,
+) {
+  const queryClient = useQueryClient()
+  const isUpdate = entityId != null
+
+  return useMutation({
+    mutationFn: (input: unknown) =>
+      isUpdate
+        ? updateContent(campaignId, def.routeKey, entityId, input)
+        : createContent(campaignId, def.routeKey, input),
+    onSuccess: () => {
+      invalidateContentFormDefQueries(queryClient, campaignId, def)
+    },
+  })
 }

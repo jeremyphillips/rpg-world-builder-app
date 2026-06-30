@@ -1,44 +1,16 @@
-import { z } from 'zod'
-import {
-  abilitySchema,
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
-  createSkillProficiencyInputSchema,
-  slugSchema,
-  type CreateSkillProficiencyInput,
-  type SkillProficiency,
-} from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { type CreateSkillProficiencyInput, type SkillProficiency } from '@rpg/contracts'
 
-import { identityFields } from '../../lib/forms/content-identity-form-fields'
-import {
-  contentFormRegistry,
-  type ContentFormDef,
-  type ContentFormInputCtx,
-} from '../../lib/forms/content-form-registry'
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
-
-const abilityOptions = toOptions(
-  ABILITY_IDS,
-  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
-    (typeof ABILITY_IDS)[number],
-    string
-  >,
-)
-
-const SUGGESTED_CLASSES_HINT =
-  'Classes that suggest this skill for starting proficiency selection. Used by the character builder to restrict skill picks.'
-
-const skillProficiencyFormSchema = z.object({
-  name: z.string().min(1),
-  slug: slugSchema.optional(),
-  description: z.string().optional(),
-  ability: abilitySchema,
-  suggestedClasses: z.array(z.string()).min(1),
-})
-
-type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>
+import {
+  buildSkillProficiencyFields,
+  skillProficiencyFormSchema,
+  type SkillProficiencyFormValues,
+} from './skill-proficiency-form-fields'
+import {
+  buildSkillProficiencyCreateInput,
+  skillProficiencyToFormValues,
+} from './skill-proficiency-form-values'
 
 const skillProficiencyFormDef: ContentFormDef<
   SkillProficiency,
@@ -48,48 +20,9 @@ const skillProficiencyFormDef: ContentFormDef<
   routeKey: 'skill-proficiencies',
   schema: skillProficiencyFormSchema,
   coverage: 'structural',
-  buildFields: (ctx): FormItem[] => [
-    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
-    {
-      kind: 'group',
-      legend: 'Mechanics',
-      fields: [
-        {
-          type: 'chips',
-          name: 'ability',
-          label: 'Governing ability',
-          options: abilityOptions,
-          multiple: false,
-          required: true,
-        },
-        {
-          type: 'chips',
-          name: 'suggestedClasses',
-          label: 'Suggested classes',
-          options: ctx.options?.classes ?? [],
-          required: true,
-          hint: SUGGESTED_CLASSES_HINT,
-        },
-      ],
-    },
-  ],
-  toFormValues: (entity) => ({
-    name: entity.name,
-    slug: entity.slug,
-    description: entity.description,
-    ability: entity.ability,
-    suggestedClasses: entity.suggestedClasses,
-  }),
-  toInput: (values, ctx?: ContentFormInputCtx<SkillProficiency>) => {
-    const input = createSkillProficiencyInputSchema.parse({
-      slug: slugForInputParse(values.name, ctx),
-      name: values.name,
-      description: values.description || undefined,
-      ability: values.ability,
-      suggestedClasses: values.suggestedClasses,
-    })
-    return finalizeContentInput(input, ctx) as CreateSkillProficiencyInput
-  },
+  buildFields: buildSkillProficiencyFields,
+  toFormValues: skillProficiencyToFormValues,
+  toInput: buildSkillProficiencyCreateInput,
   useListQuery: useSkillProficiencies,
   queryKey: skillProficienciesQueryKey,
 }

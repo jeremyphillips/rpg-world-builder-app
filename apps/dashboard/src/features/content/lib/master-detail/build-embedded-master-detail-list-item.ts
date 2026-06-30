@@ -1,7 +1,7 @@
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import { isContentRowActive, resolveMasterDetailRowKey } from './content-campaign-availability'
 import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
-import type { MasterDetailListItem } from '../../components/master-detail-list-panel.client'
+import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel.client'
 
 export interface BuildEmbeddedMasterDetailListItemParams {
   field: { id: string }

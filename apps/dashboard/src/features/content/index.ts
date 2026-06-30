@@ -27,8 +27,11 @@ export { FeatsOverview, FeatDetail, FeatCreate, FeatEdit, useFeats, featsQueryKe
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'
 export { SpellEdit } from './spells/routes/spell-edit'
-export { ContentCreateShell, ContentFormShellResolver } from './lib/forms/content-create-shell'
-export { ContentEditShell } from './lib/forms/content-edit-shell'
+export {
+  ContentCreateShell,
+  ContentFormShellResolver,
+} from './lib/forms/shells/content-create-shell'
+export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
 export {
   contentFormRegistry,
   type ContentFormDef,
@@ -40,4 +43,7 @@ export {
   useContentFormOptions,
   type ContentFormOptionSets,
 } from './lib/form-options/content-form-options'
-export { createContentMutationHooks } from './lib/list/use-content-mutations'
+export {
+  createContentMutationHooks,
+  useContentWriteMutation,
+} from './lib/list/use-content-mutations'

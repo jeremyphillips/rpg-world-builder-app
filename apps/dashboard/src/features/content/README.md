@@ -1,7 +1,5 @@
 # content (dashboard feature)
 
-> Scaffold only — no implementation yet.
-
 World-building content the DM authors and reuses across campaigns. This is one
 feature (one ESLint boundary element) made of several content-type sub-areas:
 
@@ -34,7 +32,7 @@ builders (`*-stat-rows.ts`).
 ```text
 lib/
   fixtures/       # STORY_* IDs, pick*() catalog helpers
-  forms/            # ContentFormDef registry, shells, grant splits, field builders
+  forms/            # registry + key helpers; shells/, fields/, grants/ subfolders
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge
   detail/           # Detail layout, stat rows, edit href
@@ -50,6 +48,14 @@ through [`createContentListApi`](./lib/list/create-content-list.ts) and
 `api/*-api.ts` and `hooks/use-*.ts` pair delegates to those factories. Nested
 resources (e.g. subclasses under a class) stay hand-written until a second
 nested list pattern appears.
+
+Create/update mutations use [`createContentMutationHooks`](./lib/list/use-content-mutations.ts)
+the same way: each sub-area's `hooks/use-*.ts` exports aliased
+`useCreate*` / `useUpdate*` hooks at module level. Generic create/edit shells
+call [`useContentWriteMutation`](./lib/list/use-content-mutations.ts) with the
+registered `ContentFormDef` (including optional `invalidateQueryKeys` — classes
+also refresh skill proficiencies). Future sub-areas (`locations/`, `monsters/`)
+should follow the same list + mutation factory pattern in their `hooks/use-*.ts`.
 
 Class [`FeatureItem`](./classes/lib/feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature
@@ -67,26 +73,26 @@ fails without a visible error — check inactive tabs.
 Detail and overview authoring controls (Edit, New, row actions) are gated by
 [`useCanManageCampaign`](./campaign/hooks/use-can-manage-campaign.ts) — owner or
 co-owner membership from `GET /api/campaigns`. Create/edit routes use
-[`ContentAuthoringGate`](./lib/forms/content-authoring-gate.tsx) for the same check.
+[`ContentAuthoringGate`](./lib/forms/shells/content-authoring-gate.tsx) for the same check.
 
 ## Master-detail abstraction
 
 Long embedded arrays (where each row is itself a heavy form) can render as a
 list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 
-| Piece                                                                                                | Role                                                                                                                                                                                    |
-| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`useMasterDetailArray`](./lib/master-detail/use-master-detail-array.ts)                             | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing.                                   |
-| [`MasterDetailListPanel`](./components/master-detail-list-panel.client.tsx)                          | Sidebar: add button + selectable rows with optional eyebrow, status badge, per-row delete, and drag-to-reorder (keyboard-accessible handle).                                            |
-| [`MasterDetailEditorPanel`](./components/master-detail-editor-panel.client.tsx)                      | Detail column: validation banner, **Active in campaign** toggle, selected row `FormItems`, or empty-selection hint.                                                                     |
-| [`MasterDetailDeleteDialog`](./components/master-detail-delete-dialog.client.tsx)                    | Shared `ConfirmDialog` wrapper for row removal.                                                                                                                                         |
-| [`MasterDetailValidationBanner`](./components/master-detail-validation-banner.client.tsx)            | Post-submit alert when unselected list rows have validation errors.                                                                                                                     |
-| [`MasterDetailActiveToggle`](./components/master-detail-active-toggle.client.tsx)                    | Shared campaign availability switch for detail panels.                                                                                                                                  |
-| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts) | Builds a list row with source badges, `deletable`, and inactive styling.                                                                                                                |
-| [`resolveEmbeddedRowMeta`](./lib/master-detail/resolve-embedded-row-meta.ts)                         | Derives system/homebrew source, delete-lock, and badge set for embedded rows.                                                                                                           |
-| [`isEmbeddedRowSystemLocked`](./lib/master-detail/is-embedded-row-system-locked.ts)                  | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                                                  |
-| [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)              | Shared active-in-campaign labels and row-key helpers (also used by subclasses).                                                                                                         |
-| [`FormEmbeddedMasterDetailEditor`](./components/form-embedded-master-detail-editor.client.tsx)       | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form. Optional `leadingContent` for fields above the grid (uses `fieldGroupFlexStackClasses`). |
+| Piece                                                                                                        | Role                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`useMasterDetailArray`](./lib/master-detail/use-master-detail-array.ts)                                     | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing.                                   |
+| [`MasterDetailListPanel`](./components/master-detail/master-detail-list-panel.client.tsx)                    | Sidebar: add button + selectable rows with optional eyebrow, status badge, per-row delete, and drag-to-reorder (keyboard-accessible handle).                                            |
+| [`MasterDetailEditorPanel`](./components/master-detail/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, **Active in campaign** toggle, selected row `FormItems`, or empty-selection hint.                                                                     |
+| [`MasterDetailDeleteDialog`](./components/master-detail/master-detail-delete-dialog.client.tsx)              | Shared `ConfirmDialog` wrapper for row removal.                                                                                                                                         |
+| [`MasterDetailValidationBanner`](./components/master-detail/master-detail-validation-banner.client.tsx)      | Post-submit alert when unselected list rows have validation errors.                                                                                                                     |
+| [`MasterDetailActiveToggle`](./components/master-detail/master-detail-active-toggle.client.tsx)              | Shared campaign availability switch for detail panels.                                                                                                                                  |
+| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts)         | Builds a list row with source badges, `deletable`, and inactive styling.                                                                                                                |
+| [`resolveEmbeddedRowMeta`](./lib/master-detail/resolve-embedded-row-meta.ts)                                 | Derives system/homebrew source, delete-lock, and badge set for embedded rows.                                                                                                           |
+| [`isEmbeddedRowSystemLocked`](./lib/master-detail/is-embedded-row-system-locked.ts)                          | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                                                  |
+| [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)                      | Shared active-in-campaign labels and row-key helpers (also used by subclasses).                                                                                                         |
+| [`FormEmbeddedMasterDetailEditor`](./components/master-detail/form-embedded-master-detail-editor.client.tsx) | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form. Optional `leadingContent` for fields above the grid (uses `fieldGroupFlexStackClasses`). |
 
 It is presentation-only over the parent form, so global save and validation are
 unchanged. Use `FormEmbeddedMasterDetailEditor` for the standard traits/features

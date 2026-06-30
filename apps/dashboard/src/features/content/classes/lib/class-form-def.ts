@@ -6,6 +6,7 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import { skillProficienciesQueryKey } from '../../skillProficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import { deriveAsiLevels } from './class-asi-features'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
@@ -75,6 +76,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
+  invalidateQueryKeys: (campaignId) => [skillProficienciesQueryKey(campaignId)],
 
   extractEmbeddedSeedRowIds: (entity) => ({
     features: entity.features.map((feature) => feature.id),

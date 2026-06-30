@@ -5,7 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
-import { FormEmbeddedMasterDetailEditor } from '../../components/form-embedded-master-detail-editor.client'
+import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {

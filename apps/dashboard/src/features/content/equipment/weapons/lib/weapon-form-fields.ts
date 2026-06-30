@@ -29,7 +29,7 @@ import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {
   feetInputUnitField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../../lib/forms/content-identity-form-fields'
+} from '../../../lib/forms/fields/content-identity-form-fields'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
