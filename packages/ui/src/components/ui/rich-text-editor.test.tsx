@@ -57,10 +57,17 @@ describe('RichTextEditor', () => {
     expect(surface.querySelector('pre')).toBeInTheDocument()
   })
 
-  it('applies prose classes to the editable surface', async () => {
+  it('applies prose-md to the editable surface by default', async () => {
     render(<RichTextEditor aria-label="Biography" />)
     const surface = await screen.findByRole('textbox')
+    expect(surface).toHaveClass('prose', 'prose-md', 'max-w-none')
+  })
+
+  it('applies prose-sm when field size is sm', async () => {
+    render(<RichTextEditor aria-label="Biography" size="sm" />)
+    const surface = await screen.findByRole('textbox')
     expect(surface).toHaveClass('prose', 'prose-sm', 'max-w-none')
+    expect(surface).not.toHaveClass('prose-md')
   })
 
   it('does not call onChange when mounted with an empty value', async () => {

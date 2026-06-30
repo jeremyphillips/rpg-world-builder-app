@@ -91,7 +91,7 @@ import { Heading, Text, RichTextContent } from '@rpg/ui'
 
 <Heading variant="page" as="h1">{item.name}</Heading>
 <Text variant="muted">{item.description}</Text>
-<RichTextContent html={trait.description} size="sm" tone="muted" />
+<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 ## Importing components

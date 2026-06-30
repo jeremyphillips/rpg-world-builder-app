@@ -11,17 +11,17 @@ describe('MarkdownContent', () => {
         markdown={`## Heading
 
 Hello **world**.`}
-        size="sm"
+        size="md"
         tone="muted"
       />,
     )
     expect(screen.getByRole('heading', { level: 2, name: 'Heading' })).toBeInTheDocument()
     expect(screen.getByText('world')).toHaveProperty('tagName', 'STRONG')
-    expect(container.firstChild).toHaveClass('prose', 'prose-sm', 'max-w-none')
+    expect(container.firstChild).toHaveClass('prose', 'prose-md', 'max-w-none')
   })
 
   it('renders GFM tables', () => {
-    render(<MarkdownContent markdown={'| Col |\n| --- |\n| Val |'} size="sm" />)
+    render(<MarkdownContent markdown={'| Col |\n| --- |\n| Val |'} size="md" />)
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getByText('Val')).toBeInTheDocument()
   })

@@ -521,7 +521,7 @@ If you need a control `<Form>` doesn't support, you have two options:
 ```tsx
 import { RichTextContent, sanitizeHtml } from '@rpg/ui'
 
-<RichTextContent html={trait.description} size="sm" tone="muted" />
+<RichTextContent html={trait.description} size="md" tone="muted" />
 
 // Only when you truly need raw HTML output:
 <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(stored) }} />

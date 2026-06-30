@@ -34,7 +34,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                       |
 | `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"` |
 | `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels                 |
-| `RichTextContent` `size="sm"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
+| `RichTextContent` `size="md"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
 | `CardDescription`             | `div`  | 15   | 400    | Card header secondary line               |
 
 Preserve semantic headings and existing `id`s — content detail routes use
@@ -68,7 +68,7 @@ Polymorphic via `as`. All Tailwind lives in `text.variants.ts`.
 ```tsx
 import { Text } from '@rpg/ui'
 
-<RichTextContent html={species.description} size="sm" tone="muted" />
+<RichTextContent html={species.description} size="md" tone="muted" />
 <Text variant="destructive" role="alert">
   Could not load species.
 </Text>
@@ -85,15 +85,15 @@ Form hints and errors inside `Field.*`, `Form`, and field wrappers already compo
 Always use this instead of raw `dangerouslySetInnerHTML`. Sanitization via
 `sanitizeHtml` is built in.
 
-| Prop   | Values               | Default   | Notes                                                           |
-| ------ | -------------------- | --------- | --------------------------------------------------------------- |
-| `html` | `string`             | required  | Sanitized before render                                         |
-| `size` | `sm` \| `base`       | `base`    | `sm` → `prose-sm` at `--text-md` (15px) for catalog detail copy |
-| `tone` | `default` \| `muted` | `default` | `muted` maps prose tokens to muted foreground                   |
+| Prop   | Values                 | Default   | Notes                                                                 |
+| ------ | ---------------------- | --------- | --------------------------------------------------------------------- |
+| `html` | `string`               | required  | Sanitized before render                                               |
+| `size` | `sm` \| `md` \| `base` | `base`    | `md` → `prose-md` (15px) for catalog detail; `sm` → `prose-sm` (14px) |
+| `tone` | `default` \| `muted`   | `default` | `muted` maps prose tokens to muted foreground                         |
 
 ```tsx
 import { RichTextContent } from '@rpg/ui'
-;<RichTextContent html={trait.description} size="sm" tone="muted" />
+;<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 Do not add `[&>p]:my-0` overrides — let the typography plugin manage paragraph
@@ -116,14 +116,17 @@ per-theme prose classes are required in components.
 At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`,
 14px) and primary body (`text-base`, 16px).
 
-| Surface                                             | Size                                |
-| --------------------------------------------------- | ----------------------------------- |
-| `RichTextContent` `size="sm"` (`prose-sm`)          | 15px via `.prose.prose-sm` override |
-| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                           |
-| `CardDescription`                                   | `text-md` (via `Text` small)        |
-| Rich-text editor                                    | `text-md` (matches read view)       |
-| Form fields (`size="md"`)                           | `text-md` labels + controls         |
-| Form fields (`size="lg"`)                           | `text-base` labels + controls       |
+| Surface                                             | Size                              |
+| --------------------------------------------------- | --------------------------------- |
+| `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
+| `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
+| `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
+| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                         |
+| `CardDescription`                                   | `text-md` (via `Text` small)      |
+| Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
+| Rich-text editor (`size="sm"`)                      | `prose-sm`                        |
+| Form fields (`size="md"`)                           | `text-md` labels + controls       |
+| Form fields (`size="lg"`)                           | `text-base` labels + controls     |
 
 Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
@@ -137,7 +140,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | --------------------- | -------------- | ----------------------------------------------- |
 | `text-xs`             | 12             | Captions, table stat columns                    |
 | `text-sm`             | 14             | Compact UI chrome (buttons, menus, data tables) |
-| `text-md`             | 15             | Secondary body (`Text` small, `prose-sm`, …)    |
+| `text-md`             | 15             | Secondary body (`Text` small, `prose-md`, …)    |
 | `text-base`           | 16             | Primary body default                            |
 | `text-lg`             | 18             | Card titles, lead copy                          |
 | `text-xl`             | 20             | Section headings                                |

@@ -68,6 +68,7 @@ export function RichTextField({
         control={
           <RichTextEditor
             aria-label={label}
+            size={size}
             linkable={linkable}
             codeBlocks={codeBlocks}
             internalLinkOptions={internalLinkOptions}

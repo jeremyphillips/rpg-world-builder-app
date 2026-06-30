@@ -42,7 +42,7 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
         {display.name}
       </Heading>
       {display.descriptionHtml && (
-        <RichTextContent html={display.descriptionHtml} size="sm" tone="muted" />
+        <RichTextContent html={display.descriptionHtml} size="md" tone="muted" />
       )}
     </li>
   )
@@ -76,7 +76,7 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
         {heritage.name}
       </Heading>
       {heritage.description && (
-        <RichTextContent html={heritage.description} size="sm" tone="muted" className="mb-4" />
+        <RichTextContent html={heritage.description} size="md" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
         {heritage.options.map((option) => {
@@ -87,7 +87,7 @@ function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
                 {display.name}
               </Heading>
               {display.descriptionHtml && (
-                <RichTextContent html={display.descriptionHtml} size="sm" tone="muted" />
+                <RichTextContent html={display.descriptionHtml} size="md" tone="muted" />
               )}
             </li>
           )
@@ -135,7 +135,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         metadata={<SpeciesStatsSection species={species} campaignId={campaignId} />}
         descriptionContent={
           species.description ? (
-            <RichTextContent html={species.description} size="sm" tone="muted" />
+            <RichTextContent html={species.description} size="md" tone="muted" />
           ) : undefined
         }
       >

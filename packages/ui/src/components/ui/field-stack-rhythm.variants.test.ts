@@ -9,6 +9,7 @@ import {
   resolveFormFieldSize,
   resolveInheritedFieldSize,
 } from './field.variants'
+import { richTextEditorProseClasses, richTextProseSizeClasses } from './rich-text-content.variants'
 
 describe('fieldStackRhythmVariants', () => {
   it('applies compact gap by default', () => {
@@ -115,5 +116,20 @@ describe('fieldGroupLegendVariants', () => {
     expect(fieldGroupLegendVariants({ size: 'array', scale: 'default' })).toContain(
       'text-field-array-legend',
     )
+  })
+})
+
+describe('richTextProseSizeClasses', () => {
+  it('maps field sizes to prose modifiers', () => {
+    expect(richTextProseSizeClasses.sm).toBe('prose-sm')
+    expect(richTextProseSizeClasses.md).toBe('prose-md')
+    expect(richTextProseSizeClasses.lg).toBe('')
+  })
+
+  it('builds editor prose classes from field size', () => {
+    expect(richTextEditorProseClasses('md')).toContain('prose-md')
+    expect(richTextEditorProseClasses('sm')).toContain('prose-sm')
+    expect(richTextEditorProseClasses('lg')).not.toContain('prose-sm')
+    expect(richTextEditorProseClasses('lg')).not.toContain('prose-md')
   })
 })

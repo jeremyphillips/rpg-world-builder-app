@@ -31,7 +31,7 @@ export const Default: Story = {
     descriptionContent: (
       <RichTextContent
         html="<p>A master of martial combat, skilled with a variety of weapons and armor.</p>"
-        size="sm"
+        size="md"
         tone="muted"
       />
     ),
@@ -60,7 +60,7 @@ export const WithActions: Story = {
     descriptionContent: (
       <RichTextContent
         html="<p>A scholarly magic-user capable of manipulating the structures of reality.</p>"
-        size="sm"
+        size="md"
         tone="muted"
       />
     ),

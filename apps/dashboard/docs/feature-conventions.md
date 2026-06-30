@@ -53,10 +53,10 @@ Standard pattern:
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
 <Heading variant="display" as="h1">{item.name}</Heading>
-<RichTextContent html={item.description} size="sm" tone="muted" />
+<RichTextContent html={item.description} size="md" tone="muted" />
 <Heading variant="section" as="h2" id="traits-heading">Traits</Heading>
 <Heading variant="subsection" as="h3">Heritage name</Heading>
-<RichTextContent html={trait.description} size="sm" tone="muted" />
+<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
 Use **one h1 per page** (`page` on list/settings routes, `display` on detail entity
@@ -163,7 +163,7 @@ import { ContentDetailLayout } from '@/features/content/lib/content-detail-layou
     imageName={item.name}
     campaignId={campaignId}
     editHref={contentEditHref('feats', campaignId, item.id)}
-    descriptionContent={<RichTextContent html={item.description} size="sm" tone="muted" />}
+    descriptionContent={<RichTextContent html={item.description} size="md" tone="muted" />}
   >
     {/* narrow sections */}
   </ContentDetailLayout>

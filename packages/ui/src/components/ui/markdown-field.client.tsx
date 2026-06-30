@@ -44,10 +44,10 @@ function MarkdownFieldPreview({ value }: { value: string }) {
   }
 
   if (looksLikeRichTextHtml(trimmed)) {
-    return <RichTextContent html={trimmed} size="sm" />
+    return <RichTextContent html={trimmed} size="md" />
   }
 
-  return <MarkdownContent markdown={trimmed} size="sm" />
+  return <MarkdownContent markdown={trimmed} size="md" />
 }
 
 /**

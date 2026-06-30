@@ -36,9 +36,9 @@ export const Default: Story = {
   },
 }
 
-export const SmallMuted: Story = {
+export const MdMuted: Story = {
   args: {
-    size: 'sm',
+    size: 'md',
     tone: 'muted',
   },
 }
@@ -52,6 +52,6 @@ export const Empty: Story = {
 export const ExternalLink: Story = {
   args: {
     markdown: 'See [Dev Bench docs](https://example.com/docs) for details.',
-    size: 'sm',
+    size: 'md',
   },
 }

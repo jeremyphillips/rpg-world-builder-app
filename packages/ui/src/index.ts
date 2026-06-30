@@ -17,6 +17,8 @@ export { RichTextContent, type RichTextContentProps } from './components/ui/rich
 export { MarkdownContent, type MarkdownContentProps } from './components/ui/markdown-content'
 export {
   richTextContentVariants,
+  richTextEditorProseClasses,
+  richTextProseSizeClasses,
   type RichTextContentVariantProps,
 } from './components/ui/rich-text-content.variants'
 export {

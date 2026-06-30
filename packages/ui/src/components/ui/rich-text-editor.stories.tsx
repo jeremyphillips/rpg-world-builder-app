@@ -97,7 +97,7 @@ export const WithSanitizedPreview: StoryObj = {
       <div className="space-y-4">
         <RichTextEditor aria-label="Biography" value={html} onChange={setHtml} />
         <div className="rounded-md border border-border p-3">
-          <RichTextContent html={html} size="sm" />
+          <RichTextContent html={html} size="md" />
         </div>
       </div>
     )

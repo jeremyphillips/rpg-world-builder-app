@@ -73,7 +73,7 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
                 {sub.tagline}
               </Text>
             )}
-            {sub.description && <RichTextContent html={sub.description} size="sm" tone="muted" />}
+            {sub.description && <RichTextContent html={sub.description} size="md" tone="muted" />}
             <SubclassFeaturesList features={sub.features} />
           </li>
         ))}
@@ -190,7 +190,7 @@ export function ClassDetailContent({
         metadata={<ClassStatsSection characterClass={characterClass} />}
         descriptionContent={
           characterClass.description ? (
-            <RichTextContent html={characterClass.description} size="sm" tone="muted" />
+            <RichTextContent html={characterClass.description} size="md" tone="muted" />
           ) : undefined
         }
       >

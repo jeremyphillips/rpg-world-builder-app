@@ -25,7 +25,7 @@ export function FeatureItem({ feature }: FeatureItemProps) {
         {heading}
       </Heading>
       {hasFeatureDescription(feature.description) && (
-        <RichTextContent html={feature.description} size="sm" tone="muted" />
+        <RichTextContent html={feature.description} size="md" tone="muted" />
       )}
     </li>
   )

@@ -115,7 +115,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
         statRows={statRows}
         descriptionContent={
           spell.description ? (
-            <RichTextContent html={spell.description} size="sm" tone="muted" />
+            <RichTextContent html={spell.description} size="md" tone="muted" />
           ) : undefined
         }
       >
