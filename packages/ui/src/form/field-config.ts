@@ -564,8 +564,6 @@ export interface GroupConfig {
   rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
 }
 
 /**
@@ -607,8 +605,6 @@ export interface ArrayConfig {
    * by relative field names) and the 0-based index.
    */
   itemTitle?: (values: Record<string, unknown>, index: number) => string
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
   /**
    * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
    * the array unmounts and RHF clears its value via `shouldUnregister`.
@@ -664,8 +660,6 @@ export interface SlotConfig {
    * Control + label scale for slot content. Defaults to `sm` (array section default).
    */
   size?: FieldSize
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */

@@ -292,7 +292,7 @@ describe('ArrayFieldRenderer', () => {
     expect(results.violations).toEqual([])
   })
 
-  it('does not duplicate accordion landmarks for nested arrays inside multiple items', async () => {
+  it('does not duplicate landmarks for nested arrays inside multiple items', async () => {
     const user = userEvent.setup()
     const nestedSchema = z.object({
       items: z.array(

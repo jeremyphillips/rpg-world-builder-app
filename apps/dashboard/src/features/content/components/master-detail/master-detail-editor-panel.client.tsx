@@ -61,7 +61,6 @@ export function MasterDetailEditorPanel({
             items={itemFields}
             idPrefix={`${idPrefix}-${selectedFieldId}`}
             namePrefix={`${fieldName}.${editor.selectedIndex}`}
-            plainSections
           />
         </>
       ) : !showValidationBanner ? (

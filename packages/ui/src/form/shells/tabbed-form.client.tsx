@@ -49,8 +49,6 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /** When true (default), sections may render in accordions when `collapsible: true` is set. */
-  collapsibleSections?: boolean
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -97,7 +95,6 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   fileFieldProps,
   className,
   mode,
-  collapsibleSections = true,
   rhythm,
   size,
   stickyChrome = true,
@@ -128,7 +125,6 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
-      collapsibleSections={collapsibleSections}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

@@ -44,7 +44,6 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
       fields={fields}
       defaultValues={{ notes: '' }}
       onSubmit={onSubmit}
-      collapsibleSections={false}
       footer={<button type="submit">Save</button>}
     />,
   )
@@ -95,7 +94,6 @@ describe('SlotFieldRenderer', () => {
         fields={sizedFields}
         defaultValues={{ notes: '' }}
         onSubmit={vi.fn()}
-        collapsibleSections={false}
         footer={<button type="submit">Save</button>}
       />,
     )
@@ -121,7 +119,6 @@ describe('SlotFieldRenderer', () => {
         fields={probeFields}
         defaultValues={{ notes: '' }}
         onSubmit={vi.fn()}
-        collapsibleSections={false}
         footer={<button type="submit">Save</button>}
       />,
     )

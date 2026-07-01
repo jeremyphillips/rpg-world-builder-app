@@ -13,9 +13,7 @@ import {
 import { cn } from '../../lib/utils'
 
 export interface FormSectionContextValue {
-  /** When false, sections render as plain fieldsets. Defaults to true on `<Form>`. */
-  collapsibleSections: boolean
-  /** Nesting depth; accordion sections only apply at depth 0. */
+  /** Nesting depth for section rhythm/size inheritance. */
   depth: number
   /** Vertical gap between sibling fields/groups in the current section. */
   rhythm: FieldStackRhythm
@@ -24,7 +22,6 @@ export interface FormSectionContextValue {
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
-  collapsibleSections: true,
   depth: 0,
   rhythm: DEFAULT_FORM_RHYTHM,
   size: DEFAULT_FORM_FIELD_SIZE,
@@ -46,7 +43,6 @@ export function buildFormSectionChildContext(
   overrides?: FormSectionContextOverrides,
 ): FormSectionContextValue {
   return {
-    collapsibleSections: false,
     depth: depth + 1,
     rhythm: overrides?.rhythm ?? parent.rhythm,
     size: overrides?.size ?? parent.size,
@@ -77,7 +73,6 @@ export interface FormSectionProviderProps {
    * `comfortable` maps to `md`.
    */
   size?: FieldSize
-  collapsibleSections?: boolean
   depth?: number
 }
 
@@ -86,13 +81,12 @@ export function FormSectionProvider({
   children,
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
-  collapsibleSections = true,
   depth = 0,
 }: FormSectionProviderProps) {
   const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
   const value = React.useMemo(
-    () => ({ collapsibleSections, depth, rhythm, size: resolvedSize }),
-    [collapsibleSections, depth, rhythm, resolvedSize],
+    () => ({ depth, rhythm, size: resolvedSize }),
+    [depth, rhythm, resolvedSize],
   )
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>
 }

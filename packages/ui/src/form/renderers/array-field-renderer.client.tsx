@@ -31,10 +31,6 @@ export interface ArrayFieldRendererProps {
   idPrefix: string
   /** Resolved full RHF field name for the array (e.g. `"traits"` or `"root.0.traits"`). */
   fullName: string
-  /** When set, the visible legend is omitted (e.g. accordion trigger labels the section). */
-  hideLegend?: boolean
-  /** Associates the fieldset with an external heading when `hideLegend` is true. */
-  labelledBy?: string
 }
 
 interface ArrayFieldItemProps {
@@ -150,13 +146,7 @@ function ArrayFieldItem({
  *
  * Must be rendered inside a `FormProvider`.
  */
-export function ArrayFieldRenderer({
-  config,
-  idPrefix,
-  fullName,
-  hideLegend = false,
-  labelledBy,
-}: ArrayFieldRendererProps) {
+export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
   const { getValues } = useFormContext()
   const { rhythm, size } = useFormSectionContext()
@@ -190,17 +180,10 @@ export function ArrayFieldRenderer({
   }
 
   return (
-    <fieldset
-      className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses)}
-      aria-labelledby={hideLegend ? labelledBy : undefined}
-    >
-      {hideLegend ? (
-        <legend className="sr-only">{legend}</legend>
-      ) : (
-        <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
-          {legend}
-        </legend>
-      )}
+    <fieldset className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses)}>
+      <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
+        {legend}
+      </legend>
       <div className={stackClasses}>
         {fields.map((rhfField, index) => (
           <ArrayFieldItem

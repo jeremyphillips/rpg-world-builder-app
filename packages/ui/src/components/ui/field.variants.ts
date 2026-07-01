@@ -12,7 +12,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldGroupBottomMarginClasses` — space below a field group or array section fieldset
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
- * - `formSectionStackClasses` — top-level accordion sections
+ * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutVariants` — display mode for schema-driven rows
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
@@ -41,7 +41,7 @@ export const fieldChipWrapGapClasses = 'gap-2 pt-1'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-5'
 export const fieldSubgroupLegendSpacingClasses = 'mb-4'
-/** Shared legend typography — field groups, array sections, and collapsible accordion triggers. */
+/** Shared legend typography — field groups and array section legends. */
 export const fieldGroupLegendTypographyClasses =
   'text-field-group-legend font-heading leading-none text-foreground'
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */

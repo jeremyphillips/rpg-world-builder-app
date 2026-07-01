@@ -32,7 +32,7 @@ Nested: `legendSize: 'subsection'`.
 `FieldGroup` (standalone) accepts the same `legendSize` and `size`. Groups may declare
 `visibility` — hidden groups unmount and clear nested values.
 
-`rhythm` overrides inherited form rhythm. `collapsible: true` → accordion section (see below).
+`rhythm` overrides inherited form rhythm.
 
 ## Rows
 
@@ -74,16 +74,6 @@ Pair dependent scalars with `labelPosition: 'settings'`.
 
 `separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-4` before next sibling.
 Token: `fieldSeparatorVariants`. Do not use row `className` for recurring dividers.
-
-## Collapsible sections
-
-`collapsible: true` on `group` or `array` wraps an accordion (`collapsibleSections` on
-`<Form>` defaults `true`; pass `false` to force flat fieldsets).
-
-- Sections **start open**; values preserved while collapsed (not `shouldUnregister`).
-- Accordion triggers share group legend typography; array collapsibles hide fieldset legend
-  (trigger labels the section).
-- Panels use `overflow-visible` so focus rings are not clipped.
 
 ## Array fields
 

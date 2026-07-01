@@ -78,7 +78,6 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
-  collapsibleSections?: boolean
   valueSyncs?: FormValueSync[]
   beforeSubmit?: (
     values: TFormValues,
@@ -97,7 +96,6 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   submitPending,
   formError,
   onSubmit,
-  collapsibleSections,
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
@@ -122,7 +120,6 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         formError={formError}
-        collapsibleSections={collapsibleSections}
         valueSyncs={valueSyncs}
         stickyFooter
         footer={(form) => (
@@ -188,7 +185,6 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         schema={schema}
         tabs={tabs}
         defaultValues={defaultValues}
-        collapsibleSections={false}
         valueSyncs={valueSyncs}
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
@@ -259,13 +255,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     return <ContentTabbedSchemaForm tabs={def.buildTabs(ctx)} {...sharedProps} />
   }
 
-  return (
-    <ContentSchemaForm
-      fields={contentFormFields(def, ctx)}
-      collapsibleSections={def.routeKey === 'equipment' ? false : undefined}
-      {...sharedProps}
-    />
-  )
+  return <ContentSchemaForm fields={contentFormFields(def, ctx)} {...sharedProps} />
 }
 
 interface ContentFormOptionsGateProps {

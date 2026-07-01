@@ -7,7 +7,7 @@ subpaths under this directory.
 
 | Directory     | Role                                                                    |
 | ------------- | ----------------------------------------------------------------------- |
-| `config/`     | Resolver, accordion state, `dependsOn` hook, pure helpers               |
+| `config/`     | Resolver, `dependsOn` hook, pure helpers                                |
 | `context/`    | Section rhythm/size context (`FormSectionProvider`)                     |
 | `renderers/`  | Leaf field adapters (`FieldRenderer` registry) and array/slot renderers |
 | `containers/` | Structural items: groups, rows, stacks, arrays, conditionals            |

@@ -123,7 +123,6 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}
-            collapsibleSections={false}
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />
@@ -192,7 +191,6 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}
-            collapsibleSections={false}
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />

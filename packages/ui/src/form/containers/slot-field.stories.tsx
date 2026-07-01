@@ -53,7 +53,6 @@ export const WithNotesSlot: Story = {
     schema,
     fields,
     defaultValues: { notes: '' },
-    collapsibleSections: false,
     onSubmit: action('submit'),
     className: 'max-w-lg',
     footer: (

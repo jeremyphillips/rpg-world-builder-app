@@ -58,12 +58,6 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * and can drive a disabled Next button.
    */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /**
-   * When true (default), sections may render inside collapsible accordions when
-   * `collapsible: true` is set on a group or array. Set false to force flat
-   * fieldsets for every section.
-   */
-  collapsibleSections?: boolean
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
   /**
@@ -99,7 +93,6 @@ export function Form<TFieldValues extends FieldValues>({
   id,
   fileFieldProps,
   mode,
-  collapsibleSections = true,
   stickyFooter = false,
   rhythm,
   size,
@@ -130,7 +123,6 @@ export function Form<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
-      collapsibleSections={collapsibleSections}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

@@ -17,7 +17,6 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   formId: string
   fileFieldProps?: FileFieldPropsMap
-  collapsibleSections: boolean
   /** Vertical gap between top-level fields/groups. Defaults to `comfortable` (`gap-6`). */
   rhythm?: FieldStackRhythm
   /**
@@ -35,7 +34,6 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   form,
   formId,
   fileFieldProps,
-  collapsibleSections,
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
   onSubmit,
@@ -44,8 +42,8 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
 }: SchemaFormShellProps<TFieldValues>) {
   const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
   const sectionContext = React.useMemo(
-    () => ({ collapsibleSections, depth: 0, rhythm, size: resolvedSize }),
-    [collapsibleSections, rhythm, resolvedSize],
+    () => ({ depth: 0, rhythm, size: resolvedSize }),
+    [rhythm, resolvedSize],
   )
 
   return (
