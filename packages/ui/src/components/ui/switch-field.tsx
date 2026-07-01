@@ -6,6 +6,9 @@ import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
 import { Switch } from './switch.client'
 import {
+  fieldInlineSwitchControlColumnClasses,
+  fieldInlineSwitchLabelClasses,
+  fieldInlineToggleRowClasses,
   fieldLabelHintStackClasses,
   type FieldHintPosition,
   type FieldLabelPosition,
@@ -49,7 +52,9 @@ export function SwitchField({
   const resolvedHintPosition = hintPosition ?? 'below-label'
 
   const labelNode = (
-    <Field.Label className={labelPosition === 'inline' ? 'font-normal' : undefined}>
+    <Field.Label
+      className={labelPosition === 'inline' ? fieldInlineSwitchLabelClasses : undefined}
+    >
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )
@@ -87,10 +92,12 @@ export function SwitchField({
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
-      <div className="flex items-start gap-2">
-        <Field.Control>
-          <Switch {...switchProps} />
-        </Field.Control>
+      <div className={fieldInlineToggleRowClasses}>
+        <div className={fieldInlineSwitchControlColumnClasses}>
+          <Field.Control>
+            <Switch {...switchProps} />
+          </Field.Control>
+        </div>
         <div className={fieldLabelHintStackClasses}>
           {labelNode}
           <Field.Hint />

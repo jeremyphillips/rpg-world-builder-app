@@ -21,6 +21,9 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
+ * - `fieldInlineToggleRowClasses` — checkbox/switch beside label (+ hint below label)
+ * - `fieldInlineSwitchControlColumnClasses` / `fieldInlineSwitchLabelClasses` — switch alignment
+ * - `fieldInlineCheckboxControlColumnClasses` / `fieldInlineCheckboxLabelClasses` — checkbox alignment
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
@@ -84,6 +87,23 @@ export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
+/**
+ * Inline checkbox/switch row — control beside label, hint stacked under the label.
+ *
+ * A bare `flex items-start` row misaligns label cap-height with the control because
+ * label type scale (~15px) and control height (`h-5` switch / `size-4` checkbox)
+ * differ. Outer `items-center` would vertically centre the control against label +
+ * hint when a hint is present. Instead, the control column and label share a
+ * fixed first-line height (`h-5` / `h-4`) with internal centring; hint stays in
+ * `fieldLabelHintStackClasses` below the label, unchanged.
+ */
+export const fieldInlineToggleRowClasses = 'flex gap-2'
+/** Switch track is `h-5` — centre it on the first label line. */
+export const fieldInlineSwitchControlColumnClasses = 'flex h-5 shrink-0 items-center'
+export const fieldInlineSwitchLabelClasses = 'flex min-h-5 items-center font-normal'
+/** Checkbox root is `size-4` — centre it on the first label line. */
+export const fieldInlineCheckboxControlColumnClasses = 'flex h-4 shrink-0 items-center'
+export const fieldInlineCheckboxLabelClasses = 'flex min-h-4 items-center font-normal'
 /** Dense settings row — label + hint column left, compact control right. */
 export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'

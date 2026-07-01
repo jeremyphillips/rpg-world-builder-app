@@ -57,7 +57,9 @@ describe('SwitchField', () => {
     expect(
       textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
-    expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
+    const row = label.parentElement?.parentElement
+    expect(row).toHaveClass('flex', 'gap-2')
+    expect(row?.firstElementChild).toHaveClass('flex', 'h-5', 'shrink-0', 'items-center')
   })
 
   it('renders label and hint in the left column when labelPosition is settings', () => {
