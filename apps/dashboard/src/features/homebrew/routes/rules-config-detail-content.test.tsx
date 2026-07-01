@@ -29,6 +29,9 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { RulesConfigDetailContent } from './rules-config-detail-content'
 
+/** Character config form mount is heavy (~3s); default 5s Vitest limit is too tight under load. */
+vi.setConfig({ testTimeout: 15_000 })
+
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 
 const mockPatch: RulesetPatchRead = {
@@ -68,7 +71,14 @@ const attackResolutionOptions = [
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+        gcTime: Infinity,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      },
       mutations: { retry: false },
     },
   })
