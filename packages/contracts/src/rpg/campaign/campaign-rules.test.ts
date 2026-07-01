@@ -17,13 +17,12 @@ import {
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 
+import { baseCharacterCreationPatch } from '../../test/fixtures/character-creation-patch'
+
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
 const defaultMulticlassing = defaultMulticlassingRules()
 
-const basePatch = {
-  startingLevel: 1,
-  importedCharacters: { policy: 'disabled' as const },
-}
+const basePatch = baseCharacterCreationPatch
 
 describe('resolveStandardMaxCharacterLevel', () => {
   it('defaults to system max when override is absent', () => {
