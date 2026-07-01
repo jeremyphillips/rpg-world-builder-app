@@ -36,6 +36,10 @@
       "types": "./src/starting-wealth/index.ts",
       "default": "./src/starting-wealth/index.ts"
     },
+    "./starting-wealth/test-fixtures": {
+      "types": "./src/starting-wealth/test-fixtures.ts",
+      "default": "./src/starting-wealth/test-fixtures.ts"
+    },
     "./vocabulary": {
       "types": "./src/vocabulary/index.ts",
       "default": "./src/vocabulary/index.ts"
