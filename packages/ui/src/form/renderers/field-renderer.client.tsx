@@ -17,8 +17,7 @@ import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
-import { DiceFormulaField } from '../../components/ui/dice-formula-field.client'
-import type { DiceFormulaValue } from '../../components/ui/dice-formula-field.lib'
+import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
@@ -398,28 +397,13 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  diceFormula: ({ config, field, id, error }) => (
-    <DiceFormulaField
+  diceFormula: ({ config, field, id, error, namePrefix }) => (
+    <DiceFormulaFieldRenderer
+      config={config}
+      field={field}
       id={id}
-      label={config.label}
       error={error}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={config.size}
-      disabled={config.disabled}
-      labelPosition={config.labelPosition}
-      modifierMode={config.modifierMode}
-      faces={config.faces}
-      countMin={config.countMin}
-      countMax={config.countMax}
-      modifierMin={config.modifierMin}
-      modifierMax={config.modifierMax}
-      value={(field.value as DiceFormulaValue | undefined) ?? undefined}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
+      namePrefix={namePrefix}
     />
   ),
 }

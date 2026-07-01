@@ -92,6 +92,30 @@ export const WithModifier: Story = {
   ),
 }
 
+export const MultiplyRequired: Story = {
+  render: (args) => (
+    <DiceFormulaPreview
+      {...args}
+      modifierMode="required"
+      modifierOperators={['×']}
+      modifierMin={1}
+      modifierAmountLabel="Multiplier"
+      value={{ count: 1, faces: 10, modifier: { operator: '×', amount: 250 } }}
+    />
+  ),
+}
+
+export const AllOperators: Story = {
+  render: (args) => (
+    <DiceFormulaPreview
+      {...args}
+      modifierMode="required"
+      modifierOperators={['+', '-', '×', '÷']}
+      value={{ count: 2, faces: 6, modifier: { operator: '×', amount: 3 } }}
+    />
+  ),
+}
+
 export const WithHint: Story = {
   render: (args) => (
     <DiceFormulaPreview

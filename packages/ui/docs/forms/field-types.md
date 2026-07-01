@@ -30,7 +30,6 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ```tsx
 import { RichTextContent } from '@rpg/ui'
-
 ;<RichTextContent html={trait.description} size="md" tone="muted" />
 ```
 
@@ -148,8 +147,21 @@ Searchable dropdown for large lists (catalog refs).
 
 ## Dice formula (`diceFormula`)
 
-XdY + optional modifier. Modes: `none` | `optional` | `required`. Storybook:
-`Forms/DiceFormulaField`, `Recipes/DiceNotation`.
+XdY + optional tail operand (flat modifier or multiplier). Modes: `none` | `optional` | `required`.
+Storybook: `Forms/DiceFormulaField`, `Recipes/DiceNotation`.
+
+| Prop                  | Default      | Notes                                                                              |
+| --------------------- | ------------ | ---------------------------------------------------------------------------------- |
+| `modifierOperators`   | `['+', '-']` | Single entry renders a static glyph (no operator select)                           |
+| `modifierAmountLabel` | `"Modifier"` | sr-only label for the tail amount (e.g. `"Multiplier"`)                            |
+| `currencyUnit`        | —            | Optional `{ name?, options, defaultValue }` — sibling select after the tail amount |
+
+Examples:
+
+```ts
+{ type: 'diceFormula', modifierMode: 'optional', modifierOperators: ['+', '-'] }
+{ type: 'diceFormula', modifierMode: 'required', modifierOperators: ['×'], modifierMin: 1, modifierAmountLabel: 'Multiplier' }
+```
 
 ## Editable grid (`editableGrid`)
 

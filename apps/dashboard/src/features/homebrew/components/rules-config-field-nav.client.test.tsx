@@ -28,8 +28,8 @@ describe('RulesConfigFieldNav', () => {
     render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     const rail = screen.getByRole('navigation', { name: 'Character configuration sections' })
-    expect(rail).toHaveTextContent('Starting level')
-    expect(rail).toHaveTextContent('Imported characters')
+    expect(rail).toHaveTextContent('Creation')
+    expect(rail).toHaveTextContent('Standard max level')
     expect(rail).toHaveTextContent('Extended progression')
   })
 

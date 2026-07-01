@@ -29,7 +29,14 @@ import {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
 } from '../../../components/level-range-summary.client'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
+
 import { IMPORTED_CHARACTERS_POLICY_LABELS } from './character-configuration-form-labels'
+import {
+  buildStartingWealthTiersField,
+  startingWealthFormSchema,
+} from './starting-wealth-form-fields'
+import { mapStartingWealthToFormValues } from './starting-wealth-form-values'
 
 export type CharacterRuleSurface = 'create' | 'config'
 
@@ -67,6 +74,9 @@ const configRulesObjectSchema = z.object({
     .default(DEFAULT_PRIMARY_ABILITY_MINIMUM),
   speciesMulticlassPolicyEnabled: z.boolean().default(DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED),
   speciesLevelLimitsEnabled: z.boolean().default(DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED),
+  startingWealth: startingWealthFormSchema.default(() =>
+    mapStartingWealthToFormValues(getStandardStartingWealthRules('srd-cc-5.2.1')),
+  ),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -365,11 +375,51 @@ type CharacterRuleFieldDef = {
   buildReviewRow?: (values: Partial<RulesValues>) => RulesReviewRow | undefined
 }
 
+function creationSectionItems(): FormItem[] {
+  const prefix = 'startingWealth'
+  return [
+    {
+      kind: 'group',
+      legend: 'Creation',
+      fields: [
+        {
+          kind: 'slot',
+          name: '_anchor_starting-level',
+          render: () => createElement('div', { id: 'starting-level', className: 'scroll-mt-20' }),
+        },
+        startingLevelField(),
+        importedCharactersPolicyField(),
+        {
+          kind: 'slot',
+          name: '_anchor_starting-wealth',
+          render: () => createElement('div', { id: 'starting-wealth', className: 'scroll-mt-20' }),
+        },
+        {
+          type: 'text',
+          name: `${prefix}.name`,
+          label: 'Table name',
+          required: true,
+          width: 'full',
+        },
+        {
+          type: 'richtext',
+          name: `${prefix}.description`,
+          label: 'Description',
+          width: 'full',
+        },
+      ],
+    },
+    {
+      ...buildStartingWealthTiersField(),
+      name: `${prefix}.tiers`,
+    },
+  ]
+}
+
 const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   {
     id: 'startingLevel',
-    surfaces: ['create', 'config'],
-    configSection: { id: 'starting-level', label: 'Starting level' },
+    surfaces: ['create'],
     buildFormItems: () => [startingLevelField()],
     buildReviewRow: (values) => ({
       label: 'Starting level',
@@ -378,8 +428,7 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   },
   {
     id: 'importedCharactersPolicy',
-    surfaces: ['create', 'config'],
-    configSection: { id: 'imported-characters', label: 'Imported characters' },
+    surfaces: ['create'],
     buildFormItems: () => [importedCharactersPolicyField()],
     buildReviewRow: (values) => ({
       label: 'Imported characters',
@@ -387,6 +436,12 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
         ? IMPORTED_CHARACTERS_POLICY_LABELS[values.importedCharactersPolicy]
         : '—',
     }),
+  },
+  {
+    id: 'creation',
+    surfaces: ['config'],
+    configSection: { id: 'creation', label: 'Creation' },
+    buildFormItems: () => creationSectionItems(),
   },
   {
     id: 'maxCharacterLevel',

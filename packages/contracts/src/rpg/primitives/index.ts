@@ -1,5 +1,7 @@
 export * from './level'
 export * from './dice'
+export * from './dice-formula'
+export * from './currency-formula'
 export * from './number-format'
 export * from './units'
 export * from './ruleset'

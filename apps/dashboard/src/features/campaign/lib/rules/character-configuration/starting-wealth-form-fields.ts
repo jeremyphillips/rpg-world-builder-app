@@ -1,0 +1,238 @@
+import { z } from 'zod'
+import {
+  MAGIC_ITEM_RARITIES,
+  MAGIC_ITEM_RARITY_ENTRIES,
+  absoluteLevelSchema,
+  currencySchema,
+  magicItemRaritySchema,
+} from '@rpg/contracts'
+import { DIE_FACES } from '@rpg/contracts/primitives'
+import { toOptions, type FormItem } from '@rpg/ui/form'
+
+import {
+  formatStartingWealthTierSummary,
+  STARTING_WEALTH_CURRENCY_OPTIONS,
+  STARTING_WEALTH_FORM_PREFIX,
+  STARTING_WEALTH_TIER_COUNT,
+  type StartingWealthTierFormValues,
+} from './starting-wealth-form-values'
+
+const BONUS_GOLD_ENABLED = 'bonusGoldEnabled'
+
+const magicItemRarityOptions = toOptions(
+  MAGIC_ITEM_RARITIES,
+  Object.fromEntries(
+    MAGIC_ITEM_RARITIES.map((rarity) => [rarity, MAGIC_ITEM_RARITY_ENTRIES[rarity].label]),
+  ) as Record<(typeof MAGIC_ITEM_RARITIES)[number], string>,
+)
+
+const diceFormulaModifierSchema = z.object({
+  operator: z.enum(['+', '-', '×', '÷']),
+  amount: z.number().int(),
+})
+
+const diceFormulaValueSchema = z.object({
+  count: z.number().int().min(1),
+  faces: z.number().int().min(1),
+  modifier: diceFormulaModifierSchema.optional(),
+})
+
+const startingWealthMagicItemGrantFormSchema = z.object({
+  rarity: magicItemRaritySchema,
+  quantity: z.number().int().min(1),
+})
+
+const startingWealthTierBonusGoldFormSchema = z.object({
+  baseGp: z.number().int().min(0),
+  formula: diceFormulaValueSchema,
+  currency: currencySchema,
+})
+
+export const startingWealthTierFormSchema = z
+  .object({
+    label: z.string().min(1),
+    minLevel: absoluteLevelSchema,
+    maxLevel: absoluteLevelSchema,
+    includeNormalStartingEquipment: z.boolean(),
+    bonusGoldEnabled: z.boolean(),
+    bonusGold: startingWealthTierBonusGoldFormSchema,
+    magicItemGrants: z.array(startingWealthMagicItemGrantFormSchema),
+  })
+  .superRefine((tier, ctx) => {
+    if (tier.minLevel > tier.maxLevel) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Min level must not exceed max level',
+        path: ['minLevel'],
+      })
+    }
+
+    if (tier.bonusGoldEnabled && tier.bonusGold.formula.modifier?.operator !== '×') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Bonus gold rolls must use a multiplier (×)',
+        path: ['bonusGold', 'formula'],
+      })
+    }
+  })
+
+export const startingWealthFormSchema = z
+  .object({
+    name: z.string().min(1),
+    description: z.string().optional(),
+    tiers: z.array(startingWealthTierFormSchema).length(STARTING_WEALTH_TIER_COUNT),
+  })
+  .superRefine((values, ctx) => {
+    values.tiers.forEach((tier, index) => {
+      const previousTier = values.tiers[index - 1]
+      if (previousTier !== undefined && tier.minLevel <= previousTier.maxLevel) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Tier level ranges must not overlap',
+          path: ['tiers', index, 'minLevel'],
+        })
+      }
+    })
+  })
+
+function tierItemTitle(values: Record<string, unknown>, index: number): string {
+  const tier = values as StartingWealthTierFormValues
+  const label = tier.label
+  const minLevel = tier.minLevel
+  const maxLevel = tier.maxLevel
+  const range =
+    label && minLevel !== undefined && maxLevel !== undefined
+      ? minLevel === maxLevel
+        ? `${label} (level ${minLevel})`
+        : `${label} (levels ${minLevel}–${maxLevel})`
+      : (label ?? `Tier ${index + 1}`)
+
+  return `${range} — ${formatStartingWealthTierSummary(tier)}`
+}
+
+/** Fixed-length tier array editor for `startingWealth.tiers`. */
+export function buildStartingWealthTiersField(): FormItem {
+  return {
+    kind: 'array',
+    name: 'tiers',
+    legend: 'Wealth tiers',
+    min: STARTING_WEALTH_TIER_COUNT,
+    max: STARTING_WEALTH_TIER_COUNT,
+    rhythm: 'comfortable',
+    itemTitle: tierItemTitle,
+    fields: [
+      {
+        type: 'text',
+        name: 'label',
+        label: 'Tier label',
+        required: true,
+        width: 'full',
+      },
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'number',
+            name: 'minLevel',
+            label: 'Min level',
+            min: 1,
+            required: true,
+            digits: 2,
+            width: 'auto',
+          },
+          {
+            type: 'number',
+            name: 'maxLevel',
+            label: 'Max level',
+            min: 1,
+            required: true,
+            digits: 2,
+            width: 'auto',
+          },
+        ],
+      },
+      {
+        type: 'switch',
+        name: 'includeNormalStartingEquipment',
+        label: 'Include normal starting equipment',
+        defaultValue: true,
+        labelPosition: 'settings',
+      },
+      {
+        type: 'switch',
+        name: BONUS_GOLD_ENABLED,
+        label: 'Bonus gold',
+        defaultValue: false,
+        labelPosition: 'settings',
+      },
+      {
+        kind: 'stack',
+        layout: 'toggleDependent',
+        dependentsChrome: 'subtle',
+        visibility: {
+          dependsOn: [BONUS_GOLD_ENABLED],
+          visibleWhen: (watched) => watched[BONUS_GOLD_ENABLED] === true,
+        },
+        fields: [
+          {
+            type: 'number',
+            name: 'bonusGold.baseGp',
+            label: 'Base GP',
+            min: 0,
+            required: true,
+            width: 'auto',
+          },
+          {
+            type: 'diceFormula',
+            name: 'bonusGold.formula',
+            label: 'Bonus roll',
+            modifierMode: 'required',
+            modifierOperators: ['×'],
+            modifierMin: 1,
+            modifierMax: 9999,
+            modifierAmountLabel: 'Multiplier',
+            faces: DIE_FACES,
+            currencyUnit: {
+              name: 'bonusGold.currency',
+              options: STARTING_WEALTH_CURRENCY_OPTIONS,
+              defaultValue: 'gp',
+            },
+          },
+        ],
+      },
+      {
+        kind: 'array',
+        name: 'magicItemGrants',
+        legend: 'Magic item grants',
+        addLabel: 'Add grant',
+        min: 0,
+        fields: [
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'select',
+                name: 'rarity',
+                label: 'Rarity',
+                options: magicItemRarityOptions,
+                required: true,
+                width: 'lg',
+              },
+              {
+                type: 'number',
+                name: 'quantity',
+                label: 'Quantity',
+                min: 1,
+                required: true,
+                digits: 2,
+                width: 'auto',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }
+}
+
+export { STARTING_WEALTH_FORM_PREFIX }

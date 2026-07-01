@@ -26,6 +26,12 @@ describe('formatDiceFormula', () => {
       '1d4-1',
     )
   })
+
+  it('formats dice with multiply operator using spaced notation', () => {
+    expect(
+      formatDiceFormula({ count: 1, faces: 10, modifier: { operator: '×', amount: 250 } }),
+    ).toBe('1d10 × 250')
+  })
 })
 
 describe('defaultDiceFormulaForMode', () => {
@@ -34,8 +40,12 @@ describe('defaultDiceFormulaForMode', () => {
     expect(defaultDiceFormulaForMode('optional')).toEqual(DEFAULT_DICE_FORMULA_VALUE)
   })
 
-  it('returns 1d6+1 for required', () => {
-    expect(defaultDiceFormulaForMode('required')).toEqual(DEFAULT_DICE_FORMULA_WITH_MODIFIER)
+  it('uses the configured default operator for required mode', () => {
+    expect(defaultDiceFormulaForMode('required', ['×'])).toEqual({
+      count: 1,
+      faces: 6,
+      modifier: { operator: '×', amount: 1 },
+    })
   })
 })
 

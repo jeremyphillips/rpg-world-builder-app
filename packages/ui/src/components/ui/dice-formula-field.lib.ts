@@ -1,7 +1,10 @@
-export type DiceFormulaOperator = '+' | '-'
+export type DiceFormulaTailOperator = '+' | '-' | '×' | '÷'
+
+/** @deprecated Prefer `DiceFormulaTailOperator` — kept for existing imports. */
+export type DiceFormulaOperator = DiceFormulaTailOperator
 
 export interface DiceFormulaModifier {
-  operator: DiceFormulaOperator
+  operator: DiceFormulaTailOperator
   amount: number
 }
 
@@ -25,9 +28,17 @@ export type DiceFormulaModifierMode = 'none' | 'optional' | 'required'
 
 export type DiceFormulaLabelPosition = 'above' | 'inline'
 
-export const DICE_FORMULA_OPERATORS: readonly DiceFormulaOperator[] = ['+', '-']
+export const DICE_FORMULA_TAIL_OPERATORS = ['+', '-', '×', '÷'] as const
+
+/** Default flat-modifier operators for hit dice and similar controls. */
+export const DICE_FORMULA_OPERATORS: readonly DiceFormulaTailOperator[] = ['+', '-']
 
 export type DiceFormulaPatch = Partial<DiceFormulaValue> & { clearModifier?: boolean }
+
+export interface DiceFormulaCurrencyUnitOption {
+  label: string
+  value: string
+}
 
 export function clampInt(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.trunc(value)))
@@ -38,6 +49,13 @@ export function parseInputInt(raw: string, fallback: number, min: number, max: n
   const parsed = Number(raw)
   if (Number.isNaN(parsed)) return fallback
   return clampInt(parsed, min, max)
+}
+
+export function defaultModifierForOperators(
+  operators: readonly DiceFormulaTailOperator[],
+): DiceFormulaModifier {
+  const operator = operators[0] ?? '+'
+  return { operator, amount: 1 }
 }
 
 export function stripDiceFormulaModifier(value: DiceFormulaValue): DiceFormulaValue {
@@ -58,16 +76,19 @@ export function applyDiceFormulaPatch(
   resolved: DiceFormulaValue,
   patch: DiceFormulaPatch,
   modifierMode: DiceFormulaModifierMode,
+  modifierOperators: readonly DiceFormulaTailOperator[] = DICE_FORMULA_OPERATORS,
 ): DiceFormulaValue {
   const next: DiceFormulaValue = {
     count: patch.count ?? resolved.count,
     faces: patch.faces ?? resolved.faces,
   }
 
+  const defaultModifier = defaultModifierForOperators(modifierOperators)
+
   if (modifierMode === 'required') {
     next.modifier = patch.clearModifier
-      ? { ...DEFAULT_DICE_FORMULA_MODIFIER }
-      : (patch.modifier ?? resolved.modifier ?? { ...DEFAULT_DICE_FORMULA_MODIFIER })
+      ? { ...defaultModifier }
+      : (patch.modifier ?? resolved.modifier ?? { ...defaultModifier })
     return next
   }
 
@@ -87,25 +108,40 @@ export function shouldShowModifierFields(
   return modifierMode === 'required' || (modifierMode === 'optional' && Boolean(resolved.modifier))
 }
 
-export function defaultDiceFormulaForMode(mode: DiceFormulaModifierMode): DiceFormulaValue {
-  return mode === 'required'
-    ? { ...DEFAULT_DICE_FORMULA_WITH_MODIFIER }
-    : { ...DEFAULT_DICE_FORMULA_VALUE }
+export function defaultDiceFormulaForMode(
+  mode: DiceFormulaModifierMode,
+  modifierOperators: readonly DiceFormulaTailOperator[] = DICE_FORMULA_OPERATORS,
+): DiceFormulaValue {
+  if (mode === 'required') {
+    return {
+      count: 1,
+      faces: 6,
+      modifier: defaultModifierForOperators(modifierOperators),
+    }
+  }
+  return { ...DEFAULT_DICE_FORMULA_VALUE }
 }
 
-/** Formats a dice formula for display (e.g. `1d8`, `2d6+3`, `1d4-1`). */
+/** Formats a dice formula for display (e.g. `1d8`, `2d6+3`, `1d10 × 250`). */
 export function formatDiceFormula(value: DiceFormulaValue): string {
   const base = `${value.count}d${value.faces}`
   if (!value.modifier) return base
-  return `${base}${value.modifier.operator}${value.modifier.amount}`
+
+  const { operator, amount } = value.modifier
+  if (operator === '×' || operator === '÷') {
+    return `${base} ${operator} ${amount}`
+  }
+
+  return `${base}${operator}${amount}`
 }
 
 export function resolveDiceFormulaValue(
   value: DiceFormulaValue | undefined,
   modifierMode: DiceFormulaModifierMode,
   faces: readonly number[],
+  modifierOperators: readonly DiceFormulaTailOperator[] = DICE_FORMULA_OPERATORS,
 ): DiceFormulaValue {
-  const fallback = defaultDiceFormulaForMode(modifierMode)
+  const fallback = defaultDiceFormulaForMode(modifierMode, modifierOperators)
   const resolved: DiceFormulaValue = {
     count: value?.count ?? fallback.count,
     faces: value?.faces ?? fallback.faces,
@@ -115,7 +151,8 @@ export function resolveDiceFormulaValue(
   resolved.faces = faceFallback
 
   if (modifierMode === 'required') {
-    resolved.modifier = value?.modifier ?? fallback.modifier ?? { ...DEFAULT_DICE_FORMULA_MODIFIER }
+    resolved.modifier =
+      value?.modifier ?? fallback.modifier ?? defaultModifierForOperators(modifierOperators)
   } else if (modifierMode === 'optional' && value?.modifier) {
     resolved.modifier = value.modifier
   }

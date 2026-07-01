@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import type {
   DiceFormulaLabelPosition,
   DiceFormulaModifierMode,
+  DiceFormulaTailOperator,
   DiceFormulaValue,
 } from '../components/ui/dice-formula-field.lib'
 import { defaultDiceFormulaForMode } from '../components/ui/dice-formula-field.lib'
@@ -416,6 +417,17 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   countMax?: number
   modifierMin?: number
   modifierMax?: number
+  /** Allowed tail operators — single entry renders a static glyph instead of a select. */
+  modifierOperators?: readonly DiceFormulaTailOperator[]
+  /** sr-only / aria label for the tail amount input (e.g. "Multiplier"). */
+  modifierAmountLabel?: string
+  /** Optional currency select rendered after the tail amount in the modifier group. */
+  currencyUnit?: {
+    /** Relative field name under the same parent object (default `currency`). */
+    name?: string
+    options: FieldOption[]
+    defaultValue: string
+  }
   defaultValue?: DiceFormulaValue
 }
 
@@ -726,7 +738,10 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   }
   if (field.type === 'diceFormula') {
     const diceField = field as DiceFormulaFieldConfig
-    return defaultDiceFormulaForMode(diceField.modifierMode ?? 'optional')
+    return defaultDiceFormulaForMode(
+      diceField.modifierMode ?? 'optional',
+      diceField.modifierOperators,
+    )
   }
   return TYPE_DEFAULTS[field.type]
 }
