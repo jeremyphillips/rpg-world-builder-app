@@ -9,6 +9,8 @@ import {
 import { DIE_FACES } from '@rpg/contracts/primitives'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
+import { buildLevelRangeTiersArrayField } from '../../forms/fields/level-range-table-form-fields'
+
 import {
   formatStartingWealthTierSummary,
   STARTING_WEALTH_CURRENCY_OPTIONS,
@@ -91,8 +93,7 @@ function tierItemTitle(values: Record<string, unknown>, index: number): string {
 
 /** Fixed-length tier array editor for `startingWealth.tiers`. */
 export function buildStartingWealthTiersField(): FormItem {
-  return {
-    kind: 'array',
+  return buildLevelRangeTiersArrayField({
     name: 'tiers',
     legend: 'Wealth tiers',
     min: STARTING_WEALTH_TIER_COUNT,
@@ -106,29 +107,6 @@ export function buildStartingWealthTiersField(): FormItem {
         label: 'Tier label',
         required: true,
         width: 'full',
-      },
-      {
-        kind: 'row',
-        fields: [
-          {
-            type: 'number',
-            name: 'minLevel',
-            label: 'Min level',
-            min: 1,
-            required: true,
-            digits: 2,
-            width: 'auto',
-          },
-          {
-            type: 'number',
-            name: 'maxLevel',
-            label: 'Max level',
-            min: 1,
-            required: true,
-            digits: 2,
-            width: 'auto',
-          },
-        ],
       },
       {
         type: 'switch',
@@ -212,7 +190,7 @@ export function buildStartingWealthTiersField(): FormItem {
         ],
       },
     ],
-  }
+  })
 }
 
 export { STARTING_WEALTH_FORM_PREFIX }

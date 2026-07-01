@@ -52,6 +52,7 @@ export type FieldType =
   | 'inputUnit'
   | 'chooseFromChips'
   | 'inlineChooseCount'
+  | 'levelRange'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -364,6 +365,20 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   defaultValue?: number
 }
 
+export interface LevelRangeFieldConfig extends BaseFieldConfig {
+  type: 'levelRange'
+  /** Relative min-level field name within the parent object. Defaults to `minLevel`. */
+  minName?: string
+  /** Relative max-level field name within the parent object. Defaults to `maxLevel`. */
+  maxName?: string
+  options: SelectFieldOptionListItem[]
+  /** Prose between min and max selects. Defaults to `through`. */
+  connector?: string
+  digits?: FieldDigits
+  defaultMinValue?: number
+  defaultMaxValue?: number
+}
+
 /**
  * Searchable dropdown for picking one or many values from a large option list.
  * `multiple: true` (default) → value is `string[]`; selected values render as removable badges.
@@ -496,6 +511,7 @@ export type FieldConfig =
   | ChipsFieldConfig
   | ChooseFromChipsFieldConfig
   | InlineChooseCountFieldConfig
+  | LevelRangeFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
@@ -598,6 +614,33 @@ export interface ArrayConfig {
    * the array unmounts and RHF clears its value via `shouldUnregister`.
    */
   visibility?: FieldVisibility
+
+  /** Whether reordering is permitted. Default true. */
+  allowReorder?: boolean
+
+  /**
+   * Hide move buttons even when `allowReorder` is true.
+   * Move buttons are also hidden when `allowReorder` is false.
+   */
+  hideMoveControls?: boolean
+
+  /** Opaque tag for dashboard patterns / drift tests. Renderer does not interpret domain kinds. */
+  arrayPattern?: { kind: string } & Record<string, unknown>
+
+  /** Supplies default values for a newly appended row. */
+  appendDefaults?: (items: unknown[]) => Record<string, unknown>
+
+  /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
+  filterSelectDependsOn?: string[]
+
+  /** Cross-row select option filtering inside array items. */
+  filterSelectOptions?: (ctx: {
+    arrayItems: unknown[]
+    rowIndex: number
+    fieldName: string
+    options: FieldOption[]
+    watchedValues: Record<string, unknown>
+  }) => FieldOption[]
 }
 
 /**
@@ -652,7 +695,9 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
   const fields: FieldConfig[] = []
   for (const item of items) {
     if (!('kind' in item)) {
-      fields.push(item)
+      if (item.type !== 'levelRange') {
+        fields.push(item)
+      }
     } else if (item.kind === 'array' || item.kind === 'slot') {
       // Intentionally skipped — see JSDoc above.
     } else {
@@ -700,6 +745,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   inputUnit: undefined,
   chooseFromChips: [],
   inlineChooseCount: undefined,
+  levelRange: undefined,
 }
 
 function emptyEditableGridValue(
@@ -747,6 +793,15 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
 }
 
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
+  if (field.type === 'levelRange') {
+    const levelRangeField = field as LevelRangeFieldConfig
+    const minName = levelRangeField.minName ?? levelRangeField.name
+    const maxName = levelRangeField.maxName ?? 'maxLevel'
+    values[minName] = levelRangeField.defaultMinValue ?? TYPE_DEFAULTS.number
+    values[maxName] = levelRangeField.defaultMaxValue ?? TYPE_DEFAULTS.number
+    return
+  }
+
   values[field.name] = fieldDefaultValue(field)
   if (field.type === 'chooseFromChips') {
     const chooseField = field as ChooseFromChipsFieldConfig

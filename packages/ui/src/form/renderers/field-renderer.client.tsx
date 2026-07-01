@@ -20,8 +20,14 @@ import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
+import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type { FieldConfig, FieldType, InputSelectFieldConfig } from '../field-config'
+import type {
+  FieldConfig,
+  FieldType,
+  InputSelectFieldConfig,
+  LevelRangeFieldConfig,
+} from '../field-config'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -76,7 +82,9 @@ interface RenderArgs<K extends FieldType> {
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
 const fieldRenderers: {
-  [K in Exclude<FieldType, 'inputSelect'>]: (args: RenderArgs<K>) => React.ReactElement
+  [K in Exclude<FieldType, 'inputSelect' | 'levelRange'>]: (
+    args: RenderArgs<K>,
+  ) => React.ReactElement
 } = {
   text: ({ config, field, id, error }) => (
     <TextField
@@ -464,6 +472,10 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     )
   }
 
+  if (renderConfig.type === 'levelRange') {
+    return <LevelRangeFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+  }
+
   return (
     <StandardFieldRenderer
       config={config}
@@ -475,7 +487,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   )
 }
 
-type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig>
+type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig | LevelRangeFieldConfig>
 
 interface StandardFieldRendererProps {
   config: FieldConfig

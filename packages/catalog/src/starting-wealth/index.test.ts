@@ -41,7 +41,7 @@ describe('SRD 5.2.1 starting wealth seed', () => {
 
   it('ships contiguous non-overlapping tier ranges through level 20', () => {
     const tiers = getStandardStartingWealth(RULESET).tiers
-    expect(tiers[0]).toMatchObject({ id: 'level-1', minLevel: 1, maxLevel: 1 })
-    expect(tiers.at(-1)).toMatchObject({ id: 'levels-17-20', minLevel: 17, maxLevel: 20 })
+    expect(tiers[0]).toMatchObject({ id: 'initiate', minLevel: 1, maxLevel: 1 })
+    expect(tiers.at(-1)).toMatchObject({ id: 'legend', minLevel: 17, maxLevel: 20 })
   })
 })

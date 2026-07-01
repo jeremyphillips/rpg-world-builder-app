@@ -7,7 +7,7 @@
     },
     "tiers": [
       {
-        "id": "level-1",
+        "id": "initiate",
         "label": "Initiate",
         "minLevel": 1,
         "maxLevel": 1,
@@ -16,7 +16,7 @@
         "magicItemGrants": []
       },
       {
-        "id": "levels-2-4",
+        "id": "adventurer",
         "label": "Adventurer",
         "minLevel": 2,
         "maxLevel": 4,
@@ -30,7 +30,7 @@
         ]
       },
       {
-        "id": "levels-5-10",
+        "id": "hero",
         "label": "Hero",
         "minLevel": 5,
         "maxLevel": 10,
@@ -59,7 +59,7 @@
         ]
       },
       {
-        "id": "levels-11-16",
+        "id": "champion",
         "label": "Champion",
         "minLevel": 11,
         "maxLevel": 16,
@@ -92,7 +92,7 @@
         ]
       },
       {
-        "id": "levels-17-20",
+        "id": "legend",
         "label": "Legend",
         "minLevel": 17,
         "maxLevel": 20,

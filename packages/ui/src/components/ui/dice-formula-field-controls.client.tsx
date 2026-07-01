@@ -29,9 +29,9 @@ import {
   diceFormulaGroupedOperatorSegmentVariants,
   diceFormulaModifierGroupVariants,
   diceFormulaModifierInputVariants,
-  diceFormulaRowVariants,
   diceFormulaSeparatorVariants,
 } from './dice-formula-field.variants'
+import { InlineSentenceRow } from './inline-sentence-row'
 import { inputSelectDividerVariants } from './input-select-field.variants'
 
 const ADD_MODIFIER_LABEL = 'Add modifier'
@@ -446,8 +446,7 @@ export function DiceFormulaControls({
   const currencyId = `${id}-currency`
 
   return (
-    <div
-      className={diceFormulaRowVariants()}
+    <InlineSentenceRow
       role={labelPosition === 'inline' ? 'group' : undefined}
       aria-labelledby={labelPosition === 'inline' ? inlineLabelId : undefined}
     >
@@ -496,6 +495,6 @@ export function DiceFormulaControls({
           {ADD_MODIFIER_LABEL}
         </Button>
       ) : null}
-    </div>
+    </InlineSentenceRow>
   )
 }

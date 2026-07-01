@@ -44,7 +44,7 @@ export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses
   },
 })
 
-/** Outer row — control segments and action buttons share the inline sentence gap. */
+/** @deprecated Use `InlineSentenceRow` — kept for grouped segment imports. */
 export const diceFormulaRowVariants = cva(fieldInlineSentenceClasses)
 
 export const diceFormulaSeparatorVariants = cva(
