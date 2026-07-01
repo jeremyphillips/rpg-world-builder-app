@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { InlineSentenceConnector, InlineSentenceRow } from './inline-sentence-row'
-import { Text } from './text'
 
 const meta = {
   title: 'UI/InlineSentenceRow',
@@ -18,9 +17,9 @@ type Story = StoryObj<typeof meta>
 export const LevelRangeSentence: Story = {
   render: () => (
     <InlineSentenceRow>
-      <Text variant="body">1</Text>
-      <InlineSentenceConnector>through</InlineSentenceConnector>
-      <Text variant="body">4</Text>
+      <InlineSentenceConnector size="sm">1</InlineSentenceConnector>
+      <InlineSentenceConnector size="sm">through</InlineSentenceConnector>
+      <InlineSentenceConnector size="sm">4</InlineSentenceConnector>
     </InlineSentenceRow>
   ),
 }
@@ -28,9 +27,15 @@ export const LevelRangeSentence: Story = {
 export const DiceSentence: Story = {
   render: () => (
     <InlineSentenceRow>
-      <Text variant="body">2</Text>
-      <InlineSentenceConnector>d</InlineSentenceConnector>
-      <Text variant="body">6</Text>
+      <InlineSentenceConnector size="sm" tone="mono" aria-hidden>
+        2
+      </InlineSentenceConnector>
+      <InlineSentenceConnector size="sm" tone="mono" aria-hidden>
+        d
+      </InlineSentenceConnector>
+      <InlineSentenceConnector size="sm" tone="mono" aria-hidden>
+        6
+      </InlineSentenceConnector>
     </InlineSentenceRow>
   ),
 }

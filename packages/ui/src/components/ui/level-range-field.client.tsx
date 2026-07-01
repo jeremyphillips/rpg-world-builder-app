@@ -109,7 +109,7 @@ export function LevelRangeField({
               <SelectContent>{renderOptions(minOptions)}</SelectContent>
             </Select>
 
-            <InlineSentenceConnector>{connector}</InlineSentenceConnector>
+            <InlineSentenceConnector size={size}>{connector}</InlineSentenceConnector>
 
             <label htmlFor={maxId} className="sr-only">
               {label} maximum

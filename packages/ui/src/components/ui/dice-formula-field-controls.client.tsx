@@ -19,6 +19,7 @@ import {
   type DiceFormulaTailOperator,
   type DiceFormulaValue,
 } from './dice-formula-field.lib'
+import { InlineSentenceConnector, InlineSentenceRow } from './inline-sentence-row'
 import {
   diceFormulaControlCellVariants,
   diceFormulaCoreGroupVariants,
@@ -29,9 +30,7 @@ import {
   diceFormulaGroupedOperatorSegmentVariants,
   diceFormulaModifierGroupVariants,
   diceFormulaModifierInputVariants,
-  diceFormulaSeparatorVariants,
 } from './dice-formula-field.variants'
-import { InlineSentenceRow } from './inline-sentence-row'
 import { inputSelectDividerVariants } from './input-select-field.variants'
 
 const ADD_MODIFIER_LABEL = 'Add modifier'
@@ -218,9 +217,9 @@ function DiceFormulaCoreControls({
 
       <div aria-hidden className={inputSelectDividerVariants()} />
 
-      <span aria-hidden className={diceFormulaSeparatorVariants({ size })}>
+      <InlineSentenceConnector size={size} tone="mono" aria-hidden>
         d
-      </span>
+      </InlineSentenceConnector>
 
       <div aria-hidden className={inputSelectDividerVariants()} />
 

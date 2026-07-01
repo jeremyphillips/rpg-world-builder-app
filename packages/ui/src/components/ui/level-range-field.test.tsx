@@ -23,12 +23,13 @@ describe('LevelRangeField', () => {
         maxValue={4}
         minOptions={OPTIONS}
         maxOptions={OPTIONS}
+        size="sm"
         required
       />,
     )
 
     expect(screen.getByText('Level range')).toBeInTheDocument()
-    expect(screen.getByText('through')).toBeInTheDocument()
+    expect(screen.getByText('through')).toHaveClass('text-xs')
     expect(screen.getByLabelText('Level range minimum')).toBeInTheDocument()
     expect(screen.getByLabelText('Level range maximum')).toBeInTheDocument()
   })

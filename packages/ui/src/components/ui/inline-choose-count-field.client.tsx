@@ -8,7 +8,7 @@ import type { FieldHintPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
 import { fieldInlineSentenceClasses } from './field.variants'
 import { NumberInput } from './number-input.client'
-import { Text } from './text'
+import { InlineSentenceConnector } from './inline-sentence-row'
 import { parseChooseCount } from './choose-count-field.lib'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
 
@@ -78,7 +78,7 @@ export function InlineChooseCountField({
     >
       {({ chooseId }) => (
         <div className={fieldInlineSentenceClasses}>
-          {prefix ? <Text variant="body">{prefix}</Text> : null}
+          {prefix ? <InlineSentenceConnector size={size}>{prefix}</InlineSentenceConnector> : null}
           <label htmlFor={chooseId} className="sr-only">
             {label} count
           </label>
@@ -96,7 +96,7 @@ export function InlineChooseCountField({
             onChange={(event) => onChange?.(parseChooseCount(event.target.value))}
             onBlur={onBlur}
           />
-          <Text variant="body">{suffix}</Text>
+          <InlineSentenceConnector size={size}>{suffix}</InlineSentenceConnector>
         </div>
       )}
     </ChooseCountFieldShell>

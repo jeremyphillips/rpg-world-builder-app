@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import { Text } from './text'
+import type { FieldSize } from './field.client'
 import { fieldInlineSentenceClasses } from './field.variants'
+import {
+  inlineSentenceConnectorVariants,
+  type InlineSentenceConnectorVariantProps,
+} from './inline-sentence-row.variants'
 
 export interface InlineSentenceRowProps {
   children: ReactNode
@@ -33,13 +37,30 @@ export function InlineSentenceRow({
 export interface InlineSentenceConnectorProps {
   children: ReactNode
   className?: string
+  size?: FieldSize
+  tone?: NonNullable<InlineSentenceConnectorVariantProps['tone']>
+  'aria-hidden'?: boolean
 }
 
 /** Static prose between inline sentence controls (`through`, `d`, …). */
-export function InlineSentenceConnector({ children, className }: InlineSentenceConnectorProps) {
+export function InlineSentenceConnector({
+  children,
+  className,
+  size = 'md',
+  tone = 'prose',
+  'aria-hidden': ariaHidden,
+}: InlineSentenceConnectorProps) {
   return (
-    <Text variant="body" className={className}>
+    <span
+      className={cn(inlineSentenceConnectorVariants({ size, tone }), className)}
+      aria-hidden={ariaHidden}
+    >
       {children}
-    </Text>
+    </span>
   )
 }
+
+export {
+  inlineSentenceConnectorVariants,
+  diceFormulaSeparatorVariants,
+} from './inline-sentence-row.variants'

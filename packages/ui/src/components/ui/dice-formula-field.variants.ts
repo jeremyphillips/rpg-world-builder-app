@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupedControlSizeClasses, fieldSizeTypographyClasses } from './field-sizing.variants'
+import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 import { fieldInlineSentenceClasses } from './field.variants'
 
 /** Shared bordered shell for grouped dice segments (mirrors InputSelectField group). */
@@ -47,17 +47,7 @@ export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses
 /** @deprecated Use `InlineSentenceRow` — kept for grouped segment imports. */
 export const diceFormulaRowVariants = cva(fieldInlineSentenceClasses)
 
-export const diceFormulaSeparatorVariants = cva(
-  'shrink-0 px-2 font-mono font-medium text-foreground',
-  {
-    variants: {
-      size: fieldSizeTypographyClasses,
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-  },
-)
+export { diceFormulaSeparatorVariants } from './inline-sentence-row.variants'
 
 export const diceFormulaControlCellVariants = cva('flex shrink-0 items-center')
 
