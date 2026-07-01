@@ -1,8 +1,8 @@
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { ProfileSection } from '@/features/user/components/profile-section'
-import { ChangePasswordSection } from '@/features/user/components/change-password-section'
+import { ChangePasswordSection } from '../components/change-password-section'
+import { ProfileSection } from '../components/profile-section'
 
 export function AccountSettings() {
   return (

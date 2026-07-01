@@ -117,7 +117,7 @@ sequenceDiagram
 
 The public app uses the same `GET /api/auth/me` contract for its header and to
 redirect signed-in users away from `/login` and `/signup`. Cross-app navigation
-paths (`/app/`, `/login`, `/app/profile`, …) are centralized as
+paths (`/app/`, `/login`, `/app/account`, …) are centralized as
 `CROSS_APP_PATHS` in `@rpg/contracts`.
 
 Details: [public auth forms](../apps/public/docs/auth-forms.md),

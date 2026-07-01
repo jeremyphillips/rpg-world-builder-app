@@ -2,11 +2,11 @@ import { Heading, Text } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 
-export function Profile() {
+export function CharactersOverview() {
   return (
     <NarrowPage>
       <Heading variant="page" as="h1">
-        Profile
+        Characters
       </Heading>
       <Text variant="muted">Coming soon.</Text>
     </NarrowPage>

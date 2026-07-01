@@ -18,7 +18,7 @@ written as raw strings. All navigation code imports from it.
 **Static path → plain string**
 
 ```ts
-profile: '/profile',
+account: '/account',
 ```
 
 **Parameterized path → function returning string**

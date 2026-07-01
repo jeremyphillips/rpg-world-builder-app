@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 
+import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
 import type { CrumbHandle } from '@/app/breadcrumbs'
@@ -15,7 +16,8 @@ import {
   CampaignDetailRoute,
   CampaignSessionsRoute,
   CampaignSettingsRoute,
-  CharactersRoute,
+  CharacterDetailRoute,
+  CharactersOverviewRoute,
   ClassCreateRoute,
   ClassDetailRoute,
   ClassEditRoute,
@@ -29,7 +31,6 @@ import {
   FeatDetailRoute,
   FeatEditRoute,
   FeatsOverviewRoute,
-  ProfileRoute,
   SkillProficienciesOverviewRoute,
   SkillProficiencyCreateRoute,
   SkillProficiencyDetailRoute,
@@ -65,13 +66,22 @@ const router = createBrowserRouter(
             { index: true, element: <DashboardHome /> },
             {
               path: 'characters',
-              element: <CharactersRoute />,
-              handle: { crumb: () => ({ label: 'Characters' }) } satisfies CrumbHandle,
-            },
-            {
-              path: 'profile',
-              element: <ProfileRoute />,
-              handle: { crumb: () => ({ label: 'Profile' }) } satisfies CrumbHandle,
+              element: <Outlet />,
+              handle: {
+                crumb: () => ({ label: 'Characters', href: ROUTES.characters.list }),
+              } satisfies CrumbHandle,
+              children: [
+                { index: true, element: <CharactersOverviewRoute /> },
+                {
+                  path: ':characterId',
+                  element: <CharacterDetailRoute />,
+                  handle: {
+                    crumb: (_params, { entityLabel }) => ({
+                      label: entityLabel ?? '…',
+                    }),
+                  } satisfies CrumbHandle,
+                },
+              ],
             },
             {
               path: 'account',
@@ -80,7 +90,7 @@ const router = createBrowserRouter(
             },
             {
               path: 'admin',
-              element: <Outlet />,
+              element: <AdminRouteGuard />,
               children: [
                 {
                   path: 'users',
