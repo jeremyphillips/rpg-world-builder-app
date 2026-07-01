@@ -5,6 +5,7 @@ import {
   startingEquipmentChoiceItemFormSchema,
   startingEquipmentFormSchema,
   startingEquipmentItemFields,
+  startingEquipmentItemTitle,
   startingEquipmentOptionFormSchema,
 } from './class-starting-equipment-form-fields'
 import {
@@ -89,6 +90,33 @@ describe('startingEquipment round-trip', () => {
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
+  })
+})
+
+describe('startingEquipmentItemTitle', () => {
+  const equipmentOptions = [
+    { value: 'javelin', label: 'Javelin' },
+    { value: 'greataxe', label: 'Greataxe' },
+  ]
+
+  it('includes quantity when fixed equipment count is greater than one', () => {
+    expect(
+      startingEquipmentItemTitle(
+        { itemKind: 'fixed', equipmentSlug: 'javelin', quantity: 4 },
+        0,
+        equipmentOptions,
+      ),
+    ).toBe('Javelin x4')
+  })
+
+  it('omits quantity suffix for a single fixed item', () => {
+    expect(
+      startingEquipmentItemTitle(
+        { itemKind: 'fixed', equipmentSlug: 'greataxe', quantity: 1 },
+        0,
+        equipmentOptions,
+      ),
+    ).toBe('Greataxe')
   })
 })
 

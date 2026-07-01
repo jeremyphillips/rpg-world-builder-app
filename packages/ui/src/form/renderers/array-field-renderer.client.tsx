@@ -143,7 +143,7 @@ function ArrayFieldItemContent({
       role="group"
       aria-labelledby={titleId}
       className={cn(
-        fieldArrayItemVariants({ variant, nested, sortable }),
+        fieldArrayItemVariants({ variant, nested }),
         dragHandleProps?.isDragging && arrayItemDraggingClasses,
       )}
     >
@@ -178,7 +178,7 @@ function ArrayFieldItemContent({
         <div
           id={bodyId}
           hidden={collapsed || undefined}
-          className={arrayItemBodyClasses({ collapsible })}
+          className={arrayItemBodyClasses({ collapsible, sortable })}
           aria-hidden={collapsed}
         >
           {fieldsNode}

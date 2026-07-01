@@ -143,7 +143,9 @@ export function startingEquipmentItemTitle(
 
   if (row.itemKind === 'fixed') {
     const label = equipmentOptions?.find((option) => option.value === row.equipmentSlug)?.label
-    return label ?? row.equipmentSlug ?? `Item ${index + 1}`
+    const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
+    const quantity = row.quantity ?? 1
+    return quantity > 1 ? `${name} x${quantity}` : name
   }
 
   return row.label || `Pool choice ${index + 1}`
@@ -308,6 +310,8 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'items',
       legend: 'Items',
       addLabel: 'Add item',
+      itemVariant: 'detailed',
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Item ${index + 1}`,
         primary: (values, index) =>

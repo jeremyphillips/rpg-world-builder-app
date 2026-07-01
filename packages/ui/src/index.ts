@@ -140,7 +140,6 @@ export {
 } from './components/ui/field-group'
 export {
   fieldArrayItemClasses,
-  fieldArrayItemGutterClasses,
   fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupFlexStackClasses,

@@ -55,9 +55,7 @@ export const fieldArrayLegendSmTypographyClasses =
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
-export const fieldArrayItemGutterClasses = 'pl-10'
-
-export const fieldArrayItemVariants = cva('relative rounded-md border border-border', {
+export const fieldArrayItemVariants = cva('relative rounded-md border border-border pl-2', {
   variants: {
     variant: {
       compact: 'py-[calc(var(--spacing)*2)] pr-2',
@@ -67,16 +65,10 @@ export const fieldArrayItemVariants = cva('relative rounded-md border border-bor
       true: '',
       false: '',
     },
-    /** When true, reserves left gutter space for the drag handle. */
-    sortable: {
-      true: fieldArrayItemGutterClasses,
-      false: 'pl-2',
-    },
   },
   defaultVariants: {
     variant: 'detailed',
     nested: false,
-    sortable: true,
   },
 })
 

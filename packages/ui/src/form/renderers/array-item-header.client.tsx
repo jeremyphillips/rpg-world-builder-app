@@ -20,6 +20,7 @@ import {
   arrayItemHeaderSummaryClasses,
   arrayItemHeaderTitleClasses,
   arrayItemRemoveButtonClasses,
+  arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
 } from './array-item-toolbar.variants'
 
@@ -53,9 +54,16 @@ interface ArrayItemHeaderTitleProps {
   summary?: string
   collapsed: boolean
   titleId: string
+  className?: string
 }
 
-function ArrayItemHeaderTitle({ header, summary, collapsed, titleId }: ArrayItemHeaderTitleProps) {
+function ArrayItemHeaderTitle({
+  header,
+  summary,
+  collapsed,
+  titleId,
+  className,
+}: ArrayItemHeaderTitleProps) {
   if (header.srOnly) {
     return (
       <span id={titleId} className="sr-only">
@@ -66,7 +74,7 @@ function ArrayItemHeaderTitle({ header, summary, collapsed, titleId }: ArrayItem
 
   if (collapsed && summary) {
     return (
-      <div id={titleId} className="min-w-0 flex-1">
+      <div id={titleId} className={cn('min-w-0 flex-1', className)}>
         <div className={arrayItemHeaderTitleClasses}>
           {header.primary ? (
             <>
@@ -88,7 +96,7 @@ function ArrayItemHeaderTitle({ header, summary, collapsed, titleId }: ArrayItem
   }
 
   return (
-    <div id={titleId} className={arrayItemHeaderTitleClasses}>
+    <div id={titleId} className={cn(arrayItemHeaderTitleClasses, className)}>
       {header.primary ? (
         <>
           <span>{header.primary}</span>
@@ -155,7 +163,7 @@ export function ArrayItemToolbar({
     collapsed && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
 
   return (
-    <div className={arrayItemToolbarRowClasses}>
+    <div className={cn(arrayItemToolbarRowClasses, compact ? 'items-start' : 'items-center')}>
       {showDragHandle && dragHandleProps ? (
         <ArrayItemDragHandle
           {...dragHandleProps}
@@ -186,7 +194,9 @@ export function ArrayItemToolbar({
               {header.ariaLabel}
             </span>
           ) : null}
-          <div className="min-w-0 flex-1">{children}</div>
+          <div className={cn(collapsible ? arrayItemToolbarContentClasses : 'min-w-0 flex-1')}>
+            {children}
+          </div>
         </>
       ) : (
         <ArrayItemHeaderTitle
@@ -194,6 +204,7 @@ export function ArrayItemToolbar({
           summary={summary}
           collapsed={collapsed}
           titleId={titleId}
+          className={collapsible ? arrayItemToolbarContentClasses : undefined}
         />
       )}
       <Button
@@ -205,7 +216,7 @@ export function ArrayItemToolbar({
         aria-label={`Remove ${header.ariaLabel}`}
         onClick={onRemove}
       >
-        <Trash2 className="size-4" aria-hidden />
+        <Trash2 aria-hidden />
       </Button>
     </div>
   )

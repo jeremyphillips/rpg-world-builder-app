@@ -1,19 +1,21 @@
 import { cn } from '../../lib/utils'
-import { fieldArrayItemGutterClasses } from '../../components/ui/field.variants'
 
-/** Left gutter shared by compact and detailed array item rows. */
-export { fieldArrayItemGutterClasses }
+/** Shared 24×24 hit target for grip and collapse caret (WCAG 2.2 AA minimum). */
+export const arrayItemChromeButtonClasses =
+  'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
-/** Drag handle — sits in the pl-10 gutter on sortable rows. */
-export const arrayItemDragHandleClasses =
-  'absolute -left-10 top-1/2 flex size-10 shrink-0 -translate-y-1/2 cursor-grab items-center justify-center rounded-sm text-muted-foreground hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+/** Inline drag handle — precedes caret/title in the toolbar flex row. */
+export const arrayItemDragHandleClasses = cn(
+  arrayItemChromeButtonClasses,
+  '-ml-[calc(var(--spacing)*1)] cursor-grab active:cursor-grabbing',
+)
+
+/** Collapse caret in detailed item headers. */
+export const arrayItemCollapseButtonClasses = arrayItemChromeButtonClasses
 
 /** Remove control — destructive hover treatment. */
 export const arrayItemRemoveButtonClasses =
-  'size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
-
-/** Collapse caret button in detailed item headers. */
-export const arrayItemCollapseButtonClasses = 'size-8 shrink-0 p-0 text-muted-foreground'
+  'ml-[calc(var(--spacing)*3)] size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5'
 
 /** Detailed item header title cluster. */
 export const arrayItemHeaderTitleClasses =
@@ -29,11 +31,26 @@ export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-for
 export const arrayItemHeaderSummaryClasses = 'truncate text-xs text-muted-foreground'
 
 /** Toolbar row shared by compact and detailed headers. */
-export const arrayItemToolbarRowClasses = 'relative flex min-w-0 items-center gap-1 pr-2'
+export const arrayItemToolbarRowClasses = 'relative flex min-w-0 gap-0 pr-2'
+
+/** Space between collapse caret and title / compact fields. */
+export const arrayItemToolbarContentClasses = 'min-w-0 flex-1 ml-[calc(var(--spacing)*1)]'
+
+/** Indents collapsible bodies under the title (caret column only). */
+export const arrayItemBodyCaretIndentClasses = 'pl-7'
+
+/** Indents collapsible bodies under the title (inline grip + caret columns). */
+export const arrayItemBodySortableCaretIndentClasses = 'pl-13'
 
 /** Body region below a detailed item header. */
-export function arrayItemBodyClasses(options: { collapsible: boolean }): string {
-  return cn(options.collapsible && fieldArrayItemGutterClasses, 'pt-3')
+export function arrayItemBodyClasses(options: { collapsible: boolean; sortable: boolean }): string {
+  if (!options.collapsible) return 'pt-3'
+
+  const indent = options.sortable
+    ? arrayItemBodySortableCaretIndentClasses
+    : arrayItemBodyCaretIndentClasses
+
+  return cn(indent, 'pt-3')
 }
 
 /** Inline field region for compact items (same row as toolbar). */

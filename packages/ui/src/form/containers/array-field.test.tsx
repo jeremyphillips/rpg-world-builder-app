@@ -77,7 +77,7 @@ describe('ArrayFieldRenderer', () => {
       'rounded-md',
       'border',
       'border-border',
-      'pl-10',
+      'pl-2',
     )
   })
 
