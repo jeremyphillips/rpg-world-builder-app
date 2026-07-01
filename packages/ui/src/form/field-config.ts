@@ -583,7 +583,7 @@ export interface ArrayItemHeaderConfig {
   fallback: (index: number) => string
   /** Shown in the header when a collapsible item is collapsed. */
   summary?: (values: Record<string, unknown>, index: number) => string
-  /** Renders `primary | fallback` when both are present. */
+  /** Renders `primary · fallback` when both are present. */
   showDivider?: boolean
   /** When true, primary label is visually hidden but available to assistive tech. */
   srOnly?: boolean

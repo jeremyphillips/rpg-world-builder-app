@@ -49,11 +49,7 @@ import { buildArraySectionChildContext } from '../containers/form-section-child-
 import { useVisibilityValues } from '../containers/form-conditional.client'
 import { NestedFormItems } from '../containers/form-item-node.client'
 import { ArrayItemToolbar } from './array-item-header.client'
-import {
-  arrayItemBodyClasses,
-  arrayItemDraggingClasses,
-  arrayItemRowSortableClasses,
-} from './array-item-toolbar.variants'
+import { arrayItemBodyClasses, arrayItemDraggingClasses } from './array-item-toolbar.variants'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 
 export interface ArrayFieldRendererProps {
@@ -76,6 +72,7 @@ interface ArrayFieldItemContentProps {
   collapsible: boolean
   variant: 'compact' | 'detailed'
   nested: boolean
+  sortable: boolean
   collapsed: boolean
   onToggleCollapse: () => void
   onRemove: () => void
@@ -99,6 +96,7 @@ function ArrayFieldItemContent({
   collapsible,
   variant,
   nested,
+  sortable,
   collapsed,
   onToggleCollapse,
   onRemove,
@@ -145,8 +143,7 @@ function ArrayFieldItemContent({
       role="group"
       aria-labelledby={titleId}
       className={cn(
-        fieldArrayItemVariants({ variant, nested }),
-        showDragHandle && arrayItemRowSortableClasses,
+        fieldArrayItemVariants({ variant, nested, sortable }),
         dragHandleProps?.isDragging && arrayItemDraggingClasses,
       )}
     >
@@ -161,7 +158,6 @@ function ArrayFieldItemContent({
           dragHandleProps
             ? {
                 ariaLabel: '',
-                isDragging: dragHandleProps.isDragging,
                 attributes: dragHandleProps.attributes,
                 listeners: dragHandleProps.listeners,
               }
@@ -182,7 +178,7 @@ function ArrayFieldItemContent({
         <div
           id={bodyId}
           hidden={collapsed || undefined}
-          className={arrayItemBodyClasses}
+          className={arrayItemBodyClasses({ collapsible })}
           aria-hidden={collapsed}
         >
           {fieldsNode}
@@ -267,7 +263,8 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const nested = isNestedArraySection(depth)
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
-  const sortableEnabled = reorder === 'dragHandle' && fields.length > 1
+  const sortable = reorder === 'dragHandle'
+  const sortableEnabled = sortable && fields.length > 1
   const showDragHandle = sortableEnabled
   const collapsible = itemCollapsible && variant === 'detailed' && !nested
 
@@ -320,6 +317,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     collapsible,
     variant,
     nested,
+    sortable,
     collapsedIds,
     onToggleCollapse: toggleCollapse,
     onRemove: () => remove(index),

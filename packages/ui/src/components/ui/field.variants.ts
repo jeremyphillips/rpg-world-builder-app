@@ -57,25 +57,28 @@ export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
 export const fieldArrayItemGutterClasses = 'pl-10'
 
-export const fieldArrayItemVariants = cva(
-  cn('relative rounded-md border border-border', fieldArrayItemGutterClasses),
-  {
-    variants: {
-      variant: {
-        compact: 'py-[calc(var(--spacing)*2)] pr-2',
-        detailed: 'py-[calc(var(--spacing)*2)] pr-2',
-      },
-      nested: {
-        true: '',
-        false: '',
-      },
+export const fieldArrayItemVariants = cva('relative rounded-md border border-border', {
+  variants: {
+    variant: {
+      compact: 'py-[calc(var(--spacing)*2)] pr-2',
+      detailed: 'py-[calc(var(--spacing)*2)] pr-2',
     },
-    defaultVariants: {
-      variant: 'detailed',
-      nested: false,
+    nested: {
+      true: '',
+      false: '',
+    },
+    /** When true, reserves left gutter space for the drag handle. */
+    sortable: {
+      true: fieldArrayItemGutterClasses,
+      false: 'pl-2',
     },
   },
-)
+  defaultVariants: {
+    variant: 'detailed',
+    nested: false,
+    sortable: true,
+  },
+})
 
 export type FieldArrayItemVariantProps = VariantProps<typeof fieldArrayItemVariants>
 

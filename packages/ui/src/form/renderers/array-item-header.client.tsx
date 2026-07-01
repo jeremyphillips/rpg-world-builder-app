@@ -15,7 +15,8 @@ import {
 import {
   arrayItemCollapseButtonClasses,
   arrayItemDragHandleClasses,
-  arrayItemDragHandleVisibleClasses,
+  arrayItemHeaderDividerClasses,
+  arrayItemHeaderFallbackClasses,
   arrayItemHeaderSummaryClasses,
   arrayItemHeaderTitleClasses,
   arrayItemRemoveButtonClasses,
@@ -24,21 +25,19 @@ import {
 
 export interface ArrayItemDragHandleProps {
   ariaLabel: string
-  isDragging?: boolean
   attributes: DraggableAttributes
   listeners: SyntheticListenerMap | undefined
 }
 
 export function ArrayItemDragHandle({
   ariaLabel,
-  isDragging = false,
   attributes,
   listeners,
 }: ArrayItemDragHandleProps) {
   return (
     <button
       type="button"
-      className={cn(arrayItemDragHandleClasses, isDragging && arrayItemDragHandleVisibleClasses)}
+      className={arrayItemDragHandleClasses}
       aria-label={ariaLabel}
       onClick={(event) => event.stopPropagation()}
       {...attributes}
@@ -73,11 +72,11 @@ function ArrayItemHeaderTitle({ header, summary, collapsed, titleId }: ArrayItem
             <>
               <span>{header.primary}</span>
               {header.showDivider ? (
-                <span className="mx-1.5 text-muted-foreground" aria-hidden>
-                  |
+                <span className={arrayItemHeaderDividerClasses} aria-hidden>
+                  ·
                 </span>
               ) : null}
-              <span className="text-muted-foreground">{header.fallback}</span>
+              <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
             </>
           ) : (
             header.fallback
@@ -94,11 +93,11 @@ function ArrayItemHeaderTitle({ header, summary, collapsed, titleId }: ArrayItem
         <>
           <span>{header.primary}</span>
           {header.showDivider ? (
-            <span className="mx-1.5 text-muted-foreground" aria-hidden>
-              |
+            <span className={arrayItemHeaderDividerClasses} aria-hidden>
+              ·
             </span>
           ) : null}
-          <span className="text-muted-foreground">{header.fallback}</span>
+          <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
         </>
       ) : (
         header.fallback

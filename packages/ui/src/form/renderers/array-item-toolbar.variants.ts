@@ -4,15 +4,9 @@ import { fieldArrayItemGutterClasses } from '../../components/ui/field.variants'
 /** Left gutter shared by compact and detailed array item rows. */
 export { fieldArrayItemGutterClasses }
 
-/** Enables hover/focus reveal for the drag handle on sortable array rows. */
-export const arrayItemRowSortableClasses = 'group'
-
-/** Drag handle — hidden until row hover, focus, or active drag. */
+/** Drag handle — sits in the pl-10 gutter on sortable rows. */
 export const arrayItemDragHandleClasses =
-  'absolute left-0 top-0 flex size-10 shrink-0 cursor-grab items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 ease-in-out hover:text-foreground focus-visible:opacity-100 active:cursor-grabbing group-focus-within:opacity-100 group-hover:opacity-100'
-
-/** Keeps the handle visible while a row is being dragged. */
-export const arrayItemDragHandleVisibleClasses = 'opacity-100'
+  'absolute -left-10 top-1/2 flex size-10 shrink-0 -translate-y-1/2 cursor-grab items-center justify-center rounded-sm text-muted-foreground hover:text-foreground active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 /** Remove control — destructive hover treatment. */
 export const arrayItemRemoveButtonClasses =
@@ -25,6 +19,12 @@ export const arrayItemCollapseButtonClasses = 'size-8 shrink-0 p-0 text-muted-fo
 export const arrayItemHeaderTitleClasses =
   'min-w-0 flex-1 truncate text-sm font-medium leading-none'
 
+/** Middle-dot separator between primary and fallback labels. */
+export const arrayItemHeaderDividerClasses = 'mx-1.5 text-muted-foreground'
+
+/** Fallback label after the divider (lighter than primary). */
+export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-foreground'
+
 /** Collapsed summary line in detailed item headers. */
 export const arrayItemHeaderSummaryClasses = 'truncate text-xs text-muted-foreground'
 
@@ -32,7 +32,9 @@ export const arrayItemHeaderSummaryClasses = 'truncate text-xs text-muted-foregr
 export const arrayItemToolbarRowClasses = 'relative flex min-w-0 items-center gap-1 pr-2'
 
 /** Body region below a detailed item header. */
-export const arrayItemBodyClasses = cn(fieldArrayItemGutterClasses, 'pt-3')
+export function arrayItemBodyClasses(options: { collapsible: boolean }): string {
+  return cn(options.collapsible && fieldArrayItemGutterClasses, 'pt-3')
+}
 
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'

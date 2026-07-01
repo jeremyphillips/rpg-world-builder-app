@@ -365,6 +365,8 @@ describe('ArrayFieldRenderer', () => {
 
     expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: /Remove Traits — Item/ })).toHaveLength(2)
+    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass('pl-2')
+    expect(screen.getByRole('group', { name: 'Item 1' })).not.toHaveClass('pl-10')
   })
 
   it('collapses detailed items while preserving field values', async () => {
