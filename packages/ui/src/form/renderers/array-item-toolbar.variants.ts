@@ -13,9 +13,15 @@ export const arrayItemDragHandleClasses = cn(
 /** Collapse caret in detailed item headers. */
 export const arrayItemCollapseButtonClasses = arrayItemChromeButtonClasses
 
-/** Remove control — destructive hover treatment. */
+/** Remove control — destructive hover treatment; pinned to the toolbar trailing edge. */
 export const arrayItemRemoveButtonClasses =
-  'ml-[calc(var(--spacing)*3)] size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5'
+  'ml-auto size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5'
+
+/** Column wrapper for the title row and optional summary row below it. */
+export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-1'
+
+/** Shared flex-1 body slot — title line or compact inline fields. */
+export const arrayItemHeaderContentClasses = 'flex min-w-0 flex-1 items-center'
 
 /** Detailed item header title cluster. */
 export const arrayItemHeaderTitleClasses =
@@ -35,6 +41,18 @@ export const arrayItemToolbarRowClasses = 'relative flex min-w-0 gap-0 pr-2'
 
 /** Space between collapse caret and title / compact fields. */
 export const arrayItemToolbarContentClasses = 'min-w-0 flex-1 ml-[calc(var(--spacing)*1)]'
+
+/** Indents summary text to align with the title column start. */
+export function arrayItemHeaderSummaryIndentClasses(options: {
+  showDragHandle: boolean
+  collapsible: boolean
+}): string {
+  if (options.showDragHandle && options.collapsible) {
+    return arrayItemBodySortableCaretIndentClasses
+  }
+  if (options.collapsible) return arrayItemBodyCaretIndentClasses
+  return ''
+}
 
 /** Indents collapsible bodies under the title (caret column only). */
 export const arrayItemBodyCaretIndentClasses = 'pl-7'

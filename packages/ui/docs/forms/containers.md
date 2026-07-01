@@ -140,7 +140,7 @@ Optional hooks:
 | Property                | Purpose                                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------------- |
 | `itemVariant`           | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                      |
-| `itemHeader`            | Primary/fallback labels, optional `summary` below the title on collapsible items.           |
+| `itemHeader`            | Primary/fallback labels; optional `summary` on a second row below the title (detailed).     |
 | `itemCollapsible`       | Detailed items only — collapse body into header row.                                        |
 | `reorder`               | `'dragHandle'` (default) or `false` for fixed order.                                        |
 | `appendDefaults`        | `(items) => defaults` replaces static defaults on append.                                   |

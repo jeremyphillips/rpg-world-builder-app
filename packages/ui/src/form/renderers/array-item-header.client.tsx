@@ -16,9 +16,12 @@ import {
 import {
   arrayItemCollapseButtonClasses,
   arrayItemDragHandleClasses,
+  arrayItemHeaderContentClasses,
   arrayItemHeaderDividerClasses,
   arrayItemHeaderFallbackClasses,
+  arrayItemHeaderShellClasses,
   arrayItemHeaderSummaryClasses,
+  arrayItemHeaderSummaryIndentClasses,
   arrayItemHeaderTitleClasses,
   arrayItemRemoveButtonClasses,
   arrayItemToolbarContentClasses,
@@ -50,47 +53,22 @@ export function ArrayItemDragHandle({
   )
 }
 
-interface ArrayItemHeaderTitleProps {
-  header: ResolvedArrayItemHeader
-  summary?: string
-  titleId: string
-  className?: string
-}
-
-function ArrayItemHeaderTitle({
-  header,
-  summary,
-  titleId,
-  className,
-}: ArrayItemHeaderTitleProps) {
-  if (header.srOnly) {
+function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
+  if (header.primary) {
     return (
-      <span id={titleId} className="sr-only">
-        {header.ariaLabel}
-      </span>
+      <>
+        <span>{header.primary}</span>
+        {header.showDivider ? (
+          <span className={arrayItemHeaderDividerClasses} aria-hidden>
+            {ARRAY_ITEM_HEADER_DIVIDER}
+          </span>
+        ) : null}
+        <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
+      </>
     )
   }
 
-  const titleLine = header.primary ? (
-    <>
-      <span>{header.primary}</span>
-      {header.showDivider ? (
-        <span className={arrayItemHeaderDividerClasses} aria-hidden>
-          {ARRAY_ITEM_HEADER_DIVIDER}
-        </span>
-      ) : null}
-      <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
-    </>
-  ) : (
-    header.fallback
-  )
-
-  return (
-    <div id={titleId} className={cn('min-w-0 flex-1', className)}>
-      <div className={arrayItemHeaderTitleClasses}>{titleLine}</div>
-      {summary ? <p className={cn(arrayItemHeaderSummaryClasses, 'mt-1')}>{summary}</p> : null}
-    </div>
-  )
+  return header.fallback
 }
 
 export interface ArrayItemToolbarProps {
@@ -138,10 +116,16 @@ export function ArrayItemToolbar({
     watchedPrimary,
     legend,
   )
-  const summary = headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
+  const summary =
+    !compact && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
 
-  return (
-    <div className={cn(arrayItemToolbarRowClasses, compact ? 'items-start' : 'items-center')}>
+  const headerContentClasses = cn(
+    arrayItemHeaderContentClasses,
+    collapsible && arrayItemToolbarContentClasses,
+  )
+
+  const titleRow = (
+    <div className={cn(arrayItemToolbarRowClasses, 'items-center')}>
       {showDragHandle && dragHandleProps ? (
         <ArrayItemDragHandle
           {...dragHandleProps}
@@ -165,25 +149,20 @@ export function ArrayItemToolbar({
           />
         </Button>
       ) : null}
-      {compact ? (
-        <>
-          {!showDragHandle && !collapsible ? (
-            <span className="sr-only" id={titleId}>
-              {header.ariaLabel}
-            </span>
-          ) : null}
-          <div className={cn(collapsible ? arrayItemToolbarContentClasses : 'min-w-0 flex-1')}>
+      <div id={titleId} className={headerContentClasses}>
+        {compact ? (
+          <>
+            {!showDragHandle && !collapsible ? (
+              <span className="sr-only">{header.ariaLabel}</span>
+            ) : null}
             {children}
-          </div>
-        </>
-      ) : (
-        <ArrayItemHeaderTitle
-          header={header}
-          summary={summary}
-          titleId={titleId}
-          className={collapsible ? arrayItemToolbarContentClasses : undefined}
-        />
-      )}
+          </>
+        ) : header.srOnly ? (
+          <span className="sr-only">{header.ariaLabel}</span>
+        ) : (
+          <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
+        )}
+      </div>
       <Button
         type="button"
         variant="ghost"
@@ -195,6 +174,22 @@ export function ArrayItemToolbar({
       >
         <Trash2 aria-hidden />
       </Button>
+    </div>
+  )
+
+  if (!summary) return titleRow
+
+  return (
+    <div className={arrayItemHeaderShellClasses}>
+      {titleRow}
+      <p
+        className={cn(
+          arrayItemHeaderSummaryClasses,
+          arrayItemHeaderSummaryIndentClasses({ showDragHandle, collapsible }),
+        )}
+      >
+        {summary}
+      </p>
     </div>
   )
 }
