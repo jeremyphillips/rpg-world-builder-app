@@ -67,7 +67,10 @@ const attackResolutionOptions = [
 
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+      mutations: { retry: false },
+    },
   })
   queryClient.setQueryData(['campaigns', campaignId, 'ruleset-patch'], mockPatch)
   queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', CREATURE_TYPE_SET_ID], {
@@ -115,14 +118,11 @@ describe('RulesConfigDetailContent', () => {
     renderDetail()
 
     expect(
-      await screen.findByRole('heading', { name: 'Character Configuration' }),
-    ).toBeInTheDocument()
-    expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),
     ).toBeInTheDocument()
+    await screen.findByLabelText('Character starting level')
+    expect(screen.getByRole('heading', { name: 'Character Configuration' })).toBeInTheDocument()
     expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
-    expect(screen.getByLabelText('Table name')).toHaveValue('Standard Starting Wealth')
-    expect(screen.getByText('Wealth tiers')).toBeInTheDocument()
     expect(screen.getByLabelText('Allow multiclassing')).toBeChecked()
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
   })

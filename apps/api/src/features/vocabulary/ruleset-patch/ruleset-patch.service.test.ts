@@ -6,13 +6,19 @@ import {
   CREATURE_TYPE_SET_ID,
   defaultCampaignMechanicsPatch,
   defaultMulticlassingRules,
+  type StartingWealthTier,
 } from '@rpg/contracts'
-import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { createApp } from '../../../app'
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import {
+  INITIATE_TIER_ID,
+  patchInitiateStartingWealthTier,
+  standardStartingWealthSeed,
+  withLastTierMaxLevel,
+} from '../../../test/starting-wealth-patch-fixtures'
 import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
   getRulesetPatchRead,
@@ -24,6 +30,11 @@ import { createCampaign } from '../../campaign'
 import { createUser } from '../../user'
 
 let app: Express
+
+const EXTENDED_PROGRESSION_INPUT = {
+  maxCharacterLevel: 20,
+  extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+} as const
 
 beforeAll(async () => {
   await startTestDb()
@@ -42,6 +53,13 @@ async function makeUser(email: string) {
   return createUser({ email, passwordHash: 'x', displayName: email })
 }
 
+async function enableExtendedProgressionAt30(campaignId: string) {
+  await updateCharacterCreationPatch(campaignId, {
+    progression: EXTENDED_PROGRESSION_INPUT,
+    startingWealth: { tiers: withLastTierMaxLevel(30) },
+  })
+}
+
 describe('getRulesetPatchRead', () => {
   it('returns resolved defaults when no patch document exists', async () => {
     const owner = await makeUser('owner@example.com')
@@ -55,53 +73,74 @@ describe('getRulesetPatchRead', () => {
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       multiclassing: defaultMulticlassingRules(),
-      startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
+      startingWealth: standardStartingWealthSeed(),
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })
 })
 
 describe('updateCharacterCreationPatch', () => {
-  function tiersCoveringMax(maxLevel: number) {
-    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
-    return seed.tiers.map((tier) => (tier.id === 'levels-17-20' ? { ...tier, maxLevel } : tier))
-  }
-
   it('rejects extended progression when resolved tiers do not cover the new max', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
 
     await expect(
       updateCharacterCreationPatch(campaign.id, {
-        progression: {
-          maxCharacterLevel: 20,
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
+        progression: EXTENDED_PROGRESSION_INPUT,
       }),
     ).rejects.toMatchObject({ status: 400 })
   })
 
-  it('persists extended progression when tiers cover the new max', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+  describe('extended progression with starting wealth tiers', () => {
+    it('persists extended progression when tiers cover the new max', async () => {
+      const owner = await makeUser('owner@example.com')
+      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
-      progression: {
-        maxCharacterLevel: 20,
-        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-      },
-      startingWealth: { tiers: tiersCoveringMax(30) },
+      const patch = await updateCharacterCreationPatch(campaign.id, {
+        progression: EXTENDED_PROGRESSION_INPUT,
+        startingWealth: { tiers: withLastTierMaxLevel(30) },
+      })
+
+      expect(patch?.characterCreation.progression.extendedProgression).toEqual({
+        tierName: 'Epic Destiny',
+        maxLevel: 30,
+      })
+
+      const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+      expect(stored?.characterCreation?.progression?.extendedProgression).toEqual({
+        tierName: 'Epic Destiny',
+        maxLevel: 30,
+      })
     })
 
-    expect(patch?.characterCreation.progression.extendedProgression).toEqual({
-      tierName: 'Epic Destiny',
-      maxLevel: 30,
+    it('rejects unsetting extended progression while tiers still cover the extended max', async () => {
+      const owner = await makeUser('owner@example.com')
+      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+      await enableExtendedProgressionAt30(campaign.id)
+
+      await expect(
+        updateCharacterCreationPatch(campaign.id, {
+          progression: { maxCharacterLevel: 20 },
+        }),
+      ).rejects.toMatchObject({ status: 400 })
     })
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.characterCreation?.progression?.extendedProgression).toEqual({
-      tierName: 'Epic Destiny',
-      maxLevel: 30,
+    it('unsets extended progression when tiers are reset to the standard max', async () => {
+      const owner = await makeUser('owner@example.com')
+      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+      await enableExtendedProgressionAt30(campaign.id)
+
+      const patch = await updateCharacterCreationPatch(campaign.id, {
+        progression: { maxCharacterLevel: 20 },
+        startingWealth: { tiers: withLastTierMaxLevel(20) },
+      })
+
+      expect(patch?.characterCreation.progression.extendedProgression).toBeUndefined()
+
+      const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+      expect(stored?.characterCreation?.progression?.extendedProgression).toBeUndefined()
     })
   })
 
@@ -139,48 +178,6 @@ describe('updateCharacterCreationPatch', () => {
       status: 400,
       code: 'invalid_vocabulary',
     })
-  })
-
-  it('rejects unsetting extended progression while tiers still cover the extended max', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
-
-    await updateCharacterCreationPatch(campaign.id, {
-      progression: {
-        maxCharacterLevel: 20,
-        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-      },
-      startingWealth: { tiers: tiersCoveringMax(30) },
-    })
-
-    await expect(
-      updateCharacterCreationPatch(campaign.id, {
-        progression: { maxCharacterLevel: 20 },
-      }),
-    ).rejects.toMatchObject({ status: 400 })
-  })
-
-  it('unsets extended progression when tiers are reset to the standard max', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
-
-    await updateCharacterCreationPatch(campaign.id, {
-      progression: {
-        maxCharacterLevel: 20,
-        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-      },
-      startingWealth: { tiers: tiersCoveringMax(30) },
-    })
-
-    const patch = await updateCharacterCreationPatch(campaign.id, {
-      progression: { maxCharacterLevel: 20 },
-      startingWealth: { tiers: tiersCoveringMax(20) },
-    })
-
-    expect(patch?.characterCreation.progression.extendedProgression).toBeUndefined()
-
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.characterCreation?.progression?.extendedProgression).toBeUndefined()
   })
 
   it('persists non-default multiclassing overrides', async () => {
@@ -263,31 +260,34 @@ describe('updateCharacterCreationPatch', () => {
   it('persists starting wealth tier patches on the ruleset patch', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
-    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
-    const patchedTiers = seed.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
-    )
+    const patchedTiers = patchInitiateStartingWealthTier({
+      includeNormalStartingEquipment: false,
+    })
 
     const patch = await updateCharacterCreationPatch(campaign.id, {
       startingWealth: { tiers: patchedTiers },
     })
 
     expect(
-      patch?.characterCreation.startingWealth.tiers.find((tier) => tier.id === 'level-1')
+      patch?.characterCreation.startingWealth.tiers.find((tier) => tier.id === INITIATE_TIER_ID)
         ?.includeNormalStartingEquipment,
     ).toBe(false)
 
     const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.characterCreation?.startingWealth).toEqual({ tiers: patchedTiers })
+    expect(
+      stored?.characterCreation?.startingWealth?.tiers?.find(
+        (tier: StartingWealthTier) => tier.id === INITIATE_TIER_ID,
+      )?.includeNormalStartingEquipment,
+    ).toBe(false)
   })
 
   it('unsets starting wealth when reverted to catalog seed defaults', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
-    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
-    const patchedTiers = seed.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
-    )
+    const seed = standardStartingWealthSeed()
+    const patchedTiers = patchInitiateStartingWealthTier({
+      includeNormalStartingEquipment: false,
+    })
 
     await updateCharacterCreationPatch(campaign.id, {
       startingWealth: { tiers: patchedTiers },
@@ -413,22 +413,20 @@ describe('ruleset patch routes', () => {
   it('patches starting wealth tiers for campaign managers', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createTestCampaign(agent, csrfToken)
-    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
-    const patchedTiers = seed.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
-    )
 
     const res = await agent
       .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
       .set(CSRF_HEADER, csrfToken)
       .send({
-        startingWealth: { tiers: patchedTiers },
+        startingWealth: {
+          tiers: patchInitiateStartingWealthTier({ includeNormalStartingEquipment: false }),
+        },
       })
       .expect(200)
 
     expect(
       res.body.patch.characterCreation.startingWealth.tiers.find(
-        (tier: { id: string }) => tier.id === 'level-1',
+        (tier: { id: string }) => tier.id === INITIATE_TIER_ID,
       )?.includeNormalStartingEquipment,
     ).toBe(false)
   })
