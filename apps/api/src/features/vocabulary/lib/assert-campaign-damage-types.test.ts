@@ -1,10 +1,9 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { DAMAGE_TYPE_SET_ID, SENSE_SET_ID } from '@rpg/contracts'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createCampaign } from '../../campaign'
-import { createUser } from '../../user'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import {
   assertDamageTypesActiveInCampaign,
   assertSensesActiveInCampaign,
@@ -13,48 +12,28 @@ import {
 } from './assert-campaign-damage-types'
 import { updateVocabularyEntry } from '../sets/vocabulary.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
+useIntegrationDb()
 
 describe('assertDamageTypesActiveInCampaign', () => {
   it('accepts active seed damage types', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Vocab', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Vocab' })
 
-    const activeIds = await getActiveDamageTypeIdsForCampaign(campaign.id)
+    const activeIds = await getActiveDamageTypeIdsForCampaign(campaignId)
     expect(activeIds.has('fire')).toBe(true)
 
     await expect(
-      assertDamageTypesActiveInCampaign(campaign.id, ['fire', 'cold']),
+      assertDamageTypesActiveInCampaign(campaignId, ['fire', 'cold']),
     ).resolves.toBeUndefined()
   })
 
   it('rejects disabled damage types', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Disabled', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaign.id, DAMAGE_TYPE_SET_ID, 'fire', {
+    await updateVocabularyEntry(campaignId, DAMAGE_TYPE_SET_ID, 'fire', {
       status: 'disabled',
     })
 
-    await expect(assertDamageTypesActiveInCampaign(campaign.id, ['fire'])).rejects.toMatchObject({
+    await expect(assertDamageTypesActiveInCampaign(campaignId, ['fire'])).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',
     })
@@ -63,32 +42,22 @@ describe('assertDamageTypesActiveInCampaign', () => {
 
 describe('assertSensesActiveInCampaign', () => {
   it('accepts active seed senses', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Vocab', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Vocab' })
 
-    const activeIds = await getActiveSenseIdsForCampaign(campaign.id)
+    const activeIds = await getActiveSenseIdsForCampaign(campaignId)
     expect(activeIds.has('darkvision')).toBe(true)
 
-    await expect(assertSensesActiveInCampaign(campaign.id, ['darkvision'])).resolves.toBeUndefined()
+    await expect(assertSensesActiveInCampaign(campaignId, ['darkvision'])).resolves.toBeUndefined()
   })
 
   it('rejects disabled senses', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Disabled', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaign.id, SENSE_SET_ID, 'darkvision', {
+    await updateVocabularyEntry(campaignId, SENSE_SET_ID, 'darkvision', {
       status: 'disabled',
     })
 
-    await expect(assertSensesActiveInCampaign(campaign.id, ['darkvision'])).rejects.toMatchObject({
+    await expect(assertSensesActiveInCampaign(campaignId, ['darkvision'])).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',
     })

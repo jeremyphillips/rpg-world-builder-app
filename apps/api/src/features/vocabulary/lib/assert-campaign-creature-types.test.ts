@@ -1,58 +1,37 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createCampaign } from '../../campaign'
-import { createUser } from '../../user'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import {
   assertCreatureTypesActiveInCampaign,
   getActiveCreatureTypeIdsForCampaign,
 } from './assert-campaign-creature-types'
 import { updateVocabularyEntry } from '../sets/vocabulary.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
+useIntegrationDb()
 
 describe('assertCreatureTypesActiveInCampaign', () => {
   it('accepts active seed creature types', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Vocab', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Vocab' })
 
-    const activeIds = await getActiveCreatureTypeIdsForCampaign(campaign.id)
+    const activeIds = await getActiveCreatureTypeIdsForCampaign(campaignId)
     expect(activeIds.has('humanoid')).toBe(true)
 
     await expect(
-      assertCreatureTypesActiveInCampaign(campaign.id, ['humanoid', 'fey']),
+      assertCreatureTypesActiveInCampaign(campaignId, ['humanoid', 'fey']),
     ).resolves.toBeUndefined()
   })
 
   it('rejects disabled creature types', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Disabled', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'fey', {
+    await updateVocabularyEntry(campaignId, CREATURE_TYPE_SET_ID, 'fey', {
       status: 'disabled',
     })
 
-    await expect(assertCreatureTypesActiveInCampaign(campaign.id, ['fey'])).rejects.toMatchObject({
+    await expect(assertCreatureTypesActiveInCampaign(campaignId, ['fey'])).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',
     })

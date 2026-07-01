@@ -1,36 +1,21 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
-import type { Express } from 'express'
+import { describe, expect, it } from 'vitest'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { createApp } from '../../../app'
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { useIntegrationApp } from '../../../test/setup/integration-app'
 
-let app: Express
+const getApp = useIntegrationApp()
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  return registerAndLoginTestUser(app)
+  return registerAndLoginTestUser(getApp())
 }
 
 async function createCampaign(agent: Agent, csrfToken: string): Promise<string> {
   return createTestCampaign(agent, csrfToken, 'Vocabulary Test')
 }
-
-beforeAll(async () => {
-  await startTestDb()
-  app = createApp()
-})
-
-afterEach(async () => {
-  await clearTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
 
 describe('vocabulary routes', () => {
   it('lists and reads resolved vocabulary sets for campaign members', async () => {
@@ -106,6 +91,6 @@ describe('vocabulary routes', () => {
   })
 
   it('requires authentication for vocabulary reads', async () => {
-    await request(app).get('/api/campaigns/000000000000000000000000/vocabulary').expect(401)
+    await request(getApp()).get('/api/campaigns/000000000000000000000000/vocabulary').expect(401)
   })
 })

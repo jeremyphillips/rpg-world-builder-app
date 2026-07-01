@@ -1,10 +1,10 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createUser } from '../../user'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
   createCampaignVocabularyEntry,
@@ -12,33 +12,12 @@ import {
   resolveVocabularySetForCampaign,
   updateVocabularyEntry,
 } from './vocabulary.service'
-import { createCampaign } from '../../campaign'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeCampaign() {
-  const owner = await createUser({
-    email: 'owner@example.com',
-    passwordHash: 'x',
-    displayName: 'Owner',
-  })
-  const campaign = await createCampaign({ name: 'Test', createdBy: owner.id })
-  return campaign
-}
+useIntegrationDb()
 
 describe('CampaignRulesetPatch persistence', () => {
   it('upserts one document per (campaignId, rulesetId)', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await createCampaignVocabularyEntry(campaign.id, {
       setId: CREATURE_TYPE_SET_ID,
@@ -52,7 +31,7 @@ describe('CampaignRulesetPatch persistence', () => {
   })
 
   it('updates the same patch document on subsequent writes', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await createCampaignVocabularyEntry(campaign.id, {
       setId: CREATURE_TYPE_SET_ID,
@@ -88,7 +67,7 @@ describe('CampaignRulesetPatch persistence', () => {
 
 describe('vocabulary write rules', () => {
   it('rejects duplicate ids against system and campaign entries', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await expect(
       createCampaignVocabularyEntry(campaign.id, {
@@ -114,7 +93,7 @@ describe('vocabulary write rules', () => {
   })
 
   it('patches and disables system entries without deleting them', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     const patched = await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
       label: 'People',
@@ -133,7 +112,7 @@ describe('vocabulary write rules', () => {
   })
 
   it('edits, disables, and deletes unused campaign entries', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await createCampaignVocabularyEntry(campaign.id, {
       setId: CREATURE_TYPE_SET_ID,
@@ -156,14 +135,14 @@ describe('vocabulary write rules', () => {
   })
 
   it('returns usage counts as zero from the stub', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const set = await resolveVocabularySetForCampaign(campaign.id, CREATURE_TYPE_SET_ID)
 
     expect(set.options.every((option) => option.usedBy === 0)).toBe(true)
   })
 
   it('allows delete while usage stub reports zero references', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await createCampaignVocabularyEntry(campaign.id, {
       setId: CREATURE_TYPE_SET_ID,
@@ -179,7 +158,7 @@ describe('vocabulary write rules', () => {
 
 describe('resolveVocabularySetForCampaign', () => {
   it('merges seed and patch entries for members', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'fey', {
       status: 'disabled',

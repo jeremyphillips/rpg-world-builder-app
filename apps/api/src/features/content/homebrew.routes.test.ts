@@ -1,31 +1,17 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { Agent } from 'supertest'
-import type { Express } from 'express'
 
-import { createApp } from '../../app'
-import { CSRF_HEADER } from '../../lib/cookies'
-import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts'
 
-let app: Express
+import { CSRF_HEADER } from '../../lib/cookies'
+import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
+import { useIntegrationApp } from '../../test/setup/integration-app'
+
+const getApp = useIntegrationApp()
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  return registerAndLoginTestUser(app)
+  return registerAndLoginTestUser(getApp())
 }
-
-beforeAll(async () => {
-  await startTestDb()
-  app = createApp()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-afterEach(async () => {
-  await clearTestDb()
-})
 
 describe('homebrew routes', () => {
   it('returns the homebrew content summary for campaign members', async () => {

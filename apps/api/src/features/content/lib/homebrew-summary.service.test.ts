@@ -1,36 +1,17 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createUser } from '../../user'
-import { createCampaign } from '../../campaign'
-import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts'
+
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
+import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { getHomebrewContentSummary } from './homebrew-summary.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeCampaign() {
-  const owner = await createUser({
-    email: 'owner@example.com',
-    passwordHash: 'x',
-    displayName: 'Owner',
-  })
-  return createCampaign({ name: 'Test', createdBy: owner.id })
-}
+useIntegrationDb()
 
 describe('getHomebrewContentSummary', () => {
   it('returns catalog counts for every visible-sidebar content type', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await HomebrewClassModel.create({
       slug: 'blood-hunter',

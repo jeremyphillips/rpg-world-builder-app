@@ -1,10 +1,9 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { LANGUAGE_SET_ID, SPELL_SCHOOL_SET_ID } from '@rpg/contracts'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createCampaign } from '../../campaign'
-import { createUser } from '../../user'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import {
   assertLanguagesActiveInCampaign,
   assertSpellSchoolsActiveInCampaign,
@@ -13,48 +12,28 @@ import {
 } from './assert-campaign-languages-spell-schools'
 import { updateVocabularyEntry } from '../sets/vocabulary.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
+useIntegrationDb()
 
 describe('assertLanguagesActiveInCampaign', () => {
   it('accepts active seed languages', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Vocab', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Vocab' })
 
-    const activeIds = await getActiveLanguageIdsForCampaign(campaign.id)
+    const activeIds = await getActiveLanguageIdsForCampaign(campaignId)
     expect(activeIds.has('common')).toBe(true)
 
     await expect(
-      assertLanguagesActiveInCampaign(campaign.id, ['common', 'elvish']),
+      assertLanguagesActiveInCampaign(campaignId, ['common', 'elvish']),
     ).resolves.toBeUndefined()
   })
 
   it('rejects disabled languages', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Disabled', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaign.id, LANGUAGE_SET_ID, 'common', {
+    await updateVocabularyEntry(campaignId, LANGUAGE_SET_ID, 'common', {
       status: 'disabled',
     })
 
-    await expect(assertLanguagesActiveInCampaign(campaign.id, ['common'])).rejects.toMatchObject({
+    await expect(assertLanguagesActiveInCampaign(campaignId, ['common'])).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',
     })
@@ -63,35 +42,25 @@ describe('assertLanguagesActiveInCampaign', () => {
 
 describe('assertSpellSchoolsActiveInCampaign', () => {
   it('accepts active seed spell schools', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Vocab', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Vocab' })
 
-    const activeIds = await getActiveSpellSchoolIdsForCampaign(campaign.id)
+    const activeIds = await getActiveSpellSchoolIdsForCampaign(campaignId)
     expect(activeIds.has('evocation')).toBe(true)
 
     await expect(
-      assertSpellSchoolsActiveInCampaign(campaign.id, ['evocation']),
+      assertSpellSchoolsActiveInCampaign(campaignId, ['evocation']),
     ).resolves.toBeUndefined()
   })
 
   it('rejects disabled spell schools', async () => {
-    const owner = await createUser({
-      email: 'owner@example.com',
-      passwordHash: 'x',
-      displayName: 'Owner',
-    })
-    const campaign = await createCampaign({ name: 'Disabled', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaign.id, SPELL_SCHOOL_SET_ID, 'evocation', {
+    await updateVocabularyEntry(campaignId, SPELL_SCHOOL_SET_ID, 'evocation', {
       status: 'disabled',
     })
 
     await expect(
-      assertSpellSchoolsActiveInCampaign(campaign.id, ['evocation']),
+      assertSpellSchoolsActiveInCampaign(campaignId, ['evocation']),
     ).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',

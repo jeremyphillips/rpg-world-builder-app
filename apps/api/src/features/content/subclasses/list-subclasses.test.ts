@@ -1,36 +1,16 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createCampaign } from '../../campaign'
-import { createUser } from '../../user'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { resolveSubclassesForCampaign } from './list-subclasses'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeCampaign() {
-  const owner = await createUser({
-    email: 'owner@example.com',
-    passwordHash: 'x',
-    displayName: 'Owner',
-  })
-  return createCampaign({ name: 'Test', createdBy: owner.id })
-}
+useIntegrationDb()
 
 describe('resolveSubclassesForCampaign', () => {
   it('returns catalog subclasses for a system class id', async () => {
-    const campaign = await makeCampaign()
+    const { id: campaignId } = await makeTestCampaign()
 
-    const subclasses = await resolveSubclassesForCampaign(campaign.id, 'srd-cc-5.2.1:fighter')
+    const subclasses = await resolveSubclassesForCampaign(campaignId, 'srd-cc-5.2.1:fighter')
 
     expect(subclasses.length).toBeGreaterThan(0)
     expect(subclasses.every((sub) => sub.classId === 'srd-cc-5.2.1:fighter')).toBe(true)
