@@ -86,7 +86,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Traits — Item 1' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Traits · Item 1' }))
     expect(screen.queryByRole('textbox', { name: 'Trait name' })).not.toBeInTheDocument()
   })
 
@@ -161,7 +161,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits — Item 1' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove Traits · Item 1' })).toBeDisabled()
   })
 
   it('hides nested arrays when item-scoped visibility is false', async () => {
@@ -364,9 +364,50 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /Remove Traits — Item/ })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: /Remove Traits · Item/ })).toHaveLength(2)
     expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass('pl-2')
     expect(screen.getByRole('group', { name: 'Item 1' })).not.toHaveClass('pl-10')
+  })
+
+  it('shows item summaries while expanded and collapsed', async () => {
+    const user = userEvent.setup()
+    const collapsibleFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemVariant: 'detailed',
+        itemCollapsible: true,
+        itemHeader: {
+          fallback: (index) => `Trait ${index + 1}`,
+          primaryField: 'name',
+          summary: (values) => (values.description as string) || 'No description',
+        },
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+    await user.type(screen.getByRole('textbox', { name: 'Description' }), 'See in the dark')
+
+    expect(screen.getByText('See in the dark', { selector: 'p' })).toBeInTheDocument()
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
+    await user.click(collapseTrigger)
+
+    expect(screen.getByText('See in the dark', { selector: 'p' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
   })
 
   it('collapses detailed items while preserving field values', async () => {

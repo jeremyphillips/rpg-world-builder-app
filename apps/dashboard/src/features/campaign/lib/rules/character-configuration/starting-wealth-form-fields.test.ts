@@ -4,12 +4,33 @@ import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { buildRulesSchemaForSurface } from './character-configuration-form-fields'
 import {
   buildStartingWealthPatchInput,
+  formatStartingWealthTierSummary,
   mapStartingWealthToFormValues,
 } from './starting-wealth-form-values'
 import { startingWealthFormSchema } from './starting-wealth-form-fields'
 
 const SEED = getStandardStartingWealthRules('srd-cc-5.2.1')
 const configRulesSchema = buildRulesSchemaForSurface('config')
+
+describe('formatStartingWealthTierSummary', () => {
+  it('formats hero tier with level range, average bonus gold, and grant count', () => {
+    const heroTier = mapStartingWealthToFormValues(SEED).tiers.find((tier) => tier.label === 'Hero')
+    expect(heroTier).toBeDefined()
+
+    expect(formatStartingWealthTierSummary(heroTier!)).toBe(
+      'Levels 5–10 · Avg 637.5 GP · 2 grants',
+    )
+  })
+
+  it('formats tiers with grants but no bonus gold', () => {
+    const adventurerTier = mapStartingWealthToFormValues(SEED).tiers.find(
+      (tier) => tier.label === 'Adventurer',
+    )
+    expect(adventurerTier).toBeDefined()
+
+    expect(formatStartingWealthTierSummary(adventurerTier!)).toBe('Levels 2–4 · 1 grant')
+  })
+})
 
 describe('mapStartingWealthToFormValues', () => {
   it('round-trips catalog seed tiers', () => {

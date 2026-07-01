@@ -581,7 +581,7 @@ export interface ArrayItemHeaderConfig {
   /** Computed primary label; overrides `primaryField` when set. */
   primary?: (values: Record<string, unknown>, index: number) => string | undefined
   fallback: (index: number) => string
-  /** Shown in the header when a collapsible item is collapsed. */
+  /** Shown below the header title on collapsible detailed items. */
   summary?: (values: Record<string, unknown>, index: number) => string
   /** Renders `primary · fallback` when both are present. */
   showDivider?: boolean

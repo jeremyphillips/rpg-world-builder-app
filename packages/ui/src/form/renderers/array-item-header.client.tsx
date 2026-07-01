@@ -10,6 +10,7 @@ import { cn } from '../../lib/utils'
 import type { ArrayItemHeaderConfig } from '../field-config'
 import {
   resolveArrayItemHeaderLabels,
+  ARRAY_ITEM_HEADER_DIVIDER,
   type ResolvedArrayItemHeader,
 } from '../config/array-item-config.lib'
 import {
@@ -52,7 +53,6 @@ export function ArrayItemDragHandle({
 interface ArrayItemHeaderTitleProps {
   header: ResolvedArrayItemHeader
   summary?: string
-  collapsed: boolean
   titleId: string
   className?: string
 }
@@ -60,7 +60,6 @@ interface ArrayItemHeaderTitleProps {
 function ArrayItemHeaderTitle({
   header,
   summary,
-  collapsed,
   titleId,
   className,
 }: ArrayItemHeaderTitleProps) {
@@ -72,44 +71,24 @@ function ArrayItemHeaderTitle({
     )
   }
 
-  if (collapsed && summary) {
-    return (
-      <div id={titleId} className={cn('min-w-0 flex-1', className)}>
-        <div className={arrayItemHeaderTitleClasses}>
-          {header.primary ? (
-            <>
-              <span>{header.primary}</span>
-              {header.showDivider ? (
-                <span className={arrayItemHeaderDividerClasses} aria-hidden>
-                  ·
-                </span>
-              ) : null}
-              <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
-            </>
-          ) : (
-            header.fallback
-          )}
-        </div>
-        <p className={cn(arrayItemHeaderSummaryClasses, 'mt-1')}>{summary}</p>
-      </div>
-    )
-  }
+  const titleLine = header.primary ? (
+    <>
+      <span>{header.primary}</span>
+      {header.showDivider ? (
+        <span className={arrayItemHeaderDividerClasses} aria-hidden>
+          {ARRAY_ITEM_HEADER_DIVIDER}
+        </span>
+      ) : null}
+      <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
+    </>
+  ) : (
+    header.fallback
+  )
 
   return (
-    <div id={titleId} className={cn(arrayItemHeaderTitleClasses, className)}>
-      {header.primary ? (
-        <>
-          <span>{header.primary}</span>
-          {header.showDivider ? (
-            <span className={arrayItemHeaderDividerClasses} aria-hidden>
-              ·
-            </span>
-          ) : null}
-          <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
-        </>
-      ) : (
-        header.fallback
-      )}
+    <div id={titleId} className={cn('min-w-0 flex-1', className)}>
+      <div className={arrayItemHeaderTitleClasses}>{titleLine}</div>
+      {summary ? <p className={cn(arrayItemHeaderSummaryClasses, 'mt-1')}>{summary}</p> : null}
     </div>
   )
 }
@@ -159,8 +138,7 @@ export function ArrayItemToolbar({
     watchedPrimary,
     legend,
   )
-  const summary =
-    collapsed && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
+  const summary = headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
 
   return (
     <div className={cn(arrayItemToolbarRowClasses, compact ? 'items-start' : 'items-center')}>
@@ -202,7 +180,6 @@ export function ArrayItemToolbar({
         <ArrayItemHeaderTitle
           header={header}
           summary={summary}
-          collapsed={collapsed}
           titleId={titleId}
           className={collapsible ? arrayItemToolbarContentClasses : undefined}
         />

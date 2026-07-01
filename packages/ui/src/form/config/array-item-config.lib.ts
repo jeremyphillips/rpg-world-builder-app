@@ -48,6 +48,17 @@ export function resolveArrayItemHeader(config: ArrayConfig): ArrayItemHeaderConf
   return config.itemHeader ?? defaultArrayItemHeader()
 }
 
+/** Middle-dot separator for array item header labels and summary segments. */
+export const ARRAY_ITEM_TEXT_SEPARATOR = ' · '
+
+/** Single middle dot rendered between primary and fallback header labels. */
+export const ARRAY_ITEM_HEADER_DIVIDER = '·'
+
+/** Joins non-empty summary/header segments with {@link ARRAY_ITEM_TEXT_SEPARATOR}. */
+export function joinArrayItemSummaryParts(parts: readonly string[]): string {
+  return parts.filter((part) => part.length > 0).join(ARRAY_ITEM_TEXT_SEPARATOR)
+}
+
 export function resolveArrayItemPrimaryLabel(
   header: ArrayItemHeaderConfig,
   values: Record<string, unknown>,
@@ -88,7 +99,9 @@ export function resolveArrayItemHeaderLabels(
   const primary = resolveArrayItemPrimaryLabel(header, values, index, watchedPrimary)
   const fallback = header.fallback(index)
   const showDivider = header.showDivider ?? Boolean(primary)
-  const ariaLabel = primary ? `${primary} — ${fallback}` : `${legend} — ${fallback}`
+  const ariaLabel = primary
+    ? joinArrayItemSummaryParts([primary, fallback])
+    : joinArrayItemSummaryParts([legend, fallback])
 
   return {
     primary,

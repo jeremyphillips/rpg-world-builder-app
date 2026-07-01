@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '../field-config'
-import { isNestedArraySection, resolveArrayItemVariant } from './array-item-config.lib'
+import { isNestedArraySection, joinArrayItemSummaryParts, resolveArrayItemVariant } from './array-item-config.lib'
 
 describe('array-item-config.lib', () => {
   it('treats nested array sections as compact', () => {
@@ -50,5 +50,11 @@ describe('array-item-config.lib', () => {
     }
 
     expect(resolveArrayItemVariant(config, { nested: false })).toBe('detailed')
+  })
+
+  it('joins summary segments with the middle-dot separator', () => {
+    expect(joinArrayItemSummaryParts(['Levels 5–10', 'Avg 637.5 GP', '2 grants'])).toBe(
+      'Levels 5–10 · Avg 637.5 GP · 2 grants',
+    )
   })
 })

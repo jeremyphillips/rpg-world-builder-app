@@ -109,6 +109,11 @@ export {
   type DiceFormulaValue,
 } from './components/ui/dice-formula-field.lib'
 export {
+  ARRAY_ITEM_HEADER_DIVIDER,
+  ARRAY_ITEM_TEXT_SEPARATOR,
+  joinArrayItemSummaryParts,
+} from './form/config/array-item-config.lib'
+export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,

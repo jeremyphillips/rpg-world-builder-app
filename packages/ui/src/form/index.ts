@@ -90,6 +90,11 @@ export {
   type SlotConfig,
   type FormItem,
 } from './field-config'
+export {
+  ARRAY_ITEM_HEADER_DIVIDER,
+  ARRAY_ITEM_TEXT_SEPARATOR,
+  joinArrayItemSummaryParts,
+} from './config/array-item-config.lib'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,

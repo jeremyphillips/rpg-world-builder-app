@@ -1,8 +1,8 @@
 import {
-  averageTierBonusGold,
+  averageScaledDiceRoll,
   computeStartingWealthSparsePatch,
   CURRENCY_IDS,
-  formatTierBonusGold,
+  moneyToCp,
   type Currency,
   type CurrencyDiceFormula,
   type DieFace,
@@ -13,7 +13,7 @@ import {
   type TierBonusGold,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
-import type { DiceFormulaValue } from '@rpg/ui'
+import { joinArrayItemSummaryParts, type DiceFormulaValue } from '@rpg/ui'
 
 export const STARTING_WEALTH_FORM_PREFIX = 'startingWealth' as const
 
@@ -170,32 +170,27 @@ export function buildStartingWealthPatchInput(
 }
 
 export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValues): string {
-  const parts: string[] = []
+  const parts: string[] = [`Levels ${tier.minLevel}–${tier.maxLevel}`]
 
   if (tier.bonusGoldEnabled) {
     const bonus: TierBonusGold = {
       baseGp: tier.bonusGold.baseGp,
       formula: mapDiceValueToBonusGoldFormula(tier.bonusGold.formula, tier.bonusGold.currency),
     }
-    parts.push(
-      `${formatTierBonusGold(bonus)} (avg ${averageTierBonusGold(bonus).toLocaleString()} GP)`,
-    )
+    const rollAverage = averageScaledDiceRoll(bonus.formula)
+    const rollGp =
+      bonus.formula.currency === 'gp'
+        ? rollAverage
+        : moneyToCp({ amount: rollAverage, currency: bonus.formula.currency }) / 100
+    const avgGp = bonus.baseGp + rollGp
+    const formattedAvg = Number.isInteger(avgGp) ? String(avgGp) : String(avgGp)
+    parts.push(`Avg ${formattedAvg} GP`)
   }
 
-  if (tier.magicItemGrants.length > 0) {
-    const grantSummary = tier.magicItemGrants
-      .map((grant) => `${grant.quantity} ${grant.rarity}`)
-      .join(', ')
-    parts.push(
-      `${tier.magicItemGrants.length} magic item grant${tier.magicItemGrants.length === 1 ? '' : 's'} (${grantSummary})`,
-    )
+  const grantCount = tier.magicItemGrants.length
+  if (grantCount > 0) {
+    parts.push(`${grantCount} grant${grantCount === 1 ? '' : 's'}`)
   }
 
-  if (parts.length === 0) {
-    return tier.includeNormalStartingEquipment
-      ? 'Class starting equipment only'
-      : 'No bonus gold or magic items'
-  }
-
-  return parts.join(' · ')
+  return joinArrayItemSummaryParts(parts)
 }
