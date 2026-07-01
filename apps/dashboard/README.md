@@ -66,10 +66,12 @@ locally (e.g. `useSession`, `useLogout`).
 | `auth`, `user`, `campaign`, `admin` (stub screens)                                           | Implemented |
 | `content` — classes, species, feats, spells, equipment (family modules), skill proficiencies | Implemented |
 | `homebrew` — vocabulary sets, rules configuration                                            | Implemented |
-| `character`, `message`, `notification`                                                       | Scaffold    |
+| `character` (stub routes: list + detail wired)                                               | Scaffold    |
+| `message`, `notification`                                                                    | Scaffold    |
 | `content/monsters`, `content/locations`                                                      | Scaffold    |
 
-Campaign-scoped catalog routes live under `/campaigns/:campaignId/…`. The home
+Campaign-scoped catalog routes live under `/campaigns/:campaignId/…`. User-scoped
+character routes live at `/characters` and `/characters/:characterId`. The home
 route is a campaign picker with a one-shot landing redirect
 ([`src/routes/dashboard-home.tsx`](src/routes/dashboard-home.tsx)).
 

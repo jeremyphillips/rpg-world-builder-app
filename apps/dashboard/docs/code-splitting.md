@@ -28,7 +28,9 @@ For before/after size history, see [bundle-baseline.md](./bundle-baseline.md).
 
 ## Adding a new route
 
-1. Create the screen under `src/features/<feature>/routes/` (or `src/routes/`).
+1. Create the screen under `src/features/<feature>/routes/`. Reserve
+   [`src/routes/`](../src/routes/) for app bootstrap only (dashboard home,
+   landing redirect).
 2. Register it in `lazy-routes.ts` with `lazyNamed(() => import('…'), 'ExportName')`
    and `withRouteSuspense`.
 3. Wire the path in `router.tsx` using the wrapped export from `lazy-routes.ts`.

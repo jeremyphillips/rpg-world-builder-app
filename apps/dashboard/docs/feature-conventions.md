@@ -115,10 +115,10 @@ For layout-only decorators, use page shells or a `<div>` — not a router.
 
 Every route picks **one width shell** from `components/layout/`:
 
-| Shell                                                    | Width                | Typical routes                                                      |
-| -------------------------------------------------------- | -------------------- | ------------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account/profile stubs, content create/edit forms |
-| [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                                   |
+| Shell                                                    | Width                | Typical routes                                                 |
+| -------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account settings, content create/edit forms |
+| [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                              |
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page-content.variants.ts)

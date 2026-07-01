@@ -265,10 +265,12 @@ apps/dashboard/src/features/content/<type>/          ← single-word: spells/; m
   routes/<type>-detail.tsx         ← Detail page + stories
   index.ts                         ← Sub-area barrel
 apps/dashboard/src/
-  features/content/index.ts        ← Content feature barrel
-  app/routes.ts                    ← ROUTES constant (content paths in content-routes.ts)
-  app/router.tsx                   ← React Router wiring
-  components/layout/sidebar/campaign-nav-section.tsx  ← Sidebar NavItem
+  features/content/index.ts        ← Content feature barrel (hooks/components — not route screens)
+  app/routes.ts                    ← ROUTES aggregator
+  app/content-routes.ts            ← Catalog path builders (add new types here)
+  app/lazy-routes.ts               ← Lazy route registrations (import route files directly)
+  app/router.tsx                   ← React Router tree + breadcrumb handles
+  features/homebrew/lib/hub/content-registry.ts  ← VISIBLE_SIDEBAR_CONTENT (sidebar + hub)
 ```
 
 ---
@@ -635,37 +637,66 @@ Add co-located `*.stories.tsx` (CSF3, `title: 'Content/<TypeName>Detail'`).
 
 ### 13. Sub-area barrel (`index.ts`)
 
+Export hooks and query keys only — **do not** re-export route screens (they are
+lazy-loaded via direct path imports in `lazy-routes.ts`; barrel re-exports defeat
+code splitting). See
+[code-splitting.md](../apps/dashboard/docs/code-splitting.md).
+
 ```typescript
-export { <TypeName>sOverview } from './routes/<kebab-plural>-overview'
-export { <TypeName>Detail } from './routes/<kebab-singular>-detail'
 export { use<TypeName>s, <camelPlural>QueryKey } from './hooks/use-<kebab-plural>'
 ```
 
+Optional: export non-route helpers other sub-areas need (e.g. column builders).
+
 ### 14. Content feature barrel (`apps/dashboard/src/features/content/index.ts`)
 
+Re-export hooks, shared shells, and form infra from sub-areas — **not** route
+screen components. Create/edit route exports that exist today are legacy; new
+types should omit them.
+
 ```typescript
-export { <TypeName>sOverview, <TypeName>Detail, use<TypeName>s, <camelPlural>QueryKey } from './<camelPlural>'
+export { use<TypeName>s, <camelPlural>QueryKey } from './<kebab-plural-or-camel>'
 ```
 
-### 15. Route constants (`apps/dashboard/src/app/routes.ts`)
+### 15. Route constants (`apps/dashboard/src/app/content-routes.ts`)
+
+Add the new type to `CONTENT_ROUTES` (aggregated by `routes.ts` as `ROUTES.content`):
 
 ```typescript
-content: {
-  // ...existing types
-  <camelPlural>: {
-    overview: (campaignId: string) => `/campaigns/${campaignId}/<kebab-plural>`,
-    detail: (campaignId: string, itemId: string) => `/campaigns/${campaignId}/<kebab-plural>/${itemId}`,
-    edit: (campaignId: string, itemId: string) => `/campaigns/${campaignId}/<kebab-plural>/${itemId}/edit`,
-    create: (campaignId: string) => `/campaigns/${campaignId}/<kebab-plural>/new`,
-  },
-}
+<camelPlural>: {
+  overview: (campaignId: string) => `/campaigns/${campaignId}/<kebab-plural>`,
+  detail: (campaignId: string, itemId: string) => `/campaigns/${campaignId}/<kebab-plural>/${itemId}`,
+  edit: (campaignId: string, itemId: string) => `/campaigns/${campaignId}/<kebab-plural>/${itemId}/edit`,
+  create: (campaignId: string) => `/campaigns/${campaignId}/<kebab-plural>/new`,
+},
 ```
 
 Note: URL segments and dashboard/API subfolders use the content type key (kebab-case when multi-word, e.g. `skill-proficiencies/`). `ROUTES.content.*` object keys and JSON response keys stay camelCase (`skillProficiencies`).
 
-### 16. React Router (`apps/dashboard/src/app/router.tsx`)
+### 16. Lazy routes (`apps/dashboard/src/app/lazy-routes.ts`)
 
-Import the two route components from `@/features/content`, then add under `campaigns/:campaignId`:
+Register four lazy exports — import **route module paths directly**, never from
+`@/features/content`:
+
+```typescript
+export const <TypeName>sOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-plural>-overview'), '<TypeName>sOverview'),
+)
+export const <TypeName>DetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-detail'), '<TypeName>Detail'),
+)
+export const <TypeName>CreateRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-create'), '<TypeName>Create'),
+)
+export const <TypeName>EditRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-edit'), '<TypeName>Edit'),
+)
+```
+
+### 17. React Router (`apps/dashboard/src/app/router.tsx`)
+
+Import the `*Route` wrappers from `@/app/lazy-routes`, then add under
+`campaigns/:campaignId` (match the `classes` tree):
 
 ```typescript
 {
@@ -678,22 +709,48 @@ Import the two route components from `@/features/content`, then add under `campa
     }),
   } satisfies CrumbHandle,
   children: [
-    { index: true, element: <<TypeName>sOverview /> },
+    { index: true, element: <<TypeName>sOverviewRoute /> },
+    {
+      path: 'new',
+      element: <<TypeName>CreateRoute />,
+      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+    },
     {
       path: ':<singularId>',
-      element: <<TypeName>Detail />,
+      element: <Outlet />,
       handle: {
         crumb: (_params, { entityLabel }) => ({ label: entityLabel ?? '…' }),
       } satisfies CrumbHandle,
+      children: [
+        { index: true, element: <<TypeName>DetailRoute /> },
+        {
+          path: 'edit',
+          element: <<TypeName>EditRoute />,
+          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+        },
+      ],
     },
   ],
 },
 ```
 
-### 17. Sidebar nav (`apps/dashboard/src/components/layout/sidebar/campaign-nav-section.tsx`)
+Detail routes call `useSetBreadcrumbLabel(item.name)`. Edit routes inherit the
+entity crumb via `ContentEditShell` (`useSetBreadcrumbLabel(entity.name)` once
+the entity resolves).
+
+### 18. Sidebar and Homebrew hub (`features/homebrew/lib/hub/content-registry.ts`)
+
+Add an entry to `VISIBLE_SIDEBAR_CONTENT` (drives campaign sidebar **and**
+Homebrew hub cards — keep in sync with `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in
+contracts):
 
 ```typescript
-<NavItem to={ROUTES.content.<camelPlural>.overview(activeCampaignId)} label="<Display Plural>" />
+{
+  contentType: '<kebab-plural>',
+  label: '<Display Plural>',
+  overview: ROUTES.content.<camelPlural>.overview,
+  create: ROUTES.content.<camelPlural>.create,
+},
 ```
 
 ---
