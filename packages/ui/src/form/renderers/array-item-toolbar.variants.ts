@@ -38,7 +38,9 @@ export const arrayItemHeaderSummaryClasses =
   'truncate pb-1 text-xs leading-none text-muted-foreground'
 
 /** Toolbar row shared by compact and detailed headers. */
-export const arrayItemToolbarRowClasses = 'relative flex min-w-0 gap-0 pr-2'
+export function arrayItemToolbarRowClasses(options: { compact?: boolean } = {}): string {
+  return cn('relative flex min-w-0 gap-0 pr-2', options.compact ? 'items-start' : 'items-center')
+}
 
 /** Space between collapse caret and title / compact fields. */
 export const arrayItemToolbarContentClasses = 'min-w-0 flex-1 ml-[calc(var(--spacing)*1)]'

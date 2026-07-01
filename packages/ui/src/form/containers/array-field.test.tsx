@@ -481,4 +481,34 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: /Expand .*Trait 1/ }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
+
+  it('top-aligns compact item toolbar controls including remove', async () => {
+    const user = userEvent.setup()
+    const compactFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemVariant: 'compact',
+        fields: traitFields,
+        addLabel: 'Add trait',
+        itemHeader: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={compactFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait 1' })
+    expect(removeButton.parentElement).toHaveClass('items-start')
+    expect(removeButton.parentElement).not.toHaveClass('items-center')
+  })
 })

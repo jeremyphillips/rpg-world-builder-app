@@ -125,7 +125,7 @@ export function ArrayItemToolbar({
   )
 
   const titleRow = (
-    <div className={cn(arrayItemToolbarRowClasses, 'items-center')}>
+    <div className={arrayItemToolbarRowClasses({ compact })}>
       {showDragHandle && dragHandleProps ? (
         <ArrayItemDragHandle
           {...dragHandleProps}
