@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primitives/level'
+import { refineLevelRangeTable } from '../../primitives/level-range-table'
 import { creatureTypeSchema, type CreatureTypeId } from '../../vocab/creature-type'
+import { resolveMaxCharacterLevel } from '../campaign-rules'
 import { validateExtendedMaxLevel } from '../campaign-level-validation'
 import {
   resolveStartingWealthRules,
@@ -116,6 +118,7 @@ function validateCharacterCreationPatchInput(
   patch: CampaignCharacterCreationPatch,
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[] = [],
+  options: { skipStartingWealthTiers?: boolean } = {},
 ): void {
   const standardMaxCharacterLevel = patch.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const extended = patch.progression?.extendedProgression
@@ -140,6 +143,52 @@ function validateCharacterCreationPatchInput(
       })
     }
   }
+
+  const tiers = patch.startingWealth?.tiers
+  if (tiers !== undefined && !options.skipStartingWealthTiers) {
+    const effectiveMax = resolveMaxCharacterLevel(patch)
+
+    refineLevelRangeTable(tiers, ctx, {
+      pathPrefix: [...pathPrefix, 'startingWealth', 'tiers'],
+      maxLevel: effectiveMax,
+      requireStartAt: 1,
+      requireEndAt: effectiveMax,
+    })
+  }
+}
+
+/**
+ * Validates a merged character-creation patch before API persist.
+ * Always checks resolved starting wealth tiers against the campaign effective max.
+ */
+export function refineMergedCharacterCreationPatch(
+  merged: CampaignCharacterCreationPatch,
+  ctx: z.RefinementCtx,
+  startingWealthSeed: StartingWealthRules,
+  pathPrefix: (string | number)[] = [],
+): void {
+  validateCharacterCreationPatchInput(merged, ctx, pathPrefix, { skipStartingWealthTiers: true })
+
+  const effectiveMax = resolveMaxCharacterLevel(merged)
+  const tiers = resolveStartingWealthRules(startingWealthSeed, merged.startingWealth).tiers
+
+  refineLevelRangeTable(tiers, ctx, {
+    pathPrefix: [...pathPrefix, 'startingWealth', 'tiers'],
+    maxLevel: effectiveMax,
+    requireStartAt: 1,
+    requireEndAt: effectiveMax,
+  })
+}
+
+export function safeParseMergedCharacterCreationPatch(
+  merged: CampaignCharacterCreationPatch,
+  startingWealthSeed: StartingWealthRules,
+) {
+  return campaignCharacterCreationPatchSchema
+    .superRefine((patch, ctx) => {
+      refineMergedCharacterCreationPatch(patch, ctx, startingWealthSeed)
+    })
+    .safeParse(merged)
 }
 
 /** Partial update payload for PATCH ruleset-patch character creation. */

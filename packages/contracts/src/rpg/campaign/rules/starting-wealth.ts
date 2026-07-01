@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { systemRulesetIdSchema, type SystemRulesetId } from '../../primitives/ruleset'
 import { tierBonusGoldSchema } from '../../primitives/currency-formula'
 import { absoluteLevelSchema } from '../../primitives/level'
+import { levelRangeTiersSchema } from '../../primitives/level-range-table'
 import { magicItemRaritySchema } from '../../vocab/magic-item/rarity'
 
 // ---------------------------------------------------------------------------
@@ -44,41 +45,26 @@ export const magicItemRarityGrantSchema = z.object({
 
 export type MagicItemRarityGrant = z.infer<typeof magicItemRarityGrantSchema>
 
-export const startingWealthTierSchema = z.object({
+const startingWealthTierRowShape = {
   id: z.string().min(1),
   label: z.string().min(1),
-  minLevel: absoluteLevelSchema,
-  maxLevel: absoluteLevelSchema,
   includeNormalStartingEquipment: z.boolean().default(true),
   bonusGold: tierBonusGoldSchema.nullable().optional(),
   magicItemGrants: z.array(magicItemRarityGrantSchema).default([]),
+}
+
+export const startingWealthTierSchema = z.object({
+  minLevel: absoluteLevelSchema,
+  maxLevel: absoluteLevelSchema,
+  ...startingWealthTierRowShape,
 })
 
 export type StartingWealthTier = z.infer<typeof startingWealthTierSchema>
 
-export const startingWealthTiersSchema = z
-  .array(startingWealthTierSchema)
-  .min(1)
-  .superRefine((tiers, ctx) => {
-    tiers.forEach((tier, index) => {
-      if (tier.minLevel > tier.maxLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'minLevel must not exceed maxLevel',
-          path: [index, 'minLevel'],
-        })
-      }
-
-      const previousTier = tiers[index - 1]
-      if (previousTier !== undefined && tier.minLevel <= previousTier.maxLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'tier level ranges must not overlap',
-          path: [index, 'minLevel'],
-        })
-      }
-    })
-  })
+export const startingWealthTiersSchema = levelRangeTiersSchema(startingWealthTierRowShape, {
+  requireStartAt: 1,
+  min: 1,
+})
 
 export type StartingWealthTiers = z.infer<typeof startingWealthTiersSchema>
 
@@ -127,10 +113,24 @@ export function resolveStartingWealthRules(
   return mergeStartingWealthRulesPatch(seed, patch) as StartingWealthRules
 }
 
+function tiersEqual(a: StartingWealthTier[], b: StartingWealthTier[]): boolean {
+  if (a.length !== b.length) return false
+
+  return a.every((tier, index) => {
+    const left = startingWealthTierSchema.parse(tier)
+    const right = startingWealthTierSchema.parse(b[index])
+    return JSON.stringify(left) === JSON.stringify(right)
+  })
+}
+
 function startingWealthFieldEquals(
   a: StartingWealthRules[keyof StartingWealthRules],
   b: StartingWealthRules[keyof StartingWealthRules],
 ): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return tiersEqual(a as StartingWealthTier[], b as StartingWealthTier[])
+  }
+
   return JSON.stringify(a) === JSON.stringify(b)
 }
 

@@ -12,6 +12,7 @@ import {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
   MAX_CHARACTER_LEVEL,
   creatureTypeSchema,
+  refineLevelRangeTable,
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 import {
@@ -150,6 +151,13 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
       path: ['startingLevel'],
     })
   }
+
+  refineLevelRangeTable(values.startingWealth.tiers, ctx, {
+    pathPrefix: ['startingWealth', 'tiers'],
+    maxLevel: effectiveMax,
+    requireStartAt: 1,
+    requireEndAt: effectiveMax,
+  })
 
   if (!values.extendedProgressionEnabled) return
 

@@ -59,14 +59,6 @@ export const startingWealthTierFormSchema = z
     magicItemGrants: z.array(startingWealthMagicItemGrantFormSchema),
   })
   .superRefine((tier, ctx) => {
-    if (tier.minLevel > tier.maxLevel) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Min level must not exceed max level',
-        path: ['minLevel'],
-      })
-    }
-
     if (tier.bonusGoldEnabled && tier.bonusGold.formula.modifier?.operator !== '×') {
       ctx.addIssue({
         code: 'custom',
@@ -76,24 +68,11 @@ export const startingWealthTierFormSchema = z
     }
   })
 
-export const startingWealthFormSchema = z
-  .object({
-    name: z.string().min(1),
-    description: z.string().optional(),
-    tiers: z.array(startingWealthTierFormSchema).length(STARTING_WEALTH_TIER_COUNT),
-  })
-  .superRefine((values, ctx) => {
-    values.tiers.forEach((tier, index) => {
-      const previousTier = values.tiers[index - 1]
-      if (previousTier !== undefined && tier.minLevel <= previousTier.maxLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Tier level ranges must not overlap',
-          path: ['tiers', index, 'minLevel'],
-        })
-      }
-    })
-  })
+export const startingWealthFormSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  tiers: z.array(startingWealthTierFormSchema).length(STARTING_WEALTH_TIER_COUNT),
+})
 
 function tierItemTitle(values: Record<string, unknown>, index: number): string {
   const tier = values as StartingWealthTierFormValues

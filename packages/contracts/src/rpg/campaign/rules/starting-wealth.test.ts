@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { levelRangeGapMessage, levelRangeOverlapMessage } from '../../primitives/level'
 import {
   computeStartingWealthSparsePatch,
   mergeStartingWealthRulesPatch,
@@ -77,6 +78,39 @@ describe('startingWealthRulesSchema', () => {
       }).success,
     ).toBe(false)
   })
+
+  it('rejects gapped tier ranges', () => {
+    const result = startingWealthRulesSchema.safeParse({
+      name: 'Standard Starting Wealth',
+      scope: { kind: 'standard' },
+      tiers: [
+        { id: 'a', label: 'A', minLevel: 1, maxLevel: 1, magicItemGrants: [] },
+        { id: 'b', label: 'B', minLevel: 2, maxLevel: 4, magicItemGrants: [] },
+        { id: 'c', label: 'C', minLevel: 6, maxLevel: 9, magicItemGrants: [] },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(levelRangeGapMessage(5))
+    }
+  })
+
+  it('uses shared overlap message copy', () => {
+    const result = startingWealthRulesSchema.safeParse({
+      name: 'Standard Starting Wealth',
+      scope: { kind: 'standard' },
+      tiers: [
+        { id: 'a', label: 'A', minLevel: 1, maxLevel: 5, magicItemGrants: [] },
+        { id: 'b', label: 'B', minLevel: 4, maxLevel: 10, magicItemGrants: [] },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(levelRangeOverlapMessage())
+    }
+  })
 })
 
 describe('resolveStartingWealthRules', () => {
@@ -117,6 +151,10 @@ describe('computeStartingWealthSparsePatch', () => {
     const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
 
     expect(computeStartingWealthSparsePatch(resolved, SEED)).toEqual({ tiers: patchedTiers })
+  })
+
+  it('returns undefined when resolved tiers match the seed after form round-trip field order', () => {
+    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
   })
 })
 

@@ -12,6 +12,7 @@ import {
   isSparseDefaultMulticlassingPatch,
   mergeStartingWealthRulesPatch,
   resolveStartingWealthRules,
+  safeParseMergedCharacterCreationPatch,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
@@ -24,6 +25,7 @@ import type {
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { assertCreatureTypesActiveInCampaign } from '../lib/assert-campaign-creature-types'
+import { HttpError } from '../../../lib/http-error'
 import {
   applySparsePatchUpdate,
   loadPatchDocument,
@@ -274,6 +276,18 @@ function buildCharacterCreationUpdateSet(
   return ops
 }
 
+function assertMergedCharacterCreationPatch(
+  merged: CampaignCharacterCreationPatch,
+  rulesetId: SystemRulesetId,
+): void {
+  const seed = getStandardStartingWealthRules(rulesetId)
+  const parsed = safeParseMergedCharacterCreationPatch(merged, seed)
+
+  if (!parsed.success) {
+    throw HttpError.badRequest('Invalid character creation patch.', parsed.error.flatten())
+  }
+}
+
 async function applyCharacterCreationUpdate(
   campaignId: string,
   rulesetId: SystemRulesetId,
@@ -303,7 +317,9 @@ export async function writeInitialCharacterCreation(
   input: UpdateCampaignCharacterCreationInput,
 ): Promise<void> {
   await assertCreatureTypePolicyIds(campaignId, input)
-  await applyCharacterCreationUpdate(campaignId, rulesetId, input)
+  const merged = mergeCharacterCreationPatch(undefined, input)
+  assertMergedCharacterCreationPatch(merged, rulesetId)
+  await applyCharacterCreationUpdate(campaignId, rulesetId, merged)
 }
 
 /** Merges a partial character-creation patch and persists sparse overrides. */
@@ -317,6 +333,8 @@ export async function updateCharacterCreationPatch(
   const patchDoc = await loadPatchDocument(campaignId, rulesetId)
   const existing = patchDoc?.characterCreation as CampaignCharacterCreationPatch | undefined
   const merged = mergeCharacterCreationPatch(existing, input)
+
+  assertMergedCharacterCreationPatch(merged, rulesetId)
 
   await applyCharacterCreationUpdate(campaignId, rulesetId, merged)
 }

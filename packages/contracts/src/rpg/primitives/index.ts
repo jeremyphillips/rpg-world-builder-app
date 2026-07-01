@@ -1,4 +1,5 @@
 export * from './level'
+export * from './level-range-table'
 export * from './dice'
 export * from './dice-formula'
 export * from './currency-formula'

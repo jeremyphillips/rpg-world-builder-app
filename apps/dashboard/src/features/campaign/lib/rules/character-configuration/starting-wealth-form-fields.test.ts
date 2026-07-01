@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
+import { buildRulesSchemaForSurface } from './character-configuration-form-fields'
 import {
   buildStartingWealthPatchInput,
   mapStartingWealthToFormValues,
@@ -8,6 +9,7 @@ import {
 import { startingWealthFormSchema } from './starting-wealth-form-fields'
 
 const SEED = getStandardStartingWealthRules('srd-cc-5.2.1')
+const configRulesSchema = buildRulesSchemaForSurface('config')
 
 describe('mapStartingWealthToFormValues', () => {
   it('round-trips catalog seed tiers', () => {
@@ -63,11 +65,11 @@ describe('buildStartingWealthPatchInput', () => {
 })
 
 describe('startingWealthFormSchema', () => {
-  it('rejects overlapping tier ranges', () => {
+  it('does not validate tier overlap at row schema level', () => {
     const form = mapStartingWealthToFormValues(SEED)
     form.tiers[1] = { ...form.tiers[1]!, minLevel: 1, maxLevel: 4 }
 
-    expect(startingWealthFormSchema.safeParse(form).success).toBe(false)
+    expect(startingWealthFormSchema.safeParse(form).success).toBe(true)
   })
 
   it('rejects bonus gold without a multiply operator', () => {
@@ -82,5 +84,43 @@ describe('startingWealthFormSchema', () => {
     }
 
     expect(startingWealthFormSchema.safeParse(form).success).toBe(false)
+  })
+})
+
+describe('configRulesSchema starting wealth tiers', () => {
+  function baseConfigForm() {
+    return mapStartingWealthToFormValues(SEED)
+  }
+
+  it('rejects overlapping tier ranges via parent refine', () => {
+    const startingWealth = baseConfigForm()
+    startingWealth.tiers[1] = { ...startingWealth.tiers[1]!, minLevel: 1, maxLevel: 4 }
+
+    const result = configRulesSchema.safeParse({
+      startingLevel: 1,
+      maxCharacterLevel: 20,
+      extendedProgressionEnabled: false,
+      importedCharactersPolicy: 'disabled',
+      allowedCharacterCreatureTypes: ['humanoid'],
+      startingWealth,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects gapped tier ranges via parent refine', () => {
+    const startingWealth = baseConfigForm()
+    startingWealth.tiers[2] = { ...startingWealth.tiers[2]!, minLevel: 6, maxLevel: 10 }
+
+    const result = configRulesSchema.safeParse({
+      startingLevel: 1,
+      maxCharacterLevel: 20,
+      extendedProgressionEnabled: false,
+      importedCharactersPolicy: 'disabled',
+      allowedCharacterCreatureTypes: ['humanoid'],
+      startingWealth,
+    })
+
+    expect(result.success).toBe(false)
   })
 })

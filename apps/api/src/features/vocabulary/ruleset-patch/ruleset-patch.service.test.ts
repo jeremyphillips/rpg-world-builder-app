@@ -62,7 +62,26 @@ describe('getRulesetPatchRead', () => {
 })
 
 describe('updateCharacterCreationPatch', () => {
-  it('persists extended progression on the ruleset patch', async () => {
+  function tiersCoveringMax(maxLevel: number) {
+    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
+    return seed.tiers.map((tier) => (tier.id === 'levels-17-20' ? { ...tier, maxLevel } : tier))
+  }
+
+  it('rejects extended progression when resolved tiers do not cover the new max', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+    await expect(
+      updateCharacterCreationPatch(campaign.id, {
+        progression: {
+          maxCharacterLevel: 20,
+          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+        },
+      }),
+    ).rejects.toMatchObject({ status: 400 })
+  })
+
+  it('persists extended progression when tiers cover the new max', async () => {
     const owner = await makeUser('owner@example.com')
     const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
 
@@ -71,6 +90,7 @@ describe('updateCharacterCreationPatch', () => {
         maxCharacterLevel: 20,
         extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
       },
+      startingWealth: { tiers: tiersCoveringMax(30) },
     })
 
     expect(patch?.characterCreation.progression.extendedProgression).toEqual({
@@ -121,21 +141,40 @@ describe('updateCharacterCreationPatch', () => {
     })
   })
 
-  it('unsets extended progression when omitted from a progression patch', async () => {
+  it('rejects unsetting extended progression while tiers still cover the extended max', async () => {
     const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({
-      name: 'Epic',
-      createdBy: owner.id,
-      characterCreation: {
-        progression: {
-          maxCharacterLevel: 20,
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
+    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+    await updateCharacterCreationPatch(campaign.id, {
+      progression: {
+        maxCharacterLevel: 20,
+        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
       },
+      startingWealth: { tiers: tiersCoveringMax(30) },
+    })
+
+    await expect(
+      updateCharacterCreationPatch(campaign.id, {
+        progression: { maxCharacterLevel: 20 },
+      }),
+    ).rejects.toMatchObject({ status: 400 })
+  })
+
+  it('unsets extended progression when tiers are reset to the standard max', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+
+    await updateCharacterCreationPatch(campaign.id, {
+      progression: {
+        maxCharacterLevel: 20,
+        extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+      },
+      startingWealth: { tiers: tiersCoveringMax(30) },
     })
 
     const patch = await updateCharacterCreationPatch(campaign.id, {
       progression: { maxCharacterLevel: 20 },
+      startingWealth: { tiers: tiersCoveringMax(20) },
     })
 
     expect(patch?.characterCreation.progression.extendedProgression).toBeUndefined()
