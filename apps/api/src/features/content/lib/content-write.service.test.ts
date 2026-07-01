@@ -14,7 +14,6 @@ import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-profic
 import { spellWriteConfig } from '../spells/spells.config'
 import { featWriteConfig } from '../feats/feats.config'
 import { speciesWriteConfig } from '../species/species.config'
-import { startingWealthWriteConfig } from '../starting-wealth/starting-wealth.config'
 import { createHomebrewContent, updateContentEntity } from './content-write.service'
 import { resolveCatalogForCampaign } from '../content.service'
 import { HttpError } from '../../../lib/http-error'
@@ -500,31 +499,6 @@ describe('createHomebrewContent (feats)', () => {
 
     expect(updated.name).toBe('Enhanced Alert')
     expect(updated.source).toBe('system')
-  })
-})
-
-describe('updateContentEntity (starting-wealth)', () => {
-  it('patches the system starting wealth table tiers', async () => {
-    const campaign = await makeCampaign()
-    const standard = (
-      await resolveCatalogForCampaign(startingWealthWriteConfig.readConfig, campaign.id)
-    )[0]!
-
-    const updated = await updateContentEntity(startingWealthWriteConfig, campaign.id, standard.id, {
-      tiers: standard.tiers.map((tier) =>
-        tier.id === 'level-1'
-          ? {
-              ...tier,
-              includeNormalStartingEquipment: false,
-            }
-          : tier,
-      ),
-    })
-
-    expect(updated.source).toBe('system')
-    expect(
-      updated.tiers.find((tier) => tier.id === 'level-1')?.includeNormalStartingEquipment,
-    ).toBe(false)
   })
 })
 

@@ -139,6 +139,38 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Operator')).toHaveClass('w-[calc(1*1ch+2.75rem)]')
   })
 
+  it('shows a static multiply glyph when only one operator is allowed', () => {
+    render(
+      <DiceFormulaField
+        id="wealth-roll"
+        label="Bonus roll"
+        modifierMode="required"
+        modifierOperators={['×']}
+        modifierAmountLabel="Multiplier"
+        value={{ count: 1, faces: 10, modifier: { operator: '×', amount: 250 } }}
+      />,
+    )
+
+    expect(screen.queryByLabelText('Operator')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Multiplier')).toHaveValue(250)
+  })
+
+  it('has no axe violations with multiply-only mode', async () => {
+    const { container } = render(
+      <DiceFormulaField
+        id="wealth-roll"
+        label="Bonus roll"
+        modifierMode="required"
+        modifierOperators={['×']}
+        modifierAmountLabel="Multiplier"
+        value={{ count: 1, faces: 10, modifier: { operator: '×', amount: 250 } }}
+      />,
+    )
+
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <DiceFormulaField

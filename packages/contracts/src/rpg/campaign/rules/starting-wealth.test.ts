@@ -1,0 +1,187 @@
+import { describe, expect, it } from 'vitest'
+
+import { levelRangeGapMessage, levelRangeOverlapMessage } from '../../primitives/level'
+import {
+  computeStartingWealthSparsePatch,
+  mergeStartingWealthRulesPatch,
+  resolveStartingWealthRules,
+  startingWealthRulesSchema,
+  startingWealthTierForLevel,
+  startingWealthTierSchema,
+  type StartingWealthRules,
+  type StartingWealthTier,
+} from './starting-wealth'
+
+const SEED: StartingWealthRules = {
+  name: 'Standard Starting Wealth',
+  scope: { kind: 'standard' },
+  tiers: [
+    {
+      id: 'level-1',
+      label: 'Level 1',
+      minLevel: 1,
+      maxLevel: 1,
+      includeNormalStartingEquipment: true,
+      magicItemGrants: [],
+    },
+    {
+      id: 'levels-2-4',
+      label: 'Levels 2–4',
+      minLevel: 2,
+      maxLevel: 4,
+      includeNormalStartingEquipment: true,
+      magicItemGrants: [{ rarity: 'common', quantity: 1 }],
+    },
+    {
+      id: 'levels-5-10',
+      label: 'Levels 5–10',
+      minLevel: 5,
+      maxLevel: 10,
+      includeNormalStartingEquipment: true,
+      bonusGold: {
+        baseGp: 500,
+        formula: {
+          kind: 'dice',
+          dice: { count: 1, faces: 10 },
+          multiplier: 25,
+          currency: 'gp',
+        },
+      },
+      magicItemGrants: [
+        { rarity: 'common', quantity: 1 },
+        { rarity: 'uncommon', quantity: 1 },
+      ],
+    },
+  ],
+}
+
+describe('startingWealthTierSchema', () => {
+  it('defaults includeNormalStartingEquipment to true', () => {
+    expect(startingWealthTierSchema.parse(SEED.tiers[0]).includeNormalStartingEquipment).toBe(true)
+  })
+})
+
+describe('startingWealthRulesSchema', () => {
+  it('accepts non-overlapping tier ranges', () => {
+    expect(startingWealthRulesSchema.parse(SEED).tiers).toHaveLength(3)
+  })
+
+  it('rejects overlapping tier ranges', () => {
+    expect(
+      startingWealthRulesSchema.safeParse({
+        name: 'Standard Starting Wealth',
+        scope: { kind: 'standard' },
+        tiers: [
+          { id: 'a', label: 'A', minLevel: 1, maxLevel: 5, magicItemGrants: [] },
+          { id: 'b', label: 'B', minLevel: 5, maxLevel: 10, magicItemGrants: [] },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects gapped tier ranges', () => {
+    const result = startingWealthRulesSchema.safeParse({
+      name: 'Standard Starting Wealth',
+      scope: { kind: 'standard' },
+      tiers: [
+        { id: 'a', label: 'A', minLevel: 1, maxLevel: 1, magicItemGrants: [] },
+        { id: 'b', label: 'B', minLevel: 2, maxLevel: 4, magicItemGrants: [] },
+        { id: 'c', label: 'C', minLevel: 6, maxLevel: 9, magicItemGrants: [] },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(levelRangeGapMessage(5))
+    }
+  })
+
+  it('uses shared overlap message copy', () => {
+    const result = startingWealthRulesSchema.safeParse({
+      name: 'Standard Starting Wealth',
+      scope: { kind: 'standard' },
+      tiers: [
+        { id: 'a', label: 'A', minLevel: 1, maxLevel: 5, magicItemGrants: [] },
+        { id: 'b', label: 'B', minLevel: 4, maxLevel: 10, magicItemGrants: [] },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(levelRangeOverlapMessage())
+    }
+  })
+})
+
+describe('resolveStartingWealthRules', () => {
+  it('returns the seed when no patch is provided', () => {
+    expect(resolveStartingWealthRules(SEED)).toEqual(SEED)
+  })
+
+  it('replaces tiers wholesale when patched', () => {
+    const patchedTiers: StartingWealthTier[] = SEED.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
+
+    expect(
+      resolved.tiers.find((tier) => tier.id === 'level-1')?.includeNormalStartingEquipment,
+    ).toBe(false)
+    expect(resolved.name).toBe(SEED.name)
+  })
+
+  it('overrides table metadata without touching tiers', () => {
+    const resolved = resolveStartingWealthRules(SEED, { name: 'Custom table name' })
+
+    expect(resolved.name).toBe('Custom table name')
+    expect(resolved.tiers).toEqual(SEED.tiers)
+  })
+})
+
+describe('computeStartingWealthSparsePatch', () => {
+  it('returns undefined when resolved rules match the seed', () => {
+    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
+  })
+
+  it('returns only fields that differ from the seed', () => {
+    const patchedTiers = SEED.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+    const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
+
+    expect(computeStartingWealthSparsePatch(resolved, SEED)).toEqual({ tiers: patchedTiers })
+  })
+
+  it('returns undefined when resolved tiers match the seed after form round-trip field order', () => {
+    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
+  })
+})
+
+describe('mergeStartingWealthRulesPatch', () => {
+  it('layers sparse patches without dropping prior overrides', () => {
+    const patchedTiers = SEED.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    const merged = mergeStartingWealthRulesPatch(
+      { tiers: patchedTiers },
+      { name: 'Custom table name' },
+    )
+
+    expect(merged).toEqual({
+      name: 'Custom table name',
+      tiers: patchedTiers,
+    })
+  })
+})
+
+describe('startingWealthTierForLevel', () => {
+  it('returns the matching tier for a level', () => {
+    expect(startingWealthTierForLevel(SEED, 3)?.id).toBe('levels-2-4')
+  })
+
+  it('returns undefined when no tier matches', () => {
+    expect(startingWealthTierForLevel(SEED, 20)).toBeUndefined()
+  })
+})

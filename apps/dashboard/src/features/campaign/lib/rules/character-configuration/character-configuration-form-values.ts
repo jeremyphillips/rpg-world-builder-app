@@ -1,5 +1,6 @@
 import type {
   ResolvedCampaignCharacterCreationPatch,
+  SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
 import {
@@ -13,8 +14,15 @@ import {
   sameStringSet,
 } from '@rpg/contracts'
 import type { CampaignMulticlassingPatch } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import type { CreateRulesValues, RulesValues } from './character-configuration-form-fields'
+import {
+  buildStartingWealthPatchInput,
+  mapStartingWealthToFormValues,
+} from './starting-wealth-form-values'
+
+const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
   const defined = Object.fromEntries(
@@ -103,6 +111,9 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
     speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
     speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+    startingWealth: mapStartingWealthToFormValues(
+      getStandardStartingWealthRules(DEFAULT_RULESET_ID),
+    ),
   }
 }
 
@@ -129,6 +140,15 @@ export function buildCharacterCreationPatchInput(
   const multiclassing = resolveMulticlassingOverride(values)
   if (multiclassing) {
     patch.multiclassing = multiclassing
+  }
+
+  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
+  const startingWealthPatch = buildStartingWealthPatchInput(
+    values.startingWealth,
+    startingWealthSeed,
+  )
+  if (startingWealthPatch) {
+    patch.startingWealth = startingWealthPatch
   }
 
   return patch
@@ -164,5 +184,6 @@ export function mapRulesetPatchToRulesValues(
       characterCreation.multiclassing.requirements.speciesPolicy.enabled,
     speciesLevelLimitsEnabled:
       characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
+    startingWealth: mapStartingWealthToFormValues(characterCreation.startingWealth),
   }
 }

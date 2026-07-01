@@ -337,4 +337,35 @@ describe('ArrayFieldRenderer', () => {
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations.filter((violation) => violation.id === 'landmark-unique')).toEqual([])
   })
+
+  it('hides move buttons when allowReorder is false', async () => {
+    const user = userEvent.setup()
+    const noReorderFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        allowReorder: false,
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={noReorderFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    expect(screen.queryByRole('button', { name: 'Move Traits item 1 up' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Move Traits item 1 down' }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeInTheDocument()
+  })
 })

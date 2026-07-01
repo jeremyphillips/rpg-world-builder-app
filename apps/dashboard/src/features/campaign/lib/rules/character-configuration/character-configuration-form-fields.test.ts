@@ -118,7 +118,8 @@ describe('character-configuration-form-fields', () => {
       expect(fieldNames).toContain('allowedCharacterCreatureTypes')
       expect(fieldNames).toContain('extendedProgressionEnabled')
       expect(fieldNames).toContain('multiclassingEnabled')
-      expect(fieldNames).toContain('primaryAbilityMinimumScore')
+      expect(fieldNames).toContain('startingWealth.name')
+      expect(fieldNames).toContain('startingWealth.tiers')
     })
   })
 
@@ -141,8 +142,7 @@ describe('character-configuration-form-fields', () => {
   describe('CHARACTER_CONFIGURATION_SECTIONS', () => {
     it('derives config anchor nav from the field registry', () => {
       expect(CHARACTER_CONFIGURATION_SECTIONS.map((section) => section.id)).toEqual([
-        'starting-level',
-        'imported-characters',
+        'creation',
         'standard-max-level',
         'extended-progression',
         'creature-type-policy',

@@ -13,10 +13,13 @@ import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import {
   applyDiceFormulaPatch,
+  DICE_FORMULA_OPERATORS,
   emitDiceFormulaChange,
+  type DiceFormulaCurrencyUnitOption,
   type DiceFormulaLabelPosition,
   type DiceFormulaModifierMode,
   type DiceFormulaPatch,
+  type DiceFormulaTailOperator,
   type DiceFormulaValue,
   resolveDiceFormulaValue,
   shouldShowModifierFields,
@@ -51,6 +54,13 @@ export interface DiceFormulaFieldProps {
   countMax?: number
   modifierMin?: number
   modifierMax?: number
+  modifierOperators?: readonly DiceFormulaTailOperator[]
+  modifierAmountLabel?: string
+  currencyUnit?: {
+    value: string
+    options: readonly DiceFormulaCurrencyUnitOption[]
+    onChange: (value: string) => void
+  }
 }
 
 /** Composite XdY [±N] roll editor with optional or required flat modifiers. */
@@ -75,8 +85,11 @@ export function DiceFormulaField({
   countMax = 99,
   modifierMin = 0,
   modifierMax = 99,
+  modifierOperators = DICE_FORMULA_OPERATORS,
+  modifierAmountLabel = 'Modifier',
+  currencyUnit,
 }: DiceFormulaFieldProps) {
-  const resolved = resolveDiceFormulaValue(value, modifierMode, faces)
+  const resolved = resolveDiceFormulaValue(value, modifierMode, faces, modifierOperators)
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
   const inlineLabelId = `${id}-inline-label`
@@ -86,10 +99,10 @@ export function DiceFormulaField({
 
   const update = React.useCallback(
     (patch: DiceFormulaPatch) => {
-      const next = applyDiceFormulaPatch(resolved, patch, modifierMode)
+      const next = applyDiceFormulaPatch(resolved, patch, modifierMode, modifierOperators)
       emitDiceFormulaChange(next, modifierMode, onChange)
     },
-    [modifierMode, onChange, resolved],
+    [modifierMode, modifierOperators, onChange, resolved],
   )
 
   const controls = (
@@ -106,6 +119,9 @@ export function DiceFormulaField({
       countMax={countMax}
       modifierMin={modifierMin}
       modifierMax={modifierMax}
+      modifierOperators={modifierOperators}
+      modifierAmountLabel={modifierAmountLabel}
+      currencyUnit={currencyUnit}
       labelPosition={labelPosition}
       inlineLabelId={inlineLabelId}
       onBlur={onBlur}

@@ -6,6 +6,7 @@ import type {
   UpdateCampaignCharacterCreationInput,
   UpdateCampaignMechanicsInput,
 } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { findCampaignById } from '../../campaign'
 import { loadPatchDocument } from '../lib/patch-document'
@@ -31,7 +32,10 @@ export async function getRulesetPatchRead(campaignId: string): Promise<RulesetPa
   const mechanics = patchDoc?.mechanics as CampaignMechanicsPatch | undefined
 
   return {
-    characterCreation: resolveCharacterCreationPatch(characterCreation),
+    characterCreation: resolveCharacterCreationPatch(
+      characterCreation,
+      getStandardStartingWealthRules(campaign.rulesetId),
+    ),
     mechanics: resolveStoredMechanicsPatch(mechanics),
   }
 }

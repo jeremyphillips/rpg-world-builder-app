@@ -60,17 +60,18 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                       | Layer              | Example path                                             |
-| ----------------------------------------------------- | ------------------ | -------------------------------------------------------- |
-| A closed id set with labels (and optional SRD text)   | `rpg/vocab/`       | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`     |
-| A reusable value type used across content types       | `rpg/primitives/`  | `rpg/primitives/dice.ts`, `rpg/primitives/level.ts`      |
-| A catalog content type or its DTOs/patches            | `rpg/content/`     | `rpg/content/species.ts`, `rpg/content/classes/class.ts` |
-| Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/` | `rpg/content/lib/grants.ts`                              |
-| A stored character sheet or builder runtime contract  | `rpg/runtime/`     | `rpg/runtime/character/sheet.ts`                         |
-| Campaign identity, rules, membership, ruleset patches | `rpg/campaign/`    | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`      |
-| Auth, session, upload, or API error shapes            | `shared/`          | `shared/auth.ts`, `shared/errors.ts`                     |
-| Dev Bench ticket/epic schemas and input DTOs          | `dev-bench/`       | `dev-bench/ticket.ts`                                    |
-| Public marketing or CMS schemas                       | `public/`          | (scaffold — add when needed)                             |
+| You are adding…                                       | Layer                 | Example path                                             |
+| ----------------------------------------------------- | --------------------- | -------------------------------------------------------- |
+| A closed id set with labels (and optional SRD text)   | `rpg/vocab/`          | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`     |
+| A reusable value type used across content types       | `rpg/primitives/`     | `rpg/primitives/dice.ts`, `rpg/primitives/level.ts`      |
+| A catalog content type or its DTOs/patches            | `rpg/content/`        | `rpg/content/species.ts`, `rpg/content/classes/class.ts` |
+| Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/`    | `rpg/content/lib/grants.ts`                              |
+| A stored character sheet or builder runtime contract  | `rpg/runtime/`        | `rpg/runtime/character/sheet.ts`                         |
+| Campaign identity, rules, membership, ruleset patches | `rpg/campaign/`       | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`      |
+| Campaign rule bodies (not catalog content types)      | `rpg/campaign/rules/` | `rpg/campaign/rules/starting-wealth.ts`                  |
+| Auth, session, upload, or API error shapes            | `shared/`             | `shared/auth.ts`, `shared/errors.ts`                     |
+| Dev Bench ticket/epic schemas and input DTOs          | `dev-bench/`          | `dev-bench/ticket.ts`                                    |
+| Public marketing or CMS schemas                       | `public/`             | (scaffold — add when needed)                             |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).

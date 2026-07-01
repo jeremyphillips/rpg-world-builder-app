@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   ATTACK_RESOLUTION_MODE_SET_ID,
   CREATURE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
-  defaultCampaignMechanicsPatch,
   defaultMulticlassingRules,
+  defaultCampaignMechanicsPatch,
   type RulesetPatchRead,
 } from '@rpg/contracts'
 
@@ -37,6 +38,7 @@ const mockPatch: RulesetPatchRead = {
     progression: { maxCharacterLevel: 20 },
     species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
     multiclassing: defaultMulticlassingRules(),
+    startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
   },
   mechanics: defaultCampaignMechanicsPatch(),
 }
@@ -65,7 +67,10 @@ const attackResolutionOptions = [
 
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+      mutations: { retry: false },
+    },
   })
   queryClient.setQueryData(['campaigns', campaignId, 'ruleset-patch'], mockPatch)
   queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', CREATURE_TYPE_SET_ID], {
@@ -113,11 +118,10 @@ describe('RulesConfigDetailContent', () => {
     renderDetail()
 
     expect(
-      await screen.findByRole('heading', { name: 'Character Configuration' }),
-    ).toBeInTheDocument()
-    expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),
     ).toBeInTheDocument()
+    await screen.findByLabelText('Character starting level')
+    expect(screen.getByRole('heading', { name: 'Character Configuration' })).toBeInTheDocument()
     expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
     expect(screen.getByLabelText('Allow multiclassing')).toBeChecked()
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()

@@ -12,11 +12,11 @@ shared across apps.
 
 ## Consumers
 
-| App / package    | Use                                                  |
-| ---------------- | ---------------------------------------------------- |
-| `@rpg/api`       | `loadSystem` / `systemSlugs` in content type configs |
-| `@rpg/dashboard` | Storybook fixtures via slug picks                    |
-| `@rpg/public`    | Future rules/marketing pages (build-time import)     |
+| App / package    | Use                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| `@rpg/api`       | `loadSystem` / `systemSlugs` in content type configs; rules seeds for ruleset-patch |
+| `@rpg/dashboard` | Storybook fixtures via slug picks                                                   |
+| `@rpg/public`    | Future rules/marketing pages (build-time import)                                    |
 
 ## Imports
 
@@ -26,7 +26,7 @@ Tree-shake by content type:
 import { loadSeedSpecies, getSpeciesBySlug } from '@rpg/catalog/species'
 import { loadSeedClasses, getClassBySlug } from '@rpg/catalog/classes'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
-import { getStandardStartingWealth } from '@rpg/catalog/starting-wealth'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { loadSeedCreatureTypes } from '@rpg/catalog/vocabulary'
 ```
 
@@ -37,6 +37,11 @@ module load so malformed seed data fails in CI, not at request time.
 
 Campaign-customizable vocabulary sets (`@rpg/catalog/vocabulary`) follow the
 same pattern; see [docs/vocabulary.md](../../docs/vocabulary.md).
+
+Starting wealth is **not** a content type — `@rpg/catalog/starting-wealth` ships
+the SRD rules body (`startingWealthRulesSchema`) for ruleset-patch resolution via
+`getStandardStartingWealthRules()`. Legacy envelope helpers (`loadSeedStartingWealth`,
+`getStandardStartingWealth`) remain for catalog tests and deterministic table ids.
 
 ## Commands
 

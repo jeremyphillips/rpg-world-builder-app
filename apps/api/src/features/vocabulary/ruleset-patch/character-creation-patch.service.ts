@@ -1,4 +1,5 @@
 import {
+  computeStartingWealthSparsePatch,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   DEFAULT_IMPORTED_CHARACTERS_POLICY,
   DEFAULT_MULTICLASSING_ENABLED,
@@ -9,6 +10,9 @@ import {
   DEFAULT_STARTING_LEVEL,
   MAX_CHARACTER_LEVEL,
   isSparseDefaultMulticlassingPatch,
+  mergeStartingWealthRulesPatch,
+  resolveStartingWealthRules,
+  safeParseMergedCharacterCreationPatch,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
@@ -18,15 +22,17 @@ import type {
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { assertCreatureTypesActiveInCampaign } from '../lib/assert-campaign-creature-types'
+import { HttpError } from '../../../lib/http-error'
 import {
   applySparsePatchUpdate,
   loadPatchDocument,
   requireCampaignRuleset,
   type SparsePatchUpdateOps,
 } from '../lib/patch-document'
-import { sparseSetIfDiffers } from './sparse-patch-helpers'
+import { sparseSetIfDiffers, sparseSetOrUnset } from './sparse-patch-helpers'
 
 const CHARACTER_CREATION_PREFIX = 'characterCreation.'
 
@@ -115,6 +121,13 @@ function mergeCharacterCreationPatch(
     merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
   }
 
+  if (input.startingWealth !== undefined) {
+    merged.startingWealth = mergeStartingWealthRulesPatch(
+      existing?.startingWealth,
+      input.startingWealth,
+    )
+  }
+
   return merged
 }
 
@@ -195,7 +208,10 @@ function buildMulticlassingUpdateSet(
   }
 }
 
-function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch): MongoUpdateOps {
+function buildCharacterCreationUpdateSet(
+  patch: CampaignCharacterCreationPatch,
+  rulesetId: SystemRulesetId,
+): MongoUpdateOps {
   const ops: MongoUpdateOps = { $set: {}, $unset: {} }
   const prefix = CHARACTER_CREATION_PREFIX
 
@@ -250,7 +266,26 @@ function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch):
     buildMulticlassingUpdateSet(ops, patch.multiclassing, prefix)
   }
 
+  if (patch.startingWealth !== undefined) {
+    const seed = getStandardStartingWealthRules(rulesetId)
+    const resolved = resolveStartingWealthRules(seed, patch.startingWealth)
+    const sparse = computeStartingWealthSparsePatch(resolved, seed)
+    sparseSetOrUnset(ops, `${prefix}startingWealth`, sparse)
+  }
+
   return ops
+}
+
+function assertMergedCharacterCreationPatch(
+  merged: CampaignCharacterCreationPatch,
+  rulesetId: SystemRulesetId,
+): void {
+  const seed = getStandardStartingWealthRules(rulesetId)
+  const parsed = safeParseMergedCharacterCreationPatch(merged, seed)
+
+  if (!parsed.success) {
+    throw HttpError.badRequest('Invalid character creation patch.', parsed.error.flatten())
+  }
 }
 
 async function applyCharacterCreationUpdate(
@@ -258,7 +293,11 @@ async function applyCharacterCreationUpdate(
   rulesetId: SystemRulesetId,
   patch: CampaignCharacterCreationPatch,
 ): Promise<void> {
-  await applySparsePatchUpdate(campaignId, rulesetId, buildCharacterCreationUpdateSet(patch))
+  await applySparsePatchUpdate(
+    campaignId,
+    rulesetId,
+    buildCharacterCreationUpdateSet(patch, rulesetId),
+  )
 }
 
 async function assertCreatureTypePolicyIds(
@@ -278,7 +317,9 @@ export async function writeInitialCharacterCreation(
   input: UpdateCampaignCharacterCreationInput,
 ): Promise<void> {
   await assertCreatureTypePolicyIds(campaignId, input)
-  await applyCharacterCreationUpdate(campaignId, rulesetId, input)
+  const merged = mergeCharacterCreationPatch(undefined, input)
+  assertMergedCharacterCreationPatch(merged, rulesetId)
+  await applyCharacterCreationUpdate(campaignId, rulesetId, merged)
 }
 
 /** Merges a partial character-creation patch and persists sparse overrides. */
@@ -292,6 +333,8 @@ export async function updateCharacterCreationPatch(
   const patchDoc = await loadPatchDocument(campaignId, rulesetId)
   const existing = patchDoc?.characterCreation as CampaignCharacterCreationPatch | undefined
   const merged = mergeCharacterCreationPatch(existing, input)
+
+  assertMergedCharacterCreationPatch(merged, rulesetId)
 
   await applyCharacterCreationUpdate(campaignId, rulesetId, merged)
 }

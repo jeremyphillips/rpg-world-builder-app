@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   defaultMulticlassingRules,
   DEFAULT_MULTICLASSING_ENABLED,
@@ -23,6 +24,11 @@ import {
   buildCharacterCreationPatchInputFromCreateWizard,
   mapRulesetPatchToRulesValues,
 } from './rules/character-configuration/character-configuration-form-values'
+import { mapStartingWealthToFormValues } from './rules/character-configuration/starting-wealth-form-values'
+
+const defaultStartingWealth = mapStartingWealthToFormValues(
+  getStandardStartingWealthRules('srd-cc-5.2.1'),
+)
 
 const campaign: Campaign = {
   id: 'c1',
@@ -65,6 +71,7 @@ const defaultMulticlassingFields = {
   primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
   speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  startingWealth: defaultStartingWealth,
 } as const
 
 describe('mapCampaignToSettingsValues', () => {
@@ -177,6 +184,7 @@ describe('buildCharacterCreationPatchInput', () => {
         primaryAbilityMinimumScore: 15,
         speciesMulticlassPolicyEnabled: true,
         speciesLevelLimitsEnabled: false,
+        startingWealth: defaultStartingWealth,
       }),
     ).toEqual({
       startingLevel: 1,
@@ -261,6 +269,7 @@ describe('mapRulesetPatchToRulesValues', () => {
         },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
         multiclassing: defaultMulticlassingRules(),
+        startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
       }),
     ).toEqual({
       startingLevel: 3,
@@ -275,6 +284,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       primaryAbilityMinimumScore: 13,
       speciesMulticlassPolicyEnabled: false,
       speciesLevelLimitsEnabled: false,
+      startingWealth: defaultStartingWealth,
     })
   })
 })

@@ -120,6 +120,17 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 `buildItemDefaultValues(config.fields)` seeds new items — exported from `@rpg/ui/form`.
 
+Optional hooks:
+
+| Property                | Purpose                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------- |
+| `allowReorder`          | When `false`, hides ↑/↓ move buttons (default `true`).                                      |
+| `hideMoveControls`      | Hides move buttons even when reorder is allowed.                                            |
+| `appendDefaults`        | `(items) => defaults` replaces static defaults on append.                                   |
+| `filterSelectDependsOn` | Root field names passed to `filterSelectOptions` as `watchedValues`.                        |
+| `filterSelectOptions`   | Cross-row select filtering inside array items.                                              |
+| `arrayPattern`          | Opaque metadata tag for dashboard patterns / drift tests — not interpreted by the renderer. |
+
 ### Conditional fields in items
 
 `dependsOn` names are **item-relative**; `visibleWhen` uses relative keys (`v.type`).

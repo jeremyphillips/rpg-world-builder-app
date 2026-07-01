@@ -20,6 +20,17 @@ campaign settings, homebrew rules). UI layer detail lives in
 Campaign settings follow the same suffixes under `features/campaign/lib/` (e.g.
 `campaign-profile-form-fields.ts`, `mechanics-form-values.ts`).
 
+## Validation
+
+Table-level domain rules (contiguous level ranges, cross-row overlap, campaign
+cap coverage) belong in the **parent** schema's `superRefine` — e.g.
+`configRulesSuperRefine` calling `refineLevelRangeTable` from `@rpg/contracts`.
+Do not duplicate those checks on row schemas or in `FormItem` config.
+
+Row schemas keep only field-local refines (bonus-gold operator, required
+sub-fields). Shared user-facing messages live in contracts (`level.ts`,
+`level-range-table.ts`) so form and API copy stay aligned.
+
 ## Layout
 
 **Flat prefixes** — default for content catalog subdomains:

@@ -17,12 +17,17 @@ import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
-import { DiceFormulaField } from '../../components/ui/dice-formula-field.client'
-import type { DiceFormulaValue } from '../../components/ui/dice-formula-field.lib'
+import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
 import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
 import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
+import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type { FieldConfig, FieldType, InputSelectFieldConfig } from '../field-config'
+import type {
+  FieldConfig,
+  FieldType,
+  InputSelectFieldConfig,
+  LevelRangeFieldConfig,
+} from '../field-config'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -77,7 +82,9 @@ interface RenderArgs<K extends FieldType> {
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
 const fieldRenderers: {
-  [K in Exclude<FieldType, 'inputSelect'>]: (args: RenderArgs<K>) => React.ReactElement
+  [K in Exclude<FieldType, 'inputSelect' | 'levelRange'>]: (
+    args: RenderArgs<K>,
+  ) => React.ReactElement
 } = {
   text: ({ config, field, id, error }) => (
     <TextField
@@ -398,28 +405,13 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  diceFormula: ({ config, field, id, error }) => (
-    <DiceFormulaField
+  diceFormula: ({ config, field, id, error, namePrefix }) => (
+    <DiceFormulaFieldRenderer
+      config={config}
+      field={field}
       id={id}
-      label={config.label}
       error={error}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={config.size}
-      disabled={config.disabled}
-      labelPosition={config.labelPosition}
-      modifierMode={config.modifierMode}
-      faces={config.faces}
-      countMin={config.countMin}
-      countMax={config.countMax}
-      modifierMin={config.modifierMin}
-      modifierMax={config.modifierMax}
-      value={(field.value as DiceFormulaValue | undefined) ?? undefined}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
+      namePrefix={namePrefix}
     />
   ),
 }
@@ -480,6 +472,10 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     )
   }
 
+  if (renderConfig.type === 'levelRange') {
+    return <LevelRangeFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+  }
+
   return (
     <StandardFieldRenderer
       config={config}
@@ -491,7 +487,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   )
 }
 
-type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig>
+type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig | LevelRangeFieldConfig>
 
 interface StandardFieldRendererProps {
   config: FieldConfig
