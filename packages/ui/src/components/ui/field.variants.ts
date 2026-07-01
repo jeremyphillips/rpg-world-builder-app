@@ -23,6 +23,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldInlineControlRowClasses` — inline label + control rows
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
+ * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
@@ -143,6 +144,21 @@ export const fieldStackRhythmVariants = cva('flex flex-col', {
 })
 
 export type FieldStackRhythmVariantProps = VariantProps<typeof fieldStackRhythmVariants>
+
+/**
+ * Vertical gap between sibling array items (list + Add button).
+ * Item body field stacks use {@link fieldStackRhythmVariants} instead.
+ */
+export function fieldArrayItemListClasses(options: {
+  rhythm: FieldStackRhythm
+  size: FieldSizeToken
+}): string {
+  if (options.rhythm === 'comfortable') {
+    return cn('flex flex-col', options.size === 'md' ? 'gap-6' : 'gap-3')
+  }
+
+  return cn('flex flex-col', options.size === 'md' ? 'gap-3' : 'gap-2')
+}
 
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })

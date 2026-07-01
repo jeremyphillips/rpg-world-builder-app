@@ -4,6 +4,7 @@ import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { buildRulesSchemaForSurface } from './character-configuration-form-fields'
 import {
   buildStartingWealthPatchInput,
+  defaultStartingWealthTierBonusGoldFormValues,
   formatStartingWealthTierSummary,
   mapStartingWealthToFormValues,
 } from './starting-wealth-form-values'
@@ -36,6 +37,20 @@ describe('formatStartingWealthTierSummary', () => {
     expect(adventurerTier).toBeDefined()
 
     expect(formatStartingWealthTierSummary(adventurerTier!)).toBe('Levels 2–4 · 1 grant')
+  })
+
+  it('formats average bonus gold with grouped thousands separators', () => {
+    expect(
+      formatStartingWealthTierSummary({
+        ...mapStartingWealthToFormValues(SEED).tiers[0]!,
+        bonusGoldEnabled: true,
+        bonusGold: {
+          ...defaultStartingWealthTierBonusGoldFormValues(),
+          baseGp: 21_369.5,
+          formula: { count: 1, faces: 10, modifier: { operator: '×', amount: 1 } },
+        },
+      }),
+    ).toBe('Level 1 · Avg 21,375 GP')
   })
 
   it('tolerates missing bonusGold while bonus gold is enabled', () => {

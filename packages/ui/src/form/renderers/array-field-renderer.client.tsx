@@ -23,6 +23,7 @@ import { CSS } from '@dnd-kit/utilities'
 
 import { Button } from '../../components/ui/button.client'
 import {
+  fieldArrayItemListClasses,
   fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupLegendVariants,
@@ -66,7 +67,7 @@ interface ArrayFieldItemContentProps {
   index: number
   itemId: string
   legend: string
-  stackClasses: string
+  itemBodyStackClasses: string
   canRemove: boolean
   showDragHandle: boolean
   collapsible: boolean
@@ -90,7 +91,7 @@ function ArrayFieldItemContent({
   index,
   itemId,
   legend,
-  stackClasses,
+  itemBodyStackClasses,
   canRemove,
   showDragHandle,
   collapsible,
@@ -127,7 +128,7 @@ function ArrayFieldItemContent({
 
   const fieldsNode = (
     <ArrayFieldContext.Provider value={arrayContext}>
-      <div className={stackClasses}>
+      <div className={itemBodyStackClasses}>
         <NestedFormItems
           items={config.fields}
           idPrefix={idPrefix}
@@ -259,7 +260,8 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     itemCollapsible = false,
   } = config
   const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
-  const stackClasses = fieldStackRhythmVariants({ rhythm })
+  const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
+  const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
@@ -311,7 +313,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     index,
     itemId: rhfField.id,
     legend,
-    stackClasses,
+    itemBodyStackClasses,
     canRemove,
     showDragHandle,
     collapsible,
@@ -340,7 +342,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
         {legend}
       </legend>
-      <div className={stackClasses}>
+      <div className={itemListClasses}>
         {sortableEnabled ? (
           <DndContext
             sensors={sensors}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  fieldArrayItemListClasses,
   fieldGroupLegendVariants,
   fieldStackRhythmVariants,
   resolveArrayLegendScale,
@@ -20,6 +21,25 @@ describe('fieldStackRhythmVariants', () => {
 
   it('applies comfortable gap when requested', () => {
     expect(fieldStackRhythmVariants({ rhythm: 'comfortable' })).toContain('gap-6')
+  })
+})
+
+describe('fieldArrayItemListClasses', () => {
+  it('uses gap-3 between sm comfortable array items', () => {
+    expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'sm' })).toContain('gap-3')
+    expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'sm' })).not.toContain('gap-6')
+  })
+
+  it('uses gap-6 between md comfortable array items', () => {
+    expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'md' })).toContain('gap-6')
+  })
+
+  it('uses gap-2 for default compact sm arrays', () => {
+    expect(fieldArrayItemListClasses({ rhythm: 'compact', size: 'sm' })).toContain('gap-2')
+  })
+
+  it('uses gap-3 for compact md arrays', () => {
+    expect(fieldArrayItemListClasses({ rhythm: 'compact', size: 'md' })).toContain('gap-3')
   })
 })
 

@@ -2,6 +2,7 @@ import {
   averageScaledDiceRoll,
   computeStartingWealthSparsePatch,
   CURRENCY_IDS,
+  formatGroupedNumber,
   formatLevelRangeLabel,
   moneyToCp,
   type Currency,
@@ -192,8 +193,7 @@ export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValu
         ? rollAverage
         : moneyToCp({ amount: rollAverage, currency: bonus.formula.currency }) / 100
     const avgGp = bonus.baseGp + rollGp
-    const formattedAvg = Number.isInteger(avgGp) ? String(avgGp) : String(avgGp)
-    parts.push(`Avg ${formattedAvg} GP`)
+    parts.push(`Avg ${formatGroupedNumber(avgGp)} GP`)
   }
 
   const grantCount = tier.magicItemGrants.length

@@ -18,7 +18,7 @@ export const arrayItemRemoveButtonClasses =
   'ml-auto size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5'
 
 /** Column wrapper for the title row and optional summary row below it. */
-export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-1'
+export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-0'
 
 /** Shared flex-1 body slot — title line or compact inline fields. */
 export const arrayItemHeaderContentClasses = 'flex min-w-0 flex-1 items-center'
@@ -33,8 +33,9 @@ export const arrayItemHeaderDividerClasses = 'mx-1.5 text-muted-foreground'
 /** Fallback label after the divider (lighter than primary). */
 export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-foreground'
 
-/** Collapsed summary line in detailed item headers. */
-export const arrayItemHeaderSummaryClasses = 'truncate text-xs text-muted-foreground'
+/** Summary line below the title row — tight leading; pb-1 separates from item body fields. */
+export const arrayItemHeaderSummaryClasses =
+  'truncate pb-1 text-xs leading-none text-muted-foreground'
 
 /** Toolbar row shared by compact and detailed headers. */
 export const arrayItemToolbarRowClasses = 'relative flex min-w-0 gap-0 pr-2'

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
@@ -64,6 +64,38 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
+  })
+
+  it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {
+    const user = userEvent.setup()
+    const comfortableFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        rhythm: 'comfortable',
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={comfortableFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-3')
+    expect(list).not.toHaveClass('gap-6')
+
+    const item = screen.getByRole('group', { name: 'Item 1' })
+    expect(within(item).getByRole('textbox', { name: 'Trait name' }).closest('.gap-6')).toBeTruthy()
   })
 
   it('adds an item when the add button is clicked', async () => {
