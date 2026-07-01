@@ -73,7 +73,6 @@ interface ArrayFieldItemContentProps {
   showDragHandle: boolean
   collapsible: boolean
   variant: 'compact' | 'detailed'
-  sortable: boolean
   collapsed: boolean
   onToggleCollapse: () => void
   onRemove: () => void
@@ -96,7 +95,6 @@ function ArrayFieldItemContent({
   showDragHandle,
   collapsible,
   variant,
-  sortable,
   collapsed,
   onToggleCollapse,
   onRemove,
@@ -145,10 +143,14 @@ function ArrayFieldItemContent({
     watchedPrimary,
     legend,
   )
+  const gripVisible = showDragHandle && Boolean(dragHandleProps)
+  const leadingChrome = { showDragHandle: gripVisible, collapsible }
 
   return (
     <ArrayItemShell
       titleId={titleId}
+      showDragHandle={gripVisible}
+      collapsible={collapsible}
       dragging={dragHandleProps?.isDragging}
       main={
         <>
@@ -181,7 +183,7 @@ function ArrayFieldItemContent({
             <div
               id={bodyId}
               hidden={collapsed || undefined}
-              className={arrayItemBodyClasses({ collapsible, sortable })}
+              className={arrayItemBodyClasses(leadingChrome)}
               aria-hidden={collapsed}
             >
               {fieldsNode}
@@ -330,7 +332,6 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     showDragHandle,
     collapsible,
     variant,
-    sortable,
     collapsedIds,
     onToggleCollapse: toggleCollapse,
     onRemove: () => remove(index),

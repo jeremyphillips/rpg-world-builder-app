@@ -5,7 +5,6 @@ import { ChevronDown, GripVertical } from 'lucide-react'
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
-import { Button } from '../../components/ui/button.client'
 import { cn } from '../../lib/utils'
 import type { ArrayItemHeaderConfig } from '../field-config'
 import {
@@ -14,6 +13,7 @@ import {
   type ResolvedArrayItemHeader,
 } from '../config/array-item-config.lib'
 import {
+  arrayItemChromeColumnClasses,
   arrayItemCollapseButtonClasses,
   arrayItemDragHandleClasses,
   arrayItemHeaderContentClasses,
@@ -25,6 +25,7 @@ import {
   arrayItemHeaderTitleClasses,
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
+  type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 
 export interface ArrayItemDragHandleProps {
@@ -117,41 +118,47 @@ export function ArrayItemToolbar({
   const summary =
     !compact && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
 
+  const gripVisible = showDragHandle && Boolean(dragHandleProps)
+  const leadingChrome: ArrayItemLeadingChromeOptions = { showDragHandle: gripVisible, collapsible }
+
   const headerContentClasses = cn(
     arrayItemHeaderContentClasses,
-    collapsible && arrayItemToolbarContentClasses,
+    'min-w-0 flex-1',
+    arrayItemToolbarContentClasses(leadingChrome),
   )
 
   const titleRow = (
-    <div className={arrayItemToolbarRowClasses({ compact })}>
-      {showDragHandle && dragHandleProps ? (
-        <ArrayItemDragHandle
-          {...dragHandleProps}
-          compact={compact}
-          ariaLabel={`Drag to reorder ${header.ariaLabel}`}
-        />
+    <div className={arrayItemToolbarRowClasses({ ...leadingChrome, compact })}>
+      {gripVisible && dragHandleProps ? (
+        <div className={arrayItemChromeColumnClasses}>
+          <ArrayItemDragHandle
+            {...dragHandleProps}
+            compact={compact}
+            ariaLabel={`Drag to reorder ${header.ariaLabel}`}
+          />
+        </div>
       ) : null}
       {collapsible ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className={cn(arrayItemCollapseButtonClasses, 'shrink-0')}
-          aria-expanded={!collapsed}
-          aria-controls={bodyId}
-          aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${header.ariaLabel}`}
-          onClick={onToggleCollapse}
-        >
-          <ChevronDown
-            className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
-            aria-hidden
-          />
-        </Button>
+        <div className={arrayItemChromeColumnClasses}>
+          <button
+            type="button"
+            className={arrayItemCollapseButtonClasses}
+            aria-expanded={!collapsed}
+            aria-controls={bodyId}
+            aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${header.ariaLabel}`}
+            onClick={onToggleCollapse}
+          >
+            <ChevronDown
+              className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
+              aria-hidden
+            />
+          </button>
+        </div>
       ) : null}
       <div id={titleId} className={headerContentClasses}>
         {compact ? (
           <>
-            {!showDragHandle && !collapsible ? (
+            {!gripVisible && !collapsible ? (
               <span className="sr-only">{header.ariaLabel}</span>
             ) : null}
             {children}
@@ -173,7 +180,7 @@ export function ArrayItemToolbar({
       <p
         className={cn(
           arrayItemHeaderSummaryClasses,
-          arrayItemHeaderSummaryIndentClasses({ showDragHandle, collapsible }),
+          arrayItemHeaderSummaryIndentClasses(leadingChrome),
         )}
       >
         {summary}

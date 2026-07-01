@@ -1,10 +1,22 @@
 import { cn } from '../../lib/utils'
+import {
+  resolveArrayItemLeadingChrome,
+  type ArrayItemLeadingChromeOptions,
+} from '../config/array-item-leading-chrome.lib'
+
+export {
+  arrayItemChromeColumnClasses,
+  resolveArrayItemLeadingChrome,
+  type ArrayItemLeadingChromeOptions,
+  type ResolvedArrayItemLeadingChrome,
+} from '../config/array-item-leading-chrome.lib'
 
 /**
  * Array item chrome geometry — single source of truth for shell padding and action hit targets.
  *
  * Layout contract: content flows in the main column; trailing actions (remove, future issue
- * summary) live in a top-aligned rail pinned to the shell's top-right corner.
+ * summary) live in a top-aligned rail pinned to the shell's top-right corner. Leading inset for
+ * grip/caret is resolved via `resolveArrayItemLeadingChrome`.
  */
 export const arrayItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 
@@ -37,11 +49,11 @@ export function arrayItemActionsRailClasses(options: { compact?: boolean } = {})
   )
 }
 
-/** Inline drag handle — precedes caret/title in the toolbar flex row. */
+/** Inline drag handle — first leading chrome column when sortable. */
 export function arrayItemDragHandleClasses(options: { compact?: boolean } = {}): string {
   return cn(
     arrayItemChromeButtonClasses,
-    '-ml-[calc(var(--spacing)*1)] cursor-grab active:cursor-grabbing',
+    'cursor-grab active:cursor-grabbing',
     options.compact && '-mt-1',
   )
 }
@@ -59,7 +71,7 @@ export const arrayItemRemoveButtonClasses = cn(
 export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-0'
 
 /** Shared flex-1 body slot — title line or compact inline fields. */
-export const arrayItemHeaderContentClasses = 'flex min-w-0 flex-1 items-center'
+export const arrayItemHeaderContentClasses = 'flex min-w-0 min-h-0 items-center'
 
 /** Detailed item header title cluster. */
 export const arrayItemHeaderTitleClasses =
@@ -76,40 +88,27 @@ export const arrayItemHeaderSummaryClasses =
   'truncate pb-1 text-xs leading-none text-muted-foreground'
 
 /** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
-export function arrayItemToolbarRowClasses(options: { compact?: boolean } = {}): string {
-  return cn('relative flex min-w-0 gap-0', options.compact ? 'items-start' : 'items-center')
+export function arrayItemToolbarRowClasses(
+  options: ArrayItemLeadingChromeOptions & { compact?: boolean },
+): string {
+  return cn('flex min-w-0 gap-0', options.compact ? 'items-start' : 'items-center')
 }
 
-/** Space between collapse caret and title / compact fields. */
-export const arrayItemToolbarContentClasses = 'min-w-0 flex-1 ml-[calc(var(--spacing)*1)]'
-
-/** Indents summary text to align with the title column start. */
-export function arrayItemHeaderSummaryIndentClasses(options: {
-  showDragHandle: boolean
-  collapsible: boolean
-}): string {
-  if (options.showDragHandle && options.collapsible) {
-    return arrayItemBodySortableCaretIndentClasses
-  }
-  if (options.collapsible) return arrayItemBodyCaretIndentClasses
-  return ''
+/** Gap before the toolbar content grid cell when leading chrome is visible. */
+export function arrayItemToolbarContentClasses(options: ArrayItemLeadingChromeOptions): string {
+  return cn('min-w-0', resolveArrayItemLeadingChrome(options).toolbarContentGapClasses)
 }
 
-/** Indents collapsible bodies under the title (caret column only). */
-export const arrayItemBodyCaretIndentClasses = 'pl-7'
+/** Aligns summary text with the toolbar content column. */
+export function arrayItemHeaderSummaryIndentClasses(
+  options: ArrayItemLeadingChromeOptions,
+): string {
+  return resolveArrayItemLeadingChrome(options).contentColumnIndentClasses
+}
 
-/** Indents collapsible bodies under the title (inline grip + caret columns). */
-export const arrayItemBodySortableCaretIndentClasses = 'pl-13'
-
-/** Body region below a detailed item header. */
-export function arrayItemBodyClasses(options: { collapsible: boolean; sortable: boolean }): string {
-  if (!options.collapsible) return 'pt-3'
-
-  const indent = options.sortable
-    ? arrayItemBodySortableCaretIndentClasses
-    : arrayItemBodyCaretIndentClasses
-
-  return cn(indent, 'pt-3')
+/** Aligns detailed item bodies with the toolbar content column. */
+export function arrayItemBodyClasses(options: ArrayItemLeadingChromeOptions): string {
+  return cn(resolveArrayItemLeadingChrome(options).contentColumnIndentClasses, 'pt-3')
 }
 
 /** Inline field region for compact items (same row as toolbar). */
