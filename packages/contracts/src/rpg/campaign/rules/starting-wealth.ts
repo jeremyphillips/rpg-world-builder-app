@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { SystemRulesetId } from '../../primitives/ruleset'
+import { systemRulesetIdSchema, type SystemRulesetId } from '../../primitives/ruleset'
 import { tierBonusGoldSchema } from '../../primitives/currency-formula'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { magicItemRaritySchema } from '../../vocab/magic-item/rarity'
@@ -104,6 +104,19 @@ export const startingWealthRulesPatchSchema = startingWealthRulesSchema.partial(
 
 export type StartingWealthRulesPatch = z.infer<typeof startingWealthRulesPatchSchema>
 
+/** Merges sparse patch layers (tiers replace wholesale when present). */
+export function mergeStartingWealthRulesPatch(
+  existing: StartingWealthRulesPatch | undefined,
+  input: StartingWealthRulesPatch,
+): StartingWealthRulesPatch {
+  return {
+    ...existing,
+    ...input,
+    scope: input.scope ?? existing?.scope,
+    tiers: input.tiers ?? existing?.tiers,
+  }
+}
+
 /** Merges a sparse campaign patch onto the catalog seed (tiers replace wholesale). */
 export function resolveStartingWealthRules(
   seed: StartingWealthRules,
@@ -111,13 +124,50 @@ export function resolveStartingWealthRules(
 ): StartingWealthRules {
   if (!patch) return seed
 
-  return {
-    ...seed,
-    ...patch,
-    scope: patch.scope ?? seed.scope,
-    tiers: patch.tiers ?? seed.tiers,
-  }
+  return mergeStartingWealthRulesPatch(seed, patch) as StartingWealthRules
 }
+
+function startingWealthFieldEquals(
+  a: StartingWealthRules[keyof StartingWealthRules],
+  b: StartingWealthRules[keyof StartingWealthRules],
+): boolean {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+/** Returns only fields that differ from the catalog seed — for sparse Mongo storage. */
+export function computeStartingWealthSparsePatch(
+  resolved: StartingWealthRules,
+  seed: StartingWealthRules,
+): StartingWealthRulesPatch | undefined {
+  const sparse: StartingWealthRulesPatch = {}
+
+  if (resolved.name !== seed.name) sparse.name = resolved.name
+  if (resolved.description !== seed.description) sparse.description = resolved.description
+  if (resolved.imageKey !== seed.imageKey) sparse.imageKey = resolved.imageKey
+  if (!startingWealthFieldEquals(resolved.scope, seed.scope)) sparse.scope = resolved.scope
+  if (!startingWealthFieldEquals(resolved.tiers, seed.tiers)) sparse.tiers = resolved.tiers
+
+  return Object.keys(sparse).length > 0 ? sparse : undefined
+}
+
+const startingWealthTableSlugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+
+const startingWealthTableMetaSchema = z.object({
+  id: z.string().min(1),
+  slug: startingWealthTableSlugSchema,
+  rulesetId: systemRulesetIdSchema,
+  source: z.enum(['system', 'homebrew']),
+  campaignId: z.string().min(1).nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+
+/** Catalog read DTO — system seed table with deterministic id and ownership meta. */
+export const startingWealthTableSchema = startingWealthTableMetaSchema.extend(
+  startingWealthRulesSchema.shape,
+)
+
+export type StartingWealth = z.infer<typeof startingWealthTableSchema>
 
 /** Returns the tier matching a character level, if any. */
 export function startingWealthTierForLevel(

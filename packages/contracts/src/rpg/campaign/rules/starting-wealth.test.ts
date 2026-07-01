@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  computeStartingWealthSparsePatch,
+  mergeStartingWealthRulesPatch,
   resolveStartingWealthRules,
   startingWealthRulesSchema,
   startingWealthTierForLevel,
@@ -100,6 +102,39 @@ describe('resolveStartingWealthRules', () => {
 
     expect(resolved.name).toBe('Custom table name')
     expect(resolved.tiers).toEqual(SEED.tiers)
+  })
+})
+
+describe('computeStartingWealthSparsePatch', () => {
+  it('returns undefined when resolved rules match the seed', () => {
+    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
+  })
+
+  it('returns only fields that differ from the seed', () => {
+    const patchedTiers = SEED.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+    const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
+
+    expect(computeStartingWealthSparsePatch(resolved, SEED)).toEqual({ tiers: patchedTiers })
+  })
+})
+
+describe('mergeStartingWealthRulesPatch', () => {
+  it('layers sparse patches without dropping prior overrides', () => {
+    const patchedTiers = SEED.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    const merged = mergeStartingWealthRulesPatch(
+      { tiers: patchedTiers },
+      { name: 'Custom table name' },
+    )
+
+    expect(merged).toEqual({
+      name: 'Custom table name',
+      tiers: patchedTiers,
+    })
   })
 })
 

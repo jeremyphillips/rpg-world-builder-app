@@ -220,6 +220,49 @@ describe('updateCharacterCreationPatch', () => {
     const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
     expect(stored?.characterCreation?.multiclassing).toBeUndefined()
   })
+
+  it('persists starting wealth tier patches on the ruleset patch', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
+    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
+    const patchedTiers = seed.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    const patch = await updateCharacterCreationPatch(campaign.id, {
+      startingWealth: { tiers: patchedTiers },
+    })
+
+    expect(
+      patch?.characterCreation.startingWealth.tiers.find((tier) => tier.id === 'level-1')
+        ?.includeNormalStartingEquipment,
+    ).toBe(false)
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.characterCreation?.startingWealth).toEqual({ tiers: patchedTiers })
+  })
+
+  it('unsets starting wealth when reverted to catalog seed defaults', async () => {
+    const owner = await makeUser('owner@example.com')
+    const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
+    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
+    const patchedTiers = seed.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    await updateCharacterCreationPatch(campaign.id, {
+      startingWealth: { tiers: patchedTiers },
+    })
+
+    const patch = await updateCharacterCreationPatch(campaign.id, {
+      startingWealth: { tiers: seed.tiers },
+    })
+
+    expect(patch?.characterCreation.startingWealth).toEqual(seed)
+
+    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    expect(stored?.characterCreation?.startingWealth).toBeUndefined()
+  })
 })
 
 describe('updateMechanicsPatch', () => {
@@ -326,6 +369,29 @@ describe('ruleset patch routes', () => {
       .expect(200)
 
     expect(res.body.patch.characterCreation.multiclassing.enabled).toBe(false)
+  })
+
+  it('patches starting wealth tiers for campaign managers', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const seed = getStandardStartingWealthRules('srd-cc-5.2.1')
+    const patchedTiers = seed.tiers.map((tier) =>
+      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    )
+
+    const res = await agent
+      .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        startingWealth: { tiers: patchedTiers },
+      })
+      .expect(200)
+
+    expect(
+      res.body.patch.characterCreation.startingWealth.tiers.find(
+        (tier: { id: string }) => tier.id === 'level-1',
+      )?.includeNormalStartingEquipment,
+    ).toBe(false)
   })
 
   it('patches mechanics for campaign managers', async () => {

@@ -15,7 +15,6 @@ import type { ContentWriteConfig, WriteEntityBase } from './lib/content-write-co
 import { skillProficiencyRegistration } from './skill-proficiencies/skill-proficiencies.config'
 import { speciesRegistration } from './species/species.config'
 import { spellRegistration } from './spells/spells.config'
-import { startingWealthRegistration } from './starting-wealth/starting-wealth.config'
 
 /** Bundled read + write wiring for one content type — the single extension point. */
 export interface ContentTypeRegistration<T extends WriteEntityBase = WriteEntityBase> {
@@ -39,7 +38,6 @@ const CONTENT_TYPES = {
   species: speciesRegistration,
   spells: spellRegistration,
   feats: featRegistration,
-  'starting-wealth': startingWealthRegistration,
 } as const satisfies Record<ApiContentTypeKey, ContentTypeRegistration>
 
 export type ContentTypeName = keyof typeof CONTENT_TYPES

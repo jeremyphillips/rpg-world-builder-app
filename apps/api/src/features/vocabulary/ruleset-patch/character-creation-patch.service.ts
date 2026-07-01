@@ -1,4 +1,5 @@
 import {
+  computeStartingWealthSparsePatch,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   DEFAULT_IMPORTED_CHARACTERS_POLICY,
   DEFAULT_MULTICLASSING_ENABLED,
@@ -9,6 +10,8 @@ import {
   DEFAULT_STARTING_LEVEL,
   MAX_CHARACTER_LEVEL,
   isSparseDefaultMulticlassingPatch,
+  mergeStartingWealthRulesPatch,
+  resolveStartingWealthRules,
   sameStringSet,
 } from '@rpg/contracts'
 import type {
@@ -18,6 +21,7 @@ import type {
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { assertCreatureTypesActiveInCampaign } from '../lib/assert-campaign-creature-types'
 import {
@@ -26,7 +30,7 @@ import {
   requireCampaignRuleset,
   type SparsePatchUpdateOps,
 } from '../lib/patch-document'
-import { sparseSetIfDiffers } from './sparse-patch-helpers'
+import { sparseSetIfDiffers, sparseSetOrUnset } from './sparse-patch-helpers'
 
 const CHARACTER_CREATION_PREFIX = 'characterCreation.'
 
@@ -115,6 +119,13 @@ function mergeCharacterCreationPatch(
     merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
   }
 
+  if (input.startingWealth !== undefined) {
+    merged.startingWealth = mergeStartingWealthRulesPatch(
+      existing?.startingWealth,
+      input.startingWealth,
+    )
+  }
+
   return merged
 }
 
@@ -195,7 +206,10 @@ function buildMulticlassingUpdateSet(
   }
 }
 
-function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch): MongoUpdateOps {
+function buildCharacterCreationUpdateSet(
+  patch: CampaignCharacterCreationPatch,
+  rulesetId: SystemRulesetId,
+): MongoUpdateOps {
   const ops: MongoUpdateOps = { $set: {}, $unset: {} }
   const prefix = CHARACTER_CREATION_PREFIX
 
@@ -250,6 +264,13 @@ function buildCharacterCreationUpdateSet(patch: CampaignCharacterCreationPatch):
     buildMulticlassingUpdateSet(ops, patch.multiclassing, prefix)
   }
 
+  if (patch.startingWealth !== undefined) {
+    const seed = getStandardStartingWealthRules(rulesetId)
+    const resolved = resolveStartingWealthRules(seed, patch.startingWealth)
+    const sparse = computeStartingWealthSparsePatch(resolved, seed)
+    sparseSetOrUnset(ops, `${prefix}startingWealth`, sparse)
+  }
+
   return ops
 }
 
@@ -258,7 +279,11 @@ async function applyCharacterCreationUpdate(
   rulesetId: SystemRulesetId,
   patch: CampaignCharacterCreationPatch,
 ): Promise<void> {
-  await applySparsePatchUpdate(campaignId, rulesetId, buildCharacterCreationUpdateSet(patch))
+  await applySparsePatchUpdate(
+    campaignId,
+    rulesetId,
+    buildCharacterCreationUpdateSet(patch, rulesetId),
+  )
 }
 
 async function assertCreatureTypePolicyIds(

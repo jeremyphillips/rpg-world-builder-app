@@ -108,6 +108,7 @@ const characterCreationSchema = new Schema(
       },
     },
     multiclassing: { type: multiclassingSchema, default: undefined },
+    startingWealth: { type: Schema.Types.Mixed, default: undefined },
   },
   { _id: false },
 )
