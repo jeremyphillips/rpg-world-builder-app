@@ -4,6 +4,7 @@ import {
   MAGIC_ITEM_RARITY_ENTRIES,
   absoluteLevelSchema,
   currencySchema,
+  getCurrencyAbbrev,
   magicItemRaritySchema,
 } from '@rpg/contracts'
 import { DIE_FACES } from '@rpg/contracts/primitives'
@@ -46,6 +47,8 @@ const startingWealthMagicItemGrantFormSchema = z.object({
 
 const startingWealthTierBonusGoldFormSchema = z.object({
   baseGp: z.number().int().min(0),
+  /** Form-only unit label backing for the Base inputSelect; always GP. */
+  baseCurrency: z.literal('gp').optional(),
   formula: diceFormulaValueSchema,
   currency: currencySchema,
 })
@@ -108,27 +111,30 @@ export function buildStartingWealthTiersField(): FormItem {
         defaultValue: true,
       },
       {
-        type: 'switch',
-        name: BONUS_GOLD_ENABLED,
-        label: 'Bonus gold',
-        defaultValue: false,
-      },
-      {
         kind: 'stack',
         layout: 'toggleDependent',
         dependentsChrome: 'subtle',
-        visibility: {
-          dependsOn: [BONUS_GOLD_ENABLED],
-          visibleWhen: (watched) => watched[BONUS_GOLD_ENABLED] === true,
-        },
         fields: [
           {
-            type: 'number',
-            name: 'bonusGold.baseGp',
-            label: 'Base GP',
+            type: 'switch',
+            name: BONUS_GOLD_ENABLED,
+            label: 'Bonus gold',
+            defaultValue: false,
+          },
+          {
+            type: 'inputSelect',
+            name: 'bonusGold',
+            label: 'Base',
+            inputType: 'number',
+            valueKey: 'baseGp',
+            unitKey: 'baseCurrency',
+            fixedUnit: getCurrencyAbbrev('gp'),
+            unitValue: 'gp',
             min: 0,
             required: true,
-            width: 'auto',
+            width: 'md',
+            formatGrouped: true,
+            defaultValue: { baseGp: 0, baseCurrency: 'gp' },
           },
           {
             type: 'diceFormula',

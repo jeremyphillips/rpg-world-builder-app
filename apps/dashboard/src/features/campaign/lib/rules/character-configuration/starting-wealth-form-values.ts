@@ -28,6 +28,8 @@ export type StartingWealthMagicItemGrantFormValues = {
 
 export type StartingWealthTierBonusGoldFormValues = {
   baseGp: number
+  /** Form-only unit backing for the Base inputSelect; always `gp`. */
+  baseCurrency?: 'gp'
   formula: DiceFormulaValue
   currency: Currency
 }
@@ -62,6 +64,7 @@ const DEFAULT_BONUS_GOLD_FORMULA: DiceFormulaValue = {
 export function defaultStartingWealthTierBonusGoldFormValues(): StartingWealthTierBonusGoldFormValues {
   return {
     baseGp: 0,
+    baseCurrency: 'gp',
     formula: { ...DEFAULT_BONUS_GOLD_FORMULA },
     currency: 'gp',
   }
@@ -101,6 +104,7 @@ export function mapStartingWealthTierToFormValues(
       tier.bonusGold !== null && tier.bonusGold !== undefined
         ? {
             baseGp: tier.bonusGold.baseGp,
+            baseCurrency: 'gp',
             formula: mapBonusGoldFormulaToDiceValue(tier.bonusGold.formula),
             currency: tier.bonusGold.formula.currency,
           }
