@@ -125,7 +125,6 @@ const conditionalFields: FormItem[] = [
         const type = values.type as string | undefined
         return type ? `${type.charAt(0).toUpperCase()}${type.slice(1)}` : undefined
       },
-      showDivider: true,
     },
   },
 ]
@@ -262,7 +261,6 @@ const detailedCollapsibleFields: FormItem[] = [
     itemHeader: {
       fallback: (i) => `Trait ${i + 1}`,
       primaryField: 'name',
-      showDivider: true,
       summary: (values) => (values.description as string) || 'No description',
     },
   },
@@ -324,7 +322,6 @@ const nestedCompactFields: FormItem[] = [
     itemHeader: {
       fallback: (i) => `Package ${i + 1}`,
       primaryField: 'label',
-      showDivider: true,
     },
   },
 ]

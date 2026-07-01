@@ -472,13 +472,13 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
 
-    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Trait 1/ })
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
     expect(collapseTrigger).toHaveAttribute('aria-expanded', 'true')
     await user.click(collapseTrigger)
     expect(collapseTrigger).toHaveAttribute('aria-expanded', 'false')
     expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
 
-    await user.click(screen.getByRole('button', { name: /Expand .*Trait 1/ }))
+    await user.click(screen.getByRole('button', { name: /Expand .*Darkvision/ }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
 

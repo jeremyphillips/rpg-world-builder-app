@@ -92,7 +92,6 @@ export function buildStartingWealthTiersField(): FormItem {
     itemHeader: {
       primaryField: 'label',
       fallback: (index) => `Wealth tier #${index + 1}`,
-      showDivider: true,
       summary: (values) => formatStartingWealthTierSummary(values as StartingWealthTierFormValues),
     },
     fields: [

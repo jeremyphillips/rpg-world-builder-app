@@ -583,7 +583,12 @@ export interface ArrayItemHeaderConfig {
   fallback: (index: number) => string
   /** Shown on its own row below the header title on detailed items. */
   summary?: (values: Record<string, unknown>, index: number) => string
-  /** Renders `primary · fallback` when both are present. */
+  /**
+   * When true, appends ` · {fallback}` after the primary label in the header title.
+   * Defaults to false — fallback still drives aria labels and empty-primary titles.
+   */
+  showFallbackInHeader?: boolean
+  /** Renders a divider between primary and fallback when `showFallbackInHeader` is true. */
   showDivider?: boolean
   /** When true, primary label is visually hidden but available to assistive tech. */
   srOnly?: boolean

@@ -86,6 +86,8 @@ export interface ResolvedArrayItemHeader {
   fallback: string
   ariaLabel: string
   showDivider: boolean
+  /** When true, render fallback after primary in the visible header title. */
+  showFallbackInTitle: boolean
   srOnly: boolean
 }
 
@@ -98,9 +100,13 @@ export function resolveArrayItemHeaderLabels(
 ): ResolvedArrayItemHeader {
   const primary = resolveArrayItemPrimaryLabel(header, values, index, watchedPrimary)
   const fallback = header.fallback(index)
-  const showDivider = header.showDivider ?? Boolean(primary)
+  const showFallbackInHeader = header.showFallbackInHeader ?? false
+  const showFallbackInTitle = showFallbackInHeader && Boolean(primary)
+  const showDivider = showFallbackInTitle && (header.showDivider ?? true)
   const ariaLabel = primary
-    ? joinArrayItemSummaryParts([primary, fallback])
+    ? showFallbackInHeader
+      ? joinArrayItemSummaryParts([primary, fallback])
+      : joinArrayItemSummaryParts([legend, primary])
     : joinArrayItemSummaryParts([legend, fallback])
 
   return {
@@ -108,6 +114,7 @@ export function resolveArrayItemHeaderLabels(
     fallback,
     ariaLabel,
     showDivider,
+    showFallbackInTitle,
     srOnly: header.srOnly ?? false,
   }
 }

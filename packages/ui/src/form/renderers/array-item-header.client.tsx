@@ -60,12 +60,16 @@ function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactN
     return (
       <>
         <span>{header.primary}</span>
-        {header.showDivider ? (
-          <span className={arrayItemHeaderDividerClasses} aria-hidden>
-            {ARRAY_ITEM_HEADER_DIVIDER}
-          </span>
+        {header.showFallbackInTitle ? (
+          <>
+            {header.showDivider ? (
+              <span className={arrayItemHeaderDividerClasses} aria-hidden>
+                {ARRAY_ITEM_HEADER_DIVIDER}
+              </span>
+            ) : null}
+            <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
+          </>
         ) : null}
-        <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
       </>
     )
   }

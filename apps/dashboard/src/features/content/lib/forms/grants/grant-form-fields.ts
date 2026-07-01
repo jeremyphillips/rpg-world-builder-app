@@ -314,7 +314,6 @@ export function grantArrayFields<T extends string>(
           const type = values['grantType'] as T | undefined
           return type ? labels[type] : undefined
         },
-        showDivider: true,
       },
       fields: grantItemFields(grantTypes, labels, ctx),
     },

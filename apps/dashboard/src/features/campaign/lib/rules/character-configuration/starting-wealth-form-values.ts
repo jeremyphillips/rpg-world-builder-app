@@ -15,7 +15,12 @@ import {
   type TierBonusGold,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
-import { joinArrayItemSummaryParts, type DiceFormulaValue } from '@rpg/ui'
+import { type DiceFormulaValue } from '@rpg/ui'
+
+import {
+  appendGrantCountSummaryPart,
+  joinFormArrayItemSummaryParts,
+} from '../../../../../lib/forms/array-item-summary'
 
 export const STARTING_WEALTH_FORM_PREFIX = 'startingWealth' as const
 
@@ -197,9 +202,7 @@ export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValu
   }
 
   const grantCount = tier.magicItemGrants.length
-  if (grantCount > 0) {
-    parts.push(`${grantCount} grant${grantCount === 1 ? '' : 's'}`)
-  }
+  appendGrantCountSummaryPart(parts, grantCount)
 
-  return joinArrayItemSummaryParts(parts)
+  return joinFormArrayItemSummaryParts(parts)
 }

@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '../field-config'
-import { isNestedArraySection, joinArrayItemSummaryParts, resolveArrayItemVariant } from './array-item-config.lib'
+import {
+  isNestedArraySection,
+  joinArrayItemSummaryParts,
+  resolveArrayItemHeaderLabels,
+  resolveArrayItemVariant,
+} from './array-item-config.lib'
 
 describe('array-item-config.lib', () => {
   it('treats nested array sections as compact', () => {
@@ -56,5 +61,36 @@ describe('array-item-config.lib', () => {
     expect(joinArrayItemSummaryParts(['Levels 5–10', 'Avg 637.5 GP', '2 grants'])).toBe(
       'Levels 5–10 · Avg 637.5 GP · 2 grants',
     )
+  })
+
+  it('omits fallback from the visible header title unless showFallbackInHeader is true', () => {
+    const hiddenFallback = resolveArrayItemHeaderLabels(
+      {
+        fallback: (index) => `Trait ${index + 1}`,
+        primaryField: 'name',
+      },
+      { name: 'Darkvision' },
+      0,
+      'Darkvision',
+      'Traits',
+    )
+
+    expect(hiddenFallback.showFallbackInTitle).toBe(false)
+    expect(hiddenFallback.ariaLabel).toBe('Traits · Darkvision')
+
+    const visibleFallback = resolveArrayItemHeaderLabels(
+      {
+        fallback: (index) => `Trait ${index + 1}`,
+        primaryField: 'name',
+        showFallbackInHeader: true,
+      },
+      { name: 'Darkvision' },
+      0,
+      'Darkvision',
+      'Traits',
+    )
+
+    expect(visibleFallback.showFallbackInTitle).toBe(true)
+    expect(visibleFallback.ariaLabel).toBe('Darkvision · Trait 1')
   })
 })
