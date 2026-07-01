@@ -1,30 +1,15 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
-import type { Express } from 'express'
+import { describe, expect, it } from 'vitest'
 
-import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { useIntegrationApp } from '../../test/setup/integration-app'
 
-let app: Express
+const getApp = useIntegrationApp()
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  return registerAndLoginTestUser(app)
+  return registerAndLoginTestUser(getApp())
 }
-
-beforeAll(async () => {
-  await startTestDb()
-  app = createApp()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-afterEach(async () => {
-  await clearTestDb()
-})
 
 describe('content list routes', () => {
   it('returns resolved classes for campaign members', async () => {
@@ -90,6 +75,8 @@ describe('content list routes', () => {
   })
 
   it('requires authentication for content reads', async () => {
-    await request(app).get('/api/campaigns/000000000000000000000000/content/classes').expect(401)
+    await request(getApp())
+      .get('/api/campaigns/000000000000000000000000/content/classes')
+      .expect(401)
   })
 })

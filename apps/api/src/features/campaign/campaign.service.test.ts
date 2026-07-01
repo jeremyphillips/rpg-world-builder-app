@@ -1,7 +1,7 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
-import { createUser } from '../user'
+import { makeTestUser } from '../../test/fixtures/users'
+import { useIntegrationDb } from '../../test/setup/integration-db'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
   createCampaign,
@@ -11,25 +11,11 @@ import {
 } from './campaign.service'
 import { getRulesetPatchRead } from '../vocabulary'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeUser(email: string) {
-  return createUser({ email, passwordHash: 'x', displayName: email })
-}
+useIntegrationDb()
 
 describe('createCampaign', () => {
   it('persists flavor on the campaign and character creation on the ruleset patch', async () => {
-    const owner = await makeUser('owner@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
 
     const campaign = await createCampaign({
       name: 'Flavored',
@@ -65,7 +51,7 @@ describe('createCampaign', () => {
 
 describe('listCampaignsForUser', () => {
   it('returns every campaign the user owns or belongs to, sorted by name', async () => {
-    const owner = await makeUser('owner@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
 
     const zelda = await createCampaign({ name: 'Zelda', createdBy: owner.id })
     const arden = await createCampaign({ name: 'Arden', createdBy: owner.id })
@@ -78,8 +64,8 @@ describe('listCampaignsForUser', () => {
   })
 
   it('includes campaigns the user joined but did not create', async () => {
-    const owner = await makeUser('owner@example.com')
-    const member = await makeUser('member@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const member = await makeTestUser({ email: 'member@example.com' })
     const campaign = await createCampaign({ name: 'Shared', createdBy: owner.id })
 
     await CampaignMembershipModel.create({
@@ -97,8 +83,8 @@ describe('listCampaignsForUser', () => {
   })
 
   it('returns co-owner role for co-owner memberships', async () => {
-    const owner = await makeUser('owner@example.com')
-    const coOwner = await makeUser('co@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const coOwner = await makeTestUser({ email: 'co@example.com' })
     const campaign = await createCampaign({ name: 'Shared', createdBy: owner.id })
 
     await CampaignMembershipModel.create({
@@ -116,8 +102,8 @@ describe('listCampaignsForUser', () => {
   })
 
   it('excludes campaigns the user has no membership in', async () => {
-    const owner = await makeUser('owner@example.com')
-    const stranger = await makeUser('stranger@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const stranger = await makeTestUser({ email: 'stranger@example.com' })
     await createCampaign({ name: 'Private', createdBy: owner.id })
 
     await expect(listCampaignsForUser(stranger.id)).resolves.toEqual([])
@@ -126,7 +112,7 @@ describe('listCampaignsForUser', () => {
 
 describe('updateCampaign', () => {
   it('merges identity and flavor into the existing document', async () => {
-    const owner = await makeUser('owner@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
     const campaign = await createCampaign({ name: 'Original', createdBy: owner.id })
 
     const updated = await updateCampaign(campaign.id, {
@@ -154,7 +140,7 @@ describe('updateCampaign', () => {
   })
 
   it('returns null for an unknown campaign id', async () => {
-    const owner = await makeUser('owner@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
     await expect(updateCampaign('507f1f77bcf86cd799439011', { name: 'Nope' })).resolves.toBeNull()
     void owner
   })
@@ -162,8 +148,8 @@ describe('updateCampaign', () => {
 
 describe('isCampaignMember', () => {
   it('is true for a member and false for a non-member', async () => {
-    const owner = await makeUser('owner@example.com')
-    const stranger = await makeUser('stranger@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const stranger = await makeTestUser({ email: 'stranger@example.com' })
     const campaign = await createCampaign({ name: 'Campaign', createdBy: owner.id })
 
     await expect(isCampaignMember(owner.id, campaign.id)).resolves.toBe(true)
@@ -171,7 +157,7 @@ describe('isCampaignMember', () => {
   })
 
   it('is false for an invalid campaign id', async () => {
-    const owner = await makeUser('owner@example.com')
+    const owner = await makeTestUser({ email: 'owner@example.com' })
     await expect(isCampaignMember(owner.id, 'not-an-object-id')).resolves.toBe(false)
   })
 })

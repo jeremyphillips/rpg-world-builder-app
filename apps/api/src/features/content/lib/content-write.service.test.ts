@@ -1,10 +1,9 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createUser } from '../../user'
-import { createCampaign } from '../../campaign'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { classWriteConfig } from '../classes/classes.config'
 import { equipmentWriteConfig } from '../equipment/equipment.config'
 import { ClassPatchModel } from '../classes/class-patch.model'
@@ -20,26 +19,7 @@ import { HttpError } from '../../../lib/http-error'
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 import { updateVocabularyEntry } from '../../vocabulary'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeCampaign() {
-  const owner = await createUser({
-    email: 'dm@example.com',
-    passwordHash: 'x',
-    displayName: 'DM',
-  })
-  return createCampaign({ name: 'Catalog', createdBy: owner.id })
-}
+useIntegrationDb()
 
 describe('createHomebrewContent (equipment)', () => {
   const minimalArmorInput = {
@@ -82,7 +62,7 @@ describe('createHomebrewContent (equipment)', () => {
   }
 
   it('returns the merged system catalog including weapons and armor', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
 
     expect(equipment.some((item) => item.kind === 'weapon' && item.slug === 'longsword')).toBe(true)
@@ -95,7 +75,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('creates homebrew armor and returns it in the resolved catalog', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       equipmentWriteConfig,
       campaign.id,
@@ -112,7 +92,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('creates homebrew weapon with flat storage (no nested body)', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       equipmentWriteConfig,
       campaign.id,
@@ -126,7 +106,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('creates homebrew tool with utilizes and crafts', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, minimalToolInput)
 
     expect(created.kind).toBe('tool')
@@ -137,7 +117,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('updates homebrew tool utilizes and crafts', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, minimalToolInput)
 
     const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, created.id, {
@@ -152,7 +132,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('patches a system tool record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const thievesTools = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
     ).find((item) => item.slug === 'thieves-tools' && item.kind === 'tool')!
@@ -169,7 +149,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('derives slug from name and ignores client-provided slug', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(equipmentWriteConfig, campaign.id, {
       ...minimalArmorInput,
       slug: 'wrong-slug',
@@ -179,7 +159,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('ignores slug changes on homebrew update', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       equipmentWriteConfig,
       campaign.id,
@@ -197,7 +177,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('patches a system armor record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const leather = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
     ).find((item) => item.slug === 'leather-armor' && item.kind === 'armor')!
@@ -213,7 +193,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('patches a system weapon record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const longsword = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
     ).find((item) => item.slug === 'longsword' && item.kind === 'weapon')!
@@ -228,7 +208,7 @@ describe('createHomebrewContent (equipment)', () => {
   })
 
   it('patches a system magic item record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const bracers = (
       await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
     ).find((item) => item.slug === 'bracers-of-defense' && item.kind === 'magic_item')!
@@ -261,7 +241,7 @@ const minimalClassInput = {
 
 describe('createHomebrewContent (classes)', () => {
   it('derives slug and feature ids on create', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
     expect(created.slug).toBe('berserker')
@@ -269,7 +249,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('preserves feature ids when the display name changes', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
     const updated = await updateContentEntity(classWriteConfig, campaign.id, created.id, {
@@ -281,7 +261,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('rejects nested feature id rename on update', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
     await expect(
@@ -292,7 +272,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('syncs suggestedClasses when homebrew class skill options are set on create', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     await createHomebrewContent(classWriteConfig, campaign.id, {
       ...minimalClassInput,
       proficiencies: {
@@ -313,7 +293,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('syncs suggestedClasses when homebrew class skill options change on update', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, {
       ...minimalClassInput,
       proficiencies: {
@@ -338,7 +318,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('patches system skill suggestedClasses when a system class skill options change', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const rogue = (await resolveClassesForCampaign(campaign.id)).find(
       (cls) => cls.slug === 'rogue',
     )!
@@ -362,7 +342,7 @@ describe('createHomebrewContent (classes)', () => {
   })
 
   it('does not persist skills.from on homebrew create', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, {
       ...minimalClassInput,
       proficiencies: {
@@ -393,7 +373,7 @@ describe('createHomebrewContent (spells)', () => {
   }
 
   it('creates homebrew spell and returns it in the resolved catalog', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(spellWriteConfig, campaign.id, minimalSpellInput)
 
     expect(created.source).toBe('homebrew')
@@ -405,7 +385,7 @@ describe('createHomebrewContent (spells)', () => {
   })
 
   it('rejects classIds for classes without spellcasting', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await expect(
       createHomebrewContent(spellWriteConfig, campaign.id, {
@@ -417,7 +397,7 @@ describe('createHomebrewContent (spells)', () => {
   })
 
   it('accepts a patched class that gained spellcasting', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     await ClassPatchModel.create({
       campaignId: campaign.id,
       targetId: 'srd-cc-5.2.1:barbarian',
@@ -441,7 +421,7 @@ describe('createHomebrewContent (spells)', () => {
   })
 
   it('rejects update that assigns non-caster classIds', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(spellWriteConfig, campaign.id, minimalSpellInput)
 
     await expect(
@@ -452,7 +432,7 @@ describe('createHomebrewContent (spells)', () => {
   })
 
   it('patches a system spell record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const fireBolt = (
       await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
     ).find((s) => s.slug === 'fire-bolt')!
@@ -476,7 +456,7 @@ describe('createHomebrewContent (feats)', () => {
   }
 
   it('creates homebrew feat and returns it in the resolved catalog', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(featWriteConfig, campaign.id, minimalFeatInput)
 
     expect(created.source).toBe('homebrew')
@@ -488,7 +468,7 @@ describe('createHomebrewContent (feats)', () => {
   })
 
   it('patches a system feat record', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const alert = (await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)).find(
       (f) => f.slug === 'alert',
     )!
@@ -513,7 +493,7 @@ describe('createHomebrewContent (species)', () => {
   }
 
   it('creates homebrew species with an active creature type', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       speciesWriteConfig,
       campaign.id,
@@ -525,7 +505,7 @@ describe('createHomebrewContent (species)', () => {
   })
 
   it('rejects a disabled creature type', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
       status: 'disabled',
     })
@@ -539,7 +519,7 @@ describe('createHomebrewContent (species)', () => {
   })
 
   it('creates homebrew species with characterCreation multiclass data', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(speciesWriteConfig, campaign.id, {
       ...minimalSpeciesInput,
       characterCreation: {
@@ -559,7 +539,7 @@ describe('createHomebrewContent (species)', () => {
   })
 
   it('rejects unknown class slugs in characterCreation', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
 
     await expect(
       createHomebrewContent(speciesWriteConfig, campaign.id, {
@@ -578,7 +558,7 @@ describe('createHomebrewContent (species)', () => {
   })
 
   it('updates homebrew species characterCreation and round-trips via catalog', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       speciesWriteConfig,
       campaign.id,
@@ -607,7 +587,7 @@ describe('createHomebrewContent (species)', () => {
   })
 
   it('rejects unknown class slugs on species update', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(
       speciesWriteConfig,
       campaign.id,

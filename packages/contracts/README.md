@@ -23,6 +23,9 @@ Source lives under `src/shared/`, `src/rpg/`, and isolated `dev-bench/`:
 Dependency rules, ESLint enforcement, and where to put new modules →
 [docs/structure.md](docs/structure.md).
 
+Campaign ruleset test conventions (fixtures, matrices, naming) →
+[docs/testing.md](docs/testing.md).
+
 ## Subpath exports
 
 The root import remains the default public API. Layer subpaths are available

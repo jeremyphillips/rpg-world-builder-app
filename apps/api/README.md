@@ -71,7 +71,11 @@ src/
     auth/                # routes + controller + service (login/register)
     user/                # Mongoose model + service (the only DB owner of users)
   test/db.ts             # in-memory Mongo helpers for tests
+  test/                  # integration setup, fixtures, helpers — see docs/testing.md
 ```
+
+Integration test conventions (service vs route tests, catalog fixtures) →
+[docs/testing.md](docs/testing.md).
 
 Cross-feature imports go only through a feature's `index.ts` (enforced by the
 ESLint boundary rule); e.g. `auth` reaches `user` via `../user`.

@@ -1,15 +1,16 @@
-import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import type { StartingWealthTier, SystemRulesetId } from '@rpg/contracts'
+
+import { getStandardStartingWealthRules } from './index'
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
-const catalogSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
+const defaultCatalogSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
 
-/** First SRD starting wealth tier id — aligned with catalog seed. */
-export const INITIATE_TIER_ID = catalogSeed.tiers[0]!.id
+/** First SRD starting wealth tier id — aligned with catalog seed (`initiate`). */
+export const INITIATE_TIER_ID = defaultCatalogSeed.tiers[0]!.id
 
-/** Last SRD starting wealth tier id — aligned with catalog seed. */
-export const LEGEND_TIER_ID = catalogSeed.tiers.at(-1)!.id
+/** Last SRD starting wealth tier id — aligned with catalog seed (`legend`). */
+export const LEGEND_TIER_ID = defaultCatalogSeed.tiers.at(-1)!.id
 
 /** Catalog rules body for the standard SRD starting wealth table. */
 export function standardStartingWealthSeed(rulesetId: SystemRulesetId = DEFAULT_RULESET_ID) {
@@ -39,9 +40,12 @@ export function patchStartingWealthTierById(
 }
 
 /** Patches the initiate tier on the catalog seed. */
-export function patchInitiateStartingWealthTier(
+export function patchInitiateTier(
   patch: Partial<StartingWealthTier>,
   rulesetId: SystemRulesetId = DEFAULT_RULESET_ID,
 ) {
   return patchStartingWealthTierById(INITIATE_TIER_ID, patch, rulesetId)
 }
+
+/** Alias for {@link patchInitiateTier} — matches API test fixture naming. */
+export const patchInitiateStartingWealthTier = patchInitiateTier

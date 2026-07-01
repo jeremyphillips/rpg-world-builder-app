@@ -55,3 +55,9 @@ Id conflicts use `assertVocabularyIdAvailable` (409) — campaign ids must not s
 
 Homebrew hub catalog counts live in the **content** feature — see
 [`../content/README.md`](../content/README.md).
+
+## Tests
+
+Ruleset-patch integration tests: `ruleset-patch/ruleset-patch.service.test.ts`
+(persist + resolve) and `ruleset-patch/ruleset-patch.routes.test.ts` (HTTP smoke).
+Shared scaffold and catalog tier ids → [`../../docs/testing.md`](../../docs/testing.md).

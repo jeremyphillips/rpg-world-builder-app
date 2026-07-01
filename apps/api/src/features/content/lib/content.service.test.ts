@@ -1,38 +1,20 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
-import { createUser } from '../../user'
 import { createCampaign } from '../../campaign'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { makeTestUser } from '../../../test/fixtures/users'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { ClassPatchModel } from '../classes/class-patch.model'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { classContentConfig } from '../classes/classes.config'
 import { resolveClassesForCampaign } from '../classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from '../content.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeCampaign() {
-  const owner = await createUser({
-    email: 'dm@example.com',
-    passwordHash: 'x',
-    displayName: 'DM',
-  })
-  return createCampaign({ name: 'Catalog', createdBy: owner.id })
-}
+useIntegrationDb()
 
 describe('resolveCatalogForCampaign (classes)', () => {
   it('returns the unmodified system catalog when a campaign has no patches or homebrew', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     const classes = await resolveClassesForCampaign(campaign.id)
 
     expect(classes).toHaveLength(12)
@@ -44,7 +26,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
   })
 
   it('deep-merges a campaign overlay patch onto the system class', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     await ClassPatchModel.create({
       campaignId: campaign.id,
       targetId: 'srd-cc-5.2.1:fighter',
@@ -61,7 +43,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
   })
 
   it('appends a campaign homebrew class to the resolved catalog', async () => {
-    const campaign = await makeCampaign()
+    const campaign = await makeTestCampaign()
     await HomebrewClassModel.create({
       slug: 'blood-hunter',
       rulesetId: 'srd-cc-5.2.1',
@@ -88,8 +70,8 @@ describe('resolveCatalogForCampaign (classes)', () => {
   })
 
   it('scopes patches and homebrew to their own campaign', async () => {
-    const a = await makeCampaign()
-    const ownerB = await createUser({ email: 'b@example.com', passwordHash: 'x', displayName: 'B' })
+    const a = await makeTestCampaign({ name: 'Catalog' })
+    const ownerB = await makeTestUser({ email: 'b@example.com', displayName: 'B' })
     const b = await createCampaign({ name: 'Other', createdBy: ownerB.id })
 
     await ClassPatchModel.create({

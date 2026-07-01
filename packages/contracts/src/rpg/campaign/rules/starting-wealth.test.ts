@@ -8,62 +8,27 @@ import {
   startingWealthRulesSchema,
   startingWealthTierForLevel,
   startingWealthTierSchema,
-  type StartingWealthRules,
   type StartingWealthTier,
 } from './starting-wealth'
-
-const SEED: StartingWealthRules = {
-  name: 'Standard Starting Wealth',
-  scope: { kind: 'standard' },
-  tiers: [
-    {
-      id: 'level-1',
-      label: 'Level 1',
-      minLevel: 1,
-      maxLevel: 1,
-      includeNormalStartingEquipment: true,
-      magicItemGrants: [],
-    },
-    {
-      id: 'levels-2-4',
-      label: 'Levels 2–4',
-      minLevel: 2,
-      maxLevel: 4,
-      includeNormalStartingEquipment: true,
-      magicItemGrants: [{ rarity: 'common', quantity: 1 }],
-    },
-    {
-      id: 'levels-5-10',
-      label: 'Levels 5–10',
-      minLevel: 5,
-      maxLevel: 10,
-      includeNormalStartingEquipment: true,
-      bonusGold: {
-        baseGp: 500,
-        formula: {
-          kind: 'dice',
-          dice: { count: 1, faces: 10 },
-          multiplier: 25,
-          currency: 'gp',
-        },
-      },
-      magicItemGrants: [
-        { rarity: 'common', quantity: 1 },
-        { rarity: 'uncommon', quantity: 1 },
-      ],
-    },
-  ],
-}
+import {
+  MINIMAL_TIER_A_ID,
+  MINIMAL_TIER_B_ID,
+  minimalStartingWealthSeed,
+} from '../../../test/fixtures/starting-wealth-minimal'
+import { patchTierById } from '../../../test/helpers/patch-tier'
 
 describe('startingWealthTierSchema', () => {
   it('defaults includeNormalStartingEquipment to true', () => {
-    expect(startingWealthTierSchema.parse(SEED.tiers[0]).includeNormalStartingEquipment).toBe(true)
+    expect(
+      startingWealthTierSchema.parse(minimalStartingWealthSeed.tiers[0])
+        .includeNormalStartingEquipment,
+    ).toBe(true)
   })
 })
 
 describe('startingWealthRulesSchema', () => {
   it('accepts non-overlapping tier ranges', () => {
-    expect(startingWealthRulesSchema.parse(SEED).tiers).toHaveLength(3)
+    expect(startingWealthRulesSchema.parse(minimalStartingWealthSeed).tiers).toHaveLength(3)
   })
 
   it('rejects overlapping tier ranges', () => {
@@ -115,54 +80,60 @@ describe('startingWealthRulesSchema', () => {
 
 describe('resolveStartingWealthRules', () => {
   it('returns the seed when no patch is provided', () => {
-    expect(resolveStartingWealthRules(SEED)).toEqual(SEED)
+    expect(resolveStartingWealthRules(minimalStartingWealthSeed)).toEqual(minimalStartingWealthSeed)
   })
 
   it('replaces tiers wholesale when patched', () => {
-    const patchedTiers: StartingWealthTier[] = SEED.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
+    const patchedTiers: StartingWealthTier[] = patchTierById(
+      minimalStartingWealthSeed,
+      MINIMAL_TIER_A_ID,
+      { includeNormalStartingEquipment: false },
     )
 
-    const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
+    const resolved = resolveStartingWealthRules(minimalStartingWealthSeed, { tiers: patchedTiers })
 
     expect(
-      resolved.tiers.find((tier) => tier.id === 'level-1')?.includeNormalStartingEquipment,
+      resolved.tiers.find((tier) => tier.id === MINIMAL_TIER_A_ID)?.includeNormalStartingEquipment,
     ).toBe(false)
-    expect(resolved.name).toBe(SEED.name)
+    expect(resolved.name).toBe(minimalStartingWealthSeed.name)
   })
 
   it('overrides table metadata without touching tiers', () => {
-    const resolved = resolveStartingWealthRules(SEED, { name: 'Custom table name' })
+    const resolved = resolveStartingWealthRules(minimalStartingWealthSeed, {
+      name: 'Custom table name',
+    })
 
     expect(resolved.name).toBe('Custom table name')
-    expect(resolved.tiers).toEqual(SEED.tiers)
+    expect(resolved.tiers).toEqual(minimalStartingWealthSeed.tiers)
   })
 })
 
 describe('computeStartingWealthSparsePatch', () => {
   it('returns undefined when resolved rules match the seed', () => {
-    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
+    expect(computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed)).toBeUndefined()
   })
 
   it('returns only fields that differ from the seed', () => {
-    const patchedTiers = SEED.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
-    )
-    const resolved = resolveStartingWealthRules(SEED, { tiers: patchedTiers })
+    const patchedTiers = patchTierById(minimalStartingWealthSeed, MINIMAL_TIER_A_ID, {
+      includeNormalStartingEquipment: false,
+    })
+    const resolved = resolveStartingWealthRules(minimalStartingWealthSeed, { tiers: patchedTiers })
 
-    expect(computeStartingWealthSparsePatch(resolved, SEED)).toEqual({ tiers: patchedTiers })
+    expect(computeStartingWealthSparsePatch(resolved, minimalStartingWealthSeed)).toEqual({
+      tiers: patchedTiers,
+    })
   })
 
   it('returns undefined when resolved tiers match the seed after form round-trip field order', () => {
-    expect(computeStartingWealthSparsePatch(SEED, SEED)).toBeUndefined()
+    expect(computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed)).toBeUndefined()
   })
 })
 
 describe('mergeStartingWealthRulesPatch', () => {
   it('layers sparse patches without dropping prior overrides', () => {
-    const patchedTiers = SEED.tiers.map((tier) =>
-      tier.id === 'level-1' ? { ...tier, includeNormalStartingEquipment: false } : tier,
-    )
+    const patchedTiers = patchTierById(minimalStartingWealthSeed, MINIMAL_TIER_A_ID, {
+      includeNormalStartingEquipment: false,
+    })
 
     const merged = mergeStartingWealthRulesPatch(
       { tiers: patchedTiers },
@@ -178,10 +149,10 @@ describe('mergeStartingWealthRulesPatch', () => {
 
 describe('startingWealthTierForLevel', () => {
   it('returns the matching tier for a level', () => {
-    expect(startingWealthTierForLevel(SEED, 3)?.id).toBe('levels-2-4')
+    expect(startingWealthTierForLevel(minimalStartingWealthSeed, 3)?.id).toBe(MINIMAL_TIER_B_ID)
   })
 
   it('returns undefined when no tier matches', () => {
-    expect(startingWealthTierForLevel(SEED, 20)).toBeUndefined()
+    expect(startingWealthTierForLevel(minimalStartingWealthSeed, 20)).toBeUndefined()
   })
 })

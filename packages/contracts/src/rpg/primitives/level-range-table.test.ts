@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
 
 import {
   campaignLevelOutOfBoundsMessage,
@@ -9,17 +8,7 @@ import {
   levelRangeStartAtMessage,
   minLevelExceedsMaxLevelMessage,
 } from './level'
-import { refineLevelRangeTable } from './level-range-table'
-
-function parseWithRefine(
-  rows: { minLevel: number; maxLevel: number }[],
-  options?: Parameters<typeof refineLevelRangeTable>[2],
-) {
-  return z
-    .array(z.object({ minLevel: z.number(), maxLevel: z.number() }))
-    .superRefine((value, ctx) => refineLevelRangeTable(value, ctx, options))
-    .safeParse(rows)
-}
+import { parseWithRefine } from '../../test/helpers/parse-with-refine'
 
 describe('refineLevelRangeTable', () => {
   it('accepts a valid contiguous table', () => {

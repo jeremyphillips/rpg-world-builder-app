@@ -1,6 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import request, { type Agent } from 'supertest'
-import type { Express } from 'express'
+import { describe, expect, it } from 'vitest'
 
 import {
   CREATURE_TYPE_SET_ID,
@@ -9,63 +7,33 @@ import {
   type StartingWealthTier,
 } from '@rpg/contracts'
 
-import { createApp } from '../../../app'
-import { CSRF_HEADER } from '../../../lib/cookies'
-import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
+import {
+  characterCreationScenarios,
+  enableExtendedProgressionAt30,
+} from '../../../test/fixtures/character-creation'
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import {
   INITIATE_TIER_ID,
-  patchInitiateStartingWealthTier,
   standardStartingWealthSeed,
   withLastTierMaxLevel,
-} from '../../../test/starting-wealth-patch-fixtures'
-import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
+} from '../../../test/fixtures/starting-wealth'
+import { expectHttpErrorAsync } from '../../../test/expect-http-error'
+import { expectStoredSparseUnset, storedRulesetPatchDoc } from '../../../test/helpers/ruleset-patch'
 import {
   getRulesetPatchRead,
   updateCharacterCreationPatch,
   updateMechanicsPatch,
 } from './ruleset-patch.service'
 import { updateVocabularyEntry } from '../sets/vocabulary.service'
-import { createCampaign } from '../../campaign'
-import { createUser } from '../../user'
 
-let app: Express
-
-const EXTENDED_PROGRESSION_INPUT = {
-  maxCharacterLevel: 20,
-  extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-} as const
-
-beforeAll(async () => {
-  await startTestDb()
-  app = createApp()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
-
-async function makeUser(email: string) {
-  return createUser({ email, passwordHash: 'x', displayName: email })
-}
-
-async function enableExtendedProgressionAt30(campaignId: string) {
-  await updateCharacterCreationPatch(campaignId, {
-    progression: EXTENDED_PROGRESSION_INPUT,
-    startingWealth: { tiers: withLastTierMaxLevel(30) },
-  })
-}
+useIntegrationDb()
 
 describe('getRulesetPatchRead', () => {
   it('returns resolved defaults when no patch document exists', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Defaults', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Defaults' })
 
-    const patch = await getRulesetPatchRead(campaign.id)
+    const patch = await getRulesetPatchRead(campaignId)
 
     expect(patch?.characterCreation).toMatchObject({
       startingLevel: 1,
@@ -81,32 +49,29 @@ describe('getRulesetPatchRead', () => {
 
 describe('updateCharacterCreationPatch', () => {
   it('rejects extended progression when resolved tiers do not cover the new max', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Epic' })
 
-    await expect(
-      updateCharacterCreationPatch(campaign.id, {
-        progression: EXTENDED_PROGRESSION_INPUT,
-      }),
-    ).rejects.toMatchObject({ status: 400 })
+    await expectHttpErrorAsync(
+      () => updateCharacterCreationPatch(campaignId, characterCreationScenarios.extendedAt30()),
+      { status: 400 },
+    )
   })
 
   describe('extended progression with starting wealth tiers', () => {
     it('persists extended progression when tiers cover the new max', async () => {
-      const owner = await makeUser('owner@example.com')
-      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+      const { id: campaignId } = await makeTestCampaign({ name: 'Epic' })
 
-      const patch = await updateCharacterCreationPatch(campaign.id, {
-        progression: EXTENDED_PROGRESSION_INPUT,
-        startingWealth: { tiers: withLastTierMaxLevel(30) },
-      })
+      const patch = await updateCharacterCreationPatch(
+        campaignId,
+        characterCreationScenarios.extendedAt30WithTiers(),
+      )
 
       expect(patch?.characterCreation.progression.extendedProgression).toEqual({
         tierName: 'Epic Destiny',
         maxLevel: 30,
       })
 
-      const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+      const stored = await storedRulesetPatchDoc(campaignId)
       expect(stored?.characterCreation?.progression?.extendedProgression).toEqual({
         tierName: 'Epic Destiny',
         maxLevel: 30,
@@ -114,41 +79,40 @@ describe('updateCharacterCreationPatch', () => {
     })
 
     it('rejects unsetting extended progression while tiers still cover the extended max', async () => {
-      const owner = await makeUser('owner@example.com')
-      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+      const { id: campaignId } = await makeTestCampaign({ name: 'Epic' })
 
-      await enableExtendedProgressionAt30(campaign.id)
+      await enableExtendedProgressionAt30(campaignId)
 
-      await expect(
-        updateCharacterCreationPatch(campaign.id, {
-          progression: { maxCharacterLevel: 20 },
-        }),
-      ).rejects.toMatchObject({ status: 400 })
+      await expectHttpErrorAsync(
+        () =>
+          updateCharacterCreationPatch(campaignId, {
+            progression: { maxCharacterLevel: 20 },
+          }),
+        { status: 400 },
+      )
     })
 
     it('unsets extended progression when tiers are reset to the standard max', async () => {
-      const owner = await makeUser('owner@example.com')
-      const campaign = await createCampaign({ name: 'Epic', createdBy: owner.id })
+      const { id: campaignId } = await makeTestCampaign({ name: 'Epic' })
 
-      await enableExtendedProgressionAt30(campaign.id)
+      await enableExtendedProgressionAt30(campaignId)
 
-      const patch = await updateCharacterCreationPatch(campaign.id, {
+      const patch = await updateCharacterCreationPatch(campaignId, {
         progression: { maxCharacterLevel: 20 },
         startingWealth: { tiers: withLastTierMaxLevel(20) },
       })
 
       expect(patch?.characterCreation.progression.extendedProgression).toBeUndefined()
 
-      const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-      expect(stored?.characterCreation?.progression?.extendedProgression).toBeUndefined()
+      const stored = await storedRulesetPatchDoc(campaignId)
+      expectStoredSparseUnset(stored?.characterCreation?.progression?.extendedProgression)
     })
   })
 
   it('persists creature type policy on the ruleset patch', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Types' })
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
+    const patch = await updateCharacterCreationPatch(campaignId, {
       species: {
         creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] },
       },
@@ -161,30 +125,27 @@ describe('updateCharacterCreationPatch', () => {
   })
 
   it('rejects disabled creature types in the creature type policy', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Types', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Types' })
 
-    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'fey', {
+    await updateVocabularyEntry(campaignId, CREATURE_TYPE_SET_ID, 'fey', {
       status: 'disabled',
     })
 
-    await expect(
-      updateCharacterCreationPatch(campaign.id, {
-        species: {
-          creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] },
-        },
-      }),
-    ).rejects.toMatchObject({
-      status: 400,
-      code: 'invalid_vocabulary',
-    })
+    await expectHttpErrorAsync(
+      () =>
+        updateCharacterCreationPatch(campaignId, {
+          species: {
+            creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] },
+          },
+        }),
+      { status: 400, code: 'invalid_vocabulary' },
+    )
   })
 
   it('persists non-default multiclassing overrides', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Multiclass' })
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
+    const patch = await updateCharacterCreationPatch(campaignId, {
       multiclassing: {
         enabled: false,
         requirements: {
@@ -200,7 +161,7 @@ describe('updateCharacterCreationPatch', () => {
       },
     })
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const stored = await storedRulesetPatchDoc(campaignId)
     expect(stored?.characterCreation?.multiclassing?.enabled).toBe(false)
     expect(
       stored?.characterCreation?.multiclassing?.requirements?.primaryAbilityMinimum?.minimumScore,
@@ -208,10 +169,9 @@ describe('updateCharacterCreationPatch', () => {
   })
 
   it('deep-merges partial multiclassing patches without wiping sibling overrides', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Multiclass' })
 
-    await updateCharacterCreationPatch(campaign.id, {
+    await updateCharacterCreationPatch(campaignId, {
       multiclassing: {
         requirements: {
           primaryAbilityMinimum: { minimumScore: 15 },
@@ -219,7 +179,7 @@ describe('updateCharacterCreationPatch', () => {
       },
     })
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
+    const patch = await updateCharacterCreationPatch(campaignId, {
       multiclassing: {
         requirements: {
           speciesPolicy: { enabled: true },
@@ -235,14 +195,13 @@ describe('updateCharacterCreationPatch', () => {
   })
 
   it('unsets stored multiclassing when reverted to defaults', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Multiclass', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Multiclass' })
 
-    await updateCharacterCreationPatch(campaign.id, {
+    await updateCharacterCreationPatch(campaignId, {
       multiclassing: { enabled: false },
     })
 
-    await updateCharacterCreationPatch(campaign.id, {
+    await updateCharacterCreationPatch(campaignId, {
       multiclassing: {
         enabled: true,
         requirements: {
@@ -253,27 +212,24 @@ describe('updateCharacterCreationPatch', () => {
       },
     })
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.characterCreation?.multiclassing).toBeUndefined()
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.characterCreation?.multiclassing)
   })
 
   it('persists starting wealth tier patches on the ruleset patch', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
-    const patchedTiers = patchInitiateStartingWealthTier({
-      includeNormalStartingEquipment: false,
-    })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Wealth' })
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
-      startingWealth: { tiers: patchedTiers },
-    })
+    const patch = await updateCharacterCreationPatch(
+      campaignId,
+      characterCreationScenarios.initiateWithoutClassEquipment(),
+    )
 
     expect(
       patch?.characterCreation.startingWealth.tiers.find((tier) => tier.id === INITIATE_TIER_ID)
         ?.includeNormalStartingEquipment,
     ).toBe(false)
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const stored = await storedRulesetPatchDoc(campaignId)
     expect(
       stored?.characterCreation?.startingWealth?.tiers?.find(
         (tier: StartingWealthTier) => tier.id === INITIATE_TIER_ID,
@@ -282,34 +238,30 @@ describe('updateCharacterCreationPatch', () => {
   })
 
   it('unsets starting wealth when reverted to catalog seed defaults', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Wealth', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Wealth' })
     const seed = standardStartingWealthSeed()
-    const patchedTiers = patchInitiateStartingWealthTier({
-      includeNormalStartingEquipment: false,
-    })
 
-    await updateCharacterCreationPatch(campaign.id, {
-      startingWealth: { tiers: patchedTiers },
-    })
+    await updateCharacterCreationPatch(
+      campaignId,
+      characterCreationScenarios.initiateWithoutClassEquipment(),
+    )
 
-    const patch = await updateCharacterCreationPatch(campaign.id, {
+    const patch = await updateCharacterCreationPatch(campaignId, {
       startingWealth: { tiers: seed.tiers },
     })
 
     expect(patch?.characterCreation.startingWealth).toEqual(seed)
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.characterCreation?.startingWealth).toBeUndefined()
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.characterCreation?.startingWealth)
   })
 })
 
 describe('updateMechanicsPatch', () => {
   it('persists a non-default edition preset sparsely', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Classic', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Classic' })
 
-    const patch = await updateMechanicsPatch(campaign.id, {
+    const patch = await updateMechanicsPatch(campaignId, {
       editionPreset: { id: 'becmi' },
     })
 
@@ -320,7 +272,7 @@ describe('updateMechanicsPatch', () => {
     })
     expect(patch?.mechanics.editionPreset.appliedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const stored = await storedRulesetPatchDoc(campaignId)
     expect(stored?.mechanics?.editionPreset?.id).toBe('becmi')
     expect(stored?.mechanics?.editionPreset?.appliedAt).toBeInstanceOf(Date)
     expect(stored?.mechanics?.armorClass).toBeUndefined()
@@ -328,127 +280,31 @@ describe('updateMechanicsPatch', () => {
   })
 
   it('marks modified when knobs drift from the selected preset', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Drift', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Drift' })
 
-    await updateMechanicsPatch(campaign.id, { editionPreset: { id: '3e' } })
+    await updateMechanicsPatch(campaignId, { editionPreset: { id: '3e' } })
 
-    const patch = await updateMechanicsPatch(campaign.id, {
+    const patch = await updateMechanicsPatch(campaignId, {
       armorClass: { base: 9 },
     })
 
     expect(patch?.mechanics.editionPreset).toMatchObject({ id: '3e', modified: true })
     expect(patch?.mechanics.armorClass).toEqual({ mode: 'ascending', base: 9 })
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const stored = await storedRulesetPatchDoc(campaignId)
     expect(stored?.mechanics?.editionPreset?.modified).toBe(true)
     expect(stored?.mechanics?.armorClass).toEqual({ mode: 'ascending', base: 9 })
   })
 
   it('clears stored mechanics when reverting to the default 5e preset', async () => {
-    const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Modern', createdBy: owner.id })
+    const { id: campaignId } = await makeTestCampaign({ name: 'Modern' })
 
-    await updateMechanicsPatch(campaign.id, { editionPreset: { id: '2e' } })
-    const patch = await updateMechanicsPatch(campaign.id, { editionPreset: { id: '5e' } })
+    await updateMechanicsPatch(campaignId, { editionPreset: { id: '2e' } })
+    const patch = await updateMechanicsPatch(campaignId, { editionPreset: { id: '5e' } })
 
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
 
-    const stored = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
-    expect(stored?.mechanics).toBeUndefined()
-  })
-})
-
-describe('ruleset patch routes', () => {
-  async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-    return registerAndLoginTestUser(app)
-  }
-
-  it('returns resolved character creation for campaign members', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createTestCampaign(agent, csrfToken)
-
-    const res = await agent
-      .get(`/api/campaigns/${campaignId}/ruleset-patch`)
-      .set(CSRF_HEADER, csrfToken)
-      .expect(200)
-
-    expect(res.body.patch.characterCreation.startingLevel).toBe(1)
-  })
-
-  it('patches character creation for campaign managers', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createTestCampaign(agent, csrfToken)
-
-    const res = await agent
-      .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({
-        startingLevel: 5,
-        importedCharacters: { policy: 'approval_required' },
-      })
-      .expect(200)
-
-    expect(res.body.patch.characterCreation).toMatchObject({
-      startingLevel: 5,
-      importedCharacters: { policy: 'approval_required' },
-    })
-  })
-
-  it('patches multiclassing for campaign managers', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createTestCampaign(agent, csrfToken)
-
-    const res = await agent
-      .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({
-        multiclassing: { enabled: false },
-      })
-      .expect(200)
-
-    expect(res.body.patch.characterCreation.multiclassing.enabled).toBe(false)
-  })
-
-  it('patches starting wealth tiers for campaign managers', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createTestCampaign(agent, csrfToken)
-
-    const res = await agent
-      .patch(`/api/campaigns/${campaignId}/ruleset-patch/character-creation`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({
-        startingWealth: {
-          tiers: patchInitiateStartingWealthTier({ includeNormalStartingEquipment: false }),
-        },
-      })
-      .expect(200)
-
-    expect(
-      res.body.patch.characterCreation.startingWealth.tiers.find(
-        (tier: { id: string }) => tier.id === INITIATE_TIER_ID,
-      )?.includeNormalStartingEquipment,
-    ).toBe(false)
-  })
-
-  it('patches mechanics for campaign managers', async () => {
-    const { agent, csrfToken } = await registerAndLogin()
-    const campaignId = await createTestCampaign(agent, csrfToken)
-
-    const res = await agent
-      .patch(`/api/campaigns/${campaignId}/ruleset-patch/mechanics`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({ editionPreset: { id: '1e' } })
-      .expect(200)
-
-    expect(res.body.patch.mechanics).toMatchObject({
-      editionPreset: { id: '1e', modified: false },
-      armorClass: { mode: 'descending', base: 10 },
-      attackResolution: { mode: 'combat_tables' },
-    })
-  })
-
-  it('requires authentication for ruleset patch reads', async () => {
-    await request(app).get('/api/campaigns/000000000000000000000000/ruleset-patch').expect(401)
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.mechanics)
   })
 })
