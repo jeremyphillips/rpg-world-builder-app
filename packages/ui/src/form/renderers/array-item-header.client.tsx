@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, GripVertical, Trash2 } from 'lucide-react'
+import { ChevronDown, GripVertical } from 'lucide-react'
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
@@ -23,7 +23,6 @@ import {
   arrayItemHeaderSummaryClasses,
   arrayItemHeaderSummaryIndentClasses,
   arrayItemHeaderTitleClasses,
-  arrayItemRemoveButtonClasses,
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
 } from './array-item-toolbar.variants'
@@ -32,17 +31,19 @@ export interface ArrayItemDragHandleProps {
   ariaLabel: string
   attributes: DraggableAttributes
   listeners: SyntheticListenerMap | undefined
+  compact?: boolean
 }
 
 export function ArrayItemDragHandle({
   ariaLabel,
   attributes,
   listeners,
+  compact = false,
 }: ArrayItemDragHandleProps) {
   return (
     <button
       type="button"
-      className={arrayItemDragHandleClasses}
+      className={arrayItemDragHandleClasses({ compact })}
       aria-label={ariaLabel}
       onClick={(event) => event.stopPropagation()}
       {...attributes}
@@ -82,15 +83,14 @@ export interface ArrayItemToolbarProps {
   collapsible: boolean
   collapsed: boolean
   onToggleCollapse: () => void
-  canRemove: boolean
-  onRemove: () => void
   bodyId: string
   titleId: string
-  /** When true, only drag + remove render (compact inline row). */
+  /** When true, only drag + title/fields render (compact inline row). */
   compact?: boolean
   children?: React.ReactNode
 }
 
+/** Leading chrome and title/compact fields — trailing actions live in `ArrayItemActionsRail`. */
 export function ArrayItemToolbar({
   legend,
   index,
@@ -102,8 +102,6 @@ export function ArrayItemToolbar({
   collapsible,
   collapsed,
   onToggleCollapse,
-  canRemove,
-  onRemove,
   bodyId,
   titleId,
   compact = false,
@@ -129,6 +127,7 @@ export function ArrayItemToolbar({
       {showDragHandle && dragHandleProps ? (
         <ArrayItemDragHandle
           {...dragHandleProps}
+          compact={compact}
           ariaLabel={`Drag to reorder ${header.ariaLabel}`}
         />
       ) : null}
@@ -163,17 +162,6 @@ export function ArrayItemToolbar({
           <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
         )}
       </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className={arrayItemRemoveButtonClasses}
-        disabled={!canRemove}
-        aria-label={`Remove ${header.ariaLabel}`}
-        onClick={onRemove}
-      >
-        <Trash2 aria-hidden />
-      </Button>
     </div>
   )
 

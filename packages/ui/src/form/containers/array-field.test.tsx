@@ -482,7 +482,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
 
-  it('top-aligns compact item toolbar controls including remove', async () => {
+  it('pins compact item remove control in the top-right actions rail', async () => {
     const user = userEvent.setup()
     const compactFields: FormItem[] = [
       {
@@ -507,8 +507,12 @@ describe('ArrayFieldRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
+    const item = screen.getByRole('group', { name: 'Traits · Trait 1 Trait name Description' })
+    const actionsRail = screen.getByRole('group', { name: 'Item actions' })
     const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait 1' })
-    expect(removeButton.parentElement).toHaveClass('items-start')
-    expect(removeButton.parentElement).not.toHaveClass('items-center')
+
+    expect(item).toContainElement(actionsRail)
+    expect(actionsRail).toContainElement(removeButton)
+    expect(actionsRail).toHaveClass('self-start', 'mt-1', 'mr-1')
   })
 })

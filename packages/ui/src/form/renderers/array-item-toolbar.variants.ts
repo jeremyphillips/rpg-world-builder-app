@@ -1,21 +1,59 @@
 import { cn } from '../../lib/utils'
 
-/** Shared 24×24 hit target for grip and collapse caret (WCAG 2.2 AA minimum). */
+/**
+ * Array item chrome geometry — single source of truth for shell padding and action hit targets.
+ *
+ * Layout contract: content flows in the main column; trailing actions (remove, future issue
+ * summary) live in a top-aligned rail pinned to the shell's top-right corner.
+ */
+export const arrayItemShellInsetClasses = 'calc(var(--spacing) * 2)'
+
+/** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
 export const arrayItemChromeButtonClasses =
   'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
-/** Inline drag handle — precedes caret/title in the toolbar flex row. */
-export const arrayItemDragHandleClasses = cn(
-  arrayItemChromeButtonClasses,
-  '-ml-[calc(var(--spacing)*1)] cursor-grab active:cursor-grabbing',
+/** Item shell — border, left/bottom inset; actions rail occupies the top-right with no inset. */
+export const arrayItemShellClasses = cn(
+  'relative grid grid-cols-[minmax(0,1fr)_auto] items-start',
+  'rounded-md border border-border',
+  'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
 )
+
+/** Main content column — top inset matches shell vertical rhythm. */
+export const arrayItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
+
+/**
+ * Trailing actions rail — top-right of the shell, independent of content height.
+ *
+ * TODO(array-item-issues): Add warning icon + "{N} issues" control before remove when the item
+ * has nested field errors. Keep order `[status] [issue summary] [remove]`; reserve width via
+ * the actions column so long counts do not overlap fields.
+ */
+export function arrayItemActionsRailClasses(options: { compact?: boolean } = {}): string {
+  return cn(
+    'flex shrink-0 items-center gap-1 self-start',
+    // Nudge from shell top-right: detailed +8px/+4px left; compact +4px/+4px left.
+    options.compact ? 'mt-1 mr-1' : 'mt-2 mr-1',
+  )
+}
+
+/** Inline drag handle — precedes caret/title in the toolbar flex row. */
+export function arrayItemDragHandleClasses(options: { compact?: boolean } = {}): string {
+  return cn(
+    arrayItemChromeButtonClasses,
+    '-ml-[calc(var(--spacing)*1)] cursor-grab active:cursor-grabbing',
+    options.compact && '-mt-1',
+  )
+}
 
 /** Collapse caret in detailed item headers. */
 export const arrayItemCollapseButtonClasses = arrayItemChromeButtonClasses
 
-/** Remove control — destructive hover treatment; pinned to the toolbar trailing edge. */
-export const arrayItemRemoveButtonClasses =
-  'ml-auto size-8 shrink-0 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5'
+/** Remove control — destructive hover; always last in the actions rail. */
+export const arrayItemRemoveButtonClasses = cn(
+  arrayItemChromeButtonClasses,
+  'text-muted-foreground hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5',
+)
 
 /** Column wrapper for the title row and optional summary row below it. */
 export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-0'
@@ -37,9 +75,9 @@ export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-for
 export const arrayItemHeaderSummaryClasses =
   'truncate pb-1 text-xs leading-none text-muted-foreground'
 
-/** Toolbar row shared by compact and detailed headers. */
+/** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
 export function arrayItemToolbarRowClasses(options: { compact?: boolean } = {}): string {
-  return cn('relative flex min-w-0 gap-0 pr-2', options.compact ? 'items-start' : 'items-center')
+  return cn('relative flex min-w-0 gap-0', options.compact ? 'items-start' : 'items-center')
 }
 
 /** Space between collapse caret and title / compact fields. */

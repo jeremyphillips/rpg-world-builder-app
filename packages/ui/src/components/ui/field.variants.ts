@@ -56,6 +56,10 @@ export const fieldArrayLegendSmTypographyClasses =
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
+/**
+ * Legacy array item chrome — used by hand-built array UIs outside the schema `<Form>` renderer.
+ * Schema-driven arrays use `arrayItemShellClasses` in `array-item-toolbar.variants.ts`.
+ */
 export const fieldArrayItemVariants = cva('relative rounded-md border border-border pl-2', {
   variants: {
     variant: {

@@ -24,7 +24,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { Button } from '../../components/ui/button.client'
 import {
   fieldArrayItemListClasses,
-  fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupLegendVariants,
   fieldStackRhythmVariants,
@@ -42,6 +41,7 @@ import { useDependsOnValues } from '../config/form-depends-on.client'
 import {
   isNestedArraySection,
   resolveArrayItemHeader,
+  resolveArrayItemHeaderLabels,
   resolveArrayItemReorder,
   resolveArrayItemVariant,
 } from '../config/array-item-config.lib'
@@ -50,7 +50,8 @@ import { buildArraySectionChildContext } from '../containers/form-section-child-
 import { useVisibilityValues } from '../containers/form-conditional.client'
 import { NestedFormItems } from '../containers/form-item-node.client'
 import { ArrayItemToolbar } from './array-item-header.client'
-import { arrayItemBodyClasses, arrayItemDraggingClasses } from './array-item-toolbar.variants'
+import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
+import { arrayItemBodyClasses } from './array-item-toolbar.variants'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 
 export interface ArrayFieldRendererProps {
@@ -72,7 +73,6 @@ interface ArrayFieldItemContentProps {
   showDragHandle: boolean
   collapsible: boolean
   variant: 'compact' | 'detailed'
-  nested: boolean
   sortable: boolean
   collapsed: boolean
   onToggleCollapse: () => void
@@ -96,7 +96,6 @@ function ArrayFieldItemContent({
   showDragHandle,
   collapsible,
   variant,
-  nested,
   sortable,
   collapsed,
   onToggleCollapse,
@@ -139,53 +138,66 @@ function ArrayFieldItemContent({
     </ArrayFieldContext.Provider>
   )
 
+  const header = resolveArrayItemHeaderLabels(
+    headerConfig,
+    itemValues,
+    index,
+    watchedPrimary,
+    legend,
+  )
+
   return (
-    <div
-      role="group"
-      aria-labelledby={titleId}
-      className={cn(
-        fieldArrayItemVariants({ variant, nested }),
-        dragHandleProps?.isDragging && arrayItemDraggingClasses,
-      )}
-    >
-      <ArrayItemToolbar
-        legend={legend}
-        index={index}
-        headerConfig={headerConfig}
-        itemValues={itemValues}
-        watchedPrimary={watchedPrimary}
-        showDragHandle={showDragHandle}
-        dragHandleProps={
-          dragHandleProps
-            ? {
-                ariaLabel: '',
-                attributes: dragHandleProps.attributes,
-                listeners: dragHandleProps.listeners,
-              }
-            : undefined
-        }
-        collapsible={collapsible}
-        collapsed={collapsed}
-        onToggleCollapse={onToggleCollapse}
-        canRemove={canRemove}
-        onRemove={onRemove}
-        bodyId={bodyId}
-        titleId={titleId}
-        compact={variant === 'compact'}
-      >
-        {variant === 'compact' ? fieldsNode : null}
-      </ArrayItemToolbar>
-      {variant === 'detailed' ? (
-        <div
-          id={bodyId}
-          hidden={collapsed || undefined}
-          className={arrayItemBodyClasses({ collapsible, sortable })}
-          aria-hidden={collapsed}
-        >
-          {fieldsNode}
-        </div>
-      ) : null}
-    </div>
+    <ArrayItemShell
+      titleId={titleId}
+      dragging={dragHandleProps?.isDragging}
+      main={
+        <>
+          <ArrayItemToolbar
+            legend={legend}
+            index={index}
+            headerConfig={headerConfig}
+            itemValues={itemValues}
+            watchedPrimary={watchedPrimary}
+            showDragHandle={showDragHandle}
+            dragHandleProps={
+              dragHandleProps
+                ? {
+                    ariaLabel: '',
+                    attributes: dragHandleProps.attributes,
+                    listeners: dragHandleProps.listeners,
+                  }
+                : undefined
+            }
+            collapsible={collapsible}
+            collapsed={collapsed}
+            onToggleCollapse={onToggleCollapse}
+            bodyId={bodyId}
+            titleId={titleId}
+            compact={variant === 'compact'}
+          >
+            {variant === 'compact' ? fieldsNode : null}
+          </ArrayItemToolbar>
+          {variant === 'detailed' ? (
+            <div
+              id={bodyId}
+              hidden={collapsed || undefined}
+              className={arrayItemBodyClasses({ collapsible, sortable })}
+              aria-hidden={collapsed}
+            >
+              {fieldsNode}
+            </div>
+          ) : null}
+        </>
+      }
+      actions={
+        <ArrayItemActionsRail
+          removeAriaLabel={`Remove ${header.ariaLabel}`}
+          canRemove={canRemove}
+          onRemove={onRemove}
+          compact={variant === 'compact'}
+        />
+      }
+    />
   )
 }
 
@@ -318,7 +330,6 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     showDragHandle,
     collapsible,
     variant,
-    nested,
     sortable,
     collapsedIds,
     onToggleCollapse: toggleCollapse,
