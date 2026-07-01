@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   defaultMulticlassingRules,
   DEFAULT_MULTICLASSING_ENABLED,
@@ -261,6 +262,7 @@ describe('mapRulesetPatchToRulesValues', () => {
         },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
         multiclassing: defaultMulticlassingRules(),
+        startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
       }),
     ).toEqual({
       startingLevel: 3,

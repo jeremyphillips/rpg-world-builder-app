@@ -4,6 +4,12 @@ import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primiti
 import { creatureTypeSchema, type CreatureTypeId } from '../../vocab/creature-type'
 import { validateExtendedMaxLevel } from '../campaign-level-validation'
 import {
+  resolveStartingWealthRules,
+  startingWealthRulesPatchSchema,
+  startingWealthRulesSchema,
+  type StartingWealthRules,
+} from '../rules/starting-wealth'
+import {
   campaignMulticlassingPatchSchema,
   resolveMulticlassingRules,
   resolvedCampaignMulticlassingPatchSchema,
@@ -73,6 +79,7 @@ export const campaignCharacterCreationPatchSchema = z
       })
       .optional(),
     multiclassing: campaignMulticlassingPatchSchema.optional(),
+    startingWealth: startingWealthRulesPatchSchema.optional(),
   })
   .strict()
 
@@ -98,6 +105,7 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
     creatureTypePolicy: creatureTypePolicySchema,
   }),
   multiclassing: resolvedCampaignMulticlassingPatchSchema,
+  startingWealth: startingWealthRulesSchema,
 })
 
 export type ResolvedCampaignCharacterCreationPatch = z.infer<
@@ -147,7 +155,8 @@ export type UpdateCampaignCharacterCreationInput = z.infer<
 
 /** Applies campaign defaults to a sparse character-creation patch. */
 export function resolveCharacterCreationPatch(
-  patch?: CampaignCharacterCreationPatch,
+  patch: CampaignCharacterCreationPatch | undefined,
+  startingWealthSeed: StartingWealthRules,
 ): ResolvedCampaignCharacterCreationPatch {
   const standardMaxCharacterLevel = patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const extendedProgression = patch?.progression?.extendedProgression
@@ -168,5 +177,6 @@ export function resolveCharacterCreationPatch(
       },
     },
     multiclassing: resolveMulticlassingRules(patch?.multiclassing),
+    startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),
   }
 }

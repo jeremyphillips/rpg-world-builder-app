@@ -1,12 +1,5 @@
 [
   {
-    "id": "srd-cc-5.2.1:standard-starting-wealth",
-    "slug": "standard-starting-wealth",
-    "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Standard Starting Wealth",
     "description": "<p>Default starting wealth tiers for higher-level character creation in SRD 5.2.1.</p>",
     "scope": {

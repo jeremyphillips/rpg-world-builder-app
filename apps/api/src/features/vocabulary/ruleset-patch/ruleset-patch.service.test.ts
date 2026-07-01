@@ -7,6 +7,7 @@ import {
   defaultCampaignMechanicsPatch,
   defaultMulticlassingRules,
 } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { createApp } from '../../../app'
 import { CSRF_HEADER } from '../../../lib/cookies'
@@ -54,6 +55,7 @@ describe('getRulesetPatchRead', () => {
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       multiclassing: defaultMulticlassingRules(),
+      startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })

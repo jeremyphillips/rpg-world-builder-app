@@ -1,4 +1,5 @@
 export * from './campaign-level-validation'
+export * from './rules'
 export * from './patches'
 export * from './campaign-rules'
 export * from './campaign'

@@ -1,19 +1,23 @@
 import { z } from 'zod'
 
-import { tierBonusGoldSchema } from '../primitives/currency-formula'
-import { absoluteLevelSchema } from '../primitives/level'
-import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './lib/envelope'
+import type { SystemRulesetId } from '../../primitives/ruleset'
+import { tierBonusGoldSchema } from '../../primitives/currency-formula'
+import { absoluteLevelSchema } from '../../primitives/level'
+import { magicItemRaritySchema } from '../../vocab/magic-item/rarity'
 
 // ---------------------------------------------------------------------------
-// Starting wealth — ruleset-scoped tier table for higher-level character creation.
-// System records provide SRD defaults; campaigns can patch via homebrew overlays.
+// Starting wealth — campaign rules for higher-level character creation tiers.
+// SRD defaults ship from @rpg/catalog; campaigns patch via ruleset-patch.
 // ---------------------------------------------------------------------------
+
+export const STANDARD_STARTING_WEALTH_SLUG = 'standard-starting-wealth' as const
+
+export type StandardStartingWealthSlug = typeof STANDARD_STARTING_WEALTH_SLUG
+
+/** Deterministic table id for the standard SRD starting wealth table. */
+export function standardStartingWealthTableId(rulesetId: SystemRulesetId): string {
+  return `${rulesetId}:${STANDARD_STARTING_WEALTH_SLUG}`
+}
 
 export const STARTING_WEALTH_SCOPE_KINDS = ['standard'] as const
 
@@ -78,33 +82,47 @@ export const startingWealthTiersSchema = z
 
 export type StartingWealthTiers = z.infer<typeof startingWealthTiersSchema>
 
-/** The editable shape: what a form authors and what a patch overrides. */
-export const startingWealthBodySchema = contentBodyBaseSchema.extend({
+/** Cross-type body fields mirrored from catalog content bodies (without content envelope). */
+const startingWealthRulesBaseSchema = z.object({
+  /** Storage key for artwork. Resolve to a URL with `getAssetUrl`. */
+  imageKey: z.string().optional(),
+  name: z.string().min(1),
+  /** Rich-text HTML (TipTap / SRD prose). Render with `RichTextContent`. */
+  description: z.string().optional(),
+})
+
+/** Full starting wealth rules body — catalog seed shape and resolved campaign rules. */
+export const startingWealthRulesSchema = startingWealthRulesBaseSchema.extend({
   scope: startingWealthScopeSchema,
   tiers: startingWealthTiersSchema,
 })
 
-export type StartingWealthBody = z.infer<typeof startingWealthBodySchema>
+export type StartingWealthRules = z.infer<typeof startingWealthRulesSchema>
 
-/** Stored shape = ownership envelope + body. */
-export const startingWealthSchema = contentMetaSchema.extend(startingWealthBodySchema.shape)
-export type StartingWealth = z.infer<typeof startingWealthSchema>
+/** Sparse override stored on CampaignRulesetPatch.characterCreation.startingWealth. */
+export const startingWealthRulesPatchSchema = startingWealthRulesSchema.partial()
 
-export const createStartingWealthInputSchema = startingWealthBodySchema.extend({ slug: slugSchema })
-export type CreateStartingWealthInput = z.infer<typeof createStartingWealthInputSchema>
+export type StartingWealthRulesPatch = z.infer<typeof startingWealthRulesPatchSchema>
 
-export const updateStartingWealthInputSchema = createStartingWealthInputSchema.partial()
-export type UpdateStartingWealthInput = z.infer<typeof updateStartingWealthInputSchema>
+/** Merges a sparse campaign patch onto the catalog seed (tiers replace wholesale). */
+export function resolveStartingWealthRules(
+  seed: StartingWealthRules,
+  patch?: StartingWealthRulesPatch,
+): StartingWealthRules {
+  if (!patch) return seed
 
-export const startingWealthPatchSchema = contentPatchBaseSchema.extend({
-  patch: startingWealthBodySchema.partial(),
-})
-export type StartingWealthPatch = z.infer<typeof startingWealthPatchSchema>
+  return {
+    ...seed,
+    ...patch,
+    scope: patch.scope ?? seed.scope,
+    tiers: patch.tiers ?? seed.tiers,
+  }
+}
 
 /** Returns the tier matching a character level, if any. */
 export function startingWealthTierForLevel(
-  body: Pick<StartingWealthBody, 'tiers'>,
+  rules: Pick<StartingWealthRules, 'tiers'>,
   level: number,
 ): StartingWealthTier | undefined {
-  return body.tiers.find((tier) => level >= tier.minLevel && level <= tier.maxLevel)
+  return rules.tiers.find((tier) => level >= tier.minLevel && level <= tier.maxLevel)
 }

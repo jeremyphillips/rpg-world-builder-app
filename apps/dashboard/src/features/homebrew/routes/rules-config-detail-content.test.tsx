@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   ATTACK_RESOLUTION_MODE_SET_ID,
   CREATURE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
-  defaultCampaignMechanicsPatch,
   defaultMulticlassingRules,
+  defaultCampaignMechanicsPatch,
   type RulesetPatchRead,
 } from '@rpg/contracts'
 
@@ -37,6 +38,7 @@ const mockPatch: RulesetPatchRead = {
     progression: { maxCharacterLevel: 20 },
     species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
     multiclassing: defaultMulticlassingRules(),
+    startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
   },
   mechanics: defaultCampaignMechanicsPatch(),
 }

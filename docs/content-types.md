@@ -18,6 +18,8 @@ If the entity is always embedded inside another (e.g. class features, spell comp
 
 When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as optional **heritage** on the parent body rather than a separate content type. See `content/species.ts` — `{ id, name, description?, options }` where `name` carries lineage/ancestry wording (e.g. "Draconic Ancestry", "Elven Lineage") and `options` are `contentTraitSchema` rows with optional `grants`.
 
+**Not a content type:** starting wealth (higher-level character creation tier tables) lives in `rpg/campaign/rules/starting-wealth.ts` and is patched via `CampaignRulesetPatch.characterCreation.startingWealth` — not the content API registry. SRD defaults ship from `@rpg/catalog/starting-wealth`; legacy content-kernel shapes remain exported until Phase 8 removes the API registry entry.
+
 ---
 
 ## Content traits (`custom` vs `grant`)
