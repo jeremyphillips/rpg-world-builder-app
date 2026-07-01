@@ -2,6 +2,7 @@ import {
   averageScaledDiceRoll,
   computeStartingWealthSparsePatch,
   CURRENCY_IDS,
+  formatLevelRangeLabel,
   moneyToCp,
   type Currency,
   type CurrencyDiceFormula,
@@ -128,9 +129,10 @@ function mapTierFormValuesToContract(
   let bonusGold: TierBonusGold | null = null
 
   if (tier.bonusGoldEnabled) {
+    const bonusGoldForm = tier.bonusGold ?? defaultStartingWealthTierBonusGoldFormValues()
     bonusGold = {
-      baseGp: tier.bonusGold.baseGp,
-      formula: mapDiceValueToBonusGoldFormula(tier.bonusGold.formula, tier.bonusGold.currency),
+      baseGp: bonusGoldForm.baseGp,
+      formula: mapDiceValueToBonusGoldFormula(bonusGoldForm.formula, bonusGoldForm.currency),
     }
   }
 
@@ -170,12 +172,15 @@ export function buildStartingWealthPatchInput(
 }
 
 export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValues): string {
-  const parts: string[] = [`Levels ${tier.minLevel}–${tier.maxLevel}`]
+  const parts: string[] = [
+    formatLevelRangeLabel({ minLevel: tier.minLevel, maxLevel: tier.maxLevel }),
+  ]
 
   if (tier.bonusGoldEnabled) {
+    const bonusGold = tier.bonusGold ?? defaultStartingWealthTierBonusGoldFormValues()
     const bonus: TierBonusGold = {
-      baseGp: tier.bonusGold.baseGp,
-      formula: mapDiceValueToBonusGoldFormula(tier.bonusGold.formula, tier.bonusGold.currency),
+      baseGp: bonusGold.baseGp,
+      formula: mapDiceValueToBonusGoldFormula(bonusGold.formula, bonusGold.currency),
     }
     const rollAverage = averageScaledDiceRoll(bonus.formula)
     const rollGp =

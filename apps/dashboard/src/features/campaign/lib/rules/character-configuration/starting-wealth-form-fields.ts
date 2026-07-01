@@ -106,14 +106,12 @@ export function buildStartingWealthTiersField(): FormItem {
         label: 'Include class starting equipment',
         hint: 'Adds equipment from Class → Character Creation in addition to this starting wealth.',
         defaultValue: true,
-        labelPosition: 'settings',
       },
       {
         type: 'switch',
         name: BONUS_GOLD_ENABLED,
         label: 'Bonus gold',
         defaultValue: false,
-        labelPosition: 'settings',
       },
       {
         kind: 'stack',

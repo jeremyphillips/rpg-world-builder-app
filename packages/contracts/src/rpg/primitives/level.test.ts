@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { absoluteLevelSchema, levelSchema, MAX_CHARACTER_LEVEL } from './level'
+import {
+  absoluteLevelSchema,
+  formatLevelRangeLabel,
+  levelSchema,
+  MAX_CHARACTER_LEVEL,
+} from './level'
 
 describe('levelSchema', () => {
   it('accepts the full 1–20 range', () => {
@@ -17,5 +22,15 @@ describe('levelSchema', () => {
 describe('absoluteLevelSchema', () => {
   it('accepts levels above the default ruleset cap', () => {
     expect(absoluteLevelSchema.parse(MAX_CHARACTER_LEVEL + 1)).toBe(21)
+  })
+})
+
+describe('formatLevelRangeLabel', () => {
+  it('uses singular Level N when min and max match', () => {
+    expect(formatLevelRangeLabel({ minLevel: 1, maxLevel: 1 })).toBe('Level 1')
+  })
+
+  it('uses Levels N–M when min and max differ', () => {
+    expect(formatLevelRangeLabel({ minLevel: 2, maxLevel: 4 })).toBe('Levels 2–4')
   })
 })

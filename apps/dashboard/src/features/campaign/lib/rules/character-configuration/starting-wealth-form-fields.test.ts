@@ -13,13 +13,20 @@ const SEED = getStandardStartingWealthRules('srd-cc-5.2.1')
 const configRulesSchema = buildRulesSchemaForSurface('config')
 
 describe('formatStartingWealthTierSummary', () => {
+  it('formats a single-level tier as Level N', () => {
+    const initiateTier = mapStartingWealthToFormValues(SEED).tiers.find(
+      (tier) => tier.label === 'Initiate',
+    )
+    expect(initiateTier).toBeDefined()
+
+    expect(formatStartingWealthTierSummary(initiateTier!)).toBe('Level 1')
+  })
+
   it('formats hero tier with level range, average bonus gold, and grant count', () => {
     const heroTier = mapStartingWealthToFormValues(SEED).tiers.find((tier) => tier.label === 'Hero')
     expect(heroTier).toBeDefined()
 
-    expect(formatStartingWealthTierSummary(heroTier!)).toBe(
-      'Levels 5–10 · Avg 637.5 GP · 2 grants',
-    )
+    expect(formatStartingWealthTierSummary(heroTier!)).toBe('Levels 5–10 · Avg 637.5 GP · 2 grants')
   })
 
   it('formats tiers with grants but no bonus gold', () => {
@@ -29,6 +36,18 @@ describe('formatStartingWealthTierSummary', () => {
     expect(adventurerTier).toBeDefined()
 
     expect(formatStartingWealthTierSummary(adventurerTier!)).toBe('Levels 2–4 · 1 grant')
+  })
+
+  it('tolerates missing bonusGold while bonus gold is enabled', () => {
+    const tier = mapStartingWealthToFormValues(SEED).tiers[0]!
+
+    expect(
+      formatStartingWealthTierSummary({
+        ...tier,
+        bonusGoldEnabled: true,
+        bonusGold: undefined as unknown as typeof tier.bonusGold,
+      }),
+    ).toContain('Avg')
   })
 })
 

@@ -72,3 +72,12 @@ export function levelRangeEndAtMessage(expected: number): string {
 export function campaignLevelOutOfBoundsMessage(maxLevel: number): string {
   return `Level must be between 1 and ${maxLevel}`
 }
+
+/** User-facing label for a tier level range (`Level 1` or `Levels 2–4`). */
+export function formatLevelRangeLabel(range: { minLevel: number; maxLevel: number }): string {
+  if (range.minLevel === range.maxLevel) {
+    return `Level ${range.minLevel}`
+  }
+
+  return `Levels ${range.minLevel}–${range.maxLevel}`
+}
