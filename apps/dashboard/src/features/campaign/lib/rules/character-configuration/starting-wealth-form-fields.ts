@@ -154,7 +154,8 @@ export function buildStartingWealthTiersField(): FormItem {
       {
         type: 'switch',
         name: 'includeNormalStartingEquipment',
-        label: 'Include normal starting equipment',
+        label: 'Include class starting equipment',
+        hint: 'Adds equipment from Class → Character Creation in addition to this starting wealth.',
         defaultValue: true,
         labelPosition: 'settings',
       },
@@ -204,7 +205,7 @@ export function buildStartingWealthTiersField(): FormItem {
         kind: 'array',
         name: 'magicItemGrants',
         legend: 'Magic item grants',
-        addLabel: 'Add grant',
+        addLabel: 'Add magic item grant',
         min: 0,
         fields: [
           {

@@ -193,7 +193,7 @@ export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValu
 
   if (parts.length === 0) {
     return tier.includeNormalStartingEquipment
-      ? 'Normal starting equipment only'
+      ? 'Class starting equipment only'
       : 'No bonus gold or magic items'
   }
 
