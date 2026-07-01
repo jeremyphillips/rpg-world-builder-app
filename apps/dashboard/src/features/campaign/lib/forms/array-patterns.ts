@@ -7,5 +7,5 @@ export type DashboardArrayPattern =
 
 export type LevelRangeArrayConfig = ArrayConfig & {
   arrayPattern: { kind: 'levelRange'; levelKeys?: { min: string; max: string } }
-  allowReorder: false
+  reorder: false
 }

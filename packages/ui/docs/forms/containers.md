@@ -92,8 +92,33 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
   addLabel: 'Add trait',
   min: 0,
   max: 10,
-  itemTitle: (_v, i) => `Trait ${i + 1}`,
-  // rhythm: 'comfortable', size: 'md',
+  itemHeader: {
+    fallback: (i) => `Trait ${i + 1}`,
+    primaryField: 'name',
+  },
+  // rhythm: 'comfortable', size: 'md', itemVariant: 'detailed', itemCollapsible: true,
+}
+```
+
+**Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
+caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
+leaf `row`; otherwise `detailed`. Nested arrays inside another item are always compact.
+
+```ts
+{
+  kind: 'array',
+  name: 'tiers',
+  legend: 'Wealth tiers',
+  itemVariant: 'detailed',
+  itemCollapsible: true,
+  reorder: false,
+  itemHeader: {
+    primaryField: 'label',
+    fallback: (i) => `Wealth tier #${i + 1}`,
+    showDivider: true,
+    summary: (values) => formatTierSummary(values),
+  },
+  fields: [/* … */],
 }
 ```
 
@@ -114,8 +139,10 @@ Optional hooks:
 
 | Property                | Purpose                                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------------- |
-| `allowReorder`          | When `false`, hides ↑/↓ move buttons (default `true`).                                      |
-| `hideMoveControls`      | Hides move buttons even when reorder is allowed.                                            |
+| `itemVariant`           | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                      |
+| `itemHeader`            | Primary/fallback labels, optional `summary` when collapsed.                                 |
+| `itemCollapsible`       | Detailed items only — collapse body into header row.                                        |
+| `reorder`               | `'dragHandle'` (default) or `false` for fixed order.                                        |
 | `appendDefaults`        | `(items) => defaults` replaces static defaults on append.                                   |
 | `filterSelectDependsOn` | Root field names passed to `filterSelectOptions` as `watchedValues`.                        |
 | `filterSelectOptions`   | Cross-row select filtering inside array items.                                              |

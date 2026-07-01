@@ -157,12 +157,15 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       addLabel: 'Add modifier',
       visibility: visibleForItemKind('fixed'),
-      itemTitle: (values) => {
-        const row = values as StartingEquipmentModifierForm | undefined
-        if (row?.focusKind) {
-          return GEAR_KIND_ENTRIES[row.focusKind].label
-        }
-        return 'Modifier'
+      itemHeader: {
+        fallback: () => 'Modifier',
+        primary: (values) => {
+          const row = values as StartingEquipmentModifierForm | undefined
+          if (row?.focusKind) {
+            return GEAR_KIND_ENTRIES[row.focusKind].label
+          }
+          return undefined
+        },
       },
       fields: [
         {
@@ -305,12 +308,15 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'items',
       legend: 'Items',
       addLabel: 'Add item',
-      itemTitle: (values, index) =>
-        startingEquipmentItemTitle(
-          values as StartingEquipmentItemForm | undefined,
-          index,
-          equipmentOptions,
-        ),
+      itemHeader: {
+        fallback: (index) => `Item ${index + 1}`,
+        primary: (values, index) =>
+          startingEquipmentItemTitle(
+            values as StartingEquipmentItemForm | undefined,
+            index,
+            equipmentOptions,
+          ),
+      },
       fields: startingEquipmentItemFields(ctx),
     },
   ]

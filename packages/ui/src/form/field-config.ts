@@ -566,6 +566,29 @@ export interface GroupConfig {
   visibility?: FieldVisibility
 }
 
+/** Layout profile for repeatable array item chrome. */
+export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
+
+/** How array items may be reordered. Defaults to `dragHandle`. */
+export type ArrayItemReorder = false | 'dragHandle'
+
+/** Per-item header chrome for detailed and compact array rows. */
+export interface ArrayItemHeaderConfig {
+  /** Relative field name watched for the primary label (e.g. `'label'`). */
+  primaryField?: string
+  /** Optional formatter when `primaryField` is set. */
+  formatPrimary?: (value: unknown, values: Record<string, unknown>) => string | undefined
+  /** Computed primary label; overrides `primaryField` when set. */
+  primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  fallback: (index: number) => string
+  /** Shown in the header when a collapsible item is collapsed. */
+  summary?: (values: Record<string, unknown>, index: number) => string
+  /** Renders `primary | fallback` when both are present. */
+  showDivider?: boolean
+  /** When true, primary label is visually hidden but available to assistive tech. */
+  srOnly?: boolean
+}
+
 /**
  * A repeatable field array backed by `useFieldArray`. Item `fields` use
  * **relative** names (`name`, `description`) — the renderer prefixes them with
@@ -600,25 +623,19 @@ export interface ArrayConfig {
   min?: number
   /** Maximum item count; hides the "Add" button once reached. */
   max?: number
-  /**
-   * Optional heading per item row. Receives the item's current values (keyed
-   * by relative field names) and the 0-based index.
-   */
-  itemTitle?: (values: Record<string, unknown>, index: number) => string
+  /** Item row layout — `auto` picks compact when item fields fit a single row. */
+  itemVariant?: ArrayItemVariant
+  /** Header labels and optional collapsed summary for each item row. */
+  itemHeader?: ArrayItemHeaderConfig
+  /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
+  itemCollapsible?: boolean
+  /** Reorder control — defaults to `dragHandle`; pass `false` for fixed order. */
+  reorder?: ArrayItemReorder
   /**
    * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
    * the array unmounts and RHF clears its value via `shouldUnregister`.
    */
   visibility?: FieldVisibility
-
-  /** Whether reordering is permitted. Default true. */
-  allowReorder?: boolean
-
-  /**
-   * Hide move buttons even when `allowReorder` is true.
-   * Move buttons are also hidden when `allowReorder` is false.
-   */
-  hideMoveControls?: boolean
 
   /** Opaque tag for dashboard patterns / drift tests. Renderer does not interpret domain kinds. */
   arrayPattern?: { kind: string } & Record<string, unknown>

@@ -40,7 +40,10 @@ export function buildSubclassFields(
       name: 'features',
       legend: 'Features',
       addLabel: 'Add feature',
-      itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
+      itemHeader: {
+        fallback: (index) => `Feature ${index + 1}`,
+        primaryField: 'name',
+      },
       fields: classFeatureItemFields(ctx, options),
     },
   ]

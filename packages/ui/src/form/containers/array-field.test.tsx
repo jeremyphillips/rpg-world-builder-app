@@ -73,11 +73,11 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
-    expect(screen.getByRole('group', { name: 'Traits item 1' })).toHaveClass(
+    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass(
       'rounded-md',
       'border',
       'border-border',
-      'p-4',
+      'pl-10',
     )
   })
 
@@ -86,7 +86,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Traits item 1' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Traits — Item 1' }))
     expect(screen.queryByRole('textbox', { name: 'Trait name' })).not.toBeInTheDocument()
   })
 
@@ -161,7 +161,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove Traits — Item 1' })).toBeDisabled()
   })
 
   it('hides nested arrays when item-scoped visibility is false', async () => {
@@ -338,14 +338,14 @@ describe('ArrayFieldRenderer', () => {
     expect(results.violations.filter((violation) => violation.id === 'landmark-unique')).toEqual([])
   })
 
-  it('hides move buttons when allowReorder is false', async () => {
+  it('hides drag handles when reorder is false', async () => {
     const user = userEvent.setup()
     const noReorderFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        allowReorder: false,
+        reorder: false,
         fields: traitFields,
         addLabel: 'Add trait',
       },
@@ -361,11 +361,49 @@ describe('ArrayFieldRenderer', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
-    expect(screen.queryByRole('button', { name: 'Move Traits item 1 up' })).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'Move Traits item 1 down' }),
-    ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /Remove Traits — Item/ })).toHaveLength(2)
+  })
+
+  it('collapses detailed items while preserving field values', async () => {
+    const user = userEvent.setup()
+    const collapsibleFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemVariant: 'detailed',
+        itemCollapsible: true,
+        itemHeader: {
+          fallback: (index) => `Trait ${index + 1}`,
+          primaryField: 'name',
+        },
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Trait 1/ })
+    expect(collapseTrigger).toHaveAttribute('aria-expanded', 'true')
+    await user.click(collapseTrigger)
+    expect(collapseTrigger).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: /Expand .*Trait 1/ }))
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
 })

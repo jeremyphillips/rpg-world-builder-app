@@ -84,6 +84,9 @@ export {
   type GroupFieldItem,
   type StackConfig,
   type ArrayConfig,
+  type ArrayItemHeaderConfig,
+  type ArrayItemReorder,
+  type ArrayItemVariant,
   type SlotConfig,
   type FormItem,
 } from './field-config'

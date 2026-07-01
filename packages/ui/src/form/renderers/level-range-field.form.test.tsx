@@ -22,7 +22,7 @@ const fields: FormItem[] = [
     kind: 'array',
     name: 'tiers',
     legend: 'Tiers',
-    allowReorder: false,
+    reorder: false,
     fields: [
       {
         type: 'levelRange',

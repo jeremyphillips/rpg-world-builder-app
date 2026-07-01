@@ -139,8 +139,9 @@ export {
   type FieldGroupProps,
 } from './components/ui/field-group'
 export {
-  fieldArrayItemActionRowClasses,
   fieldArrayItemClasses,
+  fieldArrayItemGutterClasses,
+  fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupFlexStackClasses,
   fieldGroupStackClasses,

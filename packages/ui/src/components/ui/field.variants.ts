@@ -18,9 +18,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — space below a group/section description
  * - `fieldGroupLegendSpacingClasses` — space below a group legend
- * - `fieldArrayItemClasses` — chrome around one repeatable array item
- * - `fieldArrayItemActionsClasses` — space above array item action buttons
- * - `fieldArrayItemActionRowClasses` — action button row inside one array item
+ * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
@@ -54,12 +52,35 @@ export const fieldArrayLegendTypographyClasses =
 /** Compact array section legend — follows section `size: 'sm'` (14px). */
 export const fieldArrayLegendSmTypographyClasses =
   'text-sm font-heading leading-none text-foreground'
-export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
-export const fieldArrayItemActionsClasses = 'mt-3'
-export const fieldArrayItemActionRowClasses = cn(
-  'flex items-center gap-2',
-  fieldArrayItemActionsClasses,
+
+export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
+
+export const fieldArrayItemGutterClasses = 'pl-10'
+
+export const fieldArrayItemVariants = cva(
+  cn('relative rounded-md border border-border', fieldArrayItemGutterClasses),
+  {
+    variants: {
+      variant: {
+        compact: 'py-[calc(var(--spacing)*2)] pr-2',
+        detailed: 'py-[calc(var(--spacing)*2)] pr-2',
+      },
+      nested: {
+        true: '',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      variant: 'detailed',
+      nested: false,
+    },
+  },
 )
+
+export type FieldArrayItemVariantProps = VariantProps<typeof fieldArrayItemVariants>
+
+/** @deprecated Use `fieldArrayItemVariants` — retained for legacy class assertions. */
+export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed' })
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'

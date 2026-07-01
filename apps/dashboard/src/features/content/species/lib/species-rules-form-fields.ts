@@ -162,13 +162,16 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       name: 'classLevelCaps',
       legend: 'Class level caps',
       addLabel: 'Add class cap',
-      itemTitle: (values, index) => {
-        const classId = values['classId'] as string | undefined
-        const maxLevelValue = values['maxLevel'] as string | number | undefined
-        if (classId && maxLevelValue !== undefined) {
-          return `${classId} · level ${maxLevelValue}`
-        }
-        return `Class cap ${index + 1}`
+      itemHeader: {
+        fallback: (index) => `Class cap ${index + 1}`,
+        primary: (values) => {
+          const classId = values['classId'] as string | undefined
+          const maxLevelValue = values['maxLevel'] as string | number | undefined
+          if (classId && maxLevelValue !== undefined) {
+            return `${classId} · level ${maxLevelValue}`
+          }
+          return undefined
+        },
       },
       fields: classLevelCapItemFields(ctx),
     },

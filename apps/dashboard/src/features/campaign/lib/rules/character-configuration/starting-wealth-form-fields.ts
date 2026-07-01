@@ -76,21 +76,6 @@ export const startingWealthFormSchema = z.object({
   tiers: z.array(startingWealthTierFormSchema).length(STARTING_WEALTH_TIER_COUNT),
 })
 
-function tierItemTitle(values: Record<string, unknown>, index: number): string {
-  const tier = values as StartingWealthTierFormValues
-  const label = tier.label
-  const minLevel = tier.minLevel
-  const maxLevel = tier.maxLevel
-  const range =
-    label && minLevel !== undefined && maxLevel !== undefined
-      ? minLevel === maxLevel
-        ? `${label} (level ${minLevel})`
-        : `${label} (levels ${minLevel}–${maxLevel})`
-      : (label ?? `Tier ${index + 1}`)
-
-  return `${range} — ${formatStartingWealthTierSummary(tier)}`
-}
-
 /** Fixed-length tier array editor for `startingWealth.tiers`. */
 export function buildStartingWealthTiersField(): FormItem {
   return buildLevelRangeTiersArrayField({
@@ -99,7 +84,14 @@ export function buildStartingWealthTiersField(): FormItem {
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
     rhythm: 'comfortable',
-    itemTitle: tierItemTitle,
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      primaryField: 'label',
+      fallback: (index) => `Wealth tier #${index + 1}`,
+      showDivider: true,
+      summary: (values) => formatStartingWealthTierSummary(values as StartingWealthTierFormValues),
+    },
     fields: [
       {
         type: 'text',
@@ -164,6 +156,11 @@ export function buildStartingWealthTiersField(): FormItem {
         legend: 'Magic item grants',
         addLabel: 'Add magic item grant',
         min: 0,
+        itemVariant: 'compact',
+        itemHeader: {
+          fallback: (index) => `Grant #${index + 1}`,
+          srOnly: true,
+        },
         fields: [
           {
             kind: 'row',
