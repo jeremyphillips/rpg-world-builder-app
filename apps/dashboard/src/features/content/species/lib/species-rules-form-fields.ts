@@ -162,6 +162,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       name: 'classLevelCaps',
       legend: 'Class level caps',
       addLabel: 'Add class cap',
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Class cap ${index + 1}`,
         primary: (values) => {

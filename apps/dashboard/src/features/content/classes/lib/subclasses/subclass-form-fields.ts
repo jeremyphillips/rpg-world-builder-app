@@ -40,6 +40,7 @@ export function buildSubclassFields(
       name: 'features',
       legend: 'Features',
       addLabel: 'Add feature',
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Feature ${index + 1}`,
         primaryField: 'name',

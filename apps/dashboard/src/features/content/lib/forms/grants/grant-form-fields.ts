@@ -201,6 +201,7 @@ export function grantItemFields<T extends string>(
       name: 'innateSpellEntries',
       legend: 'Innate spell entries',
       addLabel: 'Add entry',
+      itemCollapsible: true,
       visibility: visibleFor('innateSpells'),
       itemHeader: {
         fallback: (index) => `Entry ${index + 1}`,
@@ -306,6 +307,7 @@ export function grantArrayFields<T extends string>(
       name: 'grants',
       legend: 'Grants',
       addLabel: 'Add grant',
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Grant ${index + 1}`,
         primary: (values) => {

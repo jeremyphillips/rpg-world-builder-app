@@ -60,6 +60,7 @@ export function toolFormFieldGroup(): FormItem[] {
       legend: 'Utilize actions',
       addLabel: 'Add utilize action',
       min: 1,
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Action ${index + 1}`,
         primaryField: 'description',

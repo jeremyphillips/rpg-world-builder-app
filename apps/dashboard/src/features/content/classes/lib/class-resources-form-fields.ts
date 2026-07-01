@@ -14,6 +14,7 @@ function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Level values',
       addLabel: 'Add level value',
       min: 1,
+      itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Entry ${index + 1}`,
         primaryField: 'level',
@@ -54,6 +55,7 @@ export function resourcesArrayField(ctx: ContentFormCtx): FormItem {
     name: 'resources',
     legend: 'Resources',
     addLabel: 'Add resource',
+    itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Resource ${index + 1}`,
       primaryField: 'name',

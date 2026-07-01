@@ -158,6 +158,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
       name: 'modifiers',
       legend: 'Modifiers',
       addLabel: 'Add modifier',
+      itemCollapsible: true,
       visibility: visibleForItemKind('fixed'),
       itemHeader: {
         fallback: () => 'Modifier',

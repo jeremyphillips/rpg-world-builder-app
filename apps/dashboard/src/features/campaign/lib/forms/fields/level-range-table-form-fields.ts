@@ -66,7 +66,7 @@ export function buildLevelRangeTiersArrayField(
     size: options.size,
     itemHeader: options.itemHeader,
     itemVariant: options.itemVariant,
-    itemCollapsible: options.itemCollapsible,
+    itemCollapsible: options.itemCollapsible ?? true,
     addLabel: options.addLabel,
     reorder: false,
     arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
