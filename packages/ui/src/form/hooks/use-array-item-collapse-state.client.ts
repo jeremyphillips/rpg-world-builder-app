@@ -44,7 +44,8 @@ export function useArrayItemCollapseState({
   itemCollapseKey = 'id',
   getItemValues,
 }: UseArrayItemCollapseStateOptions) {
-  const { uiStateKey, validationSessionExpandKeys } = useFormUiContext()
+  const { uiStateKey, validationSessionExpandKeys, removeValidationSessionExpandKeys } =
+    useFormUiContext()
   const { control } = useFormContext()
 
   const watchedItems = useWatch({
@@ -134,13 +135,16 @@ export function useArrayItemCollapseState({
       if (!collapsible) return
       const itemKey = itemKeysByFieldId.get(fieldId)
       if (itemKey === undefined) return
+      const validationSessionKey = buildValidationSessionExpandKey(fullName, itemKey)
 
       setSnapshot((prev) => {
-        const currentlyCollapsed = isArrayItemCollapsed({
-          itemCount,
-          itemKey,
-          overrides: prev.overrides,
-        })
+        const currentlyCollapsed = validationSessionExpandKeys.has(validationSessionKey)
+          ? false
+          : isArrayItemCollapsed({
+              itemCount,
+              itemKey,
+              overrides: prev.overrides,
+            })
         const next = toggleArrayItemCollapseOverride(prev, itemKey, !currentlyCollapsed)
         if (uiStateKey) {
           writeArrayItemCollapseOverrides(
@@ -151,8 +155,17 @@ export function useArrayItemCollapseState({
         }
         return next
       })
+      removeValidationSessionExpandKeys([validationSessionKey])
     },
-    [collapsible, itemCount, itemKeysByFieldId, uiStateKey, fullName],
+    [
+      collapsible,
+      itemCount,
+      itemKeysByFieldId,
+      uiStateKey,
+      fullName,
+      validationSessionExpandKeys,
+      removeValidationSessionExpandKeys,
+    ],
   )
 
   return { collapsedIds, toggleCollapse }

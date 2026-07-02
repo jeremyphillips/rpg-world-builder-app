@@ -83,7 +83,7 @@ describe('mapStartingWealthToFormValues', () => {
 
     const formTier = mapStartingWealthToFormValues(SEED).tiers.find((tier) => tier.bonusGoldEnabled)
 
-    expect(formTier?.bonusGold.formula.modifier).toEqual({
+    expect(formTier?.bonusGold?.formula.modifier).toEqual({
       operator: '×',
       amount: tierWithBonus!.bonusGold!.formula.multiplier,
     })
@@ -133,12 +133,48 @@ describe('startingWealthFormSchema', () => {
       ...form.tiers[0]!,
       bonusGoldEnabled: true,
       bonusGold: {
-        ...form.tiers[0]!.bonusGold,
+        ...defaultStartingWealthTierBonusGoldFormValues(),
         formula: { count: 1, faces: 6, modifier: { operator: '+', amount: 3 } },
       },
     }
 
     expect(startingWealthFormSchema.safeParse(form).success).toBe(false)
+  })
+
+  it('allows missing bonus gold details while bonus gold is disabled', () => {
+    const form = mapStartingWealthToFormValues(SEED)
+    form.tiers = form.tiers.map((tier) =>
+      tier.label === 'Adventurer'
+        ? {
+            ...tier,
+            bonusGoldEnabled: false,
+            bonusGold: undefined,
+          }
+        : tier,
+    )
+
+    expect(startingWealthFormSchema.safeParse(form).success).toBe(true)
+  })
+
+  it('rejects missing bonus gold details while bonus gold is enabled', () => {
+    const form = mapStartingWealthToFormValues(SEED)
+    form.tiers[0] = {
+      ...form.tiers[0]!,
+      bonusGoldEnabled: true,
+      bonusGold: undefined,
+    }
+
+    const result = startingWealthFormSchema.safeParse(form)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: 'Bonus gold details are required when bonus gold is enabled',
+          path: ['tiers', 0, 'bonusGold'],
+        }),
+      )
+    }
   })
 })
 

@@ -60,11 +60,22 @@ export const startingWealthTierFormSchema = z
     maxLevel: absoluteLevelSchema,
     includeNormalStartingEquipment: z.boolean(),
     bonusGoldEnabled: z.boolean(),
-    bonusGold: startingWealthTierBonusGoldFormSchema,
+    bonusGold: startingWealthTierBonusGoldFormSchema.optional(),
     magicItemGrants: z.array(startingWealthMagicItemGrantFormSchema),
   })
   .superRefine((tier, ctx) => {
-    if (tier.bonusGoldEnabled && tier.bonusGold.formula.modifier?.operator !== '×') {
+    if (!tier.bonusGoldEnabled) return
+
+    if (!tier.bonusGold) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Bonus gold details are required when bonus gold is enabled',
+        path: ['bonusGold'],
+      })
+      return
+    }
+
+    if (tier.bonusGold.formula.modifier?.operator !== '×') {
       ctx.addIssue({
         code: 'custom',
         message: 'Bonus gold rolls must use a multiplier (×)',

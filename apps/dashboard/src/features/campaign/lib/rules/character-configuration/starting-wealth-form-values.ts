@@ -46,7 +46,7 @@ export type StartingWealthTierFormValues = {
   maxLevel: number
   includeNormalStartingEquipment: boolean
   bonusGoldEnabled: boolean
-  bonusGold: StartingWealthTierBonusGoldFormValues
+  bonusGold?: StartingWealthTierBonusGoldFormValues
   magicItemGrants: StartingWealthMagicItemGrantFormValues[]
 }
 

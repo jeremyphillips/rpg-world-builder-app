@@ -21,6 +21,7 @@ export interface FormUiContextValue {
   /** Ephemeral expand overrides keyed by `${fullName}:${collapseKey}`. */
   validationSessionExpandKeys: ReadonlySet<ValidationSessionExpandKey>
   addValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
+  removeValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
 }
 
 const defaultContext: FormUiContextValue = {
@@ -30,6 +31,7 @@ const defaultContext: FormUiContextValue = {
   markSubmitAttempted: () => undefined,
   validationSessionExpandKeys: new Set(),
   addValidationSessionExpandKeys: () => undefined,
+  removeValidationSessionExpandKeys: () => undefined,
 }
 
 export const FormUiContext = React.createContext<FormUiContextValue>(defaultContext)
@@ -73,6 +75,18 @@ export function FormUiProvider({
     [],
   )
 
+  const removeValidationSessionExpandKeys = React.useCallback(
+    (keys: readonly ValidationSessionExpandKey[]) => {
+      if (keys.length === 0) return
+      setValidationSessionExpandKeys((previous) => {
+        const next = new Set(previous)
+        for (const key of keys) next.delete(key)
+        return next
+      })
+    },
+    [],
+  )
+
   const value = React.useMemo(
     () => ({
       uiStateKey,
@@ -82,6 +96,7 @@ export function FormUiProvider({
       markSubmitAttempted,
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
+      removeValidationSessionExpandKeys,
     }),
     [
       uiStateKey,
@@ -91,6 +106,7 @@ export function FormUiProvider({
       markSubmitAttempted,
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
+      removeValidationSessionExpandKeys,
     ],
   )
 

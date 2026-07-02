@@ -786,4 +786,38 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toBeUndefined()
   })
+
+  it('allows a user to collapse a row that validation opened', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'validation-session-manual-collapse'
+
+    render(
+      <Form<z.infer<typeof rowIssueSchema>>
+        uiStateKey={uiStateKey}
+        schema={rowIssueSchema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={{
+          traits: [
+            { name: 'Darkvision', description: '' },
+            { name: 'Keen Senses', description: '' },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    const collapseButton = await screen.findByRole('button', { name: /Collapse .*Darkvision/ })
+    expect(collapseButton).toHaveAttribute('aria-expanded', 'true')
+
+    await user.click(collapseButton)
+
+    expect(screen.getByRole('button', { name: /Expand .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({ 'index:0': 'closed' })
+  })
 })
