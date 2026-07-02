@@ -54,6 +54,15 @@ import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
 import { arrayItemBodyClasses } from './array-item-toolbar.variants'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 import { useArrayItemCollapseState } from '../hooks/use-array-item-collapse-state.client'
+import {
+  useArrayItemIssues,
+  useFormValidationPresentation,
+} from '../hooks/use-form-validation-presentation.client'
+import { useFormUiContext } from '../context/form-ui.context'
+import { buildValidationSessionExpandKey, countInvalidArrayItems, sortFormIssues } from '../errors'
+import { resolveIssueFocusControlId } from '../errors/resolve-issue-focus-target'
+import { collectArraySections } from '../errors/resolve-field-order'
+import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 function resolveLevelRangeKeys(
   arrayPattern: ArrayConfig['arrayPattern'],
@@ -64,6 +73,12 @@ function resolveLevelRangeKeys(
   return {
     min: levelKeys?.min ?? 'minLevel',
     max: levelKeys?.max ?? 'maxLevel',
+  }
+}
+
+function scrollElementIntoView(element: Element): void {
+  if ('scrollIntoView' in element && typeof element.scrollIntoView === 'function') {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
 
@@ -126,6 +141,10 @@ function ArrayFieldItemContent({
   const arrayItemsSignature = React.useMemo(() => JSON.stringify(arrayItems ?? []), [arrayItems])
   const titleId = `${idPrefix}-${fullName}-${itemId}-title`
   const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
+  const { addValidationSessionExpandKeys } = useFormUiContext()
+  const validation = useFormValidationPresentation()
+  const issueGroup = useArrayItemIssues(fullName, itemPrefix, index)
+  const showIssueChrome = validation.shouldShowRowIssues(itemPrefix, issueGroup)
 
   const levelRangeKeys = React.useMemo(
     () => resolveLevelRangeKeys(config.arrayPattern),
@@ -174,10 +193,65 @@ function ArrayFieldItemContent({
   )
   const gripVisible = showDragHandle && Boolean(dragHandleProps)
   const leadingChrome = { showDragHandle: gripVisible, collapsible }
+  const rowLabel = header.ariaLabel
+
+  const focusIssue = React.useCallback(() => {
+    const issue = issueGroup.sortedIssues[0]
+    if (!issue) return
+
+    if (collapsible) {
+      addValidationSessionExpandKeys([
+        buildValidationSessionExpandKey(
+          fullName,
+          index,
+          itemValues,
+          config.itemCollapseKey ?? 'id',
+        ),
+      ])
+    }
+
+    window.requestAnimationFrame(() => {
+      const focusControlId = resolveIssueFocusControlId(issue, idPrefix, config.arrayPattern)
+      if (focusControlId) {
+        const element = document.getElementById(focusControlId)
+        if (element) {
+          scrollElementIntoView(element)
+          if ('focus' in element && typeof element.focus === 'function') {
+            element.focus({ preventScroll: true })
+          }
+          return
+        }
+      }
+
+      const rowElement = document.querySelector(`[data-array-item-prefix="${itemPrefix}"]`)
+      if (rowElement) scrollElementIntoView(rowElement)
+    })
+  }, [
+    addValidationSessionExpandKeys,
+    collapsible,
+    config.arrayPattern,
+    config.itemCollapseKey,
+    fullName,
+    idPrefix,
+    index,
+    issueGroup.sortedIssues,
+    itemPrefix,
+    itemValues,
+  ])
+
+  const issueSummary =
+    showIssueChrome && variant === 'detailed' && (collapsed || issueGroup.headerIssues.length > 0)
+      ? {
+          group: issueGroup,
+          onPrimaryPress: focusIssue,
+          onMorePress: focusIssue,
+        }
+      : undefined
 
   return (
     <ArrayItemShell
       titleId={titleId}
+      itemPrefix={itemPrefix}
       showDragHandle={gripVisible}
       collapsible={collapsible}
       dragging={dragHandleProps?.isDragging}
@@ -205,6 +279,7 @@ function ArrayFieldItemContent({
             bodyId={bodyId}
             titleId={titleId}
             compact={variant === 'compact'}
+            issueSummary={issueSummary}
           >
             {variant === 'compact' ? fieldsNode : null}
           </ArrayItemToolbar>
@@ -225,6 +300,9 @@ function ArrayFieldItemContent({
           removeAriaLabel={`Remove ${header.ariaLabel}`}
           canRemove={canRemove}
           onRemove={onRemove}
+          issueCount={showIssueChrome ? issueGroup.totalCount : 0}
+          issueRowLabel={rowLabel}
+          onIssuePress={focusIssue}
           compact={variant === 'compact'}
         />
       }
@@ -293,6 +371,8 @@ function ArrayFieldItem({ collapsedIds, onToggleCollapse, itemId, ...props }: Ar
 export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
   const { getValues } = useFormContext()
+  const { addValidationSessionExpandKeys } = useFormUiContext()
+  const validation = useFormValidationPresentation()
   const { rhythm, size, depth } = useFormSectionContext()
   const {
     addLabel = 'Add item',
@@ -329,6 +409,56 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
 
   const canRemove = fields.length > min
   const canAdd = max === undefined || fields.length < max
+  const invalidRowCount = validation.hasAttemptedSubmit
+    ? countInvalidArrayItems(validation.issues, fullName)
+    : 0
+
+  const focusFirstArrayIssue = React.useCallback(() => {
+    const sections = collectArraySections(validation.fields)
+    const arrayIssues = validation.issues.filter(
+      (issue) => issue.path === fullName || issue.path.startsWith(`${fullName}.`),
+    )
+    const firstIssue = sortFormIssues(arrayIssues, sections)[0]
+    if (!firstIssue || firstIssue.itemIndex === undefined) return
+
+    const itemValues = getItemValues(firstIssue.itemIndex)
+    addValidationSessionExpandKeys([
+      buildValidationSessionExpandKey(
+        fullName,
+        firstIssue.itemIndex,
+        itemValues,
+        config.itemCollapseKey ?? 'id',
+      ),
+    ])
+
+    window.requestAnimationFrame(() => {
+      const focusControlId = resolveIssueFocusControlId(firstIssue, idPrefix, config.arrayPattern)
+      if (focusControlId) {
+        const element = document.getElementById(focusControlId)
+        if (element) {
+          scrollElementIntoView(element)
+          if ('focus' in element && typeof element.focus === 'function') {
+            element.focus({ preventScroll: true })
+          }
+          return
+        }
+      }
+
+      const rowElement = document.querySelector(
+        `[data-array-item-prefix="${firstIssue.itemPrefix}"]`,
+      )
+      if (rowElement) scrollElementIntoView(rowElement)
+    })
+  }, [
+    addValidationSessionExpandKeys,
+    config.arrayPattern,
+    config.itemCollapseKey,
+    fullName,
+    getItemValues,
+    idPrefix,
+    validation.fields,
+    validation.issues,
+  ])
 
   const staticItemDefaults = React.useMemo(
     () => buildItemDefaultValues(config.fields),
@@ -395,6 +525,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}
+          <ArrayLegendIssueLink invalidRowCount={invalidRowCount} onPress={focusFirstArrayIssue} />
         </legend>
       ) : null}
       <div className={itemListClasses}>

@@ -16,7 +16,7 @@ import {
   readArrayItemCollapseOverrides,
   writeArrayItemCollapseOverrides,
 } from '../config/array-item-collapse-storage.lib'
-import { useFormUiContext } from '../context/form-ui.context'
+import { useFormUiContext, type ValidationSessionExpandKey } from '../context/form-ui.context'
 
 export interface UseArrayItemCollapseStateOptions {
   fullName: string
@@ -30,6 +30,13 @@ function serializeActiveItemKeys(itemKeysByFieldId: ReadonlyMap<string, string>)
   return [...itemKeysByFieldId.values()].sort().join('\0')
 }
 
+function buildValidationSessionExpandKey(
+  fullName: string,
+  itemKey: string,
+): ValidationSessionExpandKey {
+  return `${fullName}:${itemKey}`
+}
+
 export function useArrayItemCollapseState({
   fullName,
   collapsible,
@@ -37,7 +44,7 @@ export function useArrayItemCollapseState({
   itemCollapseKey = 'id',
   getItemValues,
 }: UseArrayItemCollapseStateOptions) {
-  const { uiStateKey } = useFormUiContext()
+  const { uiStateKey, validationSessionExpandKeys } = useFormUiContext()
   const { control } = useFormContext()
 
   const watchedItems = useWatch({
@@ -81,10 +88,31 @@ export function useArrayItemCollapseState({
 
   const itemCount = fields.length
 
-  const collapsedIds = React.useMemo(() => {
+  const persistedCollapsedIds = React.useMemo(() => {
     if (!collapsible) return new Set<string>()
     return collapsedIdsFromSnapshot(fields, itemKeysByFieldId, prunedSnapshot, itemCount)
   }, [collapsible, fields, itemKeysByFieldId, prunedSnapshot, itemCount])
+
+  const collapsedIds = React.useMemo(() => {
+    if (!collapsible || validationSessionExpandKeys.size === 0) return persistedCollapsedIds
+
+    const next = new Set(persistedCollapsedIds)
+    for (const field of fields) {
+      const itemKey = itemKeysByFieldId.get(field.id)
+      if (!itemKey) continue
+      if (validationSessionExpandKeys.has(buildValidationSessionExpandKey(fullName, itemKey))) {
+        next.delete(field.id)
+      }
+    }
+    return next
+  }, [
+    collapsible,
+    fields,
+    fullName,
+    itemKeysByFieldId,
+    persistedCollapsedIds,
+    validationSessionExpandKeys,
+  ])
 
   React.useEffect(() => {
     if (!collapsible || !uiStateKey) return

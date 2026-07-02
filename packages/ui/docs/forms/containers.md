@@ -226,7 +226,46 @@ Optional hooks:
 | `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                  |
 | `filterSelectDependsOn`           | Root field names passed to `filterSelectOptions` as `watchedValues`.                       |
 | `filterSelectOptions`             | Cross-row select filtering inside array items.                                             |
-| `arrayPattern`                    | Dashboard pattern tag. `kind: 'levelRange'` enables cascade edits on `levelRange` fields.  |
+| `arrayPattern`                    | Domain hooks for array validation severity and focus navigation.                           |
+
+### Array validation presentation
+
+Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Zod errors:
+
+- Before the first failed submit, progressive presentation shows row issue chrome only for
+  touched rows.
+- After the first failed submit, all invalid rows in the form are flagged live.
+- Detailed rows show an issue badge in the actions rail. Collapsed rows also show the first
+  issue message in the header. Expanded rows show row/cross-row messages in the header; field
+  messages stay with their controls.
+- Compact nested rows get badge-only rollup in v1. Descendant errors still count toward the
+  nearest detailed ancestor row.
+- The array legend shows an invalid-row link after a failed submit. Clicking it jumps to the
+  first invalid row in that array.
+
+Submit failure expands the first invalid row and scrolls/focuses the best matching control when
+one can be resolved. This expansion is session-only; it does not write a manual collapse override
+to `localStorage`.
+
+`validationPresentation` on `<Form>` / `<TabbedForm>` defaults to `'progressive'`. Use
+`'always'` for demos or flows that should expose array row issue chrome as soon as errors exist.
+
+`arrayPattern` can customize issue behavior:
+
+```ts
+{
+  kind: 'array',
+  name: 'tiers',
+  legend: 'Wealth tiers',
+  arrayPattern: {
+    kind: 'levelRange',
+    levelKeys: { min: 'minLevel', max: 'maxLevel' },
+    getErrorFocusTarget: ({ issue, levelKeys }) =>
+      issue.message.includes('cover levels') ? levelKeys?.max : levelKeys?.min,
+  },
+  fields: [/* … */],
+}
+```
 
 ### Conditional fields in items
 

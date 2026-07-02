@@ -27,6 +27,8 @@ import {
   arrayItemToolbarRowClasses,
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
+import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
+import { ArrayItemIssueSummary } from './array-item-issue.client'
 
 export interface ArrayItemDragHandleProps {
   ariaLabel: string
@@ -77,6 +79,165 @@ function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactN
   return header.fallback
 }
 
+interface ArrayItemCollapseButtonProps {
+  collapsed: boolean
+  bodyId: string
+  ariaLabel: string
+  onToggleCollapse: () => void
+}
+
+function ArrayItemCollapseButton({
+  collapsed,
+  bodyId,
+  ariaLabel,
+  onToggleCollapse,
+}: ArrayItemCollapseButtonProps) {
+  return (
+    <button
+      type="button"
+      className={arrayItemCollapseButtonClasses}
+      aria-expanded={!collapsed}
+      aria-controls={bodyId}
+      aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${ariaLabel}`}
+      onClick={onToggleCollapse}
+    >
+      <ChevronDown
+        className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
+        aria-hidden
+      />
+    </button>
+  )
+}
+
+interface ArrayItemTitleContentProps {
+  header: ResolvedArrayItemHeader
+  compact: boolean
+  gripVisible: boolean
+  collapsible: boolean
+  children?: React.ReactNode
+}
+
+function ArrayItemTitleContent({
+  header,
+  compact,
+  gripVisible,
+  collapsible,
+  children,
+}: ArrayItemTitleContentProps) {
+  if (compact) {
+    return (
+      <>
+        {!gripVisible && !collapsible ? <span className="sr-only">{header.ariaLabel}</span> : null}
+        {children}
+      </>
+    )
+  }
+
+  if (header.srOnly) return <span className="sr-only">{header.ariaLabel}</span>
+
+  return <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
+}
+
+interface ArrayItemTitleRowProps {
+  header: ResolvedArrayItemHeader
+  headerContentClasses: string
+  leadingChrome: ArrayItemLeadingChromeOptions
+  compact: boolean
+  gripVisible: boolean
+  dragHandleProps?: ArrayItemDragHandleProps
+  collapsible: boolean
+  collapsed: boolean
+  onToggleCollapse: () => void
+  bodyId: string
+  titleId: string
+  children?: React.ReactNode
+}
+
+function ArrayItemTitleRow({
+  header,
+  headerContentClasses,
+  leadingChrome,
+  compact,
+  gripVisible,
+  dragHandleProps,
+  collapsible,
+  collapsed,
+  onToggleCollapse,
+  bodyId,
+  titleId,
+  children,
+}: ArrayItemTitleRowProps) {
+  return (
+    <div className={arrayItemToolbarRowClasses({ ...leadingChrome, compact })}>
+      {gripVisible && dragHandleProps ? (
+        <div className={arrayItemChromeColumnClasses}>
+          <ArrayItemDragHandle
+            {...dragHandleProps}
+            compact={compact}
+            ariaLabel={`Drag to reorder ${header.ariaLabel}`}
+          />
+        </div>
+      ) : null}
+      {collapsible ? (
+        <div className={arrayItemChromeColumnClasses}>
+          <ArrayItemCollapseButton
+            collapsed={collapsed}
+            bodyId={bodyId}
+            ariaLabel={header.ariaLabel}
+            onToggleCollapse={onToggleCollapse}
+          />
+        </div>
+      ) : null}
+      <div id={titleId} className={headerContentClasses}>
+        <ArrayItemTitleContent
+          header={header}
+          compact={compact}
+          gripVisible={gripVisible}
+          collapsible={collapsible}
+        >
+          {children}
+        </ArrayItemTitleContent>
+      </div>
+    </div>
+  )
+}
+
+interface ArrayItemHeaderExtrasProps {
+  summary?: string
+  issueSummary?: ArrayItemIssueSummaryProps
+  collapsed: boolean
+  leadingChrome: ArrayItemLeadingChromeOptions
+}
+
+function ArrayItemHeaderExtras({
+  summary,
+  issueSummary,
+  collapsed,
+  leadingChrome,
+}: ArrayItemHeaderExtrasProps) {
+  return (
+    <>
+      {issueSummary ? (
+        <ArrayItemIssueSummary
+          {...issueSummary}
+          placement={issueSummary.placement ?? (collapsed ? 'collapsed' : 'expanded')}
+          className={cn(issueSummary.className, arrayItemHeaderSummaryIndentClasses(leadingChrome))}
+        />
+      ) : null}
+      {summary ? (
+        <p
+          className={cn(
+            arrayItemHeaderSummaryClasses,
+            arrayItemHeaderSummaryIndentClasses(leadingChrome),
+          )}
+        >
+          {summary}
+        </p>
+      ) : null}
+    </>
+  )
+}
+
 export interface ArrayItemToolbarProps {
   legend: string
   index: number
@@ -92,6 +253,7 @@ export interface ArrayItemToolbarProps {
   titleId: string
   /** When true, only drag + title/fields render (compact inline row). */
   compact?: boolean
+  issueSummary?: ArrayItemIssueSummaryProps
   children?: React.ReactNode
 }
 
@@ -110,6 +272,7 @@ export function ArrayItemToolbar({
   bodyId,
   titleId,
   compact = false,
+  issueSummary,
   children,
 }: ArrayItemToolbarProps) {
   const header = resolveArrayItemHeaderLabels(
@@ -132,63 +295,34 @@ export function ArrayItemToolbar({
   )
 
   const titleRow = (
-    <div className={arrayItemToolbarRowClasses({ ...leadingChrome, compact })}>
-      {gripVisible && dragHandleProps ? (
-        <div className={arrayItemChromeColumnClasses}>
-          <ArrayItemDragHandle
-            {...dragHandleProps}
-            compact={compact}
-            ariaLabel={`Drag to reorder ${header.ariaLabel}`}
-          />
-        </div>
-      ) : null}
-      {collapsible ? (
-        <div className={arrayItemChromeColumnClasses}>
-          <button
-            type="button"
-            className={arrayItemCollapseButtonClasses}
-            aria-expanded={!collapsed}
-            aria-controls={bodyId}
-            aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${header.ariaLabel}`}
-            onClick={onToggleCollapse}
-          >
-            <ChevronDown
-              className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
-              aria-hidden
-            />
-          </button>
-        </div>
-      ) : null}
-      <div id={titleId} className={headerContentClasses}>
-        {compact ? (
-          <>
-            {!gripVisible && !collapsible ? (
-              <span className="sr-only">{header.ariaLabel}</span>
-            ) : null}
-            {children}
-          </>
-        ) : header.srOnly ? (
-          <span className="sr-only">{header.ariaLabel}</span>
-        ) : (
-          <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
-        )}
-      </div>
-    </div>
+    <ArrayItemTitleRow
+      header={header}
+      headerContentClasses={headerContentClasses}
+      leadingChrome={leadingChrome}
+      compact={compact}
+      gripVisible={gripVisible}
+      dragHandleProps={dragHandleProps}
+      collapsible={collapsible}
+      collapsed={collapsed}
+      onToggleCollapse={onToggleCollapse}
+      bodyId={bodyId}
+      titleId={titleId}
+    >
+      {children}
+    </ArrayItemTitleRow>
   )
 
-  if (!summary) return titleRow
+  if (!summary && !issueSummary) return titleRow
 
   return (
     <div className={arrayItemHeaderShellClasses}>
       {titleRow}
-      <p
-        className={cn(
-          arrayItemHeaderSummaryClasses,
-          arrayItemHeaderSummaryIndentClasses(leadingChrome),
-        )}
-      >
-        {summary}
-      </p>
+      <ArrayItemHeaderExtras
+        summary={summary}
+        issueSummary={issueSummary}
+        collapsed={collapsed}
+        leadingChrome={leadingChrome}
+      />
     </div>
   )
 }

@@ -43,8 +43,9 @@ function isItemPrefixTouched(itemPrefix: string, touchedPaths: readonly string[]
   return touchedPaths.some((path) => path === itemPrefix || path.startsWith(`${itemPrefix}.`))
 }
 
-export function useFormValidationPresentation(fields: FormItem[]) {
-  const { validationPresentation, hasAttemptedSubmit } = useFormUiContext()
+export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
+  const { validationPresentation, hasAttemptedSubmit, fields: contextFields } = useFormUiContext()
+  const fields = fieldsOverride ?? contextFields
   const { errors, touchedFields } = useFormState()
   const issues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
   const touchedPaths = React.useMemo(() => flattenTouchedPaths(touchedFields), [touchedFields])
@@ -60,6 +61,7 @@ export function useFormValidationPresentation(fields: FormItem[]) {
   )
 
   return {
+    fields,
     issues,
     hasAttemptedSubmit,
     shouldShowRowIssues,
@@ -67,12 +69,11 @@ export function useFormValidationPresentation(fields: FormItem[]) {
 }
 
 export function useArrayItemIssues(
-  fields: FormItem[],
   arrayPath: string,
   itemPrefix: string,
   itemIndex: number,
 ): ArrayItemIssueGroup {
-  const { issues } = useFormValidationPresentation(fields)
+  const { issues, fields } = useFormValidationPresentation()
   const fieldOrder = React.useMemo(() => {
     const section = collectArraySections(fields).find((entry) => entry.fullName === arrayPath)
     return section?.fieldOrder ?? []

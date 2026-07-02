@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import type { FormItem } from '../field-config'
+
 export type FormValidationPresentation = 'progressive' | 'always'
 
 export type ValidationSessionExpandKey = `${string}:${string}`
@@ -11,6 +13,8 @@ export interface FormUiContextValue {
   uiStateKey?: string
   /** Controls when array row issue chrome appears. Defaults to `progressive`. */
   validationPresentation: FormValidationPresentation
+  /** Complete schema-driven field tree for validation issue grouping/navigation. */
+  fields: FormItem[]
   /** Set after the first failed submit for the form instance. */
   hasAttemptedSubmit: boolean
   markSubmitAttempted: () => void
@@ -21,6 +25,7 @@ export interface FormUiContextValue {
 
 const defaultContext: FormUiContextValue = {
   validationPresentation: 'progressive',
+  fields: [],
   hasAttemptedSubmit: false,
   markSubmitAttempted: () => undefined,
   validationSessionExpandKeys: new Set(),
@@ -35,6 +40,7 @@ export function useFormUiContext(): FormUiContextValue {
 
 export interface FormUiProviderProps {
   uiStateKey?: string
+  fields?: FormItem[]
   validationPresentation?: FormValidationPresentation
   children: React.ReactNode
 }
@@ -42,6 +48,7 @@ export interface FormUiProviderProps {
 /** Supplies form UI state including progressive validation presentation. */
 export function FormUiProvider({
   uiStateKey,
+  fields = [],
   validationPresentation = 'progressive',
   children,
 }: FormUiProviderProps) {
@@ -70,6 +77,7 @@ export function FormUiProvider({
     () => ({
       uiStateKey,
       validationPresentation,
+      fields,
       hasAttemptedSubmit,
       markSubmitAttempted,
       validationSessionExpandKeys,
@@ -78,6 +86,7 @@ export function FormUiProvider({
     [
       uiStateKey,
       validationPresentation,
+      fields,
       hasAttemptedSubmit,
       markSubmitAttempted,
       validationSessionExpandKeys,

@@ -1,37 +1,39 @@
 import type { FieldConfig, FormItem, RowConfig } from '../field-config'
 import { isContainer } from '../field-config'
 
+type FieldOrderContainer = Extract<FormItem, { kind: string }>
+
+function appendFieldPath(field: FieldConfig, prefix: string, paths: string[]): void {
+  const base = prefix ? `${prefix}.${field.name}` : field.name
+
+  if (field.type !== 'levelRange') {
+    paths.push(base)
+    return
+  }
+
+  paths.push(base)
+  paths.push(
+    field.name.endsWith('minLevel') || field.name === 'minLevel'
+      ? base.replace(/minLevel$/, 'maxLevel')
+      : `${base}.maxLevel`,
+  )
+}
+
+function walkContainerItem(item: FieldOrderContainer, prefix: string, paths: string[]): void {
+  if (item.kind === 'slot') return
+
+  const nestedPrefix = item.kind === 'array' ? prefix : prefix
+  walkItems(item.fields, nestedPrefix, paths)
+}
+
 function walkItems(items: Array<FormItem | RowConfig>, prefix: string, paths: string[]): void {
   for (const item of items) {
     if (!isContainer(item)) {
-      const field = item as FieldConfig
-      if (field.type === 'levelRange') {
-        const base = prefix ? `${prefix}.${field.name}` : field.name
-        paths.push(base)
-        if (field.name.endsWith('minLevel') || field.name === 'minLevel') {
-          paths.push(base.replace(/minLevel$/, 'maxLevel'))
-        } else {
-          paths.push(`${base}.maxLevel`)
-        }
-      } else {
-        paths.push(prefix ? `${prefix}.${field.name}` : field.name)
-      }
+      appendFieldPath(item as FieldConfig, prefix, paths)
       continue
     }
 
-    if (item.kind === 'row') {
-      walkItems(item.fields, prefix, paths)
-      continue
-    }
-
-    if (item.kind === 'array') {
-      walkItems(item.fields, prefix, paths)
-      continue
-    }
-
-    if (item.kind === 'slot') continue
-
-    walkItems(item.fields, prefix, paths)
+    walkContainerItem(item, prefix, paths)
   }
 }
 

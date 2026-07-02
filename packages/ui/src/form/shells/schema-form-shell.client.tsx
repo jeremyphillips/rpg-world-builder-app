@@ -58,7 +58,7 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
       noValidate
       onSubmit={form.handleSubmit(
         (values) => onSubmit(values, form),
-        () => navigateInvalidSubmit(form, fields, formId, ui),
+        (errors) => navigateInvalidSubmit(form, fields, formId, ui, errors),
       )}
       className={className}
     >
@@ -90,7 +90,11 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   return (
     <FormProvider {...form}>
       <FileFieldPropsProvider value={fileFieldProps ?? {}}>
-        <FormUiProvider uiStateKey={uiStateKey} validationPresentation={validationPresentation}>
+        <FormUiProvider
+          uiStateKey={uiStateKey}
+          fields={fields}
+          validationPresentation={validationPresentation}
+        >
           <SchemaFormElement
             form={form}
             formId={formId}
