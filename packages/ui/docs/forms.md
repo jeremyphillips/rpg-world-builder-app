@@ -92,7 +92,7 @@ Spacing tokens, `width`, `digits`, row layouts: [sizing-and-spacing.md](./forms/
 | ------- | -------------------------------- | --------------------------------------------------- |
 | `group` | Named fieldset subsection        | [containers.md](./forms/containers.md#groups)       |
 | `row`   | Horizontal siblings              | [containers.md](./forms/containers.md#rows)         |
-| `stack` | Layout column (toggle-dependent) | [containers.md](./forms/containers.md#stacks)       |
+| `stack` | Layout column (dependent stacks) | [containers.md](./forms/containers.md#stacks)       |
 | `array` | Repeatable `useFieldArray`       | [containers.md](./forms/containers.md#array-fields) |
 | `slot`  | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
 

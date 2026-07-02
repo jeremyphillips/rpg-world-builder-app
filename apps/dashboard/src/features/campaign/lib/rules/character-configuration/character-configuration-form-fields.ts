@@ -259,7 +259,7 @@ function extendedProgressionGroup(): FormItem {
     fields: [
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         fields: [
           {
@@ -324,7 +324,7 @@ function multiclassingGroup(): FormItem {
       },
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         visibility: visibleWhenMulticlassingEnabled(),
         fields: [

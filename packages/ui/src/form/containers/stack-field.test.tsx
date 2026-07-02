@@ -19,7 +19,7 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>
 
-const toggleDependentStack = (
+const dependentStack = (
   options: {
     dependentsChrome?: 'subtle' | 'error'
     dependentsChromeScope?: 'wrapper' | 'arrayItems'
@@ -27,7 +27,7 @@ const toggleDependentStack = (
   } = {},
 ): FormItem => ({
   kind: 'stack',
-  layout: 'toggleDependent',
+  layout: 'dependent',
   ...(options.dependentsChrome ? { dependentsChrome: options.dependentsChrome } : {}),
   ...(options.dependentsChromeScope
     ? { dependentsChromeScope: options.dependentsChromeScope }
@@ -69,7 +69,7 @@ const toggleDependentStack = (
 })
 
 function renderStackForm(
-  fields: FormItem[] = [toggleDependentStack({ dependentsChrome: 'subtle' })],
+  fields: FormItem[] = [dependentStack({ dependentsChrome: 'subtle' })],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -91,7 +91,7 @@ function queryChromeShell(container: HTMLElement) {
   return region?.querySelector(':scope > .p-3') ?? null
 }
 
-describe('toggle-dependent stack', () => {
+describe('dependent stack', () => {
   it('keeps the toggle outside the dependents chrome region', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm()
@@ -145,7 +145,7 @@ describe('toggle-dependent stack', () => {
 
   it('renders a plain indented stack when dependentsChrome is omitted', async () => {
     const user = userEvent.setup()
-    const { container } = renderStackForm([toggleDependentStack()])
+    const { container } = renderStackForm([dependentStack()])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
@@ -161,7 +161,7 @@ describe('toggle-dependent stack', () => {
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm([
-      toggleDependentStack({ dependentsChrome: 'subtle', rhythm: 'comfortable' }),
+      dependentStack({ dependentsChrome: 'subtle', rhythm: 'comfortable' }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -206,7 +206,7 @@ describe('toggle-dependent stack', () => {
     const fields: FormItem[] = [
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         dependentsChromeScope: 'arrayItems',
         fields: [
@@ -247,5 +247,76 @@ describe('toggle-dependent stack', () => {
       expect(itemShell).toHaveClass('bg-muted/30')
       expect(itemShell).toHaveClass('border-border')
     })
+  })
+
+  it('gates dependents on explicit dependentsVisibility with a select controller', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'all',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [
+              { label: 'Fighter', value: 'fighter' },
+              { label: 'Wizard', value: 'wizard' },
+            ],
+          },
+        ],
+      },
+    ]
+
+    const hidden = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'all', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('combobox', { name: 'Classes' })).not.toBeInTheDocument()
+    expect(queryDependentsRegion(hidden.container)).toBeNull()
+
+    hidden.unmount()
+
+    const visible = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'only', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(queryChromeShell(visible.container)).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Classes' })).toBeInTheDocument()
+
+    const stack = visible.container.querySelector('[data-field-stack][role="group"]')
+    expect(stack).toHaveAttribute('aria-labelledby', expect.stringContaining('mode'))
   })
 })

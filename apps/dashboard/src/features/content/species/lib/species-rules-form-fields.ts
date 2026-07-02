@@ -74,26 +74,33 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
       hint: 'Controls whether characters of this species can multiclass when the campaign allows multiclassing.',
     },
     {
-      type: 'select',
-      name: 'classPolicy.mode',
-      labelPosition: 'settings',
-      separator: 'subtle',
-      label: 'Class restrictions',
-      width: 'full',
-      options: speciesClassPolicyModeOptions,
-      required: true,
-      defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
-      hint: 'Choose which classes this species may multiclass into.',
-    },
-    {
-      type: 'combobox',
-      name: 'classPolicy.classIds',
-      label: 'Classes',
-      multiple: true,
-      options: ctx.options?.classes ?? [],
-      placeholder: 'Choose classes…',
-      required: true,
-      visibility: visibleWhenClassPolicyNeedsIds(),
+      kind: 'stack',
+      layout: 'dependent',
+      dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
+      dependentsChrome: 'subtle',
+      fields: [
+        {
+          type: 'select',
+          name: 'classPolicy.mode',
+          labelPosition: 'settings',
+          separator: 'subtle',
+          label: 'Class restrictions',
+          width: 'full',
+          options: speciesClassPolicyModeOptions,
+          required: true,
+          defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
+          hint: 'Choose which classes this species may multiclass into.',
+        },
+        {
+          type: 'combobox',
+          name: 'classPolicy.classIds',
+          label: 'Classes',
+          multiple: true,
+          options: ctx.options?.classes ?? [],
+          placeholder: 'Choose classes…',
+          required: true,
+        },
+      ],
     },
   ]
 }
@@ -137,7 +144,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'stack',
-      layout: 'toggleDependent',
+      layout: 'dependent',
       dependentsChrome: 'subtle',
       fields: [
         {
@@ -164,7 +171,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'stack',
-      layout: 'toggleDependent',
+      layout: 'dependent',
       dependentsChrome: 'subtle',
       dependentsChromeScope: 'arrayItems',
       fields: [

@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { useWatch } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
 import {
@@ -18,14 +17,15 @@ import {
 } from '../context/form-section.context'
 import {
   isContainer,
+  resolveDependentsVisibility,
+  type FieldVisibility,
   type FormItem,
   type GroupFieldItem,
   type RowConfig,
   type StackConfig,
-  type SwitchFieldConfig,
 } from '../field-config'
 import { buildFieldControlId, FieldNode, useVisibilityValues } from './form-conditional.client'
-import { isLeafSwitch } from './form-group-section.client'
+import { isLeafController } from './form-group-section.client'
 
 export interface RenderNestedFormItemsProps {
   items: Array<FormItem | RowConfig>
@@ -44,7 +44,7 @@ interface StackSectionProps {
   renderNestedItems: RenderNestedFormItems
 }
 
-/** Layout-only stack; toggle-dependent preset splits the switch from indented dependents. */
+/** Layout-only stack; dependent preset splits the controller from indented dependents. */
 export function StackSection({
   item,
   idPrefix,
@@ -60,7 +60,7 @@ export function StackSection({
   )
   const layout = item.layout ?? 'default'
 
-  if (layout !== 'toggleDependent') {
+  if (layout !== 'dependent') {
     return (
       <div data-field-stack="" className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}>
         <FormSectionContext.Provider value={childContext}>
@@ -75,10 +75,11 @@ export function StackSection({
     )
   }
 
-  const [first, ...dependents] = item.fields
-  const toggleSwitch = first && isLeafSwitch(first) ? first : null
-  const groupLabelledBy = toggleSwitch
-    ? buildFieldControlId(idPrefix, namePrefix, toggleSwitch.name)
+  const [controllerField, ...dependents] = item.fields
+  const controller = controllerField && isLeafController(controllerField) ? controllerField : null
+  const dependentsVisibility = resolveDependentsVisibility(item, controllerField)
+  const groupLabelledBy = controller
+    ? buildFieldControlId(idPrefix, namePrefix, controller.name)
     : undefined
 
   return (
@@ -89,20 +90,20 @@ export function StackSection({
       className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
     >
       <FormSectionContext.Provider value={childContext}>
-        {first ? (
-          isContainer(first) ? (
+        {controllerField ? (
+          isContainer(controllerField) ? (
             renderNestedItems({
-              items: [first],
+              items: [controllerField],
               idPrefix,
               namePrefix,
               depth: depth + 1,
             })
           ) : (
-            <FieldNode config={first} idPrefix={idPrefix} namePrefix={namePrefix} />
+            <FieldNode config={controllerField} idPrefix={idPrefix} namePrefix={namePrefix} />
           )
         ) : null}
         <StackDependentsRegion
-          toggleSwitch={toggleSwitch}
+          dependentsVisibility={dependentsVisibility}
           dependentsChrome={item.dependentsChrome}
           dependentsChromeScope={item.dependentsChromeScope}
           rhythm={rhythm}
@@ -119,7 +120,7 @@ export function StackSection({
 }
 
 interface StackDependentsRegionProps {
-  toggleSwitch: SwitchFieldConfig | null
+  dependentsVisibility: FieldVisibility | null
   dependentsChrome?: StackConfig['dependentsChrome']
   dependentsChromeScope?: StackConfig['dependentsChromeScope']
   rhythm: FieldStackRhythm
@@ -131,9 +132,33 @@ interface StackDependentsRegionProps {
   renderNestedItems: RenderNestedFormItems
 }
 
-/** Indented dependents region with optional chrome; hidden while the gate switch is off. */
-function StackDependentsRegion({
-  toggleSwitch,
+/** Indented dependents region with optional chrome; hidden when the visibility gate is false. */
+function StackDependentsRegion(props: StackDependentsRegionProps) {
+  if (props.dependents.length === 0) return null
+  const { dependentsVisibility, ...contentProps } = props
+  if (dependentsVisibility) {
+    return (
+      <GatedStackDependentsRegion
+        {...contentProps}
+        dependentsVisibility={dependentsVisibility}
+      />
+    )
+  }
+  return <StackDependentsRegionContent {...props} />
+}
+
+function GatedStackDependentsRegion({
+  dependentsVisibility,
+  ...props
+}: Omit<StackDependentsRegionProps, 'dependentsVisibility'> & {
+  dependentsVisibility: FieldVisibility
+}) {
+  const values = useVisibilityValues(dependentsVisibility, props.namePrefix)
+  if (!dependentsVisibility.visibleWhen(values)) return null
+  return <StackDependentsRegionContent {...props} dependentsVisibility={dependentsVisibility} />
+}
+
+function StackDependentsRegionContent({
   dependentsChrome,
   dependentsChromeScope = 'wrapper',
   rhythm,
@@ -144,16 +169,6 @@ function StackDependentsRegion({
   depth,
   renderNestedItems,
 }: StackDependentsRegionProps) {
-  const switchFieldName = toggleSwitch
-    ? namePrefix
-      ? `${namePrefix}.${toggleSwitch.name}`
-      : toggleSwitch.name
-    : ''
-  const switchOn = useWatch({
-    name: switchFieldName,
-    disabled: !toggleSwitch,
-  })
-
   const useArrayItemScope = Boolean(
     dependentsChrome && dependentsChromeScope === 'arrayItems',
   )
@@ -164,9 +179,6 @@ function StackDependentsRegion({
         : null,
     [useArrayItemScope, parentContext, dependentsChrome],
   )
-
-  if (dependents.length === 0) return null
-  if (toggleSwitch && !switchOn) return null
 
   const dependentsContent = renderNestedItems({
     items: dependents,

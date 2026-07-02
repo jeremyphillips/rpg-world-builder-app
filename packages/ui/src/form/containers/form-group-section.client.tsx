@@ -9,7 +9,7 @@ import {
   buildFormSectionChildContext,
   useFormSectionContext,
 } from '../context/form-section.context'
-import type { GroupConfig, GroupFieldItem, SwitchFieldConfig } from '../field-config'
+import type { GroupConfig, GroupFieldItem, SelectFieldConfig, SwitchFieldConfig } from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
 import type { RenderNestedFormItems } from './form-stack-section.client'
 
@@ -89,4 +89,11 @@ export function ConditionalGroup({
 
 export function isLeafSwitch(item: GroupFieldItem): item is SwitchFieldConfig {
   return !('kind' in item) && item.type === 'switch'
+}
+
+/** Leaf switch or select — used for dependent-stack `aria-labelledby`. */
+export function isLeafController(
+  item: GroupFieldItem,
+): item is SwitchFieldConfig | SelectFieldConfig {
+  return !('kind' in item) && (item.type === 'switch' || item.type === 'select')
 }

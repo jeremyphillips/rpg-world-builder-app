@@ -110,7 +110,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   const levelDigits = levelSelectDigits(ctx)
   const stack: StackConfig = {
     kind: 'stack',
-    layout: 'toggleDependent',
+    layout: 'dependent',
     dependentsChrome: 'subtle',
     rhythm: 'comfortable',
     fields: [

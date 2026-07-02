@@ -105,7 +105,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
   })
 
-  it('omits section bottom margin and empty legends for nested arrays in toggleDependent stacks', async () => {
+  it('omits section bottom margin and empty legends for nested arrays in dependent stacks', async () => {
     const user = userEvent.setup()
     const nestedSchema = z.object({
       enabled: z.boolean(),
@@ -115,7 +115,7 @@ describe('ArrayFieldRenderer', () => {
     const nestedFields: FormItem[] = [
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         dependentsChromeScope: 'arrayItems',
         fields: [

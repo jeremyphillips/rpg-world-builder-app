@@ -18,7 +18,7 @@ type Values = z.infer<typeof schema>
 const fields: FormItem[] = [
   {
     kind: 'stack',
-    layout: 'toggleDependent',
+    layout: 'dependent',
     dependentsChrome: 'subtle',
     fields: [
       {

@@ -41,12 +41,15 @@ Side-by-side leaf fields. `layout`: `flex` (default) or `responsive-2/3/4`. Row-
 
 ## Stacks
 
-Layout-only — one slot in outer rhythm, no fieldset. Use `layout: 'toggleDependent'` when a
-switch gates dependents:
+Layout-only — one slot in outer rhythm, no fieldset. Use `layout: 'dependent'` when a
+controller field gates indented dependents:
 
-- Field `[0]` (switch) renders outside chrome.
-- Dependents indent (`pl-11`) to align with switch label column.
-- Dependents hidden when switch off — no empty inset.
+- Field `[0]` (controller) — switch, select, etc. — always visible.
+- Fields `[1..]` (dependents) indent (`pl-11`) to align with the controller label column.
+- Dependents hidden when the gate predicate is false — no empty inset.
+- `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
+  to "switch is true". For select/other controllers, pass an explicit predicate for hide
+  behavior; omit for indent/chrome only (dependents always shown).
 - Optional `dependentsChrome`: `subtle` | `warning` | `error`.
 - Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
   - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
@@ -59,7 +62,7 @@ Pair dependent scalars with `labelPosition: 'settings'`.
 ```ts
 {
   kind: 'stack',
-  layout: 'toggleDependent',
+  layout: 'dependent',
   dependentsChrome: 'subtle',
   fields: [
     { type: 'switch', name: 'enabled', label: 'Primary ability minimum', hint: '…' },
@@ -68,18 +71,41 @@ Pair dependent scalars with `labelPosition: 'settings'`.
       name: 'score',
       label: 'Minimum ability score',
       labelPosition: 'settings',
-      visibility: visibleWhenEnabled(),
     },
   ],
 }
 ```
 
-Toggle-dependent stack with an array dependent — use `arrayItems` scope:
+Select controller with explicit gate (species class-policy pattern):
 
 ```ts
 {
   kind: 'stack',
-  layout: 'toggleDependent',
+  layout: 'dependent',
+  dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
+  dependentsChrome: 'subtle',
+  fields: [
+    {
+      type: 'select',
+      name: 'classPolicy.mode',
+      label: 'Class restrictions',
+      labelPosition: 'settings',
+    },
+    {
+      type: 'combobox',
+      name: 'classPolicy.classIds',
+      label: 'Classes',
+    },
+  ],
+}
+```
+
+Dependent stack with an array dependent — use `arrayItems` scope:
+
+```ts
+{
+  kind: 'stack',
+  layout: 'dependent',
   dependentsChrome: 'subtle',
   dependentsChromeScope: 'arrayItems',
   fields: [
@@ -126,7 +152,7 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
 ```
 
 **Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
-`toggleDependent` dependents). Empty legends are not rendered — no phantom spacing.
+`dependent` stack dependents). Empty legends are not rendered — no phantom spacing.
 
 **Section margin:** Top-level array fieldsets use `mb-8`. Nested arrays (inside stacks,
 groups, or array items) omit it so parent `fieldStackRhythmVariants` gap controls spacing.

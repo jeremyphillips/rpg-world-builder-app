@@ -111,7 +111,7 @@ export function buildStartingWealthTiersField(): FormItem {
       },
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         fields: [
           {

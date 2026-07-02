@@ -252,8 +252,8 @@ export const fieldLabelVariants = cva(
 
 export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVariants>['placement']>
 
-/** Layout preset for toggle-dependent stacks. */
-export type FieldStackLayout = 'default' | 'toggleDependent'
+/** Layout preset for controller + dependent field stacks. */
+export type FieldStackLayout = 'default' | 'dependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 

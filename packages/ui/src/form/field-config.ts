@@ -541,10 +541,15 @@ export type GroupFieldItem =
   | StackConfig
   | ArrayConfig
 
-/** Layout-only container for toggle + dependent fields (no fieldset legend). */
+/** Layout-only container for controller + dependent fields (no fieldset legend). */
 export interface StackConfig {
   kind: 'stack'
   layout?: FieldStackLayout
+  /**
+   * Gates fields [1..]: when false, dependents unmount and values clear.
+   * When omitted and fields[0] is a switch, defaults to "switch is true".
+   */
+  dependentsVisibility?: FieldVisibility
   /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
   dependentsChrome?: FieldStackDependentsTone
   /**
@@ -895,6 +900,26 @@ export function applyOptionAvailabilityToFieldOptions(
     ...option,
     disabled: Boolean(option.disabled) || !availability.enabledWhen(values, option.value),
   }))
+}
+
+/**
+ * Resolves the visibility gate for dependent stack fields [1..].
+ * Switch controllers auto-gate on truthy when `dependentsVisibility` is omitted.
+ */
+export function resolveDependentsVisibility(
+  stack: Pick<StackConfig, 'dependentsVisibility'>,
+  controller: GroupFieldItem | undefined,
+): FieldVisibility | null {
+  if (stack.dependentsVisibility) {
+    return stack.dependentsVisibility
+  }
+  if (controller && !('kind' in controller) && controller.type === 'switch') {
+    return {
+      dependsOn: [controller.name],
+      visibleWhen: (values) => values[controller.name] === true,
+    }
+  }
+  return null
 }
 
 /** Applies `optionAvailability` to select options, including grouped sections. */

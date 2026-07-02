@@ -45,6 +45,7 @@ export {
   isContainer,
   toOptions,
   combineFieldVisibility,
+  resolveDependentsVisibility,
   resolveFieldHint,
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
