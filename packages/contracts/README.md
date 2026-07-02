@@ -13,6 +13,7 @@ Source lives under `src/shared/`, `src/rpg/`, and isolated `dev-bench/`:
 
 | Layer      | Path                  | Purpose                                               |
 | ---------- | --------------------- | ----------------------------------------------------- |
+| Validation | `src/validation/`     | `defineMessage` + global validation message catalog   |
 | Shared     | `src/shared/`         | Auth, users, roles, routes, uploads, errors, assets   |
 | Vocabulary | `src/rpg/vocab/`      | Closed-set game terms + open vocabulary set ids       |
 | Primitives | `src/rpg/primitives/` | Shared value types (levels, dice, units, ruleset id)  |
@@ -26,6 +27,9 @@ Dependency rules, ESLint enforcement, and where to put new modules →
 Campaign ruleset test conventions (fixtures, matrices, naming) →
 [docs/testing.md](docs/testing.md).
 
+Validation message architecture (tiers, `defineMessage`, naming, copy style) →
+[docs/validation-messages.md](docs/validation-messages.md).
+
 ## Subpath exports
 
 The root import remains the default public API. Layer subpaths are available
@@ -34,6 +38,7 @@ when you want an explicit boundary in the import path:
 | Import                        | Entry                         |
 | ----------------------------- | ----------------------------- |
 | `@rpg/contracts`              | `src/index.ts` (shared + rpg) |
+| `@rpg/contracts/validation`   | `src/validation/index.ts`     |
 | `@rpg/contracts/shared`       | `src/shared/index.ts`         |
 | `@rpg/contracts/vocab`        | `src/rpg/vocab/index.ts`      |
 | `@rpg/contracts/primitives`   | `src/rpg/primitives/index.ts` |

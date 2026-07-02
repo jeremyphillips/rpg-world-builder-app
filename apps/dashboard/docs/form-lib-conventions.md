@@ -28,8 +28,22 @@ cap coverage) belong in the **parent** schema's `superRefine` — e.g.
 Do not duplicate those checks on row schemas or in `FormItem` config.
 
 Row schemas keep only field-local refines (bonus-gold operator, required
-sub-fields). Shared user-facing messages live in contracts (`level.ts`,
-`level-range-table.ts`) so form and API copy stay aligned.
+sub-fields).
+
+### Validation messages
+
+Three tiers — see
+[packages/contracts/docs/validation-messages.md](../../../packages/contracts/docs/validation-messages.md):
+
+- **Global defaults** come for free: leave schemas message-free
+  (`z.number().min(1)`) and the form resolver formats the issue with the
+  field's `label` (`Level must be at least 1.`).
+- **Shared domain rules** use contracts catalogs (`levelValidationMessages`,
+  `xpProgressionValidationMessages`) so form and API copy stay aligned.
+- **Form-specific rules** define a `<scope>ValidationMessages` catalog with
+  `defineMessage` from `@rpg/contracts` next to the form schema (e.g.
+  `startingWealthValidationMessages` in `starting-wealth-form-fields.ts`) —
+  never inline message literals, and assert tests through the catalog.
 
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses

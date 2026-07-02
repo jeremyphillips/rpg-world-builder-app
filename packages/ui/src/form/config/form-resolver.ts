@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
 import { hiddenFieldNames, type FormItem } from '../field-config'
+import { makeFieldErrorMap } from './field-error-map'
 
 /**
  * A schema as duck-typed for the hidden-field omission below. We avoid
@@ -49,16 +50,24 @@ function omitHidden(schema: ZodType, hidden: string[]): ZodType {
   return obj.omit(mask)
 }
 
-/** Builds the RHF resolver that treats currently-hidden fields as optional. */
+/**
+ * Builds the RHF resolver that treats currently-hidden fields as optional and
+ * formats default Zod issues into shared boilerplate copy using field labels
+ * (custom `.refine` / `.superRefine` messages pass through untouched).
+ */
 export function makeResolver<TFieldValues extends FieldValues>(
   schema: ZodType,
   items: FormItem[],
 ): Resolver<TFieldValues> {
+  const errorMap = makeFieldErrorMap(items)
+
   return (values, context, options) => {
     const hidden = hiddenFieldNames(items, values as Record<string, unknown>)
     // `zodResolver` over-constrains the schema's input type; the runtime schema
-    // is correct, so widen the argument at this one boundary.
-    const resolver = zodResolver(omitHidden(schema, hidden) as never) as Resolver<TFieldValues>
+    // is correct, so widen the arguments at this one boundary.
+    const resolver = zodResolver(omitHidden(schema, hidden) as never, {
+      error: errorMap,
+    }) as unknown as Resolver<TFieldValues>
     return resolver(values, context, options)
   }
 }

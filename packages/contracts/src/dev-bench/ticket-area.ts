@@ -14,4 +14,13 @@ export const TICKET_AREA_SUGGESTIONS = [
   'combat',
   'content',
   'devops',
+  'forms',
+  'security',
+  'documentation',
+  'testing',
+  'performance',
+  'scalability',
+  'security',
+  'documentation',
+  'testing',
 ] as const satisfies readonly TicketArea[]

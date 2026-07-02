@@ -8,7 +8,10 @@ import {
   formatStartingWealthTierSummary,
   mapStartingWealthToFormValues,
 } from './starting-wealth-form-values'
-import { startingWealthFormSchema } from './starting-wealth-form-fields'
+import {
+  startingWealthFormSchema,
+  startingWealthValidationMessages,
+} from './starting-wealth-form-fields'
 
 const SEED = getStandardStartingWealthRules('srd-cc-5.2.1')
 const configRulesSchema = buildRulesSchemaForSurface('config')
@@ -185,7 +188,7 @@ describe('startingWealthFormSchema', () => {
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({
-          message: 'Bonus gold details are required when bonus gold is enabled',
+          message: startingWealthValidationMessages.bonusGoldRequired(),
           path: ['tiers', 0, 'bonusGold'],
         }),
       )

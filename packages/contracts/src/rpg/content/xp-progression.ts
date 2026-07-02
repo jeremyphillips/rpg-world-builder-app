@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { defineMessage } from '../../validation/define-message'
 import { absoluteLevelSchema } from '../primitives/level'
 import {
   contentBodyBaseSchema,
@@ -41,6 +42,23 @@ export const xpProgressionScopeSchema = z.discriminatedUnion('kind', [
 
 export type XpProgressionScope = z.infer<typeof xpProgressionScopeSchema>
 
+/** XP progression validation messages (tier 2 domain catalog). */
+export const xpProgressionValidationMessages = {
+  /** Entry rows must run 1, 2, 3, … — `expected` is the level the row should hold. */
+  contiguousLevels: defineMessage<{ expected: number }>(
+    'validation.xpProgression.contiguousLevels',
+    ({ expected }) => `Levels must be contiguous from level 1; expected level ${expected}.`,
+  ),
+  levelOneZeroXp: defineMessage(
+    'validation.xpProgression.levelOneZeroXp',
+    () => 'Level 1 must require 0 XP.',
+  ),
+  increasingXp: defineMessage(
+    'validation.xpProgression.increasingXp',
+    () => 'XP required must increase with each level.',
+  ),
+}
+
 export const xpProgressionEntrySchema = z.object({
   level: absoluteLevelSchema,
   xpRequired: z.number().int().min(0),
@@ -58,7 +76,7 @@ export const xpProgressionEntriesSchema = z
       if (entry.level !== expectedLevel) {
         ctx.addIssue({
           code: 'custom',
-          message: `XP progression entries must be contiguous from level 1; expected level ${expectedLevel}`,
+          message: xpProgressionValidationMessages.contiguousLevels({ expected: expectedLevel }),
           path: [index, 'level'],
         })
       }
@@ -66,7 +84,7 @@ export const xpProgressionEntriesSchema = z
       if (index === 0 && entry.xpRequired !== 0) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Level 1 must require 0 XP',
+          message: xpProgressionValidationMessages.levelOneZeroXp(),
           path: [index, 'xpRequired'],
         })
       }
@@ -75,7 +93,7 @@ export const xpProgressionEntriesSchema = z
       if (previousEntry !== undefined && entry.xpRequired <= previousEntry.xpRequired) {
         ctx.addIssue({
           code: 'custom',
-          message: 'XP required must increase with each level',
+          message: xpProgressionValidationMessages.increasingXp(),
           path: [index, 'xpRequired'],
         })
       }
