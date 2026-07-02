@@ -348,7 +348,7 @@ const fieldRenderers: {
       chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
-      value={field.value ?? (config.multiple === false ? '' : [])}
+      value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
       onBlur={field.onBlur}
     />
@@ -390,7 +390,7 @@ const fieldRenderers: {
       width={config.width}
       size={config.size}
       disabled={config.disabled}
-      value={field.value ?? (config.multiple === false ? '' : [])}
+      value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}

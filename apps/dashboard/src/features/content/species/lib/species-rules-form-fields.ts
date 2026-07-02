@@ -116,6 +116,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'stack',
       layout: 'dependent',
+      separator: 'subtle',
       dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
       dependentsChrome: 'subtle',
       fields: [
@@ -123,7 +124,6 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
           type: 'select',
           name: 'classPolicy.mode',
           labelPosition: 'settings',
-          separator: 'subtle',
           label: 'Class restrictions',
           width: 'full',
           options: speciesClassPolicyModeOptions,
@@ -177,6 +177,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'stack',
       layout: 'dependent',
+      separator: 'subtle',
       dependentsChrome: 'subtle',
       fields: [
         {
@@ -186,7 +187,6 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
           hint: 'Caps the total character level for characters using this species. Leave off to use the campaign maximum.',
           defaultValue: false,
           labelPosition: 'settings',
-          separator: 'subtle',
         },
         {
           type: 'select',

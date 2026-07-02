@@ -45,7 +45,11 @@ describe('multiclassingPolicyFields', () => {
       }),
     )
     const stack = expectStack(fields[1])
-    expect(stack).toMatchObject({ kind: 'stack', layout: 'dependent' })
+    expect(stack).toMatchObject({
+      kind: 'stack',
+      layout: 'dependent',
+      separator: 'subtle',
+    })
     expect(stack.fields[0]).toEqual(
       expect.objectContaining({
         name: 'classPolicy.mode',
@@ -80,7 +84,11 @@ describe('speciesLevelLimitsFields', () => {
       campaignRules: { ...defaultCampaignRules(), maxCharacterLevel: campaignMax },
     })
     const stack = expectStack(fields[0])
-    expect(stack).toMatchObject({ kind: 'stack', layout: 'dependent' })
+    expect(stack).toMatchObject({
+      kind: 'stack',
+      layout: 'dependent',
+      separator: 'subtle',
+    })
     expect(stack.fields[1]).toEqual(
       expect.objectContaining({
         name: 'maxCharacterLevel',
@@ -119,7 +127,11 @@ describe('mergeCharacterCreationFormDefaults', () => {
       policy: DEFAULT_SPECIES_MULTICLASS_POLICY,
       classPolicy: { mode: DEFAULT_SPECIES_CLASS_POLICY_MODE, classIds: [] },
     })
-    expect(mergeMulticlassingFormDefaults({ classPolicy: { mode: 'only', classIds: ['fighter'] } } as never)).toEqual({
+    expect(
+      mergeMulticlassingFormDefaults({
+        classPolicy: { mode: 'only', classIds: ['fighter'] },
+      } as never),
+    ).toEqual({
       policy: DEFAULT_SPECIES_MULTICLASS_POLICY,
       classPolicy: { mode: 'only', classIds: ['fighter'] },
     })

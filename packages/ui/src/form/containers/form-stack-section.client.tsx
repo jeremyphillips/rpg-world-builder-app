@@ -24,7 +24,12 @@ import {
   type RowConfig,
   type StackConfig,
 } from '../field-config'
-import { buildFieldControlId, FieldNode, useVisibilityValues } from './form-conditional.client'
+import {
+  buildFieldControlId,
+  FieldNode,
+  useVisibilityValues,
+  withFieldSeparator,
+} from './form-conditional.client'
 import { isLeafController } from './form-group-section.client'
 
 export interface RenderNestedFormItemsProps {
@@ -59,9 +64,10 @@ export function StackSection({
     [parentContext, depth, rhythm],
   )
   const layout = item.layout ?? 'default'
+  let stackBody: React.ReactNode
 
   if (layout !== 'dependent') {
-    return (
+    stackBody = (
       <div data-field-stack="" className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}>
         <FormSectionContext.Provider value={childContext}>
           {renderNestedItems({
@@ -73,50 +79,52 @@ export function StackSection({
         </FormSectionContext.Provider>
       </div>
     )
+  } else {
+    const [controllerField, ...dependents] = item.fields
+    const controller = controllerField && isLeafController(controllerField) ? controllerField : null
+    const dependentsVisibility = resolveDependentsVisibility(item, controllerField)
+    const groupLabelledBy = controller
+      ? buildFieldControlId(idPrefix, namePrefix, controller.name)
+      : undefined
+
+    stackBody = (
+      <div
+        data-field-stack=""
+        role={groupLabelledBy ? 'group' : undefined}
+        aria-labelledby={groupLabelledBy}
+        className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
+      >
+        <FormSectionContext.Provider value={childContext}>
+          {controllerField ? (
+            isContainer(controllerField) ? (
+              renderNestedItems({
+                items: [controllerField],
+                idPrefix,
+                namePrefix,
+                depth: depth + 1,
+              })
+            ) : (
+              <FieldNode config={controllerField} idPrefix={idPrefix} namePrefix={namePrefix} />
+            )
+          ) : null}
+          <StackDependentsRegion
+            dependentsVisibility={dependentsVisibility}
+            dependentsChrome={item.dependentsChrome}
+            dependentsChromeScope={item.dependentsChromeScope}
+            rhythm={rhythm}
+            parentContext={childContext}
+            dependents={dependents}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+            depth={depth}
+            renderNestedItems={renderNestedItems}
+          />
+        </FormSectionContext.Provider>
+      </div>
+    )
   }
 
-  const [controllerField, ...dependents] = item.fields
-  const controller = controllerField && isLeafController(controllerField) ? controllerField : null
-  const dependentsVisibility = resolveDependentsVisibility(item, controllerField)
-  const groupLabelledBy = controller
-    ? buildFieldControlId(idPrefix, namePrefix, controller.name)
-    : undefined
-
-  return (
-    <div
-      data-field-stack=""
-      role={groupLabelledBy ? 'group' : undefined}
-      aria-labelledby={groupLabelledBy}
-      className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
-    >
-      <FormSectionContext.Provider value={childContext}>
-        {controllerField ? (
-          isContainer(controllerField) ? (
-            renderNestedItems({
-              items: [controllerField],
-              idPrefix,
-              namePrefix,
-              depth: depth + 1,
-            })
-          ) : (
-            <FieldNode config={controllerField} idPrefix={idPrefix} namePrefix={namePrefix} />
-          )
-        ) : null}
-        <StackDependentsRegion
-          dependentsVisibility={dependentsVisibility}
-          dependentsChrome={item.dependentsChrome}
-          dependentsChromeScope={item.dependentsChromeScope}
-          rhythm={rhythm}
-          parentContext={childContext}
-          dependents={dependents}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-          depth={depth}
-          renderNestedItems={renderNestedItems}
-        />
-      </FormSectionContext.Provider>
-    </div>
-  )
+  return withFieldSeparator(item.separator, stackBody)
 }
 
 interface StackDependentsRegionProps {
@@ -138,10 +146,7 @@ function StackDependentsRegion(props: StackDependentsRegionProps) {
   const { dependentsVisibility, ...contentProps } = props
   if (dependentsVisibility) {
     return (
-      <GatedStackDependentsRegion
-        {...contentProps}
-        dependentsVisibility={dependentsVisibility}
-      />
+      <GatedStackDependentsRegion {...contentProps} dependentsVisibility={dependentsVisibility} />
     )
   }
   return <StackDependentsRegionContent {...props} />
@@ -168,10 +173,8 @@ function StackDependentsRegionContent({
   namePrefix,
   depth,
   renderNestedItems,
-}: StackDependentsRegionProps) {
-  const useArrayItemScope = Boolean(
-    dependentsChrome && dependentsChromeScope === 'arrayItems',
-  )
+}: Omit<StackDependentsRegionProps, 'dependentsVisibility'>) {
+  const useArrayItemScope = Boolean(dependentsChrome && dependentsChromeScope === 'arrayItems')
   const arrayItemContext = React.useMemo(
     () =>
       useArrayItemScope && dependentsChrome

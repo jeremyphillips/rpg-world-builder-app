@@ -110,6 +110,7 @@ const selectDependentStackFields: FormItem[] = [
   {
     kind: 'stack',
     layout: 'dependent',
+    separator: 'subtle',
     dependentsVisibility: {
       dependsOn: ['classPolicyMode'],
       visibleWhen: (values) => values.classPolicyMode !== 'all',
@@ -121,7 +122,6 @@ const selectDependentStackFields: FormItem[] = [
         name: 'classPolicyMode',
         label: 'Class restrictions',
         labelPosition: 'settings',
-        separator: 'subtle',
         options: [
           { label: 'All classes', value: 'all' },
           { label: 'Only listed classes', value: 'only' },

@@ -82,6 +82,7 @@ Select controller with explicit gate (species class-policy pattern):
 {
   kind: 'stack',
   layout: 'dependent',
+  separator: 'subtle',
   dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
   dependentsChrome: 'subtle',
   fields: [
@@ -123,7 +124,10 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ## Field separators
 
-`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-4` before next sibling.
+`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-4` before the next sibling.
+On a `stack` → trailing divider after the whole stack (controller + dependents region).
+Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
+controller field.
 Token: `fieldSeparatorVariants`. Do not use row `className` for recurring dividers.
 
 ## Array fields

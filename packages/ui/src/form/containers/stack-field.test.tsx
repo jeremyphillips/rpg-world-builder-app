@@ -319,4 +319,113 @@ describe('dependent stack', () => {
     const stack = visible.container.querySelector('[data-field-stack][role="group"]')
     expect(stack).toHaveAttribute('aria-labelledby', expect.stringContaining('mode'))
   })
+
+  it('applies stack separator after the full dependent grouping', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        separator: 'subtle',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'only',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [{ label: 'Fighter', value: 'fighter' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'only', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('border-b', 'border-border', 'pb-4')
+    expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
+    expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
+    expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)
+  })
+
+  it('keeps stack separator when dependents are gated off', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        separator: 'subtle',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'all',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [{ label: 'Fighter', value: 'fighter' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'all', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
+    expect(queryDependentsRegion(container)).toBeNull()
+  })
 })

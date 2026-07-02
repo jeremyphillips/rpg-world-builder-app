@@ -564,6 +564,8 @@ export interface StackConfig {
   rhythm?: FieldStackRhythm
   fields: GroupFieldItem[]
   visibility?: FieldVisibility
+  /** Trailing divider after this stack (controller + dependents) within parent rhythm. */
+  separator?: FieldSeparator
   className?: string
 }
 
@@ -816,7 +818,12 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   if (explicit !== undefined) return explicit
   if (field.type === 'chips' || field.type === 'combobox') {
     const multiField = field as ChipsFieldConfig | ComboboxFieldConfig
-    return multiField.multiple === false ? '' : []
+    if (multiField.multiple === false) {
+      // Optional single-select controls use `undefined` (not `''`) so optional
+      // Zod enums validate; required fields keep the empty-string sentinel.
+      return field.required ? '' : undefined
+    }
+    return []
   }
   if (field.type === 'editableGrid') {
     const gridField = field as EditableGridFieldConfig
