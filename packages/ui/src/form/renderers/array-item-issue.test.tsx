@@ -27,6 +27,7 @@ describe('array-item-issue', () => {
     render(
       <ArrayItemIssueSummary
         placement="compactSummary"
+        summaryId="grant-0-summary"
         group={{
           totalCount: 2,
           sortedIssues: [],
@@ -36,7 +37,10 @@ describe('array-item-issue', () => {
       />,
     )
 
-    expect(screen.getByText('Missing Rarity · Missing Quantity')).toBeInTheDocument()
+    const summary = screen.getByRole('alert')
+    expect(summary).toHaveAttribute('id', 'grant-0-summary')
+    expect(summary).toHaveAttribute('aria-live', 'polite')
+    expect(summary).toHaveTextContent('Missing Rarity · Missing Quantity')
   })
 
   it('formats legend issue labels', () => {

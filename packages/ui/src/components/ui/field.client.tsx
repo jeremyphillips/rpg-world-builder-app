@@ -51,6 +51,13 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   required?: boolean
   /** Field-level validation message; presence drives the error state + aria. */
   error?: string
+  /**
+   * When set, drives invalid chrome and `aria-invalid` even when `error` is
+   * omitted (e.g. row-level error placement suppresses visible error text).
+   */
+  invalid?: boolean
+  /** Overrides the auto-computed `aria-describedby` for the control. */
+  describedBy?: string
   /** Helper text shown when there is no error. */
   hint?: string
 }
@@ -64,6 +71,8 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       width = 'full',
       required = false,
       error,
+      invalid,
+      describedBy: describedByOverride,
       hint,
       className,
       children,
@@ -75,9 +84,10 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const controlId = id ?? generatedId
     const hintId = `${controlId}-hint`
     const errorId = `${controlId}-error`
-    const hasError = Boolean(error)
+    const hasError = invalid ?? Boolean(error)
     const hasHint = Boolean(hint)
-    const describedBy = hasError ? errorId : hasHint ? hintId : undefined
+    const autoDescribedBy = hasError ? errorId : hasHint ? hintId : undefined
+    const describedBy = describedByOverride ?? autoDescribedBy
 
     const value = React.useMemo<FieldContextValue>(
       () => ({
@@ -247,9 +257,11 @@ export type FieldErrorProps = React.HTMLAttributes<HTMLParagraphElement>
 function FieldError({ className, children, ...props }: FieldErrorProps) {
   const { errorId, hasError, error, size } = useFieldContext('Field.Error')
   if (!hasError) return null
+  const message = children ?? error
+  if (message == null || message === '') return null
   return (
     <FieldErrorText id={errorId} size={size} className={className} {...props}>
-      {children ?? error ?? ''}
+      {message}
     </FieldErrorText>
   )
 }

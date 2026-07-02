@@ -33,6 +33,10 @@ import {
 import { cn } from '../../lib/utils'
 import { ArrayFieldContext } from '../context/array-field.context'
 import {
+  ArrayItemPresentationContext,
+  resolveErrorPlacement,
+} from '../context/array-item-presentation.context'
+import {
   FormSectionContext,
   useFormSectionContext,
   type FormSectionContextValue,
@@ -178,17 +182,22 @@ function ArrayFieldItemContent({
     ],
   )
 
+  const rowSummaryId = `${idPrefix}-${itemPrefix.replaceAll('.', '-')}-summary`
+  const suppressFieldErrorText = resolveErrorPlacement(config.errorPlacement, variant, false)
+
   const fieldsNode = (
-    <ArrayFieldContext.Provider value={arrayContext}>
-      <div className={itemBodyStackClasses}>
-        <NestedFormItems
-          items={config.fields}
-          idPrefix={idPrefix}
-          namePrefix={itemPrefix}
-          depth={1}
-        />
-      </div>
-    </ArrayFieldContext.Provider>
+    <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
+      <ArrayFieldContext.Provider value={arrayContext}>
+        <div className={itemBodyStackClasses}>
+          <NestedFormItems
+            items={config.fields}
+            idPrefix={idPrefix}
+            namePrefix={itemPrefix}
+            depth={1}
+          />
+        </div>
+      </ArrayFieldContext.Provider>
+    </ArrayItemPresentationContext.Provider>
   )
 
   const header = resolveArrayItemHeaderLabels(
@@ -257,6 +266,7 @@ function ArrayFieldItemContent({
       return {
         group: issueGroup,
         placement: 'compactSummary' as const,
+        summaryId: rowSummaryId,
       }
     }
 

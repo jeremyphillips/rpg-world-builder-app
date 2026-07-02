@@ -15,6 +15,8 @@ export interface FormFieldProps {
   id: string
   label: string
   error?: string
+  invalid?: boolean
+  describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
   /** Optional info-icon content rendered as an `[i]` tooltip beside the label. */
@@ -43,6 +45,8 @@ export function FormField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -54,7 +58,16 @@ export function FormField({
 }: FormFieldProps) {
   if (labelPosition === 'settings') {
     return (
-      <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+      <Field.Root
+        id={id}
+        error={error}
+        invalid={invalid}
+        describedBy={describedBy}
+        hint={hint}
+        required={required}
+        size={size}
+        width={width}
+      >
         <div className={fieldSettingsRowClasses}>
           <div className={fieldLabelHintStackClasses}>
             {labelNode(label, info)}
@@ -68,12 +81,17 @@ export function FormField({
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
-      <FieldLayout
-        hintPosition={hintPosition}
-        label={labelNode(label, info)}
-        control={children}
-      />
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      size={size}
+      width={width}
+    >
+      <FieldLayout hintPosition={hintPosition} label={labelNode(label, info)} control={children} />
     </Field.Root>
   )
 }

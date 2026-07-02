@@ -21,6 +21,7 @@ import { FieldLabelContent } from './field-label-content'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
+import { fieldHasValidationError, resolveFieldDescribedBy } from './field-validation-props'
 import { chipPillVariants, type ChipSize } from './chips-field.variants'
 
 interface ChipOptionButtonProps {
@@ -172,6 +173,8 @@ export function ChipsField({
   onChange,
   onBlur,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition = 'below-label',
   info,
@@ -185,13 +188,21 @@ export function ChipsField({
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
-  const describedBy = error ? errorId : hint ? hintId : undefined
+  const hasError = fieldHasValidationError(error, invalid)
+  const resolvedDescribedBy = resolveFieldDescribedBy(
+    error,
+    invalid,
+    hint,
+    describedBy,
+    errorId,
+    hintId,
+  )
 
   return (
     <fieldset
       id={id}
-      aria-describedby={describedBy}
-      aria-invalid={error ? true : undefined}
+      aria-describedby={resolvedDescribedBy}
+      aria-invalid={hasError || undefined}
       disabled={disabled}
       className={cn(
         fieldSetResetClasses,

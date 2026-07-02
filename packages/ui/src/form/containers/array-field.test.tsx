@@ -820,4 +820,53 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({ 'index:0': 'closed' })
   })
+
+  it('suppresses per-field error text on compact rows and surfaces a row summary', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(
+        z.object({
+          rarity: z.string().min(1, 'Choose a rarity.'),
+          quantity: z.string().min(1, 'Quantity is required.'),
+        }),
+      ),
+    })
+
+    const compactGrantFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        itemVariant: 'compact',
+        fields: [
+          { type: 'text', name: 'rarity', label: 'Rarity', required: true },
+          { type: 'text', name: 'quantity', label: 'Quantity', required: true },
+        ],
+        addLabel: 'Add grant',
+        min: 1,
+        itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={compactGrantFields}
+        defaultValues={{ grants: [{ rarity: '', quantity: '' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Rarity')).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByLabelText('Quantity')).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
+  })
 })

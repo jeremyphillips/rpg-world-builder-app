@@ -532,6 +532,11 @@ export interface RowConfig {
   separator?: FieldSeparator
   /** When hidden, the whole row unmounts. */
   visibility?: FieldVisibility
+  /**
+   * Where visible field errors render — `auto` suppresses per-field text on
+   * horizontal rows; `row` always surfaces a joined row summary instead.
+   */
+  errorPlacement?: 'auto' | 'field' | 'row'
 }
 
 /** Fields allowed inside a `group` or `stack` — may nest one level or more. */
@@ -713,6 +718,11 @@ export interface ArrayConfig {
   id?: string
   /** Classes merged onto the array fieldset wrapper. */
   className?: string
+  /**
+   * Where visible field errors render — `auto` suppresses per-field text on
+   * compact items; `row` always surfaces a joined row summary instead.
+   */
+  errorPlacement?: 'auto' | 'field' | 'row'
 }
 
 /**

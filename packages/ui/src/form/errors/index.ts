@@ -15,6 +15,7 @@ export {
   countIssuesForArrayPath,
   indexArrayItemIssues,
   findArraySectionForIssue,
+  buildFieldSummaryText,
   type ArrayIssueIndex,
 } from './group-form-issues'
 export {

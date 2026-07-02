@@ -3,6 +3,10 @@
 import * as React from 'react'
 
 import { FieldRow } from '../../components/ui/field-row'
+import {
+  ArrayItemPresentationContext,
+  resolveErrorPlacement,
+} from '../context/array-item-presentation.context'
 import type { RowConfig } from '../field-config'
 import { FieldNode, useVisibilityValues, withFieldSeparator } from './form-conditional.client'
 
@@ -14,20 +18,26 @@ interface RowFieldSectionProps {
 }
 
 export function RowFieldSection({ item, index, idPrefix, namePrefix }: RowFieldSectionProps) {
+  const parent = React.useContext(ArrayItemPresentationContext)
+  const suppress = resolveErrorPlacement(item.errorPlacement, 'detailed', true)
+  const value = suppress ? { ...parent, suppressFieldErrorText: true } : parent
+
   return (
     <React.Fragment key={`row-${index}`}>
       {withFieldSeparator(
         item.separator,
-        <FieldRow layout={item.layout} className={item.className}>
-          {item.fields.map((field) => (
-            <FieldNode
-              key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-              config={field}
-              idPrefix={idPrefix}
-              namePrefix={namePrefix}
-            />
-          ))}
-        </FieldRow>,
+        <ArrayItemPresentationContext.Provider value={value}>
+          <FieldRow layout={item.layout} className={item.className}>
+            {item.fields.map((field) => (
+              <FieldNode
+                key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+                config={field}
+                idPrefix={idPrefix}
+                namePrefix={namePrefix}
+              />
+            ))}
+          </FieldRow>
+        </ArrayItemPresentationContext.Provider>,
       )}
     </React.Fragment>
   )

@@ -55,6 +55,8 @@ export interface ArrayItemIssueSummaryProps {
   onPrimaryPress?: () => void
   onMorePress?: () => void
   placement?: 'collapsed' | 'expanded' | 'compactSummary'
+  /** Stable id for compact row summaries — wired to suppressed field `aria-describedby`. */
+  summaryId?: string
   className?: string
 }
 
@@ -63,6 +65,7 @@ export function ArrayItemIssueSummary({
   onPrimaryPress,
   onMorePress,
   placement = 'collapsed',
+  summaryId,
   className,
 }: ArrayItemIssueSummaryProps) {
   if (group.totalCount <= 0) return null
@@ -72,9 +75,13 @@ export function ArrayItemIssueSummary({
 
     return (
       <p
+        id={summaryId}
+        role="alert"
+        aria-live="polite"
         className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
         data-array-item-issue-summary
       >
+        <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
         {group.fieldSummary}
       </p>
     )

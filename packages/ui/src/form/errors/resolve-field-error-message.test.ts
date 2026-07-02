@@ -5,6 +5,7 @@ import { encodeStructuredMessage } from '@rpg/contracts'
 import {
   resolveFieldErrorMessage,
   resolveFirstFieldErrorMessage,
+  resolveNestedFieldErrorMessage,
 } from './resolve-field-error-message'
 
 describe('resolveFieldErrorMessage', () => {
@@ -28,5 +29,16 @@ describe('resolveFieldErrorMessage', () => {
     expect(resolveFirstFieldErrorMessage('Quantity is required.', structured)).toBe(
       'Quantity is required.',
     )
+  })
+
+  it('reads nested array field errors from RHF error trees', () => {
+    expect(
+      resolveNestedFieldErrorMessage(
+        {
+          grants: [{ rarity: { type: 'custom', message: 'Choose a rarity.' } }],
+        },
+        'grants.0.rarity',
+      ),
+    ).toBe('Choose a rarity.')
   })
 })

@@ -9,6 +9,7 @@ import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import { Text } from '../../components/ui/text'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs.client'
 import { FormItems } from '../containers/form-items.client'
+import { ArrayItemPresentationContext } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
 import { makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
@@ -88,19 +89,27 @@ function TabbedFormTabPanel({
   tab,
   formId,
   panelClassName,
+  activeTabId,
 }: {
   tab: TabbedFormTab
   formId: string
   panelClassName: string
+  activeTabId: string
 }) {
+  const isActive = activeTabId === tab.id
+
   return (
     <TabsContent value={tab.id} forceMount>
-      <div className={panelClassName}>
-        {tab.header}
-        {tab.fields.length > 0 ? (
-          <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
-        ) : null}
-      </div>
+      <ArrayItemPresentationContext.Provider
+        value={{ suppressFieldErrorText: !isActive, rowSummaryId: undefined }}
+      >
+        <div className={panelClassName}>
+          {tab.header}
+          {tab.fields.length > 0 ? (
+            <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+          ) : null}
+        </div>
+      </ArrayItemPresentationContext.Provider>
     </TabsContent>
   )
 }
@@ -113,13 +122,14 @@ export function TabbedFormPanels({
   omitPanelBottomPadding,
 }: TabbedFormPanelsProps) {
   const { rhythm } = useFormSectionContext()
+  const [activeTabId, setActiveTabId] = React.useState(tabs[0]?.id ?? '')
   const panelClassName = cn(
     fieldStackRhythmVariants({ rhythm }),
     stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
   )
 
   return (
-    <Tabs defaultValue={tabs[0]?.id} variant="line">
+    <Tabs value={activeTabId} onValueChange={setActiveTabId} variant="line">
       <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
         <TabsList>
           {tabs.map((tab) => (
@@ -135,6 +145,7 @@ export function TabbedFormPanels({
           tab={tab}
           formId={formId}
           panelClassName={panelClassName}
+          activeTabId={activeTabId}
         />
       ))}
     </Tabs>

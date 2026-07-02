@@ -16,10 +16,12 @@ import type { FieldWidth } from './field-control.variants'
 
 export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
-export interface SwitchFieldProps extends Omit<ComponentProps<typeof Switch>, 'id'> {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface SwitchFieldProps
+  extends Omit<ComponentProps<typeof Switch>, 'id'>, FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -39,6 +41,8 @@ export function SwitchField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -62,6 +66,8 @@ export function SwitchField({
         id={id}
         label={label}
         error={error}
+        invalid={invalid}
+        describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
         info={info}
@@ -77,7 +83,16 @@ export function SwitchField({
 
   if (labelPosition === 'above') {
     return (
-      <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+      <Field.Root
+        id={id}
+        error={error}
+        invalid={invalid}
+        describedBy={describedBy}
+        hint={hint}
+        required={required}
+        width={width}
+        size={size}
+      >
         <FieldLayout
           hintPosition={resolvedHintPosition}
           label={labelNode}
@@ -88,7 +103,16 @@ export function SwitchField({
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <div className={fieldInlineToggleRowClasses}>
         <div className={fieldInlineSwitchControlColumnClasses}>
           <Field.Control>

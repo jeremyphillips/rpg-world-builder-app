@@ -4,6 +4,23 @@ import { joinArrayItemSummaryParts } from '../config/array-item-config.lib'
 import type { ArrayItemIssueGroup, FormIssue } from './form-issue.types'
 import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 
+const MAX_NAMED_FIELD_SUMMARY_PARTS = 2
+
+/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
+export function buildFieldSummaryText(
+  fieldIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  if (fieldIssues.length === 0) return undefined
+
+  const parts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
+  if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
+
+  const named = parts.slice(0, maxNamed)
+  const extra = parts.length - maxNamed
+  return `${joinArrayItemSummaryParts(named)} · +${extra} more`
+}
+
 function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly string[]): number {
   const severityDelta =
     FORM_ISSUE_SEVERITY_ORDER[left.severity] - FORM_ISSUE_SEVERITY_ORDER[right.severity]
@@ -29,9 +46,7 @@ function buildIssueGroup(
 ): ArrayItemIssueGroup {
   const sortedIssues = [...issues].sort((left, right) => compareIssues(left, right, fieldOrder))
   const fieldIssues = sortedIssues.filter((issue) => issue.severity === 'field')
-  const fieldSummaryParts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
-  const fieldSummary =
-    fieldSummaryParts.length > 0 ? joinArrayItemSummaryParts(fieldSummaryParts) : undefined
+  const fieldSummary = buildFieldSummaryText(fieldIssues)
 
   return {
     itemPrefix,

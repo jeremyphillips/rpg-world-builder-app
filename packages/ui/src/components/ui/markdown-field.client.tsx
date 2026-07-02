@@ -19,10 +19,11 @@ const MARKDOWN_FIELD_TAB_WRITE = 'write'
 const MARKDOWN_FIELD_TAB_PREVIEW = 'preview'
 const MARKDOWN_PREVIEW_EMPTY = 'Nothing to preview'
 
-export interface MarkdownFieldProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface MarkdownFieldProps extends FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   info?: React.ReactNode
   required?: boolean
@@ -58,6 +59,8 @@ export function MarkdownField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   info,
   required,
@@ -75,7 +78,16 @@ export function MarkdownField({
   const previewId = `${id}-preview`
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}

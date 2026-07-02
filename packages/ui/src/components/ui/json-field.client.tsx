@@ -13,10 +13,11 @@ import type { FieldHintPosition } from './field.variants'
 
 const INVALID_JSON_MESSAGE = 'Invalid JSON'
 
-export interface JsonFieldProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface JsonFieldProps extends FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -48,6 +49,8 @@ export function JsonField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -93,11 +96,14 @@ export function JsonField({
   }
 
   const displayError = error ?? parseError
+  const displayInvalid = invalid ?? Boolean(displayError)
 
   return (
     <Field.Root
       id={id}
       error={displayError}
+      invalid={displayInvalid}
+      describedBy={describedBy}
       hint={hint}
       required={required}
       width={width}
