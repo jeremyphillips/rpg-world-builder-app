@@ -23,8 +23,8 @@ export async function authedCampaignContext(app: Express): Promise<AuthedCampaig
   return { agent, csrfToken, campaignId }
 }
 
-export function getRulesetPatchRoute(agent: Agent, csrfToken: string, campaignId: string): Test {
-  return agent.get(`/api/campaigns/${campaignId}/ruleset-patch`).set(CSRF_HEADER, csrfToken)
+export function getRulesetPatchRoute(agent: Agent, campaignId: string): Test {
+  return agent.get(`/api/campaigns/${campaignId}/ruleset-patch`)
 }
 
 export function patchCharacterCreationRoute(

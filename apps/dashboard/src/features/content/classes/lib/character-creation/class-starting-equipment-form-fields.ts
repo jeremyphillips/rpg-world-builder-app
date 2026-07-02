@@ -19,7 +19,10 @@ import {
   equipmentGrantItemFields,
   EQUIPMENT_GRANT_ITEM_KINDS,
 } from '../../../lib/forms/grants/equipment-grant-form-fields'
-import { equipmentGrantTitle } from '../../../lib/forms/grants/equipment-grant-form-values'
+import {
+  equipmentGrantTitle,
+  equipmentGrantSummary,
+} from '../../../lib/forms/grants/equipment-grant-form-values'
 import { STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT } from './class-starting-equipment-form-labels'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
@@ -215,6 +218,8 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
             index,
             equipmentOptions,
           ),
+        summary: (values) =>
+          equipmentGrantSummary(values as StartingEquipmentItemForm | undefined, equipmentOptions),
       },
       fields: startingEquipmentItemFields(ctx),
     },

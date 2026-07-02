@@ -14,10 +14,10 @@ import { contentPoolChoiceSchema } from './choice'
 // ---------------------------------------------------------------------------
 
 const EQUIPMENT_KIND_CATEGORY_FIELD = {
-  tool: 'toolCategories',
-  weapon: 'weaponCategories',
-  armor: 'armorCategories',
-  adventuring_gear: 'gearKinds',
+  tool: 'toolCategory',
+  weapon: 'weaponCategory',
+  armor: 'armorCategory',
+  adventuring_gear: 'gearKind',
 } as const
 
 const EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER = [
@@ -30,19 +30,19 @@ const EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER = [
 type EquipmentKindWithCategoryFilter = keyof typeof EQUIPMENT_KIND_CATEGORY_FIELD
 
 const FILTERED_POOL_CATEGORY_FIELDS = [
-  'toolCategories',
-  'weaponCategories',
-  'armorCategories',
-  'gearKinds',
+  'toolCategory',
+  'weaponCategory',
+  'armorCategory',
+  'gearKind',
 ] as const
 
 function refineFilteredEquipmentPool(
   val: {
     equipmentKind: z.infer<typeof equipmentKindSchema>
-    toolCategories?: z.infer<typeof toolCategorySchema>[]
-    weaponCategories?: z.infer<typeof weaponCategorySchema>[]
-    armorCategories?: z.infer<typeof armorCategorySchema>[]
-    gearKinds?: z.infer<typeof gearKindSchema>[]
+    toolCategory?: z.infer<typeof toolCategorySchema>
+    weaponCategory?: z.infer<typeof weaponCategorySchema>
+    armorCategory?: z.infer<typeof armorCategorySchema>
+    gearKind?: z.infer<typeof gearKindSchema>
   },
   ctx: z.RefinementCtx,
 ): void {
@@ -50,8 +50,8 @@ function refineFilteredEquipmentPool(
     EQUIPMENT_KIND_CATEGORY_FIELD[val.equipmentKind as EquipmentKindWithCategoryFilter]
 
   for (const field of FILTERED_POOL_CATEGORY_FIELDS) {
-    const categories = val[field]
-    if (categories === undefined || categories.length === 0) continue
+    const category = val[field]
+    if (category === undefined) continue
 
     if (
       (EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER as readonly string[]).includes(val.equipmentKind)
@@ -85,10 +85,10 @@ const filteredEquipmentPoolSchema = z
   .object({
     source: z.literal('filtered'),
     equipmentKind: equipmentKindSchema,
-    toolCategories: z.array(toolCategorySchema).min(1).optional(),
-    weaponCategories: z.array(weaponCategorySchema).min(1).optional(),
-    armorCategories: z.array(armorCategorySchema).min(1).optional(),
-    gearKinds: z.array(gearKindSchema).min(1).optional(),
+    toolCategory: toolCategorySchema.optional(),
+    weaponCategory: weaponCategorySchema.optional(),
+    armorCategory: armorCategorySchema.optional(),
+    gearKind: gearKindSchema.optional(),
   })
   .superRefine(refineFilteredEquipmentPool)
 
@@ -112,49 +112,83 @@ export const fixedEquipmentGrantSchema = z.object({
 
 export type FixedEquipmentGrant = z.infer<typeof fixedEquipmentGrantSchema>
 
+const LEGACY_CATEGORY_FIELD_MAP = [
+  ['toolCategories', 'toolCategory'],
+  ['weaponCategories', 'weaponCategory'],
+  ['armorCategories', 'armorCategory'],
+  ['gearKinds', 'gearKind'],
+] as const
+
+function normalizeFilteredPoolCategories(pool: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...pool }
+
+  for (const [plural, singular] of LEGACY_CATEGORY_FIELD_MAP) {
+    if (result[singular] !== undefined) {
+      delete result[plural]
+      continue
+    }
+
+    const categories = result[plural]
+    if (Array.isArray(categories) && categories.length > 0) {
+      result[singular] = categories[0]
+    }
+    delete result[plural]
+  }
+
+  return result
+}
+
 /**
  * Maps legacy starting-equipment `from` pools to `pool` for records written before
  * the equipment-grant primitive (overlay patches, homebrew, stale Mongo rows).
+ * Also strips legacy `label` and plural category arrays.
  */
 export function normalizeEquipmentChoiceGrant(input: unknown): unknown {
   if (typeof input !== 'object' || input === null) return input
 
   const record = input as Record<string, unknown>
-  if (record.kind !== 'choice' || record.pool !== undefined) return input
+  if (record.kind !== 'choice') return input
 
-  const from = record.from
-  if (typeof from !== 'object' || from === null) return input
+  const { from: legacyFrom, label: _legacyLabel, pool: rawPool, ...rest } = record
 
-  const fromRecord = from as Record<string, unknown>
-  const { from: _legacyFrom, ...rest } = record
+  let pool = rawPool
 
-  const equipmentSlugs = fromRecord.equipmentSlugs
-  if (Array.isArray(equipmentSlugs) && equipmentSlugs.length > 0) {
-    return {
-      ...rest,
-      pool: { source: 'explicit', equipmentSlugs },
+  if (pool === undefined && typeof legacyFrom === 'object' && legacyFrom !== null) {
+    const fromRecord = legacyFrom as Record<string, unknown>
+
+    const equipmentSlugs = fromRecord.equipmentSlugs
+    if (Array.isArray(equipmentSlugs) && equipmentSlugs.length > 0) {
+      pool = { source: 'explicit', equipmentSlugs }
+    } else {
+      const toolCategories = fromRecord.toolCategories
+      if (Array.isArray(toolCategories) && toolCategories.length > 0) {
+        pool = {
+          source: 'filtered',
+          equipmentKind: 'tool',
+          toolCategory: toolCategories[0],
+        }
+      }
     }
   }
 
-  const toolCategories = fromRecord.toolCategories
-  if (Array.isArray(toolCategories) && toolCategories.length > 0) {
-    return {
-      ...rest,
-      pool: {
-        source: 'filtered',
-        equipmentKind: 'tool',
-        toolCategories,
-      },
-    }
+  if (typeof pool === 'object' && pool !== null) {
+    pool = normalizeFilteredPoolCategories(pool as Record<string, unknown>)
   }
 
-  return input
+  if (pool === undefined) {
+    return rest
+  }
+
+  return {
+    ...rest,
+    pool,
+  }
 }
 
 export const equipmentChoiceGrantObjectSchema = contentPoolChoiceSchema
+  .omit({ label: true })
   .extend({
     kind: z.literal('choice'),
-    label: z.string().min(1),
     pool: equipmentPoolSchema,
   })
   .strict()
@@ -185,28 +219,57 @@ export const equipmentGrantSchema = z.preprocess(
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
 
+function naivePluralize(label: string, count: number): string {
+  const lower = label.toLowerCase()
+  if (count === 1) return lower
+  return lower.endsWith('s') ? lower : `${lower}s`
+}
+
 /** Display label for a pool-backed equipment choice (titles, character builder). */
 export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
   if (pool.source === 'explicit') {
     return pool.equipmentSlugs.join(', ')
   }
 
-  if (pool.toolCategories?.length === 1) {
-    const category = pool.toolCategories[0]
-    if (category) return getToolCategoryLabel(category)
+  if (pool.toolCategory) {
+    return getToolCategoryLabel(pool.toolCategory)
   }
-  if (pool.weaponCategories?.length === 1) {
-    const category = pool.weaponCategories[0]
-    if (category) return getWeaponCategoryLabel(category)
+  if (pool.weaponCategory) {
+    return getWeaponCategoryLabel(pool.weaponCategory)
   }
-  if (pool.armorCategories?.length === 1) {
-    const category = pool.armorCategories[0]
-    if (category) return getArmorCategoryLabel(category)
+  if (pool.armorCategory) {
+    return getArmorCategoryLabel(pool.armorCategory)
   }
-  if (pool.gearKinds?.length === 1) {
-    const kind = pool.gearKinds[0]
-    if (kind) return getGearKindLabel(kind)
+  if (pool.gearKind) {
+    return getGearKindLabel(pool.gearKind)
   }
 
   return getEquipmentKindLabel(pool.equipmentKind)
+}
+
+/** Human-readable summary for equipment grant array item headers. */
+export function formatEquipmentGrantSentence(
+  grant: EquipmentGrant,
+  resolveEquipmentName?: (slug: string) => string | undefined,
+): string {
+  if (grant.kind === 'fixed') {
+    const name = resolveEquipmentName?.(grant.equipmentSlug) ?? grant.equipmentSlug
+    const quantity = grant.quantity ?? 1
+    if (quantity === 1) {
+      return `Character receives 1 ${name.toLowerCase()}.`
+    }
+    return `Character receives ${quantity} ${naivePluralize(name, quantity)}.`
+  }
+
+  const choose = grant.choose ?? 1
+  const pool = grant.pool
+
+  if (pool.source === 'explicit') {
+    const names = pool.equipmentSlugs.map((slug) => resolveEquipmentName?.(slug) ?? slug)
+    const itemWord = choose === 1 ? 'item' : 'items'
+    return `Character chooses ${choose} ${itemWord} from: ${names.join(', ')}.`
+  }
+
+  const poolLabel = formatEquipmentPoolLabel(pool)
+  return `Character chooses ${choose} ${naivePluralize(poolLabel, choose)}.`
 }

@@ -5,6 +5,7 @@ import {
   equipmentGrantSchema,
   equipmentPoolSchema,
   fixedEquipmentGrantSchema,
+  formatEquipmentGrantSentence,
   formatEquipmentPoolLabel,
 } from './equipment-grant'
 
@@ -38,12 +39,12 @@ describe('equipmentPoolSchema', () => {
       equipmentPoolSchema.parse({
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       }),
     ).toEqual({
       source: 'filtered',
       equipmentKind: 'tool',
-      toolCategories: ['musical_instrument'],
+      toolCategory: 'musical_instrument',
     })
   })
 
@@ -52,7 +53,7 @@ describe('equipmentPoolSchema', () => {
       equipmentPoolSchema.safeParse({
         source: 'filtered',
         equipmentKind: 'weapon',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       }).success,
     ).toBe(false)
   })
@@ -62,7 +63,7 @@ describe('equipmentPoolSchema', () => {
       equipmentPoolSchema.safeParse({
         source: 'filtered',
         equipmentKind: 'vehicle',
-        weaponCategories: ['simple'],
+        weaponCategory: 'simple',
       }).success,
     ).toBe(false)
   })
@@ -99,20 +100,18 @@ describe('equipmentChoiceGrantSchema', () => {
       equipmentChoiceGrantSchema.parse({
         kind: 'choice',
         choose: 1,
-        label: 'Musical Instrument',
         pool: {
           source: 'filtered',
           equipmentKind: 'tool',
-          toolCategories: ['musical_instrument'],
+          toolCategory: 'musical_instrument',
         },
       }),
     ).toMatchObject({
       kind: 'choice',
-      label: 'Musical Instrument',
       pool: {
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       },
     })
   })
@@ -122,7 +121,6 @@ describe('equipmentChoiceGrantSchema', () => {
       equipmentChoiceGrantSchema.parse({
         kind: 'choice',
         choose: 1,
-        label: 'Melee weapon',
         pool: {
           source: 'explicit',
           equipmentSlugs: ['longsword', 'rapier'],
@@ -138,17 +136,15 @@ describe('equipmentChoiceGrantSchema', () => {
       equipmentChoiceGrantSchema.parse({
         kind: 'choice',
         choose: 1,
-        label: 'Musical Instrument',
         from: { toolCategories: ['musical_instrument'] },
       }),
     ).toEqual({
       kind: 'choice',
       choose: 1,
-      label: 'Musical Instrument',
       pool: {
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       },
     })
   })
@@ -158,14 +154,35 @@ describe('equipmentChoiceGrantSchema', () => {
       equipmentChoiceGrantSchema.parse({
         kind: 'choice',
         choose: 1,
-        label: 'Melee weapon',
         from: { equipmentSlugs: ['longsword', 'rapier'] },
       }),
     ).toEqual({
       kind: 'choice',
       choose: 1,
-      label: 'Melee weapon',
       pool: { source: 'explicit', equipmentSlugs: ['longsword', 'rapier'] },
+    })
+  })
+
+  it('strips legacy label and plural pool category arrays', () => {
+    expect(
+      equipmentChoiceGrantSchema.parse({
+        kind: 'choice',
+        choose: 1,
+        label: 'Musical Instrument',
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'tool',
+          toolCategories: ['musical_instrument', 'artisan'],
+        },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 1,
+      pool: {
+        source: 'filtered',
+        equipmentKind: 'tool',
+        toolCategory: 'musical_instrument',
+      },
     })
   })
 })
@@ -181,11 +198,10 @@ describe('equipmentGrantSchema', () => {
     const choice = {
       kind: 'choice' as const,
       choose: 1,
-      label: 'Simple Weapon',
       pool: {
         source: 'filtered' as const,
         equipmentKind: 'weapon' as const,
-        weaponCategories: ['simple' as const],
+        weaponCategory: 'simple' as const,
       },
     }
 
@@ -209,7 +225,7 @@ describe('formatEquipmentPoolLabel', () => {
       formatEquipmentPoolLabel({
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       }),
     ).toBe('Musical Instrument')
 
@@ -217,7 +233,7 @@ describe('formatEquipmentPoolLabel', () => {
       formatEquipmentPoolLabel({
         source: 'filtered',
         equipmentKind: 'weapon',
-        weaponCategories: ['simple'],
+        weaponCategory: 'simple',
       }),
     ).toBe('Simple Weapon')
   })
@@ -236,5 +252,65 @@ describe('formatEquipmentPoolLabel', () => {
         equipmentKind: 'mount',
       }),
     ).toBe('Mount')
+  })
+})
+
+describe('formatEquipmentGrantSentence', () => {
+  it('formats fixed grants with naive pluralization', () => {
+    expect(
+      formatEquipmentGrantSentence(
+        { kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 },
+        () => 'Dagger',
+      ),
+    ).toBe('Character receives 1 dagger.')
+
+    expect(
+      formatEquipmentGrantSentence(
+        { kind: 'fixed', equipmentSlug: 'dagger', quantity: 2 },
+        () => 'Dagger',
+      ),
+    ).toBe('Character receives 2 daggers.')
+  })
+
+  it('formats filtered pool choices with lowercase category labels', () => {
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'tool',
+          toolCategory: 'musical_instrument',
+        },
+      }),
+    ).toBe('Character chooses 1 musical instrument.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 2,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'weapon',
+          weaponCategory: 'simple',
+        },
+      }),
+    ).toBe('Character chooses 2 simple weapons.')
+  })
+
+  it('formats explicit pool choices with resolved equipment names', () => {
+    expect(
+      formatEquipmentGrantSentence(
+        {
+          kind: 'choice',
+          choose: 1,
+          pool: {
+            source: 'explicit',
+            equipmentSlugs: ['rope', 'torch', 'rations'],
+          },
+        },
+        (slug) => ({ rope: 'Rope', torch: 'Torch', rations: 'Rations' })[slug],
+      ),
+    ).toBe('Character chooses 1 item from: Rope, Torch, Rations.')
   })
 })

@@ -17,13 +17,21 @@ import {
   equipmentKindSchema,
   gearKindSchema,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  combineFieldVisibilityAll,
+  toOptions,
+  type FieldVisibility,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
 import {
   EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   EQUIPMENT_POOL_SOURCE_LABELS,
 } from './equipment-grant-form-labels'
+
+/** Sentinel for “any category” in single-select pool category fields (Radix Select rejects `''`). */
+export const EQUIPMENT_POOL_CATEGORY_ANY = '__any__' as const
 
 /** Equipment grant validation messages (tier 3 form overrides). */
 export const equipmentGrantValidationMessages = {
@@ -86,6 +94,10 @@ const gearKindOptions = toOptions(
   >,
 )
 
+function categoryOptionsWithAny(options: { value: string; label: string }[]) {
+  return [{ value: EQUIPMENT_POOL_CATEGORY_ANY, label: 'Any' }, ...options]
+}
+
 export const equipmentGrantFixedItemFormSchema = z.object({
   itemKind: z.literal('fixed'),
   equipmentSlug: z.string().min(1),
@@ -96,15 +108,20 @@ export const equipmentGrantFixedItemFormSchema = z.object({
 export const equipmentGrantChoiceItemFormSchema = z
   .object({
     itemKind: z.literal('choice'),
-    label: z.string().min(1),
     choose: z.coerce.number().int().min(1).default(1),
     poolSource: z.enum(EQUIPMENT_POOL_SOURCES).default('filtered'),
     poolEquipmentSlugs: z.array(z.string().min(1)).optional(),
     poolEquipmentKind: equipmentKindSchema.optional(),
-    poolToolCategories: z.array(toolCategorySchema).optional(),
-    poolWeaponCategories: z.array(weaponCategorySchema).optional(),
-    poolArmorCategories: z.array(armorCategorySchema).optional(),
-    poolGearKinds: z.array(gearKindSchema).optional(),
+    poolToolCategory: z
+      .union([toolCategorySchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
+      .optional(),
+    poolWeaponCategory: z
+      .union([weaponCategorySchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
+      .optional(),
+    poolArmorCategory: z
+      .union([armorCategorySchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
+      .optional(),
+    poolGearKind: z.union([gearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)]).optional(),
   })
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit') {
@@ -138,44 +155,68 @@ export type EquipmentGrantFixedItemForm = Extract<EquipmentGrantItemForm, { item
 
 export type EquipmentGrantChoiceItemForm = Extract<EquipmentGrantItemForm, { itemKind: 'choice' }>
 
+function withGuard(
+  visibility: FieldVisibility | undefined,
+  guard?: FieldVisibility,
+): FieldVisibility | undefined {
+  if (!guard) return visibility
+  if (!visibility) return guard
+  return combineFieldVisibilityAll(guard, visibility)
+}
+
 function visibleForItemKind(
   itemKind: (typeof EQUIPMENT_GRANT_ITEM_KINDS)[number],
+  guard?: FieldVisibility,
 ): FieldVisibility {
-  return {
-    dependsOn: ['itemKind'],
-    visibleWhen: (watched) => watched['itemKind'] === itemKind,
-  }
+  return withGuard(
+    {
+      dependsOn: ['itemKind'],
+      visibleWhen: (watched) => watched['itemKind'] === itemKind,
+    },
+    guard,
+  )!
 }
 
 function visibleForChoicePoolSource(
   poolSource: (typeof EQUIPMENT_POOL_SOURCES)[number],
+  guard?: FieldVisibility,
 ): FieldVisibility {
-  return {
-    dependsOn: ['itemKind', 'poolSource'],
-    visibleWhen: (watched) =>
-      watched['itemKind'] === 'choice' && watched['poolSource'] === poolSource,
-  }
+  return withGuard(
+    {
+      dependsOn: ['itemKind', 'poolSource'],
+      visibleWhen: (watched) =>
+        watched['itemKind'] === 'choice' && watched['poolSource'] === poolSource,
+    },
+    guard,
+  )!
 }
 
 function visibleForFilteredEquipmentKind(
   equipmentKind: (typeof EQUIPMENT_KINDS)[number],
+  guard?: FieldVisibility,
 ): FieldVisibility {
-  return {
-    dependsOn: ['itemKind', 'poolSource', 'poolEquipmentKind'],
-    visibleWhen: (watched) =>
-      watched['itemKind'] === 'choice' &&
-      watched['poolSource'] === 'filtered' &&
-      watched['poolEquipmentKind'] === equipmentKind,
-  }
+  return withGuard(
+    {
+      dependsOn: ['itemKind', 'poolSource', 'poolEquipmentKind'],
+      visibleWhen: (watched) =>
+        watched['itemKind'] === 'choice' &&
+        watched['poolSource'] === 'filtered' &&
+        watched['poolEquipmentKind'] === equipmentKind,
+    },
+    guard,
+  )!
 }
 
-export function fixedEquipmentGrantFields(ctx: ContentFormCtx): FormItem[] {
+export function fixedEquipmentGrantFields(
+  ctx: ContentFormCtx,
+  guard?: FieldVisibility,
+): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
 
   return [
     {
       kind: 'row',
-      visibility: visibleForItemKind('fixed'),
+      visibility: visibleForItemKind('fixed', guard),
       fields: [
         {
           type: 'combobox',
@@ -202,41 +243,34 @@ export function fixedEquipmentGrantFields(ctx: ContentFormCtx): FormItem[] {
       type: 'switch',
       name: 'equipped',
       label: 'Equipped',
-      visibility: visibleForItemKind('fixed'),
+      visibility: visibleForItemKind('fixed', guard),
     },
   ]
 }
 
-export function equipmentChoiceGrantFields(ctx: ContentFormCtx): FormItem[] {
+export function equipmentChoiceGrantFields(
+  ctx: ContentFormCtx,
+  guard?: FieldVisibility,
+): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
 
   return [
     {
-      type: 'text',
-      name: 'label',
-      label: 'Choice label',
-      required: true,
-      visibility: visibleForItemKind('choice'),
-    },
-    {
       type: 'inlineChooseCount',
       name: 'choose',
       label: '',
-      min: 1,
-      prefix: 'Character can choose',
-      suffix: 'from equipment pool:',
+      chooseMin: 1,
+      prefix: 'Character chooses',
+      suffix: 'item(s) from',
       defaultValue: 1,
       digits: 1,
-      visibility: visibleForItemKind('choice'),
-    },
-    {
-      type: 'select',
-      name: 'poolSource',
-      label: 'Pool source',
-      options: poolSourceOptions,
-      required: true,
-      defaultValue: 'filtered',
-      visibility: visibleForItemKind('choice'),
+      hideLabel: true,
+      visibility: visibleForItemKind('choice', guard),
+      selectName: 'poolSource',
+      selectLabel: 'Pool source',
+      selectOptions: poolSourceOptions,
+      selectDefaultValue: 'filtered',
+      selectRequired: true,
     },
     {
       type: 'combobox',
@@ -245,66 +279,83 @@ export function equipmentChoiceGrantFields(ctx: ContentFormCtx): FormItem[] {
       multiple: true,
       options: equipmentOptions,
       placeholder: 'Choose equipment…',
-      visibility: visibleForChoicePoolSource('explicit'),
+      visibility: visibleForChoicePoolSource('explicit', guard),
     },
     {
-      type: 'select',
-      name: 'poolEquipmentKind',
-      label: 'Equipment type',
-      options: equipmentKindOptions,
-      required: true,
-      visibility: visibleForChoicePoolSource('filtered'),
-    },
-    {
-      type: 'chips',
-      name: 'poolToolCategories',
-      label: 'Tool categories',
-      options: toolCategoryOptions,
-      visibility: visibleForFilteredEquipmentKind('tool'),
-    },
-    {
-      type: 'chips',
-      name: 'poolWeaponCategories',
-      label: 'Weapon categories',
-      options: weaponCategoryOptions,
-      visibility: visibleForFilteredEquipmentKind('weapon'),
-    },
-    {
-      type: 'chips',
-      name: 'poolArmorCategories',
-      label: 'Armor categories',
-      options: armorCategoryOptions,
-      visibility: visibleForFilteredEquipmentKind('armor'),
-    },
-    {
-      type: 'chips',
-      name: 'poolGearKinds',
-      label: 'Gear kinds',
-      options: gearKindOptions,
-      visibility: visibleForFilteredEquipmentKind('adventuring_gear'),
+      kind: 'row',
+      visibility: visibleForChoicePoolSource('filtered', guard),
+      fields: [
+        {
+          type: 'select',
+          name: 'poolEquipmentKind',
+          label: 'Equipment type',
+          options: equipmentKindOptions,
+          required: true,
+          defaultValue: 'tool',
+        },
+        {
+          type: 'select',
+          name: 'poolToolCategory',
+          label: 'Tool category',
+          options: categoryOptionsWithAny(toolCategoryOptions),
+          defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
+          visibility: visibleForFilteredEquipmentKind('tool', guard),
+        },
+        {
+          type: 'select',
+          name: 'poolWeaponCategory',
+          label: 'Weapon category',
+          options: categoryOptionsWithAny(weaponCategoryOptions),
+          defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
+          visibility: visibleForFilteredEquipmentKind('weapon', guard),
+        },
+        {
+          type: 'select',
+          name: 'poolArmorCategory',
+          label: 'Armor category',
+          options: categoryOptionsWithAny(armorCategoryOptions),
+          defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
+          visibility: visibleForFilteredEquipmentKind('armor', guard),
+        },
+        {
+          type: 'select',
+          name: 'poolGearKind',
+          label: 'Gear kind',
+          options: categoryOptionsWithAny(gearKindOptions),
+          defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
+          visibility: visibleForFilteredEquipmentKind('adventuring_gear', guard),
+        },
+      ],
     },
   ]
 }
 
 export type EquipmentGrantItemFieldsOptions = {
   extraFields?: FormItem[]
+  /** Override the item-kind select label (e.g. when composed inside the grants array). */
+  kindSelectLabel?: string
+  /** AND-combined visibility guard applied to every equipment grant field. */
+  guardVisibility?: FieldVisibility
 }
 
 export function equipmentGrantItemFields(
   ctx: ContentFormCtx,
   opts: EquipmentGrantItemFieldsOptions = {},
 ): FormItem[] {
+  const guard = opts.guardVisibility
+
   return [
     {
       type: 'select',
       name: 'itemKind',
-      label: 'Granted item',
+      label: opts.kindSelectLabel ?? 'Grant type',
       options: itemKindOptions,
       required: true,
       defaultValue: 'fixed',
+      visibility: guard,
     },
-    ...fixedEquipmentGrantFields(ctx),
+    ...fixedEquipmentGrantFields(ctx, guard),
     ...(opts.extraFields ?? []),
-    ...equipmentChoiceGrantFields(ctx),
+    ...equipmentChoiceGrantFields(ctx, guard),
   ]
 }

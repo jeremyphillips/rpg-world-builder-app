@@ -1,7 +1,9 @@
 'use client'
 
 import * as React from 'react'
+import { useMemo } from 'react'
 
+import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
@@ -11,6 +13,7 @@ import { NumberInput } from './number-input.client'
 import { InlineSentenceConnector } from './inline-sentence-row'
 import { parseChooseCount } from './choose-count-field.lib'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 
 export interface InlineChooseCountFieldProps {
   id: string
@@ -26,6 +29,12 @@ export interface InlineChooseCountFieldProps {
   suffix?: string
   /** Visual digit capacity for the count input. Defaults to `1`. */
   digits?: FieldDigits
+  selectId?: string
+  selectLabel?: string
+  selectValue?: string
+  selectOptions?: FieldOption[]
+  onSelectChange?: (value: string) => void
+  onSelectBlur?: () => void
   error?: string
   hint?: string
   hintPosition?: FieldHintPosition
@@ -52,6 +61,12 @@ export function InlineChooseCountField({
   prefix = 'Choose',
   suffix = 'from:',
   digits = 1,
+  selectId,
+  selectLabel,
+  selectValue,
+  selectOptions,
+  onSelectChange,
+  onSelectBlur,
   error,
   hint,
   hintPosition,
@@ -62,6 +77,16 @@ export function InlineChooseCountField({
   width,
   hideLabel = false,
 }: InlineChooseCountFieldProps) {
+  const selectOptionNodes = useMemo(
+    () =>
+      selectOptions?.map((option) => (
+        <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+          {option.label}
+        </SelectItem>
+      )),
+    [selectOptions],
+  )
+
   return (
     <ChooseCountFieldShell
       id={id}
@@ -100,9 +125,29 @@ export function InlineChooseCountField({
             onChange={(event) => onChange?.(parseChooseCount(event.target.value))}
             onBlur={onBlur}
           />
-          <InlineSentenceConnector size={size} tone="label">
-            {suffix}
-          </InlineSentenceConnector>
+          {suffix ? (
+            <InlineSentenceConnector size={size} tone="label">
+              {suffix}
+            </InlineSentenceConnector>
+          ) : null}
+          {selectOptions?.length && selectId ? (
+            <>
+              <label htmlFor={selectId} className="sr-only">
+                {selectLabel ?? label}
+              </label>
+              <Select value={selectValue} onValueChange={onSelectChange} disabled={disabled}>
+                <SelectTrigger
+                  id={selectId}
+                  size={size}
+                  aria-invalid={error ? true : undefined}
+                  onBlur={onSelectBlur}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>{selectOptionNodes}</SelectContent>
+              </Select>
+            </>
+          ) : null}
         </div>
       )}
     </ChooseCountFieldShell>

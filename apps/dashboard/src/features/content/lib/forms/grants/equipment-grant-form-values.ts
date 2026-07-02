@@ -4,14 +4,22 @@ import type {
   EquipmentPool,
   FixedEquipmentGrant,
 } from '@rpg/contracts'
-import { formatEquipmentPoolLabel } from '@rpg/contracts'
+import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import { EQUIPMENT_POOL_CATEGORY_ANY } from './equipment-grant-form-fields'
 import type {
   EquipmentGrantChoiceItemForm,
   EquipmentGrantFixedItemForm,
   EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
+
+function formatExplicitPoolTitle(slugs: string[], equipmentOptions: FieldOption[]): string {
+  const labels = slugs.map(
+    (slug) => equipmentOptions.find((option) => option.value === slug)?.label ?? slug,
+  )
+  return labels.length <= 2 ? labels.join(', ') : `${labels.length} items`
+}
 
 /** Clears category filters that do not match the selected equipment kind. */
 export function applyEquipmentGrantKindSync(
@@ -23,11 +31,20 @@ export function applyEquipmentGrantKindSync(
 
   return {
     ...row,
-    poolToolCategories: row.poolEquipmentKind === 'tool' ? row.poolToolCategories : undefined,
-    poolWeaponCategories: row.poolEquipmentKind === 'weapon' ? row.poolWeaponCategories : undefined,
-    poolArmorCategories: row.poolEquipmentKind === 'armor' ? row.poolArmorCategories : undefined,
-    poolGearKinds: row.poolEquipmentKind === 'adventuring_gear' ? row.poolGearKinds : undefined,
+    poolToolCategory:
+      row.poolEquipmentKind === 'tool' ? row.poolToolCategory : EQUIPMENT_POOL_CATEGORY_ANY,
+    poolWeaponCategory:
+      row.poolEquipmentKind === 'weapon' ? row.poolWeaponCategory : EQUIPMENT_POOL_CATEGORY_ANY,
+    poolArmorCategory:
+      row.poolEquipmentKind === 'armor' ? row.poolArmorCategory : EQUIPMENT_POOL_CATEGORY_ANY,
+    poolGearKind:
+      row.poolEquipmentKind === 'adventuring_gear' ? row.poolGearKind : EQUIPMENT_POOL_CATEGORY_ANY,
   }
+}
+
+function categoryFormValueToDomain(value: string | undefined): string | undefined {
+  if (!value || value === EQUIPMENT_POOL_CATEGORY_ANY) return undefined
+  return value
 }
 
 export function equipmentPoolToFormRow(
@@ -37,10 +54,10 @@ export function equipmentPoolToFormRow(
   | 'poolSource'
   | 'poolEquipmentSlugs'
   | 'poolEquipmentKind'
-  | 'poolToolCategories'
-  | 'poolWeaponCategories'
-  | 'poolArmorCategories'
-  | 'poolGearKinds'
+  | 'poolToolCategory'
+  | 'poolWeaponCategory'
+  | 'poolArmorCategory'
+  | 'poolGearKind'
 > {
   if (pool.source === 'explicit') {
     return {
@@ -52,10 +69,10 @@ export function equipmentPoolToFormRow(
   return {
     poolSource: 'filtered',
     poolEquipmentKind: pool.equipmentKind,
-    poolToolCategories: pool.toolCategories,
-    poolWeaponCategories: pool.weaponCategories,
-    poolArmorCategories: pool.armorCategories,
-    poolGearKinds: pool.gearKinds,
+    poolToolCategory: pool.toolCategory ?? EQUIPMENT_POOL_CATEGORY_ANY,
+    poolWeaponCategory: pool.weaponCategory ?? EQUIPMENT_POOL_CATEGORY_ANY,
+    poolArmorCategory: pool.armorCategory ?? EQUIPMENT_POOL_CATEGORY_ANY,
+    poolGearKind: pool.gearKind ?? EQUIPMENT_POOL_CATEGORY_ANY,
   }
 }
 
@@ -74,17 +91,30 @@ export function equipmentPoolFromFormRow(row: EquipmentGrantChoiceItemForm): Equ
     equipmentKind: synced.poolEquipmentKind!,
   }
 
-  if (synced.poolToolCategories?.length) {
-    pool.toolCategories = synced.poolToolCategories
+  const toolCategory = categoryFormValueToDomain(synced.poolToolCategory)
+  if (toolCategory) {
+    pool.toolCategory = toolCategory as Extract<
+      EquipmentPool,
+      { source: 'filtered' }
+    >['toolCategory']
   }
-  if (synced.poolWeaponCategories?.length) {
-    pool.weaponCategories = synced.poolWeaponCategories
+  const weaponCategory = categoryFormValueToDomain(synced.poolWeaponCategory)
+  if (weaponCategory) {
+    pool.weaponCategory = weaponCategory as Extract<
+      EquipmentPool,
+      { source: 'filtered' }
+    >['weaponCategory']
   }
-  if (synced.poolArmorCategories?.length) {
-    pool.armorCategories = synced.poolArmorCategories
+  const armorCategory = categoryFormValueToDomain(synced.poolArmorCategory)
+  if (armorCategory) {
+    pool.armorCategory = armorCategory as Extract<
+      EquipmentPool,
+      { source: 'filtered' }
+    >['armorCategory']
   }
-  if (synced.poolGearKinds?.length) {
-    pool.gearKinds = synced.poolGearKinds
+  const gearKind = categoryFormValueToDomain(synced.poolGearKind)
+  if (gearKind) {
+    pool.gearKind = gearKind as Extract<EquipmentPool, { source: 'filtered' }>['gearKind']
   }
 
   return pool
@@ -102,7 +132,6 @@ function fixedGrantToFormRow(grant: FixedEquipmentGrant): EquipmentGrantItemForm
 function choiceGrantToFormRow(grant: EquipmentChoiceGrant): EquipmentGrantItemForm {
   return {
     itemKind: 'choice',
-    label: grant.label,
     choose: grant.choose,
     ...equipmentPoolToFormRow(grant.pool),
   }
@@ -127,7 +156,6 @@ function fixedGrantFromFormRow(row: EquipmentGrantFixedItemForm): FixedEquipment
 function choiceGrantFromFormRow(row: EquipmentGrantChoiceItemForm): EquipmentChoiceGrant {
   return {
     kind: 'choice',
-    label: row.label,
     choose: row.choose ?? 1,
     pool: equipmentPoolFromFormRow(row),
   }
@@ -151,7 +179,26 @@ export function equipmentGrantTitle(
     return quantity > 1 ? `${name} x${quantity}` : name
   }
 
-  const poolLabel = row.label || formatEquipmentPoolLabel(equipmentPoolFromFormRow(row))
   const choose = row.choose ?? 1
+  let poolLabel: string
+
+  if (row.poolSource === 'explicit') {
+    poolLabel = formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentOptions)
+  } else {
+    poolLabel = formatEquipmentPoolLabel(equipmentPoolFromFormRow(row))
+  }
+
   return `${poolLabel} — choose ${choose}`
+}
+
+export function equipmentGrantSummary(
+  row: EquipmentGrantItemForm | undefined,
+  equipmentOptions: FieldOption[] = [],
+): string {
+  if (!row) return ''
+
+  const resolveEquipmentName = (slug: string) =>
+    equipmentOptions.find((option) => option.value === slug)?.label
+
+  return formatEquipmentGrantSentence(equipmentGrantFromFormRow(row), resolveEquipmentName)
 }

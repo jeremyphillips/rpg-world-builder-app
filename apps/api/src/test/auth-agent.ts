@@ -37,7 +37,13 @@ export async function registerAndLoginTestUser(
     .set(CSRF_HEADER, csrf1)
     .send({ email: credentials.email, password: credentials.password })
     .expect(200)
-  return { agent, csrfToken: loginRes.body.csrfToken as string }
+
+  const csrfToken =
+    typeof loginRes.body.csrfToken === 'string'
+      ? loginRes.body.csrfToken
+      : ((await agent.get('/api/auth/csrf')).body.csrfToken as string)
+
+  return { agent, csrfToken }
 }
 
 export async function createTestCampaign(

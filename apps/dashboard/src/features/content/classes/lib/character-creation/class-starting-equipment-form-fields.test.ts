@@ -83,11 +83,10 @@ describe('startingEquipment round-trip', () => {
 
     expect(instrumentChoice).toMatchObject({
       itemKind: 'choice',
-      label: 'Musical Instrument',
       choose: 1,
       poolSource: 'filtered',
       poolEquipmentKind: 'tool',
-      poolToolCategories: ['musical_instrument'],
+      poolToolCategory: 'musical_instrument',
     })
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
@@ -151,7 +150,6 @@ describe('startingEquipmentFormSchema validation', () => {
   it('rejects a pool choice item without pool configuration', () => {
     const result = startingEquipmentChoiceItemFormSchema.safeParse({
       itemKind: 'choice',
-      label: 'Musical Instrument',
       choose: 1,
       poolSource: 'filtered',
     })

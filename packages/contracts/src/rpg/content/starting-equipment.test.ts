@@ -59,11 +59,10 @@ describe('startingEquipmentChoiceSchema', () => {
               {
                 kind: 'choice',
                 choose: 1,
-                label: 'Musical Instrument',
                 pool: {
                   source: 'filtered',
                   equipmentKind: 'tool',
-                  toolCategories: ['musical_instrument'],
+                  toolCategory: 'musical_instrument',
                 },
               },
             ],
@@ -76,7 +75,7 @@ describe('startingEquipmentChoiceSchema', () => {
       pool: {
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       },
     })
   })
@@ -115,7 +114,6 @@ describe('startingEquipmentChoiceSchema', () => {
               {
                 kind: 'choice',
                 choose: 1,
-                label: 'Musical Instrument',
                 from: { toolCategories: ['musical_instrument'] },
               },
             ],
@@ -127,7 +125,7 @@ describe('startingEquipmentChoiceSchema', () => {
       pool: {
         source: 'filtered',
         equipmentKind: 'tool',
-        toolCategories: ['musical_instrument'],
+        toolCategory: 'musical_instrument',
       },
     })
   })
