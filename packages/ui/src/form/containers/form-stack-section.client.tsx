@@ -68,7 +68,11 @@ export function StackSection({
 
   if (layout !== 'dependent') {
     stackBody = (
-      <div data-field-stack="" className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}>
+      <div
+        id={item.id}
+        data-field-stack=""
+        className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
+      >
         <FormSectionContext.Provider value={childContext}>
           {renderNestedItems({
             items: item.fields,
@@ -89,6 +93,7 @@ export function StackSection({
 
     stackBody = (
       <div
+        id={item.id}
         data-field-stack=""
         role={groupLabelledBy ? 'group' : undefined}
         aria-labelledby={groupLabelledBy}

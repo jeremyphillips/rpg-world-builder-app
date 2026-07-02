@@ -37,6 +37,7 @@ type MechanicsFieldOptions = {
 }
 
 const EDITION_PRESET_RECOMMENDED_BADGE = 'Recommended'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
 
 function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): FieldOption[] {
   return options.map((option) =>
@@ -46,18 +47,12 @@ function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): Field
   )
 }
 
-function anchorSlot(sectionId: string): FormItem {
-  return {
-    kind: 'slot',
-    name: `_anchor_${sectionId}`,
-    render: () => createElement('div', { id: sectionId, className: 'scroll-mt-20' }),
-  }
-}
-
 function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
     legend: 'Edition preset',
+    id: 'edition-preset',
+    className: SCROLL_SECTION_ANCHOR_CLASS,
     fields: [
       {
         type: 'radioCard',
@@ -81,6 +76,8 @@ function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormIt
   return {
     kind: 'group',
     legend: 'Mechanics knobs',
+    id: 'mechanics-knobs',
+    className: SCROLL_SECTION_ANCHOR_CLASS,
     description:
       'Fine-tune armor class and attack resolution. The server tracks whether these differ from your selected preset.',
     fields: [
@@ -132,9 +129,7 @@ export function buildMechanicsConfigFields({
           'Choose a rules-era preset to quickly configure core mechanics. You can customize individual mechanics after choosing a preset.',
         ),
     },
-    anchorSlot('edition-preset'),
     editionPresetGroup(editionPresetOptions),
-    anchorSlot('mechanics-knobs'),
     mechanicsKnobsGroup(attackResolutionModeOptions),
   ]
 }

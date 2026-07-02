@@ -384,7 +384,14 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const showLegend = legend.trim().length > 0
 
   return (
-    <fieldset className={cn(fieldSetResetClasses, !nested && fieldGroupBottomMarginClasses)}>
+    <fieldset
+      id={config.id}
+      className={cn(
+        fieldSetResetClasses,
+        !nested && fieldGroupBottomMarginClasses,
+        config.className,
+      )}
+    >
       {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}

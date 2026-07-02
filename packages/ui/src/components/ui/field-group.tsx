@@ -32,6 +32,8 @@ export interface FieldGroupProps {
   rhythm?: FieldStackRhythm
   description?: string
   className?: string
+  /** Optional DOM id on the fieldset — for in-page scroll anchors. */
+  id?: string
   children: ReactNode
 }
 
@@ -46,13 +48,17 @@ export function FieldGroup({
   rhythm = DEFAULT_FORM_RHYTHM,
   description,
   className,
+  id,
   children,
 }: FieldGroupProps) {
   const legendScale =
     legendSize === 'array' ? resolveArrayLegendScale(size ?? DEFAULT_ARRAY_SECTION_SIZE) : 'default'
 
   return (
-    <fieldset className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses, className)}>
+    <fieldset
+      id={id}
+      className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses, className)}
+    >
       <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
         {legend}
       </legend>

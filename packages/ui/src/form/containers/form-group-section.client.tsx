@@ -9,7 +9,12 @@ import {
   buildFormSectionChildContext,
   useFormSectionContext,
 } from '../context/form-section.context'
-import type { GroupConfig, GroupFieldItem, SelectFieldConfig, SwitchFieldConfig } from '../field-config'
+import type {
+  GroupConfig,
+  GroupFieldItem,
+  SelectFieldConfig,
+  SwitchFieldConfig,
+} from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
 import type { RenderNestedFormItems } from './form-stack-section.client'
 
@@ -40,6 +45,7 @@ export function GroupFieldSection({
 
   return (
     <FieldGroup
+      id={item.id}
       legend={item.legend}
       legendSize={item.legendSize}
       rhythm={groupRhythm}

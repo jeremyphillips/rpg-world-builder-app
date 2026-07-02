@@ -185,6 +185,25 @@ describe('dependent stack', () => {
     })
   })
 
+  it('renders an optional id on the stack wrapper', () => {
+    const { container } = renderStackForm([
+      {
+        kind: 'stack',
+        id: 'feature-section',
+        className: 'scroll-mt-20',
+        fields: [
+          {
+            type: 'text',
+            name: 'featureNote',
+            label: 'Feature note',
+          },
+        ],
+      },
+    ])
+
+    expect(container.querySelector('#feature-section')).toHaveClass('scroll-mt-20')
+  })
+
   it('has no axe violations when dependents are visible', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm(undefined, { featureEnabled: true, featureValue: 13 })

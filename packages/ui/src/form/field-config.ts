@@ -567,6 +567,8 @@ export interface StackConfig {
   /** Trailing divider after this stack (controller + dependents) within parent rhythm. */
   separator?: FieldSeparator
   className?: string
+  /** Optional DOM id on the stack wrapper — for in-page scroll anchors. */
+  id?: string
 }
 
 /** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
@@ -576,6 +578,8 @@ export interface GroupConfig {
   description?: string
   fields: GroupFieldItem[]
   className?: string
+  /** Optional DOM id on the fieldset — for in-page scroll anchors. */
+  id?: string
   /** Legend scale — `subsection` (20px) for nested groups inside another group. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -685,6 +689,10 @@ export interface ArrayConfig {
     options: FieldOption[]
     watchedValues: Record<string, unknown>
   }) => FieldOption[]
+  /** Optional DOM id on the array fieldset — for in-page scroll anchors. */
+  id?: string
+  /** Classes merged onto the array fieldset wrapper. */
+  className?: string
 }
 
 /**
