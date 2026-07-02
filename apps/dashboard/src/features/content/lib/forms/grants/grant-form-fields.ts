@@ -26,6 +26,11 @@ import type { ContentFormCtx } from '../content-form-registry'
 import { feetInputUnitField } from '../fields/content-identity-form-fields'
 import { getLevelFieldOptions, levelSelectDigits } from '../../form-options/level-field-options'
 import { titleCase } from '../../utils/title-case'
+import {
+  equipmentGrantItemFields,
+  type EquipmentGrantItemForm,
+} from './equipment-grant-form-fields'
+import { equipmentGrantSummary, equipmentGrantTitle } from './equipment-grant-form-values'
 
 const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
   value: String(r),
@@ -77,6 +82,10 @@ function visibleFor<T extends string>(value: T): FieldVisibility {
     dependsOn: ['grantType'],
     visibleWhen: (watched) => watched['grantType'] === value,
   }
+}
+
+function includesEquipmentGrantType(grantTypes: readonly string[]): boolean {
+  return grantTypes.includes('equipment')
 }
 
 function grantTypeOptionsFor<T extends string>(
@@ -293,6 +302,12 @@ export function grantItemFields<T extends string>(
       label: 'Replaceable on later class levels',
       visibility: visibleFor('featChoice'),
     },
+    ...(includesEquipmentGrantType(grantTypes)
+      ? equipmentGrantItemFields(ctx, {
+          guardVisibility: visibleFor('equipment'),
+          kindSelectLabel: 'Item kind',
+        })
+      : []),
   ]
 }
 
@@ -301,6 +316,9 @@ export function grantArrayFields<T extends string>(
   labels: Record<T, string>,
   ctx: ContentFormCtx,
 ): FormItem[] {
+  const equipmentOptions = ctx.options?.equipment ?? []
+  const rowLabels = labels as Record<string, string>
+
   return [
     {
       kind: 'array',
@@ -310,9 +328,16 @@ export function grantArrayFields<T extends string>(
       itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Grant ${index + 1}`,
-        primary: (values) => {
-          const type = values['grantType'] as T | undefined
-          return type ? labels[type] : undefined
+        primary: (values, index) => {
+          const type = values['grantType'] as string | undefined
+          if (type === 'equipment') {
+            return equipmentGrantTitle(values as EquipmentGrantItemForm, index, equipmentOptions)
+          }
+          return type ? rowLabels[type] : undefined
+        },
+        summary: (values) => {
+          if (values['grantType'] !== 'equipment') return ''
+          return equipmentGrantSummary(values as EquipmentGrantItemForm, equipmentOptions)
         },
       },
       fields: grantItemFields(grantTypes, labels, ctx),

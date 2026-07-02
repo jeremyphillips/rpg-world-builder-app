@@ -11,6 +11,8 @@ import type {
 } from '@rpg/contracts'
 
 import { type GrantRowForm, type GrantType } from './grant-form-schema'
+import type { EquipmentGrantItemForm } from './equipment-grant-form-fields'
+import { equipmentGrantFromFormRow, equipmentGrantToFormRow } from './equipment-grant-form-values'
 
 function emptyGrantRow(grantType: GrantType): GrantRowForm {
   return {
@@ -108,6 +110,13 @@ function featChoiceToRow(featChoice: ContentGrants['featChoice']): GrantRowForm 
   }
 }
 
+function equipmentGrantsToRows(equipment: ContentGrants['equipment']): GrantRowForm[] {
+  return (equipment ?? []).map((grant) => ({
+    grantType: 'equipment',
+    ...equipmentGrantToFormRow(grant),
+  }))
+}
+
 /** Converts a `ContentGrants` object into flat grant-row form values. */
 export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowForm[] {
   if (!grants) return []
@@ -120,6 +129,7 @@ export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowFor
     ...optionalGrantRow(proficienciesToRow(grants.proficiencies)),
     ...optionalGrantRow(innateSpellsToRow(grants.innateSpells)),
     ...optionalGrantRow(featChoiceToRow(grants.featChoice)),
+    ...equipmentGrantsToRows(grants.equipment),
   ]
 }
 
@@ -228,6 +238,15 @@ function applyFeatChoiceFromRows(result: ContentGrants, rows: GrantRowForm[]): v
   result.featChoice = featChoice
 }
 
+function applyEquipmentFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const equipmentRows = rows.filter((row) => row.grantType === 'equipment' && row.itemKind)
+  if (!equipmentRows.length) return
+
+  result.equipment = equipmentRows.map((row) =>
+    equipmentGrantFromFormRow(row as EquipmentGrantItemForm),
+  )
+}
+
 /** Folds grant-row form values back into a `ContentGrants` object. */
 export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefined {
   if (!rows.length) return undefined
@@ -241,6 +260,7 @@ export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefine
   applyProficienciesFromRows(result, rows)
   applyInnateSpellsFromRows(result, rows)
   applyFeatChoiceFromRows(result, rows)
+  applyEquipmentFromRows(result, rows)
 
   return Object.keys(result).length ? result : undefined
 }
