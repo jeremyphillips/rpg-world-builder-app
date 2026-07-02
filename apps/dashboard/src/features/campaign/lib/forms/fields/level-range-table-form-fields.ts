@@ -9,6 +9,7 @@ import {
 import type { ArrayItemHeaderConfig, FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import type { LevelRangeArrayConfig } from '../array-patterns'
+import { levelRangeArrayPattern } from '../array-patterns'
 
 const LEVEL_RANGE_FILTER_DEPENDS_ON = [
   'maxCharacterLevel',
@@ -69,7 +70,7 @@ export function buildLevelRangeTiersArrayField(
     itemCollapsible: options.itemCollapsible ?? true,
     addLabel: options.addLabel,
     reorder: false,
-    arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
+    arrayPattern: levelRangeArrayPattern({ min: 'minLevel', max: 'maxLevel' }),
     filterSelectDependsOn: [...LEVEL_RANGE_FILTER_DEPENDS_ON],
     filterSelectOptions: ({ arrayItems, rowIndex, fieldName, watchedValues }) => {
       const effectiveMax = resolveEffectiveMax(watchedValues)

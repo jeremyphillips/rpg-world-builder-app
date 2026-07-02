@@ -82,6 +82,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
+  /** See `FormProps['validationPresentation']`. */
+  validationPresentation?: import('../context/form-ui.context').FormValidationPresentation
 }
 
 /**
@@ -109,10 +111,12 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   contentWrapper,
   footerWrapper,
   valueSyncs,
+  validationPresentation,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
   const { form } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
+  const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
 
@@ -130,10 +134,12 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     <SchemaFormShell
       form={form}
       formId={formId}
+      fields={allFields}
       fileFieldProps={fileFieldProps}
       uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
+      validationPresentation={validationPresentation}
       onSubmit={onSubmit}
       className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >

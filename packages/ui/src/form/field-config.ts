@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { FormIssue, FormIssueSeverity } from './errors/form-issue.types'
+
 import type {
   DiceFormulaLabelPosition,
   DiceFormulaModifierMode,
@@ -597,6 +599,23 @@ export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
+export type { FormIssue, FormIssueSeverity } from './errors/form-issue.types'
+
+/** Context for mapping a row-level/cross-row issue to a focusable field name. */
+export type ArrayErrorFocusContext = {
+  issue: FormIssue
+  itemIndex: number
+  levelKeys?: { min: string; max: string }
+}
+
+/** Optional domain hooks for array validation navigation and severity. */
+export type ArrayPatternConfig = {
+  kind: string
+  levelKeys?: { min: string; max: string }
+  getErrorFocusTarget?: (ctx: ArrayErrorFocusContext) => string | undefined
+  classifyIssueSeverity?: (issue: FormIssue) => FormIssueSeverity
+} & Record<string, unknown>
+
 /** Per-item header chrome for detailed and compact array rows. */
 export interface ArrayItemHeaderConfig {
   /** Relative field name watched for the primary label (e.g. `'label'`). */
@@ -672,8 +691,8 @@ export interface ArrayConfig {
    */
   visibility?: FieldVisibility
 
-  /** Opaque tag for dashboard patterns / drift tests. Renderer does not interpret domain kinds. */
-  arrayPattern?: { kind: string } & Record<string, unknown>
+  /** Domain pattern hooks for validation navigation, focus, and severity classification. */
+  arrayPattern?: ArrayPatternConfig
 
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
