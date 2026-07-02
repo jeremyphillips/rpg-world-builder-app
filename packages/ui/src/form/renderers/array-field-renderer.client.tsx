@@ -353,11 +353,17 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     </>
   )
 
+  const showLegend = legend.trim().length > 0
+
   return (
-    <fieldset className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses)}>
-      <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
-        {legend}
-      </legend>
+    <fieldset
+      className={cn(fieldSetResetClasses, !nested && fieldGroupBottomMarginClasses)}
+    >
+      {showLegend ? (
+        <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
+          {legend}
+        </legend>
+      ) : null}
       <div className={itemListClasses}>
         {sortableEnabled ? (
           <DndContext

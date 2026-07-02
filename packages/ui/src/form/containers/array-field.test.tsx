@@ -102,6 +102,57 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
+  })
+
+  it('omits section bottom margin and empty legends for nested arrays in toggleDependent stacks', async () => {
+    const user = userEvent.setup()
+    const nestedSchema = z.object({
+      enabled: z.boolean(),
+      caps: z.array(z.object({ classId: z.string() })),
+    })
+
+    const nestedFields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'toggleDependent',
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'switch',
+            name: 'enabled',
+            label: 'Class-specific limits',
+            defaultValue: true,
+          },
+          {
+            kind: 'array',
+            name: 'caps',
+            legend: '',
+            addLabel: 'Add class limit',
+            fields: [{ type: 'text', name: 'classId', label: 'Class' }],
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof nestedSchema>>
+        schema={nestedSchema}
+        fields={nestedFields}
+        defaultValues={{ enabled: true, caps: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add class limit' })
+    const fieldset = addButton.closest('fieldset')
+    expect(fieldset).not.toBeNull()
+    expect(fieldset).not.toHaveClass('mb-8')
+    expect(fieldset?.querySelector('legend')).toBeNull()
+
+    await user.click(addButton)
+    expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument()
   })
 
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {

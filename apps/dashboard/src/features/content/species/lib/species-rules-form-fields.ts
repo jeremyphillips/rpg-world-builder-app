@@ -165,7 +165,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'stack',
       layout: 'toggleDependent',
-      dependentsChrome: undefined,
+      dependentsChrome: 'subtle',
       fields: [
         {
           type: 'switch',

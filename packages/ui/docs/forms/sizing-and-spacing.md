@@ -20,7 +20,7 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 | `fieldGroupStackClasses`          | `flex flex-col gap-6`       | Alias for `comfortable` — prefer `fieldStackRhythmVariants` in new code          |
 | `fieldStackRhythmVariants`        | `gap-2` / `gap-6`           | Form columns, groups, stacks, array item **bodies** — `compact` or `comfortable` |
 | `fieldArrayItemListClasses`       | `gap-2` / `gap-3` / `gap-6` | Gap between sibling **array items** — combines rhythm + section `size`           |
-| `fieldGroupBottomMarginClasses`   | `mb-8`                      | Space below a group or array fieldset                                            |
+| `fieldGroupBottomMarginClasses`   | `mb-8`                      | Space below a top-level group or array fieldset (nested arrays omit — parent rhythm) |
 | `fieldGroupFlexStackClasses`      | `flex flex-col gap-8`       | Stacking fieldsets or collapse-prone siblings                                    |
 | `formSectionStackClasses`         | `flex flex-col gap-7`       | Top-level accordion sections on `<Form>`                                         |
 | `fieldRowGapClasses`              | `gap-6`                     | Gap between fields in a `FieldRow`                                               |

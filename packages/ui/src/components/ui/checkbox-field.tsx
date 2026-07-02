@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 
-import { Field } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
 import { Checkbox } from './checkbox.client'
 import {
@@ -18,6 +18,7 @@ export interface CheckboxFieldProps extends Omit<ComponentProps<typeof Checkbox>
   info?: ReactNode
   required?: boolean
   width?: FieldWidth
+  size?: FieldSize
 }
 
 /** A single checkbox with an inline label, bound to the compound `Field`. */
@@ -29,6 +30,7 @@ export function CheckboxField({
   info,
   required,
   width,
+  size = 'md',
   ...checkboxProps
 }: CheckboxFieldProps) {
   const labelNode = (
@@ -38,7 +40,7 @@ export function CheckboxField({
   )
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
       <div className={fieldInlineToggleRowClasses}>
         <div className={fieldInlineCheckboxControlColumnClasses}>
           <Field.Control>

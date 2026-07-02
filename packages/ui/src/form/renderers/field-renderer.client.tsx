@@ -220,6 +220,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
+      size={config.size}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={(checked) => field.onChange(checked === true)}

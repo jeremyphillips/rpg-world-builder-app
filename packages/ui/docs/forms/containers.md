@@ -100,6 +100,12 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
 }
 ```
 
+**Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
+`toggleDependent` dependents). Empty legends are not rendered — no phantom spacing.
+
+**Section margin:** Top-level array fieldsets use `mb-8`. Nested arrays (inside stacks,
+groups, or array items) omit it so parent `fieldStackRhythmVariants` gap controls spacing.
+
 **Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
 caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
 leaf `row`; otherwise `detailed`. Nested arrays inside another item are always compact.

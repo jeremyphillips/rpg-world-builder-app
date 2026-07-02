@@ -9,7 +9,8 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below a field group or array section fieldset
+ * - `fieldGroupBottomMarginClasses` — space below a top-level group or array section fieldset
+ *   (nested array sections omit this; parent stack/group rhythm owns spacing)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `formSectionStackClasses` — vertical gap between top-level form sections
