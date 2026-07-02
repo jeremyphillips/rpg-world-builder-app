@@ -31,6 +31,7 @@ import type {
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
+  fieldDefaultValue,
   resolveFieldHint,
 } from '../field-config'
 import { useDependsOnValues } from '../config/form-depends-on.client'
@@ -504,7 +505,10 @@ function StandardFieldRenderer({
   id,
   namePrefix,
 }: StandardFieldRendererProps) {
-  const { field, fieldState } = useController({ name: fullName })
+  const { field, fieldState } = useController({
+    name: fullName,
+    defaultValue: fieldDefaultValue(config),
+  })
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.

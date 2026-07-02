@@ -36,6 +36,27 @@ describe('StackConfig helpers', () => {
     expect(flattenFields([stack]).map((field) => field.name)).toEqual(['enabled', 'score'])
   })
 
+  it('builds default values from nested stack fields including arrays', () => {
+    const stack: StackConfig = {
+      kind: 'stack',
+      layout: 'toggleDependent',
+      fields: [
+        { type: 'switch', name: 'enabled', label: 'Enabled', defaultValue: false },
+        {
+          kind: 'array',
+          name: 'items',
+          legend: 'Items',
+          fields: [{ type: 'text', name: 'label', label: 'Label' }],
+        },
+      ],
+    }
+
+    expect(buildDefaultValues([stack])).toEqual({
+      enabled: false,
+      items: [],
+    })
+  })
+
   it('builds default values from nested stack fields', () => {
     expect(buildDefaultValues([stack])).toEqual({
       enabled: false,

@@ -27,6 +27,7 @@ function TabStory({ formCtx }: { formCtx: ContentFormCtx }) {
         levelLimits: {
           limitMaxCharacterLevel: true,
           maxCharacterLevel: 10,
+          enableClassLevelCaps: true,
           classLevelCaps: [{ classId: 'wizard', maxLevel: 5 }],
         },
       },

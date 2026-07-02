@@ -530,7 +530,13 @@ export interface RowConfig {
 }
 
 /** Fields allowed inside a `group` or `stack` — may nest one level or more. */
-export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig | StackConfig
+export type GroupFieldItem =
+  | FieldConfig
+  | RowConfig
+  | SlotConfig
+  | GroupConfig
+  | StackConfig
+  | ArrayConfig
 
 /** Layout-only container for toggle + dependent fields (no fieldset legend). */
 export interface StackConfig {
