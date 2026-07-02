@@ -14,6 +14,22 @@ export function nextLevelRangeRowDefaults(
   return { minLevel: nextMin, maxLevel: effectiveMax }
 }
 
+function cloneLevelRangeRows(rows: readonly LevelRangeRow[]): LevelRangeRow[] {
+  return rows.map((row) => ({ ...row }))
+}
+
+/** Keeps rows [startIndex..] contiguous after an upstream boundary change. */
+function snapForwardContiguousRows(rows: LevelRangeRow[], startIndex: number): void {
+  for (let index = Math.max(1, startIndex); index < rows.length; index++) {
+    const previousRow = rows[index - 1]!
+    const row = rows[index]!
+    row.minLevel = previousRow.maxLevel + 1
+    if (row.maxLevel < row.minLevel) {
+      row.maxLevel = row.minLevel
+    }
+  }
+}
+
 /** Whether `level` is a valid min-level choice for row `rowIndex`. */
 export function minLevelSelectable(
   rows: readonly LevelRangeRow[],
@@ -28,9 +44,11 @@ export function minLevelSelectable(
   }
 
   const previousRow = rows[rowIndex - 1]
-  if (!previousRow) return false
+  const row = rows[rowIndex]
+  if (!previousRow || !row) return false
 
-  return level === previousRow.maxLevel + 1
+  const lowerBound = previousRow.minLevel + 1
+  return level >= lowerBound && level <= row.maxLevel
 }
 
 /** Whether `level` is a valid max-level choice for row `rowIndex`. */
@@ -44,7 +62,65 @@ export function maxLevelSelectable(
   if (level < rowMin || level > effectiveMax) return false
 
   const nextRow = rows[rowIndex + 1]
-  if (nextRow && level >= nextRow.minLevel) return false
+  const upperBound = nextRow ? nextRow.maxLevel : effectiveMax
+  return level <= upperBound
+}
 
-  return true
+/** Applies a max-level edit and ripples contiguous boundaries through later rows. */
+export function applyLevelRangeMaxChange(
+  rows: readonly LevelRangeRow[],
+  rowIndex: number,
+  newMax: number,
+): LevelRangeRow[] {
+  const result = cloneLevelRangeRows(rows)
+  const row = result[rowIndex]
+  if (!row) return result
+
+  row.maxLevel = newMax
+  if (row.maxLevel < row.minLevel) {
+    row.minLevel = row.maxLevel
+  }
+
+  snapForwardContiguousRows(result, rowIndex + 1)
+  return result
+}
+
+/** Applies a min-level edit, adjusts the previous row max, and ripples forward. */
+export function applyLevelRangeMinChange(
+  rows: readonly LevelRangeRow[],
+  rowIndex: number,
+  newMin: number,
+): LevelRangeRow[] {
+  const result = cloneLevelRangeRows(rows)
+  const row = result[rowIndex]
+  if (!row) return result
+
+  row.minLevel = newMin
+  if (row.maxLevel < row.minLevel) {
+    row.maxLevel = row.minLevel
+  }
+
+  if (rowIndex > 0) {
+    const previousRow = result[rowIndex - 1]!
+    previousRow.maxLevel = newMin - 1
+    if (previousRow.maxLevel < previousRow.minLevel) {
+      previousRow.minLevel = previousRow.maxLevel
+    }
+  }
+
+  snapForwardContiguousRows(result, rowIndex + 1)
+  return result
+}
+
+/** Returns true when two tables have identical min/max pairs. */
+export function levelRangeRowsEqual(
+  left: readonly LevelRangeRow[],
+  right: readonly LevelRangeRow[],
+): boolean {
+  if (left.length !== right.length) return false
+
+  return left.every(
+    (row, index) =>
+      row.minLevel === right[index]?.minLevel && row.maxLevel === right[index]?.maxLevel,
+  )
 }

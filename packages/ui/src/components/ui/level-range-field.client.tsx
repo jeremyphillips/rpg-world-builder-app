@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
@@ -47,6 +47,10 @@ function renderOptions(options: FieldOption[]) {
   ))
 }
 
+function optionsSignature(options: FieldOption[]): string {
+  return JSON.stringify(options.map((option) => [option.value, option.disabled ?? false]))
+}
+
 /** Inline min/max level selects joined by a connector (`1 through 20`). */
 export function LevelRangeField({
   id,
@@ -74,6 +78,10 @@ export function LevelRangeField({
 }: LevelRangeFieldProps) {
   const minString = minValue !== undefined ? String(minValue) : undefined
   const maxString = maxValue !== undefined ? String(maxValue) : undefined
+  const minOptionsKey = optionsSignature(minOptions)
+  const maxOptionsKey = optionsSignature(maxOptions)
+  const minOptionNodes = useMemo(() => renderOptions(minOptions), [minOptions, minOptionsKey])
+  const maxOptionNodes = useMemo(() => renderOptions(maxOptions), [maxOptions, maxOptionsKey])
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
@@ -106,7 +114,7 @@ export function LevelRangeField({
                   <SelectValue placeholder="Min" />
                 </SelectTrigger>
               </Field.Control>
-              <SelectContent>{renderOptions(minOptions)}</SelectContent>
+              <SelectContent>{minOptionNodes}</SelectContent>
             </Select>
 
             <InlineSentenceConnector size={size}>{connector}</InlineSentenceConnector>
@@ -130,7 +138,7 @@ export function LevelRangeField({
                   <SelectValue placeholder="Max" />
                 </SelectTrigger>
               </Field.Control>
-              <SelectContent>{renderOptions(maxOptions)}</SelectContent>
+              <SelectContent>{maxOptionNodes}</SelectContent>
             </Select>
           </InlineSentenceRow>
         }

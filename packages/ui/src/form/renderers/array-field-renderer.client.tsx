@@ -55,6 +55,18 @@ import { arrayItemBodyClasses } from './array-item-toolbar.variants'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 import { useArrayItemCollapseState } from '../hooks/use-array-item-collapse-state.client'
 
+function resolveLevelRangeKeys(
+  arrayPattern: ArrayConfig['arrayPattern'],
+): { min: string; max: string } | undefined {
+  if (arrayPattern?.kind !== 'levelRange') return undefined
+
+  const levelKeys = arrayPattern.levelKeys as { min?: string; max?: string } | undefined
+  return {
+    min: levelKeys?.min ?? 'minLevel',
+    max: levelKeys?.max ?? 'maxLevel',
+  }
+}
+
 export interface ArrayFieldRendererProps {
   config: ArrayConfig
   idPrefix: string
@@ -111,17 +123,33 @@ function ArrayFieldItemContent({
   const itemValues = (useWatch({ name: itemPrefix }) ?? {}) as Record<string, unknown>
   const arrayItems = useWatch({ name: fullName, defaultValue: [] }) as unknown[]
   const watchedValues = useDependsOnValues(config.filterSelectDependsOn ?? [])
+  const arrayItemsSignature = React.useMemo(() => JSON.stringify(arrayItems ?? []), [arrayItems])
   const titleId = `${idPrefix}-${fullName}-${itemId}-title`
   const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
+
+  const levelRangeKeys = React.useMemo(
+    () => resolveLevelRangeKeys(config.arrayPattern),
+    [config.arrayPattern],
+  )
 
   const arrayContext = React.useMemo(
     () => ({
       items: arrayItems ?? [],
       rowIndex: index,
+      fullArrayName: levelRangeKeys ? fullName : undefined,
+      levelRangeKeys,
       filterSelectOptions: config.filterSelectOptions,
       watchedValues,
     }),
-    [arrayItems, index, config.filterSelectOptions, watchedValues],
+    [
+      arrayItems,
+      arrayItemsSignature,
+      index,
+      fullName,
+      levelRangeKeys,
+      config.filterSelectOptions,
+      watchedValues,
+    ],
   )
 
   const fieldsNode = (
@@ -356,9 +384,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const showLegend = legend.trim().length > 0
 
   return (
-    <fieldset
-      className={cn(fieldSetResetClasses, !nested && fieldGroupBottomMarginClasses)}
-    >
+    <fieldset className={cn(fieldSetResetClasses, !nested && fieldGroupBottomMarginClasses)}>
       {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}

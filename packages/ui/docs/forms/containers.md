@@ -215,18 +215,18 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property                          | Purpose                                                                                     |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                      |
-| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).     |
-| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).               |
-| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                        |
-| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).  |
-| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                        |
-| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                   |
-| `filterSelectDependsOn`           | Root field names passed to `filterSelectOptions` as `watchedValues`.                        |
-| `filterSelectOptions`             | Cross-row select filtering inside array items.                                              |
-| `arrayPattern`                    | Opaque metadata tag for dashboard patterns / drift tests — not interpreted by the renderer. |
+| Property                          | Purpose                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                     |
+| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).    |
+| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).              |
+| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                       |
+| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`). |
+| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                       |
+| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                  |
+| `filterSelectDependsOn`           | Root field names passed to `filterSelectOptions` as `watchedValues`.                       |
+| `filterSelectOptions`             | Cross-row select filtering inside array items.                                             |
+| `arrayPattern`                    | Dashboard pattern tag. `kind: 'levelRange'` enables cascade edits on `levelRange` fields.  |
 
 ### Conditional fields in items
 
