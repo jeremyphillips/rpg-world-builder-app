@@ -5,11 +5,8 @@ import {
   GEAR_KIND_ENTRIES,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   spellcastingFocusGearKindSchema,
-  TOOL_CATEGORIES,
-  TOOL_CATEGORY_ENTRIES,
-  toolCategorySchema,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
@@ -17,17 +14,16 @@ import {
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
-  STARTING_EQUIPMENT_ITEM_KIND_LABELS,
-  STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
-} from './class-starting-equipment-form-labels'
+  equipmentGrantChoiceItemFormSchema,
+  equipmentGrantFixedItemFormSchema,
+  equipmentGrantItemFields,
+  EQUIPMENT_GRANT_ITEM_KINDS,
+} from '../../../lib/forms/grants/equipment-grant-form-fields'
+import { equipmentGrantTitle } from '../../../lib/forms/grants/equipment-grant-form-values'
+import { STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT } from './class-starting-equipment-form-labels'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
 export const startingEquipmentValidationMessages = {
-  poolChoiceSourcesRequired: defineMessage(
-    'validation.startingEquipment.poolChoiceSourcesRequired',
-    () => 'Pool choices require equipment and/or tool categories',
-    () => 'Missing pool sources',
-  ),
   wealthGrantRequired: defineMessage(
     'validation.startingEquipment.wealthGrantRequired',
     () => 'Packages with no items require a wealth grant',
@@ -35,30 +31,18 @@ export const startingEquipmentValidationMessages = {
   ),
 }
 
-export const STARTING_EQUIPMENT_ITEM_KINDS = ['fixed', 'choice'] as const
+export const STARTING_EQUIPMENT_ITEM_KINDS = EQUIPMENT_GRANT_ITEM_KINDS
 
 export const STARTING_EQUIPMENT_OPTIONS_FIELD_NAME =
   'characterCreation.startingEquipment.options' as const
 
 export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipment' as const
 
-const itemKindOptions = toOptions(
-  STARTING_EQUIPMENT_ITEM_KINDS,
-  STARTING_EQUIPMENT_ITEM_KIND_LABELS,
-)
-
 const focusKindOptions = toOptions(
   SPELLCASTING_FOCUS_GEAR_KINDS,
   Object.fromEntries(
     SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, GEAR_KIND_ENTRIES[kind].label]),
   ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
-)
-
-const toolCategoryOptions = toOptions(
-  TOOL_CATEGORIES,
-  Object.fromEntries(
-    TOOL_CATEGORIES.map((category) => [category, TOOL_CATEGORY_ENTRIES[category].label]),
-  ) as Record<(typeof TOOL_CATEGORIES)[number], string>,
 )
 
 const wealthGrantMoneyFormSchema = z.object({
@@ -73,31 +57,11 @@ export const startingEquipmentModifierFormSchema = z.object({
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
-export const startingEquipmentFixedItemFormSchema = z.object({
-  itemKind: z.literal('fixed'),
-  equipmentSlug: z.string().min(1),
-  quantity: z.coerce.number().int().min(1).default(1),
-  equipped: z.boolean().optional(),
+export const startingEquipmentFixedItemFormSchema = equipmentGrantFixedItemFormSchema.extend({
   modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
 })
 
-export const startingEquipmentChoiceItemFormSchema = z
-  .object({
-    itemKind: z.literal('choice'),
-    label: z.string().min(1),
-    choose: z.coerce.number().int().min(1).default(1),
-    fromEquipmentSlugs: z.array(z.string().min(1)).optional(),
-    fromToolCategories: z.array(toolCategorySchema).optional(),
-  })
-  .superRefine((row, ctx) => {
-    if (!row.fromEquipmentSlugs?.length && !row.fromToolCategories?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: startingEquipmentValidationMessages.poolChoiceSourcesRequired(),
-        path: ['fromEquipmentSlugs'],
-      })
-    }
-  })
+export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
 
 export const startingEquipmentItemFormSchema = z.discriminatedUnion('itemKind', [
   startingEquipmentFixedItemFormSchema,
@@ -152,18 +116,9 @@ export function startingEquipmentOptionTitle(
 export function startingEquipmentItemTitle(
   row: StartingEquipmentItemForm | undefined,
   index: number,
-  equipmentOptions: FieldOption[] = [],
+  equipmentOptions: Parameters<typeof equipmentGrantTitle>[2] = [],
 ): string {
-  if (!row) return `Item ${index + 1}`
-
-  if (row.itemKind === 'fixed') {
-    const label = equipmentOptions?.find((option) => option.value === row.equipmentSlug)?.label
-    const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
-    const quantity = row.quantity ?? 1
-    return quantity > 1 ? `${name} x${quantity}` : name
-  }
-
-  return row.label || `Pool choice ${index + 1}`
+  return equipmentGrantTitle(row, index, equipmentOptions)
 }
 
 export function startingEquipmentModifierFields(): FormItem[] {
@@ -222,85 +177,7 @@ export function startingEquipmentChooseFields(): FormItem[] {
 }
 
 export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
-  const equipmentOptions = ctx.options?.equipment ?? []
-
-  return [
-    {
-      type: 'text',
-      name: 'label',
-      label: 'Choice label',
-      required: true,
-      visibility: visibleForItemKind('choice'),
-    },
-    {
-      type: 'select',
-      name: 'itemKind',
-      label: 'Item kind',
-      options: itemKindOptions,
-      required: true,
-      defaultValue: 'fixed',
-    },
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'combobox',
-          name: 'equipmentSlug',
-          label: 'Equipment',
-          options: equipmentOptions,
-          multiple: false,
-          placeholder: 'Choose equipment…',
-          required: true,
-          width: 'full',
-          visibility: visibleForItemKind('fixed'),
-        },
-        {
-          type: 'number',
-          name: 'quantity',
-          label: 'Quantity',
-          min: 1,
-          defaultValue: 1,
-          width: 'auto',
-          digits: 2,
-          visibility: visibleForItemKind('fixed'),
-        },
-      ],
-    },
-    {
-      type: 'switch',
-      name: 'equipped',
-      label: 'Equipped',
-      visibility: visibleForItemKind('fixed'),
-    },
-    ...startingEquipmentModifierFields(),
-    {
-      type: 'inlineChooseCount',
-      name: 'choose',
-      label: '',
-      min: 1,
-      prefix: 'Character can choose',
-      suffix: 'from Equipment pool:',
-      defaultValue: 1,
-      visibility: visibleForItemKind('choice'),
-      digits: 1,
-    },
-    {
-      type: 'combobox',
-      name: 'fromEquipmentSlugs',
-      label: '',
-      multiple: true,
-      options: equipmentOptions,
-      placeholder: 'Choose equipment…',
-      visibility: visibleForItemKind('choice'),
-    },
-    {
-      type: 'chips',
-      name: 'fromToolCategories',
-      label: 'Tool categories',
-      options: toolCategoryOptions,
-      visibility: visibleForItemKind('choice'),
-    },
-  ]
+  return equipmentGrantItemFields(ctx, { extraFields: startingEquipmentModifierFields() })
 }
 
 export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem[] {

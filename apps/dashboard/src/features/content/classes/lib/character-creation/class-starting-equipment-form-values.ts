@@ -2,7 +2,6 @@ import type {
   StartingEquipmentChoice,
   StartingEquipmentFixedItem,
   StartingEquipmentItem,
-  StartingEquipmentItemChoice,
   StartingEquipmentOption,
 } from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
@@ -14,76 +13,41 @@ import {
 import { applyStableIdsForChoiceOptions } from '../../../lib/forms/content-form-key-helpers'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
+  equipmentGrantFromFormRow,
+  equipmentGrantToFormRow,
+} from '../../../lib/forms/grants/equipment-grant-form-values'
+import {
   startingEquipmentOptionItemFields,
   type StartingEquipmentForm,
   type StartingEquipmentItemForm,
   type StartingEquipmentOptionForm,
 } from './class-starting-equipment-form-fields'
 
-type StartingEquipmentFixedItemForm = Extract<StartingEquipmentItemForm, { itemKind: 'fixed' }>
-type StartingEquipmentChoiceItemForm = Extract<StartingEquipmentItemForm, { itemKind: 'choice' }>
-
-function fixedItemToFormRow(item: StartingEquipmentFixedItem): StartingEquipmentItemForm {
-  return {
-    itemKind: 'fixed',
-    equipmentSlug: item.equipmentSlug,
-    quantity: item.quantity,
-    equipped: item.equipped,
-    modifiers: item.modifiers?.map((modifier) => ({
-      kind: modifier.kind,
-      focusKind: modifier.focusKind,
-    })),
-  }
-}
-
-function choiceItemToFormRow(item: StartingEquipmentItemChoice): StartingEquipmentItemForm {
-  return {
-    itemKind: 'choice',
-    label: item.label,
-    choose: item.choose,
-    fromEquipmentSlugs: item.from.equipmentSlugs,
-    fromToolCategories: item.from.toolCategories,
-  }
-}
-
 function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
-  return item.kind === 'fixed' ? fixedItemToFormRow(item) : choiceItemToFormRow(item)
-}
-
-function fixedItemFromFormRow(row: StartingEquipmentFixedItemForm): StartingEquipmentFixedItem {
-  const item: StartingEquipmentFixedItem = {
-    kind: 'fixed',
-    equipmentSlug: row.equipmentSlug,
-    quantity: row.quantity ?? 1,
+  if (item.kind === 'fixed') {
+    return {
+      itemKind: 'fixed',
+      equipmentSlug: item.equipmentSlug,
+      quantity: item.quantity,
+      equipped: item.equipped,
+      modifiers: item.modifiers?.map((modifier) => ({
+        kind: modifier.kind,
+        focusKind: modifier.focusKind,
+      })),
+    }
   }
-  if (row.equipped !== undefined) {
-    item.equipped = row.equipped
-  }
-  if (row.modifiers?.length) {
-    item.modifiers = row.modifiers
-  }
-  return item
-}
-
-function choiceItemFromFormRow(row: StartingEquipmentChoiceItemForm): StartingEquipmentItemChoice {
-  const from: StartingEquipmentItemChoice['from'] = {}
-  if (row.fromEquipmentSlugs?.length) {
-    from.equipmentSlugs = row.fromEquipmentSlugs
-  }
-  if (row.fromToolCategories?.length) {
-    from.toolCategories = row.fromToolCategories
-  }
-
-  return {
-    kind: 'choice',
-    label: row.label,
-    choose: row.choose ?? 1,
-    from,
-  }
+  return equipmentGrantToFormRow(item)
 }
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
-  return row.itemKind === 'fixed' ? fixedItemFromFormRow(row) : choiceItemFromFormRow(row)
+  if (row.itemKind === 'fixed') {
+    const grant = equipmentGrantFromFormRow(row) as StartingEquipmentFixedItem
+    if (row.modifiers?.length) {
+      grant.modifiers = row.modifiers
+    }
+    return grant
+  }
+  return equipmentGrantFromFormRow(row)
 }
 
 export function startingEquipmentOptionToFormRow(

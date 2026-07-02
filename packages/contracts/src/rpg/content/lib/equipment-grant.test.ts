@@ -132,6 +132,42 @@ describe('equipmentChoiceGrantSchema', () => {
       pool: { source: 'explicit', equipmentSlugs: ['longsword', 'rapier'] },
     })
   })
+
+  it('normalizes legacy from.toolCategories pools', () => {
+    expect(
+      equipmentChoiceGrantSchema.parse({
+        kind: 'choice',
+        choose: 1,
+        label: 'Musical Instrument',
+        from: { toolCategories: ['musical_instrument'] },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 1,
+      label: 'Musical Instrument',
+      pool: {
+        source: 'filtered',
+        equipmentKind: 'tool',
+        toolCategories: ['musical_instrument'],
+      },
+    })
+  })
+
+  it('normalizes legacy from.equipmentSlugs pools', () => {
+    expect(
+      equipmentChoiceGrantSchema.parse({
+        kind: 'choice',
+        choose: 1,
+        label: 'Melee weapon',
+        from: { equipmentSlugs: ['longsword', 'rapier'] },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 1,
+      label: 'Melee weapon',
+      pool: { source: 'explicit', equipmentSlugs: ['longsword', 'rapier'] },
+    })
+  })
 })
 
 describe('equipmentGrantSchema', () => {

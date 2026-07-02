@@ -428,7 +428,11 @@
                 "kind": "choice",
                 "choose": 1,
                 "label": "Musical Instrument",
-                "from": { "toolCategories": ["musical_instrument"] }
+                "pool": {
+                  "source": "filtered",
+                  "equipmentKind": "tool",
+                  "toolCategories": ["musical_instrument"]
+                }
               },
               { "kind": "fixed", "equipmentSlug": "entertainers-pack", "quantity": 1 }
             ],

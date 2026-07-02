@@ -112,7 +112,46 @@ export const fixedEquipmentGrantSchema = z.object({
 
 export type FixedEquipmentGrant = z.infer<typeof fixedEquipmentGrantSchema>
 
-export const equipmentChoiceGrantSchema = contentPoolChoiceSchema
+/**
+ * Maps legacy starting-equipment `from` pools to `pool` for records written before
+ * the equipment-grant primitive (overlay patches, homebrew, stale Mongo rows).
+ */
+export function normalizeEquipmentChoiceGrant(input: unknown): unknown {
+  if (typeof input !== 'object' || input === null) return input
+
+  const record = input as Record<string, unknown>
+  if (record.kind !== 'choice' || record.pool !== undefined) return input
+
+  const from = record.from
+  if (typeof from !== 'object' || from === null) return input
+
+  const fromRecord = from as Record<string, unknown>
+  const { from: _legacyFrom, ...rest } = record
+
+  const equipmentSlugs = fromRecord.equipmentSlugs
+  if (Array.isArray(equipmentSlugs) && equipmentSlugs.length > 0) {
+    return {
+      ...rest,
+      pool: { source: 'explicit', equipmentSlugs },
+    }
+  }
+
+  const toolCategories = fromRecord.toolCategories
+  if (Array.isArray(toolCategories) && toolCategories.length > 0) {
+    return {
+      ...rest,
+      pool: {
+        source: 'filtered',
+        equipmentKind: 'tool',
+        toolCategories,
+      },
+    }
+  }
+
+  return input
+}
+
+export const equipmentChoiceGrantObjectSchema = contentPoolChoiceSchema
   .extend({
     kind: z.literal('choice'),
     label: z.string().min(1),
@@ -120,12 +159,29 @@ export const equipmentChoiceGrantSchema = contentPoolChoiceSchema
   })
   .strict()
 
-export type EquipmentChoiceGrant = z.infer<typeof equipmentChoiceGrantSchema>
+/** Standalone parse (forms, tests) — includes legacy `from` normalization. */
+export const equipmentChoiceGrantSchema = z.preprocess(
+  normalizeEquipmentChoiceGrant,
+  equipmentChoiceGrantObjectSchema,
+)
 
-export const equipmentGrantSchema = z.discriminatedUnion('kind', [
-  fixedEquipmentGrantSchema,
-  equipmentChoiceGrantSchema,
-])
+export type EquipmentChoiceGrant = z.infer<typeof equipmentChoiceGrantObjectSchema>
+
+function normalizeEquipmentGrant(input: unknown): unknown {
+  if (
+    typeof input === 'object' &&
+    input !== null &&
+    (input as Record<string, unknown>).kind === 'choice'
+  ) {
+    return normalizeEquipmentChoiceGrant(input)
+  }
+  return input
+}
+
+export const equipmentGrantSchema = z.preprocess(
+  normalizeEquipmentGrant,
+  z.discriminatedUnion('kind', [fixedEquipmentGrantSchema, equipmentChoiceGrantObjectSchema]),
+)
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
 

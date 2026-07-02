@@ -1,26 +1,18 @@
 import { z } from 'zod'
 
-import { toolCategorySchema } from '../vocab/equipment/tool-category'
+import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/choice'
 import {
-  contentChoiceOptionSchema,
-  contentChoiceSchema,
-  contentPoolChoiceSchema,
-} from './lib/choice'
+  equipmentChoiceGrantObjectSchema,
+  fixedEquipmentGrantSchema,
+  normalizeEquipmentChoiceGrant,
+} from './lib/equipment-grant'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
-import { equipmentModifierSchema } from './equipment/modifier'
 
 // ---------------------------------------------------------------------------
 // Starting equipment — class/background character-creation gear packages.
 // ---------------------------------------------------------------------------
 
-export const startingEquipmentFixedItemSchema = z.object({
-  kind: z.literal('fixed'),
-  /** Bare equipment slug; resolved to `{rulesetId}:{slug}` at build time. */
-  equipmentSlug: z.string().min(1),
-  quantity: z.number().int().min(1).default(1),
-  equipped: z.boolean().optional(),
-  modifiers: z.array(equipmentModifierSchema).optional(),
-})
+export const startingEquipmentFixedItemSchema = fixedEquipmentGrantSchema
 
 export type StartingEquipmentFixedItem = z.infer<typeof startingEquipmentFixedItemSchema>
 
@@ -31,33 +23,25 @@ export type StartingEquipmentFixedItem = z.infer<typeof startingEquipmentFixedIt
  * linked to class tool proficiency) are prose-only in v1 — see catalog Monk seed
  * and FOLLOWUP: proficiencyLinkedChoice.
  */
-export const startingEquipmentItemChoiceSchema = contentPoolChoiceSchema
-  .extend({
-    kind: z.literal('choice'),
-    label: z.string().min(1),
-    from: z
-      .object({
-        equipmentSlugs: z.array(z.string().min(1)).min(1).optional(),
-        toolCategories: z.array(toolCategorySchema).min(1).optional(),
-      })
-      .strict(),
-  })
-  .superRefine((val, ctx) => {
-    if (val.from.equipmentSlugs === undefined && val.from.toolCategories === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'item choices require equipmentSlugs and/or toolCategories',
-        path: ['from'],
-      })
-    }
-  })
+export const startingEquipmentItemChoiceSchema = z.preprocess(
+  normalizeEquipmentChoiceGrant,
+  equipmentChoiceGrantObjectSchema,
+)
 
-export type StartingEquipmentItemChoice = z.infer<typeof startingEquipmentItemChoiceSchema>
+export type StartingEquipmentItemChoice = z.infer<typeof equipmentChoiceGrantObjectSchema>
 
-export const startingEquipmentItemSchema = z.discriminatedUnion('kind', [
-  startingEquipmentFixedItemSchema,
-  startingEquipmentItemChoiceSchema,
-])
+export const startingEquipmentItemSchema = z.preprocess(
+  (input) =>
+    typeof input === 'object' &&
+    input !== null &&
+    (input as Record<string, unknown>).kind === 'choice'
+      ? normalizeEquipmentChoiceGrant(input)
+      : input,
+  z.discriminatedUnion('kind', [
+    startingEquipmentFixedItemSchema,
+    equipmentChoiceGrantObjectSchema,
+  ]),
+)
 
 export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>
 
