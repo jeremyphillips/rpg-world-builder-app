@@ -87,21 +87,46 @@ describe('flattenFormIssues', () => {
     })
   })
 
-  it('decodes structured field and summary messages', () => {
-    const structured = encodeStructuredMessage('Choose a rarity.', 'Missing Rarity')
+  it('decodes structured field and summary messages with messageId and params', () => {
+    const structured = encodeStructuredMessage(
+      'Choose a rarity.',
+      'Missing Rarity',
+      'validation.field.requiredSelect',
+      { label: 'Rarity' },
+    )
     const errors = {
       tiers: [{ rarity: { type: 'custom', message: structured } }],
     } as unknown as FieldErrors
 
-    const issues = flattenFormIssues(errors)
+    const issues = classifyFormIssues(flattenFormIssues(errors), {})
     expect(issues[0]).toMatchObject({
       message: 'Choose a rarity.',
       summaryMessage: 'Missing Rarity',
+      messageId: 'validation.field.requiredSelect',
+      messageParams: { label: 'Rarity' },
+      scope: 'field',
     })
   })
 })
 
-describe('classifyFormIssues', () => {
+describe('classifyFormIssues scope', () => {
+  it('derives scope from array path context', () => {
+    const [labelIssue, overlapIssue, grantIssue] = classifyFormIssues(
+      flattenFormIssues({
+        startingWealth: {
+          tiers: [
+            { label: { type: 'custom', message: 'Required' } },
+            { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
+          ],
+        },
+      } as unknown as FieldErrors),
+      { arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } } },
+    )
+
+    expect(labelIssue?.scope).toBe('field')
+    expect(overlapIssue?.scope).toBe('field')
+    expect(grantIssue).toBeUndefined()
+  })
   it('classifies level range min/max as cross-row for levelRange patterns', () => {
     const [overlap, label] = classifyFormIssues(
       [

@@ -1,4 +1,9 @@
-export type { FormIssue, FormIssueSeverity, ArrayItemIssueGroup } from './form-issue.types'
+export type {
+  FormIssue,
+  FormIssueScope,
+  FormIssueSeverity,
+  ArrayItemIssueGroup,
+} from './form-issue.types'
 export { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 export { flattenFormIssues } from './flatten-form-issues'
 export { classifyFormIssue, classifyFormIssues } from './classify-form-issue'

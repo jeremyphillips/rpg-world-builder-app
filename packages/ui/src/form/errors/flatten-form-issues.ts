@@ -40,6 +40,8 @@ function walkFieldErrors(node: FieldErrors, pathPrefix: string, issues: FormIssu
       path: pathPrefix,
       message: decoded?.field ?? node.message,
       summaryMessage: decoded?.summary,
+      messageId: decoded?.messageId,
+      messageParams: decoded?.params,
       severity: 'field',
       ...parseArrayItemContext(pathPrefix),
     })

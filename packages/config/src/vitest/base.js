@@ -14,5 +14,10 @@ export default {
     clearMocks: true,
     restoreMocks: true,
     passWithNoTests: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['json', 'text'],
+      reportsDirectory: './coverage',
+    },
   },
 }

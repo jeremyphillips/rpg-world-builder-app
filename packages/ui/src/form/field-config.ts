@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import type { FormIssue, FormIssueSeverity } from './errors/form-issue.types'
+import type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 import type {
   DiceFormulaLabelPosition,
@@ -599,7 +599,7 @@ export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
-export type { FormIssue, FormIssueSeverity } from './errors/form-issue.types'
+export type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 /** Context for mapping a row-level/cross-row issue to a focusable field name. */
 export type ArrayErrorFocusContext = {
@@ -614,6 +614,7 @@ export type ArrayPatternConfig = {
   levelKeys?: { min: string; max: string }
   getErrorFocusTarget?: (ctx: ArrayErrorFocusContext) => string | undefined
   classifyIssueSeverity?: (issue: FormIssue) => FormIssueSeverity
+  classifyIssueScope?: (issue: FormIssue) => FormIssueScope
 } & Record<string, unknown>
 
 /** Per-item header chrome for detailed and compact array rows. */

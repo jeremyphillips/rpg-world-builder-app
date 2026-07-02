@@ -65,7 +65,8 @@ import {
   countIssuesForArrayPath,
   sortFormIssues,
 } from '../errors'
-import type { ArrayItemIssueProminence } from './array-item-issue.variants'
+import { resolveIssueProminence } from '../errors/resolve-issue-prominence'
+import type { FormIssueScope } from '../errors/form-issue.types'
 import { resolveIssueFocusControlId } from '../errors/resolve-issue-focus-target'
 import { collectArraySections } from '../errors/resolve-field-order'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
@@ -245,8 +246,9 @@ function ArrayFieldItemContent({
     itemValues,
   ])
 
-  const badgeProminence: ArrayItemIssueProminence =
-    variant === 'compact' ? 'action' : collapsed ? 'nav' : 'aggregate'
+  const issueScope: FormIssueScope = variant === 'compact' ? 'field' : 'item'
+  const issueVisibility = variant === 'compact' || !collapsed ? 'visible' : 'collapsed'
+  const badgeProminence = resolveIssueProminence(issueScope, issueVisibility)
 
   const issueSummary = (() => {
     if (!showIssueChrome || issueGroup.totalCount <= 0) return undefined

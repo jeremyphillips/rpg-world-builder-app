@@ -1,5 +1,10 @@
+import type { MessageParams } from '@rpg/contracts'
+
 /** Severity tier for ordering and header vs field display split. */
 export type FormIssueSeverity = 'crossRow' | 'row' | 'field'
+
+/** Where a validation issue belongs in the form hierarchy. */
+export type FormIssueScope = 'form' | 'section' | 'array' | 'item' | 'field'
 
 /** Flattened validation issue with array item context when applicable. */
 export type FormIssue = {
@@ -9,7 +14,13 @@ export type FormIssue = {
   message: string
   /** Shorter summary label for collapsed row chrome; falls back to `message`. */
   summaryMessage?: string
+  /** Stable message id from a {@link defineMessage} catalog when encoded in the payload. */
+  messageId?: string
+  /** Interpolation params from a {@link defineMessage} catalog when encoded in the payload. */
+  messageParams?: MessageParams
   severity: FormIssueSeverity
+  /** Derived placement in the form hierarchy (array item, field, etc.). */
+  scope?: FormIssueScope
   /** Array field path when the issue belongs to an array item, e.g. `startingWealth.tiers`. */
   arrayPath?: string
   itemIndex?: number

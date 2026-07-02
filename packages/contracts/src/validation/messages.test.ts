@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { defineMessage, decodeStructuredMessage } from './define-message'
+import {
+  defineMessage,
+  decodeStructuredMessage,
+  formatFieldMessage,
+  encodeStructuredMessage,
+} from './define-message'
 import {
   fieldValidationMessages,
   midSentenceLabel,
@@ -15,14 +20,23 @@ describe('defineMessage', () => {
       ({ min }) => `At least ${min}.`,
     )
 
-    expect(message({ min: 3 })).toBe('At least 3.')
+    expect(formatFieldMessage(message({ min: 3 }))).toBe('At least 3.')
     expect(message.id).toBe('validation.test.min')
+    expect(decodeStructuredMessage(message({ min: 3 }))).toMatchObject({
+      field: 'At least 3.',
+      messageId: 'validation.test.min',
+      params: { min: 3 },
+    })
   })
 
   it('supports parameterless messages', () => {
     const message = defineMessage('validation.test.plain', () => 'Plain.')
 
-    expect(message()).toBe('Plain.')
+    expect(formatFieldMessage(message())).toBe('Plain.')
+    expect(decodeStructuredMessage(message())).toMatchObject({
+      field: 'Plain.',
+      messageId: 'validation.test.plain',
+    })
   })
 
   it('encodes field and summary variants when both are provided', () => {
@@ -35,6 +49,24 @@ describe('defineMessage', () => {
     expect(decodeStructuredMessage(message({ label: 'Rarity' }))).toEqual({
       field: 'Rarity is required.',
       summary: 'Missing Rarity',
+      messageId: 'validation.test.required',
+      params: { label: 'Rarity' },
+    })
+  })
+
+  it('round-trips messageId and params through encodeStructuredMessage', () => {
+    const encoded = encodeStructuredMessage(
+      'Choose a rarity.',
+      'Missing Rarity',
+      'validation.field.requiredSelect',
+      { label: 'Rarity' },
+    )
+
+    expect(decodeStructuredMessage(encoded)).toEqual({
+      field: 'Choose a rarity.',
+      summary: 'Missing Rarity',
+      messageId: 'validation.field.requiredSelect',
+      params: { label: 'Rarity' },
     })
   })
 })
@@ -58,65 +90,65 @@ describe('label helpers', () => {
 })
 
 describe('fieldValidationMessages', () => {
-  function fieldMessage(message: string): string {
-    return decodeStructuredMessage(message)?.field ?? message
-  }
-
   it.each([
     [
       'requiredText',
-      fieldMessage(fieldValidationMessages.requiredText({ label: 'Name' })),
+      formatFieldMessage(fieldValidationMessages.requiredText({ label: 'Name' })),
       'Name is required.',
     ],
     [
       'requiredSelect',
-      fieldMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
+      formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
       'Choose a rarity.',
     ],
     [
       'invalidSelect',
-      fieldMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
+      formatFieldMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
       'Choose a valid rarity.',
     ],
-    ['invalidNumber', fieldValidationMessages.invalidNumber(), 'Enter a valid number.'],
+    [
+      'invalidNumber',
+      formatFieldMessage(fieldValidationMessages.invalidNumber()),
+      'Enter a valid number.',
+    ],
     [
       'minNumber',
-      fieldValidationMessages.minNumber({ label: 'Level', min: 1 }),
+      formatFieldMessage(fieldValidationMessages.minNumber({ label: 'Level', min: 1 })),
       'Level must be at least 1.',
     ],
     [
       'maxNumber',
-      fieldValidationMessages.maxNumber({ label: 'Level', max: 20 }),
+      formatFieldMessage(fieldValidationMessages.maxNumber({ label: 'Level', max: 20 })),
       'Level cannot exceed 20.',
     ],
     [
       'integer',
-      fieldValidationMessages.integer({ label: 'Level' }),
+      formatFieldMessage(fieldValidationMessages.integer({ label: 'Level' })),
       'Level must be a whole number.',
     ],
     [
       'minLength',
-      fieldValidationMessages.minLength({ label: 'Slug', min: 3 }),
+      formatFieldMessage(fieldValidationMessages.minLength({ label: 'Slug', min: 3 })),
       'Slug must be at least 3 characters.',
     ],
     [
       'maxLength',
-      fieldValidationMessages.maxLength({ label: 'Slug', max: 64 }),
+      formatFieldMessage(fieldValidationMessages.maxLength({ label: 'Slug', max: 64 })),
       'Slug cannot exceed 64 characters.',
     ],
     [
       'minItems',
-      fieldValidationMessages.minItems({ itemLabel: 'wealth tier' }),
+      formatFieldMessage(fieldValidationMessages.minItems({ itemLabel: 'wealth tier' })),
       'Add at least one wealth tier.',
     ],
     [
       'minItemsCount',
-      fieldValidationMessages.minItemsCount({ itemsLabel: 'skills', min: 2 }),
+      formatFieldMessage(fieldValidationMessages.minItemsCount({ itemsLabel: 'skills', min: 2 })),
       'Add at least 2 skills.',
     ],
     [
       'duplicateItem',
-      fieldValidationMessages.duplicateItem({ itemLabel: 'class' }),
+      formatFieldMessage(fieldValidationMessages.duplicateItem({ itemLabel: 'class' })),
       'This class is already used.',
     ],
   ])('%s formats the boilerplate copy', (_name, actual, expected) => {
@@ -135,19 +167,28 @@ describe('fieldValidationMessages', () => {
     ).toEqual({
       field: 'Quantity is required.',
       summary: 'Missing Quantity',
+      messageId: 'validation.field.requiredText',
+      params: { label: 'Quantity' },
     })
     expect(
       decodeStructuredMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
     ).toEqual({
       field: 'Choose a rarity.',
       summary: 'Missing Rarity',
+      messageId: 'validation.field.requiredSelect',
+      params: { label: 'Rarity' },
     })
     expect(
       decodeStructuredMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
     ).toEqual({
       field: 'Choose a valid rarity.',
       summary: 'Invalid Rarity',
+      messageId: 'validation.field.invalidSelect',
+      params: { label: 'Rarity' },
     })
-    expect(decodeStructuredMessage(fieldValidationMessages.invalidNumber())).toBeNull()
+    expect(decodeStructuredMessage(fieldValidationMessages.invalidNumber())).toMatchObject({
+      field: 'Enter a valid number.',
+      messageId: 'validation.field.invalidNumber',
+    })
   })
 })

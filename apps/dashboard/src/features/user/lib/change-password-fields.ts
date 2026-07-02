@@ -1,6 +1,14 @@
-import type { z } from 'zod'
-import { changePasswordInputSchema, passwordSchema } from '@rpg/contracts'
+import { z } from 'zod'
+import { changePasswordInputSchema, defineMessage, passwordSchema } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
+
+/** Change-password form validation messages (tier 3 form overrides). */
+export const changePasswordValidationMessages = {
+  passwordsDoNotMatch: defineMessage(
+    'validation.changePassword.passwordsDoNotMatch',
+    () => 'Passwords do not match',
+  ),
+}
 
 /**
  * Client-side form schema — extends the API contract with `confirmNewPassword`
@@ -9,9 +17,14 @@ import type { FormItem } from '@rpg/ui/form'
  */
 export const changePasswordFormSchema = changePasswordInputSchema
   .extend({ confirmNewPassword: passwordSchema })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmNewPassword'],
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmNewPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        message: changePasswordValidationMessages.passwordsDoNotMatch(),
+        path: ['confirmNewPassword'],
+      })
+    }
   })
 
 export type ChangePasswordFormValues = z.infer<typeof changePasswordFormSchema>

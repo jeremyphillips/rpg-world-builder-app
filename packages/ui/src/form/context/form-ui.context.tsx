@@ -44,6 +44,10 @@ export interface FormUiProviderProps {
   uiStateKey?: string
   fields?: FormItem[]
   validationPresentation?: FormValidationPresentation
+  /** When set, the provider reads this flag instead of local submit-attempt state. */
+  hasAttemptedSubmit?: boolean
+  /** Called when a failed submit marks the form as attempted (external state mode). */
+  onMarkSubmitAttempted?: () => void
   children: React.ReactNode
 }
 
@@ -52,16 +56,24 @@ export function FormUiProvider({
   uiStateKey,
   fields = [],
   validationPresentation = 'progressive',
+  hasAttemptedSubmit: externalHasAttemptedSubmit,
+  onMarkSubmitAttempted,
   children,
 }: FormUiProviderProps) {
-  const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
+  const [localHasAttemptedSubmit, setLocalHasAttemptedSubmit] = React.useState(false)
   const [validationSessionExpandKeys, setValidationSessionExpandKeys] = React.useState<
     ReadonlySet<ValidationSessionExpandKey>
   >(() => new Set())
 
+  const hasAttemptedSubmit = externalHasAttemptedSubmit ?? localHasAttemptedSubmit
+
   const markSubmitAttempted = React.useCallback(() => {
-    setHasAttemptedSubmit(true)
-  }, [])
+    if (onMarkSubmitAttempted) {
+      onMarkSubmitAttempted()
+      return
+    }
+    setLocalHasAttemptedSubmit(true)
+  }, [onMarkSubmitAttempted])
 
   const addValidationSessionExpandKeys = React.useCallback(
     (keys: readonly ValidationSessionExpandKey[]) => {

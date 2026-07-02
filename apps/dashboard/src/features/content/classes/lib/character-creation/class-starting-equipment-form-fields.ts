@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   choiceOptionTitle,
+  defineMessage,
   GEAR_KIND_ENTRIES,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   spellcastingFocusGearKindSchema,
@@ -19,6 +20,20 @@ import {
   STARTING_EQUIPMENT_ITEM_KIND_LABELS,
   STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
 } from './class-starting-equipment-form-labels'
+
+/** Starting equipment validation messages (tier 3 form overrides). */
+export const startingEquipmentValidationMessages = {
+  poolChoiceSourcesRequired: defineMessage(
+    'validation.startingEquipment.poolChoiceSourcesRequired',
+    () => 'Pool choices require equipment slugs and/or tool categories',
+    () => 'Missing pool sources',
+  ),
+  wealthGrantRequired: defineMessage(
+    'validation.startingEquipment.wealthGrantRequired',
+    () => 'Packages with no items require a wealth grant',
+    () => 'Missing wealth grant',
+  ),
+}
 
 export const STARTING_EQUIPMENT_ITEM_KINDS = ['fixed', 'choice'] as const
 
@@ -78,7 +93,7 @@ export const startingEquipmentChoiceItemFormSchema = z
     if (!row.fromEquipmentSlugs?.length && !row.fromToolCategories?.length) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Pool choices require equipment slugs and/or tool categories',
+        message: startingEquipmentValidationMessages.poolChoiceSourcesRequired(),
         path: ['fromEquipmentSlugs'],
       })
     }
@@ -103,7 +118,7 @@ export const startingEquipmentOptionFormSchema = z
     if (!row.items.length && !wealthGrantMoneyFromForm(row.wealth)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Packages with no items require a wealth grant',
+        message: startingEquipmentValidationMessages.wealthGrantRequired(),
         path: ['wealth', 'amount'],
       })
     }
