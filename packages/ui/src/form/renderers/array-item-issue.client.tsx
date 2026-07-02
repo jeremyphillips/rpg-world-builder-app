@@ -8,10 +8,16 @@ import {
   arrayItemIssueBadgeClasses,
   arrayItemIssueSummaryClasses,
   arrayLegendIssueLinkClasses,
+  type ArrayItemIssueProminence,
 } from './array-item-issue.variants'
 
 function issueCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'issue' : 'issues'}`
+}
+
+function arrayLegendIssueLabel(issueCount: number, invalidRowCount: number): string {
+  const rowLabel = invalidRowCount === 1 ? '1 row' : `${invalidRowCount} rows`
+  return `${issueCountLabel(issueCount)} in ${rowLabel}`
 }
 
 export interface ArrayItemIssueBadgeProps {
@@ -19,6 +25,7 @@ export interface ArrayItemIssueBadgeProps {
   rowLabel: string
   onPress?: () => void
   compact?: boolean
+  prominence?: ArrayItemIssueProminence
 }
 
 export function ArrayItemIssueBadge({
@@ -26,13 +33,14 @@ export function ArrayItemIssueBadge({
   rowLabel,
   onPress,
   compact = false,
+  prominence = 'nav',
 }: ArrayItemIssueBadgeProps) {
   if (issueCount <= 0) return null
 
   return (
     <button
       type="button"
-      className={arrayItemIssueBadgeClasses({ compact })}
+      className={arrayItemIssueBadgeClasses({ compact, prominence })}
       aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
       onClick={onPress}
     >
@@ -43,10 +51,10 @@ export function ArrayItemIssueBadge({
 }
 
 export interface ArrayItemIssueSummaryProps {
-  group: Pick<ArrayItemIssueGroup, 'totalCount' | 'sortedIssues' | 'headerIssues'>
+  group: Pick<ArrayItemIssueGroup, 'totalCount' | 'sortedIssues' | 'headerIssues' | 'fieldSummary'>
   onPrimaryPress?: () => void
   onMorePress?: () => void
-  placement?: 'collapsed' | 'expanded'
+  placement?: 'collapsed' | 'expanded' | 'compactSummary'
   className?: string
 }
 
@@ -58,6 +66,19 @@ export function ArrayItemIssueSummary({
   className,
 }: ArrayItemIssueSummaryProps) {
   if (group.totalCount <= 0) return null
+
+  if (placement === 'compactSummary') {
+    if (!group.fieldSummary) return null
+
+    return (
+      <p
+        className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
+        data-array-item-issue-summary
+      >
+        {group.fieldSummary}
+      </p>
+    )
+  }
 
   const displayIssues =
     placement === 'expanded' && group.headerIssues.length > 0
@@ -88,22 +109,35 @@ export function ArrayItemIssueSummary({
 }
 
 export interface ArrayLegendIssueLinkProps {
+  issueCount: number
   invalidRowCount: number
+  sectionLabel: string
   onPress?: () => void
+  prominence?: Extract<ArrayItemIssueProminence, 'nav' | 'aggregate'>
 }
 
-export function ArrayLegendIssueLink({ invalidRowCount, onPress }: ArrayLegendIssueLinkProps) {
-  if (invalidRowCount <= 0) return null
+export function ArrayLegendIssueLink({
+  issueCount,
+  invalidRowCount,
+  sectionLabel,
+  onPress,
+  prominence = 'nav',
+}: ArrayLegendIssueLinkProps) {
+  if (issueCount <= 0 || invalidRowCount <= 0) return null
+
+  const label = arrayLegendIssueLabel(issueCount, invalidRowCount)
 
   return (
     <button
       type="button"
-      className={arrayLegendIssueLinkClasses}
-      aria-label={`Review ${issueCountLabel(invalidRowCount)} in this section`}
+      className={arrayLegendIssueLinkClasses({ prominence })}
+      aria-label={`Review ${label} in ${sectionLabel}`}
       onClick={onPress}
     >
       <AlertTriangle className="size-3.5" aria-hidden />
-      {invalidRowCount} invalid {invalidRowCount === 1 ? 'row' : 'rows'}
+      {label}
     </button>
   )
 }
+
+export { issueCountLabel, arrayLegendIssueLabel }

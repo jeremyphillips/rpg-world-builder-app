@@ -1,5 +1,6 @@
 import type { ArraySectionMeta } from './resolve-field-order'
 import { resolveFieldOrderIndex } from './resolve-field-order'
+import { joinArrayItemSummaryParts } from '../config/array-item-config.lib'
 import type { ArrayItemIssueGroup, FormIssue } from './form-issue.types'
 import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 
@@ -27,6 +28,10 @@ function buildIssueGroup(
   fieldOrder: readonly string[],
 ): ArrayItemIssueGroup {
   const sortedIssues = [...issues].sort((left, right) => compareIssues(left, right, fieldOrder))
+  const fieldIssues = sortedIssues.filter((issue) => issue.severity === 'field')
+  const fieldSummaryParts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
+  const fieldSummary =
+    fieldSummaryParts.length > 0 ? joinArrayItemSummaryParts(fieldSummaryParts) : undefined
 
   return {
     itemPrefix,
@@ -35,7 +40,8 @@ function buildIssueGroup(
     totalCount: sortedIssues.length,
     sortedIssues,
     headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
-    fieldIssues: sortedIssues.filter((issue) => issue.severity === 'field'),
+    fieldIssues,
+    fieldSummary,
   }
 }
 
@@ -111,6 +117,13 @@ export function countInvalidArrayItems(issues: readonly FormIssue[], arrayPath: 
     if (issue.itemIndex !== undefined) indices.add(issue.itemIndex)
   }
   return indices.size
+}
+
+/** Count all error paths under an array path (including nested descendants). */
+export function countIssuesForArrayPath(issues: readonly FormIssue[], arrayPath: string): number {
+  return issues.filter(
+    (issue) => issue.path === arrayPath || issue.path.startsWith(`${arrayPath}.`),
+  ).length
 }
 
 export type ArrayIssueIndex = Map<string, ArrayItemIssueGroup>

@@ -15,6 +15,7 @@ import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
+import { resolveFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
@@ -520,7 +521,7 @@ function StandardFieldRenderer({
     config: renderConfig,
     field,
     id,
-    error: fieldState.error?.message,
+    error: resolveFieldErrorMessage(fieldState.error?.message),
     remotePreview,
     namePrefix,
   })

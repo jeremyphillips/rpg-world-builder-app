@@ -16,6 +16,7 @@ import {
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 import { ArrayItemIssueBadge } from './array-item-issue.client'
+import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 
 export interface ArrayItemRemoveButtonProps {
   ariaLabel: string
@@ -48,6 +49,7 @@ export interface ArrayItemActionsRailProps {
   issueCount?: number
   issueRowLabel?: string
   onIssuePress?: () => void
+  badgeProminence?: ArrayItemIssueProminence
   compact?: boolean
   className?: string
 }
@@ -62,6 +64,7 @@ export function ArrayItemActionsRail({
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
+  badgeProminence = 'nav',
   compact = false,
   className,
 }: ArrayItemActionsRailProps) {
@@ -76,6 +79,7 @@ export function ArrayItemActionsRail({
         rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
         onPress={onIssuePress}
         compact={compact}
+        prominence={badgeProminence}
       />
       <ArrayItemRemoveButton
         ariaLabel={removeAriaLabel}

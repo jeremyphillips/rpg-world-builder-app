@@ -163,7 +163,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(addButton)
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
-    const itemShell = screen.getByRole('group', { name: /Item 1/ })
+    const itemShell = screen.getByRole('group', { name: /Item #1/ })
     expect(itemShell).toHaveClass('bg-muted/30')
     const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
@@ -198,7 +198,7 @@ describe('ArrayFieldRenderer', () => {
     expect(list).toHaveClass('gap-3')
     expect(list).not.toHaveClass('gap-6')
 
-    const item = screen.getByRole('group', { name: 'Item 1' })
+    const item = screen.getByRole('group', { name: 'Trait #1' })
     expect(within(item).getByRole('textbox', { name: 'Trait name' }).closest('.gap-6')).toBeTruthy()
   })
 
@@ -209,7 +209,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
-    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass(
+    expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
       'rounded-md',
       'border',
       'border-border',
@@ -222,7 +222,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Traits · Item 1' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Traits · Trait #1' }))
     expect(screen.queryByRole('textbox', { name: 'Trait name' })).not.toBeInTheDocument()
   })
 
@@ -297,7 +297,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits · Item 1' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove Traits · Trait #1' })).toBeDisabled()
   })
 
   it('hides nested arrays when item-scoped visibility is false', async () => {
@@ -500,9 +500,9 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /Remove Traits · Item/ })).toHaveLength(2)
-    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass('pl-2')
-    expect(screen.getByRole('group', { name: 'Item 1' })).not.toHaveClass('pl-10')
+    expect(screen.getAllByRole('button', { name: /Remove Traits · Trait #/ })).toHaveLength(2)
+    expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass('pl-2')
+    expect(screen.getByRole('group', { name: 'Trait #1' })).not.toHaveClass('pl-10')
   })
 
   it('shows item summaries while expanded and collapsed', async () => {
@@ -749,7 +749,7 @@ describe('ArrayFieldRenderer', () => {
       await screen.findByRole('button', { name: '1 issue in Traits · Darkvision' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'Review 1 issue in this section' }),
+      screen.getByRole('button', { name: 'Review 1 issue in 1 row in Traits' }),
     ).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Review this trait before saving')
     expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(

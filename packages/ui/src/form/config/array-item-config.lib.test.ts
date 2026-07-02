@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '../field-config'
 import {
+  defaultArrayItemHeader,
   isNestedArraySection,
   joinArrayItemSummaryParts,
   resolveArrayItemHeaderLabels,
@@ -92,5 +93,10 @@ describe('array-item-config.lib', () => {
 
     expect(visibleFallback.showFallbackInTitle).toBe(true)
     expect(visibleFallback.ariaLabel).toBe('Darkvision · Trait 1')
+  })
+
+  it('uses singularized legend in the default fallback title', () => {
+    const header = defaultArrayItemHeader('Magic item grants')
+    expect(header.fallback(2)).toBe('Magic item grant #3')
   })
 })

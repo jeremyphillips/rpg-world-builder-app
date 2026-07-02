@@ -5,7 +5,10 @@ export type FormIssueSeverity = 'crossRow' | 'row' | 'field'
 export type FormIssue = {
   /** Dot path from form root, e.g. `startingWealth.tiers.1.minLevel`. */
   path: string
+  /** Full field-context message shown beside the control. */
   message: string
+  /** Shorter summary label for collapsed row chrome; falls back to `message`. */
+  summaryMessage?: string
   severity: FormIssueSeverity
   /** Array field path when the issue belongs to an array item, e.g. `startingWealth.tiers`. */
   arrayPath?: string
@@ -26,6 +29,8 @@ export type ArrayItemIssueGroup = {
   headerIssues: FormIssue[]
   /** Field-level issues shown at controls when expanded. */
   fieldIssues: FormIssue[]
+  /** Joined summary labels for compact invalid row chrome. */
+  fieldSummary?: string
 }
 
 export const FORM_ISSUE_SEVERITY_ORDER: Record<FormIssueSeverity, number> = {

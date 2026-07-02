@@ -7,6 +7,7 @@ export {
   groupIssuesForItemPrefix,
   sortFormIssues,
   countInvalidArrayItems,
+  countIssuesForArrayPath,
   indexArrayItemIssues,
   findArraySectionForIssue,
   type ArrayIssueIndex,
@@ -22,6 +23,10 @@ export {
   resolveIssueFocusFieldName,
   resolveIssueFocusControlId,
 } from './resolve-issue-focus-target'
+export {
+  resolveFieldErrorMessage,
+  resolveFirstFieldErrorMessage,
+} from './resolve-field-error-message'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,

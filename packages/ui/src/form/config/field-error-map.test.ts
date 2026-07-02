@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
+import { formatFieldMessage } from '@rpg/contracts'
+
 import { makeFieldErrorMap } from './field-error-map'
 import type { FormItem } from '../field-config'
 
@@ -41,7 +43,7 @@ function messageFor(schema: z.ZodType, value: unknown, path?: (string | number)[
     ? result.error.issues.find((candidate) => candidate.path.join('.') === path.join('.'))
     : result.error.issues[0]
   if (!issue) throw new Error(`no issue at path ${path?.join('.')}`)
-  return issue.message
+  return formatFieldMessage(issue.message)
 }
 
 describe('makeFieldErrorMap', () => {

@@ -467,7 +467,7 @@ export const FirstSubmitIssueNavigation: StoryObj<Meta<object>> = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Save traits' }))
     await expect(canvas.findByRole('button', { name: /1 issue in Traits/ })).resolves.toBeVisible()
-    await expect(canvas.findByRole('button', { name: /1 invalid row/ })).resolves.toBeVisible()
+    await expect(canvas.findByRole('button', { name: /1 issue in 1 row/ })).resolves.toBeVisible()
   },
 }
 

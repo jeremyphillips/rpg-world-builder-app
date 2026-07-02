@@ -1,3 +1,5 @@
+import { singularizeLabel } from '@rpg/contracts'
+
 import type {
   ArrayConfig,
   ArrayItemHeaderConfig,
@@ -38,14 +40,18 @@ export function resolveArrayItemReorder(config: ArrayConfig): ArrayItemReorder {
   return config.reorder ?? 'dragHandle'
 }
 
-export function defaultArrayItemHeader(): ArrayItemHeaderConfig {
+export function defaultArrayItemHeader(legend?: string): ArrayItemHeaderConfig {
+  const itemLabel = legend ? singularizeLabel(legend) : 'Item'
   return {
-    fallback: (index) => `Item ${index + 1}`,
+    fallback: (index) => `${itemLabel} #${index + 1}`,
   }
 }
 
-export function resolveArrayItemHeader(config: ArrayConfig): ArrayItemHeaderConfig {
-  return config.itemHeader ?? defaultArrayItemHeader()
+export function resolveArrayItemHeader(
+  config: ArrayConfig,
+  legend?: string,
+): ArrayItemHeaderConfig {
+  return config.itemHeader ?? defaultArrayItemHeader(legend)
 }
 
 /** Middle-dot separator for array item header labels and summary segments. */

@@ -59,7 +59,13 @@ import {
   useFormValidationPresentation,
 } from '../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../context/form-ui.context'
-import { buildValidationSessionExpandKey, countInvalidArrayItems, sortFormIssues } from '../errors'
+import {
+  buildValidationSessionExpandKey,
+  countInvalidArrayItems,
+  countIssuesForArrayPath,
+  sortFormIssues,
+} from '../errors'
+import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 import { resolveIssueFocusControlId } from '../errors/resolve-issue-focus-target'
 import { collectArraySections } from '../errors/resolve-field-order'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
@@ -129,7 +135,7 @@ function ArrayFieldItemContent({
   dragHandleProps,
 }: ArrayFieldItemContentProps) {
   const itemPrefix = `${fullName}.${index}`
-  const headerConfig = resolveArrayItemHeader(config)
+  const headerConfig = resolveArrayItemHeader(config, legend)
   const primaryField = headerConfig.primaryField
   const watchedPrimary = useWatch({
     name: primaryField ? `${itemPrefix}.${primaryField}` : `${itemPrefix}`,
@@ -239,14 +245,30 @@ function ArrayFieldItemContent({
     itemValues,
   ])
 
-  const issueSummary =
-    showIssueChrome && variant === 'detailed' && (collapsed || issueGroup.headerIssues.length > 0)
-      ? {
-          group: issueGroup,
-          onPrimaryPress: focusIssue,
-          onMorePress: focusIssue,
-        }
-      : undefined
+  const badgeProminence: ArrayItemIssueProminence =
+    variant === 'compact' ? 'action' : collapsed ? 'nav' : 'aggregate'
+
+  const issueSummary = (() => {
+    if (!showIssueChrome || issueGroup.totalCount <= 0) return undefined
+
+    if (variant === 'compact' && issueGroup.fieldSummary) {
+      return {
+        group: issueGroup,
+        placement: 'compactSummary' as const,
+      }
+    }
+
+    if (variant === 'detailed' && (collapsed || issueGroup.headerIssues.length > 0)) {
+      return {
+        group: issueGroup,
+        onPrimaryPress: focusIssue,
+        onMorePress: focusIssue,
+        placement: (collapsed ? 'collapsed' : 'expanded') as 'collapsed' | 'expanded',
+      }
+    }
+
+    return undefined
+  })()
 
   return (
     <ArrayItemShell
@@ -303,6 +325,7 @@ function ArrayFieldItemContent({
           issueCount={showIssueChrome ? issueGroup.totalCount : 0}
           issueRowLabel={rowLabel}
           onIssuePress={focusIssue}
+          badgeProminence={showIssueChrome ? badgeProminence : 'nav'}
           compact={variant === 'compact'}
         />
       }
@@ -411,6 +434,9 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const canAdd = max === undefined || fields.length < max
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
+    : 0
+  const arrayIssueCount = validation.hasAttemptedSubmit
+    ? countIssuesForArrayPath(validation.issues, fullName)
     : 0
 
   const focusFirstArrayIssue = React.useCallback(() => {
@@ -525,7 +551,12 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}
-          <ArrayLegendIssueLink invalidRowCount={invalidRowCount} onPress={focusFirstArrayIssue} />
+          <ArrayLegendIssueLink
+            issueCount={arrayIssueCount}
+            invalidRowCount={invalidRowCount}
+            sectionLabel={legend}
+            onPress={focusFirstArrayIssue}
+          />
         </legend>
       ) : null}
       <div className={itemListClasses}>

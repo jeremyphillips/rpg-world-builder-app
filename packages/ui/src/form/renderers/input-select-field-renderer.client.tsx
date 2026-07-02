@@ -4,6 +4,7 @@ import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../../components/ui/input-select-field.client'
 import { resolveValueDigitsFromConfig } from '../config/input-field-value-digits.lib'
+import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { fieldDefaultValue, type InputSelectFieldConfig } from '../field-config'
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -49,7 +50,7 @@ function inputSelectFieldError(
   valueError: string | undefined,
   unitError: string | undefined,
 ): string | undefined {
-  return valueError ?? unitError
+  return resolveFirstFieldErrorMessage(valueError, unitError)
 }
 
 export function InputSelectFieldRenderer({

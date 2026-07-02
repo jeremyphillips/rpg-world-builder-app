@@ -37,16 +37,19 @@ export const fieldValidationMessages = {
   requiredText: defineMessage<{ label: string }>(
     'validation.field.requiredText',
     ({ label }) => `${label} is required.`,
+    ({ label }) => `Missing ${label}`,
   ),
   /** Empty required choice-like field (select, radio, chips single, combobox). */
   requiredSelect: defineMessage<{ label: string }>(
     'validation.field.requiredSelect',
     ({ label }) => `Choose ${withArticle(midSentenceLabel(label))}.`,
+    ({ label }) => `Missing ${label}`,
   ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',
     ({ label }) => `Choose a valid ${midSentenceLabel(label)}.`,
+    ({ label }) => `Invalid ${label}`,
   ),
   /** Non-numeric input in a number-like field. */
   invalidNumber: defineMessage('validation.field.invalidNumber', () => 'Enter a valid number.'),

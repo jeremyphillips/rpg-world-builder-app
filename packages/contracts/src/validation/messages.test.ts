@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { defineMessage } from './define-message'
+import { defineMessage, decodeStructuredMessage } from './define-message'
 import {
   fieldValidationMessages,
   midSentenceLabel,
@@ -24,6 +24,19 @@ describe('defineMessage', () => {
 
     expect(message()).toBe('Plain.')
   })
+
+  it('encodes field and summary variants when both are provided', () => {
+    const message = defineMessage<{ label: string }>(
+      'validation.test.required',
+      ({ label }) => `${label} is required.`,
+      ({ label }) => `Missing ${label}`,
+    )
+
+    expect(decodeStructuredMessage(message({ label: 'Rarity' }))).toEqual({
+      field: 'Rarity is required.',
+      summary: 'Missing Rarity',
+    })
+  })
 })
 
 describe('label helpers', () => {
@@ -45,16 +58,24 @@ describe('label helpers', () => {
 })
 
 describe('fieldValidationMessages', () => {
+  function fieldMessage(message: string): string {
+    return decodeStructuredMessage(message)?.field ?? message
+  }
+
   it.each([
-    ['requiredText', fieldValidationMessages.requiredText({ label: 'Name' }), 'Name is required.'],
+    [
+      'requiredText',
+      fieldMessage(fieldValidationMessages.requiredText({ label: 'Name' })),
+      'Name is required.',
+    ],
     [
       'requiredSelect',
-      fieldValidationMessages.requiredSelect({ label: 'Rarity' }),
+      fieldMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
       'Choose a rarity.',
     ],
     [
       'invalidSelect',
-      fieldValidationMessages.invalidSelect({ label: 'Rarity' }),
+      fieldMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
       'Choose a valid rarity.',
     ],
     ['invalidNumber', fieldValidationMessages.invalidNumber(), 'Enter a valid number.'],
@@ -106,5 +127,27 @@ describe('fieldValidationMessages', () => {
     for (const message of Object.values(fieldValidationMessages)) {
       expect(message.id).toMatch(/^validation\.field\.[a-zA-Z]+$/)
     }
+  })
+
+  it('encodes summary variants for field and choice messages', () => {
+    expect(
+      decodeStructuredMessage(fieldValidationMessages.requiredText({ label: 'Quantity' })),
+    ).toEqual({
+      field: 'Quantity is required.',
+      summary: 'Missing Quantity',
+    })
+    expect(
+      decodeStructuredMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
+    ).toEqual({
+      field: 'Choose a rarity.',
+      summary: 'Missing Rarity',
+    })
+    expect(
+      decodeStructuredMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
+    ).toEqual({
+      field: 'Choose a valid rarity.',
+      summary: 'Invalid Rarity',
+    })
+    expect(decodeStructuredMessage(fieldValidationMessages.invalidNumber())).toBeNull()
   })
 })
