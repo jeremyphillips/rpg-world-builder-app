@@ -1,10 +1,6 @@
 import { describe, it } from 'vitest'
 
-import {
-  campaignLevelOutOfBoundsMessage,
-  levelRangeEndAtMessage,
-  levelRangeGapMessage,
-} from '../../primitives/level'
+import { levelValidationMessages } from '../../primitives/level-messages'
 import {
   safeParseMergedCharacterCreationPatch,
   updateCampaignCharacterCreationInputSchema,
@@ -23,7 +19,7 @@ describe('safeParseMergedCharacterCreationPatch', () => {
     {
       name: 'rejects when resolved tiers do not cover extended max',
       patch: characterCreationScenarios.extendedAt30(),
-      expected: { message: levelRangeEndAtMessage(30) },
+      expected: { message: levelValidationMessages.rangeEndAt({ expected: 30 }) },
     },
     {
       name: 'accepts when tiers cover extended max',
@@ -67,7 +63,7 @@ describe('updateCampaignCharacterCreationInputSchema', () => {
           ],
         },
       },
-      expected: { message: levelRangeGapMessage(2) },
+      expected: { message: levelValidationMessages.rangeGap({ level: 2 }) },
     },
     {
       name: 'rejects tiers whose max exceeds effective max in the same request',
@@ -76,7 +72,7 @@ describe('updateCampaignCharacterCreationInputSchema', () => {
           tiers: [{ id: 'a', label: 'A', minLevel: 1, maxLevel: 25, magicItemGrants: [] }],
         },
       },
-      expected: { message: campaignLevelOutOfBoundsMessage(20) },
+      expected: { message: levelValidationMessages.outOfBounds({ maxLevel: 20 }) },
     },
     {
       name: 'rejects starting level above effective max in the same request',
@@ -111,7 +107,7 @@ describe('updateCampaignCharacterCreationInputSchema', () => {
           tiers: patchTierById(minimalStartingWealthSeed, MINIMAL_TIER_B_ID, { maxLevel: 4 }),
         },
       },
-      expected: { message: levelRangeEndAtMessage(30) },
+      expected: { message: levelValidationMessages.rangeEndAt({ expected: 30 }) },
     },
     {
       name: 'accepts extended progression when request tiers cover extended max',

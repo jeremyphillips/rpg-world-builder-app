@@ -103,6 +103,7 @@ export {
   type ArrayPatternConfig,
   type ArrayErrorFocusContext,
 } from './field-config'
+export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
 export {
   flattenFormIssues,
   classifyFormIssue,

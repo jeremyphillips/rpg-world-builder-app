@@ -10,6 +10,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./validation": {
+      "types": "./src/validation/index.ts",
+      "default": "./src/validation/index.ts"
+    },
     "./shared": {
       "types": "./src/shared/index.ts",
       "default": "./src/shared/index.ts"

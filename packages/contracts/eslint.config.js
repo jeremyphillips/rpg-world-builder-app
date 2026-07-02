@@ -7,6 +7,7 @@ export default [
     ignores: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     settings: {
       'boundaries/elements': [
+        { type: 'validation', pattern: 'src/validation/**', mode: 'full' },
         { type: 'shared', pattern: 'src/shared/**', mode: 'full' },
         { type: 'vocab', pattern: 'src/rpg/vocab/**', mode: 'full' },
         { type: 'primitives', pattern: 'src/rpg/primitives/**', mode: 'full' },
@@ -26,17 +27,32 @@ export default [
           message:
             '${file.type} must not import ${dependency.type} (${dependency.source}). See packages/contracts/docs/structure.md.',
           rules: [
-            { from: ['shared'], allow: ['shared', 'primitives'] },
-            { from: ['vocab'], allow: ['vocab'] },
-            { from: ['primitives'], allow: ['vocab', 'primitives'] },
-            { from: ['content'], allow: ['vocab', 'primitives', 'content'] },
-            { from: ['runtime'], allow: ['vocab', 'primitives', 'content', 'runtime'] },
-            { from: ['campaign'], allow: ['vocab', 'primitives', 'campaign', 'shared'] },
+            { from: ['validation'], allow: ['validation'] },
+            { from: ['shared'], allow: ['validation', 'shared', 'primitives'] },
+            { from: ['vocab'], allow: ['validation', 'vocab'] },
+            { from: ['primitives'], allow: ['validation', 'vocab', 'primitives'] },
+            { from: ['content'], allow: ['validation', 'vocab', 'primitives', 'content'] },
+            {
+              from: ['runtime'],
+              allow: ['validation', 'vocab', 'primitives', 'content', 'runtime'],
+            },
+            {
+              from: ['campaign'],
+              allow: ['validation', 'vocab', 'primitives', 'campaign', 'shared'],
+            },
             { from: ['public'], allow: ['public'] },
             { from: ['dev-bench'], allow: ['dev-bench'] },
             {
               from: ['barrel'],
-              allow: ['shared', 'vocab', 'primitives', 'content', 'runtime', 'campaign'],
+              allow: [
+                'validation',
+                'shared',
+                'vocab',
+                'primitives',
+                'content',
+                'runtime',
+                'campaign',
+              ],
             },
           ],
         },

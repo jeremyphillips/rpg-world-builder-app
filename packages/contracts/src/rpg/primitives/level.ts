@@ -45,34 +45,6 @@ export type LevelOptionGroup = {
   options: { value: string; label: string }[]
 }
 
-// ---------------------------------------------------------------------------
-// Level range table — shared user-facing validation messages
-// ---------------------------------------------------------------------------
-
-export function minLevelExceedsMaxLevelMessage(): string {
-  return 'Min level must not exceed max level'
-}
-
-export function levelRangeOverlapMessage(): string {
-  return 'Tier level ranges must not overlap'
-}
-
-export function levelRangeGapMessage(missingLevel: number): string {
-  return `Tier level ranges must be contiguous; level ${missingLevel} is missing`
-}
-
-export function levelRangeStartAtMessage(expected: number): string {
-  return `Tier level ranges must start at level ${expected}`
-}
-
-export function levelRangeEndAtMessage(expected: number): string {
-  return `Tier level ranges must cover levels 1–${expected}`
-}
-
-export function campaignLevelOutOfBoundsMessage(maxLevel: number): string {
-  return `Level must be between 1 and ${maxLevel}`
-}
-
 /** User-facing label for a tier level range (`Level 1` or `Levels 2–4`). */
 export function formatLevelRangeLabel(range: { minLevel: number; maxLevel: number }): string {
   if (range.minLevel === range.maxLevel) {

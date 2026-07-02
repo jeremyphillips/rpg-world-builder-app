@@ -4,6 +4,7 @@ import {
   MAGIC_ITEM_RARITY_ENTRIES,
   absoluteLevelSchema,
   currencySchema,
+  defineMessage,
   getCurrencyAbbrev,
   magicItemRaritySchema,
 } from '@rpg/contracts'
@@ -21,6 +22,18 @@ import {
 } from './starting-wealth-form-values'
 
 const BONUS_GOLD_ENABLED = 'bonusGoldEnabled'
+
+/** Starting-wealth form validation messages (tier 3 form overrides). */
+export const startingWealthValidationMessages = {
+  bonusGoldRequired: defineMessage(
+    'validation.startingWealth.bonusGoldRequired',
+    () => 'Bonus gold details are required when bonus gold is enabled.',
+  ),
+  bonusGoldMultiplier: defineMessage(
+    'validation.startingWealth.bonusGoldMultiplier',
+    () => 'Bonus gold rolls must use a multiplier (×).',
+  ),
+}
 
 const magicItemRarityOptions = toOptions(
   MAGIC_ITEM_RARITIES,
@@ -69,7 +82,7 @@ export const startingWealthTierFormSchema = z
     if (!tier.bonusGold) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Bonus gold details are required when bonus gold is enabled',
+        message: startingWealthValidationMessages.bonusGoldRequired(),
         path: ['bonusGold'],
       })
       return
@@ -78,7 +91,7 @@ export const startingWealthTierFormSchema = z
     if (tier.bonusGold.formula.modifier?.operator !== '×') {
       ctx.addIssue({
         code: 'custom',
-        message: 'Bonus gold rolls must use a multiplier (×)',
+        message: startingWealthValidationMessages.bonusGoldMultiplier(),
         path: ['bonusGold', 'formula'],
       })
     }

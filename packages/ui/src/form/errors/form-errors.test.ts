@@ -37,7 +37,7 @@ describe('flattenFormIssues', () => {
       startingWealth: {
         tiers: [
           { label: { type: 'custom', message: 'Required' } },
-          { minLevel: { type: 'custom', message: 'Tier level ranges must not overlap' } },
+          { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
         ],
       },
     } as unknown as FieldErrors
@@ -54,7 +54,7 @@ describe('flattenFormIssues', () => {
       }),
       expect.objectContaining({
         path: 'startingWealth.tiers.1.minLevel',
-        message: 'Tier level ranges must not overlap',
+        message: 'This range overlaps with Levels 1–5.',
         arrayPath: 'startingWealth.tiers',
         itemIndex: 1,
         relativePath: 'minLevel',
@@ -91,7 +91,7 @@ describe('classifyFormIssues', () => {
       [
         {
           path: 'startingWealth.tiers.1.minLevel',
-          message: 'Tier level ranges must not overlap',
+          message: 'This range overlaps with Levels 1–5.',
           severity: 'field',
           relativePath: 'minLevel',
         },
@@ -150,7 +150,7 @@ describe('resolveInvalidSubmitNavigation', () => {
         startingWealth: {
           tiers: [
             { label: { type: 'custom', message: 'Required' } },
-            { minLevel: { type: 'custom', message: 'Tier level ranges must not overlap' } },
+            { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
           ],
         },
       } as unknown as FieldErrors,
@@ -167,7 +167,7 @@ describe('resolveIssueFocusFieldName', () => {
     const target = resolveIssueFocusFieldName(
       {
         path: 'startingWealth.tiers.3.maxLevel',
-        message: 'Tier level ranges must cover levels 1–20',
+        message: 'Tiers must cover levels 1–20.',
         severity: 'crossRow',
         relativePath: 'maxLevel',
       },
@@ -187,7 +187,7 @@ describe('sortFormIssues', () => {
         startingWealth: {
           tiers: [
             { label: { type: 'custom', message: 'Required' } },
-            { minLevel: { type: 'custom', message: 'Tier level ranges must not overlap' } },
+            { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
           ],
         },
       } as unknown as FieldErrors),
@@ -205,7 +205,7 @@ describe('countInvalidArrayItems', () => {
       startingWealth: {
         tiers: [
           { label: { type: 'custom', message: 'Required' } },
-          { minLevel: { type: 'custom', message: 'Tier level ranges must not overlap' } },
+          { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
         ],
       },
     } as unknown as FieldErrors)

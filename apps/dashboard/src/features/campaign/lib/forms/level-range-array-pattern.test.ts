@@ -10,7 +10,7 @@ describe('levelRangeArrayPattern', () => {
     const target = resolveLevelRangeErrorFocusTarget({
       issue: {
         path: 'startingWealth.tiers.1.minLevel',
-        message: 'Tier level ranges must not overlap',
+        message: 'This range overlaps with Levels 1–5.',
         severity: 'crossRow',
         relativePath: 'minLevel',
       },
@@ -25,7 +25,7 @@ describe('levelRangeArrayPattern', () => {
     const target = resolveLevelRangeErrorFocusTarget({
       issue: {
         path: 'startingWealth.tiers.3.maxLevel',
-        message: 'Tier level ranges must cover levels 1–20',
+        message: 'Tiers must cover levels 1–20.',
         severity: 'crossRow',
         relativePath: 'maxLevel',
       },

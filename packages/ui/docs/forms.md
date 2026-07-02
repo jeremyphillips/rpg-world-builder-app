@@ -117,6 +117,19 @@ import { CreateCampaignInput } from '@rpg/contracts'
 
 `<form noValidate>` — RHF + Zod own validation messages.
 
+### Default error messages
+
+Schemas stay message-free. `makeResolver` builds a field-aware error map
+(`makeFieldErrorMap`) that formats raw Zod issues (`invalid_type`, `too_small`,
+`invalid_value`, …) into shared boilerplate copy from `@rpg/contracts`
+(`fieldValidationMessages`), interpolating the field's configured `label` —
+e.g. `z.number().min(1)` on a field labeled `Level` renders
+`Level must be at least 1.` Array containers use their `legend`
+(`Add at least one wealth tier.`). Custom `.refine` / `superRefine` messages
+always win; unregistered paths (slot content, unmapped issue codes) fall back
+to Zod defaults. Tiers, naming, and copy style →
+[packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
+
 Contract enums → `toOptions` with a label map keyed by the enum type:
 
 ```ts

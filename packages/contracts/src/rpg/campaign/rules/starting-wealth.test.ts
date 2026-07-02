@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { levelRangeGapMessage, levelRangeOverlapMessage } from '../../primitives/level'
+import { levelValidationMessages } from '../../primitives/level-messages'
 import {
   computeStartingWealthSparsePatch,
   mergeStartingWealthRulesPatch,
@@ -57,7 +57,7 @@ describe('startingWealthRulesSchema', () => {
 
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toBe(levelRangeGapMessage(5))
+      expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ level: 5 }))
     }
   })
 
@@ -73,7 +73,9 @@ describe('startingWealthRulesSchema', () => {
 
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toBe(levelRangeOverlapMessage())
+      expect(result.error.issues[0]?.message).toBe(
+        levelValidationMessages.rangeOverlap({ otherLabel: 'Levels 1–5' }),
+      )
     }
   })
 })
@@ -110,7 +112,9 @@ describe('resolveStartingWealthRules', () => {
 
 describe('computeStartingWealthSparsePatch', () => {
   it('returns undefined when resolved rules match the seed', () => {
-    expect(computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed)).toBeUndefined()
+    expect(
+      computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed),
+    ).toBeUndefined()
   })
 
   it('returns only fields that differ from the seed', () => {
@@ -125,7 +129,9 @@ describe('computeStartingWealthSparsePatch', () => {
   })
 
   it('returns undefined when resolved tiers match the seed after form round-trip field order', () => {
-    expect(computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed)).toBeUndefined()
+    expect(
+      computeStartingWealthSparsePatch(minimalStartingWealthSeed, minimalStartingWealthSeed),
+    ).toBeUndefined()
   })
 })
 

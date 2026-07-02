@@ -1,15 +1,7 @@
 import { z } from 'zod'
 
-import {
-  absoluteLevelSchema,
-  campaignLevelOutOfBoundsMessage,
-  campaignLevelSchema,
-  levelRangeEndAtMessage,
-  levelRangeGapMessage,
-  levelRangeOverlapMessage,
-  levelRangeStartAtMessage,
-  minLevelExceedsMaxLevelMessage,
-} from './level'
+import { absoluteLevelSchema, campaignLevelSchema, formatLevelRangeLabel } from './level'
+import { levelValidationMessages } from './level-messages'
 
 export type LevelRangeRow = { minLevel: number; maxLevel: number }
 
@@ -40,7 +32,7 @@ function issueCampaignLevelBounds(
     if (!levelSchema.safeParse(row.minLevel).success) {
       ctx.addIssue({
         code: 'custom',
-        message: campaignLevelOutOfBoundsMessage(cap),
+        message: levelValidationMessages.outOfBounds({ maxLevel: cap }),
         path: [...pathPrefix, index, 'minLevel'],
       })
     }
@@ -48,7 +40,7 @@ function issueCampaignLevelBounds(
     if (!levelSchema.safeParse(row.maxLevel).success) {
       ctx.addIssue({
         code: 'custom',
-        message: campaignLevelOutOfBoundsMessage(cap),
+        message: levelValidationMessages.outOfBounds({ maxLevel: cap }),
         path: [...pathPrefix, index, 'maxLevel'],
       })
     }
@@ -71,7 +63,7 @@ export function refineLevelRangeTable(
     if (row.minLevel > row.maxLevel) {
       ctx.addIssue({
         code: 'custom',
-        message: minLevelExceedsMaxLevelMessage(),
+        message: levelValidationMessages.invertedRange(),
         path: [...pathPrefix, index, 'minLevel'],
       })
     }
@@ -83,7 +75,7 @@ export function refineLevelRangeTable(
     ) {
       ctx.addIssue({
         code: 'custom',
-        message: levelRangeStartAtMessage(options.requireStartAt),
+        message: levelValidationMessages.rangeStartAt({ expected: options.requireStartAt }),
         path: [...pathPrefix, 0, 'minLevel'],
       })
     }
@@ -93,7 +85,9 @@ export function refineLevelRangeTable(
       if (row.minLevel <= previousRow.maxLevel) {
         ctx.addIssue({
           code: 'custom',
-          message: levelRangeOverlapMessage(),
+          message: levelValidationMessages.rangeOverlap({
+            otherLabel: formatLevelRangeLabel(previousRow),
+          }),
           path: [...pathPrefix, index, 'minLevel'],
         })
       }
@@ -101,7 +95,7 @@ export function refineLevelRangeTable(
       if (row.minLevel > previousRow.maxLevel + 1) {
         ctx.addIssue({
           code: 'custom',
-          message: levelRangeGapMessage(previousRow.maxLevel + 1),
+          message: levelValidationMessages.rangeGap({ level: previousRow.maxLevel + 1 }),
           path: [...pathPrefix, index, 'minLevel'],
         })
       }
@@ -115,7 +109,7 @@ export function refineLevelRangeTable(
     if (lastRow.maxLevel !== options.requireEndAt) {
       ctx.addIssue({
         code: 'custom',
-        message: levelRangeEndAtMessage(options.requireEndAt),
+        message: levelValidationMessages.rangeEndAt({ expected: options.requireEndAt }),
         path: [...pathPrefix, lastIndex, 'maxLevel'],
       })
     }
