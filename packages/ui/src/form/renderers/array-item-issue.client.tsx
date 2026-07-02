@@ -15,6 +15,10 @@ function issueCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'issue' : 'issues'}`
 }
 
+function issueCountCompactLabel(count: number): string {
+  return String(count)
+}
+
 function arrayLegendIssueLabel(issueCount: number, invalidRowCount: number): string {
   const rowLabel = invalidRowCount === 1 ? '1 row' : `${invalidRowCount} rows`
   return `${issueCountLabel(issueCount)} in ${rowLabel}`
@@ -45,7 +49,9 @@ export function ArrayItemIssueBadge({
       onClick={onPress}
     >
       <AlertTriangle className="size-3.5" aria-hidden />
-      <span>{issueCountLabel(issueCount)}</span>
+      <span className={compact ? 'tabular-nums' : undefined}>
+        {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
+      </span>
     </button>
   )
 }
@@ -147,4 +153,4 @@ export function ArrayLegendIssueLink({
   )
 }
 
-export { issueCountLabel, arrayLegendIssueLabel }
+export { issueCountLabel, issueCountCompactLabel, arrayLegendIssueLabel }

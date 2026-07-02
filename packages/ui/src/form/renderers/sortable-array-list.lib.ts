@@ -2,7 +2,7 @@ import type { DragEndEvent } from '@dnd-kit/core'
 
 /** Resolves drag-end indices for array field rows keyed by RHF field id. */
 export function resolveSortableArrayMove(
-  items: { id: string }[],
+  items: ReadonlyArray<{ id: string }>,
   event: DragEndEvent,
 ): { from: number; to: number } | null {
   const { active, over } = event

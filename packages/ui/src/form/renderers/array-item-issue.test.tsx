@@ -15,12 +15,22 @@ describe('array-item-issue', () => {
       <ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="action" />,
     )
 
-    expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass('text-destructive')
+    const badge = screen.getByRole('button', { name: '2 issues in Hero' })
+    expect(badge).toHaveClass('text-destructive')
+    expect(badge).toHaveTextContent('2 issues')
 
     rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
     expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
       'text-destructive-subtle',
     )
+  })
+
+  it('shows compact count-only badge text with full aria-label', () => {
+    render(<ArrayItemIssueBadge issueCount={2} rowLabel="Grant 1" compact prominence="action" />)
+
+    const badge = screen.getByRole('button', { name: '2 issues in Grant 1' })
+    expect(badge).toHaveTextContent('2')
+    expect(badge).not.toHaveTextContent('issues')
   })
 
   it('renders compact field summary text', () => {

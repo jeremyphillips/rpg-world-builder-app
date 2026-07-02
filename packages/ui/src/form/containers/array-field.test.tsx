@@ -722,6 +722,50 @@ describe('ArrayFieldRenderer', () => {
     expect(actionsRail).toHaveClass('self-start', 'mt-1', 'mr-1')
   })
 
+  it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {
+    const compactRowFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        itemVariant: 'compact',
+        fields: [
+          {
+            kind: 'row',
+            fields: [
+              { type: 'text', name: 'grantType', label: 'Type', required: true },
+              { type: 'text', name: 'detail', label: 'Detail' },
+            ],
+          },
+        ],
+        addLabel: 'Add grant',
+        itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+      },
+    ]
+
+    const grantSchema = z.object({
+      grants: z.array(z.object({ grantType: z.string(), detail: z.string().optional() })),
+    })
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={compactRowFields}
+        defaultValues={{ grants: [{ grantType: 'senses', detail: 'Darkvision' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const compactRow = document.querySelector('[data-compact-field-count="2"]')
+    expect(compactRow).toBeInTheDocument()
+
+    const actionsRail = compactRow!.querySelector('[aria-label="Item actions"]')
+    expect(actionsRail).toBeInTheDocument()
+    expect(actionsRail).not.toHaveClass('mt-1')
+    expect(actionsRail).toHaveClass('justify-self-end')
+  })
+
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
     const user = userEvent.setup()
 

@@ -25,7 +25,7 @@ import {
 export const startingEquipmentValidationMessages = {
   poolChoiceSourcesRequired: defineMessage(
     'validation.startingEquipment.poolChoiceSourcesRequired',
-    () => 'Pool choices require equipment slugs and/or tool categories',
+    () => 'Pool choices require equipment and/or tool categories',
     () => 'Missing pool sources',
   ),
   wealthGrantRequired: defineMessage(
@@ -226,6 +226,13 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
 
   return [
     {
+      type: 'text',
+      name: 'label',
+      label: 'Choice label',
+      required: true,
+      visibility: visibleForItemKind('choice'),
+    },
+    {
       type: 'select',
       name: 'itemKind',
       label: 'Item kind',
@@ -267,17 +274,12 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
     },
     ...startingEquipmentModifierFields(),
     {
-      type: 'text',
-      name: 'label',
-      label: 'Choice label',
-      required: true,
-      visibility: visibleForItemKind('choice'),
-    },
-    {
-      type: 'number',
+      type: 'inlineChooseCount',
       name: 'choose',
-      label: 'Number to choose',
+      label: '',
       min: 1,
+      prefix: 'Character can choose',
+      suffix: 'from Equipment pool:',
       defaultValue: 1,
       visibility: visibleForItemKind('choice'),
       digits: 1,
@@ -285,7 +287,7 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
     {
       type: 'combobox',
       name: 'fromEquipmentSlugs',
-      label: 'Equipment pool',
+      label: '',
       multiple: true,
       options: equipmentOptions,
       placeholder: 'Choose equipment…',

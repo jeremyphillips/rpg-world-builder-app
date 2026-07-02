@@ -7,8 +7,10 @@ export const inlineSentenceConnectorVariants = cva('shrink-0 text-foreground', {
   variants: {
     size: fieldSizeTypographyClasses,
     tone: {
-      /** Loose prose connectors (`through`, choose-count prefix/suffix). */
+      /** Loose prose connectors (level range `through`, etc.). */
       prose: '',
+      /** Field-label weight for choose-count prefix/suffix — matches `fieldLabelVariants`. */
+      label: 'font-field-label leading-none',
       /** Grouped dice cluster separator (`d`, operators). */
       mono: 'px-2 font-mono font-medium',
     },

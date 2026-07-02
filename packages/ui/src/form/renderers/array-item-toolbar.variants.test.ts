@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   arrayItemActionsRailClasses,
   arrayItemBodyClasses,
+  arrayItemCompactRowClasses,
   arrayItemDragHandleClasses,
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
@@ -10,6 +11,7 @@ import {
   arrayItemShellVariants,
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
+  buildArrayItemCompactRowGridTemplate,
 } from './array-item-toolbar.variants'
 import { fieldSurfaceToneVariants } from '../../components/ui/field-stack.variants'
 
@@ -80,5 +82,22 @@ describe('array item shell variants', () => {
     const classes = arrayItemShellVariants({ tone: 'subtle' })
     expect(classes).toContain(fieldSurfaceToneVariants({ tone: 'subtle' }))
     expect(classes).toContain('bg-muted/30')
+  })
+
+  it('uses a single-column shell for compact inline rows', () => {
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('p-2')
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('grid-cols-')
+  })
+
+  it('builds compact row grid templates with a reserved actions column', () => {
+    expect(buildArrayItemCompactRowGridTemplate(2, true)).toBe(
+      'auto repeat(2, minmax(0, 1fr)) max-content',
+    )
+    expect(buildArrayItemCompactRowGridTemplate(3, false)).toBe(
+      'repeat(3, minmax(0, 1fr)) max-content',
+    )
+    expect(arrayItemCompactRowClasses).toContain('grid')
+    expect(arrayItemActionsRailClasses({ embedded: true })).toContain('justify-self-end')
+    expect(arrayItemActionsRailClasses({ embedded: true })).not.toContain('mt-1')
   })
 })

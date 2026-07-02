@@ -20,10 +20,16 @@ function isLeafField(item: FormItem | RowConfig): boolean {
 }
 
 function isCompactEligible(fields: FormItem[]): boolean {
-  if (fields.length !== 1) return false
+  return resolveCompactInlineRow(fields) !== undefined
+}
+
+/** Single leaf `row` container used by compact inline array items. */
+export function resolveCompactInlineRow(fields: FormItem[]): RowConfig | undefined {
+  if (fields.length !== 1) return undefined
   const only = fields[0]
-  if (only === undefined || !('kind' in only) || only.kind !== 'row') return false
-  return only.fields.every(isLeafField)
+  if (only === undefined || !('kind' in only) || only.kind !== 'row') return undefined
+  if (!only.fields.every(isLeafField)) return undefined
+  return only
 }
 
 export function resolveArrayItemVariant(

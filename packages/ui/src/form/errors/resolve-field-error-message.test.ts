@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { FieldErrors } from 'react-hook-form'
 
 import { encodeStructuredMessage } from '@rpg/contracts'
 
@@ -32,13 +33,10 @@ describe('resolveFieldErrorMessage', () => {
   })
 
   it('reads nested array field errors from RHF error trees', () => {
-    expect(
-      resolveNestedFieldErrorMessage(
-        {
-          grants: [{ rarity: { type: 'custom', message: 'Choose a rarity.' } }],
-        },
-        'grants.0.rarity',
-      ),
-    ).toBe('Choose a rarity.')
+    const errors = {
+      grants: [{ rarity: { type: 'custom', message: 'Choose a rarity.' } }],
+    } as FieldErrors<{ grants: Array<{ rarity: string }> }>
+
+    expect(resolveNestedFieldErrorMessage(errors, 'grants.0.rarity')).toBe('Choose a rarity.')
   })
 })
