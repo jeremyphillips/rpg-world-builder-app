@@ -7,7 +7,7 @@
     "bench": "./src/cli.ts"
   },
   "scripts": {
-    "bench": "tsx src/cli.ts",
+    "bench": "node --import tsx/esm src/cli.ts",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run"
