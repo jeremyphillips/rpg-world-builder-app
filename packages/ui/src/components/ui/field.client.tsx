@@ -10,6 +10,7 @@ import {
 } from './field-control.variants'
 import {
   fieldAnatomyStackClasses,
+  fieldErrorTextVariants,
   fieldLabelVariants,
   type FieldLabelPlacement,
 } from './field.variants'
@@ -154,6 +155,80 @@ function FieldControl({ children }: FieldControlProps) {
 }
 FieldControl.displayName = 'Field.Control'
 
+interface FieldMessageIds {
+  hintId: string
+  errorId: string
+}
+
+interface FieldHintErrorContent {
+  hint?: string
+  error?: string
+}
+
+export function FieldHintText({ id, children }: { id: string; children: string }) {
+  return (
+    <Text id={id} variant="caption">
+      {children}
+    </Text>
+  )
+}
+
+export type FieldErrorTextProps = React.HTMLAttributes<HTMLParagraphElement> & {
+  id: string
+  size?: FieldSize
+  children: React.ReactNode
+}
+
+export function FieldErrorText({
+  id,
+  size = 'md',
+  className,
+  children,
+  ...props
+}: FieldErrorTextProps) {
+  return (
+    <Text
+      id={id}
+      variant="destructive"
+      role="alert"
+      aria-live="polite"
+      className={cn(fieldErrorTextVariants({ size }), className)}
+      {...props}
+    >
+      {children}
+    </Text>
+  )
+}
+
+/** Hint for below-label placement — hidden while an error is present. */
+export function FieldHintBelowLabel({
+  hint,
+  error,
+  hintId,
+}: FieldHintErrorContent & Pick<FieldMessageIds, 'hintId'>) {
+  if (error || !hint) return null
+  return <FieldHintText id={hintId}>{hint}</FieldHintText>
+}
+
+/** Hint or error after the control. */
+export function FieldHintErrorBelowControl({
+  hint,
+  error,
+  hintId,
+  errorId,
+  size,
+}: FieldHintErrorContent & FieldMessageIds & { size?: FieldSize }) {
+  if (error) {
+    return (
+      <FieldErrorText id={errorId} size={size}>
+        {error}
+      </FieldErrorText>
+    )
+  }
+  if (hint) return <FieldHintText id={hintId}>{hint}</FieldHintText>
+  return null
+}
+
 export type FieldHintProps = React.HTMLAttributes<HTMLParagraphElement>
 
 function FieldHint({ className, children, ...props }: FieldHintProps) {
@@ -170,19 +245,12 @@ FieldHint.displayName = 'Field.Hint'
 export type FieldErrorProps = React.HTMLAttributes<HTMLParagraphElement>
 
 function FieldError({ className, children, ...props }: FieldErrorProps) {
-  const { errorId, hasError, error } = useFieldContext('Field.Error')
+  const { errorId, hasError, error, size } = useFieldContext('Field.Error')
   if (!hasError) return null
   return (
-    <Text
-      id={errorId}
-      variant="destructive"
-      role="alert"
-      aria-live="polite"
-      className={className}
-      {...props}
-    >
-      {children ?? error}
-    </Text>
+    <FieldErrorText id={errorId} size={size} className={className} {...props}>
+      {children ?? error ?? ''}
+    </FieldErrorText>
   )
 }
 FieldError.displayName = 'Field.Error'

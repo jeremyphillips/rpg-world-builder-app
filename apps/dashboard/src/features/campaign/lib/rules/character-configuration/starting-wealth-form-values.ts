@@ -201,7 +201,7 @@ export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValu
     parts.push(`Avg ${formatGroupedNumber(avgGp)} GP`)
   }
 
-  const grantCount = tier.magicItemGrants.length
+  const grantCount = tier.magicItemGrants?.length ?? 0
   appendGrantCountSummaryPart(parts, grantCount)
 
   return joinFormArrayItemSummaryParts(parts)

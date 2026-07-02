@@ -3,10 +3,14 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from './field.client'
+import {
+  FieldErrorText,
+  FieldHintBelowLabel,
+  FieldHintErrorBelowControl,
+  type FieldSize,
+} from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldAnatomyIds, fieldDescribedBy } from './choose-count-field.lib'
-import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import {
   fieldAnatomyStackClasses,
   fieldLabelVariants,
@@ -80,10 +84,18 @@ export function ChooseCountFieldShell({
       {children({ legendId, chooseId, hintId, errorId })}
       {hintPosition === 'below-label' ? (
         error ? (
-          <FieldErrorText id={errorId}>{error}</FieldErrorText>
+          <FieldErrorText id={errorId} size={size}>
+            {error}
+          </FieldErrorText>
         ) : null
       ) : (
-        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+        <FieldHintErrorBelowControl
+          hint={hint}
+          error={error}
+          hintId={hintId}
+          errorId={errorId}
+          size={size}
+        />
       )}
     </fieldset>
   )

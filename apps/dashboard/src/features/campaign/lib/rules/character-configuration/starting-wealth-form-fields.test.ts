@@ -64,6 +64,21 @@ describe('formatStartingWealthTierSummary', () => {
       }),
     ).toContain('Avg')
   })
+
+  it('tolerates missing magic item grants while rendering a transient form row', () => {
+    const tier = mapStartingWealthToFormValues(SEED).tiers.find(
+      (entry) => entry.label === 'Adventurer',
+    )
+    expect(tier).toBeDefined()
+    const adventurerTier = tier!
+
+    expect(
+      formatStartingWealthTierSummary({
+        ...adventurerTier,
+        magicItemGrants: undefined as unknown as typeof adventurerTier.magicItemGrants,
+      }),
+    ).toBe('Levels 2–4')
+  })
 })
 
 describe('mapStartingWealthToFormValues', () => {
