@@ -18,36 +18,36 @@ describe('resolveTraitDisplay', () => {
     })
   })
 
-  it('derives resistance display', () => {
+  it('derives resistance display from grantGroups', () => {
     const display = resolveTraitDisplay(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'poison-resistance',
-        grants: { resistances: ['poison'] },
+        grantGroups: [{ grants: [{ kind: 'resistances', damageTypes: ['poison'] }] }],
       }),
     )
     expect(display.name).toBe('Damage Resistance')
     expect(display.descriptionHtml).toBe('<p>You have Resistance to Poison damage.</p>')
   })
 
-  it('derives walk speed override display', () => {
+  it('derives walk speed override display from grantGroups', () => {
     const display = resolveTraitDisplay(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'speed',
-        grants: { speedOverride: { walk: 35 } },
+        grantGroups: [{ grants: [{ kind: 'speedOverride', walk: 35 }] }],
       }),
     )
     expect(display.name).toBe('Speed')
     expect(display.descriptionHtml).toBe('<p>Your Speed is 35 feet.</p>')
   })
 
-  it('derives language display', () => {
+  it('derives language display from grantGroups', () => {
     const display = resolveTraitDisplay(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'common',
-        grants: { languages: ['common'] },
+        grantGroups: [{ grants: [{ kind: 'languages', languageIds: ['common'] }] }],
       }),
     )
     expect(display.name).toBe('Language')

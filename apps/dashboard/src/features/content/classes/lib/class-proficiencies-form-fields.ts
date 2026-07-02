@@ -21,7 +21,6 @@ import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
-  CLASS_SKILL_OPTIONS_INFO,
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   SAVING_THROWS_HINT,
   WEAPON_PROFICIENCIES_HINT,
@@ -162,12 +161,13 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           type: 'chooseFromChips',
           name: 'proficiencies.skills.from',
           chooseName: 'proficiencies.skills.choose',
-          label: 'Skill proficiencies',
+          label: '',
           options: skillOptions,
-          info: CLASS_SKILL_OPTIONS_INFO,
           chooseMin: 0,
           chooseMax: SKILL_IDS.length,
           required: true,
+          prefix: 'Character chooses',
+          suffix: 'Skill Proficiencies from:',
         },
         {
           type: 'chips',

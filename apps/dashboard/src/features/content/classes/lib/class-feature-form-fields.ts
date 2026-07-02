@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
+import {
+  campaignLevelSchema,
+  grantGroupsSchema,
+  MAX_CHARACTER_LEVEL,
+  type ClassFeature,
+} from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
@@ -27,6 +32,7 @@ export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVE
     description: z.string().optional(),
     level: levelField,
     grants: z.array(createGrantRowFormSchema(maxLevel)),
+    _grantGroups: grantGroupsSchema.optional(),
   })
 }
 
@@ -103,6 +109,7 @@ export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
     description: feature.description,
     level: feature.level,
     grants: grantsToFormRows(feature.grants),
+    _grantGroups: feature.grantGroups,
   }
 }
 
@@ -114,6 +121,7 @@ export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassF
     description: row.description || undefined,
     level: row.level,
     grants: formRowsToGrants(row.grants),
+    ...(row._grantGroups !== undefined ? { grantGroups: row._grantGroups } : {}),
   }
 }
 

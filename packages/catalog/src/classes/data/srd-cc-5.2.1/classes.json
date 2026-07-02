@@ -31,18 +31,35 @@
             "label": "Standard Equipment",
             "description": "Greataxe, 4 Javelins, Explorer's Pack, and 15 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "greataxe", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 4 },
-              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "greataxe",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "javelin",
+                "quantity": 4
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "explorers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 15 }
+            "wealth": {
+              "gp": 15
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 75 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 75 }
+            "wealth": {
+              "gp": 75
+            }
           }
         ]
       }
@@ -89,14 +106,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "extra-attack",
@@ -127,14 +149,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "brutal-strike",
@@ -153,14 +180,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "improved-brutal-strike",
@@ -179,14 +211,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "masterful-brutal-strike",
@@ -205,14 +242,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-irresistible-offense"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-irresistible-offense"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "primal-champion",
@@ -423,7 +465,12 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 2,
+                "equipped": true
+              },
               {
                 "kind": "choice",
                 "choose": 1,
@@ -433,16 +480,24 @@
                   "toolCategory": "musical_instrument"
                 }
               },
-              { "kind": "fixed", "equipmentSlug": "entertainers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "entertainers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 19 }
+            "wealth": {
+              "gp": 19
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 90 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 90 }
+            "wealth": {
+              "gp": 90
+            }
           }
         ]
       }
@@ -471,14 +526,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "font-of-inspiration",
@@ -497,14 +557,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "magical-secrets",
@@ -517,28 +582,38 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-16",
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "superior-inspiration",
@@ -551,32 +626,37 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-spell-recall"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-spell-recall"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "words-of-creation",
         "name": "Words of Creation",
         "level": 20,
         "description": "<p>You have mastered two of the Words of Creation: the words of life and death. You therefore always have the Power Word Heal and Power Word Kill spells prepared. When you cast either spell, you can target a second creature with it if that creature is within 10 feet of the first target.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 20,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["power-word-heal", "power-word-kill"]
               }
             ]
           }
-        }
+        ]
       }
     ],
     "resources": [
@@ -737,24 +817,47 @@
             "label": "Standard Equipment",
             "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "chain-shirt", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "mace", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "chain-shirt",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shield",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "mace",
+                "quantity": 1,
+                "equipped": true
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
-              { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "priests-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 7 }
+            "wealth": {
+              "gp": 7
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 110 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 110 }
+            "wealth": {
+              "gp": 110
+            }
           }
         ]
       }
@@ -777,14 +880,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "sear-undead",
@@ -803,14 +911,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "divine-intervention",
@@ -823,14 +936,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "improved-blessed-strikes",
@@ -843,28 +961,38 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-fate"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-fate"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "greater-divine-intervention",
@@ -1033,25 +1161,47 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shield",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "sickle",
+                "quantity": 1,
+                "equipped": true
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "wooden-staff",
                 "quantity": 1,
                 "equipped": false
               },
-              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "herbalism-kit", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "explorers-pack",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "herbalism-kit",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 9 }
+            "wealth": {
+              "gp": 9
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 50 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 50 }
+            "wealth": {
+              "gp": 50
+            }
           }
         ]
       }
@@ -1062,18 +1212,18 @@
         "name": "Druidic",
         "level": 1,
         "description": "<p>You know Druidic, the secret language of Druids. While learning this ancient tongue, you also unlocked the magic of communicating with animals; you always have the <em>Speak with Animals</em> spell prepared.</p><p>You can use Druidic to leave hidden messages. You and others who know Druidic automatically spot such a message. Others spot the message's presence with a successful DC 15 Intelligence (Investigation) check but can't decipher it without magic.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "wis",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 1,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["speak-with-animals"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "primal-order",
@@ -1098,14 +1248,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "wild-resurgence",
@@ -1124,28 +1279,38 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-12",
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "improved-elemental-fury",
@@ -1158,14 +1323,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "beast-spells",
@@ -1178,14 +1348,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-dimensional-travel"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "archdruid",
@@ -1246,13 +1421,37 @@
             "label": "Heavy Armor",
             "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "chain-mail", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "greatsword", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "flail", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 8 },
-              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "chain-mail",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "greatsword",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "flail",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "javelin",
+                "quantity": 8
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dungeoneers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 4 }
+            "wealth": {
+              "gp": 4
+            }
           },
           {
             "id": "skirmisher",
@@ -1265,21 +1464,51 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "scimitar", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "longbow", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
-              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "scimitar",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shortsword",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "longbow",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "arrows",
+                "quantity": 20
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "quiver",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dungeoneers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 11 }
+            "wealth": {
+              "gp": 11
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 155 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 155 }
+            "wealth": {
+              "gp": 155
+            }
           }
         ]
       }
@@ -1290,14 +1519,19 @@
         "name": "Fighting Style",
         "level": 1,
         "description": "<p>You have honed your martial prowess and gain a Fighting Style feat of your choice (see \"Feats\").</p><p>Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "fighting-style",
-            "choose": 1,
-            "replaceable": true,
-            "recommendedFeatIds": ["defense"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "fighting-style",
+                "choose": 1,
+                "replaceable": true,
+                "recommendedFeatIds": ["defense"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "second-wind",
@@ -1328,14 +1562,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "extra-attack",
@@ -1354,28 +1593,38 @@
         "name": "Ability Score Improvement",
         "level": 6,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-8",
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "indomitable",
@@ -1400,14 +1649,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "studied-attacks",
@@ -1420,42 +1674,57 @@
         "name": "Ability Score Improvement",
         "level": 14,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-16",
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-combat-prowess"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-combat-prowess"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "three-extra-attacks",
@@ -1554,18 +1823,35 @@
             "label": "Standard Equipment",
             "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument chosen for the tool proficiency above, Explorer's Pack, and 11 GP. FOLLOWUP: proficiencyLinkedChoice — structured item choice deferred until class tool proficiency selection is modeled.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "spear", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 5 },
-              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "spear",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 5
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "explorers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 11 }
+            "wealth": {
+              "gp": 11
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 50 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 50 }
+            "wealth": {
+              "gp": 50
+            }
           }
         ]
       }
@@ -1612,14 +1898,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "slow-fall",
@@ -1656,14 +1947,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "acrobatic-movement",
@@ -1688,14 +1984,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "deflect-energy",
@@ -1720,14 +2021,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "superior-defense",
@@ -1740,14 +2046,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-irresistible-offense"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-irresistible-offense"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "body-and-mind",
@@ -1974,25 +2285,52 @@
             "label": "Standard Equipment",
             "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "chain-mail", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shield", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "longsword", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "javelin", "quantity": 6 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "chain-mail",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shield",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "longsword",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "javelin",
+                "quantity": 6
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
-              { "kind": "fixed", "equipmentSlug": "priests-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "priests-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 9 }
+            "wealth": {
+              "gp": 9
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 150 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 150 }
+            "wealth": {
+              "gp": 150
+            }
           }
         ]
       }
@@ -2015,31 +2353,36 @@
         "name": "Fighting Style",
         "level": 2,
         "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Blessed Warrior.</strong> You learn two Cleric cantrips of your choice (see the Cleric class's section for a list of Cleric spells). Guidance and Sacred Flame are recommended. The chosen cantrips count as Paladin spells for you, and Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of these cantrips with another Cleric cantrip.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "fighting-style",
-            "choose": 1,
-            "recommendedFeatIds": ["defense"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "fighting-style",
+                "choose": 1,
+                "recommendedFeatIds": ["defense"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "paladins-smite",
         "name": "Paladin's Smite",
         "level": 2,
         "description": "<p>You always have the <em>Divine Smite</em> spell prepared. In addition, you can cast it without expending a spell slot, but you must finish a Long Rest before you can cast it in this way again.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 2,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["divine-smite"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "channel-divinity",
@@ -2052,14 +2395,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "extra-attack",
@@ -2072,18 +2420,18 @@
         "name": "Faithful Steed",
         "level": 5,
         "description": "<p>You can call on the aid of an otherworldly steed. You always have the <em>Find Steed</em> spell prepared.</p><p>You can also cast the spell once without expending a spell slot, and you regain the ability to do so when you finish a Long Rest.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 5,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["find-steed"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "aura-of-protection",
@@ -2096,14 +2444,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "abjure-foes",
@@ -2128,14 +2481,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "restoring-touch",
@@ -2148,14 +2506,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "aura-expansion",
@@ -2168,14 +2531,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-truesight"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-truesight"]
+              }
+            ]
           }
-        }
+        ]
       }
     ],
     "resources": [
@@ -2288,26 +2656,56 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "scimitar", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "longbow", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
-              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "scimitar",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shortsword",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "longbow",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "arrows",
+                "quantity": 20
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "quiver",
+                "quantity": 1
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "sprig-of-mistletoe",
                 "quantity": 1
               },
-              { "kind": "fixed", "equipmentSlug": "explorers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "explorers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 7 }
+            "wealth": {
+              "gp": 7
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 150 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 150 }
+            "wealth": {
+              "gp": 150
+            }
           }
         ]
       }
@@ -2318,18 +2716,18 @@
         "name": "Favored Enemy",
         "level": 1,
         "description": "<p>You always have the <em>Hunter's Mark</em> spell prepared. You can cast it twice without expending a spell slot, and you regain all expended uses of this ability when you finish a Long Rest.</p><p>The number of times you can cast the spell without a spell slot increases when you reach certain Ranger levels, as shown in the Favored Enemy column of the Ranger Features table.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "wis",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 1,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["hunters-mark"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "weapon-mastery",
@@ -2348,27 +2746,37 @@
         "name": "Fighting Style",
         "level": 2,
         "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Druidic Warrior.</strong> You learn two Druid cantrips of your choice (see the Druid class's section for a list of Druid spells). <em>Guidance</em> and <em>Starry Wisp</em> are recommended. The chosen cantrips count as Ranger spells for you, and Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of these cantrips with another Druid cantrip.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "fighting-style",
-            "choose": 1,
-            "recommendedFeatIds": ["defense"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "fighting-style",
+                "choose": 1,
+                "recommendedFeatIds": ["defense"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "extra-attack",
@@ -2387,14 +2795,19 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "expertise",
@@ -2413,14 +2826,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "relentless-hunter",
@@ -2439,14 +2857,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "precise-hunter",
@@ -2459,28 +2882,36 @@
         "name": "Feral Senses",
         "level": 18,
         "description": "<p>Your connection to the forces of nature grants you Blindsight with a range of 30 feet.</p>",
-        "grants": {
-          "senses": [
-            {
-              "type": "blindsight",
-              "range": 30
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "blindsight",
+                "range": 30
+              }
+            ]
+          }
+        ]
       },
       {
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-dimensional-travel"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "foe-slayer",
@@ -2559,22 +2990,57 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shortsword", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "shortbow", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "arrows", "quantity": 20 },
-              { "kind": "fixed", "equipmentSlug": "quiver", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "thieves-tools", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "burglars-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 2,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shortsword",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "shortbow",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "arrows",
+                "quantity": 20
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "quiver",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "thieves-tools",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "burglars-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 8 }
+            "wealth": {
+              "gp": 8
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 100 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 100 }
+            "wealth": {
+              "gp": 100
+            }
           }
         ]
       }
@@ -2621,14 +3087,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "cunning-strike",
@@ -2659,28 +3130,38 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-10",
         "name": "Ability Score Improvement",
         "level": 10,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "improved-cunning-strike",
@@ -2693,14 +3174,19 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "devious-strikes",
@@ -2719,14 +3205,19 @@
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "elusive",
@@ -2739,14 +3230,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-the-night-spirit"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-the-night-spirit"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "stroke-of-luck",
@@ -2891,23 +3387,40 @@
             "label": "Standard Equipment",
             "description": "Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, and 28 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "spear", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "spear",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 2
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "crystal",
                 "quantity": 1
               },
-              { "kind": "fixed", "equipmentSlug": "dungeoneers-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dungeoneers-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 28 }
+            "wealth": {
+              "gp": 28
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 50 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 50 }
+            "wealth": {
+              "gp": 50
+            }
           }
         ]
       }
@@ -2936,14 +3449,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "sorcerous-restoration",
@@ -2962,56 +3480,76 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-12",
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-16",
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-dimensional-travel"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "arcane-apotheosis",
@@ -3220,24 +3758,45 @@
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "sickle", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "sickle",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 2
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "orb",
                 "quantity": 1
               },
-              { "kind": "fixed", "equipmentSlug": "book-occult-lore", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "book-occult-lore",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "scholars-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 15 }
+            "wealth": {
+              "gp": 15
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 100 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 100 }
+            "wealth": {
+              "gp": 100
+            }
           }
         ]
       }
@@ -3260,52 +3819,63 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-8",
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "contact-patron",
         "name": "Contact Patron",
         "level": 9,
         "description": "<p>In the past, you usually contacted your patron through intermediaries. Now you can communicate directly; you always have the <em>Contact Other Plane</em> spell prepared. With this feature, you can cast the spell without expending a spell slot to contact your patron, and you automatically succeed on the spell's saving throw.</p><p>Once you cast the spell with this feature, you can't do so in this way again until you finish a Long Rest.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 9,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["contact-other-plane"]
               },
               {
-                "level": 9,
-                "kind": "free_cast",
-                "frequency": "once_per_long_rest",
-                "spellIds": ["contact-other-plane"]
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "free_cast",
+                "spellIds": ["contact-other-plane"],
+                "frequency": "once_per_long_rest"
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "mystic-arcanum",
@@ -3318,42 +3888,57 @@
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-16",
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "epic-boon",
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-fate"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-fate"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "eldritch-master",
@@ -3536,25 +4121,46 @@
             "label": "Standard Equipment",
             "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
             "items": [
-              { "kind": "fixed", "equipmentSlug": "dagger", "quantity": 2 },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "dagger",
+                "quantity": 2
+              },
               {
                 "kind": "fixed",
                 "equipmentSlug": "arcane-staff",
                 "quantity": 1,
                 "equipped": true
               },
-              { "kind": "fixed", "equipmentSlug": "robe", "quantity": 1, "equipped": true },
-              { "kind": "fixed", "equipmentSlug": "spellbook", "quantity": 1 },
-              { "kind": "fixed", "equipmentSlug": "scholars-pack", "quantity": 1 }
+              {
+                "kind": "fixed",
+                "equipmentSlug": "robe",
+                "quantity": 1,
+                "equipped": true
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "spellbook",
+                "quantity": 1
+              },
+              {
+                "kind": "fixed",
+                "equipmentSlug": "scholars-pack",
+                "quantity": 1
+              }
             ],
-            "wealth": { "gp": 5 }
+            "wealth": {
+              "gp": 5
+            }
           },
           {
             "id": "gold",
             "label": "Starting Gold",
             "description": "Take 55 GP instead of standard equipment.",
             "items": [],
-            "wealth": { "gp": 55 }
+            "wealth": {
+              "gp": 55
+            }
           }
         ]
       }
@@ -3583,14 +4189,19 @@
         "name": "Ability Score Improvement",
         "level": 4,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "memorize-spell",
@@ -3603,42 +4214,57 @@
         "name": "Ability Score Improvement",
         "level": 8,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-12",
         "name": "Ability Score Improvement",
         "level": 12,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "ability-score-improvement-16",
         "name": "Ability Score Improvement",
         "level": 16,
         "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "general",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["ability-score-improvement"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "general",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["ability-score-improvement"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "spell-mastery",
@@ -3651,14 +4277,19 @@
         "name": "Epic Boon",
         "level": 19,
         "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "epic-boon",
-            "choose": 1,
-            "allowAnyQualifying": true,
-            "recommendedFeatIds": ["boon-of-spell-recall"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "epic-boon",
+                "choose": 1,
+                "allowAnyQualifying": true,
+                "recommendedFeatIds": ["boon-of-spell-recall"]
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "signature-spells",

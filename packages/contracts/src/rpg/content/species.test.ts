@@ -18,7 +18,7 @@ const ELF_BODY = {
     {
       kind: 'grant' as const,
       id: 'darkvision',
-      grants: { senses: [{ type: 'darkvision', range: 60 }] },
+      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
     },
     {
       kind: 'custom' as const,

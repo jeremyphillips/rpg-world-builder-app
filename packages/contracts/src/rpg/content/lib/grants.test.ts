@@ -263,27 +263,54 @@ describe('customContentTraitSchema', () => {
 })
 
 describe('grantContentTraitSchema', () => {
-  it('parses a grant-only darkvision trait', () => {
+  it('parses a grant-only darkvision trait using grantGroups', () => {
     const trait = {
       kind: 'grant' as const,
       id: 'darkvision',
-      grants: { senses: [{ type: 'darkvision' as const, range: 60 }] },
+      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
     }
     expect(grantContentTraitSchema.parse(trait)).toEqual(trait)
   })
 
-  it('rejects ineligible grants', () => {
+  it('parses a grant trait with a nameOverride', () => {
+    const trait = {
+      kind: 'grant' as const,
+      id: 'darkvision-superior',
+      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 120 }] }],
+      nameOverride: 'Superior Darkvision',
+    }
+    expect(grantContentTraitSchema.parse(trait)).toEqual(trait)
+  })
+
+  it('rejects ineligible grantGroups (multiple grants in group)', () => {
     expect(
       grantContentTraitSchema.safeParse({
         kind: 'grant',
         id: 'drow',
-        grants: {
-          senses: [{ type: 'darkvision', range: 120 }],
-          innateSpells: {
-            ability: 'cha',
-            entries: [{ level: 1, spellIds: ['dancing-lights'] }],
+        grantGroups: [
+          {
+            grants: [
+              { kind: 'sense', type: 'darkvision', range: 120 },
+              { kind: 'spells', ability: 'cha', mode: 'free_cast', spellIds: ['dancing-lights'] },
+            ],
           },
-        },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects ineligible grantGroups (spells-only grant)', () => {
+    expect(
+      grantContentTraitSchema.safeParse({
+        kind: 'grant',
+        id: 'drow-magic',
+        grantGroups: [
+          {
+            grants: [
+              { kind: 'spells', ability: 'cha', mode: 'free_cast', spellIds: ['dancing-lights'] },
+            ],
+          },
+        ],
       }).success,
     ).toBe(false)
   })
@@ -295,7 +322,7 @@ describe('contentTraitSchema', () => {
       contentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grants: { senses: [{ type: 'darkvision', range: 60 }] },
+        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
       }),
     ).toMatchObject({ kind: 'grant', id: 'darkvision' })
 
@@ -329,19 +356,19 @@ describe('normalizeContentTrait', () => {
       normalizeContentTrait({
         kind: 'grant',
         id: 'darkvision',
-        grants: { senses: [{ type: 'darkvision', range: 60 }] },
+        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
       }),
     ).toMatchObject({ kind: 'grant' })
   })
 })
 
 describe('resolveTraitDisplay', () => {
-  it('derives darkvision display from grant traits', () => {
+  it('derives darkvision display from grant traits (grantGroups model)', () => {
     const display = resolveTraitDisplay(
       contentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grants: { senses: [{ type: 'darkvision', range: 60 }] },
+        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
       }),
     )
     expect(display.name).toBe('Darkvision')
@@ -353,7 +380,7 @@ describe('resolveTraitDisplay', () => {
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grants: { senses: [{ type: 'darkvision', range: 120 }] },
+        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 120 }] }],
         nameOverride: 'Superior Darkvision',
         descriptionOverride: '<p>Custom homebrew wording.</p>',
       }),

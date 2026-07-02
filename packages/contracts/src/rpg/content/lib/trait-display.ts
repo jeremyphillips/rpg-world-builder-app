@@ -1,58 +1,47 @@
 import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import { getLanguageLabel } from '../../vocab/language'
 import { getSenseLabel } from '../../vocab/sense'
-import type { ContentGrants, ContentTrait, CustomContentTrait, GrantContentTrait } from './grants'
+import type {
+  ContentGrants,
+  ContentTrait,
+  CustomContentTrait,
+  GrantContentTrait,
+  GrantGroups,
+} from './grants'
 
 export type TraitDisplay = {
   name: string
   descriptionHtml?: string
 }
 
-function formatSenseGrantDescription(grants: ContentGrants): TraitDisplay | undefined {
-  const sense = grants.senses?.[0]
-  if (!sense) return undefined
-  return {
-    name: getSenseLabel(sense.type),
-    descriptionHtml: `<p>You have ${getSenseLabel(sense.type)} with a range of ${sense.range} feet.</p>`,
-  }
-}
+function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
+  const grant = groups[0]?.grants[0]
+  if (!grant) return { name: 'Grant' }
 
-function formatResistanceGrantDescription(grants: ContentGrants): TraitDisplay | undefined {
-  const type = grants.resistances?.[0]
-  if (!type) return undefined
-  return {
-    name: 'Damage Resistance',
-    descriptionHtml: `<p>You have Resistance to ${getDamageTypeLabel(type)} damage.</p>`,
+  switch (grant.kind) {
+    case 'sense':
+      return {
+        name: getSenseLabel(grant.type),
+        descriptionHtml: `<p>You have ${getSenseLabel(grant.type)} with a range of ${grant.range} feet.</p>`,
+      }
+    case 'resistances':
+      return {
+        name: 'Damage Resistance',
+        descriptionHtml: `<p>You have Resistance to ${getDamageTypeLabel(grant.damageTypes[0]!)} damage.</p>`,
+      }
+    case 'speedOverride':
+      return {
+        name: 'Speed',
+        descriptionHtml: `<p>Your Speed is ${grant.walk} feet.</p>`,
+      }
+    case 'languages':
+      return {
+        name: 'Language',
+        descriptionHtml: `<p>You know ${getLanguageLabel(grant.languageIds[0]!)}.</p>`,
+      }
+    default:
+      return { name: 'Grant' }
   }
-}
-
-function formatSpeedOverrideGrantDescription(grants: ContentGrants): TraitDisplay | undefined {
-  const walk = grants.speedOverride?.walk
-  if (walk === undefined) return undefined
-  return {
-    name: 'Speed',
-    descriptionHtml: `<p>Your Speed is ${walk} feet.</p>`,
-  }
-}
-
-function formatLanguageGrantDescription(grants: ContentGrants): TraitDisplay | undefined {
-  const language = grants.languages?.[0]
-  if (!language) return undefined
-  return {
-    name: 'Language',
-    descriptionHtml: `<p>You know ${getLanguageLabel(language)}.</p>`,
-  }
-}
-
-function deriveGrantDisplay(grants: ContentGrants): TraitDisplay {
-  return (
-    formatSenseGrantDescription(grants) ??
-    formatResistanceGrantDescription(grants) ??
-    formatSpeedOverrideGrantDescription(grants) ??
-    formatLanguageGrantDescription(grants) ?? {
-      name: 'Grant',
-    }
-  )
 }
 
 function resolveCustomTraitDisplay(trait: CustomContentTrait): TraitDisplay {
@@ -63,7 +52,7 @@ function resolveCustomTraitDisplay(trait: CustomContentTrait): TraitDisplay {
 }
 
 function resolveGrantTraitDisplay(trait: GrantContentTrait): TraitDisplay {
-  const derived = deriveGrantDisplay(trait.grants)
+  const derived = deriveGrantGroupDisplay(trait.grantGroups)
   return {
     name: trait.nameOverride ?? derived.name,
     descriptionHtml: trait.descriptionOverride ?? derived.descriptionHtml,
@@ -78,9 +67,13 @@ export function resolveTraitDisplay(trait: ContentTrait): TraitDisplay {
   return resolveCustomTraitDisplay(trait)
 }
 
-/** Reads structured grants from either trait variant (for stat aggregation). */
+/**
+ * Reads structured grants from either trait variant (for stat aggregation).
+ * Custom traits may carry a legacy `grants` bag; grant traits use `grantGroups`.
+ */
 export function getTraitGrants(trait: ContentTrait): ContentGrants | undefined {
-  return trait.grants
+  if (trait.kind === 'custom') return trait.grants
+  return undefined
 }
 
 /** Resolves display name for list labels and breadcrumbs. */

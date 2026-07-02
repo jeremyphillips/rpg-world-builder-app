@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass } from '../../fixtures/pick'
 import { formatInnateSpellEntryTitle } from './grant-form-fields'
 import { GRANT_ROW_TYPE_LABELS, GRANT_ROW_TYPES } from './grant-form-schema'
 import { formRowsToGrants, grantsToFormRows } from './grant-form-values'
@@ -26,9 +25,13 @@ describe('grantsToFormRows / formRowsToGrants', () => {
   })
 
   it('round-trips innate spell slug arrays', () => {
-    const bard = pickClass('bard')
-    const wordsOfCreation = bard.features.find((feature) => feature.id === 'words-of-creation')
-    const rows = grantsToFormRows(wordsOfCreation?.grants)
+    const grants = {
+      innateSpells: {
+        ability: 'cha' as const,
+        entries: [{ spellIds: ['power-word-heal', 'power-word-kill'] }],
+      },
+    }
+    const rows = grantsToFormRows(grants)
     const innateRow = rows.find((row) => row.grantType === 'innateSpells')
 
     expect(innateRow?.innateSpellEntries?.[0]?.spellIds).toEqual([
@@ -44,9 +47,15 @@ describe('grantsToFormRows / formRowsToGrants', () => {
   })
 
   it('round-trips recommended feat ids on feat choice grants', () => {
-    const fighter = pickClass('fighter')
-    const fightingStyle = fighter.features.find((feature) => feature.id === 'fighting-style')
-    const rows = grantsToFormRows(fightingStyle?.grants)
+    const grants = {
+      featChoice: {
+        category: 'fighting-style' as const,
+        choose: 1,
+        replaceable: true,
+        recommendedFeatIds: ['defense'],
+      },
+    }
+    const rows = grantsToFormRows(grants)
     const featRow = rows.find((row) => row.grantType === 'featChoice')
 
     expect(featRow?.featRecommendedIds).toEqual(['defense'])
@@ -61,9 +70,15 @@ describe('grantsToFormRows / formRowsToGrants', () => {
   })
 
   it('round-trips feat choice grants', () => {
-    const fighter = pickClass('fighter')
-    const fightingStyle = fighter.features.find((feature) => feature.id === 'fighting-style')
-    const rows = grantsToFormRows(fightingStyle?.grants)
+    const grants = {
+      featChoice: {
+        category: 'fighting-style' as const,
+        choose: 1,
+        replaceable: true,
+        recommendedFeatIds: ['defense'],
+      },
+    }
+    const rows = grantsToFormRows(grants)
     const featRow = rows.find((row) => row.grantType === 'featChoice')
 
     expect(featRow?.featCategory).toBe('fighting-style')

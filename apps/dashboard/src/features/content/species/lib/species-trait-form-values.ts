@@ -1,11 +1,10 @@
-import { getTraitGrants, type ContentTrait } from '@rpg/contracts'
+import { getTraitGrants, legacyGrantsToGrantGroups, type ContentTrait } from '@rpg/contracts'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
 
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {
-  const grants = grantsToFormRows(getTraitGrants(trait))
   if (trait.kind === 'grant') {
     const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
     return {
@@ -14,9 +13,13 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
       overrideDisplay: hasOverrides,
       nameOverride: trait.nameOverride,
       descriptionOverride: trait.descriptionOverride,
-      grants,
+      // Carry grantGroups through the form state; grant form rows stay empty
+      // until Phase 3 migrates the authoring UI to the atomic model.
+      grants: [],
+      _grantGroups: trait.grantGroups,
     }
   }
+  const grants = grantsToFormRows(getTraitGrants(trait))
   return {
     id: trait.id,
     kind: 'custom',
@@ -24,26 +27,33 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
     name: trait.name,
     description: trait.description,
     grants,
+    _grantGroups: trait.grantGroups,
   }
 }
 
 export function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
-  const grants = formRowsToGrants(row.grants)
   if (row.kind === 'grant') {
+    // Use passthrough grantGroups when available (migrated trait); otherwise
+    // convert legacy form rows (authoring via old UI, Phase 3 not yet done).
+    const formGrants = formRowsToGrants(row.grants)
+    const grantGroups =
+      row._grantGroups ?? (formGrants ? legacyGrantsToGrantGroups(formGrants) : [])
     return {
       kind: 'grant',
       id: row.id,
-      grants: grants!,
+      grantGroups,
       nameOverride: row.nameOverride || undefined,
       descriptionOverride: row.descriptionOverride || undefined,
     }
   }
+  const grants = formRowsToGrants(row.grants)
   return {
     kind: 'custom',
     id: row.id,
     name: row.name!,
     description: row.description || undefined,
     grants,
+    grantGroups: row._grantGroups,
   }
 }
 

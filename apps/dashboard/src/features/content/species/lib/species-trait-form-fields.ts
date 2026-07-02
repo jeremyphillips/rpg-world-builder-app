@@ -3,9 +3,13 @@ import {
   contentTraitKindSchema,
   defineMessage,
   fieldValidationMessages,
+  grantGroupsSchema,
   isGrantEligibleGrants,
+  isGrantGroupsEligible,
+  legacyGrantsToGrantGroups,
   resolveTraitName,
   type ContentTraitKind,
+  type GrantGroups,
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
@@ -54,6 +58,12 @@ export const traitRowFormSchema = z
     nameOverride: z.string().optional(),
     descriptionOverride: z.string().optional(),
     grants: z.array(grantRowFormSchema),
+    /**
+     * Pass-through for grantGroups on traits that have been migrated to the
+     * atomic model. Populated by `traitToFormRow`; written back by
+     * `traitFromFormRow`. Invisible to the form UI until Phase 3.
+     */
+    _grantGroups: grantGroupsSchema.optional(),
   })
   .superRefine((row, ctx) => {
     if (row.kind === 'custom' && !row.name?.trim()) {
@@ -133,12 +143,21 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
 export function traitItemTitle(values: Record<string, unknown>, index: number): string {
   const row = values as TraitRowForm
   if (row.kind === 'grant') {
-    const grants = formRowsToGrants(row.grants)
-    if (grants && isGrantEligibleGrants(grants)) {
+    // Prefer passthrough grantGroups (migrated trait); fall back to converting legacy form rows.
+    const grantGroups: GrantGroups | undefined =
+      row._grantGroups ??
+      (() => {
+        const grants = formRowsToGrants(row.grants)
+        return grants && isGrantEligibleGrants(grants)
+          ? legacyGrantsToGrantGroups(grants)
+          : undefined
+      })()
+
+    if (grantGroups && isGrantGroupsEligible(grantGroups)) {
       return resolveTraitName({
         kind: 'grant',
         id: row.id ?? `trait-${index}`,
-        grants,
+        grantGroups,
         nameOverride: row.nameOverride,
         descriptionOverride: row.descriptionOverride,
       })

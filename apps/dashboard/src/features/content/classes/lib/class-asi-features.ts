@@ -10,8 +10,9 @@ export const ASI_FEATURE_DESCRIPTION =
 const ASI_FEATURE_ID_PATTERN = /^ability-score-improvement-\d+$/
 
 /** Whether a feature row is an ASI milestone (managed by the ASI level picker). */
-export function isAsiFeature(feature: Pick<ClassFeature, 'id' | 'grants'>): boolean {
+export function isAsiFeature(feature: Pick<ClassFeature, 'id' | 'name' | 'grants'>): boolean {
   if (ASI_FEATURE_ID_PATTERN.test(feature.id)) return true
+  if (feature.name === ASI_FEATURE_NAME) return true
   return (
     feature.grants?.featChoice?.recommendedFeatIds?.includes(ABILITY_SCORE_IMPROVEMENT_FEAT_ID) ??
     false

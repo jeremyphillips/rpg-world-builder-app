@@ -87,15 +87,16 @@ describe('classFormDef round-trips', () => {
     })
   }
 
-  it('bard: innate spell grant on Words of Creation is preserved', () => {
+  it('bard: spell grant on Words of Creation is preserved through grantGroups', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     const wordsOfCreation = input.features.find((f) => f.id === 'words-of-creation')
-    expect(wordsOfCreation?.grants?.innateSpells?.entries[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
+    const spellGrant = wordsOfCreation?.grantGroups?.[0]?.grants?.[0]
+    expect(spellGrant?.kind).toBe('spells')
+    if (spellGrant?.kind === 'spells') {
+      expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    }
   })
 
   it('rogue: tool proficiencies round-trip with categories and items', () => {
@@ -235,14 +236,15 @@ describe('classFormDef round-trips', () => {
     })
   })
 
-  it('bard: innate spell entries use spell slug arrays in form values', () => {
+  it('bard: spell grant on Words of Creation is carried in _grantGroups form passthrough', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const wordsOfCreation = formValues.features.find((f) => f.id === 'words-of-creation')
-    expect(wordsOfCreation?.grants?.[0]?.innateSpellEntries?.[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
+    const spellGrant = wordsOfCreation?._grantGroups?.[0]?.grants?.[0]
+    expect(spellGrant?.kind).toBe('spells')
+    if (spellGrant?.kind === 'spells') {
+      expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    }
   })
 
   it('sorcerer: spellcasting and resources round-trip', () => {

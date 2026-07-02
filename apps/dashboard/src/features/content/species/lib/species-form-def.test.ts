@@ -17,7 +17,6 @@ import { loadSeedSpecies } from '@rpg/catalog/species'
 import {
   createSpeciesInputSchema,
   deriveContentKey,
-  getTraitGrants,
   resolveTraitName,
   type CreateSpeciesInput,
 } from '@rpg/contracts'
@@ -86,27 +85,38 @@ describe('speciesFormDef round-trips', () => {
     expect(input.heritage?.options.length).toBeGreaterThan(0)
   })
 
-  it('dragonborn: ancestry option resistances are preserved', () => {
+  it('dragonborn: ancestry option resistances are preserved (grantGroups)', () => {
     const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     const firstOption = input.heritage?.options[0]
-    expect(firstOption?.grants?.resistances).toEqual(['acid'])
-    expect(firstOption?.grants?.damageType).toEqual(['acid'])
+    const defaultGrants = firstOption?.grantGroups?.[0]?.grants ?? []
+    expect(
+      defaultGrants.some((g) => g.kind === 'resistances' && g.damageTypes.includes('acid')),
+    ).toBe(true)
+    expect(
+      defaultGrants.some((g) => g.kind === 'damageType' && g.damageTypes.includes('acid')),
+    ).toBe(true)
   })
 
-  it('elf: darkvision sense grant is preserved', () => {
+  it('elf: darkvision sense grant is preserved (grantGroups)', () => {
     const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
     const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
-    // Find the trait with a darkvision grant
-    const darkvisionTrait = input.traits.find((t) =>
-      getTraitGrants(t)?.senses?.some((s) => s.type === 'darkvision'),
+    // Find the grant trait with a darkvision sense grant
+    const darkvisionTrait = input.traits.find(
+      (t) =>
+        t.kind === 'grant' &&
+        t.grantGroups[0]?.grants.some((g) => g.kind === 'sense' && g.type === 'darkvision'),
     )
     expect(darkvisionTrait).toBeDefined()
     expect(darkvisionTrait?.kind).toBe('grant')
-    expect(getTraitGrants(darkvisionTrait!)?.senses?.[0]?.type).toBe('darkvision')
-    expect(getTraitGrants(darkvisionTrait!)?.senses?.[0]?.range).toBe(60)
+    const senseGrant =
+      darkvisionTrait?.kind === 'grant'
+        ? darkvisionTrait.grantGroups[0]?.grants.find((g) => g.kind === 'sense')
+        : undefined
+    expect(senseGrant?.kind === 'sense' && senseGrant.type).toBe('darkvision')
+    expect(senseGrant?.kind === 'sense' && senseGrant.range).toBe(60)
   })
 })
 

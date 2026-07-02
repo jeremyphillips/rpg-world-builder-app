@@ -552,33 +552,27 @@ export const customContentTraitSchema = z.object({
 export type CustomContentTrait = z.infer<typeof customContentTraitSchema>
 
 /**
- * Mechanics-only trait: display name and description are derived from `grants`
- * unless overridden. `grants` must pass {@link isGrantEligibleGrants}.
- *
- * When `grantGroups` is provided instead of `grants`, eligibility is checked via
- * {@link isGrantGroupsEligible} (exactly one default group with one atomic grant).
+ * Mechanics-only trait: display name and description are derived from `grantGroups`
+ * unless overridden. The groups must pass {@link isGrantGroupsEligible}: exactly
+ * one default group containing exactly one sense, resistance, walk-speed, or
+ * language grant.
  */
 export const grantContentTraitSchema = z
   .object({
     kind: z.literal('grant'),
     id: z.string().min(1),
-    /**
-     * Legacy bag model grants. Required when `grantGroups` is not provided.
-     * @deprecated Use `grantGroups` for new authoring.
-     */
-    grants: contentGrantsSchema,
-    /** Atomic grant groups (new model). When present, describes the grants in the canonical shape. */
-    grantGroups: grantGroupsSchema.optional(),
+    /** Atomic grant groups — the single source of truth for grant traits. */
+    grantGroups: grantGroupsSchema,
     nameOverride: z.string().min(1).optional(),
     descriptionOverride: z.string().optional(),
   })
   .superRefine((val, ctx) => {
-    if (!isGrantEligibleGrants(val.grants)) {
+    if (!isGrantGroupsEligible(val.grantGroups)) {
       ctx.addIssue({
         code: 'custom',
         message:
           'grant traits require a single atomic grant (one sense, resistance, walk speed, or language)',
-        path: ['grants'],
+        path: ['grantGroups'],
       })
     }
   })
@@ -605,3 +599,36 @@ export function normalizeContentTrait(input: unknown): unknown {
 export const contentTraitSchema = z.preprocess(normalizeContentTrait, contentTraitUnionSchema)
 
 export type ContentTrait = z.infer<typeof contentTraitSchema>
+
+/**
+ * Converts a legacy ContentGrants bag to the canonical GrantGroups format by
+ * placing all grants into a single default group (no unlock).
+ *
+ * @deprecated Bridge for dashboard form code pending Phase 3 grant form migration.
+ *   Remove once `grant-form-fields.ts` and `grant-form-values.ts` are migrated.
+ */
+export function legacyGrantsToGrantGroups(grants: ContentGrants): GrantGroups {
+  const atomicGrants: ContentGrant[] = []
+
+  for (const sense of grants.senses ?? []) {
+    atomicGrants.push({ kind: 'sense', type: sense.type, range: sense.range } as ContentGrant)
+  }
+  if (grants.speedOverride && Object.keys(grants.speedOverride).length > 0) {
+    atomicGrants.push({ kind: 'speedOverride', ...grants.speedOverride } as ContentGrant)
+  }
+  if (grants.damageType?.length) {
+    atomicGrants.push({ kind: 'damageType', damageTypes: grants.damageType })
+  }
+  if (grants.resistances?.length) {
+    atomicGrants.push({ kind: 'resistances', damageTypes: grants.resistances })
+  }
+  if (grants.languages?.length) {
+    atomicGrants.push({ kind: 'languages', languageIds: grants.languages })
+  }
+  if (grants.featChoice) {
+    atomicGrants.push({ kind: 'featChoice', ...grants.featChoice } as ContentGrant)
+  }
+
+  if (atomicGrants.length === 0) return []
+  return [{ grants: atomicGrants }]
+}
