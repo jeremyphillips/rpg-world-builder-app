@@ -155,7 +155,7 @@ function GatedStackDependentsRegion({
 }) {
   const values = useVisibilityValues(dependentsVisibility, props.namePrefix)
   if (!dependentsVisibility.visibleWhen(values)) return null
-  return <StackDependentsRegionContent {...props} dependentsVisibility={dependentsVisibility} />
+  return <StackDependentsRegionContent {...props} />
 }
 
 function StackDependentsRegionContent({

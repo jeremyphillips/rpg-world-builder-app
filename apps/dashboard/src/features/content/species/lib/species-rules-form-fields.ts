@@ -12,6 +12,10 @@ import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rul
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
+  SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
+  SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL,
+  SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
+  SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL,
   speciesClassPolicyModeOptions,
   speciesMulticlassPolicyOptions,
 } from './species-rules-form-labels'
@@ -55,6 +59,42 @@ function visibleWhenClassPolicyNeedsIds(): FieldVisibility {
   }
 }
 
+function visibleWhenClassPolicyMode(mode: SpeciesClassPolicyMode): FieldVisibility {
+  return {
+    dependsOn: [CLASS_POLICY_MODE_FIELD],
+    visibleWhen: (watched) => watched[CLASS_POLICY_MODE_FIELD] === mode,
+  }
+}
+
+function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
+  const classOptions = ctx.options?.classes ?? []
+
+  return [
+    {
+      type: 'combobox',
+      name: 'classPolicy.classIds',
+      label: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL,
+      hint: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
+      multiple: true,
+      options: classOptions,
+      placeholder: 'Choose classes…',
+      required: true,
+      visibility: visibleWhenClassPolicyMode('only'),
+    },
+    {
+      type: 'combobox',
+      name: 'classPolicy.classIds',
+      label: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL,
+      hint: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
+      multiple: true,
+      options: classOptions,
+      placeholder: 'Choose classes…',
+      required: true,
+      visibility: visibleWhenClassPolicyMode('all_except'),
+    },
+  ]
+}
+
 export function characterConfigurationMulticlassingHref(campaignId: string): string {
   return `/campaigns/${campaignId}/homebrew/rules-config/character-configuration#multiclassing`
 }
@@ -91,15 +131,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
           defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
           hint: 'Choose which classes this species may multiclass into.',
         },
-        {
-          type: 'combobox',
-          name: 'classPolicy.classIds',
-          label: 'Classes',
-          multiple: true,
-          options: ctx.options?.classes ?? [],
-          placeholder: 'Choose classes…',
-          required: true,
-        },
+        ...classPolicyClassIdFields(ctx),
       ],
     },
   ]

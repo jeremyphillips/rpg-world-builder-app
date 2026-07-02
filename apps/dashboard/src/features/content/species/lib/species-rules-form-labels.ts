@@ -19,6 +19,14 @@ export const SPECIES_CLASS_POLICY_MODE_LABELS = {
   all_except: 'All except listed classes',
 } as const satisfies Record<SpeciesClassPolicyMode, string>
 
+export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL = 'Allowed classes'
+export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL = 'Forbidden classes'
+
+export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT =
+  'Characters of this species may multiclass only into these classes.'
+export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT =
+  'Characters of this species may multiclass into any class except these.'
+
 export const speciesMulticlassPolicyOptions = toOptions(
   SPECIES_MULTICLASS_POLICIES,
   SPECIES_MULTICLASS_POLICY_LABELS,

@@ -15,6 +15,12 @@ import {
   speciesLevelLimitsFields,
 } from './species-rules-form-fields'
 import {
+  SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
+  SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL,
+  SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
+  SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL,
+} from './species-rules-form-labels'
+import {
   characterCreationFromFormValues,
   characterCreationToFormValues,
   mergeCharacterCreationFormDefaults,
@@ -48,7 +54,20 @@ describe('multiclassingPolicyFields', () => {
     )
     expect(stack.fields[1]).toEqual(
       expect.objectContaining({
+        type: 'combobox',
         name: 'classPolicy.classIds',
+        label: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL,
+        hint: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
+        visibility: expect.objectContaining({ dependsOn: ['classPolicy.mode'] }),
+      }),
+    )
+    expect(stack.fields[2]).toEqual(
+      expect.objectContaining({
+        type: 'combobox',
+        name: 'classPolicy.classIds',
+        label: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL,
+        hint: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
+        visibility: expect.objectContaining({ dependsOn: ['classPolicy.mode'] }),
       }),
     )
   })
