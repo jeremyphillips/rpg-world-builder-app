@@ -22,8 +22,8 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
  * - `fieldInlineToggleRowClasses` — checkbox/switch beside label (+ hint below label)
- * - `fieldInlineSwitchControlColumnClasses` / `fieldInlineSwitchLabelClasses` — switch alignment
- * - `fieldInlineCheckboxControlColumnClasses` / `fieldInlineCheckboxLabelClasses` — checkbox alignment
+ * - `fieldInlineSwitchControlColumnClasses` / `fieldInlineCheckboxControlColumnClasses` — control alignment
+ * - `fieldLabelVariants` `placement` — inline switch/checkbox label first-line height (typography unchanged)
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
@@ -100,10 +100,8 @@ export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 export const fieldInlineToggleRowClasses = 'flex gap-2'
 /** Switch track is `h-5` — centre it on the first label line. */
 export const fieldInlineSwitchControlColumnClasses = 'flex h-5 shrink-0 items-center'
-export const fieldInlineSwitchLabelClasses = 'flex min-h-5 items-center font-normal'
 /** Checkbox root is `size-4` — centre it on the first label line. */
 export const fieldInlineCheckboxControlColumnClasses = 'flex h-4 shrink-0 items-center'
-export const fieldInlineCheckboxLabelClasses = 'flex min-h-4 items-center font-normal'
 /** Dense settings row — label + hint column left, compact control right. */
 export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
@@ -237,12 +235,21 @@ export const fieldLabelVariants = cva(
   {
     variants: {
       size: fieldSizeTypographyClasses,
+      /** First-line min-height for inline toggles — keeps `font-field-label` typography. */
+      placement: {
+        default: '',
+        inlineSwitch: 'min-h-5',
+        inlineCheckbox: 'min-h-4',
+      },
     },
     defaultVariants: {
       size: 'md',
+      placement: 'default',
     },
   },
 )
+
+export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVariants>['placement']>
 
 /** Layout preset for toggle-dependent stacks. */
 export type FieldStackLayout = 'default' | 'toggleDependent'

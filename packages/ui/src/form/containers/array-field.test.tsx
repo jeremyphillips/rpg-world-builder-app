@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { readArrayItemCollapseOverrides } from '../config/array-item-collapse-storage.lib'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,39 @@ type Values = z.infer<typeof schema>
 const traitFields: FormItem[] = [
   { type: 'text', name: 'name', label: 'Trait name', required: true },
   { type: 'textarea', name: 'description', label: 'Description' },
+]
+
+const collapsibleTraitFields: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      fallback: (index) => `Trait ${index + 1}`,
+      primaryField: 'name',
+      summary: (values) => (values.description as string) || 'No description',
+    },
+    fields: traitFields,
+    addLabel: 'Add trait',
+  },
+]
+
+const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      fallback: (index) => `Trait ${index + 1}`,
+      primaryField: 'name',
+    },
+    fields: traitFields,
+    addLabel: 'Add trait',
+  },
 ]
 
 const fields: FormItem[] = [
@@ -53,6 +87,10 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ArrayFieldRenderer', () => {
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders the add button and legend for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
@@ -403,27 +441,11 @@ describe('ArrayFieldRenderer', () => {
 
   it('shows item summaries while expanded and collapsed', async () => {
     const user = userEvent.setup()
-    const collapsibleFields: FormItem[] = [
-      {
-        kind: 'array',
-        name: 'traits',
-        legend: 'Traits',
-        itemVariant: 'detailed',
-        itemCollapsible: true,
-        itemHeader: {
-          fallback: (index) => `Trait ${index + 1}`,
-          primaryField: 'name',
-          summary: (values) => (values.description as string) || 'No description',
-        },
-        fields: traitFields,
-        addLabel: 'Add trait',
-      },
-    ]
 
     render(
       <Form<Values>
         schema={schema}
-        fields={collapsibleFields}
+        fields={collapsibleTraitFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -442,28 +464,146 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
   })
 
-  it('collapses detailed items while preserving field values', async () => {
+  it('starts with a single collapsible item expanded', async () => {
     const user = userEvent.setup()
-    const collapsibleFields: FormItem[] = [
-      {
-        kind: 'array',
-        name: 'traits',
-        legend: 'Traits',
-        itemVariant: 'detailed',
-        itemCollapsible: true,
-        itemHeader: {
-          fallback: (index) => `Trait ${index + 1}`,
-          primaryField: 'name',
-        },
-        fields: traitFields,
-        addLabel: 'Add trait',
-      },
-    ]
 
     render(
       <Form<Values>
         schema={schema}
-        fields={collapsibleFields}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+  })
+
+  it('starts with two collapsible items collapsed by default', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    expect(screen.getAllByRole('button', { name: /Expand .*Trait/ })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: /Collapse .*Trait/ })).not.toBeInTheDocument()
+  })
+
+  it('persists a manually closed sole item across remount when uiStateKey is set', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'collapse-test-form'
+    const defaultValues: Values = {
+      name: 'Species',
+      traits: [{ name: 'Darkvision', description: 'See in the dark' }],
+    }
+
+    const first = render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Collapse .*Darkvision/ }))
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({
+      'index:0': 'closed',
+    })
+
+    first.unmount()
+
+    render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Expand .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+  })
+
+  it('persists a manually opened item among many across remount when uiStateKey is set', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'collapse-test-form-many'
+    const defaultValues: Values = {
+      name: 'Species',
+      traits: [
+        { name: 'Darkvision', description: '' },
+        { name: 'Keen Senses', description: '' },
+      ],
+    }
+
+    const first = render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Expand .*Darkvision/ }))
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({
+      'index:0': 'open',
+    })
+
+    first.unmount()
+
+    render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: /Expand .*Keen Senses/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+  })
+
+  it('collapses detailed items while preserving field values', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   fieldArrayItemListClasses,
   fieldGroupLegendVariants,
+  fieldLabelVariants,
   fieldStackRhythmVariants,
   resolveArrayLegendScale,
   resolveArraySectionSize,
@@ -21,6 +22,15 @@ describe('fieldStackRhythmVariants', () => {
 
   it('applies comfortable gap when requested', () => {
     expect(fieldStackRhythmVariants({ rhythm: 'comfortable' })).toContain('gap-6')
+  })
+})
+
+describe('fieldLabelVariants', () => {
+  it('adds first-line min-height for inline toggles without overriding label weight', () => {
+    expect(fieldLabelVariants({ placement: 'inlineSwitch' })).toContain('min-h-5')
+    expect(fieldLabelVariants({ placement: 'inlineSwitch' })).toContain('font-field-label')
+    expect(fieldLabelVariants({ placement: 'inlineCheckbox' })).toContain('min-h-4')
+    expect(fieldLabelVariants({ placement: 'inlineCheckbox' })).not.toContain('font-normal')
   })
 })
 

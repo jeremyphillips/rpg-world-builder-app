@@ -11,12 +11,15 @@ import {
 } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
 import { FormSectionContext } from '../context/form-section.context'
+import { FormUiContext } from '../context/form-ui.context'
 import type { FileFieldPropsMap } from '../field-config'
 
 interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   formId: string
   fileFieldProps?: FileFieldPropsMap
+  /** Scopes persisted form UI state to a stable form instance. */
+  uiStateKey?: string
   /** Vertical gap between top-level fields/groups. Defaults to `comfortable` (`gap-6`). */
   rhythm?: FieldStackRhythm
   /**
@@ -34,6 +37,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   form,
   formId,
   fileFieldProps,
+  uiStateKey,
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
   onSubmit,
@@ -45,6 +49,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
     () => ({ depth: 0, rhythm, size: resolvedSize }),
     [rhythm, resolvedSize],
   )
+  const uiContext = React.useMemo(() => ({ uiStateKey }), [uiStateKey])
 
   return (
     <FormProvider {...form}>
@@ -55,9 +60,11 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
           onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
           className={className}
         >
-          <FormSectionContext.Provider value={sectionContext}>
-            {children}
-          </FormSectionContext.Provider>
+          <FormUiContext.Provider value={uiContext}>
+            <FormSectionContext.Provider value={sectionContext}>
+              {children}
+            </FormSectionContext.Provider>
+          </FormUiContext.Provider>
         </form>
       </FileFieldPropsProvider>
     </FormProvider>

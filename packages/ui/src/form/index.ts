@@ -13,6 +13,7 @@ export {
   useFormSectionContext,
   type FormSectionProviderProps,
 } from './context/form-section.context'
+export { FormUiContext, useFormUiContext, type FormUiContextValue } from './context/form-ui.context'
 export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,
@@ -95,6 +96,25 @@ export {
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
 } from './config/array-item-config.lib'
+export {
+  buildItemKeysByFieldId,
+  collapsedIdsFromSnapshot,
+  createArrayItemCollapseSnapshot,
+  isArrayItemCollapsed,
+  pruneArrayItemCollapseOverrides,
+  resolveArrayItemCollapseKey,
+  serializeArrayItemCollapseOverrides,
+  toggleArrayItemCollapseOverride,
+  type ArrayItemCollapseOverride,
+  type ArrayItemCollapseSnapshot,
+} from './config/array-item-collapse.lib'
+export {
+  buildArrayItemCollapseStorageKey,
+  readArrayItemCollapseOverrides,
+  writeArrayItemCollapseOverrides,
+  type ArrayItemCollapseStoredValue,
+} from './config/array-item-collapse-storage.lib'
+export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,

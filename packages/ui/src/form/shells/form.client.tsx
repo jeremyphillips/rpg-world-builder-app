@@ -48,6 +48,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
   /**
+   * Scopes persisted form UI state (e.g. array item collapse) to a stable form
+   * instance — typically an entity or campaign id.
+   */
+  uiStateKey?: string
+  /**
    * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
    * Keyed by field name; not part of the Zod schema.
    */
@@ -91,6 +96,7 @@ export function Form<TFieldValues extends FieldValues>({
   className,
   contentClassName,
   id,
+  uiStateKey,
   fileFieldProps,
   mode,
   stickyFooter = false,
@@ -123,6 +129,7 @@ export function Form<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
+      uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

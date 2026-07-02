@@ -124,6 +124,24 @@ leaf `row`; otherwise `detailed`. Nested arrays inside another item are always c
 **Legend scale:** `legendSize` defaults to `array`. With default `size: 'sm'`, legend is
 `text-sm`; pass `size: 'md'` for `text-field-array-legend` (18px).
 
+### Collapse defaults and persistence
+
+When `itemCollapsible: true` on detailed items:
+
+- **One item** — expanded by default.
+- **Two or more** — collapsed by default.
+- **Manual toggles** — stored as per-item `open` / `closed` overrides and take precedence.
+
+Pass `uiStateKey` on `<Form>` / `<TabbedForm>` (typically an entity or campaign id) to persist
+overrides in `localStorage` keyed by `uiStateKey` + array path (`fullName`). Without
+`uiStateKey`, overrides apply for the current mount only. Scope the key when one browser
+session hosts multiple forms for the same campaign (e.g.
+`${campaignId}:character-configuration`).
+
+Use `itemCollapseKey` when rows expose a stable id field (default `'id'`). Rows without that
+field fall back to `index:${index}` — suitable for fixed-order arrays such as wealth tiers.
+Drag-reorder arrays should expose a stable id on each row.
+
 ### Zod
 
 ```ts
@@ -142,6 +160,7 @@ Optional hooks:
 | `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).     |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).               |
 | `itemCollapsible`                 | Detailed items only — collapse body into header row.                                        |
+| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).  |
 | `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                        |
 | `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                   |
 | `filterSelectDependsOn`           | Root field names passed to `filterSelectOptions` as `watchedValues`.                        |

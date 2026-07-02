@@ -53,6 +53,7 @@ import { ArrayItemToolbar } from './array-item-header.client'
 import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
 import { arrayItemBodyClasses } from './array-item-toolbar.variants'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
+import { useArrayItemCollapseState } from '../hooks/use-array-item-collapse-state.client'
 
 export interface ArrayFieldRendererProps {
   config: ArrayConfig
@@ -272,6 +273,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     legend,
     legendSize = 'array',
     itemCollapsible = false,
+    itemCollapseKey,
   } = config
   const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
   const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
@@ -284,16 +286,18 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const showDragHandle = sortableEnabled
   const collapsible = itemCollapsible && variant === 'detailed' && !nested
 
-  const [collapsedIds, setCollapsedIds] = React.useState<ReadonlySet<string>>(() => new Set())
+  const getItemValues = React.useCallback(
+    (index: number) => (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>,
+    [getValues, fullName],
+  )
 
-  const toggleCollapse = React.useCallback((itemId: string) => {
-    setCollapsedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(itemId)) next.delete(itemId)
-      else next.add(itemId)
-      return next
-    })
-  }, [])
+  const { collapsedIds, toggleCollapse } = useArrayItemCollapseState({
+    fullName,
+    collapsible,
+    fields,
+    itemCollapseKey: itemCollapseKey,
+    getItemValues,
+  })
 
   const canRemove = fields.length > min
   const canAdd = max === undefined || fields.length < max

@@ -11,6 +11,13 @@ describe('SwitchField', () => {
     expect(screen.getByText('Email reminders')).toHaveClass('text-xs')
   })
 
+  it('keeps inline label typography on fieldLabelVariants', () => {
+    render(<SwitchField id="notify" label="Email reminders" />)
+    expect(screen.getByText('Email reminders')).toHaveClass('font-field-label')
+    expect(screen.getByText('Email reminders')).toHaveClass('min-h-5')
+    expect(screen.getByText('Email reminders')).not.toHaveClass('font-normal')
+  })
+
   it('toggles via its associated label', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()

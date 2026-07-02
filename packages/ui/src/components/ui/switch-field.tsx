@@ -7,7 +7,6 @@ import { FormField } from './form-field'
 import { Switch } from './switch.client'
 import {
   fieldInlineSwitchControlColumnClasses,
-  fieldInlineSwitchLabelClasses,
   fieldInlineToggleRowClasses,
   fieldLabelHintStackClasses,
   type FieldHintPosition,
@@ -52,9 +51,7 @@ export function SwitchField({
   const resolvedHintPosition = hintPosition ?? 'below-label'
 
   const labelNode = (
-    <Field.Label
-      className={labelPosition === 'inline' ? fieldInlineSwitchLabelClasses : undefined}
-    >
+    <Field.Label placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}>
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )

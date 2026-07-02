@@ -8,7 +8,11 @@ import {
   type FieldControlVariantProps,
   type FieldWidth,
 } from './field-control.variants'
-import { fieldAnatomyStackClasses, fieldLabelVariants } from './field.variants'
+import {
+  fieldAnatomyStackClasses,
+  fieldLabelVariants,
+  type FieldLabelPlacement,
+} from './field.variants'
 import { Text } from './text'
 
 type FieldSize = NonNullable<FieldControlVariantProps['size']>
@@ -106,17 +110,20 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
 )
 FieldRoot.displayName = 'Field.Root'
 
-export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
+export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
+  /** Inline toggle first-line alignment — typography stays on `fieldLabelVariants`. */
+  placement?: FieldLabelPlacement
+}
 
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, placement, ...props }, ref) => {
     const { controlId, size, required } = useFieldContext('Field.Label')
     return (
       <label
         ref={ref}
         htmlFor={controlId}
         data-required={required || undefined}
-        className={cn(fieldLabelVariants({ size }), className)}
+        className={cn(fieldLabelVariants({ size, placement }), className)}
         {...props}
       >
         {children}

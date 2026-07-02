@@ -5,7 +5,6 @@ import { FieldLabelContent } from './field-label-content'
 import { Checkbox } from './checkbox.client'
 import {
   fieldInlineCheckboxControlColumnClasses,
-  fieldInlineCheckboxLabelClasses,
   fieldInlineToggleRowClasses,
   fieldLabelHintStackClasses,
 } from './field.variants'
@@ -33,7 +32,7 @@ export function CheckboxField({
   ...checkboxProps
 }: CheckboxFieldProps) {
   const labelNode = (
-    <Field.Label className={fieldInlineCheckboxLabelClasses}>
+    <Field.Label placement="inlineCheckbox">
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )

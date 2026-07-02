@@ -634,6 +634,11 @@ export interface ArrayConfig {
   itemHeader?: ArrayItemHeaderConfig
   /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
   itemCollapsible?: boolean
+  /**
+   * Relative field name used to persist collapse overrides across navigation.
+   * Defaults to `'id'`; falls back to `index:${index}` when absent on a row.
+   */
+  itemCollapseKey?: string
   /** Reorder control — defaults to `dragHandle`; pass `false` for fixed order. */
   reorder?: ArrayItemReorder
   /**

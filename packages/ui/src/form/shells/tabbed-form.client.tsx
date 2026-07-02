@@ -42,6 +42,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Optional id for the `<form>` element. */
   id?: string
   /**
+   * Scopes persisted form UI state (e.g. array item collapse) to a stable form
+   * instance — typically an entity or campaign id.
+   */
+  uiStateKey?: string
+  /**
    * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
    * Keyed by field name; not part of the Zod schema.
    */
@@ -92,6 +97,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   formError,
   footer,
   id,
+  uiStateKey,
   fileFieldProps,
   className,
   mode,
@@ -125,6 +131,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
+      uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

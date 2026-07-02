@@ -1,0 +1,131 @@
+'use client'
+
+import * as React from 'react'
+import { useFormContext, useWatch } from 'react-hook-form'
+
+import {
+  buildItemKeysByFieldId,
+  collapsedIdsFromSnapshot,
+  createArrayItemCollapseSnapshot,
+  isArrayItemCollapsed,
+  pruneArrayItemCollapseOverrides,
+  serializeArrayItemCollapseOverrides,
+  toggleArrayItemCollapseOverride,
+} from '../config/array-item-collapse.lib'
+import {
+  readArrayItemCollapseOverrides,
+  writeArrayItemCollapseOverrides,
+} from '../config/array-item-collapse-storage.lib'
+import { useFormUiContext } from '../context/form-ui.context'
+
+export interface UseArrayItemCollapseStateOptions {
+  fullName: string
+  collapsible: boolean
+  fields: ReadonlyArray<{ id: string }>
+  itemCollapseKey?: string
+  getItemValues: (index: number) => Record<string, unknown>
+}
+
+function serializeActiveItemKeys(itemKeysByFieldId: ReadonlyMap<string, string>): string {
+  return [...itemKeysByFieldId.values()].sort().join('\0')
+}
+
+export function useArrayItemCollapseState({
+  fullName,
+  collapsible,
+  fields,
+  itemCollapseKey = 'id',
+  getItemValues,
+}: UseArrayItemCollapseStateOptions) {
+  const { uiStateKey } = useFormUiContext()
+  const { control } = useFormContext()
+
+  const watchedItems = useWatch({
+    control,
+    name: fullName,
+    disabled: !collapsible,
+  }) as unknown[] | undefined
+
+  const [snapshot, setSnapshot] = React.useState(() => {
+    if (!uiStateKey) return createArrayItemCollapseSnapshot()
+    const stored = readArrayItemCollapseOverrides(uiStateKey, fullName)
+    return createArrayItemCollapseSnapshot(stored)
+  })
+
+  React.useEffect(() => {
+    if (!collapsible || !uiStateKey) return
+    const stored = readArrayItemCollapseOverrides(uiStateKey, fullName)
+    setSnapshot(createArrayItemCollapseSnapshot(stored))
+  }, [collapsible, uiStateKey, fullName])
+
+  const resolveItemValues = React.useCallback(
+    (index: number) =>
+      (watchedItems?.[index] ?? getItemValues(index) ?? {}) as Record<string, unknown>,
+    [watchedItems, getItemValues],
+  )
+
+  const itemKeysByFieldId = React.useMemo(
+    () => buildItemKeysByFieldId(fields, resolveItemValues, itemCollapseKey),
+    [fields, resolveItemValues, itemCollapseKey],
+  )
+
+  const activeItemKeySignature = React.useMemo(
+    () => serializeActiveItemKeys(itemKeysByFieldId),
+    [itemKeysByFieldId],
+  )
+
+  const prunedSnapshot = React.useMemo(() => {
+    const activeItemKeys = new Set(itemKeysByFieldId.values())
+    return pruneArrayItemCollapseOverrides(snapshot, activeItemKeys)
+  }, [snapshot, itemKeysByFieldId])
+
+  const itemCount = fields.length
+
+  const collapsedIds = React.useMemo(() => {
+    if (!collapsible) return new Set<string>()
+    return collapsedIdsFromSnapshot(fields, itemKeysByFieldId, prunedSnapshot, itemCount)
+  }, [collapsible, fields, itemKeysByFieldId, prunedSnapshot, itemCount])
+
+  React.useEffect(() => {
+    if (!collapsible || !uiStateKey) return
+    setSnapshot((prev) => {
+      const activeItemKeys = new Set(itemKeysByFieldId.values())
+      const pruned = pruneArrayItemCollapseOverrides(prev, activeItemKeys)
+      if (pruned.overrides.size === prev.overrides.size) return prev
+      writeArrayItemCollapseOverrides(
+        uiStateKey,
+        fullName,
+        serializeArrayItemCollapseOverrides(pruned),
+      )
+      return pruned
+    })
+  }, [collapsible, activeItemKeySignature, itemKeysByFieldId, uiStateKey, fullName])
+
+  const toggleCollapse = React.useCallback(
+    (fieldId: string) => {
+      if (!collapsible) return
+      const itemKey = itemKeysByFieldId.get(fieldId)
+      if (itemKey === undefined) return
+
+      setSnapshot((prev) => {
+        const currentlyCollapsed = isArrayItemCollapsed({
+          itemCount,
+          itemKey,
+          overrides: prev.overrides,
+        })
+        const next = toggleArrayItemCollapseOverride(prev, itemKey, !currentlyCollapsed)
+        if (uiStateKey) {
+          writeArrayItemCollapseOverrides(
+            uiStateKey,
+            fullName,
+            serializeArrayItemCollapseOverrides(next),
+          )
+        }
+        return next
+      })
+    },
+    [collapsible, itemCount, itemKeysByFieldId, uiStateKey, fullName],
+  )
+
+  return { collapsedIds, toggleCollapse }
+}
