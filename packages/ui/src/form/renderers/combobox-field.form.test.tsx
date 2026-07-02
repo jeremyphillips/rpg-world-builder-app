@@ -29,7 +29,7 @@ const weaponOptions = [
 ]
 
 describe('fieldDefaultValue', () => {
-  it('defaults multi combobox to [] and single combobox to empty string', () => {
+  it('defaults multi combobox to [] and optional single combobox to undefined', () => {
     const multi: ComboboxFieldConfig = {
       type: 'combobox',
       name: 'weapons',
@@ -45,8 +45,8 @@ describe('fieldDefaultValue', () => {
     }
 
     expect(fieldDefaultValue(multi)).toEqual([])
-    expect(fieldDefaultValue(single)).toBe('')
-    expect(buildDefaultValues([multi, single])).toEqual({ weapons: [], weapon: '' })
+    expect(fieldDefaultValue(single)).toBeUndefined()
+    expect(buildDefaultValues([multi, single])).toEqual({ weapons: [], weapon: undefined })
   })
 })
 

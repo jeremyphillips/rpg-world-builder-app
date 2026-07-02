@@ -78,7 +78,6 @@ interface ContentSchemaFormProps<TFormValues extends FieldValues> {
   submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
-  collapsibleSections?: boolean
   valueSyncs?: FormValueSync[]
   beforeSubmit?: (
     values: TFormValues,
@@ -97,7 +96,6 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   submitPending,
   formError,
   onSubmit,
-  collapsibleSections,
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
@@ -117,12 +115,12 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
     <>
       <Form<TFormValues>
         key={formKey}
+        uiStateKey={formKey}
         schema={schema}
         fields={fields}
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         formError={formError}
-        collapsibleSections={collapsibleSections}
         valueSyncs={valueSyncs}
         stickyFooter
         footer={(form) => (
@@ -185,10 +183,10 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
     <>
       <TabbedForm<TFormValues>
         key={formKey}
+        uiStateKey={formKey}
         schema={schema}
         tabs={tabs}
         defaultValues={defaultValues}
-        collapsibleSections={false}
         valueSyncs={valueSyncs}
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
@@ -231,13 +229,15 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
-  const weaponAdvisoryOptions = React.useMemo(
-    () => (isWeaponEquipmentForm ? weaponAdvisorySubmitOptions() : { enabled: false }),
-    [isWeaponEquipmentForm],
-  )
+  const weaponAdvisoryOptions = React.useMemo((): AdvisoryFormSubmitOptions<TFormValues> => {
+    if (!isWeaponEquipmentForm) return { enabled: false }
+    // Weapon advisories are authored for EquipmentFormValues; this layout only
+    // enables them on the weapon equipment route where TFormValues matches.
+    return weaponAdvisorySubmitOptions() as unknown as AdvisoryFormSubmitOptions<TFormValues>
+  }, [isWeaponEquipmentForm])
   const { onSubmit: advisoryOnSubmit, confirmDialog } = useAdvisoryFormSubmit(
     onSubmit,
-    weaponAdvisoryOptions as AdvisoryFormSubmitOptions<TFormValues>,
+    weaponAdvisoryOptions,
   )
   const resolvedOnSubmit = isWeaponEquipmentForm ? advisoryOnSubmit : onSubmit
   const valueSyncs = isWeaponEquipmentForm ? weaponFormValueSyncs : undefined
@@ -259,13 +259,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     return <ContentTabbedSchemaForm tabs={def.buildTabs(ctx)} {...sharedProps} />
   }
 
-  return (
-    <ContentSchemaForm
-      fields={contentFormFields(def, ctx)}
-      collapsibleSections={def.routeKey === 'equipment' ? false : undefined}
-      {...sharedProps}
-    />
-  )
+  return <ContentSchemaForm fields={contentFormFields(def, ctx)} {...sharedProps} />
 }
 
 interface ContentFormOptionsGateProps {

@@ -1,11 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi, afterEach } from 'vitest'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { readArrayItemCollapseOverrides } from '../config/array-item-collapse-storage.lib'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,39 @@ type Values = z.infer<typeof schema>
 const traitFields: FormItem[] = [
   { type: 'text', name: 'name', label: 'Trait name', required: true },
   { type: 'textarea', name: 'description', label: 'Description' },
+]
+
+const collapsibleTraitFields: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      fallback: (index) => `Trait ${index + 1}`,
+      primaryField: 'name',
+      summary: (values) => (values.description as string) || 'No description',
+    },
+    fields: traitFields,
+    addLabel: 'Add trait',
+  },
+]
+
+const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      fallback: (index) => `Trait ${index + 1}`,
+      primaryField: 'name',
+    },
+    fields: traitFields,
+    addLabel: 'Add trait',
+  },
 ]
 
 const fields: FormItem[] = [
@@ -53,6 +87,10 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ArrayFieldRenderer', () => {
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders the add button and legend for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
@@ -64,6 +102,98 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
+  })
+
+  it('omits section bottom margin and empty legends for nested arrays in dependent stacks', async () => {
+    const user = userEvent.setup()
+    const nestedSchema = z.object({
+      enabled: z.boolean(),
+      caps: z.array(z.object({ classId: z.string() })),
+    })
+
+    const nestedFields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        dependentsChrome: 'subtle',
+        dependentsChromeScope: 'arrayItems',
+        fields: [
+          {
+            type: 'switch',
+            name: 'enabled',
+            label: 'Class-specific limits',
+            defaultValue: true,
+          },
+          {
+            kind: 'array',
+            name: 'caps',
+            legend: '',
+            addLabel: 'Add class limit',
+            fields: [{ type: 'text', name: 'classId', label: 'Class' }],
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof nestedSchema>>
+        schema={nestedSchema}
+        fields={nestedFields}
+        defaultValues={{ enabled: true, caps: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add class limit' })
+    const fieldset = addButton.closest('fieldset')
+    expect(fieldset).not.toBeNull()
+    expect(fieldset).not.toHaveClass('mb-8')
+    expect(fieldset?.querySelector('legend')).toBeNull()
+
+    await user.click(addButton)
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument(),
+    )
+
+    const itemShell = screen.getByRole('group', { name: /Item 1/ })
+    expect(itemShell).toHaveClass('bg-muted/30')
+    const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
+    expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
+    expect(dependentsRegion?.querySelector('.bg-muted\\/30')).toBe(itemShell)
+  })
+
+  it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {
+    const user = userEvent.setup()
+    const comfortableFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        rhythm: 'comfortable',
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={comfortableFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-3')
+    expect(list).not.toHaveClass('gap-6')
+
+    const item = screen.getByRole('group', { name: 'Item 1' })
+    expect(within(item).getByRole('textbox', { name: 'Trait name' }).closest('.gap-6')).toBeTruthy()
   })
 
   it('adds an item when the add button is clicked', async () => {
@@ -73,11 +203,11 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
-    expect(screen.getByRole('group', { name: 'Traits item 1' })).toHaveClass(
+    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass(
       'rounded-md',
       'border',
       'border-border',
-      'p-4',
+      'pl-2',
     )
   })
 
@@ -86,7 +216,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Traits item 1' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Traits · Item 1' }))
     expect(screen.queryByRole('textbox', { name: 'Trait name' })).not.toBeInTheDocument()
   })
 
@@ -161,7 +291,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove Traits · Item 1' })).toBeDisabled()
   })
 
   it('hides nested arrays when item-scoped visibility is false', async () => {
@@ -292,7 +422,7 @@ describe('ArrayFieldRenderer', () => {
     expect(results.violations).toEqual([])
   })
 
-  it('does not duplicate accordion landmarks for nested arrays inside multiple items', async () => {
+  it('does not duplicate landmarks for nested arrays inside multiple items', async () => {
     const user = userEvent.setup()
     const nestedSchema = z.object({
       items: z.array(
@@ -338,14 +468,14 @@ describe('ArrayFieldRenderer', () => {
     expect(results.violations.filter((violation) => violation.id === 'landmark-unique')).toEqual([])
   })
 
-  it('hides move buttons when allowReorder is false', async () => {
+  it('hides drag handles when reorder is false', async () => {
     const user = userEvent.setup()
     const noReorderFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        allowReorder: false,
+        reorder: false,
         fields: traitFields,
         addLabel: 'Add trait',
       },
@@ -361,11 +491,228 @@ describe('ArrayFieldRenderer', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
-    expect(screen.queryByRole('button', { name: 'Move Traits item 1 up' })).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'Move Traits item 1 down' }),
-    ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove Traits item 1' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /Remove Traits · Item/ })).toHaveLength(2)
+    expect(screen.getByRole('group', { name: 'Item 1' })).toHaveClass('pl-2')
+    expect(screen.getByRole('group', { name: 'Item 1' })).not.toHaveClass('pl-10')
+  })
+
+  it('shows item summaries while expanded and collapsed', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+    await user.type(screen.getByRole('textbox', { name: 'Description' }), 'See in the dark')
+
+    expect(screen.getByText('See in the dark', { selector: 'p' })).toBeInTheDocument()
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
+    await user.click(collapseTrigger)
+
+    expect(screen.getByText('See in the dark', { selector: 'p' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
+  })
+
+  it('starts with a single collapsible item expanded', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+  })
+
+  it('starts with two collapsible items collapsed by default', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    expect(screen.getAllByRole('button', { name: /Expand .*Trait/ })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: /Collapse .*Trait/ })).not.toBeInTheDocument()
+  })
+
+  it('persists a manually closed sole item across remount when uiStateKey is set', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'collapse-test-form'
+    const defaultValues: Values = {
+      name: 'Species',
+      traits: [{ name: 'Darkvision', description: 'See in the dark' }],
+    }
+
+    const first = render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Collapse .*Darkvision/ }))
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({
+      'index:0': 'closed',
+    })
+
+    first.unmount()
+
+    render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Expand .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+  })
+
+  it('persists a manually opened item among many across remount when uiStateKey is set', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'collapse-test-form-many'
+    const defaultValues: Values = {
+      name: 'Species',
+      traits: [
+        { name: 'Darkvision', description: '' },
+        { name: 'Keen Senses', description: '' },
+      ],
+    }
+
+    const first = render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Expand .*Darkvision/ }))
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({
+      'index:0': 'open',
+    })
+
+    first.unmount()
+
+    render(
+      <Form<Values>
+        uiStateKey={uiStateKey}
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={defaultValues}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: /Expand .*Keen Senses/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+  })
+
+  it('collapses detailed items while preserving field values', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
+    expect(collapseTrigger).toHaveAttribute('aria-expanded', 'true')
+    await user.click(collapseTrigger)
+    expect(collapseTrigger).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('textbox', { name: 'Trait name', hidden: true })).not.toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: /Expand .*Darkvision/ }))
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
+  })
+
+  it('pins compact item remove control in the top-right actions rail', async () => {
+    const user = userEvent.setup()
+    const compactFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemVariant: 'compact',
+        fields: traitFields,
+        addLabel: 'Add trait',
+        itemHeader: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={compactFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const item = screen.getByRole('group', { name: 'Traits · Trait 1 Trait name Description' })
+    const actionsRail = screen.getByRole('group', { name: 'Item actions' })
+    const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait 1' })
+
+    expect(item).toContainElement(actionsRail)
+    expect(actionsRail).toContainElement(removeButton)
+    expect(actionsRail).toHaveClass('self-start', 'mt-1', 'mr-1')
   })
 })

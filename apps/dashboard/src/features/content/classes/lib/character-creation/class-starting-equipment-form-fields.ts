@@ -143,7 +143,9 @@ export function startingEquipmentItemTitle(
 
   if (row.itemKind === 'fixed') {
     const label = equipmentOptions?.find((option) => option.value === row.equipmentSlug)?.label
-    return label ?? row.equipmentSlug ?? `Item ${index + 1}`
+    const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
+    const quantity = row.quantity ?? 1
+    return quantity > 1 ? `${name} x${quantity}` : name
   }
 
   return row.label || `Pool choice ${index + 1}`
@@ -156,13 +158,17 @@ export function startingEquipmentModifierFields(): FormItem[] {
       name: 'modifiers',
       legend: 'Modifiers',
       addLabel: 'Add modifier',
+      itemCollapsible: true,
       visibility: visibleForItemKind('fixed'),
-      itemTitle: (values) => {
-        const row = values as StartingEquipmentModifierForm | undefined
-        if (row?.focusKind) {
-          return GEAR_KIND_ENTRIES[row.focusKind].label
-        }
-        return 'Modifier'
+      itemHeader: {
+        fallback: () => 'Modifier',
+        primary: (values) => {
+          const row = values as StartingEquipmentModifierForm | undefined
+          if (row?.focusKind) {
+            return GEAR_KIND_ENTRIES[row.focusKind].label
+          }
+          return undefined
+        },
       },
       fields: [
         {
@@ -305,12 +311,17 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'items',
       legend: 'Items',
       addLabel: 'Add item',
-      itemTitle: (values, index) =>
-        startingEquipmentItemTitle(
-          values as StartingEquipmentItemForm | undefined,
-          index,
-          equipmentOptions,
-        ),
+      itemVariant: 'detailed',
+      itemCollapsible: true,
+      itemHeader: {
+        fallback: (index) => `Item ${index + 1}`,
+        primary: (values, index) =>
+          startingEquipmentItemTitle(
+            values as StartingEquipmentItemForm | undefined,
+            index,
+            equipmentOptions,
+          ),
+      },
       fields: startingEquipmentItemFields(ctx),
     },
   ]

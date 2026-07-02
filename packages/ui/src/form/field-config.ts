@@ -19,7 +19,10 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
+import type {
+  FieldStackDependentsChromeScope,
+  FieldStackDependentsTone,
+} from '../components/ui/field-stack.variants'
 import type {
   FieldRowLayout,
   FieldHintPosition,
@@ -530,14 +533,30 @@ export interface RowConfig {
 }
 
 /** Fields allowed inside a `group` or `stack` — may nest one level or more. */
-export type GroupFieldItem = FieldConfig | RowConfig | SlotConfig | GroupConfig | StackConfig
+export type GroupFieldItem =
+  | FieldConfig
+  | RowConfig
+  | SlotConfig
+  | GroupConfig
+  | StackConfig
+  | ArrayConfig
 
-/** Layout-only container for toggle + dependent fields (no fieldset legend). */
+/** Layout-only container for controller + dependent fields (no fieldset legend). */
 export interface StackConfig {
   kind: 'stack'
   layout?: FieldStackLayout
+  /**
+   * Gates fields [1..]: when false, dependents unmount and values clear.
+   * When omitted and fields[0] is a switch, defaults to "switch is true".
+   */
+  dependentsVisibility?: FieldVisibility
   /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
   dependentsChrome?: FieldStackDependentsTone
+  /**
+   * Where `dependentsChrome` applies. Default `wrapper`. Use `arrayItems` when
+   * dependents include repeatable lists to avoid double borders on array shells.
+   */
+  dependentsChromeScope?: FieldStackDependentsChromeScope
   /**
    * Vertical gap between stack siblings. `compact` (default) — dense settings panels;
    * `comfortable` — matches `fieldGroupStackClasses` rhythm for multi-field blocks.
@@ -545,7 +564,11 @@ export interface StackConfig {
   rhythm?: FieldStackRhythm
   fields: GroupFieldItem[]
   visibility?: FieldVisibility
+  /** Trailing divider after this stack (controller + dependents) within parent rhythm. */
+  separator?: FieldSeparator
   className?: string
+  /** Optional DOM id on the stack wrapper — for in-page scroll anchors. */
+  id?: string
 }
 
 /** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
@@ -555,6 +578,8 @@ export interface GroupConfig {
   description?: string
   fields: GroupFieldItem[]
   className?: string
+  /** Optional DOM id on the fieldset — for in-page scroll anchors. */
+  id?: string
   /** Legend scale — `subsection` (20px) for nested groups inside another group. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -564,8 +589,34 @@ export interface GroupConfig {
   rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
+}
+
+/** Layout profile for repeatable array item chrome. */
+export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
+
+/** How array items may be reordered. Defaults to `dragHandle`. */
+export type ArrayItemReorder = false | 'dragHandle'
+
+/** Per-item header chrome for detailed and compact array rows. */
+export interface ArrayItemHeaderConfig {
+  /** Relative field name watched for the primary label (e.g. `'label'`). */
+  primaryField?: string
+  /** Optional formatter when `primaryField` is set. */
+  formatPrimary?: (value: unknown, values: Record<string, unknown>) => string | undefined
+  /** Computed primary label; overrides `primaryField` when set. */
+  primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  fallback: (index: number) => string
+  /** Shown on its own row below the header title on detailed items. */
+  summary?: (values: Record<string, unknown>, index: number) => string
+  /**
+   * When true, appends ` · {fallback}` after the primary label in the header title.
+   * Defaults to false — fallback still drives aria labels and empty-primary titles.
+   */
+  showFallbackInHeader?: boolean
+  /** Renders a divider between primary and fallback when `showFallbackInHeader` is true. */
+  showDivider?: boolean
+  /** When true, primary label is visually hidden but available to assistive tech. */
+  srOnly?: boolean
 }
 
 /**
@@ -602,27 +653,24 @@ export interface ArrayConfig {
   min?: number
   /** Maximum item count; hides the "Add" button once reached. */
   max?: number
+  /** Item row layout — `auto` picks compact when item fields fit a single row. */
+  itemVariant?: ArrayItemVariant
+  /** Header labels and optional collapsed summary for each item row. */
+  itemHeader?: ArrayItemHeaderConfig
+  /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
+  itemCollapsible?: boolean
   /**
-   * Optional heading per item row. Receives the item's current values (keyed
-   * by relative field names) and the 0-based index.
+   * Relative field name used to persist collapse overrides across navigation.
+   * Defaults to `'id'`; falls back to `index:${index}` when absent on a row.
    */
-  itemTitle?: (values: Record<string, unknown>, index: number) => string
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
+  itemCollapseKey?: string
+  /** Reorder control — defaults to `dragHandle`; pass `false` for fixed order. */
+  reorder?: ArrayItemReorder
   /**
    * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
    * the array unmounts and RHF clears its value via `shouldUnregister`.
    */
   visibility?: FieldVisibility
-
-  /** Whether reordering is permitted. Default true. */
-  allowReorder?: boolean
-
-  /**
-   * Hide move buttons even when `allowReorder` is true.
-   * Move buttons are also hidden when `allowReorder` is false.
-   */
-  hideMoveControls?: boolean
 
   /** Opaque tag for dashboard patterns / drift tests. Renderer does not interpret domain kinds. */
   arrayPattern?: { kind: string } & Record<string, unknown>
@@ -641,6 +689,10 @@ export interface ArrayConfig {
     options: FieldOption[]
     watchedValues: Record<string, unknown>
   }) => FieldOption[]
+  /** Optional DOM id on the array fieldset — for in-page scroll anchors. */
+  id?: string
+  /** Classes merged onto the array fieldset wrapper. */
+  className?: string
 }
 
 /**
@@ -664,8 +716,6 @@ export interface SlotConfig {
    * Control + label scale for slot content. Defaults to `sm` (array section default).
    */
   size?: FieldSize
-  /** When true, renders inside an accordion when form collapsible sections are enabled. */
-  collapsible?: boolean
 }
 
 /** Any item allowed at the top level of a form's `fields` array. */
@@ -776,7 +826,12 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   if (explicit !== undefined) return explicit
   if (field.type === 'chips' || field.type === 'combobox') {
     const multiField = field as ChipsFieldConfig | ComboboxFieldConfig
-    return multiField.multiple === false ? '' : []
+    if (multiField.multiple === false) {
+      // Optional single-select controls use `undefined` (not `''`) so optional
+      // Zod enums validate; required fields keep the empty-string sentinel.
+      return field.required ? '' : undefined
+    }
+    return []
   }
   if (field.type === 'editableGrid') {
     const gridField = field as EditableGridFieldConfig
@@ -860,6 +915,26 @@ export function applyOptionAvailabilityToFieldOptions(
     ...option,
     disabled: Boolean(option.disabled) || !availability.enabledWhen(values, option.value),
   }))
+}
+
+/**
+ * Resolves the visibility gate for dependent stack fields [1..].
+ * Switch controllers auto-gate on truthy when `dependentsVisibility` is omitted.
+ */
+export function resolveDependentsVisibility(
+  stack: Pick<StackConfig, 'dependentsVisibility'>,
+  controller: GroupFieldItem | undefined,
+): FieldVisibility | null {
+  if (stack.dependentsVisibility) {
+    return stack.dependentsVisibility
+  }
+  if (controller && !('kind' in controller) && controller.type === 'switch') {
+    return {
+      dependsOn: [controller.name],
+      visibleWhen: (values) => values[controller.name] === true,
+    }
+  }
+  return null
 }
 
 /** Applies `optionAvailability` to select options, including grouped sections. */

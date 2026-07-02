@@ -31,6 +31,7 @@ import type {
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
+  fieldDefaultValue,
   resolveFieldHint,
 } from '../field-config'
 import { useDependsOnValues } from '../config/form-depends-on.client'
@@ -219,6 +220,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
+      size={config.size}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={(checked) => field.onChange(checked === true)}
@@ -346,7 +348,7 @@ const fieldRenderers: {
       chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
-      value={field.value ?? (config.multiple === false ? '' : [])}
+      value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
       onBlur={field.onBlur}
     />
@@ -388,7 +390,7 @@ const fieldRenderers: {
       width={config.width}
       size={config.size}
       disabled={config.disabled}
-      value={field.value ?? (config.multiple === false ? '' : [])}
+      value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}
@@ -504,7 +506,10 @@ function StandardFieldRenderer({
   id,
   namePrefix,
 }: StandardFieldRendererProps) {
-  const { field, fieldState } = useController({ name: fullName })
+  const { field, fieldState } = useController({
+    name: fullName,
+    defaultValue: fieldDefaultValue(config),
+  })
   const remotePreview = useFileFieldRemotePreview(config.name)
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.

@@ -48,6 +48,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
   /**
+   * Scopes persisted form UI state (e.g. array item collapse) to a stable form
+   * instance — typically an entity or campaign id.
+   */
+  uiStateKey?: string
+  /**
    * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
    * Keyed by field name; not part of the Zod schema.
    */
@@ -58,12 +63,6 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * and can drive a disabled Next button.
    */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /**
-   * When true (default), sections may render inside collapsible accordions when
-   * `collapsible: true` is set on a group or array. Set false to force flat
-   * fieldsets for every section.
-   */
-  collapsibleSections?: boolean
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
   /**
@@ -97,9 +96,9 @@ export function Form<TFieldValues extends FieldValues>({
   className,
   contentClassName,
   id,
+  uiStateKey,
   fileFieldProps,
   mode,
-  collapsibleSections = true,
   stickyFooter = false,
   rhythm,
   size,
@@ -130,7 +129,7 @@ export function Form<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
-      collapsibleSections={collapsibleSections}
+      uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {
+  buildLevelOptions,
+  maxLevelSelectable,
+  minLevelSelectable,
+  type LevelRangeRow,
+} from '@rpg/contracts'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
@@ -22,19 +28,31 @@ const fields: FormItem[] = [
     kind: 'array',
     name: 'tiers',
     legend: 'Tiers',
-    allowReorder: false,
+    reorder: false,
+    arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
+    filterSelectOptions: ({ arrayItems, rowIndex, fieldName }) => {
+      const rows = arrayItems as LevelRangeRow[]
+      const row = rows[rowIndex]
+      const rowMin = row?.minLevel ?? 1
+      const effectiveMax = 20
+
+      return buildLevelOptions(effectiveMax).map((option) => {
+        const level = Number(option.value)
+        const selectable =
+          fieldName === 'minLevel'
+            ? minLevelSelectable(rows, rowIndex, level, effectiveMax)
+            : maxLevelSelectable(rows, rowIndex, level, rowMin, effectiveMax)
+
+        return { ...option, disabled: !selectable }
+      })
+    },
     fields: [
       {
         type: 'levelRange',
         name: 'minLevel',
         label: 'Level range',
         required: true,
-        options: [
-          { value: '1', label: '1' },
-          { value: '2', label: '2' },
-          { value: '3', label: '3' },
-          { value: '4', label: '4' },
-        ],
+        options: buildLevelOptions(20),
       },
     ],
   },

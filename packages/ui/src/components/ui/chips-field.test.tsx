@@ -114,7 +114,7 @@ describe('ChipsField', () => {
       />,
     )
     await userEvent.click(screen.getByRole('radio', { name: 'Casual' }))
-    expect(onChange).toHaveBeenCalledWith('')
+    expect(onChange).toHaveBeenCalledWith(undefined)
   })
 
   it('coerces numeric values to match string option values', () => {

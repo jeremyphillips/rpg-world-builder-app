@@ -6,6 +6,11 @@ import axe from 'axe-core'
 import { CheckboxField } from './checkbox-field'
 
 describe('CheckboxField', () => {
+  it('applies field size to the label', () => {
+    render(<CheckboxField id="homebrew" label="Allow homebrew" size="sm" />)
+    expect(screen.getByText('Allow homebrew')).toHaveClass('text-xs')
+  })
+
   it('toggles via its associated label', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()

@@ -92,7 +92,7 @@ Spacing tokens, `width`, `digits`, row layouts: [sizing-and-spacing.md](./forms/
 | ------- | -------------------------------- | --------------------------------------------------- |
 | `group` | Named fieldset subsection        | [containers.md](./forms/containers.md#groups)       |
 | `row`   | Horizontal siblings              | [containers.md](./forms/containers.md#rows)         |
-| `stack` | Layout column (toggle-dependent) | [containers.md](./forms/containers.md#stacks)       |
+| `stack` | Layout column (dependent stacks) | [containers.md](./forms/containers.md#stacks)       |
 | `array` | Repeatable `useFieldArray`       | [containers.md](./forms/containers.md#array-fields) |
 | `slot`  | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
 
@@ -209,7 +209,7 @@ Runnable recipes beat copying from docs. Start at `Forms/Form`, `Forms/TabbedFor
 | Doc                                                    | Contents                                              |
 | ------------------------------------------------------ | ----------------------------------------------------- |
 | [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, … |
-| [containers.md](./forms/containers.md)                 | group, row, stack, array, slot, collapsible           |
+| [containers.md](./forms/containers.md)                 | group, row, stack, array, slot                        |
 | [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                    |
 | [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index  |
 | [field-config.ts](../src/form/field-config.ts)         | Config types (source of truth)                        |

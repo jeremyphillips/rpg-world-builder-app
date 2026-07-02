@@ -32,7 +32,7 @@ const plainStackFields: FormItem[] = [
   },
 ]
 
-const toggleDependentStackFieldItems = [
+const dependentStackFieldItems = [
   {
     type: 'switch' as const,
     name: 'advancedEnabled',
@@ -68,19 +68,19 @@ const toggleDependentStackFieldItems = [
   },
 ]
 
-const toggleDependentStackFields: FormItem[] = [
+const dependentStackFields: FormItem[] = [
   {
     kind: 'stack',
-    layout: 'toggleDependent',
+    layout: 'dependent',
     dependentsChrome: 'subtle',
-    fields: toggleDependentStackFieldItems,
+    fields: dependentStackFieldItems,
   },
 ]
 
-const toggleDependentErrorToneFields: FormItem[] = [
+const dependentErrorToneFields: FormItem[] = [
   {
     kind: 'stack',
-    layout: 'toggleDependent',
+    layout: 'dependent',
     dependentsChrome: 'error',
     fields: [
       {
@@ -101,6 +101,51 @@ const toggleDependentErrorToneFields: FormItem[] = [
   },
 ]
 
+const selectDependentSchema = z.object({
+  classPolicyMode: z.string(),
+  classPolicyClassIds: z.array(z.string()).optional(),
+})
+
+const selectDependentStackFields: FormItem[] = [
+  {
+    kind: 'stack',
+    layout: 'dependent',
+    separator: 'subtle',
+    dependentsVisibility: {
+      dependsOn: ['classPolicyMode'],
+      visibleWhen: (values) => values.classPolicyMode !== 'all',
+    },
+    dependentsChrome: 'subtle',
+    fields: [
+      {
+        type: 'select',
+        name: 'classPolicyMode',
+        label: 'Class restrictions',
+        labelPosition: 'settings',
+        options: [
+          { label: 'All classes', value: 'all' },
+          { label: 'Only listed classes', value: 'only' },
+          { label: 'All except listed', value: 'except' },
+        ],
+        defaultValue: 'all',
+        hint: 'Choose which classes this species may multiclass into.',
+      },
+      {
+        type: 'combobox',
+        name: 'classPolicyClassIds',
+        label: 'Classes',
+        multiple: true,
+        options: [
+          { label: 'Fighter', value: 'fighter' },
+          { label: 'Wizard', value: 'wizard' },
+          { label: 'Rogue', value: 'rogue' },
+        ],
+        placeholder: 'Choose classes…',
+      },
+    ],
+  },
+]
+
 const meta = {
   title: 'Forms/Form/Stack',
   component: Form<StackForm>,
@@ -110,7 +155,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Default layout stack — tight inner rhythm, no toggle-dependent split. */
+/** Default layout stack — tight inner rhythm, no dependent split. */
 export const PlainStack: Story = {
   args: {
     schema: stackSchema,
@@ -121,28 +166,28 @@ export const PlainStack: Story = {
   },
 }
 
-/** Toggle-dependent stack with subtle dependents-only chrome (production pattern). */
-export const ToggleDependentStack: Story = {
+/** Switch-gated dependent stack with subtle dependents-only chrome (production pattern). */
+export const DependentStack: Story = {
   args: {
     schema: stackSchema,
-    fields: toggleDependentStackFields,
+    fields: dependentStackFields,
     defaultValues: { advancedEnabled: true, advancedLevel: '1', advancedValue: 13 },
     onSubmit: action('submit'),
     className: 'max-w-lg',
   },
 }
 
-/** Toggle-dependent stack with comfortable rhythm for multi-field dependents. */
-export const ToggleDependentStackComfortable: Story = {
+/** Dependent stack with comfortable rhythm for multi-field dependents. */
+export const DependentStackComfortable: Story = {
   args: {
     schema: stackSchema,
     fields: [
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         rhythm: 'comfortable',
-        fields: toggleDependentStackFieldItems,
+        fields: dependentStackFieldItems,
       },
     ],
     defaultValues: { advancedEnabled: true, advancedLevel: '1', advancedValue: 13 },
@@ -152,12 +197,86 @@ export const ToggleDependentStackComfortable: Story = {
 }
 
 /** Error tone slot — future-facing semantic chrome variant. */
-export const ToggleDependentStackErrorTone: Story = {
+export const DependentStackErrorTone: Story = {
   args: {
     schema: stackSchema,
-    fields: toggleDependentErrorToneFields,
+    fields: dependentErrorToneFields,
     defaultValues: { advancedEnabled: true, advancedValue: 99 },
     onSubmit: action('submit'),
     className: 'max-w-lg',
   },
+}
+
+const arrayItemsScopeSchema = z.object({
+  classLimitsEnabled: z.boolean(),
+  caps: z.array(z.object({ classId: z.string(), maxLevel: z.string() })),
+})
+
+/** Dependent stack with array dependents — tone on item shells, not wrapper. */
+export const DependentStackArrayItemsScope: Story = {
+  args: {
+    schema: stackSchema,
+    fields: dependentStackFields,
+    defaultValues: { advancedEnabled: true },
+    onSubmit: action('submit'),
+    className: 'max-w-lg',
+  },
+  render: () => (
+    <Form<z.infer<typeof arrayItemsScopeSchema>>
+      schema={arrayItemsScopeSchema}
+      fields={[
+        {
+          kind: 'stack',
+          layout: 'dependent',
+          dependentsChrome: 'subtle',
+          dependentsChromeScope: 'arrayItems',
+          fields: [
+            {
+              type: 'switch',
+              name: 'classLimitsEnabled',
+              label: 'Class-specific limits',
+              hint: 'Limit progression per class.',
+              defaultValue: true,
+            },
+            {
+              kind: 'array',
+              name: 'caps',
+              legend: '',
+              addLabel: 'Add class limit',
+              fields: [
+                { type: 'text', name: 'classId', label: 'Class' },
+                { type: 'text', name: 'maxLevel', label: 'Max level' },
+              ],
+            },
+          ],
+        },
+      ]}
+      defaultValues={{
+        classLimitsEnabled: true,
+        caps: [{ classId: 'Fighter', maxLevel: '10' }],
+      }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+/** Select controller + explicit dependentsVisibility — class-policy shape. */
+export const SelectDependentStack: Story = {
+  args: {
+    schema: stackSchema,
+    fields: dependentStackFields,
+    defaultValues: { advancedEnabled: false },
+    onSubmit: action('submit'),
+    className: 'max-w-lg',
+  },
+  render: () => (
+    <Form<z.infer<typeof selectDependentSchema>>
+      schema={selectDependentSchema}
+      fields={selectDependentStackFields}
+      defaultValues={{ classPolicyMode: 'only', classPolicyClassIds: ['fighter'] }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
 }

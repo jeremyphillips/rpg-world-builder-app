@@ -4,6 +4,7 @@ import {
   MAGIC_ITEM_RARITY_ENTRIES,
   absoluteLevelSchema,
   currencySchema,
+  getCurrencyAbbrev,
   magicItemRaritySchema,
 } from '@rpg/contracts'
 import { DIE_FACES } from '@rpg/contracts/primitives'
@@ -46,6 +47,8 @@ const startingWealthMagicItemGrantFormSchema = z.object({
 
 const startingWealthTierBonusGoldFormSchema = z.object({
   baseGp: z.number().int().min(0),
+  /** Form-only unit label backing for the Base inputSelect; always GP. */
+  baseCurrency: z.literal('gp').optional(),
   formula: diceFormulaValueSchema,
   currency: currencySchema,
 })
@@ -76,21 +79,6 @@ export const startingWealthFormSchema = z.object({
   tiers: z.array(startingWealthTierFormSchema).length(STARTING_WEALTH_TIER_COUNT),
 })
 
-function tierItemTitle(values: Record<string, unknown>, index: number): string {
-  const tier = values as StartingWealthTierFormValues
-  const label = tier.label
-  const minLevel = tier.minLevel
-  const maxLevel = tier.maxLevel
-  const range =
-    label && minLevel !== undefined && maxLevel !== undefined
-      ? minLevel === maxLevel
-        ? `${label} (level ${minLevel})`
-        : `${label} (levels ${minLevel}–${maxLevel})`
-      : (label ?? `Tier ${index + 1}`)
-
-  return `${range} — ${formatStartingWealthTierSummary(tier)}`
-}
-
 /** Fixed-length tier array editor for `startingWealth.tiers`. */
 export function buildStartingWealthTiersField(): FormItem {
   return buildLevelRangeTiersArrayField({
@@ -99,7 +87,13 @@ export function buildStartingWealthTiersField(): FormItem {
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
     rhythm: 'comfortable',
-    itemTitle: tierItemTitle,
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    itemHeader: {
+      primaryField: 'label',
+      fallback: (index) => `Wealth tier #${index + 1}`,
+      summary: (values) => formatStartingWealthTierSummary(values as StartingWealthTierFormValues),
+    },
     fields: [
       {
         type: 'text',
@@ -114,31 +108,32 @@ export function buildStartingWealthTiersField(): FormItem {
         label: 'Include class starting equipment',
         hint: 'Adds equipment from Class → Character Creation in addition to this starting wealth.',
         defaultValue: true,
-        labelPosition: 'settings',
-      },
-      {
-        type: 'switch',
-        name: BONUS_GOLD_ENABLED,
-        label: 'Bonus gold',
-        defaultValue: false,
-        labelPosition: 'settings',
       },
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
-        visibility: {
-          dependsOn: [BONUS_GOLD_ENABLED],
-          visibleWhen: (watched) => watched[BONUS_GOLD_ENABLED] === true,
-        },
         fields: [
           {
-            type: 'number',
-            name: 'bonusGold.baseGp',
-            label: 'Base GP',
+            type: 'switch',
+            name: BONUS_GOLD_ENABLED,
+            label: 'Bonus gold',
+            defaultValue: false,
+          },
+          {
+            type: 'inputSelect',
+            name: 'bonusGold',
+            label: 'Base',
+            inputType: 'number',
+            valueKey: 'baseGp',
+            unitKey: 'baseCurrency',
+            fixedUnit: getCurrencyAbbrev('gp'),
+            unitValue: 'gp',
             min: 0,
             required: true,
-            width: 'auto',
+            width: 'md',
+            formatGrouped: true,
+            defaultValue: { baseGp: 0, baseCurrency: 'gp' },
           },
           {
             type: 'diceFormula',
@@ -164,6 +159,11 @@ export function buildStartingWealthTiersField(): FormItem {
         legend: 'Magic item grants',
         addLabel: 'Add magic item grant',
         min: 0,
+        itemVariant: 'compact',
+        itemHeader: {
+          fallback: (index) => `Grant #${index + 1}`,
+          srOnly: true,
+        },
         fields: [
           {
             kind: 'row',

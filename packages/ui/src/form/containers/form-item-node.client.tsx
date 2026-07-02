@@ -23,7 +23,7 @@ export interface NestedFormItemsProps {
   depth: number
 }
 
-/** Package-internal: used by array items at nested depth (avoids accordion re-entry). */
+/** Package-internal: renders nested field lists inside groups, stacks, and array items. */
 export function NestedFormItems({ items, idPrefix, namePrefix, depth }: NestedFormItemsProps) {
   return (
     <>

@@ -1,12 +1,29 @@
 'use client'
 
 import * as React from 'react'
+import type { CSSProperties } from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { CSS } from '@dnd-kit/utilities'
 
 import { Button } from '../../components/ui/button.client'
 import {
-  fieldArrayItemActionRowClasses,
-  fieldArrayItemClasses,
+  fieldArrayItemListClasses,
   fieldGroupBottomMarginClasses,
   fieldGroupLegendVariants,
   fieldStackRhythmVariants,
@@ -21,161 +38,297 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import { useDependsOnValues } from '../config/form-depends-on.client'
+import {
+  isNestedArraySection,
+  resolveArrayItemHeader,
+  resolveArrayItemHeaderLabels,
+  resolveArrayItemReorder,
+  resolveArrayItemVariant,
+} from '../config/array-item-config.lib'
 import { buildItemDefaultValues, type ArrayConfig } from '../field-config'
 import { buildArraySectionChildContext } from '../containers/form-section-child-context.lib'
 import { useVisibilityValues } from '../containers/form-conditional.client'
 import { NestedFormItems } from '../containers/form-item-node.client'
+import { ArrayItemToolbar } from './array-item-header.client'
+import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
+import { arrayItemBodyClasses } from './array-item-toolbar.variants'
+import { resolveSortableArrayMove } from './sortable-array-list.lib'
+import { useArrayItemCollapseState } from '../hooks/use-array-item-collapse-state.client'
+
+function resolveLevelRangeKeys(
+  arrayPattern: ArrayConfig['arrayPattern'],
+): { min: string; max: string } | undefined {
+  if (arrayPattern?.kind !== 'levelRange') return undefined
+
+  const levelKeys = arrayPattern.levelKeys as { min?: string; max?: string } | undefined
+  return {
+    min: levelKeys?.min ?? 'minLevel',
+    max: levelKeys?.max ?? 'maxLevel',
+  }
+}
 
 export interface ArrayFieldRendererProps {
   config: ArrayConfig
   idPrefix: string
   /** Resolved full RHF field name for the array (e.g. `"traits"` or `"root.0.traits"`). */
   fullName: string
-  /** When set, the visible legend is omitted (e.g. accordion trigger labels the section). */
-  hideLegend?: boolean
-  /** Associates the fieldset with an external heading when `hideLegend` is true. */
-  labelledBy?: string
 }
 
-interface ArrayFieldItemProps {
+interface ArrayFieldItemContentProps {
   config: ArrayConfig
   idPrefix: string
   fullName: string
   index: number
   itemId: string
   legend: string
-  stackClasses: string
+  itemBodyStackClasses: string
   canRemove: boolean
-  showMoveButtons: boolean
-  isFirst: boolean
-  isLast: boolean
-  itemTitle?: (values: Record<string, unknown>, index: number) => string
-  itemValues: Record<string, unknown>
-  onMoveUp: () => void
-  onMoveDown: () => void
+  showDragHandle: boolean
+  collapsible: boolean
+  variant: 'compact' | 'detailed'
+  collapsed: boolean
+  onToggleCollapse: () => void
   onRemove: () => void
+  dragHandleProps?: {
+    attributes: ReturnType<typeof useSortable>['attributes']
+    listeners: ReturnType<typeof useSortable>['listeners']
+    isDragging: boolean
+  }
 }
 
-function ArrayFieldItem({
+function ArrayFieldItemContent({
   config,
   idPrefix,
   fullName,
   index,
   itemId,
   legend,
-  stackClasses,
+  itemBodyStackClasses,
   canRemove,
-  showMoveButtons,
-  isFirst,
-  isLast,
-  itemTitle,
-  itemValues,
-  onMoveUp,
-  onMoveDown,
+  showDragHandle,
+  collapsible,
+  variant,
+  collapsed,
+  onToggleCollapse,
   onRemove,
-}: ArrayFieldItemProps) {
+  dragHandleProps,
+}: ArrayFieldItemContentProps) {
   const itemPrefix = `${fullName}.${index}`
-  const title = itemTitle ? itemTitle(itemValues, index) : undefined
+  const headerConfig = resolveArrayItemHeader(config)
+  const primaryField = headerConfig.primaryField
+  const watchedPrimary = useWatch({
+    name: primaryField ? `${itemPrefix}.${primaryField}` : `${itemPrefix}`,
+    disabled: !primaryField,
+  })
+  const itemValues = (useWatch({ name: itemPrefix }) ?? {}) as Record<string, unknown>
   const arrayItems = useWatch({ name: fullName, defaultValue: [] }) as unknown[]
   const watchedValues = useDependsOnValues(config.filterSelectDependsOn ?? [])
+  const arrayItemsSignature = React.useMemo(() => JSON.stringify(arrayItems ?? []), [arrayItems])
+  const titleId = `${idPrefix}-${fullName}-${itemId}-title`
+  const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
+
+  const levelRangeKeys = React.useMemo(
+    () => resolveLevelRangeKeys(config.arrayPattern),
+    [config.arrayPattern],
+  )
 
   const arrayContext = React.useMemo(
     () => ({
       items: arrayItems ?? [],
       rowIndex: index,
+      fullArrayName: levelRangeKeys ? fullName : undefined,
+      levelRangeKeys,
       filterSelectOptions: config.filterSelectOptions,
       watchedValues,
     }),
-    [arrayItems, index, config.filterSelectOptions, watchedValues],
+    [
+      arrayItems,
+      arrayItemsSignature,
+      index,
+      fullName,
+      levelRangeKeys,
+      config.filterSelectOptions,
+      watchedValues,
+    ],
   )
 
-  return (
-    <fieldset
-      key={itemId}
-      className={fieldArrayItemClasses}
-      aria-label={title ?? `${legend} item ${index + 1}`}
-    >
-      {title ? <legend className="px-1 text-xs text-muted-foreground">{title}</legend> : null}
-      <ArrayFieldContext.Provider value={arrayContext}>
-        <div className={stackClasses}>
-          <NestedFormItems
-            items={config.fields}
-            idPrefix={idPrefix}
-            namePrefix={itemPrefix}
-            depth={1}
-          />
-        </div>
-      </ArrayFieldContext.Provider>
-      <div className={fieldArrayItemActionRowClasses}>
-        {showMoveButtons ? (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isFirst}
-              onClick={onMoveUp}
-              aria-label={`Move ${legend} item ${index + 1} up`}
-            >
-              ↑
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isLast}
-              onClick={onMoveDown}
-              aria-label={`Move ${legend} item ${index + 1} down`}
-            >
-              ↓
-            </Button>
-          </>
-        ) : null}
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={!canRemove}
-          onClick={onRemove}
-          aria-label={`Remove ${legend} item ${index + 1}`}
-        >
-          Remove
-        </Button>
+  const fieldsNode = (
+    <ArrayFieldContext.Provider value={arrayContext}>
+      <div className={itemBodyStackClasses}>
+        <NestedFormItems
+          items={config.fields}
+          idPrefix={idPrefix}
+          namePrefix={itemPrefix}
+          depth={1}
+        />
       </div>
-    </fieldset>
+    </ArrayFieldContext.Provider>
+  )
+
+  const header = resolveArrayItemHeaderLabels(
+    headerConfig,
+    itemValues,
+    index,
+    watchedPrimary,
+    legend,
+  )
+  const gripVisible = showDragHandle && Boolean(dragHandleProps)
+  const leadingChrome = { showDragHandle: gripVisible, collapsible }
+
+  return (
+    <ArrayItemShell
+      titleId={titleId}
+      showDragHandle={gripVisible}
+      collapsible={collapsible}
+      dragging={dragHandleProps?.isDragging}
+      main={
+        <>
+          <ArrayItemToolbar
+            legend={legend}
+            index={index}
+            headerConfig={headerConfig}
+            itemValues={itemValues}
+            watchedPrimary={watchedPrimary}
+            showDragHandle={showDragHandle}
+            dragHandleProps={
+              dragHandleProps
+                ? {
+                    ariaLabel: '',
+                    attributes: dragHandleProps.attributes,
+                    listeners: dragHandleProps.listeners,
+                  }
+                : undefined
+            }
+            collapsible={collapsible}
+            collapsed={collapsed}
+            onToggleCollapse={onToggleCollapse}
+            bodyId={bodyId}
+            titleId={titleId}
+            compact={variant === 'compact'}
+          >
+            {variant === 'compact' ? fieldsNode : null}
+          </ArrayItemToolbar>
+          {variant === 'detailed' ? (
+            <div
+              id={bodyId}
+              hidden={collapsed || undefined}
+              className={arrayItemBodyClasses(leadingChrome)}
+              aria-hidden={collapsed}
+            >
+              {fieldsNode}
+            </div>
+          ) : null}
+        </>
+      }
+      actions={
+        <ArrayItemActionsRail
+          removeAriaLabel={`Remove ${header.ariaLabel}`}
+          canRemove={canRemove}
+          onRemove={onRemove}
+          compact={variant === 'compact'}
+        />
+      }
+    />
+  )
+}
+
+interface SortableArrayFieldItemProps extends ArrayFieldItemProps {}
+
+function SortableArrayFieldItem({
+  collapsedIds,
+  onToggleCollapse,
+  itemId,
+  ...props
+}: SortableArrayFieldItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: itemId,
+  })
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <ArrayFieldItemContent
+        {...props}
+        itemId={itemId}
+        collapsed={collapsedIds.has(itemId)}
+        onToggleCollapse={() => onToggleCollapse(itemId)}
+        dragHandleProps={{ attributes, listeners, isDragging }}
+      />
+    </div>
+  )
+}
+
+interface ArrayFieldItemProps extends Omit<
+  ArrayFieldItemContentProps,
+  'dragHandleProps' | 'collapsed' | 'onToggleCollapse'
+> {
+  collapsedIds: ReadonlySet<string>
+  onToggleCollapse: (itemId: string) => void
+}
+
+function ArrayFieldItem({ collapsedIds, onToggleCollapse, itemId, ...props }: ArrayFieldItemProps) {
+  const collapsed = collapsedIds.has(itemId)
+
+  return (
+    <ArrayFieldItemContent
+      {...props}
+      itemId={itemId}
+      collapsed={collapsed}
+      onToggleCollapse={() => onToggleCollapse(itemId)}
+    />
   )
 }
 
 /**
  * Renders a repeatable array of field groups backed by RHF's `useFieldArray`.
- * Each item renders as a `<fieldset>` with the item's fields, plus Remove/Move
- * controls. An "Add" button appends a new item with type-appropriate defaults.
+ * Each item renders with header chrome (drag handle, optional collapse, remove)
+ * and an "Add" button below the list.
  *
  * Must be rendered inside a `FormProvider`.
  */
-export function ArrayFieldRenderer({
-  config,
-  idPrefix,
-  fullName,
-  hideLegend = false,
-  labelledBy,
-}: ArrayFieldRendererProps) {
+export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRendererProps) {
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
   const { getValues } = useFormContext()
-  const { rhythm, size } = useFormSectionContext()
+  const { rhythm, size, depth } = useFormSectionContext()
   const {
     addLabel = 'Add item',
     min = 0,
     max,
     legend,
     legendSize = 'array',
-    itemTitle,
-    allowReorder = true,
-    hideMoveControls = false,
+    itemCollapsible = false,
+    itemCollapseKey,
   } = config
   const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
-  const stackClasses = fieldStackRhythmVariants({ rhythm })
+  const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
+  const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
+  const nested = isNestedArraySection(depth)
+  const variant = resolveArrayItemVariant(config, { nested })
+  const reorder = resolveArrayItemReorder(config)
+  const sortable = reorder === 'dragHandle'
+  const sortableEnabled = sortable && fields.length > 1
+  const showDragHandle = sortableEnabled
+  const collapsible = itemCollapsible && variant === 'detailed' && !nested
+
+  const getItemValues = React.useCallback(
+    (index: number) => (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>,
+    [getValues, fullName],
+  )
+
+  const { collapsedIds, toggleCollapse } = useArrayItemCollapseState({
+    fullName,
+    collapsible,
+    fields,
+    itemCollapseKey: itemCollapseKey,
+    getItemValues,
+  })
 
   const canRemove = fields.length > min
   const canAdd = max === undefined || fields.length < max
-  const showMoveButtons = allowReorder && !hideMoveControls
 
   const staticItemDefaults = React.useMemo(
     () => buildItemDefaultValues(config.fields),
@@ -189,40 +342,79 @@ export function ArrayFieldRenderer({
     append(nextDefaults)
   }
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const resolved = resolveSortableArrayMove(fields, event)
+    if (resolved) move(resolved.from, resolved.to)
+  }
+
+  const itemProps = (rhfField: (typeof fields)[number], index: number) => ({
+    config,
+    idPrefix,
+    fullName,
+    index,
+    itemId: rhfField.id,
+    legend,
+    itemBodyStackClasses,
+    canRemove,
+    showDragHandle,
+    collapsible,
+    variant,
+    collapsedIds,
+    onToggleCollapse: toggleCollapse,
+    onRemove: () => remove(index),
+  })
+
+  const list = (
+    <>
+      {fields.map((rhfField, index) =>
+        sortableEnabled ? (
+          <SortableArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
+        ) : (
+          <ArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
+        ),
+      )}
+    </>
+  )
+
+  const showLegend = legend.trim().length > 0
+
   return (
     <fieldset
-      className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses)}
-      aria-labelledby={hideLegend ? labelledBy : undefined}
+      id={config.id}
+      className={cn(
+        fieldSetResetClasses,
+        !nested && fieldGroupBottomMarginClasses,
+        config.className,
+      )}
     >
-      {hideLegend ? (
-        <legend className="sr-only">{legend}</legend>
-      ) : (
+      {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}
         </legend>
-      )}
-      <div className={stackClasses}>
-        {fields.map((rhfField, index) => (
-          <ArrayFieldItem
-            key={rhfField.id}
-            config={config}
-            idPrefix={idPrefix}
-            fullName={fullName}
-            index={index}
-            itemId={rhfField.id}
-            legend={legend}
-            stackClasses={stackClasses}
-            canRemove={canRemove}
-            showMoveButtons={showMoveButtons}
-            isFirst={index === 0}
-            isLast={index === fields.length - 1}
-            itemTitle={itemTitle}
-            itemValues={rhfField as unknown as Record<string, unknown>}
-            onMoveUp={() => move(index, index - 1)}
-            onMoveDown={() => move(index, index + 1)}
-            onRemove={() => remove(index)}
-          />
-        ))}
+      ) : null}
+      <div className={itemListClasses}>
+        {sortableEnabled ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={fields.map((field) => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {list}
+            </SortableContext>
+          </DndContext>
+        ) : (
+          list
+        )}
         {canAdd ? (
           <Button variant="outline" size="sm" onClick={appendItem} aria-label={addLabel}>
             {addLabel}

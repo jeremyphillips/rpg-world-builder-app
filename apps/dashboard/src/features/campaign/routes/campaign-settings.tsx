@@ -71,6 +71,7 @@ export function CampaignSettings() {
     body = (
       <TabbedForm<CampaignSettingsValues>
         key={campaign.id}
+        uiStateKey={campaign.id}
         schema={campaignSettingsSchema}
         tabs={tabs}
         defaultValues={mapCampaignToSettingsValues(campaign)}

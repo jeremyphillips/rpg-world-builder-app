@@ -42,6 +42,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Optional id for the `<form>` element. */
   id?: string
   /**
+   * Scopes persisted form UI state (e.g. array item collapse) to a stable form
+   * instance — typically an entity or campaign id.
+   */
+  uiStateKey?: string
+  /**
    * Per-file-field remote preview props (e.g. `existingImageUrl` from a storage key).
    * Keyed by field name; not part of the Zod schema.
    */
@@ -49,8 +54,6 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   className?: string
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
-  /** When true (default), sections may render in accordions when `collapsible: true` is set. */
-  collapsibleSections?: boolean
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -94,10 +97,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   formError,
   footer,
   id,
+  uiStateKey,
   fileFieldProps,
   className,
   mode,
-  collapsibleSections = true,
   rhythm,
   size,
   stickyChrome = true,
@@ -128,7 +131,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       form={form}
       formId={formId}
       fileFieldProps={fileFieldProps}
-      collapsibleSections={collapsibleSections}
+      uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
       onSubmit={onSubmit}

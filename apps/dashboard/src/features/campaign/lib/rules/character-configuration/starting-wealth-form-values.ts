@@ -1,8 +1,10 @@
 import {
-  averageTierBonusGold,
+  averageScaledDiceRoll,
   computeStartingWealthSparsePatch,
   CURRENCY_IDS,
-  formatTierBonusGold,
+  formatGroupedNumber,
+  formatLevelRangeLabel,
+  moneyToCp,
   type Currency,
   type CurrencyDiceFormula,
   type DieFace,
@@ -13,7 +15,12 @@ import {
   type TierBonusGold,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
-import type { DiceFormulaValue } from '@rpg/ui'
+import { type DiceFormulaValue } from '@rpg/ui'
+
+import {
+  appendGrantCountSummaryPart,
+  joinFormArrayItemSummaryParts,
+} from '../../../../../lib/forms/array-item-summary'
 
 export const STARTING_WEALTH_FORM_PREFIX = 'startingWealth' as const
 
@@ -27,6 +34,8 @@ export type StartingWealthMagicItemGrantFormValues = {
 
 export type StartingWealthTierBonusGoldFormValues = {
   baseGp: number
+  /** Form-only unit backing for the Base inputSelect; always `gp`. */
+  baseCurrency?: 'gp'
   formula: DiceFormulaValue
   currency: Currency
 }
@@ -61,6 +70,7 @@ const DEFAULT_BONUS_GOLD_FORMULA: DiceFormulaValue = {
 export function defaultStartingWealthTierBonusGoldFormValues(): StartingWealthTierBonusGoldFormValues {
   return {
     baseGp: 0,
+    baseCurrency: 'gp',
     formula: { ...DEFAULT_BONUS_GOLD_FORMULA },
     currency: 'gp',
   }
@@ -100,6 +110,7 @@ export function mapStartingWealthTierToFormValues(
       tier.bonusGold !== null && tier.bonusGold !== undefined
         ? {
             baseGp: tier.bonusGold.baseGp,
+            baseCurrency: 'gp',
             formula: mapBonusGoldFormulaToDiceValue(tier.bonusGold.formula),
             currency: tier.bonusGold.formula.currency,
           }
@@ -128,9 +139,10 @@ function mapTierFormValuesToContract(
   let bonusGold: TierBonusGold | null = null
 
   if (tier.bonusGoldEnabled) {
+    const bonusGoldForm = tier.bonusGold ?? defaultStartingWealthTierBonusGoldFormValues()
     bonusGold = {
-      baseGp: tier.bonusGold.baseGp,
-      formula: mapDiceValueToBonusGoldFormula(tier.bonusGold.formula, tier.bonusGold.currency),
+      baseGp: bonusGoldForm.baseGp,
+      formula: mapDiceValueToBonusGoldFormula(bonusGoldForm.formula, bonusGoldForm.currency),
     }
   }
 
@@ -170,32 +182,27 @@ export function buildStartingWealthPatchInput(
 }
 
 export function formatStartingWealthTierSummary(tier: StartingWealthTierFormValues): string {
-  const parts: string[] = []
+  const parts: string[] = [
+    formatLevelRangeLabel({ minLevel: tier.minLevel, maxLevel: tier.maxLevel }),
+  ]
 
   if (tier.bonusGoldEnabled) {
+    const bonusGold = tier.bonusGold ?? defaultStartingWealthTierBonusGoldFormValues()
     const bonus: TierBonusGold = {
-      baseGp: tier.bonusGold.baseGp,
-      formula: mapDiceValueToBonusGoldFormula(tier.bonusGold.formula, tier.bonusGold.currency),
+      baseGp: bonusGold.baseGp,
+      formula: mapDiceValueToBonusGoldFormula(bonusGold.formula, bonusGold.currency),
     }
-    parts.push(
-      `${formatTierBonusGold(bonus)} (avg ${averageTierBonusGold(bonus).toLocaleString()} GP)`,
-    )
+    const rollAverage = averageScaledDiceRoll(bonus.formula)
+    const rollGp =
+      bonus.formula.currency === 'gp'
+        ? rollAverage
+        : moneyToCp({ amount: rollAverage, currency: bonus.formula.currency }) / 100
+    const avgGp = bonus.baseGp + rollGp
+    parts.push(`Avg ${formatGroupedNumber(avgGp)} GP`)
   }
 
-  if (tier.magicItemGrants.length > 0) {
-    const grantSummary = tier.magicItemGrants
-      .map((grant) => `${grant.quantity} ${grant.rarity}`)
-      .join(', ')
-    parts.push(
-      `${tier.magicItemGrants.length} magic item grant${tier.magicItemGrants.length === 1 ? '' : 's'} (${grantSummary})`,
-    )
-  }
+  const grantCount = tier.magicItemGrants.length
+  appendGrantCountSummaryPart(parts, grantCount)
 
-  if (parts.length === 0) {
-    return tier.includeNormalStartingEquipment
-      ? 'Class starting equipment only'
-      : 'No bonus gold or magic items'
-  }
-
-  return parts.join(' · ')
+  return joinFormArrayItemSummaryParts(parts)
 }

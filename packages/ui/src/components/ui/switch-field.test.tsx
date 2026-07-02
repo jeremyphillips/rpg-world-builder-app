@@ -11,6 +11,13 @@ describe('SwitchField', () => {
     expect(screen.getByText('Email reminders')).toHaveClass('text-xs')
   })
 
+  it('keeps inline label typography on fieldLabelVariants', () => {
+    render(<SwitchField id="notify" label="Email reminders" />)
+    expect(screen.getByText('Email reminders')).toHaveClass('font-field-label')
+    expect(screen.getByText('Email reminders')).toHaveClass('min-h-5')
+    expect(screen.getByText('Email reminders')).not.toHaveClass('font-normal')
+  })
+
   it('toggles via its associated label', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()
@@ -57,7 +64,9 @@ describe('SwitchField', () => {
     expect(
       textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
-    expect(label.parentElement?.parentElement).toHaveClass('flex', 'items-start', 'gap-2')
+    const row = label.parentElement?.parentElement
+    expect(row).toHaveClass('flex', 'gap-2')
+    expect(row?.firstElementChild).toHaveClass('flex', 'h-5', 'shrink-0', 'items-center')
   })
 
   it('renders label and hint in the left column when labelPosition is settings', () => {

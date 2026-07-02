@@ -4,6 +4,11 @@ import { type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
 import {
+  appendGrantCountSummaryPart,
+  formatCharacterLevelSummaryPart,
+  joinFormArrayItemSummaryParts,
+} from '../../../../lib/forms/array-item-summary'
+import {
   GRANT_TYPES,
   GRANT_TYPE_LABELS,
   createGrantRowFormSchema,
@@ -39,9 +44,18 @@ export function featureItemTitle(
 export function featureItemEyebrow(
   row: { level?: number | string } | undefined,
 ): string | undefined {
-  const level = row?.level
-  if (level === undefined || level === null || level === '') return undefined
-  return `Level ${level}`
+  return formatCharacterLevelSummaryPart(row?.level)
+}
+
+export function formatFeatureRowSummary(row: FeatureRowForm): string {
+  const parts: string[] = []
+
+  const levelPart = formatCharacterLevelSummaryPart(row.level)
+  if (levelPart) parts.push(levelPart)
+
+  appendGrantCountSummaryPart(parts, row.grants?.length ?? 0)
+
+  return joinFormArrayItemSummaryParts(parts)
 }
 
 export function classFeatureItemFields(

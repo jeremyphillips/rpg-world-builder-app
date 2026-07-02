@@ -60,8 +60,11 @@ export function toolFormFieldGroup(): FormItem[] {
       legend: 'Utilize actions',
       addLabel: 'Add utilize action',
       min: 1,
-      itemTitle: (values: Record<string, unknown>, index: number) =>
-        values['description'] ? String(values['description']) : `Action ${index + 1}`,
+      itemCollapsible: true,
+      itemHeader: {
+        fallback: (index) => `Action ${index + 1}`,
+        primaryField: 'description',
+      },
       fields: [
         {
           kind: 'row',

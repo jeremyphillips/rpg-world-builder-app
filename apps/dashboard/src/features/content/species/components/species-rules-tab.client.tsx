@@ -17,7 +17,9 @@ import {
   MULTICLASSING_FIELD_PREFIX,
   speciesLevelLimitsFields,
 } from '../lib/species-rules-form-fields'
-import { defaultSpeciesCharacterCreationFormValues } from '../lib/species-rules-form-values'
+import {
+  mergeCharacterCreationFormDefaults,
+} from '../lib/species-rules-form-values'
 import type { SpeciesCharacterCreationForm } from '../lib/species-rules-form-fields'
 
 export interface SpeciesRulesTabProps {
@@ -79,20 +81,12 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   useEffect(() => {
     const current = getValues('characterCreation') as SpeciesCharacterCreationForm | undefined
-    const defaults = defaultSpeciesCharacterCreationFormValues()
-    let changed = false
-    const next: SpeciesCharacterCreationForm = { ...(current ?? {}) }
+    const next = mergeCharacterCreationFormDefaults(current, {
+      policyEnabled,
+      limitsEnabled,
+    })
 
-    if (policyEnabled && !next.multiclassing) {
-      next.multiclassing = defaults.multiclassing
-      changed = true
-    }
-    if (limitsEnabled && !next.levelLimits) {
-      next.levelLimits = defaults.levelLimits
-      changed = true
-    }
-
-    if (changed) {
+    if (JSON.stringify(current ?? {}) !== JSON.stringify(next)) {
       setValue('characterCreation', next, { shouldDirty: false })
     }
   }, [getValues, limitsEnabled, policyEnabled, setValue])

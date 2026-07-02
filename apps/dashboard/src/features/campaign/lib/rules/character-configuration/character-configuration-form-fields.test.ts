@@ -6,6 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import {
+  buildRulesConfigLayoutFields,
   buildRulesFieldsForSurface,
   buildRulesReviewRowsForSurface,
   buildRulesSchemaForSurface,
@@ -150,6 +151,27 @@ describe('character-configuration-form-fields', () => {
       ])
     })
   })
+
+  describe('buildRulesConfigLayoutFields', () => {
+    it('places section scroll anchors on containers instead of empty anchor slots', () => {
+      const fields = buildRulesConfigLayoutFields([])
+      const slotNames = collectSlotNames(fields)
+      const containerIds = collectContainerIds(fields)
+
+      expect(slotNames.filter((name) => name.startsWith('_anchor_'))).toEqual([])
+      expect(containerIds).toEqual(
+        expect.arrayContaining([
+          'creation',
+          'starting-level',
+          'starting-wealth',
+          'standard-max-level',
+          'extended-progression',
+          'creature-type-policy',
+          'multiclassing',
+        ]),
+      )
+    })
+  })
 })
 
 function collectFieldNames(fields: ReturnType<typeof buildRulesFieldsForSurface>): string[] {
@@ -165,4 +187,38 @@ function collectFieldNames(fields: ReturnType<typeof buildRulesFieldsForSurface>
   }
 
   return names
+}
+
+function collectSlotNames(fields: ReturnType<typeof buildRulesConfigLayoutFields>): string[] {
+  const names: string[] = []
+
+  for (const field of fields) {
+    if ('kind' in field && field.kind === 'slot') {
+      names.push(field.name)
+    }
+    if ('fields' in field && Array.isArray(field.fields)) {
+      names.push(
+        ...collectSlotNames(field.fields as ReturnType<typeof buildRulesConfigLayoutFields>),
+      )
+    }
+  }
+
+  return names
+}
+
+function collectContainerIds(fields: ReturnType<typeof buildRulesConfigLayoutFields>): string[] {
+  const ids: string[] = []
+
+  for (const field of fields) {
+    if ('kind' in field && 'id' in field && typeof field.id === 'string') {
+      ids.push(field.id)
+    }
+    if ('fields' in field && Array.isArray(field.fields)) {
+      ids.push(
+        ...collectContainerIds(field.fields as ReturnType<typeof buildRulesConfigLayoutFields>),
+      )
+    }
+  }
+
+  return ids
 }

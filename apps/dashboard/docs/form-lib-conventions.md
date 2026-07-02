@@ -31,6 +31,12 @@ Row schemas keep only field-local refines (bonus-gold operator, required
 sub-fields). Shared user-facing messages live in contracts (`level.ts`,
 `level-range-table.ts`) so form and API copy stay aligned.
 
+Level-range tier arrays use `buildLevelRangeTiersArrayField` with
+`arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses
+`minLevelSelectable` / `maxLevelSelectable`; edits cascade via
+`applyLevelRangeMaxChange` / `applyLevelRangeMinChange` in the `@rpg/ui`
+level-range renderer when that pattern is set.
+
 ## Layout
 
 **Flat prefixes** — default for content catalog subdomains:

@@ -6,7 +6,7 @@ import {
   minLevelSelectable,
   type LevelRangeRow,
 } from '@rpg/contracts'
-import type { FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
+import type { ArrayItemHeaderConfig, FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import type { LevelRangeArrayConfig } from '../array-patterns'
 
@@ -38,7 +38,9 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   max?: number
   rhythm?: LevelRangeArrayConfig['rhythm']
   size?: LevelRangeArrayConfig['size']
-  itemTitle?: LevelRangeArrayConfig['itemTitle']
+  itemHeader?: ArrayItemHeaderConfig
+  itemVariant?: LevelRangeArrayConfig['itemVariant']
+  itemCollapsible?: LevelRangeArrayConfig['itemCollapsible']
   addLabel?: string
   /** Row fields after the level range control. */
   fields: FormItem[]
@@ -62,9 +64,11 @@ export function buildLevelRangeTiersArrayField(
     max: options.max,
     rhythm: options.rhythm,
     size: options.size,
-    itemTitle: options.itemTitle,
+    itemHeader: options.itemHeader,
+    itemVariant: options.itemVariant,
+    itemCollapsible: options.itemCollapsible ?? true,
     addLabel: options.addLabel,
-    allowReorder: false,
+    reorder: false,
     arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
     filterSelectDependsOn: [...LEVEL_RANGE_FILTER_DEPENDS_ON],
     filterSelectOptions: ({ arrayItems, rowIndex, fieldName, watchedValues }) => {

@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
 
-import { fieldStackDependentsChromeVariants } from '../../components/ui/field-stack.variants'
 import {
   fieldStackRhythmVariants,
   fieldToggleDependentIndentClasses,
@@ -20,12 +19,19 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>
 
-const toggleDependentStack = (
-  options: { dependentsChrome?: 'subtle' | 'error'; rhythm?: 'compact' | 'comfortable' } = {},
+const dependentStack = (
+  options: {
+    dependentsChrome?: 'subtle' | 'error'
+    dependentsChromeScope?: 'wrapper' | 'arrayItems'
+    rhythm?: 'compact' | 'comfortable'
+  } = {},
 ): FormItem => ({
   kind: 'stack',
-  layout: 'toggleDependent',
+  layout: 'dependent',
   ...(options.dependentsChrome ? { dependentsChrome: options.dependentsChrome } : {}),
+  ...(options.dependentsChromeScope
+    ? { dependentsChromeScope: options.dependentsChromeScope }
+    : {}),
   ...(options.rhythm ? { rhythm: options.rhythm } : {}),
   fields: [
     {
@@ -63,7 +69,7 @@ const toggleDependentStack = (
 })
 
 function renderStackForm(
-  fields: FormItem[] = [toggleDependentStack({ dependentsChrome: 'subtle' })],
+  fields: FormItem[] = [dependentStack({ dependentsChrome: 'subtle' })],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -81,13 +87,11 @@ function queryDependentsRegion(container: HTMLElement) {
 }
 
 function queryChromeShell(container: HTMLElement) {
-  const subtleBorderClass = fieldStackDependentsChromeVariants({ tone: 'subtle' })
-    .split(' ')
-    .find((token) => token.startsWith('border-') && !token.includes('/'))
-  return subtleBorderClass ? container.querySelector(`.${subtleBorderClass}`) : null
+  const region = queryDependentsRegion(container)
+  return region?.querySelector(':scope > .p-3') ?? null
 }
 
-describe('toggle-dependent stack', () => {
+describe('dependent stack', () => {
   it('keeps the toggle outside the dependents chrome region', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm()
@@ -141,7 +145,7 @@ describe('toggle-dependent stack', () => {
 
   it('renders a plain indented stack when dependentsChrome is omitted', async () => {
     const user = userEvent.setup()
-    const { container } = renderStackForm([toggleDependentStack()])
+    const { container } = renderStackForm([dependentStack()])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
@@ -157,7 +161,7 @@ describe('toggle-dependent stack', () => {
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm([
-      toggleDependentStack({ dependentsChrome: 'subtle', rhythm: 'comfortable' }),
+      dependentStack({ dependentsChrome: 'subtle', rhythm: 'comfortable' }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -181,6 +185,25 @@ describe('toggle-dependent stack', () => {
     })
   })
 
+  it('renders an optional id on the stack wrapper', () => {
+    const { container } = renderStackForm([
+      {
+        kind: 'stack',
+        id: 'feature-section',
+        className: 'scroll-mt-20',
+        fields: [
+          {
+            type: 'text',
+            name: 'featureNote',
+            label: 'Feature note',
+          },
+        ],
+      },
+    ])
+
+    expect(container.querySelector('#feature-section')).toHaveClass('scroll-mt-20')
+  })
+
   it('has no axe violations when dependents are visible', async () => {
     const user = userEvent.setup()
     const { container } = renderStackForm(undefined, { featureEnabled: true, featureValue: 13 })
@@ -190,5 +213,238 @@ describe('toggle-dependent stack', () => {
 
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('applies arrayItems scope tone on array shells without wrapper chrome', async () => {
+    const user = userEvent.setup()
+    const arraySchema = z.object({
+      featureEnabled: z.boolean(),
+      items: z.array(z.object({ label: z.string() })),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        dependentsChrome: 'subtle',
+        dependentsChromeScope: 'arrayItems',
+        fields: [
+          {
+            type: 'switch',
+            name: 'featureEnabled',
+            label: 'Enable feature',
+            defaultValue: false,
+          },
+          {
+            kind: 'array',
+            name: 'items',
+            legend: '',
+            addLabel: 'Add item',
+            fields: [{ type: 'text', name: 'label', label: 'Label' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof arraySchema>>
+        schema={arraySchema}
+        fields={fields}
+        defaultValues={{ featureEnabled: true, items: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add item' }))
+
+    await waitFor(() => {
+      const region = queryDependentsRegion(container)
+      expect(region).toBeInTheDocument()
+      expect(queryChromeShell(container)).toBeNull()
+
+      const itemShell = screen.getByRole('group', { name: /Item 1/ })
+      expect(itemShell).toHaveClass('bg-muted/30')
+      expect(itemShell).toHaveClass('border-border')
+    })
+  })
+
+  it('gates dependents on explicit dependentsVisibility with a select controller', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'all',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [
+              { label: 'Fighter', value: 'fighter' },
+              { label: 'Wizard', value: 'wizard' },
+            ],
+          },
+        ],
+      },
+    ]
+
+    const hidden = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'all', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('combobox', { name: 'Classes' })).not.toBeInTheDocument()
+    expect(queryDependentsRegion(hidden.container)).toBeNull()
+
+    hidden.unmount()
+
+    const visible = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'only', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(queryChromeShell(visible.container)).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Classes' })).toBeInTheDocument()
+
+    const stack = visible.container.querySelector('[data-field-stack][role="group"]')
+    expect(stack).toHaveAttribute('aria-labelledby', expect.stringContaining('mode'))
+  })
+
+  it('applies stack separator after the full dependent grouping', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        separator: 'subtle',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'only',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [{ label: 'Fighter', value: 'fighter' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'only', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('border-b', 'border-border', 'pb-4')
+    expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
+    expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
+    expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)
+  })
+
+  it('keeps stack separator when dependents are gated off', () => {
+    const selectSchema = z.object({
+      mode: z.string(),
+      classIds: z.array(z.string()).optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'dependent',
+        separator: 'subtle',
+        dependentsVisibility: {
+          dependsOn: ['mode'],
+          visibleWhen: (values) => values.mode !== 'all',
+        },
+        fields: [
+          {
+            type: 'select',
+            name: 'mode',
+            label: 'Class restrictions',
+            labelPosition: 'settings',
+            options: [
+              { label: 'All classes', value: 'all' },
+              { label: 'Only listed', value: 'only' },
+            ],
+            defaultValue: 'all',
+          },
+          {
+            type: 'combobox',
+            name: 'classIds',
+            label: 'Classes',
+            multiple: true,
+            options: [{ label: 'Fighter', value: 'fighter' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof selectSchema>>
+        schema={selectSchema}
+        fields={fields}
+        defaultValues={{ mode: 'all', classIds: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
+    expect(queryDependentsRegion(container)).toBeNull()
   })
 })

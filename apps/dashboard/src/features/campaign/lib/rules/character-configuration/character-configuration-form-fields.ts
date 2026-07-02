@@ -17,10 +17,12 @@ import {
 } from '@rpg/contracts'
 import {
   toOptions,
+  type ArrayConfig,
   type FieldConfig,
   type FieldOption,
   type FieldVisibility,
   type FormItem,
+  type GroupFieldItem,
 } from '@rpg/ui/form'
 
 import { vocabularyComboboxField } from '@/features/homebrew'
@@ -48,6 +50,7 @@ export type CreateWizardRuleFieldId = (typeof CREATE_WIZARD_RULE_FIELD_IDS)[numb
 const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
 const MULTICLASSING_ENABLED = 'multiclassingEnabled'
 const PRIMARY_ABILITY_MINIMUM_ENABLED = 'primaryAbilityMinimumEnabled'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
 
 const configRulesObjectSchema = z.object({
   startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
@@ -259,7 +262,7 @@ function extendedProgressionGroup(): FormItem {
     fields: [
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         fields: [
           {
@@ -324,7 +327,7 @@ function multiclassingGroup(): FormItem {
       },
       {
         kind: 'stack',
-        layout: 'toggleDependent',
+        layout: 'dependent',
         dependentsChrome: 'subtle',
         visibility: visibleWhenMulticlassingEnabled(),
         fields: [
@@ -383,6 +386,36 @@ type CharacterRuleFieldDef = {
   buildReviewRow?: (values: Partial<RulesValues>) => RulesReviewRow | undefined
 }
 
+function mergeAnchorClassName(className?: string): string {
+  return className ? `${className} ${SCROLL_SECTION_ANCHOR_CLASS}` : SCROLL_SECTION_ANCHOR_CLASS
+}
+
+function applySectionAnchor(section: CharacterConfigurationSection, items: FormItem[]): FormItem[] {
+  if (items.length === 0) return items
+
+  const first = items[0]
+  if (first && 'kind' in first && first.kind === 'group') {
+    return [
+      {
+        ...first,
+        id: section.id,
+        className: mergeAnchorClassName(first.className),
+      },
+      ...items.slice(1),
+    ]
+  }
+
+  return [
+    {
+      kind: 'stack',
+      id: section.id,
+      className: SCROLL_SECTION_ANCHOR_CLASS,
+      rhythm: 'comfortable',
+      fields: items as GroupFieldItem[],
+    },
+  ]
+}
+
 function creationSectionItems(): FormItem[] {
   const prefix = 'startingWealth'
   return [
@@ -391,17 +424,12 @@ function creationSectionItems(): FormItem[] {
       legend: 'Creation',
       fields: [
         {
-          kind: 'slot',
-          name: '_anchor_starting-level',
-          render: () => createElement('div', { id: 'starting-level', className: 'scroll-mt-20' }),
+          kind: 'stack',
+          id: 'starting-level',
+          className: SCROLL_SECTION_ANCHOR_CLASS,
+          fields: [startingLevelField()],
         },
-        startingLevelField(),
         importedCharactersPolicyField(),
-        {
-          kind: 'slot',
-          name: '_anchor_starting-wealth',
-          render: () => createElement('div', { id: 'starting-wealth', className: 'scroll-mt-20' }),
-        },
         {
           type: 'text',
           name: `${prefix}.name`,
@@ -418,8 +446,10 @@ function creationSectionItems(): FormItem[] {
       ],
     },
     {
-      ...buildStartingWealthTiersField(),
+      ...(buildStartingWealthTiersField() as ArrayConfig),
       name: `${prefix}.tiers`,
+      id: 'starting-wealth',
+      className: SCROLL_SECTION_ANCHOR_CLASS,
     },
   ]
 }
@@ -496,14 +526,7 @@ export function buildRulesConfigLayoutFields(creatureTypeOptions: FieldOption[])
     const items = field.buildFormItems(creatureTypeOptions)
     const section = field.configSection
     if (!section) return items
-    return [
-      {
-        kind: 'slot' as const,
-        name: `_anchor_${section.id}`,
-        render: () => createElement('div', { id: section.id, className: 'scroll-mt-20' }),
-      },
-      ...items,
-    ]
+    return applySectionAnchor(section, items)
   })
 }
 

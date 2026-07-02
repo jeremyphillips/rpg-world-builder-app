@@ -3,7 +3,12 @@ import { slugSchema } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
-import { classFeatureItemFields, featureRowFormSchema } from '../class-feature-form-fields'
+import {
+  classFeatureItemFields,
+  featureRowFormSchema,
+  formatFeatureRowSummary,
+  type FeatureRowForm,
+} from '../class-feature-form-fields'
 
 export const subclassFormSchema = z.object({
   name: z.string().min(1),
@@ -40,7 +45,12 @@ export function buildSubclassFields(
       name: 'features',
       legend: 'Features',
       addLabel: 'Add feature',
-      itemTitle: (values, index) => (values['name'] as string) || `Feature ${index + 1}`,
+      itemCollapsible: true,
+      itemHeader: {
+        fallback: (index) => `Feature ${index + 1}`,
+        primaryField: 'name',
+        summary: (values) => formatFeatureRowSummary(values as FeatureRowForm),
+      },
       fields: classFeatureItemFields(ctx, options),
     },
   ]

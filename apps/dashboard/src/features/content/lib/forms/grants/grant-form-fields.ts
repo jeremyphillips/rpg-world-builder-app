@@ -201,13 +201,17 @@ export function grantItemFields<T extends string>(
       name: 'innateSpellEntries',
       legend: 'Innate spell entries',
       addLabel: 'Add entry',
+      itemCollapsible: true,
       visibility: visibleFor('innateSpells'),
-      itemTitle: (values, index) =>
-        formatInnateSpellEntryTitle(
-          values['spellIds'] as string[] | undefined,
-          spellOptions,
-          index,
-        ),
+      itemHeader: {
+        fallback: (index) => `Entry ${index + 1}`,
+        primary: (values, index) =>
+          formatInnateSpellEntryTitle(
+            values['spellIds'] as string[] | undefined,
+            spellOptions,
+            index,
+          ),
+      },
       fields: [
         {
           type: 'select',
@@ -303,9 +307,13 @@ export function grantArrayFields<T extends string>(
       name: 'grants',
       legend: 'Grants',
       addLabel: 'Add grant',
-      itemTitle: (values, index) => {
-        const type = values['grantType'] as T | undefined
-        return type ? labels[type] : `Grant ${index + 1}`
+      itemCollapsible: true,
+      itemHeader: {
+        fallback: (index) => `Grant ${index + 1}`,
+        primary: (values) => {
+          const type = values['grantType'] as T | undefined
+          return type ? labels[type] : undefined
+        },
       },
       fields: grantItemFields(grantTypes, labels, ctx),
     },

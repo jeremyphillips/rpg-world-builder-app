@@ -10,7 +10,8 @@ export interface SelectFieldValueProps {
   /** Maximum selections when `multiple` is true. */
   max?: number
   value?: string | number | Array<string | number>
-  onChange?: (value: string | string[]) => void
+  /** Optional single-select controls may emit `undefined` when cleared. */
+  onChange?: (value: string | string[] | undefined) => void
   onBlur?: () => void
   error?: string
   hint?: string

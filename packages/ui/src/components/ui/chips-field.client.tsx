@@ -76,7 +76,7 @@ export interface ChipsFieldOptionsProps {
   multiple?: boolean
   max?: number
   value?: string | number | Array<string | number>
-  onChange?: (value: string | string[]) => void
+  onChange?: (value: string | string[] | undefined) => void
   onBlur?: () => void
   disabled?: boolean
   chipSize: ChipSize
@@ -108,7 +108,7 @@ export function ChipsFieldOptions({
       onChange?.(nextMultiSelection(selected, optionValue, max))
       return
     }
-    onChange?.(selected[0] === optionValue ? '' : optionValue)
+    onChange?.(selected[0] === optionValue ? undefined : optionValue)
   }
 
   const selectionRole = multiple ? 'checkbox' : 'radio'

@@ -9,6 +9,10 @@ export interface ArrayFieldContextValue {
   items: unknown[]
   /** 0-based index of the item being rendered. */
   rowIndex: number
+  /** Resolved RHF path for the parent array when cascade editing is enabled. */
+  fullArrayName?: string
+  /** Level-range key names for cascade edits inside level-range tier arrays. */
+  levelRangeKeys?: { min: string; max: string }
   /** Optional cross-row select filtering from the parent array config. */
   filterSelectOptions?: ArrayConfig['filterSelectOptions']
   /** Watched form values for `filterSelectDependsOn` keys. */

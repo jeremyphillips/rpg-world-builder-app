@@ -118,12 +118,12 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
           {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<RulesValues>
             key={campaignId}
+            uiStateKey={`${campaignId}:character-configuration`}
             schema={schema}
             fields={fields}
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}
-            collapsibleSections={false}
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />
@@ -187,12 +187,12 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
           {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<MechanicsValues>
             key={campaignId}
+            uiStateKey={`${campaignId}:mechanics`}
             schema={mechanicsValuesSchema}
             fields={fields}
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}
-            collapsibleSections={false}
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />

@@ -109,6 +109,11 @@ export {
   type DiceFormulaValue,
 } from './components/ui/dice-formula-field.lib'
 export {
+  ARRAY_ITEM_HEADER_DIVIDER,
+  ARRAY_ITEM_TEXT_SEPARATOR,
+  joinArrayItemSummaryParts,
+} from './form/config/array-item-config.lib'
+export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,
@@ -139,13 +144,17 @@ export {
   type FieldGroupProps,
 } from './components/ui/field-group'
 export {
-  fieldArrayItemActionRowClasses,
   fieldArrayItemClasses,
+  fieldArrayItemListClasses,
+  fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupFlexStackClasses,
   fieldGroupStackClasses,
+  fieldInlineCheckboxControlColumnClasses,
   fieldInlineControlRowClasses,
   fieldInlineSentenceClasses,
+  fieldInlineSwitchControlColumnClasses,
+  fieldInlineToggleRowClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
   fieldRowLayoutVariants,
@@ -155,6 +164,7 @@ export {
   fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
   type FieldHintPosition,
+  type FieldLabelPlacement,
   type FieldLabelPosition,
   type FieldRowLayout,
   type FieldSeparator,

@@ -9,22 +9,25 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below a field group or array section fieldset
+ * - `fieldGroupBottomMarginClasses` — space below a top-level group or array section fieldset
+ *   (nested array sections omit this; parent stack/group rhythm owns spacing)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
- * - `formSectionStackClasses` — top-level accordion sections
+ * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutVariants` — display mode for schema-driven rows
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — space below a group/section description
  * - `fieldGroupLegendSpacingClasses` — space below a group legend
- * - `fieldArrayItemClasses` — chrome around one repeatable array item
- * - `fieldArrayItemActionsClasses` — space above array item action buttons
- * - `fieldArrayItemActionRowClasses` — action button row inside one array item
+ * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
+ * - `fieldInlineToggleRowClasses` — checkbox/switch beside label (+ hint below label)
+ * - `fieldInlineSwitchControlColumnClasses` / `fieldInlineCheckboxControlColumnClasses` — control alignment
+ * - `fieldLabelVariants` `placement` — inline switch/checkbox label first-line height (typography unchanged)
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
+ * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
@@ -41,7 +44,7 @@ export const fieldChipWrapGapClasses = 'gap-2 pt-1'
 export const fieldGroupDescriptionClasses = 'mb-3'
 export const fieldGroupLegendSpacingClasses = 'mb-5'
 export const fieldSubgroupLegendSpacingClasses = 'mb-4'
-/** Shared legend typography — field groups, array sections, and collapsible accordion triggers. */
+/** Shared legend typography — field groups and array section legends. */
 export const fieldGroupLegendTypographyClasses =
   'text-field-group-legend font-heading leading-none text-foreground'
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
@@ -54,15 +57,52 @@ export const fieldArrayLegendTypographyClasses =
 /** Compact array section legend — follows section `size: 'sm'` (14px). */
 export const fieldArrayLegendSmTypographyClasses =
   'text-sm font-heading leading-none text-foreground'
-export const fieldArrayItemClasses = 'rounded-md border border-border p-4'
-export const fieldArrayItemActionsClasses = 'mt-3'
-export const fieldArrayItemActionRowClasses = cn(
-  'flex items-center gap-2',
-  fieldArrayItemActionsClasses,
-)
+
+export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
+
+/**
+ * Legacy array item chrome — used by hand-built array UIs outside the schema `<Form>` renderer.
+ * Schema-driven arrays use `arrayItemShellClasses` in `array-item-toolbar.variants.ts`.
+ */
+export const fieldArrayItemVariants = cva('relative rounded-md border border-border pl-2', {
+  variants: {
+    variant: {
+      compact: 'py-[calc(var(--spacing)*2)] pr-2',
+      detailed: 'py-[calc(var(--spacing)*2)] pr-2',
+    },
+    nested: {
+      true: '',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'detailed',
+    nested: false,
+  },
+})
+
+export type FieldArrayItemVariantProps = VariantProps<typeof fieldArrayItemVariants>
+
+/** @deprecated Use `fieldArrayItemVariants` — retained for legacy class assertions. */
+export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed' })
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
+/**
+ * Inline checkbox/switch row — control beside label, hint stacked under the label.
+ *
+ * A bare `flex items-start` row misaligns label cap-height with the control because
+ * label type scale (~15px) and control height (`h-5` switch / `size-4` checkbox)
+ * differ. Outer `items-center` would vertically centre the control against label +
+ * hint when a hint is present. Instead, the control column and label share a
+ * fixed first-line height (`h-5` / `h-4`) with internal centring; hint stays in
+ * `fieldLabelHintStackClasses` below the label, unchanged.
+ */
+export const fieldInlineToggleRowClasses = 'flex gap-2'
+/** Switch track is `h-5` — centre it on the first label line. */
+export const fieldInlineSwitchControlColumnClasses = 'flex h-5 shrink-0 items-center'
+/** Checkbox root is `size-4` — centre it on the first label line. */
+export const fieldInlineCheckboxControlColumnClasses = 'flex h-4 shrink-0 items-center'
 /** Dense settings row — label + hint column left, compact control right. */
 export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
@@ -128,6 +168,21 @@ export const fieldStackRhythmVariants = cva('flex flex-col', {
 
 export type FieldStackRhythmVariantProps = VariantProps<typeof fieldStackRhythmVariants>
 
+/**
+ * Vertical gap between sibling array items (list + Add button).
+ * Item body field stacks use {@link fieldStackRhythmVariants} instead.
+ */
+export function fieldArrayItemListClasses(options: {
+  rhythm: FieldStackRhythm
+  size: FieldSizeToken
+}): string {
+  if (options.rhythm === 'comfortable') {
+    return cn('flex flex-col', options.size === 'md' ? 'gap-6' : 'gap-3')
+  }
+
+  return cn('flex flex-col', options.size === 'md' ? 'gap-3' : 'gap-2')
+}
+
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
 /** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
@@ -181,15 +236,24 @@ export const fieldLabelVariants = cva(
   {
     variants: {
       size: fieldSizeTypographyClasses,
+      /** First-line min-height for inline toggles — keeps `font-field-label` typography. */
+      placement: {
+        default: '',
+        inlineSwitch: 'min-h-5',
+        inlineCheckbox: 'min-h-4',
+      },
     },
     defaultVariants: {
       size: 'md',
+      placement: 'default',
     },
   },
 )
 
-/** Layout preset for toggle-dependent stacks. */
-export type FieldStackLayout = 'default' | 'toggleDependent'
+export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVariants>['placement']>
+
+/** Layout preset for controller + dependent field stacks. */
+export type FieldStackLayout = 'default' | 'dependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 

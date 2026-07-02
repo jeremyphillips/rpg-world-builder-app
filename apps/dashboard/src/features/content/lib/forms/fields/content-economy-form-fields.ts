@@ -167,7 +167,7 @@ export function wealthGrantMoneyField(namePrefix: string): FormItem[] {
           unitKey: 'currency',
           options: currencyOptions,
           min: 0,
-          width: 'auto',
+          width: 'lg',
           formatGrouped: true,
           defaultValue: { amount: 0, currency: 'gp' as Currency },
         },

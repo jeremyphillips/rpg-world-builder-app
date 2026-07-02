@@ -13,6 +13,7 @@ export {
   useFormSectionContext,
   type FormSectionProviderProps,
 } from './context/form-section.context'
+export { FormUiContext, useFormUiContext, type FormUiContextValue } from './context/form-ui.context'
 export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,
@@ -44,6 +45,7 @@ export {
   isContainer,
   toOptions,
   combineFieldVisibility,
+  resolveDependentsVisibility,
   resolveFieldHint,
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -84,13 +86,43 @@ export {
   type GroupFieldItem,
   type StackConfig,
   type ArrayConfig,
+  type ArrayItemHeaderConfig,
+  type ArrayItemReorder,
+  type ArrayItemVariant,
   type SlotConfig,
   type FormItem,
 } from './field-config'
+export {
+  ARRAY_ITEM_HEADER_DIVIDER,
+  ARRAY_ITEM_TEXT_SEPARATOR,
+  joinArrayItemSummaryParts,
+} from './config/array-item-config.lib'
+export {
+  buildItemKeysByFieldId,
+  collapsedIdsFromSnapshot,
+  createArrayItemCollapseSnapshot,
+  isArrayItemCollapsed,
+  pruneArrayItemCollapseOverrides,
+  resolveArrayItemCollapseKey,
+  serializeArrayItemCollapseOverrides,
+  toggleArrayItemCollapseOverride,
+  type ArrayItemCollapseOverride,
+  type ArrayItemCollapseSnapshot,
+} from './config/array-item-collapse.lib'
+export {
+  buildArrayItemCollapseStorageKey,
+  readArrayItemCollapseOverrides,
+  writeArrayItemCollapseOverrides,
+  type ArrayItemCollapseStoredValue,
+} from './config/array-item-collapse-storage.lib'
+export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,
   FieldStackLayout,
   FieldStackRhythm,
 } from '../components/ui/field.variants'
-export type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
+export type {
+  FieldStackDependentsChromeScope,
+  FieldStackDependentsTone,
+} from '../components/ui/field-stack.variants'
