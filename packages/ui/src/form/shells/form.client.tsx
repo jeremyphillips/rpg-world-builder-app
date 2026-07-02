@@ -20,6 +20,7 @@ import {
 import { FormActionsBar } from '../chrome/form-actions-bar'
 import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
+import type { FormValidationPresentation } from '../context/form-ui.context'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -77,6 +78,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   size?: FieldSize
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
+  /**
+   * Controls when array row issue chrome appears. Defaults to `progressive` — issue
+   * badges on untouched rows appear only after the first failed submit.
+   */
+  validationPresentation?: FormValidationPresentation
 }
 
 /**
@@ -103,6 +109,7 @@ export function Form<TFieldValues extends FieldValues>({
   rhythm,
   size,
   valueSyncs,
+  validationPresentation,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
@@ -128,10 +135,12 @@ export function Form<TFieldValues extends FieldValues>({
     <SchemaFormShell
       form={form}
       formId={formId}
+      fields={fields}
       fileFieldProps={fileFieldProps}
       uiStateKey={uiStateKey}
       rhythm={rhythm}
       size={size}
+      validationPresentation={validationPresentation}
       onSubmit={onSubmit}
       className={className}
     >

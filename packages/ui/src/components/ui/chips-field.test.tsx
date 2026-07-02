@@ -176,6 +176,21 @@ describe('ChipsField', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Select at least one.')
   })
 
+  it('uses compact error text for sm fields', () => {
+    render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        error="Select at least one."
+        size="sm"
+      />,
+    )
+    expect(screen.getByRole('alert')).toHaveClass('text-xs')
+  })
+
   it('renders hint when no error', () => {
     render(
       <ChipsField

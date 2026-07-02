@@ -1,11 +1,14 @@
-import type { ArrayConfig } from '@rpg/ui/form'
+import type { ArrayConfig, ArrayPatternConfig } from '@rpg/ui/form'
+
+export {
+  levelRangeArrayPattern,
+  resolveLevelRangeErrorFocusTarget,
+} from './level-range-array-pattern'
 
 /** Domain repeatable-field templates — not imported by `@rpg/ui/form`. */
-export type DashboardArrayPattern =
-  | { kind: 'levelRange'; levelKeys?: { min: string; max: string } }
-  | { kind: 'grantSelection'; selectionKey?: string }
+export type DashboardArrayPattern = ArrayPatternConfig
 
 export type LevelRangeArrayConfig = ArrayConfig & {
-  arrayPattern: { kind: 'levelRange'; levelKeys?: { min: string; max: string } }
+  arrayPattern: ArrayPatternConfig & { kind: 'levelRange' }
   reorder: false
 }

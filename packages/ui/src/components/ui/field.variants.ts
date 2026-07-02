@@ -252,6 +252,19 @@ export const fieldLabelVariants = cva(
 
 export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVariants>['placement']>
 
+export const fieldErrorTextVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'text-xs',
+      md: 'text-md',
+      lg: 'text-md',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
 /** Layout preset for controller + dependent field stacks. */
 export type FieldStackLayout = 'default' | 'dependent'
 

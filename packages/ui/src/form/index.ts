@@ -13,7 +13,14 @@ export {
   useFormSectionContext,
   type FormSectionProviderProps,
 } from './context/form-section.context'
-export { FormUiContext, useFormUiContext, type FormUiContextValue } from './context/form-ui.context'
+export {
+  FormUiContext,
+  FormUiProvider,
+  useFormUiContext,
+  type FormUiContextValue,
+  type FormValidationPresentation,
+  type ValidationSessionExpandKey,
+} from './context/form-ui.context'
 export {
   TabbedForm,
   type TabbedFormFooterWrapperProps,
@@ -91,7 +98,35 @@ export {
   type ArrayItemVariant,
   type SlotConfig,
   type FormItem,
+  type FormIssue,
+  type FormIssueSeverity,
+  type ArrayPatternConfig,
+  type ArrayErrorFocusContext,
 } from './field-config'
+export {
+  flattenFormIssues,
+  classifyFormIssue,
+  classifyFormIssues,
+  groupIssuesForItemPrefix,
+  filterIssuesForItemPrefix,
+  sortFormIssues,
+  countInvalidArrayItems,
+  indexArrayItemIssues,
+  collectArraySections,
+  resolveIssueFocusControlId,
+  resolveIssueFocusFieldName,
+  buildValidationSessionExpandKey,
+  resolveInvalidSubmitNavigation,
+  prepareFormIssues,
+  type ArrayItemIssueGroup,
+  type ArraySectionMeta,
+} from './errors'
+export {
+  useFormValidationPresentation,
+  useArrayItemIssues,
+  useDebouncedArrayItemValidationTrigger,
+  useDebouncedArrayValidationTrigger,
+} from './hooks/use-form-validation-presentation.client'
 export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,

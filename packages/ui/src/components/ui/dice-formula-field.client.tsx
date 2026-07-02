@@ -5,10 +5,15 @@ import * as React from 'react'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { cn } from '../../lib/utils'
-import { Field, type FieldSize } from './field.client'
+import {
+  Field,
+  FieldErrorText,
+  FieldHintBelowLabel,
+  FieldHintErrorBelowControl,
+  type FieldSize,
+} from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
-import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import {
@@ -156,10 +161,18 @@ export function DiceFormulaField({
 
         {hintPosition === 'below-label' ? (
           error ? (
-            <FieldErrorText id={errorId}>{error}</FieldErrorText>
+            <FieldErrorText id={errorId} size={size}>
+              {error}
+            </FieldErrorText>
           ) : null
         ) : (
-          <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+          <FieldHintErrorBelowControl
+            hint={hint}
+            error={error}
+            hintId={hintId}
+            errorId={errorId}
+            size={size}
+          />
         )}
       </div>
     )

@@ -20,6 +20,14 @@ const schema = z.object({
   traits: z.array(traitSchema).min(0),
 })
 
+const rowIssueSchema = z.object({ traits: z.array(traitSchema) }).superRefine((_values, ctx) => {
+  ctx.addIssue({
+    code: 'custom',
+    path: ['traits', 0],
+    message: 'Review this trait before saving',
+  })
+})
+
 type Values = z.infer<typeof schema>
 
 // ── Field configs ────────────────────────────────────────────────────────────
@@ -153,9 +161,7 @@ describe('ArrayFieldRenderer', () => {
     expect(fieldset?.querySelector('legend')).toBeNull()
 
     await user.click(addButton)
-    await waitFor(() =>
-      expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item 1/ })
     expect(itemShell).toHaveClass('bg-muted/30')
@@ -714,5 +720,104 @@ describe('ArrayFieldRenderer', () => {
     expect(item).toContainElement(actionsRail)
     expect(actionsRail).toContainElement(removeButton)
     expect(actionsRail).toHaveClass('self-start', 'mt-1', 'mr-1')
+  })
+
+  it('shows issue badge, row summary, and legend link after failed submit', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<z.infer<typeof rowIssueSchema>>
+        id="issue-form"
+        schema={rowIssueSchema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={{
+          traits: [
+            { name: 'Darkvision', description: '' },
+            { name: 'Keen Senses', description: '' },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getAllByRole('button', { name: /Expand .*Trait/ })).toHaveLength(2)
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(
+      await screen.findByRole('button', { name: '1 issue in Traits · Darkvision' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Review 1 issue in this section' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Review this trait before saving')
+    expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+  })
+
+  it('keeps submit-time expansion out of persisted collapse overrides', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'validation-session-collapse'
+
+    render(
+      <Form<z.infer<typeof rowIssueSchema>>
+        uiStateKey={uiStateKey}
+        schema={rowIssueSchema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={{
+          traits: [
+            { name: 'Darkvision', description: '' },
+            { name: 'Keen Senses', description: '' },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('button', { name: /Collapse .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toBeUndefined()
+  })
+
+  it('allows a user to collapse a row that validation opened', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'validation-session-manual-collapse'
+
+    render(
+      <Form<z.infer<typeof rowIssueSchema>>
+        uiStateKey={uiStateKey}
+        schema={rowIssueSchema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        defaultValues={{
+          traits: [
+            { name: 'Darkvision', description: '' },
+            { name: 'Keen Senses', description: '' },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    const collapseButton = await screen.findByRole('button', { name: /Collapse .*Darkvision/ })
+    expect(collapseButton).toHaveAttribute('aria-expanded', 'true')
+
+    await user.click(collapseButton)
+
+    expect(screen.getByRole('button', { name: /Expand .*Darkvision/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+    expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({ 'index:0': 'closed' })
   })
 })

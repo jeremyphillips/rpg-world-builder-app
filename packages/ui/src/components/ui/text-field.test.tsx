@@ -35,6 +35,11 @@ describe('TextField', () => {
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
   })
 
+  it('uses compact error text for sm fields', () => {
+    render(<TextField id="email" label="Email" error="Required." size="sm" />)
+    expect(screen.getByRole('alert')).toHaveClass('text-xs')
+  })
+
   it('forwards the ref to the underlying input', () => {
     const ref = createRef<HTMLInputElement>()
     render(<TextField id="email" label="Email" ref={ref} />)

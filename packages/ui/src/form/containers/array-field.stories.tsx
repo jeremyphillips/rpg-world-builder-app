@@ -1,5 +1,6 @@
 import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
@@ -394,4 +395,140 @@ export const DragReorder: StoryObj<Meta<object>> = {
       }
     />
   ),
+}
+
+// ── Array validation issue chrome stories ────────────────────────────────────
+
+const issueTraitSchema = z.object({
+  traits: z.array(traitSchema),
+})
+
+const rowIssueTraitSchema = issueTraitSchema.superRefine((_values, ctx) => {
+  ctx.addIssue({
+    code: 'custom',
+    path: ['traits', 0],
+    message: 'Review this trait before saving',
+  })
+})
+
+const nestedIssueSchema = z.object({
+  packages: z.array(
+    z.object({
+      label: z.string(),
+      items: z.array(z.object({ name: z.string().min(1, 'Item name is required') })),
+    }),
+  ),
+})
+
+const validationTraitFields: FormItem[] = [
+  { type: 'text', name: 'name', label: 'Trait name', required: true },
+  { type: 'textarea', name: 'description', label: 'Description', rows: 2 },
+]
+
+const validationIssueFields: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'traits',
+    legend: 'Traits',
+    itemVariant: 'detailed',
+    itemCollapsible: true,
+    fields: validationTraitFields,
+    addLabel: 'Add trait',
+    itemHeader: {
+      fallback: (i) => `Trait ${i + 1}`,
+      primaryField: 'name',
+    },
+  },
+]
+
+/** Failed submit expands the first invalid collapsed row and shows badge + legend issue chrome. */
+export const FirstSubmitIssueNavigation: StoryObj<Meta<object>> = {
+  render: () => (
+    <Form<z.infer<typeof issueTraitSchema>>
+      id="array-validation-navigation"
+      schema={issueTraitSchema}
+      fields={validationIssueFields}
+      defaultValues={{
+        traits: [
+          { name: '', description: '' },
+          { name: 'Keen Senses', description: 'Advantage on Perception checks.' },
+        ],
+      }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+      footer={
+        <CardFooter className="justify-end px-0">
+          <SubmitButton>Save traits</SubmitButton>
+        </CardFooter>
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Save traits' }))
+    await expect(canvas.findByRole('button', { name: /1 issue in Traits/ })).resolves.toBeVisible()
+    await expect(canvas.findByRole('button', { name: /1 invalid row/ })).resolves.toBeVisible()
+  },
+}
+
+/** Row-level issues render a summary in the expanded detailed row header. */
+export const ExpandedRowIssueSummary: StoryObj<Meta<object>> = {
+  render: () => (
+    <Form<z.infer<typeof rowIssueTraitSchema>>
+      id="array-validation-summary"
+      schema={rowIssueTraitSchema}
+      fields={validationIssueFields}
+      defaultValues={{
+        traits: [
+          { name: 'Darkvision', description: 'See in dim light within 60 feet.' },
+          { name: 'Keen Senses', description: 'Advantage on Perception checks.' },
+        ],
+      }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+      footer={
+        <CardFooter className="justify-end px-0">
+          <SubmitButton>Save traits</SubmitButton>
+        </CardFooter>
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Save traits' }))
+    await expect(canvas.findByText('Review this trait before saving')).resolves.toBeVisible()
+  },
+}
+
+/** Nested field errors roll up to the detailed parent row badge in v1. */
+export const NestedErrorRollup: StoryObj<Meta<object>> = {
+  render: () => (
+    <Form<z.infer<typeof nestedIssueSchema>>
+      id="array-validation-nested-rollup"
+      schema={nestedIssueSchema}
+      fields={nestedCompactFields}
+      defaultValues={{
+        packages: [
+          {
+            label: 'Explorer pack',
+            items: [{ name: '' }],
+          },
+        ],
+      }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+      footer={
+        <CardFooter className="justify-end px-0">
+          <SubmitButton>Save package</SubmitButton>
+        </CardFooter>
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Save package' }))
+    await expect(
+      canvas.findByRole('button', { name: /1 issue in Equipment packages/ }),
+    ).resolves.toBeVisible()
+  },
 }

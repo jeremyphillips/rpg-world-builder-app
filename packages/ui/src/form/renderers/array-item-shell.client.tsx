@@ -15,6 +15,7 @@ import {
   arrayItemDraggingClasses,
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
+import { ArrayItemIssueBadge } from './array-item-issue.client'
 
 export interface ArrayItemRemoveButtonProps {
   ariaLabel: string
@@ -44,20 +45,23 @@ export interface ArrayItemActionsRailProps {
   removeAriaLabel: string
   canRemove: boolean
   onRemove: () => void
+  issueCount?: number
+  issueRowLabel?: string
+  onIssuePress?: () => void
   compact?: boolean
   className?: string
 }
 
 /**
  * Top-right action cluster for one array item row.
- *
- * TODO(array-item-issues): Render `<ArrayItemIssueSummary issueCount={…} onPress={…} />` before
- * remove when `issueCount > 0`. Wire from RHF nested errors in `ArrayFieldItemContent`.
  */
 export function ArrayItemActionsRail({
   removeAriaLabel,
   canRemove,
   onRemove,
+  issueCount = 0,
+  issueRowLabel,
+  onIssuePress,
   compact = false,
   className,
 }: ArrayItemActionsRailProps) {
@@ -67,6 +71,12 @@ export function ArrayItemActionsRail({
       aria-label="Item actions"
       className={cn(arrayItemActionsRailClasses({ compact }), className)}
     >
+      <ArrayItemIssueBadge
+        issueCount={issueCount}
+        rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
+        onPress={onIssuePress}
+        compact={compact}
+      />
       <ArrayItemRemoveButton
         ariaLabel={removeAriaLabel}
         canRemove={canRemove}
@@ -78,6 +88,7 @@ export function ArrayItemActionsRail({
 
 export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
   titleId: string
+  itemPrefix?: string
   dragging?: boolean
   className?: string
   main: React.ReactNode
@@ -87,6 +98,7 @@ export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
 /** Grid shell for one array item — main content column + trailing actions rail. */
 export function ArrayItemShell({
   titleId,
+  itemPrefix,
   showDragHandle,
   collapsible,
   dragging = false,
@@ -106,6 +118,7 @@ export function ArrayItemShell({
     <div
       role="group"
       aria-labelledby={titleId}
+      data-array-item-prefix={itemPrefix}
       className={cn(
         arrayItemShellVariants({ tone: arrayItemTone ?? 'default' }),
         dragging && arrayItemDraggingClasses,

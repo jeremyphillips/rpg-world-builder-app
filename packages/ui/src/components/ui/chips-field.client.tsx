@@ -3,7 +3,13 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field, type FieldSize } from './field.client'
+import {
+  Field,
+  FieldErrorText,
+  FieldHintBelowLabel,
+  FieldHintErrorBelowControl,
+  type FieldSize,
+} from './field.client'
 import {
   fieldAnatomyStackClasses,
   fieldChipWrapGapClasses,
@@ -11,7 +17,6 @@ import {
   fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
-import { FieldErrorText, FieldHintBelowLabel, FieldHintErrorBelowControl } from './field-messages'
 import { FieldLabelContent } from './field-label-content'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
@@ -221,10 +226,18 @@ export function ChipsField({
 
       {hintPosition === 'below-label' ? (
         error ? (
-          <FieldErrorText id={errorId}>{error}</FieldErrorText>
+          <FieldErrorText id={errorId} size={size}>
+            {error}
+          </FieldErrorText>
         ) : null
       ) : (
-        <FieldHintErrorBelowControl hint={hint} error={error} hintId={hintId} errorId={errorId} />
+        <FieldHintErrorBelowControl
+          hint={hint}
+          error={error}
+          hintId={hintId}
+          errorId={errorId}
+          size={size}
+        />
       )}
     </fieldset>
   )

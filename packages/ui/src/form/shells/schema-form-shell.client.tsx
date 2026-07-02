@@ -11,12 +11,18 @@ import {
 } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
 import { FormSectionContext } from '../context/form-section.context'
-import { FormUiContext } from '../context/form-ui.context'
-import type { FileFieldPropsMap } from '../field-config'
+import {
+  FormUiContext,
+  FormUiProvider,
+  type FormValidationPresentation,
+} from '../context/form-ui.context'
+import type { FileFieldPropsMap, FormItem } from '../field-config'
+import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
 
 interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   formId: string
+  fields: FormItem[]
   fileFieldProps?: FileFieldPropsMap
   /** Scopes persisted form UI state to a stable form instance. */
   uiStateKey?: string
@@ -27,19 +33,50 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
    * `sm` and `comfortable` maps to `md`.
    */
   size?: FieldSize
+  validationPresentation?: FormValidationPresentation
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   className?: string | undefined
   children: React.ReactNode
+}
+
+function SchemaFormElement<TFieldValues extends FieldValues>({
+  form,
+  formId,
+  fields,
+  onSubmit,
+  className,
+  children,
+}: Pick<
+  SchemaFormShellProps<TFieldValues>,
+  'form' | 'formId' | 'fields' | 'onSubmit' | 'className' | 'children'
+>) {
+  const ui = React.useContext(FormUiContext)
+
+  return (
+    <form
+      id={formId}
+      noValidate
+      onSubmit={form.handleSubmit(
+        (values) => onSubmit(values, form),
+        (errors) => navigateInvalidSubmit(form, fields, formId, ui, errors),
+      )}
+      className={className}
+    >
+      {children}
+    </form>
+  )
 }
 
 /** Shared FormProvider + schema-driven form element wrapper for Form and TabbedForm. */
 export function SchemaFormShell<TFieldValues extends FieldValues>({
   form,
   formId,
+  fields,
   fileFieldProps,
   uiStateKey,
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
+  validationPresentation = 'progressive',
   onSubmit,
   className,
   children,
@@ -49,23 +86,27 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
     () => ({ depth: 0, rhythm, size: resolvedSize }),
     [rhythm, resolvedSize],
   )
-  const uiContext = React.useMemo(() => ({ uiStateKey }), [uiStateKey])
 
   return (
     <FormProvider {...form}>
       <FileFieldPropsProvider value={fileFieldProps ?? {}}>
-        <form
-          id={formId}
-          noValidate
-          onSubmit={form.handleSubmit((values) => onSubmit(values, form))}
-          className={className}
+        <FormUiProvider
+          uiStateKey={uiStateKey}
+          fields={fields}
+          validationPresentation={validationPresentation}
         >
-          <FormUiContext.Provider value={uiContext}>
+          <SchemaFormElement
+            form={form}
+            formId={formId}
+            fields={fields}
+            onSubmit={onSubmit}
+            className={className}
+          >
             <FormSectionContext.Provider value={sectionContext}>
               {children}
             </FormSectionContext.Provider>
-          </FormUiContext.Provider>
-        </form>
+          </SchemaFormElement>
+        </FormUiProvider>
       </FileFieldPropsProvider>
     </FormProvider>
   )
