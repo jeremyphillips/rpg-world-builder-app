@@ -6,10 +6,12 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
-export interface TextFieldProps extends Omit<React.ComponentProps<typeof Input>, 'id'> {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface TextFieldProps
+  extends Omit<React.ComponentProps<typeof Input>, 'id'>, FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -26,7 +28,20 @@ export interface TextFieldProps extends Omit<React.ComponentProps<typeof Input>,
  */
 export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
   (
-    { id, label, error, hint, hintPosition, info, required, width, size = 'md', ...inputProps },
+    {
+      id,
+      label,
+      error,
+      invalid,
+      describedBy,
+      hint,
+      hintPosition,
+      info,
+      required,
+      width,
+      size = 'md',
+      ...inputProps
+    },
     ref,
   ) => {
     return (
@@ -34,6 +49,8 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         id={id}
         label={label}
         error={error}
+        invalid={invalid}
+        describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
         info={info}

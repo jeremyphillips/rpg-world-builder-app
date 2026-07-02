@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '../field-config'
 import {
+  defaultArrayItemHeader,
   isNestedArraySection,
   joinArrayItemSummaryParts,
   resolveArrayItemHeaderLabels,
   resolveArrayItemVariant,
+  resolveCompactInlineRow,
 } from './array-item-config.lib'
 
 describe('array-item-config.lib', () => {
@@ -41,6 +43,19 @@ describe('array-item-config.lib', () => {
     }
 
     expect(resolveArrayItemVariant(config, { nested: false })).toBe('compact')
+  })
+
+  it('resolves compact inline row config from a single leaf row', () => {
+    const row = {
+      kind: 'row' as const,
+      fields: [
+        { type: 'text' as const, name: 'grantType', label: 'Type', required: true },
+        { type: 'text' as const, name: 'detail', label: 'Detail' },
+      ],
+    }
+
+    expect(resolveCompactInlineRow([row])).toBe(row)
+    expect(resolveCompactInlineRow([{ type: 'text', name: 'name', label: 'Name' }])).toBeUndefined()
   })
 
   it('auto-selects detailed for multi-field items', () => {
@@ -92,5 +107,10 @@ describe('array-item-config.lib', () => {
 
     expect(visibleFallback.showFallbackInTitle).toBe(true)
     expect(visibleFallback.ariaLabel).toBe('Darkvision · Trait 1')
+  })
+
+  it('uses singularized legend in the default fallback title', () => {
+    const header = defaultArrayItemHeader('Magic item grants')
+    expect(header.fallback(2)).toBe('Magic item grant #3')
   })
 })

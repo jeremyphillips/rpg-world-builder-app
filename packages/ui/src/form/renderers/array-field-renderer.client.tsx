@@ -1,25 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import type { CSSProperties } from 'react'
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import { CSS } from '@dnd-kit/utilities'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 
 import { Button } from '../../components/ui/button.client'
 import {
@@ -31,334 +13,35 @@ import {
   resolveArrayLegendScale,
 } from '../../components/ui/field.variants'
 import { cn } from '../../lib/utils'
-import { ArrayFieldContext } from '../context/array-field.context'
 import {
   FormSectionContext,
   useFormSectionContext,
   type FormSectionContextValue,
 } from '../context/form-section.context'
-import { useDependsOnValues } from '../config/form-depends-on.client'
 import {
   isNestedArraySection,
-  resolveArrayItemHeader,
-  resolveArrayItemHeaderLabels,
   resolveArrayItemReorder,
   resolveArrayItemVariant,
 } from '../config/array-item-config.lib'
 import { buildItemDefaultValues, type ArrayConfig } from '../field-config'
 import { buildArraySectionChildContext } from '../containers/form-section-child-context.lib'
 import { useVisibilityValues } from '../containers/form-conditional.client'
-import { NestedFormItems } from '../containers/form-item-node.client'
-import { ArrayItemToolbar } from './array-item-header.client'
-import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
-import { arrayItemBodyClasses } from './array-item-toolbar.variants'
-import { resolveSortableArrayMove } from './sortable-array-list.lib'
+import { type ArrayFieldItemContentProps } from './array-field-item-content.client'
+import { ArrayFieldItemList } from './array-field-item-list.client'
+import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { useArrayItemCollapseState } from '../hooks/use-array-item-collapse-state.client'
-import {
-  useArrayItemIssues,
-  useFormValidationPresentation,
-} from '../hooks/use-form-validation-presentation.client'
+import { useFormValidationPresentation } from '../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../context/form-ui.context'
-import { buildValidationSessionExpandKey, countInvalidArrayItems, sortFormIssues } from '../errors'
-import { resolveIssueFocusControlId } from '../errors/resolve-issue-focus-target'
-import { collectArraySections } from '../errors/resolve-field-order'
+import { countInvalidArrayItems, countIssuesForArrayPath } from '../errors'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
 
-function resolveLevelRangeKeys(
-  arrayPattern: ArrayConfig['arrayPattern'],
-): { min: string; max: string } | undefined {
-  if (arrayPattern?.kind !== 'levelRange') return undefined
-
-  const levelKeys = arrayPattern.levelKeys as { min?: string; max?: string } | undefined
-  return {
-    min: levelKeys?.min ?? 'minLevel',
-    max: levelKeys?.max ?? 'maxLevel',
-  }
-}
-
-function scrollElementIntoView(element: Element): void {
-  if ('scrollIntoView' in element && typeof element.scrollIntoView === 'function') {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
-}
+export type { ArrayFieldItemContentProps }
 
 export interface ArrayFieldRendererProps {
   config: ArrayConfig
   idPrefix: string
   /** Resolved full RHF field name for the array (e.g. `"traits"` or `"root.0.traits"`). */
   fullName: string
-}
-
-interface ArrayFieldItemContentProps {
-  config: ArrayConfig
-  idPrefix: string
-  fullName: string
-  index: number
-  itemId: string
-  legend: string
-  itemBodyStackClasses: string
-  canRemove: boolean
-  showDragHandle: boolean
-  collapsible: boolean
-  variant: 'compact' | 'detailed'
-  collapsed: boolean
-  onToggleCollapse: () => void
-  onRemove: () => void
-  dragHandleProps?: {
-    attributes: ReturnType<typeof useSortable>['attributes']
-    listeners: ReturnType<typeof useSortable>['listeners']
-    isDragging: boolean
-  }
-}
-
-function ArrayFieldItemContent({
-  config,
-  idPrefix,
-  fullName,
-  index,
-  itemId,
-  legend,
-  itemBodyStackClasses,
-  canRemove,
-  showDragHandle,
-  collapsible,
-  variant,
-  collapsed,
-  onToggleCollapse,
-  onRemove,
-  dragHandleProps,
-}: ArrayFieldItemContentProps) {
-  const itemPrefix = `${fullName}.${index}`
-  const headerConfig = resolveArrayItemHeader(config)
-  const primaryField = headerConfig.primaryField
-  const watchedPrimary = useWatch({
-    name: primaryField ? `${itemPrefix}.${primaryField}` : `${itemPrefix}`,
-    disabled: !primaryField,
-  })
-  const itemValues = (useWatch({ name: itemPrefix }) ?? {}) as Record<string, unknown>
-  const arrayItems = useWatch({ name: fullName, defaultValue: [] }) as unknown[]
-  const watchedValues = useDependsOnValues(config.filterSelectDependsOn ?? [])
-  const arrayItemsSignature = React.useMemo(() => JSON.stringify(arrayItems ?? []), [arrayItems])
-  const titleId = `${idPrefix}-${fullName}-${itemId}-title`
-  const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
-  const { addValidationSessionExpandKeys } = useFormUiContext()
-  const validation = useFormValidationPresentation()
-  const issueGroup = useArrayItemIssues(fullName, itemPrefix, index)
-  const showIssueChrome = validation.shouldShowRowIssues(itemPrefix, issueGroup)
-
-  const levelRangeKeys = React.useMemo(
-    () => resolveLevelRangeKeys(config.arrayPattern),
-    [config.arrayPattern],
-  )
-
-  const arrayContext = React.useMemo(
-    () => ({
-      items: arrayItems ?? [],
-      rowIndex: index,
-      fullArrayName: levelRangeKeys ? fullName : undefined,
-      levelRangeKeys,
-      filterSelectOptions: config.filterSelectOptions,
-      watchedValues,
-    }),
-    [
-      arrayItems,
-      arrayItemsSignature,
-      index,
-      fullName,
-      levelRangeKeys,
-      config.filterSelectOptions,
-      watchedValues,
-    ],
-  )
-
-  const fieldsNode = (
-    <ArrayFieldContext.Provider value={arrayContext}>
-      <div className={itemBodyStackClasses}>
-        <NestedFormItems
-          items={config.fields}
-          idPrefix={idPrefix}
-          namePrefix={itemPrefix}
-          depth={1}
-        />
-      </div>
-    </ArrayFieldContext.Provider>
-  )
-
-  const header = resolveArrayItemHeaderLabels(
-    headerConfig,
-    itemValues,
-    index,
-    watchedPrimary,
-    legend,
-  )
-  const gripVisible = showDragHandle && Boolean(dragHandleProps)
-  const leadingChrome = { showDragHandle: gripVisible, collapsible }
-  const rowLabel = header.ariaLabel
-
-  const focusIssue = React.useCallback(() => {
-    const issue = issueGroup.sortedIssues[0]
-    if (!issue) return
-
-    if (collapsible) {
-      addValidationSessionExpandKeys([
-        buildValidationSessionExpandKey(
-          fullName,
-          index,
-          itemValues,
-          config.itemCollapseKey ?? 'id',
-        ),
-      ])
-    }
-
-    window.requestAnimationFrame(() => {
-      const focusControlId = resolveIssueFocusControlId(issue, idPrefix, config.arrayPattern)
-      if (focusControlId) {
-        const element = document.getElementById(focusControlId)
-        if (element) {
-          scrollElementIntoView(element)
-          if ('focus' in element && typeof element.focus === 'function') {
-            element.focus({ preventScroll: true })
-          }
-          return
-        }
-      }
-
-      const rowElement = document.querySelector(`[data-array-item-prefix="${itemPrefix}"]`)
-      if (rowElement) scrollElementIntoView(rowElement)
-    })
-  }, [
-    addValidationSessionExpandKeys,
-    collapsible,
-    config.arrayPattern,
-    config.itemCollapseKey,
-    fullName,
-    idPrefix,
-    index,
-    issueGroup.sortedIssues,
-    itemPrefix,
-    itemValues,
-  ])
-
-  const issueSummary =
-    showIssueChrome && variant === 'detailed' && (collapsed || issueGroup.headerIssues.length > 0)
-      ? {
-          group: issueGroup,
-          onPrimaryPress: focusIssue,
-          onMorePress: focusIssue,
-        }
-      : undefined
-
-  return (
-    <ArrayItemShell
-      titleId={titleId}
-      itemPrefix={itemPrefix}
-      showDragHandle={gripVisible}
-      collapsible={collapsible}
-      dragging={dragHandleProps?.isDragging}
-      main={
-        <>
-          <ArrayItemToolbar
-            legend={legend}
-            index={index}
-            headerConfig={headerConfig}
-            itemValues={itemValues}
-            watchedPrimary={watchedPrimary}
-            showDragHandle={showDragHandle}
-            dragHandleProps={
-              dragHandleProps
-                ? {
-                    ariaLabel: '',
-                    attributes: dragHandleProps.attributes,
-                    listeners: dragHandleProps.listeners,
-                  }
-                : undefined
-            }
-            collapsible={collapsible}
-            collapsed={collapsed}
-            onToggleCollapse={onToggleCollapse}
-            bodyId={bodyId}
-            titleId={titleId}
-            compact={variant === 'compact'}
-            issueSummary={issueSummary}
-          >
-            {variant === 'compact' ? fieldsNode : null}
-          </ArrayItemToolbar>
-          {variant === 'detailed' ? (
-            <div
-              id={bodyId}
-              hidden={collapsed || undefined}
-              className={arrayItemBodyClasses(leadingChrome)}
-              aria-hidden={collapsed}
-            >
-              {fieldsNode}
-            </div>
-          ) : null}
-        </>
-      }
-      actions={
-        <ArrayItemActionsRail
-          removeAriaLabel={`Remove ${header.ariaLabel}`}
-          canRemove={canRemove}
-          onRemove={onRemove}
-          issueCount={showIssueChrome ? issueGroup.totalCount : 0}
-          issueRowLabel={rowLabel}
-          onIssuePress={focusIssue}
-          compact={variant === 'compact'}
-        />
-      }
-    />
-  )
-}
-
-interface SortableArrayFieldItemProps extends ArrayFieldItemProps {}
-
-function SortableArrayFieldItem({
-  collapsedIds,
-  onToggleCollapse,
-  itemId,
-  ...props
-}: SortableArrayFieldItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: itemId,
-  })
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <ArrayFieldItemContent
-        {...props}
-        itemId={itemId}
-        collapsed={collapsedIds.has(itemId)}
-        onToggleCollapse={() => onToggleCollapse(itemId)}
-        dragHandleProps={{ attributes, listeners, isDragging }}
-      />
-    </div>
-  )
-}
-
-interface ArrayFieldItemProps extends Omit<
-  ArrayFieldItemContentProps,
-  'dragHandleProps' | 'collapsed' | 'onToggleCollapse'
-> {
-  collapsedIds: ReadonlySet<string>
-  onToggleCollapse: (itemId: string) => void
-}
-
-function ArrayFieldItem({ collapsedIds, onToggleCollapse, itemId, ...props }: ArrayFieldItemProps) {
-  const collapsed = collapsedIds.has(itemId)
-
-  return (
-    <ArrayFieldItemContent
-      {...props}
-      itemId={itemId}
-      collapsed={collapsed}
-      onToggleCollapse={() => onToggleCollapse(itemId)}
-    />
-  )
 }
 
 /**
@@ -412,53 +95,20 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
     : 0
+  const arrayIssueCount = validation.hasAttemptedSubmit
+    ? countIssuesForArrayPath(validation.issues, fullName)
+    : 0
 
-  const focusFirstArrayIssue = React.useCallback(() => {
-    const sections = collectArraySections(validation.fields)
-    const arrayIssues = validation.issues.filter(
-      (issue) => issue.path === fullName || issue.path.startsWith(`${fullName}.`),
-    )
-    const firstIssue = sortFormIssues(arrayIssues, sections)[0]
-    if (!firstIssue || firstIssue.itemIndex === undefined) return
-
-    const itemValues = getItemValues(firstIssue.itemIndex)
-    addValidationSessionExpandKeys([
-      buildValidationSessionExpandKey(
-        fullName,
-        firstIssue.itemIndex,
-        itemValues,
-        config.itemCollapseKey ?? 'id',
-      ),
-    ])
-
-    window.requestAnimationFrame(() => {
-      const focusControlId = resolveIssueFocusControlId(firstIssue, idPrefix, config.arrayPattern)
-      if (focusControlId) {
-        const element = document.getElementById(focusControlId)
-        if (element) {
-          scrollElementIntoView(element)
-          if ('focus' in element && typeof element.focus === 'function') {
-            element.focus({ preventScroll: true })
-          }
-          return
-        }
-      }
-
-      const rowElement = document.querySelector(
-        `[data-array-item-prefix="${firstIssue.itemPrefix}"]`,
-      )
-      if (rowElement) scrollElementIntoView(rowElement)
-    })
-  }, [
-    addValidationSessionExpandKeys,
-    config.arrayPattern,
-    config.itemCollapseKey,
+  const focusFirstArrayIssue = useFocusFirstArrayIssue({
     fullName,
-    getItemValues,
     idPrefix,
-    validation.fields,
-    validation.issues,
-  ])
+    arrayPattern: config.arrayPattern,
+    itemCollapseKey: config.itemCollapseKey,
+    issues: validation.issues,
+    fields: validation.fields,
+    getItemValues,
+    addValidationSessionExpandKeys,
+  })
 
   const staticItemDefaults = React.useMemo(
     () => buildItemDefaultValues(config.fields),
@@ -470,16 +120,6 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       ? config.appendDefaults((getValues(fullName) as unknown[]) ?? [])
       : staticItemDefaults
     append(nextDefaults)
-  }
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  )
-
-  function handleDragEnd(event: DragEndEvent) {
-    const resolved = resolveSortableArrayMove(fields, event)
-    if (resolved) move(resolved.from, resolved.to)
   }
 
   const itemProps = (rhfField: (typeof fields)[number], index: number) => ({
@@ -499,18 +139,6 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     onRemove: () => remove(index),
   })
 
-  const list = (
-    <>
-      {fields.map((rhfField, index) =>
-        sortableEnabled ? (
-          <SortableArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
-        ) : (
-          <ArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
-        ),
-      )}
-    </>
-  )
-
   const showLegend = legend.trim().length > 0
 
   return (
@@ -525,27 +153,21 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       {showLegend ? (
         <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
           {legend}
-          <ArrayLegendIssueLink invalidRowCount={invalidRowCount} onPress={focusFirstArrayIssue} />
+          <ArrayLegendIssueLink
+            issueCount={arrayIssueCount}
+            invalidRowCount={invalidRowCount}
+            sectionLabel={legend}
+            onPress={focusFirstArrayIssue}
+          />
         </legend>
       ) : null}
       <div className={itemListClasses}>
-        {sortableEnabled ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={fields.map((field) => field.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {list}
-            </SortableContext>
-          </DndContext>
-        ) : (
-          list
-        )}
+        <ArrayFieldItemList
+          fields={fields}
+          sortableEnabled={sortableEnabled}
+          itemProps={itemProps}
+          onMove={move}
+        />
         {canAdd ? (
           <Button variant="outline" size="sm" onClick={appendItem} aria-label={addLabel}>
             {addLabel}

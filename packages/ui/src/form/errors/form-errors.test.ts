@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { FieldErrors } from 'react-hook-form'
 
+import { encodeStructuredMessage } from '@rpg/contracts'
+
 import { classifyFormIssues } from './classify-form-issue'
 import { flattenFormIssues } from './flatten-form-issues'
 import {
   countInvalidArrayItems,
+  countIssuesForArrayPath,
   groupIssuesForItemPrefix,
   sortFormIssues,
 } from './group-form-issues'
@@ -83,9 +86,47 @@ describe('flattenFormIssues', () => {
       itemPrefix: 'startingWealth.tiers.0',
     })
   })
+
+  it('decodes structured field and summary messages with messageId and params', () => {
+    const structured = encodeStructuredMessage(
+      'Choose a rarity.',
+      'Missing Rarity',
+      'validation.field.requiredSelect',
+      { label: 'Rarity' },
+    )
+    const errors = {
+      tiers: [{ rarity: { type: 'custom', message: structured } }],
+    } as unknown as FieldErrors
+
+    const issues = classifyFormIssues(flattenFormIssues(errors), {})
+    expect(issues[0]).toMatchObject({
+      message: 'Choose a rarity.',
+      summaryMessage: 'Missing Rarity',
+      messageId: 'validation.field.requiredSelect',
+      messageParams: { label: 'Rarity' },
+      scope: 'field',
+    })
+  })
 })
 
-describe('classifyFormIssues', () => {
+describe('classifyFormIssues scope', () => {
+  it('derives scope from array path context', () => {
+    const [labelIssue, overlapIssue, grantIssue] = classifyFormIssues(
+      flattenFormIssues({
+        startingWealth: {
+          tiers: [
+            { label: { type: 'custom', message: 'Required' } },
+            { minLevel: { type: 'custom', message: 'This range overlaps with Levels 1–5.' } },
+          ],
+        },
+      } as unknown as FieldErrors),
+      { arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } } },
+    )
+
+    expect(labelIssue?.scope).toBe('field')
+    expect(overlapIssue?.scope).toBe('field')
+    expect(grantIssue).toBeUndefined()
+  })
   it('classifies level range min/max as cross-row for levelRange patterns', () => {
     const [overlap, label] = classifyFormIssues(
       [
@@ -138,6 +179,31 @@ describe('groupIssuesForItemPrefix', () => {
 
     expect(group.totalCount).toBe(2)
     expect(group.fieldIssues).toHaveLength(2)
+  })
+
+  it('joins field summary labels for compact row chrome', () => {
+    const issues = classifyFormIssues(
+      [
+        {
+          path: 'grants.0.rarity',
+          message: 'Choose a rarity.',
+          summaryMessage: 'Missing Rarity',
+          severity: 'field',
+          relativePath: 'rarity',
+        },
+        {
+          path: 'grants.0.quantity',
+          message: 'Quantity is required.',
+          summaryMessage: 'Missing Quantity',
+          severity: 'field',
+          relativePath: 'quantity',
+        },
+      ],
+      {},
+    )
+
+    const group = groupIssuesForItemPrefix(issues, 'grants.0', 'grants', 0, ['rarity', 'quantity'])
+    expect(group.fieldSummary).toBe('Missing Rarity · Missing Quantity')
   })
 })
 
@@ -211,5 +277,26 @@ describe('countInvalidArrayItems', () => {
     } as unknown as FieldErrors)
 
     expect(countInvalidArrayItems(issues, 'startingWealth.tiers')).toBe(2)
+  })
+})
+
+describe('countIssuesForArrayPath', () => {
+  it('counts all error paths under an array', () => {
+    const issues = flattenFormIssues({
+      startingWealth: {
+        tiers: [
+          {
+            label: { type: 'custom', message: 'Required' },
+            magicItemGrants: [
+              { rarity: { type: 'custom', message: 'Missing Rarity' } },
+              { rarity: { type: 'custom', message: 'Missing Rarity' } },
+            ],
+          },
+        ],
+      },
+    } as unknown as FieldErrors)
+
+    expect(countIssuesForArrayPath(issues, 'startingWealth.tiers')).toBe(3)
+    expect(countInvalidArrayItems(issues, 'startingWealth.tiers')).toBe(1)
   })
 })

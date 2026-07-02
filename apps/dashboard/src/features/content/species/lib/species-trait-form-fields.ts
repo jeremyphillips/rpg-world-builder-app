@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import {
   contentTraitKindSchema,
+  defineMessage,
+  fieldValidationMessages,
   isGrantEligibleGrants,
   resolveTraitName,
   type ContentTraitKind,
@@ -16,6 +18,15 @@ import {
 import { formRowsToGrants } from '../../lib/forms/grants/grant-form-values'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { traitKindOptions } from './species-trait-form-labels'
+
+/** Species trait row validation messages (tier 3 form overrides). */
+export const speciesTraitValidationMessages = {
+  grantRowRequired: defineMessage(
+    'validation.speciesTrait.grantRowRequired',
+    () => 'Grant traits require one eligible grant row',
+    () => 'Missing grant row',
+  ),
+}
 
 export function visibleForTraitKind(kind: ContentTraitKind): FieldVisibility {
   return {
@@ -46,14 +57,18 @@ export const traitRowFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.kind === 'custom' && !row.name?.trim()) {
-      ctx.addIssue({ code: 'custom', message: 'Name is required', path: ['name'] })
+      ctx.addIssue({
+        code: 'custom',
+        message: fieldValidationMessages.requiredText({ label: 'Name' }),
+        path: ['name'],
+      })
     }
     if (row.kind === 'grant') {
       const grants = formRowsToGrants(row.grants)
       if (!grants || !isGrantEligibleGrants(grants)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Grant traits require one eligible grant row',
+          message: speciesTraitValidationMessages.grantRowRequired(),
           path: ['grants'],
         })
       }

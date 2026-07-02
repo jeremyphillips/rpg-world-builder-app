@@ -1,7 +1,25 @@
 import type { ArraySectionMeta } from './resolve-field-order'
 import { resolveFieldOrderIndex } from './resolve-field-order'
+import { joinArrayItemSummaryParts } from '../config/array-item-config.lib'
 import type { ArrayItemIssueGroup, FormIssue } from './form-issue.types'
 import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
+
+const MAX_NAMED_FIELD_SUMMARY_PARTS = 2
+
+/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
+export function buildFieldSummaryText(
+  fieldIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  if (fieldIssues.length === 0) return undefined
+
+  const parts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
+  if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
+
+  const named = parts.slice(0, maxNamed)
+  const extra = parts.length - maxNamed
+  return `${joinArrayItemSummaryParts(named)} · +${extra} more`
+}
 
 function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly string[]): number {
   const severityDelta =
@@ -27,6 +45,8 @@ function buildIssueGroup(
   fieldOrder: readonly string[],
 ): ArrayItemIssueGroup {
   const sortedIssues = [...issues].sort((left, right) => compareIssues(left, right, fieldOrder))
+  const fieldIssues = sortedIssues.filter((issue) => issue.severity === 'field')
+  const fieldSummary = buildFieldSummaryText(fieldIssues)
 
   return {
     itemPrefix,
@@ -35,7 +55,8 @@ function buildIssueGroup(
     totalCount: sortedIssues.length,
     sortedIssues,
     headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
-    fieldIssues: sortedIssues.filter((issue) => issue.severity === 'field'),
+    fieldIssues,
+    fieldSummary,
   }
 }
 
@@ -111,6 +132,13 @@ export function countInvalidArrayItems(issues: readonly FormIssue[], arrayPath: 
     if (issue.itemIndex !== undefined) indices.add(issue.itemIndex)
   }
   return indices.size
+}
+
+/** Count all error paths under an array path (including nested descendants). */
+export function countIssuesForArrayPath(issues: readonly FormIssue[], arrayPath: string): number {
+  return issues.filter(
+    (issue) => issue.path === arrayPath || issue.path.startsWith(`${arrayPath}.`),
+  ).length
 }
 
 export type ArrayIssueIndex = Map<string, ArrayItemIssueGroup>

@@ -1,3 +1,5 @@
+import { singularizeLabel } from '@rpg/contracts'
+
 import type {
   ArrayConfig,
   ArrayItemHeaderConfig,
@@ -18,10 +20,16 @@ function isLeafField(item: FormItem | RowConfig): boolean {
 }
 
 function isCompactEligible(fields: FormItem[]): boolean {
-  if (fields.length !== 1) return false
+  return resolveCompactInlineRow(fields) !== undefined
+}
+
+/** Single leaf `row` container used by compact inline array items. */
+export function resolveCompactInlineRow(fields: FormItem[]): RowConfig | undefined {
+  if (fields.length !== 1) return undefined
   const only = fields[0]
-  if (only === undefined || !('kind' in only) || only.kind !== 'row') return false
-  return only.fields.every(isLeafField)
+  if (only === undefined || !('kind' in only) || only.kind !== 'row') return undefined
+  if (!only.fields.every(isLeafField)) return undefined
+  return only
 }
 
 export function resolveArrayItemVariant(
@@ -38,14 +46,18 @@ export function resolveArrayItemReorder(config: ArrayConfig): ArrayItemReorder {
   return config.reorder ?? 'dragHandle'
 }
 
-export function defaultArrayItemHeader(): ArrayItemHeaderConfig {
+export function defaultArrayItemHeader(legend?: string): ArrayItemHeaderConfig {
+  const itemLabel = legend ? singularizeLabel(legend) : 'Item'
   return {
-    fallback: (index) => `Item ${index + 1}`,
+    fallback: (index) => `${itemLabel} #${index + 1}`,
   }
 }
 
-export function resolveArrayItemHeader(config: ArrayConfig): ArrayItemHeaderConfig {
-  return config.itemHeader ?? defaultArrayItemHeader()
+export function resolveArrayItemHeader(
+  config: ArrayConfig,
+  legend?: string,
+): ArrayItemHeaderConfig {
+  return config.itemHeader ?? defaultArrayItemHeader(legend)
 }
 
 /** Middle-dot separator for array item header labels and summary segments. */

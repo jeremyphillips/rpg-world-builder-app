@@ -78,7 +78,11 @@ export function InlineChooseCountField({
     >
       {({ chooseId }) => (
         <div className={fieldInlineSentenceClasses}>
-          {prefix ? <InlineSentenceConnector size={size}>{prefix}</InlineSentenceConnector> : null}
+          {prefix ? (
+            <InlineSentenceConnector size={size} tone="label">
+              {prefix}
+            </InlineSentenceConnector>
+          ) : null}
           <label htmlFor={chooseId} className="sr-only">
             {label} count
           </label>
@@ -96,7 +100,9 @@ export function InlineChooseCountField({
             onChange={(event) => onChange?.(parseChooseCount(event.target.value))}
             onBlur={onBlur}
           />
-          <InlineSentenceConnector size={size}>{suffix}</InlineSentenceConnector>
+          <InlineSentenceConnector size={size} tone="label">
+            {suffix}
+          </InlineSentenceConnector>
         </div>
       )}
     </ChooseCountFieldShell>

@@ -262,7 +262,7 @@ describe('dependent stack', () => {
       expect(region).toBeInTheDocument()
       expect(queryChromeShell(container)).toBeNull()
 
-      const itemShell = screen.getByRole('group', { name: /Item 1/ })
+      const itemShell = screen.getByRole('group', { name: /Item #1/ })
       expect(itemShell).toHaveClass('bg-muted/30')
       expect(itemShell).toHaveClass('border-border')
     })

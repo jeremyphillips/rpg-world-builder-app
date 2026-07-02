@@ -10,10 +10,12 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 
-export interface CheckboxFieldProps extends Omit<ComponentProps<typeof Checkbox>, 'id'> {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface CheckboxFieldProps
+  extends Omit<ComponentProps<typeof Checkbox>, 'id'>, FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   info?: ReactNode
   required?: boolean
@@ -26,6 +28,8 @@ export function CheckboxField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   info,
   required,
@@ -40,7 +44,16 @@ export function CheckboxField({
   )
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <div className={fieldInlineToggleRowClasses}>
         <div className={fieldInlineCheckboxControlColumnClasses}>
           <Field.Control>

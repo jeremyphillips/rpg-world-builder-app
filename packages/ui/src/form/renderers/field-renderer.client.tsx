@@ -1,7 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { useController, type ControllerRenderProps } from 'react-hook-form'
+import {
+  useController,
+  useFormContext,
+  useFormState,
+  type ControllerRenderProps,
+} from 'react-hook-form'
 
 import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
@@ -15,6 +20,8 @@ import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
+import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
+import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
@@ -71,8 +78,18 @@ interface RenderArgs<K extends FieldType> {
   field: ControllerRenderProps
   id: string
   error?: string
+  invalid?: boolean
+  describedBy?: string
   remotePreview?: ReturnType<typeof useFileFieldRemotePreview>
   namePrefix?: string
+}
+
+function fieldValidationProps({
+  error,
+  invalid,
+  describedBy,
+}: Pick<RenderArgs<FieldType>, 'error' | 'invalid' | 'describedBy'>) {
+  return { error, invalid, describedBy }
 }
 
 /**
@@ -87,11 +104,11 @@ const fieldRenderers: {
     args: RenderArgs<K>,
   ) => React.ReactElement
 } = {
-  text: ({ config, field, id, error }) => (
+  text: ({ config, field, id, ...validation }) => (
     <TextField
       id={id}
       label={config.label}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -108,11 +125,11 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  number: ({ config, field, id, error }) => (
+  number: ({ config, field, id, ...validation }) => (
     <NumberField
       id={id}
       label={config.label}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -133,11 +150,11 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  textarea: ({ config, field, id, error }) => (
+  textarea: ({ config, field, id, ...validation }) => (
     <TextareaField
       id={id}
       label={config.label}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -153,12 +170,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  select: ({ config, field, id, error }) => (
+  select: ({ config, field, id, ...validation }) => (
     <SelectField
       id={id}
       label={config.label}
       options={config.options}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -174,12 +191,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  radio: ({ config, field, id, error }) => (
+  radio: ({ config, field, id, ...validation }) => (
     <RadioGroupField
       id={id}
       label={config.label}
       options={config.options}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -193,12 +210,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  radioCard: ({ config, field, id, error }) => (
+  radioCard: ({ config, field, id, ...validation }) => (
     <RadioCardField
       id={id}
       label={config.label}
       options={config.options}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -211,11 +228,11 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  checkbox: ({ config, field, id, error }) => (
+  checkbox: ({ config, field, id, ...validation }) => (
     <CheckboxField
       id={id}
       label={config.label}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       info={config.info}
       required={config.required}
@@ -227,12 +244,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  switch: ({ config, field, id, error }) => (
+  switch: ({ config, field, id, ...validation }) => (
     <SwitchField
       id={id}
       label={config.label}
       labelPosition={config.labelPosition}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -245,12 +262,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  json: ({ config, field, id, error }) => (
+  json: ({ config, field, id, ...validation }) => (
     <LazyFieldSuspense>
       <LazyJsonField
         id={id}
         label={config.label}
-        error={error}
+        {...fieldValidationProps(validation)}
         hint={config.hint}
         hintPosition={config.hintPosition}
         info={config.info}
@@ -266,12 +283,12 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  richtext: ({ config, field, id, error }) => (
+  richtext: ({ config, field, id, ...validation }) => (
     <LazyFieldSuspense>
       <LazyRichTextField
         id={id}
         label={config.label}
-        error={error}
+        {...fieldValidationProps(validation)}
         hint={config.hint}
         hintPosition={config.hintPosition}
         info={config.info}
@@ -289,11 +306,11 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  markdown: ({ config, field, id, error }) => (
+  markdown: ({ config, field, id, ...validation }) => (
     <MarkdownField
       id={id}
       label={config.label}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -308,12 +325,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  file: ({ config, field, id, error, remotePreview }) => (
+  file: ({ config, field, id, remotePreview, ...validation }) => (
     <LazyFieldSuspense>
       <LazyFileField
         id={id}
         label={config.label}
-        error={error}
+        {...fieldValidationProps(validation)}
         hint={config.hint}
         hintPosition={config.hintPosition}
         info={config.info}
@@ -332,14 +349,14 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  chips: ({ config, field, id, error }) => (
+  chips: ({ config, field, id, ...validation }) => (
     <ChipsField
       id={id}
       label={config.label}
       options={config.options}
       multiple={config.multiple}
       max={config.max}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -353,28 +370,33 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  chooseFromChips: ({ config, field, id, error, namePrefix }) => (
+  chooseFromChips: ({ config, field, id, namePrefix, ...validation }) => (
     <ChooseFromChipsFieldRenderer
       config={config}
       field={field}
       id={id}
-      error={error}
+      {...fieldValidationProps(validation)}
       namePrefix={namePrefix}
     />
   ),
-  inlineChooseCount: ({ config, field, id, error }) => (
-    <InlineChooseCountFieldRenderer config={config} field={field} id={id} error={error} />
+  inlineChooseCount: ({ config, field, id, ...validation }) => (
+    <InlineChooseCountFieldRenderer
+      config={config}
+      field={field}
+      id={id}
+      {...fieldValidationProps(validation)}
+    />
   ),
-  inputUnit: ({ config, field, id, error, namePrefix }) => (
+  inputUnit: ({ config, field, id, namePrefix, ...validation }) => (
     <InputUnitFieldRenderer
       config={config}
       field={field}
       id={id}
-      error={error}
+      {...fieldValidationProps(validation)}
       namePrefix={namePrefix}
     />
   ),
-  combobox: ({ config, field, id, error }) => (
+  combobox: ({ config, field, id, ...validation }) => (
     <ComboboxField
       id={id}
       label={config.label}
@@ -382,7 +404,7 @@ const fieldRenderers: {
       multiple={config.multiple}
       max={config.max}
       placeholder={config.placeholder}
-      error={error}
+      {...fieldValidationProps(validation)}
       hint={config.hint}
       hintPosition={config.hintPosition}
       info={config.info}
@@ -396,23 +418,23 @@ const fieldRenderers: {
       renderSelectedItem={config.renderSelectedItem}
     />
   ),
-  editableGrid: ({ config, field, id, error, namePrefix }) => (
+  editableGrid: ({ config, field, id, namePrefix, ...validation }) => (
     <LazyFieldSuspense>
       <LazyEditableGridFieldRenderer
         config={config}
         field={field}
         id={id}
-        error={error}
+        {...fieldValidationProps(validation)}
         namePrefix={namePrefix}
       />
     </LazyFieldSuspense>
   ),
-  diceFormula: ({ config, field, id, error, namePrefix }) => (
+  diceFormula: ({ config, field, id, namePrefix, ...validation }) => (
     <DiceFormulaFieldRenderer
       config={config}
       field={field}
       id={id}
-      error={error}
+      {...fieldValidationProps(validation)}
       namePrefix={namePrefix}
     />
   ),
@@ -506,11 +528,21 @@ function StandardFieldRenderer({
   id,
   namePrefix,
 }: StandardFieldRendererProps) {
+  const { getFieldState } = useFormContext()
   const { field, fieldState } = useController({
     name: fullName,
     defaultValue: fieldDefaultValue(config),
   })
+  const formState = useFormState({ name: fullName, exact: true })
+  const { errors } = useFormState()
+  const liveError = getFieldState(fullName, formState).error
   const remotePreview = useFileFieldRemotePreview(config.name)
+  const validation = useFieldErrorPresentation(
+    liveError?.message ??
+      fieldState.error?.message ??
+      resolveNestedFieldErrorMessage(errors, fullName),
+    fullName,
+  )
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
   const render = fieldRenderers[renderConfig.type] as (
@@ -520,7 +552,7 @@ function StandardFieldRenderer({
     config: renderConfig,
     field,
     id,
-    error: fieldState.error?.message,
+    ...validation,
     remotePreview,
     namePrefix,
   })

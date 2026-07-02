@@ -6,10 +6,12 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
-export interface TextareaFieldProps extends React.ComponentProps<typeof Textarea> {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface TextareaFieldProps
+  extends React.ComponentProps<typeof Textarea>, FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -21,7 +23,20 @@ export interface TextareaFieldProps extends React.ComponentProps<typeof Textarea
 /** Labelled multi-line text input bound to the compound `Field`. */
 export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
   (
-    { id, label, error, hint, hintPosition, info, required, width, size = 'md', ...textareaProps },
+    {
+      id,
+      label,
+      error,
+      invalid,
+      describedBy,
+      hint,
+      hintPosition,
+      info,
+      required,
+      width,
+      size = 'md',
+      ...textareaProps
+    },
     ref,
   ) => {
     return (
@@ -29,6 +44,8 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
         id={id}
         label={label}
         error={error}
+        invalid={invalid}
+        describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
         info={info}

@@ -14,6 +14,12 @@ export {
   type FormSectionProviderProps,
 } from './context/form-section.context'
 export {
+  ArrayItemPresentationContext,
+  resolveErrorPlacement,
+  type ArrayItemPresentationContextValue,
+  type ErrorPlacement,
+} from './context/array-item-presentation.context'
+export {
   FormUiContext,
   FormUiProvider,
   useFormUiContext,

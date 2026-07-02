@@ -1,4 +1,9 @@
-export type { FormIssue, FormIssueSeverity, ArrayItemIssueGroup } from './form-issue.types'
+export type {
+  FormIssue,
+  FormIssueScope,
+  FormIssueSeverity,
+  ArrayItemIssueGroup,
+} from './form-issue.types'
 export { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 export { flattenFormIssues } from './flatten-form-issues'
 export { classifyFormIssue, classifyFormIssues } from './classify-form-issue'
@@ -7,8 +12,10 @@ export {
   groupIssuesForItemPrefix,
   sortFormIssues,
   countInvalidArrayItems,
+  countIssuesForArrayPath,
   indexArrayItemIssues,
   findArraySectionForIssue,
+  buildFieldSummaryText,
   type ArrayIssueIndex,
 } from './group-form-issues'
 export {
@@ -22,6 +29,10 @@ export {
   resolveIssueFocusFieldName,
   resolveIssueFocusControlId,
 } from './resolve-issue-focus-target'
+export {
+  resolveFieldErrorMessage,
+  resolveFirstFieldErrorMessage,
+} from './resolve-field-error-message'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,

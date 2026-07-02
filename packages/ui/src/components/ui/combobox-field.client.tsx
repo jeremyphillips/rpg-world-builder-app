@@ -113,6 +113,8 @@ export function ComboboxField({
   onChange,
   onBlur,
   error,
+  invalid,
+  describedBy,
   hint,
   info,
   required,
@@ -128,7 +130,16 @@ export function ComboboxField({
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}

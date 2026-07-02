@@ -8,10 +8,11 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
-export interface FileFieldProps extends FileDropzoneProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface FileFieldProps extends FileDropzoneProps, FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -33,6 +34,8 @@ export function FileField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -46,6 +49,8 @@ export function FileField({
       id={id}
       label={label}
       error={error}
+      invalid={invalid}
+      describedBy={describedBy}
       hint={hint}
       hintPosition={hintPosition}
       info={info}

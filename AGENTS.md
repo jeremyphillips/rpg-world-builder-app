@@ -11,7 +11,7 @@ Work is **not done** until the pre-commit gate passes. The source of truth is
 Currently:
 
 ```text
-pnpm lint-staged → pnpm typecheck → pnpm test → fallow dupes --production --format human → fallow health --production --complexity --format human
+pnpm lint-staged → pnpm typecheck → pnpm coverage → fallow dupes --production --format human → fallow health --production --complexity --coverage --format human
 ```
 
 ## fallow (code health)
@@ -19,8 +19,8 @@ pnpm lint-staged → pnpm typecheck → pnpm test → fallow dupes --production 
 Use the `/fallow` skill for code-health work. Use judgement per finding: fix it
 in code, or — if a fix isn't worth it — propose an inline suppression or a
 `.fallowrc.json` tweak and **consult the user before ignoring**. Production
-complexity thresholds live in `.fallowrc.json` `health` (`maxCrap` is raised
-because CRAP is estimated without Istanbul coverage until we wire `--coverage`).
+complexity thresholds live in `.fallowrc.json` `health`; CRAP uses Istanbul
+coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`.
 
 ## Types
 

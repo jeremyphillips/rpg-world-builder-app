@@ -11,10 +11,11 @@ import type {
   RichTextLinkPickerInternalOption,
 } from './rich-text-link-picker.client'
 
-export interface RichTextFieldProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface RichTextFieldProps extends FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -41,6 +42,8 @@ export function RichTextField({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -57,7 +60,16 @@ export function RichTextField({
   onBlur,
 }: RichTextFieldProps) {
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <FieldLayout
         hintPosition={hintPosition}
         label={

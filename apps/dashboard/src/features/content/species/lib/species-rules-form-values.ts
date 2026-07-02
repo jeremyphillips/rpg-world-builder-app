@@ -1,6 +1,7 @@
 import type { RefinementCtx } from 'zod'
 import {
   defaultSpeciesMulticlassing,
+  defineMessage,
   speciesLevelLimitsSchema,
   speciesMulticlassingSchema,
   type Species,
@@ -10,6 +11,23 @@ import {
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
+
+/** Species character-creation validation messages (tier 3 form overrides). */
+export const speciesCharacterCreationValidationMessages = {
+  maxCharacterLevelRequired: defineMessage(
+    'validation.speciesCharacterCreation.maxCharacterLevelRequired',
+    () => 'Max character level is required when the limit is enabled',
+  ),
+  maxCharacterLevelExceedsCampaign: defineMessage<{ campaignMax: number }>(
+    'validation.speciesCharacterCreation.maxCharacterLevelExceedsCampaign',
+    ({ campaignMax }) => `Max character level cannot exceed the campaign cap (${campaignMax})`,
+  ),
+  classLevelCapExceedsCampaign: defineMessage<{ campaignMax: number }>(
+    'validation.speciesCharacterCreation.classLevelCapExceedsCampaign',
+    ({ campaignMax }) => `Class level cap cannot exceed the campaign cap (${campaignMax})`,
+    () => 'Cap exceeds campaign',
+  ),
+}
 
 export function mergeMulticlassingFormDefaults(
   multiclassing: SpeciesCharacterCreationForm['multiclassing'],
@@ -29,8 +47,7 @@ export function mergeLevelLimitsFormDefaults(
 ): NonNullable<SpeciesCharacterCreationForm['levelLimits']> {
   const defaults = defaultSpeciesCharacterCreationFormValues().levelLimits!
   return {
-    limitMaxCharacterLevel:
-      levelLimits?.limitMaxCharacterLevel ?? defaults.limitMaxCharacterLevel,
+    limitMaxCharacterLevel: levelLimits?.limitMaxCharacterLevel ?? defaults.limitMaxCharacterLevel,
     maxCharacterLevel: levelLimits?.maxCharacterLevel ?? defaults.maxCharacterLevel,
     enableClassLevelCaps: levelLimits?.enableClassLevelCaps ?? defaults.enableClassLevelCaps,
     classLevelCaps: levelLimits?.classLevelCaps ?? defaults.classLevelCaps,
@@ -127,13 +144,15 @@ export function refineSpeciesCharacterCreationForm(
     if (maxLevel === undefined) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: 'Max character level is required when the limit is enabled',
+        message: speciesCharacterCreationValidationMessages.maxCharacterLevelRequired(),
         path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
       })
     } else if (maxLevel > campaignMax) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: `Max character level cannot exceed the campaign cap (${campaignMax})`,
+        message: speciesCharacterCreationValidationMessages.maxCharacterLevelExceedsCampaign({
+          campaignMax,
+        }),
         path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
       })
     }
@@ -145,7 +164,9 @@ export function refineSpeciesCharacterCreationForm(
     if (cap.maxLevel > campaignMax) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: `Class level cap cannot exceed the campaign cap (${campaignMax})`,
+        message: speciesCharacterCreationValidationMessages.classLevelCapExceedsCampaign({
+          campaignMax,
+        }),
         path: ['characterCreation', 'levelLimits', 'classLevelCaps', index, 'maxLevel'],
       })
     }

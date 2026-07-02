@@ -28,26 +28,28 @@ export const arrayItemChromeButtonClasses =
   'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 /** Item shell — border, left/bottom inset; actions rail occupies the top-right with no inset. */
-export const arrayItemShellVariants = cva(
-  cn(
-    'relative grid grid-cols-[minmax(0,1fr)_auto] items-start',
-    'rounded-md border',
-    'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
-  ),
-  {
-    variants: {
-      tone: {
-        default: 'border-border',
-        subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
-        warning: fieldSurfaceToneVariants({ tone: 'warning' }),
-        error: fieldSurfaceToneVariants({ tone: 'error' }),
-      },
+export const arrayItemShellVariants = cva(cn('relative rounded-md border'), {
+  variants: {
+    layout: {
+      default: cn(
+        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
+        'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
+      ),
+      /** Compact inline row — single column; actions live inside the row grid. */
+      compactRow: 'p-2 pt-[calc(var(--spacing)*2)]',
     },
-    defaultVariants: {
-      tone: 'default',
+    tone: {
+      default: 'border-border',
+      subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
+      warning: fieldSurfaceToneVariants({ tone: 'warning' }),
+      error: fieldSurfaceToneVariants({ tone: 'error' }),
     },
   },
-)
+  defaultVariants: {
+    layout: 'default',
+    tone: 'default',
+  },
+})
 
 /** Default shell classes — backward-compatible alias for tests and non-context usage. */
 export const arrayItemShellClasses = arrayItemShellVariants({ tone: 'default' })
@@ -58,15 +60,16 @@ export const arrayItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
 /**
  * Trailing actions rail — top-right of the shell, independent of content height.
  *
- * TODO(array-item-issues): Add warning icon + "{N} issues" control before remove when the item
- * has nested field errors. Keep order `[status] [issue summary] [remove]`; reserve width via
- * the actions column so long counts do not overlap fields.
+ * When `embedded`, the rail sits inside the compact row grid's actions column.
  */
-export function arrayItemActionsRailClasses(options: { compact?: boolean } = {}): string {
+export function arrayItemActionsRailClasses(
+  options: { compact?: boolean; embedded?: boolean } = {},
+): string {
   return cn(
-    'flex shrink-0 items-center gap-1 self-start',
-    // Nudge from shell top-right: detailed +8px/+4px left; compact +4px/+4px left.
-    options.compact ? 'mt-1 mr-1' : 'mt-2 mr-1',
+    'flex shrink-0 items-center gap-1',
+    options.embedded
+      ? 'justify-self-end'
+      : cn('self-start', options.compact ? 'mt-1 mr-1' : 'mt-2 mr-1'),
   )
 }
 
@@ -134,6 +137,34 @@ export function arrayItemBodyClasses(options: ArrayItemLeadingChromeOptions): st
 
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
+
+/** Compact inline row — grip, fields, and actions share one grid row. */
+export const arrayItemCompactRowClasses = 'grid w-full min-w-0 items-start gap-x-2'
+
+/** Grip column in the compact row grid. */
+export const arrayItemCompactGripClasses = 'flex items-start justify-center'
+
+/** Per-field cell in the compact row grid. */
+export const arrayItemCompactFieldCellClasses = 'min-w-0'
+
+/**
+ * Actions column in the compact row grid — max-content width, never steals field space.
+ * Minimum width fits icon+count badge and remove control.
+ */
+export const arrayItemCompactActionsClasses =
+  'w-max min-w-[calc(var(--spacing)*14)] shrink-0 justify-self-end'
+
+/** Full-width row summary below the compact inline field row. */
+export const arrayItemCompactSummaryClasses = 'col-span-full min-w-0'
+
+/** Builds `grid-template-columns` for a compact inline row. */
+export function buildArrayItemCompactRowGridTemplate(
+  fieldCount: number,
+  showGrip: boolean,
+): string {
+  const grip = showGrip ? 'auto ' : ''
+  return `${grip}repeat(${fieldCount}, minmax(0, 1fr)) max-content`
+}
 
 /** Applied to the item wrapper while it is being dragged. */
 export const arrayItemDraggingClasses = 'opacity-50'

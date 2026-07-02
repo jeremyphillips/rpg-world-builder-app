@@ -5,6 +5,7 @@ import {
   CREATURE_SIZE_ENTRIES,
   creatureSizeSchema,
   creatureTypeSchema,
+  defineMessage,
   slugSchema,
   type CreatureTypeId,
 } from '@rpg/contracts'
@@ -34,6 +35,18 @@ const creatureSizeOptions = toOptions(
   >,
 )
 
+/** Species form validation messages (tier 3 form overrides). */
+export const speciesValidationMessages = {
+  creatureTypeNotAllowed: defineMessage(
+    'validation.species.creatureTypeNotAllowed',
+    () => 'Creature type is not allowed for character sheets in this campaign',
+  ),
+  creatureTypeUnavailable: defineMessage(
+    'validation.species.creatureTypeUnavailable',
+    () => 'Creature type is not available in this campaign vocabulary',
+  ),
+}
+
 export function createSpeciesFormSchema(
   allowedCreatureTypes: readonly CreatureTypeId[],
   activeCreatureTypes?: ReadonlySet<string>,
@@ -59,14 +72,14 @@ export function createSpeciesFormSchema(
       if (!allowedSet.has(values.creatureType)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Creature type is not allowed for character sheets in this campaign',
+          message: speciesValidationMessages.creatureTypeNotAllowed(),
           path: ['creatureType'],
         })
       }
       if (activeCreatureTypes && !activeCreatureTypes.has(values.creatureType)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Creature type is not available in this campaign vocabulary',
+          message: speciesValidationMessages.creatureTypeUnavailable(),
           path: ['creatureType'],
         })
       }

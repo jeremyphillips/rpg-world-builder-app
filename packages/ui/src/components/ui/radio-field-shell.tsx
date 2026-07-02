@@ -7,10 +7,11 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
-export interface BaseRadioFieldProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface BaseRadioFieldProps extends FieldValidationProps {
   id: string
   label: string
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -29,6 +30,8 @@ export function RadioFieldShell({
   id,
   label,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -41,7 +44,16 @@ export function RadioFieldShell({
   const labelId = `${id}-label`
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      size={size}
+      width={width}
+    >
       <FieldLayout
         hintPosition={hintPosition}
         label={

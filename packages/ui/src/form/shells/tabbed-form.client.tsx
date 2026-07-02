@@ -115,6 +115,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
+  const markSubmitAttempted = React.useCallback(() => {
+    setHasAttemptedSubmit(true)
+  }, [])
   const { form } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
   const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
@@ -140,6 +144,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       rhythm={rhythm}
       size={size}
       validationPresentation={validationPresentation}
+      hasAttemptedSubmit={hasAttemptedSubmit}
+      onMarkSubmitAttempted={markSubmitAttempted}
       onSubmit={onSubmit}
       className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >

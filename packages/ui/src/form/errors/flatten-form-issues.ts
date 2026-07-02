@@ -1,5 +1,7 @@
 import type { FieldError, FieldErrors } from 'react-hook-form'
 
+import { decodeStructuredMessage } from '@rpg/contracts'
+
 import type { FormIssue } from './form-issue.types'
 
 function isFieldError(value: unknown): value is FieldError & { message: string } {
@@ -33,9 +35,13 @@ function parseArrayItemContext(
 
 function walkFieldErrors(node: FieldErrors, pathPrefix: string, issues: FormIssue[]): void {
   if (isFieldError(node)) {
+    const decoded = decodeStructuredMessage(node.message)
     issues.push({
       path: pathPrefix,
-      message: node.message,
+      message: decoded?.field ?? node.message,
+      summaryMessage: decoded?.summary,
+      messageId: decoded?.messageId,
+      messageParams: decoded?.params,
       severity: 'field',
       ...parseArrayItemContext(pathPrefix),
     })

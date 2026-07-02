@@ -16,6 +16,7 @@ import {
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 import { ArrayItemIssueBadge } from './array-item-issue.client'
+import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 
 export interface ArrayItemRemoveButtonProps {
   ariaLabel: string
@@ -48,7 +49,10 @@ export interface ArrayItemActionsRailProps {
   issueCount?: number
   issueRowLabel?: string
   onIssuePress?: () => void
+  badgeProminence?: ArrayItemIssueProminence
   compact?: boolean
+  /** When true, rail is inside the compact row grid (no shell corner nudge). */
+  embedded?: boolean
   className?: string
 }
 
@@ -62,20 +66,23 @@ export function ArrayItemActionsRail({
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
+  badgeProminence = 'nav',
   compact = false,
+  embedded = false,
   className,
 }: ArrayItemActionsRailProps) {
   return (
     <div
       role="group"
       aria-label="Item actions"
-      className={cn(arrayItemActionsRailClasses({ compact }), className)}
+      className={cn(arrayItemActionsRailClasses({ compact, embedded }), className)}
     >
       <ArrayItemIssueBadge
         issueCount={issueCount}
         rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
         onPress={onIssuePress}
         compact={compact}
+        prominence={badgeProminence}
       />
       <ArrayItemRemoveButton
         ariaLabel={removeAriaLabel}
@@ -90,9 +97,10 @@ export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
   titleId: string
   itemPrefix?: string
   dragging?: boolean
+  layout?: 'default' | 'compactRow'
   className?: string
   main: React.ReactNode
-  actions: React.ReactNode
+  actions?: React.ReactNode
 }
 
 /** Grid shell for one array item — main content column + trailing actions rail. */
@@ -102,6 +110,7 @@ export function ArrayItemShell({
   showDragHandle,
   collapsible,
   dragging = false,
+  layout = 'default',
   className,
   main,
   actions,
@@ -120,14 +129,20 @@ export function ArrayItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
-        arrayItemShellVariants({ tone: arrayItemTone ?? 'default' }),
+        arrayItemShellVariants({ tone: arrayItemTone ?? 'default', layout }),
         dragging && arrayItemDraggingClasses,
         className,
       )}
       style={leadingChromeStyle}
     >
-      <div className={arrayItemMainClasses}>{main}</div>
-      {actions}
+      {layout === 'compactRow' ? (
+        main
+      ) : (
+        <>
+          <div className={arrayItemMainClasses}>{main}</div>
+          {actions}
+        </>
+      )}
     </div>
   )
 }

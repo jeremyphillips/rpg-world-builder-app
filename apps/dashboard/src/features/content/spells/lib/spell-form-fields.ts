@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   castingTimeUnitSchema,
   damageTypeIdSchema,
+  defineMessage,
   durationUnitSchema,
   effectConditionSchema,
   slugSchema,
@@ -36,6 +37,19 @@ import {
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
+
+/** Spell form validation messages (tier 3 form overrides). */
+export const spellValidationMessages = {
+  componentRequired: defineMessage(
+    'validation.spell.componentRequired',
+    () => 'At least one spell component (verbal, somatic, or material) is required',
+  ),
+  materialDescriptionRequired: defineMessage(
+    'validation.spell.materialDescriptionRequired',
+    () => 'Material description is required when Material is enabled',
+    () => 'Missing material description',
+  ),
+}
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -139,7 +153,7 @@ export const spellFormSchema = z
     if (!hasComponent) {
       ctx.addIssue({
         code: 'custom',
-        message: 'At least one spell component (verbal, somatic, or material) is required',
+        message: spellValidationMessages.componentRequired(),
         path: ['components'],
       })
     }
@@ -150,7 +164,7 @@ export const spellFormSchema = z
     ) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Material description is required when Material is enabled',
+        message: spellValidationMessages.materialDescriptionRequired(),
         path: ['components', 'material', 'description'],
       })
     }

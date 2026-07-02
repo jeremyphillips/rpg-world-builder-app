@@ -4,6 +4,7 @@ import { useController, type ControllerRenderProps } from 'react-hook-form'
 
 import { ChooseFromChipsField } from '../../components/ui/choose-from-chips-field.client'
 import type { ChooseFromChipsFieldConfig } from '../field-config'
+import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
 
 export interface ChooseFromChipsFieldRendererProps {
   config: ChooseFromChipsFieldConfig
@@ -23,7 +24,7 @@ export function ChooseFromChipsFieldRenderer({
 }: ChooseFromChipsFieldRendererProps) {
   const chooseFullName = namePrefix ? `${namePrefix}.${config.chooseName}` : config.chooseName
   const { field: chooseField, fieldState: chooseState } = useController({ name: chooseFullName })
-  const combinedError = chooseState.error?.message ?? error
+  const combinedError = resolveFirstFieldErrorMessage(chooseState.error?.message, error)
 
   const chipsValue = Array.isArray(field.value) ? field.value.map(String) : []
 

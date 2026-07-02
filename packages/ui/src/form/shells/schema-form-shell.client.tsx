@@ -34,6 +34,9 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
    */
   size?: FieldSize
   validationPresentation?: FormValidationPresentation
+  /** Shared submit-attempt flag for tabbed layouts; see `FormUiProvider`. */
+  hasAttemptedSubmit?: boolean
+  onMarkSubmitAttempted?: () => void
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   className?: string | undefined
   children: React.ReactNode
@@ -77,6 +80,8 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
   validationPresentation = 'progressive',
+  hasAttemptedSubmit,
+  onMarkSubmitAttempted,
   onSubmit,
   className,
   children,
@@ -94,6 +99,8 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
           uiStateKey={uiStateKey}
           fields={fields}
           validationPresentation={validationPresentation}
+          hasAttemptedSubmit={hasAttemptedSubmit}
+          onMarkSubmitAttempted={onMarkSubmitAttempted}
         >
           <SchemaFormElement
             form={form}

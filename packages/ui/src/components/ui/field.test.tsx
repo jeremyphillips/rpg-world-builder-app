@@ -5,7 +5,15 @@ import axe from 'axe-core'
 import { Field } from './field.client'
 import { Input } from './input.client'
 
-function renderField(props: { error?: string; hint?: string; required?: boolean } = {}) {
+function renderField(
+  props: {
+    error?: string
+    invalid?: boolean
+    describedBy?: string
+    hint?: string
+    required?: boolean
+  } = {},
+) {
   return render(
     <Field.Root id="name" {...props}>
       <Field.Label>Name</Field.Label>
@@ -38,6 +46,14 @@ describe('Field', () => {
     expect(input).toHaveAttribute('aria-describedby', 'name-error')
     expect(screen.getByRole('alert')).toHaveTextContent('Name is required.')
     expect(screen.queryByText('Your display name.')).not.toBeInTheDocument()
+  })
+
+  it('marks invalid without rendering error text when invalid is set alone', () => {
+    renderField({ invalid: true, describedBy: 'row-summary' })
+    const input = screen.getByLabelText('Name')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveAttribute('aria-describedby', 'row-summary')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('throws when a part is used outside Field.Root', () => {

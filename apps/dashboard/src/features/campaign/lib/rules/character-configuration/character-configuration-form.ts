@@ -9,6 +9,7 @@ import {
   buildRulesConfigLayoutFields,
   buildRulesFieldsForSurface,
   buildRulesSchemaForSurface,
+  characterConfigurationValidationMessages,
 } from './character-configuration-form-fields'
 
 const defaultCreatureTypeOptions = buildActiveCreatureTypeFieldOptions(
@@ -42,7 +43,7 @@ export function resolveRulesSchema(activeCreatureTypeIds?: ReadonlySet<string>) 
       if (!activeCreatureTypeIds.has(id)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Creature type is not available in this campaign vocabulary',
+          message: characterConfigurationValidationMessages.creatureTypeUnavailable(),
           path: ['allowedCharacterCreatureTypes'],
         })
       }

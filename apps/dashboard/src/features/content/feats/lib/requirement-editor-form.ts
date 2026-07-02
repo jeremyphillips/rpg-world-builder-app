@@ -2,6 +2,7 @@ import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   campaignLevelSchema,
+  defineMessage,
   formatRequirementExpression,
   MAX_CHARACTER_LEVEL,
 } from '@rpg/contracts'
@@ -15,6 +16,30 @@ import {
   isRequirementLeafForm,
   requirementEditorToPreviewExpression,
 } from './requirement-editor-form-values'
+
+/** Prerequisite editor validation messages (tier 3 form overrides). */
+export const requirementEditorValidationMessages = {
+  requirementRequired: defineMessage(
+    'validation.requirementEditor.requirementRequired',
+    () => 'Add at least one requirement',
+    () => 'Missing requirement',
+  ),
+  conditionTypeRequired: defineMessage(
+    'validation.requirementEditor.conditionTypeRequired',
+    () => 'Condition type is required',
+    () => 'Missing condition',
+  ),
+  minLevelRequired: defineMessage(
+    'validation.requirementEditor.minLevelRequired',
+    () => 'Minimum character level is required',
+    () => 'Missing level',
+  ),
+  abilityMinimumRange: defineMessage<{ min: number; max: number }>(
+    'validation.requirementEditor.abilityMinimumRange',
+    ({ min, max }) => `Minimum score must be between ${min} and ${max}`,
+    () => 'Invalid score',
+  ),
+}
 
 function addCustomIssue(ctx: RefinementCtx, path: (string | number)[], message: string): void {
   ctx.addIssue({ code: 'custom', message, path })
@@ -30,14 +55,22 @@ function validateLeaf(
   const path = ['prerequisiteEditor', 'groups', groupIndex, 'requirements', leafIndex]
 
   if (!isRequirementLeafForm(leaf)) {
-    addCustomIssue(ctx, [...path, 'type'], 'Condition type is required')
+    addCustomIssue(
+      ctx,
+      [...path, 'type'],
+      requirementEditorValidationMessages.conditionTypeRequired(),
+    )
     return
   }
 
   switch (leaf.type) {
     case 'minLevel':
       if (!campaignLevelSchema(maxLevel).safeParse(leaf.level).success) {
-        addCustomIssue(ctx, [...path, 'level'], 'Minimum character level is required')
+        addCustomIssue(
+          ctx,
+          [...path, 'level'],
+          requirementEditorValidationMessages.minLevelRequired(),
+        )
       }
       return
     case 'abilityMinimum':
@@ -45,7 +78,10 @@ function validateLeaf(
         addCustomIssue(
           ctx,
           [...path, 'minimum'],
-          `Minimum score must be between ${ABILITY_SCORE_MIN} and ${ABILITY_SCORE_MAX}`,
+          requirementEditorValidationMessages.abilityMinimumRange({
+            min: ABILITY_SCORE_MIN,
+            max: ABILITY_SCORE_MAX,
+          }),
         )
       }
       return
@@ -65,7 +101,7 @@ export function refineRequirementEditor(
       addCustomIssue(
         ctx,
         ['prerequisiteEditor', 'groups', groupIndex, 'requirements'],
-        'Add at least one requirement',
+        requirementEditorValidationMessages.requirementRequired(),
       )
     }
 

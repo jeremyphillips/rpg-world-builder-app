@@ -24,11 +24,12 @@ import {
 
 export type SelectFieldOption = FieldOption
 
-export interface SelectFieldProps {
+import type { FieldValidationProps } from './field-validation-props'
+
+export interface SelectFieldProps extends FieldValidationProps {
   id: string
   label: string
   options: SelectFieldOptionListItem[]
-  error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -85,6 +86,8 @@ export function SelectField({
   label,
   options,
   error,
+  invalid,
+  describedBy,
   hint,
   hintPosition,
   info,
@@ -130,6 +133,8 @@ export function SelectField({
         id={id}
         label={label}
         error={error}
+        invalid={invalid}
+        describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
         info={info}
@@ -144,7 +149,16 @@ export function SelectField({
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      required={required}
+      width={width}
+      size={size}
+    >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}

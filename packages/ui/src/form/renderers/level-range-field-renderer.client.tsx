@@ -15,6 +15,7 @@ import {
 } from '../../components/ui/level-range-field.client'
 import { applyArrayFilterSelectOptions, useArrayFieldContext } from '../context/array-field.context'
 import { useFormSectionContext } from '../context/form-section.context'
+import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { resolveInheritedFieldSize } from '../../components/ui/field.variants'
 import type { LevelRangeFieldConfig } from '../field-config'
 
@@ -107,7 +108,10 @@ export function LevelRangeFieldRenderer({ config, id, namePrefix }: LevelRangeFi
     [arrayContext, baseOptions, maxName],
   )
 
-  const combinedError = minState.error?.message ?? maxState.error?.message
+  const combinedError = resolveFirstFieldErrorMessage(
+    minState.error?.message,
+    maxState.error?.message,
+  )
 
   const cascadeArrayUpdate = useCallback(
     (field: 'min' | 'max', value: number) => {
