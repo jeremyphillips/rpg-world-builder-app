@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
 import { z } from 'zod'
 
-import { fieldStackDependentsChromeVariants } from '../../components/ui/field-stack.variants'
 import {
   fieldStackRhythmVariants,
   fieldToggleDependentIndentClasses,
@@ -21,11 +20,18 @@ const schema = z.object({
 type Values = z.infer<typeof schema>
 
 const toggleDependentStack = (
-  options: { dependentsChrome?: 'subtle' | 'error'; rhythm?: 'compact' | 'comfortable' } = {},
+  options: {
+    dependentsChrome?: 'subtle' | 'error'
+    dependentsChromeScope?: 'wrapper' | 'arrayItems'
+    rhythm?: 'compact' | 'comfortable'
+  } = {},
 ): FormItem => ({
   kind: 'stack',
   layout: 'toggleDependent',
   ...(options.dependentsChrome ? { dependentsChrome: options.dependentsChrome } : {}),
+  ...(options.dependentsChromeScope
+    ? { dependentsChromeScope: options.dependentsChromeScope }
+    : {}),
   ...(options.rhythm ? { rhythm: options.rhythm } : {}),
   fields: [
     {
@@ -81,10 +87,8 @@ function queryDependentsRegion(container: HTMLElement) {
 }
 
 function queryChromeShell(container: HTMLElement) {
-  const subtleBorderClass = fieldStackDependentsChromeVariants({ tone: 'subtle' })
-    .split(' ')
-    .find((token) => token.startsWith('border-') && !token.includes('/'))
-  return subtleBorderClass ? container.querySelector(`.${subtleBorderClass}`) : null
+  const region = queryDependentsRegion(container)
+  return region?.querySelector(':scope > .p-3') ?? null
 }
 
 describe('toggle-dependent stack', () => {
@@ -190,5 +194,58 @@ describe('toggle-dependent stack', () => {
 
     const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations).toEqual([])
+  })
+
+  it('applies arrayItems scope tone on array shells without wrapper chrome', async () => {
+    const user = userEvent.setup()
+    const arraySchema = z.object({
+      featureEnabled: z.boolean(),
+      items: z.array(z.object({ label: z.string() })),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'stack',
+        layout: 'toggleDependent',
+        dependentsChrome: 'subtle',
+        dependentsChromeScope: 'arrayItems',
+        fields: [
+          {
+            type: 'switch',
+            name: 'featureEnabled',
+            label: 'Enable feature',
+            defaultValue: false,
+          },
+          {
+            kind: 'array',
+            name: 'items',
+            legend: '',
+            addLabel: 'Add item',
+            fields: [{ type: 'text', name: 'label', label: 'Label' }],
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof arraySchema>>
+        schema={arraySchema}
+        fields={fields}
+        defaultValues={{ featureEnabled: true, items: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add item' }))
+
+    await waitFor(() => {
+      const region = queryDependentsRegion(container)
+      expect(region).toBeInTheDocument()
+      expect(queryChromeShell(container)).toBeNull()
+
+      const itemShell = screen.getByRole('group', { name: /Item 1/ })
+      expect(itemShell).toHaveClass('bg-muted/30')
+      expect(itemShell).toHaveClass('border-border')
+    })
   })
 })

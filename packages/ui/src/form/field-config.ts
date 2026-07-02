@@ -19,7 +19,10 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
+import type {
+  FieldStackDependentsChromeScope,
+  FieldStackDependentsTone,
+} from '../components/ui/field-stack.variants'
 import type {
   FieldRowLayout,
   FieldHintPosition,
@@ -544,6 +547,11 @@ export interface StackConfig {
   layout?: FieldStackLayout
   /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
   dependentsChrome?: FieldStackDependentsTone
+  /**
+   * Where `dependentsChrome` applies. Default `wrapper`. Use `arrayItems` when
+   * dependents include repeatable lists to avoid double borders on array shells.
+   */
+  dependentsChromeScope?: FieldStackDependentsChromeScope
   /**
    * Vertical gap between stack siblings. `compact` (default) — dense settings panels;
    * `comfortable` — matches `fieldGroupStackClasses` rhythm for multi-field blocks.

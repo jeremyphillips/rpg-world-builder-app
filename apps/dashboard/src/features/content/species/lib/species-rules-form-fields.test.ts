@@ -61,6 +61,8 @@ describe('speciesLevelLimitsFields', () => {
     expect(fields[1]).toMatchObject({
       kind: 'stack',
       layout: 'toggleDependent',
+      dependentsChrome: 'subtle',
+      dependentsChromeScope: 'arrayItems',
     })
     const stack = fields[1]
     if (stack.kind !== 'stack') throw new Error('expected toggleDependent stack')

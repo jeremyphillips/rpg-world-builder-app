@@ -64,26 +64,26 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
     {
       type: 'select',
       name: 'policy',
-      label: 'Multiclass policy',
+      label: 'Species multiclassing',
       labelPosition: 'settings',
       separator: 'subtle',
       options: speciesMulticlassPolicyOptions,
       required: true,
       width: 'full',
       defaultValue: DEFAULT_SPECIES_MULTICLASS_POLICY,
-      hint: 'How this species interacts with multiclassing when the campaign allows it.',
+      hint: 'Controls whether characters of this species can multiclass when the campaign allows multiclassing.',
     },
     {
       type: 'select',
       name: 'classPolicy.mode',
       labelPosition: 'settings',
       separator: 'subtle',
-      label: 'Class policy',
+      label: 'Class restrictions',
       width: 'full',
       options: speciesClassPolicyModeOptions,
       required: true,
       defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
-      hint: 'Which classes this species may multiclass into when policy is restricted.',
+      hint: 'Choose which classes this species may multiclass into.',
     },
     {
       type: 'combobox',
@@ -166,6 +166,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'stack',
       layout: 'toggleDependent',
       dependentsChrome: 'subtle',
+      dependentsChromeScope: 'arrayItems',
       fields: [
         {
           type: 'switch',

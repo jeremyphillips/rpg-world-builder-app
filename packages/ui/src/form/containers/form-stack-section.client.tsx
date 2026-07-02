@@ -14,6 +14,7 @@ import {
   FormSectionContext,
   buildFormSectionChildContext,
   useFormSectionContext,
+  type FormSectionContextValue,
 } from '../context/form-section.context'
 import {
   isContainer,
@@ -103,7 +104,9 @@ export function StackSection({
         <StackDependentsRegion
           toggleSwitch={toggleSwitch}
           dependentsChrome={item.dependentsChrome}
+          dependentsChromeScope={item.dependentsChromeScope}
           rhythm={rhythm}
+          parentContext={childContext}
           dependents={dependents}
           idPrefix={idPrefix}
           namePrefix={namePrefix}
@@ -118,7 +121,9 @@ export function StackSection({
 interface StackDependentsRegionProps {
   toggleSwitch: SwitchFieldConfig | null
   dependentsChrome?: StackConfig['dependentsChrome']
+  dependentsChromeScope?: StackConfig['dependentsChromeScope']
   rhythm: FieldStackRhythm
+  parentContext: FormSectionContextValue
   dependents: GroupFieldItem[]
   idPrefix: string
   namePrefix?: string
@@ -130,7 +135,9 @@ interface StackDependentsRegionProps {
 function StackDependentsRegion({
   toggleSwitch,
   dependentsChrome,
+  dependentsChromeScope = 'wrapper',
   rhythm,
+  parentContext,
   dependents,
   idPrefix,
   namePrefix,
@@ -147,6 +154,17 @@ function StackDependentsRegion({
     disabled: !toggleSwitch,
   })
 
+  const useArrayItemScope = Boolean(
+    dependentsChrome && dependentsChromeScope === 'arrayItems',
+  )
+  const arrayItemContext = React.useMemo(
+    () =>
+      useArrayItemScope && dependentsChrome
+        ? { ...parentContext, arrayItemTone: dependentsChrome }
+        : null,
+    [useArrayItemScope, parentContext, dependentsChrome],
+  )
+
   if (dependents.length === 0) return null
   if (toggleSwitch && !switchOn) return null
 
@@ -157,9 +175,13 @@ function StackDependentsRegion({
     depth: depth + 1,
   })
 
+  const rhythmWrapper = (content: React.ReactNode) => (
+    <div className={fieldStackRhythmVariants({ rhythm })}>{content}</div>
+  )
+
   return (
     <div className={fieldToggleDependentIndentClasses} data-field-stack-dependents="">
-      {dependentsChrome ? (
+      {dependentsChrome && dependentsChromeScope === 'wrapper' ? (
         <div
           className={cn(
             fieldStackRhythmVariants({ rhythm }),
@@ -168,8 +190,12 @@ function StackDependentsRegion({
         >
           {dependentsContent}
         </div>
+      ) : useArrayItemScope && arrayItemContext ? (
+        <FormSectionContext.Provider value={arrayItemContext}>
+          {rhythmWrapper(dependentsContent)}
+        </FormSectionContext.Provider>
       ) : (
-        <div className={fieldStackRhythmVariants({ rhythm })}>{dependentsContent}</div>
+        rhythmWrapper(dependentsContent)
       )}
     </div>
   )

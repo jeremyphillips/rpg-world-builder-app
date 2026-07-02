@@ -117,6 +117,7 @@ describe('ArrayFieldRenderer', () => {
         kind: 'stack',
         layout: 'toggleDependent',
         dependentsChrome: 'subtle',
+        dependentsChromeScope: 'arrayItems',
         fields: [
           {
             type: 'switch',
@@ -152,7 +153,15 @@ describe('ArrayFieldRenderer', () => {
     expect(fieldset?.querySelector('legend')).toBeNull()
 
     await user.click(addButton)
-    expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument(),
+    )
+
+    const itemShell = screen.getByRole('group', { name: /Item 1/ })
+    expect(itemShell).toHaveClass('bg-muted/30')
+    const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
+    expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
+    expect(dependentsRegion?.querySelector('.bg-muted\\/30')).toBe(itemShell)
   })
 
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {

@@ -48,6 +48,10 @@ switch gates dependents:
 - Dependents indent (`pl-11`) to align with switch label column.
 - Dependents hidden when switch off — no empty inset.
 - Optional `dependentsChrome`: `subtle` | `warning` | `error`.
+- Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
+  - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
+  - `arrayItems` — tone on array item shells only; avoids double borders when dependents include arrays.
+  - Mixed dependents: only array item shells receive tone; scalars render without wash.
 - `rhythm`: `compact` (default) or `comfortable` for multi-field blocks.
 
 Pair dependent scalars with `labelPosition: 'settings'`.
@@ -65,6 +69,27 @@ Pair dependent scalars with `labelPosition: 'settings'`.
       label: 'Minimum ability score',
       labelPosition: 'settings',
       visibility: visibleWhenEnabled(),
+    },
+  ],
+}
+```
+
+Toggle-dependent stack with an array dependent — use `arrayItems` scope:
+
+```ts
+{
+  kind: 'stack',
+  layout: 'toggleDependent',
+  dependentsChrome: 'subtle',
+  dependentsChromeScope: 'arrayItems',
+  fields: [
+    { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
+    {
+      kind: 'array',
+      name: 'caps',
+      legend: '',
+      addLabel: 'Add class limit',
+      fields: [/* … */],
     },
   ],
 }

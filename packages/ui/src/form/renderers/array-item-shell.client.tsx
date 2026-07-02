@@ -6,11 +6,12 @@ import { Trash2 } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { resolveArrayItemLeadingChrome } from '../config/array-item-leading-chrome.lib'
+import { useFormSectionContext } from '../context/form-section.context'
 import {
   arrayItemActionsRailClasses,
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
-  arrayItemShellClasses,
+  arrayItemShellVariants,
   arrayItemDraggingClasses,
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
@@ -93,6 +94,7 @@ export function ArrayItemShell({
   main,
   actions,
 }: ArrayItemShellProps) {
+  const { arrayItemTone } = useFormSectionContext()
   const leadingChromeStyle = {
     '--array-item-chrome-count': resolveArrayItemLeadingChrome({
       showDragHandle,
@@ -104,7 +106,11 @@ export function ArrayItemShell({
     <div
       role="group"
       aria-labelledby={titleId}
-      className={cn(arrayItemShellClasses, dragging && arrayItemDraggingClasses, className)}
+      className={cn(
+        arrayItemShellVariants({ tone: arrayItemTone ?? 'default' }),
+        dragging && arrayItemDraggingClasses,
+        className,
+      )}
       style={leadingChromeStyle}
     >
       <div className={arrayItemMainClasses}>{main}</div>

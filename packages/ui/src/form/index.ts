@@ -121,4 +121,7 @@ export type {
   FieldStackLayout,
   FieldStackRhythm,
 } from '../components/ui/field.variants'
-export type { FieldStackDependentsTone } from '../components/ui/field-stack.variants'
+export type {
+  FieldStackDependentsChromeScope,
+  FieldStackDependentsTone,
+} from '../components/ui/field-stack.variants'

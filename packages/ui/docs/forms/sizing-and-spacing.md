@@ -5,6 +5,7 @@ rules (array/slot defaults, form-level rhythm) live in the
 [forms hub](../forms.md#form-rhythm).
 
 Source of truth: [`field.variants.ts`](../../src/components/ui/field.variants.ts),
+[`field-stack.variants.ts`](../../src/components/ui/field-stack.variants.ts),
 [`field-sizing.variants.ts`](../../src/components/ui/field-sizing.variants.ts),
 [`field-digit-metrics.ts`](../../src/components/ui/field-digit-metrics.ts).
 
@@ -35,6 +36,8 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 | `fieldArrayItemClasses`           | `p-4 border`                | Chrome around one array item                                                     |
 | `fieldArrayItemActionsClasses`    | `mt-3`                      | Above array item move/remove controls                                            |
 | `fieldSetResetClasses`            | `m-0 border-0 p-0`          | Strip UA fieldset chrome                                                         |
+| `fieldSurfaceToneVariants`        | border + bg wash            | Shared tone for stack dependents wrapper and array item shells (`subtle` \| `warning` \| `error`) |
+| `fieldStackDependentsChromeVariants` | `rounded-md border p-3` + tone | Wrapper chrome for toggle-dependent stack dependents (`dependentsChromeScope: 'wrapper'`) |
 
 ## Sizing maps
 

@@ -161,3 +161,57 @@ export const ToggleDependentStackErrorTone: Story = {
     className: 'max-w-lg',
   },
 }
+
+const arrayItemsScopeSchema = z.object({
+  classLimitsEnabled: z.boolean(),
+  caps: z.array(z.object({ classId: z.string(), maxLevel: z.string() })),
+})
+
+/** Toggle-dependent stack with array dependents — tone on item shells, not wrapper. */
+export const ToggleDependentStackArrayItemsScope: Story = {
+  args: {
+    schema: stackSchema,
+    fields: toggleDependentStackFields,
+    defaultValues: { advancedEnabled: true },
+    onSubmit: action('submit'),
+    className: 'max-w-lg',
+  },
+  render: () => (
+    <Form<z.infer<typeof arrayItemsScopeSchema>>
+      schema={arrayItemsScopeSchema}
+      fields={[
+        {
+          kind: 'stack',
+          layout: 'toggleDependent',
+          dependentsChrome: 'subtle',
+          dependentsChromeScope: 'arrayItems',
+          fields: [
+            {
+              type: 'switch',
+              name: 'classLimitsEnabled',
+              label: 'Class-specific limits',
+              hint: 'Limit progression per class.',
+              defaultValue: true,
+            },
+            {
+              kind: 'array',
+              name: 'caps',
+              legend: '',
+              addLabel: 'Add class limit',
+              fields: [
+                { type: 'text', name: 'classId', label: 'Class' },
+                { type: 'text', name: 'maxLevel', label: 'Max level' },
+              ],
+            },
+          ],
+        },
+      ]}
+      defaultValues={{
+        classLimitsEnabled: true,
+        caps: [{ classId: 'Fighter', maxLevel: '10' }],
+      }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}

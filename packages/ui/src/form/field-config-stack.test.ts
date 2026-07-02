@@ -12,6 +12,7 @@ describe('StackConfig helpers', () => {
     kind: 'stack',
     layout: 'toggleDependent',
     dependentsChrome: 'subtle',
+    dependentsChromeScope: 'arrayItems',
     fields: [
       { type: 'switch', name: 'enabled', label: 'Enabled', defaultValue: false },
       {

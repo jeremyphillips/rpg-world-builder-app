@@ -7,9 +7,11 @@ import {
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
   arrayItemShellClasses,
+  arrayItemShellVariants,
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
 } from './array-item-toolbar.variants'
+import { fieldSurfaceToneVariants } from '../../components/ui/field-stack.variants'
 
 describe('array item shell variants', () => {
   it('uses a two-column grid with top-aligned actions and no right inset', () => {
@@ -71,5 +73,12 @@ describe('array item shell variants', () => {
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain(
       '--array-item-chrome-count',
     )
+  })
+
+  it('applies shared surface tone classes when tone is set', () => {
+    expect(arrayItemShellVariants({ tone: 'default' })).not.toContain('bg-muted/30')
+    const classes = arrayItemShellVariants({ tone: 'subtle' })
+    expect(classes).toContain(fieldSurfaceToneVariants({ tone: 'subtle' }))
+    expect(classes).toContain('bg-muted/30')
   })
 })

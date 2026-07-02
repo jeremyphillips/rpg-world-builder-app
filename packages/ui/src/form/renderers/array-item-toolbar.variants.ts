@@ -1,4 +1,7 @@
+import { cva } from 'class-variance-authority'
+
 import { cn } from '../../lib/utils'
+import { fieldSurfaceToneVariants } from '../../components/ui/field-stack.variants'
 import {
   resolveArrayItemLeadingChrome,
   type ArrayItemLeadingChromeOptions,
@@ -25,11 +28,29 @@ export const arrayItemChromeButtonClasses =
   'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 /** Item shell — border, left/bottom inset; actions rail occupies the top-right with no inset. */
-export const arrayItemShellClasses = cn(
-  'relative grid grid-cols-[minmax(0,1fr)_auto] items-start',
-  'rounded-md border border-border',
-  'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
+export const arrayItemShellVariants = cva(
+  cn(
+    'relative grid grid-cols-[minmax(0,1fr)_auto] items-start',
+    'rounded-md border',
+    'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
+  ),
+  {
+    variants: {
+      tone: {
+        default: 'border-border',
+        subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
+        warning: fieldSurfaceToneVariants({ tone: 'warning' }),
+        error: fieldSurfaceToneVariants({ tone: 'error' }),
+      },
+    },
+    defaultVariants: {
+      tone: 'default',
+    },
+  },
 )
+
+/** Default shell classes — backward-compatible alias for tests and non-context usage. */
+export const arrayItemShellClasses = arrayItemShellVariants({ tone: 'default' })
 
 /** Main content column — top inset matches shell vertical rhythm. */
 export const arrayItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
