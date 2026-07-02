@@ -19,7 +19,7 @@ import { equipmentGrantSchema } from './equipment-grant'
 // Player choices (e.g. "choose two skills") stay in rich-text descriptions.
 // ---------------------------------------------------------------------------
 
-// --- Innate spellcasting ----------------------------------------------------
+// --- Innate spellcasting (legacy bag model — kept for catalog backward compat) ----
 
 export const INNATE_SPELL_KINDS = ['free_cast', 'always_prepared'] as const
 
@@ -33,6 +33,8 @@ export type InnateSpellKind = z.infer<typeof innateSpellKindSchema>
  *
  * - `free_cast` — slotless casting cadence via `frequency` (species lineage pattern).
  * - `always_prepared` — always on the prepared list; cast with normal slots when used.
+ *
+ * @deprecated Superseded by the `spells` atomic grant in `contentGrantSchema`.
  */
 const innateSpellEntryBaseSchema = z.object({
   level: absoluteLevelSchema,
@@ -127,11 +129,14 @@ export const featChoiceGrantSchema = z
 
 export type FeatChoiceGrant = z.infer<typeof featChoiceGrantSchema>
 
-// --- Grants -----------------------------------------------------------------
+// --- Grants bag (legacy — kept for catalog backward compat) -----------------
 
 /**
  * Structured, character-builder-facing payload. Every field is optional; purely
  * flavorful content omits `grants` and carries only rich-text description.
+ *
+ * @deprecated Superseded by the `grantGroups` model. Catalog seeds still use this
+ *   shape and will be migrated to `grantGroups` in a subsequent phase.
  */
 export const contentGrantsSchema = z.object({
   senses: z.array(senseSchema).optional(),
@@ -161,8 +166,11 @@ function definedGrantKeys(grants: ContentGrants): (keyof ContentGrants)[] {
 }
 
 /**
- * Phase-1 eligibility: grants fully described by a single atomic template
+ * Legacy eligibility check for the `grant` trait kind using the bag model.
+ * Grants are eligible when fully described by a single atomic template
  * (one sense, one resistance, walk speed override, or one language).
+ *
+ * @deprecated Use {@link isGrantGroupsEligible} for the `grantGroups` model.
  */
 export function isGrantEligibleGrants(grants: ContentGrants): boolean {
   const keys = definedGrantKeys(grants)
@@ -188,6 +196,331 @@ export function isGrantEligibleGrants(grants: ContentGrants): boolean {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Atomic content grants — discriminated union model
+//
+// Each variant is level-less: the timing lives in the enclosing `GrantGroup.unlock`.
+// The `kind` field discriminates the union. Unlock kind (class level vs. character
+// level) is implicit from the container — class/subclass features use class level;
+// species traits use character level.
+// ---------------------------------------------------------------------------
+
+/** A single special sense granted by a trait or feature. */
+const senseContentGrantSchema = senseSchema.extend({ kind: z.literal('sense') })
+
+/** Damage resistance grant. */
+const resistancesContentGrantSchema = z.object({
+  kind: z.literal('resistances'),
+  damageTypes: z.array(damageTypeIdSchema).min(1),
+})
+
+/** Chosen damage type(s) — e.g. a Dragonborn's breath or a Goliath's ancestry. */
+const damageTypeContentGrantSchema = z.object({
+  kind: z.literal('damageType'),
+  damageTypes: z.array(damageTypeIdSchema).min(1),
+})
+
+/** Partial speed override — sets or replaces walk speed and/or additional modes. */
+const speedOverrideContentGrantSchema = speedSchema.partial().extend({
+  kind: z.literal('speedOverride'),
+})
+
+/** Proficiency grant — skills, tools, weapons, and/or armor. */
+const proficienciesContentGrantSchema = contentProficienciesSchema.extend({
+  kind: z.literal('proficiencies'),
+})
+
+/** Fixed language grant. */
+const languagesContentGrantSchema = z.object({
+  kind: z.literal('languages'),
+  languageIds: z.array(languageIdSchema).min(1),
+})
+
+/** Language choice from a constrained pool. */
+const languageChoiceContentGrantSchema = z
+  .object({
+    kind: z.literal('languageChoice'),
+    choose: z.number().int().min(1).default(1),
+    from: z.array(languageIdSchema).min(1).optional(),
+    categories: z.array(languageCategorySchema).min(1).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.from === undefined && val.categories === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'language choices require a fixed language list or language categories',
+        path: ['from'],
+      })
+    }
+  })
+
+/** Feat pick from a filtered pool. */
+const featChoiceContentGrantSchema = z
+  .object({
+    kind: z.literal('featChoice'),
+    category: featCategorySchema,
+    choose: z.number().int().min(1).default(1),
+    allowAnyQualifying: z.boolean().optional(),
+    replaceable: z.boolean().optional(),
+    recommendedFeatIds: z.array(z.string().min(1)).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'allowAnyQualifying is only allowed when category is epic-boon or general',
+        path: ['allowAnyQualifying'],
+      })
+    }
+  })
+
+/** Single equipment grant (a fixed item or a pool choice). */
+const equipmentContentGrantSchema = z.object({
+  kind: z.literal('equipment'),
+  grant: equipmentGrantSchema,
+})
+
+/**
+ * Spells granted by a trait or feature at a given unlock level.
+ * Replaces the legacy `innateSpells` bag entry in the atomic model.
+ *
+ * - `free_cast` — slotless casting via `frequency` (species lineage pattern).
+ * - `always_prepared` — always on the prepared list; cast with normal slots.
+ */
+const spellsContentGrantSchema = z
+  .object({
+    kind: z.literal('spells'),
+    ability: abilitySchema,
+    mode: z.enum(INNATE_SPELL_KINDS),
+    frequency: usageFrequencySchema.optional(),
+    spellIds: z.array(z.string().min(1)).min(1),
+  })
+  .superRefine((val, ctx) => {
+    if (val.mode === 'always_prepared' && val.frequency !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'frequency is not allowed when mode is always_prepared',
+        path: ['frequency'],
+      })
+    }
+  })
+
+/**
+ * Atomic, level-less content grant discriminated by `kind`.
+ * Place grants inside `GrantGroup.grants`; the group's `unlock` carries timing.
+ */
+export const contentGrantSchema = z.discriminatedUnion('kind', [
+  senseContentGrantSchema,
+  resistancesContentGrantSchema,
+  damageTypeContentGrantSchema,
+  speedOverrideContentGrantSchema,
+  proficienciesContentGrantSchema,
+  languagesContentGrantSchema,
+  languageChoiceContentGrantSchema,
+  featChoiceContentGrantSchema,
+  equipmentContentGrantSchema,
+  spellsContentGrantSchema,
+])
+
+export type ContentGrant = z.infer<typeof contentGrantSchema>
+
+// ---------------------------------------------------------------------------
+// Grant groups — `{ unlock?, grants: ContentGrant[] }` wrappers
+//
+// The wrapper owns *when* grants are received; atomic grants own *what* and
+// remain level-less. Unlock kind is implicit from container (see `contentGrantSchema`).
+// ---------------------------------------------------------------------------
+
+/**
+ * When a set of grants unlocks. The `level` is in class levels for class/subclass
+ * features and in character levels for species traits.
+ *
+ * Kept as an object (not a bare number) to allow future conditional unlock types.
+ */
+export const grantUnlockSchema = z.object({ level: absoluteLevelSchema })
+
+export type GrantUnlock = z.infer<typeof grantUnlockSchema>
+
+/**
+ * A set of grants that unlock at the same time.
+ * A group without `unlock` is the *default group* — granted when the trait/feature
+ * is first gained: the feature level for class/subclass features; level 1 / when
+ * the trait is gained for species traits.
+ */
+export const grantGroupSchema = z.object({
+  unlock: grantUnlockSchema.optional(),
+  grants: z.array(contentGrantSchema).min(1),
+})
+
+export type GrantGroup = z.infer<typeof grantGroupSchema>
+
+/**
+ * Canonical grant groups array. The stored shape must satisfy:
+ * - At most one default group (no `unlock`).
+ * - Unique unlock levels.
+ * - Default group is the first element (if present), followed by ascending levels.
+ *
+ * Use {@link normalizeGrantGroups} to produce a canonical array before storing.
+ */
+export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, ctx) => {
+  const defaultIndexes = groups.reduce<number[]>((acc, g, i) => {
+    if (g.unlock === undefined) acc.push(i)
+    return acc
+  }, [])
+
+  if (defaultIndexes.length > 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'at most one default grant group (no unlock) is allowed',
+    })
+    return
+  }
+
+  if (defaultIndexes.length === 1 && defaultIndexes[0] !== 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'default grant group must be the first element',
+    })
+    return
+  }
+
+  const levelGroups = groups.filter((g) => g.unlock !== undefined)
+  const levels = levelGroups.map((g) => g.unlock!.level)
+
+  if (new Set(levels).size !== levels.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'grant group unlock levels must be unique',
+    })
+    return
+  }
+
+  for (let i = 1; i < levelGroups.length; i++) {
+    if (levelGroups[i]!.unlock!.level <= levelGroups[i - 1]!.unlock!.level) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'grant groups must be sorted in ascending unlock level order',
+      })
+      return
+    }
+  }
+})
+
+export type GrantGroups = z.infer<typeof grantGroupsSchema>
+
+// ---------------------------------------------------------------------------
+// Grant group helpers — single canonical iteration surface.
+// Consumers never hand-roll group traversal; use these helpers.
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalises a grant groups array into the canonical stored shape:
+ * - Strips groups with empty `grants` arrays (transient form state).
+ * - Drops `unlock` when its level equals `parentUnlock.level` (e.g. the feature
+ *   level for a class feature, or level 1 for a species trait), promoting those
+ *   grants to the default group.
+ * - Merges groups that share the same unlock level.
+ * - Sorts: default group first, then ascending level.
+ */
+export function normalizeGrantGroups(
+  groups: GrantGroup[],
+  parentUnlock?: GrantUnlock,
+): GrantGroup[] {
+  const nonEmpty = groups.filter((g) => g.grants.length > 0)
+
+  const normalized = nonEmpty.map((g): GrantGroup => {
+    if (
+      g.unlock !== undefined &&
+      parentUnlock !== undefined &&
+      g.unlock.level === parentUnlock.level
+    ) {
+      return { grants: g.grants }
+    }
+    return g
+  })
+
+  const byKey = new Map<'__default__' | number, ContentGrant[]>()
+  for (const g of normalized) {
+    const key: '__default__' | number = g.unlock?.level ?? '__default__'
+    const existing = byKey.get(key) ?? []
+    byKey.set(key, [...existing, ...g.grants])
+  }
+
+  const result: GrantGroup[] = []
+
+  const defaultGrants = byKey.get('__default__')
+  if (defaultGrants) {
+    result.push({ grants: defaultGrants })
+  }
+
+  const levelEntries = (
+    Array.from(byKey.entries()) as Array<['__default__' | number, ContentGrant[]]>
+  )
+    .filter((entry): entry is [number, ContentGrant[]] => typeof entry[0] === 'number')
+    .sort(([a], [b]) => a - b)
+
+  for (const [level, grants] of levelEntries) {
+    result.push({ unlock: { level }, grants })
+  }
+
+  return result
+}
+
+/**
+ * Flattens grant groups into a flat list of `{ grant, unlock? }` pairs.
+ * Default-group grants produce entries with `unlock: undefined`.
+ */
+export function flattenGrantGroups(
+  groups: GrantGroup[],
+): Array<{ grant: ContentGrant; unlock?: GrantUnlock }> {
+  return groups.flatMap((group) => group.grants.map((grant) => ({ grant, unlock: group.unlock })))
+}
+
+/**
+ * Returns the effective unlock for a group: the group's own `unlock`, falling
+ * back to `parentUnlock` for the default group (no `unlock`).
+ */
+export function getGrantGroupEffectiveUnlock(
+  group: GrantGroup,
+  parentUnlock?: GrantUnlock,
+): GrantUnlock | undefined {
+  return group.unlock ?? parentUnlock
+}
+
+/**
+ * Returns all grants unlocked at or before `level`.
+ * Default groups use `parentLevel` as their effective level
+ * (feature level for class features; `1` for species traits).
+ */
+export function getUnlockedGrantsAtLevel(
+  groups: GrantGroup[],
+  level: number,
+  parentLevel = 1,
+): ContentGrant[] {
+  return groups
+    .filter((group) => {
+      const effectiveLevel = group.unlock?.level ?? parentLevel
+      return effectiveLevel <= level
+    })
+    .flatMap((group) => group.grants)
+}
+
+/**
+ * Returns true when `grantGroups` is eligible for the `grant` trait kind in the
+ * atomic model: exactly one default group (no `unlock`) containing exactly one
+ * sense, resistances, speedOverride, or languages grant.
+ */
+export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
+  if (groups.length !== 1) return false
+  const [group] = groups
+  if (group!.unlock !== undefined) return false
+  if (group!.grants.length !== 1) return false
+  const kind = group!.grants[0]!.kind
+  return (
+    kind === 'sense' || kind === 'resistances' || kind === 'speedOverride' || kind === 'languages'
+  )
+}
+
 // --- Trait building block ---------------------------------------------------
 
 export const CONTENT_TRAIT_KINDS = ['custom', 'grant'] as const
@@ -199,6 +532,10 @@ export type ContentTraitKind = z.infer<typeof contentTraitKindSchema>
 /**
  * Named trait or feature: SRD prose plus optional structured grants (hybrids).
  * Class/subclass features always use this variant.
+ *
+ * Supports both the legacy `grants` bag and the new atomic `grantGroups` model.
+ * New authoring uses `grantGroups`; the `grants` bag is preserved for catalog
+ * backward compatibility until seeds are migrated.
  */
 export const customContentTraitSchema = z.object({
   kind: z.literal('custom'),
@@ -206,7 +543,10 @@ export const customContentTraitSchema = z.object({
   name: z.string().min(1),
   /** Rich-text HTML faithful to the SRD wording (body only — no "Level N:" prefix). */
   description: z.string().optional(),
+  /** @deprecated Use `grantGroups` for new authoring. */
   grants: contentGrantsSchema.optional(),
+  /** Atomic grant groups — one group per unlock level. Replaces the `grants` bag. */
+  grantGroups: grantGroupsSchema.optional(),
 })
 
 export type CustomContentTrait = z.infer<typeof customContentTraitSchema>
@@ -214,12 +554,21 @@ export type CustomContentTrait = z.infer<typeof customContentTraitSchema>
 /**
  * Mechanics-only trait: display name and description are derived from `grants`
  * unless overridden. `grants` must pass {@link isGrantEligibleGrants}.
+ *
+ * When `grantGroups` is provided instead of `grants`, eligibility is checked via
+ * {@link isGrantGroupsEligible} (exactly one default group with one atomic grant).
  */
 export const grantContentTraitSchema = z
   .object({
     kind: z.literal('grant'),
     id: z.string().min(1),
+    /**
+     * Legacy bag model grants. Required when `grantGroups` is not provided.
+     * @deprecated Use `grantGroups` for new authoring.
+     */
     grants: contentGrantsSchema,
+    /** Atomic grant groups (new model). When present, describes the grants in the canonical shape. */
+    grantGroups: grantGroupsSchema.optional(),
     nameOverride: z.string().min(1).optional(),
     descriptionOverride: z.string().optional(),
   })

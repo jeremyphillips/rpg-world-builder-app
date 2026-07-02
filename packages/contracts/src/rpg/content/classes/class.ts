@@ -12,6 +12,7 @@ import {
   slugSchema,
 } from '../lib/envelope'
 import { customContentTraitSchema, normalizeContentTrait } from '../lib/grants'
+import type { GrantGroup } from '../lib/grants'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
 import { skillSchema } from '../skill-proficiency'
 
@@ -28,8 +29,16 @@ import { spellcastingSchema } from './spellcasting'
 
 export const classFeatureSchema = z.preprocess(
   normalizeContentTrait,
-  customContentTraitSchema.extend({
-    level: absoluteLevelSchema,
+  customContentTraitSchema.extend({ level: absoluteLevelSchema }).superRefine((feature, ctx) => {
+    for (const group of (feature.grantGroups ?? []) as GrantGroup[]) {
+      if (group.unlock !== undefined && group.unlock.level <= feature.level) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Grant group unlock level (${group.unlock.level}) must be greater than the feature level (${feature.level})`,
+          path: ['grantGroups'],
+        })
+      }
+    }
   }),
 )
 

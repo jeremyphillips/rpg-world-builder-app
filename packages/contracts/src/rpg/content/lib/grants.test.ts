@@ -1,15 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  contentGrantSchema,
   contentGrantsSchema,
   contentTraitSchema,
   customContentTraitSchema,
   featChoiceGrantSchema,
+  flattenGrantGroups,
+  getGrantGroupEffectiveUnlock,
+  getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
+  grantGroupsSchema,
   innateSpellEntrySchema,
   isGrantEligibleGrants,
+  isGrantGroupsEligible,
   languageChoiceGrantSchema,
   normalizeContentTrait,
+  normalizeGrantGroups,
 } from './grants'
 import { resolveTraitDisplay } from './trait-display'
 
@@ -353,5 +360,452 @@ describe('resolveTraitDisplay', () => {
     )
     expect(display.name).toBe('Superior Darkvision')
     expect(display.descriptionHtml).toBe('<p>Custom homebrew wording.</p>')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Atomic contentGrantSchema
+// ---------------------------------------------------------------------------
+
+describe('contentGrantSchema — sense', () => {
+  it('parses a sense grant', () => {
+    expect(contentGrantSchema.parse({ kind: 'sense', type: 'darkvision', range: 60 })).toEqual({
+      kind: 'sense',
+      type: 'darkvision',
+      range: 60,
+    })
+  })
+})
+
+describe('contentGrantSchema — resistances', () => {
+  it('parses a resistances grant', () => {
+    expect(contentGrantSchema.parse({ kind: 'resistances', damageTypes: ['fire'] })).toEqual({
+      kind: 'resistances',
+      damageTypes: ['fire'],
+    })
+  })
+  it('rejects empty damageTypes', () => {
+    expect(contentGrantSchema.safeParse({ kind: 'resistances', damageTypes: [] }).success).toBe(
+      false,
+    )
+  })
+})
+
+describe('contentGrantSchema — damageType', () => {
+  it('parses a damageType grant', () => {
+    expect(contentGrantSchema.parse({ kind: 'damageType', damageTypes: ['fire', 'acid'] })).toEqual(
+      { kind: 'damageType', damageTypes: ['fire', 'acid'] },
+    )
+  })
+})
+
+describe('contentGrantSchema — speedOverride', () => {
+  it('parses a walk speed override', () => {
+    expect(contentGrantSchema.parse({ kind: 'speedOverride', walk: 35 })).toEqual({
+      kind: 'speedOverride',
+      walk: 35,
+    })
+  })
+})
+
+describe('contentGrantSchema — proficiencies', () => {
+  it('parses a proficiencies grant', () => {
+    expect(
+      contentGrantSchema.parse({ kind: 'proficiencies', skills: ['athletics', 'stealth'] }),
+    ).toEqual({ kind: 'proficiencies', skills: ['athletics', 'stealth'] })
+  })
+})
+
+describe('contentGrantSchema — languages', () => {
+  it('parses a languages grant', () => {
+    expect(
+      contentGrantSchema.parse({ kind: 'languages', languageIds: ['common', 'elvish'] }),
+    ).toEqual({ kind: 'languages', languageIds: ['common', 'elvish'] })
+  })
+  it('rejects empty languageIds', () => {
+    expect(contentGrantSchema.safeParse({ kind: 'languages', languageIds: [] }).success).toBe(false)
+  })
+})
+
+describe('contentGrantSchema — languageChoice', () => {
+  it('parses with categories', () => {
+    expect(contentGrantSchema.parse({ kind: 'languageChoice', categories: ['standard'] })).toEqual({
+      kind: 'languageChoice',
+      choose: 1,
+      categories: ['standard'],
+    })
+  })
+  it('rejects without from or categories', () => {
+    expect(contentGrantSchema.safeParse({ kind: 'languageChoice', choose: 1 }).success).toBe(false)
+  })
+})
+
+describe('contentGrantSchema — featChoice', () => {
+  it('parses a feat choice grant', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'featChoice',
+        category: 'general',
+        allowAnyQualifying: true,
+      }),
+    ).toEqual({ kind: 'featChoice', category: 'general', choose: 1, allowAnyQualifying: true })
+  })
+  it('rejects allowAnyQualifying on non-eligible categories', () => {
+    expect(
+      contentGrantSchema.safeParse({
+        kind: 'featChoice',
+        category: 'fighting-style',
+        allowAnyQualifying: true,
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('contentGrantSchema — equipment', () => {
+  it('parses a fixed equipment grant', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'equipment',
+        grant: { kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 },
+      }),
+    ).toMatchObject({ kind: 'equipment', grant: { kind: 'fixed', equipmentSlug: 'dagger' } })
+  })
+})
+
+describe('contentGrantSchema — spells', () => {
+  it('parses an always_prepared spells grant', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'spells',
+        ability: 'wis',
+        mode: 'always_prepared',
+        spellIds: ['bless', 'cure-wounds'],
+      }),
+    ).toEqual({
+      kind: 'spells',
+      ability: 'wis',
+      mode: 'always_prepared',
+      spellIds: ['bless', 'cure-wounds'],
+    })
+  })
+
+  it('parses a free_cast spells grant with frequency', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'spells',
+        ability: 'cha',
+        mode: 'free_cast',
+        frequency: 'at_will',
+        spellIds: ['dancing-lights'],
+      }),
+    ).toEqual({
+      kind: 'spells',
+      ability: 'cha',
+      mode: 'free_cast',
+      frequency: 'at_will',
+      spellIds: ['dancing-lights'],
+    })
+  })
+
+  it('rejects always_prepared with frequency', () => {
+    expect(
+      contentGrantSchema.safeParse({
+        kind: 'spells',
+        ability: 'wis',
+        mode: 'always_prepared',
+        frequency: 'at_will',
+        spellIds: ['bless'],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects empty spellIds', () => {
+    expect(
+      contentGrantSchema.safeParse({
+        kind: 'spells',
+        ability: 'wis',
+        mode: 'always_prepared',
+        spellIds: [],
+      }).success,
+    ).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// grantGroupsSchema — canonical shape enforcement
+// ---------------------------------------------------------------------------
+
+describe('grantGroupsSchema', () => {
+  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const spellGrant = {
+    kind: 'spells' as const,
+    ability: 'cha' as const,
+    mode: 'free_cast' as const,
+    frequency: 'at_will' as const,
+    spellIds: ['dancing-lights'],
+  }
+
+  it('accepts an empty array', () => {
+    expect(grantGroupsSchema.parse([])).toEqual([])
+  })
+
+  it('accepts a single default group', () => {
+    expect(grantGroupsSchema.parse([{ grants: [senseGrant] }])).toEqual([{ grants: [senseGrant] }])
+  })
+
+  it('accepts default group followed by ascending level groups', () => {
+    const groups = [
+      { grants: [senseGrant] },
+      { unlock: { level: 3 }, grants: [spellGrant] },
+      { unlock: { level: 5 }, grants: [spellGrant] },
+    ]
+    expect(grantGroupsSchema.parse(groups)).toEqual(groups)
+  })
+
+  it('rejects two default groups', () => {
+    expect(
+      grantGroupsSchema.safeParse([{ grants: [senseGrant] }, { grants: [spellGrant] }]).success,
+    ).toBe(false)
+  })
+
+  it('rejects default group not in first position', () => {
+    expect(
+      grantGroupsSchema.safeParse([
+        { unlock: { level: 3 }, grants: [spellGrant] },
+        { grants: [senseGrant] },
+      ]).success,
+    ).toBe(false)
+  })
+
+  it('rejects duplicate unlock levels', () => {
+    expect(
+      grantGroupsSchema.safeParse([
+        { unlock: { level: 3 }, grants: [senseGrant] },
+        { unlock: { level: 3 }, grants: [spellGrant] },
+      ]).success,
+    ).toBe(false)
+  })
+
+  it('rejects unsorted unlock levels', () => {
+    expect(
+      grantGroupsSchema.safeParse([
+        { unlock: { level: 5 }, grants: [spellGrant] },
+        { unlock: { level: 3 }, grants: [senseGrant] },
+      ]).success,
+    ).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// normalizeGrantGroups
+// ---------------------------------------------------------------------------
+
+describe('normalizeGrantGroups', () => {
+  const grantA: Parameters<typeof normalizeGrantGroups>[0][number]['grants'][number] = {
+    kind: 'sense',
+    type: 'darkvision',
+    range: 60,
+  }
+  const grantB: Parameters<typeof normalizeGrantGroups>[0][number]['grants'][number] = {
+    kind: 'resistances',
+    damageTypes: ['fire'],
+  }
+
+  it('returns an empty array unchanged', () => {
+    expect(normalizeGrantGroups([])).toEqual([])
+  })
+
+  it('strips groups with empty grants arrays', () => {
+    expect(normalizeGrantGroups([{ grants: [] }])).toEqual([])
+  })
+
+  it('drops unlock when it equals the parent unlock level', () => {
+    const result = normalizeGrantGroups([{ unlock: { level: 3 }, grants: [grantA] }], { level: 3 })
+    expect(result).toEqual([{ grants: [grantA] }])
+  })
+
+  it('keeps unlock when it differs from parent unlock level', () => {
+    const result = normalizeGrantGroups([{ unlock: { level: 5 }, grants: [grantA] }], { level: 3 })
+    expect(result).toEqual([{ unlock: { level: 5 }, grants: [grantA] }])
+  })
+
+  it('merges groups with duplicate unlock levels', () => {
+    const result = normalizeGrantGroups([
+      { unlock: { level: 3 }, grants: [grantA] },
+      { unlock: { level: 3 }, grants: [grantB] },
+    ])
+    expect(result).toEqual([{ unlock: { level: 3 }, grants: [grantA, grantB] }])
+  })
+
+  it('sorts: default group first, then ascending level', () => {
+    const result = normalizeGrantGroups([
+      { unlock: { level: 5 }, grants: [grantB] },
+      { grants: [grantA] },
+      { unlock: { level: 3 }, grants: [grantB] },
+    ])
+    expect(result).toEqual([
+      { grants: [grantA] },
+      { unlock: { level: 3 }, grants: [grantB] },
+      { unlock: { level: 5 }, grants: [grantB] },
+    ])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// flattenGrantGroups
+// ---------------------------------------------------------------------------
+
+describe('flattenGrantGroups', () => {
+  it('flattens groups into { grant, unlock? } pairs', () => {
+    const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+    const spellGrant = {
+      kind: 'spells' as const,
+      ability: 'cha' as const,
+      mode: 'free_cast' as const,
+      frequency: 'at_will' as const,
+      spellIds: ['dancing-lights'],
+    }
+
+    const result = flattenGrantGroups([
+      { grants: [senseGrant] },
+      { unlock: { level: 3 }, grants: [spellGrant] },
+    ])
+
+    expect(result).toEqual([
+      { grant: senseGrant, unlock: undefined },
+      { grant: spellGrant, unlock: { level: 3 } },
+    ])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// getGrantGroupEffectiveUnlock
+// ---------------------------------------------------------------------------
+
+describe('getGrantGroupEffectiveUnlock', () => {
+  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+
+  it('returns the group unlock when present', () => {
+    expect(getGrantGroupEffectiveUnlock({ unlock: { level: 5 }, grants: [senseGrant] })).toEqual({
+      level: 5,
+    })
+  })
+
+  it('falls back to parentUnlock for a default group', () => {
+    expect(getGrantGroupEffectiveUnlock({ grants: [senseGrant] }, { level: 3 })).toEqual({
+      level: 3,
+    })
+  })
+
+  it('returns undefined for a default group with no parentUnlock', () => {
+    expect(getGrantGroupEffectiveUnlock({ grants: [senseGrant] })).toBeUndefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// getUnlockedGrantsAtLevel
+// ---------------------------------------------------------------------------
+
+describe('getUnlockedGrantsAtLevel', () => {
+  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const spellGrant3 = {
+    kind: 'spells' as const,
+    ability: 'cha' as const,
+    mode: 'free_cast' as const,
+    frequency: 'once_per_long_rest' as const,
+    spellIds: ['faerie-fire'],
+  }
+  const spellGrant5 = {
+    kind: 'spells' as const,
+    ability: 'cha' as const,
+    mode: 'free_cast' as const,
+    frequency: 'once_per_long_rest' as const,
+    spellIds: ['darkness'],
+  }
+
+  const groups = [
+    { grants: [senseGrant] },
+    { unlock: { level: 3 }, grants: [spellGrant3] },
+    { unlock: { level: 5 }, grants: [spellGrant5] },
+  ]
+
+  it('returns default group grants when level >= parentLevel', () => {
+    expect(getUnlockedGrantsAtLevel(groups, 1)).toEqual([senseGrant])
+  })
+
+  it('returns all grants up to and including the requested level', () => {
+    expect(getUnlockedGrantsAtLevel(groups, 3)).toEqual([senseGrant, spellGrant3])
+  })
+
+  it('returns all grants when level >= highest unlock', () => {
+    expect(getUnlockedGrantsAtLevel(groups, 5)).toEqual([senseGrant, spellGrant3, spellGrant5])
+  })
+
+  it('excludes grants from future unlock levels', () => {
+    expect(getUnlockedGrantsAtLevel(groups, 4)).toEqual([senseGrant, spellGrant3])
+  })
+
+  it('uses parentLevel for default group comparison', () => {
+    const result = getUnlockedGrantsAtLevel([{ grants: [senseGrant] }], 3, 5)
+    expect(result).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// isGrantGroupsEligible
+// ---------------------------------------------------------------------------
+
+describe('isGrantGroupsEligible', () => {
+  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const spellGrant = {
+    kind: 'spells' as const,
+    ability: 'cha' as const,
+    mode: 'free_cast' as const,
+    spellIds: ['dancing-lights'],
+  }
+
+  it('accepts a single default group with one sense grant', () => {
+    expect(isGrantGroupsEligible([{ grants: [senseGrant] }])).toBe(true)
+  })
+
+  it('accepts a single default group with one resistances grant', () => {
+    expect(
+      isGrantGroupsEligible([{ grants: [{ kind: 'resistances', damageTypes: ['fire'] }] }]),
+    ).toBe(true)
+  })
+
+  it('accepts a single default group with one speedOverride grant', () => {
+    expect(isGrantGroupsEligible([{ grants: [{ kind: 'speedOverride', walk: 35 }] }])).toBe(true)
+  })
+
+  it('accepts a single default group with one languages grant', () => {
+    expect(
+      isGrantGroupsEligible([{ grants: [{ kind: 'languages', languageIds: ['elvish'] }] }]),
+    ).toBe(true)
+  })
+
+  it('rejects when there are multiple groups', () => {
+    expect(
+      isGrantGroupsEligible([
+        { grants: [senseGrant] },
+        { unlock: { level: 3 }, grants: [spellGrant] },
+      ]),
+    ).toBe(false)
+  })
+
+  it('rejects a group with an unlock (not default)', () => {
+    expect(isGrantGroupsEligible([{ unlock: { level: 3 }, grants: [senseGrant] }])).toBe(false)
+  })
+
+  it('rejects a group with multiple grants', () => {
+    expect(
+      isGrantGroupsEligible([
+        { grants: [senseGrant, { kind: 'resistances', damageTypes: ['fire'] }] },
+      ]),
+    ).toBe(false)
+  })
+
+  it('rejects spells-only grant (not eligible kind)', () => {
+    expect(isGrantGroupsEligible([{ grants: [spellGrant] }])).toBe(false)
   })
 })
