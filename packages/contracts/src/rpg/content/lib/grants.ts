@@ -11,6 +11,7 @@ import { usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema } from '../../vocab/feat'
 import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 import { skillSchema } from '../skill-proficiency'
+import { equipmentGrantSchema } from './equipment-grant'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
@@ -144,6 +145,7 @@ export const contentGrantsSchema = z.object({
   languageChoices: z.array(languageChoiceGrantSchema).optional(),
   innateSpells: innateSpellsSchema.optional(),
   featChoice: featChoiceGrantSchema.optional(),
+  equipment: z.array(equipmentGrantSchema).optional(),
 })
 
 export type ContentGrants = z.infer<typeof contentGrantsSchema>

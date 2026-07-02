@@ -110,6 +110,8 @@ export const EQUIPMENT_KINDS = Object.keys(EQUIPMENT_KIND_LABELS) as [
   ...EquipmentKind[],
 ]
 
+export const equipmentKindSchema = z.enum(EQUIPMENT_KINDS)
+
 /** Returns the display name for an equipment kind. Falls back to the raw value. */
 export function getEquipmentKindLabel(kind: string): string {
   return EQUIPMENT_KIND_LABELS[kind as EquipmentKind] ?? kind

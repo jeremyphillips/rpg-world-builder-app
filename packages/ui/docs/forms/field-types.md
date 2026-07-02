@@ -77,7 +77,9 @@ Inline “Choose [N] skills from:” + chips. `name` = selection (`string[]`); `
 
 ## Inline choose count (`inlineChooseCount`)
 
-Sentence with count input only — no chips below.
+Sentence with count input only — no chips below. Optionally bind a trailing
+`select` inside the sentence via `selectName` / `selectOptions` / `selectLabel`
+(same dual-path pattern as `chooseFromChips.chooseName`).
 
 ```ts
 {
@@ -88,6 +90,9 @@ Sentence with count input only — no chips below.
   suffix: 'packages',
   chooseMin: 0,
   chooseMax: 4,
+  selectName: 'poolSource',
+  selectLabel: 'Pool source',
+  selectOptions: poolSourceOptions,
 }
 ```
 

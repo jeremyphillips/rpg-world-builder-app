@@ -16,9 +16,9 @@ const getApp = useIntegrationApp()
 describe('ruleset patch routes', () => {
   it('returns resolved character creation for campaign members', async () => {
     const app = getApp()
-    const { agent, csrfToken, campaignId } = await authedCampaignContext(app)
+    const { agent, campaignId } = await authedCampaignContext(app)
 
-    const res = await getRulesetPatchRoute(agent, csrfToken, campaignId).expect(200)
+    const res = await getRulesetPatchRoute(agent, campaignId).expect(200)
 
     expect(res.body.patch.characterCreation.startingLevel).toBe(1)
   })

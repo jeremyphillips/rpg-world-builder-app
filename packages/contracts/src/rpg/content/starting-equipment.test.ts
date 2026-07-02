@@ -59,8 +59,11 @@ describe('startingEquipmentChoiceSchema', () => {
               {
                 kind: 'choice',
                 choose: 1,
-                label: 'Musical Instrument',
-                from: { toolCategories: ['musical_instrument'] },
+                pool: {
+                  source: 'filtered',
+                  equipmentKind: 'tool',
+                  toolCategory: 'musical_instrument',
+                },
               },
             ],
             wealth: { gp: 19 },
@@ -69,7 +72,11 @@ describe('startingEquipmentChoiceSchema', () => {
       }).options[0]?.items[0],
     ).toMatchObject({
       kind: 'choice',
-      from: { toolCategories: ['musical_instrument'] },
+      pool: {
+        source: 'filtered',
+        equipmentKind: 'tool',
+        toolCategory: 'musical_instrument',
+      },
     })
   })
 
@@ -81,11 +88,46 @@ describe('startingEquipmentChoiceSchema', () => {
           {
             id: 'standard',
             label: 'Standard Equipment',
-            items: [{ kind: 'choice', choose: 1, label: 'Pick one', from: {} }],
+            items: [
+              {
+                kind: 'choice',
+                choose: 1,
+                label: 'Pick one',
+                pool: { source: 'explicit', equipmentSlugs: [] },
+              },
+            ],
           },
         ],
       }).success,
     ).toBe(false)
+  })
+
+  it('normalizes legacy item choice pools on parse', () => {
+    expect(
+      startingEquipmentChoiceSchema.parse({
+        choose: 1,
+        options: [
+          {
+            id: 'standard',
+            label: 'Standard Equipment',
+            items: [
+              {
+                kind: 'choice',
+                choose: 1,
+                from: { toolCategories: ['musical_instrument'] },
+              },
+            ],
+          },
+        ],
+      }).options[0]?.items[0],
+    ).toMatchObject({
+      kind: 'choice',
+      pool: {
+        source: 'filtered',
+        equipmentKind: 'tool',
+        toolCategory: 'musical_instrument',
+      },
+    })
   })
 })
 

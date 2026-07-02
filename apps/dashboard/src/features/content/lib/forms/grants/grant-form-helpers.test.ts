@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickClass } from '../../fixtures/pick'
 import { formatInnateSpellEntryTitle } from './grant-form-fields'
+import { GRANT_ROW_TYPE_LABELS, GRANT_ROW_TYPES } from './grant-form-schema'
 import { formRowsToGrants, grantsToFormRows } from './grant-form-values'
 
 describe('grantsToFormRows / formRowsToGrants', () => {
@@ -76,6 +77,47 @@ describe('grantsToFormRows / formRowsToGrants', () => {
       replaceable: true,
       recommendedFeatIds: ['defense'],
     })
+  })
+
+  it('round-trips equipment grants when the row type list includes equipment', () => {
+    const grants = {
+      equipment: [
+        { kind: 'fixed' as const, equipmentSlug: 'dagger', quantity: 2, equipped: true },
+        {
+          kind: 'choice' as const,
+          choose: 1,
+          pool: {
+            source: 'filtered' as const,
+            equipmentKind: 'tool' as const,
+            toolCategory: 'musical_instrument' as const,
+          },
+        },
+      ],
+    }
+
+    const rows = grantsToFormRows(grants)
+    expect(rows.filter((row) => row.grantType === 'equipment')).toHaveLength(2)
+    expect(rows.find((row) => row.itemKind === 'fixed')).toMatchObject({
+      grantType: 'equipment',
+      equipmentSlug: 'dagger',
+      quantity: 2,
+      equipped: true,
+    })
+    expect(rows.find((row) => row.itemKind === 'choice')).toMatchObject({
+      grantType: 'equipment',
+      poolSource: 'filtered',
+      poolEquipmentKind: 'tool',
+      poolToolCategory: 'musical_instrument',
+    })
+
+    expect(formRowsToGrants(rows)).toEqual(grants)
+  })
+})
+
+describe('grant row type exports', () => {
+  it('keeps consumer grant pickers unchanged while allowing equipment rows in the schema', () => {
+    expect(GRANT_ROW_TYPES).toContain('equipment')
+    expect(GRANT_ROW_TYPE_LABELS.equipment).toBe('Equipment')
   })
 })
 

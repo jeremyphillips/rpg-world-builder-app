@@ -379,11 +379,12 @@ const fieldRenderers: {
       namePrefix={namePrefix}
     />
   ),
-  inlineChooseCount: ({ config, field, id, ...validation }) => (
+  inlineChooseCount: ({ config, field, id, namePrefix, ...validation }) => (
     <InlineChooseCountFieldRenderer
       config={config}
       field={field}
       id={id}
+      namePrefix={namePrefix}
       {...fieldValidationProps(validation)}
     />
   ),

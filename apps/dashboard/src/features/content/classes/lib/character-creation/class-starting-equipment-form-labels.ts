@@ -1,8 +1,3 @@
-export const STARTING_EQUIPMENT_ITEM_KIND_LABELS = {
-  fixed: 'Fixed item',
-  choice: 'Pool choice',
-} as const
-
 export const STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT =
   'For cross-references tied to another proficiency pick (e.g. Monk tool/instrument), describe the choice in prose and include FOLLOWUP: proficiencyLinkedChoice when structured support is deferred.'
 

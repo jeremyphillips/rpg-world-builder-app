@@ -4,6 +4,7 @@ import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   combineFieldVisibility,
+  combineFieldVisibilityAll,
   resolveFieldHint,
 } from './field-config'
 
@@ -28,6 +29,26 @@ describe('combineFieldVisibility', () => {
   })
 })
 
+describe('combineFieldVisibilityAll', () => {
+  it('merges dependsOn and ANDs visibleWhen predicates', () => {
+    const combined = combineFieldVisibilityAll(
+      {
+        dependsOn: ['grantType'],
+        visibleWhen: (values) => values.grantType === 'equipment',
+      },
+      {
+        dependsOn: ['itemKind'],
+        visibleWhen: (values) => values.itemKind === 'choice',
+      },
+    )
+
+    expect(combined.dependsOn).toEqual(['grantType', 'itemKind'])
+    expect(combined.visibleWhen({ grantType: 'equipment', itemKind: 'choice' })).toBe(true)
+    expect(combined.visibleWhen({ grantType: 'equipment', itemKind: 'fixed' })).toBe(false)
+    expect(combined.visibleWhen({ grantType: 'feat', itemKind: 'choice' })).toBe(false)
+  })
+})
+
 describe('resolveFieldHint', () => {
   it('prefers dynamic hint when provided', () => {
     expect(
@@ -36,8 +57,7 @@ describe('resolveFieldHint', () => {
           hint: 'Static hint',
           dynamicHint: {
             dependsOn: ['mode'],
-            hintWhen: (values) =>
-              values.mode === 'ranged' ? 'Ranged hint' : undefined,
+            hintWhen: (values) => (values.mode === 'ranged' ? 'Ranged hint' : undefined),
           },
         },
         { mode: 'ranged' },

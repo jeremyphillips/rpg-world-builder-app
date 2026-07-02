@@ -155,8 +155,9 @@ describe('classFormDef round-trips', () => {
       ?.items.find((item) => item.itemKind === 'choice')
     expect(instrumentChoice).toMatchObject({
       itemKind: 'choice',
-      label: 'Musical Instrument',
-      fromToolCategories: ['musical_instrument'],
+      poolSource: 'filtered',
+      poolEquipmentKind: 'tool',
+      poolToolCategory: 'musical_instrument',
     })
     const input = classFormDef.toInput(formValues, { entity: bard })
     expect(input.characterCreation?.startingEquipment).toEqual(

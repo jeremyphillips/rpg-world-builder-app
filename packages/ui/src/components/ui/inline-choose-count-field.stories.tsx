@@ -45,6 +45,22 @@ export const WithError: Story = {
   },
 }
 
+export const WithTrailingSelect: Story = {
+  args: {
+    hideLabel: true,
+    prefix: 'Character chooses',
+    suffix: 'item(s) from',
+    selectId: 'pool-source',
+    selectLabel: 'Pool source',
+    selectValue: 'filtered',
+    selectOptions: [
+      { value: 'filtered', label: 'A category of equipment' },
+      { value: 'explicit', label: 'A list of specific items' },
+    ],
+    onSelectChange: action('onSelectChange'),
+  },
+}
+
 /** Walk speed authoring: label above, `[N] ft.` inline row. */
 export const WalkSpeed: Story = {
   args: {

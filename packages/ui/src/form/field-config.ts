@@ -118,6 +118,14 @@ export function combineFieldVisibility(a: FieldVisibility, b: FieldVisibility): 
   }
 }
 
+/** Merges two visibility predicates with AND semantics and a deduped `dependsOn` list. */
+export function combineFieldVisibilityAll(a: FieldVisibility, b: FieldVisibility): FieldVisibility {
+  return {
+    dependsOn: [...new Set([...a.dependsOn, ...b.dependsOn])],
+    visibleWhen: (values) => a.visibleWhen(values) && b.visibleWhen(values),
+  }
+}
+
 /**
  * Per-option enablement keyed on other field values. Disabled options stay
  * selectable in the current value but cannot be toggled on (tier-2 UX).
@@ -368,6 +376,13 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   /** When true, the legend is visually hidden but kept for assistive tech. */
   hideLabel?: boolean
   defaultValue?: number
+  /** Optional trailing select bound to a second RHF path (same pattern as `chooseFromChips.chooseName`). */
+  selectName?: string
+  selectOptions?: FieldOption[]
+  /** sr-only label for the trailing select. */
+  selectLabel?: string
+  selectDefaultValue?: string
+  selectRequired?: boolean
 }
 
 export interface LevelRangeFieldConfig extends BaseFieldConfig {
@@ -891,6 +906,13 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
   if (field.type === 'chooseFromChips') {
     const chooseField = field as ChooseFromChipsFieldConfig
     values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
+  }
+  if (field.type === 'inlineChooseCount') {
+    const inlineField = field as InlineChooseCountFieldConfig
+    if (inlineField.selectName) {
+      values[inlineField.selectName] =
+        inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
+    }
   }
 }
 

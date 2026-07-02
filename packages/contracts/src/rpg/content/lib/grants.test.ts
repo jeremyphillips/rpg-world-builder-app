@@ -40,6 +40,14 @@ describe('isGrantEligibleGrants', () => {
       }),
     ).toBe(false)
   })
+
+  it('rejects equipment-only grants', () => {
+    expect(
+      isGrantEligibleGrants({
+        equipment: [{ kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 }],
+      }),
+    ).toBe(false)
+  })
 })
 
 describe('innateSpellEntrySchema', () => {
@@ -214,6 +222,24 @@ describe('contentGrantsSchema', () => {
 
   it('rejects display labels in fixed language grants', () => {
     expect(contentGrantsSchema.safeParse({ languages: ['Common'] }).success).toBe(false)
+  })
+
+  it('parses equipment grant arrays', () => {
+    const grants = {
+      equipment: [
+        { kind: 'fixed' as const, equipmentSlug: 'dagger', quantity: 1 },
+        {
+          kind: 'choice' as const,
+          choose: 1,
+          pool: {
+            source: 'filtered' as const,
+            equipmentKind: 'tool' as const,
+            toolCategory: 'musical_instrument' as const,
+          },
+        },
+      ],
+    }
+    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
   })
 })
 

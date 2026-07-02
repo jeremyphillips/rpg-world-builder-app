@@ -6,6 +6,7 @@ import type {
   ComboboxFieldConfig,
   FieldConfig,
   FormItem,
+  InlineChooseCountFieldConfig,
   InputSelectFieldConfig,
   LevelRangeFieldConfig,
 } from '../field-config'
@@ -101,6 +102,16 @@ function registerField(
   if (field.type === 'chooseFromChips') {
     const chooseFrom = field as ChooseFromChipsFieldConfig
     registry.set(key(chooseFrom.chooseName), { label: field.label, category: 'number' })
+  }
+
+  if (field.type === 'inlineChooseCount') {
+    const inlineField = field as InlineChooseCountFieldConfig
+    if (inlineField.selectName) {
+      registry.set(key(inlineField.selectName), {
+        label: inlineField.selectLabel ?? field.label,
+        category: 'choice',
+      })
+    }
   }
 }
 
