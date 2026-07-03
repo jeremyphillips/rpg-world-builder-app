@@ -224,7 +224,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     ]
     const rows = grantGroupsToFormRows(groups)
     expect(rows[0]?.grantType).toBe('toolProficiency')
-    expect(rows[0]?.itemKind).toBe('fixed')
+    expect(rows[0]?.proficiencySource).toBe('specific')
     expect(rows[0]?.toolProficiencySlugs).toEqual(['thieves-tools'])
 
     const restored = formRowsToGrantGroups(rows)
@@ -270,7 +270,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     ]
     const rows = grantGroupsToFormRows(groups)
     expect(rows[0]?.grantType).toBe('weaponProficiency')
-    expect(rows[0]?.itemKind).toBe('choice')
+    expect(rows[0]?.proficiencySource).toBe('pool')
     expect(rows[0]?.weaponProficiencyPoolCategory).toBe('martial')
 
     const restored = formRowsToGrantGroups(rows)
@@ -293,6 +293,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     ]
     const rows = grantGroupsToFormRows(groups)
     expect(rows[0]?.grantType).toBe('armorTraining')
+    expect(rows[0]?.proficiencySource).toBe('category')
     expect(rows[0]?.armorTrainingCategories).toEqual(['light'])
 
     const restored = formRowsToGrantGroups(rows)

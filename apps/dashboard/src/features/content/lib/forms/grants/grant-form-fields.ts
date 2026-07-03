@@ -228,7 +228,6 @@ function proficiencyGrantFieldsForTypes(
     includesGrantType(grantTypes, grantType)
       ? proficiencyGrantItemFields(grantType, ctx, {
           guardVisibility: visibleFor(grantType),
-          kindSelectLabel: 'Grant type',
         })
       : [],
   )

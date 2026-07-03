@@ -9,14 +9,14 @@ import type {
   WeaponProficiencyPool,
 } from '@rpg/contracts'
 import {
+  categoryProficiencySingular,
   formatArmorTrainingGrantSentence,
-  formatArmorTrainingPoolLabel,
   formatSkillProficiencyGrantSentence,
-  formatSkillProficiencyPoolLabel,
   formatToolProficiencyGrantSentence,
-  formatToolProficiencyPoolLabel,
   formatWeaponProficiencyGrantSentence,
-  formatWeaponProficiencyPoolLabel,
+  getArmorCategoryLabel,
+  getToolCategoryLabel,
+  getWeaponCategoryLabel,
   SKILLS,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
@@ -34,27 +34,61 @@ function categoryFormValueToDomain(value: string | undefined): string | undefine
   return value
 }
 
-function formatExplicitPoolTitle(slugs: string[], options: FieldOption[]): string {
-  const labels = slugs.map((slug) => options.find((option) => option.value === slug)?.label ?? slug)
-  return labels.length <= 2 ? labels.join(', ') : `${labels.length} items`
+function joinList(items: string[]): string {
+  if (items.length === 0) return ''
+  if (items.length === 1) return items[0]!
+  if (items.length === 2) return `${items[0]} and ${items[1]}`
+  return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`
 }
 
-function formatSkillPoolTitle(skillIds: string[]): string {
-  const labels = skillIds.map((id) => SKILLS[id as keyof typeof SKILLS] ?? id)
-  return labels.length <= 2 ? labels.join(', ') : `${labels.length} skills`
+function grantTypePrefix(grantLabel: string, detail: string): string {
+  return `${grantLabel} — ${detail}`
 }
 
-type WeaponProficiencyChoiceItemForm = Extract<WeaponProficiencyItemForm, { itemKind: 'choice' }>
-type ToolProficiencyChoiceItemForm = Extract<ToolProficiencyItemForm, { itemKind: 'choice' }>
-type SkillProficiencyChoiceItemForm = Extract<SkillProficiencyItemForm, { itemKind: 'choice' }>
-type ArmorTrainingChoiceItemForm = Extract<ArmorTrainingItemForm, { itemKind: 'choice' }>
+type WeaponProficiencyPoolItemForm = Extract<
+  WeaponProficiencyItemForm,
+  { proficiencySource: 'pool' }
+>
+type ToolProficiencyPoolItemForm = Extract<ToolProficiencyItemForm, { proficiencySource: 'pool' }>
+type SkillProficiencyPoolItemForm = Extract<SkillProficiencyItemForm, { proficiencySource: 'pool' }>
+type ArmorTrainingPoolItemForm = Extract<ArmorTrainingItemForm, { proficiencySource: 'pool' }>
+
+function weaponProficiencySourceFromGrant(
+  grant: WeaponProficiencyGrant,
+): WeaponProficiencyItemForm['proficiencySource'] {
+  if (grant.kind === 'choice') return 'pool'
+  if (grant.weaponCategories?.length && !grant.weaponSlugs?.length) return 'category'
+  return 'specific'
+}
+
+function toolProficiencySourceFromGrant(
+  grant: ToolProficiencyGrant,
+): ToolProficiencyItemForm['proficiencySource'] {
+  if (grant.kind === 'choice') return 'pool'
+  if (grant.toolCategories?.length && !grant.toolSlugs?.length) return 'category'
+  return 'specific'
+}
+
+function skillProficiencySourceFromGrant(
+  grant: SkillProficiencyGrant,
+): SkillProficiencyItemForm['proficiencySource'] {
+  return grant.kind === 'choice' ? 'pool' : 'specific'
+}
+
+function armorTrainingSourceFromGrant(
+  grant: ArmorTrainingGrant,
+): ArmorTrainingItemForm['proficiencySource'] {
+  if (grant.kind === 'choice') return 'pool'
+  if (grant.armorCategories?.length && !grant.armorSlugs?.length) return 'category'
+  return 'specific'
+}
 
 // --- Weapon -----------------------------------------------------------------
 
 export function weaponProficiencyPoolToFormRow(
   pool: WeaponProficiencyPool,
 ): Pick<
-  WeaponProficiencyChoiceItemForm,
+  WeaponProficiencyPoolItemForm,
   'poolSource' | 'weaponProficiencyPoolSlugs' | 'weaponProficiencyPoolCategory'
 > {
   if (pool.source === 'explicit') {
@@ -71,7 +105,7 @@ export function weaponProficiencyPoolToFormRow(
 }
 
 export function weaponProficiencyPoolFromFormRow(
-  row: WeaponProficiencyChoiceItemForm,
+  row: WeaponProficiencyPoolItemForm,
 ): WeaponProficiencyPool {
   if (row.poolSource === 'explicit') {
     return {
@@ -94,40 +128,76 @@ export function weaponProficiencyPoolFromFormRow(
 export function weaponProficiencyGrantToFormRow(
   grant: WeaponProficiencyGrant,
 ): WeaponProficiencyItemForm {
-  if (grant.kind === 'fixed') {
+  const proficiencySource = weaponProficiencySourceFromGrant(grant)
+
+  if (proficiencySource === 'pool') {
+    if (grant.kind !== 'choice') {
+      return { proficiencySource: 'specific', weaponProficiencySlugs: [] }
+    }
     return {
-      itemKind: 'fixed',
-      weaponProficiencySlugs: grant.weaponSlugs,
-      weaponProficiencyCategories: grant.weaponCategories,
+      proficiencySource: 'pool',
+      choose: grant.choose,
+      ...weaponProficiencyPoolToFormRow(grant.pool),
     }
   }
 
+  if (proficiencySource === 'category') {
+    if (grant.kind !== 'fixed') {
+      return { proficiencySource: 'category', weaponProficiencyCategories: [] }
+    }
+    return {
+      proficiencySource: 'category',
+      weaponProficiencyCategories: grant.weaponCategories ?? [],
+    }
+  }
+
+  if (grant.kind !== 'fixed') {
+    return { proficiencySource: 'specific', weaponProficiencySlugs: [] }
+  }
   return {
-    itemKind: 'choice',
-    choose: grant.choose,
-    ...weaponProficiencyPoolToFormRow(grant.pool),
+    proficiencySource: 'specific',
+    weaponProficiencySlugs: grant.weaponSlugs ?? [],
   }
 }
 
 export function weaponProficiencyGrantFromFormRow(
   row: WeaponProficiencyItemForm,
 ): WeaponProficiencyGrant {
-  if (row.itemKind === 'fixed') {
-    const grant: Extract<WeaponProficiencyGrant, { kind: 'fixed' }> = { kind: 'fixed' }
-    if (row.weaponProficiencySlugs?.length) {
-      grant.weaponSlugs = row.weaponProficiencySlugs
+  if (row.proficiencySource === 'pool') {
+    return {
+      kind: 'choice',
+      choose: row.choose ?? 1,
+      pool: weaponProficiencyPoolFromFormRow(row),
     }
-    if (row.weaponProficiencyCategories?.length) {
-      grant.weaponCategories = row.weaponProficiencyCategories
+  }
+
+  if (row.proficiencySource === 'category') {
+    return {
+      kind: 'fixed',
+      weaponCategories: row.weaponProficiencyCategories,
     }
-    return grant
   }
 
   return {
-    kind: 'choice',
-    choose: row.choose ?? 1,
-    pool: weaponProficiencyPoolFromFormRow(row),
+    kind: 'fixed',
+    weaponSlugs: row.weaponProficiencySlugs,
   }
+}
+
+function weaponPoolTitleDetail(row: WeaponProficiencyPoolItemForm): string {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'filtered') {
+    const category = categoryFormValueToDomain(row.weaponProficiencyPoolCategory)
+    if (category) {
+      const phrase = categoryProficiencySingular(getWeaponCategoryLabel(category))
+      return `choose ${choose} ${phrase}`
+    }
+    return `choose ${choose} weapon proficiency`
+  }
+  if (row.poolSource === 'explicit') {
+    return `choose ${choose} from selected weapons`
+  }
+  return `choose ${choose} weapon proficiency`
 }
 
 export function weaponProficiencyGrantTitle(
@@ -135,39 +205,36 @@ export function weaponProficiencyGrantTitle(
   index: number,
   weaponOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return `Weapon proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `Weapon proficiency ${index + 1}`
 
-  if (row.itemKind === 'fixed') {
-    const slugLabels = (row.weaponProficiencySlugs ?? []).map(
+  if (row.proficiencySource === 'specific') {
+    const labels = (row.weaponProficiencySlugs ?? []).map(
       (slug) => weaponOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    const categoryLabels = row.weaponProficiencyCategories ?? []
-    const parts = [...slugLabels, ...categoryLabels]
-    if (!parts.length) return `Weapon proficiency ${index + 1}`
-    return parts.length <= 2 ? parts.join(', ') : `${parts.length} proficiencies`
+    if (!labels.length) return `Weapon proficiency ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} weapons`
+    return grantTypePrefix('Weapon proficiency', detail)
   }
 
-  const choose = row.choose ?? 1
-  const poolLabel =
-    row.poolSource === 'explicit'
-      ? formatExplicitPoolTitle(row.weaponProficiencyPoolSlugs ?? [], weaponOptions)
-      : formatWeaponProficiencyPoolLabel(weaponProficiencyPoolFromFormRow(row))
+  if (row.proficiencySource === 'category') {
+    const labels = (row.weaponProficiencyCategories ?? []).map((category) =>
+      getWeaponCategoryLabel(category),
+    )
+    if (!labels.length) return `Weapon proficiency ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} categories`
+    return grantTypePrefix('Weapon proficiency', detail)
+  }
 
-  return `${poolLabel} — choose ${choose}`
+  return grantTypePrefix('Weapon proficiency', weaponPoolTitleDetail(row))
 }
 
 export function weaponProficiencyGrantSummary(
   row: WeaponProficiencyItemForm | undefined,
   weaponOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return ''
-  if (
-    row.itemKind === 'fixed' &&
-    !row.weaponProficiencySlugs?.length &&
-    !row.weaponProficiencyCategories?.length
-  ) {
-    return ''
-  }
+  if (!row?.proficiencySource) return ''
+  if (row.proficiencySource === 'specific' && !row.weaponProficiencySlugs?.length) return ''
+  if (row.proficiencySource === 'category' && !row.weaponProficiencyCategories?.length) return ''
 
   const resolveWeaponName = (slug: string) =>
     weaponOptions.find((option) => option.value === slug)?.label
@@ -183,7 +250,7 @@ export function weaponProficiencyGrantSummary(
 export function toolProficiencyPoolToFormRow(
   pool: ToolProficiencyPool,
 ): Pick<
-  ToolProficiencyChoiceItemForm,
+  ToolProficiencyPoolItemForm,
   'poolSource' | 'toolProficiencyPoolSlugs' | 'toolProficiencyPoolCategory'
 > {
   if (pool.source === 'explicit') {
@@ -203,7 +270,7 @@ export function toolProficiencyPoolToFormRow(
 }
 
 export function toolProficiencyPoolFromFormRow(
-  row: ToolProficiencyChoiceItemForm,
+  row: ToolProficiencyPoolItemForm,
 ): ToolProficiencyPool {
   if (row.poolSource === 'explicit') {
     return {
@@ -229,40 +296,74 @@ export function toolProficiencyPoolFromFormRow(
 export function toolProficiencyGrantToFormRow(
   grant: ToolProficiencyGrant,
 ): ToolProficiencyItemForm {
-  if (grant.kind === 'fixed') {
+  const proficiencySource = toolProficiencySourceFromGrant(grant)
+
+  if (proficiencySource === 'pool') {
+    if (grant.kind !== 'choice') {
+      return { proficiencySource: 'specific', toolProficiencySlugs: [] }
+    }
     return {
-      itemKind: 'fixed',
-      toolProficiencySlugs: grant.toolSlugs,
-      toolProficiencyCategories: grant.toolCategories,
+      proficiencySource: 'pool',
+      choose: grant.choose,
+      ...toolProficiencyPoolToFormRow(grant.pool),
     }
   }
 
+  if (proficiencySource === 'category') {
+    if (grant.kind !== 'fixed') {
+      return { proficiencySource: 'category', toolProficiencyCategories: [] }
+    }
+    return {
+      proficiencySource: 'category',
+      toolProficiencyCategories: grant.toolCategories ?? [],
+    }
+  }
+
+  if (grant.kind !== 'fixed') {
+    return { proficiencySource: 'specific', toolProficiencySlugs: [] }
+  }
+
   return {
-    itemKind: 'choice',
-    choose: grant.choose,
-    ...toolProficiencyPoolToFormRow(grant.pool),
+    proficiencySource: 'specific',
+    toolProficiencySlugs: grant.toolSlugs ?? [],
   }
 }
 
 export function toolProficiencyGrantFromFormRow(
   row: ToolProficiencyItemForm,
 ): ToolProficiencyGrant {
-  if (row.itemKind === 'fixed') {
-    const grant: Extract<ToolProficiencyGrant, { kind: 'fixed' }> = { kind: 'fixed' }
-    if (row.toolProficiencySlugs?.length) {
-      grant.toolSlugs = row.toolProficiencySlugs
+  if (row.proficiencySource === 'pool') {
+    return {
+      kind: 'choice',
+      choose: row.choose ?? 1,
+      pool: toolProficiencyPoolFromFormRow(row),
     }
-    if (row.toolProficiencyCategories?.length) {
-      grant.toolCategories = row.toolProficiencyCategories
+  }
+
+  if (row.proficiencySource === 'category') {
+    return {
+      kind: 'fixed',
+      toolCategories: row.toolProficiencyCategories,
     }
-    return grant
   }
 
   return {
-    kind: 'choice',
-    choose: row.choose ?? 1,
-    pool: toolProficiencyPoolFromFormRow(row),
+    kind: 'fixed',
+    toolSlugs: row.toolProficiencySlugs,
   }
+}
+
+function toolPoolTitleDetail(row: ToolProficiencyPoolItemForm): string {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'any') return `choose ${choose} from any tools`
+  if (row.poolSource === 'filtered') {
+    const category = categoryFormValueToDomain(row.toolProficiencyPoolCategory)
+    if (category) {
+      return `choose ${choose} ${categoryProficiencySingular(getToolCategoryLabel(category))}`
+    }
+    return `choose ${choose} tool proficiency`
+  }
+  return `choose ${choose} from selected tools`
 }
 
 export function toolProficiencyGrantTitle(
@@ -270,39 +371,36 @@ export function toolProficiencyGrantTitle(
   index: number,
   toolOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return `Tool proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `Tool proficiency ${index + 1}`
 
-  if (row.itemKind === 'fixed') {
-    const slugLabels = (row.toolProficiencySlugs ?? []).map(
+  if (row.proficiencySource === 'specific') {
+    const labels = (row.toolProficiencySlugs ?? []).map(
       (slug) => toolOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    const categoryLabels = row.toolProficiencyCategories ?? []
-    const parts = [...slugLabels, ...categoryLabels]
-    if (!parts.length) return `Tool proficiency ${index + 1}`
-    return parts.length <= 2 ? parts.join(', ') : `${parts.length} proficiencies`
+    if (!labels.length) return `Tool proficiency ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} tools`
+    return grantTypePrefix('Tool proficiency', detail)
   }
 
-  const choose = row.choose ?? 1
-  const poolLabel =
-    row.poolSource === 'explicit'
-      ? formatExplicitPoolTitle(row.toolProficiencyPoolSlugs ?? [], toolOptions)
-      : formatToolProficiencyPoolLabel(toolProficiencyPoolFromFormRow(row))
+  if (row.proficiencySource === 'category') {
+    const labels = (row.toolProficiencyCategories ?? []).map((category) =>
+      getToolCategoryLabel(category),
+    )
+    if (!labels.length) return `Tool proficiency ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} categories`
+    return grantTypePrefix('Tool proficiency', detail)
+  }
 
-  return `${poolLabel} — choose ${choose}`
+  return grantTypePrefix('Tool proficiency', toolPoolTitleDetail(row))
 }
 
 export function toolProficiencyGrantSummary(
   row: ToolProficiencyItemForm | undefined,
   toolOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return ''
-  if (
-    row.itemKind === 'fixed' &&
-    !row.toolProficiencySlugs?.length &&
-    !row.toolProficiencyCategories?.length
-  ) {
-    return ''
-  }
+  if (!row?.proficiencySource) return ''
+  if (row.proficiencySource === 'specific' && !row.toolProficiencySlugs?.length) return ''
+  if (row.proficiencySource === 'category' && !row.toolProficiencyCategories?.length) return ''
 
   const resolveToolName = (slug: string) =>
     toolOptions.find((option) => option.value === slug)?.label
@@ -314,7 +412,7 @@ export function toolProficiencyGrantSummary(
 
 export function skillProficiencyPoolToFormRow(
   pool: SkillProficiencyPool,
-): Pick<SkillProficiencyChoiceItemForm, 'poolSource' | 'skillProficiencyPoolIds'> {
+): Pick<SkillProficiencyPoolItemForm, 'poolSource' | 'skillProficiencyPoolIds'> {
   if (pool.source === 'any') {
     return { poolSource: 'any' }
   }
@@ -326,7 +424,7 @@ export function skillProficiencyPoolToFormRow(
 }
 
 export function skillProficiencyPoolFromFormRow(
-  row: SkillProficiencyChoiceItemForm,
+  row: SkillProficiencyPoolItemForm,
 ): SkillProficiencyPool {
   if (row.poolSource === 'any') {
     return { source: 'any' }
@@ -341,61 +439,77 @@ export function skillProficiencyPoolFromFormRow(
 export function skillProficiencyGrantToFormRow(
   grant: SkillProficiencyGrant,
 ): SkillProficiencyItemForm {
-  if (grant.kind === 'fixed') {
+  const proficiencySource = skillProficiencySourceFromGrant(grant)
+
+  if (proficiencySource === 'pool') {
+    if (grant.kind !== 'choice') {
+      return { proficiencySource: 'specific', skillProficiencyIds: [] }
+    }
     return {
-      itemKind: 'fixed',
-      skillProficiencyIds: grant.skillIds,
+      proficiencySource: 'pool',
+      choose: grant.choose,
+      ...skillProficiencyPoolToFormRow(grant.pool),
     }
   }
 
+  if (grant.kind !== 'fixed') {
+    return { proficiencySource: 'specific', skillProficiencyIds: [] }
+  }
+
   return {
-    itemKind: 'choice',
-    choose: grant.choose,
-    ...skillProficiencyPoolToFormRow(grant.pool),
+    proficiencySource: 'specific',
+    skillProficiencyIds: grant.skillIds,
   }
 }
 
 export function skillProficiencyGrantFromFormRow(
   row: SkillProficiencyItemForm,
 ): SkillProficiencyGrant {
-  if (row.itemKind === 'fixed') {
+  if (row.proficiencySource === 'pool') {
     return {
-      kind: 'fixed',
-      skillIds: row.skillProficiencyIds ?? [],
+      kind: 'choice',
+      choose: row.choose ?? 1,
+      pool: skillProficiencyPoolFromFormRow(row),
     }
   }
 
   return {
-    kind: 'choice',
-    choose: row.choose ?? 1,
-    pool: skillProficiencyPoolFromFormRow(row),
+    kind: 'fixed',
+    skillIds: row.skillProficiencyIds ?? [],
   }
+}
+
+function formatSkillPoolTitle(skillIds: string[]): string {
+  const labels = skillIds.map((id) => SKILLS[id as keyof typeof SKILLS] ?? id)
+  return labels.length <= 2 ? joinList(labels) : `${labels.length} skills`
+}
+
+function skillPoolTitleDetail(row: SkillProficiencyPoolItemForm): string {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'any') return `choose ${choose} from any skills`
+  const ids = row.skillProficiencyPoolIds ?? []
+  if (!ids.length) return `choose ${choose} skill proficiency`
+  return `choose ${choose} from ${formatSkillPoolTitle(ids)}`
 }
 
 export function skillProficiencyGrantTitle(
   row: SkillProficiencyItemForm | undefined,
   index: number,
 ): string {
-  if (!row?.itemKind) return `Skill proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `Skill proficiency ${index + 1}`
 
-  if (row.itemKind === 'fixed') {
+  if (row.proficiencySource === 'specific') {
     const ids = row.skillProficiencyIds ?? []
     if (!ids.length) return `Skill proficiency ${index + 1}`
-    return formatSkillPoolTitle(ids)
+    return grantTypePrefix('Skill proficiency', formatSkillPoolTitle(ids))
   }
 
-  const choose = row.choose ?? 1
-  const poolLabel =
-    row.poolSource === 'any'
-      ? formatSkillProficiencyPoolLabel({ source: 'any' })
-      : formatSkillPoolTitle(row.skillProficiencyPoolIds ?? [])
-
-  return `${poolLabel} — choose ${choose}`
+  return grantTypePrefix('Skill proficiency', skillPoolTitleDetail(row))
 }
 
 export function skillProficiencyGrantSummary(row: SkillProficiencyItemForm | undefined): string {
-  if (!row?.itemKind) return ''
-  if (row.itemKind === 'fixed' && !row.skillProficiencyIds?.length) return ''
+  if (!row?.proficiencySource) return ''
+  if (row.proficiencySource === 'specific' && !row.skillProficiencyIds?.length) return ''
   return formatSkillProficiencyGrantSentence(skillProficiencyGrantFromFormRow(row))
 }
 
@@ -404,7 +518,7 @@ export function skillProficiencyGrantSummary(row: SkillProficiencyItemForm | und
 export function armorTrainingPoolToFormRow(
   pool: ArmorTrainingPool,
 ): Pick<
-  ArmorTrainingChoiceItemForm,
+  ArmorTrainingPoolItemForm,
   'poolSource' | 'armorTrainingPoolSlugs' | 'armorTrainingPoolCategory'
 > {
   if (pool.source === 'explicit') {
@@ -420,7 +534,7 @@ export function armorTrainingPoolToFormRow(
   }
 }
 
-export function armorTrainingPoolFromFormRow(row: ArmorTrainingChoiceItemForm): ArmorTrainingPool {
+export function armorTrainingPoolFromFormRow(row: ArmorTrainingPoolItemForm): ArmorTrainingPool {
   if (row.poolSource === 'explicit') {
     return {
       source: 'explicit',
@@ -440,38 +554,71 @@ export function armorTrainingPoolFromFormRow(row: ArmorTrainingChoiceItemForm): 
 }
 
 export function armorTrainingGrantToFormRow(grant: ArmorTrainingGrant): ArmorTrainingItemForm {
-  if (grant.kind === 'fixed') {
+  const proficiencySource = armorTrainingSourceFromGrant(grant)
+
+  if (proficiencySource === 'pool') {
+    if (grant.kind !== 'choice') {
+      return { proficiencySource: 'specific', armorTrainingSlugs: [] }
+    }
     return {
-      itemKind: 'fixed',
-      armorTrainingSlugs: grant.armorSlugs,
-      armorTrainingCategories: grant.armorCategories,
+      proficiencySource: 'pool',
+      choose: grant.choose,
+      ...armorTrainingPoolToFormRow(grant.pool),
     }
   }
 
+  if (proficiencySource === 'category') {
+    if (grant.kind !== 'fixed') {
+      return { proficiencySource: 'category', armorTrainingCategories: [] }
+    }
+    return {
+      proficiencySource: 'category',
+      armorTrainingCategories: grant.armorCategories ?? [],
+    }
+  }
+
+  if (grant.kind !== 'fixed') {
+    return { proficiencySource: 'specific', armorTrainingSlugs: [] }
+  }
+
   return {
-    itemKind: 'choice',
-    choose: grant.choose,
-    ...armorTrainingPoolToFormRow(grant.pool),
+    proficiencySource: 'specific',
+    armorTrainingSlugs: grant.armorSlugs ?? [],
   }
 }
 
 export function armorTrainingGrantFromFormRow(row: ArmorTrainingItemForm): ArmorTrainingGrant {
-  if (row.itemKind === 'fixed') {
-    const grant: Extract<ArmorTrainingGrant, { kind: 'fixed' }> = { kind: 'fixed' }
-    if (row.armorTrainingSlugs?.length) {
-      grant.armorSlugs = row.armorTrainingSlugs
+  if (row.proficiencySource === 'pool') {
+    return {
+      kind: 'choice',
+      choose: row.choose ?? 1,
+      pool: armorTrainingPoolFromFormRow(row),
     }
-    if (row.armorTrainingCategories?.length) {
-      grant.armorCategories = row.armorTrainingCategories
+  }
+
+  if (row.proficiencySource === 'category') {
+    return {
+      kind: 'fixed',
+      armorCategories: row.armorTrainingCategories,
     }
-    return grant
   }
 
   return {
-    kind: 'choice',
-    choose: row.choose ?? 1,
-    pool: armorTrainingPoolFromFormRow(row),
+    kind: 'fixed',
+    armorSlugs: row.armorTrainingSlugs,
   }
+}
+
+function armorPoolTitleDetail(row: ArmorTrainingPoolItemForm): string {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'filtered') {
+    const category = categoryFormValueToDomain(row.armorTrainingPoolCategory)
+    if (category) {
+      return `choose ${choose} ${categoryProficiencySingular(getArmorCategoryLabel(category))}`
+    }
+    return `choose ${choose} armor training`
+  }
+  return `choose ${choose} from selected armor`
 }
 
 export function armorTrainingGrantTitle(
@@ -479,39 +626,36 @@ export function armorTrainingGrantTitle(
   index: number,
   armorOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return `Armor training ${index + 1}`
+  if (!row?.proficiencySource) return `Armor training ${index + 1}`
 
-  if (row.itemKind === 'fixed') {
-    const slugLabels = (row.armorTrainingSlugs ?? []).map(
+  if (row.proficiencySource === 'specific') {
+    const labels = (row.armorTrainingSlugs ?? []).map(
       (slug) => armorOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    const categoryLabels = row.armorTrainingCategories ?? []
-    const parts = [...slugLabels, ...categoryLabels]
-    if (!parts.length) return `Armor training ${index + 1}`
-    return parts.length <= 2 ? parts.join(', ') : `${parts.length} trainings`
+    if (!labels.length) return `Armor training ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} armor`
+    return grantTypePrefix('Armor training', detail)
   }
 
-  const choose = row.choose ?? 1
-  const poolLabel =
-    row.poolSource === 'explicit'
-      ? formatExplicitPoolTitle(row.armorTrainingPoolSlugs ?? [], armorOptions)
-      : formatArmorTrainingPoolLabel(armorTrainingPoolFromFormRow(row))
+  if (row.proficiencySource === 'category') {
+    const labels = (row.armorTrainingCategories ?? []).map((category) =>
+      getArmorCategoryLabel(category),
+    )
+    if (!labels.length) return `Armor training ${index + 1}`
+    const detail = labels.length <= 2 ? joinList(labels) : `${labels.length} categories`
+    return grantTypePrefix('Armor training', detail)
+  }
 
-  return `${poolLabel} — choose ${choose}`
+  return grantTypePrefix('Armor training', armorPoolTitleDetail(row))
 }
 
 export function armorTrainingGrantSummary(
   row: ArmorTrainingItemForm | undefined,
   armorOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return ''
-  if (
-    row.itemKind === 'fixed' &&
-    !row.armorTrainingSlugs?.length &&
-    !row.armorTrainingCategories?.length
-  ) {
-    return ''
-  }
+  if (!row?.proficiencySource) return ''
+  if (row.proficiencySource === 'specific' && !row.armorTrainingSlugs?.length) return ''
+  if (row.proficiencySource === 'category' && !row.armorTrainingCategories?.length) return ''
 
   const resolveArmorName = (slug: string) =>
     armorOptions.find((option) => option.value === slug)?.label

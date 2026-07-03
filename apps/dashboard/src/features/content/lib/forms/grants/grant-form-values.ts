@@ -209,7 +209,7 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
 // ---------------------------------------------------------------------------
 
 function weaponProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.itemKind) return undefined
+  if (!row.proficiencySource) return undefined
   return {
     kind: 'weaponProficiency',
     grant: weaponProficiencyGrantFromFormRow(row as WeaponProficiencyItemForm),
@@ -217,7 +217,7 @@ function weaponProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function toolProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.itemKind) return undefined
+  if (!row.proficiencySource) return undefined
   return {
     kind: 'toolProficiency',
     grant: toolProficiencyGrantFromFormRow(row as ToolProficiencyItemForm),
@@ -225,7 +225,7 @@ function toolProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function skillProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.itemKind) return undefined
+  if (!row.proficiencySource) return undefined
   return {
     kind: 'skillProficiency',
     grant: skillProficiencyGrantFromFormRow(row as SkillProficiencyItemForm),
@@ -233,7 +233,7 @@ function skillProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function armorTrainingToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.itemKind) return undefined
+  if (!row.proficiencySource) return undefined
   return {
     kind: 'armorTraining',
     grant: armorTrainingGrantFromFormRow(row as ArmorTrainingItemForm),

@@ -37,12 +37,26 @@ import {
 } from './proficiency-grant-form-values'
 
 describe('weaponProficiencyGrantToFormRow / weaponProficiencyGrantFromFormRow', () => {
-  it('round-trips a fixed grant', () => {
+  it('round-trips a category grant', () => {
     const grant = {
       kind: 'fixed' as const,
       weaponCategories: ['simple' as const],
     }
     const row = weaponProficiencyGrantToFormRow(grant)
+    expect(row).toMatchObject({ proficiencySource: 'category' })
+    expect(weaponProficiencyGrantFromFormRow(row)).toEqual(grant)
+  })
+
+  it('round-trips a specific weapons grant', () => {
+    const grant = {
+      kind: 'fixed' as const,
+      weaponSlugs: ['longsword', 'shortbow'],
+    }
+    const row = weaponProficiencyGrantToFormRow(grant)
+    expect(row).toMatchObject({
+      proficiencySource: 'specific',
+      weaponProficiencySlugs: ['longsword', 'shortbow'],
+    })
     expect(weaponProficiencyGrantFromFormRow(row)).toEqual(grant)
   })
 
@@ -54,7 +68,7 @@ describe('weaponProficiencyGrantToFormRow / weaponProficiencyGrantFromFormRow', 
     }
     const row = weaponProficiencyGrantToFormRow(grant)
     expect(row).toMatchObject({
-      itemKind: 'choice',
+      proficiencySource: 'pool',
       poolSource: 'filtered',
       weaponProficiencyPoolCategory: 'martial',
     })
@@ -70,18 +84,19 @@ describe('toolProficiencyGrantToFormRow / toolProficiencyGrantFromFormRow', () =
       pool: { source: 'any' as const },
     }
     const row = toolProficiencyGrantToFormRow(grant)
-    expect(row).toMatchObject({ itemKind: 'choice', poolSource: 'any' })
+    expect(row).toMatchObject({ proficiencySource: 'pool', poolSource: 'any' })
     expect(toolProficiencyGrantFromFormRow(row)).toEqual(grant)
   })
 })
 
 describe('skillProficiencyGrantToFormRow / skillProficiencyGrantFromFormRow', () => {
-  it('round-trips fixed skill ids', () => {
+  it('round-trips specific skill ids', () => {
     const grant = {
       kind: 'fixed' as const,
       skillIds: ['athletics' as const, 'stealth' as const],
     }
     const row = skillProficiencyGrantToFormRow(grant)
+    expect(row).toMatchObject({ proficiencySource: 'specific' })
     expect(skillProficiencyGrantFromFormRow(row)).toEqual(grant)
   })
 
@@ -97,12 +112,13 @@ describe('skillProficiencyGrantToFormRow / skillProficiencyGrantFromFormRow', ()
 })
 
 describe('armorTrainingGrantToFormRow / armorTrainingGrantFromFormRow', () => {
-  it('round-trips fixed armor categories', () => {
+  it('round-trips category armor training', () => {
     const grant = {
       kind: 'fixed' as const,
       armorCategories: ['light' as const, 'medium' as const],
     }
     const row = armorTrainingGrantToFormRow(grant)
+    expect(row).toMatchObject({ proficiencySource: 'category' })
     expect(armorTrainingGrantFromFormRow(row)).toEqual(grant)
   })
 })
@@ -110,7 +126,7 @@ describe('armorTrainingGrantToFormRow / armorTrainingGrantFromFormRow', () => {
 describe('weaponProficiencyPoolToFormRow / weaponProficiencyPoolFromFormRow', () => {
   it('maps empty category form values to undefined pool categories', () => {
     const pool = weaponProficiencyPoolFromFormRow({
-      itemKind: 'choice',
+      proficiencySource: 'pool',
       choose: 1,
       poolSource: 'filtered',
       weaponProficiencyPoolCategory: PROFICIENCY_POOL_CATEGORY_ANY,
@@ -125,7 +141,7 @@ describe('weaponProficiencyPoolToFormRow / weaponProficiencyPoolFromFormRow', ()
     }
     const formFields = weaponProficiencyPoolToFormRow(pool)
     expect(
-      weaponProficiencyPoolFromFormRow({ itemKind: 'choice', choose: 1, ...formFields }),
+      weaponProficiencyPoolFromFormRow({ proficiencySource: 'pool', choose: 1, ...formFields }),
     ).toEqual(pool)
   })
 })
@@ -133,7 +149,7 @@ describe('weaponProficiencyPoolToFormRow / weaponProficiencyPoolFromFormRow', ()
 describe('toolProficiencyPoolToFormRow / toolProficiencyPoolFromFormRow', () => {
   it('maps filtered tool pools without a category', () => {
     const pool = toolProficiencyPoolFromFormRow({
-      itemKind: 'choice',
+      proficiencySource: 'pool',
       choose: 1,
       poolSource: 'filtered',
       toolProficiencyPoolCategory: PROFICIENCY_POOL_CATEGORY_ANY,
@@ -148,7 +164,7 @@ describe('toolProficiencyPoolToFormRow / toolProficiencyPoolFromFormRow', () => 
     }
     const formFields = toolProficiencyPoolToFormRow(pool)
     expect(
-      toolProficiencyPoolFromFormRow({ itemKind: 'choice', choose: 1, ...formFields }),
+      toolProficiencyPoolFromFormRow({ proficiencySource: 'pool', choose: 1, ...formFields }),
     ).toEqual(pool)
   })
 })
@@ -160,133 +176,165 @@ describe('armorTrainingPoolToFormRow / armorTrainingPoolFromFormRow', () => {
       armorCategory: 'heavy' as const,
     }
     const formFields = armorTrainingPoolToFormRow(pool)
-    expect(armorTrainingPoolFromFormRow({ itemKind: 'choice', choose: 1, ...formFields })).toEqual(
-      pool,
-    )
+    expect(
+      armorTrainingPoolFromFormRow({ proficiencySource: 'pool', choose: 1, ...formFields }),
+    ).toEqual(pool)
   })
 })
 
 describe('proficiency grant titles and summaries', () => {
   const weaponOptions = [
     { value: 'longsword', label: 'Longsword' },
+    { value: 'shortbow', label: 'Shortbow' },
     { value: 'rapier', label: 'Rapier' },
   ]
 
-  it('formats weapon choice titles with pool label and choose count', () => {
-    expect(
-      weaponProficiencyGrantTitle(
-        {
-          itemKind: 'choice',
-          choose: 1,
-          poolSource: 'filtered',
-          weaponProficiencyPoolCategory: 'martial',
-        },
-        0,
-      ),
-    ).toBe('Martial Weapon — choose 1')
+  it('formats specific weapon titles and summaries from mocks', () => {
+    const row: WeaponProficiencyItemForm = {
+      proficiencySource: 'specific',
+      weaponProficiencySlugs: ['longsword', 'shortbow'],
+    }
+    expect(weaponProficiencyGrantTitle(row, 0, weaponOptions)).toBe(
+      'Weapon proficiency — Longsword and Shortbow',
+    )
+    expect(weaponProficiencyGrantSummary(row, weaponOptions)).toBe(
+      'Character gains proficiency with Longsword and Shortbow.',
+    )
   })
 
-  it('truncates explicit weapon pool titles when more than two items are listed', () => {
+  it('formats category weapon titles and summaries from mocks', () => {
+    const row: WeaponProficiencyItemForm = {
+      proficiencySource: 'category',
+      weaponProficiencyCategories: ['simple'],
+    }
+    expect(weaponProficiencyGrantTitle(row, 0)).toBe('Weapon proficiency — Simple Weapon')
+    expect(weaponProficiencyGrantSummary(row)).toBe(
+      'Character gains proficiency with all simple weapons.',
+    )
+  })
+
+  it('formats pool weapon titles and summaries from mocks', () => {
+    const row: WeaponProficiencyItemForm = {
+      proficiencySource: 'pool',
+      choose: 1,
+      poolSource: 'filtered',
+      weaponProficiencyPoolCategory: 'simple',
+    }
+    expect(weaponProficiencyGrantTitle(row, 0)).toBe('Weapon proficiency — choose 1 simple weapon')
+    expect(weaponProficiencyGrantSummary(row)).toBe(
+      'Character chooses 1 weapon proficiency from simple weapons.',
+    )
+  })
+
+  it('truncates explicit pool titles when more than two items are listed', () => {
     expect(
       weaponProficiencyGrantTitle(
         {
-          itemKind: 'choice',
+          proficiencySource: 'pool',
           choose: 1,
           poolSource: 'explicit',
-          weaponProficiencyPoolSlugs: ['longsword', 'rapier', 'greataxe'],
+          weaponProficiencyPoolSlugs: ['longsword', 'rapier', 'shortbow'],
         },
         0,
         weaponOptions,
       ),
-    ).toBe('3 items — choose 1')
+    ).toBe('Weapon proficiency — choose 1 from selected weapons')
   })
 
-  it('wraps formatWeaponProficiencyGrantSentence for form rows', () => {
+  it('returns an empty summary for incomplete specific rows', () => {
     expect(
       weaponProficiencyGrantSummary(
-        {
-          itemKind: 'choice',
-          choose: 1,
-          poolSource: 'filtered',
-          weaponProficiencyPoolCategory: 'martial',
-        },
+        { proficiencySource: 'specific' } as WeaponProficiencyItemForm,
         [],
       ),
-    ).toBe('Character chooses 1 martial weapon.')
-  })
-
-  it('returns an empty summary for incomplete fixed rows', () => {
-    expect(
-      weaponProficiencyGrantSummary({ itemKind: 'fixed' } as WeaponProficiencyItemForm, []),
     ).toBe('')
   })
 
-  it('formats tool choice titles', () => {
-    expect(toolProficiencyGrantTitle({ itemKind: 'choice', choose: 3, poolSource: 'any' }, 0)).toBe(
-      'any tool — choose 3',
-    )
+  it('formats tool pool titles', () => {
+    expect(
+      toolProficiencyGrantTitle({ proficiencySource: 'pool', choose: 3, poolSource: 'any' }, 0),
+    ).toBe('Tool proficiency — choose 3 from any tools')
   })
 
-  it('formats skill fixed titles from skill labels', () => {
+  it('formats skill specific titles from skill labels', () => {
     expect(
       skillProficiencyGrantTitle(
-        { itemKind: 'fixed', skillProficiencyIds: ['athletics', 'stealth'] },
+        { proficiencySource: 'specific', skillProficiencyIds: ['athletics', 'stealth'] },
         0,
       ),
-    ).toBe('Athletics, Stealth')
+    ).toBe('Skill proficiency — Athletics and Stealth')
   })
 
-  it('formats armor training summaries', () => {
+  it('formats armor training pool summaries', () => {
     expect(
       armorTrainingGrantSummary(
         {
-          itemKind: 'choice',
+          proficiencySource: 'pool',
           choose: 1,
           poolSource: 'filtered',
           armorTrainingPoolCategory: 'heavy',
         },
         [],
       ),
-    ).toBe('Character chooses 1 heavy armor.')
+    ).toBe('Character chooses 1 armor training from heavy armor.')
   })
 
-  it('formats armor training choice titles', () => {
+  it('formats armor training pool titles', () => {
     expect(
       armorTrainingGrantTitle(
         {
-          itemKind: 'choice',
+          proficiencySource: 'pool',
           choose: 1,
           poolSource: 'filtered',
           armorTrainingPoolCategory: 'heavy',
         },
         0,
       ),
-    ).toBe('Heavy Armor — choose 1')
+    ).toBe('Armor training — choose 1 heavy armor')
   })
 })
 
 describe('weaponProficiencyGrantItemFields', () => {
-  it('uses Grant type for the item kind select', () => {
+  it('uses Proficiency source for the mode select', () => {
     const fields = weaponProficiencyGrantItemFields({ options: { weapons: [] } })
-    const itemKind = fields.find((field) => 'name' in field && field.name === 'itemKind')
-    expect(itemKind).toMatchObject({ label: 'Grant type' })
+    const proficiencySource = fields.find(
+      (field) => 'name' in field && field.name === 'proficiencySource',
+    )
+    expect(proficiencySource).toMatchObject({ label: 'Proficiency source' })
   })
 
-  it('embeds pool source in the choice inline sentence', () => {
+  it('embeds pool kind in the choice inline sentence', () => {
     const fields = weaponProficiencyGrantItemFields({ options: { weapons: [] } })
     const chooseField = fields.find((field) => 'name' in field && field.name === 'choose')
     expect(chooseField).toMatchObject({
       type: 'inlineSentence',
       segments: expect.arrayContaining([
         { kind: 'text', value: 'Character chooses', tone: 'label' },
-        { kind: 'text', value: 'from', tone: 'label' },
+        { kind: 'text', value: 'proficiency from', tone: 'label' },
         expect.objectContaining({
           kind: 'select',
           name: 'poolSource',
           defaultValue: 'filtered',
-          ariaLabel: 'Pool source',
+          ariaLabel: 'Pool kind',
         }),
       ]),
+    })
+  })
+
+  it('shows only weapon slug combobox in specific mode', () => {
+    const fields = weaponProficiencyGrantItemFields({
+      options: { weapons: [{ value: 'longsword', label: 'Longsword' }] },
+    })
+    const slugField = fields.find(
+      (field) => 'name' in field && field.name === 'weaponProficiencySlugs',
+    )
+    const categoryField = fields.find(
+      (field) => 'name' in field && field.name === 'weaponProficiencyCategories',
+    )
+    expect(slugField).toMatchObject({ type: 'combobox', required: true })
+    expect(categoryField).toMatchObject({
+      type: 'chips',
+      name: 'weaponProficiencyCategories',
     })
   })
 
@@ -304,7 +352,7 @@ describe('weaponProficiencyGrantItemFields', () => {
     })
   })
 
-  it('uses chips for skill proficiency fields', () => {
+  it('uses chips for skill proficiency fields in specific mode', () => {
     const fields = skillProficiencyGrantItemFields({ options: {} })
     const skillField = fields.find(
       (field) => 'name' in field && field.name === 'skillProficiencyIds',
@@ -331,7 +379,7 @@ describe('proficiency grant choice schema validation', () => {
   it('rejects explicit weapon pools without slugs', () => {
     expect(
       weaponProficiencyChoiceFormSchema.safeParse({
-        itemKind: 'choice',
+        proficiencySource: 'pool',
         choose: 1,
         poolSource: 'explicit',
       }).success,
@@ -341,7 +389,7 @@ describe('proficiency grant choice schema validation', () => {
   it('rejects explicit skill pools without skill ids', () => {
     expect(
       skillProficiencyChoiceFormSchema.safeParse({
-        itemKind: 'choice',
+        proficiencySource: 'pool',
         choose: 1,
         poolSource: 'explicit',
       }).success,
@@ -351,7 +399,7 @@ describe('proficiency grant choice schema validation', () => {
   it('accepts filtered weapon pools with optional category', () => {
     expect(
       weaponProficiencyChoiceFormSchema.safeParse({
-        itemKind: 'choice',
+        proficiencySource: 'pool',
         choose: 1,
         poolSource: 'filtered',
         weaponProficiencyPoolCategory: PROFICIENCY_POOL_CATEGORY_ANY,
@@ -362,7 +410,7 @@ describe('proficiency grant choice schema validation', () => {
   it('accepts any-tool choice pools', () => {
     expect(
       toolProficiencyChoiceFormSchema.safeParse({
-        itemKind: 'choice',
+        proficiencySource: 'pool',
         choose: 2,
         poolSource: 'any',
       }).success,
@@ -372,7 +420,7 @@ describe('proficiency grant choice schema validation', () => {
   it('rejects explicit armor pools without slugs', () => {
     expect(
       armorTrainingChoiceFormSchema.safeParse({
-        itemKind: 'choice',
+        proficiencySource: 'pool',
         choose: 1,
         poolSource: 'explicit',
       }).success,
@@ -381,12 +429,19 @@ describe('proficiency grant choice schema validation', () => {
 })
 
 describe('weaponProficiencyItemFormSchema', () => {
-  it('parses fixed and choice rows', () => {
+  it('parses specific, category, and pool rows', () => {
     expect(
       weaponProficiencyItemFormSchema.parse({
-        itemKind: 'fixed',
+        proficiencySource: 'category',
         weaponProficiencyCategories: ['simple'],
       }),
-    ).toMatchObject({ itemKind: 'fixed', weaponProficiencyCategories: ['simple'] })
+    ).toMatchObject({ proficiencySource: 'category', weaponProficiencyCategories: ['simple'] })
+
+    expect(
+      weaponProficiencyItemFormSchema.parse({
+        proficiencySource: 'specific',
+        weaponProficiencySlugs: ['longsword'],
+      }),
+    ).toMatchObject({ proficiencySource: 'specific' })
   })
 })

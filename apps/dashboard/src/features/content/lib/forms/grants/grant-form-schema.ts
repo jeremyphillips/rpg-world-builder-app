@@ -112,6 +112,7 @@ const equipmentGrantRowFieldsSchema = z.object({
 })
 
 const proficiencyGrantRowFieldsSchema = z.object({
+  proficiencySource: z.enum(['specific', 'category', 'pool']).optional(),
   weaponProficiencySlugs: z.array(z.string().min(1)).optional(),
   weaponProficiencyCategories: z.array(weaponCategorySchema).optional(),
   weaponProficiencyPoolSlugs: z.array(z.string().min(1)).optional(),

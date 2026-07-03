@@ -94,13 +94,35 @@ describe('armorTrainingGrantSchema', () => {
 })
 
 describe('format proficiency grant sentences', () => {
-  it('formats fixed weapon proficiency', () => {
+  it('formats fixed weapon proficiency from categories', () => {
     expect(
       formatWeaponProficiencyGrantSentence({
         kind: 'fixed',
         weaponCategories: ['simple'],
       }),
-    ).toBe('Character gains proficiency with Simple Weapon.')
+    ).toBe('Character gains proficiency with all simple weapons.')
+  })
+
+  it('formats fixed weapon proficiency from specific weapons', () => {
+    expect(
+      formatWeaponProficiencyGrantSentence(
+        {
+          kind: 'fixed',
+          weaponSlugs: ['longsword', 'shortbow'],
+        },
+        (slug) => (slug === 'longsword' ? 'Longsword' : 'Shortbow'),
+      ),
+    ).toBe('Character gains proficiency with Longsword and Shortbow.')
+  })
+
+  it('formats filtered weapon choice pool', () => {
+    expect(
+      formatWeaponProficiencyGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered', weaponCategory: 'simple' },
+      }),
+    ).toBe('Character chooses 1 weapon proficiency from simple weapons.')
   })
 
   it('formats any-skill choice', () => {
@@ -110,7 +132,7 @@ describe('format proficiency grant sentences', () => {
         choose: 2,
         pool: { source: 'any' },
       }),
-    ).toBe('Character chooses 2 any skills.')
+    ).toBe('Character chooses 2 skill proficiency from any skills.')
   })
 
   it('formats any-tool choice', () => {
@@ -120,7 +142,7 @@ describe('format proficiency grant sentences', () => {
         choose: 1,
         pool: { source: 'any' },
       }),
-    ).toBe('Character chooses 1 any tool.')
+    ).toBe('Character chooses 1 tool proficiency from any tools.')
   })
 
   it('formats armor training choice from category', () => {
@@ -130,6 +152,6 @@ describe('format proficiency grant sentences', () => {
         choose: 1,
         pool: { source: 'filtered', armorCategory: 'heavy' },
       }),
-    ).toBe('Character chooses 1 heavy armor.')
+    ).toBe('Character chooses 1 armor training from heavy armor.')
   })
 })
