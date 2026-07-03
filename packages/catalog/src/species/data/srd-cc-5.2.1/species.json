@@ -468,8 +468,11 @@
             {
               "grants": [
                 {
-                  "kind": "speedOverride",
-                  "walk": 35
+                  "kind": "movement",
+                  "mode": "walk",
+                  "operation": "bonus",
+                  "value": 5,
+                  "unit": "ft"
                 },
                 {
                   "kind": "spells",

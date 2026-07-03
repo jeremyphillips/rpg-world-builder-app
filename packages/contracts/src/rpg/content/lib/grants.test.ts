@@ -426,11 +426,22 @@ describe('contentGrantSchema — damageType', () => {
   })
 })
 
-describe('contentGrantSchema — speedOverride', () => {
-  it('parses a walk speed override', () => {
-    expect(contentGrantSchema.parse({ kind: 'speedOverride', walk: 35 })).toEqual({
-      kind: 'speedOverride',
-      walk: 35,
+describe('contentGrantSchema — movement', () => {
+  it('parses a walk speed bonus', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'movement',
+        mode: 'walk',
+        operation: 'bonus',
+        value: 5,
+        unit: 'ft',
+      }),
+    ).toEqual({
+      kind: 'movement',
+      mode: 'walk',
+      operation: 'bonus',
+      value: 5,
+      unit: 'ft',
     })
   })
 })
@@ -801,8 +812,16 @@ describe('isGrantGroupsEligible', () => {
     ).toBe(true)
   })
 
-  it('accepts a single default group with one speedOverride grant', () => {
-    expect(isGrantGroupsEligible([{ grants: [{ kind: 'speedOverride', walk: 35 }] }])).toBe(true)
+  it('accepts a single default group with one movement grant', () => {
+    expect(
+      isGrantGroupsEligible([
+        {
+          grants: [
+            { kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
+          ],
+        },
+      ]),
+    ).toBe(true)
   })
 
   it('accepts a single default group with one languages grant', () => {

@@ -107,12 +107,18 @@ describe('SRD 5.2.1 species seed', () => {
     expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
   })
 
-  it('Wood Elf grants a speed override of walk 35', () => {
+  it('Wood Elf grants +5 ft walking speed', () => {
     const elf = species.find((s) => s.slug === 'elf')!
     const woodElf = elf.heritage!.options.find((o) => o.id === 'wood-elf')!
     const defaultGrants = woodElf.grantGroups?.[0]?.grants ?? []
-    const speedGrant = defaultGrants.find((g) => g.kind === 'speedOverride')
-    expect(speedGrant?.kind === 'speedOverride' && speedGrant.walk).toBe(35)
+    const speedGrant = defaultGrants.find((g) => g.kind === 'movement')
+    expect(speedGrant).toEqual({
+      kind: 'movement',
+      mode: 'walk',
+      operation: 'bonus',
+      value: 5,
+      unit: 'ft',
+    })
   })
 
   it('Tiefling has fiendish-legacy heritage with 3 options', () => {

@@ -5,7 +5,7 @@ import { abilitySchema } from '../../vocab/ability'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
-import { speedSchema } from '../../vocab/movement-mode'
+import { movementGrantPayloadSchema } from '../../vocab/movement-mode'
 import { senseSchema } from '../../vocab/sense'
 import { usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema } from '../../vocab/feat'
@@ -140,8 +140,8 @@ export type FeatChoiceGrant = z.infer<typeof featChoiceGrantSchema>
  */
 export const contentGrantsSchema = z.object({
   senses: z.array(senseSchema).optional(),
-  /** Replaces or adds movement modes (e.g. Wood Elf walk 35). Partial of `speedSchema`. */
-  speedOverride: speedSchema.partial().optional(),
+  /** Movement bonus (e.g. Wood Elf +5 ft walking speed). */
+  movement: movementGrantPayloadSchema.optional(),
   /** Chosen damage type(s), e.g. a Dragonborn's breath or a Goliath's ancestry. */
   damageType: z.array(damageTypeIdSchema).optional(),
   resistances: z.array(damageTypeIdSchema).optional(),
@@ -182,13 +182,8 @@ export function isGrantEligibleGrants(grants: ContentGrants): boolean {
       return grants.senses!.length === 1
     case 'resistances':
       return grants.resistances!.length === 1
-    case 'speedOverride': {
-      const override = grants.speedOverride!
-      const modes = (Object.keys(override) as (keyof typeof override)[]).filter(
-        (mode) => override[mode] !== undefined,
-      )
-      return modes.length === 1 && modes[0] === 'walk' && override.walk !== undefined
-    }
+    case 'movement':
+      return grants.movement !== undefined
     case 'languages':
       return grants.languages!.length === 1
     default:
@@ -220,9 +215,9 @@ const damageTypeContentGrantSchema = z.object({
   damageTypes: z.array(damageTypeIdSchema).min(1),
 })
 
-/** Partial speed override — sets or replaces walk speed and/or additional modes. */
-const speedOverrideContentGrantSchema = speedSchema.partial().extend({
-  kind: z.literal('speedOverride'),
+/** Movement bonus — increases speed for a movement mode (e.g. Wood Elf +5 ft walk). */
+const movementContentGrantSchema = movementGrantPayloadSchema.extend({
+  kind: z.literal('movement'),
 })
 
 /** Proficiency grant — skills, tools, weapons, and/or armor. */
@@ -313,7 +308,7 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   senseContentGrantSchema,
   resistancesContentGrantSchema,
   damageTypeContentGrantSchema,
-  speedOverrideContentGrantSchema,
+  movementContentGrantSchema,
   proficienciesContentGrantSchema,
   languagesContentGrantSchema,
   languageChoiceContentGrantSchema,
@@ -508,7 +503,7 @@ export function getUnlockedGrantsAtLevel(
 /**
  * Returns true when `grantGroups` is eligible for the `grant` trait kind in the
  * atomic model: exactly one default group (no `unlock`) containing exactly one
- * sense, resistances, speedOverride, or languages grant.
+ * sense, resistances, movement, or languages grant.
  */
 export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
   if (groups.length !== 1) return false
@@ -517,7 +512,7 @@ export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
   if (group!.grants.length !== 1) return false
   const kind = group!.grants[0]!.kind
   return (
-    kind === 'sense' || kind === 'resistances' || kind === 'speedOverride' || kind === 'languages'
+    kind === 'sense' || kind === 'resistances' || kind === 'movement' || kind === 'languages'
   )
 }
 
@@ -554,7 +549,7 @@ export type CustomContentTrait = z.infer<typeof customContentTraitSchema>
 /**
  * Mechanics-only trait: display name and description are derived from `grantGroups`
  * unless overridden. The groups must pass {@link isGrantGroupsEligible}: exactly
- * one default group containing exactly one sense, resistance, walk-speed, or
+ * one default group containing exactly one sense, resistance, movement bonus, or
  * language grant.
  */
 export const grantContentTraitSchema = z
@@ -571,7 +566,7 @@ export const grantContentTraitSchema = z
       ctx.addIssue({
         code: 'custom',
         message:
-          'grant traits require a single atomic grant (one sense, resistance, walk speed, or language)',
+          'grant traits require a single atomic grant (one sense, resistance, movement bonus, or language)',
         path: ['grantGroups'],
       })
     }

@@ -54,7 +54,9 @@ const ELF_BODY = {
         id: 'wood-elf',
         name: 'Wood Elf',
         description: '<p>Your Speed is 35 feet.</p>',
-        grants: { speedOverride: { walk: 35 } },
+        grants: {
+          movement: { mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
+        },
       },
     ],
   },

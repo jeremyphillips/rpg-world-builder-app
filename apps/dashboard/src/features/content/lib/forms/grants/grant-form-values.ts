@@ -30,7 +30,10 @@ function emptyGrantRow(grantType: GrantType): GrantRowForm {
     damageType: [],
     senseType: undefined,
     senseRange: undefined,
-    speedWalkOverride: undefined,
+    movementMode: undefined,
+    movementOperation: undefined,
+    movementValue: undefined,
+    movementUnit: undefined,
     language: undefined,
     proficiencySkills: [],
     proficiencyArmor: [],
@@ -89,8 +92,17 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
       return [{ ...emptyGrantRow('resistances'), unlockLevel: formUnlockLevel(unlockLevel), resistances: grant.damageTypes }]
     case 'damageType':
       return [{ ...emptyGrantRow('damageType'), unlockLevel: formUnlockLevel(unlockLevel), damageType: grant.damageTypes }]
-    case 'speedOverride':
-      return [{ ...emptyGrantRow('speedOverride'), unlockLevel: formUnlockLevel(unlockLevel), speedWalkOverride: grant.walk }]
+    case 'movement':
+      return [
+        {
+          ...emptyGrantRow('movement'),
+          unlockLevel: formUnlockLevel(unlockLevel),
+          movementMode: grant.mode,
+          movementOperation: grant.operation,
+          movementValue: grant.value,
+          movementUnit: grant.unit,
+        },
+      ]
     case 'proficiencies':
       return [
         {
@@ -170,9 +182,15 @@ function damageTypeToGrant(row: GrantRowForm): ContentGrant | undefined {
   return { kind: 'damageType', damageTypes: row.damageType as DamageTypeId[] }
 }
 
-function speedOverrideToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (row.speedWalkOverride === undefined) return undefined
-  return { kind: 'speedOverride', walk: row.speedWalkOverride }
+function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
+  if (!row.movementMode || !row.movementOperation || row.movementValue === undefined) return undefined
+  return {
+    kind: 'movement',
+    mode: row.movementMode,
+    operation: row.movementOperation,
+    value: row.movementValue,
+    unit: row.movementUnit ?? 'ft',
+  }
 }
 
 function languagesToGrant(row: GrantRowForm): ContentGrant | undefined {
@@ -226,7 +244,7 @@ export function formRowToContentGrant(row: GrantRowForm): ContentGrant | undefin
     case 'senses':       return sensesToGrant(row)
     case 'resistances':  return resistancesToGrant(row)
     case 'damageType':   return damageTypeToGrant(row)
-    case 'speedOverride': return speedOverrideToGrant(row)
+    case 'movement': return movementToGrant(row)
     case 'languages':    return languagesToGrant(row)
     case 'proficiencies': return proficienciesToGrant(row)
     case 'featChoice':   return featChoiceToGrant(row)
@@ -325,11 +343,15 @@ function damageTypesToRow(damageType: ContentGrants['damageType']): GrantRowForm
   return { ...emptyGrantRow('damageType'), damageType }
 }
 
-function speedOverrideToRow(
-  speedOverride: ContentGrants['speedOverride'],
-): GrantRowForm | undefined {
-  if (speedOverride?.walk === undefined) return undefined
-  return { ...emptyGrantRow('speedOverride'), speedWalkOverride: speedOverride.walk }
+function movementToRow(movement: ContentGrants['movement']): GrantRowForm | undefined {
+  if (!movement) return undefined
+  return {
+    ...emptyGrantRow('movement'),
+    movementMode: movement.mode,
+    movementOperation: movement.operation,
+    movementValue: movement.value,
+    movementUnit: movement.unit,
+  }
 }
 
 function languageGrantsToRows(languages: ContentGrants['languages']): GrantRowForm[] {
@@ -396,7 +418,7 @@ export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowFor
     ...senseGrantsToRows(grants.senses),
     ...optionalGrantRow(resistancesToRow(grants.resistances)),
     ...optionalGrantRow(damageTypesToRow(grants.damageType)),
-    ...optionalGrantRow(speedOverrideToRow(grants.speedOverride)),
+    ...optionalGrantRow(movementToRow(grants.movement)),
     ...languageGrantsToRows(grants.languages),
     ...optionalGrantRow(legacyProficienciesToRow(grants.proficiencies)),
     ...innateSpellsToSpellRows(grants.innateSpells),
@@ -426,10 +448,15 @@ function applyDamageTypesFromRows(result: ContentGrants, rows: GrantRowForm[]): 
   result.damageType = row.damageType as DamageTypeId[]
 }
 
-function applySpeedOverrideFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'speedOverride')
-  if (row?.speedWalkOverride === undefined) return
-  result.speedOverride = { walk: row.speedWalkOverride }
+function applyMovementFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'movement')
+  if (!row?.movementMode || !row.movementOperation || row.movementValue === undefined) return
+  result.movement = {
+    mode: row.movementMode,
+    operation: row.movementOperation,
+    value: row.movementValue,
+    unit: row.movementUnit ?? 'ft',
+  }
 }
 
 function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
@@ -489,7 +516,7 @@ export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefine
   applySensesFromRows(result, rows)
   applyResistancesFromRows(result, rows)
   applyDamageTypesFromRows(result, rows)
-  applySpeedOverrideFromRows(result, rows)
+  applyMovementFromRows(result, rows)
   applyLanguagesFromRows(result, rows)
   applyProficienciesFromRows(result, rows)
   applyFeatChoiceFromRows(result, rows)

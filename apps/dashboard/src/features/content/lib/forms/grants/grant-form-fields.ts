@@ -3,13 +3,21 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
+  formatMovementBonusAuthoringSummary,
+  formatMovementBonusTitle,
+  getMovementModeGrantLabel,
   INNATE_SPELL_KINDS,
+  MOVEMENT_BONUS_FEET,
+  MOVEMENT_MODES,
+  MOVEMENT_OPERATION_ENTRIES,
+  MOVEMENT_OPERATIONS,
   SENSE_RANGES,
   SKILL_IDS,
   SKILLS,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
+  type MovementMode,
   type UsageFrequency,
 } from '@rpg/contracts'
 import {
@@ -27,7 +35,6 @@ import {
 } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../content-form-registry'
-import { feetInputUnitField } from '../fields/content-identity-form-fields'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
 import { titleCase } from '../../utils/title-case'
@@ -42,6 +49,90 @@ import {
   GRANT_DEFAULT_UNLOCK_LEVEL,
   GRANT_ROW_TYPE_LABELS,
 } from './grant-form-schema'
+
+const movementModeOptions: FieldOption[] = MOVEMENT_MODES.map((mode) => ({
+  value: mode,
+  label: getMovementModeGrantLabel(mode),
+}))
+
+const movementOperationOptions: FieldOption[] = MOVEMENT_OPERATIONS.map((operation) => ({
+  value: operation,
+  label: MOVEMENT_OPERATION_ENTRIES[operation].label,
+}))
+
+const movementBonusOptions: FieldOption[] = MOVEMENT_BONUS_FEET.map((feet) => ({
+  value: String(feet),
+  label: `+${feet} ft`,
+}))
+
+function movementInlineSentenceField(
+  overrides?: Partial<InlineSentenceFieldConfig>,
+): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: 'movementValue',
+    label: 'Movement',
+    segments: [
+      {
+        kind: 'select',
+        name: 'movementMode',
+        options: movementModeOptions,
+        defaultValue: 'walk',
+        width: 'lg',
+        ariaLabel: 'Movement mode',
+      },
+      {
+        kind: 'select',
+        name: 'movementOperation',
+        options: movementOperationOptions,
+        defaultValue: 'bonus',
+        width: 'md',
+        ariaLabel: 'Movement operation',
+      },
+      {
+        kind: 'select',
+        name: 'movementValue',
+        options: movementBonusOptions,
+        defaultValue: '5',
+        width: 'sm',
+        ariaLabel: 'Movement bonus',
+      },
+    ],
+    ...overrides,
+  }
+}
+
+/** Formats a concise title for a movement grant row header. */
+export function formatMovementRowTitle(
+  mode: string | undefined,
+  value: number | string | undefined,
+): string {
+  if (!mode || value === undefined || value === '') return 'Movement bonus'
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numericValue)) return 'Movement bonus'
+  return `Movement — ${formatMovementBonusTitle({
+    mode: mode as MovementMode,
+    operation: 'bonus',
+    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
+    unit: 'ft',
+  })}`
+}
+
+/** Formats the authoring summary for a movement grant row header. */
+export function formatMovementRowSummary(
+  mode: string | undefined,
+  value: number | string | undefined,
+): string {
+  if (!mode || value === undefined || value === '') return ''
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numericValue)) return ''
+  return formatMovementBonusAuthoringSummary({
+    mode: mode as MovementMode,
+    operation: 'bonus',
+    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
+    unit: 'ft',
+  })
+}
 
 const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((range) => ({
   value: String(range),
@@ -204,8 +295,8 @@ export function grantItemFields<T extends string>(
         senseRangeInlineSentenceField(),
       ],
     },
-    feetInputUnitField('speedWalkOverride', 'Walk speed', {
-      visibility: visibleFor('speedOverride'),
+    movementInlineSentenceField({
+      visibility: visibleFor('movement'),
     }),
     {
       type: 'select',
@@ -367,12 +458,24 @@ export function grantArrayFields<T extends string>(
           if (type === 'equipment') {
             return equipmentGrantTitle(values as EquipmentGrantItemForm, index, equipmentOptions)
           }
+          if (type === 'movement') {
+            return formatMovementRowTitle(
+              values['movementMode'] as string | undefined,
+              values['movementValue'] as number | string | undefined,
+            )
+          }
           if (type === 'spells') {
             return formatSpellRowTitle(values['spellIds'] as string[] | undefined, spellOptions)
           }
           return type ? rowLabels[type] : undefined
         },
         summary: (values) => {
+          if (values['grantType'] === 'movement') {
+            return formatMovementRowSummary(
+              values['movementMode'] as string | undefined,
+              values['movementValue'] as number | string | undefined,
+            )
+          }
           if (values['grantType'] !== 'equipment') return ''
           return equipmentGrantSummary(values as EquipmentGrantItemForm, equipmentOptions)
         },

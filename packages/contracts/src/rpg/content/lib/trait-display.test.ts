@@ -30,16 +30,22 @@ describe('resolveTraitDisplay', () => {
     expect(display.descriptionHtml).toBe('<p>You have Resistance to Poison damage.</p>')
   })
 
-  it('derives walk speed override display from grantGroups', () => {
+  it('derives movement bonus display from grantGroups', () => {
     const display = resolveTraitDisplay(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'speed',
-        grantGroups: [{ grants: [{ kind: 'speedOverride', walk: 35 }] }],
+        grantGroups: [
+          {
+            grants: [
+              { kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
+            ],
+          },
+        ],
       }),
     )
-    expect(display.name).toBe('Speed')
-    expect(display.descriptionHtml).toBe('<p>Your Speed is 35 feet.</p>')
+    expect(display.name).toBe('Movement')
+    expect(display.descriptionHtml).toBe('<p>Your walking speed increases by 5 feet.</p>')
   })
 
   it('derives language display from grantGroups', () => {

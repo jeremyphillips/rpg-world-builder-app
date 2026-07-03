@@ -1,5 +1,6 @@
 import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import { getLanguageLabel } from '../../vocab/language'
+import { formatMovementBonusDescription } from '../../vocab/movement-mode'
 import { getSenseLabel } from '../../vocab/sense'
 import type {
   ContentGrants,
@@ -29,10 +30,10 @@ function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
         name: 'Damage Resistance',
         descriptionHtml: `<p>You have Resistance to ${getDamageTypeLabel(grant.damageTypes[0]!)} damage.</p>`,
       }
-    case 'speedOverride':
+    case 'movement':
       return {
-        name: 'Speed',
-        descriptionHtml: `<p>Your Speed is ${grant.walk} feet.</p>`,
+        name: 'Movement',
+        descriptionHtml: `<p>${formatMovementBonusDescription(grant)}</p>`,
       }
     case 'languages':
       return {

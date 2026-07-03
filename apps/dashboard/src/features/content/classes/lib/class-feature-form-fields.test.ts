@@ -8,7 +8,7 @@ describe('formatFeatureRowSummary', () => {
       formatFeatureRowSummary({
         name: 'Rage',
         level: 1,
-        grants: [{ grantType: 'speedOverride' }],
+        grants: [{ grantType: 'movement' }],
       }),
     ).toBe('Level 1 · 1 grant')
   })
@@ -18,7 +18,7 @@ describe('formatFeatureRowSummary', () => {
       formatFeatureRowSummary({
         name: 'Extra Attack',
         level: 3,
-        grants: [{ grantType: 'speedOverride' }, { grantType: 'proficiencies' }],
+        grants: [{ grantType: 'movement' }, { grantType: 'proficiencies' }],
       }),
     ).toBe('Level 3 · 2 grants')
   })
