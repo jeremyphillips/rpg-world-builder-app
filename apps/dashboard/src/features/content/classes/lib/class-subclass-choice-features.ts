@@ -6,6 +6,10 @@ import {
 
 export const DEFAULT_SUBCLASS_CHOICE_LEVEL = 3
 
+export function isSubclassChoiceFeatureRow(row: { id?: string } | undefined): boolean {
+  return typeof row?.id === 'string' && row.id.endsWith('-subclass')
+}
+
 /** Creates the explicit feature row that marks when a class chooses a subclass. */
 export function createSubclassChoiceFeature({
   classSlug,

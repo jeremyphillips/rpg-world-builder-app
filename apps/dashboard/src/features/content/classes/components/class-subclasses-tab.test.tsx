@@ -29,13 +29,13 @@ vi.mock('./subclass-editor-panel.client', () => ({
 const QueryWrapper = makeQueryWrapper()
 
 function ClassFormShell({
-  subclassChoiceLevel = '3',
+  features = [{ id: 'fighter-subclass', name: 'Fighter Subclass', level: 3, grants: [] }],
   mode = 'edit' as const,
 }: {
-  subclassChoiceLevel?: string
+  features?: Array<{ id: string; name: string; level: number; grants: never[] }>
   mode?: 'create' | 'edit'
 }) {
-  const form = useForm({ defaultValues: { subclassChoiceLevel } })
+  const form = useForm({ defaultValues: { features } })
   return (
     <QueryWrapper>
       <FormProvider {...form}>
@@ -57,9 +57,9 @@ describe('ClassSubclassesTab', () => {
     expect(screen.getByText(/Save this class first/i)).toBeInTheDocument()
   })
 
-  it('gates authoring when subclass choice level is none', () => {
-    render(<ClassFormShell subclassChoiceLevel="none" />)
-    expect(screen.getByText(/Basics/i)).toBeInTheDocument()
+  it('gates authoring when the subclass choice feature is missing', () => {
+    render(<ClassFormShell features={[]} />)
+    expect(screen.getByText(/Features/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Add subclass/i })).not.toBeInTheDocument()
   })
 

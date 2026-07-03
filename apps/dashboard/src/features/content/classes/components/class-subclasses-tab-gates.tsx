@@ -12,7 +12,8 @@ export function SubclassChoiceLevelGate() {
   return (
     <div className="rounded-lg border border-dashed border-border p-8 text-center">
       <Text variant="muted">
-        Set a subclass choice level on the <strong>Basics</strong> tab before authoring subclasses.
+        Add a subclass choice feature on the <strong>Features</strong> tab before authoring
+        subclasses.
       </Text>
     </div>
   )
