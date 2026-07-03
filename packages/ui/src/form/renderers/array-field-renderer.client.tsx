@@ -1,9 +1,10 @@
 'use client'
 
 import * as React from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { Button } from '../../components/ui/button.client'
+import { ButtonDropdown } from '../../components/ui/button-dropdown.client'
 import {
   fieldArrayItemListClasses,
   fieldGroupBottomMarginClasses,
@@ -24,6 +25,11 @@ import {
   resolveArrayItemVariant,
 } from '../config/array-item-config.lib'
 import { buildItemDefaultValues, type ArrayConfig } from '../field-config'
+import {
+  buildArrayAddMenuItems,
+  resolveArrayAddMenuAppendDefaults,
+} from '../config/array-add-menu.lib'
+import { buildValidationSessionExpandKey } from '../errors'
 import { buildArraySectionChildContext } from '../containers/form-section-child-context.lib'
 import { useVisibilityValues } from '../containers/form-conditional.client'
 import { type ArrayFieldItemContentProps } from './array-field-item-content.client'
@@ -34,6 +40,10 @@ import { useFormValidationPresentation } from '../hooks/use-form-validation-pres
 import { useFormUiContext } from '../context/form-ui.context'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../errors'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
+import {
+  focusFirstEligibleArrayItemControl,
+  scrollArrayItemElementIntoView,
+} from './array-field-item-focus.lib'
 
 export type { ArrayFieldItemContentProps }
 
@@ -55,6 +65,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
   const { getValues } = useFormContext()
   const { addValidationSessionExpandKeys } = useFormUiContext()
+  const watchedItems = useWatch({ name: fullName }) as unknown[] | undefined
   const validation = useFormValidationPresentation()
   const { rhythm, size, depth } = useFormSectionContext()
   const {
@@ -115,12 +126,62 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     [config.fields],
   )
 
-  function appendItem() {
-    const nextDefaults = config.appendDefaults
-      ? config.appendDefaults((getValues(fullName) as unknown[]) ?? [])
-      : staticItemDefaults
+  function appendItem(defaults?: Record<string, unknown>) {
+    const nextDefaults =
+      defaults ??
+      (config.appendDefaults
+        ? config.appendDefaults((getValues(fullName) as unknown[]) ?? [])
+        : staticItemDefaults)
     append(nextDefaults)
   }
+
+  const appendFromAddMenu = React.useCallback(
+    (itemId: string) => {
+      const menuItem = config.addMenu?.items.find((item) => item.id === itemId)
+      if (!menuItem) return
+
+      const newIndex = fields.length
+      const mergedDefaults = {
+        ...staticItemDefaults,
+        ...resolveArrayAddMenuAppendDefaults(menuItem.appendDefaults),
+      }
+      append(mergedDefaults)
+
+      if (collapsible) {
+        addValidationSessionExpandKeys([
+          buildValidationSessionExpandKey(
+            fullName,
+            newIndex,
+            mergedDefaults,
+            itemCollapseKey ?? 'id',
+          ),
+        ])
+      }
+
+      const itemPrefix = `${fullName}.${newIndex}`
+      window.requestAnimationFrame(() => {
+        const rowElement = document.querySelector(`[data-array-item-prefix="${itemPrefix}"]`)
+        if (!rowElement) return
+        scrollArrayItemElementIntoView(rowElement)
+        focusFirstEligibleArrayItemControl(rowElement)
+      })
+    },
+    [
+      addValidationSessionExpandKeys,
+      append,
+      collapsible,
+      config.addMenu?.items,
+      fields.length,
+      fullName,
+      itemCollapseKey,
+      staticItemDefaults,
+    ],
+  )
+
+  const addMenuItems = React.useMemo(() => {
+    if (!config.addMenu) return []
+    return buildArrayAddMenuItems(config.addMenu, watchedItems ?? [])
+  }, [config.addMenu, watchedItems])
 
   const itemProps = (rhfField: (typeof fields)[number], index: number) => ({
     config,
@@ -169,9 +230,19 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
           onMove={move}
         />
         {canAdd ? (
-          <Button variant="outline" size="sm" onClick={appendItem} aria-label={addLabel}>
-            {addLabel}
-          </Button>
+          config.addMenu ? (
+            <ButtonDropdown
+              label={addLabel}
+              groups={config.addMenu.groups}
+              items={addMenuItems}
+              enableSearch={config.addMenu.enableSearch}
+              onSelectItem={appendFromAddMenu}
+            />
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => appendItem()} aria-label={addLabel}>
+              {addLabel}
+            </Button>
+          )
         ) : null}
       </div>
     </fieldset>

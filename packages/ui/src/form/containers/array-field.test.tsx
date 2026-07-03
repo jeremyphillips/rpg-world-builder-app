@@ -913,4 +913,131 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
   })
+
+  it('appends defaults from addMenu selections', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(
+        z.object({
+          grantType: z.string().optional(),
+          detail: z.string().optional(),
+        }),
+      ),
+    })
+
+    const addMenuFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        addLabel: 'Add grant',
+        itemCollapsible: true,
+        itemHeader: {
+          fallback: (index) => `Grant ${index + 1}`,
+          primary: (values) => (values.grantType as string | undefined) ?? undefined,
+        },
+        addMenu: {
+          groups: [{ id: 'traits', label: 'Traits' }],
+          items: [
+            {
+              id: 'movement-bonus',
+              label: 'Movement bonus',
+              description: 'Increase speed',
+              groupId: 'traits',
+              appendDefaults: { grantType: 'movement', detail: 'Walk +5' },
+            },
+            {
+              id: 'language',
+              label: 'Language',
+              groupId: 'traits',
+              appendDefaults: () => ({ grantType: 'languages' }),
+            },
+          ],
+        },
+        fields: [
+          { type: 'text', name: 'grantType', label: 'Grant type' },
+          { type: 'text', name: 'detail', label: 'Detail' },
+        ],
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={addMenuFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    await user.click(screen.getByRole('option', { name: /Movement bonus/i }))
+
+    expect(screen.getByDisplayValue('movement')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Walk +5')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Collapse .*movement/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByRole('textbox', { name: 'Grant type' })).toHaveFocus()
+  })
+
+  it('applies duplicate policy states in addMenu', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(z.object({ grantType: z.string().optional() })),
+    })
+
+    const duplicateFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        addLabel: 'Add grant',
+        addMenu: {
+          groups: [{ id: 'traits', label: 'Traits' }],
+          items: [
+            {
+              id: 'movement-bonus',
+              label: 'Movement bonus',
+              groupId: 'traits',
+              appendDefaults: { grantType: 'movement' },
+              duplicatePolicy: 'block',
+              isDuplicate: (items) =>
+                (items as Array<{ grantType?: string }>).some(
+                  (row) => row.grantType === 'movement',
+                ),
+            },
+            {
+              id: 'language',
+              label: 'Language',
+              groupId: 'traits',
+              appendDefaults: { grantType: 'languages' },
+              duplicatePolicy: 'warn',
+              isDuplicate: (items) =>
+                (items as Array<{ grantType?: string }>).some(
+                  (row) => row.grantType === 'languages',
+                ),
+            },
+          ],
+        },
+        fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={duplicateFields}
+        defaultValues={{ grants: [{ grantType: 'movement' }, { grantType: 'languages' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getAllByText('Already added')).toHaveLength(2)
+    expect(screen.queryByRole('option', { name: /Movement bonus/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Language/i })).toBeInTheDocument()
+  })
 })

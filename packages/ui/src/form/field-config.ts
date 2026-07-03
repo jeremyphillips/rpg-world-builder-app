@@ -19,11 +19,10 @@ import type {
 } from '../components/ui/rich-text-link-picker.client'
 import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
+import type { WeightedSearchField } from '../lib/search'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import {
-  isInlineSentenceBoundSegment,
-} from '../components/ui/inline-sentence-field.lib'
+import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBelowChips,
   InlineSentenceSegment,
@@ -755,6 +754,22 @@ export interface ArrayConfig {
 
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
+
+  /** Searchable template menu for the add control; replaces the plain add button when set. */
+  addMenu?: {
+    groups: { id: string; label: string }[]
+    items: {
+      id: string
+      label: string
+      description?: string
+      groupId?: string
+      searchTerms?: WeightedSearchField[]
+      appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
+      isDuplicate?: (items: unknown[]) => boolean
+      duplicatePolicy?: 'allow' | 'warn' | 'block'
+    }[]
+    enableSearch?: boolean
+  }
 
   /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
   filterSelectDependsOn?: string[]

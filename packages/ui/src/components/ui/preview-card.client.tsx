@@ -23,6 +23,12 @@ export interface PreviewCardProps extends PreviewCardRootVariantProps {
   footerSlot?: React.ReactNode
   className?: string
   /**
+   * When set with `onSelect`, marks the button as a listbox option for
+   * `aria-activedescendant` wiring in searchable menus.
+   */
+  optionId?: string
+  isHighlighted?: boolean
+  /**
    * When provided, the root renders as a `<button>`. `startSlot`, `endSlot`, and
    * `footerSlot` must not contain interactive elements — use the non-selectable
    * `<div>` root when nested controls are required.
@@ -98,6 +104,8 @@ export function PreviewCard({
   density = 'compact',
   interactive,
   className,
+  optionId,
+  isHighlighted = false,
   onSelect,
 }: PreviewCardProps) {
   const resolvedInteractive = interactive ?? Boolean(onSelect)
@@ -120,7 +128,15 @@ export function PreviewCard({
 
   if (onSelect) {
     return (
-      <button type="button" onClick={onSelect} className={rootClassName}>
+      <button
+        type="button"
+        id={optionId}
+        role={optionId ? 'option' : undefined}
+        aria-selected={optionId ? false : undefined}
+        data-active={optionId ? isHighlighted : undefined}
+        onClick={onSelect}
+        className={rootClassName}
+      >
         {content}
       </button>
     )
