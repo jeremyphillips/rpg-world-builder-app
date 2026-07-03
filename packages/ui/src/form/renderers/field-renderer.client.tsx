@@ -24,15 +24,22 @@ import { useFieldErrorPresentation } from '../context/array-item-presentation.co
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
+import {
+  chooseFromChipsToInlineSentence,
+  inlineChooseCountToInlineSentence,
+} from '../config/inline-sentence-legacy-config.lib'
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
-import { ChooseFromChipsFieldRenderer } from './choose-from-chips-field-renderer.client'
-import { InlineChooseCountFieldRenderer } from './inline-choose-count-field-renderer.client'
+import { InlineSentenceFieldRenderer } from './inline-sentence-field-renderer.client'
 import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
   FieldType,
   InputSelectFieldConfig,
+  InlineSentenceFieldConfig,
+  InlineChooseCountFieldConfig,
+  ChooseFromChipsFieldConfig,
+  InputUnitFieldConfig,
   LevelRangeFieldConfig,
 } from '../field-config'
 import {
@@ -100,9 +107,15 @@ function fieldValidationProps({
  * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
  */
 const fieldRenderers: {
-  [K in Exclude<FieldType, 'inputSelect' | 'levelRange'>]: (
-    args: RenderArgs<K>,
-  ) => React.ReactElement
+  [K in Exclude<
+    FieldType,
+    | 'inputSelect'
+    | 'levelRange'
+    | 'inlineSentence'
+    | 'inlineChooseCount'
+    | 'chooseFromChips'
+    | 'inputUnit'
+  >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
   text: ({ config, field, id, ...validation }) => (
     <TextField
@@ -370,33 +383,6 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  chooseFromChips: ({ config, field, id, namePrefix, ...validation }) => (
-    <ChooseFromChipsFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      {...fieldValidationProps(validation)}
-      namePrefix={namePrefix}
-    />
-  ),
-  inlineChooseCount: ({ config, field, id, namePrefix, ...validation }) => (
-    <InlineChooseCountFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      namePrefix={namePrefix}
-      {...fieldValidationProps(validation)}
-    />
-  ),
-  inputUnit: ({ config, field, id, namePrefix, ...validation }) => (
-    <InputUnitFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      {...fieldValidationProps(validation)}
-      namePrefix={namePrefix}
-    />
-  ),
   combobox: ({ config, field, id, ...validation }) => (
     <ComboboxField
       id={id}
@@ -497,8 +483,36 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     )
   }
 
+  if (renderConfig.type === 'inputUnit') {
+    return <InputUnitFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+  }
+
   if (renderConfig.type === 'levelRange') {
     return <LevelRangeFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+  }
+
+  if (renderConfig.type === 'inlineChooseCount') {
+    return (
+      <InlineSentenceFieldRenderer
+        config={inlineChooseCountToInlineSentence(renderConfig)}
+        id={id}
+        namePrefix={namePrefix}
+      />
+    )
+  }
+
+  if (renderConfig.type === 'chooseFromChips') {
+    return (
+      <InlineSentenceFieldRenderer
+        config={chooseFromChipsToInlineSentence(renderConfig)}
+        id={id}
+        namePrefix={namePrefix}
+      />
+    )
+  }
+
+  if (renderConfig.type === 'inlineSentence') {
+    return <InlineSentenceFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
   }
 
   return (
@@ -512,7 +526,15 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   )
 }
 
-type StandardFieldConfig = Exclude<FieldConfig, InputSelectFieldConfig | LevelRangeFieldConfig>
+type StandardFieldConfig = Exclude<
+  FieldConfig,
+  | InputSelectFieldConfig
+  | LevelRangeFieldConfig
+  | InlineSentenceFieldConfig
+  | InlineChooseCountFieldConfig
+  | ChooseFromChipsFieldConfig
+  | InputUnitFieldConfig
+>
 
 interface StandardFieldRendererProps {
   config: FieldConfig

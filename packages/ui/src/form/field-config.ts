@@ -21,6 +21,13 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
+import {
+  isInlineSentenceBoundSegment,
+} from '../components/ui/inline-sentence-field.lib'
+import type {
+  InlineSentenceBelowChips,
+  InlineSentenceSegment,
+} from '../components/ui/inline-sentence-field.types'
 import type {
   FieldStackDependentsChromeScope,
   FieldStackDependentsTone,
@@ -57,6 +64,7 @@ export type FieldType =
   | 'inputUnit'
   | 'chooseFromChips'
   | 'inlineChooseCount'
+  | 'inlineSentence'
   | 'levelRange'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
@@ -342,9 +350,30 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
   defaultValue?: string | string[]
 }
 
+export type {
+  InlineSentenceBelowChips,
+  InlineSentenceNumberSegment,
+  InlineSentenceSegment,
+  InlineSentenceSelectSegment,
+  InlineSentenceTextSegment,
+} from '../components/ui/inline-sentence-field.types'
+
+/** Composable inline prose + bound controls (number, select) with optional chips below. */
+export interface InlineSentenceFieldConfig extends BaseFieldConfig {
+  type: 'inlineSentence'
+  segments: InlineSentenceSegment[]
+  below?: InlineSentenceBelowChips
+  /** When true, the legend is visually hidden but kept for assistive tech. */
+  hideLabel?: boolean
+  /** Pill scale for `below` chips; defaults to field `size`. */
+  chipSize?: FieldSize
+}
+
 /**
  * Inline “Choose [N] … from:” sentence plus chip options — e.g. class skill proficiencies.
  * `name` is the chip selection path; `chooseName` is the numeric count path.
+ *
+ * @deprecated Prefer `inlineSentence` with a `below` chips segment.
  */
 export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
   type: 'chooseFromChips'
@@ -362,7 +391,11 @@ export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
   chooseDefaultValue?: number
 }
 
-/** Inline “Choose [N] …” sentence with a numeric count input only. */
+/**
+ * Inline “Choose [N] …” sentence with a numeric count input only.
+ *
+ * @deprecated Prefer `inlineSentence`.
+ */
 export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   type: 'inlineChooseCount'
   chooseMin?: number
@@ -498,7 +531,11 @@ export interface InputSelectFieldConfig extends BaseFieldConfig {
   defaultValue?: Record<string, unknown>
 }
 
-/** Scalar number + fixed unit label (walk speed, weapon range, spell distance, …). */
+/**
+ * Scalar number + fixed unit label (walk speed, weapon range, spell distance, …).
+ *
+ * @deprecated Prefer `inlineSentence` with a number segment and trailing text.
+ */
 export interface InputUnitFieldConfig extends BaseFieldConfig {
   type: 'inputUnit'
   /** Defaults to `number`. */
@@ -531,6 +568,7 @@ export type FieldConfig =
   | ChipsFieldConfig
   | ChooseFromChipsFieldConfig
   | InlineChooseCountFieldConfig
+  | InlineSentenceFieldConfig
   | LevelRangeFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
@@ -809,7 +847,7 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
 export function buildItemDefaultValues(itemFields: FormItem[]): Record<string, unknown> {
   const values: Record<string, unknown> = {}
   for (const field of flattenFields(itemFields)) {
-    values[field.name] = fieldDefaultValue(field)
+    assignFieldDefaultValues(field, values)
   }
   return values
 }
@@ -840,7 +878,27 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   inputUnit: undefined,
   chooseFromChips: [],
   inlineChooseCount: undefined,
+  inlineSentence: undefined,
   levelRange: undefined,
+}
+
+function assignInlineSentenceDefaults(
+  field: InlineSentenceFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  for (const segment of field.segments) {
+    if (!isInlineSentenceBoundSegment(segment)) continue
+    const explicit = segment.defaultValue
+    if (segment.kind === 'number') {
+      values[segment.name] = explicit ?? TYPE_DEFAULTS.number
+      continue
+    }
+    values[segment.name] = explicit ?? TYPE_DEFAULTS.select
+  }
+
+  if (field.below) {
+    values[field.below.name] = field.below.defaultValue ?? TYPE_DEFAULTS.chips
+  }
 }
 
 function emptyEditableGridValue(
@@ -893,6 +951,11 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
 }
 
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
+  if (field.type === 'inlineSentence') {
+    assignInlineSentenceDefaults(field, values)
+    return
+  }
+
   if (field.type === 'levelRange') {
     const levelRangeField = field as LevelRangeFieldConfig
     const minName = levelRangeField.minName ?? levelRangeField.name

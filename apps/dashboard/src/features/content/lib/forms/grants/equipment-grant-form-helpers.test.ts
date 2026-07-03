@@ -209,10 +209,18 @@ describe('equipmentGrantItemFields', () => {
     const fields = equipmentGrantItemFields({ options: { equipment: [] } })
     const chooseField = fields.find((field) => 'name' in field && field.name === 'choose')
     expect(chooseField).toMatchObject({
-      type: 'inlineChooseCount',
-      selectName: 'poolSource',
-      prefix: 'Character chooses',
-      suffix: 'item(s) from',
+      type: 'inlineSentence',
+      segments: expect.arrayContaining([
+        { kind: 'text', value: 'Character chooses', tone: 'label' },
+        { kind: 'number', name: 'choose', min: 1, digits: 1, defaultValue: 1 },
+        { kind: 'text', value: 'item(s) from', tone: 'label' },
+        expect.objectContaining({
+          kind: 'select',
+          name: 'poolSource',
+          defaultValue: 'filtered',
+          ariaLabel: 'Pool source',
+        }),
+      ]),
     })
     expect(fields.some((field) => 'name' in field && field.name === 'label')).toBe(false)
   })

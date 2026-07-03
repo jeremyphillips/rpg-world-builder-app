@@ -7,7 +7,7 @@ import {
   equipmentKindSchema,
   featCategorySchema,
   gearKindSchema,
-  innateSpellKindSchema,
+  INNATE_SPELL_KINDS,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
   senseIdSchema,
@@ -34,7 +34,7 @@ const BASE_GRANT_TYPES = [
 ] as const
 
 /** Grant types exposed in species traits and class-feature grant pickers. */
-export const GRANT_TYPES = [...BASE_GRANT_TYPES, 'innateSpells', 'featChoice'] as const
+export const GRANT_TYPES = [...BASE_GRANT_TYPES, 'spells', 'featChoice'] as const
 
 /** All grant row discriminators, including types not yet wired into consumer forms. */
 export const GRANT_ROW_TYPES = [...GRANT_TYPES, 'equipment'] as const
@@ -54,7 +54,7 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
 
 export const GRANT_TYPE_LABELS: Record<GrantType, string> = {
   ...BASE_GRANT_TYPE_LABELS,
-  innateSpells: 'Innate spells',
+  spells: 'Spells',
   featChoice: 'Feat choice',
 }
 
@@ -63,14 +63,16 @@ export const GRANT_ROW_TYPE_LABELS: Record<GrantRowType, string> = {
   equipment: 'Equipment',
 }
 
-function createInnateSpellEntryFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  return z.object({
-    level: z.coerce.number().pipe(campaignLevelSchema(maxLevel)),
-    spellIds: z.array(z.string()).min(1),
-    kind: innateSpellKindSchema.optional(),
-    frequency: usageFrequencySchema.optional(),
-  })
+/** Label shown in the "Granted at" select when the row has no explicit unlock level. */
+export const GRANT_DEFAULT_UNLOCK_LABEL = 'when feature is gained'
+
+/** User-facing label for a grant row unlocked at a specific character level. */
+export function formatGrantUnlockLevelLabel(level: number): string {
+  return `at level ${level}`
 }
+
+/** Radix Select rejects empty-string item values; use this for the default unlock level. */
+export const GRANT_DEFAULT_UNLOCK_LEVEL = 'default' as const
 
 const equipmentGrantRowFieldsSchema = z.object({
   itemKind: z.enum(EQUIPMENT_GRANT_ITEM_KINDS).optional(),
@@ -97,6 +99,17 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
   return z
     .object({
       grantType: z.enum(GRANT_ROW_TYPES),
+      /**
+       * Unlock level for this grant row. `undefined` = default group ("When feature is gained").
+       * For class/subclass features this must be > feature.level; for species traits it is a
+       * character level.
+       */
+      unlockLevel: z
+        .union([
+          z.literal(GRANT_DEFAULT_UNLOCK_LEVEL),
+          z.coerce.number().pipe(campaignLevelSchema(maxLevel)),
+        ])
+        .optional(),
       resistances: z.array(damageTypeIdSchema).optional(),
       damageType: z.array(damageTypeIdSchema).optional(),
       senseType: senseIdSchema.optional(),
@@ -107,8 +120,14 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       proficiencyArmor: z.array(armorCategorySchema).optional(),
       proficiencyTools: z.array(z.string()).optional(),
       proficiencyWeapons: z.array(z.string()).optional(),
-      innateSpellAbility: abilitySchema.optional(),
-      innateSpellEntries: z.array(createInnateSpellEntryFormSchema(maxLevel)).optional(),
+      /** Spellcasting ability for a `spells` row. */
+      spellAbility: abilitySchema.optional(),
+      /** Cast mode: `free_cast` (innate, via frequency) or `always_prepared` (slot-based). */
+      spellMode: z.enum(INNATE_SPELL_KINDS).optional(),
+      /** Usage frequency — only valid when `spellMode` is `free_cast`. */
+      spellFrequency: usageFrequencySchema.optional(),
+      /** Spell slugs granted by this row. */
+      spellIds: z.array(z.string()).optional(),
       featCategory: featCategorySchema.optional(),
       featChoose: z.coerce.number().int().min(1).optional(),
       featAllowAnyQualifying: z.boolean().optional(),

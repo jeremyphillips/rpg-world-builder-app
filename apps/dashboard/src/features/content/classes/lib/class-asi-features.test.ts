@@ -1,62 +1,44 @@
 import { describe, expect, it } from 'vitest'
-import type { ClassFeature } from '@rpg/contracts'
 
 import {
   ASI_FEATURE_DESCRIPTION,
   ASI_FEATURE_NAME,
+  ABILITY_SCORE_IMPROVEMENT_FEAT_ID,
   createAsiFeature,
-  deriveAsiLevels,
-  isAsiFeature,
-  syncAsiFeatures,
 } from './class-asi-features'
 
-const secondWind: ClassFeature = {
-  kind: 'custom',
-  id: 'second-wind',
-  name: 'Second Wind',
-  level: 1,
-}
-
-describe('class-asi-features', () => {
-  it('detects ASI features by id or recommendedFeatIds', () => {
-    expect(isAsiFeature(createAsiFeature(4))).toBe(true)
-    expect(
-      isAsiFeature({
-        id: 'custom-asi',
-        grants: {
-          featChoice: {
-            category: 'general',
-            choose: 1,
-            recommendedFeatIds: ['ability-score-improvement'],
-          },
-        },
-      }),
-    ).toBe(true)
-    expect(isAsiFeature(secondWind)).toBe(false)
+describe('createAsiFeature', () => {
+  it('creates an ASI feature at the specified level', () => {
+    const feature = createAsiFeature(4)
+    expect(feature.id).toBe('ability-score-improvement-4')
+    expect(feature.name).toBe(ASI_FEATURE_NAME)
+    expect(feature.level).toBe(4)
+    expect(feature.description).toBe(ASI_FEATURE_DESCRIPTION)
   })
 
-  it('derives ASI levels from feature rows', () => {
-    const features = [secondWind, createAsiFeature(4), createAsiFeature(8)]
-    expect(deriveAsiLevels(features)).toEqual([4, 8])
+  it('uses the atomic grantGroups model (no legacy grants bag)', () => {
+    const feature = createAsiFeature(8)
+    expect(feature).not.toHaveProperty('grants')
+    expect(feature.grantGroups).toHaveLength(1)
+    const group = feature.grantGroups![0]!
+    expect(group.unlock).toBeUndefined()
+    expect(group.grants).toHaveLength(1)
   })
 
-  it('syncAsiFeatures replaces ASI rows and preserves other features', () => {
-    const features = [secondWind, createAsiFeature(4), createAsiFeature(8)]
-    const synced = syncAsiFeatures([4, 12], features)
+  it('produces a general featChoice grant with ASI as recommended', () => {
+    const feature = createAsiFeature(12)
+    const grant = feature.grantGroups![0]!.grants[0]!
+    expect(grant.kind).toBe('featChoice')
+    if (grant.kind === 'featChoice') {
+      expect(grant.category).toBe('general')
+      expect(grant.choose).toBe(1)
+      expect(grant.allowAnyQualifying).toBe(true)
+      expect(grant.recommendedFeatIds).toContain(ABILITY_SCORE_IMPROVEMENT_FEAT_ID)
+    }
+  })
 
-    expect(synced.filter(isAsiFeature).map((f) => f.level)).toEqual([4, 12])
-    expect(synced.find((f) => f.id === 'second-wind')).toEqual(secondWind)
-    expect(synced.find((f) => f.id === 'ability-score-improvement-4')).toMatchObject({
-      name: ASI_FEATURE_NAME,
-      description: ASI_FEATURE_DESCRIPTION,
-      grants: {
-        featChoice: {
-          category: 'general',
-          choose: 1,
-          allowAnyQualifying: true,
-          recommendedFeatIds: ['ability-score-improvement'],
-        },
-      },
-    })
+  it('generates unique ids per level', () => {
+    const ids = [4, 8, 12, 16].map((l) => createAsiFeature(l).id)
+    expect(new Set(ids).size).toBe(4)
   })
 })

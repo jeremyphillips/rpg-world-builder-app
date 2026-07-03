@@ -1,14 +1,9 @@
 import { MAX_CHARACTER_LEVEL, type CharacterClass, type CreateClassInput } from '@rpg/contracts'
 
-import {
-  contentFormRegistry,
-  contentFormFields,
-  type ContentFormDef,
-} from '../../lib/forms/content-form-registry'
+import { contentFormRegistry, contentFormFields, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
-import { deriveAsiLevels } from './class-asi-features'
 import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import {
   buildClassTabs,
@@ -43,7 +38,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     description: entity.description,
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
-    asiLevels: deriveAsiLevels(entity.features),
     subclassChoiceLevel:
       entity.subclassChoiceLevel !== undefined
         ? String(entity.subclassChoiceLevel)

@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import {
   campaignLevelSchema,
-  grantGroupsSchema,
   MAX_CHARACTER_LEVEL,
   type ClassFeature,
 } from '@rpg/contracts'
@@ -18,7 +17,11 @@ import {
   GRANT_TYPE_LABELS,
   createGrantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
+import {
+  grantGroupsToFormRows,
+  formRowsToGrantGroups,
+  grantsToFormRows,
+} from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -32,7 +35,6 @@ export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVE
     description: z.string().optional(),
     level: levelField,
     grants: z.array(createGrantRowFormSchema(maxLevel)),
-    _grantGroups: grantGroupsSchema.optional(),
   })
 }
 
@@ -103,25 +105,27 @@ export function classFeatureItemFields(
 }
 
 export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
+  const grants = feature.grantGroups?.length
+    ? grantGroupsToFormRows(feature.grantGroups)
+    : grantsToFormRows(feature.grants)
   return {
     id: feature.id,
     name: feature.name,
     description: feature.description,
     level: feature.level,
-    grants: grantsToFormRows(feature.grants),
-    _grantGroups: feature.grantGroups,
+    grants,
   }
 }
 
 export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
+  const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
   return {
     kind: 'custom',
     id: row.id,
     name: row.name,
     description: row.description || undefined,
     level: row.level,
-    grants: formRowsToGrants(row.grants),
-    ...(row._grantGroups !== undefined ? { grantGroups: row._grantGroups } : {}),
+    ...(grantGroups.length ? { grantGroups } : {}),
   }
 }
 

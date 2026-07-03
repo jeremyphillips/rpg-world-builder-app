@@ -1,6 +1,5 @@
-import type { InputUnitFieldConfig } from '@rpg/ui/form'
 import type { NumberInputDigits } from '@rpg/ui'
-import type { FieldConfig, RowConfig } from '@rpg/ui/form'
+import type { FieldConfig, InlineSentenceFieldConfig, RowConfig } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
 
@@ -16,17 +15,30 @@ export const SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS = 3 satisfies NumberInputD
 export function feetInputUnitField(
   name: string,
   label: string,
-  overrides?: Partial<InputUnitFieldConfig>,
-): InputUnitFieldConfig {
+  overrides?: Partial<InlineSentenceFieldConfig> & {
+    valueDigits?: NumberInputDigits
+    defaultValue?: number
+  },
+): InlineSentenceFieldConfig {
+  const { valueDigits, defaultValue, ...fieldOverrides } = overrides ?? {}
+  const digits = valueDigits ?? WALK_SPEED_INLINE_COUNT_DIGITS
+
   return {
-    type: 'inputUnit',
+    type: 'inlineSentence',
     name,
     label,
-    inputType: 'number',
-    unit: 'ft.',
-    min: 0,
-    valueDigits: WALK_SPEED_INLINE_COUNT_DIGITS,
-    ...overrides,
+    segments: [
+      {
+        kind: 'number',
+        name,
+        min: 0,
+        digits,
+        defaultValue,
+        ariaLabel: `${label} value`,
+      },
+      { kind: 'text', value: 'ft.', tone: 'label' },
+    ],
+    ...fieldOverrides,
   }
 }
 

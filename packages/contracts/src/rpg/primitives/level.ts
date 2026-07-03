@@ -53,3 +53,8 @@ export function formatLevelRangeLabel(range: { minLevel: number; maxLevel: numbe
 
   return `Levels ${range.minLevel}–${range.maxLevel}`
 }
+
+/** User-facing label for a single character level (`Level 3`). */
+export function formatCharacterLevelLabel(level: number): string {
+  return formatLevelRangeLabel({ minLevel: level, maxLevel: level })
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   absoluteLevelSchema,
+  formatCharacterLevelLabel,
   formatLevelRangeLabel,
   levelSchema,
   MAX_CHARACTER_LEVEL,
@@ -32,5 +33,12 @@ describe('formatLevelRangeLabel', () => {
 
   it('uses Levels N–M when min and max differ', () => {
     expect(formatLevelRangeLabel({ minLevel: 2, maxLevel: 4 })).toBe('Levels 2–4')
+  })
+})
+
+describe('formatCharacterLevelLabel', () => {
+  it('formats a single level', () => {
+    expect(formatCharacterLevelLabel(1)).toBe('Level 1')
+    expect(formatCharacterLevelLabel(12)).toBe('Level 12')
   })
 })

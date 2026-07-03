@@ -7,6 +7,7 @@ import type {
   FieldConfig,
   FormItem,
   InlineChooseCountFieldConfig,
+  InlineSentenceFieldConfig,
   InputSelectFieldConfig,
   LevelRangeFieldConfig,
 } from '../field-config'
@@ -57,6 +58,7 @@ const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   number: 'number',
   inputUnit: 'number',
   inlineChooseCount: 'number',
+  inlineSentence: 'number',
   editableGrid: 'number',
   diceFormula: 'number',
   levelRange: 'number',
@@ -111,6 +113,24 @@ function registerField(
         label: inlineField.selectLabel ?? field.label,
         category: 'choice',
       })
+    }
+  }
+
+  if (field.type === 'inlineSentence') {
+    const inlineField = field as InlineSentenceFieldConfig
+    for (const segment of inlineField.segments) {
+      if (segment.kind === 'number') {
+        registry.set(key(segment.name), { label: field.label, category: 'number' })
+      }
+      if (segment.kind === 'select') {
+        registry.set(key(segment.name), {
+          label: segment.ariaLabel ?? field.label,
+          category: 'choice',
+        })
+      }
+    }
+    if (inlineField.below) {
+      registry.set(key(inlineField.below.name), { label: field.label, category: 'multi' })
     }
   }
 }

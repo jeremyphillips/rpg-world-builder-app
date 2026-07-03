@@ -1,6 +1,4 @@
 import {
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
@@ -11,8 +9,8 @@ import {
   SKILLS,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
-  type UsageFrequency,
   type FeatCategory,
+  type UsageFrequency,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
@@ -24,13 +22,20 @@ import {
 
 import type { ContentFormCtx } from '../content-form-registry'
 import { feetInputUnitField } from '../fields/content-identity-form-fields'
-import { getLevelFieldOptions, levelSelectDigits } from '../../form-options/level-field-options'
+import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
+import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
 import { titleCase } from '../../utils/title-case'
 import {
   equipmentGrantItemFields,
   type EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
 import { equipmentGrantSummary, equipmentGrantTitle } from './equipment-grant-form-values'
+import {
+  formatGrantUnlockLevelLabel,
+  GRANT_DEFAULT_UNLOCK_LABEL,
+  GRANT_DEFAULT_UNLOCK_LEVEL,
+  GRANT_ROW_TYPE_LABELS,
+} from './grant-form-schema'
 
 const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
   value: String(r),
@@ -47,15 +52,7 @@ const armorCategoryOptions = toOptions(
   >,
 )
 
-const abilityOptions = toOptions(
-  ABILITY_IDS,
-  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
-    (typeof ABILITY_IDS)[number],
-    string
-  >,
-)
-
-const innateSpellKindOptions = toOptions(
+const spellModeOptions = toOptions(
   INNATE_SPELL_KINDS,
   Object.fromEntries(
     INNATE_SPELL_KINDS.map((k) => [k, titleCase(k.replaceAll('_', ' '))]),
@@ -95,12 +92,12 @@ function grantTypeOptionsFor<T extends string>(
   return grantTypes.map((t) => ({ value: t, label: labels[t] }))
 }
 
-export function formatInnateSpellEntryTitle(
+/** Formats a concise title for a spells row header. */
+export function formatSpellRowTitle(
   spellIds: string[] | undefined,
   spellOptions: FieldOption[],
-  index: number,
 ): string {
-  if (!spellIds?.length) return `Entry ${index + 1}`
+  if (!spellIds?.length) return 'Spells'
   const labels = spellIds.map(
     (id) => spellOptions.find((option) => option.value === id)?.label ?? id,
   )
@@ -119,6 +116,12 @@ export function grantItemFields<T extends string>(
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
   const languageOptions = buildActiveLanguageFieldOptions(ctx.languageVocabulary)
+  const levelOptions = getLevelFieldOptions(ctx)
+
+  const unlockLevelOptions = [
+    { value: GRANT_DEFAULT_UNLOCK_LEVEL, label: GRANT_DEFAULT_UNLOCK_LABEL },
+    ...withLevelOptionLabels(levelOptions, formatGrantUnlockLevelLabel),
+  ]
 
   return [
     {
@@ -127,6 +130,22 @@ export function grantItemFields<T extends string>(
       label: 'Grant type',
       options: grantTypeOptionsFor(grantTypes, labels),
       required: true,
+    },
+    {
+      type: 'inlineSentence',
+      name: 'unlockLevel',
+      label: 'Granted at',
+      hideLabel: true,
+      segments: [
+        { kind: 'text', value: 'Granted this', tone: 'label' },
+        {
+          kind: 'select',
+          name: 'unlockLevel',
+          options: unlockLevelOptions,
+          width: 'lg',
+          defaultValue: GRANT_DEFAULT_UNLOCK_LEVEL,
+        },
+      ],
     },
     {
       type: 'chips',
@@ -198,67 +217,52 @@ export function grantItemFields<T extends string>(
       placeholder: 'Choose weapons…',
       visibility: visibleFor('proficiencies'),
     },
+    // --- Spells row fields (replaces legacy innateSpells entries array) ---
     {
-      type: 'select',
-      name: 'innateSpellAbility',
-      label: 'Spellcasting ability',
-      options: abilityOptions,
-      visibility: visibleFor('innateSpells'),
-    },
-    {
-      kind: 'array',
-      name: 'innateSpellEntries',
-      legend: 'Innate spell entries',
-      addLabel: 'Add entry',
-      itemCollapsible: true,
-      visibility: visibleFor('innateSpells'),
-      itemHeader: {
-        fallback: (index) => `Entry ${index + 1}`,
-        primary: (values, index) =>
-          formatInnateSpellEntryTitle(
-            values['spellIds'] as string[] | undefined,
-            spellOptions,
-            index,
-          ),
-      },
+      kind: 'row',
+      visibility: visibleFor('spells'),
       fields: [
         {
           type: 'select',
-          name: 'level',
-          label: 'Character level',
-          options: getLevelFieldOptions(ctx),
-          digits: levelSelectDigits(ctx),
-          required: true,
-        },
-        {
-          type: 'combobox',
-          name: 'spellIds',
-          label: 'Spells',
-          multiple: true,
-          options: spellOptions,
-          placeholder: 'Choose spells…',
-          required: true,
+          name: 'spellAbility',
+          label: 'Spellcasting ability',
+          options: getSpellcastingAbilityFieldOptions(),
+          width: '1/3',
         },
         {
           type: 'select',
-          name: 'kind',
-          label: 'Kind',
-          options: innateSpellKindOptions,
+          name: 'spellMode',
+          label: 'Cast mode',
+          options: spellModeOptions,
           defaultValue: 'free_cast',
+          width: '1/3',
         },
         {
           type: 'select',
-          name: 'frequency',
+          name: 'spellFrequency',
           label: 'Frequency',
           options: usageFrequencyOptions,
+          width: '1/3',
           visibility: {
-            dependsOn: ['kind'],
+            dependsOn: ['grantType', 'spellMode'],
             visibleWhen: (watched) =>
-              watched['kind'] === undefined || watched['kind'] === 'free_cast',
+              watched['grantType'] === 'spells' &&
+              (watched['spellMode'] === undefined || watched['spellMode'] === 'free_cast'),
           },
         },
       ],
     },
+    {
+      type: 'combobox',
+      name: 'spellIds',
+      label: 'Spells',
+      multiple: true,
+      options: spellOptions,
+      placeholder: 'Choose spells…',
+      required: true,
+      visibility: visibleFor('spells'),
+    },
+    // --- Feat choice fields ---
     {
       type: 'select',
       name: 'featCategory',
@@ -317,6 +321,7 @@ export function grantArrayFields<T extends string>(
   ctx: ContentFormCtx,
 ): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
+  const spellOptions = ctx.options?.spells ?? []
   const rowLabels = labels as Record<string, string>
 
   return [
@@ -333,6 +338,9 @@ export function grantArrayFields<T extends string>(
           if (type === 'equipment') {
             return equipmentGrantTitle(values as EquipmentGrantItemForm, index, equipmentOptions)
           }
+          if (type === 'spells') {
+            return formatSpellRowTitle(values['spellIds'] as string[] | undefined, spellOptions)
+          }
           return type ? rowLabels[type] : undefined
         },
         summary: (values) => {
@@ -344,3 +352,6 @@ export function grantArrayFields<T extends string>(
     },
   ]
 }
+
+// Re-export GRANT_ROW_TYPE_LABELS for consumers that import it from this module.
+export { GRANT_ROW_TYPE_LABELS }

@@ -27,7 +27,6 @@ const subclassChoiceLevelOptions = (ctx: ContentFormCtx) => [
 ]
 
 export function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
-  const flatLevelOptions = getLevelFieldOptions(ctx, { showTierLabels: false })
   return [
     {
       kind: 'row',
@@ -51,13 +50,6 @@ export function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
           width: 'auto',
         },
       ],
-    },
-    {
-      type: 'chips',
-      name: 'asiLevels',
-      label: 'ASI levels',
-      options: flatLevelOptions,
-      hint: 'Levels that grant an ability score improvement',
     },
     {
       type: 'select',

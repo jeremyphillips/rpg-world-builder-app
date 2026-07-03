@@ -167,14 +167,20 @@ export function startingEquipmentModifierFields(): FormItem[] {
 export function startingEquipmentChooseFields(): FormItem[] {
   return [
     {
-      type: 'inlineChooseCount',
+      type: 'inlineSentence',
       name: 'choose',
       label: 'Packages to choose',
       hideLabel: true,
-      prefix: 'Character can choose',
-      suffix: 'package(s) from list',
-      chooseMin: 1,
-      defaultValue: 1,
+      segments: [
+        { kind: 'text', value: 'Character can choose', tone: 'label' },
+        {
+          kind: 'number',
+          name: 'choose',
+          min: 1,
+          defaultValue: 1,
+        },
+        { kind: 'text', value: 'package(s) from list', tone: 'label' },
+      ],
     },
   ]
 }

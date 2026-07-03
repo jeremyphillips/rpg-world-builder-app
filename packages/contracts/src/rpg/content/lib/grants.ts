@@ -599,36 +599,3 @@ export function normalizeContentTrait(input: unknown): unknown {
 export const contentTraitSchema = z.preprocess(normalizeContentTrait, contentTraitUnionSchema)
 
 export type ContentTrait = z.infer<typeof contentTraitSchema>
-
-/**
- * Converts a legacy ContentGrants bag to the canonical GrantGroups format by
- * placing all grants into a single default group (no unlock).
- *
- * @deprecated Bridge for dashboard form code pending Phase 3 grant form migration.
- *   Remove once `grant-form-fields.ts` and `grant-form-values.ts` are migrated.
- */
-export function legacyGrantsToGrantGroups(grants: ContentGrants): GrantGroups {
-  const atomicGrants: ContentGrant[] = []
-
-  for (const sense of grants.senses ?? []) {
-    atomicGrants.push({ kind: 'sense', type: sense.type, range: sense.range } as ContentGrant)
-  }
-  if (grants.speedOverride && Object.keys(grants.speedOverride).length > 0) {
-    atomicGrants.push({ kind: 'speedOverride', ...grants.speedOverride } as ContentGrant)
-  }
-  if (grants.damageType?.length) {
-    atomicGrants.push({ kind: 'damageType', damageTypes: grants.damageType })
-  }
-  if (grants.resistances?.length) {
-    atomicGrants.push({ kind: 'resistances', damageTypes: grants.resistances })
-  }
-  if (grants.languages?.length) {
-    atomicGrants.push({ kind: 'languages', languageIds: grants.languages })
-  }
-  if (grants.featChoice) {
-    atomicGrants.push({ kind: 'featChoice', ...grants.featChoice } as ContentGrant)
-  }
-
-  if (atomicGrants.length === 0) return []
-  return [{ grants: atomicGrants }]
-}

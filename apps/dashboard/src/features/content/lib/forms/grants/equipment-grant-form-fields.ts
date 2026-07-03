@@ -256,21 +256,30 @@ export function equipmentChoiceGrantFields(
 
   return [
     {
-      type: 'inlineChooseCount',
+      type: 'inlineSentence',
       name: 'choose',
       label: '',
-      chooseMin: 1,
-      prefix: 'Character chooses',
-      suffix: 'item(s) from',
-      defaultValue: 1,
-      digits: 1,
       hideLabel: true,
       visibility: visibleForItemKind('choice', guard),
-      selectName: 'poolSource',
-      selectLabel: 'Pool source',
-      selectOptions: poolSourceOptions,
-      selectDefaultValue: 'filtered',
-      selectRequired: true,
+      segments: [
+        { kind: 'text', value: 'Character chooses', tone: 'label' },
+        {
+          kind: 'number',
+          name: 'choose',
+          min: 1,
+          digits: 1,
+          defaultValue: 1,
+        },
+        { kind: 'text', value: 'item(s) from', tone: 'label' },
+        {
+          kind: 'select',
+          name: 'poolSource',
+          options: poolSourceOptions,
+          width: 'xl',
+          defaultValue: 'filtered',
+          ariaLabel: 'Pool source',
+        },
+      ],
     },
     {
       type: 'combobox',

@@ -1,6 +1,6 @@
-import { buildGroupedLevelOptions, type BuildGroupedLevelOptionsConfig } from '@rpg/contracts'
+import { buildGroupedLevelOptions, formatCharacterLevelLabel, type BuildGroupedLevelOptionsConfig } from '@rpg/contracts'
 import type { SelectFieldConfig } from '@rpg/ui/form'
-import { type FieldOption, type SelectFieldOptionListItem } from '@rpg/ui/form'
+import { isFieldOptionGroup, type FieldOption, type SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import { campaignRulesFromCtx, effectiveMaxFromCtx } from './content-campaign-rules'
@@ -67,4 +67,36 @@ export function getLevelFieldOptions(
   }
 
   return groupedLevelOptions(ctx, config)
+}
+
+function mapLevelOptionLabel(
+  option: FieldOption,
+  formatLabel: (level: number) => string,
+): FieldOption {
+  return {
+    ...option,
+    label: formatLabel(Number(option.value)),
+  }
+}
+
+/** Maps level select option labels via a formatter; preserves grouped option structure. */
+export function withLevelOptionLabels(
+  options: SelectFieldOptionListItem[],
+  formatLabel: (level: number) => string,
+): SelectFieldOptionListItem[] {
+  return options.map((item) =>
+    isFieldOptionGroup(item)
+      ? {
+          ...item,
+          options: item.options.map((option) => mapLevelOptionLabel(option, formatLabel)),
+        }
+      : mapLevelOptionLabel(item, formatLabel),
+  )
+}
+
+/** Maps level select options to `Level N` labels via {@link formatCharacterLevelLabel}. */
+export function withCharacterLevelLabels(
+  options: SelectFieldOptionListItem[],
+): SelectFieldOptionListItem[] {
+  return withLevelOptionLabels(options, formatCharacterLevelLabel)
 }

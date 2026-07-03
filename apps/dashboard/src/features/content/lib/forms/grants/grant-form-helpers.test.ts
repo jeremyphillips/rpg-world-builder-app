@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
+import type { GrantGroups } from '@rpg/contracts'
 
-import { formatInnateSpellEntryTitle } from './grant-form-fields'
-import { GRANT_ROW_TYPE_LABELS, GRANT_ROW_TYPES } from './grant-form-schema'
-import { formRowsToGrants, grantsToFormRows } from './grant-form-values'
+import { formatSpellRowTitle } from './grant-form-fields'
+import { GRANT_ROW_TYPE_LABELS, GRANT_ROW_TYPES, GRANT_DEFAULT_UNLOCK_LEVEL } from './grant-form-schema'
+import {
+  formRowsToGrants,
+  formRowsToGrantGroups,
+  grantGroupsToFormRows,
+  grantsToFormRows,
+} from './grant-form-values'
 
-describe('grantsToFormRows / formRowsToGrants', () => {
+describe('grantsToFormRows / formRowsToGrants (legacy bridge)', () => {
   it('round-trips proficiency tool and weapon slug arrays', () => {
     const rows = grantsToFormRows({
       proficiencies: {
@@ -24,26 +30,17 @@ describe('grantsToFormRows / formRowsToGrants', () => {
     })
   })
 
-  it('round-trips innate spell slug arrays', () => {
-    const grants = {
+  it('converts innate spell entries to spells rows', () => {
+    const rows = grantsToFormRows({
       innateSpells: {
         ability: 'cha' as const,
-        entries: [{ spellIds: ['power-word-heal', 'power-word-kill'] }],
+        entries: [{ level: 1, kind: 'free_cast' as const, spellIds: ['power-word-heal', 'power-word-kill'] }],
       },
-    }
-    const rows = grantsToFormRows(grants)
-    const innateRow = rows.find((row) => row.grantType === 'innateSpells')
-
-    expect(innateRow?.innateSpellEntries?.[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
-
-    const restored = formRowsToGrants(rows)
-    expect(restored?.innateSpells?.entries[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
+    })
+    const spellRow = rows.find((row) => row.grantType === 'spells')
+    expect(spellRow).toBeDefined()
+    expect(spellRow?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    expect(spellRow?.spellAbility).toBe('cha')
   })
 
   it('round-trips recommended feat ids on feat choice grants', () => {
@@ -129,28 +126,164 @@ describe('grantsToFormRows / formRowsToGrants', () => {
   })
 })
 
+describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
+  it('round-trips a spells grant through grantGroups', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'spells',
+            ability: 'cha',
+            mode: 'free_cast',
+            frequency: 'once_per_long_rest',
+            spellIds: ['power-word-heal', 'power-word-kill'],
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows).toHaveLength(1)
+    expect(rows[0]?.grantType).toBe('spells')
+    expect(rows[0]?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    expect(rows[0]?.spellAbility).toBe('cha')
+    expect(rows[0]?.spellMode).toBe('free_cast')
+    expect(rows[0]?.spellFrequency).toBe('once_per_long_rest')
+    expect(rows[0]?.unlockLevel).toBe(GRANT_DEFAULT_UNLOCK_LEVEL)
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('stamps unlockLevel from the group onto rows', () => {
+    const groups: GrantGroups = [
+      {
+        unlock: { level: 5 },
+        grants: [
+          {
+            kind: 'spells',
+            ability: 'wis',
+            mode: 'always_prepared',
+            spellIds: ['bless', 'cure-wounds'],
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.unlockLevel).toBe(5)
+  })
+
+  it('groups rows by unlockLevel when saving', () => {
+    const rows = [
+      {
+        grantType: 'spells' as const,
+        spellAbility: 'cha' as const,
+        spellMode: 'free_cast' as const,
+        spellIds: ['dancing-lights'],
+        unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
+      },
+      {
+        grantType: 'spells' as const,
+        spellAbility: 'cha' as const,
+        spellMode: 'free_cast' as const,
+        spellFrequency: 'once_per_long_rest' as const,
+        spellIds: ['faerie-fire'],
+        unlockLevel: 3,
+      },
+    ]
+    const groups = formRowsToGrantGroups(rows)
+    expect(groups).toHaveLength(2)
+    expect(groups[0]?.unlock).toBeUndefined()
+    expect(groups[0]?.grants[0]).toMatchObject({ kind: 'spells', spellIds: ['dancing-lights'] })
+    expect(groups[1]?.unlock?.level).toBe(3)
+    expect(groups[1]?.grants[0]).toMatchObject({ kind: 'spells', spellIds: ['faerie-fire'] })
+  })
+
+  it('normalizes unlock level equal to parentUnlock to default group', () => {
+    const rows = [
+      {
+        grantType: 'featChoice' as const,
+        featCategory: 'general' as const,
+        featChoose: 1,
+        featAllowAnyQualifying: true,
+        featRecommendedIds: ['ability-score-improvement'],
+        unlockLevel: 4,
+      },
+    ]
+    // parentUnlock level = 4 means unlockLevel 4 is the default group
+    const groups = formRowsToGrantGroups(rows, { level: 4 })
+    expect(groups).toHaveLength(1)
+    expect(groups[0]?.unlock).toBeUndefined()
+  })
+
+  it('round-trips a proficiencies grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'proficiencies',
+            skills: ['perception'],
+            tools: ['thieves-tools'],
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('proficiencies')
+    expect(rows[0]?.proficiencySkills).toEqual(['perception'])
+    expect(rows[0]?.proficiencyTools).toEqual(['thieves-tools'])
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('expands languages grant with multiple ids into multiple rows', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [{ kind: 'languages', languageIds: ['common', 'elvish'] }],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows.filter((r) => r.grantType === 'languages')).toHaveLength(2)
+
+    const restored = formRowsToGrantGroups(rows)
+    // Two separate languages grants, each with 1 ID
+    const langGrants = restored[0]?.grants.filter((g) => g.kind === 'languages')
+    expect(langGrants).toHaveLength(2)
+  })
+})
+
 describe('grant row type exports', () => {
   it('keeps consumer grant pickers unchanged while allowing equipment rows in the schema', () => {
     expect(GRANT_ROW_TYPES).toContain('equipment')
     expect(GRANT_ROW_TYPE_LABELS.equipment).toBe('Equipment')
   })
+
+  it('spells replaces innateSpells in the grant types', () => {
+    expect(GRANT_ROW_TYPES).toContain('spells')
+    expect(GRANT_ROW_TYPES).not.toContain('innateSpells')
+    expect(GRANT_ROW_TYPE_LABELS.spells).toBe('Spells')
+  })
 })
 
-describe('formatInnateSpellEntryTitle', () => {
+describe('formatSpellRowTitle', () => {
   it('shows spell labels when one or two spells are selected', () => {
     expect(
-      formatInnateSpellEntryTitle(
+      formatSpellRowTitle(
         ['power-word-heal', 'power-word-kill'],
         [
           { value: 'power-word-heal', label: 'Power Word Heal' },
           { value: 'power-word-kill', label: 'Power Word Kill' },
         ],
-        0,
       ),
     ).toBe('Power Word Heal, Power Word Kill')
   })
 
   it('shows a count when more than two spells are selected', () => {
-    expect(formatInnateSpellEntryTitle(['a', 'b', 'c'], [], 2)).toBe('3 spells')
+    expect(formatSpellRowTitle(['a', 'b', 'c'], [])).toBe('3 spells')
+  })
+
+  it('returns Spells when no spells are selected', () => {
+    expect(formatSpellRowTitle([], [])).toBe('Spells')
+    expect(formatSpellRowTitle(undefined, [])).toBe('Spells')
   })
 })

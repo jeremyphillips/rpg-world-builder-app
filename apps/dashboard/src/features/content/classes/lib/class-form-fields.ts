@@ -48,7 +48,6 @@ export function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     description: z.string().optional(),
     primaryAbilities: z.array(abilitySchema).min(1).max(2),
     hitDie: z.coerce.number().pipe(hitDieSchema),
-    asiLevels: z.array(levelField),
     subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
     hasSpellcasting: z.boolean(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),

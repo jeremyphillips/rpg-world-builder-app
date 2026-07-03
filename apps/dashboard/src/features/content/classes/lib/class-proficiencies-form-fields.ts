@@ -158,16 +158,25 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Skills & Tools',
       fields: [
         {
-          type: 'chooseFromChips',
+          type: 'inlineSentence',
           name: 'proficiencies.skills.from',
-          chooseName: 'proficiencies.skills.choose',
           label: '',
-          options: skillOptions,
-          chooseMin: 0,
-          chooseMax: SKILL_IDS.length,
           required: true,
-          prefix: 'Character chooses',
-          suffix: 'Skill Proficiencies from:',
+          segments: [
+            { kind: 'text', value: 'Character chooses', tone: 'label' },
+            {
+              kind: 'number',
+              name: 'proficiencies.skills.choose',
+              min: 0,
+              max: SKILL_IDS.length,
+            },
+            { kind: 'text', value: 'Skill Proficiencies from:', tone: 'label' },
+          ],
+          below: {
+            kind: 'chips',
+            name: 'proficiencies.skills.from',
+            options: skillOptions,
+          },
         },
         {
           type: 'chips',

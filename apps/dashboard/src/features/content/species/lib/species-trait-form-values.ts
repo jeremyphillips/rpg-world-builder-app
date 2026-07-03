@@ -1,7 +1,11 @@
-import { getTraitGrants, legacyGrantsToGrantGroups, type ContentTrait } from '@rpg/contracts'
+import { type ContentTrait } from '@rpg/contracts'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
+import {
+  grantGroupsToFormRows,
+  grantsToFormRows,
+  formRowsToGrantGroups,
+} from '../../lib/forms/grants/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
 
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {
@@ -13,13 +17,13 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
       overrideDisplay: hasOverrides,
       nameOverride: trait.nameOverride,
       descriptionOverride: trait.descriptionOverride,
-      // Carry grantGroups through the form state; grant form rows stay empty
-      // until Phase 3 migrates the authoring UI to the atomic model.
-      grants: [],
-      _grantGroups: trait.grantGroups,
+      grants: grantGroupsToFormRows(trait.grantGroups),
     }
   }
-  const grants = grantsToFormRows(getTraitGrants(trait))
+  // Custom trait: prefer grantGroups (new model), fall back to legacy grants bag.
+  const grants = trait.grantGroups?.length
+    ? grantGroupsToFormRows(trait.grantGroups)
+    : grantsToFormRows(trait.grants)
   return {
     id: trait.id,
     kind: 'custom',
@@ -27,17 +31,12 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
     name: trait.name,
     description: trait.description,
     grants,
-    _grantGroups: trait.grantGroups,
   }
 }
 
 export function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
   if (row.kind === 'grant') {
-    // Use passthrough grantGroups when available (migrated trait); otherwise
-    // convert legacy form rows (authoring via old UI, Phase 3 not yet done).
-    const formGrants = formRowsToGrants(row.grants)
-    const grantGroups =
-      row._grantGroups ?? (formGrants ? legacyGrantsToGrantGroups(formGrants) : [])
+    const grantGroups = formRowsToGrantGroups(row.grants)
     return {
       kind: 'grant',
       id: row.id,
@@ -46,14 +45,13 @@ export function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTra
       descriptionOverride: row.descriptionOverride || undefined,
     }
   }
-  const grants = formRowsToGrants(row.grants)
+  const grantGroups = formRowsToGrantGroups(row.grants)
   return {
     kind: 'custom',
     id: row.id,
     name: row.name!,
     description: row.description || undefined,
-    grants,
-    grantGroups: row._grantGroups,
+    ...(grantGroups.length ? { grantGroups } : {}),
   }
 }
 

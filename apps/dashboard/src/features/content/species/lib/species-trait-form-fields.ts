@@ -3,10 +3,7 @@ import {
   contentTraitKindSchema,
   defineMessage,
   fieldValidationMessages,
-  grantGroupsSchema,
-  isGrantEligibleGrants,
   isGrantGroupsEligible,
-  legacyGrantsToGrantGroups,
   resolveTraitName,
   type ContentTraitKind,
   type GrantGroups,
@@ -19,7 +16,7 @@ import {
   GRANT_TYPE_LABELS,
   grantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
-import { formRowsToGrants } from '../../lib/forms/grants/grant-form-values'
+import { formRowsToGrantGroups } from '../../lib/forms/grants/grant-form-values'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { traitKindOptions } from './species-trait-form-labels'
 
@@ -58,12 +55,6 @@ export const traitRowFormSchema = z
     nameOverride: z.string().optional(),
     descriptionOverride: z.string().optional(),
     grants: z.array(grantRowFormSchema),
-    /**
-     * Pass-through for grantGroups on traits that have been migrated to the
-     * atomic model. Populated by `traitToFormRow`; written back by
-     * `traitFromFormRow`. Invisible to the form UI until Phase 3.
-     */
-    _grantGroups: grantGroupsSchema.optional(),
   })
   .superRefine((row, ctx) => {
     if (row.kind === 'custom' && !row.name?.trim()) {
@@ -74,8 +65,8 @@ export const traitRowFormSchema = z
       })
     }
     if (row.kind === 'grant') {
-      const grants = formRowsToGrants(row.grants)
-      if (!grants || !isGrantEligibleGrants(grants)) {
+      const grantGroups = formRowsToGrantGroups(row.grants)
+      if (!isGrantGroupsEligible(grantGroups)) {
         ctx.addIssue({
           code: 'custom',
           message: speciesTraitValidationMessages.grantRowRequired(),
@@ -143,17 +134,8 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
 export function traitItemTitle(values: Record<string, unknown>, index: number): string {
   const row = values as TraitRowForm
   if (row.kind === 'grant') {
-    // Prefer passthrough grantGroups (migrated trait); fall back to converting legacy form rows.
-    const grantGroups: GrantGroups | undefined =
-      row._grantGroups ??
-      (() => {
-        const grants = formRowsToGrants(row.grants)
-        return grants && isGrantEligibleGrants(grants)
-          ? legacyGrantsToGrantGroups(grants)
-          : undefined
-      })()
-
-    if (grantGroups && isGrantGroupsEligible(grantGroups)) {
+    const grantGroups: GrantGroups = formRowsToGrantGroups(row.grants)
+    if (isGrantGroupsEligible(grantGroups)) {
       return resolveTraitName({
         kind: 'grant',
         id: row.id ?? `trait-${index}`,

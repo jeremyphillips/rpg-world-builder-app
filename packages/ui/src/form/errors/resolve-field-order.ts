@@ -1,9 +1,17 @@
 import type { FieldConfig, FormItem, RowConfig } from '../field-config'
 import { isContainer } from '../field-config'
+import { inlineSentenceBoundNames } from '../../components/ui/inline-sentence-field.lib'
 
 type FieldOrderContainer = Extract<FormItem, { kind: string }>
 
 function appendFieldPath(field: FieldConfig, prefix: string, paths: string[]): void {
+  if (field.type === 'inlineSentence') {
+    for (const name of inlineSentenceBoundNames(field.segments, field.below)) {
+      paths.push(prefix ? `${prefix}.${name}` : name)
+    }
+    return
+  }
+
   const base = prefix ? `${prefix}.${field.name}` : field.name
 
   if (field.type !== 'levelRange') {
