@@ -3,11 +3,16 @@ import { describe, expect, it } from 'vitest'
 import { ARMOR_CATEGORY_ENTRIES } from './armor/category'
 import { PHYSICAL_DAMAGE_TYPE_ENTRIES } from './damage/physical'
 import { GEAR_KIND_ENTRIES } from './equipment/gear-kind'
+import { SERVICE_CATEGORY_ENTRIES } from './equipment/service-category'
 import { TOOL_CATEGORY_ENTRIES } from './equipment/tool-category'
+import { VEHICLE_CATEGORY_ENTRIES } from './equipment/vehicle-category'
 import { FEAT_CATEGORY_ENTRIES } from './feat'
 import { LANGUAGE_CATEGORY_ENTRIES } from './language'
+import { MAGIC_ITEM_CATEGORY_ENTRIES } from './magic-item/category'
+import { MAGIC_ITEM_RARITY_ENTRIES } from './magic-item/rarity'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
 import { getTermSentenceForm, pluralizeTermLabel, type GameTermEntry } from './types'
+import { USAGE_FREQUENCY_ENTRIES } from './usage-frequency'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
 
 const ROLLOUT_ENTRY_TABLES = [
@@ -19,6 +24,11 @@ const ROLLOUT_ENTRY_TABLES = [
   LANGUAGE_CATEGORY_ENTRIES,
   MOVEMENT_MODE_ENTRIES,
   FEAT_CATEGORY_ENTRIES,
+  MAGIC_ITEM_CATEGORY_ENTRIES,
+  MAGIC_ITEM_RARITY_ENTRIES,
+  VEHICLE_CATEGORY_ENTRIES,
+  SERVICE_CATEGORY_ENTRIES,
+  USAGE_FREQUENCY_ENTRIES,
 ] as const
 
 describe('term sentence forms', () => {

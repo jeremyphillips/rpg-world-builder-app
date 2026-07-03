@@ -7,10 +7,30 @@ import {
 } from '../../vocab/armor/category'
 import { gearKindSchema, getGearKindEntry, getGearKindLabel } from '../../vocab/equipment/gear-kind'
 import {
+  getServiceCategoryEntry,
+  getServiceCategoryLabel,
+  serviceCategorySchema,
+} from '../../vocab/equipment/service-category'
+import {
   getToolCategoryEntry,
   getToolCategoryLabel,
   toolCategorySchema,
 } from '../../vocab/equipment/tool-category'
+import {
+  getVehicleCategoryEntry,
+  getVehicleCategoryLabel,
+  vehicleCategorySchema,
+} from '../../vocab/equipment/vehicle-category'
+import {
+  getMagicItemCategoryEntry,
+  getMagicItemCategoryLabel,
+  magicItemCategorySchema,
+} from '../../vocab/magic-item/category'
+import {
+  getMagicItemRarityEntry,
+  getMagicItemRarityLabel,
+  magicItemRaritySchema,
+} from '../../vocab/magic-item/rarity'
 import {
   getWeaponCategoryEntry,
   getWeaponCategoryLabel,
@@ -26,27 +46,29 @@ import { contentPoolChoiceSchema } from './choice'
 // traits, and future contentGrants.equipment payloads.
 // ---------------------------------------------------------------------------
 
-const EQUIPMENT_KIND_CATEGORY_FIELD = {
-  tool: 'toolCategory',
-  weapon: 'weaponCategory',
-  armor: 'armorCategory',
-  adventuring_gear: 'gearKind',
+const EQUIPMENT_KIND_CATEGORY_FIELDS = {
+  tool: ['toolCategory'],
+  weapon: ['weaponCategory'],
+  armor: ['armorCategory'],
+  adventuring_gear: ['gearKind'],
+  magic_item: ['magicItemCategory', 'magicItemRarity'],
+  vehicle: ['vehicleCategory'],
+  service: ['serviceCategory'],
 } as const
 
-const EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER = [
-  'mount',
-  'vehicle',
-  'service',
-  'magic_item',
-] as const
+const EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER = ['mount'] as const
 
-type EquipmentKindWithCategoryFilter = keyof typeof EQUIPMENT_KIND_CATEGORY_FIELD
+type EquipmentKindWithCategoryFilter = keyof typeof EQUIPMENT_KIND_CATEGORY_FIELDS
 
 const FILTERED_POOL_CATEGORY_FIELDS = [
   'toolCategory',
   'weaponCategory',
   'armorCategory',
   'gearKind',
+  'magicItemCategory',
+  'magicItemRarity',
+  'vehicleCategory',
+  'serviceCategory',
 ] as const
 
 const FILTERED_POOL_CATEGORY_LABELS = {
@@ -54,6 +76,10 @@ const FILTERED_POOL_CATEGORY_LABELS = {
   weaponCategory: 'Weapon category',
   armorCategory: 'Armor category',
   gearKind: 'Gear kind',
+  magicItemCategory: 'Magic item category',
+  magicItemRarity: 'Magic item rarity',
+  vehicleCategory: 'Vehicle category',
+  serviceCategory: 'Service category',
 } as const satisfies Record<(typeof FILTERED_POOL_CATEGORY_FIELDS)[number], string>
 
 function refineFilteredEquipmentPool(
@@ -63,11 +89,15 @@ function refineFilteredEquipmentPool(
     weaponCategory?: z.infer<typeof weaponCategorySchema>
     armorCategory?: z.infer<typeof armorCategorySchema>
     gearKind?: z.infer<typeof gearKindSchema>
+    magicItemCategory?: z.infer<typeof magicItemCategorySchema>
+    magicItemRarity?: z.infer<typeof magicItemRaritySchema>
+    vehicleCategory?: z.infer<typeof vehicleCategorySchema>
+    serviceCategory?: z.infer<typeof serviceCategorySchema>
   },
   ctx: z.RefinementCtx,
 ): void {
-  const allowedField =
-    EQUIPMENT_KIND_CATEGORY_FIELD[val.equipmentKind as EquipmentKindWithCategoryFilter]
+  const allowedFields =
+    EQUIPMENT_KIND_CATEGORY_FIELDS[val.equipmentKind as EquipmentKindWithCategoryFilter]
 
   for (const field of FILTERED_POOL_CATEGORY_FIELDS) {
     const category = val[field]
@@ -86,9 +116,9 @@ function refineFilteredEquipmentPool(
       continue
     }
 
-    if (allowedField !== field) {
-      const expectedKind = Object.entries(EQUIPMENT_KIND_CATEGORY_FIELD).find(
-        ([, categoryField]) => categoryField === field,
+    if (!(allowedFields as readonly string[] | undefined)?.includes(field)) {
+      const expectedKind = Object.entries(EQUIPMENT_KIND_CATEGORY_FIELDS).find(([, fields]) =>
+        (fields as readonly string[]).includes(field),
       )?.[0]
       ctx.addIssue({
         code: 'custom',
@@ -116,6 +146,10 @@ const filteredEquipmentPoolSchema = z
     weaponCategory: weaponCategorySchema.optional(),
     armorCategory: armorCategorySchema.optional(),
     gearKind: gearKindSchema.optional(),
+    magicItemCategory: magicItemCategorySchema.optional(),
+    magicItemRarity: magicItemRaritySchema.optional(),
+    vehicleCategory: vehicleCategorySchema.optional(),
+    serviceCategory: serviceCategorySchema.optional(),
   })
   .superRefine(refineFilteredEquipmentPool)
 
@@ -264,6 +298,18 @@ export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
   if (pool.gearKind) {
     return getGearKindLabel(pool.gearKind)
   }
+  if (pool.magicItemCategory) {
+    return getMagicItemCategoryLabel(pool.magicItemCategory)
+  }
+  if (pool.magicItemRarity) {
+    return getMagicItemRarityLabel(pool.magicItemRarity)
+  }
+  if (pool.vehicleCategory) {
+    return getVehicleCategoryLabel(pool.vehicleCategory)
+  }
+  if (pool.serviceCategory) {
+    return getServiceCategoryLabel(pool.serviceCategory)
+  }
 
   return getEquipmentKindLabel(pool.equipmentKind)
 }
@@ -273,6 +319,10 @@ function getEquipmentPoolSentenceEntry(pool: Extract<EquipmentPool, { source: 'f
   if (pool.weaponCategory) return getWeaponCategoryEntry(pool.weaponCategory)
   if (pool.armorCategory) return getArmorCategoryEntry(pool.armorCategory)
   if (pool.gearKind) return getGearKindEntry(pool.gearKind)
+  if (pool.magicItemCategory) return getMagicItemCategoryEntry(pool.magicItemCategory)
+  if (pool.magicItemRarity) return getMagicItemRarityEntry(pool.magicItemRarity)
+  if (pool.vehicleCategory) return getVehicleCategoryEntry(pool.vehicleCategory)
+  if (pool.serviceCategory) return getServiceCategoryEntry(pool.serviceCategory)
   return getEquipmentKindEntry(pool.equipmentKind)
 }
 

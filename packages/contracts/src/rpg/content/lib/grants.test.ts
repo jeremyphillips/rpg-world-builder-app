@@ -13,6 +13,7 @@ import {
   formatLanguageGrantSentence,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
+  formatSpellsGrantSentence,
   getGrantGroupEffectiveUnlock,
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
@@ -222,6 +223,43 @@ describe('grant sentence formatters', () => {
     expect(formatFeatChoiceGrantSentence({ category: 'general', choose: 2 })).toBe(
       'Character chooses 2 general feats.',
     )
+  })
+
+  it('formats spell grants with usage-frequency cadence prose', () => {
+    expect(
+      formatSpellsGrantSentence({
+        kind: 'spells',
+        ability: 'cha',
+        mode: 'free_cast',
+        frequency: 'at_will',
+        spellIds: ['dancing-lights'],
+      }),
+    ).toBe('Character can cast dancing-lights at will.')
+
+    expect(
+      formatSpellsGrantSentence(
+        {
+          kind: 'spells',
+          ability: 'cha',
+          mode: 'free_cast',
+          frequency: 'once_per_long_rest',
+          spellIds: ['faerie-fire', 'darkness'],
+        },
+        (id) => ({ 'faerie-fire': 'Faerie Fire', darkness: 'Darkness' })[id],
+      ),
+    ).toBe('Character can cast Faerie Fire and Darkness once per long rest.')
+
+    expect(
+      formatSpellsGrantSentence(
+        {
+          kind: 'spells',
+          ability: 'wis',
+          mode: 'always_prepared',
+          spellIds: ['cure-wounds'],
+        },
+        () => 'Cure Wounds',
+      ),
+    ).toBe('Character has Cure Wounds always prepared.')
   })
 })
 

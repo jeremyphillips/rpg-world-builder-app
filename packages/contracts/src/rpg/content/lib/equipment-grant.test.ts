@@ -61,7 +61,7 @@ describe('equipmentPoolSchema', () => {
     )
   })
 
-  it('rejects category filters on kinds without category vocab', () => {
+  it('rejects mismatched category filters on vehicle pools', () => {
     const result = equipmentPoolSchema.safeParse({
       source: 'filtered',
       equipmentKind: 'vehicle',
@@ -70,7 +70,62 @@ describe('equipmentPoolSchema', () => {
     expect(result.success).toBe(false)
     if (result.success) throw new Error('Expected invalid filtered pool')
     expect(result.error?.issues[0]?.message).toBe(
-      'Weapon category filters are not allowed when equipment kind is Vehicle',
+      'Weapon category filters only apply to Weapon equipment',
+    )
+  })
+
+  it('accepts a filtered magic item pool with category and rarity filters', () => {
+    expect(
+      equipmentPoolSchema.parse({
+        source: 'filtered',
+        equipmentKind: 'magic_item',
+        magicItemCategory: 'wondrous_item',
+        magicItemRarity: 'rare',
+      }),
+    ).toEqual({
+      source: 'filtered',
+      equipmentKind: 'magic_item',
+      magicItemCategory: 'wondrous_item',
+      magicItemRarity: 'rare',
+    })
+  })
+
+  it('accepts vehicle and service category filters on matching kinds', () => {
+    expect(
+      equipmentPoolSchema.parse({
+        source: 'filtered',
+        equipmentKind: 'vehicle',
+        vehicleCategory: 'water',
+      }),
+    ).toEqual({
+      source: 'filtered',
+      equipmentKind: 'vehicle',
+      vehicleCategory: 'water',
+    })
+
+    expect(
+      equipmentPoolSchema.parse({
+        source: 'filtered',
+        equipmentKind: 'service',
+        serviceCategory: 'lodging',
+      }),
+    ).toEqual({
+      source: 'filtered',
+      equipmentKind: 'service',
+      serviceCategory: 'lodging',
+    })
+  })
+
+  it('rejects category filters on mount pools', () => {
+    const result = equipmentPoolSchema.safeParse({
+      source: 'filtered',
+      equipmentKind: 'mount',
+      vehicleCategory: 'land',
+    })
+    expect(result.success).toBe(false)
+    if (result.success) throw new Error('Expected invalid filtered pool')
+    expect(result.error?.issues[0]?.message).toBe(
+      'Vehicle category filters are not allowed when equipment kind is Mount',
     )
   })
 })
@@ -259,6 +314,40 @@ describe('formatEquipmentPoolLabel', () => {
       }),
     ).toBe('Mount')
   })
+
+  it('uses magic item, vehicle, and service category labels when present', () => {
+    expect(
+      formatEquipmentPoolLabel({
+        source: 'filtered',
+        equipmentKind: 'magic_item',
+        magicItemCategory: 'wondrous_item',
+      }),
+    ).toBe('Wondrous Item')
+
+    expect(
+      formatEquipmentPoolLabel({
+        source: 'filtered',
+        equipmentKind: 'magic_item',
+        magicItemRarity: 'rare',
+      }),
+    ).toBe('Rare')
+
+    expect(
+      formatEquipmentPoolLabel({
+        source: 'filtered',
+        equipmentKind: 'vehicle',
+        vehicleCategory: 'water',
+      }),
+    ).toBe('Water')
+
+    expect(
+      formatEquipmentPoolLabel({
+        source: 'filtered',
+        equipmentKind: 'service',
+        serviceCategory: 'lodging',
+      }),
+    ).toBe('Lodging')
+  })
 })
 
 describe('formatEquipmentGrantSentence', () => {
@@ -337,6 +426,56 @@ describe('formatEquipmentGrantSentence', () => {
         },
       }),
     ).toBe('Character chooses 1 piece of adventuring gear.')
+  })
+
+  it('formats magic item, vehicle, and service filtered pools with vocab sentence forms', () => {
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 2,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'magic_item',
+          magicItemCategory: 'wondrous_item',
+        },
+      }),
+    ).toBe('Character chooses 2 wondrous items.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'magic_item',
+          magicItemRarity: 'rare',
+        },
+      }),
+    ).toBe('Character chooses 1 rare magic item.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 2,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'vehicle',
+          vehicleCategory: 'water',
+        },
+      }),
+    ).toBe('Character chooses 2 water vehicles.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'service',
+          serviceCategory: 'lodging',
+        },
+      }),
+    ).toBe('Character chooses 1 lodging.')
   })
 
   it('formats explicit pool choices with resolved equipment names', () => {

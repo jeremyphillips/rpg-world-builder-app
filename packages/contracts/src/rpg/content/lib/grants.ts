@@ -6,7 +6,7 @@ import { getDamageTypeSentenceForm, damageTypeIdSchema } from '../../vocab/damag
 import { absoluteLevelSchema } from '../../primitives/level'
 import { movementGrantPayloadSchema } from '../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../vocab/sense'
-import { usageFrequencySchema } from '../../vocab/usage-frequency'
+import { getUsageFrequencySentenceForm, usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
 import {
   getLanguageCategorySentenceForm,
@@ -355,6 +355,28 @@ const spellsContentGrantSchema = z
       })
     }
   })
+
+export type SpellsContentGrant = z.infer<typeof spellsContentGrantSchema>
+
+/** Human-readable summary for spell grants in trait and feature summaries. */
+export function formatSpellsGrantSentence(
+  grant: SpellsContentGrant,
+  resolveSpellName?: (id: string) => string | undefined,
+): string {
+  const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
+  const spellList = joinNaturalList(names)
+
+  if (grant.mode === 'always_prepared') {
+    return `Character has ${spellList} always prepared.`
+  }
+
+  if (grant.frequency) {
+    const cadence = getUsageFrequencySentenceForm(grant.frequency)
+    return `Character can cast ${spellList} ${cadence}.`
+  }
+
+  return `Character gains ${spellList}.`
+}
 
 /**
  * Atomic, level-less content grant discriminated by `kind`.

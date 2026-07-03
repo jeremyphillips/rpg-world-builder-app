@@ -5,6 +5,7 @@ import {
   USAGE_FREQUENCY_ENTRIES,
   getUsageFrequencyEntry,
   getUsageFrequencyLabel,
+  getUsageFrequencySentenceForm,
   usageFrequencySchema,
 } from './usage-frequency'
 
@@ -36,5 +37,13 @@ describe('usage frequency vocabulary', () => {
   it('returns labels and falls back for unknown ids', () => {
     expect(getUsageFrequencyLabel('at_will')).toBe('At Will')
     expect(getUsageFrequencyLabel('custom')).toBe('custom')
+  })
+
+  it('returns cadence phrases for generated prose', () => {
+    expect(getUsageFrequencySentenceForm('at_will')).toBe('at will')
+    expect(getUsageFrequencySentenceForm('once_per_long_rest')).toBe('once per long rest')
+    expect(getUsageFrequencySentenceForm('prof_bonus_per_long_rest')).toBe(
+      'proficiency bonus times per long rest',
+    )
   })
 })
