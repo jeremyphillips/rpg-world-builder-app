@@ -7,6 +7,7 @@ import {
   formatAlignmentLabel,
   getAlignmentEntry,
   getAlignmentLabel,
+  getAlignmentSentenceForm,
 } from './alignment'
 
 describe('alignmentSchema', () => {
@@ -45,5 +46,10 @@ describe('alignment vocabulary', () => {
     expect(formatAlignmentLabel('lg')).toBe('Lawful Good (LG)')
     expect(formatAlignmentLabel('n')).toBe('Neutral (N)')
     expect(formatAlignmentLabel('unknown')).toBe('unknown')
+  })
+
+  it('returns alignment sentence forms', () => {
+    expect(getAlignmentSentenceForm('lg', 1)).toBe('lawful good')
+    expect(getAlignmentSentenceForm('cn', 2)).toBe('chaotic neutrals')
   })
 })

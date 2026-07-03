@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
@@ -11,26 +12,50 @@ export const ABILITY_ENTRIES = {
   str: {
     label: 'Strength',
     description: 'Physical might',
+    sentence: {
+      singular: 'strength',
+      plural: 'strength',
+    },
   },
   dex: {
     label: 'Dexterity',
     description: 'Agility, reflexes, and balance',
+    sentence: {
+      singular: 'dexterity',
+      plural: 'dexterity',
+    },
   },
   con: {
     label: 'Constitution',
     description: 'Health and stamina',
+    sentence: {
+      singular: 'constitution',
+      plural: 'constitution',
+    },
   },
   int: {
     label: 'Intelligence',
     description: 'Reasoning and memory',
+    sentence: {
+      singular: 'intelligence',
+      plural: 'intelligence',
+    },
   },
   wis: {
     label: 'Wisdom',
     description: 'Perceptiveness and mental fortitude',
+    sentence: {
+      singular: 'wisdom',
+      plural: 'wisdom',
+    },
   },
   cha: {
     label: 'Charisma',
     description: 'Force of personality',
+    sentence: {
+      singular: 'charisma',
+      plural: 'charisma',
+    },
   },
 } as const satisfies Record<string, GameTermEntry>
 
@@ -41,10 +66,18 @@ export const ABILITY_IDS = Object.keys(ABILITY_ENTRIES) as [Ability, ...Ability[
 export const abilitySchema = z.enum(ABILITY_IDS)
 
 /** Standard spellcasting abilities (INT / WIS / CHA). */
-export const COMMON_SPELLCASTING_ABILITY_IDS = ['int', 'wis', 'cha'] as const satisfies readonly Ability[]
+export const COMMON_SPELLCASTING_ABILITY_IDS = [
+  'int',
+  'wis',
+  'cha',
+] as const satisfies readonly Ability[]
 
 /** Unusual spellcasting abilities (STR / DEX / CON) for homebrew or edge cases. */
-export const ADVANCED_SPELLCASTING_ABILITY_IDS = ['str', 'dex', 'con'] as const satisfies readonly Ability[]
+export const ADVANCED_SPELLCASTING_ABILITY_IDS = [
+  'str',
+  'dex',
+  'con',
+] as const satisfies readonly Ability[]
 
 export const SPELLCASTING_ABILITY_GROUP_LABELS = {
   common: 'Common',
@@ -84,6 +117,13 @@ export function getAbilityEntry(id: string): GameTermEntry | undefined {
 /** Returns the display label for an ability id. Falls back to the raw value. */
 export function getAbilityLabel(id: string): string {
   return getAbilityEntry(id)?.label ?? id
+}
+
+/** Lowercase ability phrase for generated prose (e.g. spellcasting ability text). */
+export function getAbilitySentenceForm(id: string, count = 1): string {
+  const entry = getAbilityEntry(id)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: id, description: '' }, count)
 }
 
 // ---------------------------------------------------------------------------

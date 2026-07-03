@@ -6,8 +6,13 @@ import { GEAR_KIND_ENTRIES } from './equipment/gear-kind'
 import { SERVICE_CATEGORY_ENTRIES } from './equipment/service-category'
 import { TOOL_CATEGORY_ENTRIES } from './equipment/tool-category'
 import { VEHICLE_CATEGORY_ENTRIES } from './equipment/vehicle-category'
+import { ABILITY_ENTRIES } from './ability'
+import { ALIGNMENT_ENTRIES } from './alignment'
+import { CREATURE_SIZE_ENTRIES } from './creature-size'
 import { FEAT_CATEGORY_ENTRIES } from './feat'
 import { LANGUAGE_CATEGORY_ENTRIES } from './language'
+import { ATTACK_RESOLUTION_MODE_ENTRIES } from './mechanics/attack-resolution-mode'
+import { EDITION_PRESET_ENTRIES } from './mechanics/edition-preset'
 import { MAGIC_ITEM_CATEGORY_ENTRIES } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_ENTRIES } from './magic-item/rarity'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
@@ -29,6 +34,11 @@ const ROLLOUT_ENTRY_TABLES = [
   VEHICLE_CATEGORY_ENTRIES,
   SERVICE_CATEGORY_ENTRIES,
   USAGE_FREQUENCY_ENTRIES,
+  ALIGNMENT_ENTRIES,
+  CREATURE_SIZE_ENTRIES,
+  ABILITY_ENTRIES,
+  EDITION_PRESET_ENTRIES,
+  ATTACK_RESOLUTION_MODE_ENTRIES,
 ] as const
 
 describe('term sentence forms', () => {

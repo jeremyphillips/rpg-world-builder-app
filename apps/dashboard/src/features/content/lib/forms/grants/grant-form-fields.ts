@@ -364,7 +364,7 @@ export function grantItemFields<T extends string>(
           kind: 'select',
           name: 'unlockLevel',
           options: unlockLevelOptions,
-          width: 'lg',
+          width: 'auto',
           defaultValue: GRANT_DEFAULT_UNLOCK_LEVEL,
         },
       ],

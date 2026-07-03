@@ -9,6 +9,7 @@ import {
   abilityScoreSchema,
   buildGroupedSpellcastingAbilityOptions,
   characterAbilityScoreSchema,
+  getAbilitySentenceForm,
 } from './ability'
 
 describe('abilitySchema', () => {
@@ -72,5 +73,12 @@ describe('buildGroupedSpellcastingAbilityOptions', () => {
         ],
       },
     ])
+  })
+})
+
+describe('ability sentence forms', () => {
+  it('returns lowercase ability phrases for generated prose', () => {
+    expect(getAbilitySentenceForm('str', 1)).toBe('strength')
+    expect(getAbilitySentenceForm('cha', 2)).toBe('charisma')
   })
 })
