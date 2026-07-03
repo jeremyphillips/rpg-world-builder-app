@@ -57,7 +57,7 @@ export type GrantType = (typeof GRANT_TYPES)[number]
 export type GrantRowType = (typeof GRANT_ROW_TYPES)[number]
 
 const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
-  resistances: 'Damage resistances',
+  resistances: 'Damage resistance',
   senses: 'Special sense',
   damageType: 'Damage type',
   movement: 'Movement bonus',

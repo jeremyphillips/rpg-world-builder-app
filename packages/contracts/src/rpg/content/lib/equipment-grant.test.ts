@@ -49,23 +49,29 @@ describe('equipmentPoolSchema', () => {
   })
 
   it('rejects tool categories on a weapon filtered pool', () => {
-    expect(
-      equipmentPoolSchema.safeParse({
-        source: 'filtered',
-        equipmentKind: 'weapon',
-        toolCategory: 'musical_instrument',
-      }).success,
-    ).toBe(false)
+    const result = equipmentPoolSchema.safeParse({
+      source: 'filtered',
+      equipmentKind: 'weapon',
+      toolCategory: 'musical_instrument',
+    })
+    expect(result.success).toBe(false)
+    if (result.success) throw new Error('Expected invalid filtered pool')
+    expect(result.error.issues[0]?.message).toBe(
+      'Tool category filters only apply to Tool equipment',
+    )
   })
 
   it('rejects category filters on kinds without category vocab', () => {
-    expect(
-      equipmentPoolSchema.safeParse({
-        source: 'filtered',
-        equipmentKind: 'vehicle',
-        weaponCategory: 'simple',
-      }).success,
-    ).toBe(false)
+    const result = equipmentPoolSchema.safeParse({
+      source: 'filtered',
+      equipmentKind: 'vehicle',
+      weaponCategory: 'simple',
+    })
+    expect(result.success).toBe(false)
+    if (result.success) throw new Error('Expected invalid filtered pool')
+    expect(result.error?.issues[0]?.message).toBe(
+      'Weapon category filters are not allowed when equipment kind is Vehicle',
+    )
   })
 })
 
@@ -272,7 +278,7 @@ describe('formatEquipmentGrantSentence', () => {
     ).toBe('Character receives 2 daggers.')
   })
 
-  it('formats filtered pool choices with lowercase category labels', () => {
+  it('formats filtered pool choices with vocab sentence forms', () => {
     expect(
       formatEquipmentGrantSentence({
         kind: 'choice',
@@ -296,6 +302,41 @@ describe('formatEquipmentGrantSentence', () => {
         },
       }),
     ).toBe('Character chooses 2 simple weapons.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'tool',
+          toolCategory: 'thieves',
+        },
+      }),
+    ).toBe("Character chooses 1 set of thieves' tools.")
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 2,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'armor',
+          armorCategory: 'light',
+        },
+      }),
+    ).toBe('Character chooses 2 suits of light armor.')
+
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'adventuring_gear',
+        },
+      }),
+    ).toBe('Character chooses 1 piece of adventuring gear.')
   })
 
   it('formats explicit pool choices with resolved equipment names', () => {

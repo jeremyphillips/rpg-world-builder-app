@@ -25,11 +25,19 @@ export const GEAR_KIND_ENTRIES = {
   general: {
     label: 'General',
     description: 'Standard adventuring gear without a more specific classification.',
+    sentence: {
+      singular: 'piece of adventuring gear',
+      plural: 'pieces of adventuring gear',
+    },
   },
   ammunition: {
     label: 'Ammunition',
     description:
       'Arrows, bolts, sling bullets, and similar consumable projectiles sold in bundles.',
+    sentence: {
+      singular: 'piece of ammunition',
+      plural: 'pieces of ammunition',
+    },
   },
   book: {
     label: 'Book',
@@ -38,10 +46,16 @@ export const GEAR_KIND_ENTRIES = {
   arcane_focus: {
     label: 'Arcane Focus',
     description: 'An arcane spellcasting focus such as a crystal, orb, rod, staff, or wand.',
+    sentence: {
+      plural: 'arcane focuses',
+    },
   },
   druidic_focus: {
     label: 'Druidic Focus',
     description: 'A druidic spellcasting focus such as mistletoe, a totem, or a wooden staff.',
+    sentence: {
+      plural: 'druidic focuses',
+    },
   },
   holy_symbol: {
     label: 'Holy Symbol',
@@ -57,7 +71,12 @@ export const GEAR_KIND_ENTRIES = {
   },
 } as const satisfies Record<GearKind, GameTermEntry>
 
+/** Returns the reference entry for a gear kind, if known. */
+export function getGearKindEntry(kind: string): GameTermEntry | undefined {
+  return GEAR_KIND_ENTRIES[kind as GearKind]
+}
+
 /** Returns the display label for a gear kind. Falls back to the raw value. */
 export function getGearKindLabel(kind: string): string {
-  return GEAR_KIND_ENTRIES[kind as GearKind]?.label ?? kind
+  return getGearKindEntry(kind)?.label ?? kind
 }
