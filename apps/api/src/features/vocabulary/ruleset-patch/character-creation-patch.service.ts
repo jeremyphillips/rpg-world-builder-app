@@ -8,16 +8,20 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_STARTING_LEVEL,
+  DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
   isSparseDefaultMulticlassingPatch,
+  isSparseDefaultSubclassingPatch,
   mergeStartingWealthRulesPatch,
   resolveStartingWealthRules,
   safeParseMergedCharacterCreationPatch,
   sameStringSet,
+  validateSubclassChoicesEnabledChange,
 } from '@rpg/contracts'
 import type {
   CampaignCharacterCreationPatch,
   CampaignMulticlassingPatch,
+  CampaignSubclassingPatch,
   CreatureTypePolicy,
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
@@ -121,6 +125,10 @@ function mergeCharacterCreationPatch(
     merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
   }
 
+  if (input.subclasses !== undefined) {
+    merged.subclasses = mergeSubclassingPatch(existing?.subclasses, input.subclasses)
+  }
+
   if (input.startingWealth !== undefined) {
     merged.startingWealth = mergeStartingWealthRulesPatch(
       existing?.startingWealth,
@@ -129,6 +137,16 @@ function mergeCharacterCreationPatch(
   }
 
   return merged
+}
+
+function mergeSubclassingPatch(
+  existing: CampaignSubclassingPatch | undefined,
+  input: CampaignSubclassingPatch,
+): CampaignSubclassingPatch {
+  return {
+    ...(existing ?? {}),
+    ...input,
+  }
 }
 
 function buildPrimaryAbilityMinimumUpdateSet(
@@ -266,6 +284,10 @@ function buildCharacterCreationUpdateSet(
     buildMulticlassingUpdateSet(ops, patch.multiclassing, prefix)
   }
 
+  if (patch.subclasses !== undefined) {
+    buildSubclassingUpdateSet(ops, patch.subclasses, prefix)
+  }
+
   if (patch.startingWealth !== undefined) {
     const seed = getStandardStartingWealthRules(rulesetId)
     const resolved = resolveStartingWealthRules(seed, patch.startingWealth)
@@ -274,6 +296,26 @@ function buildCharacterCreationUpdateSet(
   }
 
   return ops
+}
+
+function buildSubclassingUpdateSet(
+  ops: MongoUpdateOps,
+  subclassing: CampaignSubclassingPatch,
+  prefix: string,
+): void {
+  const subclassingPrefix = `${prefix}subclasses`
+
+  if (isSparseDefaultSubclassingPatch(subclassing)) {
+    ops.$unset[subclassingPrefix] = 1
+    return
+  }
+
+  sparseSetIfDiffers(
+    ops,
+    `${subclassingPrefix}.enabled`,
+    subclassing.enabled,
+    DEFAULT_SUBCLASS_CHOICES_ENABLED,
+  )
 }
 
 function assertMergedCharacterCreationPatch(
@@ -310,6 +352,17 @@ async function assertCreatureTypePolicyIds(
   }
 }
 
+function assertSubclassChoicesChangeAllowed(input: UpdateCampaignCharacterCreationInput): void {
+  if (input.subclasses?.enabled === undefined) return
+
+  const result = validateSubclassChoicesEnabledChange()
+  if (!result.valid) {
+    throw HttpError.badRequest(
+      result.message ?? 'Subclass choice changes are not allowed for this campaign.',
+    )
+  }
+}
+
 /** Writes initial character-creation patch values when a campaign is created. */
 export async function writeInitialCharacterCreation(
   campaignId: string,
@@ -317,6 +370,7 @@ export async function writeInitialCharacterCreation(
   input: UpdateCampaignCharacterCreationInput,
 ): Promise<void> {
   await assertCreatureTypePolicyIds(campaignId, input)
+  assertSubclassChoicesChangeAllowed(input)
   const merged = mergeCharacterCreationPatch(undefined, input)
   assertMergedCharacterCreationPatch(merged, rulesetId)
   await applyCharacterCreationUpdate(campaignId, rulesetId, merged)
@@ -329,6 +383,7 @@ export async function updateCharacterCreationPatch(
 ): Promise<void> {
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   await assertCreatureTypePolicyIds(campaignId, input)
+  assertSubclassChoicesChangeAllowed(input)
 
   const patchDoc = await loadPatchDocument(campaignId, rulesetId)
   const existing = patchDoc?.characterCreation as CampaignCharacterCreationPatch | undefined

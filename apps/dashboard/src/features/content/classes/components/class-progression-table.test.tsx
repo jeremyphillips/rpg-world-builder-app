@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules } from '@rpg/contracts'
+import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 import axe from 'axe-core'
 import type { CharacterClass } from '@rpg/contracts'
 
@@ -118,6 +118,7 @@ describe('ClassProgressionTable', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
           extendedProgression: {
             tierName: 'Epic Destiny',
             startsAt: 21,
@@ -141,6 +142,7 @@ describe('ClassProgressionTable', () => {
           standardMaxCharacterLevel: 25,
           allowedCharacterCreatureTypes: ['humanoid'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         }}
       />,
     )

@@ -6,6 +6,7 @@ import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultExtendedMaxLevel,
   defaultMulticlassingRules,
+  defaultSubclassingRules,
   formatExtendedLevelRange,
   formatStandardLevelRange,
   MAX_CHARACTER_LEVEL,
@@ -21,6 +22,7 @@ import { baseCharacterCreationPatch } from '../../test/fixtures/character-creati
 
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
 const defaultMulticlassing = defaultMulticlassingRules()
+const defaultSubclassing = defaultSubclassingRules()
 
 const basePatch = baseCharacterCreationPatch
 
@@ -111,6 +113,7 @@ describe('resolveCampaignRules', () => {
       standardMaxCharacterLevel: 25,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
+      subclassing: defaultSubclassing,
     })
   })
 
@@ -128,6 +131,7 @@ describe('resolveCampaignRules', () => {
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
+      subclassing: defaultSubclassing,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
@@ -152,6 +156,16 @@ describe('resolveCampaignRules', () => {
         progression: { maxCharacterLevel: ABSOLUTE_MAX_CHARACTER_LEVEL },
       }).maxCharacterLevel,
     ).toBe(ABSOLUTE_MAX_CHARACTER_LEVEL)
+  })
+
+  it('resolves subclassing rules', () => {
+    expect(resolveCampaignRules(basePatch).subclassing).toEqual(defaultSubclassing)
+    expect(
+      resolveCampaignRules({
+        ...basePatch,
+        subclasses: { enabled: false },
+      }).subclassing,
+    ).toEqual({ enabled: false })
   })
 })
 
@@ -217,6 +231,7 @@ describe('buildGroupedLevelOptions', () => {
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
+      subclassing: defaultSubclassing,
     })
     expect(groups).toHaveLength(1)
     expect(groups[0]?.options).toHaveLength(20)
@@ -228,6 +243,7 @@ describe('buildGroupedLevelOptions', () => {
       standardMaxCharacterLevel: 20,
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
+      subclassing: defaultSubclassing,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
@@ -248,6 +264,7 @@ describe('buildGroupedLevelOptions', () => {
         standardMaxCharacterLevel: 20,
         allowedCharacterCreatureTypes: defaultCreatureTypes,
         multiclassing: defaultMulticlassing,
+        subclassing: defaultSubclassing,
         extendedProgression: {
           tierName: 'Epic Destiny',
           startsAt: 21,

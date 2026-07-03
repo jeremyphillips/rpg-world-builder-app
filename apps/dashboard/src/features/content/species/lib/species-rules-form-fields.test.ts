@@ -4,6 +4,7 @@ import {
   DEFAULT_SPECIES_MULTICLASS_POLICY,
   defaultSpeciesLevelLimits,
   defaultMulticlassingRules,
+  defaultSubclassingRules,
 } from '@rpg/contracts'
 
 import { type StackConfig, type FormItem } from '@rpg/ui/form'
@@ -273,7 +274,8 @@ describe('species-rules-form-fields conversions', () => {
 })
 
 describe('default campaign rules', () => {
-  it('includes resolved multiclassing defaults', () => {
+  it('includes resolved character configuration defaults', () => {
     expect(defaultCampaignRules().multiclassing).toEqual(defaultMulticlassingRules())
+    expect(defaultCampaignRules().subclassing).toEqual(defaultSubclassingRules())
   })
 })

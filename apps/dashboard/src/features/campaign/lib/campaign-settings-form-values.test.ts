@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   defaultMulticlassingRules,
+  defaultSubclassingRules,
   DEFAULT_MULTICLASSING_ENABLED,
   DEFAULT_PRIMARY_ABILITY_MINIMUM,
   DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+  DEFAULT_SUBCLASS_CHOICES_ENABLED,
   type Campaign,
   type CreatureTypeId,
 } from '@rpg/contracts'
@@ -71,6 +73,7 @@ const defaultMulticlassingFields = {
   primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
   speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+  subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
   startingWealth: defaultStartingWealth,
 } as const
 
@@ -184,6 +187,7 @@ describe('buildCharacterCreationPatchInput', () => {
         primaryAbilityMinimumScore: 15,
         speciesMulticlassPolicyEnabled: true,
         speciesLevelLimitsEnabled: false,
+        subclassChoicesEnabled: true,
         startingWealth: defaultStartingWealth,
       }),
     ).toEqual({
@@ -226,6 +230,7 @@ describe('buildCharacterCreationPatchInput', () => {
           primaryAbilityMinimumScore: 13,
           speciesMulticlassPolicyEnabled: true,
           speciesLevelLimitsEnabled: true,
+          subclassChoicesEnabled: true,
           startingWealth: defaultStartingWealth,
         },
         { includeDefaultMulticlassing: true },
@@ -239,6 +244,40 @@ describe('buildCharacterCreationPatchInput', () => {
           speciesLevelLimits: { enabled: true },
         },
       },
+    })
+  })
+
+  it('includes subclassing when disabled', () => {
+    expect(
+      buildCharacterCreationPatchInput({
+        startingLevel: 1,
+        maxCharacterLevel: 20,
+        extendedProgressionEnabled: false,
+        importedCharactersPolicy: 'disabled',
+        allowedCharacterCreatureTypes: ['humanoid'],
+        ...defaultMulticlassingFields,
+        subclassChoicesEnabled: false,
+      }),
+    ).toMatchObject({
+      subclasses: { enabled: false },
+    })
+  })
+
+  it('includes default subclassing when explicit subclassing output is requested', () => {
+    expect(
+      buildCharacterCreationPatchInput(
+        {
+          startingLevel: 1,
+          maxCharacterLevel: 20,
+          extendedProgressionEnabled: false,
+          importedCharactersPolicy: 'disabled',
+          allowedCharacterCreatureTypes: ['humanoid'],
+          ...defaultMulticlassingFields,
+        },
+        { includeDefaultSubclassing: true },
+      ),
+    ).toMatchObject({
+      subclasses: { enabled: true },
     })
   })
 })
@@ -299,6 +338,7 @@ describe('mapRulesetPatchToRulesValues', () => {
         },
         species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
         multiclassing: defaultMulticlassingRules(),
+        subclasses: defaultSubclassingRules(),
         startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
       }),
     ).toEqual({
@@ -314,6 +354,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       primaryAbilityMinimumScore: 13,
       speciesMulticlassPolicyEnabled: false,
       speciesLevelLimitsEnabled: false,
+      subclassChoicesEnabled: true,
       startingWealth: defaultStartingWealth,
     })
   })

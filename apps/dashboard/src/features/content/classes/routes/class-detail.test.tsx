@@ -22,6 +22,7 @@ vi.mock('@/features/campaign', () => ({
         speciesLevelLimits: { enabled: false },
       },
     },
+    subclassing: { enabled: true },
   })),
 }))
 

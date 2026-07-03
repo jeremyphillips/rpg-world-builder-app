@@ -10,10 +10,11 @@ import {
   DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+  DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
   sameStringSet,
 } from '@rpg/contracts'
-import type { CampaignMulticlassingPatch } from '@rpg/contracts'
+import type { CampaignMulticlassingPatch, CampaignSubclassingPatch } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import type { CreateRulesValues, RulesValues } from './character-configuration-form-fields'
@@ -26,6 +27,7 @@ const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type BuildCharacterCreationPatchInputOptions = {
   includeDefaultMulticlassing?: boolean
+  includeDefaultSubclassing?: boolean
 }
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
@@ -119,6 +121,19 @@ function resolveMulticlassingOverride(
   })
 }
 
+function resolveSubclassingOverride(
+  values: RulesValues,
+  options: BuildCharacterCreationPatchInputOptions = {},
+): CampaignSubclassingPatch | undefined {
+  const enabled = values.subclassChoicesEnabled ?? DEFAULT_SUBCLASS_CHOICES_ENABLED
+
+  if (options.includeDefaultSubclassing) {
+    return { enabled }
+  }
+
+  return enabled === DEFAULT_SUBCLASS_CHOICES_ENABLED ? undefined : { enabled }
+}
+
 function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValues {
   return {
     ...createRules,
@@ -132,6 +147,7 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     primaryAbilityMinimumScore: DEFAULT_PRIMARY_ABILITY_MINIMUM,
     speciesMulticlassPolicyEnabled: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
     speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+    subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
     startingWealth: mapStartingWealthToFormValues(
       getStandardStartingWealthRules(DEFAULT_RULESET_ID),
     ),
@@ -162,6 +178,11 @@ export function buildCharacterCreationPatchInput(
   const multiclassing = resolveMulticlassingOverride(values, options)
   if (multiclassing) {
     patch.multiclassing = multiclassing
+  }
+
+  const subclassing = resolveSubclassingOverride(values, options)
+  if (subclassing) {
+    patch.subclasses = subclassing
   }
 
   const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
@@ -206,6 +227,7 @@ export function mapRulesetPatchToRulesValues(
       characterCreation.multiclassing.requirements.speciesPolicy.enabled,
     speciesLevelLimitsEnabled:
       characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
+    subclassChoicesEnabled: characterCreation.subclasses.enabled,
     startingWealth: mapStartingWealthToFormValues(characterCreation.startingWealth),
   }
 }

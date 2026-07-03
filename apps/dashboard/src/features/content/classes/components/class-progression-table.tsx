@@ -6,6 +6,7 @@ import {
   SLOT_TABLES,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultMulticlassingRules,
+  defaultSubclassingRules,
   MAX_CHARACTER_LEVEL,
   isSpellcastingActiveAtLevel,
   spellcastingFeatureLabel,
@@ -262,6 +263,7 @@ const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   standardMaxCharacterLevel: MAX_CHARACTER_LEVEL,
   allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
   multiclassing: defaultMulticlassingRules(),
+  subclassing: defaultSubclassingRules(),
 }
 
 export function ClassProgressionTable({

@@ -7,6 +7,7 @@ import {
   CREATURE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
   defaultMulticlassingRules,
+  defaultSubclassingRules,
   defaultCampaignMechanicsPatch,
   type RulesetPatchRead,
 } from '@rpg/contracts'
@@ -41,6 +42,7 @@ const mockPatch: RulesetPatchRead = {
     progression: { maxCharacterLevel: 20 },
     species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
     multiclassing: defaultMulticlassingRules(),
+    subclasses: defaultSubclassingRules(),
     startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
   },
   mechanics: defaultCampaignMechanicsPatch(),
@@ -133,7 +135,7 @@ describe('RulesConfigDetailContent', () => {
     await screen.findByLabelText('Character starting level')
     expect(screen.getByRole('heading', { name: 'Character Configuration' })).toBeInTheDocument()
     expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
-    expect(screen.getByLabelText('Allow multiclassing')).toBeChecked()
+    expect(screen.getByRole('link', { name: 'Subclasses' })).toHaveAttribute('href', '#subclasses')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
   })
 

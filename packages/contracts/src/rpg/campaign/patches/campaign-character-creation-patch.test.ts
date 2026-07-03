@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  resolveStartingWealthRules,
-  startingWealthRulesSchema,
-} from '../rules/starting-wealth'
+import { resolveStartingWealthRules, startingWealthRulesSchema } from '../rules/starting-wealth'
 import { resolveCharacterCreationPatch } from './campaign-character-creation-patch'
 import { extendedProgressionAt } from '../../../test/fixtures/character-creation-patch'
 import {
@@ -50,5 +47,15 @@ describe('resolveCharacterCreationPatch', () => {
     expect(resolved.startingWealth).toEqual(
       startingWealthRulesSchema.parse(minimalStartingWealthSeed),
     )
+  })
+
+  it('resolves subclassing defaults and overrides', () => {
+    expect(resolveCharacterCreationPatch(undefined, minimalStartingWealthSeed).subclasses).toEqual({
+      enabled: true,
+    })
+    expect(
+      resolveCharacterCreationPatch({ subclasses: { enabled: false } }, minimalStartingWealthSeed)
+        .subclasses,
+    ).toEqual({ enabled: false })
   })
 })
