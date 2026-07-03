@@ -43,6 +43,52 @@ function trimCodeRefs(refs: CodeRef[]): CodeRef[] {
   }))
 }
 
+type TrimUpdateFieldRule<T> = {
+  key: keyof T
+  trim?: (value: unknown) => unknown
+}
+
+function buildTrimmedUpdateInput<T extends Record<string, unknown>>(
+  input: T,
+  rules: readonly TrimUpdateFieldRule<T>[],
+): Partial<T> {
+  const result: Partial<T> = {}
+
+  for (const { key, trim } of rules) {
+    const value = input[key]
+    if (value === undefined) continue
+    result[key] = (trim ? trim(value) : value) as T[keyof T]
+  }
+
+  return result
+}
+
+const UPDATE_TICKET_TRIM_RULES: TrimUpdateFieldRule<UpdateTicketInput>[] = [
+  { key: 'title', trim: (value) => (value as string).trim() },
+  { key: 'description', trim: (value) => trimOptional(value as string | undefined) },
+  { key: 'type' },
+  { key: 'status' },
+  { key: 'priority' },
+  { key: 'size' },
+  { key: 'area', trim: (value) => trimOptional(value as string | undefined) },
+  { key: 'epicId', trim: (value) => trimNullable(value as string | null | undefined) },
+  { key: 'blockedByTicketIds' },
+  { key: 'relatedTicketIds' },
+  { key: 'acceptanceCriteria', trim: (value) => trimStringArray(value as string[]) },
+  { key: 'codeRefs', trim: (value) => trimCodeRefs(value as CodeRef[]) },
+  { key: 'createdBy' },
+]
+
+const UPDATE_EPIC_TRIM_RULES: TrimUpdateFieldRule<UpdateEpicInput>[] = [
+  { key: 'title', trim: (value) => (value as string).trim() },
+  { key: 'description', trim: (value) => trimOptional(value as string | undefined) },
+  { key: 'goal', trim: (value) => trimOptional(value as string | undefined) },
+  { key: 'status' },
+  { key: 'priority' },
+  { key: 'area', trim: (value) => trimOptional(value as string | undefined) },
+  { key: 'badgeColor', trim: (value) => (value as string).trim() },
+]
+
 export function trimCreateTicketInput(input: CreateTicketInput): CreateTicketInput {
   return {
     ...input,
@@ -58,25 +104,7 @@ export function trimCreateTicketInput(input: CreateTicketInput): CreateTicketInp
 }
 
 export function trimUpdateTicketInput(input: UpdateTicketInput): UpdateTicketInput {
-  return {
-    ...(input.title !== undefined && { title: input.title.trim() }),
-    ...(input.description !== undefined && { description: trimOptional(input.description) }),
-    ...(input.type !== undefined && { type: input.type }),
-    ...(input.status !== undefined && { status: input.status }),
-    ...(input.priority !== undefined && { priority: input.priority }),
-    ...(input.size !== undefined && { size: input.size }),
-    ...(input.area !== undefined && { area: trimOptional(input.area) }),
-    ...(input.epicId !== undefined && { epicId: trimNullable(input.epicId) }),
-    ...(input.blockedByTicketIds !== undefined && {
-      blockedByTicketIds: input.blockedByTicketIds,
-    }),
-    ...(input.relatedTicketIds !== undefined && { relatedTicketIds: input.relatedTicketIds }),
-    ...(input.acceptanceCriteria !== undefined && {
-      acceptanceCriteria: trimStringArray(input.acceptanceCriteria),
-    }),
-    ...(input.codeRefs !== undefined && { codeRefs: trimCodeRefs(input.codeRefs) }),
-    ...(input.createdBy !== undefined && { createdBy: input.createdBy }),
-  }
+  return buildTrimmedUpdateInput(input, UPDATE_TICKET_TRIM_RULES)
 }
 
 export function trimCreateEpicInput(input: CreateEpicInput): CreateEpicInput {
@@ -91,13 +119,5 @@ export function trimCreateEpicInput(input: CreateEpicInput): CreateEpicInput {
 }
 
 export function trimUpdateEpicInput(input: UpdateEpicInput): UpdateEpicInput {
-  return {
-    ...(input.title !== undefined && { title: input.title.trim() }),
-    ...(input.description !== undefined && { description: trimOptional(input.description) }),
-    ...(input.goal !== undefined && { goal: trimOptional(input.goal) }),
-    ...(input.status !== undefined && { status: input.status }),
-    ...(input.priority !== undefined && { priority: input.priority }),
-    ...(input.area !== undefined && { area: trimOptional(input.area) }),
-    ...(input.badgeColor !== undefined && { badgeColor: input.badgeColor.trim() }),
-  }
+  return buildTrimmedUpdateInput(input, UPDATE_EPIC_TRIM_RULES)
 }

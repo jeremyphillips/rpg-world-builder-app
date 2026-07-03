@@ -135,6 +135,27 @@ export function formatDiceFormula(value: DiceFormulaValue): string {
   return `${base}${operator}${amount}`
 }
 
+function resolveDiceFormulaModifier(
+  value: DiceFormulaValue | undefined,
+  modifierMode: DiceFormulaModifierMode,
+  fallback: DiceFormulaValue,
+  modifierOperators: readonly DiceFormulaTailOperator[],
+): DiceFormulaModifier | undefined {
+  if (modifierMode === 'required') {
+    return value?.modifier ?? fallback.modifier ?? defaultModifierForOperators(modifierOperators)
+  }
+
+  if (modifierMode === 'optional' && value?.modifier) {
+    return value.modifier
+  }
+
+  return undefined
+}
+
+function resolveDiceFormulaFaces(faces: number, allowedFaces: readonly number[]): number {
+  return allowedFaces.includes(faces) ? faces : allowedFaces[0]!
+}
+
 export function resolveDiceFormulaValue(
   value: DiceFormulaValue | undefined,
   modifierMode: DiceFormulaModifierMode,
@@ -144,17 +165,12 @@ export function resolveDiceFormulaValue(
   const fallback = defaultDiceFormulaForMode(modifierMode, modifierOperators)
   const resolved: DiceFormulaValue = {
     count: value?.count ?? fallback.count,
-    faces: value?.faces ?? fallback.faces,
+    faces: resolveDiceFormulaFaces(value?.faces ?? fallback.faces, faces),
   }
 
-  const faceFallback = faces.includes(resolved.faces) ? resolved.faces : faces[0]!
-  resolved.faces = faceFallback
-
-  if (modifierMode === 'required') {
-    resolved.modifier =
-      value?.modifier ?? fallback.modifier ?? defaultModifierForOperators(modifierOperators)
-  } else if (modifierMode === 'optional' && value?.modifier) {
-    resolved.modifier = value.modifier
+  const modifier = resolveDiceFormulaModifier(value, modifierMode, fallback, modifierOperators)
+  if (modifier !== undefined) {
+    resolved.modifier = modifier
   }
 
   return resolved

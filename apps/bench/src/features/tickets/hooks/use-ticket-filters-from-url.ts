@@ -56,27 +56,40 @@ export function filtersFromSearchParams(searchParams: URLSearchParams): TicketLi
   return filters
 }
 
+const ENUM_FILTER_PARAMS: ReadonlyArray<{
+  filterKey: 'type' | 'priority' | 'size' | 'createdBy'
+  paramKey: string
+  allowed: readonly string[]
+}> = [
+  { filterKey: 'type', paramKey: FILTER_PARAM.type, allowed: TICKET_TYPES },
+  { filterKey: 'priority', paramKey: FILTER_PARAM.priority, allowed: TICKET_PRIORITIES },
+  { filterKey: 'size', paramKey: FILTER_PARAM.size, allowed: TICKET_SIZES },
+  { filterKey: 'createdBy', paramKey: FILTER_PARAM.createdBy, allowed: TICKET_CREATED_BY },
+]
+
+function setEpicFilterParam(params: URLSearchParams, epic: TicketListFilters['epic']): void {
+  if (epic === EPIC_FILTER_NONE) {
+    params.set(FILTER_PARAM.epic, EPIC_FILTER_NONE)
+    return
+  }
+
+  if (epic && epic !== EPIC_FILTER_ALL) {
+    params.set(FILTER_PARAM.epic, epic)
+  }
+}
+
 export function filtersToSearchParams(filters: TicketListFilters): URLSearchParams {
   const params = new URLSearchParams()
 
-  if (filters.type && TICKET_TYPES.includes(filters.type)) {
-    params.set(FILTER_PARAM.type, filters.type)
+  for (const { filterKey, paramKey, allowed } of ENUM_FILTER_PARAMS) {
+    const value = filters[filterKey]
+    if (typeof value === 'string' && allowed.includes(value)) {
+      params.set(paramKey, value)
+    }
   }
-  if (filters.priority && TICKET_PRIORITIES.includes(filters.priority)) {
-    params.set(FILTER_PARAM.priority, filters.priority)
-  }
-  if (filters.size && TICKET_SIZES.includes(filters.size)) {
-    params.set(FILTER_PARAM.size, filters.size)
-  }
+
   if (filters.area) params.set(FILTER_PARAM.area, filters.area)
-  if (filters.createdBy && TICKET_CREATED_BY.includes(filters.createdBy)) {
-    params.set(FILTER_PARAM.createdBy, filters.createdBy)
-  }
-  if (filters.epic === EPIC_FILTER_NONE) {
-    params.set(FILTER_PARAM.epic, EPIC_FILTER_NONE)
-  } else if (filters.epic && filters.epic !== EPIC_FILTER_ALL) {
-    params.set(FILTER_PARAM.epic, filters.epic)
-  }
+  setEpicFilterParam(params, filters.epic)
   if (filters.includeWontDo) params.set(FILTER_PARAM.includeWontDo, 'true')
   if (filters.search) params.set(FILTER_PARAM.search, filters.search)
 

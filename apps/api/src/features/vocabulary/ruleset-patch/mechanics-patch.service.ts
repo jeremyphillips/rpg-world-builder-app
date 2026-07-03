@@ -44,27 +44,31 @@ export function normalizeMechanicsPatchFromDoc(
   return mechanics
 }
 
-function computeMechanicsPatchMetadata(
+function resolveMechanicsPatchAppliedAt(
   patch: CampaignMechanicsPatch,
   options?: { appliedAt?: string; presetIdChanged?: boolean },
-): CampaignMechanicsPatch {
-  const presetId = (patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID) as EditionPresetId
-  const knobs = resolveMechanicsKnobsFromPatch(patch, presetId)
-  const bundle = getEditionPresetMechanics(presetId)
-  const modified = mechanicsDriftFromPreset(presetId, knobs)
-  const appliedAt =
-    options?.presetIdChanged === true
-      ? options.appliedAt
-      : (patch.editionPreset?.appliedAt ?? options?.appliedAt)
+): string | undefined {
+  if (options?.presetIdChanged === true) return options.appliedAt
+  return patch.editionPreset?.appliedAt ?? options?.appliedAt
+}
 
-  const result: CampaignMechanicsPatch = {
-    editionPreset: {
-      id: presetId,
-      modified,
-      ...(appliedAt !== undefined && { appliedAt }),
-    },
+function buildMechanicsEditionPresetResult(
+  presetId: EditionPresetId,
+  modified: boolean,
+  appliedAt: string | undefined,
+): NonNullable<CampaignMechanicsPatch['editionPreset']> {
+  return {
+    id: presetId,
+    modified,
+    ...(appliedAt !== undefined && { appliedAt }),
   }
+}
 
+function applyDriftedMechanicsKnobs(
+  result: CampaignMechanicsPatch,
+  knobs: ReturnType<typeof resolveMechanicsKnobsFromPatch>,
+  bundle: ReturnType<typeof getEditionPresetMechanics>,
+): void {
   if (
     knobs.armorClass.mode !== bundle.armorClass.mode ||
     knobs.armorClass.base !== bundle.armorClass.base
@@ -75,41 +79,52 @@ function computeMechanicsPatchMetadata(
   if (knobs.attackResolution.mode !== bundle.attackResolution.mode) {
     result.attackResolution = knobs.attackResolution
   }
+}
 
+function computeMechanicsPatchMetadata(
+  patch: CampaignMechanicsPatch,
+  options?: { appliedAt?: string; presetIdChanged?: boolean },
+): CampaignMechanicsPatch {
+  const presetId = (patch.editionPreset?.id ?? DEFAULT_EDITION_PRESET_ID) as EditionPresetId
+  const knobs = resolveMechanicsKnobsFromPatch(patch, presetId)
+  const bundle = getEditionPresetMechanics(presetId)
+  const result: CampaignMechanicsPatch = {
+    editionPreset: buildMechanicsEditionPresetResult(
+      presetId,
+      mechanicsDriftFromPreset(presetId, knobs),
+      resolveMechanicsPatchAppliedAt(patch, options),
+    ),
+  }
+
+  applyDriftedMechanicsKnobs(result, knobs, bundle)
   return result
 }
 
-function mergeMechanicsPatch(
+function buildMechanicsPatchOnPresetChange(inputPresetId: EditionPresetId): CampaignMechanicsPatch {
+  const bundle = getEditionPresetMechanics(inputPresetId)
+  return computeMechanicsPatchMetadata(
+    {
+      editionPreset: { id: inputPresetId },
+      armorClass: { ...bundle.armorClass },
+      attackResolution: { ...bundle.attackResolution },
+    },
+    {
+      appliedAt: inputPresetId === DEFAULT_EDITION_PRESET_ID ? undefined : new Date().toISOString(),
+      presetIdChanged: true,
+    },
+  )
+}
+
+function mergeMechanicsKnobFields(
   existing: CampaignMechanicsPatch | undefined,
   input: UpdateCampaignMechanicsInput,
 ): CampaignMechanicsPatch {
-  const existingPresetId = (existing?.editionPreset?.id ??
-    DEFAULT_EDITION_PRESET_ID) as EditionPresetId
-  const inputPresetId = input.editionPreset?.id
-  const presetIdChanging = inputPresetId !== undefined && inputPresetId !== existingPresetId
-
-  if (presetIdChanging && inputPresetId !== undefined) {
-    const bundle = getEditionPresetMechanics(inputPresetId)
-    return computeMechanicsPatchMetadata(
-      {
-        editionPreset: { id: inputPresetId },
-        armorClass: { ...bundle.armorClass },
-        attackResolution: { ...bundle.attackResolution },
-      },
-      {
-        appliedAt:
-          inputPresetId === DEFAULT_EDITION_PRESET_ID ? undefined : new Date().toISOString(),
-        presetIdChanged: true,
-      },
-    )
-  }
-
   const merged: CampaignMechanicsPatch = { ...(existing ?? {}) }
 
-  if (inputPresetId !== undefined) {
+  if (input.editionPreset?.id !== undefined) {
     merged.editionPreset = {
       ...(merged.editionPreset ?? {}),
-      id: inputPresetId,
+      id: input.editionPreset.id,
     }
   }
 
@@ -127,7 +142,22 @@ function mergeMechanicsPatch(
     }
   }
 
-  return computeMechanicsPatchMetadata(merged)
+  return merged
+}
+
+function mergeMechanicsPatch(
+  existing: CampaignMechanicsPatch | undefined,
+  input: UpdateCampaignMechanicsInput,
+): CampaignMechanicsPatch {
+  const existingPresetId = (existing?.editionPreset?.id ??
+    DEFAULT_EDITION_PRESET_ID) as EditionPresetId
+  const inputPresetId = input.editionPreset?.id
+
+  if (inputPresetId !== undefined && inputPresetId !== existingPresetId) {
+    return buildMechanicsPatchOnPresetChange(inputPresetId)
+  }
+
+  return computeMechanicsPatchMetadata(mergeMechanicsKnobFields(existing, input))
 }
 
 function isSparseDefaultMechanicsPatch(patch: CampaignMechanicsPatch): boolean {

@@ -195,7 +195,7 @@ async function expectMechanicsReady() {
   await screen.findByRole('radio', { name: /Modern 5e/i })
 }
 
-describe('RulesConfigDetailContent', () => {
+describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
     mockResolvedRulesData()

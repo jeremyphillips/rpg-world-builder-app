@@ -33,36 +33,52 @@ function parseArrayItemContext(
   return {}
 }
 
-function walkFieldErrors(node: FieldErrors, pathPrefix: string, issues: FormIssue[]): void {
-  if (isFieldError(node)) {
-    const decoded = decodeStructuredMessage(node.message)
-    issues.push({
-      path: pathPrefix,
-      message: decoded?.field ?? node.message,
-      summaryMessage: decoded?.summary,
-      messageId: decoded?.messageId,
-      messageParams: decoded?.params,
-      severity: 'field',
-      ...parseArrayItemContext(pathPrefix),
-    })
-    return
-  }
+function pushFieldErrorIssue(
+  node: FieldError & { message: string },
+  pathPrefix: string,
+  issues: FormIssue[],
+): void {
+  const decoded = decodeStructuredMessage(node.message)
+  issues.push({
+    path: pathPrefix,
+    message: decoded?.field ?? node.message,
+    summaryMessage: decoded?.summary,
+    messageId: decoded?.messageId,
+    messageParams: decoded?.params,
+    severity: 'field',
+    ...parseArrayItemContext(pathPrefix),
+  })
+}
 
-  if (Array.isArray(node)) {
-    node.forEach((entry, index) => {
-      if (entry === undefined || entry === null) return
-      walkFieldErrors(entry as FieldErrors, `${pathPrefix}.${index}`, issues)
-    })
-    return
-  }
+function walkFieldErrorArray(node: unknown[], pathPrefix: string, issues: FormIssue[]): void {
+  node.forEach((entry, index) => {
+    if (entry === undefined || entry === null) return
+    walkFieldErrors(entry as FieldErrors, `${pathPrefix}.${index}`, issues)
+  })
+}
 
-  if (typeof node !== 'object' || node === null) return
-
+function walkFieldErrorObject(node: object, pathPrefix: string, issues: FormIssue[]): void {
   for (const [key, value] of Object.entries(node)) {
     if (value === undefined || value === null) continue
     const nextPath = pathPrefix ? `${pathPrefix}.${key}` : key
     walkFieldErrors(value as FieldErrors, nextPath, issues)
   }
+}
+
+function walkFieldErrors(node: FieldErrors, pathPrefix: string, issues: FormIssue[]): void {
+  if (isFieldError(node)) {
+    pushFieldErrorIssue(node, pathPrefix, issues)
+    return
+  }
+
+  if (Array.isArray(node)) {
+    walkFieldErrorArray(node, pathPrefix, issues)
+    return
+  }
+
+  if (typeof node !== 'object' || node === null) return
+
+  walkFieldErrorObject(node, pathPrefix, issues)
 }
 
 /** Walk nested RHF `FieldErrors` into a flat list of actionable issues. */

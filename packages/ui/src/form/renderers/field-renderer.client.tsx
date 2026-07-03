@@ -22,15 +22,9 @@ import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
-import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
-import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
-import {
-  chooseFromChipsToInlineSentence,
-  inlineChooseCountToInlineSentence,
-} from '../config/inline-sentence-legacy-config.lib'
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
-import { InlineSentenceFieldRenderer } from './inline-sentence-field-renderer.client'
-import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
+import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
+import { renderSpecializedField } from './field-renderer-specialized.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
@@ -42,15 +36,9 @@ import type {
   InputUnitFieldConfig,
   LevelRangeFieldConfig,
 } from '../field-config'
-import {
-  applyOptionAvailabilityToFieldOptions,
-  applyOptionAvailabilityToSelectOptions,
-  fieldDefaultValue,
-  resolveFieldHint,
-} from '../field-config'
+import { fieldDefaultValue } from '../field-config'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
-import { resolveInheritedFieldSize } from '../../components/ui/field.variants'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
 import type { FileFieldProps } from '../../components/ui/file-field.client'
@@ -446,74 +434,16 @@ export interface FieldRendererProps {
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
   const { size: inheritedSize } = useFormSectionContext()
-  const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
-  const id = `${idPrefix}-${fullName.replaceAll('.', '-')}`
+  const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
 
   const hintValues = useDependsOnValues(config.dynamicHint?.dependsOn ?? [], namePrefix)
-  const resolvedHint = resolveFieldHint(config, hintValues)
-
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
+  const renderConfig = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
 
-  const resolvedSize = resolveInheritedFieldSize({
-    explicit: config.size,
-    inherited: inheritedSize,
-  })
-  let renderConfig: FieldConfig = { ...config, size: resolvedSize }
-  if (resolvedHint !== config.hint) {
-    renderConfig = { ...renderConfig, hint: resolvedHint }
-  }
-  if (optionAvailability && (config.type === 'chips' || config.type === 'select')) {
-    const options =
-      config.type === 'chips'
-        ? applyOptionAvailabilityToFieldOptions(config.options, optionAvailability, optionValues)
-        : applyOptionAvailabilityToSelectOptions(config.options, optionAvailability, optionValues)
-    renderConfig = { ...renderConfig, options } as FieldConfig
-  }
-
-  if (renderConfig.type === 'inputSelect') {
-    return (
-      <InputSelectFieldRenderer
-        config={renderConfig}
-        fullName={fullName}
-        id={id}
-        namePrefix={namePrefix}
-      />
-    )
-  }
-
-  if (renderConfig.type === 'inputUnit') {
-    return <InputUnitFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
-  }
-
-  if (renderConfig.type === 'levelRange') {
-    return <LevelRangeFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
-  }
-
-  if (renderConfig.type === 'inlineChooseCount') {
-    return (
-      <InlineSentenceFieldRenderer
-        config={inlineChooseCountToInlineSentence(renderConfig)}
-        id={id}
-        namePrefix={namePrefix}
-      />
-    )
-  }
-
-  if (renderConfig.type === 'chooseFromChips') {
-    return (
-      <InlineSentenceFieldRenderer
-        config={chooseFromChipsToInlineSentence(renderConfig)}
-        id={id}
-        namePrefix={namePrefix}
-      />
-    )
-  }
-
-  if (renderConfig.type === 'inlineSentence') {
-    return <InlineSentenceFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
-  }
+  const specialized = renderSpecializedField({ renderConfig, fullName, id, namePrefix })
+  if (specialized) return specialized
 
   return (
     <StandardFieldRenderer

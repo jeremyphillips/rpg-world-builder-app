@@ -141,6 +141,33 @@ function buildWeaponCategoryBySlug(
   )
 }
 
+function toSortedContentFieldOptions<T extends ContentOptionEntity>(
+  entities: T[] | undefined,
+): FieldOption[] {
+  return sortFieldOptions(entities?.map(toContentFieldOption) ?? [])
+}
+
+function buildRichTextLinkOptionSets(input: {
+  campaignId?: string
+  spells?: Spell[]
+  feats?: Feat[]
+}): Pick<ContentFormOptionSets, 'richTextInternalLinkOptions' | 'richTextContentTypeOptions'> {
+  const richTextInternalLinkOptions = input.campaignId
+    ? buildRichTextInternalLinkOptions({
+        campaignId: input.campaignId,
+        entitiesByType: {
+          spell: input.spells,
+          feat: input.feats,
+        },
+      })
+    : []
+
+  return {
+    richTextInternalLinkOptions,
+    richTextContentTypeOptions: [...RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS],
+  }
+}
+
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
@@ -150,38 +177,21 @@ export function buildContentFormOptionSets(input: {
   skills?: SkillProficiency[]
   equipment?: Equipment[]
 }): ContentFormOptionSets {
-  const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
-  const weapons = input.equipment?.filter(isWeaponEquipment)
-  const armor = input.equipment?.filter(isArmorEquipment)
-
   return {
-    classes: classOptions,
-    spellcastingClasses: sortFieldOptions(
-      input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
-    ),
-    weapons: sortFieldOptions(weapons?.map(toContentFieldOption) ?? []),
-    armor: sortFieldOptions(armor?.map(toContentFieldOption) ?? []),
-    equipment: sortFieldOptions(input.equipment?.map(toContentFieldOption) ?? []),
-    spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
-    feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
-    skills: sortFieldOptions(input.skills?.map(toContentFieldOption) ?? []),
-    tools: sortFieldOptions(
-      input.equipment?.filter((item) => item.kind === 'tool').map(toContentFieldOption) ?? [],
-    ),
-    magicItemBaseEquipment: sortFieldOptions(
-      input.equipment?.filter(isMagicItemBaseEquipment).map(toContentFieldOption) ?? [],
+    classes: toSortedContentFieldOptions(input.classes),
+    spellcastingClasses: toSortedContentFieldOptions(input.classes?.filter(classHasSpellcasting)),
+    weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment)),
+    armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment)),
+    equipment: toSortedContentFieldOptions(input.equipment),
+    spells: toSortedContentFieldOptions(input.spells),
+    feats: toSortedContentFieldOptions(input.feats),
+    skills: toSortedContentFieldOptions(input.skills),
+    tools: toSortedContentFieldOptions(input.equipment?.filter((item) => item.kind === 'tool')),
+    magicItemBaseEquipment: toSortedContentFieldOptions(
+      input.equipment?.filter(isMagicItemBaseEquipment),
     ),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
-    richTextInternalLinkOptions: input.campaignId
-      ? buildRichTextInternalLinkOptions({
-          campaignId: input.campaignId,
-          entitiesByType: {
-            spell: input.spells,
-            feat: input.feats,
-          },
-        })
-      : [],
-    richTextContentTypeOptions: [...RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS],
+    ...buildRichTextLinkOptionSets(input),
   }
 }
 

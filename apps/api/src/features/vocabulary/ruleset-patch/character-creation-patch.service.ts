@@ -23,6 +23,7 @@ import type {
   CampaignMulticlassingPatch,
   CampaignSubclassingPatch,
   CreatureTypePolicy,
+  ImportedCharactersPolicy,
   SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
@@ -91,6 +92,88 @@ function mergeMulticlassingPatch(
   return merged
 }
 
+function mergeProgressionPatch(
+  existing: CampaignCharacterCreationPatch['progression'] | undefined,
+  input: NonNullable<UpdateCampaignCharacterCreationInput['progression']>,
+): NonNullable<CampaignCharacterCreationPatch['progression']> {
+  const merged = {
+    ...(existing ?? {}),
+    ...input,
+  }
+
+  if ('extendedProgression' in input) return merged
+
+  const { extendedProgression: _removed, ...withoutExtended } = merged
+  return withoutExtended
+}
+
+function applyStartingLevelMerge(
+  merged: CampaignCharacterCreationPatch,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.startingLevel === undefined) return
+  merged.startingLevel = input.startingLevel
+}
+
+function applyImportedCharactersMerge(
+  merged: CampaignCharacterCreationPatch,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.importedCharacters === undefined) return
+  merged.importedCharacters = input.importedCharacters
+}
+
+function applyProgressionMerge(
+  merged: CampaignCharacterCreationPatch,
+  existing: CampaignCharacterCreationPatch | undefined,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.progression === undefined) return
+  merged.progression = mergeProgressionPatch(existing?.progression, input.progression)
+}
+
+function applySpeciesMerge(
+  merged: CampaignCharacterCreationPatch,
+  existing: CampaignCharacterCreationPatch | undefined,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.species === undefined) return
+  merged.species = {
+    ...(existing?.species ?? {}),
+    ...input.species,
+  }
+}
+
+function applyMulticlassingMerge(
+  merged: CampaignCharacterCreationPatch,
+  existing: CampaignCharacterCreationPatch | undefined,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.multiclassing === undefined) return
+  merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
+}
+
+function applySubclassingMerge(
+  merged: CampaignCharacterCreationPatch,
+  existing: CampaignCharacterCreationPatch | undefined,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.subclasses === undefined) return
+  merged.subclasses = mergeSubclassingPatch(existing?.subclasses, input.subclasses)
+}
+
+function applyStartingWealthMerge(
+  merged: CampaignCharacterCreationPatch,
+  existing: CampaignCharacterCreationPatch | undefined,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.startingWealth === undefined) return
+  merged.startingWealth = mergeStartingWealthRulesPatch(
+    existing?.startingWealth,
+    input.startingWealth,
+  )
+}
+
 function mergeCharacterCreationPatch(
   existing: CampaignCharacterCreationPatch | undefined,
   input: UpdateCampaignCharacterCreationInput,
@@ -99,42 +182,13 @@ function mergeCharacterCreationPatch(
     ...(existing ?? {}),
   }
 
-  if (input.startingLevel !== undefined) merged.startingLevel = input.startingLevel
-  if (input.importedCharacters !== undefined) merged.importedCharacters = input.importedCharacters
-
-  if (input.progression !== undefined) {
-    const previous = existing?.progression ?? {}
-    merged.progression = {
-      ...previous,
-      ...input.progression,
-    }
-    if (!('extendedProgression' in input.progression)) {
-      const { extendedProgression: _removed, ...withoutExtended } = merged.progression
-      merged.progression = withoutExtended
-    }
-  }
-
-  if (input.species !== undefined) {
-    merged.species = {
-      ...(existing?.species ?? {}),
-      ...input.species,
-    }
-  }
-
-  if (input.multiclassing !== undefined) {
-    merged.multiclassing = mergeMulticlassingPatch(existing?.multiclassing, input.multiclassing)
-  }
-
-  if (input.subclasses !== undefined) {
-    merged.subclasses = mergeSubclassingPatch(existing?.subclasses, input.subclasses)
-  }
-
-  if (input.startingWealth !== undefined) {
-    merged.startingWealth = mergeStartingWealthRulesPatch(
-      existing?.startingWealth,
-      input.startingWealth,
-    )
-  }
+  applyStartingLevelMerge(merged, input)
+  applyImportedCharactersMerge(merged, input)
+  applyProgressionMerge(merged, existing, input)
+  applySpeciesMerge(merged, existing, input)
+  applyMulticlassingMerge(merged, existing, input)
+  applySubclassingMerge(merged, existing, input)
+  applyStartingWealthMerge(merged, existing, input)
 
   return merged
 }
@@ -226,6 +280,84 @@ function buildMulticlassingUpdateSet(
   }
 }
 
+function buildStartingLevelUpdateSet(
+  ops: MongoUpdateOps,
+  startingLevel: number | undefined,
+  prefix: string,
+): void {
+  if (startingLevel === undefined) return
+
+  if (startingLevel !== DEFAULT_STARTING_LEVEL) {
+    ops.$set[`${prefix}startingLevel`] = startingLevel
+  } else {
+    ops.$unset[`${prefix}startingLevel`] = 1
+  }
+}
+
+function buildImportedCharactersUpdateSet(
+  ops: MongoUpdateOps,
+  policy: ImportedCharactersPolicy | undefined,
+  prefix: string,
+): void {
+  if (policy === undefined) return
+
+  if (policy !== DEFAULT_IMPORTED_CHARACTERS_POLICY) {
+    ops.$set[`${prefix}importedCharacters.policy`] = policy
+  } else {
+    ops.$unset[`${prefix}importedCharacters`] = 1
+  }
+}
+
+function buildProgressionUpdateSet(
+  ops: MongoUpdateOps,
+  progression: NonNullable<CampaignCharacterCreationPatch['progression']>,
+  prefix: string,
+): void {
+  const maxLevel = progression.maxCharacterLevel
+  if (maxLevel !== undefined) {
+    if (maxLevel !== MAX_CHARACTER_LEVEL) {
+      ops.$set[`${prefix}progression.maxCharacterLevel`] = maxLevel
+    } else {
+      ops.$unset[`${prefix}progression.maxCharacterLevel`] = 1
+    }
+  }
+
+  const extended = progression.extendedProgression
+  if (extended) {
+    ops.$set[`${prefix}progression.extendedProgression.tierName`] = extended.tierName
+    ops.$set[`${prefix}progression.extendedProgression.maxLevel`] = extended.maxLevel
+  } else {
+    ops.$unset[`${prefix}progression.extendedProgression`] = 1
+  }
+}
+
+function buildSpeciesCreatureTypePolicyUpdateSet(
+  ops: MongoUpdateOps,
+  creaturePolicy: CreatureTypePolicy,
+  prefix: string,
+): void {
+  if (!isDefaultCreatureTypePolicy(creaturePolicy)) {
+    ops.$set[`${prefix}species.creatureTypePolicy.mode`] = creaturePolicy.mode
+    ops.$set[`${prefix}species.creatureTypePolicy.ids`] = creaturePolicy.ids
+    return
+  }
+
+  ops.$unset[`${prefix}species.creatureTypePolicy`] = 1
+  ops.$unset[`${prefix}species`] = 1
+}
+
+function buildStartingWealthUpdateSet(
+  ops: MongoUpdateOps,
+  startingWealth: NonNullable<CampaignCharacterCreationPatch['startingWealth']>,
+  rulesetId: SystemRulesetId,
+  prefix: string,
+): void {
+  const seed = getStandardStartingWealthRules(rulesetId)
+  const resolved = resolveStartingWealthRules(seed, startingWealth)
+  const sparse = computeStartingWealthSparsePatch(resolved, seed)
+  sparseSetOrUnset(ops, `${prefix}startingWealth`, sparse)
+}
+
 function buildCharacterCreationUpdateSet(
   patch: CampaignCharacterCreationPatch,
   rulesetId: SystemRulesetId,
@@ -233,51 +365,16 @@ function buildCharacterCreationUpdateSet(
   const ops: MongoUpdateOps = { $set: {}, $unset: {} }
   const prefix = CHARACTER_CREATION_PREFIX
 
-  if (patch.startingLevel !== undefined) {
-    if (patch.startingLevel !== DEFAULT_STARTING_LEVEL) {
-      ops.$set[`${prefix}startingLevel`] = patch.startingLevel
-    } else {
-      ops.$unset[`${prefix}startingLevel`] = 1
-    }
-  }
-
-  const policy = patch.importedCharacters?.policy
-  if (policy !== undefined) {
-    if (policy !== DEFAULT_IMPORTED_CHARACTERS_POLICY) {
-      ops.$set[`${prefix}importedCharacters.policy`] = policy
-    } else {
-      ops.$unset[`${prefix}importedCharacters`] = 1
-    }
-  }
+  buildStartingLevelUpdateSet(ops, patch.startingLevel, prefix)
+  buildImportedCharactersUpdateSet(ops, patch.importedCharacters?.policy, prefix)
 
   if (patch.progression !== undefined) {
-    const maxLevel = patch.progression.maxCharacterLevel
-    if (maxLevel !== undefined) {
-      if (maxLevel !== MAX_CHARACTER_LEVEL) {
-        ops.$set[`${prefix}progression.maxCharacterLevel`] = maxLevel
-      } else {
-        ops.$unset[`${prefix}progression.maxCharacterLevel`] = 1
-      }
-    }
-
-    const extended = patch.progression.extendedProgression
-    if (extended) {
-      ops.$set[`${prefix}progression.extendedProgression.tierName`] = extended.tierName
-      ops.$set[`${prefix}progression.extendedProgression.maxLevel`] = extended.maxLevel
-    } else {
-      ops.$unset[`${prefix}progression.extendedProgression`] = 1
-    }
+    buildProgressionUpdateSet(ops, patch.progression, prefix)
   }
 
   const creaturePolicy = patch.species?.creatureTypePolicy
   if (creaturePolicy !== undefined) {
-    if (!isDefaultCreatureTypePolicy(creaturePolicy)) {
-      ops.$set[`${prefix}species.creatureTypePolicy.mode`] = creaturePolicy.mode
-      ops.$set[`${prefix}species.creatureTypePolicy.ids`] = creaturePolicy.ids
-    } else {
-      ops.$unset[`${prefix}species.creatureTypePolicy`] = 1
-      ops.$unset[`${prefix}species`] = 1
-    }
+    buildSpeciesCreatureTypePolicyUpdateSet(ops, creaturePolicy, prefix)
   }
 
   if (patch.multiclassing !== undefined) {
@@ -289,10 +386,7 @@ function buildCharacterCreationUpdateSet(
   }
 
   if (patch.startingWealth !== undefined) {
-    const seed = getStandardStartingWealthRules(rulesetId)
-    const resolved = resolveStartingWealthRules(seed, patch.startingWealth)
-    const sparse = computeStartingWealthSparsePatch(resolved, seed)
-    sparseSetOrUnset(ops, `${prefix}startingWealth`, sparse)
+    buildStartingWealthUpdateSet(ops, patch.startingWealth, rulesetId, prefix)
   }
 
   return ops
