@@ -27,19 +27,36 @@ import { spellcastingSchema } from './spellcasting'
 
 // --- Class features + proficiencies ----------------------------------------
 
+export const CLASS_FEATURE_KINDS = ['custom', 'subclass-choice'] as const
+
+export type ClassFeatureKind = (typeof CLASS_FEATURE_KINDS)[number]
+
+function refineClassFeatureGrantUnlockLevels(
+  feature: { level: number; grantGroups?: GrantGroup[] },
+  ctx: z.RefinementCtx,
+): void {
+  for (const group of (feature.grantGroups ?? []) as GrantGroup[]) {
+    if (group.unlock !== undefined && group.unlock.level <= feature.level) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Grant group unlock level (${group.unlock.level}) must be greater than the feature level (${feature.level})`,
+        path: ['grantGroups'],
+      })
+    }
+  }
+}
+
+export const customClassFeatureSchema = customContentTraitSchema
+  .extend({ level: absoluteLevelSchema })
+  .superRefine(refineClassFeatureGrantUnlockLevels)
+
+export const subclassChoiceClassFeatureSchema = customContentTraitSchema
+  .extend({ kind: z.literal('subclass-choice'), level: absoluteLevelSchema })
+  .superRefine(refineClassFeatureGrantUnlockLevels)
+
 export const classFeatureSchema = z.preprocess(
   normalizeContentTrait,
-  customContentTraitSchema.extend({ level: absoluteLevelSchema }).superRefine((feature, ctx) => {
-    for (const group of (feature.grantGroups ?? []) as GrantGroup[]) {
-      if (group.unlock !== undefined && group.unlock.level <= feature.level) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Grant group unlock level (${group.unlock.level}) must be greater than the feature level (${feature.level})`,
-          path: ['grantGroups'],
-        })
-      }
-    }
-  }),
+  z.discriminatedUnion('kind', [customClassFeatureSchema, subclassChoiceClassFeatureSchema]),
 )
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>

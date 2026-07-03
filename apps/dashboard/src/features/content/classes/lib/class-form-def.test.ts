@@ -291,6 +291,7 @@ describe('classFormDef round-trips', () => {
       'Ability Score Improvement',
       'Ability Score Improvement',
     ])
+    expect(features[0]?.kind).toBe('subclass-choice')
   })
 
   it('fighter: hasSpellcasting is false when no spellcasting block', () => {

@@ -53,6 +53,27 @@ export const Destructive: Story = {
   },
 }
 
+export const Info: Story = {
+  args: {
+    variant: 'info',
+    children: 'Multiclassing is disabled for this campaign.',
+  },
+}
+
+export const Success: Story = {
+  args: {
+    variant: 'success',
+    children: 'Changes saved successfully.',
+  },
+}
+
+export const Warning: Story = {
+  args: {
+    variant: 'warning',
+    children: 'Subclass choices are disabled for this campaign.',
+  },
+}
+
 export const AllVariants: Story = {
   render: () => (
     <div className="space-y-3">
@@ -61,6 +82,9 @@ export const AllVariants: Story = {
       <Text variant="small">Small — hints and secondary metadata.</Text>
       <Text variant="caption">Caption — form field hints.</Text>
       <Text variant="lead">Lead — hero or intro paragraphs.</Text>
+      <Text variant="info">Info — informational status copy.</Text>
+      <Text variant="success">Success — positive status copy.</Text>
+      <Text variant="warning">Warning — cautionary status copy.</Text>
       <Text variant="destructive" role="alert">
         Destructive — inline error messages.
       </Text>

@@ -29,10 +29,18 @@ vi.mock('./subclass-editor-panel.client', () => ({
 const QueryWrapper = makeQueryWrapper()
 
 function ClassFormShell({
-  features = [{ id: 'fighter-subclass', name: 'Fighter Subclass', level: 3, grants: [] }],
+  features = [
+    {
+      kind: 'subclass-choice',
+      id: 'fighter-subclass',
+      name: 'Fighter Subclass',
+      level: 3,
+      grants: [],
+    },
+  ],
   mode = 'edit' as const,
 }: {
-  features?: Array<{ id: string; name: string; level: number; grants: never[] }>
+  features?: Array<{ kind?: string; id: string; name: string; level: number; grants: never[] }>
   mode?: 'create' | 'edit'
 }) {
   const form = useForm({ defaultValues: { features } })

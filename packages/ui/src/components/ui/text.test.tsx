@@ -27,6 +27,11 @@ describe('Text', () => {
     expect(screen.getByText('Hint')).toHaveClass('text-md', 'text-muted-foreground')
   })
 
+  it('applies status variant classes', () => {
+    render(<Text variant="warning">Caution</Text>)
+    expect(screen.getByText('Caution')).toHaveClass('text-warning')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<Text variant="body">Body copy.</Text>)
     const results = await axe.run(container, {
