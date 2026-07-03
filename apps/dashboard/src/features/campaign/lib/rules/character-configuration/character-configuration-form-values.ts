@@ -24,6 +24,10 @@ import {
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
+type BuildCharacterCreationPatchInputOptions = {
+  includeDefaultMulticlassing?: boolean
+}
+
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
   const defined = Object.fromEntries(
     Object.entries(values).filter(([, value]) => value !== undefined),
@@ -55,7 +59,24 @@ function resolveCreatureTypePolicyOverride(
   return { mode: 'only' as const, ids: [...allowedCharacterCreatureTypes] }
 }
 
-function resolveMulticlassingOverride(values: RulesValues): CampaignMulticlassingPatch | undefined {
+function resolveMulticlassingOverride(
+  values: RulesValues,
+  options: BuildCharacterCreationPatchInputOptions = {},
+): CampaignMulticlassingPatch | undefined {
+  if (options.includeDefaultMulticlassing) {
+    return {
+      enabled: values.multiclassingEnabled,
+      requirements: {
+        primaryAbilityMinimum: {
+          enabled: values.primaryAbilityMinimumEnabled,
+          minimumScore: values.primaryAbilityMinimumScore,
+        },
+        speciesPolicy: { enabled: values.speciesMulticlassPolicyEnabled },
+        speciesLevelLimits: { enabled: values.speciesLevelLimitsEnabled },
+      },
+    }
+  }
+
   const enabledDiff =
     values.multiclassingEnabled !== DEFAULT_MULTICLASSING_ENABLED
       ? values.multiclassingEnabled
@@ -120,6 +141,7 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
 /** Maps flat rules wizard fields to the nested character-creation patch shape. */
 export function buildCharacterCreationPatchInput(
   values: RulesValues,
+  options: BuildCharacterCreationPatchInputOptions = {},
 ): UpdateCampaignCharacterCreationInput {
   const patch: UpdateCampaignCharacterCreationInput = {
     startingLevel: values.startingLevel,
@@ -137,7 +159,7 @@ export function buildCharacterCreationPatchInput(
     patch.species = { creatureTypePolicy }
   }
 
-  const multiclassing = resolveMulticlassingOverride(values)
+  const multiclassing = resolveMulticlassingOverride(values, options)
   if (multiclassing) {
     patch.multiclassing = multiclassing
   }

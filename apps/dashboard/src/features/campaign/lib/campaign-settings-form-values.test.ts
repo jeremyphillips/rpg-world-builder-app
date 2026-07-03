@@ -211,6 +211,36 @@ describe('buildCharacterCreationPatchInput', () => {
       }),
     ).not.toHaveProperty('multiclassing')
   })
+
+  it('includes full multiclassing values when explicit multiclassing output is requested', () => {
+    expect(
+      buildCharacterCreationPatchInput(
+        {
+          startingLevel: 1,
+          maxCharacterLevel: 20,
+          extendedProgressionEnabled: false,
+          importedCharactersPolicy: 'disabled',
+          allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassingEnabled: true,
+          primaryAbilityMinimumEnabled: true,
+          primaryAbilityMinimumScore: 13,
+          speciesMulticlassPolicyEnabled: true,
+          speciesLevelLimitsEnabled: true,
+          startingWealth: defaultStartingWealth,
+        },
+        { includeDefaultMulticlassing: true },
+      ),
+    ).toMatchObject({
+      multiclassing: {
+        enabled: true,
+        requirements: {
+          primaryAbilityMinimum: { enabled: true, minimumScore: 13 },
+          speciesPolicy: { enabled: true },
+          speciesLevelLimits: { enabled: true },
+        },
+      },
+    })
+  })
 })
 
 describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
