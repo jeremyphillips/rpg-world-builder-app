@@ -51,8 +51,8 @@ describe('SpeciesRulesTab', () => {
       />,
     )
 
-    expect(screen.getByText(/Multiclassing is disabled for this campaign/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Campaign Rules/i })).toHaveAttribute(
+    expect(screen.getByText(/Multiclassing is disabled/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Edit multiclassing rules/i })).toHaveAttribute(
       'href',
       '/campaigns/camp_1/homebrew/rules-config/character-configuration#multiclassing',
     )

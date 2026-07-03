@@ -3,6 +3,7 @@
 import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
+import { AvailabilityAlert, type Availability } from '@/lib/availability'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
 import { MasterDetailActiveToggle } from './master-detail-active-toggle.client'
@@ -21,6 +22,8 @@ export interface MasterDetailEditorPanelProps {
   showActiveToggle?: boolean
   /** Selected row values used to resolve the stable row key for the toggle. */
   selectedRow?: { id?: string }
+  campaignId?: string
+  rowAvailability?: Availability
 }
 
 /**
@@ -36,6 +39,8 @@ export function MasterDetailEditorPanel({
   emptySelectionLabel,
   showActiveToggle = true,
   selectedRow,
+  campaignId,
+  rowAvailability,
 }: MasterDetailEditorPanelProps) {
   const selectedFieldId =
     editor.selectedIndex !== null ? editor.fields[editor.selectedIndex]?.id : undefined
@@ -55,6 +60,9 @@ export function MasterDetailEditorPanel({
               activeInCampaign={editor.isRowActive(editor.selectedIndex, selectedRow)}
               onActiveChange={(active) => editor.setRowActive(rowKey, active)}
             />
+          ) : null}
+          {rowAvailability?.status === 'inactive' && campaignId ? (
+            <AvailabilityAlert availability={rowAvailability} context={{ campaignId }} />
           ) : null}
           <FormItems
             key={selectedFieldId}

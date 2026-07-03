@@ -4,7 +4,9 @@ import { useWatch } from 'react-hook-form'
 
 import type { Subclass } from '@rpg/contracts'
 
+import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
@@ -78,38 +80,54 @@ export function ClassSubclassesTab({
   }
 
   const defaultFeatureLevel = Number(subclassChoiceFeature.level)
+  const campaignRules = campaignRulesFromCtx(formCtx)
+  const subclassesDisabledAlert =
+    !campaignRules.subclassing.enabled && campaignId ? (
+      <AvailabilityAlert
+        availability={resolveAvailability([
+          {
+            code: 'subclasses-disabled',
+            settingId: 'characterCreation.subclasses.enabled',
+          },
+        ])}
+        context={{ campaignId }}
+      />
+    ) : null
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <SubclassListPanel
-          items={editor.listItems}
-          selectedId={editor.selectedId}
-          activeById={editor.activeById}
-          modifiedIds={editor.modifiedIds}
-          onSelect={editor.setSelectedId}
-          onAdd={editor.handleAdd}
-          onDeleteRequest={editor.handleDeleteRequest}
-        />
+      <div className="space-y-6">
+        {subclassesDisabledAlert}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <SubclassListPanel
+            items={editor.listItems}
+            selectedId={editor.selectedId}
+            activeById={editor.activeById}
+            modifiedIds={editor.modifiedIds}
+            onSelect={editor.setSelectedId}
+            onAdd={editor.handleAdd}
+            onDeleteRequest={editor.handleDeleteRequest}
+          />
 
-        <div className="md:col-span-2">
-          {editor.selectedId && editor.selectedValues ? (
-            <SubclassEditorPanel
-              key={editor.selectedId}
-              subclassId={editor.selectedId}
-              classId={classId}
-              entity={editor.selectedEntity}
-              defaultValues={editor.selectedValues}
-              activeInCampaign={editor.activeById[editor.selectedId] !== false}
-              defaultFeatureLevel={defaultFeatureLevel}
-              formCtx={formCtx}
-              onActiveChange={(active) => editor.handleActiveChange(editor.selectedId!, active)}
-              onValuesChange={editor.handleValuesChange}
-              onDeleteRequest={() => editor.handleDeleteRequest(editor.selectedId!)}
-            />
-          ) : (
-            <SubclassEmptySelectionGate />
-          )}
+          <div className="md:col-span-2">
+            {editor.selectedId && editor.selectedValues ? (
+              <SubclassEditorPanel
+                key={editor.selectedId}
+                subclassId={editor.selectedId}
+                classId={classId}
+                entity={editor.selectedEntity}
+                defaultValues={editor.selectedValues}
+                activeInCampaign={editor.activeById[editor.selectedId] !== false}
+                defaultFeatureLevel={defaultFeatureLevel}
+                formCtx={formCtx}
+                onActiveChange={(active) => editor.handleActiveChange(editor.selectedId!, active)}
+                onValuesChange={editor.handleValuesChange}
+                onDeleteRequest={() => editor.handleDeleteRequest(editor.selectedId!)}
+              />
+            ) : (
+              <SubclassEmptySelectionGate />
+            )}
+          </div>
         </div>
       </div>
 

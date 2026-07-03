@@ -1,8 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { ClassFeaturesTab } from './class-features-tab.client'
 
@@ -16,22 +18,33 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
   }
 })
 
-type Feature = { id?: string; name: string; level: number; description: string; grants: never[] }
+type Feature = {
+  id?: string
+  kind?: string
+  name: string
+  level: number
+  description: string
+  grants: never[]
+}
 
 function TabShell({
   features = [] as Feature[],
   entitySource,
   embeddedSeedRowIds,
+  formCtx = {},
 }: {
   features?: Feature[]
   entitySource?: ContentFormCtx['entitySource']
   embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  formCtx?: ContentFormCtx
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
-    <FormProvider {...form}>
-      <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds }} />
-    </FormProvider>
+    <MemoryRouter>
+      <FormProvider {...form}>
+        <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds, ...formCtx }} />
+      </FormProvider>
+    </MemoryRouter>
   )
 }
 
@@ -108,5 +121,36 @@ describe('ClassFeaturesTab', () => {
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
     expect(screen.getByRole('button', { name: /Remove Feature 2/i })).toBeInTheDocument()
+  })
+
+  it('shows inactive badge and availability alert for subclass-choice rows when subclassing is disabled', () => {
+    const subclassChoice: Feature = {
+      kind: 'subclass-choice',
+      id: 'fighter-subclass',
+      name: 'Fighter Subclass',
+      level: 3,
+      description: '',
+      grants: [],
+    }
+
+    render(
+      <TabShell
+        features={[subclassChoice]}
+        formCtx={{
+          campaignId: 'camp_1',
+          campaignRules: {
+            ...defaultCampaignRules(),
+            subclassing: { enabled: false },
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getAllByText('Inactive').length).toBeGreaterThan(0)
+    expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Enable subclasses' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_1/homebrew/rules-config/character-configuration#subclasses',
+    )
   })
 })

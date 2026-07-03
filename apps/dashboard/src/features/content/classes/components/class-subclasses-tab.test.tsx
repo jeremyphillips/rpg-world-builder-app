@@ -1,8 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { makeQueryWrapper } from '@/test/make-wrapper'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassSubclassesTab } from './class-subclasses-tab.client'
@@ -39,23 +41,27 @@ function ClassFormShell({
     },
   ],
   mode = 'edit' as const,
+  formCtx = {},
 }: {
   features?: Array<{ kind?: string; id: string; name: string; level: number; grants: never[] }>
   mode?: 'create' | 'edit'
+  formCtx?: Record<string, unknown>
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
-    <QueryWrapper>
-      <FormProvider {...form}>
-        <ClassSubclassesTab
-          campaignId="camp_1"
-          classId="srd-cc-5.2.1:fighter"
-          mode={mode}
-          formCtx={{}}
-          subclassesOverride={mode === 'edit' ? SUBCLASSES_FOR_FIGHTER : undefined}
-        />
-      </FormProvider>
-    </QueryWrapper>
+    <MemoryRouter>
+      <QueryWrapper>
+        <FormProvider {...form}>
+          <ClassSubclassesTab
+            campaignId="camp_1"
+            classId="srd-cc-5.2.1:fighter"
+            mode={mode}
+            formCtx={formCtx}
+            subclassesOverride={mode === 'edit' ? SUBCLASSES_FOR_FIGHTER : undefined}
+          />
+        </FormProvider>
+      </QueryWrapper>
+    </MemoryRouter>
   )
 }
 
@@ -106,5 +112,25 @@ describe('ClassSubclassesTab', () => {
     await waitFor(() => {
       expect(screen.queryByText('Untitled subclass')).not.toBeInTheDocument()
     })
+  })
+
+  it('shows a subclasses-disabled availability alert when subclassing is off', () => {
+    render(
+      <ClassFormShell
+        formCtx={{
+          campaignRules: {
+            ...defaultCampaignRules(),
+            subclassing: { enabled: false },
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Enable subclasses' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_1/homebrew/rules-config/character-configuration#subclasses',
+    )
+    expect(screen.getByRole('button', { name: /Add subclass/i })).toBeInTheDocument()
   })
 })

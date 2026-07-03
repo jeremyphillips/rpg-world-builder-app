@@ -1,4 +1,5 @@
 import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { AvailabilityReason } from '@/lib/availability'
 import { isContentRowActive, resolveMasterDetailRowKey } from './content-campaign-availability'
 import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
 import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel.client'
@@ -14,6 +15,7 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   title: string
   eyebrow?: string
   showDelete?: boolean
+  extraReasons?: readonly AvailabilityReason[]
 }
 
 /** Builds a list row with derived source badges, deletable flag, and active state. */
@@ -28,6 +30,7 @@ export function buildEmbeddedMasterDetailListItem({
   title,
   eyebrow,
   showDelete = true,
+  extraReasons = [],
 }: BuildEmbeddedMasterDetailListItemParams): MasterDetailListItem {
   const rowKey = resolveMasterDetailRowKey(field.id, row)
   const meta = resolveEmbeddedRowMeta({
@@ -36,6 +39,7 @@ export function buildEmbeddedMasterDetailListItem({
     seedRowIds,
     activeById,
     rowKey,
+    extraReasons,
   })
 
   return {
