@@ -4,6 +4,6 @@ export const EQUIPMENT_GRANT_ITEM_KIND_LABELS = {
 } as const
 
 export const EQUIPMENT_POOL_SOURCE_LABELS = {
-  explicit: 'A list of specific items',
-  filtered: 'A category of equipment',
+  explicit: 'a list of specific items',
+  filtered: 'a category of equipment',
 } as const

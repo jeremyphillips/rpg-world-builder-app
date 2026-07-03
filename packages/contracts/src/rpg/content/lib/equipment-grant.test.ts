@@ -313,4 +313,8 @@ describe('formatEquipmentGrantSentence', () => {
       ),
     ).toBe('Character chooses 1 item from: Rope, Torch, Rations.')
   })
+
+  it('returns an empty string for incomplete fixed grants', () => {
+    expect(formatEquipmentGrantSentence({ kind: 'fixed', equipmentSlug: '', quantity: 1 })).toBe('')
+  })
 })

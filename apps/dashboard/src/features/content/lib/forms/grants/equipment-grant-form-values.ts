@@ -195,7 +195,8 @@ export function equipmentGrantSummary(
   row: EquipmentGrantItemForm | undefined,
   equipmentOptions: FieldOption[] = [],
 ): string {
-  if (!row) return ''
+  if (!row?.itemKind) return ''
+  if (row.itemKind === 'fixed' && !row.equipmentSlug) return ''
 
   const resolveEquipmentName = (slug: string) =>
     equipmentOptions.find((option) => option.value === slug)?.label

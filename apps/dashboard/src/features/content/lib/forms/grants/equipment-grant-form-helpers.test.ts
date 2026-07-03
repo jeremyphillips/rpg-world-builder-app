@@ -6,6 +6,7 @@ import {
   equipmentGrantItemFields,
   equipmentGrantItemFormSchema,
   EQUIPMENT_POOL_CATEGORY_ANY,
+  type EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
 import {
   applyEquipmentGrantKindSync,
@@ -170,6 +171,10 @@ describe('equipmentGrantSummary', () => {
         [],
       ),
     ).toBe('Character chooses 1 musical instrument.')
+  })
+
+  it('returns an empty string for incomplete fixed rows', () => {
+    expect(equipmentGrantSummary({ itemKind: 'fixed' } as EquipmentGrantItemForm, [])).toBe('')
   })
 })
 
