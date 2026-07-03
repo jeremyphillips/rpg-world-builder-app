@@ -1,13 +1,14 @@
 'use client'
 
-import { useFormContext } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 
 import type { Subclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
+import type { FeatureRowForm } from '../lib/class-feature-form-fields'
+import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import { useSubclasses } from '../hooks/use-subclasses'
-import { SUBCLASS_CHOICE_LEVEL_NONE } from '../lib/class-form-constants'
 import { SubclassDeleteDialog } from './subclass-delete-dialog.client'
 import {
   SubclassChoiceLevelGate,
@@ -47,12 +48,6 @@ function useSubclassTabData(
   }
 }
 
-function parseDefaultFeatureLevel(subclassChoiceLevel: string): number | undefined {
-  return subclassChoiceLevel !== SUBCLASS_CHOICE_LEVEL_NONE
-    ? Number(subclassChoiceLevel)
-    : undefined
-}
-
 export function ClassSubclassesTab({
   campaignId,
   classId,
@@ -60,9 +55,8 @@ export function ClassSubclassesTab({
   formCtx = {},
   subclassesOverride,
 }: ClassSubclassesTabProps) {
-  const subclassChoiceLevel = useFormContext<{ subclassChoiceLevel: string }>().watch(
-    'subclassChoiceLevel',
-  )
+  const features = useWatch({ name: 'features' }) as FeatureRowForm[] | undefined
+  const subclassChoiceFeature = features?.find(isSubclassChoiceFeatureRow)
   const { subclasses, isPending } = useSubclassTabData(
     mode,
     campaignId,
@@ -75,7 +69,7 @@ export function ClassSubclassesTab({
     return <SubclassCreateGate />
   }
 
-  if (subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE) {
+  if (!subclassChoiceFeature) {
     return <SubclassChoiceLevelGate />
   }
 
@@ -83,7 +77,7 @@ export function ClassSubclassesTab({
     return <SubclassLoadingGate />
   }
 
-  const defaultFeatureLevel = parseDefaultFeatureLevel(subclassChoiceLevel)
+  const defaultFeatureLevel = Number(subclassChoiceFeature.level)
 
   return (
     <>

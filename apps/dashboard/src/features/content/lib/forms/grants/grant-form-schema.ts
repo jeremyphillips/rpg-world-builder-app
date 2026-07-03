@@ -10,6 +10,7 @@ import {
   INNATE_SPELL_KINDS,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
+  PROFICIENCY_POOL_SOURCES,
   senseIdSchema,
   skillSchema,
   toolCategorySchema,
@@ -23,16 +24,25 @@ import {
 import {
   EQUIPMENT_GRANT_ITEM_KINDS,
   EQUIPMENT_POOL_CATEGORY_ANY,
-  EQUIPMENT_POOL_SOURCES,
   equipmentGrantItemFormSchema,
 } from './equipment-grant-form-fields'
+import {
+  armorTrainingItemFormSchema,
+  PROFICIENCY_POOL_CATEGORY_ANY,
+  skillProficiencyItemFormSchema,
+  toolProficiencyItemFormSchema,
+  weaponProficiencyItemFormSchema,
+} from './proficiency-grant-form-fields'
 
 const BASE_GRANT_TYPES = [
   'resistances',
   'senses',
   'damageType',
   'movement',
-  'proficiencies',
+  'weaponProficiency',
+  'toolProficiency',
+  'skillProficiency',
+  'armorTraining',
   'languages',
 ] as const
 
@@ -51,7 +61,10 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
   senses: 'Special sense',
   damageType: 'Damage type',
   movement: 'Movement bonus',
-  proficiencies: 'Proficiencies',
+  weaponProficiency: 'Weapon proficiency',
+  toolProficiency: 'Tool proficiency',
+  skillProficiency: 'Skill proficiency',
+  armorTraining: 'Armor training',
   languages: 'Language',
 }
 
@@ -83,7 +96,7 @@ const equipmentGrantRowFieldsSchema = z.object({
   quantity: z.coerce.number().int().min(1).optional(),
   equipped: z.boolean().optional(),
   choose: z.coerce.number().int().min(1).optional(),
-  poolSource: z.enum(EQUIPMENT_POOL_SOURCES).optional(),
+  poolSource: z.enum(PROFICIENCY_POOL_SOURCES).optional(),
   poolEquipmentSlugs: z.array(z.string().min(1)).optional(),
   poolEquipmentKind: equipmentKindSchema.optional(),
   poolToolCategory: z
@@ -97,6 +110,45 @@ const equipmentGrantRowFieldsSchema = z.object({
     .optional(),
   poolGearKind: z.union([gearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)]).optional(),
 })
+
+const proficiencyGrantRowFieldsSchema = z.object({
+  proficiencySource: z.enum(['specific', 'category', 'pool']).optional(),
+  weaponProficiencySlugs: z.array(z.string().min(1)).optional(),
+  weaponProficiencyCategories: z.array(weaponCategorySchema).optional(),
+  weaponProficiencyPoolSlugs: z.array(z.string().min(1)).optional(),
+  weaponProficiencyPoolCategory: z
+    .union([weaponCategorySchema, z.literal(PROFICIENCY_POOL_CATEGORY_ANY)])
+    .optional(),
+  toolProficiencySlugs: z.array(z.string().min(1)).optional(),
+  toolProficiencyCategories: z.array(toolCategorySchema).optional(),
+  toolProficiencyPoolSlugs: z.array(z.string().min(1)).optional(),
+  toolProficiencyPoolCategory: z
+    .union([toolCategorySchema, z.literal(PROFICIENCY_POOL_CATEGORY_ANY)])
+    .optional(),
+  skillProficiencyIds: z.array(skillSchema).optional(),
+  skillProficiencyPoolIds: z.array(skillSchema).optional(),
+  armorTrainingSlugs: z.array(z.string().min(1)).optional(),
+  armorTrainingCategories: z.array(armorCategorySchema).optional(),
+  armorTrainingPoolSlugs: z.array(z.string().min(1)).optional(),
+  armorTrainingPoolCategory: z
+    .union([armorCategorySchema, z.literal(PROFICIENCY_POOL_CATEGORY_ANY)])
+    .optional(),
+})
+
+function applyFormSchemaIssues(
+  ctx: z.RefinementCtx,
+  result: { success: boolean; error?: z.ZodError },
+): void {
+  if (result.success || !result.error) return
+
+  for (const issue of result.error.issues) {
+    ctx.addIssue({
+      code: 'custom',
+      message: issue.message,
+      path: issue.path,
+    })
+  }
+}
 
 export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
@@ -122,10 +174,6 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       movementValue: movementBonusFeetSchema.optional(),
       movementUnit: z.literal('ft').optional(),
       language: languageIdSchema.optional(),
-      proficiencySkills: z.array(skillSchema).optional(),
-      proficiencyArmor: z.array(armorCategorySchema).optional(),
-      proficiencyTools: z.array(z.string()).optional(),
-      proficiencyWeapons: z.array(z.string()).optional(),
       /** Spellcasting ability for a `spells` row. */
       spellAbility: abilitySchema.optional(),
       /** Cast mode: `free_cast` (innate, via frequency) or `always_prepared` (slot-based). */
@@ -141,18 +189,30 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       featRecommendedIds: z.array(z.string()).optional(),
     })
     .merge(equipmentGrantRowFieldsSchema)
+    .merge(proficiencyGrantRowFieldsSchema)
     .superRefine((row, ctx) => {
-      if (row.grantType !== 'equipment') return
+      if (row.grantType === 'equipment') {
+        applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
+        return
+      }
 
-      const result = equipmentGrantItemFormSchema.safeParse(row)
-      if (result.success) return
+      if (row.grantType === 'weaponProficiency') {
+        applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+        return
+      }
 
-      for (const issue of result.error.issues) {
-        ctx.addIssue({
-          code: 'custom',
-          message: issue.message,
-          path: issue.path,
-        })
+      if (row.grantType === 'toolProficiency') {
+        applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+        return
+      }
+
+      if (row.grantType === 'skillProficiency') {
+        applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+        return
+      }
+
+      if (row.grantType === 'armorTraining') {
+        applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
       }
     })
 }

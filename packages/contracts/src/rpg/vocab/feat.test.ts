@@ -38,7 +38,7 @@ describe('feat category vocabulary', () => {
   })
 
   it('returns labels and falls back for unknown ids', () => {
-    expect(getFeatCategoryLabel('origin')).toBe('Origin Feat')
+    expect(getFeatCategoryLabel('origin')).toBe('Origin')
     expect(getFeatCategoryLabel('custom')).toBe('custom')
   })
 })

@@ -45,7 +45,6 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     ...(doc.description !== undefined && { description: doc.description }),
     primaryAbilities: doc.primaryAbilities,
     hitDie: doc.hitDie,
-    subclassChoiceLevel: doc.subclassChoiceLevel,
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
     proficiencies,
     features: doc.features ?? [],

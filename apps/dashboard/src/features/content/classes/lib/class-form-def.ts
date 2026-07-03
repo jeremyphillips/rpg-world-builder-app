@@ -1,10 +1,9 @@
-import { MAX_CHARACTER_LEVEL, type CharacterClass, type CreateClassInput } from '@rpg/contracts'
+import { type CharacterClass, type CreateClassInput } from '@rpg/contracts'
 
 import { contentFormRegistry, contentFormFields, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
-import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import {
   buildClassTabs,
   classFormSchema,
@@ -38,10 +37,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     description: entity.description,
     primaryAbilities: entity.primaryAbilities,
     hitDie: entity.hitDie,
-    subclassChoiceLevel:
-      entity.subclassChoiceLevel !== undefined
-        ? String(entity.subclassChoiceLevel)
-        : SUBCLASS_CHOICE_LEVEL_NONE,
     hasSpellcasting: entity.spellcasting !== undefined,
     weaponProficiencyMode:
       (entity.proficiencies.weapons.items?.length ?? 0) > 0 ? 'individual' : 'categories',
@@ -59,14 +54,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   }),
 
   toInput: (values, ctx) =>
-    finalizeContentInput(
-      buildClassCreateInput(
-        values,
-        ctx,
-        ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
-      ),
-      ctx,
-    ) as CreateClassInput,
+    finalizeContentInput(buildClassCreateInput(values, ctx), ctx) as CreateClassInput,
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
@@ -83,4 +71,3 @@ contentFormRegistry['classes'] = classFormDef
 
 export { classFormDef, createClassFormSchema }
 export type { ClassFormValues }
-export { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'

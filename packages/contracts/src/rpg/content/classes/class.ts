@@ -116,8 +116,6 @@ export type ClassResource = z.infer<typeof classResourceSchema>
 export const classStoredBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
-  /** Level at which a character chooses their subclass; omit when the class has none. */
-  subclassChoiceLevel: absoluteLevelSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesWriteSchema,
   features: z.array(classFeatureSchema),
@@ -139,6 +137,11 @@ export function subclassChoiceFeatureLabel(className: string): string {
   return `${className} Subclass`
 }
 
+/** Stable class feature id for the subclass choice milestone. */
+export function subclassChoiceFeatureId(classSlug: string): string {
+  return `${classSlug}-subclass`
+}
+
 /** Stored record = envelope + persisted body (seed JSON, Mongo, patch merge target). */
 export const classStoredSchema = contentMetaSchema.extend(classStoredBodySchema.shape)
 export type ClassStored = z.infer<typeof classStoredSchema>
@@ -146,6 +149,25 @@ export type ClassStored = z.infer<typeof classStoredSchema>
 /** Read record = envelope + read body (`proficiencies.skills.from` is API-derived). */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)
 export type CharacterClass = z.infer<typeof classSchema>
+
+type ClassSubclassChoiceFeatureSource = {
+  slug: string
+  features: readonly ClassFeature[]
+}
+
+/** Finds the explicit feature row that marks when a class chooses a subclass. */
+export function subclassChoiceFeature(characterClass: ClassSubclassChoiceFeatureSource) {
+  return characterClass.features.find(
+    (feature) => feature.id === subclassChoiceFeatureId(characterClass.slug),
+  )
+}
+
+/** Level at which a class chooses a subclass, derived from its feature rows. */
+export function subclassChoiceFeatureLevel(
+  characterClass: ClassSubclassChoiceFeatureSource,
+): number | undefined {
+  return subclassChoiceFeature(characterClass)?.level
+}
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
 export const createClassInputSchema = classStoredBodySchema.extend({ slug: slugSchema })

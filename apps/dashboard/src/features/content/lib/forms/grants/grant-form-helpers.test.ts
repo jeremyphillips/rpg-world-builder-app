@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import type { GrantGroups } from '@rpg/contracts'
 
 import { formatSpellRowTitle } from './grant-form-fields'
-import { GRANT_ROW_TYPE_LABELS, GRANT_ROW_TYPES, GRANT_DEFAULT_UNLOCK_LEVEL } from './grant-form-schema'
+import {
+  GRANT_ROW_TYPE_LABELS,
+  GRANT_ROW_TYPES,
+  GRANT_TYPES,
+  GRANT_TYPE_LABELS,
+  GRANT_DEFAULT_UNLOCK_LEVEL,
+} from './grant-form-schema'
 import {
   formRowsToGrants,
   formRowsToGrantGroups,
@@ -11,30 +17,17 @@ import {
 } from './grant-form-values'
 
 describe('grantsToFormRows / formRowsToGrants (legacy bridge)', () => {
-  it('round-trips proficiency tool and weapon slug arrays', () => {
-    const rows = grantsToFormRows({
-      proficiencies: {
-        tools: ['thieves-tools'],
-        weapons: ['dagger', 'rapier'],
-      },
-    })
-    const profGrant = rows.find((row) => row.grantType === 'proficiencies')
-
-    expect(profGrant?.proficiencyTools).toEqual(['thieves-tools'])
-    expect(profGrant?.proficiencyWeapons).toEqual(['dagger', 'rapier'])
-
-    const restored = formRowsToGrants(rows)
-    expect(restored?.proficiencies).toEqual({
-      tools: ['thieves-tools'],
-      weapons: ['dagger', 'rapier'],
-    })
-  })
-
   it('converts innate spell entries to spells rows', () => {
     const rows = grantsToFormRows({
       innateSpells: {
         ability: 'cha' as const,
-        entries: [{ level: 1, kind: 'free_cast' as const, spellIds: ['power-word-heal', 'power-word-kill'] }],
+        entries: [
+          {
+            level: 1,
+            kind: 'free_cast' as const,
+            spellIds: ['power-word-heal', 'power-word-kill'],
+          },
+        ],
       },
     })
     const spellRow = rows.find((row) => row.grantType === 'spells')
@@ -215,22 +208,93 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     expect(groups[0]?.unlock).toBeUndefined()
   })
 
-  it('round-trips a proficiencies grant', () => {
+  it('round-trips a tool proficiency grant', () => {
     const groups: GrantGroups = [
       {
         grants: [
           {
-            kind: 'proficiencies',
-            skills: ['perception'],
-            tools: ['thieves-tools'],
+            kind: 'toolProficiency',
+            grant: {
+              kind: 'fixed',
+              toolSlugs: ['thieves-tools'],
+            },
           },
         ],
       },
     ]
     const rows = grantGroupsToFormRows(groups)
-    expect(rows[0]?.grantType).toBe('proficiencies')
-    expect(rows[0]?.proficiencySkills).toEqual(['perception'])
-    expect(rows[0]?.proficiencyTools).toEqual(['thieves-tools'])
+    expect(rows[0]?.grantType).toBe('toolProficiency')
+    expect(rows[0]?.proficiencySource).toBe('specific')
+    expect(rows[0]?.toolProficiencySlugs).toEqual(['thieves-tools'])
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('round-trips a skill proficiency grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'skillProficiency',
+            grant: {
+              kind: 'fixed',
+              skillIds: ['perception'],
+            },
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('skillProficiency')
+    expect(rows[0]?.skillProficiencyIds).toEqual(['perception'])
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('round-trips a weapon proficiency choice grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'weaponProficiency',
+            grant: {
+              kind: 'choice',
+              choose: 1,
+              pool: { source: 'filtered', weaponCategory: 'martial' },
+            },
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('weaponProficiency')
+    expect(rows[0]?.proficiencySource).toBe('pool')
+    expect(rows[0]?.weaponProficiencyPoolCategory).toBe('martial')
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('round-trips an armor training grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'armorTraining',
+            grant: {
+              kind: 'fixed',
+              armorCategories: ['light'],
+            },
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('armorTraining')
+    expect(rows[0]?.proficiencySource).toBe('category')
+    expect(rows[0]?.armorTrainingCategories).toEqual(['light'])
 
     const restored = formRowsToGrantGroups(rows)
     expect(restored).toEqual(groups)
@@ -262,6 +326,16 @@ describe('grant row type exports', () => {
     expect(GRANT_ROW_TYPES).toContain('spells')
     expect(GRANT_ROW_TYPES).not.toContain('innateSpells')
     expect(GRANT_ROW_TYPE_LABELS.spells).toBe('Spells')
+  })
+
+  it('exposes four atomic proficiency grant types instead of combined proficiencies', () => {
+    expect(GRANT_TYPES).toContain('weaponProficiency')
+    expect(GRANT_TYPES).toContain('toolProficiency')
+    expect(GRANT_TYPES).toContain('skillProficiency')
+    expect(GRANT_TYPES).toContain('armorTraining')
+    expect(GRANT_TYPES).not.toContain('proficiencies')
+    expect(GRANT_TYPE_LABELS.weaponProficiency).toBe('Weapon proficiency')
+    expect(GRANT_TYPE_LABELS.armorTraining).toBe('Armor training')
   })
 })
 

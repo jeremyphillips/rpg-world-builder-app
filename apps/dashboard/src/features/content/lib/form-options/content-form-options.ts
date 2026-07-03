@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import {
   classHasSpellcasting,
+  isArmorEquipment,
   isMagicItemBaseEquipment,
   type CharacterClass,
   type ContentSource,
@@ -41,6 +42,8 @@ export interface ContentFormOptionSets {
    */
   spellcastingClasses: FieldOption[]
   weapons: FieldOption[]
+  /** Campaign-resolved armor equipment, sorted by label. */
+  armor: FieldOption[]
   /** All campaign-resolved equipment (weapons, armor, tools, gear, …), sorted by label. */
   equipment: FieldOption[]
   spells: FieldOption[]
@@ -143,6 +146,7 @@ export function buildContentFormOptionSets(input: {
 }): ContentFormOptionSets {
   const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
   const weapons = input.equipment?.filter(isWeaponEquipment)
+  const armor = input.equipment?.filter(isArmorEquipment)
 
   return {
     classes: classOptions,
@@ -150,6 +154,7 @@ export function buildContentFormOptionSets(input: {
       input.classes?.filter(classHasSpellcasting).map(toContentFieldOption) ?? [],
     ),
     weapons: sortFieldOptions(weapons?.map(toContentFieldOption) ?? []),
+    armor: sortFieldOptions(armor?.map(toContentFieldOption) ?? []),
     equipment: sortFieldOptions(input.equipment?.map(toContentFieldOption) ?? []),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),

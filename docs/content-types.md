@@ -33,6 +33,11 @@ Species traits and heritage options share `contentTraitSchema` — a discriminat
 
 **Class and subclass features are always `custom`** (`classFeatureSchema` extends the custom variant + `level`). Progression UI requires a stored feature name.
 
+**Subclass choice milestones** are modeled as explicit class features (`{classSlug}-subclass`,
+named `<Class> Subclass`). The feature level is the source of truth for when subclass authoring
+and default subclass feature levels unlock; there is no top-level `subclassChoiceLevel` field on
+the class body.
+
 Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a single atomic grant: one sense, one resistance, walk speed override, or one language. Hybrids (Drow: senses + innate spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).

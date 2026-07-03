@@ -9,20 +9,20 @@ import type { GameTermEntry } from './types'
 
 export const FEAT_CATEGORY_ENTRIES = {
   origin: {
-    label: 'Origin Feat',
+    label: 'Origin',
     description:
       'A feat taken at character creation or when a feature grants an Origin feat choice.',
   },
   general: {
-    label: 'General Feat',
+    label: 'General',
     description: 'A feat typically taken at level 4+ when a class grants a General feat choice.',
   },
   'fighting-style': {
-    label: 'Fighting Style Feat',
+    label: 'Fighting Style',
     description: 'A feat granted by the Fighting Style feature or similar class features.',
   },
   'epic-boon': {
-    label: 'Epic Boon Feat',
+    label: 'Epic Boon',
     description: 'A high-level feat typically taken at level 19+.',
   },
 } as const satisfies Record<string, GameTermEntry>

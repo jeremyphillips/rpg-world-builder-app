@@ -16,13 +16,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function TabStory({
-  subclassChoiceLevel = '3',
+  features = [{ id: 'fighter-subclass', name: 'Fighter Subclass', level: 3, grants: [] }],
   mode = 'edit' as const,
 }: {
-  subclassChoiceLevel?: string
+  features?: Array<Record<string, unknown>>
   mode?: 'create' | 'edit'
 }) {
-  const form = useForm({ defaultValues: { subclassChoiceLevel } })
+  const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
       <ClassSubclassesTab
@@ -40,8 +40,8 @@ export const EditMode: Story = {
   render: () => <TabStory />,
 }
 
-export const GatedNoChoiceLevel: Story = {
-  render: () => <TabStory subclassChoiceLevel="none" />,
+export const GatedNoChoiceFeature: Story = {
+  render: () => <TabStory features={[]} />,
 }
 
 export const CreateMode: Story = {

@@ -9,14 +9,25 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Barbarian",
     "description": "<p>A fierce warrior who can enter a battle rage.</p>",
-    "primaryAbilities": ["str"],
+    "primaryAbilities": [
+      "str"
+    ],
     "hitDie": 12,
-    "subclassChoiceLevel": 3,
     "proficiencies": {
-      "savingThrows": ["str", "con"],
-      "armor": ["light", "medium", "shields"],
+      "savingThrows": [
+        "str",
+        "con"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": [
+          "simple",
+          "martial"
+        ]
       },
       "skills": {
         "choose": 2
@@ -102,6 +113,13 @@
         "description": "<p>You gain proficiency in another skill of your choice from the skill list available to Barbarians at level 1.</p><p>In addition, while your Rage is active, you can channel primal power when you attempt certain tasks; whenever you make an ability check using one of the following skills, you can make it as a Strength check even if it normally uses a different ability: Acrobatics, Intimidation, Perception, Stealth, or Survival. When you use this ability, your Strength represents primal power coursing through you, honing your agility, bearing, and senses.</p>"
       },
       {
+        "kind": "custom",
+        "id": "barbarian-subclass",
+        "name": "Barbarian Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -114,7 +132,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -157,7 +177,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -188,7 +210,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -219,7 +243,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -250,7 +276,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-irresistible-offense"]
+                "recommendedFeatIds": [
+                  "boon-of-irresistible-offense"
+                ]
               }
             ]
           }
@@ -335,9 +363,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Bard",
     "description": "<p>An inspiring magician whose power echoes the music of creation.</p>",
-    "primaryAbilities": ["cha"],
+    "primaryAbilities": [
+      "cha"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "cha",
@@ -441,10 +470,17 @@
       "description": "<p>You have learned to cast spells through your bardic arts. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Bard spells, which appear in the Bard spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know two cantrips of your choice from the Bard spell list. Dancing Lights and Vicious Mockery are recommended.</p><p>Whenever you gain a Bard level, you can replace one of your cantrips with another cantrip of your choice from the Bard spell list.</p><p>When you reach Bard levels 4 and 10, you learn another cantrip of your choice from the Bard spell list, as shown in the Cantrips column of the Bard Features table.</p><p><strong>Spell Slots.</strong> The Bard Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Bard spell list. Charm Person, Color Spray, Dissonant Whispers, and Healing Word are recommended.</p><p>The number of spells on your list increases as you gain Bard levels, as shown in the Prepared Spells column of the Bard Features table. Whenever that number increases, choose additional spells from the Bard spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Bard, your list of prepared spells can include six spells of levels 1 and 2 in any combination.</p><p>If another Bard feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Bard spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you gain a Bard level, you can replace one spell on your list with another Bard spell for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Charisma is your spellcasting ability for your Bard spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Musical Instrument as a Spellcasting Focus for your Bard spells.</p>"
     },
     "proficiencies": {
-      "savingThrows": ["dex", "cha"],
-      "armor": ["light"],
+      "savingThrows": [
+        "dex",
+        "cha"
+      ],
+      "armor": [
+        "light"
+      ],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 3
@@ -522,6 +558,13 @@
         "description": "<p>You can add half your Proficiency Bonus (round down) to any ability check you make that uses a skill proficiency you lack and that doesn't otherwise use your Proficiency Bonus.</p><p>For example, if you make a Strength (Athletics) check and lack Athletics proficiency, you can add half your Proficiency Bonus to the check.</p>"
       },
       {
+        "kind": "custom",
+        "id": "bard-subclass",
+        "name": "Bard Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -534,7 +577,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -565,7 +610,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -590,7 +637,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -609,7 +658,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -634,7 +685,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-spell-recall"]
+                "recommendedFeatIds": [
+                  "boon-of-spell-recall"
+                ]
               }
             ]
           }
@@ -652,7 +705,10 @@
                 "kind": "spells",
                 "ability": "cha",
                 "mode": "always_prepared",
-                "spellIds": ["power-word-heal", "power-word-kill"]
+                "spellIds": [
+                  "power-word-heal",
+                  "power-word-kill"
+                ]
               }
             ]
           }
@@ -693,9 +749,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Cleric",
     "description": "<p>A priestly champion who wields divine magic in service of a higher power.</p>",
-    "primaryAbilities": ["wis"],
+    "primaryAbilities": [
+      "wis"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "wis",
@@ -799,10 +856,19 @@
       "description": "<p>You have learned to cast spells through prayer and meditation. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Cleric spells, which appear on the Cleric spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know three cantrips of your choice from the Cleric spell list. Guidance, Sacred Flame, and Thaumaturgy are recommended.</p><p>Whenever you gain a Cleric level, you can replace one of your cantrips with another cantrip of your choice from the Cleric spell list.</p><p>When you reach Cleric levels 4 and 10, you learn another cantrip of your choice from the Cleric spell list, as shown in the Cantrips column of the Cleric Features table.</p><p><strong>Spell Slots.</strong> The Cleric Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Cleric spell list. Bless, Cure Wounds, Guiding Bolt, and Shield of Faith are recommended.</p><p>The number of spells on your list increases as you gain Cleric levels, as shown in the Prepared Spells column of the Cleric Features table. Whenever that number increases, choose additional spells from the Cleric spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Cleric, your list of prepared spells can include six spells of levels 1 and 2 in any combination.</p><p>If another Cleric feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Cleric spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with other Cleric spells for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Wisdom is your spellcasting ability for your Cleric spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Holy Symbol as a Spellcasting Focus for your Cleric spells.</p>"
     },
     "proficiencies": {
-      "savingThrows": ["wis", "cha"],
-      "armor": ["light", "medium", "shields"],
+      "savingThrows": [
+        "wis",
+        "cha"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 2
@@ -876,6 +942,13 @@
         "description": "<p>You can channel divine energy directly from the Outer Planes to fuel magical effects. You start with two such effects: Divine Spark and Turn Undead, each of which is described below. Each time you use this class's Channel Divinity, choose which Channel Divinity effect from this class to create. You gain additional effect options at higher Cleric levels.</p><p>You can use this class's Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain additional uses when you reach certain Cleric levels, as shown in the Channel Divinity column of the Cleric Features table.</p><p>If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class's Spellcasting feature.</p><p><strong>Divine Spark.</strong> As a Magic action, you point your Holy Symbol at another creature you can see within 30 feet of yourself and focus divine energy at it. Roll 1d8 and add your Wisdom modifier. You either restore Hit Points to the creature equal to that total or force the creature to make a Constitution saving throw. On a failed save, the creature takes Necrotic or Radiant damage (your choice) equal to that total. On a successful save, the creature takes half as much damage (round down).</p><p>You roll an additional d8 when you reach Cleric levels 7 (2d8), 13 (3d8), and 18 (4d8).</p><p><strong>Turn Undead.</strong> As a Magic action, you present your Holy Symbol and censure Undead creatures. Each Undead of your choice within 30 feet of you must make a Wisdom saving throw. If the creature fails its save, it has the Frightened and Incapacitated conditions for 1 minute. For that duration, it tries to move as far from you as it can on its turns. This effect ends early on the creature if it takes any damage, if you have the Incapacitated condition, or if you die.</p>"
       },
       {
+        "kind": "custom",
+        "id": "cleric-subclass",
+        "name": "Cleric Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -888,7 +961,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -919,7 +994,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -944,7 +1021,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -969,7 +1048,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -988,7 +1069,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-fate"]
+                "recommendedFeatIds": [
+                  "boon-of-fate"
+                ]
               }
             ]
           }
@@ -1031,9 +1114,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Druid",
     "description": "<p>A priest of the Old Faith, wielding the powers of nature.</p>",
-    "primaryAbilities": ["wis"],
+    "primaryAbilities": [
+      "wis"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "wis",
@@ -1137,10 +1221,19 @@
       "description": "<p>You have learned to cast spells through studying the mystical forces of nature. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Druid spells, which appear on the Druid spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know two cantrips of your choice from the Druid spell list. Druidcraft and Produce Flame are recommended.</p><p>Whenever you gain a Druid level, you can replace one of your cantrips with another cantrip of your choice from the Druid spell list.</p><p>When you reach Druid levels 4 and 10, you learn another cantrip of your choice from the Druid spell list, as shown in the Cantrips column of the Druid Features table.</p><p><strong>Spell Slots.</strong> The Druid Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Druid spell list. Animal Friendship, Cure Wounds, Faerie Fire, and Thunderwave are recommended.</p><p>The number of spells on your list increases as you gain Druid levels, as shown in the Prepared Spells column of the Druid Features table. Whenever that number increases, choose additional spells from the Druid spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Druid, your list of prepared spells can include six spells of levels 1 and 2 in any combination.</p><p>If another Druid feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Druid spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells with other Druid spells for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Wisdom is your spellcasting ability for your Druid spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Druidic Focus as a Spellcasting Focus for your Druid spells.</p>"
     },
     "proficiencies": {
-      "savingThrows": ["int", "wis"],
-      "armor": ["light", "medium", "shields"],
+      "savingThrows": [
+        "int",
+        "wis"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 2
@@ -1219,7 +1312,9 @@
                 "kind": "spells",
                 "ability": "wis",
                 "mode": "always_prepared",
-                "spellIds": ["speak-with-animals"]
+                "spellIds": [
+                  "speak-with-animals"
+                ]
               }
             ]
           }
@@ -1244,6 +1339,13 @@
         "description": "<p>The power of nature allows you to assume the form of an animal. As a Bonus Action, you shape-shift into a Beast form that you have learned for this feature (see \"Known Forms\" below). You stay in that form for a number of hours equal to half your Druid level or until you use Wild Shape again, have the Incapacitated condition, or die. You can also leave the form early as a Bonus Action.</p><p><strong>Number of Uses.</strong> You can use Wild Shape twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>You gain additional uses when you reach certain Druid levels, as shown in the Wild Shape column of the Druid Features table.</p><p><strong>Known Forms.</strong> You know four Beast forms for this feature, chosen from among Beast stat blocks that have a maximum Challenge Rating of 1/4 and that lack a Fly Speed (see \"Animals\" in \"Monsters\" for stat block options). The Rat, Riding Horse, Spider, and Wolf are recommended. Whenever you finish a Long Rest, you can replace one of your known forms with another eligible form.</p><p>When you reach certain Druid levels, your number of known forms and the maximum Challenge Rating for those forms increases, as shown in the Beast Shapes table. In addition, starting at level 8, you can adopt a form that has a Fly Speed.</p><p>When choosing known forms, you may look in other sources for eligible Beasts if the Game Master permits you to do so.</p><p><strong>Beast Shapes.</strong> Druid Level 2: 4 known forms, maximum CR 1/4, no Fly Speed. Druid Level 4: 6 known forms, maximum CR 1/2, no Fly Speed. Druid Level 8: 8 known forms, maximum CR 1, Fly Speed allowed.</p><p><strong>Rules While Shape-Shifted.</strong> While in a form, you retain your personality, memories, and ability to speak, and the following rules apply.</p><p><strong>Temporary Hit Points.</strong> When you assume a Wild Shape form, you gain a number of Temporary Hit Points equal to your Druid level.</p><p><strong>Game Statistics.</strong> Your game statistics are replaced by the Beast's stat block, but you retain your creature type; Hit Points; Hit Point Dice; Intelligence, Wisdom, and Charisma scores; class features; languages; and feats. You also retain your skill and saving throw proficiencies and use your Proficiency Bonus for them, in addition to gaining the proficiencies of the creature. If a skill or saving throw modifier in the Beast's stat block is higher than yours, use the one in the stat block.</p><p><strong>No Spellcasting.</strong> You can't cast spells, but shape-shifting doesn't break your Concentration or otherwise interfere with a spell you've already cast.</p><p><strong>Objects.</strong> Your ability to handle objects is determined by the form's limbs rather than your own. In addition, you choose whether your equipment falls in your space, merges into your new form, or is worn by it. Worn equipment functions as normal, but the GM decides whether it's practical for the new form to wear a piece of equipment based on the creature's size and shape. Your equipment doesn't change size or shape to match the new form, and any equipment that the new form can't wear must either fall to the ground or merge with the form. Equipment that merges with the form has no effect while you're in that form.</p>"
       },
       {
+        "kind": "custom",
+        "id": "druid-subclass",
+        "name": "Druid Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -1256,7 +1358,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1287,7 +1391,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1306,7 +1412,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1331,7 +1439,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1356,7 +1466,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+                "recommendedFeatIds": [
+                  "boon-of-dimensional-travel"
+                ]
               }
             ]
           }
@@ -1399,14 +1511,27 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Fighter",
     "description": "<p>A master of martial combat, skilled with a variety of weapons and armor.</p>",
-    "primaryAbilities": ["str", "dex"],
+    "primaryAbilities": [
+      "str",
+      "dex"
+    ],
     "hitDie": 10,
-    "subclassChoiceLevel": 3,
     "proficiencies": {
-      "savingThrows": ["str", "con"],
-      "armor": ["light", "medium", "heavy", "shields"],
+      "savingThrows": [
+        "str",
+        "con"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "heavy",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": [
+          "simple",
+          "martial"
+        ]
       },
       "skills": {
         "choose": 2
@@ -1527,7 +1652,9 @@
                 "category": "fighting-style",
                 "choose": 1,
                 "replaceable": true,
-                "recommendedFeatIds": ["defense"]
+                "recommendedFeatIds": [
+                  "defense"
+                ]
               }
             ]
           }
@@ -1558,6 +1685,13 @@
         "description": "<p>You have a mind for tactics on and off the battlefield. When you fail an ability check, you can expend a use of your Second Wind to push yourself toward success. Rather than regaining Hit Points, you roll 1d10 and add the number rolled to the ability check, potentially turning it into a success. If the check still fails, this use of Second Wind isn't expended.</p>"
       },
       {
+        "kind": "custom",
+        "id": "fighter-subclass",
+        "name": "Fighter Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -1570,7 +1704,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1601,7 +1737,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1620,7 +1758,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1657,7 +1797,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1682,7 +1824,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1701,7 +1845,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1720,7 +1866,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-combat-prowess"]
+                "recommendedFeatIds": [
+                  "boon-of-combat-prowess"
+                ]
               }
             ]
           }
@@ -1801,14 +1949,21 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Monk",
     "description": "<p>A master of martial arts, harnessing the power of the body in pursuit of perfection.</p>",
-    "primaryAbilities": ["dex", "wis"],
+    "primaryAbilities": [
+      "dex",
+      "wis"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "proficiencies": {
-      "savingThrows": ["str", "dex"],
+      "savingThrows": [
+        "str",
+        "dex"
+      ],
       "armor": [],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 2
@@ -1894,6 +2049,13 @@
         "description": "<p>When an attack roll hits you and its damage includes Bludgeoning, Piercing, or Slashing damage, you can take a Reaction to reduce the attack's total damage against you. The reduction equals 1d10 plus your Dexterity modifier and Monk level.</p><p>If you reduce the damage to 0, you can expend 1 Focus Point to redirect some of the attack's force. If you do so, choose a creature you can see within 5 feet of yourself if the attack was a melee attack or a creature you can see within 60 feet of yourself that isn't behind Total Cover if the attack was a ranged attack. That creature must succeed on a Dexterity saving throw or take damage equal to two rolls of your Martial Arts die plus your Dexterity modifier. The damage is the same type dealt by the attack.</p>"
       },
       {
+        "kind": "custom",
+        "id": "monk-subclass",
+        "name": "Monk Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -1906,7 +2068,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1955,7 +2119,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -1992,7 +2158,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2029,7 +2197,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2054,7 +2224,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-irresistible-offense"]
+                "recommendedFeatIds": [
+                  "boon-of-irresistible-offense"
+                ]
               }
             ]
           }
@@ -2207,9 +2379,11 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Paladin",
     "description": "<p>A holy warrior bound to a sacred oath.</p>",
-    "primaryAbilities": ["str", "cha"],
+    "primaryAbilities": [
+      "str",
+      "cha"
+    ],
     "hitDie": 10,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "half",
       "ability": "cha",
@@ -2267,10 +2441,21 @@
       "description": "<p>You have learned to cast spells through prayer and meditation. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Paladin spells, which appear in the Paladin spell list later in the class's description.</p><p><strong>Spell Slots.</strong> The Paladin Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 Paladin spells. Heroism and Searing Smite are recommended.</p><p>The number of spells on your list increases as you gain Paladin levels, as shown in the Prepared Spells column of the Paladin Features table. Whenever that number increases, choose additional Paladin spells until the number of spells on your list matches the number in the Paladin Features table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 5 Paladin, your list of prepared spells can include six Paladin spells of level 1 or 2 in any combination.</p><p>If another Paladin feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Paladin spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can replace one spell on your list with another Paladin spell for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Charisma is your spellcasting ability for your Paladin spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Holy Symbol as a Spellcasting Focus for your Paladin spells.</p>"
     },
     "proficiencies": {
-      "savingThrows": ["wis", "cha"],
-      "armor": ["light", "medium", "heavy", "shields"],
+      "savingThrows": [
+        "wis",
+        "cha"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "heavy",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": [
+          "simple",
+          "martial"
+        ]
       },
       "skills": {
         "choose": 2
@@ -2360,7 +2545,9 @@
                 "kind": "featChoice",
                 "category": "fighting-style",
                 "choose": 1,
-                "recommendedFeatIds": ["defense"]
+                "recommendedFeatIds": [
+                  "defense"
+                ]
               }
             ]
           }
@@ -2378,7 +2565,9 @@
                 "kind": "spells",
                 "ability": "cha",
                 "mode": "always_prepared",
-                "spellIds": ["divine-smite"]
+                "spellIds": [
+                  "divine-smite"
+                ]
               }
             ]
           }
@@ -2389,6 +2578,13 @@
         "name": "Channel Divinity",
         "level": 3,
         "description": "<p>You can channel divine energy directly from the Outer Planes, using it to fuel magical effects. You start with one such effect: Divine Sense, which is described below. Other Paladin features give additional Channel Divinity effect options. Each time you use this class's Channel Divinity, you choose which effect from this class to create.</p><p>You can use this class's Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain an additional use when you reach Paladin level 11.</p><p>If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class's Spellcasting feature.</p><p><strong>Divine Sense.</strong> As a Bonus Action, you can open your awareness to detect Celestials, Fiends, and Undead. For the next 10 minutes or until you have the Incapacitated condition, you know the location of any creature of those types within 60 feet of yourself, and you know its creature type. Within the same radius, you also detect the presence of any place or object that has been consecrated or desecrated, as with the <em>Hallow</em> spell.</p>"
+      },
+      {
+        "kind": "custom",
+        "id": "paladin-subclass",
+        "name": "Paladin Subclass",
+        "level": 3,
+        "description": ""
       },
       {
         "id": "ability-score-improvement-4",
@@ -2403,7 +2599,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2427,7 +2625,9 @@
                 "kind": "spells",
                 "ability": "cha",
                 "mode": "always_prepared",
-                "spellIds": ["find-steed"]
+                "spellIds": [
+                  "find-steed"
+                ]
               }
             ]
           }
@@ -2452,7 +2652,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2489,7 +2691,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2514,7 +2718,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2539,7 +2745,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-truesight"]
+                "recommendedFeatIds": [
+                  "boon-of-truesight"
+                ]
               }
             ]
           }
@@ -2572,9 +2780,11 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Ranger",
     "description": "<p>A warrior who combats threats on the edges of civilization.</p>",
-    "primaryAbilities": ["dex", "wis"],
+    "primaryAbilities": [
+      "dex",
+      "wis"
+    ],
     "hitDie": 10,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "half",
       "ability": "wis",
@@ -2632,10 +2842,20 @@
       ]
     },
     "proficiencies": {
-      "savingThrows": ["str", "dex"],
-      "armor": ["light", "medium", "shields"],
+      "savingThrows": [
+        "str",
+        "dex"
+      ],
+      "armor": [
+        "light",
+        "medium",
+        "shields"
+      ],
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": [
+          "simple",
+          "martial"
+        ]
       },
       "skills": {
         "choose": 3
@@ -2723,7 +2943,9 @@
                 "kind": "spells",
                 "ability": "wis",
                 "mode": "always_prepared",
-                "spellIds": ["hunters-mark"]
+                "spellIds": [
+                  "hunters-mark"
+                ]
               }
             ]
           }
@@ -2753,11 +2975,20 @@
                 "kind": "featChoice",
                 "category": "fighting-style",
                 "choose": 1,
-                "recommendedFeatIds": ["defense"]
+                "recommendedFeatIds": [
+                  "defense"
+                ]
               }
             ]
           }
         ]
+      },
+      {
+        "kind": "custom",
+        "id": "ranger-subclass",
+        "name": "Ranger Subclass",
+        "level": 3,
+        "description": ""
       },
       {
         "id": "ability-score-improvement-4",
@@ -2772,7 +3003,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2803,7 +3036,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2834,7 +3069,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2865,7 +3102,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -2907,7 +3146,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+                "recommendedFeatIds": [
+                  "boon-of-dimensional-travel"
+                ]
               }
             ]
           }
@@ -2958,18 +3199,29 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Rogue",
     "description": "<p>A scoundrel who uses stealth and trickery to overcome obstacles and enemies.</p>",
-    "primaryAbilities": ["dex"],
+    "primaryAbilities": [
+      "dex"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "proficiencies": {
-      "savingThrows": ["dex", "int"],
-      "armor": ["light"],
+      "savingThrows": [
+        "dex",
+        "int"
+      ],
+      "armor": [
+        "light"
+      ],
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": [
+          "simple",
+          "martial"
+        ]
       },
       "tools": {
         "categories": [],
-        "items": ["thieves-tools"]
+        "items": [
+          "thieves-tools"
+        ]
       },
       "skills": {
         "choose": 4
@@ -3083,6 +3335,13 @@
         "description": "<p>As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn. You can use this feature only if you haven't moved during this turn, and after you use it, your Speed is 0 until the end of the current turn.</p>"
       },
       {
+        "kind": "custom",
+        "id": "rogue-subclass",
+        "name": "Rogue Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -3095,7 +3354,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3138,7 +3399,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3157,7 +3420,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3182,7 +3447,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3213,7 +3480,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3238,7 +3507,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-the-night-spirit"]
+                "recommendedFeatIds": [
+                  "boon-of-the-night-spirit"
+                ]
               }
             ]
           }
@@ -3262,9 +3533,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Sorcerer",
     "description": "<p>A spellcaster who draws on inherent magic from a gift or bloodline.</p>",
-    "primaryAbilities": ["cha"],
+    "primaryAbilities": [
+      "cha"
+    ],
     "hitDie": 6,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "cha",
@@ -3368,11 +3640,20 @@
       ]
     },
     "proficiencies": {
-      "savingThrows": ["con", "cha"],
+      "savingThrows": [
+        "con",
+        "cha"
+      ],
       "armor": [],
       "weapons": {
         "categories": [],
-        "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
+        "items": [
+          "dagger",
+          "dart",
+          "sling",
+          "quarterstaff",
+          "light-crossbow"
+        ]
       },
       "skills": {
         "choose": 2
@@ -3445,6 +3726,13 @@
         "description": "<p>Because your magic flows from within, you can alter your spells to suit your needs; you gain two Metamagic options of your choice from \"Metamagic Options\" later in this class's description. You use the chosen options to temporarily modify spells you cast. To use an option, you must spend the number of Sorcery Points that it costs.</p><p>You can use only one Metamagic option on a spell when you cast it unless otherwise noted in one of those options.</p><p>Whenever you gain a Sorcerer level, you can replace one of your Metamagic options with one you don't know. You gain two more options at Sorcerer level 10 and two more at Sorcerer level 17.</p>"
       },
       {
+        "kind": "custom",
+        "id": "sorcerer-subclass",
+        "name": "Sorcerer Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -3457,7 +3745,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3488,7 +3778,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3507,7 +3799,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3526,7 +3820,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3545,7 +3841,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-dimensional-travel"]
+                "recommendedFeatIds": [
+                  "boon-of-dimensional-travel"
+                ]
               }
             ]
           }
@@ -3652,9 +3950,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Warlock",
     "description": "<p>A wielder of magic that is derived from a bargain with an extraplanar entity.</p>",
-    "primaryAbilities": ["cha"],
+    "primaryAbilities": [
+      "cha"
+    ],
     "hitDie": 8,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "pact",
       "ability": "cha",
@@ -3734,10 +4033,17 @@
       ]
     },
     "proficiencies": {
-      "savingThrows": ["wis", "cha"],
-      "armor": ["light"],
+      "savingThrows": [
+        "wis",
+        "cha"
+      ],
+      "armor": [
+        "light"
+      ],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 2
@@ -3815,6 +4121,13 @@
         "description": "<p>You can perform an esoteric rite for 1 minute. At the end of it, you regain expended Pact Magic spell slots but no more than a number equal to half your maximum (round up). Once you use this feature, you can't do so again until you finish a Long Rest.</p>"
       },
       {
+        "kind": "custom",
+        "id": "warlock-subclass",
+        "name": "Warlock Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -3827,7 +4140,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3846,7 +4161,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3864,13 +4181,17 @@
                 "kind": "spells",
                 "ability": "cha",
                 "mode": "always_prepared",
-                "spellIds": ["contact-other-plane"]
+                "spellIds": [
+                  "contact-other-plane"
+                ]
               },
               {
                 "kind": "spells",
                 "ability": "cha",
                 "mode": "free_cast",
-                "spellIds": ["contact-other-plane"],
+                "spellIds": [
+                  "contact-other-plane"
+                ],
                 "frequency": "once_per_long_rest"
               }
             ]
@@ -3896,7 +4217,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3915,7 +4238,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -3934,7 +4259,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-fate"]
+                "recommendedFeatIds": [
+                  "boon-of-fate"
+                ]
               }
             ]
           }
@@ -3997,9 +4324,10 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Wizard",
     "description": "<p>A scholarly magic-user capable of manipulating the structures of reality.</p>",
-    "primaryAbilities": ["int"],
+    "primaryAbilities": [
+      "int"
+    ],
     "hitDie": 6,
-    "subclassChoiceLevel": 3,
     "spellcasting": {
       "progression": "full",
       "ability": "int",
@@ -4103,10 +4431,15 @@
       ]
     },
     "proficiencies": {
-      "savingThrows": ["int", "wis"],
+      "savingThrows": [
+        "int",
+        "wis"
+      ],
       "armor": [],
       "weapons": {
-        "categories": ["simple"]
+        "categories": [
+          "simple"
+        ]
       },
       "skills": {
         "choose": 2
@@ -4185,6 +4518,13 @@
         "description": "<p>While studying magic, you also specialized in another field of study. Choose one of the following skills in which you have proficiency: Arcana, History, Investigation, Medicine, Nature, or Religion. You have Expertise in the chosen skill.</p>"
       },
       {
+        "kind": "custom",
+        "id": "wizard-subclass",
+        "name": "Wizard Subclass",
+        "level": 3,
+        "description": ""
+      },
+      {
         "id": "ability-score-improvement-4",
         "name": "Ability Score Improvement",
         "level": 4,
@@ -4197,7 +4537,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -4222,7 +4564,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -4241,7 +4585,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -4260,7 +4606,9 @@
                 "category": "general",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["ability-score-improvement"]
+                "recommendedFeatIds": [
+                  "ability-score-improvement"
+                ]
               }
             ]
           }
@@ -4285,7 +4633,9 @@
                 "category": "epic-boon",
                 "choose": 1,
                 "allowAnyQualifying": true,
-                "recommendedFeatIds": ["boon-of-spell-recall"]
+                "recommendedFeatIds": [
+                  "boon-of-spell-recall"
+                ]
               }
             ]
           }

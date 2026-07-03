@@ -1,28 +1,45 @@
 import type {
   Ability,
-  ArmorCategory,
   ContentGrant,
   ContentGrants,
-  ContentProficiencies,
   DamageTypeId,
   FeatCategory,
   GrantGroup,
   GrantGroups,
   GrantUnlock,
   SenseId,
-  SkillId,
 } from '@rpg/contracts'
 import { flattenGrantGroups, normalizeGrantGroups } from '@rpg/contracts'
 
-import { type GrantRowForm, type GrantType, GRANT_DEFAULT_UNLOCK_LEVEL } from './grant-form-schema'
+import {
+  type GrantRowForm,
+  type GrantRowType,
+  GRANT_DEFAULT_UNLOCK_LEVEL,
+} from './grant-form-schema'
 import type { EquipmentGrantItemForm } from './equipment-grant-form-fields'
 import { equipmentGrantFromFormRow, equipmentGrantToFormRow } from './equipment-grant-form-values'
+import type {
+  ArmorTrainingItemForm,
+  SkillProficiencyItemForm,
+  ToolProficiencyItemForm,
+  WeaponProficiencyItemForm,
+} from './proficiency-grant-form-fields'
+import {
+  armorTrainingGrantFromFormRow,
+  armorTrainingGrantToFormRow,
+  skillProficiencyGrantFromFormRow,
+  skillProficiencyGrantToFormRow,
+  toolProficiencyGrantFromFormRow,
+  toolProficiencyGrantToFormRow,
+  weaponProficiencyGrantFromFormRow,
+  weaponProficiencyGrantToFormRow,
+} from './proficiency-grant-form-values'
 
 // ---------------------------------------------------------------------------
 // Empty row factory
 // ---------------------------------------------------------------------------
 
-function emptyGrantRow(grantType: GrantType): GrantRowForm {
+function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
   return {
     grantType,
     unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
@@ -35,10 +52,6 @@ function emptyGrantRow(grantType: GrantType): GrantRowForm {
     movementValue: undefined,
     movementUnit: undefined,
     language: undefined,
-    proficiencySkills: [],
-    proficiencyArmor: [],
-    proficiencyTools: [],
-    proficiencyWeapons: [],
     spellAbility: undefined,
     spellMode: undefined,
     spellFrequency: undefined,
@@ -89,9 +102,21 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
         },
       ]
     case 'resistances':
-      return [{ ...emptyGrantRow('resistances'), unlockLevel: formUnlockLevel(unlockLevel), resistances: grant.damageTypes }]
+      return [
+        {
+          ...emptyGrantRow('resistances'),
+          unlockLevel: formUnlockLevel(unlockLevel),
+          resistances: grant.damageTypes,
+        },
+      ]
     case 'damageType':
-      return [{ ...emptyGrantRow('damageType'), unlockLevel: formUnlockLevel(unlockLevel), damageType: grant.damageTypes }]
+      return [
+        {
+          ...emptyGrantRow('damageType'),
+          unlockLevel: formUnlockLevel(unlockLevel),
+          damageType: grant.damageTypes,
+        },
+      ]
     case 'movement':
       return [
         {
@@ -103,15 +128,36 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
           movementUnit: grant.unit,
         },
       ]
-    case 'proficiencies':
+    case 'weaponProficiency':
       return [
         {
-          ...emptyGrantRow('proficiencies'),
+          grantType: 'weaponProficiency',
           unlockLevel: formUnlockLevel(unlockLevel),
-          proficiencySkills: grant.skills ?? [],
-          proficiencyArmor: (grant.armor ?? []) as ArmorCategory[],
-          proficiencyTools: grant.tools ?? [],
-          proficiencyWeapons: grant.weapons ?? [],
+          ...weaponProficiencyGrantToFormRow(grant.grant),
+        },
+      ]
+    case 'toolProficiency':
+      return [
+        {
+          grantType: 'toolProficiency',
+          unlockLevel: formUnlockLevel(unlockLevel),
+          ...toolProficiencyGrantToFormRow(grant.grant),
+        },
+      ]
+    case 'skillProficiency':
+      return [
+        {
+          grantType: 'skillProficiency',
+          unlockLevel: formUnlockLevel(unlockLevel),
+          ...skillProficiencyGrantToFormRow(grant.grant),
+        },
+      ]
+    case 'armorTraining':
+      return [
+        {
+          grantType: 'armorTraining',
+          unlockLevel: formUnlockLevel(unlockLevel),
+          ...armorTrainingGrantToFormRow(grant.grant),
         },
       ]
     case 'languages':
@@ -133,7 +179,13 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
         },
       ]
     case 'equipment':
-      return [{ grantType: 'equipment', unlockLevel: formUnlockLevel(unlockLevel), ...equipmentGrantToFormRow(grant.grant) }]
+      return [
+        {
+          grantType: 'equipment',
+          unlockLevel: formUnlockLevel(unlockLevel),
+          ...equipmentGrantToFormRow(grant.grant),
+        },
+      ]
     case 'spells':
       return [
         {
@@ -156,15 +208,36 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
 // GrantRowForm → atomic ContentGrant (one row → one grant or nothing)
 // ---------------------------------------------------------------------------
 
-function proficienciesFromRow(row: GrantRowForm): ContentProficiencies | undefined {
-  const prof = Object.assign(
-    {},
-    row.proficiencySkills?.length ? { skills: row.proficiencySkills as SkillId[] } : {},
-    row.proficiencyArmor?.length ? { armor: row.proficiencyArmor as ArmorCategory[] } : {},
-    row.proficiencyTools?.length ? { tools: row.proficiencyTools } : {},
-    row.proficiencyWeapons?.length ? { weapons: row.proficiencyWeapons } : {},
-  )
-  return Object.keys(prof).length ? prof : undefined
+function weaponProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+  if (!row.proficiencySource) return undefined
+  return {
+    kind: 'weaponProficiency',
+    grant: weaponProficiencyGrantFromFormRow(row as WeaponProficiencyItemForm),
+  }
+}
+
+function toolProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+  if (!row.proficiencySource) return undefined
+  return {
+    kind: 'toolProficiency',
+    grant: toolProficiencyGrantFromFormRow(row as ToolProficiencyItemForm),
+  }
+}
+
+function skillProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+  if (!row.proficiencySource) return undefined
+  return {
+    kind: 'skillProficiency',
+    grant: skillProficiencyGrantFromFormRow(row as SkillProficiencyItemForm),
+  }
+}
+
+function armorTrainingToGrant(row: GrantRowForm): ContentGrant | undefined {
+  if (!row.proficiencySource) return undefined
+  return {
+    kind: 'armorTraining',
+    grant: armorTrainingGrantFromFormRow(row as ArmorTrainingItemForm),
+  }
 }
 
 function sensesToGrant(row: GrantRowForm): ContentGrant | undefined {
@@ -183,7 +256,8 @@ function damageTypeToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.movementMode || !row.movementOperation || row.movementValue === undefined) return undefined
+  if (!row.movementMode || !row.movementOperation || row.movementValue === undefined)
+    return undefined
   return {
     kind: 'movement',
     mode: row.movementMode,
@@ -196,12 +270,6 @@ function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
 function languagesToGrant(row: GrantRowForm): ContentGrant | undefined {
   if (!row.language) return undefined
   return { kind: 'languages', languageIds: [row.language] }
-}
-
-function proficienciesToGrant(row: GrantRowForm): ContentGrant | undefined {
-  const prof = proficienciesFromRow(row)
-  if (!prof) return undefined
-  return { kind: 'proficiencies', ...prof }
 }
 
 function featChoiceToGrant(row: GrantRowForm): ContentGrant | undefined {
@@ -241,16 +309,32 @@ function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
  */
 export function formRowToContentGrant(row: GrantRowForm): ContentGrant | undefined {
   switch (row.grantType) {
-    case 'senses':       return sensesToGrant(row)
-    case 'resistances':  return resistancesToGrant(row)
-    case 'damageType':   return damageTypeToGrant(row)
-    case 'movement': return movementToGrant(row)
-    case 'languages':    return languagesToGrant(row)
-    case 'proficiencies': return proficienciesToGrant(row)
-    case 'featChoice':   return featChoiceToGrant(row)
-    case 'equipment':    return equipmentToGrant(row)
-    case 'spells':       return spellsToGrant(row)
-    default:             return undefined
+    case 'senses':
+      return sensesToGrant(row)
+    case 'resistances':
+      return resistancesToGrant(row)
+    case 'damageType':
+      return damageTypeToGrant(row)
+    case 'movement':
+      return movementToGrant(row)
+    case 'languages':
+      return languagesToGrant(row)
+    case 'weaponProficiency':
+      return weaponProficiencyToGrant(row)
+    case 'toolProficiency':
+      return toolProficiencyToGrant(row)
+    case 'skillProficiency':
+      return skillProficiencyToGrant(row)
+    case 'armorTraining':
+      return armorTrainingToGrant(row)
+    case 'featChoice':
+      return featChoiceToGrant(row)
+    case 'equipment':
+      return equipmentToGrant(row)
+    case 'spells':
+      return spellsToGrant(row)
+    default:
+      return undefined
   }
 }
 
@@ -358,20 +442,6 @@ function languageGrantsToRows(languages: ContentGrants['languages']): GrantRowFo
   return (languages ?? []).map((language) => ({ ...emptyGrantRow('languages'), language }))
 }
 
-function legacyProficienciesToRow(
-  proficiencies: ContentGrants['proficiencies'],
-): GrantRowForm | undefined {
-  if (!proficiencies) return undefined
-  const { skills, armor, tools, weapons } = proficiencies
-  return {
-    ...emptyGrantRow('proficiencies'),
-    proficiencySkills: skills ?? [],
-    proficiencyArmor: armor ?? [],
-    proficiencyTools: tools ?? [],
-    proficiencyWeapons: weapons ?? [],
-  }
-}
-
 /** Each innate spell entry becomes a `spells` row, preserving the level as `unlockLevel`. */
 function innateSpellsToSpellRows(innateSpells: ContentGrants['innateSpells']): GrantRowForm[] {
   if (!innateSpells) return []
@@ -420,7 +490,6 @@ export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowFor
     ...optionalGrantRow(damageTypesToRow(grants.damageType)),
     ...optionalGrantRow(movementToRow(grants.movement)),
     ...languageGrantsToRows(grants.languages),
-    ...optionalGrantRow(legacyProficienciesToRow(grants.proficiencies)),
     ...innateSpellsToSpellRows(grants.innateSpells),
     ...optionalGrantRow(featChoiceToRow(grants.featChoice)),
     ...equipmentGrantsToRows(grants.equipment),
@@ -463,13 +532,6 @@ function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): vo
   const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language)
   if (!languageRows.length) return
   result.languages = languageRows.map((r) => r.language!)
-}
-
-function applyProficienciesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
-  const row = rows.find((r) => r.grantType === 'proficiencies')
-  if (!row) return
-  const prof = proficienciesFromRow(row)
-  if (prof) result.proficiencies = prof
 }
 
 function applyFeatChoiceFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
@@ -518,7 +580,6 @@ export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefine
   applyDamageTypesFromRows(result, rows)
   applyMovementFromRows(result, rows)
   applyLanguagesFromRows(result, rows)
-  applyProficienciesFromRows(result, rows)
   applyFeatChoiceFromRows(result, rows)
   applyEquipmentFromRows(result, rows)
 

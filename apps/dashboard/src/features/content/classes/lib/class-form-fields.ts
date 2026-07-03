@@ -17,7 +17,7 @@ import { ClassCharacterCreationTab } from '../components/class-character-creatio
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import { coreAttributesFields } from './class-basics-form-fields'
 import { createFeatureRowFormSchema } from './class-feature-form-fields'
-import { SUBCLASS_CHOICE_LEVEL_NONE, WEAPON_PROFICIENCY_MODES } from './class-form-constants'
+import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import { proficienciesFields, proficienciesFormSchema } from './class-proficiencies-form-fields'
 import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
@@ -48,7 +48,6 @@ export function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     description: z.string().optional(),
     primaryAbilities: z.array(abilitySchema).min(1).max(2),
     hitDie: z.coerce.number().pipe(hitDieSchema),
-    subclassChoiceLevel: z.union([z.literal(SUBCLASS_CHOICE_LEVEL_NONE), z.string()]),
     hasSpellcasting: z.boolean(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
     spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
@@ -72,7 +71,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...identityFields(ctx), ...coreAttributesFields(ctx)],
+      fields: [...identityFields(ctx), ...coreAttributesFields()],
     },
     {
       id: 'proficiencies',

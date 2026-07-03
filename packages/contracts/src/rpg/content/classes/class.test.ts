@@ -8,7 +8,10 @@ import {
   classStoredBodySchema,
   classStoredSchema,
   createClassInputSchema,
+  subclassChoiceFeature,
+  subclassChoiceFeatureId,
   subclassChoiceFeatureLabel,
+  subclassChoiceFeatureLevel,
   subclassPatchSchema,
   subclassCampaignAvailabilitySchema,
   subclassSchema,
@@ -20,14 +23,16 @@ const fighterStoredBody = {
   description: '<p>A master of martial combat.</p>',
   primaryAbilities: ['str'],
   hitDie: 10,
-  subclassChoiceLevel: 3,
   proficiencies: {
     savingThrows: ['str', 'con'],
     armor: ['light', 'medium', 'heavy', 'shields'],
     weapons: { categories: ['simple', 'martial'] },
     skills: { choose: 2 },
   },
-  features: [{ kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 }],
+  features: [
+    { kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 },
+    { kind: 'custom', id: 'fighter-subclass', name: 'Fighter Subclass', level: 3 },
+  ],
 } as const
 
 const fighterBody = {
@@ -94,15 +99,6 @@ describe('classSchema', () => {
     expect(classSchema.safeParse(withSaves(['str', 'con', 'dex'])).success).toBe(true)
     expect(classSchema.safeParse(withSaves([])).success).toBe(false)
     expect(classSchema.safeParse(withSaves(['str', 'con', 'dex', 'wis'])).success).toBe(false)
-  })
-
-  it('allows omitting subclassChoiceLevel', () => {
-    const { subclassChoiceLevel: _, ...withoutChoice } = fighter
-    expect(classSchema.safeParse(withoutChoice).success).toBe(true)
-  })
-
-  it('rejects an invalid subclassChoiceLevel', () => {
-    expect(classSchema.safeParse({ ...fighter, subclassChoiceLevel: 0 }).success).toBe(false)
   })
 
   it('rejects a hit die outside the class range', () => {
@@ -262,6 +258,15 @@ describe('subclassSchema', () => {
 describe('subclassChoiceFeatureLabel', () => {
   it('formats the class name with a Subclass suffix', () => {
     expect(subclassChoiceFeatureLabel('Bard')).toBe('Bard Subclass')
+  })
+
+  it('formats the stable feature id from the class slug', () => {
+    expect(subclassChoiceFeatureId('bard')).toBe('bard-subclass')
+  })
+
+  it('derives the subclass choice feature and level from class features', () => {
+    expect(subclassChoiceFeature(fighter)?.name).toBe('Fighter Subclass')
+    expect(subclassChoiceFeatureLevel(fighter)).toBe(3)
   })
 })
 
