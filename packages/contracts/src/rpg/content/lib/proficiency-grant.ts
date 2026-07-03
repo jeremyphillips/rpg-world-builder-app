@@ -16,7 +16,7 @@ import {
   getWeaponCategoryLabel,
   weaponCategorySchema,
 } from '../../vocab/weapon/category'
-import { skillSchema, SKILLS } from '../skill-proficiency'
+import { getSkillName, getSkillSentenceForm, skillSchema } from '../skill-proficiency'
 import { contentPoolChoiceSchema } from './choice'
 
 // ---------------------------------------------------------------------------
@@ -331,7 +331,7 @@ export function formatSkillProficiencyPoolLabel(pool: SkillProficiencyPool): str
   if (pool.source === 'any') {
     return 'any skill'
   }
-  return pool.skillIds.map((id) => SKILLS[id]).join(', ')
+  return pool.skillIds.map((id) => getSkillName(id)).join(', ')
 }
 
 /** Display label for an armor training choice pool. */
@@ -406,7 +406,7 @@ function formatFixedToolSentence(
 }
 
 function formatFixedSkillSentence(grant: FixedSkillProficiencyGrant): string {
-  const names = grant.skillIds.map((id) => SKILLS[id])
+  const names = grant.skillIds.map((id) => getSkillSentenceForm(id))
   return `Character gains proficiency in ${joinNaturalList(names)}.`
 }
 

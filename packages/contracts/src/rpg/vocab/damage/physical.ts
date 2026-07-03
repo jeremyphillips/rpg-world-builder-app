@@ -12,16 +12,28 @@ export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
     label: 'Bludgeoning',
     description:
       'Bludgeoning damage is delivered by a blunt instrument or a blow, fall, or constriction that does not use a cutting or piercing point.',
+    sentence: {
+      singular: 'bludgeoning damage',
+      plural: 'bludgeoning damage',
+    },
   },
   piercing: {
     label: 'Piercing',
     description:
       'Piercing damage is delivered by a strike that uses a point, such as a fang, arrow, or rapier.',
+    sentence: {
+      singular: 'piercing damage',
+      plural: 'piercing damage',
+    },
   },
   slashing: {
     label: 'Slashing',
     description:
       'Slashing damage is delivered by a cut from a sharp edge, such as an axe, claw, or greatsword.',
+    sentence: {
+      singular: 'slashing damage',
+      plural: 'slashing damage',
+    },
   },
 } as const satisfies Record<string, GameTermEntry>
 

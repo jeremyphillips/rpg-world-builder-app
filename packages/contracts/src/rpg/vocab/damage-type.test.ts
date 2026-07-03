@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { DAMAGE_TYPE_SET_ID, damageTypeIdSchema, getDamageTypeLabel } from './damage/vocabulary'
+import {
+  DAMAGE_TYPE_SET_ID,
+  damageTypeIdSchema,
+  getDamageTypeLabel,
+  getDamageTypeSentenceForm,
+} from './damage/vocabulary'
 import {
   getPhysicalDamageTypeEntry,
   PHYSICAL_DAMAGE_TYPE_IDS,
@@ -45,5 +50,11 @@ describe('damage type vocabulary', () => {
     expect(getDamageTypeLabel('fire')).toBe('Fire')
     expect(getDamageTypeLabel('bludgeoning')).toBe('Bludgeoning')
     expect(getDamageTypeLabel('custom-sonic')).toBe('Custom Sonic')
+  })
+
+  it('returns mass-noun sentence forms', () => {
+    expect(getDamageTypeSentenceForm('fire')).toBe('fire damage')
+    expect(getDamageTypeSentenceForm('bludgeoning')).toBe('bludgeoning damage')
+    expect(getDamageTypeSentenceForm('custom-sonic')).toBe('custom sonic damage')
   })
 })

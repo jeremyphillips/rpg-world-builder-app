@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
+import { getTermSentenceForm, type GameTermEntry } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
@@ -35,4 +36,22 @@ export type Sense = z.infer<typeof senseSchema>
 /** Returns a display label — title-cased slug fallback when seed label is unknown. */
 export function getSenseLabel(type: string): string {
   return formatVocabularySlugLabel(type)
+}
+
+/** Returns an entry-shaped fallback for an open-vocabulary sense id. */
+export function getSenseEntry(type: string): GameTermEntry {
+  const label = getSenseLabel(type)
+  return {
+    label,
+    description: '',
+    sentence: {
+      singular: label,
+      plural: label,
+    },
+  }
+}
+
+/** Counted noun phrase for generated sense prose. */
+export function getSenseSentenceForm(type: string, count = 1): string {
+  return getTermSentenceForm(getSenseEntry(type), count)
 }

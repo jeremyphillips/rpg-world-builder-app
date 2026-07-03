@@ -14,10 +14,10 @@ import {
   formatToolProficiencyGrantSentence,
   formatWeaponProficiencyGrantSentence,
   getArmorCategoryLabel,
+  getSkillName,
   getToolCategoryLabel,
   getWeaponCategoryLabel,
   joinNaturalList,
-  SKILLS,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
@@ -500,7 +500,7 @@ export function skillProficiencyGrantFromFormRow(
 }
 
 function formatSkillPoolTitle(skillIds: string[]): string {
-  const labels = skillIds.map((id) => SKILLS[id as keyof typeof SKILLS] ?? id)
+  const labels = skillIds.map((id) => getSkillName(id))
   return labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} skills`
 }
 

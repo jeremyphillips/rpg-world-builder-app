@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { SENSE_RANGES, SENSE_SET_ID, getSenseLabel, senseIdSchema, senseSchema } from './sense'
+import {
+  SENSE_RANGES,
+  SENSE_SET_ID,
+  getSenseLabel,
+  getSenseSentenceForm,
+  senseIdSchema,
+  senseSchema,
+} from './sense'
 
 describe('senseIdSchema', () => {
   it('accepts slug-shaped ids including campaign custom terms', () => {
@@ -35,5 +42,10 @@ describe('sense vocabulary', () => {
   it('returns title-cased slug labels', () => {
     expect(getSenseLabel('darkvision')).toBe('Darkvision')
     expect(getSenseLabel('custom-sense')).toBe('Custom Sense')
+  })
+
+  it('returns sentence forms for generated prose', () => {
+    expect(getSenseSentenceForm('darkvision')).toBe('Darkvision')
+    expect(getSenseSentenceForm('custom-sense')).toBe('Custom Sense')
   })
 })

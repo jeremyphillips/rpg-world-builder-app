@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
@@ -13,26 +14,46 @@ export const MOVEMENT_MODE_ENTRIES = {
     label: 'Walk',
     description:
       'Walk Speed is how far a creature can move on foot across open ground during its turn (e.g. 30 feet for most Medium humanoids).',
+    sentence: {
+      singular: 'walking speed',
+      plural: 'walking speeds',
+    },
   },
   fly: {
     label: 'Fly',
     description:
       'Fly Speed is how far a creature can move through the air. A creature without a Fly Speed cannot stay aloft unless a rule grants flight.',
+    sentence: {
+      singular: 'flying speed',
+      plural: 'flying speeds',
+    },
   },
   swim: {
     label: 'Swim',
     description:
       'Swim Speed is how far a creature can move through water. Without a Swim Speed, moving in water costs extra movement.',
+    sentence: {
+      singular: 'swimming speed',
+      plural: 'swimming speeds',
+    },
   },
   climb: {
     label: 'Climb',
     description:
       'Climb Speed is how far a creature can move while climbing. Without a Climb Speed, climbing costs extra movement.',
+    sentence: {
+      singular: 'climbing speed',
+      plural: 'climbing speeds',
+    },
   },
   burrow: {
     label: 'Burrow',
     description:
       'Burrow Speed is how far a creature can move by tunneling through earth or loose material.',
+    sentence: {
+      singular: 'burrowing speed',
+      plural: 'burrowing speeds',
+    },
   },
 } as const satisfies Record<string, GameTermEntry>
 
@@ -137,13 +158,15 @@ export type MovementGrantPayload = z.infer<typeof movementGrantPayloadSchema>
 
 /** Authoring label for a movement mode in grant sentences (e.g. "Walking speed"). */
 export function getMovementModeGrantLabel(mode: MovementMode): string {
-  if (mode === 'walk') return 'Walking speed'
-  return `${getMovementModeLabel(mode)} speed`
+  const phrase = getMovementModeGrantPhrase(mode)
+  return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`
 }
 
 /** Lowercase mode phrase for prose (e.g. "walking speed"). */
 export function getMovementModeGrantPhrase(mode: MovementMode): string {
-  return getMovementModeGrantLabel(mode).toLowerCase()
+  const entry = getMovementModeEntry(mode)
+  if (entry) return getTermSentenceForm(entry, 1)
+  return `${getMovementModeLabel(mode).toLowerCase()} speed`
 }
 
 /** Compact title fragment: "+5 ft walking speed". */

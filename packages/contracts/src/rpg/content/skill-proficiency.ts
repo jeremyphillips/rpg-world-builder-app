@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
+import { getTermSentenceForm, type GameTermEntry } from '../vocab/types'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -14,30 +15,88 @@ import {
 // `classProficienciesSchema` in `class.ts`.
 // ---------------------------------------------------------------------------
 
+export const SKILL_ENTRIES = {
+  acrobatics: {
+    label: 'Acrobatics',
+    description: 'Dexterity-based agility, balance, and tumbling checks.',
+  },
+  'animal-handling': {
+    label: 'Animal Handling',
+    description: 'Wisdom-based checks to calm, control, or intuit animals.',
+  },
+  arcana: {
+    label: 'Arcana',
+    description: 'Intelligence-based checks about magic, spells, and magical lore.',
+  },
+  athletics: {
+    label: 'Athletics',
+    description: 'Strength-based checks for climbing, jumping, swimming, and forceful movement.',
+  },
+  deception: {
+    label: 'Deception',
+    description: 'Charisma-based checks to mislead or disguise the truth.',
+  },
+  history: {
+    label: 'History',
+    description: 'Intelligence-based checks about historical events, people, and cultures.',
+  },
+  insight: {
+    label: 'Insight',
+    description: 'Wisdom-based checks to read intentions, moods, or sincerity.',
+  },
+  intimidation: {
+    label: 'Intimidation',
+    description: 'Charisma-based checks to influence through threats or pressure.',
+  },
+  investigation: {
+    label: 'Investigation',
+    description: 'Intelligence-based checks to deduce clues and interpret evidence.',
+  },
+  medicine: {
+    label: 'Medicine',
+    description: 'Wisdom-based checks to diagnose, stabilize, or treat creatures.',
+  },
+  nature: {
+    label: 'Nature',
+    description: 'Intelligence-based checks about terrain, plants, animals, and weather.',
+  },
+  perception: {
+    label: 'Perception',
+    description: 'Wisdom-based checks to notice hidden or subtle details.',
+  },
+  performance: {
+    label: 'Performance',
+    description: 'Charisma-based checks to entertain or present before an audience.',
+  },
+  persuasion: {
+    label: 'Persuasion',
+    description: 'Charisma-based checks to influence through tact or goodwill.',
+  },
+  religion: {
+    label: 'Religion',
+    description: 'Intelligence-based checks about deities, rites, and religious lore.',
+  },
+  'sleight-of-hand': {
+    label: 'Sleight of Hand',
+    description: 'Dexterity-based checks for legerdemain, theft, or manual trickery.',
+  },
+  stealth: {
+    label: 'Stealth',
+    description: 'Dexterity-based checks to hide or move unnoticed.',
+  },
+  survival: {
+    label: 'Survival',
+    description: 'Wisdom-based checks to track, forage, navigate, or endure wilderness hazards.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
 /**
  * Skill id -> display name. Doubles as form select options
  * (`value: id`, `label: SKILLS[id]`).
  */
-export const SKILLS = {
-  acrobatics: 'Acrobatics',
-  'animal-handling': 'Animal Handling',
-  arcana: 'Arcana',
-  athletics: 'Athletics',
-  deception: 'Deception',
-  history: 'History',
-  insight: 'Insight',
-  intimidation: 'Intimidation',
-  investigation: 'Investigation',
-  medicine: 'Medicine',
-  nature: 'Nature',
-  perception: 'Perception',
-  performance: 'Performance',
-  persuasion: 'Persuasion',
-  religion: 'Religion',
-  'sleight-of-hand': 'Sleight of Hand',
-  stealth: 'Stealth',
-  survival: 'Survival',
-} as const
+export const SKILLS = Object.fromEntries(
+  Object.entries(SKILL_ENTRIES).map(([id, entry]) => [id, entry.label]),
+) as { readonly [Id in keyof typeof SKILL_ENTRIES]: (typeof SKILL_ENTRIES)[Id]['label'] }
 
 export type SkillId = keyof typeof SKILLS
 
@@ -53,6 +112,18 @@ export const skillSchema = z.enum(SKILL_IDS)
  */
 export function getSkillName(id: string): string {
   return SKILLS[id as SkillId] ?? id
+}
+
+/** Returns the reference entry for a skill id, if known. */
+export function getSkillEntry(id: string): GameTermEntry | undefined {
+  return SKILL_ENTRIES[id as SkillId]
+}
+
+/** Counted noun phrase for generated skill prose. */
+export function getSkillSentenceForm(id: string, count = 1): string {
+  const entry = getSkillEntry(id)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: id, description: '' }, count)
 }
 
 // ---------------------------------------------------------------------------

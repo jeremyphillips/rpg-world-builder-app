@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   LANGUAGE_SET_ID,
+  getLanguageCategorySentenceForm,
   getLanguageLabel,
+  getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
   languageSeedOptionSchema,
@@ -44,5 +46,11 @@ describe('language vocabulary', () => {
     expect(getLanguageLabel('common-sign-language')).toBe('Common Sign Language')
     expect(getLanguageLabel('thieves-cant')).toBe('Thieves Cant')
     expect(getLanguageLabel('custom-tongue')).toBe('Custom Tongue')
+  })
+
+  it('returns sentence forms for ids and categories', () => {
+    expect(getLanguageSentenceForm('common')).toBe('Common')
+    expect(getLanguageCategorySentenceForm('standard', 1)).toBe('standard language')
+    expect(getLanguageCategorySentenceForm('standard', 2)).toBe('standard languages')
   })
 })

@@ -7,6 +7,12 @@ import {
   customContentTraitSchema,
   featChoiceGrantSchema,
   flattenGrantGroups,
+  formatDamageTypeGrantSentence,
+  formatFeatChoiceGrantSentence,
+  formatLanguageChoiceGrantSentence,
+  formatLanguageGrantSentence,
+  formatResistanceGrantSentence,
+  formatSenseGrantSentence,
   getGrantGroupEffectiveUnlock,
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
@@ -189,6 +195,33 @@ describe('languageChoiceGrantSchema', () => {
       choose: 1,
       categories: ['standard'],
     })
+  })
+})
+
+describe('grant sentence formatters', () => {
+  it('formats damage and resistance grants with damage sentence forms', () => {
+    expect(formatDamageTypeGrantSentence(['fire', 'cold'])).toBe(
+      'Character chooses from fire damage and cold damage.',
+    )
+    expect(formatResistanceGrantSentence(['poison'])).toBe(
+      'Character gains Resistance to poison damage.',
+    )
+  })
+
+  it('formats sense and language grants with sentence forms', () => {
+    expect(formatSenseGrantSentence({ type: 'darkvision', range: 60 })).toBe(
+      'Character gains Darkvision with a range of 60 feet.',
+    )
+    expect(formatLanguageGrantSentence(['common'])).toBe('Character knows Common.')
+  })
+
+  it('formats language and feat choices with counted forms', () => {
+    expect(formatLanguageChoiceGrantSentence({ choose: 2, categories: ['standard'] })).toBe(
+      'Character chooses 2 languages from standard languages.',
+    )
+    expect(formatFeatChoiceGrantSentence({ category: 'general', choose: 2 })).toBe(
+      'Character chooses 2 general feats.',
+    )
   })
 })
 

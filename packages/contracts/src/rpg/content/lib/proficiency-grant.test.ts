@@ -135,6 +135,15 @@ describe('format proficiency grant sentences', () => {
     ).toBe('Character chooses 2 skill proficiencies from any skills.')
   })
 
+  it('formats fixed skill proficiency with skill sentence forms', () => {
+    expect(
+      formatSkillProficiencyGrantSentence({
+        kind: 'fixed',
+        skillIds: ['animal-handling', 'sleight-of-hand'],
+      }),
+    ).toBe('Character gains proficiency in animal handling and sleight of hand.')
+  })
+
   it('formats any-tool choice', () => {
     expect(
       formatToolProficiencyGrantSentence({

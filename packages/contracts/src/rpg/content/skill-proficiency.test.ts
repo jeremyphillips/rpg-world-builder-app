@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   SKILLS,
+  SKILL_ENTRIES,
   SKILL_IDS,
+  getSkillEntry,
   getSkillName,
+  getSkillSentenceForm,
   skillSchema,
   skillProficiencyBodySchema,
   skillProficiencyPatchSchema,
@@ -28,6 +31,7 @@ describe('skillSchema', () => {
 
   it('derives ids from the SKILLS map', () => {
     expect(SKILL_IDS).toEqual(Object.keys(SKILLS))
+    expect(SKILL_IDS).toEqual(Object.keys(SKILL_ENTRIES))
   })
 
   it('rejects display labels and unknown values', () => {
@@ -44,6 +48,21 @@ describe('getSkillName', () => {
 
   it('falls back to the raw id for unknown/homebrew skills', () => {
     expect(getSkillName('lockpicking')).toBe('lockpicking')
+  })
+})
+
+describe('skill entries', () => {
+  it('has a label and description for every skill', () => {
+    for (const id of SKILL_IDS) {
+      const entry = getSkillEntry(id)
+      expect(entry?.label).toBeTruthy()
+      expect(entry?.description).toBeTruthy()
+    }
+  })
+
+  it('returns sentence forms for generated prose', () => {
+    expect(getSkillSentenceForm('animal-handling')).toBe('animal handling')
+    expect(getSkillSentenceForm('sleight-of-hand')).toBe('sleight of hand')
   })
 })
 

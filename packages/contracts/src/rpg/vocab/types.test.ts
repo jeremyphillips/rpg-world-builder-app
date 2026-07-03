@@ -1,16 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import { ARMOR_CATEGORY_ENTRIES } from './armor/category'
+import { PHYSICAL_DAMAGE_TYPE_ENTRIES } from './damage/physical'
 import { GEAR_KIND_ENTRIES } from './equipment/gear-kind'
 import { TOOL_CATEGORY_ENTRIES } from './equipment/tool-category'
+import { FEAT_CATEGORY_ENTRIES } from './feat'
+import { LANGUAGE_CATEGORY_ENTRIES } from './language'
+import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
 import { getTermSentenceForm, pluralizeTermLabel, type GameTermEntry } from './types'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
+import { SKILL_ENTRIES } from '../content/skill-proficiency'
 
 const ROLLOUT_ENTRY_TABLES = [
   TOOL_CATEGORY_ENTRIES,
   ARMOR_CATEGORY_ENTRIES,
   GEAR_KIND_ENTRIES,
   WEAPON_CATEGORY_ENTRIES,
+  PHYSICAL_DAMAGE_TYPE_ENTRIES,
+  LANGUAGE_CATEGORY_ENTRIES,
+  MOVEMENT_MODE_ENTRIES,
+  FEAT_CATEGORY_ENTRIES,
+  SKILL_ENTRIES,
 ] as const
 
 describe('term sentence forms', () => {

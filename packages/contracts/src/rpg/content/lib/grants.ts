@@ -2,13 +2,18 @@ import { z } from 'zod'
 
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../vocab/ability'
-import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
+import { getDamageTypeSentenceForm, damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { movementGrantPayloadSchema } from '../../vocab/movement-mode'
-import { senseSchema } from '../../vocab/sense'
+import { getSenseSentenceForm, senseSchema } from '../../vocab/sense'
 import { usageFrequencySchema } from '../../vocab/usage-frequency'
-import { featCategorySchema } from '../../vocab/feat'
-import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
+import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
+import {
+  getLanguageCategorySentenceForm,
+  getLanguageSentenceForm,
+  languageCategorySchema,
+  languageIdSchema,
+} from '../../vocab/language'
 import { equipmentGrantSchema } from './equipment-grant'
 import {
   armorTrainingGrantSchema,
@@ -16,6 +21,7 @@ import {
   toolProficiencyGrantSchema,
   weaponProficiencyGrantSchema,
 } from './proficiency-grant'
+import { joinNaturalList } from './proficiency-grant'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
@@ -92,6 +98,25 @@ export const languageChoiceGrantSchema = contentPoolChoiceSchema
 
 export type LanguageChoiceGrant = z.infer<typeof languageChoiceGrantSchema>
 
+export function formatLanguageGrantSentence(languageIds: readonly string[]): string {
+  return `Character knows ${joinNaturalList(languageIds.map((id) => getLanguageSentenceForm(id)))}.`
+}
+
+export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {
+  const languageWord = grant.choose === 1 ? 'language' : 'languages'
+  if (grant.from?.length) {
+    return `Character chooses ${grant.choose} ${languageWord} from ${joinNaturalList(
+      grant.from.map((id) => getLanguageSentenceForm(id)),
+    )}.`
+  }
+  if (grant.categories?.length) {
+    return `Character chooses ${grant.choose} ${languageWord} from ${joinNaturalList(
+      grant.categories.map((category) => getLanguageCategorySentenceForm(category, 2)),
+    )}.`
+  }
+  return `Character chooses ${grant.choose} ${languageWord}.`
+}
+
 // --- Feat choices -----------------------------------------------------------
 
 /**
@@ -120,6 +145,27 @@ export const featChoiceGrantSchema = z
   })
 
 export type FeatChoiceGrant = z.infer<typeof featChoiceGrantSchema>
+
+export function formatFeatChoiceGrantSentence(grant: FeatChoiceGrant): string {
+  const featForm = getFeatCategorySentenceForm(grant.category, grant.choose)
+  return `Character chooses ${grant.choose} ${featForm}.`
+}
+
+export function formatSenseGrantSentence(sense: z.infer<typeof senseSchema>): string {
+  return `Character gains ${getSenseSentenceForm(sense.type)} with a range of ${sense.range} feet.`
+}
+
+export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): string {
+  return `Character chooses from ${joinNaturalList(
+    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
+  )}.`
+}
+
+export function formatResistanceGrantSentence(damageTypes: readonly string[]): string {
+  return `Character gains Resistance to ${joinNaturalList(
+    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
+  )}.`
+}
 
 // --- Grants bag (legacy — kept for catalog backward compat) -----------------
 
