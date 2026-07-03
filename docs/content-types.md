@@ -409,9 +409,9 @@ export function getThingName(id: string): string {
 }
 ```
 
-See `SKILLS`/`getSkillName` in `content/skill-proficiency.ts` for skill display names.
-For **classes**, resolve display names from the campaign catalog (`CharacterClass.name`)
-or use `formatSlugAsLabel` from `@rpg/contracts/primitives` when no record is loaded.
+For content-backed references such as **classes** and **skill proficiencies**, resolve display
+names from the campaign catalog (`CharacterClass.name`, `SkillProficiency.name`) or use the
+module fallback helper only when no record is loaded.
 Prefer `*_ENTRIES` when rule text is available or likely soon.
 
 #### Discriminated-union content types (variant pattern)

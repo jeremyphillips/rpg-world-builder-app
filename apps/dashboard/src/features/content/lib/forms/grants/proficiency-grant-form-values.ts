@@ -499,38 +499,51 @@ export function skillProficiencyGrantFromFormRow(
   }
 }
 
-function formatSkillPoolTitle(skillIds: string[]): string {
-  const labels = skillIds.map((id) => getSkillName(id))
+function formatSkillPoolTitle(skillIds: string[], skillOptions: FieldOption[] = []): string {
+  const labels = skillIds.map(
+    (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
+  )
   return labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} skills`
 }
 
-function skillPoolTitleDetail(row: SkillProficiencyPoolItemForm): string {
+function skillPoolTitleDetail(
+  row: SkillProficiencyPoolItemForm,
+  skillOptions: FieldOption[],
+): string {
   const choose = row.choose ?? 1
   if (row.poolSource === 'any') return `choose ${choose} from any skills`
   const ids = row.skillProficiencyPoolIds ?? []
   if (!ids.length) return `choose ${choose} skill proficiency`
-  return `choose ${choose} from ${formatSkillPoolTitle(ids)}`
+  return `choose ${choose} from ${formatSkillPoolTitle(ids, skillOptions)}`
 }
 
 export function skillProficiencyGrantTitle(
   row: SkillProficiencyItemForm | undefined,
   index: number,
+  skillOptions: FieldOption[] = [],
 ): string {
   if (!row?.proficiencySource) return `Skill proficiency ${index + 1}`
 
   if (row.proficiencySource === 'specific') {
     const ids = row.skillProficiencyIds ?? []
     if (!ids.length) return `Skill proficiency ${index + 1}`
-    return grantTypePrefix('Skill proficiency', formatSkillPoolTitle(ids))
+    return grantTypePrefix('Skill proficiency', formatSkillPoolTitle(ids, skillOptions))
   }
 
-  return grantTypePrefix('Skill proficiency', skillPoolTitleDetail(row))
+  return grantTypePrefix('Skill proficiency', skillPoolTitleDetail(row, skillOptions))
 }
 
-export function skillProficiencyGrantSummary(row: SkillProficiencyItemForm | undefined): string {
+export function skillProficiencyGrantSummary(
+  row: SkillProficiencyItemForm | undefined,
+  skillOptions: FieldOption[] = [],
+): string {
   if (!row?.proficiencySource) return ''
   if (row.proficiencySource === 'specific' && !row.skillProficiencyIds?.length) return ''
-  return formatSkillProficiencyGrantSentence(skillProficiencyGrantFromFormRow(row))
+  const resolveSkillName = (id: string) => skillOptions.find((option) => option.value === id)?.label
+  return formatSkillProficiencyGrantSentence(
+    skillProficiencyGrantFromFormRow(row),
+    resolveSkillName,
+  )
 }
 
 // --- Armor training ---------------------------------------------------------

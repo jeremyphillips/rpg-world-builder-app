@@ -4,8 +4,6 @@ import {
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  SKILL_IDS,
-  SKILLS,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
@@ -64,8 +62,6 @@ const toolCategoryOptions = toOptions(
   >,
 )
 
-const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
-
 export const proficienciesFormSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(2),
   armor: z.array(armorCategorySchema),
@@ -78,7 +74,7 @@ export const proficienciesFormSchema = z.object({
     items: z.array(z.string()).optional(),
   }),
   skills: z.object({
-    choose: z.coerce.number().int().min(0).max(SKILL_IDS.length),
+    choose: z.coerce.number().int().min(0),
     from: z.array(skillSchema),
   }),
 })
@@ -98,6 +94,9 @@ function visibleWhenIndividualWeapons(): FieldVisibility {
 }
 
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
+  const skillOptions = ctx.options?.skills ?? []
+  const skillCount = skillOptions.length
+
   return [
     {
       kind: 'group',
@@ -168,7 +167,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
               kind: 'number',
               name: 'proficiencies.skills.choose',
               min: 0,
-              max: SKILL_IDS.length,
+              ...(skillCount > 0 ? { max: skillCount } : {}),
             },
             { kind: 'text', value: 'Skill Proficiencies from:', tone: 'label' },
           ],

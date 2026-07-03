@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  SKILLS,
-  SKILL_ENTRIES,
-  SKILL_IDS,
-  getSkillEntry,
   getSkillName,
   getSkillSentenceForm,
   skillSchema,
@@ -19,50 +15,33 @@ import {
 // ---------------------------------------------------------------------------
 
 describe('skillSchema', () => {
-  it('covers all 18 SRD skills', () => {
-    expect(SKILL_IDS).toHaveLength(18)
-  })
-
-  it('accepts every known skill id', () => {
-    for (const id of SKILL_IDS) {
-      expect(skillSchema.parse(id)).toBe(id)
-    }
-  })
-
-  it('derives ids from the SKILLS map', () => {
-    expect(SKILL_IDS).toEqual(Object.keys(SKILLS))
-    expect(SKILL_IDS).toEqual(Object.keys(SKILL_ENTRIES))
+  it('accepts slug-shaped ids including homebrew skills', () => {
+    expect(skillSchema.parse('athletics')).toBe('athletics')
+    expect(skillSchema.parse('custom-lockpicking')).toBe('custom-lockpicking')
   })
 
   it('rejects display labels and unknown values', () => {
     expect(skillSchema.safeParse('Animal Handling').success).toBe(false)
-    expect(skillSchema.safeParse('lockpicking').success).toBe(false)
+    expect(skillSchema.safeParse('lock_picking').success).toBe(false)
   })
 })
 
 describe('getSkillName', () => {
-  it('returns the display name for a known skill id', () => {
+  it('returns title-cased slug fallback labels', () => {
     expect(getSkillName('animal-handling')).toBe('Animal Handling')
-    expect(getSkillName('sleight-of-hand')).toBe('Sleight of Hand')
+    expect(getSkillName('sleight-of-hand')).toBe('Sleight Of Hand')
   })
 
   it('falls back to the raw id for unknown/homebrew skills', () => {
-    expect(getSkillName('lockpicking')).toBe('lockpicking')
+    expect(getSkillName('custom-lockpicking')).toBe('Custom Lockpicking')
   })
 })
 
-describe('skill entries', () => {
-  it('has a label and description for every skill', () => {
-    for (const id of SKILL_IDS) {
-      const entry = getSkillEntry(id)
-      expect(entry?.label).toBeTruthy()
-      expect(entry?.description).toBeTruthy()
-    }
-  })
-
+describe('skill sentence forms', () => {
   it('returns sentence forms for generated prose', () => {
     expect(getSkillSentenceForm('animal-handling')).toBe('animal handling')
     expect(getSkillSentenceForm('sleight-of-hand')).toBe('sleight of hand')
+    expect(getSkillSentenceForm('custom-lockpicking', 1, 'Lockpicking')).toBe('lockpicking')
   })
 })
 

@@ -502,6 +502,7 @@ export function grantArrayFields<T extends string>(
   const weaponOptions = ctx.options?.weapons ?? []
   const toolOptions = ctx.options?.tools ?? []
   const armorOptions = ctx.options?.armor ?? []
+  const skillOptions = ctx.options?.skills ?? []
   const rowLabels = labels as Record<string, string>
 
   return [
@@ -529,7 +530,11 @@ export function grantArrayFields<T extends string>(
             return toolProficiencyGrantTitle(values as ToolProficiencyItemForm, index, toolOptions)
           }
           if (type === 'skillProficiency') {
-            return skillProficiencyGrantTitle(values as SkillProficiencyItemForm, index)
+            return skillProficiencyGrantTitle(
+              values as SkillProficiencyItemForm,
+              index,
+              skillOptions,
+            )
           }
           if (type === 'armorTraining') {
             return armorTrainingGrantTitle(values as ArmorTrainingItemForm, index, armorOptions)
@@ -584,7 +589,7 @@ export function grantArrayFields<T extends string>(
             return toolProficiencyGrantSummary(values as ToolProficiencyItemForm, toolOptions)
           }
           if (type === 'skillProficiency') {
-            return skillProficiencyGrantSummary(values as SkillProficiencyItemForm)
+            return skillProficiencyGrantSummary(values as SkillProficiencyItemForm, skillOptions)
           }
           if (type === 'armorTraining') {
             return armorTrainingGrantSummary(values as ArmorTrainingItemForm, armorOptions)

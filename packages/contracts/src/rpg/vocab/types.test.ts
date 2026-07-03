@@ -9,7 +9,6 @@ import { LANGUAGE_CATEGORY_ENTRIES } from './language'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
 import { getTermSentenceForm, pluralizeTermLabel, type GameTermEntry } from './types'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
-import { SKILL_ENTRIES } from '../content/skill-proficiency'
 
 const ROLLOUT_ENTRY_TABLES = [
   TOOL_CATEGORY_ENTRIES,
@@ -20,7 +19,6 @@ const ROLLOUT_ENTRY_TABLES = [
   LANGUAGE_CATEGORY_ENTRIES,
   MOVEMENT_MODE_ENTRIES,
   FEAT_CATEGORY_ENTRIES,
-  SKILL_ENTRIES,
 ] as const
 
 describe('term sentence forms', () => {

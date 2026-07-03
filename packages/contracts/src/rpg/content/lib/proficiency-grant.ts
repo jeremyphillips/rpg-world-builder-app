@@ -405,8 +405,11 @@ function formatFixedToolSentence(
   return `Character gains proficiency with ${joinNaturalList(parts)}.`
 }
 
-function formatFixedSkillSentence(grant: FixedSkillProficiencyGrant): string {
-  const names = grant.skillIds.map((id) => getSkillSentenceForm(id))
+function formatFixedSkillSentence(
+  grant: FixedSkillProficiencyGrant,
+  resolveSkillName?: (id: string) => string | undefined,
+): string {
+  const names = grant.skillIds.map((id) => getSkillSentenceForm(id, 1, resolveSkillName?.(id)))
   return `Character gains proficiency in ${joinNaturalList(names)}.`
 }
 
@@ -539,9 +542,12 @@ export function formatToolProficiencyGrantSentence(
 }
 
 /** Human-readable summary for skill proficiency grant array item headers. */
-export function formatSkillProficiencyGrantSentence(grant: SkillProficiencyGrant): string {
+export function formatSkillProficiencyGrantSentence(
+  grant: SkillProficiencyGrant,
+  resolveSkillName?: (id: string) => string | undefined,
+): string {
   if (grant.kind === 'fixed') {
-    return formatFixedSkillSentence(grant)
+    return formatFixedSkillSentence(grant, resolveSkillName)
   }
   return formatSkillChoiceSentence(grant.choose ?? 1, grant.pool)
 }

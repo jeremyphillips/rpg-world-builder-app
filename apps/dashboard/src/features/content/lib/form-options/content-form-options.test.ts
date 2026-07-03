@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickClass, pickEquipment, pickSpell } from '../fixtures/pick'
+import { pickClass, pickEquipment, pickSkillProficiency, pickSpell } from '../fixtures/pick'
 import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
 
 describe('toContentFieldOption', () => {
@@ -29,6 +29,7 @@ describe('buildContentFormOptionSets', () => {
     const dagger = pickEquipment('dagger')
     const longsword = pickEquipment('longsword')
     const fireBolt = pickSpell('fire-bolt')
+    const athletics = pickSkillProficiency('athletics')
     const thievesTools = pickEquipment('thieves-tools')
     const torch = pickEquipment('torch')
 
@@ -36,6 +37,7 @@ describe('buildContentFormOptionSets', () => {
       classes: [fighter, barbarian],
       equipment: [longsword, dagger, thievesTools, torch],
       spells: [fireBolt],
+      skills: [athletics],
     })
 
     expect(options.classes).toEqual([
@@ -57,6 +59,7 @@ describe('buildContentFormOptionSets', () => {
       longsword: 'martial',
     })
     expect(options.spells).toEqual([{ value: 'fire-bolt', label: fireBolt.name }])
+    expect(options.skills).toEqual([{ value: 'athletics', label: athletics.name }])
     expect(options.tools).toEqual([{ value: 'thieves-tools', label: thievesTools.name }])
     expect(options.magicItemBaseEquipment).toEqual([
       { value: 'dagger', label: dagger.name },
