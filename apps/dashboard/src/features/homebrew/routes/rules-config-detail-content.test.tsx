@@ -3,9 +3,7 @@ import { screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
-  ATTACK_RESOLUTION_MODE_SET_ID,
   CREATURE_TYPE_SET_ID,
-  EDITION_PRESET_SET_ID,
   defaultMulticlassingRules,
   defaultSubclassingRules,
   defaultCampaignMechanicsPatch,
@@ -13,6 +11,14 @@ import {
 } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
+
+import { buildAttackResolutionModeVocabulary } from '../lib/vocabulary/sets/attack-resolution-modes'
+import { buildCreatureTypeVocabulary } from '../lib/vocabulary/sets/creature-types'
+import { buildEditionPresetVocabulary } from '../lib/vocabulary/sets/edition-presets'
+import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
+import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
+import { useEditionPresetVocabulary } from '../hooks/use-edition-preset-vocabulary'
+import { useRulesetPatch } from '../hooks/use-ruleset-patch'
 
 vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -26,14 +32,48 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 
+vi.mock('../hooks/use-ruleset-patch', () => ({
+  rulesetPatchQueryKey: (campaignId: string) => ['campaigns', campaignId, 'ruleset-patch'] as const,
+  useRulesetPatch: vi.fn(),
+}))
+
+vi.mock('../hooks/use-creature-type-vocabulary', () => ({
+  useCreatureTypeVocabulary: vi.fn(),
+}))
+
+vi.mock('../hooks/use-edition-preset-vocabulary', () => ({
+  useEditionPresetVocabulary: vi.fn(),
+}))
+
+vi.mock('../hooks/use-attack-resolution-mode-vocabulary', () => ({
+  useAttackResolutionModeVocabulary: vi.fn(),
+}))
+
+vi.mock('../hooks/use-patch-character-creation-mutation', () => ({
+  usePatchCharacterCreationMutation: vi.fn(() => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+    isSuccess: false,
+  })),
+}))
+
+vi.mock('../hooks/use-patch-mechanics-mutation', () => ({
+  usePatchMechanicsMutation: vi.fn(() => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+    isSuccess: false,
+  })),
+}))
+
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { RulesConfigDetailContent } from './rules-config-detail-content'
 
-/** Character config form mount is heavy (~3s); default 5s Vitest limit is too tight under load. */
-vi.setConfig({ testTimeout: 15_000 })
-
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
+const useRulesetPatchMock = vi.mocked(useRulesetPatch)
+const useCreatureTypeVocabularyMock = vi.mocked(useCreatureTypeVocabulary)
+const useEditionPresetVocabularyMock = vi.mocked(useEditionPresetVocabulary)
+const useAttackResolutionModeVocabularyMock = vi.mocked(useAttackResolutionModeVocabulary)
 
 const mockPatch: RulesetPatchRead = {
   characterCreation: {
@@ -46,6 +86,19 @@ const mockPatch: RulesetPatchRead = {
     startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
   },
   mechanics: defaultCampaignMechanicsPatch(),
+}
+
+const creatureTypeSet = {
+  id: CREATURE_TYPE_SET_ID,
+  options: [
+    {
+      id: 'humanoid',
+      label: 'Humanoid',
+      source: 'system' as const,
+      status: 'active' as const,
+      usedBy: 0,
+    },
+  ],
 }
 
 const editionPresetOptions = [
@@ -70,40 +123,38 @@ const attackResolutionOptions = [
   },
 ] as const
 
+function mockResolvedRulesData() {
+  useRulesetPatchMock.mockReturnValue({
+    data: mockPatch,
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useRulesetPatch>)
+
+  useCreatureTypeVocabularyMock.mockReturnValue({
+    vocabulary: buildCreatureTypeVocabulary(creatureTypeSet),
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useCreatureTypeVocabulary>)
+
+  useEditionPresetVocabularyMock.mockReturnValue({
+    vocabulary: buildEditionPresetVocabulary({ options: [...editionPresetOptions] }),
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useEditionPresetVocabulary>)
+
+  useAttackResolutionModeVocabularyMock.mockReturnValue({
+    vocabulary: buildAttackResolutionModeVocabulary({ options: [...attackResolutionOptions] }),
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useAttackResolutionModeVocabulary>)
+}
+
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Infinity,
-        gcTime: Infinity,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-      },
+      queries: { retry: false },
       mutations: { retry: false },
     },
-  })
-  queryClient.setQueryData(['campaigns', campaignId, 'ruleset-patch'], mockPatch)
-  queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', CREATURE_TYPE_SET_ID], {
-    id: CREATURE_TYPE_SET_ID,
-    options: [
-      {
-        id: 'humanoid',
-        label: 'Humanoid',
-        source: 'system',
-        status: 'active',
-        usedBy: 0,
-      },
-    ],
-  })
-  queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', EDITION_PRESET_SET_ID], {
-    id: EDITION_PRESET_SET_ID,
-    options: editionPresetOptions,
-  })
-  queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', ATTACK_RESOLUTION_MODE_SET_ID], {
-    id: ATTACK_RESOLUTION_MODE_SET_ID,
-    options: attackResolutionOptions,
   })
 
   return renderWithDataRouter(
@@ -124,6 +175,7 @@ function renderDetail(configId = 'character-configuration', campaignId = 'camp_1
 describe('RulesConfigDetailContent', () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
+    mockResolvedRulesData()
   })
 
   it('renders the character configuration form with section navigation', async () => {
