@@ -302,40 +302,30 @@ function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
+type GrantRowContentConverter = (row: GrantRowForm) => ContentGrant | undefined
+
+const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentConverter>> = {
+  senses: sensesToGrant,
+  resistances: resistancesToGrant,
+  damageType: damageTypeToGrant,
+  movement: movementToGrant,
+  languages: languagesToGrant,
+  weaponProficiency: weaponProficiencyToGrant,
+  toolProficiency: toolProficiencyToGrant,
+  skillProficiency: skillProficiencyToGrant,
+  armorTraining: armorTrainingToGrant,
+  featChoice: featChoiceToGrant,
+  equipment: equipmentToGrant,
+  spells: spellsToGrant,
+}
+
 /**
  * Converts a single grant row form value into an atomic `ContentGrant`, or
  * `undefined` when the row is incomplete (transient/empty rows are silently
  * dropped).
  */
 export function formRowToContentGrant(row: GrantRowForm): ContentGrant | undefined {
-  switch (row.grantType) {
-    case 'senses':
-      return sensesToGrant(row)
-    case 'resistances':
-      return resistancesToGrant(row)
-    case 'damageType':
-      return damageTypeToGrant(row)
-    case 'movement':
-      return movementToGrant(row)
-    case 'languages':
-      return languagesToGrant(row)
-    case 'weaponProficiency':
-      return weaponProficiencyToGrant(row)
-    case 'toolProficiency':
-      return toolProficiencyToGrant(row)
-    case 'skillProficiency':
-      return skillProficiencyToGrant(row)
-    case 'armorTraining':
-      return armorTrainingToGrant(row)
-    case 'featChoice':
-      return featChoiceToGrant(row)
-    case 'equipment':
-      return equipmentToGrant(row)
-    case 'spells':
-      return spellsToGrant(row)
-    default:
-      return undefined
-  }
+  return FORM_ROW_TO_CONTENT_GRANT[row.grantType]?.(row)
 }
 
 // ---------------------------------------------------------------------------

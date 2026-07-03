@@ -19,6 +19,21 @@ export type FormatCastingTimeOptions = {
   includeTrigger?: boolean
 }
 
+type CastingTimeUnitFormatter = (value: number) => string
+
+const CASTING_TIME_UNIT_FORMATTERS: Record<string, CastingTimeUnitFormatter> = {
+  action: (value) => (value === 1 ? '1 Action' : `${value} Actions`),
+  'bonus-action': (value) => (value === 1 ? '1 Bonus action' : `${value} Bonus actions`),
+  reaction: (value) => (value === 1 ? '1 Reaction' : `${value} Reactions`),
+  minute: (value) => (value === 1 ? '1 Minute' : `${value} Minutes`),
+  hour: (value) => (value === 1 ? '1 Hour' : `${value} Hours`),
+}
+
+function formatCastingTimeUnit(value: number, unit: string): string {
+  const formatter = CASTING_TIME_UNIT_FORMATTERS[unit]
+  return formatter ? formatter(value) : `${value} ${getCastingTimeUnitLabel(unit)}`
+}
+
 /** Formats a spell casting time for display (e.g. "1 Action", "1 Reaction (when hit)"). */
 export function formatCastingTime(
   castingTime: SpellCastingTime,
@@ -27,27 +42,7 @@ export function formatCastingTime(
   const { includeTrigger = true } = options
   const { value, unit, trigger } = castingTime.normal
 
-  let timeStr: string
-  switch (unit) {
-    case 'action':
-      timeStr = value === 1 ? '1 Action' : `${value} Actions`
-      break
-    case 'bonus-action':
-      timeStr = value === 1 ? '1 Bonus action' : `${value} Bonus actions`
-      break
-    case 'reaction':
-      timeStr = value === 1 ? '1 Reaction' : `${value} Reactions`
-      break
-    case 'minute':
-      timeStr = value === 1 ? '1 Minute' : `${value} Minutes`
-      break
-    case 'hour':
-      timeStr = value === 1 ? '1 Hour' : `${value} Hours`
-      break
-    default:
-      timeStr = `${value} ${getCastingTimeUnitLabel(unit)}`
-  }
-
+  let timeStr = formatCastingTimeUnit(value, unit)
   if (includeTrigger && trigger) {
     timeStr = `${timeStr} (${trigger})`
   }

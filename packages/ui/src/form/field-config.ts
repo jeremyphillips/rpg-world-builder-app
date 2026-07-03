@@ -965,6 +965,33 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   return TYPE_DEFAULTS[field.type]
 }
 
+function assignLevelRangeDefaults(
+  field: LevelRangeFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  const minName = field.minName ?? field.name
+  const maxName = field.maxName ?? 'maxLevel'
+  values[minName] = field.defaultMinValue ?? TYPE_DEFAULTS.number
+  values[maxName] = field.defaultMaxValue ?? TYPE_DEFAULTS.number
+}
+
+function assignDependentFieldDefaults(field: FieldConfig, values: Record<string, unknown>): void {
+  if (field.type === 'chooseFromChips') {
+    const chooseField = field as ChooseFromChipsFieldConfig
+    values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
+    return
+  }
+
+  if (field.type !== 'inlineChooseCount') return
+
+  const inlineField = field as InlineChooseCountFieldConfig
+  const selectName = inlineField.selectName
+  if (!selectName) return
+
+  values[selectName] =
+    inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
+}
+
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
   if (field.type === 'inlineSentence') {
     assignInlineSentenceDefaults(field, values)
@@ -972,26 +999,12 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
   }
 
   if (field.type === 'levelRange') {
-    const levelRangeField = field as LevelRangeFieldConfig
-    const minName = levelRangeField.minName ?? levelRangeField.name
-    const maxName = levelRangeField.maxName ?? 'maxLevel'
-    values[minName] = levelRangeField.defaultMinValue ?? TYPE_DEFAULTS.number
-    values[maxName] = levelRangeField.defaultMaxValue ?? TYPE_DEFAULTS.number
+    assignLevelRangeDefaults(field as LevelRangeFieldConfig, values)
     return
   }
 
   values[field.name] = fieldDefaultValue(field)
-  if (field.type === 'chooseFromChips') {
-    const chooseField = field as ChooseFromChipsFieldConfig
-    values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
-  }
-  if (field.type === 'inlineChooseCount') {
-    const inlineField = field as InlineChooseCountFieldConfig
-    if (inlineField.selectName) {
-      values[inlineField.selectName] =
-        inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
-    }
-  }
+  assignDependentFieldDefaults(field, values)
 }
 
 /** Builds the `defaultValues` object RHF needs from a form's items. */

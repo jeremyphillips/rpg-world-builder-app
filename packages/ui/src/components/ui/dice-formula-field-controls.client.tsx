@@ -257,6 +257,191 @@ function DiceFormulaStaticOperator({
   )
 }
 
+type DiceFormulaModifierSegmentProps = {
+  operatorId: string
+  modifierId: string
+  currencyId: string
+  size: FieldSize
+  resolved: DiceFormulaValue
+  disabled: boolean
+  hasError: boolean
+  modifierMin: number
+  modifierMax: number
+  modifierOperators: readonly DiceFormulaTailOperator[]
+  modifierAmountLabel: string
+  currencyUnit?: DiceFormulaControlsProps['currencyUnit']
+  onBlur?: () => void
+  onUpdate: (patch: DiceFormulaPatch) => void
+}
+
+function DiceFormulaOperatorSegment({
+  operatorId,
+  size,
+  resolved,
+  disabled,
+  hasError,
+  modifierOperators,
+  onBlur,
+  onUpdate,
+}: Pick<
+  DiceFormulaModifierSegmentProps,
+  | 'operatorId'
+  | 'size'
+  | 'resolved'
+  | 'disabled'
+  | 'hasError'
+  | 'modifierOperators'
+  | 'onBlur'
+  | 'onUpdate'
+>) {
+  const singleOperator = modifierOperators.length === 1
+  const resolvedOperator = resolved.modifier?.operator ?? modifierOperators[0] ?? '+'
+
+  if (singleOperator) {
+    return <DiceFormulaStaticOperator operator={resolvedOperator} size={size} />
+  }
+
+  return (
+    <DiceFormulaControlCell id={operatorId} label="Operator">
+      <Select
+        value={resolvedOperator}
+        onValueChange={(next) =>
+          onUpdate({
+            modifier: {
+              operator: next as DiceFormulaTailOperator,
+              amount: resolved.modifier?.amount ?? 1,
+            },
+          })
+        }
+        disabled={disabled}
+      >
+        <SelectTrigger
+          id={operatorId}
+          grouped
+          size={size}
+          digits={1}
+          aria-invalid={hasError || undefined}
+          className={diceFormulaGroupedOperatorSegmentVariants({ size })}
+          onBlur={onBlur}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {modifierOperators.map((operator) => (
+            <SelectItem key={operator} value={operator}>
+              {operator}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </DiceFormulaControlCell>
+  )
+}
+
+function DiceFormulaModifierAmountSegment({
+  modifierId,
+  size,
+  resolved,
+  resolvedOperator,
+  disabled,
+  hasError,
+  modifierMin,
+  modifierMax,
+  modifierAmountLabel,
+  onBlur,
+  onUpdate,
+}: Pick<
+  DiceFormulaModifierSegmentProps,
+  | 'modifierId'
+  | 'size'
+  | 'resolved'
+  | 'disabled'
+  | 'hasError'
+  | 'modifierMin'
+  | 'modifierMax'
+  | 'modifierAmountLabel'
+  | 'onBlur'
+  | 'onUpdate'
+> & { resolvedOperator: DiceFormulaTailOperator }) {
+  return (
+    <DiceFormulaControlCell id={modifierId} label={modifierAmountLabel}>
+      <NumberInput
+        id={modifierId}
+        grouped
+        size={size}
+        min={modifierMin}
+        max={modifierMax}
+        disabled={disabled}
+        aria-invalid={hasError || undefined}
+        digits={fieldDigitsForMax(modifierMax)}
+        rootClassName={diceFormulaGroupedModifierRootVariants()}
+        className={diceFormulaModifierInputVariants()}
+        value={resolved.modifier?.amount ?? 1}
+        onChange={(event) => {
+          onUpdate({
+            modifier: {
+              operator: resolvedOperator,
+              amount: parseInputInt(
+                event.target.value,
+                resolved.modifier?.amount ?? 1,
+                modifierMin,
+                modifierMax,
+              ),
+            },
+          })
+        }}
+        onBlur={onBlur}
+      />
+    </DiceFormulaControlCell>
+  )
+}
+
+function DiceFormulaCurrencySegment({
+  currencyId,
+  size,
+  disabled,
+  hasError,
+  currencyUnit,
+  onBlur,
+}: Pick<
+  DiceFormulaModifierSegmentProps,
+  'currencyId' | 'size' | 'disabled' | 'hasError' | 'currencyUnit' | 'onBlur'
+>) {
+  if (!currencyUnit) return null
+
+  return (
+    <>
+      <div aria-hidden className={inputSelectDividerVariants()} />
+      <DiceFormulaControlCell id={currencyId} label="Currency">
+        <Select
+          value={currencyUnit.value}
+          onValueChange={currencyUnit.onChange}
+          disabled={disabled}
+        >
+          <SelectTrigger
+            id={currencyId}
+            grouped
+            size={size}
+            digits={2}
+            aria-invalid={hasError || undefined}
+            className={diceFormulaGroupedFacesSegmentVariants({ size })}
+            onBlur={onBlur}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {currencyUnit.options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </DiceFormulaControlCell>
+    </>
+  )
+}
+
 function DiceFormulaModifierControls({
   operatorId,
   modifierId,
@@ -274,22 +459,8 @@ function DiceFormulaModifierControls({
   onBlur,
   onUpdate,
   onRemoveModifier,
-}: {
-  operatorId: string
-  modifierId: string
-  currencyId: string
-  size: FieldSize
-  resolved: DiceFormulaValue
-  disabled: boolean
-  hasError: boolean
-  modifierMin: number
-  modifierMax: number
+}: DiceFormulaModifierSegmentProps & {
   modifierMode: DiceFormulaModifierMode
-  modifierOperators: readonly DiceFormulaTailOperator[]
-  modifierAmountLabel: string
-  currencyUnit?: DiceFormulaControlsProps['currencyUnit']
-  onBlur?: () => void
-  onUpdate: (patch: DiceFormulaPatch) => void
   onRemoveModifier: () => void
 }) {
   const singleOperator = modifierOperators.length === 1
@@ -298,107 +469,41 @@ function DiceFormulaModifierControls({
   return (
     <>
       <div className={diceFormulaModifierGroupVariants({ invalid: hasError, disabled })}>
-        {singleOperator ? (
-          <DiceFormulaStaticOperator operator={resolvedOperator} size={size} />
-        ) : (
-          <DiceFormulaControlCell id={operatorId} label="Operator">
-            <Select
-              value={resolvedOperator}
-              onValueChange={(next) =>
-                onUpdate({
-                  modifier: {
-                    operator: next as DiceFormulaTailOperator,
-                    amount: resolved.modifier?.amount ?? 1,
-                  },
-                })
-              }
-              disabled={disabled}
-            >
-              <SelectTrigger
-                id={operatorId}
-                grouped
-                size={size}
-                digits={1}
-                aria-invalid={hasError || undefined}
-                className={diceFormulaGroupedOperatorSegmentVariants({ size })}
-                onBlur={onBlur}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {modifierOperators.map((operator) => (
-                  <SelectItem key={operator} value={operator}>
-                    {operator}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </DiceFormulaControlCell>
-        )}
+        <DiceFormulaOperatorSegment
+          operatorId={operatorId}
+          size={size}
+          resolved={resolved}
+          disabled={disabled}
+          hasError={hasError}
+          modifierOperators={modifierOperators}
+          onBlur={onBlur}
+          onUpdate={onUpdate}
+        />
 
         {!singleOperator ? <div aria-hidden className={inputSelectDividerVariants()} /> : null}
 
-        <DiceFormulaControlCell id={modifierId} label={modifierAmountLabel}>
-          <NumberInput
-            id={modifierId}
-            grouped
-            size={size}
-            min={modifierMin}
-            max={modifierMax}
-            disabled={disabled}
-            aria-invalid={hasError || undefined}
-            digits={fieldDigitsForMax(modifierMax)}
-            rootClassName={diceFormulaGroupedModifierRootVariants()}
-            className={diceFormulaModifierInputVariants()}
-            value={resolved.modifier?.amount ?? 1}
-            onChange={(event) => {
-              onUpdate({
-                modifier: {
-                  operator: resolvedOperator,
-                  amount: parseInputInt(
-                    event.target.value,
-                    resolved.modifier?.amount ?? 1,
-                    modifierMin,
-                    modifierMax,
-                  ),
-                },
-              })
-            }}
-            onBlur={onBlur}
-          />
-        </DiceFormulaControlCell>
+        <DiceFormulaModifierAmountSegment
+          modifierId={modifierId}
+          size={size}
+          resolved={resolved}
+          resolvedOperator={resolvedOperator}
+          disabled={disabled}
+          hasError={hasError}
+          modifierMin={modifierMin}
+          modifierMax={modifierMax}
+          modifierAmountLabel={modifierAmountLabel}
+          onBlur={onBlur}
+          onUpdate={onUpdate}
+        />
 
-        {currencyUnit ? (
-          <>
-            <div aria-hidden className={inputSelectDividerVariants()} />
-            <DiceFormulaControlCell id={currencyId} label="Currency">
-              <Select
-                value={currencyUnit.value}
-                onValueChange={currencyUnit.onChange}
-                disabled={disabled}
-              >
-                <SelectTrigger
-                  id={currencyId}
-                  grouped
-                  size={size}
-                  digits={2}
-                  aria-invalid={hasError || undefined}
-                  className={diceFormulaGroupedFacesSegmentVariants({ size })}
-                  onBlur={onBlur}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencyUnit.options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </DiceFormulaControlCell>
-          </>
-        ) : null}
+        <DiceFormulaCurrencySegment
+          currencyId={currencyId}
+          size={size}
+          disabled={disabled}
+          hasError={hasError}
+          currencyUnit={currencyUnit}
+          onBlur={onBlur}
+        />
       </div>
 
       {modifierMode === 'optional' ? (

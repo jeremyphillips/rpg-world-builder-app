@@ -620,27 +620,30 @@ export function grantItemFields<T extends string>(
   ]
 }
 
+function buildGrantRowHeaderContext(
+  labels: Record<string, string>,
+  ctx: ContentFormCtx,
+): GrantRowHeaderContext {
+  const options = ctx.options ?? {}
+
+  return {
+    rowLabels: labels,
+    equipmentOptions: options.equipment ?? [],
+    weaponOptions: options.weapons ?? [],
+    toolOptions: options.tools ?? [],
+    armorOptions: options.armor ?? [],
+    skillOptions: options.skills ?? [],
+    spellOptions: options.spells ?? [],
+  }
+}
+
 export function grantArrayFields<T extends string>(
   grantTypes: readonly T[],
   labels: Record<T, string>,
   ctx: ContentFormCtx,
 ): FormItem[] {
-  const equipmentOptions = ctx.options?.equipment ?? []
-  const spellOptions = ctx.options?.spells ?? []
-  const weaponOptions = ctx.options?.weapons ?? []
-  const toolOptions = ctx.options?.tools ?? []
-  const armorOptions = ctx.options?.armor ?? []
-  const skillOptions = ctx.options?.skills ?? []
   const rowLabels = labels as Record<string, string>
-  const headerContext: GrantRowHeaderContext = {
-    rowLabels,
-    equipmentOptions,
-    weaponOptions,
-    toolOptions,
-    armorOptions,
-    skillOptions,
-    spellOptions,
-  }
+  const headerContext = buildGrantRowHeaderContext(rowLabels, ctx)
 
   return [
     {
