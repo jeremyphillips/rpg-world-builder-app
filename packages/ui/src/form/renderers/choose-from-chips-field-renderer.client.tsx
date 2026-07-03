@@ -1,57 +1,29 @@
 'use client'
 
-import { useController, type ControllerRenderProps } from 'react-hook-form'
-
-import { ChooseFromChipsField } from '../../components/ui/choose-from-chips-field.client'
+import { InlineSentenceFieldRenderer } from './inline-sentence-field-renderer.client'
+import { chooseFromChipsToInlineSentence } from '../config/inline-sentence-legacy-config.lib'
 import type { ChooseFromChipsFieldConfig } from '../field-config'
-import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
 
 export interface ChooseFromChipsFieldRendererProps {
   config: ChooseFromChipsFieldConfig
-  field: ControllerRenderProps
   id: string
-  error?: string
   namePrefix?: string
+  error?: string
 }
 
-/** RHF adapter for `ChooseFromChipsField` — binds count + chip option paths. */
+/** @deprecated Prefer `InlineSentenceFieldRenderer`. */
 export function ChooseFromChipsFieldRenderer({
   config,
-  field,
   id,
-  error,
   namePrefix,
+  error,
 }: ChooseFromChipsFieldRendererProps) {
-  const chooseFullName = namePrefix ? `${namePrefix}.${config.chooseName}` : config.chooseName
-  const { field: chooseField, fieldState: chooseState } = useController({ name: chooseFullName })
-  const combinedError = resolveFirstFieldErrorMessage(chooseState.error?.message, error)
-
-  const chipsValue = Array.isArray(field.value) ? field.value.map(String) : []
-
   return (
-    <ChooseFromChipsField
+    <InlineSentenceFieldRenderer
+      config={chooseFromChipsToInlineSentence(config)}
       id={id}
-      label={config.label}
-      options={config.options}
-      chooseValue={typeof chooseField.value === 'number' ? chooseField.value : undefined}
-      onChooseChange={chooseField.onChange}
-      onChooseBlur={chooseField.onBlur}
-      chipsValue={chipsValue}
-      onChipsChange={field.onChange}
-      onChipsBlur={field.onBlur}
-      chooseMin={config.chooseMin}
-      chooseMax={config.chooseMax}
-      prefix={config.prefix}
-      suffix={config.suffix}
-      error={combinedError}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
-      size={config.size}
-      chipSize={config.chipSize}
-      width={config.width}
+      namePrefix={namePrefix}
+      error={error}
     />
   )
 }

@@ -101,33 +101,57 @@
         "name": "Life Domain Spells",
         "level": 3,
         "description": "<p>Your connection to this divine domain ensures you always have certain spells ready. When you reach a Cleric level specified in the Life Domain Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Life Domain Spells.</strong></p><ul><li>Level 3: <a href='../spells/srd-cc-5.2.1:aid' data-content-type='spell' data-content-id='srd-cc-5.2.1:aid' data-content-title='Aid' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Aid</a>, <a href='../spells/srd-cc-5.2.1:bless' data-content-type='spell' data-content-id='srd-cc-5.2.1:bless' data-content-title='Bless' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Bless</a>, <a href='../spells/srd-cc-5.2.1:cure-wounds' data-content-type='spell' data-content-id='srd-cc-5.2.1:cure-wounds' data-content-title='Cure Wounds' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Cure Wounds</a>, <a href='../spells/srd-cc-5.2.1:lesser-restoration' data-content-type='spell' data-content-id='srd-cc-5.2.1:lesser-restoration' data-content-title='Lesser Restoration' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Lesser Restoration</a></li><li>Level 5: <a href='../spells/srd-cc-5.2.1:mass-healing-word' data-content-type='spell' data-content-id='srd-cc-5.2.1:mass-healing-word' data-content-title='Mass Healing Word' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Mass Healing Word</a>, <a href='../spells/srd-cc-5.2.1:revivify' data-content-type='spell' data-content-id='srd-cc-5.2.1:revivify' data-content-title='Revivify' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Revivify</a></li><li>Level 7: <a href='../spells/srd-cc-5.2.1:aura-of-life' data-content-type='spell' data-content-id='srd-cc-5.2.1:aura-of-life' data-content-title='Aura of Life' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Aura of Life</a>, <a href='../spells/srd-cc-5.2.1:death-ward' data-content-type='spell' data-content-id='srd-cc-5.2.1:death-ward' data-content-title='Death Ward' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Death Ward</a></li><li>Level 9: <a href='../spells/srd-cc-5.2.1:greater-restoration' data-content-type='spell' data-content-id='srd-cc-5.2.1:greater-restoration' data-content-title='Greater Restoration' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Greater Restoration</a>, <a href='../spells/srd-cc-5.2.1:mass-cure-wounds' data-content-type='spell' data-content-id='srd-cc-5.2.1:mass-cure-wounds' data-content-title='Mass Cure Wounds' data-link-kind='detail' target='_blank' rel='noopener noreferrer'>Mass Cure Wounds</a></li></ul>",
-        "grants": {
-          "innateSpells": {
-            "ability": "wis",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 3,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["aid", "bless", "cure-wounds", "lesser-restoration"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 5
+            },
+            "grants": [
               {
-                "level": 5,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["mass-healing-word", "revivify"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 7
+            },
+            "grants": [
               {
-                "level": 7,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["aura-of-life", "death-ward"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 9
+            },
+            "grants": [
               {
-                "level": 9,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "wis",
+                "mode": "always_prepared",
                 "spellIds": ["greater-restoration", "mass-cure-wounds"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "preserve-life",
@@ -224,12 +248,17 @@
         "name": "Additional Fighting Style",
         "level": 7,
         "description": "<p>You gain another Fighting Style feat of your choice.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "fighting-style",
-            "choose": 1
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "fighting-style",
+                "choose": 1
+              }
+            ]
           }
-        }
+        ]
       },
       {
         "id": "heroic-warrior",
@@ -308,38 +337,70 @@
         "name": "Oath of Devotion Spells",
         "level": 3,
         "description": "<p>The magic of your oath ensures you always have certain spells ready; when you reach a Paladin level specified in the Oath of Devotion Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Oath of Devotion Spells.</strong> Level 3: <em>Protection from Evil and Good</em>, <em>Shield of Faith</em>. Level 5: <em>Aid</em>, <em>Zone of Truth</em>. Level 9: <em>Beacon of Hope</em>, <em>Dispel Magic</em>. Level 13: <em>Freedom of Movement</em>, <em>Guardian of Faith</em>. Level 17: <em>Commune</em>, <em>Flame Strike</em>.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 3,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["protection-from-evil-and-good", "shield-of-faith"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 5
+            },
+            "grants": [
               {
-                "level": 5,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["aid", "zone-of-truth"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 9
+            },
+            "grants": [
               {
-                "level": 9,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["beacon-of-hope", "dispel-magic"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 13
+            },
+            "grants": [
               {
-                "level": 13,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["freedom-of-movement", "guardian-of-faith"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 17
+            },
+            "grants": [
               {
-                "level": 17,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["commune", "flame-strike"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "sacred-weapon",
@@ -481,33 +542,57 @@
         "name": "Draconic Spells",
         "level": 3,
         "description": "<p>When you reach a Sorcerer level specified in the Draconic Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Draconic Spells.</strong> Level 3: <em>Alter Self</em>, <em>Chromatic Orb</em>, <em>Command</em>, <em>Dragon's Breath</em>. Level 5: <em>Fear</em>, <em>Fly</em>. Level 7: <em>Arcane Eye</em>, <em>Charm Monster</em>. Level 9: <em>Legend Lore</em>, <em>Summon Dragon</em>.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 3,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["alter-self", "chromatic-orb", "command", "dragons-breath"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 5
+            },
+            "grants": [
               {
-                "level": 5,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["fear", "fly"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 7
+            },
+            "grants": [
               {
-                "level": 7,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["arcane-eye", "charm-monster"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 9
+            },
+            "grants": [
               {
-                "level": 9,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["legend-lore", "summon-dragon"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "elemental-affinity",
@@ -526,19 +611,19 @@
         "name": "Dragon Companion",
         "level": 18,
         "description": "<p>You can cast <em>Summon Dragon</em> without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it in this way when you finish a Long Rest.</p><p>Whenever you start casting the spell, you can modify it so that it doesn't require Concentration. If you do so, the spell's duration becomes 1 minute for that casting.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 18,
-                "kind": "free_cast",
-                "frequency": "once_per_long_rest",
-                "spellIds": ["summon-dragon"]
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "free_cast",
+                "spellIds": ["summon-dragon"],
+                "frequency": "once_per_long_rest"
               }
             ]
           }
-        }
+        ]
       }
     ]
   },
@@ -566,33 +651,57 @@
         "name": "Fiend Spells",
         "level": 3,
         "description": "<p>The magic of your patron ensures you always have certain spells ready; when you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.</p><p><strong>Fiend Spells.</strong> Level 3: <em>Burning Hands</em>, <em>Command</em>, <em>Scorching Ray</em>, <em>Suggestion</em>. Level 5: <em>Fireball</em>, <em>Stinking Cloud</em>. Level 7: <em>Fire Shield</em>, <em>Wall of Fire</em>. Level 9: <em>Geas</em>, <em>Insect Plague</em>.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 3,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["burning-hands", "command", "scorching-ray", "suggestion"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 5
+            },
+            "grants": [
               {
-                "level": 5,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["fireball", "stinking-cloud"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 7
+            },
+            "grants": [
               {
-                "level": 7,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["fire-shield", "wall-of-fire"]
-              },
+              }
+            ]
+          },
+          {
+            "unlock": {
+              "level": 9
+            },
+            "grants": [
               {
-                "level": 9,
-                "kind": "always_prepared",
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "always_prepared",
                 "spellIds": ["geas", "insect-plague"]
               }
             ]
           }
-        }
+        ]
       },
       {
         "id": "dark-ones-own-luck",

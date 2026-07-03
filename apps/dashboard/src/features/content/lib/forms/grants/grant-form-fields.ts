@@ -1,20 +1,32 @@
 import {
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
+  formatMovementBonusAuthoringSummary,
+  formatMovementBonusTitle,
+  getMovementModeGrantLabel,
   INNATE_SPELL_KINDS,
+  MOVEMENT_BONUS_FEET,
+  MOVEMENT_MODES,
+  MOVEMENT_OPERATION_ENTRIES,
+  MOVEMENT_OPERATIONS,
   SENSE_RANGES,
   SKILL_IDS,
   SKILLS,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
-  type UsageFrequency,
   type FeatCategory,
+  type MovementMode,
+  type UsageFrequency,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldOption,
+  type FieldVisibility,
+  type FormItem,
+  type InlineSentenceFieldConfig,
+} from '@rpg/ui/form'
 
 import {
   buildActiveDamageTypeFieldOptions,
@@ -23,19 +35,132 @@ import {
 } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../content-form-registry'
-import { feetInputUnitField } from '../fields/content-identity-form-fields'
-import { getLevelFieldOptions, levelSelectDigits } from '../../form-options/level-field-options'
+import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
+import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
 import { titleCase } from '../../utils/title-case'
 import {
   equipmentGrantItemFields,
   type EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
 import { equipmentGrantSummary, equipmentGrantTitle } from './equipment-grant-form-values'
+import {
+  formatGrantUnlockLevelLabel,
+  GRANT_DEFAULT_UNLOCK_LABEL,
+  GRANT_DEFAULT_UNLOCK_LEVEL,
+  GRANT_ROW_TYPE_LABELS,
+} from './grant-form-schema'
 
-const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
-  value: String(r),
-  label: `${r} ft.`,
+const movementModeOptions: FieldOption[] = MOVEMENT_MODES.map((mode) => ({
+  value: mode,
+  label: getMovementModeGrantLabel(mode),
 }))
+
+const movementOperationOptions: FieldOption[] = MOVEMENT_OPERATIONS.map((operation) => ({
+  value: operation,
+  label: MOVEMENT_OPERATION_ENTRIES[operation].label,
+}))
+
+const movementBonusOptions: FieldOption[] = MOVEMENT_BONUS_FEET.map((feet) => ({
+  value: String(feet),
+  label: `+${feet} ft`,
+}))
+
+function movementInlineSentenceField(
+  overrides?: Partial<InlineSentenceFieldConfig>,
+): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: 'movementValue',
+    label: 'Movement',
+    segments: [
+      {
+        kind: 'select',
+        name: 'movementMode',
+        options: movementModeOptions,
+        defaultValue: 'walk',
+        width: 'lg',
+        ariaLabel: 'Movement mode',
+      },
+      {
+        kind: 'select',
+        name: 'movementOperation',
+        options: movementOperationOptions,
+        defaultValue: 'bonus',
+        width: 'md',
+        ariaLabel: 'Movement operation',
+      },
+      {
+        kind: 'select',
+        name: 'movementValue',
+        options: movementBonusOptions,
+        defaultValue: '5',
+        width: 'sm',
+        ariaLabel: 'Movement bonus',
+      },
+    ],
+    ...overrides,
+  }
+}
+
+/** Formats a concise title for a movement grant row header. */
+export function formatMovementRowTitle(
+  mode: string | undefined,
+  value: number | string | undefined,
+): string {
+  if (!mode || value === undefined || value === '') return 'Movement bonus'
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numericValue)) return 'Movement bonus'
+  return `Movement — ${formatMovementBonusTitle({
+    mode: mode as MovementMode,
+    operation: 'bonus',
+    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
+    unit: 'ft',
+  })}`
+}
+
+/** Formats the authoring summary for a movement grant row header. */
+export function formatMovementRowSummary(
+  mode: string | undefined,
+  value: number | string | undefined,
+): string {
+  if (!mode || value === undefined || value === '') return ''
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numericValue)) return ''
+  return formatMovementBonusAuthoringSummary({
+    mode: mode as MovementMode,
+    operation: 'bonus',
+    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
+    unit: 'ft',
+  })
+}
+
+const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((range) => ({
+  value: String(range),
+  label: String(range),
+}))
+
+function senseRangeInlineSentenceField(
+  overrides?: Partial<InlineSentenceFieldConfig>,
+): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: 'senseRange',
+    label: 'Range',
+    width: '1/3',
+    segments: [
+      {
+        kind: 'select',
+        name: 'senseRange',
+        options: senseRangeOptions,
+        digits: 3,
+        defaultValue: '60',
+        ariaLabel: 'Range',
+      },
+      { kind: 'text', value: 'ft.', tone: 'label' },
+    ],
+    ...overrides,
+  }
+}
 
 const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
 
@@ -47,15 +172,7 @@ const armorCategoryOptions = toOptions(
   >,
 )
 
-const abilityOptions = toOptions(
-  ABILITY_IDS,
-  Object.fromEntries(ABILITY_IDS.map((id) => [id, ABILITY_ENTRIES[id].label])) as Record<
-    (typeof ABILITY_IDS)[number],
-    string
-  >,
-)
-
-const innateSpellKindOptions = toOptions(
+const spellModeOptions = toOptions(
   INNATE_SPELL_KINDS,
   Object.fromEntries(
     INNATE_SPELL_KINDS.map((k) => [k, titleCase(k.replaceAll('_', ' '))]),
@@ -95,12 +212,12 @@ function grantTypeOptionsFor<T extends string>(
   return grantTypes.map((t) => ({ value: t, label: labels[t] }))
 }
 
-export function formatInnateSpellEntryTitle(
+/** Formats a concise title for a spells row header. */
+export function formatSpellRowTitle(
   spellIds: string[] | undefined,
   spellOptions: FieldOption[],
-  index: number,
 ): string {
-  if (!spellIds?.length) return `Entry ${index + 1}`
+  if (!spellIds?.length) return 'Spells'
   const labels = spellIds.map(
     (id) => spellOptions.find((option) => option.value === id)?.label ?? id,
   )
@@ -119,6 +236,12 @@ export function grantItemFields<T extends string>(
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
   const languageOptions = buildActiveLanguageFieldOptions(ctx.languageVocabulary)
+  const levelOptions = getLevelFieldOptions(ctx)
+
+  const unlockLevelOptions = [
+    { value: GRANT_DEFAULT_UNLOCK_LEVEL, label: GRANT_DEFAULT_UNLOCK_LABEL },
+    ...withLevelOptionLabels(levelOptions, formatGrantUnlockLevelLabel),
+  ]
 
   return [
     {
@@ -127,6 +250,22 @@ export function grantItemFields<T extends string>(
       label: 'Grant type',
       options: grantTypeOptionsFor(grantTypes, labels),
       required: true,
+    },
+    {
+      type: 'inlineSentence',
+      name: 'unlockLevel',
+      label: 'Granted at',
+      hideLabel: true,
+      segments: [
+        { kind: 'text', value: 'Grant this', tone: 'label' },
+        {
+          kind: 'select',
+          name: 'unlockLevel',
+          options: unlockLevelOptions,
+          width: 'lg',
+          defaultValue: GRANT_DEFAULT_UNLOCK_LEVEL,
+        },
+      ],
     },
     {
       type: 'chips',
@@ -143,21 +282,21 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('damageType'),
     },
     {
-      type: 'select',
-      name: 'senseType',
-      label: 'Sense type',
-      options: senseTypeOptions,
+      kind: 'row',
       visibility: visibleFor('senses'),
+      fields: [
+        {
+          type: 'select',
+          name: 'senseType',
+          label: 'Sense type',
+          options: senseTypeOptions,
+          width: '2/3',
+        },
+        senseRangeInlineSentenceField(),
+      ],
     },
-    {
-      type: 'select',
-      name: 'senseRange',
-      label: 'Range',
-      options: senseRangeOptions,
-      visibility: visibleFor('senses'),
-    },
-    feetInputUnitField('speedWalkOverride', 'Walk speed', {
-      visibility: visibleFor('speedOverride'),
+    movementInlineSentenceField({
+      visibility: visibleFor('movement'),
     }),
     {
       type: 'select',
@@ -198,67 +337,52 @@ export function grantItemFields<T extends string>(
       placeholder: 'Choose weapons…',
       visibility: visibleFor('proficiencies'),
     },
+    // --- Spells row fields (replaces legacy innateSpells entries array) ---
     {
-      type: 'select',
-      name: 'innateSpellAbility',
-      label: 'Spellcasting ability',
-      options: abilityOptions,
-      visibility: visibleFor('innateSpells'),
-    },
-    {
-      kind: 'array',
-      name: 'innateSpellEntries',
-      legend: 'Innate spell entries',
-      addLabel: 'Add entry',
-      itemCollapsible: true,
-      visibility: visibleFor('innateSpells'),
-      itemHeader: {
-        fallback: (index) => `Entry ${index + 1}`,
-        primary: (values, index) =>
-          formatInnateSpellEntryTitle(
-            values['spellIds'] as string[] | undefined,
-            spellOptions,
-            index,
-          ),
-      },
+      kind: 'row',
+      visibility: visibleFor('spells'),
       fields: [
         {
           type: 'select',
-          name: 'level',
-          label: 'Character level',
-          options: getLevelFieldOptions(ctx),
-          digits: levelSelectDigits(ctx),
-          required: true,
-        },
-        {
-          type: 'combobox',
-          name: 'spellIds',
-          label: 'Spells',
-          multiple: true,
-          options: spellOptions,
-          placeholder: 'Choose spells…',
-          required: true,
+          name: 'spellAbility',
+          label: 'Spellcasting ability',
+          options: getSpellcastingAbilityFieldOptions(),
+          width: '1/3',
         },
         {
           type: 'select',
-          name: 'kind',
-          label: 'Kind',
-          options: innateSpellKindOptions,
+          name: 'spellMode',
+          label: 'Cast mode',
+          options: spellModeOptions,
           defaultValue: 'free_cast',
+          width: '1/3',
         },
         {
           type: 'select',
-          name: 'frequency',
+          name: 'spellFrequency',
           label: 'Frequency',
           options: usageFrequencyOptions,
+          width: '1/3',
           visibility: {
-            dependsOn: ['kind'],
+            dependsOn: ['grantType', 'spellMode'],
             visibleWhen: (watched) =>
-              watched['kind'] === undefined || watched['kind'] === 'free_cast',
+              watched['grantType'] === 'spells' &&
+              (watched['spellMode'] === undefined || watched['spellMode'] === 'free_cast'),
           },
         },
       ],
     },
+    {
+      type: 'combobox',
+      name: 'spellIds',
+      label: 'Spells',
+      multiple: true,
+      options: spellOptions,
+      placeholder: 'Choose spells…',
+      required: true,
+      visibility: visibleFor('spells'),
+    },
+    // --- Feat choice fields ---
     {
       type: 'select',
       name: 'featCategory',
@@ -317,6 +441,7 @@ export function grantArrayFields<T extends string>(
   ctx: ContentFormCtx,
 ): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
+  const spellOptions = ctx.options?.spells ?? []
   const rowLabels = labels as Record<string, string>
 
   return [
@@ -333,9 +458,24 @@ export function grantArrayFields<T extends string>(
           if (type === 'equipment') {
             return equipmentGrantTitle(values as EquipmentGrantItemForm, index, equipmentOptions)
           }
+          if (type === 'movement') {
+            return formatMovementRowTitle(
+              values['movementMode'] as string | undefined,
+              values['movementValue'] as number | string | undefined,
+            )
+          }
+          if (type === 'spells') {
+            return formatSpellRowTitle(values['spellIds'] as string[] | undefined, spellOptions)
+          }
           return type ? rowLabels[type] : undefined
         },
         summary: (values) => {
+          if (values['grantType'] === 'movement') {
+            return formatMovementRowSummary(
+              values['movementMode'] as string | undefined,
+              values['movementValue'] as number | string | undefined,
+            )
+          }
           if (values['grantType'] !== 'equipment') return ''
           return equipmentGrantSummary(values as EquipmentGrantItemForm, equipmentOptions)
         },
@@ -344,3 +484,6 @@ export function grantArrayFields<T extends string>(
     },
   ]
 }
+
+// Re-export GRANT_ROW_TYPE_LABELS for consumers that import it from this module.
+export { GRANT_ROW_TYPE_LABELS }

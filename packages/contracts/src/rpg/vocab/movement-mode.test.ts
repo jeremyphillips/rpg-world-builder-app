@@ -5,9 +5,14 @@ import {
   MOVEMENT_MODES,
   MOVEMENT_MODE_ENTRIES,
   extraMovementModeSchema,
+  formatMovementBonusAuthoringSummary,
+  formatMovementBonusDescription,
+  formatMovementBonusTitle,
   formatSpeed,
   getMovementModeEntry,
+  getMovementModeGrantLabel,
   getMovementModeLabel,
+  movementGrantPayloadSchema,
   movementModeSchema,
   speedSchema,
 } from './movement-mode'
@@ -92,6 +97,29 @@ describe('movement mode vocabulary', () => {
   it('returns labels and falls back for unknown ids', () => {
     expect(getMovementModeLabel('fly')).toBe('Fly')
     expect(getMovementModeLabel('custom')).toBe('custom')
+  })
+})
+
+describe('movement grant vocabulary', () => {
+  it('parses movement grant payloads', () => {
+    expect(
+      movementGrantPayloadSchema.parse({
+        mode: 'walk',
+        operation: 'bonus',
+        value: 5,
+        unit: 'ft',
+      }),
+    ).toEqual({ mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' })
+  })
+
+  it('formats movement bonus display strings', () => {
+    const grant = { mode: 'walk' as const, operation: 'bonus' as const, value: 5 as const, unit: 'ft' as const }
+    expect(getMovementModeGrantLabel('walk')).toBe('Walking speed')
+    expect(formatMovementBonusTitle(grant)).toBe('+5 ft walking speed')
+    expect(formatMovementBonusDescription(grant)).toBe('Your walking speed increases by 5 feet.')
+    expect(formatMovementBonusAuthoringSummary(grant)).toBe(
+      "Character's walking speed increases by 5 ft.",
+    )
   })
 })
 

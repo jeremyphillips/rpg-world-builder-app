@@ -193,25 +193,27 @@ describe('wealthGrantToForm', () => {
 })
 
 describe('feetInputUnitField', () => {
-  it('builds an inputUnit field with a fixed ft. label', () => {
+  it('builds an inlineSentence field with a fixed ft. label', () => {
     expect(feetInputUnitField('range.value.value', 'Distance')).toMatchObject({
-      type: 'inputUnit',
+      type: 'inlineSentence',
       name: 'range.value.value',
       label: 'Distance',
-      unit: 'ft.',
-      min: 0,
-      valueDigits: 2,
+      segments: [
+        { kind: 'number', name: 'range.value.value', min: 0, digits: 2, ariaLabel: 'Distance value' },
+        { kind: 'text', value: 'ft.', tone: 'label' },
+      ],
     })
   })
 
   it('defaults walk speed label when building speed fields', () => {
     expect(feetInputUnitField('speed.walk', 'Walk speed')).toMatchObject({
-      type: 'inputUnit',
+      type: 'inlineSentence',
       name: 'speed.walk',
       label: 'Walk speed',
-      unit: 'ft.',
-      min: 0,
-      valueDigits: 2,
+      segments: [
+        { kind: 'number', name: 'speed.walk', min: 0, digits: 2, ariaLabel: 'Walk speed value' },
+        { kind: 'text', value: 'ft.', tone: 'label' },
+      ],
     })
   })
 })

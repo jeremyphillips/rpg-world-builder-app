@@ -9,7 +9,11 @@ import {
   seedClassSlugs,
 } from './index'
 import { loadSeedSkillProficiencies } from '../skill-proficiencies'
-import { skillSlugsSuggestingClass, type CharacterClass } from '@rpg/contracts'
+import {
+  normalizeGrantGroups,
+  skillSlugsSuggestingClass,
+  type CharacterClass,
+} from '@rpg/contracts'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -82,9 +86,10 @@ describe('SRD 5.2.1 class seed', () => {
       { level: 15, value: 12 },
     ])
     const words = bard.features.find((f) => f.id === 'words-of-creation')
-    expect(words?.grants?.innateSpells?.entries[0]).toEqual({
-      level: 20,
-      kind: 'always_prepared',
+    const spellGrant = words?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(spellGrant).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
       spellIds: ['power-word-heal', 'power-word-kill'],
     })
   })
@@ -110,9 +115,10 @@ describe('SRD 5.2.1 class seed', () => {
     expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
     expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 19)?.count).toBe(15)
     const favoredEnemy = ranger.features.find((f) => f.id === 'favored-enemy')
-    expect(favoredEnemy?.grants?.innateSpells?.entries[0]).toEqual({
-      level: 1,
-      kind: 'always_prepared',
+    const spellGrant = favoredEnemy?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(spellGrant).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
       spellIds: ['hunters-mark'],
     })
     expect(ranger.resources?.find((r) => r.name === 'Favored Enemy')?.entries).toEqual([
@@ -245,28 +251,20 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(life.description).toContain('positive energy that helps sustain all life')
     const domainSpells = life.features.find((f) => f.id === 'life-domain-spells')
-    expect(domainSpells?.grants?.innateSpells?.entries).toEqual([
-      {
-        level: 3,
-        kind: 'always_prepared',
-        spellIds: ['aid', 'bless', 'cure-wounds', 'lesser-restoration'],
-      },
-      {
-        level: 5,
-        kind: 'always_prepared',
-        spellIds: ['mass-healing-word', 'revivify'],
-      },
-      {
-        level: 7,
-        kind: 'always_prepared',
-        spellIds: ['aura-of-life', 'death-ward'],
-      },
-      {
-        level: 9,
-        kind: 'always_prepared',
-        spellIds: ['greater-restoration', 'mass-cure-wounds'],
-      },
-    ])
+    // level-3 entry → default group (= feature level); 5/7/9 → level-gated groups
+    expect(domainSpells?.grantGroups).toHaveLength(4)
+    expect(domainSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
+      spellIds: ['aid', 'bless', 'cure-wounds', 'lesser-restoration'],
+    })
+    expect(domainSpells?.grantGroups?.[1]).toMatchObject({
+      unlock: { level: 5 },
+      grants: [
+        { kind: 'spells', mode: 'always_prepared', spellIds: ['mass-healing-word', 'revivify'] },
+      ],
+    })
+    expect(domainSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
   })
 
   it('Druid ships spellcasting prose, prepared spells, Wild Shape resource, and features', () => {
@@ -278,9 +276,10 @@ describe('SRD 5.2.1 class seed', () => {
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
     const druidic = druid.features.find((f) => f.id === 'druidic')
-    expect(druidic?.grants?.innateSpells?.entries[0]).toEqual({
-      level: 1,
-      kind: 'always_prepared',
+    const druidicSpell = druidic?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(druidicSpell).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
       spellIds: ['speak-with-animals'],
     })
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
@@ -355,14 +354,20 @@ describe('SRD 5.2.1 class seed', () => {
       { level: 17, value: 3 },
     ])
     const fightingStyle = fighter.features.find((f) => f.id === 'fighting-style')
-    expect(fightingStyle?.grants?.featChoice).toEqual({
+    const fightingStyleGrant = fightingStyle?.grantGroups?.[0]?.grants?.find(
+      (g) => g.kind === 'featChoice',
+    )
+    expect(fightingStyleGrant).toMatchObject({
+      kind: 'featChoice',
       category: 'fighting-style',
       choose: 1,
       replaceable: true,
       recommendedFeatIds: ['defense'],
     })
     const epicBoon = fighter.features.find((f) => f.id === 'epic-boon')
-    expect(epicBoon?.grants?.featChoice).toEqual({
+    const epicGrant = epicBoon?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'featChoice')
+    expect(epicGrant).toMatchObject({
+      kind: 'featChoice',
       category: 'epic-boon',
       choose: 1,
       allowAnyQualifying: true,
@@ -389,7 +394,11 @@ describe('SRD 5.2.1 class seed', () => {
     const additionalFightingStyle = champion.features.find(
       (f) => f.id === 'additional-fighting-style',
     )
-    expect(additionalFightingStyle?.grants?.featChoice).toEqual({
+    const champFightingStyleGrant = additionalFightingStyle?.grantGroups?.[0]?.grants?.find(
+      (g) => g.kind === 'featChoice',
+    )
+    expect(champFightingStyleGrant).toMatchObject({
+      kind: 'featChoice',
       category: 'fighting-style',
       choose: 1,
     })
@@ -451,9 +460,10 @@ describe('SRD 5.2.1 class seed', () => {
     const channelDivinity = paladin.features.find((f) => f.id === 'channel-divinity')
     expect(channelDivinity?.description).toContain('<strong>Divine Sense.</strong>')
     const paladinsSmite = paladin.features.find((f) => f.id === 'paladins-smite')
-    expect(paladinsSmite?.grants?.innateSpells?.entries[0]).toEqual({
-      level: 2,
-      kind: 'always_prepared',
+    const smiteSpell = paladinsSmite?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(smiteSpell).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
       spellIds: ['divine-smite'],
     })
     expect(paladin.resources?.find((r) => r.name === 'Channel Divinity')?.entries).toEqual([
@@ -475,33 +485,17 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(devotion.description).toContain('knight in shining armor')
     const oathSpells = devotion.features.find((f) => f.id === 'oath-of-devotion-spells')
-    expect(oathSpells?.grants?.innateSpells?.entries).toEqual([
-      {
-        level: 3,
-        kind: 'always_prepared',
-        spellIds: ['protection-from-evil-and-good', 'shield-of-faith'],
-      },
-      {
-        level: 5,
-        kind: 'always_prepared',
-        spellIds: ['aid', 'zone-of-truth'],
-      },
-      {
-        level: 9,
-        kind: 'always_prepared',
-        spellIds: ['beacon-of-hope', 'dispel-magic'],
-      },
-      {
-        level: 13,
-        kind: 'always_prepared',
-        spellIds: ['freedom-of-movement', 'guardian-of-faith'],
-      },
-      {
-        level: 17,
-        kind: 'always_prepared',
-        spellIds: ['commune', 'flame-strike'],
-      },
-    ])
+    // level-3 entry → default group; 5/9/13/17 → level-gated groups
+    expect(oathSpells?.grantGroups).toHaveLength(5)
+    expect(oathSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
+      spellIds: ['protection-from-evil-and-good', 'shield-of-faith'],
+    })
+    expect(oathSpells?.grantGroups?.[4]).toMatchObject({
+      unlock: { level: 17 },
+      grants: [{ kind: 'spells', mode: 'always_prepared', spellIds: ['commune', 'flame-strike'] }],
+    })
     const holyNimbus = devotion.features.find((f) => f.id === 'holy-nimbus')
     expect(holyNimbus?.description).toContain('<strong>Holy Ward.</strong>')
     expect(holyNimbus?.description).toContain('<strong>Sunlight.</strong>')
@@ -560,33 +554,20 @@ describe('SRD 5.2.1 class seed', () => {
     expect(draconic.description).toContain('gift of a dragon')
     const draconicSpells = draconic.features.find((f) => f.id === 'draconic-spells')
     expect(draconicSpells?.description).toContain('<strong>Draconic Spells.</strong>')
-    expect(draconicSpells?.grants?.innateSpells?.entries).toEqual([
-      {
-        level: 3,
-        kind: 'always_prepared',
-        spellIds: ['alter-self', 'chromatic-orb', 'command', 'dragons-breath'],
-      },
-      {
-        level: 5,
-        kind: 'always_prepared',
-        spellIds: ['fear', 'fly'],
-      },
-      {
-        level: 7,
-        kind: 'always_prepared',
-        spellIds: ['arcane-eye', 'charm-monster'],
-      },
-      {
-        level: 9,
-        kind: 'always_prepared',
-        spellIds: ['legend-lore', 'summon-dragon'],
-      },
-    ])
+    // level-3 entry → default group; 5/7/9 → level-gated groups
+    expect(draconicSpells?.grantGroups).toHaveLength(4)
+    expect(draconicSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
+      spellIds: ['alter-self', 'chromatic-orb', 'command', 'dragons-breath'],
+    })
+    expect(draconicSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
     const dragonCompanion = draconic.features.find((f) => f.id === 'dragon-companion')
     expect(dragonCompanion?.description).toContain('<em>Summon Dragon</em>')
-    expect(dragonCompanion?.grants?.innateSpells?.entries[0]).toEqual({
-      level: 18,
-      kind: 'free_cast',
+    const dragonSpell = dragonCompanion?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(dragonSpell).toMatchObject({
+      kind: 'spells',
+      mode: 'free_cast',
       frequency: 'once_per_long_rest',
       spellIds: ['summon-dragon'],
     })
@@ -608,19 +589,20 @@ describe('SRD 5.2.1 class seed', () => {
       '<strong>Replacing and Gaining Invocations.</strong>',
     )
     const contactPatron = warlock.features.find((f) => f.id === 'contact-patron')
-    expect(contactPatron?.grants?.innateSpells?.entries).toEqual([
-      {
-        level: 9,
-        kind: 'always_prepared',
-        spellIds: ['contact-other-plane'],
-      },
-      {
-        level: 9,
-        kind: 'free_cast',
-        frequency: 'once_per_long_rest',
-        spellIds: ['contact-other-plane'],
-      },
-    ])
+    // both entries at level 9 (= feature level) → default group, two spell grants
+    const contactGrants = contactPatron?.grantGroups?.[0]?.grants ?? []
+    expect(contactGrants).toHaveLength(2)
+    expect(contactGrants[0]).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
+      spellIds: ['contact-other-plane'],
+    })
+    expect(contactGrants[1]).toMatchObject({
+      kind: 'spells',
+      mode: 'free_cast',
+      frequency: 'once_per_long_rest',
+      spellIds: ['contact-other-plane'],
+    })
     expect(warlock.resources?.find((r) => r.name === 'Eldritch Invocations')?.entries).toEqual([
       { level: 1, value: 1 },
       { level: 2, value: 3 },
@@ -647,28 +629,14 @@ describe('SRD 5.2.1 class seed', () => {
     expect(fiend.description).toContain('realms of perdition')
     const fiendSpells = fiend.features.find((f) => f.id === 'fiend-spells')
     expect(fiendSpells?.description).toContain('<strong>Fiend Spells.</strong>')
-    expect(fiendSpells?.grants?.innateSpells?.entries).toEqual([
-      {
-        level: 3,
-        kind: 'always_prepared',
-        spellIds: ['burning-hands', 'command', 'scorching-ray', 'suggestion'],
-      },
-      {
-        level: 5,
-        kind: 'always_prepared',
-        spellIds: ['fireball', 'stinking-cloud'],
-      },
-      {
-        level: 7,
-        kind: 'always_prepared',
-        spellIds: ['fire-shield', 'wall-of-fire'],
-      },
-      {
-        level: 9,
-        kind: 'always_prepared',
-        spellIds: ['geas', 'insect-plague'],
-      },
-    ])
+    // level-3 entry → default group; 5/7/9 → level-gated groups
+    expect(fiendSpells?.grantGroups).toHaveLength(4)
+    expect(fiendSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
+      kind: 'spells',
+      mode: 'always_prepared',
+      spellIds: ['burning-hands', 'command', 'scorching-ray', 'suggestion'],
+    })
+    expect(fiendSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
     const hurlThroughHell = fiend.features.find((f) => f.id === 'hurl-through-hell')
     expect(hurlThroughHell?.description).toContain('8d10 Psychic damage')
   })
@@ -767,5 +735,24 @@ describe('SRD 5.2.1 class seed', () => {
     expect(standard?.description).toContain('Artisan')
     expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
     expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)
+  })
+
+  it('all seed grantGroups are already in canonical form (normalizeGrantGroups round-trip is identity)', () => {
+    for (const cls of classes) {
+      for (const feature of cls.features) {
+        if (!feature.grantGroups) continue
+        expect(normalizeGrantGroups(feature.grantGroups), `${cls.slug} > ${feature.id}`).toEqual(
+          feature.grantGroups,
+        )
+      }
+    }
+    for (const sub of subclasses) {
+      for (const feature of sub.features) {
+        if (!feature.grantGroups) continue
+        expect(normalizeGrantGroups(feature.grantGroups), `${sub.slug} > ${feature.id}`).toEqual(
+          feature.grantGroups,
+        )
+      }
+    }
   })
 })

@@ -32,6 +32,11 @@ describe('SelectField', () => {
     expect(trigger).toHaveTextContent('Choose…')
   })
 
+  it('defaults the placeholder to Select {label}…', () => {
+    render(<SelectField id="alignment" label="Alignment" options={options} />)
+    expect(screen.getByLabelText('Alignment')).toHaveTextContent('Select Alignment…')
+  })
+
   it('renders the error and marks the trigger invalid, hiding the hint', () => {
     render(
       <SelectField

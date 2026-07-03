@@ -9,7 +9,7 @@ import {
   FieldHintErrorBelowControl,
   type FieldSize,
 } from './field.client'
-import type { FieldWidth } from './field-control.variants'
+import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
 import { fieldAnatomyIds, fieldDescribedBy } from './choose-count-field.lib'
 import {
   fieldAnatomyStackClasses,
@@ -52,7 +52,7 @@ export function ChooseCountFieldShell({
   required,
   disabled,
   size = 'md',
-  width,
+  width = 'full',
   hideLabel = false,
   children,
 }: ChooseCountFieldShellProps) {
@@ -65,11 +65,7 @@ export function ChooseCountFieldShell({
       aria-describedby={describedBy}
       aria-invalid={error ? true : undefined}
       disabled={disabled}
-      className={cn(
-        fieldSetResetClasses,
-        fieldAnatomyStackClasses,
-        width === 'auto' ? 'w-auto' : 'w-full',
-      )}
+      className={cn(fieldSetResetClasses, fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
     >
       <legend
         id={legendId}

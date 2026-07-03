@@ -30,14 +30,17 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 60
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 60
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
@@ -56,100 +59,200 @@
           "id": "black",
           "name": "Black (Acid)",
           "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-          "grants": {
-            "damageType": ["acid"],
-            "resistances": ["acid"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["acid"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["acid"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "blue",
           "name": "Blue (Lightning)",
           "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-          "grants": {
-            "damageType": ["lightning"],
-            "resistances": ["lightning"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["lightning"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["lightning"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "brass",
           "name": "Brass (Fire)",
           "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-          "grants": {
-            "damageType": ["fire"],
-            "resistances": ["fire"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["fire"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["fire"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "bronze",
           "name": "Bronze (Lightning)",
           "description": "<p>Your breath weapon and damage resistance are linked to Lightning damage.</p>",
-          "grants": {
-            "damageType": ["lightning"],
-            "resistances": ["lightning"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["lightning"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["lightning"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "copper",
           "name": "Copper (Acid)",
           "description": "<p>Your breath weapon and damage resistance are linked to Acid damage.</p>",
-          "grants": {
-            "damageType": ["acid"],
-            "resistances": ["acid"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["acid"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["acid"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "gold",
           "name": "Gold (Fire)",
           "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-          "grants": {
-            "damageType": ["fire"],
-            "resistances": ["fire"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["fire"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["fire"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "green",
           "name": "Green (Poison)",
           "description": "<p>Your breath weapon and damage resistance are linked to Poison damage.</p>",
-          "grants": {
-            "damageType": ["poison"],
-            "resistances": ["poison"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["poison"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["poison"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "red",
           "name": "Red (Fire)",
           "description": "<p>Your breath weapon and damage resistance are linked to Fire damage.</p>",
-          "grants": {
-            "damageType": ["fire"],
-            "resistances": ["fire"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["fire"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["fire"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "silver",
           "name": "Silver (Cold)",
           "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-          "grants": {
-            "damageType": ["cold"],
-            "resistances": ["cold"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["cold"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["cold"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "white",
           "name": "White (Cold)",
           "description": "<p>Your breath weapon and damage resistance are linked to Cold damage.</p>",
-          "grants": {
-            "damageType": ["cold"],
-            "resistances": ["cold"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["cold"]
+                },
+                {
+                  "kind": "resistances",
+                  "damageTypes": ["cold"]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -172,23 +275,33 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 120
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 120
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
         "id": "dwarven-resilience",
         "name": "Dwarven Resilience",
         "description": "<p>You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition.</p>",
-        "grants": {
-          "resistances": ["poison"]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "resistances",
+                "damageTypes": ["poison"]
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
@@ -222,14 +335,17 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 60
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 60
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
@@ -260,88 +376,142 @@
           "id": "drow",
           "name": "Drow",
           "description": "<p>The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip. At character level 3 you gain Faerie Fire; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "senses": [
-              {
-                "type": "darkvision",
-                "range": 120
-              }
-            ],
-            "innateSpells": {
-              "ability": "cha",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "sense",
+                  "type": "darkvision",
+                  "range": 120
+                },
+                {
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["dancing-lights"],
                   "frequency": "at_will"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["faerie-fire"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["darkness"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         },
         {
           "kind": "custom",
           "id": "high-elf",
           "name": "High Elf",
           "description": "<p>You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list. At character level 3 you gain Detect Magic; at level 5 you gain Misty Step (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "innateSpells": {
-              "ability": "int",
-              "entries": [
+          "grantGroups": [
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "int",
+                  "mode": "free_cast",
                   "spellIds": ["detect-magic"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "int",
+                  "mode": "free_cast",
                   "spellIds": ["misty-step"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         },
         {
           "kind": "custom",
           "id": "wood-elf",
           "name": "Wood Elf",
           "description": "<p>Your Speed increases to 35 feet. You also know the Druidcraft cantrip. At character level 3 you gain Longstrider; at level 5 you gain Pass without Trace (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "speedOverride": {
-              "walk": 35
-            },
-            "innateSpells": {
-              "ability": "wis",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "movement",
+                  "mode": "walk",
+                  "operation": "bonus",
+                  "value": 5,
+                  "unit": "ft"
+                },
+                {
+                  "kind": "spells",
+                  "ability": "wis",
+                  "mode": "free_cast",
                   "spellIds": ["druidcraft"],
                   "frequency": "at_will"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "wis",
+                  "mode": "free_cast",
                   "spellIds": ["longstrider"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "wis",
+                  "mode": "free_cast",
                   "spellIds": ["pass-without-trace"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         }
       ]
     }
@@ -364,14 +534,17 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 60
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 60
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
@@ -390,41 +563,45 @@
           "id": "forest-gnome",
           "name": "Forest Gnome",
           "description": "<p>You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell.</p>",
-          "grants": {
-            "innateSpells": {
-              "ability": "wis",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "spells",
+                  "ability": "wis",
+                  "mode": "free_cast",
                   "spellIds": ["minor-illusion"],
                   "frequency": "at_will"
                 },
                 {
-                  "level": 1,
+                  "kind": "spells",
+                  "ability": "wis",
+                  "mode": "free_cast",
                   "spellIds": ["speak-with-animals"],
                   "frequency": "prof_bonus_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         },
         {
           "kind": "custom",
           "id": "rock-gnome",
           "name": "Rock Gnome",
           "description": "<p>You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it as a Utilize action.</p>",
-          "grants": {
-            "innateSpells": {
-              "ability": "int",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "spells",
+                  "ability": "int",
+                  "mode": "free_cast",
                   "spellIds": ["mending", "prestidigitation"],
                   "frequency": "at_will"
                 }
               ]
             }
-          }
+          ]
         }
       ]
     }
@@ -473,18 +650,32 @@
           "id": "fires-burn",
           "name": "Fire's Burn (Fire Giant)",
           "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.</p>",
-          "grants": {
-            "damageType": ["fire"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["fire"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
           "id": "frosts-chill",
           "name": "Frost's Chill (Frost Giant)",
           "description": "<p>When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.</p>",
-          "grants": {
-            "damageType": ["cold"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["cold"]
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "custom",
@@ -503,9 +694,16 @@
           "id": "storms-thunder",
           "name": "Storm's Thunder (Storm Giant)",
           "description": "<p>When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.</p>",
-          "grants": {
-            "damageType": ["thunder"]
-          }
+          "grantGroups": [
+            {
+              "grants": [
+                {
+                  "kind": "damageType",
+                  "damageTypes": ["thunder"]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -583,13 +781,18 @@
         "id": "versatile",
         "name": "Versatile",
         "description": "<p>You gain an Origin feat of your choice.</p>",
-        "grants": {
-          "featChoice": {
-            "category": "origin",
-            "choose": 1,
-            "recommendedFeatIds": ["skilled"]
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "featChoice",
+                "category": "origin",
+                "choose": 1,
+                "recommendedFeatIds": ["skilled"]
+              }
+            ]
           }
-        }
+        ]
       }
     ]
   },
@@ -617,14 +820,17 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 120
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 120
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
@@ -652,32 +858,36 @@
       {
         "kind": "grant",
         "id": "darkvision",
-        "grants": {
-          "senses": [
-            {
-              "type": "darkvision",
-              "range": 60
-            }
-          ]
-        }
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "sense",
+                "type": "darkvision",
+                "range": 60
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",
         "id": "otherworldly-presence",
         "name": "Otherworldly Presence",
         "description": "<p>You know the Thaumaturgy cantrip. When you cast it with this trait, the spell uses the same spellcasting ability you use for your Fiendish Legacy trait.</p>",
-        "grants": {
-          "innateSpells": {
-            "ability": "cha",
-            "entries": [
+        "grantGroups": [
+          {
+            "grants": [
               {
-                "level": 1,
+                "kind": "spells",
+                "ability": "cha",
+                "mode": "free_cast",
                 "spellIds": ["thaumaturgy"],
                 "frequency": "at_will"
               }
             ]
           }
-        }
+        ]
       }
     ],
     "heritage": {
@@ -690,87 +900,153 @@
           "id": "abyssal",
           "name": "Abyssal",
           "description": "<p>You have Resistance to Poison damage. You also know the Poison Spray cantrip. At character level 3 you gain Ray of Sickness; at level 5 you gain Hold Person (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "resistances": ["poison"],
-            "innateSpells": {
-              "ability": "cha",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "resistances",
+                  "damageTypes": ["poison"]
+                },
+                {
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["poison-spray"],
                   "frequency": "at_will"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["ray-of-sickness"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["hold-person"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         },
         {
           "kind": "custom",
           "id": "chthonic",
           "name": "Chthonic",
           "description": "<p>You have Resistance to Necrotic damage. You also know the Chill Touch cantrip. At character level 3 you gain False Life; at level 5 you gain Ray of Enfeeblement (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "resistances": ["necrotic"],
-            "innateSpells": {
-              "ability": "cha",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "resistances",
+                  "damageTypes": ["necrotic"]
+                },
+                {
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["chill-touch"],
                   "frequency": "at_will"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["false-life"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["ray-of-enfeeblement"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         },
         {
           "kind": "custom",
           "id": "infernal",
           "name": "Infernal",
           "description": "<p>You have Resistance to Fire damage. You also know the Fire Bolt cantrip. At character level 3 you gain Hellish Rebuke; at level 5 you gain Darkness (each castable once per Long Rest without a spell slot).</p>",
-          "grants": {
-            "resistances": ["fire"],
-            "innateSpells": {
-              "ability": "cha",
-              "entries": [
+          "grantGroups": [
+            {
+              "grants": [
                 {
-                  "level": 1,
+                  "kind": "resistances",
+                  "damageTypes": ["fire"]
+                },
+                {
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["fire-bolt"],
                   "frequency": "at_will"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 3
+              },
+              "grants": [
                 {
-                  "level": 3,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["hellish-rebuke"],
                   "frequency": "once_per_long_rest"
-                },
+                }
+              ]
+            },
+            {
+              "unlock": {
+                "level": 5
+              },
+              "grants": [
                 {
-                  "level": 5,
+                  "kind": "spells",
+                  "ability": "cha",
+                  "mode": "free_cast",
                   "spellIds": ["darkness"],
                   "frequency": "once_per_long_rest"
                 }
               ]
             }
-          }
+          ]
         }
       ]
     }

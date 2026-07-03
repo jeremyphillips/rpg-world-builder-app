@@ -94,6 +94,73 @@ export type Speed = z.infer<typeof speedSchema>
 export const STANDARD_SPEEDS = [20, 25, 30, 35, 40] as const
 export type StandardSpeed = (typeof STANDARD_SPEEDS)[number]
 
+// ---------------------------------------------------------------------------
+// Movement grants — bonus speed from traits and features
+// ---------------------------------------------------------------------------
+
+export const MOVEMENT_OPERATIONS = ['bonus'] as const
+
+export type MovementOperation = (typeof MOVEMENT_OPERATIONS)[number]
+
+export const movementOperationSchema = z.enum(MOVEMENT_OPERATIONS)
+
+export const MOVEMENT_OPERATION_ENTRIES = {
+  bonus: {
+    label: 'increases by',
+    description: 'Adds to the creature’s existing speed for that movement mode.',
+  },
+} as const satisfies Record<MovementOperation, GameTermEntry>
+
+/** Preset foot bonuses shown in movement-grant authoring UIs. */
+export const MOVEMENT_BONUS_FEET = [5, 10, 15, 20, 25, 30] as const
+
+export type MovementBonusFeet = (typeof MOVEMENT_BONUS_FEET)[number]
+
+export const movementBonusFeetSchema = z.union([
+  z.literal(5),
+  z.literal(10),
+  z.literal(15),
+  z.literal(20),
+  z.literal(25),
+  z.literal(30),
+])
+
+/** Payload shared by movement grants in content traits and the legacy grants bag. */
+export const movementGrantPayloadSchema = z.object({
+  mode: movementModeSchema,
+  operation: movementOperationSchema,
+  value: movementBonusFeetSchema,
+  unit: z.literal('ft'),
+})
+
+export type MovementGrantPayload = z.infer<typeof movementGrantPayloadSchema>
+
+/** Authoring label for a movement mode in grant sentences (e.g. "Walking speed"). */
+export function getMovementModeGrantLabel(mode: MovementMode): string {
+  if (mode === 'walk') return 'Walking speed'
+  return `${getMovementModeLabel(mode)} speed`
+}
+
+/** Lowercase mode phrase for prose (e.g. "walking speed"). */
+export function getMovementModeGrantPhrase(mode: MovementMode): string {
+  return getMovementModeGrantLabel(mode).toLowerCase()
+}
+
+/** Compact title fragment: "+5 ft walking speed". */
+export function formatMovementBonusTitle(grant: MovementGrantPayload): string {
+  return `+${grant.value} ${grant.unit} ${getMovementModeGrantPhrase(grant.mode)}`
+}
+
+/** Trait description sentence: "Your walking speed increases by 5 feet." */
+export function formatMovementBonusDescription(grant: MovementGrantPayload): string {
+  return `Your ${getMovementModeGrantPhrase(grant.mode)} increases by ${grant.value} feet.`
+}
+
+/** Authoring summary for grant rows: "Character's walking speed increases by 5 ft." */
+export function formatMovementBonusAuthoringSummary(grant: MovementGrantPayload): string {
+  return `Character's ${getMovementModeGrantPhrase(grant.mode)} increases by ${grant.value} ft.`
+}
+
 /**
  * Human-readable speed string (e.g. "30 ft." or "30 ft., Fly 60 ft.").
  *

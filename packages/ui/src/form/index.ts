@@ -87,6 +87,8 @@ export {
   type ChipsFieldConfig,
   type ChooseFromChipsFieldConfig,
   type InlineChooseCountFieldConfig,
+  type InlineSentenceFieldConfig,
+  type InlineSentenceSegment,
   type ComboboxFieldConfig,
   type ComboboxRenderSelectedItem,
   type EditableGridColumnConfig,

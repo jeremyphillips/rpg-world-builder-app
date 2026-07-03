@@ -3,9 +3,10 @@ import {
   contentTraitKindSchema,
   defineMessage,
   fieldValidationMessages,
-  isGrantEligibleGrants,
+  isGrantGroupsEligible,
   resolveTraitName,
   type ContentTraitKind,
+  type GrantGroups,
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
@@ -15,7 +16,7 @@ import {
   GRANT_TYPE_LABELS,
   grantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
-import { formRowsToGrants } from '../../lib/forms/grants/grant-form-values'
+import { formRowsToGrantGroups } from '../../lib/forms/grants/grant-form-values'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { traitKindOptions } from './species-trait-form-labels'
 
@@ -64,8 +65,8 @@ export const traitRowFormSchema = z
       })
     }
     if (row.kind === 'grant') {
-      const grants = formRowsToGrants(row.grants)
-      if (!grants || !isGrantEligibleGrants(grants)) {
+      const grantGroups = formRowsToGrantGroups(row.grants)
+      if (!isGrantGroupsEligible(grantGroups)) {
         ctx.addIssue({
           code: 'custom',
           message: speciesTraitValidationMessages.grantRowRequired(),
@@ -133,12 +134,12 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
 export function traitItemTitle(values: Record<string, unknown>, index: number): string {
   const row = values as TraitRowForm
   if (row.kind === 'grant') {
-    const grants = formRowsToGrants(row.grants)
-    if (grants && isGrantEligibleGrants(grants)) {
+    const grantGroups: GrantGroups = formRowsToGrantGroups(row.grants)
+    if (isGrantGroupsEligible(grantGroups)) {
       return resolveTraitName({
         kind: 'grant',
         id: row.id ?? `trait-${index}`,
-        grants,
+        grantGroups,
         nameOverride: row.nameOverride,
         descriptionOverride: row.descriptionOverride,
       })

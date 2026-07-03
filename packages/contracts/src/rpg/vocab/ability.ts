@@ -40,6 +40,42 @@ export const ABILITY_IDS = Object.keys(ABILITY_ENTRIES) as [Ability, ...Ability[
 
 export const abilitySchema = z.enum(ABILITY_IDS)
 
+/** Standard spellcasting abilities (INT / WIS / CHA). */
+export const COMMON_SPELLCASTING_ABILITY_IDS = ['int', 'wis', 'cha'] as const satisfies readonly Ability[]
+
+/** Unusual spellcasting abilities (STR / DEX / CON) for homebrew or edge cases. */
+export const ADVANCED_SPELLCASTING_ABILITY_IDS = ['str', 'dex', 'con'] as const satisfies readonly Ability[]
+
+export const SPELLCASTING_ABILITY_GROUP_LABELS = {
+  common: 'Common',
+  advanced: 'Advanced',
+} as const
+
+export type SpellcastingAbilityOptionGroup = {
+  label: string
+  options: { value: string; label: string }[]
+}
+
+function spellcastingAbilityOptionsForIds(
+  ids: readonly Ability[],
+): SpellcastingAbilityOptionGroup['options'] {
+  return ids.map((id) => ({ value: id, label: ABILITY_ENTRIES[id].label }))
+}
+
+/** Grouped spellcasting ability options for authoring selects. */
+export function buildGroupedSpellcastingAbilityOptions(): SpellcastingAbilityOptionGroup[] {
+  return [
+    {
+      label: SPELLCASTING_ABILITY_GROUP_LABELS.common,
+      options: spellcastingAbilityOptionsForIds(COMMON_SPELLCASTING_ABILITY_IDS),
+    },
+    {
+      label: SPELLCASTING_ABILITY_GROUP_LABELS.advanced,
+      options: spellcastingAbilityOptionsForIds(ADVANCED_SPELLCASTING_ABILITY_IDS),
+    },
+  ]
+}
+
 /** Returns the reference entry for an ability id, if known. */
 export function getAbilityEntry(id: string): GameTermEntry | undefined {
   return ABILITY_ENTRIES[id as Ability]

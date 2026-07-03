@@ -20,6 +20,7 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import type { SelectFieldValueProps } from './select-field-value-props'
+import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
 import { useComboboxControl } from './use-combobox-control.client'
 
 export type {
@@ -122,12 +123,13 @@ export function ComboboxField({
   loading,
   width,
   size = 'md',
-  placeholder = 'Select…',
+  placeholder,
   emptyMessage = 'No options found.',
   renderSelectedItem,
   hintPosition,
 }: ComboboxFieldProps) {
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
+  const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
 
   return (
     <Field.Root
@@ -160,7 +162,7 @@ export function ComboboxField({
             disabled={disabled}
             loading={loading}
             size={size}
-            placeholder={placeholder}
+            placeholder={resolvedPlaceholder}
             emptyMessage={emptyMessage}
             renderSelectedItem={renderSelectedItem}
           />

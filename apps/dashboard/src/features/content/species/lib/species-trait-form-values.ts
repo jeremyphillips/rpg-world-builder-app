@@ -1,11 +1,14 @@
-import { getTraitGrants, type ContentTrait } from '@rpg/contracts'
+import { type ContentTrait } from '@rpg/contracts'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
+import {
+  grantGroupsToFormRows,
+  grantsToFormRows,
+  formRowsToGrantGroups,
+} from '../../lib/forms/grants/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
 
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {
-  const grants = grantsToFormRows(getTraitGrants(trait))
   if (trait.kind === 'grant') {
     const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
     return {
@@ -14,9 +17,13 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
       overrideDisplay: hasOverrides,
       nameOverride: trait.nameOverride,
       descriptionOverride: trait.descriptionOverride,
-      grants,
+      grants: grantGroupsToFormRows(trait.grantGroups),
     }
   }
+  // Custom trait: prefer grantGroups (new model), fall back to legacy grants bag.
+  const grants = trait.grantGroups?.length
+    ? grantGroupsToFormRows(trait.grantGroups)
+    : grantsToFormRows(trait.grants)
   return {
     id: trait.id,
     kind: 'custom',
@@ -28,22 +35,23 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
 }
 
 export function traitFromFormRow(row: TraitRowForm & { id: string }): ContentTrait {
-  const grants = formRowsToGrants(row.grants)
   if (row.kind === 'grant') {
+    const grantGroups = formRowsToGrantGroups(row.grants)
     return {
       kind: 'grant',
       id: row.id,
-      grants: grants!,
+      grantGroups,
       nameOverride: row.nameOverride || undefined,
       descriptionOverride: row.descriptionOverride || undefined,
     }
   }
+  const grantGroups = formRowsToGrantGroups(row.grants)
   return {
     kind: 'custom',
     id: row.id,
     name: row.name!,
     description: row.description || undefined,
-    grants,
+    ...(grantGroups.length ? { grantGroups } : {}),
   }
 }
 

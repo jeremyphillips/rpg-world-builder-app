@@ -7,6 +7,7 @@ import {
   CHARACTER_ABILITY_SCORE_MAX,
   abilitySchema,
   abilityScoreSchema,
+  buildGroupedSpellcastingAbilityOptions,
   characterAbilityScoreSchema,
 } from './ability'
 
@@ -48,5 +49,28 @@ describe('characterAbilityScoreSchema', () => {
     expect(characterAbilityScoreSchema.safeParse(CHARACTER_ABILITY_SCORE_MAX + 1).success).toBe(
       false,
     )
+  })
+})
+
+describe('buildGroupedSpellcastingAbilityOptions', () => {
+  it('groups standard and unusual spellcasting abilities', () => {
+    expect(buildGroupedSpellcastingAbilityOptions()).toEqual([
+      {
+        label: 'Common',
+        options: [
+          { value: 'int', label: 'Intelligence' },
+          { value: 'wis', label: 'Wisdom' },
+          { value: 'cha', label: 'Charisma' },
+        ],
+      },
+      {
+        label: 'Advanced',
+        options: [
+          { value: 'str', label: 'Strength' },
+          { value: 'dex', label: 'Dexterity' },
+          { value: 'con', label: 'Constitution' },
+        ],
+      },
+    ])
   })
 })

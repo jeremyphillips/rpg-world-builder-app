@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   classBodySchema,
+  classFeatureSchema,
   classHasSpellcasting,
   classPatchSchema,
   classSchema,
@@ -336,5 +337,56 @@ describe('classStoredSchema', () => {
         ...fighterStoredBody,
       }).success,
     ).toBe(true)
+  })
+})
+
+describe('classFeatureSchema — grantGroups superRefine', () => {
+  const baseFeature = { kind: 'custom' as const, id: 'smite', name: 'Divine Smite', level: 3 }
+  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const spellGrant = {
+    kind: 'spells' as const,
+    ability: 'wis' as const,
+    mode: 'always_prepared' as const,
+    spellIds: ['bless'],
+  }
+
+  it('accepts a feature with no grantGroups', () => {
+    expect(classFeatureSchema.safeParse(baseFeature).success).toBe(true)
+  })
+
+  it('accepts a feature with a valid default-only grantGroups', () => {
+    expect(
+      classFeatureSchema.safeParse({
+        ...baseFeature,
+        grantGroups: [{ grants: [senseGrant] }],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('accepts a feature with a level-gated group above the feature level', () => {
+    expect(
+      classFeatureSchema.safeParse({
+        ...baseFeature,
+        grantGroups: [{ unlock: { level: 9 }, grants: [spellGrant] }],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects a grant group whose unlock level equals the feature level', () => {
+    expect(
+      classFeatureSchema.safeParse({
+        ...baseFeature,
+        grantGroups: [{ unlock: { level: 3 }, grants: [spellGrant] }],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a grant group whose unlock level is below the feature level', () => {
+    expect(
+      classFeatureSchema.safeParse({
+        ...baseFeature,
+        grantGroups: [{ unlock: { level: 1 }, grants: [spellGrant] }],
+      }).success,
+    ).toBe(false)
   })
 })

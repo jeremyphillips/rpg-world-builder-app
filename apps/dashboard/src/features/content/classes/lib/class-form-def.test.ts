@@ -10,7 +10,6 @@ import {
 } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
-import { deriveAsiLevels } from './class-asi-features'
 import {
   cantripProgressionsEquivalent,
   spellsAvailableProgressionsEquivalent,
@@ -87,15 +86,16 @@ describe('classFormDef round-trips', () => {
     })
   }
 
-  it('bard: innate spell grant on Words of Creation is preserved', () => {
+  it('bard: spell grant on Words of Creation is preserved through grantGroups', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     const wordsOfCreation = input.features.find((f) => f.id === 'words-of-creation')
-    expect(wordsOfCreation?.grants?.innateSpells?.entries[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
+    const spellGrant = wordsOfCreation?.grantGroups?.[0]?.grants?.[0]
+    expect(spellGrant?.kind).toBe('spells')
+    if (spellGrant?.kind === 'spells') {
+      expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    }
   })
 
   it('rogue: tool proficiencies round-trip with categories and items', () => {
@@ -235,14 +235,12 @@ describe('classFormDef round-trips', () => {
     })
   })
 
-  it('bard: innate spell entries use spell slug arrays in form values', () => {
+  it('bard: spell grant on Words of Creation is in form grant rows after load', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const wordsOfCreation = formValues.features.find((f) => f.id === 'words-of-creation')
-    expect(wordsOfCreation?.grants?.[0]?.innateSpellEntries?.[0]?.spellIds).toEqual([
-      'power-word-heal',
-      'power-word-kill',
-    ])
+    const spellRow = wordsOfCreation?.grants.find((r) => r.grantType === 'spells')
+    expect(spellRow?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
   })
 
   it('sorcerer: spellcasting and resources round-trip', () => {
@@ -260,41 +258,32 @@ describe('classFormDef round-trips', () => {
     expectBardSpellcastingRoundTrip()
   })
 
-  it('fighter: ASI picker and generated features round-trip', () => {
+  it('fighter: ASI features are plain features in the form and round-trip through grantGroups', () => {
     const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
     const input = classFormDef.toInput(formValues, { entity: fighter })
 
-    expect(formValues.asiLevels).toEqual(deriveAsiLevels(fighter.features))
+    // ASI features appear as ordinary feature rows, no special asiLevels field
+    expect(formValues).not.toHaveProperty('asiLevels')
     expect(input).not.toHaveProperty('asiLevels')
-    expect(deriveAsiLevels(input.features)).toEqual(formValues.asiLevels)
+
+    // Fighter has ASI at 4, 8, 12, 16 (and 6, 14 extra fighter ASIs)
+    const asiInInput = input.features.filter((f) =>
+      f.grantGroups?.[0]?.grants.some((g) => g.kind === 'featChoice'),
+    )
+    expect(asiInInput.length).toBeGreaterThanOrEqual(4)
     expect(input.subclassChoiceLevel).toEqual(fighter.subclassChoiceLevel)
-  })
-
-  it('fighter: changing ASI levels regenerates feature rows on save', () => {
-    const fighter = SRD_CLASSES.find((c) => c.slug === 'fighter')!
-    const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
-    formValues.asiLevels = [4, 8]
-    const input = classFormDef.toInput(formValues, { entity: fighter })
-
-    expect(deriveAsiLevels(input.features)).toEqual([4, 8])
-    expect(input.features.find((f) => f.id === 'ability-score-improvement-4')).toMatchObject({
-      name: 'Ability Score Improvement',
-      grants: {
-        featChoice: {
-          category: 'general',
-          choose: 1,
-          allowAnyQualifying: true,
-          recommendedFeatIds: ['ability-score-improvement'],
-        },
-      },
-    })
-    expect(input.features.find((f) => f.id === 'ability-score-improvement-6')).toBeUndefined()
   })
 
   it('create defaults include subclass choice level 3 and specific-weapons toggle off', () => {
     expect(classFormDef.createDefaultValues?.subclassChoiceLevel).toEqual('3')
     expect(classFormDef.createDefaultValues?.weaponProficiencyMode).toBe('categories')
+  })
+
+  it('create defaults seed ASI features at levels 4, 8, 12, 16', () => {
+    const features = classFormDef.createDefaultValues?.features ?? []
+    expect(features.map((f) => f.level)).toEqual([4, 8, 12, 16])
+    expect(features.every((f) => f.name === 'Ability Score Improvement')).toBe(true)
   })
 
   it('fighter: hasSpellcasting is false when no spellcasting block', () => {

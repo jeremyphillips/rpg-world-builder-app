@@ -34,6 +34,21 @@ describe('ComboboxField', () => {
     )
   })
 
+  it('defaults the placeholder to Select {label}…', () => {
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+      />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Specific weapons' })).toHaveTextContent(
+      'Select Specific weapons…',
+    )
+  })
+
   it('shows the placeholder and spinner while loading', () => {
     render(
       <ComboboxField

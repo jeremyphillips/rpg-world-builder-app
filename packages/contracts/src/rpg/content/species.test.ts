@@ -18,7 +18,7 @@ const ELF_BODY = {
     {
       kind: 'grant' as const,
       id: 'darkvision',
-      grants: { senses: [{ type: 'darkvision', range: 60 }] },
+      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
     },
     {
       kind: 'custom' as const,
@@ -54,7 +54,9 @@ const ELF_BODY = {
         id: 'wood-elf',
         name: 'Wood Elf',
         description: '<p>Your Speed is 35 feet.</p>',
-        grants: { speedOverride: { walk: 35 } },
+        grants: {
+          movement: { mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
+        },
       },
     ],
   },

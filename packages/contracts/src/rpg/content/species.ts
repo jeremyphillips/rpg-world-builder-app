@@ -13,6 +13,10 @@ import { contentNamedChoiceSchema } from './lib/choice'
 import {
   contentGrantsSchema,
   contentTraitSchema,
+  contentGrantSchema,
+  grantUnlockSchema,
+  grantGroupSchema,
+  grantGroupsSchema,
   innateSpellEntrySchema,
   innateSpellsSchema,
 } from './lib/grants'
@@ -26,13 +30,26 @@ import { speciesCharacterCreationSchema } from './species-character-creation'
 // ---------------------------------------------------------------------------
 
 // Re-export shared grant types for species authoring.
-export { contentGrantsSchema, contentTraitSchema, innateSpellEntrySchema, innateSpellsSchema }
+export {
+  contentGrantsSchema,
+  contentTraitSchema,
+  contentGrantSchema,
+  grantUnlockSchema,
+  grantGroupSchema,
+  grantGroupsSchema,
+  innateSpellEntrySchema,
+  innateSpellsSchema,
+}
 export type {
   ContentGrants,
   ContentTrait,
   InnateSpellEntry,
   InnateSpells,
   InnateSpellKind,
+  ContentGrant,
+  GrantUnlock,
+  GrantGroup,
+  GrantGroups,
 } from './lib/grants'
 
 export type SpeciesTrait = z.infer<typeof contentTraitSchema>

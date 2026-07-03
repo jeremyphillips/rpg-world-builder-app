@@ -182,12 +182,13 @@ describe('weapon kindFieldGroups', () => {
       expect(
         rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
       ).toMatchObject({
-        type: 'inputUnit',
+        type: 'inlineSentence',
         label,
-        unit: 'ft.',
-        min: 0,
-        valueDigits: 3,
         width: 'auto',
+        segments: [
+          { kind: 'number', name, min: 0, digits: 3 },
+          { kind: 'text', value: 'ft.', tone: 'label' },
+        ],
       })
     }
   })

@@ -220,6 +220,7 @@ export const equipmentGrantSchema = z.preprocess(
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
 
 function naivePluralize(label: string, count: number): string {
+  if (!label) return ''
   const lower = label.toLowerCase()
   if (count === 1) return lower
   return lower.endsWith('s') ? lower : `${lower}s`
@@ -254,6 +255,7 @@ export function formatEquipmentGrantSentence(
 ): string {
   if (grant.kind === 'fixed') {
     const name = resolveEquipmentName?.(grant.equipmentSlug) ?? grant.equipmentSlug
+    if (!name) return ''
     const quantity = grant.quantity ?? 1
     if (quantity === 1) {
       return `Character receives 1 ${name.toLowerCase()}.`
@@ -271,5 +273,6 @@ export function formatEquipmentGrantSentence(
   }
 
   const poolLabel = formatEquipmentPoolLabel(pool)
+  if (!poolLabel) return ''
   return `Character chooses ${choose} ${naivePluralize(poolLabel, choose)}.`
 }

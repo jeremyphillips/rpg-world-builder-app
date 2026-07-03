@@ -21,6 +21,7 @@ import {
   type FieldOption,
   type SelectFieldOptionListItem,
 } from '../../form/field-config'
+import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
 
 export type SelectFieldOption = FieldOption
 
@@ -104,6 +105,7 @@ export function SelectField({
   onValueChange,
   onBlur,
 }: SelectFieldProps) {
+  const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
   const select = (
     <Select
       value={value}
@@ -114,12 +116,12 @@ export function SelectField({
     >
       {labelPosition === 'settings' ? (
         <SelectTrigger id={id} size={size} digits={digits} onBlur={onBlur}>
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={resolvedPlaceholder} />
         </SelectTrigger>
       ) : (
         <Field.Control>
           <SelectTrigger size={size} digits={digits} onBlur={onBlur}>
-            <SelectValue placeholder={placeholder} />
+            <SelectValue placeholder={resolvedPlaceholder} />
           </SelectTrigger>
         </Field.Control>
       )}

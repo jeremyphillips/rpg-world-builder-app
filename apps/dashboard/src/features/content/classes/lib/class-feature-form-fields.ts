@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { campaignLevelSchema, MAX_CHARACTER_LEVEL, type ClassFeature } from '@rpg/contracts'
+import {
+  campaignLevelSchema,
+  MAX_CHARACTER_LEVEL,
+  type ClassFeature,
+} from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
@@ -13,7 +17,11 @@ import {
   GRANT_TYPE_LABELS,
   createGrantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
-import { formRowsToGrants, grantsToFormRows } from '../../lib/forms/grants/grant-form-values'
+import {
+  grantGroupsToFormRows,
+  formRowsToGrantGroups,
+  grantsToFormRows,
+} from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -97,23 +105,27 @@ export function classFeatureItemFields(
 }
 
 export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
+  const grants = feature.grantGroups?.length
+    ? grantGroupsToFormRows(feature.grantGroups)
+    : grantsToFormRows(feature.grants)
   return {
     id: feature.id,
     name: feature.name,
     description: feature.description,
     level: feature.level,
-    grants: grantsToFormRows(feature.grants),
+    grants,
   }
 }
 
 export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
+  const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
   return {
     kind: 'custom',
     id: row.id,
     name: row.name,
     description: row.description || undefined,
     level: row.level,
-    grants: formRowsToGrants(row.grants),
+    ...(grantGroups.length ? { grantGroups } : {}),
   }
 }
 

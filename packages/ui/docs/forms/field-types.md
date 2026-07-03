@@ -18,6 +18,8 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 | `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`   |
 | `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`      |
 
+`select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+
 ## Rich text (`richtext`)
 
 - Value: **sanitized HTML string** (Tiptap).
@@ -57,64 +59,93 @@ Pill toggles from a fixed option set.
 - `multiple: false` → `string`, `role="radio"`.
 - `chipSize` defaults to field `size`.
 
-## Choose from chips (`chooseFromChips`)
+## Inline sentence (`inlineSentence`)
 
-Inline “Choose [N] skills from:” + chips. `name` = selection (`string[]`); `chooseName` = count.
+Composable inline prose + bound controls. Each bound segment declares its own RHF path via
+`name`. Use `digits` on number/select segments for short fixed-width values; use segment
+`width` (intrinsic tokens) for prose-length select labels. Field-level `width` controls
+column layout in the form stack.
 
 ```ts
+// Select-only: "Granted at [When feature is gained ▾]" / "Granted at [at level 4 ▾]"
 {
-  type: 'chooseFromChips',
+  type: 'inlineSentence',
+  name: 'unlockLevel',
+  label: 'Granted at',
+  hideLabel: true,
+  segments: [
+    { kind: 'text', value: 'Granted at', tone: 'label' },
+    {
+      kind: 'select',
+      name: 'unlockLevel',
+      options: unlockLevelOptions,
+      width: 'lg',
+      defaultValue: GRANT_DEFAULT_UNLOCK_LEVEL,
+    },
+  ],
+}
+
+// Number + trailing select
+{
+  type: 'inlineSentence',
+  name: 'choose',
+  label: 'Equipment choice',
+  hideLabel: true,
+  segments: [
+    { kind: 'text', value: 'Character chooses', tone: 'label' },
+    { kind: 'number', name: 'choose', min: 1, digits: 1, defaultValue: 1 },
+    { kind: 'text', value: 'item(s) from', tone: 'label' },
+    {
+      kind: 'select',
+      name: 'poolSource',
+      options: poolSourceOptions,
+      width: 'xl',
+      defaultValue: 'filtered',
+      ariaLabel: 'Pool source',
+    },
+  ],
+}
+
+// Inline count + chips below (class skill proficiencies)
+{
+  type: 'inlineSentence',
   name: 'proficiencies.skills.from',
-  chooseName: 'proficiencies.skills.choose',
   label: 'Skill proficiencies',
-  options: skillOptions,
-  chooseMin: 0,
-  chooseMax: 18,
+  segments: [
+    { kind: 'text', value: 'Character chooses', tone: 'label' },
+    { kind: 'number', name: 'proficiencies.skills.choose', min: 0, max: 18 },
+    { kind: 'text', value: 'Skill Proficiencies from:', tone: 'label' },
+  ],
+  below: {
+    kind: 'chips',
+    name: 'proficiencies.skills.from',
+    options: skillOptions,
+  },
 }
+
+// Number + fixed unit label (walk speed, weapon range, …)
+feetInputUnitField('speed.walk', 'Walk speed')
 ```
 
-`prefix` / `suffix` default to `Choose` / `skills from:`.
+Segment kinds:
 
-## Inline choose count (`inlineChooseCount`)
+| Kind     | RHF value | Notes                                                  |
+| -------- | --------- | ------------------------------------------------------ |
+| `text`   | —         | Prose fragment; `tone`: `label` / `prose`              |
+| `number` | `number`  | `min`, `max`, `digits`, `defaultValue`                 |
+| `select` | `string`  | Flat or grouped `options`; `digits` or segment `width` |
 
-Sentence with count input only — no chips below. Optionally bind a trailing
-`select` inside the sentence via `selectName` / `selectOptions` / `selectLabel`
-(same dual-path pattern as `chooseFromChips.chooseName`).
+Optional `below.kind: 'chips'` renders a chip row under the sentence (same fieldset).
 
-```ts
-{
-  type: 'inlineChooseCount',
-  name: 'startingEquipment.packages.choose',
-  label: 'Starting packages',
-  prefix: 'Choose',
-  suffix: 'packages',
-  chooseMin: 0,
-  chooseMax: 4,
-  selectName: 'poolSource',
-  selectLabel: 'Pool source',
-  selectOptions: poolSourceOptions,
-}
-```
+### Deprecated inline composites
 
-For fixed-unit distances prefer `inputUnit`.
+These still render (they delegate to `inlineSentence`) but prefer migrating configs:
 
-## Input unit (`inputUnit`)
-
-Scalar number + fixed unit label; single number path.
-
-```ts
-{
-  type: 'inputUnit',
-  name: 'speed.walk',
-  label: 'Walk speed',
-  unit: 'ft.',
-  min: 0,
-  valueDigits: 2,
-  defaultValue: 30,
-}
-```
-
-Dashboard helper: `feetInputUnitField` in content-form-field-helpers.
+| Legacy type         | Replacement                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `chooseFromChips`   | `inlineSentence` + `below: { kind: 'chips', … }`            |
+| `inlineChooseCount` | `inlineSentence` with `number` / `select` segments          |
+| `inputUnit`         | `inlineSentence` with `number` + trailing `text` (`ft.`, …) |
 
 ## Input select (`inputSelect`)
 
@@ -149,6 +180,12 @@ Searchable dropdown for large lists (catalog refs).
 - Filter matches `label`, `description`, `value`.
 - Multi: removable badges; `renderSelectedItem` for custom previews.
 - Stale selected values stay visible when missing from `options`.
+
+## Level range (`levelRange`)
+
+Inline min/max level selects joined by a connector (`1 through 20`). Uses sibling paths
+`minName` / `maxName` (defaults `name` + `maxLevel`). Kept separate from `inlineSentence`
+because array rows cascade adjacent tier boundaries.
 
 ## Dice formula (`diceFormula`)
 
