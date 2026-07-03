@@ -17,6 +17,7 @@ import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { FeatureItem } from '../lib/feature-item'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
+import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 
 const SUGGESTED_SKILL_CHIP_CLASS =
   'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
@@ -178,6 +179,10 @@ export function ClassDetailContent({
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
   const campaignRules = useCampaignRules(campaignId)
+  const subclassingEnabled = campaignRules.subclassing.enabled
+  const visibleFeatures = subclassingEnabled
+    ? characterClass.features
+    : characterClass.features.filter((feature) => !isSubclassChoiceFeatureRow(feature))
 
   return (
     <WidePage spacing="relaxed">
@@ -201,10 +206,10 @@ export function ClassDetailContent({
           skillProficiencies={skillProficiencies}
           isPending={skillsPending}
         />
-        {characterClass.features.length > 0 && (
-          <FeaturesList className={characterClass.name} features={characterClass.features} />
+        {visibleFeatures.length > 0 && (
+          <FeaturesList className={characterClass.name} features={visibleFeatures} />
         )}
-        <SubclassesList subclasses={subclasses} />
+        {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
       </ContentDetailLayout>
       <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
     </WidePage>

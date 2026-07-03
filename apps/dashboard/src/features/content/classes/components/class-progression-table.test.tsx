@@ -73,6 +73,25 @@ describe('ClassProgressionTable', () => {
     expect(level3Row?.textContent).toContain('Bard Subclass')
   })
 
+  it('hides subclass-choice features when subclassing is disabled', () => {
+    render(
+      <ClassProgressionTable
+        characterClass={pickClass('bard')}
+        campaignRules={{
+          maxCharacterLevel: 20,
+          standardMaxCharacterLevel: 20,
+          allowedCharacterCreatureTypes: ['humanoid'],
+          multiclassing: defaultMulticlassingRules(),
+          subclassing: { enabled: false },
+        }}
+      />,
+    )
+
+    const level3Row = screen.getAllByRole('row')[3]
+    expect(level3Row?.textContent).toMatch(/^3\+2/)
+    expect(level3Row?.textContent).not.toContain('Bard Subclass')
+  })
+
   it('derives Spellcasting in the features column from the spellcasting block', () => {
     render(<ClassProgressionTable characterClass={pickClass('paladin')} />)
 

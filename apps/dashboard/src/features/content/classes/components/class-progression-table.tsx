@@ -15,6 +15,8 @@ import {
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
+import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
+
 type ProgressionRow = {
   level: number
   profBonus: number
@@ -49,10 +51,16 @@ function featuresAtLevel(
   features: CharacterClass['features'],
   spellcasting: CharacterClass['spellcasting'],
   level: number,
+  subclassingEnabled: boolean,
 ): string[] {
   const names = features
-    .filter((f) => f.level === level && !isLegacySpellcastingFeature(f, spellcasting))
-    .map((f) => f.name)
+    .filter((feature) => {
+      if (feature.level !== level) return false
+      if (isLegacySpellcastingFeature(feature, spellcasting)) return false
+      if (!subclassingEnabled && isSubclassChoiceFeatureRow(feature)) return false
+      return true
+    })
+    .map((feature) => feature.name)
 
   const unlockLevel = spellcastingUnlockLevel(spellcasting)
   if (spellcasting && unlockLevel === level) {
@@ -75,6 +83,7 @@ function buildRow(
   level: number,
   characterClass: CharacterClass,
   slotTable: number[][] | undefined,
+  subclassingEnabled: boolean,
 ): ProgressionRow {
   const { features, spellcasting } = characterClass
   const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
@@ -86,7 +95,7 @@ function buildRow(
   return {
     level,
     profBonus: proficiencyBonus(level),
-    features: featuresAtLevel(features, spellcasting, level),
+    features: featuresAtLevel(features, spellcasting, level, subclassingEnabled),
     resources: buildResourceRow(characterClass.resources, level),
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:
@@ -105,10 +114,14 @@ function slotTableFor(characterClass: CharacterClass): number[][] | undefined {
     : undefined
 }
 
-function buildRows(characterClass: CharacterClass, maxCharacterLevel: number): ProgressionRow[] {
+function buildRows(
+  characterClass: CharacterClass,
+  maxCharacterLevel: number,
+  subclassingEnabled: boolean,
+): ProgressionRow[] {
   const slotTable = slotTableFor(characterClass)
   return Array.from({ length: maxCharacterLevel }, (_, i) =>
-    buildRow(i + 1, characterClass, slotTable),
+    buildRow(i + 1, characterClass, slotTable, subclassingEnabled),
   )
 }
 
@@ -275,7 +288,7 @@ export function ClassProgressionTable({
     ...DEFAULT_CAMPAIGN_RULES,
     maxCharacterLevel: maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
   }
-  const rows = buildRows(characterClass, rules.maxCharacterLevel)
+  const rows = buildRows(characterClass, rules.maxCharacterLevel, rules.subclassing.enabled)
   const flags = buildColumnFlags(characterClass, rows)
   const colSpan = columnCount(flags)
   const extended = rules.extendedProgression

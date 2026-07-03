@@ -28,13 +28,18 @@ vi.mock('@/features/campaign', () => ({
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { pickSkillProficiency } from '../../lib/fixtures/pick'
-import { FIGHTER } from '../fixtures'
+import { FIGHTER, SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassDetailContent } from './class-detail'
+import { useCampaignRules } from '@/features/campaign'
 
 const ATHLETICS = pickSkillProficiency('athletics')
 const STEALTH = pickSkillProficiency('stealth')
 
-function renderClassDetail() {
+function renderClassDetail({
+  subclasses = [] as typeof SUBCLASSES_FOR_FIGHTER,
+}: {
+  subclasses?: typeof SUBCLASSES_FOR_FIGHTER
+} = {}) {
   const skillProficiencies = [ATHLETICS, STEALTH]
   return render(
     <MemoryRouter>
@@ -42,7 +47,7 @@ function renderClassDetail() {
         characterClass={FIGHTER}
         campaignId={STORY_CAMPAIGN_ID}
         classId={FIGHTER.id}
-        subclasses={[]}
+        subclasses={subclasses}
         skillProficiencies={skillProficiencies}
         skillsPending={false}
       />
@@ -87,5 +92,59 @@ describe('ClassDetailContent suggested proficiencies', () => {
     )
 
     expect(screen.getByText('Loading…')).toBeInTheDocument()
+  })
+})
+
+describe('ClassDetailContent subclassing gate', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('hides subclass sections and subclass-choice features when subclassing is disabled', () => {
+    vi.mocked(useCampaignRules).mockReturnValue({
+      maxCharacterLevel: 20,
+      standardMaxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: ['humanoid'],
+      multiclassing: {
+        enabled: true,
+        requirements: {
+          primaryAbilityMinimum: { enabled: true, minimumScore: 13 },
+          speciesPolicy: { enabled: false },
+          speciesLevelLimits: { enabled: false },
+        },
+      },
+      subclassing: { enabled: false },
+    })
+
+    renderClassDetail({ subclasses: SUBCLASSES_FOR_FIGHTER })
+
+    expect(screen.queryByRole('heading', { name: 'Subclasses' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Champion')).not.toBeInTheDocument()
+    expect(screen.queryByText('Fighter Subclass')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fighter Class Features' })).toBeInTheDocument()
+    expect(screen.getByText('Second Wind')).toBeInTheDocument()
+  })
+
+  it('shows subclass sections when subclassing is enabled', () => {
+    vi.mocked(useCampaignRules).mockReturnValue({
+      maxCharacterLevel: 20,
+      standardMaxCharacterLevel: 20,
+      allowedCharacterCreatureTypes: ['humanoid'],
+      multiclassing: {
+        enabled: true,
+        requirements: {
+          primaryAbilityMinimum: { enabled: true, minimumScore: 13 },
+          speciesPolicy: { enabled: false },
+          speciesLevelLimits: { enabled: false },
+        },
+      },
+      subclassing: { enabled: true },
+    })
+
+    renderClassDetail({ subclasses: SUBCLASSES_FOR_FIGHTER })
+
+    expect(screen.getByRole('heading', { name: 'Subclasses' })).toBeInTheDocument()
+    expect(screen.getByText('Champion')).toBeInTheDocument()
+    expect(screen.getByText('Fighter Subclass')).toBeInTheDocument()
   })
 })
