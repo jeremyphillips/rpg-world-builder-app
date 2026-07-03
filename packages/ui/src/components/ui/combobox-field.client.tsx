@@ -43,14 +43,25 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   size?: FieldSize
   placeholder?: string
   emptyMessage?: string
+  /** When false, the panel omits the search row and keyboard nav targets the listbox. */
+  enableSearch?: boolean
   /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
   hintPosition?: FieldHintPosition
 }
 
 function ComboboxFieldControl(props: ComboboxFieldControlProps) {
-  const { label, selected, loading, size, emptyMessage, onBlur, multiple, renderSelectedItem } =
-    props
+  const {
+    label,
+    selected,
+    loading,
+    size,
+    emptyMessage,
+    onBlur,
+    multiple,
+    enableSearch = true,
+    renderSelectedItem,
+  } = props
   const control = useComboboxControl(props)
 
   return (
@@ -64,6 +75,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           loading={loading}
           disabled={control.isInteractionDisabled}
           muted={selected.length === 0 || Boolean(loading)}
+          hideWhenOpen={enableSearch}
           onBlur={onBlur}
         />
         <ComboboxPanel
@@ -72,6 +84,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           searchId={control.searchId}
           size={size}
           multiple={multiple}
+          enableSearch={enableSearch}
           query={control.query}
           emptyMessage={emptyMessage}
           activeOptionId={control.activeOptionId}
@@ -81,9 +94,10 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           atMax={control.atMax}
           generatedId={control.generatedId}
           searchInputRef={control.searchInputRef}
+          listboxRef={control.listboxRef}
           onQueryChange={control.handleQueryChange}
-          onSearchKeyDown={control.handleSearchKeyDown}
-          onOpenAutoFocus={control.focusSearchInput}
+          onNavigationKeyDown={control.handleNavigationKeyDown}
+          onOpenAutoFocus={control.focusPanelOnOpen}
           onHighlight={control.setActiveIndex}
           onSelect={control.toggleOption}
         />
@@ -125,6 +139,7 @@ export function ComboboxField({
   size = 'md',
   placeholder,
   emptyMessage = 'No options found.',
+  enableSearch = true,
   renderSelectedItem,
   hintPosition,
 }: ComboboxFieldProps) {
@@ -164,6 +179,7 @@ export function ComboboxField({
             size={size}
             placeholder={resolvedPlaceholder}
             emptyMessage={emptyMessage}
+            enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}
           />
         }

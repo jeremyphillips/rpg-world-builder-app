@@ -198,6 +198,14 @@ export {
   type RichTextLinkPickerInternalOption,
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
+export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
+export {
+  previewCardRootVariants,
+  previewCardBodyVariants,
+  previewCardTitleVariants,
+  previewCardDescriptionVariants,
+  type PreviewCardRootVariantProps,
+} from './components/ui/preview-card.variants'
 export {
   RichTextLinkPreviewCard,
   type RichTextLinkPreviewCardProps,

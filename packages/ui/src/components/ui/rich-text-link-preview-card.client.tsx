@@ -2,15 +2,9 @@
 
 import { X } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
-import { Eyebrow } from './eyebrow'
-import {
-  richTextLinkPreviewCardMetaVariants,
-  richTextLinkPreviewCardRootVariants,
-  richTextLinkPreviewCardTitleVariants,
-  type RichTextLinkPreviewCardRootVariantProps,
-} from './rich-text-link-preview-card.variants'
+import { PreviewCard } from './preview-card.client'
+import type { PreviewCardRootVariantProps } from './preview-card.variants'
 
 function toEyebrow(contentType: string): string {
   if (contentType.toLowerCase() === 'spell') return 'Spell'
@@ -18,7 +12,7 @@ function toEyebrow(contentType: string): string {
   return contentType.charAt(0).toUpperCase() + contentType.slice(1)
 }
 
-export interface RichTextLinkPreviewCardProps extends RichTextLinkPreviewCardRootVariantProps {
+export interface RichTextLinkPreviewCardProps extends PreviewCardRootVariantProps {
   title: string
   contentType: string
   sourceLabel?: string
@@ -39,74 +33,34 @@ export function RichTextLinkPreviewCard({
   onClear,
   clearLabel = 'Clear selected internal link',
 }: RichTextLinkPreviewCardProps) {
-  const content = (
-    <div className="flex items-start justify-between gap-2 px-2 py-1.5">
-      <div className="min-w-0">
-        <Eyebrow size="xs">{toEyebrow(contentType)}</Eyebrow>
-        <p className={richTextLinkPreviewCardTitleVariants()}>{title}</p>
-        {sourceLabel ? (
-          <p className={richTextLinkPreviewCardMetaVariants()}>{sourceLabel}</p>
-        ) : null}
-      </div>
-      {onClear ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-6"
-          aria-label={clearLabel}
-          onClick={(event) => {
-            event.stopPropagation()
-            onClear()
-          }}
-        >
-          <X className="size-3.5" />
-        </Button>
-      ) : null}
-    </div>
-  )
-
-  const canUseButtonRoot = onSelect && !onClear
-
-  if (canUseButtonRoot) {
-    return (
-      <button
-        type="button"
-        onClick={onSelect}
-        className={cn(
-          richTextLinkPreviewCardRootVariants({
-            tone,
-            interactive: interactive || Boolean(onSelect),
-          }),
-          className,
-        )}
-      >
-        {content}
-      </button>
-    )
-  }
+  const resolvedInteractive = onClear ? false : interactive || Boolean(onSelect)
 
   return (
-    <div
-      className={cn(
-        richTextLinkPreviewCardRootVariants({ tone, interactive: interactive && !onClear }),
-        className,
-      )}
-      onClick={onSelect}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
-      onKeyDown={
-        onSelect
-          ? (event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onSelect()
-              }
-            }
-          : undefined
+    <PreviewCard
+      title={title}
+      eyebrow={toEyebrow(contentType)}
+      description={sourceLabel}
+      tone={tone}
+      interactive={resolvedInteractive}
+      className={className}
+      onSelect={onClear ? undefined : onSelect}
+      endSlot={
+        onClear ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-6"
+            aria-label={clearLabel}
+            onClick={(event) => {
+              event.stopPropagation()
+              onClear()
+            }}
+          >
+            <X className="size-3.5" />
+          </Button>
+        ) : undefined
       }
-    >
-      {content}
-    </div>
+    />
   )
 }

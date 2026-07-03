@@ -138,6 +138,21 @@ export const Small: Story = {
   },
 }
 
+export const WithoutSearch: Story = {
+  args: {
+    label: 'Grant template',
+    options: [
+      { value: 'skill-proficiency', label: 'Skill proficiency' },
+      { value: 'weapon-proficiency', label: 'Weapon proficiency' },
+      { value: 'movement-bonus', label: 'Movement bonus' },
+    ],
+    multiple: false,
+    value: '',
+    enableSearch: false,
+    placeholder: 'Add grant…',
+  },
+}
+
 export const CustomSelectedItems: Story = {
   args: {
     label: 'Spells',

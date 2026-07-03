@@ -5,4 +5,7 @@ alwaysApply: true
 
 Follow the conventions in [AGENTS.md](../../AGENTS.md).
 
-Work is not done until the quality gate in [.husky/pre-commit](../../.husky/pre-commit) passes.
+Work is not done until the tiered quality gates pass: pre-commit
+([.husky/pre-commit](../../.husky/pre-commit)) for fast affected checks, and
+pre-push ([.husky/pre-push](../../.husky/pre-push)) for full coverage and build
+before sharing.
