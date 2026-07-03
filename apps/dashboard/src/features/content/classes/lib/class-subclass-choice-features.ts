@@ -1,13 +1,17 @@
 import {
+  CLASS_FEATURE_KINDS,
   subclassChoiceFeatureId,
   subclassChoiceFeatureLabel,
   type ClassFeature,
+  type ClassFeatureKind,
 } from '@rpg/contracts'
 
 export const DEFAULT_SUBCLASS_CHOICE_LEVEL = 3
 
-export function isSubclassChoiceFeatureRow(row: { id?: string } | undefined): boolean {
-  return typeof row?.id === 'string' && row.id.endsWith('-subclass')
+export const SUBCLASS_CHOICE_FEATURE_KIND = CLASS_FEATURE_KINDS[1] satisfies ClassFeatureKind
+
+export function isSubclassChoiceFeatureRow(row: { kind?: string } | undefined): boolean {
+  return row?.kind === SUBCLASS_CHOICE_FEATURE_KIND
 }
 
 /** Creates the explicit feature row that marks when a class chooses a subclass. */
@@ -21,7 +25,7 @@ export function createSubclassChoiceFeature({
   level?: number
 }): ClassFeature {
   return {
-    kind: 'custom',
+    kind: SUBCLASS_CHOICE_FEATURE_KIND,
     id: subclassChoiceFeatureId(classSlug),
     name: subclassChoiceFeatureLabel(className),
     level,

@@ -98,7 +98,10 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
 
   const { onSubmit, formError } = useSubmitHandler<RulesValues>(async (values, form) => {
     await mutateAsync(
-      buildCharacterCreationPatchInput(values, { includeDefaultMulticlassing: true }),
+      buildCharacterCreationPatchInput(values, {
+        includeDefaultMulticlassing: true,
+        includeDefaultSubclassing: true,
+      }),
     )
     form.reset(values)
   }, 'Could not save character configuration.')

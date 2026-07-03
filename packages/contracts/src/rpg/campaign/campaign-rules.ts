@@ -6,6 +6,10 @@ import {
   resolveMulticlassingRules,
   type ResolvedCampaignMulticlassingPatch,
 } from './patches/campaign-multiclassing-patch'
+import {
+  resolveSubclassingRules,
+  type ResolvedCampaignSubclassingPatch,
+} from './patches/campaign-subclassing-patch'
 import type { CreatureTypeId } from '../vocab/creature-type'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
@@ -41,6 +45,8 @@ export type ResolvedCampaignRules = {
   extendedProgression?: ResolvedExtendedProgression
   /** Resolved multiclassing rules for content authoring and validation gating. */
   multiclassing: ResolvedCampaignMulticlassingPatch
+  /** Resolved subclass choice rules for character-builder and content display gating. */
+  subclassing: ResolvedCampaignSubclassingPatch
 }
 
 /** Standard max before any optional extended tier. */
@@ -77,13 +83,16 @@ export function resolveCampaignRules(
   const standardMaxCharacterLevel = resolveStandardMaxCharacterLevel(patch)
   const allowedCharacterCreatureTypes = resolveAllowedCharacterCreatureTypes(patch)
   const storedExtended = patch?.progression?.extendedProgression
+  const multiclassing = resolveMulticlassingRules(patch?.multiclassing)
+  const subclassing = resolveSubclassingRules(patch?.subclasses)
 
   if (storedExtended) {
     return {
       maxCharacterLevel: storedExtended.maxLevel,
       standardMaxCharacterLevel,
       allowedCharacterCreatureTypes,
-      multiclassing: resolveMulticlassingRules(patch?.multiclassing),
+      multiclassing,
+      subclassing,
       extendedProgression: {
         tierName: storedExtended.tierName,
         startsAt: standardMaxCharacterLevel + 1,
@@ -96,7 +105,8 @@ export function resolveCampaignRules(
     maxCharacterLevel: standardMaxCharacterLevel,
     standardMaxCharacterLevel,
     allowedCharacterCreatureTypes,
-    multiclassing: resolveMulticlassingRules(patch?.multiclassing),
+    multiclassing,
+    subclassing,
   }
 }
 

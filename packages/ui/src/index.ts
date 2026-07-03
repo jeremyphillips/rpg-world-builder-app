@@ -13,6 +13,14 @@ export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
 export { textVariants, type TextVariantProps } from './components/ui/text.variants'
+export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
+export {
+  alertVariants,
+  alertTitleVariants,
+  alertDescriptionVariants,
+  ALERT_VARIANTS,
+  type AlertVariantProps,
+} from './components/ui/alert.variants'
 export { RichTextContent, type RichTextContentProps } from './components/ui/rich-text-content'
 export { MarkdownContent, type MarkdownContentProps } from './components/ui/markdown-content'
 export {

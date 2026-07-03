@@ -1,0 +1,59 @@
+import { render, screen } from '@testing-library/react'
+import axe from 'axe-core'
+import { describe, expect, it } from 'vitest'
+
+import { Button } from './button.client'
+import { Alert } from './alert'
+import { ALERT_VARIANTS } from './alert.variants'
+
+describe('Alert', () => {
+  it('renders title and description with role="alert"', () => {
+    render(
+      <Alert
+        variant="warning"
+        title="Subclass choices are disabled"
+        description="Enable subclasses to prompt players."
+      />,
+    )
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Subclass choices are disabled')
+    expect(alert).toHaveTextContent('Enable subclasses to prompt players.')
+    expect(alert).toHaveClass('border-warning-muted', 'bg-warning-subtle')
+  })
+
+  it('renders optional actions', () => {
+    render(
+      <Alert
+        variant="warning"
+        title="Subclass choices are disabled"
+        actions={<Button size="sm">Enable subclasses</Button>}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Enable subclasses' })).toBeInTheDocument()
+  })
+
+  it.each(ALERT_VARIANTS)('applies the %s variant classes', (variant) => {
+    render(<Alert variant={variant} title="Status" />)
+    const alert = screen.getByRole('alert')
+    if (variant === 'default') {
+      expect(alert).toHaveClass('border-border', 'bg-muted')
+      return
+    }
+    expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <Alert
+        variant="warning"
+        title="Subclass choices are disabled"
+        description="Enable subclasses to prompt players."
+        actions={<Button size="sm">Enable subclasses</Button>}
+      />,
+    )
+    const results = await axe.run(container, {
+      rules: { 'color-contrast': { enabled: false } },
+    })
+    expect(results.violations).toEqual([])
+  })
+})

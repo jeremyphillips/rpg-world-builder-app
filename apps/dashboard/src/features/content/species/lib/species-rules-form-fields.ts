@@ -11,6 +11,7 @@ import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { campaignSettingHref } from '@/lib/availability'
 import {
   SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
   SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL,
@@ -96,7 +97,7 @@ function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 export function characterConfigurationMulticlassingHref(campaignId: string): string {
-  return `/campaigns/${campaignId}/homebrew/rules-config/character-configuration#multiclassing`
+  return campaignSettingHref(campaignId, 'characterCreation.multiclassing.enabled')
 }
 
 export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {

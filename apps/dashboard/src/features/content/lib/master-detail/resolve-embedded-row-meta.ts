@@ -1,8 +1,14 @@
 import type { ContentSource } from '@rpg/contracts'
 
-import { INACTIVE_ROW_BADGE_LABEL, isContentRowActive } from './content-campaign-availability'
+import {
+  combineAvailabilityReasons,
+  resolveAvailabilityBadge,
+  type Availability,
+  type AvailabilityReason,
+} from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'
+import { isContentRowActive } from './content-campaign-availability'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
@@ -20,6 +26,7 @@ export interface ResolveEmbeddedRowMetaParams {
   seedRowIds?: ReadonlySet<string>
   activeById: Record<string, boolean>
   rowKey: string
+  extraReasons?: readonly AvailabilityReason[]
 }
 
 export interface EmbeddedRowMeta {
@@ -27,6 +34,7 @@ export interface EmbeddedRowMeta {
   deletable: boolean
   badges: MasterDetailListBadge[]
   active: boolean
+  availability: Availability
 }
 
 /** Resolves ownership for embedded rows that have no per-row `source` in the contract. */
@@ -48,13 +56,17 @@ export function resolveEmbeddedRowMeta({
   seedRowIds,
   activeById,
   rowKey,
+  extraReasons = [],
 }: ResolveEmbeddedRowMetaParams): EmbeddedRowMeta {
   const source = resolveEmbeddedRowSource(row, entitySource, seedRowIds)
-  const active = isContentRowActive(activeById, rowKey)
+  const activeByToggle = isContentRowActive(activeById, rowKey)
+  const availability = combineAvailabilityReasons(activeByToggle, extraReasons)
+  const active = availability.status === 'active'
   const badges: MasterDetailListBadge[] = [SOURCE_BADGE[source]]
 
-  if (!active) {
-    badges.push({ variant: 'outline', label: INACTIVE_ROW_BADGE_LABEL })
+  const availabilityBadge = resolveAvailabilityBadge(availability)
+  if (availabilityBadge) {
+    badges.push(availabilityBadge)
   }
 
   return {
@@ -62,5 +74,6 @@ export function resolveEmbeddedRowMeta({
     deletable: source !== 'system',
     badges,
     active,
+    availability,
   }
 }

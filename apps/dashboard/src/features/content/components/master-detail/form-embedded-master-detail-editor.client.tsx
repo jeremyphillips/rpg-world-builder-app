@@ -6,7 +6,16 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
+import {
+  combineAvailabilityReasons,
+  type Availability,
+  type AvailabilityReason,
+} from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import {
+  isContentRowActive,
+  resolveMasterDetailRowKey,
+} from '../../lib/master-detail/content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
@@ -58,6 +67,11 @@ export interface FormEmbeddedMasterDetailEditorProps {
    * field-group spacing (`fieldGroupFlexStackClasses`).
    */
   leadingContent?: ReactNode
+  resolveRowReasons?: (ctx: {
+    row: unknown
+    rowKey: string
+    index: number
+  }) => readonly AvailabilityReason[]
 }
 
 interface FormEmbeddedMasterDetailEditorBodyProps extends FormEmbeddedMasterDetailEditorProps {
@@ -79,6 +93,7 @@ function FormEmbeddedMasterDetailEditorBody({
   showDelete = true,
   showActiveToggle = true,
   leadingContent,
+  resolveRowReasons,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
   const {
     formState: { submitCount },
@@ -111,8 +126,23 @@ function FormEmbeddedMasterDetailEditorBody({
       title: listDisplay.title,
       eyebrow: listDisplay.eyebrow,
       showDelete,
+      extraReasons: resolveRowReasons?.({
+        row,
+        rowKey: resolveMasterDetailRowKey(field.id, row as { id?: string } | undefined),
+        index,
+      }),
     })
   })
+
+  const selectedRowAvailability = useMemo((): Availability | undefined => {
+    if (editor.selectedIndex === null) return undefined
+    const field = editor.fields[editor.selectedIndex]
+    if (!field) return undefined
+    const row = watched?.[editor.selectedIndex] as { id?: string } | undefined
+    const rowKey = resolveMasterDetailRowKey(field.id, row)
+    const extraReasons = resolveRowReasons?.({ row, rowKey, index: editor.selectedIndex }) ?? []
+    return combineAvailabilityReasons(isContentRowActive(editor.activeById, rowKey), extraReasons)
+  }, [editor.activeById, editor.fields, editor.selectedIndex, resolveRowReasons, watched])
 
   const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
@@ -155,6 +185,8 @@ function FormEmbeddedMasterDetailEditorBody({
         emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
         showActiveToggle={showActiveToggle}
         selectedRow={selectedRow}
+        campaignId={formCtx.campaignId}
+        rowAvailability={selectedRowAvailability}
       />
     </div>
   )

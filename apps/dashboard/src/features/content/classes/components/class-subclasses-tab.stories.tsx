@@ -16,7 +16,15 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function TabStory({
-  features = [{ id: 'fighter-subclass', name: 'Fighter Subclass', level: 3, grants: [] }],
+  features = [
+    {
+      kind: 'subclass-choice',
+      id: 'fighter-subclass',
+      name: 'Fighter Subclass',
+      level: 3,
+      grants: [],
+    },
+  ],
   mode = 'edit' as const,
 }: {
   features?: Array<Record<string, unknown>>

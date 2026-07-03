@@ -16,6 +16,12 @@ import {
   resolveMulticlassingRules,
   resolvedCampaignMulticlassingPatchSchema,
 } from './campaign-multiclassing-patch'
+import {
+  campaignSubclassingPatchSchema,
+  resolveSubclassingRules,
+  resolvedCampaignSubclassingPatchSchema,
+  validateSubclassChoicesEnabledChange,
+} from './campaign-subclassing-patch'
 
 /** Max length for extended progression tier names in campaign character-creation patch. */
 export const EXTENDED_PROGRESSION_TIER_NAME_MAX = 50
@@ -81,6 +87,7 @@ export const campaignCharacterCreationPatchSchema = z
       })
       .optional(),
     multiclassing: campaignMulticlassingPatchSchema.optional(),
+    subclasses: campaignSubclassingPatchSchema.optional(),
     startingWealth: startingWealthRulesPatchSchema.optional(),
   })
   .strict()
@@ -107,6 +114,7 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
     creatureTypePolicy: creatureTypePolicySchema,
   }),
   multiclassing: resolvedCampaignMulticlassingPatchSchema,
+  subclasses: resolvedCampaignSubclassingPatchSchema,
   startingWealth: startingWealthRulesSchema,
 })
 
@@ -140,6 +148,17 @@ function validateCharacterCreationPatchInput(
         code: 'custom',
         message: result.message,
         path: [...pathPrefix, 'progression', 'extendedProgression', 'maxLevel'],
+      })
+    }
+  }
+
+  if (patch.subclasses?.enabled !== undefined) {
+    const result = validateSubclassChoicesEnabledChange()
+    if (!result.valid) {
+      ctx.addIssue({
+        code: 'custom',
+        message: result.message ?? 'Subclass choice changes are not allowed.',
+        path: [...pathPrefix, 'subclasses', 'enabled'],
       })
     }
   }
@@ -226,6 +245,7 @@ export function resolveCharacterCreationPatch(
       },
     },
     multiclassing: resolveMulticlassingRules(patch?.multiclassing),
+    subclasses: resolveSubclassingRules(patch?.subclasses),
     startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),
   }
 }

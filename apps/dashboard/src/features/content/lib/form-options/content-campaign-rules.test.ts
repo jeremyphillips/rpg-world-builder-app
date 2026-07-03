@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
+import {
+  defaultMulticlassingRules,
+  defaultSubclassingRules,
+  MAX_CHARACTER_LEVEL,
+} from '@rpg/contracts'
 
 import {
   campaignRulesFromCtx,
@@ -14,6 +18,7 @@ describe('content-campaign-rules', () => {
     expect(rules.maxCharacterLevel).toBe(MAX_CHARACTER_LEVEL)
     expect(rules.standardMaxCharacterLevel).toBe(MAX_CHARACTER_LEVEL)
     expect(rules.multiclassing).toEqual(defaultMulticlassingRules())
+    expect(rules.subclassing).toEqual(defaultSubclassingRules())
     expect(rules.allowedCharacterCreatureTypes.length).toBeGreaterThan(0)
   })
 

@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
+import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   classFeatureItemFields,
@@ -10,6 +11,7 @@ import {
   featureItemTitle,
   type FeatureRowForm,
 } from '../lib/class-feature-form-fields'
+import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 
 const FEATURES_FIELD_NAME = 'features'
 const FEATURE_NOUN = 'feature'
@@ -21,6 +23,25 @@ export interface ClassFeaturesTabProps {
 /** Master-detail editor for the class `features` field array. */
 export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const fields = useMemo(() => classFeatureItemFields(formCtx), [formCtx])
+  const campaignRules = campaignRulesFromCtx(formCtx)
+
+  const resolveRowReasons = useCallback(
+    ({ row }: { row: unknown }) => {
+      if (
+        isSubclassChoiceFeatureRow(row as FeatureRowForm | undefined) &&
+        !campaignRules.subclassing.enabled
+      ) {
+        return [
+          {
+            code: 'subclasses-disabled' as const,
+            settingId: 'characterCreation.subclasses.enabled' as const,
+          },
+        ]
+      }
+      return []
+    },
+    [campaignRules.subclassing.enabled],
+  )
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -36,6 +57,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         title: featureItemTitle(row as FeatureRowForm | undefined, index),
         eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
       })}
+      resolveRowReasons={resolveRowReasons}
     />
   )
 }

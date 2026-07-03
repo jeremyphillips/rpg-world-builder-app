@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/react'
 import axe from 'axe-core'
 import type { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
+import { resolveAvailability } from '@/lib/availability'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel.client'
@@ -45,9 +47,11 @@ function makeEditor(
 function PanelShell(props: ComponentProps<typeof MasterDetailEditorPanel>) {
   const form = useForm({ defaultValues: { traits: [{ name: 'Rage' }] } })
   return (
-    <FormProvider {...form}>
-      <MasterDetailEditorPanel {...props} />
-    </FormProvider>
+    <MemoryRouter>
+      <FormProvider {...form}>
+        <MasterDetailEditorPanel {...props} />
+      </FormProvider>
+    </MemoryRouter>
   )
 }
 
@@ -101,6 +105,25 @@ describe('MasterDetailEditorPanel', () => {
 
     expect(screen.getByRole('alert')).toBeInTheDocument()
     expect(screen.queryByText(masterDetailEmptySelectionLabel('trait'))).not.toBeInTheDocument()
+  })
+
+  it('renders an availability alert when the selected row is inactive', () => {
+    render(
+      <PanelShell
+        editor={makeEditor()}
+        itemFields={itemFields}
+        fieldName="traits"
+        idPrefix="species-trait"
+        showValidationBanner={false}
+        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
+        campaignId="camp_1"
+        rowAvailability={resolveAvailability([
+          { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
+        ])}
+      />,
+    )
+
+    expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations when a row is selected', async () => {

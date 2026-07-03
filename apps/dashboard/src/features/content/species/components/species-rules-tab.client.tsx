@@ -6,20 +6,18 @@ import { Link } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
+import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/lib/availability'
 import { disableFormItems } from '@/lib/disable-form-items'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import {
-  characterConfigurationMulticlassingHref,
   LEVEL_LIMITS_FIELD_PREFIX,
   multiclassingPolicyFields,
   MULTICLASSING_FIELD_PREFIX,
   speciesLevelLimitsFields,
 } from '../lib/species-rules-form-fields'
-import {
-  mergeCharacterCreationFormDefaults,
-} from '../lib/species-rules-form-values'
+import { mergeCharacterCreationFormDefaults } from '../lib/species-rules-form-values'
 import type { SpeciesCharacterCreationForm } from '../lib/species-rules-form-fields'
 
 export interface SpeciesRulesTabProps {
@@ -29,7 +27,7 @@ export interface SpeciesRulesTabProps {
 function RulesConfigLink({ campaignId }: { campaignId: string }) {
   return (
     <Link
-      to={characterConfigurationMulticlassingHref(campaignId)}
+      to={campaignSettingHref(campaignId, 'characterCreation.multiclassing.enabled')}
       className="text-sm font-medium text-primary underline-offset-4 hover:underline"
     >
       Campaign Rules → Multiclassing
@@ -56,18 +54,6 @@ function RulesSectionDisabled({
       </Text>
       <RulesConfigLink campaignId={campaignId} />
     </section>
-  )
-}
-
-function MulticlassingDisabledState({ campaignId }: { campaignId: string }) {
-  return (
-    <div className="space-y-3 rounded-md border border-border bg-muted/30 p-4">
-      <Text variant="muted" className="text-sm">
-        Multiclassing is disabled for this campaign. Species multiclass policy and level limits are
-        not editable until multiclassing is allowed in campaign rules.
-      </Text>
-      <RulesConfigLink campaignId={campaignId} />
-    </div>
   )
 }
 
@@ -160,7 +146,17 @@ export function SpeciesRulesTab({ formCtx }: SpeciesRulesTabProps) {
   const campaignRules = campaignRulesFromCtx(formCtx)
 
   if (!campaignRules.multiclassing.enabled) {
-    return <MulticlassingDisabledState campaignId={formCtx.campaignId ?? ''} />
+    return (
+      <AvailabilityAlert
+        availability={resolveAvailability([
+          {
+            code: 'multiclassing-disabled',
+            settingId: 'characterCreation.multiclassing.enabled',
+          },
+        ])}
+        context={{ campaignId: formCtx.campaignId ?? '' }}
+      />
+    )
   }
 
   return <SpeciesRulesEditor formCtx={formCtx} />

@@ -94,6 +94,13 @@ const multiclassingSchema = new Schema(
   { _id: false },
 )
 
+const subclassingSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+  },
+  { _id: false },
+)
+
 const characterCreationSchema = new Schema(
   {
     startingLevel: { type: Number },
@@ -108,6 +115,7 @@ const characterCreationSchema = new Schema(
       },
     },
     multiclassing: { type: multiclassingSchema, default: undefined },
+    subclasses: { type: subclassingSchema, default: undefined },
     startingWealth: { type: Schema.Types.Mixed, default: undefined },
   },
   { _id: false },

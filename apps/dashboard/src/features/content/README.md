@@ -77,6 +77,9 @@ co-owner membership from `GET /api/campaigns`. Create/edit routes use
 
 ## Master-detail abstraction
 
+Campaign-derived inactive state (badges + alerts) →
+[availability.md](../../../docs/availability.md).
+
 Long embedded arrays (where each row is itself a heavy form) can render as a
 list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 

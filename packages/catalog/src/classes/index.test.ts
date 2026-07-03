@@ -29,6 +29,11 @@ function isSubclassChoiceFeature(cls: CharacterClass, feature: CharacterClass['f
   return feature.id === subclassChoiceFeatureId(cls.slug)
 }
 
+function expectSubclassChoiceKind(cls: CharacterClass): void {
+  const feature = cls.features.find((f) => isSubclassChoiceFeature(cls, f))
+  expect(feature?.kind).toBe('subclass-choice')
+}
+
 function expectClassFeatureDescriptions(cls: CharacterClass): void {
   for (const feature of cls.features) {
     if (isSubclassChoiceFeature(cls, feature)) {
@@ -46,6 +51,9 @@ describe('SRD 5.2.1 class seed', () => {
   it('ships all 12 classes and their subclasses (validated against the schema at load)', () => {
     expect(classes).toHaveLength(12)
     expect(subclasses).toHaveLength(12)
+    for (const cls of classes) {
+      expectSubclassChoiceKind(cls)
+    }
   })
 
   it('uses deterministic system ids and null campaignId', () => {

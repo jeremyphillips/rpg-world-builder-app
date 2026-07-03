@@ -119,6 +119,7 @@ describe('character-configuration-form-fields', () => {
       expect(fieldNames).toContain('allowedCharacterCreatureTypes')
       expect(fieldNames).toContain('extendedProgressionEnabled')
       expect(fieldNames).toContain('multiclassingEnabled')
+      expect(fieldNames).toContain('subclassChoicesEnabled')
       expect(fieldNames).toContain('startingWealth.name')
       expect(fieldNames).toContain('startingWealth.tiers')
     })
@@ -148,6 +149,7 @@ describe('character-configuration-form-fields', () => {
         'extended-progression',
         'creature-type-policy',
         'multiclassing',
+        'subclasses',
       ])
     })
   })

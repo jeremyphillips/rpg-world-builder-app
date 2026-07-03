@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import {
+  CLASS_FEATURE_KINDS,
   campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   type ClassFeature,
+  type ClassFeatureKind,
 } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
@@ -31,6 +33,7 @@ export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVE
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
   return z.object({
     id: z.string().min(1).optional(),
+    kind: z.enum(CLASS_FEATURE_KINDS).optional(),
     name: z.string().min(1),
     description: z.string().optional(),
     level: levelField,
@@ -110,6 +113,7 @@ export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
     : grantsToFormRows(feature.grants)
   return {
     id: feature.id,
+    kind: feature.kind,
     name: feature.name,
     description: feature.description,
     level: feature.level,
@@ -117,10 +121,12 @@ export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
   }
 }
 
+const DEFAULT_CLASS_FEATURE_KIND = CLASS_FEATURE_KINDS[0] satisfies ClassFeatureKind
+
 export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassFeature {
   const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
   return {
-    kind: 'custom',
+    kind: row.kind ?? DEFAULT_CLASS_FEATURE_KIND,
     id: row.id,
     name: row.name,
     description: row.description || undefined,

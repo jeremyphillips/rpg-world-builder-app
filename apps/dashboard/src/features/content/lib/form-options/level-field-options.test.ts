@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules } from '@rpg/contracts'
+import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 import { isFieldOptionGroup } from '@rpg/ui/form'
 
 import {
@@ -16,6 +16,7 @@ const extendedRulesCtx = {
     standardMaxCharacterLevel: 20,
     allowedCharacterCreatureTypes: ['humanoid'] as const,
     multiclassing: defaultMulticlassingRules(),
+    subclassing: defaultSubclassingRules(),
     extendedProgression: {
       tierName: 'Epic Destiny',
       startsAt: 21,
@@ -70,6 +71,7 @@ describe('level-field-options', () => {
           standardMaxCharacterLevel: 9,
           allowedCharacterCreatureTypes: ['humanoid'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         },
       }),
     ).toBe(1)
@@ -80,6 +82,7 @@ describe('level-field-options', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         },
       }),
     ).toBe(3)

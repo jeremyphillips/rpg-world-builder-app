@@ -71,6 +71,8 @@ classes belong in `*.variants.ts` via CVA, not long inline strings.
   [apps/dashboard/docs/feature-conventions.md](apps/dashboard/docs/feature-conventions.md).
 - Dashboard data access goes through TanStack Query, not ad-hoc `fetch` in
   components.
+- Campaign availability reasons (inactive badges/alerts on authoring surfaces) →
+  [apps/dashboard/docs/availability.md](apps/dashboard/docs/availability.md).
 
 ## Same-origin API
 

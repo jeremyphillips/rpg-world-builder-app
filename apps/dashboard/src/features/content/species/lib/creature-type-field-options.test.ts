@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules } from '@rpg/contracts'
+import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
 import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
 
@@ -26,6 +26,7 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid', 'fey'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         },
         creatureTypeVocabulary: seedVocabulary,
       }),
@@ -48,6 +49,7 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['humanoid', 'fey'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         },
         creatureTypeVocabulary: vocabulary,
       }),
@@ -64,6 +66,7 @@ describe('allowedCharacterCreatureTypesFromCtx', () => {
           standardMaxCharacterLevel: 20,
           allowedCharacterCreatureTypes: ['construct'],
           multiclassing: defaultMulticlassingRules(),
+          subclassing: defaultSubclassingRules(),
         },
       }),
     ).toEqual(['construct'])

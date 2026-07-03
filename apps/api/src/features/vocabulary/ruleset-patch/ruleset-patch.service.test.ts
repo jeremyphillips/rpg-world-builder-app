@@ -4,6 +4,7 @@ import {
   CREATURE_TYPE_SET_ID,
   defaultCampaignMechanicsPatch,
   defaultMulticlassingRules,
+  defaultSubclassingRules,
   type StartingWealthTier,
 } from '@rpg/contracts'
 
@@ -41,6 +42,7 @@ describe('getRulesetPatchRead', () => {
       progression: { maxCharacterLevel: 20 },
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       multiclassing: defaultMulticlassingRules(),
+      subclasses: defaultSubclassingRules(),
       startingWealth: standardStartingWealthSeed(),
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
@@ -214,6 +216,26 @@ describe('updateCharacterCreationPatch', () => {
 
     const stored = await storedRulesetPatchDoc(campaignId)
     expectStoredSparseUnset(stored?.characterCreation?.multiclassing)
+  })
+
+  it('persists subclassing overrides and unsets them when reverted to defaults', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'Subclasses' })
+
+    const disabled = await updateCharacterCreationPatch(campaignId, {
+      subclasses: { enabled: false },
+    })
+
+    expect(disabled?.characterCreation.subclasses).toEqual({ enabled: false })
+    expect((await storedRulesetPatchDoc(campaignId))?.characterCreation?.subclasses?.enabled).toBe(
+      false,
+    )
+
+    await updateCharacterCreationPatch(campaignId, {
+      subclasses: { enabled: true },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.characterCreation?.subclasses)
   })
 
   it('persists starting wealth tier patches on the ruleset patch', async () => {

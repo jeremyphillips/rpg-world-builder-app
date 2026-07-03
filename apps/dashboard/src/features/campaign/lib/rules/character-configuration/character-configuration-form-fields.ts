@@ -9,6 +9,7 @@ import {
   DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+  DEFAULT_SUBCLASS_CHOICES_ENABLED,
   defineMessage,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
   MAX_CHARACTER_LEVEL,
@@ -73,6 +74,7 @@ export type CreateWizardRuleFieldId = (typeof CREATE_WIZARD_RULE_FIELD_IDS)[numb
 const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
 const MULTICLASSING_ENABLED = 'multiclassingEnabled'
 const PRIMARY_ABILITY_MINIMUM_ENABLED = 'primaryAbilityMinimumEnabled'
+const SUBCLASS_CHOICES_ENABLED = 'subclassChoicesEnabled'
 const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
 
 const configRulesObjectSchema = z.object({
@@ -101,6 +103,7 @@ const configRulesObjectSchema = z.object({
     .default(DEFAULT_PRIMARY_ABILITY_MINIMUM),
   speciesMulticlassPolicyEnabled: z.boolean().default(DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED),
   speciesLevelLimitsEnabled: z.boolean().default(DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED),
+  subclassChoicesEnabled: z.boolean().default(DEFAULT_SUBCLASS_CHOICES_ENABLED),
   startingWealth: startingWealthFormSchema.default(() =>
     mapStartingWealthToFormValues(getStandardStartingWealthRules('srd-cc-5.2.1')),
   ),
@@ -344,8 +347,8 @@ function multiclassingGroup(): FormItem {
       {
         type: 'switch',
         name: MULTICLASSING_ENABLED,
-        label: 'Allow multiclassing',
-        hint: 'When off, characters cannot take levels in additional classes.',
+        label: 'Allow characters to multiclass',
+        hint: 'Characters can take levels in more than one class when leveling up. Turn this off to require characters to remain within a single class.',
         defaultValue: DEFAULT_MULTICLASSING_ENABLED,
       },
       {
@@ -391,6 +394,22 @@ function multiclassingGroup(): FormItem {
         hint: 'Let each species cap total character level and per-class levels.',
         defaultValue: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
         visibility: visibleWhenMulticlassingEnabled(),
+      },
+    ],
+  }
+}
+
+function subclassesGroup(): FormItem {
+  return {
+    kind: 'group',
+    legend: 'Subclasses',
+    fields: [
+      {
+        type: 'switch',
+        name: SUBCLASS_CHOICES_ENABLED,
+        label: 'Allow characters to choose subclasses',
+        hint: 'Characters can select subclasses when their class progression allows it. Turn this off to hide or block subclass choices in the character builder.',
+        defaultValue: DEFAULT_SUBCLASS_CHOICES_ENABLED,
       },
     ],
   }
@@ -529,6 +548,12 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     surfaces: ['config'],
     configSection: { id: 'multiclassing', label: 'Multiclassing' },
     buildFormItems: () => [multiclassingGroup()],
+  },
+  {
+    id: 'subclasses',
+    surfaces: ['config'],
+    configSection: { id: 'subclasses', label: 'Subclasses' },
+    buildFormItems: () => [subclassesGroup()],
   },
 ]
 

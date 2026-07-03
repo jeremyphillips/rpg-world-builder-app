@@ -1,6 +1,34 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFeatureRowSummary } from './class-feature-form-fields'
+import {
+  featureFromFormRow,
+  featureToFormRow,
+  formatFeatureRowSummary,
+} from './class-feature-form-fields'
+
+describe('class feature form round-trip', () => {
+  it('preserves subclass-choice kind through form conversion', () => {
+    const feature = {
+      kind: 'subclass-choice' as const,
+      id: 'fighter-subclass',
+      name: 'Fighter Subclass',
+      level: 3,
+    }
+    const row = featureToFormRow(feature)
+    expect(row.kind).toBe('subclass-choice')
+    expect(featureFromFormRow({ ...row, id: feature.id }).kind).toBe('subclass-choice')
+  })
+
+  it('defaults missing kind to custom on save', () => {
+    const row = {
+      id: 'second-wind',
+      name: 'Second Wind',
+      level: 1,
+      grants: [],
+    }
+    expect(featureFromFormRow(row).kind).toBe('custom')
+  })
+})
 
 describe('formatFeatureRowSummary', () => {
   it('joins level and grant count with the array item separator', () => {

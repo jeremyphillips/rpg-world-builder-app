@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { defaultMulticlassingRules } from '@rpg/contracts'
+import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
 import type { ContentFormDef, ContentFormCtx } from '../content-form-registry'
 import {
@@ -15,6 +15,7 @@ const baseOptionsCtx: ContentFormCtx = {
     standardMaxCharacterLevel: 20,
     allowedCharacterCreatureTypes: ['humanoid'],
     multiclassing: defaultMulticlassingRules(),
+    subclassing: defaultSubclassingRules(),
   },
 }
 

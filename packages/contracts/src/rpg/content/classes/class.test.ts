@@ -31,7 +31,7 @@ const fighterStoredBody = {
   },
   features: [
     { kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 },
-    { kind: 'custom', id: 'fighter-subclass', name: 'Fighter Subclass', level: 3 },
+    { kind: 'subclass-choice', id: 'fighter-subclass', name: 'Fighter Subclass', level: 3 },
   ],
 } as const
 
@@ -267,6 +267,37 @@ describe('subclassChoiceFeatureLabel', () => {
   it('derives the subclass choice feature and level from class features', () => {
     expect(subclassChoiceFeature(fighter)?.name).toBe('Fighter Subclass')
     expect(subclassChoiceFeatureLevel(fighter)).toBe(3)
+  })
+})
+
+describe('subclass-choice class feature kind', () => {
+  it('parses subclass-choice features separately from custom', () => {
+    const feature = classFeatureSchema.parse({
+      kind: 'subclass-choice',
+      id: 'bard-subclass',
+      name: 'Bard Subclass',
+      level: 3,
+    })
+    expect(feature.kind).toBe('subclass-choice')
+  })
+
+  it('rejects subclass-choice rows with an invalid kind literal', () => {
+    expect(
+      classFeatureSchema.safeParse({
+        kind: 'custom',
+        id: 'bard-subclass',
+        name: 'Bard Subclass',
+        level: 3,
+      }).success,
+    ).toBe(true)
+    expect(
+      classFeatureSchema.safeParse({
+        kind: 'subclass-choice',
+        id: 'second-wind',
+        name: 'Second Wind',
+        level: 1,
+      }).success,
+    ).toBe(true)
   })
 })
 
