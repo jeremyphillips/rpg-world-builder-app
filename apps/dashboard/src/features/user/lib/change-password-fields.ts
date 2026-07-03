@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import type { z } from 'zod'
 import { changePasswordInputSchema, defineMessage, passwordSchema } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
 
 import { AvailabilityAlert } from './availability-alert.client'
 import { resolveAvailability } from './availability'
@@ -7,13 +6,6 @@ import { resolveAvailability } from './availability'
 const meta = {
   title: 'Availability/AvailabilityAlert',
   component: AvailabilityAlert,
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    ),
-  ],
   args: {
     context: { campaignId: 'camp_1' },
   },
