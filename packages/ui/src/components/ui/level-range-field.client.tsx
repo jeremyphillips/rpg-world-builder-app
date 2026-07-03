@@ -47,10 +47,6 @@ function renderOptions(options: FieldOption[]) {
   ))
 }
 
-function optionsSignature(options: FieldOption[]): string {
-  return JSON.stringify(options.map((option) => [option.value, option.disabled ?? false]))
-}
-
 /** Inline min/max level selects joined by a connector (`1 through 20`). */
 export function LevelRangeField({
   id,
@@ -78,10 +74,8 @@ export function LevelRangeField({
 }: LevelRangeFieldProps) {
   const minString = minValue !== undefined ? String(minValue) : undefined
   const maxString = maxValue !== undefined ? String(maxValue) : undefined
-  const minOptionsKey = optionsSignature(minOptions)
-  const maxOptionsKey = optionsSignature(maxOptions)
-  const minOptionNodes = useMemo(() => renderOptions(minOptions), [minOptions, minOptionsKey])
-  const maxOptionNodes = useMemo(() => renderOptions(maxOptions), [maxOptions, maxOptionsKey])
+  const minOptionNodes = useMemo(() => renderOptions(minOptions), [minOptions])
+  const maxOptionNodes = useMemo(() => renderOptions(maxOptions), [maxOptions])
 
   return (
     <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>

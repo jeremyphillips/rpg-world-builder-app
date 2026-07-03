@@ -54,7 +54,10 @@ export function InlineSentenceFieldRenderer({
     disabled: boundNames.length < 3,
   })
 
-  const controllers = [controller0, controller1, controller2]
+  const controllers = useMemo(
+    () => [controller0, controller1, controller2],
+    [controller0, controller1, controller2],
+  )
   const combinedError = resolveFirstFieldErrorMessage(
     ...controllers.map(({ fieldState }) => fieldState.error?.message),
     error,
@@ -108,7 +111,7 @@ export function InlineSentenceFieldRenderer({
     }
 
     return result
-  }, [config.label, config.segments, controller0, controller1, controller2, id])
+  }, [config.label, config.segments, controllers, id])
 
   const belowControl = useMemo((): InlineSentenceBoundChips | undefined => {
     if (!config.below) return undefined
@@ -132,7 +135,7 @@ export function InlineSentenceFieldRenderer({
       onChange: field.onChange,
       onBlur: field.onBlur,
     }
-  }, [boundNames, config.below, config.chipSize, controller0, controller1, controller2, id])
+  }, [boundNames, config.below, config.chipSize, controllers, id])
 
   return (
     <InlineSentenceField

@@ -1,4 +1,4 @@
-import type { FieldConfig, FormItem, RowConfig } from '../field-config'
+import type { ArrayConfig, FieldConfig, FormItem, RowConfig } from '../field-config'
 import { isContainer } from '../field-config'
 import { inlineSentenceBoundNames } from '../../components/ui/inline-sentence-field.lib'
 
@@ -67,7 +67,7 @@ export function resolveFieldOrderIndex(path: string, fieldOrder: readonly string
 
 export type ArraySectionMeta = {
   fullName: string
-  config: import('../field-config').ArrayConfig
+  config: ArrayConfig
   fieldOrder: string[]
 }
 

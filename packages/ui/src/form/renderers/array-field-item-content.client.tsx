@@ -303,7 +303,6 @@ export function ArrayFieldItemContent({
   const itemValues = (useWatch({ name: itemPrefix }) ?? {}) as Record<string, unknown>
   const arrayItems = useWatch({ name: fullName, defaultValue: [] }) as unknown[]
   const watchedValues = useDependsOnValues(config.filterSelectDependsOn ?? [])
-  const arrayItemsSignature = React.useMemo(() => JSON.stringify(arrayItems ?? []), [arrayItems])
   const titleId = `${idPrefix}-${fullName}-${itemId}-title`
   const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
   const { addValidationSessionExpandKeys } = useFormUiContext()
@@ -325,15 +324,7 @@ export function ArrayFieldItemContent({
       filterSelectOptions: config.filterSelectOptions,
       watchedValues,
     }),
-    [
-      arrayItems,
-      arrayItemsSignature,
-      index,
-      fullName,
-      levelRangeKeys,
-      config.filterSelectOptions,
-      watchedValues,
-    ],
+    [arrayItems, index, fullName, levelRangeKeys, config.filterSelectOptions, watchedValues],
   )
 
   const rowSummaryId = `${idPrefix}-${itemPrefix.replaceAll('.', '-')}-summary`

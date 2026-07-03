@@ -26,10 +26,10 @@ export const alertTitleVariants = cva('heading-style-alert', {
   variants: {
     variant: {
       default: 'text-foreground',
-      info: 'text-info',
-      success: 'text-success',
-      warning: 'text-warning',
-      destructive: 'text-destructive',
+      info: 'text-foreground',
+      success: 'text-foreground',
+      warning: 'text-foreground',
+      destructive: 'text-foreground',
     },
   },
   defaultVariants: {

@@ -60,11 +60,17 @@ export function useArrayItemCollapseState({
     return createArrayItemCollapseSnapshot(stored)
   })
 
-  React.useEffect(() => {
-    if (!collapsible || !uiStateKey) return
-    const stored = readArrayItemCollapseOverrides(uiStateKey, fullName)
-    setSnapshot(createArrayItemCollapseSnapshot(stored))
-  }, [collapsible, uiStateKey, fullName])
+  const storageSyncKey = collapsible && uiStateKey ? `${uiStateKey}:${fullName}` : null
+  const [trackedStorageSyncKey, setTrackedStorageSyncKey] = React.useState(storageSyncKey)
+  if (storageSyncKey !== trackedStorageSyncKey) {
+    setTrackedStorageSyncKey(storageSyncKey)
+    if (storageSyncKey && uiStateKey) {
+      const stored = readArrayItemCollapseOverrides(uiStateKey, fullName)
+      setSnapshot(createArrayItemCollapseSnapshot(stored))
+    } else {
+      setSnapshot(createArrayItemCollapseSnapshot())
+    }
+  }
 
   const resolveItemValues = React.useCallback(
     (index: number) =>
@@ -115,10 +121,13 @@ export function useArrayItemCollapseState({
     validationSessionExpandKeys,
   ])
 
-  React.useEffect(() => {
-    if (!collapsible || !uiStateKey) return
+  const [trackedActiveItemKeySignature, setTrackedActiveItemKeySignature] = React.useState<
+    string | null
+  >(null)
+  if (collapsible && uiStateKey && activeItemKeySignature !== trackedActiveItemKeySignature) {
+    setTrackedActiveItemKeySignature(activeItemKeySignature)
+    const activeItemKeys = new Set(itemKeysByFieldId.values())
     setSnapshot((prev) => {
-      const activeItemKeys = new Set(itemKeysByFieldId.values())
       const pruned = pruneArrayItemCollapseOverrides(prev, activeItemKeys)
       if (pruned.overrides.size === prev.overrides.size) return prev
       writeArrayItemCollapseOverrides(
@@ -128,7 +137,7 @@ export function useArrayItemCollapseState({
       )
       return pruned
     })
-  }, [collapsible, activeItemKeySignature, itemKeysByFieldId, uiStateKey, fullName])
+  }
 
   const toggleCollapse = React.useCallback(
     (fieldId: string) => {

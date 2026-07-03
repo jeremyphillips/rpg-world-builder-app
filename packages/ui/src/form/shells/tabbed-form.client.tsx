@@ -9,6 +9,7 @@ import { type FileFieldPropsMap, type FormValueSync } from '../field-config'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
+import type { FormValidationPresentation } from '../context/form-ui.context'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -83,7 +84,7 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
   /** See `FormProps['validationPresentation']`. */
-  validationPresentation?: import('../context/form-ui.context').FormValidationPresentation
+  validationPresentation?: FormValidationPresentation
 }
 
 /**
