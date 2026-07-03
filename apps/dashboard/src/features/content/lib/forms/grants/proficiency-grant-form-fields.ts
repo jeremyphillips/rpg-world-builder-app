@@ -3,8 +3,6 @@ import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   defineMessage,
-  SKILL_IDS,
-  SKILLS,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
@@ -93,8 +91,6 @@ const skillPoolKindOptions = toOptions(
   SKILL_PROFICIENCY_POOL_KIND_LABELS,
 )
 const armorPoolKindOptions = toOptions(ARMOR_TRAINING_POOL_SOURCES, ARMOR_TRAINING_POOL_KIND_LABELS)
-
-const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
@@ -446,7 +442,9 @@ export const skillProficiencyItemFormSchema = z.discriminatedUnion('proficiencyS
 
 export type SkillProficiencyItemForm = z.infer<typeof skillProficiencyItemFormSchema>
 
-function skillProficiencyPoolFields(guard?: FieldVisibility): FormItem[] {
+function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
+  const skillOptions = ctx.options?.skills ?? []
+
   return [
     {
       type: 'inlineSentence',
@@ -486,10 +484,11 @@ function skillProficiencyPoolFields(guard?: FieldVisibility): FormItem[] {
 }
 
 export function skillProficiencyGrantItemFields(
-  _ctx: ContentFormCtx,
+  ctx: ContentFormCtx,
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
+  const skillOptions = ctx.options?.skills ?? []
 
   return [
     proficiencySourceField(skillSourceOptions, guard),
@@ -501,7 +500,7 @@ export function skillProficiencyGrantItemFields(
       required: true,
       visibility: visibleForProficiencySource('specific', guard),
     },
-    ...skillProficiencyPoolFields(guard),
+    ...skillProficiencyPoolFields(ctx, guard),
   ]
 }
 

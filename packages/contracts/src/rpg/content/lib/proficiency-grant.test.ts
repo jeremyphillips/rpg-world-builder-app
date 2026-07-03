@@ -119,10 +119,10 @@ describe('format proficiency grant sentences', () => {
     expect(
       formatWeaponProficiencyGrantSentence({
         kind: 'choice',
-        choose: 1,
+        choose: 2,
         pool: { source: 'filtered', weaponCategory: 'simple' },
       }),
-    ).toBe('Character chooses 1 weapon proficiency from simple weapons.')
+    ).toBe('Character chooses 2 weapon proficiencies from simple weapons.')
   })
 
   it('formats any-skill choice', () => {
@@ -132,7 +132,16 @@ describe('format proficiency grant sentences', () => {
         choose: 2,
         pool: { source: 'any' },
       }),
-    ).toBe('Character chooses 2 skill proficiency from any skills.')
+    ).toBe('Character chooses 2 skill proficiencies from any skills.')
+  })
+
+  it('formats fixed skill proficiency with skill sentence forms', () => {
+    expect(
+      formatSkillProficiencyGrantSentence({
+        kind: 'fixed',
+        skillIds: ['animal-handling', 'sleight-of-hand'],
+      }),
+    ).toBe('Character gains proficiency in animal handling and sleight of hand.')
   })
 
   it('formats any-tool choice', () => {
@@ -143,6 +152,16 @@ describe('format proficiency grant sentences', () => {
         pool: { source: 'any' },
       }),
     ).toBe('Character chooses 1 tool proficiency from any tools.')
+  })
+
+  it('formats filtered tool choice pool with vocab sentence forms', () => {
+    expect(
+      formatToolProficiencyGrantSentence({
+        kind: 'choice',
+        choose: 2,
+        pool: { source: 'filtered', toolCategory: 'thieves' },
+      }),
+    ).toBe("Character chooses 2 tool proficiencies from sets of thieves' tools.")
   })
 
   it('formats armor training choice from category', () => {

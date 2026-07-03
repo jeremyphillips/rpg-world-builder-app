@@ -7,6 +7,7 @@ import {
   FEAT_PART_IDS,
   getFeatCategoryEntry,
   getFeatCategoryLabel,
+  getFeatCategorySentenceForm,
   getFeatPartEntry,
   getFeatPartLabel,
   featCategorySchema,
@@ -40,6 +41,12 @@ describe('feat category vocabulary', () => {
   it('returns labels and falls back for unknown ids', () => {
     expect(getFeatCategoryLabel('origin')).toBe('Origin')
     expect(getFeatCategoryLabel('custom')).toBe('custom')
+  })
+
+  it('returns counted feat sentence forms', () => {
+    expect(getFeatCategorySentenceForm('general', 1)).toBe('general feat')
+    expect(getFeatCategorySentenceForm('general', 2)).toBe('general feats')
+    expect(getFeatCategorySentenceForm('fighting-style', 1)).toBe('fighting style feat')
   })
 })
 

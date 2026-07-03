@@ -1,8 +1,13 @@
 import {
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
+  formatDamageTypeGrantSentence,
+  formatFeatChoiceGrantSentence,
+  formatLanguageGrantSentence,
   formatMovementBonusAuthoringSummary,
   formatMovementBonusTitle,
+  formatResistanceGrantSentence,
+  formatSenseGrantSentence,
   getMovementModeGrantLabel,
   INNATE_SPELL_KINDS,
   MOVEMENT_BONUS_FEET,
@@ -14,6 +19,7 @@ import {
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
   type MovementMode,
+  type SenseId,
   type UsageFrequency,
 } from '@rpg/contracts'
 import {
@@ -145,6 +151,44 @@ export function formatMovementRowSummary(
     operation: 'bonus',
     value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
     unit: 'ft',
+  })
+}
+
+export function formatResistanceRowSummary(damageTypes: string[] | undefined): string {
+  if (!damageTypes?.length) return ''
+  return formatResistanceGrantSentence(damageTypes)
+}
+
+export function formatDamageTypeRowSummary(damageTypes: string[] | undefined): string {
+  if (!damageTypes?.length) return ''
+  return formatDamageTypeGrantSentence(damageTypes)
+}
+
+export function formatSenseRowSummary(
+  type: string | undefined,
+  range: number | string | undefined,
+): string {
+  if (!type || range === undefined || range === '') return ''
+  const numericRange = typeof range === 'number' ? range : Number(range)
+  if (!Number.isFinite(numericRange)) return ''
+  return formatSenseGrantSentence({ type: type as SenseId, range: numericRange })
+}
+
+export function formatLanguageRowSummary(languageId: string | undefined): string {
+  if (!languageId) return ''
+  return formatLanguageGrantSentence([languageId])
+}
+
+export function formatFeatChoiceRowSummary(
+  category: string | undefined,
+  choose: number | string | undefined,
+): string {
+  if (!category) return ''
+  const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
+  if (!Number.isFinite(numericChoose)) return ''
+  return formatFeatChoiceGrantSentence({
+    category: category as FeatCategory,
+    choose: numericChoose,
   })
 }
 
@@ -320,7 +364,7 @@ export function grantItemFields<T extends string>(
           kind: 'select',
           name: 'unlockLevel',
           options: unlockLevelOptions,
-          width: 'lg',
+          width: 'auto',
           defaultValue: GRANT_DEFAULT_UNLOCK_LEVEL,
         },
       ],
@@ -458,6 +502,7 @@ export function grantArrayFields<T extends string>(
   const weaponOptions = ctx.options?.weapons ?? []
   const toolOptions = ctx.options?.tools ?? []
   const armorOptions = ctx.options?.armor ?? []
+  const skillOptions = ctx.options?.skills ?? []
   const rowLabels = labels as Record<string, string>
 
   return [
@@ -485,7 +530,11 @@ export function grantArrayFields<T extends string>(
             return toolProficiencyGrantTitle(values as ToolProficiencyItemForm, index, toolOptions)
           }
           if (type === 'skillProficiency') {
-            return skillProficiencyGrantTitle(values as SkillProficiencyItemForm, index)
+            return skillProficiencyGrantTitle(
+              values as SkillProficiencyItemForm,
+              index,
+              skillOptions,
+            )
           }
           if (type === 'armorTraining') {
             return armorTrainingGrantTitle(values as ArmorTrainingItemForm, index, armorOptions)
@@ -503,10 +552,31 @@ export function grantArrayFields<T extends string>(
         },
         summary: (values) => {
           const type = values['grantType']
+          if (type === 'resistances') {
+            return formatResistanceRowSummary(values['resistances'] as string[] | undefined)
+          }
+          if (type === 'damageType') {
+            return formatDamageTypeRowSummary(values['damageType'] as string[] | undefined)
+          }
+          if (type === 'senses') {
+            return formatSenseRowSummary(
+              values['senseType'] as string | undefined,
+              values['senseRange'] as number | string | undefined,
+            )
+          }
           if (type === 'movement') {
             return formatMovementRowSummary(
               values['movementMode'] as string | undefined,
               values['movementValue'] as number | string | undefined,
+            )
+          }
+          if (type === 'languages') {
+            return formatLanguageRowSummary(values['language'] as string | undefined)
+          }
+          if (type === 'featChoice') {
+            return formatFeatChoiceRowSummary(
+              values['featCategory'] as string | undefined,
+              values['featChoose'] as number | string | undefined,
             )
           }
           if (type === 'equipment') {
@@ -519,7 +589,7 @@ export function grantArrayFields<T extends string>(
             return toolProficiencyGrantSummary(values as ToolProficiencyItemForm, toolOptions)
           }
           if (type === 'skillProficiency') {
-            return skillProficiencyGrantSummary(values as SkillProficiencyItemForm)
+            return skillProficiencyGrantSummary(values as SkillProficiencyItemForm, skillOptions)
           }
           if (type === 'armorTraining') {
             return armorTrainingGrantSummary(values as ArmorTrainingItemForm, armorOptions)

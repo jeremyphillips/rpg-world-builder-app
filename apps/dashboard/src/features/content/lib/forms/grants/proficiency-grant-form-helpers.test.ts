@@ -216,13 +216,15 @@ describe('proficiency grant titles and summaries', () => {
   it('formats pool weapon titles and summaries from mocks', () => {
     const row: WeaponProficiencyItemForm = {
       proficiencySource: 'pool',
-      choose: 1,
+      choose: 2,
       poolSource: 'filtered',
       weaponProficiencyPoolCategory: 'simple',
     }
-    expect(weaponProficiencyGrantTitle(row, 0)).toBe('Weapon proficiency — choose 1 simple weapon')
+    expect(weaponProficiencyGrantTitle(row, 0)).toBe(
+      'Weapon proficiency — choose 2 weapon proficiencies from simple weapons',
+    )
     expect(weaponProficiencyGrantSummary(row)).toBe(
-      'Character chooses 1 weapon proficiency from simple weapons.',
+      'Character chooses 2 weapon proficiencies from simple weapons.',
     )
   })
 
@@ -290,7 +292,7 @@ describe('proficiency grant titles and summaries', () => {
         },
         0,
       ),
-    ).toBe('Armor training — choose 1 heavy armor')
+    ).toBe('Armor training — choose 1 armor training from heavy armor')
   })
 })
 

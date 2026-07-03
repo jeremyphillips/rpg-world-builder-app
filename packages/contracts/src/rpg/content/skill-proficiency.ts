@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
+import { formatVocabularySlugLabel } from '../vocab/format-slug-label'
+import { getTermSentenceForm } from '../vocab/types'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -8,42 +10,14 @@ import {
 } from './lib/envelope'
 
 // ---------------------------------------------------------------------------
-// Skill taxonomy — the SRD 5.2 skills as id -> display label. Previously in
-// `skill.ts`; consolidated here as skill-proficiency is the authoritative
-// content type for skills. `skillSchema` is still consumed by
-// `classProficienciesSchema` in `class.ts`.
+// Skill references — skill proficiencies are a content type. Stored grants and
+// class proficiency fields keep opaque slugs; resolved catalog rows provide
+// labels, descriptions, and campaign patches at read/UI time.
 // ---------------------------------------------------------------------------
 
-/**
- * Skill id -> display name. Doubles as form select options
- * (`value: id`, `label: SKILLS[id]`).
- */
-export const SKILLS = {
-  acrobatics: 'Acrobatics',
-  'animal-handling': 'Animal Handling',
-  arcana: 'Arcana',
-  athletics: 'Athletics',
-  deception: 'Deception',
-  history: 'History',
-  insight: 'Insight',
-  intimidation: 'Intimidation',
-  investigation: 'Investigation',
-  medicine: 'Medicine',
-  nature: 'Nature',
-  perception: 'Perception',
-  performance: 'Performance',
-  persuasion: 'Persuasion',
-  religion: 'Religion',
-  'sleight-of-hand': 'Sleight of Hand',
-  stealth: 'Stealth',
-  survival: 'Survival',
-} as const
+export const skillSchema = slugSchema
 
-export type SkillId = keyof typeof SKILLS
-
-export const SKILL_IDS = Object.keys(SKILLS) as [SkillId, ...SkillId[]]
-
-export const skillSchema = z.enum(SKILL_IDS)
+export type SkillId = z.infer<typeof skillSchema>
 
 /**
  * Returns the display name for a skill id.
@@ -52,7 +26,12 @@ export const skillSchema = z.enum(SKILL_IDS)
  * @example getSkillName('animal-handling') // → 'Animal Handling'
  */
 export function getSkillName(id: string): string {
-  return SKILLS[id as SkillId] ?? id
+  return formatVocabularySlugLabel(id)
+}
+
+/** Counted noun phrase for generated skill prose. */
+export function getSkillSentenceForm(id: string, count = 1, label = getSkillName(id)): string {
+  return getTermSentenceForm({ label, description: '' }, count)
 }
 
 // ---------------------------------------------------------------------------

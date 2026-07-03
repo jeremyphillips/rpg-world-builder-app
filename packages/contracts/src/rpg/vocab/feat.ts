@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
@@ -12,18 +13,34 @@ export const FEAT_CATEGORY_ENTRIES = {
     label: 'Origin',
     description:
       'A feat taken at character creation or when a feature grants an Origin feat choice.',
+    sentence: {
+      singular: 'origin feat',
+      plural: 'origin feats',
+    },
   },
   general: {
     label: 'General',
     description: 'A feat typically taken at level 4+ when a class grants a General feat choice.',
+    sentence: {
+      singular: 'general feat',
+      plural: 'general feats',
+    },
   },
   'fighting-style': {
     label: 'Fighting Style',
     description: 'A feat granted by the Fighting Style feature or similar class features.',
+    sentence: {
+      singular: 'fighting style feat',
+      plural: 'fighting style feats',
+    },
   },
   'epic-boon': {
     label: 'Epic Boon',
     description: 'A high-level feat typically taken at level 19+.',
+    sentence: {
+      singular: 'epic boon feat',
+      plural: 'epic boon feats',
+    },
   },
 } as const satisfies Record<string, GameTermEntry>
 
@@ -44,6 +61,13 @@ export function getFeatCategoryEntry(id: string): GameTermEntry | undefined {
 /** Returns the display label for a feat category. Falls back to the raw id. */
 export function getFeatCategoryLabel(id: string): string {
   return getFeatCategoryEntry(id)?.label ?? id
+}
+
+/** Counted noun phrase for generated feat-choice prose. */
+export function getFeatCategorySentenceForm(id: string, count = 1): string {
+  const entry = getFeatCategoryEntry(id)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: id, description: '' }, count)
 }
 
 // ---------------------------------------------------------------------------

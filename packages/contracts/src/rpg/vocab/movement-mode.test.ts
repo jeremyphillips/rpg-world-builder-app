@@ -113,8 +113,14 @@ describe('movement grant vocabulary', () => {
   })
 
   it('formats movement bonus display strings', () => {
-    const grant = { mode: 'walk' as const, operation: 'bonus' as const, value: 5 as const, unit: 'ft' as const }
+    const grant = {
+      mode: 'walk' as const,
+      operation: 'bonus' as const,
+      value: 5 as const,
+      unit: 'ft' as const,
+    }
     expect(getMovementModeGrantLabel('walk')).toBe('Walking speed')
+    expect(getMovementModeGrantLabel('fly')).toBe('Flying speed')
     expect(formatMovementBonusTitle(grant)).toBe('+5 ft walking speed')
     expect(formatMovementBonusDescription(grant)).toBe('Your walking speed increases by 5 feet.')
     expect(formatMovementBonusAuthoringSummary(grant)).toBe(

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type { VocabularyOptionSetId } from '../vocabulary'
+import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -18,30 +19,50 @@ export const EDITION_PRESET_ENTRIES = {
     description:
       'Fast old-school play with descending armor class, class tables, simple saves, and lightweight character options.',
     meta: ['Descending AC', 'Class tables', 'Simple saves'],
+    sentence: {
+      singular: 'classic basic rules',
+      plural: 'classic basic rules',
+    },
   },
   '1e': {
     label: 'Advanced Classic 1e',
     description:
       'A stricter classic framework with table-driven combat, granular saves, and more detailed class structure.',
     meta: ['Descending AC', 'Combat tables', 'Category saves'],
+    sentence: {
+      singular: 'advanced classic 1e rules',
+      plural: 'advanced classic 1e rules',
+    },
   },
   '2e': {
     label: 'Advanced Classic 2e',
     description:
       'A refined classic framework with THAC0-style attacks, class advancement, and broader character customization.',
     meta: ['Descending AC', 'THAC0-style attacks', 'Category saves'],
+    sentence: {
+      singular: 'advanced classic 2e rules',
+      plural: 'advanced classic 2e rules',
+    },
   },
   '3e': {
     label: 'Modern 3e',
     description:
       'A detailed d20 framework with ascending armor class, attack bonuses, Fortitude/Reflex/Will saves, skill ranks, feats, and more granular character customization.',
     meta: ['Ascending AC', 'Attack bonuses', 'Fort/Ref/Will', 'Skills & feats'],
+    sentence: {
+      singular: 'modern 3e rules',
+      plural: 'modern 3e rules',
+    },
   },
   '5e': {
     label: 'Modern 5e',
     description:
       'A familiar modern fantasy rules framework with ascending armor class, proficiency-based advancement, ability checks, saving throws, and standardized d20 combat.',
     meta: ['Ascending AC', 'Proficiency bonus', 'Ability checks', 'Saving throws'],
+    sentence: {
+      singular: 'modern 5e rules',
+      plural: 'modern 5e rules',
+    },
   },
 } as const satisfies Record<string, EditionPresetEntry>
 
@@ -83,4 +104,11 @@ export function getEditionPresetEntry(id: string): EditionPresetEntry | undefine
 /** Returns the display label for an edition preset. Falls back to the raw value. */
 export function getEditionPresetLabel(id: string): string {
   return getEditionPresetEntry(id)?.label ?? id
+}
+
+/** Phrase for generated edition-preset prose. */
+export function getEditionPresetSentenceForm(id: string, count = 1): string {
+  const entry = getEditionPresetEntry(id)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: id, description: '' }, count)
 }

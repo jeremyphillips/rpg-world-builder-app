@@ -27,7 +27,7 @@ describe('resolveTraitDisplay', () => {
       }),
     )
     expect(display.name).toBe('Damage Resistance')
-    expect(display.descriptionHtml).toBe('<p>You have Resistance to Poison damage.</p>')
+    expect(display.descriptionHtml).toBe('<p>You have Resistance to poison damage.</p>')
   })
 
   it('derives movement bonus display from grantGroups', () => {
@@ -37,9 +37,7 @@ describe('resolveTraitDisplay', () => {
         id: 'speed',
         grantGroups: [
           {
-            grants: [
-              { kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
-            ],
+            grants: [{ kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' }],
           },
         ],
       }),

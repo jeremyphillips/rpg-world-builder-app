@@ -7,6 +7,13 @@ import {
   customContentTraitSchema,
   featChoiceGrantSchema,
   flattenGrantGroups,
+  formatDamageTypeGrantSentence,
+  formatFeatChoiceGrantSentence,
+  formatLanguageChoiceGrantSentence,
+  formatLanguageGrantSentence,
+  formatResistanceGrantSentence,
+  formatSenseGrantSentence,
+  formatSpellsGrantSentence,
   getGrantGroupEffectiveUnlock,
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
@@ -189,6 +196,70 @@ describe('languageChoiceGrantSchema', () => {
       choose: 1,
       categories: ['standard'],
     })
+  })
+})
+
+describe('grant sentence formatters', () => {
+  it('formats damage and resistance grants with damage sentence forms', () => {
+    expect(formatDamageTypeGrantSentence(['fire', 'cold'])).toBe(
+      'Character chooses from fire damage and cold damage.',
+    )
+    expect(formatResistanceGrantSentence(['poison'])).toBe(
+      'Character gains Resistance to poison damage.',
+    )
+  })
+
+  it('formats sense and language grants with sentence forms', () => {
+    expect(formatSenseGrantSentence({ type: 'darkvision', range: 60 })).toBe(
+      'Character gains Darkvision with a range of 60 feet.',
+    )
+    expect(formatLanguageGrantSentence(['common'])).toBe('Character knows Common.')
+  })
+
+  it('formats language and feat choices with counted forms', () => {
+    expect(formatLanguageChoiceGrantSentence({ choose: 2, categories: ['standard'] })).toBe(
+      'Character chooses 2 languages from standard languages.',
+    )
+    expect(formatFeatChoiceGrantSentence({ category: 'general', choose: 2 })).toBe(
+      'Character chooses 2 general feats.',
+    )
+  })
+
+  it('formats spell grants with usage-frequency cadence prose', () => {
+    expect(
+      formatSpellsGrantSentence({
+        kind: 'spells',
+        ability: 'cha',
+        mode: 'free_cast',
+        frequency: 'at_will',
+        spellIds: ['dancing-lights'],
+      }),
+    ).toBe('Character can cast dancing-lights at will.')
+
+    expect(
+      formatSpellsGrantSentence(
+        {
+          kind: 'spells',
+          ability: 'cha',
+          mode: 'free_cast',
+          frequency: 'once_per_long_rest',
+          spellIds: ['faerie-fire', 'darkness'],
+        },
+        (id) => ({ 'faerie-fire': 'Faerie Fire', darkness: 'Darkness' })[id],
+      ),
+    ).toBe('Character can cast Faerie Fire and Darkness once per long rest.')
+
+    expect(
+      formatSpellsGrantSentence(
+        {
+          kind: 'spells',
+          ability: 'wis',
+          mode: 'always_prepared',
+          spellIds: ['cure-wounds'],
+        },
+        () => 'Cure Wounds',
+      ),
+    ).toBe('Character has Cure Wounds always prepared.')
   })
 })
 

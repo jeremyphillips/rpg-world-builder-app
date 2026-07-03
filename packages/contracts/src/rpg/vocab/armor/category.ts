@@ -17,14 +17,26 @@ export const ARMOR_CATEGORY_ENTRIES = {
   light: {
     label: 'Light Armor',
     description: '1 minute to don or doff.',
+    sentence: {
+      singular: 'suit of light armor',
+      plural: 'suits of light armor',
+    },
   },
   medium: {
     label: 'Medium Armor',
     description: '5 minutes to don and 1 minute to doff.',
+    sentence: {
+      singular: 'suit of medium armor',
+      plural: 'suits of medium armor',
+    },
   },
   heavy: {
     label: 'Heavy Armor',
     description: '10 minutes to don and 5 minutes to doff.',
+    sentence: {
+      singular: 'suit of heavy armor',
+      plural: 'suits of heavy armor',
+    },
   },
   shields: {
     label: 'Shield',

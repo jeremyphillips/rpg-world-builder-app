@@ -1,7 +1,7 @@
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
-import { getLanguageLabel } from '../../vocab/language'
+import { getDamageTypeSentenceForm } from '../../vocab/damage/vocabulary'
+import { getLanguageSentenceForm } from '../../vocab/language'
 import { formatMovementBonusDescription } from '../../vocab/movement-mode'
-import { getSenseLabel } from '../../vocab/sense'
+import { getSenseLabel, getSenseSentenceForm } from '../../vocab/sense'
 import type {
   ContentGrants,
   ContentTrait,
@@ -23,12 +23,14 @@ function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
     case 'sense':
       return {
         name: getSenseLabel(grant.type),
-        descriptionHtml: `<p>You have ${getSenseLabel(grant.type)} with a range of ${grant.range} feet.</p>`,
+        descriptionHtml: `<p>You have ${getSenseSentenceForm(grant.type)} with a range of ${grant.range} feet.</p>`,
       }
     case 'resistances':
       return {
         name: 'Damage Resistance',
-        descriptionHtml: `<p>You have Resistance to ${getDamageTypeLabel(grant.damageTypes[0]!)} damage.</p>`,
+        descriptionHtml: `<p>You have Resistance to ${getDamageTypeSentenceForm(
+          grant.damageTypes[0]!,
+        )}.</p>`,
       }
     case 'movement':
       return {
@@ -38,7 +40,7 @@ function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
     case 'languages':
       return {
         name: 'Language',
-        descriptionHtml: `<p>You know ${getLanguageLabel(grant.languageIds[0]!)}.</p>`,
+        descriptionHtml: `<p>You know ${getLanguageSentenceForm(grant.languageIds[0]!)}.</p>`,
       }
     default:
       return { name: 'Grant' }

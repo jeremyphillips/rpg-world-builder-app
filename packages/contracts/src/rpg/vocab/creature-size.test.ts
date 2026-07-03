@@ -6,6 +6,7 @@ import {
   creatureSizeSchema,
   getCreatureSizeEntry,
   getCreatureSizeLabel,
+  getCreatureSizeSentenceForm,
 } from './creature-size'
 
 describe('creatureSizeSchema', () => {
@@ -37,5 +38,11 @@ describe('creature size vocabulary', () => {
   it('returns labels and falls back for unknown ids', () => {
     expect(getCreatureSizeLabel('medium')).toBe('Medium')
     expect(getCreatureSizeLabel('custom')).toBe('custom')
+  })
+
+  it('returns counted creature size sentence forms', () => {
+    expect(getCreatureSizeSentenceForm('medium', 1)).toBe('medium creature')
+    expect(getCreatureSizeSentenceForm('medium', 2)).toBe('medium creatures')
+    expect(getCreatureSizeSentenceForm('gargantuan', 2)).toBe('gargantuan creatures')
   })
 })

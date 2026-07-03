@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
@@ -76,4 +77,11 @@ export function formatAlignmentLabel(id: string): string {
   const entry = getAlignmentEntry(id)
   if (!entry) return id
   return `${entry.label} (${id.toUpperCase()})`
+}
+
+/** Counted noun phrase for generated alignment prose. */
+export function getAlignmentSentenceForm(id: string, count = 1): string {
+  const entry = getAlignmentEntry(id)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: id, description: '' }, count)
 }

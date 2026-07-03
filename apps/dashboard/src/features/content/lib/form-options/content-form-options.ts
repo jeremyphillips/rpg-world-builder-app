@@ -8,6 +8,7 @@ import {
   type Equipment,
   type Feat,
   isWeaponEquipment,
+  type SkillProficiency,
   type Spell,
   type WeaponCategory,
 } from '@rpg/contracts'
@@ -26,6 +27,7 @@ import {
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useFeats } from '../../feats/hooks/use-feats'
+import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import {
@@ -48,6 +50,7 @@ export interface ContentFormOptionSets {
   equipment: FieldOption[]
   spells: FieldOption[]
   feats: FieldOption[]
+  skills: FieldOption[]
   tools: FieldOption[]
   /** Weapons, armor, and adventuring gear eligible as a magic item base. */
   magicItemBaseEquipment: FieldOption[]
@@ -77,13 +80,15 @@ function useContentCatalogLists(campaignId: string | undefined) {
   const classesQuery = useClasses(campaignId)
   const spellsQuery = useSpells(campaignId)
   const featsQuery = useFeats(campaignId)
+  const skillsQuery = useSkillProficiencies(campaignId)
   const equipmentQuery = useEquipment(campaignId)
-  const queries = [classesQuery, spellsQuery, featsQuery, equipmentQuery]
+  const queries = [classesQuery, spellsQuery, featsQuery, skillsQuery, equipmentQuery]
 
   return {
     classes: classesQuery.data,
     spells: spellsQuery.data,
     feats: featsQuery.data,
+    skills: skillsQuery.data,
     equipment: equipmentQuery.data,
     isPending: isAnyPending(...queries),
     isError: isAnyError(...queries),
@@ -142,6 +147,7 @@ export function buildContentFormOptionSets(input: {
   classes?: CharacterClass[]
   spells?: Spell[]
   feats?: Feat[]
+  skills?: SkillProficiency[]
   equipment?: Equipment[]
 }): ContentFormOptionSets {
   const classOptions = sortFieldOptions(input.classes?.map(toContentFieldOption) ?? [])
@@ -158,6 +164,7 @@ export function buildContentFormOptionSets(input: {
     equipment: sortFieldOptions(input.equipment?.map(toContentFieldOption) ?? []),
     spells: sortFieldOptions(input.spells?.map(toContentFieldOption) ?? []),
     feats: sortFieldOptions(input.feats?.map(toContentFieldOption) ?? []),
+    skills: sortFieldOptions(input.skills?.map(toContentFieldOption) ?? []),
     tools: sortFieldOptions(
       input.equipment?.filter((item) => item.kind === 'tool').map(toContentFieldOption) ?? [],
     ),
@@ -194,6 +201,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
         classes: catalog.classes,
         spells: catalog.spells,
         feats: catalog.feats,
+        skills: catalog.skills,
         equipment: catalog.equipment,
       }),
     [campaignId, catalog.classes, catalog.spells, catalog.feats, catalog.equipment],

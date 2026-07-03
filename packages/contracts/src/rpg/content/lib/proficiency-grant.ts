@@ -1,9 +1,22 @@
 import { z } from 'zod'
 
-import { armorCategorySchema, getArmorCategoryLabel } from '../../vocab/armor/category'
-import { getToolCategoryLabel, toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { getWeaponCategoryLabel, weaponCategorySchema } from '../../vocab/weapon/category'
-import { skillSchema, SKILLS } from '../skill-proficiency'
+import {
+  armorCategorySchema,
+  getArmorCategoryEntry,
+  getArmorCategoryLabel,
+} from '../../vocab/armor/category'
+import {
+  getToolCategoryEntry,
+  getToolCategoryLabel,
+  toolCategorySchema,
+} from '../../vocab/equipment/tool-category'
+import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '../../vocab/types'
+import {
+  getWeaponCategoryEntry,
+  getWeaponCategoryLabel,
+  weaponCategorySchema,
+} from '../../vocab/weapon/category'
+import { getSkillName, getSkillSentenceForm, skillSchema } from '../skill-proficiency'
 import { contentPoolChoiceSchema } from './choice'
 
 // ---------------------------------------------------------------------------
@@ -238,42 +251,53 @@ export type ArmorTrainingGrant = z.infer<typeof armorTrainingGrantSchema>
 
 // --- Formatters -------------------------------------------------------------
 
-function joinNaturalList(items: string[]): string {
+export function joinNaturalList(items: string[]): string {
   if (items.length === 0) return ''
   if (items.length === 1) return items[0]!
   if (items.length === 2) return `${items[0]} and ${items[1]}`
   return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`
 }
 
-/** Lowercase category label for prose, e.g. "Simple Weapon" → "simple weapon". */
-export function categoryProficiencySingular(label: string): string {
-  return label
-    .split(' ')
-    .map((word) => word.toLowerCase())
-    .join(' ')
+const WEAPON_PROFICIENCY_FORMS = {
+  singular: 'weapon proficiency',
+  plural: 'weapon proficiencies',
+} as const
+
+const TOOL_PROFICIENCY_FORMS = {
+  singular: 'tool proficiency',
+  plural: 'tool proficiencies',
+} as const
+
+const SKILL_PROFICIENCY_FORMS = {
+  singular: 'skill proficiency',
+  plural: 'skill proficiencies',
+} as const
+
+type ProficiencyForms = {
+  readonly singular: string
+  readonly plural: string
 }
 
-/** Plural category phrase for prose, e.g. "Simple Weapon" → "simple weapons". */
-export function categoryProficiencyPlural(label: string): string {
-  const singular = categoryProficiencySingular(label)
-  const lastSpace = singular.lastIndexOf(' ')
-  const noun = lastSpace === -1 ? singular : singular.slice(lastSpace + 1)
-  if (noun === 'armor') {
-    return singular
-  }
-  if (lastSpace === -1) {
-    return noun.endsWith('s') ? singular : `${singular}s`
-  }
-  const prefix = singular.slice(0, lastSpace + 1)
-  const pluralNoun = noun.endsWith('s') ? noun : `${noun}s`
-  return `${prefix}${pluralNoun}`
+function proficiencyForm(forms: ProficiencyForms, count: number): string {
+  return count === 1 ? forms.singular : forms.plural
+}
+
+function fallbackEntry(category: string): GameTermEntry {
+  return { label: category, description: '' }
+}
+
+function armorProficiencyScopeForm(entry: GameTermEntry): string {
+  return getTermLabelSingular(entry.label)
 }
 
 function formatAllCategoriesPhrase(
   categories: string[],
-  getLabel: (category: string) => string,
+  getEntry: (category: string) => GameTermEntry | undefined,
+  getScopeForm: (entry: GameTermEntry) => string = (entry) => getTermSentenceForm(entry, 2),
 ): string {
-  const phrases = categories.map((category) => categoryProficiencyPlural(getLabel(category)))
+  const phrases = categories.map((category) =>
+    getScopeForm(getEntry(category) ?? fallbackEntry(category)),
+  )
   return joinNaturalList(phrases.map((phrase) => `all ${phrase}`))
 }
 
@@ -307,7 +331,7 @@ export function formatSkillProficiencyPoolLabel(pool: SkillProficiencyPool): str
   if (pool.source === 'any') {
     return 'any skill'
   }
-  return pool.skillIds.map((id) => SKILLS[id]).join(', ')
+  return pool.skillIds.map((id) => getSkillName(id)).join(', ')
 }
 
 /** Display label for an armor training choice pool. */
@@ -336,7 +360,7 @@ function formatFixedWeaponSentence(
   if (hasCategories && !hasSlugs) {
     return `Character gains proficiency with ${formatAllCategoriesPhrase(
       grant.weaponCategories!,
-      getWeaponCategoryLabel,
+      getWeaponCategoryEntry,
     )}.`
   }
 
@@ -346,7 +370,7 @@ function formatFixedWeaponSentence(
     parts.push(joinNaturalList(names))
   }
   if (hasCategories) {
-    parts.push(formatAllCategoriesPhrase(grant.weaponCategories!, getWeaponCategoryLabel))
+    parts.push(formatAllCategoriesPhrase(grant.weaponCategories!, getWeaponCategoryEntry))
   }
   return `Character gains proficiency with ${joinNaturalList(parts)}.`
 }
@@ -366,7 +390,7 @@ function formatFixedToolSentence(
   if (hasCategories && !hasSlugs) {
     return `Character gains proficiency with ${formatAllCategoriesPhrase(
       grant.toolCategories!,
-      getToolCategoryLabel,
+      getToolCategoryEntry,
     )}.`
   }
 
@@ -376,13 +400,16 @@ function formatFixedToolSentence(
     parts.push(joinNaturalList(names))
   }
   if (hasCategories) {
-    parts.push(formatAllCategoriesPhrase(grant.toolCategories!, getToolCategoryLabel))
+    parts.push(formatAllCategoriesPhrase(grant.toolCategories!, getToolCategoryEntry))
   }
   return `Character gains proficiency with ${joinNaturalList(parts)}.`
 }
 
-function formatFixedSkillSentence(grant: FixedSkillProficiencyGrant): string {
-  const names = grant.skillIds.map((id) => SKILLS[id])
+function formatFixedSkillSentence(
+  grant: FixedSkillProficiencyGrant,
+  resolveSkillName?: (id: string) => string | undefined,
+): string {
+  const names = grant.skillIds.map((id) => getSkillSentenceForm(id, 1, resolveSkillName?.(id)))
   return `Character gains proficiency in ${joinNaturalList(names)}.`
 }
 
@@ -401,7 +428,8 @@ function formatFixedArmorSentence(
   if (hasCategories && !hasSlugs) {
     return `Character gains training with ${formatAllCategoriesPhrase(
       grant.armorCategories!,
-      getArmorCategoryLabel,
+      getArmorCategoryEntry,
+      armorProficiencyScopeForm,
     )}.`
   }
 
@@ -411,49 +439,78 @@ function formatFixedArmorSentence(
     parts.push(joinNaturalList(names))
   }
   if (hasCategories) {
-    parts.push(formatAllCategoriesPhrase(grant.armorCategories!, getArmorCategoryLabel))
+    parts.push(
+      formatAllCategoriesPhrase(
+        grant.armorCategories!,
+        getArmorCategoryEntry,
+        armorProficiencyScopeForm,
+      ),
+    )
   }
   return `Character gains training with ${joinNaturalList(parts)}.`
 }
 
 function formatWeaponChoiceSentence(choose: number, pool: WeaponProficiencyPool): string {
   if (pool.source === 'filtered' && pool.weaponCategory) {
-    return `Character chooses ${choose} weapon proficiency from ${categoryProficiencyPlural(
-      getWeaponCategoryLabel(pool.weaponCategory),
+    return `Character chooses ${choose} ${proficiencyForm(
+      WEAPON_PROFICIENCY_FORMS,
+      choose,
+    )} from ${getTermSentenceForm(
+      getWeaponCategoryEntry(pool.weaponCategory) ?? fallbackEntry(pool.weaponCategory),
+      2,
     )}.`
   }
   if (pool.source === 'explicit') {
-    return `Character chooses ${choose} weapon proficiency from selected weapons.`
+    return `Character chooses ${choose} ${proficiencyForm(
+      WEAPON_PROFICIENCY_FORMS,
+      choose,
+    )} from selected weapons.`
   }
-  return `Character chooses ${choose} weapon proficiency.`
+  return `Character chooses ${choose} ${proficiencyForm(WEAPON_PROFICIENCY_FORMS, choose)}.`
 }
 
 function formatToolChoiceSentence(choose: number, pool: ToolProficiencyPool): string {
   if (pool.source === 'any') {
-    return `Character chooses ${choose} tool proficiency from any tools.`
+    return `Character chooses ${choose} ${proficiencyForm(
+      TOOL_PROFICIENCY_FORMS,
+      choose,
+    )} from any tools.`
   }
   if (pool.source === 'filtered' && pool.toolCategory) {
-    return `Character chooses ${choose} tool proficiency from ${categoryProficiencyPlural(
-      getToolCategoryLabel(pool.toolCategory),
+    return `Character chooses ${choose} ${proficiencyForm(
+      TOOL_PROFICIENCY_FORMS,
+      choose,
+    )} from ${getTermSentenceForm(
+      getToolCategoryEntry(pool.toolCategory) ?? fallbackEntry(pool.toolCategory),
+      2,
     )}.`
   }
   if (pool.source === 'explicit') {
-    return `Character chooses ${choose} tool proficiency from selected tools.`
+    return `Character chooses ${choose} ${proficiencyForm(
+      TOOL_PROFICIENCY_FORMS,
+      choose,
+    )} from selected tools.`
   }
-  return `Character chooses ${choose} tool proficiency.`
+  return `Character chooses ${choose} ${proficiencyForm(TOOL_PROFICIENCY_FORMS, choose)}.`
 }
 
 function formatSkillChoiceSentence(choose: number, pool: SkillProficiencyPool): string {
   if (pool.source === 'any') {
-    return `Character chooses ${choose} skill proficiency from any skills.`
+    return `Character chooses ${choose} ${proficiencyForm(
+      SKILL_PROFICIENCY_FORMS,
+      choose,
+    )} from any skills.`
   }
-  return `Character chooses ${choose} skill proficiency from selected skills.`
+  return `Character chooses ${choose} ${proficiencyForm(
+    SKILL_PROFICIENCY_FORMS,
+    choose,
+  )} from selected skills.`
 }
 
 function formatArmorChoiceSentence(choose: number, pool: ArmorTrainingPool): string {
   if (pool.source === 'filtered' && pool.armorCategory) {
-    return `Character chooses ${choose} armor training from ${categoryProficiencyPlural(
-      getArmorCategoryLabel(pool.armorCategory),
+    return `Character chooses ${choose} armor training from ${armorProficiencyScopeForm(
+      getArmorCategoryEntry(pool.armorCategory) ?? fallbackEntry(pool.armorCategory),
     )}.`
   }
   if (pool.source === 'explicit') {
@@ -485,9 +542,12 @@ export function formatToolProficiencyGrantSentence(
 }
 
 /** Human-readable summary for skill proficiency grant array item headers. */
-export function formatSkillProficiencyGrantSentence(grant: SkillProficiencyGrant): string {
+export function formatSkillProficiencyGrantSentence(
+  grant: SkillProficiencyGrant,
+  resolveSkillName?: (id: string) => string | undefined,
+): string {
   if (grant.kind === 'fixed') {
-    return formatFixedSkillSentence(grant)
+    return formatFixedSkillSentence(grant, resolveSkillName)
   }
   return formatSkillChoiceSentence(grant.choose ?? 1, grant.pool)
 }

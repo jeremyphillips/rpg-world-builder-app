@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { GrantGroups } from '@rpg/contracts'
 
-import { formatSpellRowTitle } from './grant-form-fields'
+import {
+  formatDamageTypeRowSummary,
+  formatFeatChoiceRowSummary,
+  formatLanguageRowSummary,
+  formatResistanceRowSummary,
+  formatSenseRowSummary,
+  formatSpellRowTitle,
+} from './grant-form-fields'
 import {
   GRANT_ROW_TYPE_LABELS,
   GRANT_ROW_TYPES,
@@ -359,5 +366,21 @@ describe('formatSpellRowTitle', () => {
   it('returns Spells when no spells are selected', () => {
     expect(formatSpellRowTitle([], [])).toBe('Spells')
     expect(formatSpellRowTitle(undefined, [])).toBe('Spells')
+  })
+})
+
+describe('grant row summaries', () => {
+  it('formats damage, sense, language, and feat rows with shared sentence helpers', () => {
+    expect(formatResistanceRowSummary(['poison'])).toBe(
+      'Character gains Resistance to poison damage.',
+    )
+    expect(formatDamageTypeRowSummary(['fire', 'cold'])).toBe(
+      'Character chooses from fire damage and cold damage.',
+    )
+    expect(formatSenseRowSummary('darkvision', 60)).toBe(
+      'Character gains Darkvision with a range of 60 feet.',
+    )
+    expect(formatLanguageRowSummary('common')).toBe('Character knows Common.')
+    expect(formatFeatChoiceRowSummary('general', 2)).toBe('Character chooses 2 general feats.')
   })
 })

@@ -5,6 +5,7 @@ import {
   createEquipmentInputSchema,
   equipmentPatchSchema,
   equipmentSchema,
+  EQUIPMENT_KIND_ENTRIES,
   EQUIPMENT_KIND_LABELS,
   EQUIPMENT_KINDS,
   formatWeaponDamage,
@@ -207,6 +208,7 @@ const SAMPLE_BODIES = {
 describe('equipment kind taxonomy', () => {
   it('exposes every kind in EQUIPMENT_KINDS', () => {
     expect([...EQUIPMENT_KINDS].sort()).toEqual(Object.keys(EQUIPMENT_KIND_LABELS).sort())
+    expect([...EQUIPMENT_KINDS].sort()).toEqual(Object.keys(EQUIPMENT_KIND_ENTRIES).sort())
   })
 
   it('has a sample body for every kind (keeps this test exhaustive)', () => {
@@ -214,6 +216,9 @@ describe('equipment kind taxonomy', () => {
   })
 
   it('returns labels and falls back for unknown kinds', () => {
+    expect(EQUIPMENT_KIND_LABELS.adventuring_gear).toBe(
+      EQUIPMENT_KIND_ENTRIES.adventuring_gear.label,
+    )
     expect(getEquipmentKindLabel('magic_item')).toBe('Magic Item')
     expect(getEquipmentKindLabel('teleporter')).toBe('teleporter')
   })
