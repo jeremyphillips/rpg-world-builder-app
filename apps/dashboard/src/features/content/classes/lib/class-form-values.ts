@@ -1,5 +1,4 @@
 import {
-  campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   type CharacterClass,
   type ClassProficiencies,
@@ -11,9 +10,9 @@ import {
 
 import { envelopeSlugFields } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
-import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
 import type { ClassFormValues } from './class-form-fields'
 import { createAsiFeature } from './class-asi-features'
+import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
 import {
@@ -91,14 +90,6 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   }
 }
 
-function subclassChoiceLevelInputFromForm(
-  subclassChoiceLevel: ClassFormValues['subclassChoiceLevel'],
-  maxLevel: number,
-): number | undefined {
-  if (subclassChoiceLevel === SUBCLASS_CHOICE_LEVEL_NONE) return undefined
-  return campaignLevelSchema(maxLevel).parse(Number(subclassChoiceLevel))
-}
-
 function classProficienciesInputFromForm(values: ClassFormValues) {
   return {
     ...proficienciesFromFormValues(
@@ -132,7 +123,6 @@ function classResourcesInputFromForm(
 export function buildClassCreateInput(
   values: ClassFormValues,
   ctx: ContentFormInputCtx<CharacterClass> | undefined,
-  maxLevel: number,
 ) {
   const characterCreation = classCharacterCreationInputFromForm(values, ctx?.entity)
 
@@ -142,7 +132,6 @@ export function buildClassCreateInput(
     description: values.description || undefined,
     primaryAbilities: values.primaryAbilities,
     hitDie: values.hitDie,
-    subclassChoiceLevel: subclassChoiceLevelInputFromForm(values.subclassChoiceLevel, maxLevel),
     spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
     proficiencies: classProficienciesInputFromForm(values),
     features: featuresFromFormValues(values.features, ctx?.entity?.features),
@@ -232,7 +221,6 @@ function spellcastingFromFormValues(
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   primaryAbilities: ['str'],
   hitDie: 8,
-  subclassChoiceLevel: '3',
   hasSpellcasting: false,
   weaponProficiencyMode: 'categories',
   spellcasting: {
@@ -249,6 +237,9 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
     tools: { categories: [], items: [] },
     skills: { choose: 2, from: [] },
   },
-  features: [4, 8, 12, 16].map((level) => featureToFormRow(createAsiFeature(level))),
+  features: [
+    createSubclassChoiceFeature({ classSlug: 'new-class', className: 'New Class' }),
+    ...[4, 8, 12, 16].map((level) => createAsiFeature(level)),
+  ].map(featureToFormRow),
   resources: [],
 }

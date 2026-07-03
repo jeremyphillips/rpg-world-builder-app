@@ -272,18 +272,25 @@ describe('classFormDef round-trips', () => {
       f.grantGroups?.[0]?.grants.some((g) => g.kind === 'featChoice'),
     )
     expect(asiInInput.length).toBeGreaterThanOrEqual(4)
-    expect(input.subclassChoiceLevel).toEqual(fighter.subclassChoiceLevel)
+    expect(input.features.map((feature) => feature.id)).toContain('fighter-subclass')
   })
 
-  it('create defaults include subclass choice level 3 and specific-weapons toggle off', () => {
-    expect(classFormDef.createDefaultValues?.subclassChoiceLevel).toEqual('3')
+  it('create defaults include a subclass choice feature and specific-weapons toggle off', () => {
+    const featureIds = classFormDef.createDefaultValues?.features?.map((feature) => feature.id)
+    expect(featureIds).toContain('new-class-subclass')
     expect(classFormDef.createDefaultValues?.weaponProficiencyMode).toBe('categories')
   })
 
-  it('create defaults seed ASI features at levels 4, 8, 12, 16', () => {
+  it('create defaults seed subclass choice and ASI features', () => {
     const features = classFormDef.createDefaultValues?.features ?? []
-    expect(features.map((f) => f.level)).toEqual([4, 8, 12, 16])
-    expect(features.every((f) => f.name === 'Ability Score Improvement')).toBe(true)
+    expect(features.map((f) => f.level)).toEqual([3, 4, 8, 12, 16])
+    expect(features.map((f) => f.name)).toEqual([
+      'New Class Subclass',
+      'Ability Score Improvement',
+      'Ability Score Improvement',
+      'Ability Score Improvement',
+      'Ability Score Improvement',
+    ])
   })
 
   it('fighter: hasSpellcasting is false when no spellcasting block', () => {

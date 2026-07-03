@@ -66,7 +66,7 @@ describe('ClassProgressionTable', () => {
     expect(screen.getByRole('columnheader', { name: '9th-level Slots' })).toBeInTheDocument()
   })
 
-  it('shows the subclass choice label at subclassChoiceLevel', () => {
+  it('shows the explicit subclass choice feature row', () => {
     render(<ClassProgressionTable characterClass={pickClass('bard')} />)
 
     const level3Row = screen.getAllByRole('row')[3]

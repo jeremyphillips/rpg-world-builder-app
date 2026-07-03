@@ -7,7 +7,6 @@ import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultMulticlassingRules,
   MAX_CHARACTER_LEVEL,
-  subclassChoiceFeatureLabel,
   isSpellcastingActiveAtLevel,
   spellcastingFeatureLabel,
   spellcastingUnlockLevel,
@@ -48,8 +47,6 @@ function isLegacySpellcastingFeature(
 function featuresAtLevel(
   features: CharacterClass['features'],
   spellcasting: CharacterClass['spellcasting'],
-  subclassChoiceLevel: number | undefined,
-  className: string,
   level: number,
 ): string[] {
   const names = features
@@ -62,10 +59,6 @@ function featuresAtLevel(
     if (!names.includes(label)) names.push(label)
   }
 
-  if (subclassChoiceLevel === level) {
-    const choiceLabel = subclassChoiceFeatureLabel(className)
-    if (!names.includes(choiceLabel)) names.push(choiceLabel)
-  }
   return names
 }
 
@@ -82,7 +75,7 @@ function buildRow(
   characterClass: CharacterClass,
   slotTable: number[][] | undefined,
 ): ProgressionRow {
-  const { features, subclassChoiceLevel, spellcasting, name } = characterClass
+  const { features, spellcasting } = characterClass
   const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
   const cantripsNorm = spellcasting?.cantrips?.map((c) => ({ level: c.level, value: c.known }))
   const spellsAvailableNorm = spellcasting?.spellsAvailable?.map((s) => ({
@@ -92,7 +85,7 @@ function buildRow(
   return {
     level,
     profBonus: proficiencyBonus(level),
-    features: featuresAtLevel(features, spellcasting, subclassChoiceLevel, name, level),
+    features: featuresAtLevel(features, spellcasting, level),
     resources: buildResourceRow(characterClass.resources, level),
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:

@@ -1,12 +1,7 @@
 import { ABILITY_ENTRIES, ABILITY_IDS, CLASS_HIT_DICE, formatHitDie } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
-import {
-  getLevelFieldOptions,
-  HIT_DIE_SELECT_DIGITS,
-} from '../../lib/form-options/level-field-options'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { SUBCLASS_CHOICE_LEVEL_NONE } from './class-form-constants'
+import { HIT_DIE_SELECT_DIGITS } from '../../lib/form-options/level-field-options'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -21,12 +16,7 @@ const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   label: formatHitDie(face),
 }))
 
-const subclassChoiceLevelOptions = (ctx: ContentFormCtx) => [
-  { value: SUBCLASS_CHOICE_LEVEL_NONE, label: 'None' },
-  ...getLevelFieldOptions(ctx),
-]
-
-export function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
+export function coreAttributesFields(): FormItem[] {
   return [
     {
       kind: 'row',
@@ -50,14 +40,6 @@ export function coreAttributesFields(ctx: ContentFormCtx): FormItem[] {
           width: 'auto',
         },
       ],
-    },
-    {
-      type: 'select',
-      name: 'subclassChoiceLevel',
-      label: 'Subclass choice level',
-      options: subclassChoiceLevelOptions(ctx),
-      hint: 'Level at which a character chooses their subclass',
-      digits: 2,
     },
   ]
 }

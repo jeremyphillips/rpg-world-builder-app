@@ -13,7 +13,7 @@ describe('buildFeatStatRows', () => {
     const alert = getFeatBySlug('srd-cc-5.2.1', 'alert')
     const rows = buildFeatStatRows(alert)
     expect(rows.map((r) => r.label)).toEqual(['Category', 'Repeatable'])
-    expect(rows[0]?.value).toBe('Origin Feat')
+    expect(rows[0]?.value).toBe('Origin')
     expect(rows[1]?.value).toBe('No')
   })
 

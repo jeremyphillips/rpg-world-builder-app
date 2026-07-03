@@ -198,6 +198,38 @@ const featCategoryOptions = toOptions(
   ) as Record<FeatCategory, string>,
 )
 
+function featChoiceInlineSentenceField(
+  overrides?: Partial<InlineSentenceFieldConfig>,
+): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: 'featChoose',
+    label: '',
+    hideLabel: true,
+    segments: [
+      { kind: 'text', value: 'Choose', tone: 'label' },
+      {
+        kind: 'number',
+        name: 'featChoose',
+        min: 1,
+        digits: 1,
+        defaultValue: 1,
+      },
+      { kind: 'text', value: 'from', tone: 'label' },
+      {
+        kind: 'select',
+        name: 'featCategory',
+        options: featCategoryOptions,
+        width: 'auto',
+        defaultValue: 'general',
+        ariaLabel: 'Feat category',
+      },
+      { kind: 'text', value: 'category', tone: 'label' },
+    ],
+    ...overrides,
+  }
+}
+
 function visibleFor<T extends string>(value: T): FieldVisibility {
   return {
     dependsOn: ['grantType'],
@@ -378,23 +410,9 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('spells'),
     },
     // --- Feat choice fields ---
-    {
-      type: 'select',
-      name: 'featCategory',
-      label: 'Feat category',
-      options: featCategoryOptions,
-      required: true,
+    featChoiceInlineSentenceField({
       visibility: visibleFor('featChoice'),
-    },
-    {
-      type: 'number',
-      name: 'featChoose',
-      label: 'Number to choose',
-      min: 1,
-      defaultValue: 1,
-      visibility: visibleFor('featChoice'),
-      digits: 1,
-    },
+    }),
     {
       type: 'checkbox',
       name: 'featAllowAnyQualifying',

@@ -11,6 +11,7 @@ import {
 import { loadSeedSkillProficiencies } from '../skill-proficiencies'
 import {
   normalizeGrantGroups,
+  subclassChoiceFeatureId,
   skillSlugsSuggestingClass,
   type CharacterClass,
 } from '@rpg/contracts'
@@ -22,6 +23,20 @@ function asiLevelsFromFeatures(cls: CharacterClass): number[] {
     .filter((feature) => /^ability-score-improvement-\d+$/.test(feature.id))
     .map((feature) => feature.level)
     .sort((a, b) => a - b)
+}
+
+function isSubclassChoiceFeature(cls: CharacterClass, feature: CharacterClass['features'][number]) {
+  return feature.id === subclassChoiceFeatureId(cls.slug)
+}
+
+function expectClassFeatureDescriptions(cls: CharacterClass): void {
+  for (const feature of cls.features) {
+    if (isSubclassChoiceFeature(cls, feature)) {
+      expect(feature.description).toBe('')
+    } else {
+      expect(feature.description && feature.description.length > 0).toBe(true)
+    }
+  }
 }
 
 describe('SRD 5.2.1 class seed', () => {
@@ -59,6 +74,10 @@ describe('SRD 5.2.1 class seed', () => {
     for (const cls of classes) {
       expectRichTextHtml(cls.description)
       for (const feature of cls.features) {
+        if (isSubclassChoiceFeature(cls, feature)) {
+          expect(feature.description).toBe('')
+          continue
+        }
         expectRichTextHtml(feature.description)
       }
     }
@@ -72,8 +91,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Bard ships full feature prose, prepared spells, and Bardic Die resource', () => {
     const bard = getClassBySlug(RULESET, 'bard')
-    expect(bard.features).toHaveLength(13)
-    expect(bard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(bard.features).toHaveLength(14)
+    expectClassFeatureDescriptions(bard)
     expect(bard.spellcasting?.description).toContain('cast spells through your bardic arts')
     expect(asiLevelsFromFeatures(bard)).toEqual([4, 8, 12, 16])
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
@@ -108,8 +127,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Ranger ships spellcasting prose, prepared spells, and Favored Enemy resource', () => {
     const ranger = getClassBySlug(RULESET, 'ranger')
-    expect(ranger.features).toHaveLength(18)
-    expect(ranger.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(ranger.features).toHaveLength(19)
+    expectClassFeatureDescriptions(ranger)
     expect(asiLevelsFromFeatures(ranger)).toEqual([4, 8, 12, 16])
     expect(ranger.spellcasting?.description).toContain('channel the magical essence of nature')
     expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
@@ -144,12 +163,12 @@ describe('SRD 5.2.1 class seed', () => {
     expect(hunter.description).toContain('protect nature and people')
   })
 
-  it('Rogue ships full feature prose without ASI or subclass choice entries', () => {
+  it('Rogue ships full feature prose and a subclass choice entry', () => {
     const rogue = getClassBySlug(RULESET, 'rogue')
-    expect(rogue.features).toHaveLength(21)
-    expect(rogue.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(rogue.features).toHaveLength(22)
+    expectClassFeatureDescriptions(rogue)
     expect(asiLevelsFromFeatures(rogue)).toEqual([4, 8, 10, 12, 16])
-    expect(rogue.features.map((f) => f.id)).not.toContain('rogue-subclass')
+    expect(rogue.features.map((f) => f.id)).toContain('rogue-subclass')
     expect(rogue.proficiencies.tools).toEqual({
       categories: [],
       items: ['thieves-tools'],
@@ -178,8 +197,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Barbarian ships full feature prose, resource columns, and no ASI entry', () => {
     const barbarian = getClassBySlug(RULESET, 'barbarian')
-    expect(barbarian.features).toHaveLength(22)
-    expect(barbarian.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(barbarian.features).toHaveLength(23)
+    expectClassFeatureDescriptions(barbarian)
     expect(asiLevelsFromFeatures(barbarian)).toEqual([4, 8, 12, 16])
     const rage = barbarian.features.find((f) => f.id === 'rage')
     expect(rage?.description).toContain('<strong>Damage Resistance.</strong>')
@@ -220,8 +239,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Cleric ships spellcasting prose, prepared spells, Channel Divinity resource, and features', () => {
     const cleric = getClassBySlug(RULESET, 'cleric')
-    expect(cleric.features).toHaveLength(12)
-    expect(cleric.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(cleric.features).toHaveLength(13)
+    expectClassFeatureDescriptions(cleric)
     expect(asiLevelsFromFeatures(cleric)).toEqual([4, 8, 12, 16])
     expect(cleric.spellcasting?.description).toContain('cast spells through prayer and meditation')
     expect(cleric.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
@@ -269,8 +288,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Druid ships spellcasting prose, prepared spells, Wild Shape resource, and features', () => {
     const druid = getClassBySlug(RULESET, 'druid')
-    expect(druid.features).toHaveLength(14)
-    expect(druid.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(druid.features).toHaveLength(15)
+    expectClassFeatureDescriptions(druid)
     expect(asiLevelsFromFeatures(druid)).toEqual([4, 8, 12, 16])
     expect(druid.spellcasting?.description).toContain('studying the mystical forces of nature')
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
@@ -313,8 +332,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Fighter ships full feature prose, resource columns, and no ASI entry', () => {
     const fighter = getClassBySlug(RULESET, 'fighter')
-    expect(fighter.features).toHaveLength(19)
-    expect(fighter.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(fighter.features).toHaveLength(20)
+    expectClassFeatureDescriptions(fighter)
     expect(asiLevelsFromFeatures(fighter)).toEqual([4, 6, 8, 12, 14, 16])
     expect(fighter.features.map((f) => f.id)).toEqual([
       'fighting-style',
@@ -322,6 +341,7 @@ describe('SRD 5.2.1 class seed', () => {
       'weapon-mastery',
       'action-surge',
       'tactical-mind',
+      'fighter-subclass',
       'ability-score-improvement-4',
       'extra-attack',
       'tactical-shift',
@@ -406,8 +426,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Monk ships feature prose and Martial Arts, Focus Points, and Unarmored Movement resources', () => {
     const monk = getClassBySlug(RULESET, 'monk')
-    expect(monk.features).toHaveLength(24)
-    expect(monk.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(monk.features).toHaveLength(25)
+    expectClassFeatureDescriptions(monk)
     expect(asiLevelsFromFeatures(monk)).toEqual([4, 8, 12, 16])
     const martialArts = monk.features.find((f) => f.id === 'martial-arts')
     expect(martialArts?.description).toContain('<strong>Martial Arts Die.</strong>')
@@ -451,8 +471,8 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Paladin ships spellcasting prose, prepared spells, Channel Divinity resource, and features', () => {
     const paladin = getClassBySlug(RULESET, 'paladin')
-    expect(paladin.features).toHaveLength(18)
-    expect(paladin.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(paladin.features).toHaveLength(19)
+    expectClassFeatureDescriptions(paladin)
     expect(asiLevelsFromFeatures(paladin)).toEqual([4, 8, 12, 16])
     expect(paladin.spellcasting?.description).toContain('cast spells through prayer and meditation')
     expect(paladin.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
@@ -503,10 +523,10 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Sorcerer ships spellcasting prose, prepared spells, Sorcery Points resource, and features', () => {
     const sorcerer = getClassBySlug(RULESET, 'sorcerer')
-    expect(sorcerer.features).toHaveLength(11)
-    expect(sorcerer.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(sorcerer.features).toHaveLength(12)
+    expectClassFeatureDescriptions(sorcerer)
     expect(asiLevelsFromFeatures(sorcerer)).toEqual([4, 8, 12, 16])
-    expect(sorcerer.features.map((f) => f.id)).not.toContain('sorcerer-subclass')
+    expect(sorcerer.features.map((f) => f.id)).toContain('sorcerer-subclass')
     expect(sorcerer.spellcasting?.description).toContain('Drawing from your innate magic')
     expect(sorcerer.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
     expect(sorcerer.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
@@ -575,10 +595,10 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Warlock ships Pact Magic prose, prepared spells, Eldritch Invocations resource, and features', () => {
     const warlock = getClassBySlug(RULESET, 'warlock')
-    expect(warlock.features).toHaveLength(10)
-    expect(warlock.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(warlock.features).toHaveLength(11)
+    expectClassFeatureDescriptions(warlock)
     expect(asiLevelsFromFeatures(warlock)).toEqual([4, 8, 12, 16])
-    expect(warlock.features.map((f) => f.id)).not.toContain('warlock-subclass')
+    expect(warlock.features.map((f) => f.id)).toContain('warlock-subclass')
     expect(warlock.spellcasting?.preparation).toBe('prepared')
     expect(warlock.spellcasting?.description).toContain('formed a pact with a mysterious entity')
     expect(warlock.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
@@ -659,10 +679,10 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Wizard ships spellcasting prose, prepared spells, and features', () => {
     const wizard = getClassBySlug(RULESET, 'wizard')
-    expect(wizard.features).toHaveLength(11)
-    expect(wizard.features.every((f) => f.description && f.description.length > 0)).toBe(true)
+    expect(wizard.features).toHaveLength(12)
+    expectClassFeatureDescriptions(wizard)
     expect(asiLevelsFromFeatures(wizard)).toEqual([4, 8, 12, 16])
-    expect(wizard.features.map((f) => f.id)).not.toContain('wizard-subclass')
+    expect(wizard.features.map((f) => f.id)).toContain('wizard-subclass')
     expect(wizard.spellcasting?.description).toContain('student of arcane magic')
     expect(wizard.spellcasting?.description).toContain('<strong>Spellbook.</strong>')
     expect(wizard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
