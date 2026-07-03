@@ -12,7 +12,13 @@ import {
   type FeatCategory,
   type UsageFrequency,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldOption,
+  type FieldVisibility,
+  type FormItem,
+  type InlineSentenceFieldConfig,
+} from '@rpg/ui/form'
 
 import {
   buildActiveDamageTypeFieldOptions,
@@ -37,10 +43,33 @@ import {
   GRANT_ROW_TYPE_LABELS,
 } from './grant-form-schema'
 
-const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((r) => ({
-  value: String(r),
-  label: `${r} ft.`,
+const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((range) => ({
+  value: String(range),
+  label: String(range),
 }))
+
+function senseRangeInlineSentenceField(
+  overrides?: Partial<InlineSentenceFieldConfig>,
+): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: 'senseRange',
+    label: 'Range',
+    width: '1/3',
+    segments: [
+      {
+        kind: 'select',
+        name: 'senseRange',
+        options: senseRangeOptions,
+        digits: 3,
+        defaultValue: '60',
+        ariaLabel: 'Range',
+      },
+      { kind: 'text', value: 'ft.', tone: 'label' },
+    ],
+    ...overrides,
+  }
+}
 
 const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
 
@@ -137,7 +166,7 @@ export function grantItemFields<T extends string>(
       label: 'Granted at',
       hideLabel: true,
       segments: [
-        { kind: 'text', value: 'Granted this', tone: 'label' },
+        { kind: 'text', value: 'Grant this', tone: 'label' },
         {
           kind: 'select',
           name: 'unlockLevel',
@@ -162,18 +191,18 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('damageType'),
     },
     {
-      type: 'select',
-      name: 'senseType',
-      label: 'Sense type',
-      options: senseTypeOptions,
+      kind: 'row',
       visibility: visibleFor('senses'),
-    },
-    {
-      type: 'select',
-      name: 'senseRange',
-      label: 'Range',
-      options: senseRangeOptions,
-      visibility: visibleFor('senses'),
+      fields: [
+        {
+          type: 'select',
+          name: 'senseType',
+          label: 'Sense type',
+          options: senseTypeOptions,
+          width: '2/3',
+        },
+        senseRangeInlineSentenceField(),
+      ],
     },
     feetInputUnitField('speedWalkOverride', 'Walk speed', {
       visibility: visibleFor('speedOverride'),

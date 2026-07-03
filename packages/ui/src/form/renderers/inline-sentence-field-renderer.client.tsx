@@ -15,6 +15,7 @@ import type {
   InlineSentenceBoundSelect,
 } from '../../components/ui/inline-sentence-field.types'
 import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
+import { resolveSelectPlaceholder } from '../config/field-placeholder.lib'
 import type { InlineSentenceFieldConfig } from '../field-config'
 
 export interface InlineSentenceFieldRendererProps {
@@ -89,6 +90,7 @@ export function InlineSentenceFieldRenderer({
         continue
       }
 
+      const selectLabel = segment.ariaLabel ?? config.label
       const selectControl: InlineSentenceBoundSelect = {
         kind: 'select',
         id: controlId,
@@ -97,8 +99,8 @@ export function InlineSentenceFieldRenderer({
         options: segment.options,
         digits: segment.digits,
         width: segment.width,
-        placeholder: segment.placeholder,
-        ariaLabel: segment.ariaLabel ?? config.label,
+        placeholder: resolveSelectPlaceholder(selectLabel, segment.placeholder),
+        ariaLabel: selectLabel,
         onChange: field.onChange,
         onBlur: field.onBlur,
       }

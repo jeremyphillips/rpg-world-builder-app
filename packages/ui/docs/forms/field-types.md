@@ -18,6 +18,8 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 | `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`   |
 | `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`      |
 
+`select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+
 ## Rich text (`richtext`)
 
 - Value: **sanitized HTML string** (Tiptap).
@@ -127,11 +129,11 @@ feetInputUnitField('speed.walk', 'Walk speed')
 
 Segment kinds:
 
-| Kind     | RHF value   | Notes                                      |
-| -------- | ----------- | ------------------------------------------ |
-| `text`   | —           | Prose fragment; `tone`: `label` / `prose`  |
-| `number` | `number`    | `min`, `max`, `digits`, `defaultValue`     |
-| `select` | `string`    | Flat or grouped `options`; `digits` or segment `width` |
+| Kind     | RHF value | Notes                                                  |
+| -------- | --------- | ------------------------------------------------------ |
+| `text`   | —         | Prose fragment; `tone`: `label` / `prose`              |
+| `number` | `number`  | `min`, `max`, `digits`, `defaultValue`                 |
+| `select` | `string`  | Flat or grouped `options`; `digits` or segment `width` |
 
 Optional `below.kind: 'chips'` renders a chip row under the sentence (same fieldset).
 
@@ -139,10 +141,10 @@ Optional `below.kind: 'chips'` renders a chip row under the sentence (same field
 
 These still render (they delegate to `inlineSentence`) but prefer migrating configs:
 
-| Legacy type         | Replacement                                                |
-| ------------------- | ---------------------------------------------------------- |
-| `chooseFromChips`   | `inlineSentence` + `below: { kind: 'chips', … }`           |
-| `inlineChooseCount` | `inlineSentence` with `number` / `select` segments         |
+| Legacy type         | Replacement                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `chooseFromChips`   | `inlineSentence` + `below: { kind: 'chips', … }`            |
+| `inlineChooseCount` | `inlineSentence` with `number` / `select` segments          |
 | `inputUnit`         | `inlineSentence` with `number` + trailing `text` (`ft.`, …) |
 
 ## Input select (`inputSelect`)

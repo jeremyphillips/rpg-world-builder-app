@@ -62,6 +62,35 @@ describe('InlineSentenceField form integration', () => {
     expect(onSubmit).toHaveBeenCalledWith({ unlockLevel: 'default' }, expect.anything())
   })
 
+  it('shows a default placeholder on select-only inline sentences', () => {
+    render(
+      <Form
+        schema={selectOnlySchema}
+        fields={[
+          {
+            type: 'inlineSentence',
+            name: 'unlockLevel',
+            label: 'Granted at',
+            hideLabel: true,
+            segments: [
+              { kind: 'text', value: 'Granted at', tone: 'label' },
+              {
+                kind: 'select',
+                name: 'unlockLevel',
+                options: [{ value: 'default', label: 'When feature is gained' }],
+              },
+            ],
+          },
+        ]}
+        defaultValues={{}}
+        onSubmit={vi.fn()}
+        footer={null}
+      />,
+    )
+
+    expect(screen.getByRole('combobox')).toHaveTextContent('Select Granted at…')
+  })
+
   it('keeps prose-length select triggers on the inline row', () => {
     const { container } = render(
       <InlineSentenceField
