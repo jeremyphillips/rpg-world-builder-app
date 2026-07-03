@@ -10,6 +10,7 @@ import {
   formatResistanceRowSummary,
   formatSenseRowSummary,
   formatSpellRowTitle,
+  GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
 import {
@@ -437,6 +438,13 @@ describe('formatGrantRowPrimary', () => {
     )
     expect(formatGrantRowPrimary({ grantType: 'languages' }, 0, grantRowHeaderContext)).toBe(
       'Language',
+    )
+  })
+
+  it('shows a repair label when grantType is missing', () => {
+    expect(formatGrantRowPrimary({}, 0, grantRowHeaderContext)).toBe(GRANT_TYPE_MISSING_PRIMARY)
+    expect(formatGrantRowPrimary({ grantType: '' }, 0, grantRowHeaderContext)).toBe(
+      GRANT_TYPE_MISSING_PRIMARY,
     )
   })
 })

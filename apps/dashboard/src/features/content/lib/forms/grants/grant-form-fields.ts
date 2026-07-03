@@ -22,6 +22,7 @@ import {
   type SenseId,
   type UsageFrequency,
 } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 import {
   toOptions,
   type FieldOption,
@@ -29,6 +30,7 @@ import {
   type FormItem,
   type InlineSentenceFieldConfig,
 } from '@rpg/ui/form'
+import { createElement } from 'react'
 
 import {
   buildActiveDamageTypeFieldOptions,
@@ -63,11 +65,13 @@ import {
   weaponProficiencyGrantSummary,
   weaponProficiencyGrantTitle,
 } from './proficiency-grant-form-values'
+import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
   GRANT_DEFAULT_UNLOCK_LEVEL,
   GRANT_ROW_TYPE_LABELS,
+  type GrantType,
 } from './grant-form-schema'
 
 const movementModeOptions: FieldOption[] = MOVEMENT_MODES.map((mode) => ({
@@ -274,11 +278,57 @@ function featChoiceInlineSentenceField(
   }
 }
 
+export const GRANT_TYPE_MISSING_PRIMARY = 'Grant type missing'
+
+const GRANT_TYPE_MISSING_MESSAGE =
+  'This grant row is missing its type. Remove it and add a new grant from the menu.'
+
 function visibleFor<T extends string>(value: T): FieldVisibility {
   return {
     dependsOn: ['grantType'],
     visibleWhen: (watched) => watched['grantType'] === value,
   }
+}
+
+function visibleWhenGrantTypeSet(): FieldVisibility {
+  return {
+    dependsOn: ['grantType'],
+    visibleWhen: (watched) => {
+      const grantType = watched['grantType']
+      return typeof grantType === 'string' && grantType.length > 0
+    },
+  }
+}
+
+function visibleWhenGrantTypeMissing(): FieldVisibility {
+  return {
+    dependsOn: ['grantType'],
+    visibleWhen: (watched) => {
+      const grantType = watched['grantType']
+      return typeof grantType !== 'string' || grantType.length === 0
+    },
+  }
+}
+
+function grantTypeMissingRepairFields(): FormItem[] {
+  return [
+    {
+      kind: 'stack',
+      visibility: visibleWhenGrantTypeMissing(),
+      fields: [
+        {
+          kind: 'slot',
+          name: '_grantTypeMissingRepair',
+          render: () =>
+            createElement(
+              Text,
+              { variant: 'muted', className: 'text-sm' },
+              GRANT_TYPE_MISSING_MESSAGE,
+            ),
+        },
+      ],
+    },
+  ]
 }
 
 function includesGrantType(grantTypes: readonly string[], grantType: string): boolean {
@@ -307,13 +357,6 @@ function proficiencyGrantFieldsForTypes(
         })
       : [],
   )
-}
-
-function grantTypeOptionsFor<T extends string>(
-  grantTypes: readonly T[],
-  labels: Record<T, string>,
-): FieldOption[] {
-  return grantTypes.map((t) => ({ value: t, label: labels[t] }))
 }
 
 /** Formats a concise title for a spells row header. */
@@ -414,13 +457,13 @@ export function formatGrantRowPrimary(
   ctx: GrantRowHeaderContext,
 ): string | undefined {
   const type = values['grantType']
-  if (typeof type !== 'string') return undefined
+  if (typeof type !== 'string' || type.length === 0) return GRANT_TYPE_MISSING_PRIMARY
   return GRANT_ROW_PRIMARY_BY_TYPE[type]?.(values, index, ctx) ?? ctx.rowLabels[type]
 }
 
 export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
-  labels: Record<T, string>,
+  _labels: Record<T, string>,
   ctx: ContentFormCtx,
 ): FormItem[] {
   const spellOptions = ctx.options?.spells ?? []
@@ -436,18 +479,13 @@ export function grantItemFields<T extends string>(
   ]
 
   return [
-    {
-      type: 'select',
-      name: 'grantType',
-      label: 'Grant type',
-      options: grantTypeOptionsFor(grantTypes, labels),
-      required: true,
-    },
+    ...grantTypeMissingRepairFields(),
     {
       type: 'inlineSentence',
       name: 'unlockLevel',
       label: 'Granted at',
       hideLabel: true,
+      visibility: visibleWhenGrantTypeSet(),
       segments: [
         { kind: 'text', value: 'Grant this', tone: 'label' },
         {
@@ -616,6 +654,7 @@ export function grantArrayFields<T extends string>(
         primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
         summary: (values) => formatGrantRowSummary(values, headerContext),
       },
+      addMenu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
       fields: grantItemFields(grantTypes, labels, ctx),
     },
   ]

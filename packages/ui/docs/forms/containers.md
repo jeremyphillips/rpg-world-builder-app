@@ -215,18 +215,51 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property                          | Purpose                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                     |
-| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).    |
-| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).              |
-| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                       |
-| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`). |
-| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                       |
-| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                  |
-| `filterSelectDependsOn`           | Root field names passed to `filterSelectOptions` as `watchedValues`.                       |
-| `filterSelectOptions`             | Cross-row select filtering inside array items.                                             |
-| `arrayPattern`                    | Domain hooks for array validation severity and focus navigation.                           |
+| Property                          | Purpose                                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
+| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
+| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |
+| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                                          |
+| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).                    |
+| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                                          |
+| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                                     |
+| `addMenu`                         | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
+
+```ts
+{
+  kind: 'array',
+  name: 'grants',
+  legend: 'Grants',
+  addLabel: 'Add grant',
+  addMenu: {
+    groups: [{ id: 'combat-traits', label: 'Combat & traits' }],
+    items: [
+      {
+        id: 'movement-bonus',
+        label: 'Movement bonus',
+        description: 'Increase a movement mode speed.',
+        groupId: 'combat-traits',
+        searchTerms: [{ text: 'speed', role: 'alias', weight: 1 }],
+        appendDefaults: () => ({
+          grantType: 'movement',
+          movementMode: 'walk',
+          movementOperation: 'bonus',
+          movementValue: '5',
+        }),
+      },
+    ],
+  },
+  fields: [/* item fields */],
+}
+```
+
+When `addMenu` is set, `ArrayFieldRenderer` renders `ButtonDropdown` instead of a plain add
+button. Selecting an item appends `appendDefaults`, expands the new row, and best-effort focuses
+the first eligible control inside it.
+| `filterSelectDependsOn` | Root field names passed to `filterSelectOptions` as `watchedValues`. |
+| `filterSelectOptions` | Cross-row select filtering inside array items. |
+| `arrayPattern` | Domain hooks for array validation severity and focus navigation. |
 
 ### Array validation presentation
 

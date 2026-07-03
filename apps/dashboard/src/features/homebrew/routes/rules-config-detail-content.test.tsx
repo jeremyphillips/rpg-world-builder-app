@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
@@ -25,6 +25,17 @@ vi.mock('@/features/campaign', async (importOriginal) => {
   return {
     ...actual,
     useCanManageCampaign: vi.fn(),
+    buildRulesConfigFields: vi.fn(() => [
+      {
+        type: 'number',
+        name: 'startingLevel',
+        label: 'Character starting level',
+        min: 1,
+        max: 20,
+        defaultValue: 1,
+        required: true,
+      },
+    ]),
   }
 })
 
@@ -172,6 +183,18 @@ function renderDetail(configId = 'character-configuration', campaignId = 'camp_1
   )
 }
 
+async function expectCharacterConfigurationReady() {
+  expect(
+    await screen.findByRole('heading', { name: 'Character Configuration' }),
+  ).toBeInTheDocument()
+  await screen.findByLabelText('Character starting level')
+}
+
+async function expectMechanicsReady() {
+  expect(await screen.findByRole('heading', { name: 'Mechanics' })).toBeInTheDocument()
+  await screen.findByRole('radio', { name: /Modern 5e/i })
+}
+
 describe('RulesConfigDetailContent', () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
@@ -180,12 +203,11 @@ describe('RulesConfigDetailContent', () => {
 
   it('renders the character configuration form with section navigation', async () => {
     renderDetail()
+    await expectCharacterConfigurationReady()
 
     expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),
     ).toBeInTheDocument()
-    await screen.findByLabelText('Character starting level')
-    expect(screen.getByRole('heading', { name: 'Character Configuration' })).toBeInTheDocument()
     expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
     expect(screen.getByRole('link', { name: 'Subclasses' })).toHaveAttribute('href', '#subclasses')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
@@ -193,8 +215,8 @@ describe('RulesConfigDetailContent', () => {
 
   it('renders the mechanics configuration form with section navigation', async () => {
     renderDetail('mechanics')
+    await expectMechanicsReady()
 
-    expect(await screen.findByRole('heading', { name: 'Mechanics' })).toBeInTheDocument()
     expect(
       screen.getByRole('navigation', { name: 'Mechanics configuration sections' }),
     ).toBeInTheDocument()
@@ -212,9 +234,11 @@ describe('RulesConfigDetailContent', () => {
   it('hides save actions for non-managers', async () => {
     useCanManageCampaignMock.mockReturnValue(false)
     renderDetail()
+    await expectCharacterConfigurationReady()
 
-    await screen.findByLabelText('Character starting level')
-    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+    })
     expect(
       screen.getByText('You can view these rules but only campaign owners can edit them.'),
     ).toBeInTheDocument()
