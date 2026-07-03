@@ -161,6 +161,13 @@ export function weaponProficiencyGrantSummary(
   weaponOptions: FieldOption[] = [],
 ): string {
   if (!row?.itemKind) return ''
+  if (
+    row.itemKind === 'fixed' &&
+    !row.weaponProficiencySlugs?.length &&
+    !row.weaponProficiencyCategories?.length
+  ) {
+    return ''
+  }
 
   const resolveWeaponName = (slug: string) =>
     weaponOptions.find((option) => option.value === slug)?.label
@@ -289,6 +296,13 @@ export function toolProficiencyGrantSummary(
   toolOptions: FieldOption[] = [],
 ): string {
   if (!row?.itemKind) return ''
+  if (
+    row.itemKind === 'fixed' &&
+    !row.toolProficiencySlugs?.length &&
+    !row.toolProficiencyCategories?.length
+  ) {
+    return ''
+  }
 
   const resolveToolName = (slug: string) =>
     toolOptions.find((option) => option.value === slug)?.label
@@ -381,6 +395,7 @@ export function skillProficiencyGrantTitle(
 
 export function skillProficiencyGrantSummary(row: SkillProficiencyItemForm | undefined): string {
   if (!row?.itemKind) return ''
+  if (row.itemKind === 'fixed' && !row.skillProficiencyIds?.length) return ''
   return formatSkillProficiencyGrantSentence(skillProficiencyGrantFromFormRow(row))
 }
 
@@ -490,6 +505,13 @@ export function armorTrainingGrantSummary(
   armorOptions: FieldOption[] = [],
 ): string {
   if (!row?.itemKind) return ''
+  if (
+    row.itemKind === 'fixed' &&
+    !row.armorTrainingSlugs?.length &&
+    !row.armorTrainingCategories?.length
+  ) {
+    return ''
+  }
 
   const resolveArmorName = (slug: string) =>
     armorOptions.find((option) => option.value === slug)?.label

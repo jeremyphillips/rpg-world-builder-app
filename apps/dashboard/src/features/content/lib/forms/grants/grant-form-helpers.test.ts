@@ -5,6 +5,8 @@ import { formatSpellRowTitle } from './grant-form-fields'
 import {
   GRANT_ROW_TYPE_LABELS,
   GRANT_ROW_TYPES,
+  GRANT_TYPES,
+  GRANT_TYPE_LABELS,
   GRANT_DEFAULT_UNLOCK_LEVEL,
 } from './grant-form-schema'
 import {
@@ -251,6 +253,52 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     expect(restored).toEqual(groups)
   })
 
+  it('round-trips a weapon proficiency choice grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'weaponProficiency',
+            grant: {
+              kind: 'choice',
+              choose: 1,
+              pool: { source: 'filtered', weaponCategory: 'martial' },
+            },
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('weaponProficiency')
+    expect(rows[0]?.itemKind).toBe('choice')
+    expect(rows[0]?.weaponProficiencyPoolCategory).toBe('martial')
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
+  it('round-trips an armor training grant', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'armorTraining',
+            grant: {
+              kind: 'fixed',
+              armorCategories: ['light'],
+            },
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.grantType).toBe('armorTraining')
+    expect(rows[0]?.armorTrainingCategories).toEqual(['light'])
+
+    const restored = formRowsToGrantGroups(rows)
+    expect(restored).toEqual(groups)
+  })
+
   it('expands languages grant with multiple ids into multiple rows', () => {
     const groups: GrantGroups = [
       {
@@ -277,6 +325,16 @@ describe('grant row type exports', () => {
     expect(GRANT_ROW_TYPES).toContain('spells')
     expect(GRANT_ROW_TYPES).not.toContain('innateSpells')
     expect(GRANT_ROW_TYPE_LABELS.spells).toBe('Spells')
+  })
+
+  it('exposes four atomic proficiency grant types instead of combined proficiencies', () => {
+    expect(GRANT_TYPES).toContain('weaponProficiency')
+    expect(GRANT_TYPES).toContain('toolProficiency')
+    expect(GRANT_TYPES).toContain('skillProficiency')
+    expect(GRANT_TYPES).toContain('armorTraining')
+    expect(GRANT_TYPES).not.toContain('proficiencies')
+    expect(GRANT_TYPE_LABELS.weaponProficiency).toBe('Weapon proficiency')
+    expect(GRANT_TYPE_LABELS.armorTraining).toBe('Armor training')
   })
 })
 
