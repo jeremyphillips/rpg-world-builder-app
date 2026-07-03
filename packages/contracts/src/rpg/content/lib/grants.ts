@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../vocab/ability'
-import { armorCategorySchema } from '../../vocab/armor/category'
 import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { movementGrantPayloadSchema } from '../../vocab/movement-mode'
@@ -10,8 +9,13 @@ import { senseSchema } from '../../vocab/sense'
 import { usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema } from '../../vocab/feat'
 import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
-import { skillSchema } from '../skill-proficiency'
 import { equipmentGrantSchema } from './equipment-grant'
+import {
+  armorTrainingGrantSchema,
+  skillProficiencyGrantSchema,
+  toolProficiencyGrantSchema,
+  weaponProficiencyGrantSchema,
+} from './proficiency-grant'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
@@ -61,18 +65,6 @@ export const innateSpellsSchema = z.object({
 })
 
 export type InnateSpells = z.infer<typeof innateSpellsSchema>
-
-// --- Proficiencies ----------------------------------------------------------
-
-/** Proficiencies a trait or feature grants. All optional; fixed lists only. */
-export const contentProficienciesSchema = z.object({
-  skills: z.array(skillSchema).optional(),
-  tools: z.array(z.string()).optional(),
-  weapons: z.array(z.string()).optional(),
-  armor: z.array(armorCategorySchema).optional(),
-})
-
-export type ContentProficiencies = z.infer<typeof contentProficienciesSchema>
 
 // --- Language choices --------------------------------------------------------
 
@@ -145,7 +137,6 @@ export const contentGrantsSchema = z.object({
   /** Chosen damage type(s), e.g. a Dragonborn's breath or a Goliath's ancestry. */
   damageType: z.array(damageTypeIdSchema).optional(),
   resistances: z.array(damageTypeIdSchema).optional(),
-  proficiencies: contentProficienciesSchema.optional(),
   languages: z.array(languageIdSchema).optional(),
   languageChoices: z.array(languageChoiceGrantSchema).optional(),
   innateSpells: innateSpellsSchema.optional(),
@@ -220,9 +211,28 @@ const movementContentGrantSchema = movementGrantPayloadSchema.extend({
   kind: z.literal('movement'),
 })
 
-/** Proficiency grant — skills, tools, weapons, and/or armor. */
-const proficienciesContentGrantSchema = contentProficienciesSchema.extend({
-  kind: z.literal('proficiencies'),
+/** Weapon proficiency grant — fixed weapons/categories or a pool choice. */
+const weaponProficiencyContentGrantSchema = z.object({
+  kind: z.literal('weaponProficiency'),
+  grant: weaponProficiencyGrantSchema,
+})
+
+/** Tool proficiency grant — fixed tools/categories or a pool choice. */
+const toolProficiencyContentGrantSchema = z.object({
+  kind: z.literal('toolProficiency'),
+  grant: toolProficiencyGrantSchema,
+})
+
+/** Skill proficiency grant — fixed skills or a pool choice. */
+const skillProficiencyContentGrantSchema = z.object({
+  kind: z.literal('skillProficiency'),
+  grant: skillProficiencyGrantSchema,
+})
+
+/** Armor training grant — fixed armor/categories or a pool choice. */
+const armorTrainingContentGrantSchema = z.object({
+  kind: z.literal('armorTraining'),
+  grant: armorTrainingGrantSchema,
 })
 
 /** Fixed language grant. */
@@ -309,7 +319,10 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   resistancesContentGrantSchema,
   damageTypeContentGrantSchema,
   movementContentGrantSchema,
-  proficienciesContentGrantSchema,
+  weaponProficiencyContentGrantSchema,
+  toolProficiencyContentGrantSchema,
+  skillProficiencyContentGrantSchema,
+  armorTrainingContentGrantSchema,
   languagesContentGrantSchema,
   languageChoiceContentGrantSchema,
   featChoiceContentGrantSchema,
@@ -511,9 +524,7 @@ export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
   if (group!.unlock !== undefined) return false
   if (group!.grants.length !== 1) return false
   const kind = group!.grants[0]!.kind
-  return (
-    kind === 'sense' || kind === 'resistances' || kind === 'movement' || kind === 'languages'
-  )
+  return kind === 'sense' || kind === 'resistances' || kind === 'movement' || kind === 'languages'
 }
 
 // --- Trait building block ---------------------------------------------------

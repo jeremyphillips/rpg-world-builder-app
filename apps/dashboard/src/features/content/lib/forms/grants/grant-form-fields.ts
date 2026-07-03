@@ -1,6 +1,4 @@
 import {
-  ARMOR_CATEGORIES,
-  ARMOR_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
   formatMovementBonusAuthoringSummary,
@@ -12,8 +10,6 @@ import {
   MOVEMENT_OPERATION_ENTRIES,
   MOVEMENT_OPERATIONS,
   SENSE_RANGES,
-  SKILL_IDS,
-  SKILLS,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
@@ -43,6 +39,24 @@ import {
   type EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
 import { equipmentGrantSummary, equipmentGrantTitle } from './equipment-grant-form-values'
+import {
+  proficiencyGrantItemFields,
+  type ArmorTrainingItemForm,
+  type ProficiencyGrantType,
+  type SkillProficiencyItemForm,
+  type ToolProficiencyItemForm,
+  type WeaponProficiencyItemForm,
+} from './proficiency-grant-form-fields'
+import {
+  armorTrainingGrantSummary,
+  armorTrainingGrantTitle,
+  skillProficiencyGrantSummary,
+  skillProficiencyGrantTitle,
+  toolProficiencyGrantSummary,
+  toolProficiencyGrantTitle,
+  weaponProficiencyGrantSummary,
+  weaponProficiencyGrantTitle,
+} from './proficiency-grant-form-values'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
@@ -162,16 +176,6 @@ function senseRangeInlineSentenceField(
   }
 }
 
-const skillOptions = toOptions(SKILL_IDS, SKILLS as Record<(typeof SKILL_IDS)[number], string>)
-
-const armorCategoryOptions = toOptions(
-  ARMOR_CATEGORIES,
-  Object.fromEntries(ARMOR_CATEGORIES.map((c) => [c, ARMOR_CATEGORY_ENTRIES[c].label])) as Record<
-    (typeof ARMOR_CATEGORIES)[number],
-    string
-  >,
-)
-
 const spellModeOptions = toOptions(
   INNATE_SPELL_KINDS,
   Object.fromEntries(
@@ -201,8 +205,33 @@ function visibleFor<T extends string>(value: T): FieldVisibility {
   }
 }
 
+function includesGrantType(grantTypes: readonly string[], grantType: string): boolean {
+  return grantTypes.includes(grantType)
+}
+
 function includesEquipmentGrantType(grantTypes: readonly string[]): boolean {
-  return grantTypes.includes('equipment')
+  return includesGrantType(grantTypes, 'equipment')
+}
+
+const PROFICIENCY_GRANT_TYPES = [
+  'weaponProficiency',
+  'toolProficiency',
+  'skillProficiency',
+  'armorTraining',
+] as const satisfies readonly ProficiencyGrantType[]
+
+function proficiencyGrantFieldsForTypes(
+  grantTypes: readonly string[],
+  ctx: ContentFormCtx,
+): FormItem[] {
+  return PROFICIENCY_GRANT_TYPES.flatMap((grantType) =>
+    includesGrantType(grantTypes, grantType)
+      ? proficiencyGrantItemFields(grantType, ctx, {
+          guardVisibility: visibleFor(grantType),
+          kindSelectLabel: 'Grant type',
+        })
+      : [],
+  )
 }
 
 function grantTypeOptionsFor<T extends string>(
@@ -230,8 +259,6 @@ export function grantItemFields<T extends string>(
   ctx: ContentFormCtx,
 ): FormItem[] {
   const spellOptions = ctx.options?.spells ?? []
-  const toolOptions = ctx.options?.tools ?? []
-  const weaponOptions = ctx.options?.weapons ?? []
   const featOptions = ctx.options?.feats ?? []
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
@@ -305,38 +332,7 @@ export function grantItemFields<T extends string>(
       options: languageOptions,
       visibility: visibleFor('languages'),
     },
-    {
-      type: 'chips',
-      name: 'proficiencySkills',
-      label: 'Skills',
-      options: skillOptions,
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'chips',
-      name: 'proficiencyArmor',
-      label: 'Armor',
-      options: armorCategoryOptions,
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'combobox',
-      name: 'proficiencyTools',
-      label: 'Tools',
-      multiple: true,
-      options: toolOptions,
-      placeholder: 'Choose tools…',
-      visibility: visibleFor('proficiencies'),
-    },
-    {
-      type: 'combobox',
-      name: 'proficiencyWeapons',
-      label: 'Weapons',
-      multiple: true,
-      options: weaponOptions,
-      placeholder: 'Choose weapons…',
-      visibility: visibleFor('proficiencies'),
-    },
+    ...proficiencyGrantFieldsForTypes(grantTypes, ctx),
     // --- Spells row fields (replaces legacy innateSpells entries array) ---
     {
       kind: 'row',
@@ -442,6 +438,9 @@ export function grantArrayFields<T extends string>(
 ): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
   const spellOptions = ctx.options?.spells ?? []
+  const weaponOptions = ctx.options?.weapons ?? []
+  const toolOptions = ctx.options?.tools ?? []
+  const armorOptions = ctx.options?.armor ?? []
   const rowLabels = labels as Record<string, string>
 
   return [
@@ -458,6 +457,22 @@ export function grantArrayFields<T extends string>(
           if (type === 'equipment') {
             return equipmentGrantTitle(values as EquipmentGrantItemForm, index, equipmentOptions)
           }
+          if (type === 'weaponProficiency') {
+            return weaponProficiencyGrantTitle(
+              values as WeaponProficiencyItemForm,
+              index,
+              weaponOptions,
+            )
+          }
+          if (type === 'toolProficiency') {
+            return toolProficiencyGrantTitle(values as ToolProficiencyItemForm, index, toolOptions)
+          }
+          if (type === 'skillProficiency') {
+            return skillProficiencyGrantTitle(values as SkillProficiencyItemForm, index)
+          }
+          if (type === 'armorTraining') {
+            return armorTrainingGrantTitle(values as ArmorTrainingItemForm, index, armorOptions)
+          }
           if (type === 'movement') {
             return formatMovementRowTitle(
               values['movementMode'] as string | undefined,
@@ -470,14 +485,29 @@ export function grantArrayFields<T extends string>(
           return type ? rowLabels[type] : undefined
         },
         summary: (values) => {
-          if (values['grantType'] === 'movement') {
+          const type = values['grantType']
+          if (type === 'movement') {
             return formatMovementRowSummary(
               values['movementMode'] as string | undefined,
               values['movementValue'] as number | string | undefined,
             )
           }
-          if (values['grantType'] !== 'equipment') return ''
-          return equipmentGrantSummary(values as EquipmentGrantItemForm, equipmentOptions)
+          if (type === 'equipment') {
+            return equipmentGrantSummary(values as EquipmentGrantItemForm, equipmentOptions)
+          }
+          if (type === 'weaponProficiency') {
+            return weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, weaponOptions)
+          }
+          if (type === 'toolProficiency') {
+            return toolProficiencyGrantSummary(values as ToolProficiencyItemForm, toolOptions)
+          }
+          if (type === 'skillProficiency') {
+            return skillProficiencyGrantSummary(values as SkillProficiencyItemForm)
+          }
+          if (type === 'armorTraining') {
+            return armorTrainingGrantSummary(values as ArmorTrainingItemForm, armorOptions)
+          }
+          return ''
         },
       },
       fields: grantItemFields(grantTypes, labels, ctx),

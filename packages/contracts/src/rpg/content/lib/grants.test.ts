@@ -446,11 +446,31 @@ describe('contentGrantSchema — movement', () => {
   })
 })
 
-describe('contentGrantSchema — proficiencies', () => {
-  it('parses a proficiencies grant', () => {
+describe('contentGrantSchema — weaponProficiency', () => {
+  it('parses a weapon proficiency grant', () => {
     expect(
-      contentGrantSchema.parse({ kind: 'proficiencies', skills: ['athletics', 'stealth'] }),
-    ).toEqual({ kind: 'proficiencies', skills: ['athletics', 'stealth'] })
+      contentGrantSchema.parse({
+        kind: 'weaponProficiency',
+        grant: { kind: 'fixed', weaponCategories: ['simple'] },
+      }),
+    ).toEqual({
+      kind: 'weaponProficiency',
+      grant: { kind: 'fixed', weaponCategories: ['simple'] },
+    })
+  })
+})
+
+describe('contentGrantSchema — skillProficiency', () => {
+  it('parses a skill proficiency grant', () => {
+    expect(
+      contentGrantSchema.parse({
+        kind: 'skillProficiency',
+        grant: { kind: 'fixed', skillIds: ['athletics', 'stealth'] },
+      }),
+    ).toEqual({
+      kind: 'skillProficiency',
+      grant: { kind: 'fixed', skillIds: ['athletics', 'stealth'] },
+    })
   })
 })
 
@@ -816,9 +836,7 @@ describe('isGrantGroupsEligible', () => {
     expect(
       isGrantGroupsEligible([
         {
-          grants: [
-            { kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
-          ],
+          grants: [{ kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' }],
         },
       ]),
     ).toBe(true)
