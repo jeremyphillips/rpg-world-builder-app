@@ -65,6 +65,7 @@ expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ 
 | ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------- |
 | `levelValidationMessages`                        | `validation.level.*`                        | Level bounds, tables, campaign max (`overCampaignMax`)               |
 | `characterValidationMessages`                    | `validation.character.*`                    | Valid character data (duplicate class, proficiency targets, sources) |
+| `characterBuilderValidationMessages`             | `validation.characterBuilder.*`             | Builder workflow copy (incomplete steps, pending draft choices)      |
 | `featValidationMessages`                         | `validation.feat.*`                         | Feat persisted business rules                                        |
 | `requirementEditorValidationMessages`            | `validation.requirementEditor.*`            | Prerequisite builder UI state (dashboard)                            |
 | `speciesCharacterCreationValidationMessages`     | `validation.speciesCharacterCreation.*`     | Persisted species creation domain                                    |
@@ -85,11 +86,15 @@ not a specific UI surface. First consumers live under `runtime/character/`, but 
 `characterValidationMessages`; the base catalog must not depend on builder, sheet, or
 level-up concepts.
 
+**Surface catalogs:** `characterBuilderValidationMessages` in
+`rpg/runtime/character-builder/character-builder-messages.ts` — builder workflow/state
+copy (incomplete steps, pending draft choices). It may reuse `characterValidationMessages`;
+the base catalog must not depend on it.
+
 **Future surface catalogs** (add only when those UI flows ship):
 
 | Catalog const                          | Scope prefix                      | Owns                                                                  |
 | -------------------------------------- | --------------------------------- | --------------------------------------------------------------------- |
-| `characterBuilderValidationMessages`   | `validation.characterBuilder.*`   | Builder workflow copy (incomplete steps, pending draft choices)       |
 | `characterSheetFormValidationMessages` | `validation.characterSheetForm.*` | Sheet editor workflow copy (unsaved edits, sheet-specific sequencing) |
 | `characterLevelUpValidationMessages`   | `validation.characterLevelUp.*`   | Level-up wizard workflow copy (sequencing, pending choices)           |
 
