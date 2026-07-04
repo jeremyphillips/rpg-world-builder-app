@@ -130,18 +130,21 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'traits',
       label: 'Traits',
       fields: [],
+      errorPaths: ['traits'],
       header: createElement(SpeciesTraitsTab, { formCtx: ctx }),
     },
     {
       id: 'heritage',
       label: 'Heritage',
       fields: [],
+      errorPaths: ['heritage'],
       header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },
     {
       id: 'rules',
       label: 'Rules',
       fields: [],
+      errorPaths: ['characterCreation'],
       header: createElement(SpeciesRulesTab, { formCtx: ctx }),
     },
   ]

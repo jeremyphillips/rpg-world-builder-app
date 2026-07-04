@@ -87,6 +87,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'features',
       label: 'Features',
       fields: [resourcesArrayField(ctx)],
+      errorPaths: ['features'],
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
@@ -104,6 +105,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'characterCreation',
       label: 'Character creation',
       fields: [],
+      errorPaths: ['characterCreation'],
       header: createElement(ClassCharacterCreationTab, { formCtx: ctx }),
     },
   ]

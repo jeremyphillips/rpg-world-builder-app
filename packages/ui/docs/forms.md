@@ -40,6 +40,29 @@ suppress inline error text until their tab is active.
 Optional non-field UI: `TabbedFormTab.header`. Sticky chrome, sheets, and footers:
 [patterns.md](./forms/patterns.md#tabbedform).
 
+### `errorPaths` for header-only tabs
+
+Tab ownership is inferred from each tab's `fields` tree. Header-only tabs that render
+editors via `FormEmbeddedMasterDetailEditor` (or similar) with `fields: []` must
+declare the RHF root paths they own via `errorPaths` — otherwise validation issues on
+those paths are orphaned and never appear on tab badges or the footer summary.
+
+`errorPaths` **supplements** inferred prefixes; it does not replace them. Use it only
+when fields live outside the tab's `fields` array.
+
+```ts
+{
+  id: 'heritage',
+  label: 'Heritage',
+  fields: [],
+  errorPaths: ['heritage'],
+  header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
+}
+```
+
+Content catalog examples: `buildSpeciesTabs` and `buildClassTabs` in the dashboard
+species/class `*-form-fields.ts` modules.
+
 ## Field anatomy & the a11y contract
 
 Every field resolves to the same structure ([field.client.tsx](../src/components/ui/field.client.tsx)):

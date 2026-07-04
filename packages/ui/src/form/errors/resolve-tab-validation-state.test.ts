@@ -168,6 +168,31 @@ describe('resolveTabValidationState', () => {
 
     expect(states.find((state) => state.tabId === 'meta')?.count).toBe(1)
   })
+
+  it('routes master-detail header-only tabs via errorPaths (species-style)', () => {
+    const speciesTabs: TabValidationTab[] = [
+      {
+        id: 'basics',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      { id: 'traits', fields: [], errorPaths: ['traits'] },
+      { id: 'heritage', fields: [], errorPaths: ['heritage'] },
+      { id: 'rules', fields: [], errorPaths: ['characterCreation'] },
+    ]
+    const speciesFields = speciesTabs.flatMap((tab) => tab.fields)
+    const issues = issuesFromErrors({
+      name: { type: 'custom', message: 'Required' },
+      heritage: { name: { type: 'custom', message: 'Required' } },
+      traits: [{ name: { type: 'custom', message: 'Required' } }],
+    } as unknown as FieldErrors)
+
+    const states = resolveTabValidationState(issues, speciesTabs, speciesFields)
+
+    expect(states.find((state) => state.tabId === 'basics')?.count).toBe(1)
+    expect(states.find((state) => state.tabId === 'heritage')?.count).toBe(1)
+    expect(states.find((state) => state.tabId === 'traits')?.count).toBe(1)
+    expect(states.find((state) => state.tabId === 'rules')?.count).toBe(0)
+  })
 })
 
 describe('getFirstInvalidTabId', () => {
