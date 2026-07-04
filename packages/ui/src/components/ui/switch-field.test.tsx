@@ -13,9 +13,12 @@ describe('SwitchField', () => {
 
   it('keeps inline label typography on fieldLabelVariants', () => {
     render(<SwitchField id="notify" label="Email reminders" />)
-    expect(screen.getByText('Email reminders')).toHaveClass('font-field-label')
-    expect(screen.getByText('Email reminders')).toHaveClass('min-h-5')
-    expect(screen.getByText('Email reminders')).not.toHaveClass('font-normal')
+    const label = screen.getByText('Email reminders').closest('label')
+    expect(label).not.toBeNull()
+    expect(label).toHaveClass('font-field-label')
+    expect(label).toHaveClass('min-h-5')
+    expect(label).toHaveClass('w-fit', 'self-start')
+    expect(label).not.toHaveClass('font-normal')
   })
 
   it('toggles via its associated label', async () => {
@@ -43,6 +46,22 @@ describe('SwitchField', () => {
     expect(
       label.compareDocumentPosition(switchControl) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
+  })
+
+  it('does not toggle when clicking the hint beside a shorter label', async () => {
+    const user = userEvent.setup()
+    const onCheckedChange = vi.fn()
+    const hint = 'When off, characters cannot take levels in additional classes.'
+    render(
+      <SwitchField
+        id="multiclass"
+        label="Allow multiclassing"
+        hint={hint}
+        onCheckedChange={onCheckedChange}
+      />,
+    )
+    await user.click(screen.getByText(hint))
+    expect(onCheckedChange).not.toHaveBeenCalled()
   })
 
   it('stacks inline label and hint in the same column beside the switch', () => {

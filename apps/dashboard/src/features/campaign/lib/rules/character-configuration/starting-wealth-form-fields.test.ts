@@ -11,10 +11,25 @@ import {
 import {
   startingWealthFormSchema,
   startingWealthValidationMessages,
+  buildStartingWealthTiersField,
 } from './starting-wealth-form-fields'
 
 const SEED = getStandardStartingWealthRules('srd-cc-5.2.1')
 const configRulesSchema = buildRulesSchemaForSurface('config')
+
+describe('buildStartingWealthTiersField', () => {
+  it('formats tier item headers as Wealth tier — {label}', () => {
+    const tiersField = buildStartingWealthTiersField()
+    const { itemHeader, legend } = tiersField
+
+    expect(itemHeader).toBeDefined()
+    if (!itemHeader) return
+
+    expect(itemHeader.fallback(0)).toBe('Wealth tier #1')
+    expect(itemHeader.formatPrimary?.('Hero', {})).toBe('Wealth tier — Hero')
+    expect(legend).toBe('Wealth tiers')
+  })
+})
 
 describe('formatStartingWealthTierSummary', () => {
   it('formats a single-level tier as Level N', () => {

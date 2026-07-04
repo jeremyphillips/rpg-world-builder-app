@@ -230,7 +230,7 @@ export type FieldLabelPosition = 'above' | 'settings'
 
 export const fieldLabelVariants = cva(
   [
-    'flex items-center gap-1.5 font-field-label leading-none',
+    'flex w-fit self-start items-center gap-1.5 font-field-label leading-none',
     "data-[required]:after:content-['*'] data-[required]:after:text-destructive",
   ],
   {
