@@ -26,14 +26,19 @@ export function CharacterBuilderStepPanel({ stepId, status }: CharacterBuilderSt
         <Text variant="muted">{step.description}</Text>
       </div>
 
-      {status === 'deferred' ? (
-        <Text variant="muted">
-          Proficiency, equipment, and spell choices arrive in a later milestone. You can continue to
-          Review without completing this step.
-        </Text>
-      ) : (
-        <Text variant="muted">Step fields are implemented in the next builder phase.</Text>
-      )}
+      <Text variant="muted">{getStubMessage(stepId, status)}</Text>
     </section>
   )
+}
+
+function getStubMessage(stepId: CharacterBuilderStepId, status: BuilderStepStatus): string {
+  if (stepId === 'spells' && status === 'deferred') {
+    return 'Spell selection is not required for non-caster classes in this milestone. Continue to Review when you are ready.'
+  }
+
+  if (status === 'deferred') {
+    return 'Proficiency and equipment choices arrive in a later milestone. You can continue to Review without completing this step.'
+  }
+
+  return 'Step fields are implemented in the next builder phase.'
 }

@@ -4,6 +4,7 @@ import type {
   CharacterBuildContext,
   CharacterBuilderDraft,
   CharacterBuilderStepId,
+  CharacterBuildPreview,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 
@@ -18,6 +19,7 @@ export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
+  preview: CharacterBuildPreview | null
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
@@ -27,6 +29,7 @@ export function CharacterBuilderStepContent({
   stepId,
   context,
   draft,
+  preview,
   validationIssues,
   onDraftChange,
   onStepComplete,
@@ -67,7 +70,14 @@ export function CharacterBuilderStepContent({
         />
       )
     case 'review':
-      return <ReviewStep context={context} draft={draft} />
+      return (
+        <ReviewStep
+          context={context}
+          draft={draft}
+          preview={preview}
+          validationIssues={validationIssues}
+        />
+      )
     case 'proficiencies':
     case 'equipment':
     case 'spells':

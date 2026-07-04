@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+
+import { renderWithProviders } from '@/test/render'
 
 import {
   createStandaloneBuilderCatalogIndexFixture,
@@ -38,11 +39,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    render(
-      <MemoryRouter>
-        <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
-      </MemoryRouter>,
-    )
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     expect(await screen.findByRole('heading', { name: 'New character' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Identity' })).toBeInTheDocument()
@@ -56,10 +53,8 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    const { container } = render(
-      <MemoryRouter>
-        <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
-      </MemoryRouter>,
+    const { container } = renderWithProviders(
+      <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />,
     )
 
     await screen.findByRole('button', { name: 'Continue' })

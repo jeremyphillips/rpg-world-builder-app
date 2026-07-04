@@ -3,8 +3,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, getBuilderStepStatus } from '@rpg/contracts'
 
+import { getBuilderStepStatusLabel } from '../lib/builder-step-status-display'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 describe('CharacterBuilderStepRail', () => {
@@ -20,7 +21,12 @@ describe('CharacterBuilderStepRail', () => {
 
     expect(screen.getByRole('navigation', { name: 'Character builder steps' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Species/i })).toHaveAttribute('aria-current', 'step')
-    expect(screen.getAllByText('Later').length).toBeGreaterThan(0)
+
+    const draft = createEmptyCharacterBuilderDraft()
+    expect(
+      getBuilderStepStatusLabel('spells', getBuilderStepStatus('spells', draft, null), null),
+    ).toBe('Skipped')
+    expect(screen.getByRole('button', { name: /Spells/i })).toHaveTextContent('Skipped')
   })
 
   it('calls onStepSelect when a step is clicked', async () => {

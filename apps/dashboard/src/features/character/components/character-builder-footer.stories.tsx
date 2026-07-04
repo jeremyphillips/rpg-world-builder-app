@@ -1,0 +1,38 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
+
+import { CharacterBuilderFooter } from './character-builder-footer.client'
+
+const meta = {
+  title: 'Character Builder/CharacterBuilderFooter',
+  component: CharacterBuilderFooter,
+  args: {
+    onBack: fn(),
+    onContinue: fn(),
+    onCreateCharacter: fn(),
+  },
+} satisfies Meta<typeof CharacterBuilderFooter>
+
+export default meta
+type Story = StoryObj<typeof CharacterBuilderFooter>
+
+export const IdentityStep: Story = {
+  args: {
+    currentStepId: 'identity',
+    continueFormId: 'identity-form',
+  },
+}
+
+export const ReviewStep: Story = {
+  args: {
+    currentStepId: 'review',
+    isCreating: false,
+  },
+}
+
+export const Creating: Story = {
+  args: {
+    currentStepId: 'review',
+    isCreating: true,
+  },
+}

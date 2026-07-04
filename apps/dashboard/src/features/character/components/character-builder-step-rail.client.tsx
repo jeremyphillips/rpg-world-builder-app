@@ -10,8 +10,8 @@ import {
 import { Badge, cn, Text } from '@rpg/ui'
 
 import {
-  BUILDER_STEP_STATUS_LABELS,
   builderStepStatusBadgeVariant,
+  getBuilderStepStatusLabel,
 } from '../lib/builder-step-status-display'
 import {
   characterBuilderStepRailClasses,
@@ -59,7 +59,10 @@ export function CharacterBuilderStepRail({
                     {step.description}
                   </Text>
                 </span>
-                <StepStatusBadge status={status} />
+                <StepStatusBadge
+                  label={getBuilderStepStatusLabel(step.id, status, resolvedChoiceSets)}
+                  status={status}
+                />
               </button>
             </li>
           )
@@ -69,14 +72,14 @@ export function CharacterBuilderStepRail({
   )
 }
 
-function StepStatusBadge({ status }: { status: BuilderStepStatus }) {
+function StepStatusBadge({ status, label }: { status: BuilderStepStatus; label: string }) {
   return (
     <Badge
       size="sm"
       variant={builderStepStatusBadgeVariant(status)}
       className="shrink-0 self-start"
     >
-      {BUILDER_STEP_STATUS_LABELS[status]}
+      {label}
     </Badge>
   )
 }

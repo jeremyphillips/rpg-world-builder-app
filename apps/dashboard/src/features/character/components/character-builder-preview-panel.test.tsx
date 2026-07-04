@@ -8,7 +8,10 @@ import {
   indexCharacterBuildCatalog,
 } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import {
+  createPopulatedStandaloneBuilderContextFixture,
+  createStandaloneBuilderContextFixture,
+} from '../lib/character-builder-fixtures'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 
 describe('CharacterBuilderPreviewPanel', () => {
@@ -23,13 +26,36 @@ describe('CharacterBuilderPreviewPanel', () => {
     render(<CharacterBuilderPreviewPanel preview={preview} />)
 
     expect(screen.getByRole('heading', { name: 'Preview' })).toBeInTheDocument()
-    expect(screen.getByText('Strength')).toBeInTheDocument()
+    expect(screen.getByText('Abilities')).toBeInTheDocument()
     expect(preview.warnings.length).toBeGreaterThan(0)
     expect(screen.getByText(preview.warnings[0]!)).toBeInTheDocument()
   })
 
+  it('renders saving throws and skills when class data is available', () => {
+    const context = createPopulatedStandaloneBuilderContextFixture()
+    const preview = buildCharacterPreview(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        identity: { name: 'Verna', alignment: 'ng' },
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+        abilities: {
+          method: 'manual',
+          scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
+        },
+      },
+      indexCharacterBuildCatalog(context.catalog),
+      context.characterCreationRules,
+    )
+
+    render(<CharacterBuilderPreviewPanel preview={preview} />)
+
+    expect(screen.getByText('Saving throws')).toBeInTheDocument()
+    expect(screen.getByText('Skills')).toBeInTheDocument()
+    expect(screen.getByText('Athletics')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
-    const context = createStandaloneBuilderContextFixture()
+    const context = createPopulatedStandaloneBuilderContextFixture()
     const preview = buildCharacterPreview(
       {
         ...createEmptyCharacterBuilderDraft(),

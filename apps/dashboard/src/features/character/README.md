@@ -14,15 +14,21 @@ Folder layout and the feature-boundary rule are documented in
 | List route         | `routes/characters-overview.tsx`                           |
 | Create route       | `routes/character-create.tsx` (concentration mode)         |
 | Detail route       | `routes/character-detail.tsx`                              |
+| Detail content     | `components/character-detail-content.client.tsx`           |
 | API clients        | `api/character-client.ts`, `api/ruleset-content-client.ts` |
 | Build context      | `hooks/use-build-context.ts`                               |
+| Character queries  | `hooks/use-character.ts`, `hooks/use-characters.ts`        |
+| Create mutation    | `hooks/use-create-character.ts`                            |
 | Draft store        | `store/character-builder-store.ts`                         |
 | Restore affordance | `components/character-builder-draft-restore.client.tsx`    |
 | Builder shell      | `components/character-builder-shell.client.tsx`            |
 | Step rail          | `components/character-builder-step-rail.client.tsx`        |
 | Preview panel      | `components/character-builder-preview-panel.client.tsx`    |
 | Preview hook       | `hooks/use-character-preview.ts`                           |
-| Step forms         | `lib/steps/*-form-fields.ts`, `lib/steps/*-form-values.ts` |
+| Step panel (stub)  | `components/character-builder-step-panel.client.tsx`       |
+| Step frame         | `components/steps/builder-step-frame.client.tsx`           |
+| Validation alert   | `components/character-builder-validation-alert.client.tsx` |
+| Footer             | `components/character-builder-footer.client.tsx`           |
 
 ## Routes
 

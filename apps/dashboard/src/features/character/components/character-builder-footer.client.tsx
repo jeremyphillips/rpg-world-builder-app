@@ -42,7 +42,7 @@ export function CharacterBuilderFooter({
 
         {onReview ? (
           <Button type="button" disabled={isCreating} onClick={onCreateCharacter}>
-            Create character
+            {isCreating ? 'Creating…' : 'Create character'}
           </Button>
         ) : canContinue && continueFormId ? (
           <Button type="submit" form={continueFormId}>

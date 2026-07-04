@@ -2,73 +2,43 @@
 
 import { useMemo } from 'react'
 
-import {
-  getAlignmentLabel,
-  validateCharacterBuild,
-  type CharacterBuildContext,
-  type CharacterBuilderDraft,
+import type {
+  CharacterBuildContext,
+  CharacterBuilderDraft,
+  CharacterBuildPreview,
+  CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
+import {
+  resolveReviewDisplayIssues,
+  resolveReviewReadyMessage,
+} from '../../lib/review-step-display'
 import { BuilderStepFrame } from './builder-step-frame.client'
+import { ReviewStepSummary } from './review-step-summary.client'
 
 export type ReviewStepProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
+  preview: CharacterBuildPreview | null
+  validationIssues?: CharacterBuildValidationIssue[]
 }
 
-export function ReviewStep({ context, draft }: ReviewStepProps) {
-  const validation = useMemo(
-    () =>
-      validateCharacterBuild(draft, context, 'finalSubmit', {
-        resolvedChoiceSets: [],
-      }),
-    [context, draft],
+export function ReviewStep({ context, draft, preview, validationIssues = [] }: ReviewStepProps) {
+  const displayIssues = useMemo(
+    () => resolveReviewDisplayIssues(draft, context, validationIssues),
+    [context, draft, validationIssues],
   )
 
-  const speciesName =
-    context.catalog.species.find((entry) => entry.id === draft.species.speciesId)?.name ??
-    'Not selected'
-  const className =
-    context.catalog.classes.find((entry) => entry.id === draft.class.classId)?.name ??
-    'Not selected'
+  const readyMessage = useMemo(
+    () => resolveReviewReadyMessage(draft, context, displayIssues),
+    [context, draft, displayIssues],
+  )
 
   return (
-    <BuilderStepFrame stepId="review" validationIssues={validation.issues}>
-      <dl className="grid gap-3 sm:grid-cols-2">
-        <ReviewRow label="Name" value={draft.identity.name?.trim() || 'Not set'} />
-        <ReviewRow
-          label="Alignment"
-          value={draft.identity.alignment ? getAlignmentLabel(draft.identity.alignment) : 'Not set'}
-        />
-        <ReviewRow label="Species" value={speciesName} />
-        <ReviewRow label="Class" value={className} />
-        <ReviewRow
-          label="Ability method"
-          value={
-            draft.abilities.method === 'manual'
-              ? 'Manual entry'
-              : draft.abilities.method === 'standard-array'
-                ? 'Standard array'
-                : 'Not set'
-          }
-        />
-      </dl>
-
-      {validation.ok ? (
-        <Text variant="muted">Your character is ready to create once submission is enabled.</Text>
-      ) : (
-        <Text variant="muted">Resolve the issues above before creating your character.</Text>
-      )}
+    <BuilderStepFrame stepId="review" validationIssues={displayIssues}>
+      <ReviewStepSummary context={context} draft={draft} preview={preview} />
+      {readyMessage ? <Text variant="muted">{readyMessage}</Text> : null}
     </BuilderStepFrame>
-  )
-}
-
-function ReviewRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
-    </div>
   )
 }
