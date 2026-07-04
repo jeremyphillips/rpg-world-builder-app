@@ -120,17 +120,36 @@ export function ButtonDropdown({
   size = 'sm',
   className,
 }: ButtonDropdownProps) {
-  const control = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
-  const groupedSections = groupHeadingsForItems(control.displayItems, groups, control.searchActive)
+  const {
+    open,
+    searchActive,
+    listboxId,
+    searchId,
+    generatedId,
+    query,
+    displayItems,
+    selectableItems,
+    highlightedIndex,
+    activeOptionId,
+    searchInputRef,
+    listboxRef,
+    handleOpenChange,
+    handleNavigationKeyDown,
+    handleQueryChange,
+    focusPanelOnOpen,
+    selectItem,
+    setActiveIndex,
+  } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
+  const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>
-      control.selectableItems.findIndex((candidate) => candidate.id === item.id),
-    [control.selectableItems],
+      selectableItems.findIndex((candidate) => candidate.id === item.id),
+    [selectableItems],
   )
 
   return (
-    <PopoverPrimitive.Root open={control.open} onOpenChange={control.handleOpenChange}>
+    <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <PopoverPrimitive.Trigger asChild>
         <Button
           type="button"
@@ -138,8 +157,8 @@ export function ButtonDropdown({
           size={size}
           className={className}
           aria-haspopup="listbox"
-          aria-expanded={control.open}
-          aria-controls={control.listboxId}
+          aria-expanded={open}
+          aria-controls={listboxId}
         >
           {label}
           <ChevronDown className="size-4 opacity-50" aria-hidden />
@@ -154,47 +173,47 @@ export function ButtonDropdown({
           className={cn(comboboxContentVariants(), 'min-w-[var(--radix-popover-trigger-width)]')}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
-            control.focusPanelOnOpen()
+            focusPanelOnOpen()
           }}
         >
           {enableSearch ? (
             <ComboboxSearchField
               label={label}
-              listboxId={control.listboxId}
-              searchId={control.searchId}
+              listboxId={listboxId}
+              searchId={searchId}
               size="sm"
-              query={control.query}
-              activeOptionId={control.activeOptionId}
-              searchInputRef={control.searchInputRef}
-              onQueryChange={control.handleQueryChange}
-              onSearchKeyDown={control.handleNavigationKeyDown}
+              query={query}
+              activeOptionId={activeOptionId}
+              searchInputRef={searchInputRef}
+              onQueryChange={handleQueryChange}
+              onSearchKeyDown={handleNavigationKeyDown}
             />
           ) : null}
 
           <div
-            ref={control.listboxRef}
-            id={control.listboxId}
+            ref={listboxRef}
+            id={listboxId}
             role="listbox"
             tabIndex={enableSearch ? undefined : -1}
             aria-label={label}
-            aria-activedescendant={enableSearch ? undefined : control.activeOptionId}
-            onKeyDown={enableSearch ? undefined : control.handleNavigationKeyDown}
+            aria-activedescendant={enableSearch ? undefined : activeOptionId}
+            onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
             className={comboboxListVariants()}
           >
-            {control.displayItems.length === 0 ? (
+            {displayItems.length === 0 ? (
               <p className={comboboxEmptyVariants()}>{emptyMessage}</p>
-            ) : control.searchActive ? (
-              control.displayItems.map((item) => (
+            ) : searchActive ? (
+              displayItems.map((item) => (
                 <ButtonDropdownItemRow
                   key={item.id}
                   item={item}
-                  optionId={`${control.generatedId}-option-${item.id}`}
-                  isHighlighted={highlightIndexForItem(item) === control.highlightedIndex}
+                  optionId={`${generatedId}-option-${item.id}`}
+                  isHighlighted={highlightIndexForItem(item) === highlightedIndex}
                   onHighlight={() => {
                     const index = highlightIndexForItem(item)
-                    if (index >= 0) control.setActiveIndex(index)
+                    if (index >= 0) setActiveIndex(index)
                   }}
-                  onSelect={() => control.selectItem(item.id)}
+                  onSelect={() => selectItem(item.id)}
                 />
               ))
             ) : (
@@ -209,13 +228,13 @@ export function ButtonDropdown({
                     <ButtonDropdownItemRow
                       key={item.id}
                       item={item}
-                      optionId={`${control.generatedId}-option-${item.id}`}
-                      isHighlighted={highlightIndexForItem(item) === control.highlightedIndex}
+                      optionId={`${generatedId}-option-${item.id}`}
+                      isHighlighted={highlightIndexForItem(item) === highlightedIndex}
                       onHighlight={() => {
                         const index = highlightIndexForItem(item)
-                        if (index >= 0) control.setActiveIndex(index)
+                        if (index >= 0) setActiveIndex(index)
                       }}
-                      onSelect={() => control.selectItem(item.id)}
+                      onSelect={() => selectItem(item.id)}
                     />
                   ))}
                 </div>

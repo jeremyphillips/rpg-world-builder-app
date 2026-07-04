@@ -1,34 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import type { AuthMeResponse } from '@rpg/contracts'
+import { screen, waitFor } from '@testing-library/react'
+import { Route, Routes } from 'react-router-dom'
 
 vi.mock('../api/auth-client')
 
+import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
+import { renderWithProviders } from '@/test/render'
 import { fetchSession as fetchSessionFn } from '../api/auth-client'
 import { AuthGuard } from './auth-guard'
 
 const fetchSession = vi.mocked(fetchSessionFn)
 
-function authMe(user: AuthMeResponse['user']): AuthMeResponse {
-  return { user, activeCampaign: null }
-}
-
 function renderGuard() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route element={<AuthGuard />}>
-            <Route index element={<div>protected content</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route element={<AuthGuard />}>
+        <Route index element={<div>protected content</div>} />
+      </Route>
+    </Routes>,
   )
 }
 
@@ -66,15 +55,7 @@ describe('AuthGuard', () => {
   })
 
   it('renders the protected content for an authenticated session', async () => {
-    fetchSession.mockResolvedValueOnce(
-      authMe({
-        id: '1',
-        email: 'dm@example.com',
-        displayName: 'Dungeon Master',
-        role: 'user',
-        lastSelectedCampaignId: null,
-      }),
-    )
+    fetchSession.mockResolvedValueOnce(makeAuthMe(makeSessionUser({ id: '1' })))
 
     renderGuard()
 

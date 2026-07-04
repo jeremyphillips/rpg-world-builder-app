@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { ConfirmDialog } from './confirm-dialog.client'
 
@@ -49,9 +49,6 @@ describe('ConfirmDialog', () => {
 
   it('has no axe accessibility violations', async () => {
     renderConfirm()
-    const results = await axe.run(document.body, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(document.body)
   })
 })

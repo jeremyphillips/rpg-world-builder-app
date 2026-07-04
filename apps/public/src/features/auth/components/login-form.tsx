@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { getErrorMessage, loginInputSchema, type LoginInput } from '@rpg/contracts'
+import { CROSS_APP_PATHS, getErrorMessage, loginInputSchema, type LoginInput } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
-import { DASHBOARD_PATH, login } from '../api/auth-client'
+import { login } from '../api/auth-client'
 import { loginFields } from '../lib/auth-form-fields'
 
 export interface LoginFormProps {
@@ -25,7 +25,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setFormError(null)
     try {
       await login(values)
-      ;(onSuccess ?? (() => window.location.assign(DASHBOARD_PATH)))()
+      ;(onSuccess ?? (() => window.location.assign(CROSS_APP_PATHS.dashboard)))()
     } catch (err) {
       setFormError(getErrorMessage(err, 'Unable to log in. Please try again.'))
     }

@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 import { WEAPON_MASTERY_ENTRIES } from '@rpg/contracts'
 
 import { ContentStatRow } from './content-stat-row.client'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 describe('ContentStatRow', () => {
   it('renders label and value', () => {
@@ -55,7 +53,6 @@ describe('ContentStatRow', () => {
       />,
     )
 
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

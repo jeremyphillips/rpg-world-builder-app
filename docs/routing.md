@@ -56,15 +56,16 @@ On the dashboard, route **components** (not path strings) lazy-load via
 
 ## Cross-app paths
 
-`LOGIN_PATH` (dashboard → public `/login`) and `DASHBOARD_PATH` (public → dashboard
-`/app/`) are cross-app redirect targets, not same-app navigation. They stay in
-their respective auth clients:
+Cross-app redirect targets (`CROSS_APP_PATHS` in `@rpg/contracts`) are not same-app
+navigation — import them directly where a full-page redirect is needed:
 
-- Dashboard: `apps/dashboard/src/features/auth/api/auth-client.ts`
-- Public: `apps/public/src/features/auth/api/auth-client.ts`
+| Constant                    | From                          | To                |
+| --------------------------- | ----------------------------- | ----------------- |
+| `CROSS_APP_PATHS.login`     | Dashboard auth guard / logout | Public `/login`   |
+| `CROSS_APP_PATHS.dashboard` | Public login / signup success | Dashboard `/app/` |
 
-> The trailing slash on `DASHBOARD_PATH = '/app/'` is load-bearing — omitting it
-> hits the dev server's base-mismatch hint page.
+> The trailing slash on `CROSS_APP_PATHS.dashboard` (`'/app/'`) is load-bearing —
+> omitting it hits the dev server's base-mismatch hint page.
 
 ## Tests
 

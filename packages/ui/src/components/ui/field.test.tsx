@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { Field } from './field.client'
 import { Input } from './input.client'
@@ -62,7 +62,6 @@ describe('Field', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = renderField({ hint: 'Your display name.' })
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

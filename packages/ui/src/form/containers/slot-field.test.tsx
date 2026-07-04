@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useFormContext } from 'react-hook-form'
 import axe from 'axe-core'
@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Form } from '../shells/form.client'
 import { useFormSectionContext } from '../context/form-section.context'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 
 function SlotSizeProbe() {
   const { size } = useFormSectionContext()
@@ -64,15 +65,12 @@ describe('SlotFieldRenderer', () => {
 
     await user.type(screen.getByLabelText('Name'), 'Alert')
     await user.type(screen.getByRole('textbox', { name: 'Notes' }), 'Watchful')
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ name: 'Alert', notes: 'Watchful' })
+    await submitAndExpectPayload(user, onSubmit, { name: 'Alert', notes: 'Watchful' })
   })
 
   it('has no critical accessibility violations', async () => {
     const { container } = renderForm()
-    const results = await axe.run(container)
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
     expect(results.violations.filter((v) => v.impact === 'critical')).toEqual([])
   })
 

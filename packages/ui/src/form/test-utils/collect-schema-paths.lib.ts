@@ -42,53 +42,53 @@ function objectShape(schema: ZodType): Record<string, ZodType> | undefined {
   return def?.shape
 }
 
+function leafPath(prefix: string): string[] {
+  return prefix ? [prefix] : []
+}
+
+function collectObjectPaths(schema: ZodType, prefix: string): string[] {
+  const shape = objectShape(schema)
+  if (!shape) return leafPath(prefix)
+
+  return Object.entries(shape).flatMap(([key, child]) =>
+    collectPaths(child, prefix ? `${prefix}.${key}` : key),
+  )
+}
+
+function collectArrayPaths(def: ZodDefLike, prefix: string): string[] {
+  if (!def.element) return leafPath(prefix)
+
+  const childPrefix = prefix ? `${prefix}.*` : '*'
+  return [prefix, ...collectPaths(def.element, childPrefix)].filter(Boolean)
+}
+
+function collectBranchPaths(branches: ZodType[], prefix: string): string[] {
+  const paths = new Set<string>()
+  for (const branch of branches) {
+    for (const path of collectPaths(branch, prefix)) paths.add(path)
+  }
+  return [...paths]
+}
+
 function collectPaths(schema: ZodType, prefix = ''): string[] {
   const unwrapped = unwrap(schema)
   const def = getDef(unwrapped)
-  const type = def?.type
 
-  if (type === 'object') {
-    const shape = objectShape(unwrapped)
-    if (!shape) return prefix ? [prefix] : []
-
-    const paths: string[] = []
-    for (const [key, child] of Object.entries(shape)) {
-      const childPrefix = prefix ? `${prefix}.${key}` : key
-      paths.push(...collectPaths(child, childPrefix))
-    }
-    return paths
+  switch (def?.type) {
+    case 'object':
+      return collectObjectPaths(unwrapped, prefix)
+    case 'array':
+      return collectArrayPaths(def, prefix)
+    case 'union':
+      return collectBranchPaths(def.options ?? [], prefix)
+    case 'intersection':
+      return collectBranchPaths(
+        [def.left, def.right].filter((b): b is ZodType => !!b),
+        prefix,
+      )
+    default:
+      return leafPath(prefix)
   }
-
-  if (type === 'array') {
-    const element = def?.element
-    if (!element) return prefix ? [prefix] : []
-
-    const childPrefix = prefix ? `${prefix}.*` : '*'
-    return [prefix, ...collectPaths(element, childPrefix)].filter(Boolean)
-  }
-
-  if (type === 'union') {
-    const paths = new Set<string>()
-    for (const option of def?.options ?? []) {
-      for (const path of collectPaths(option, prefix)) {
-        paths.add(path)
-      }
-    }
-    return [...paths]
-  }
-
-  if (type === 'intersection') {
-    const paths = new Set<string>()
-    if (def?.left) {
-      for (const path of collectPaths(def.left, prefix)) paths.add(path)
-    }
-    if (def?.right) {
-      for (const path of collectPaths(def.right, prefix)) paths.add(path)
-    }
-    return [...paths]
-  }
-
-  return prefix ? [prefix] : []
 }
 
 /** Dot-path leaf keys for a Zod schema (array indices normalized to `*`). */

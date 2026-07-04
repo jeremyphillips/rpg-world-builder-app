@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { screen } from '@testing-library/react'
 
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(),
@@ -9,6 +7,7 @@ vi.mock('@/features/campaign', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { makeTestQueryClient, renderWithProviders } from '@/test/render'
 import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
 
 import { HomebrewHubContent } from './homebrew-hub'
@@ -16,7 +15,7 @@ import { HomebrewHubContent } from './homebrew-hub'
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 
 function renderHub(campaignId = 'camp_1') {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const queryClient = makeTestQueryClient()
   queryClient.setQueryData(['campaigns', campaignId, 'homebrew', 'summary'], {
     content: [
       { contentType: 'classes', totalCount: 2 },
@@ -28,13 +27,7 @@ function renderHub(campaignId = 'camp_1') {
     ],
   })
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <HomebrewHubContent campaignId={campaignId} />
-      </MemoryRouter>
-    </QueryClientProvider>,
-  )
+  return renderWithProviders(<HomebrewHubContent campaignId={campaignId} />, { queryClient })
 }
 
 describe('HomebrewHubContent', () => {

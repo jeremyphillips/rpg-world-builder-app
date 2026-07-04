@@ -23,6 +23,10 @@
       "types": "./src/form/test-utils/index.ts",
       "default": "./src/form/test-utils/index.ts"
     },
+    "./test-utils": {
+      "types": "./src/test-utils/index.ts",
+      "default": "./src/test-utils/index.ts"
+    },
     "./storybook/with-theme-context": {
       "types": "./src/storybook/with-theme-context.tsx",
       "default": "./src/storybook/with-theme-context.tsx"

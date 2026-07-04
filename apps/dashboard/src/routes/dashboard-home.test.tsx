@@ -1,53 +1,28 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
-import type { AuthMeResponse, CampaignListItem, SessionUser } from '@rpg/contracts'
+import { screen } from '@testing-library/react'
+import type { CampaignListItem } from '@rpg/contracts'
 
 vi.mock('@/features/auth/api/auth-client')
 vi.mock('@/features/campaign/api/campaign-client')
 
 import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
 import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeAuthMe } from '@/test/fixtures/session'
+import { renderWithProviders } from '@/test/render'
 import { DashboardHome } from './dashboard-home'
 
 const fetchSession = vi.mocked(fetchSessionFn)
 const listCampaigns = vi.mocked(listCampaignsFn)
 
-const user: SessionUser = {
-  id: 'u1',
-  email: 'dm@example.com',
-  displayName: 'Dungeon Master',
-  role: 'user',
-  lastSelectedCampaignId: null,
-}
-
-const authSession: AuthMeResponse = { user, activeCampaign: null }
+const authSession = makeAuthMe()
 
 function campaign(id: string, name: string): CampaignListItem {
-  return {
-    id,
-    identity: { name },
-    configuration: {},
-    status: 'draft',
-    visibility: 'private',
-    rulesetId: 'srd-cc-5.2.1',
-    createdBy: 'u1',
-    campaignRole: 'owner',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  }
+  return makeCampaignListItem({ id, identity: { name }, status: 'draft' })
 }
 
 function renderHome() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/']}>
-        <DashboardHome />
-      </MemoryRouter>
-    </QueryClientProvider>,
-  )
+  return renderWithProviders(<DashboardHome />)
 }
 
 describe('DashboardHome', () => {

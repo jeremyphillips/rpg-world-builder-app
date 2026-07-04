@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { RadioCardField } from './radio-card-field'
 
@@ -53,7 +53,6 @@ describe('RadioCardField', () => {
     const { container } = render(
       <RadioCardField id="edition-preset" label="Edition preset" options={options} />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

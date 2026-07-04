@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import * as React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { InputSelectField, InputUnitField } from './input-select-field.client'
 
@@ -186,8 +186,7 @@ describe('InputSelectField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledField min={0} />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('renders a static unit label without a combobox when unitMode is label', () => {
@@ -258,7 +257,6 @@ describe('InputUnitField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledUnitField />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

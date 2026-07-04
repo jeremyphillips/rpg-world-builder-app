@@ -1,24 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { loadSeedEquipment } from '@rpg/catalog/equipment'
-import { createEquipmentInputSchema } from '@rpg/contracts'
 
-import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
+import {
+  expectComposedKindGroups,
+  expectSeedRoundTrip,
+  seedEquipmentOfKind,
+  toEquipmentFormValues,
+} from '../../lib/test-utils/equipment-form-test-utils'
 import { armorFormFieldGroup } from './armor-form-fields'
 
-const ARMOR_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'armor')
+const ARMOR_SEEDS = seedEquipmentOfKind('armor')
 
 describe('armor kindFieldGroups', () => {
   it('buildFields composes identity, economy, and registered armor group', () => {
-    const fields = equipmentFormDef.buildFields({ equipmentKind: 'armor' })
-    const legends = fields
-      .filter(
-        (field): field is Extract<(typeof fields)[number], { kind: 'group' }> =>
-          'kind' in field && field.kind === 'group',
-      )
-      .map((field) => field.legend)
-
-    expect(legends).toEqual(['Identity', 'Economy', 'Armor'])
-    expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Armor' })
+    expectComposedKindGroups('armor', 'Armor')
   })
 
   it('shows strength requirement only for heavy armor', () => {
@@ -47,14 +41,12 @@ describe('armor kindFieldGroups', () => {
 describe('armor form round-trips', () => {
   for (const item of ARMOR_SEEDS) {
     it(`${item.slug}: toFormValues → toInput → schema.parse`, () => {
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
-      const input = equipmentFormDef.toInput(formValues)
-      expect(() => createEquipmentInputSchema.parse(input)).not.toThrow()
+      expectSeedRoundTrip(item)
     })
 
     it(`${item.slug}: preserves armor fields`, () => {
       if (item.kind !== 'armor') return
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
+      const formValues = toEquipmentFormValues(item)
       expect(formValues.armorCategory).toBe(item.category)
       expect(formValues.baseAc).toBe(item.baseAc)
       expect(formValues.acBonus).toBe(item.acBonus)

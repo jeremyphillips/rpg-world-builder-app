@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 
 const schema = z.object({
   mode: z.enum(['melee', 'ranged']),
@@ -111,9 +112,7 @@ describe('Form value sync', () => {
       ),
     )
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ mode: 'ranged', properties: ['finesse'] })
+    await submitAndExpectPayload(user, onSubmit, { mode: 'ranged', properties: ['finesse'] })
   })
 
   it('does not sync on initial mount', () => {

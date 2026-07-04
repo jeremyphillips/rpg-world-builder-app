@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { SwitchField } from './switch-field'
 
@@ -33,8 +33,7 @@ describe('SwitchField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<SwitchField id="notify" label="Email reminders" />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('renders the label above the switch when labelPosition is above', () => {
@@ -102,7 +101,6 @@ describe('SwitchField', () => {
         labelPosition="settings"
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

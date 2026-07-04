@@ -72,6 +72,23 @@ function setByPath(target: Record<string, unknown>, path: string, value: unknown
   cursor[segments.at(-1)!] = value
 }
 
+type FlatField = ReturnType<typeof flattenFields>[number]
+
+const CLEARED_VALUE_BY_TYPE: Record<string, (field: FlatField) => unknown> = {
+  text: () => '',
+  textarea: () => '',
+  richtext: () => '',
+  json: () => '',
+  select: () => '',
+  radio: () => '',
+  radioCard: () => '',
+  number: () => 0,
+  checkbox: () => false,
+  switch: () => false,
+  chips: (field) => ('multiple' in field && field.multiple ? [] : ''),
+  combobox: (field) => ('multiple' in field && field.multiple ? [] : ''),
+}
+
 /** Builds defaults then clears required leaf fields to provoke validation failures. */
 export function buildClearedRequiredDefaults(fields: FormItem[]): Record<string, unknown> {
   const values = { ...(buildDefaultValues(fields) as Record<string, unknown>) }
@@ -79,32 +96,8 @@ export function buildClearedRequiredDefaults(fields: FormItem[]): Record<string,
   for (const field of flattenFields(fields)) {
     if (!field.required) continue
 
-    switch (field.type) {
-      case 'text':
-      case 'textarea':
-      case 'richtext':
-      case 'json':
-        setByPath(values, field.name, '')
-        break
-      case 'number':
-        setByPath(values, field.name, 0)
-        break
-      case 'chips':
-      case 'combobox':
-        setByPath(values, field.name, field.multiple ? [] : '')
-        break
-      case 'select':
-      case 'radio':
-      case 'radioCard':
-        setByPath(values, field.name, '')
-        break
-      case 'checkbox':
-      case 'switch':
-        setByPath(values, field.name, false)
-        break
-      default:
-        break
-    }
+    const clearedValue = CLEARED_VALUE_BY_TYPE[field.type]
+    if (clearedValue) setByPath(values, field.name, clearedValue(field))
   }
 
   return values

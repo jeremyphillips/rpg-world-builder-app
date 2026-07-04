@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import * as React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { NumberInput } from './number-input.client'
 
@@ -71,8 +71,7 @@ describe('NumberInput', () => {
     const { container } = render(
       <NumberInput aria-label="Count" defaultValue={3} min={1} max={10} />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   describe('formatGrouped', () => {

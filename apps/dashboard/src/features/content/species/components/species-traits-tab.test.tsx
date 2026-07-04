@@ -1,19 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import { TestFormShell } from '@/test/form-shell'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesTraitsTab } from './species-traits-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid="trait-detail">{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal, 'trait-detail')
 })
 
 type Trait = {
@@ -32,11 +27,10 @@ function TabShell({
   traits?: Trait[]
   entitySource?: ContentFormCtx['entitySource']
 }) {
-  const form = useForm({ defaultValues: { traits } })
   return (
-    <FormProvider {...form}>
+    <TestFormShell defaultValues={{ traits }}>
       <SpeciesTraitsTab formCtx={{ entitySource }} />
-    </FormProvider>
+    </TestFormShell>
   )
 }
 

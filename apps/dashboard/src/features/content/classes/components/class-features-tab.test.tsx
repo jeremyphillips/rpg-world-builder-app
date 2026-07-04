@@ -1,21 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
-import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
-import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
+import { TestFormShell } from '@/test/form-shell'
+import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { ClassFeaturesTab } from './class-features-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid="feature-detail">{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal, 'feature-detail')
 })
 
 type Feature = {
@@ -38,13 +32,10 @@ function TabShell({
   embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
   formCtx?: ContentFormCtx
 }) {
-  const form = useForm({ defaultValues: { features } })
   return (
-    <MemoryRouter>
-      <FormProvider {...form}>
-        <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds, ...formCtx }} />
-      </FormProvider>
-    </MemoryRouter>
+    <TestFormShell defaultValues={{ features }}>
+      <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds, ...formCtx }} />
+    </TestFormShell>
   )
 }
 
@@ -136,13 +127,7 @@ describe('ClassFeaturesTab', () => {
     render(
       <TabShell
         features={[subclassChoice]}
-        formCtx={{
-          campaignId: 'camp_1',
-          campaignRules: {
-            ...defaultCampaignRules(),
-            subclassing: { enabled: false },
-          },
-        }}
+        formCtx={makeContentFormCtx({ campaignRules: { subclassing: { enabled: false } } })}
       />,
     )
 

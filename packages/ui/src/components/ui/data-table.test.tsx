@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 
 // Pull in the FilterFns augmentation from the component module so that
@@ -605,27 +605,18 @@ describe('RowActionsMenu', () => {
 describe('DataTable — accessibility', () => {
   it('has no axe violations', async () => {
     const { container } = renderTable()
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe violations with row selection enabled', async () => {
     const { container } = renderTable({ enableRowSelection: true })
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe violations with the advanced panel open', async () => {
     const user = userEvent.setup()
     const { container } = renderTable()
     await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

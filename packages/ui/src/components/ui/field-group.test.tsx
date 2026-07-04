@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { FieldGroup } from './field-group'
 import { TextField } from './text-field'
@@ -84,7 +84,6 @@ describe('FieldGroup', () => {
         <TextField id="name" label="Name" />
       </FieldGroup>,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

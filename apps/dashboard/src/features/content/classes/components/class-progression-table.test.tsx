@@ -1,13 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { pickClass } from '../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 describe('ClassProgressionTable', () => {
   it('renders the progression heading and level rows for a spellcaster', () => {
@@ -124,8 +122,7 @@ describe('ClassProgressionTable', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<ClassProgressionTable characterClass={pickClass('bard')} />)
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('inserts a tier separator when extended progression is active', () => {

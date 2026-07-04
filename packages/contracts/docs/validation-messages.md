@@ -128,15 +128,60 @@ Form tests use `@rpg/ui/form/test-utils` (`assertRegistryCoverage`,
 [packages/ui/docs/forms.md](../../ui/docs/forms.md) and
 [apps/dashboard/docs/form-lib-conventions.md](../../../apps/dashboard/docs/form-lib-conventions.md).
 
-## Deferred (not yet cataloged / out of form scope)
+## Deferred gap list
 
-- **TabbedForm shell** — inactive-tab error indicators (copy is written to stand
-  alone outside tab context for future shell work).
-- **Non-form schemas** — runtime character, campaign patches, multiclassing
-  helper, dev-bench, API env.
-- **Equipment per-kind invalid-submit sweep** — field-path registration is
-  covered per kind; full-schema invalid-submit is blocked by the unified
-  multi-kind schema shape (variant copy verified in equipment `*-form-values`
-  tests).
-- **Future seams** — API `{ id, params }` structured issues, locale registry,
-  compact `summaryMessage` variants per id.
+Items intentionally outside the live-form verification sweep (Phase 4). Catalog
+them before the UI that surfaces the errors ships.
+
+### TabbedForm shell UX
+
+**Status:** deferred — schema/message modules for the four TabbedForm surfaces
+(campaign settings, species, class, spell) are verified; shell chrome is not.
+
+| Gap                  | Detail                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Inactive-tab errors  | Field errors on a hidden tab are not shown on the tab trigger — Save can look like a no-op until the author switches tabs. |
+| Tab-level indicators | Future work will surface validation state on tab triggers; copy for that summary line is not designed yet.                 |
+
+Shell behaviour is documented in
+[packages/ui/docs/forms.md](../../ui/docs/forms.md#tabbedform). **Copy rule for
+authors:** messages in TabbedForm-backed schemas must stand alone outside their
+tab/panel context (see [Copy style](#copy-style)) so they can be reused on tab
+triggers without rewrites.
+
+### Non-form schemas
+
+Schemas that validate API payloads, runtime state, or internal tooling — not
+bound to a `<Form>` / `WizardStepForm` / `TabbedForm` field config. Most issues
+are developer- or server-facing; migrate to `defineMessage` catalogs when a
+user-facing surface appears.
+
+| Module                                                      | Inline / hardcoded copy                                                                    | When to catalog                                |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `rpg/runtime/character/core.ts`                             | Duplicate class in level table                                                             | Character builder / sheet editor               |
+| `rpg/runtime/character/selection-sources.ts`                | `sourceId` required unless kind is manual                                                  | Selection-source editor                        |
+| `rpg/runtime/character/proficiencies.ts`                    | Exclusive `toolId` vs `toolCategory`; `weaponId` vs `weaponCategory`                       | Proficiency picker UI                          |
+| `rpg/campaign/patches/campaign-character-creation-patch.ts` | Mostly `levelValidationMessages`; one fallback: `Subclass choice changes are not allowed.` | Campaign patch API responses (if user-visible) |
+| `rpg/content/lib/multiclassing-validation.ts`               | Six eligibility strings (ability floor, species/class caps, campaign toggle)               | Multiclass step in character builder           |
+| `dev-bench/code-ref.ts`                                     | `lineEnd` ≥ `lineStart`                                                                    | Dev Bench ticket editor                        |
+| `dev-bench/hex-color.ts`                                    | Hex format (`#RRGGBB`)                                                                     | Dev Bench epic badge color                     |
+| `apps/api/src/env.ts`                                       | `JWT_SECRET` min length (startup)                                                          | Never — server config only                     |
+| `apps/api/src/features/dev-bench/bench-query.ts`            | `bucket` / `status` mutual exclusion                                                       | Dev Bench query validation (API)               |
+
+### Equipment unified schema
+
+Per-kind **field-path** registration is covered in
+`content-form-validation.test.ts`. Full-schema **invalid-submit** per equipment
+kind is blocked by the single multi-kind `equipmentFormSchema` shape — variant
+refinement copy is verified in per-family `*-form-fields.test.ts` via
+`createEquipmentInputSchema.parse()` at submit time.
+
+### Future seams
+
+Planned extensions to the message architecture — not started:
+
+| Seam                        | Purpose                                                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| API `{ id, params }` issues | Structured validation errors from the API that map to catalog ids + interpolation params (same ids as tier 2/3). |
+| Locale registry             | Key `defineMessage` ids by locale; `formatFieldMessage` becomes locale-aware.                                    |
+| `summaryMessage` variants   | Compact per-id formatters for tab triggers and inline indicators (full sentence remains the default).            |

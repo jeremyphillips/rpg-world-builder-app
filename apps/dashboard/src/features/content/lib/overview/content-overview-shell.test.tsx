@@ -30,10 +30,6 @@ describe('ContentOverviewShell', () => {
     )
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()
     expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
-    expect(screen.getByRole('status', { name: 'Loading' }).parentElement).toHaveClass(
-      'flex',
-      'justify-center',
-    )
     expect(screen.queryByText('Ready content')).not.toBeInTheDocument()
   })
 

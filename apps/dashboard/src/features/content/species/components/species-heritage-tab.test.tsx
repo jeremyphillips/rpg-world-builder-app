@@ -1,19 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import { TestFormShell } from '@/test/form-shell'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesHeritageTab } from './species-heritage-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid={`detail-${namePrefix?.replace(/\./g, '-')}`}>{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal)
 })
 
 type Heritage = {
@@ -36,11 +31,10 @@ function TabShell({
   heritage?: Heritage
   entitySource?: ContentFormCtx['entitySource']
 }) {
-  const form = useForm({ defaultValues: { heritage } })
   return (
-    <FormProvider {...form}>
+    <TestFormShell defaultValues={{ heritage }}>
       <SpeciesHeritageTab formCtx={{ entitySource }} />
-    </FormProvider>
+    </TestFormShell>
   )
 }
 

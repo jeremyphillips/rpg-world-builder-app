@@ -289,7 +289,10 @@ index.ts            # barrel re-export
    co-located `<name>.test.tsx` for logic-bearing or interactive components. Every
    UI/interactive component must pass vitest-axe and the Storybook test runner's
    axe-playwright check, and introduce no `eslint-plugin-jsx-a11y` violations
-   (target WCAG 2.2 AA); never suppress axe rules globally.
+   (target WCAG 2.2 AA); never suppress axe rules globally. In tests, use
+   `expectNoAxeViolations(container)` from `@rpg/ui/test-utils` — it runs axe with
+   `color-contrast` disabled (jsdom has no canvas; contrast is covered by
+   Storybook's addon-a11y in a real browser).
 
 > Note: all interactive primitives now follow these conventions — `*.client.tsx`
 > for client components (`button`, `input`, `avatar`, `dropdown-menu`,
@@ -400,3 +403,8 @@ The a11y addon runs axe against every story; shared preview sets `a11y.test` to
 | `pnpm test`            | Vitest: Button render + axe a11y checks (jsdom) |
 | `pnpm storybook`       | Storybook dev server                            |
 | `pnpm build-storybook` | Static Storybook build                          |
+
+Vitest is split into two projects: `ui:node` runs pure lib tests (`*.test.ts`,
+node environment, no jsdom/setup cost) and `ui:jsdom` runs component tests
+(`*.test.tsx`). Name test files accordingly — a `.test.ts` file that touches the
+DOM (render, renderHook, `document`, DOMPurify, …) must be `.test.tsx`.

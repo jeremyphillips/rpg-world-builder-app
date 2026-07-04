@@ -2,11 +2,13 @@ import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array-item-collapse-storage.lib'
+import { submitAndExpectPayload } from '../test-utils'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -233,9 +235,7 @@ describe('ArrayFieldRenderer', () => {
     await user.type(screen.getByLabelText('Name'), 'Elf')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({
+    await submitAndExpectPayload(user, onSubmit, {
       name: 'Elf',
       traits: [{ name: 'Darkvision', description: '' }],
     })
@@ -418,14 +418,12 @@ describe('ArrayFieldRenderer', () => {
     const user = userEvent.setup()
     const { container } = renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe violations on an empty array', async () => {
     const { container } = renderForm()
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('does not duplicate landmarks for nested arrays inside multiple items', async () => {

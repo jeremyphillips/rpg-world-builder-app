@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { InfoTooltip } from './tooltip.client'
 
@@ -22,7 +22,6 @@ describe('InfoTooltip', () => {
     const { container } = render(
       <InfoTooltip aria-label="About alignment">A moral compass.</InfoTooltip>,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

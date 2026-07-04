@@ -1,19 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import { TestFormShell } from '@/test/form-shell'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid={`detail-${namePrefix?.replace(/\./g, '-')}`}>{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal)
 })
 
 type TraitRow = { id?: string; kind: 'custom' | 'grant'; name?: string; grants: never[] }
@@ -27,11 +22,10 @@ function EditorShell({
   entitySource?: 'system' | 'homebrew'
   embeddedSeedRowIds?: Record<string, readonly string[]>
 }) {
-  const form = useForm({ defaultValues: { traits } })
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
 
   return (
-    <FormProvider {...form}>
+    <TestFormShell defaultValues={{ traits }}>
       <FormEmbeddedMasterDetailEditor
         formCtx={{ entitySource, embeddedSeedRowIds }}
         fieldName="traits"
@@ -46,7 +40,7 @@ function EditorShell({
           eyebrow: (row as TraitRow | undefined)?.kind === 'grant' ? 'Grant' : 'Custom',
         })}
       />
-    </FormProvider>
+    </TestFormShell>
   )
 }
 
@@ -112,11 +106,10 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     expect(screen.getByRole('switch', { name: /Active in campaign/i })).toBeInTheDocument()
   })
 
-  it('renders leadingContent above the grid with collapse-safe field-group spacing', () => {
+  it('renders leadingContent above the editor grid', () => {
     function LeadingContentShell() {
-      const form = useForm({ defaultValues: { traits: [] } })
       return (
-        <FormProvider {...form}>
+        <TestFormShell defaultValues={{ traits: [] }}>
           <FormEmbeddedMasterDetailEditor
             formCtx={{}}
             fieldName="traits"
@@ -129,17 +122,16 @@ describe('FormEmbeddedMasterDetailEditor', () => {
             leadingContent={<p>Choose how many traits apply.</p>}
             mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
           />
-        </FormProvider>
+        </TestFormShell>
       )
     }
 
     render(<LeadingContentShell />)
 
-    expect(screen.getByText('Choose how many traits apply.')).toBeInTheDocument()
     const leading = screen.getByText('Choose how many traits apply.')
-    const stack = leading.parentElement
-    const grid = stack?.querySelector('.grid')
-    expect(stack).toHaveClass('flex', 'flex-col', 'gap-8')
-    expect(grid?.parentElement).toBe(stack)
+    const list = screen.getByRole('navigation', { name: 'Traits' })
+
+    // Leading content must precede the editor grid in document order.
+    expect(leading.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

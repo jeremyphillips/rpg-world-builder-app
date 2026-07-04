@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { sampleEpic, sampleEpicTickets } from '../test-fixtures'
 import { RecommendNextButton } from './recommend-next-button'
@@ -58,9 +58,6 @@ describe('RecommendNextButton', () => {
       expect(screen.getByRole('button', { name: 'Recommend next' })).toBeInTheDocument()
     })
 
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false }, 'landmark-unique': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

@@ -1,23 +1,17 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import type { ComponentProps } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { resolveAvailability } from '@/lib/availability'
+import { TestFormShell } from '@/test/form-shell'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid="detail-form">{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal, 'detail-form')
 })
 
 function makeEditor(
@@ -45,17 +39,12 @@ function makeEditor(
 }
 
 function PanelShell(props: ComponentProps<typeof MasterDetailEditorPanel>) {
-  const form = useForm({ defaultValues: { traits: [{ name: 'Rage' }] } })
   return (
-    <MemoryRouter>
-      <FormProvider {...form}>
-        <MasterDetailEditorPanel {...props} />
-      </FormProvider>
-    </MemoryRouter>
+    <TestFormShell defaultValues={{ traits: [{ name: 'Rage' }] }}>
+      <MasterDetailEditorPanel {...props} />
+    </TestFormShell>
   )
 }
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 describe('MasterDetailEditorPanel', () => {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
@@ -138,7 +127,6 @@ describe('MasterDetailEditorPanel', () => {
       />,
     )
 
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

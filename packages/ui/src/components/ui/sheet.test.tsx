@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
@@ -72,9 +72,6 @@ describe('Sheet', () => {
     await user.click(screen.getByRole('button', { name: 'Open sheet' }))
     await screen.findByRole('dialog')
 
-    const results = await axe.run(document.body, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(document.body)
   })
 })
