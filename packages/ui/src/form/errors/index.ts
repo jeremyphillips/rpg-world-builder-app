@@ -42,3 +42,11 @@ export {
   type ValidationSessionExpandKey,
   type InvalidSubmitNavigation,
 } from './resolve-invalid-submit-navigation'
+export {
+  pathOwnsIssue,
+  collectTabPathPrefixes,
+  resolveTabValidationState,
+  getFirstInvalidTabId,
+  type TabValidationState,
+  type TabValidationTab,
+} from './resolve-tab-validation-state'

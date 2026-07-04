@@ -135,19 +135,15 @@ them before the UI that surfaces the errors ships.
 
 ### TabbedForm shell UX
 
-**Status:** deferred — schema/message modules for the four TabbedForm surfaces
-(campaign settings, species, class, spell) are verified; shell chrome is not.
-
-| Gap                  | Detail                                                                                                                     |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Inactive-tab errors  | Field errors on a hidden tab are not shown on the tab trigger — Save can look like a no-op until the author switches tabs. |
-| Tab-level indicators | Future work will surface validation state on tab triggers; copy for that summary line is not designed yet.                 |
+**Status:** implemented in `@rpg/ui` `TabbedForm` — tab count badges, auto-switch/focus on
+failed submit, and footer summary with Review actions. Schema/message modules for the four
+TabbedForm surfaces (campaign settings, species, class, spell) remain verified separately.
 
 Shell behaviour is documented in
 [packages/ui/docs/forms.md](../../ui/docs/forms.md#tabbedform). **Copy rule for
 authors:** messages in TabbedForm-backed schemas must stand alone outside their
 tab/panel context (see [Copy style](#copy-style)) so they can be reused on tab
-triggers without rewrites.
+triggers and in the footer summary without rewrites.
 
 ### Non-form schemas
 

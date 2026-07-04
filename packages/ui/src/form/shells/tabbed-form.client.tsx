@@ -1,15 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
+import type { DefaultValues, FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { type FileFieldPropsMap, type FormValueSync } from '../field-config'
+import { type FileFieldPropsMap, type FormItem, type FormValueSync } from '../field-config'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
-import type { FormValidationPresentation } from '../context/form-ui.context'
+import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
+import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
+import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -20,6 +22,7 @@ import {
 } from './tabbed-form-panels.client'
 
 export type { TabbedFormFooterWrapperProps, TabbedFormTab }
+export { collectTabbedFormResolverItems } from './tabbed-form-panels.client'
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Merged Zod schema covering all tabs' fields combined. */
@@ -116,6 +119,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
+  const [activeTabId, setActiveTabId] = React.useState(tabs[0]?.id ?? '')
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
   const markSubmitAttempted = React.useCallback(() => {
     setHasAttemptedSubmit(true)
@@ -124,11 +128,42 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
+  const handleInvalidSubmit = React.useCallback(
+    (
+      invalidForm: UseFormReturn<TFieldValues>,
+      fields: FormItem[],
+      invalidFormId: string,
+      ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'>,
+      errors: FieldErrors<TFieldValues>,
+    ) => {
+      navigateTabbedFormInvalidSubmit(
+        invalidForm,
+        fields,
+        invalidFormId,
+        tabs,
+        ui,
+        errors,
+        setActiveTabId,
+      )
+    },
+    [tabs],
+  )
+
+  const validationSummary = (
+    <TabbedFormErrorSummary
+      tabs={tabs}
+      fields={allFields}
+      formId={formId}
+      onActiveTabChange={setActiveTabId}
+    />
+  )
 
   const panels = (
     <TabbedFormPanels
       tabs={tabs}
       formId={formId}
+      activeTabId={activeTabId}
+      onActiveTabChange={setActiveTabId}
       stickyChrome={stickyChrome}
       stickyTabsClassName={stickyTabsClassName}
       omitPanelBottomPadding={Boolean(footerWrapper)}
@@ -147,6 +182,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       validationPresentation={validationPresentation}
       hasAttemptedSubmit={hasAttemptedSubmit}
       onMarkSubmitAttempted={markSubmitAttempted}
+      onInvalidSubmit={handleInvalidSubmit}
       onSubmit={onSubmit}
       className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
     >
@@ -160,6 +196,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         stickyChrome={stickyChrome}
         stickyActionsBarClassName={stickyActionsBarClassName}
         formError={formError}
+        validationSummary={validationSummary}
         resolvedFooter={resolvedFooter}
       />
     </SchemaFormShell>

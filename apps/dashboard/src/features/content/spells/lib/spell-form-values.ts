@@ -65,7 +65,6 @@ export const EMPTY_SPELL_TAGS: SpellFormTags = {
 }
 
 export const spellCreateDefaultValues: Partial<SpellFormValues> = {
-  level: 0,
   classIds: [],
   tags: { ...EMPTY_SPELL_TAGS },
   castingTime: {

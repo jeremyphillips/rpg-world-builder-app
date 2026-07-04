@@ -7,11 +7,13 @@ import {
   defineMessage,
   getCurrencyAbbrev,
   magicItemRaritySchema,
+  singularizeLabel,
 } from '@rpg/contracts'
 import { DIE_FACES } from '@rpg/contracts/primitives'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions } from '@rpg/ui/form'
 
 import { buildLevelRangeTiersArrayField } from '../../forms/fields/level-range-table-form-fields'
+import type { LevelRangeArrayConfig } from '../../forms/array-patterns'
 
 import {
   formatStartingWealthTierSummary,
@@ -22,6 +24,9 @@ import {
 } from './starting-wealth-form-values'
 
 const BONUS_GOLD_ENABLED = 'bonusGoldEnabled'
+
+const STARTING_WEALTH_TIERS_LEGEND = 'Wealth tiers' as const
+const startingWealthTierItemLabel = singularizeLabel(STARTING_WEALTH_TIERS_LEGEND)
 
 /** Starting-wealth form validation messages (tier 3 form overrides). */
 export const startingWealthValidationMessages = {
@@ -104,10 +109,10 @@ export const startingWealthFormSchema = z.object({
 })
 
 /** Fixed-length tier array editor for `startingWealth.tiers`. */
-export function buildStartingWealthTiersField(): FormItem {
+export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
   return buildLevelRangeTiersArrayField({
     name: 'tiers',
-    legend: 'Wealth tiers',
+    legend: STARTING_WEALTH_TIERS_LEGEND,
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
     rhythm: 'comfortable',
@@ -115,7 +120,8 @@ export function buildStartingWealthTiersField(): FormItem {
     itemCollapsible: true,
     itemHeader: {
       primaryField: 'label',
-      fallback: (index) => `Wealth tier #${index + 1}`,
+      fallback: (index) => `${startingWealthTierItemLabel} #${index + 1}`,
+      formatPrimary: (value) => `${startingWealthTierItemLabel} — ${String(value)}`,
       summary: (values) => formatStartingWealthTierSummary(values as StartingWealthTierFormValues),
     },
     fields: [

@@ -179,6 +179,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           name: 'level',
           label: 'Level',
           options: spellLevelOptions,
+          placeholder: 'Choose level…',
           required: true,
         },
       ],

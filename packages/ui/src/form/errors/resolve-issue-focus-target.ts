@@ -87,7 +87,13 @@ export function resolveIssueFocusControlId(
   arrayPattern?: ArrayPatternConfig,
 ): string | undefined {
   const fieldName = resolveIssueFocusFieldName(issue, arrayPattern)
-  if (!fieldName || issue.itemPrefix === undefined) return undefined
+  if (fieldName && issue.itemPrefix !== undefined) {
+    return buildFieldControlId(idPrefix, issue.itemPrefix, fieldName)
+  }
 
-  return buildFieldControlId(idPrefix, issue.itemPrefix, fieldName)
+  if (!issue.arrayPath && issue.path) {
+    return buildFieldControlId(idPrefix, undefined, issue.path)
+  }
+
+  return undefined
 }

@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
@@ -218,6 +219,158 @@ describe('TabbedForm', () => {
     expect(screen.getByTestId('wrapped-content')).toContainElement(screen.getByRole('tablist'))
   })
 
+  it('does not show tab issue badges before the first failed submit', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: '', level: 1 }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
+    expect(screen.getByRole('tab', { name: 'Rules' })).toHaveTextContent('Rules')
+    expect(screen.queryByText(/fields need attention/i)).not.toBeInTheDocument()
+  })
+
+  it('shows tab trigger badges with accessible names after a failed submit', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: /Notes.*1 field needs attention/i })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      )
+    })
+    const notesInput = screen.getByLabelText('Notes')
+    expect(notesInput).toHaveFocus()
+    expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
+    expect(screen.getByRole('tab', { name: /Notes/ })).toHaveTextContent('1')
+  })
+
+  it('uses resolverFields for tier-1 validation copy on header-only paths', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1),
+      meta: z.object({ title: z.string().min(1) }),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'meta',
+        label: 'Meta',
+        fields: [],
+        resolverFields: [{ type: 'text', name: 'meta.title', label: 'Title', required: true }],
+        header: (
+          <FormItems
+            items={[{ type: 'text', name: 'title', label: 'Title', required: true }]}
+            idPrefix="meta"
+            namePrefix="meta"
+          />
+        ),
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', meta: { title: '' } }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('tab', { name: 'Meta' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Title is required.')).toBeInTheDocument()
+    })
+  })
+
+  it('auto-switches to the first invalid tab and focuses the tab-scoped control', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        id="campaign-form"
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Notes')).toHaveFocus()
+    })
+    expect(screen.getByLabelText('Notes')).toHaveAttribute('id', 'campaign-form-notes-notes')
+    expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('propagates issue badges to a hidden tab after a failed submit', async () => {
     const user = userEvent.setup()
     const validationSchema = z.object({
@@ -271,11 +424,18 @@ describe('TabbedForm', () => {
       expect(screen.getByLabelText('Label')).toHaveAttribute('aria-invalid', 'true')
     })
 
+    expect(screen.getByRole('tab', { name: /Grants/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByLabelText('Label')).toHaveFocus()
+
     await waitFor(() => {
       expect(
         screen.getByRole('button', { name: /1 issue in Grants · Grant #1/i }),
       ).toBeInTheDocument()
     })
+
+    expect(
+      screen.getByRole('tab', { name: /Grants.*1 field needs attention/i }),
+    ).toBeInTheDocument()
   })
 
   it('suppresses inline error text on inactive tab panels while keeping invalid chrome', async () => {
@@ -317,21 +477,168 @@ describe('TabbedForm', () => {
     })
     expect(screen.getByText('Name is required')).toBeInTheDocument()
 
-    const notesPanel = screen.getByRole('tabpanel', { name: 'Notes' })
+    const notesPanel = screen.getByRole('tabpanel', { name: /Notes/i })
     const notesInput = within(notesPanel).getByLabelText('Notes')
     expect(notesInput).toHaveAttribute('aria-invalid', 'true')
     expect(screen.queryByText('Notes are required')).not.toBeInTheDocument()
   })
 
+  it('shows the validation summary after a failed submit', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Some fields need attention. Errors were found in Notes.',
+      )
+    })
+    expect(screen.getByRole('button', { name: 'Review Notes' })).toBeInTheDocument()
+  })
+
+  it('Review summary buttons switch tabs and focus the tab-scoped control', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        id="review-form"
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: '', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => {
+      expect(screen.getByLabelText('Name')).toHaveFocus()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Review Notes' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Notes')).toHaveFocus()
+    })
+    expect(screen.getByLabelText('Notes')).toHaveAttribute('id', 'review-form-notes-notes')
+    expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('clears tab badges and the validation summary after errors are fixed', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={onSubmit}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toBeInTheDocument()
+    })
+
+    await user.type(screen.getByLabelText('Notes'), 'All good now')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
+    expect(screen.getByRole('tab', { name: 'Notes' })).toHaveTextContent('Notes')
+    expect(screen.queryByText(/fields need attention/i)).not.toBeInTheDocument()
+  })
+
   it('has no accessibility violations', async () => {
+    const user = userEvent.setup()
     const { container } = render(
       <TabbedForm<TestValues>
         schema={schema}
         tabs={tabs}
         onSubmit={vi.fn()}
+        defaultValues={{ name: '', level: 1 }}
         footer={<button type="submit">Save</button>}
       />,
     )
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toBeInTheDocument()
+    })
     await expectNoAxeViolations(container)
   })
 })

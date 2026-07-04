@@ -7,6 +7,8 @@ import { formStickyActionsBarClasses } from './form-chrome.variants'
 export interface FormActionsBarProps {
   /** Form-level validation or server error shown above the actions row. */
   formError?: string | null
+  /** Cross-tab validation summary for `<TabbedForm>` footers. */
+  validationSummary?: ReactNode
   children?: ReactNode
   className?: string
 }
@@ -15,8 +17,13 @@ export interface FormActionsBarProps {
  * Sticky save/cancel row for long `<Form>` / `<TabbedForm>` layouts. Keeps primary
  * actions and form-level errors visible while tab panels or field stacks scroll.
  */
-export function FormActionsBar({ formError, children, className }: FormActionsBarProps) {
-  if (!formError && !children) {
+export function FormActionsBar({
+  formError,
+  validationSummary,
+  children,
+  className,
+}: FormActionsBarProps) {
+  if (!formError && !validationSummary && !children) {
     return null
   }
 
@@ -31,6 +38,7 @@ export function FormActionsBar({ formError, children, className }: FormActionsBa
           {formError}
         </Text>
       ) : null}
+      {validationSummary}
       {children}
     </div>
   )

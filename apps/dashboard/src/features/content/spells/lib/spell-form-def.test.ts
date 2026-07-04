@@ -131,6 +131,7 @@ describe('spellFormDef create vs update modes', () => {
       ...spellFormDef.createDefaultValues,
       name: 'Custom Bolt',
       school: 'evocation',
+      level: 1,
       classIds: ['wizard'],
     } as SpellFormValues
     const input = spellFormDef.toInput(formValues)

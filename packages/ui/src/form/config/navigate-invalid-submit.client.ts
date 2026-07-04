@@ -2,14 +2,22 @@
 
 import type { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form'
 
+import {
+  performInvalidSubmitFocus,
+  type InvalidSubmitFocusFallbacks,
+} from './navigate-invalid-submit-focus.lib'
 import { resolveInvalidSubmitNavigation } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
 import type { FormUiContextValue } from '../context/form-ui.context'
 
-function scrollElementIntoView(element: Element): void {
-  if ('scrollIntoView' in element && typeof element.scrollIntoView === 'function') {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
+export type NavigateInvalidSubmitOptions = {
+  /** Overrides the id prefix used when resolving the focus target. */
+  idPrefix?: string
+  /** Runs after submit is marked, before expand keys — e.g. activate an invalid tab. */
+  onBeforeFocus?: () => void
+  /** Waits two animation frames before focusing so layout (tab switch) can commit. */
+  waitForLayout?: boolean
+  focusFallbacks?: InvalidSubmitFocusFallbacks
 }
 
 export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
@@ -18,13 +26,16 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
   formId: string,
   ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'>,
   errors: FieldErrors<TFieldValues> = form.formState.errors,
+  options?: NavigateInvalidSubmitOptions,
 ): void {
   ui.markSubmitAttempted()
+
+  const idPrefix = options?.idPrefix ?? formId
 
   const navigation = resolveInvalidSubmitNavigation({
     errors,
     fields,
-    idPrefix: formId,
+    idPrefix,
     getItemValues: (fullName, index) => {
       const value = form.getValues(`${fullName}.${index}` as never)
       return typeof value === 'object' && value !== null
@@ -35,23 +46,17 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
 
   if (!navigation) return
 
+  options?.onBeforeFocus?.()
   ui.addValidationSessionExpandKeys(navigation.expandKeys)
 
-  window.requestAnimationFrame(() => {
-    if (navigation.focusControlId) {
-      const element = document.getElementById(navigation.focusControlId)
-      if (element) {
-        scrollElementIntoView(element)
-        if ('focus' in element && typeof element.focus === 'function') {
-          element.focus({ preventScroll: true })
-        }
-        return
-      }
-    }
+  const focus = () => performInvalidSubmitFocus(navigation, idPrefix, options?.focusFallbacks)
 
-    const rowElement = document.querySelector(
-      `[data-array-item-prefix="${navigation.firstIssue.itemPrefix}"]`,
-    )
-    if (rowElement) scrollElementIntoView(rowElement)
-  })
+  if (options?.waitForLayout) {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(focus)
+    })
+    return
+  }
+
+  window.requestAnimationFrame(focus)
 }

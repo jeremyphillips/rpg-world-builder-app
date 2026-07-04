@@ -26,6 +26,11 @@ describe('fieldStackRhythmVariants', () => {
 })
 
 describe('fieldLabelVariants', () => {
+  it('shrinks the label hit target to label copy width', () => {
+    expect(fieldLabelVariants()).toContain('w-fit')
+    expect(fieldLabelVariants()).toContain('self-start')
+  })
+
   it('adds first-line min-height for inline toggles without overriding label weight', () => {
     expect(fieldLabelVariants({ placement: 'inlineSwitch' })).toContain('min-h-5')
     expect(fieldLabelVariants({ placement: 'inlineSwitch' })).toContain('font-field-label')

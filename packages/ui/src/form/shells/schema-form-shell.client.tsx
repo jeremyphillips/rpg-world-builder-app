@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { FormProvider, type FieldValues, type UseFormReturn } from 'react-hook-form'
+import { FormProvider, type FieldErrors, type FieldValues, type UseFormReturn } from 'react-hook-form'
 
 import { FileFieldPropsProvider } from '../context/file-field-props.context'
 import {
@@ -14,6 +14,7 @@ import { FormSectionContext } from '../context/form-section.context'
 import {
   FormUiContext,
   FormUiProvider,
+  type FormUiContextValue,
   type FormValidationPresentation,
 } from '../context/form-ui.context'
 import type { FileFieldPropsMap, FormItem } from '../field-config'
@@ -38,6 +39,14 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   hasAttemptedSubmit?: boolean
   onMarkSubmitAttempted?: () => void
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
+  /** Overrides default failed-submit navigation (expand keys + focus). */
+  onInvalidSubmit?: (
+    form: UseFormReturn<TFieldValues>,
+    fields: FormItem[],
+    formId: string,
+    ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'>,
+    errors: FieldErrors<TFieldValues>,
+  ) => void
   className?: string | undefined
   children: React.ReactNode
 }
@@ -47,11 +56,12 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
   formId,
   fields,
   onSubmit,
+  onInvalidSubmit,
   className,
   children,
 }: Pick<
   SchemaFormShellProps<TFieldValues>,
-  'form' | 'formId' | 'fields' | 'onSubmit' | 'className' | 'children'
+  'form' | 'formId' | 'fields' | 'onSubmit' | 'onInvalidSubmit' | 'className' | 'children'
 >) {
   const ui = React.useContext(FormUiContext)
 
@@ -61,7 +71,13 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
       noValidate
       onSubmit={form.handleSubmit(
         (values) => onSubmit(values, form),
-        (errors) => navigateInvalidSubmit(form, fields, formId, ui, errors),
+        (errors) => {
+          if (onInvalidSubmit) {
+            onInvalidSubmit(form, fields, formId, ui, errors)
+            return
+          }
+          navigateInvalidSubmit(form, fields, formId, ui, errors)
+        },
       )}
       className={className}
     >
@@ -83,6 +99,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   hasAttemptedSubmit,
   onMarkSubmitAttempted,
   onSubmit,
+  onInvalidSubmit,
   className,
   children,
 }: SchemaFormShellProps<TFieldValues>) {
@@ -107,6 +124,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
             formId={formId}
             fields={fields}
             onSubmit={onSubmit}
+            onInvalidSubmit={onInvalidSubmit}
             className={className}
           >
             <FormSectionContext.Provider value={sectionContext}>

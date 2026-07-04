@@ -31,12 +31,52 @@ you need — and consider whether the gap belongs in the renderer.
 
 All tab panels stay mounted so every field registers and Save validates the **merged** schema.
 
-**Known gap:** field errors on an **inactive** tab are not shown on the tab trigger — a failed
-submit can look like a no-op until the author switches tabs. Deferred shell work and the full
-gap inventory → [validation-messages.md](../../contracts/docs/validation-messages.md#deferred-gap-list).
+After the first failed submit, invalid tabs show **count badges** on their triggers, the form
+**auto-switches** to the first invalid tab and focuses its control, and a **footer summary**
+(`role="status"`) lists affected tabs with **Review {tab}** actions. Badges and the summary
+live-update as errors are fixed and disappear when validation passes. Inactive panels still
+suppress inline error text until their tab is active.
 
 Optional non-field UI: `TabbedFormTab.header`. Sticky chrome, sheets, and footers:
 [patterns.md](./forms/patterns.md#tabbedform).
+
+### `errorPaths` for header-only tabs
+
+Tab ownership is inferred from each tab's `fields` tree. Header-only tabs that render
+editors via `FormEmbeddedMasterDetailEditor` (or similar) with `fields: []` must
+declare the RHF root paths they own via `errorPaths` — otherwise validation issues on
+those paths are orphaned and never appear on tab badges or the footer summary.
+
+`errorPaths` **supplements** inferred prefixes; it does not replace them. Use it only
+when fields live outside the tab's `fields` array.
+
+```ts
+{
+  id: 'heritage',
+  label: 'Heritage',
+  fields: [],
+  errorPaths: ['heritage'],
+  header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
+}
+```
+
+Content catalog examples: `buildSpeciesTabs` and `buildClassTabs` in the dashboard
+species/class `*-form-fields.ts` modules.
+
+### `resolverFields` for validation message copy
+
+The Zod resolver builds its field error map from `tab.fields` only. Header/master-detail
+editors that render via `FormItems` + `namePrefix` must also supply matching
+`resolverFields` on the tab — same `FormItem` shapes with **full** RHF paths
+(`heritage.name`, `traits`, `characterCreation.levelLimits.classLevelCaps`, …).
+These configs are **not rendered**; they exist solely so tier-1 validation copy uses
+field labels instead of Zod defaults.
+
+Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
+badges and the footer summary; `resolverFields` drives inline message copy.
+
+Dashboard helpers: `prefixFormItems` and `embeddedArrayResolverField` in
+`tabbed-form-resolver-fields.ts`.
 
 ## Field anatomy & the a11y contract
 

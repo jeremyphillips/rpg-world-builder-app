@@ -204,6 +204,7 @@ export function weaponFormFieldGroup(): FormItem {
                 min: 1,
                 visibility: visibleWhenFlatDamage(),
                 required: true,
+                digits: 3,
                 width: 'md',
               },
               {

@@ -7,6 +7,7 @@ import {
   assertFieldPathsRegistered,
   assertInvalidSubmitUsesRefinedMessages,
   assertRegistryCoverage,
+  collectValidationIssues,
 } from '@rpg/ui/form/test-utils'
 
 import {
@@ -61,20 +62,18 @@ const SLUG_EXEMPT = ['slug'] as const
 /** Server-managed row ids and form-only discriminators not rendered as fields. */
 const SERVER_ROW_EXEMPT = ['id', 'kind'] as const
 
-/** Tab panels rendered via master-detail slots — covered by embedded sub-form tests. */
-const SLOT_TAB_PREFIX_EXEMPT = [
-  /^traits\b/,
-  /^heritage\b/,
-  /^characterCreation\b/,
-  /^features\b/,
-] as const
+/** Heritage scalar paths not authored as visible fields (optional id, defaulted choose). */
+const HERITAGE_FORM_EXEMPT = ['heritage.id', 'heritage.choose'] as const
 
 /** Grant union variants explode many schema paths; grant rows are tested at row scope. */
 const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 
-const COMMON_SCHEMA_EXEMPT = [...SLOT_IGNORE, ...SLUG_EXEMPT, ...GRANT_NESTED_EXEMPT] as const
-
-const TABBED_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...SLOT_TAB_PREFIX_EXEMPT] as const
+const COMMON_SCHEMA_EXEMPT = [
+  ...SLOT_IGNORE,
+  ...SLUG_EXEMPT,
+  ...HERITAGE_FORM_EXEMPT,
+  ...GRANT_NESTED_EXEMPT,
+] as const
 
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {
   const ctx = routeKey === 'equipment' ? { equipmentKind: 'weapon' as const } : {}
@@ -87,7 +86,7 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
     it('registers schema leaf paths in the field error map', () => {
       const fields = contentFormFields(def, ctx)
       const schema = def.resolveSchema?.(ctx) ?? def.schema
-      const exempt = def.buildTabs ? TABBED_SCHEMA_EXEMPT : COMMON_SCHEMA_EXEMPT
+      const exempt = COMMON_SCHEMA_EXEMPT
 
       assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
     })
@@ -247,6 +246,31 @@ describe('embedded content sub-forms validation', () => {
 })
 
 describe('content form schema factories', () => {
+  it('species heritage.name resolves refined copy via resolverFields', () => {
+    const fields = contentFormFields(contentFormRegistry.species!, {})
+    const schema = createSpeciesFormSchema(['humanoid'])
+    const issues = collectValidationIssues(
+      schema,
+      {
+        name: 'Elf',
+        creatureType: 'humanoid',
+        sizes: ['medium'],
+        speed: { walk: 30 },
+        traits: [],
+        heritage: {
+          name: '',
+          choose: 1,
+          options: [{ kind: 'custom', name: 'Option', grants: [] }],
+        },
+      },
+      fields,
+    )
+
+    expect(issues.find((issue) => issue.path === 'heritage.name')?.message).toBe(
+      'Name is required.',
+    )
+  })
+
   it('species and class campaign-aware schemas reject basics without Zod defaults', () => {
     const speciesFields = contentFormFields(contentFormRegistry.species!, {})
     const speciesSchema = createSpeciesFormSchema(['humanoid'])
