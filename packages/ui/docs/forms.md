@@ -133,6 +133,21 @@ See `field-error-map-fixture.stories.tsx` for a synthetic form covering each
 edge case. Tiers, naming, and copy style →
 [packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
 
+### Verifying validation messages in tests
+
+Co-located form tests import helpers from `@rpg/ui/form/test-utils`:
+
+| Helper                                                          | Purpose                                                                                       |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                            |
+| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions)        |
+| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist` / `unionWhitelist` |
+| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                                   |
+
+Pass a targeted `invalidValue` when `{}` parses successfully or triggers unrelated
+paths (tabbed forms, equipment kinds). Master-detail sub-forms (trait rows,
+starting-equipment options, …) get their own `*-form-validation.test.ts` cases.
+
 Contract enums → `toOptions` with a label map keyed by the enum type:
 
 ```ts

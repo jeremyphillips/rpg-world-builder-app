@@ -119,3 +119,24 @@ register their `legend` with `itemLabel` derived from `itemHeader` when present)
 3. Reference the catalog in `.refine` / `superRefine` — never inline literals.
 4. Assert messages in tests through the catalog.
 5. Re-export from the layer barrel (contracts) so apps share the copy.
+
+## Verification
+
+Form tests use `@rpg/ui/form/test-utils` (`assertRegistryCoverage`,
+`assertFieldPathsRegistered`, `assertInvalidSubmitUsesRefinedMessages`,
+`expectNoDefaultZodMessages`) so live forms never surface raw Zod copy. See
+[packages/ui/docs/forms.md](../../ui/docs/forms.md) and
+[apps/dashboard/docs/form-lib-conventions.md](../../../apps/dashboard/docs/form-lib-conventions.md).
+
+## Deferred (not yet cataloged / out of form scope)
+
+- **TabbedForm shell** — inactive-tab error indicators (copy is written to stand
+  alone outside tab context for future shell work).
+- **Non-form schemas** — runtime character, campaign patches, multiclassing
+  helper, dev-bench, API env.
+- **Equipment per-kind invalid-submit sweep** — field-path registration is
+  covered per kind; full-schema invalid-submit is blocked by the unified
+  multi-kind schema shape (variant copy verified in equipment `*-form-values`
+  tests).
+- **Future seams** — API `{ id, params }` structured issues, locale registry,
+  compact `summaryMessage` variants per id.

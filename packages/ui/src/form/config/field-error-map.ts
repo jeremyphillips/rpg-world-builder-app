@@ -70,10 +70,15 @@ function registerItems(
 }
 
 /** Field lookup keyed by dot-joined path with array indices normalized to `*`. */
-function buildFieldRegistry(items: FormItem[]): Map<string, RegistryEntry> {
+export function buildFieldRegistry(items: FormItem[]): Map<string, RegistryEntry> {
   const registry = new Map<string, RegistryEntry>()
   registerItems(registry, '', items)
   return registry
+}
+
+/** Registered dot-path keys for a form field tree (array indices use `*`). */
+export function collectRegisteredPaths(items: FormItem[]): Set<string> {
+  return new Set(buildFieldRegistry(items).keys())
 }
 
 /**
