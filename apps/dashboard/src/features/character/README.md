@@ -9,10 +9,14 @@ Folder layout and the feature-boundary rule are documented in
 
 ## Key files
 
-| Area         | Path                             |
-| ------------ | -------------------------------- |
-| List route   | `routes/characters-overview.tsx` |
-| Detail route | `routes/character-detail.tsx`    |
+| Area               | Path                                                       |
+| ------------------ | ---------------------------------------------------------- |
+| List route         | `routes/characters-overview.tsx`                           |
+| Detail route       | `routes/character-detail.tsx`                              |
+| API clients        | `api/character-client.ts`, `api/ruleset-content-client.ts` |
+| Build context      | `hooks/use-build-context.ts`                               |
+| Draft store        | `store/character-builder-store.ts`                         |
+| Restore affordance | `components/character-builder-draft-restore.client.tsx`    |
 
 ## Routes
 
