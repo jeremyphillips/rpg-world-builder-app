@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { ABILITY_IDS, type Ability } from '../../vocab/ability'
+
 // ---------------------------------------------------------------------------
 // Ability score generation — how a builder draft assigns the six scores.
 // The method union stays open for 'point-buy' and 'rolled' later; MVP ships
@@ -28,3 +30,22 @@ export const DEFAULT_ABILITY_GENERATION_RULES = {
   methods: [...ABILITY_GENERATION_METHODS],
   standardArray: [...STANDARD_ARRAY],
 } as const satisfies AbilityGenerationRules
+
+/**
+ * Returns true when `scores` uses each value from `standardArray` exactly once.
+ * Incomplete assignments return false.
+ */
+export function isStandardArrayAssignment(
+  scores: Partial<Record<Ability, number>>,
+  standardArray: readonly number[],
+): boolean {
+  const assigned = ABILITY_IDS.map((ability) => scores[ability]).filter(
+    (score): score is number => typeof score === 'number',
+  )
+
+  if (assigned.length !== ABILITY_IDS.length) return false
+
+  const sortedAssigned = [...assigned].sort((a, b) => a - b)
+  const sortedExpected = [...standardArray].sort((a, b) => a - b)
+  return sortedAssigned.every((value, index) => value === sortedExpected[index])
+}
