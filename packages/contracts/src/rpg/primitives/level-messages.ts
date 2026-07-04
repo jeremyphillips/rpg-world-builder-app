@@ -1,4 +1,5 @@
 import { defineMessage } from '../../validation/define-message'
+import { betweenCopy } from '../../validation/messages'
 
 // ---------------------------------------------------------------------------
 // Level / level-range-table validation messages (tier 2 domain catalog).
@@ -33,9 +34,8 @@ export const levelValidationMessages = {
     ({ expected }) => `Tiers must cover levels 1–${expected}.`,
   ),
   /** A level lies outside the campaign's 1–max bound. */
-  outOfBounds: defineMessage<{ maxLevel: number }>(
-    'validation.level.outOfBounds',
-    ({ maxLevel }) => `Level must be between 1 and ${maxLevel}.`,
+  outOfBounds: defineMessage<{ maxLevel: number }>('validation.level.outOfBounds', ({ maxLevel }) =>
+    betweenCopy('Level', 1, maxLevel),
   ),
   /** Extended max equals the standard max — must be strictly higher. */
   extendedMaxMustExceedStandard: defineMessage(

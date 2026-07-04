@@ -7,6 +7,7 @@ import {
   defineMessage,
   getCurrencyAbbrev,
   magicItemRaritySchema,
+  requiredWhenCopy,
   singularizeLabel,
 } from '@rpg/contracts'
 import { DIE_FACES } from '@rpg/contracts/primitives'
@@ -30,9 +31,8 @@ const startingWealthTierItemLabel = singularizeLabel(STARTING_WEALTH_TIERS_LEGEN
 
 /** Starting-wealth form validation messages (tier 3 form overrides). */
 export const startingWealthValidationMessages = {
-  bonusGoldRequired: defineMessage(
-    'validation.startingWealth.bonusGoldRequired',
-    () => 'Bonus gold details are required when bonus gold is enabled.',
+  bonusGoldRequired: defineMessage('validation.startingWealth.bonusGoldRequired', () =>
+    requiredWhenCopy('Bonus gold details', 'bonus gold is enabled'),
   ),
   bonusGoldMultiplier: defineMessage(
     'validation.startingWealth.bonusGoldMultiplier',

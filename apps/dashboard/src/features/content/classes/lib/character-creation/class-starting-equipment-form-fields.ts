@@ -29,7 +29,7 @@ import { STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT } from './class-starting-equ
 export const startingEquipmentValidationMessages = {
   wealthGrantRequired: defineMessage(
     'validation.startingEquipment.wealthGrantRequired',
-    () => 'Packages with no items require a wealth grant',
+    () => 'Packages with no items require a wealth grant.',
     () => 'Missing wealth grant',
   ),
 }

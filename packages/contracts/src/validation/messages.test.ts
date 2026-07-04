@@ -7,8 +7,10 @@ import {
   encodeStructuredMessage,
 } from './define-message'
 import {
+  betweenCopy,
   fieldValidationMessages,
   midSentenceLabel,
+  requiredWhenCopy,
   singularizeLabel,
   withArticle,
 } from './messages'
@@ -86,6 +88,21 @@ describe('label helpers', () => {
     expect(singularizeLabel('Wealth tiers')).toBe('Wealth tier')
     expect(singularizeLabel('Abilities')).toBe('Ability')
     expect(singularizeLabel('Class')).toBe('Class')
+  })
+})
+
+describe('copy helpers', () => {
+  it('formats required-when copy with a realistic condition clause', () => {
+    expect(requiredWhenCopy('Bonus gold details', 'starting wealth includes bonus gold')).toBe(
+      'Bonus gold details is required when starting wealth includes bonus gold.',
+    )
+  })
+
+  it('formats between copy with numeric and string bounds', () => {
+    expect(betweenCopy('Minimum score', 3, 20)).toBe('Minimum score must be between 3 and 20.')
+    expect(betweenCopy('Level', 1, 'campaign max')).toBe(
+      'Level must be between 1 and campaign max.',
+    )
   })
 })
 

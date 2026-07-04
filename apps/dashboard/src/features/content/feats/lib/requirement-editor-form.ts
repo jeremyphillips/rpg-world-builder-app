@@ -1,6 +1,7 @@
 import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
+  betweenCopy,
   campaignLevelSchema,
   defineMessage,
   formatRequirementExpression,
@@ -21,22 +22,22 @@ import {
 export const requirementEditorValidationMessages = {
   requirementRequired: defineMessage(
     'validation.requirementEditor.requirementRequired',
-    () => 'Add at least one requirement',
+    () => 'Add at least one requirement.',
     () => 'Missing requirement',
   ),
   conditionTypeRequired: defineMessage(
     'validation.requirementEditor.conditionTypeRequired',
-    () => 'Condition type is required',
+    () => 'Condition type is required.',
     () => 'Missing condition',
   ),
   minLevelRequired: defineMessage(
     'validation.requirementEditor.minLevelRequired',
-    () => 'Minimum character level is required',
+    () => 'Minimum character level is required.',
     () => 'Missing level',
   ),
   abilityMinimumRange: defineMessage<{ min: number; max: number }>(
     'validation.requirementEditor.abilityMinimumRange',
-    ({ min, max }) => `Minimum score must be between ${min} and ${max}`,
+    ({ min, max }) => betweenCopy('Minimum score', min, max),
     () => 'Invalid score',
   ),
 }

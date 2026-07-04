@@ -112,6 +112,53 @@ violations; the form-only “required when limit enabled” rule stays in
   `midSentenceLabel` (lowercase unless initialism), `withArticle` (`a`/`an`),
   `singularizeLabel` (`Wealth tiers` → `Wealth tier`).
 
+## Copy helpers
+
+Small sentence-shape helpers live beside the label helpers in
+`src/validation/messages.ts`. They format copy only — message ids and domain
+ownership stay in each catalog's `defineMessage` definitions.
+
+| Helper                                            | Shape                                        | Param conventions                                                                    |
+| ------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `requiredWhenCopy(subjectLabel, conditionClause)` | `{subject} is required when {clause}.`       | `conditionClause` is lowercase, no leading "when", no trailing punctuation           |
+| `betweenCopy(subjectLabel, min, max)`             | `{subject} must be between {min} and {max}.` | Prefer concrete numbers when known; strings are for bounds not fixed at message time |
+
+**Decision standard:** domain-specific message ids + small copy helpers first;
+extract a primitive/shared catalog only after the same rule appears in a second
+domain with identical copy. Do not contort copy to fit a helper — if "for",
+"unless", or action-oriented wording reads better (`Choose a source, or set the
+source kind to manual.`), keep the message domain-specific.
+
+**Non-recommendations** (from BENCH-067 analysis — one helper per shape, no
+shared primitive ids):
+
+| Shape                                | Why not                                                                                                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Exclusivity (`Choose either A or B`) | Only character proficiencies today; keep `exclusiveEitherCopy` private in `character-messages.ts` until a second domain needs it |
+| Duplicate / already used             | Tier-1 `duplicateItem` covers the common case; domain rules need specific subjects                                               |
+| At-least-one / add-one               | Tier-1 `minItems` and action-led "Add …" copy fit list fields better                                                             |
+| Only-applies-to / unless             | Condition clauses vary too much (`for`, `when`, `unless`) for a single template                                                  |
+
+Example adoption (ids unchanged):
+
+```ts
+import { betweenCopy, requiredWhenCopy } from '@rpg/contracts'
+
+materialDescriptionRequired: defineMessage(
+  'validation.spell.materialDescriptionRequired',
+  () => requiredWhenCopy('Material description', 'the material component is selected'),
+),
+
+outOfBounds: defineMessage<{ maxLevel: number }>(
+  'validation.level.outOfBounds',
+  ({ maxLevel }) => betweenCopy('Level', 1, maxLevel),
+),
+```
+
+Intentionally **not** adopting helpers: `selectionSourceIdRequired` (action copy),
+`extendedTierNameRequired` / `extendedMaxLevelRequired` ("for", not "when"),
+`overCampaignMax` (shared domain concept with its own id and summary variant).
+
 ## Tier 1: how the error map picks a message
 
 The form layer (`makeFieldErrorMap` in `@rpg/ui/form`) walks the form's

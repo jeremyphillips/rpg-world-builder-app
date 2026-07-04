@@ -58,7 +58,7 @@ describe('ChangePasswordSection', () => {
     renderSection()
     await fillForm(user, { confirm: 'DifferentPass' })
     await user.click(screen.getByRole('button', { name: 'Change password' }))
-    expect(await screen.findByText('Passwords do not match')).toBeInTheDocument()
+    expect(await screen.findByText('Passwords do not match.')).toBeInTheDocument()
     expect(changePassword).not.toHaveBeenCalled()
   })
 

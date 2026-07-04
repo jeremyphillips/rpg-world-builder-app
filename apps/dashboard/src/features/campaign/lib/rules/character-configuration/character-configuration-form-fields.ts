@@ -48,7 +48,7 @@ import { mapStartingWealthToFormValues } from './starting-wealth-form-values'
 export const characterConfigurationValidationMessages = {
   creatureTypeUnavailable: defineMessage(
     'validation.characterConfiguration.creatureTypeUnavailable',
-    () => 'Creature type is not available in this campaign vocabulary',
+    () => 'Creature type is not available in this campaign vocabulary.',
   ),
 }
 

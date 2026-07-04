@@ -6,7 +6,7 @@ import type { FormItem } from '@rpg/ui/form'
 export const changePasswordValidationMessages = {
   passwordsDoNotMatch: defineMessage(
     'validation.changePassword.passwordsDoNotMatch',
-    () => 'Passwords do not match',
+    () => 'Passwords do not match.',
   ),
 }
 

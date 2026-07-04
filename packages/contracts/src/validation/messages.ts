@@ -27,6 +27,24 @@ export function singularizeLabel(label: string): string {
   return label
 }
 
+/**
+ * `{subjectLabel} is required when {conditionClause}.`
+ *
+ * `conditionClause` is a lowercase clause with no leading "when" and no trailing
+ * punctuation (e.g. `'the material component is selected'`).
+ */
+export const requiredWhenCopy = (subjectLabel: string, conditionClause: string) =>
+  `${subjectLabel} is required when ${conditionClause}.`
+
+/**
+ * `{subjectLabel} must be between {min} and {max}.`
+ *
+ * Bounds accept strings for named concepts whose number is not known at message
+ * time; prefer concrete numbers when available.
+ */
+export const betweenCopy = (subjectLabel: string, min: string | number, max: string | number) =>
+  `${subjectLabel} must be between ${min} and ${max}.`
+
 // ---------------------------------------------------------------------------
 // Global field validation defaults (tier 1). Formatted by the form layer's
 // error map with the field's configured label — schemas stay message-free.

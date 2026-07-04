@@ -37,12 +37,12 @@ export const EQUIPMENT_POOL_CATEGORY_ANY = '__any__' as const
 export const equipmentGrantValidationMessages = {
   explicitPoolSlugsRequired: defineMessage(
     'validation.equipmentGrant.explicitPoolSlugsRequired',
-    () => 'Specific item lists require at least one equipment item',
+    () => 'Specific item lists require at least one equipment item.',
     () => 'Missing pool equipment',
   ),
   filteredPoolKindRequired: defineMessage(
     'validation.equipmentGrant.filteredPoolKindRequired',
-    () => 'Filtered pools require an equipment type',
+    () => 'Filtered pools require an equipment type.',
     () => 'Missing equipment type',
   ),
 }
