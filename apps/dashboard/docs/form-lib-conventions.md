@@ -65,8 +65,9 @@ Out-of-scope deferrals (non-form schemas, future i18n/API seams)
 → [validation-messages.md](../../../../packages/contracts/docs/validation-messages.md#deferred-gap-list).
 
 Header-only `TabbedForm` tabs (`fields: []` + `header` master-detail editors) must set
-`errorPaths` to the RHF root paths they own — see
-[forms.md § errorPaths](../../../packages/ui/docs/forms.md#errorpaths-for-header-only-tabs).
+`errorPaths` for tab badges/summary and `resolverFields` for tier-1 validation copy — see
+[forms.md § errorPaths](../../../packages/ui/docs/forms.md#errorpaths-for-header-only-tabs)
+and [forms.md § resolverFields](../../../packages/ui/docs/forms.md#resolverfields-for-validation-message-copy).
 
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses

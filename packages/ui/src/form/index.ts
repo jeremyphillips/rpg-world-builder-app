@@ -29,6 +29,7 @@ export {
 } from './context/form-ui.context'
 export {
   TabbedForm,
+  collectTabbedFormResolverItems,
   type TabbedFormFooterWrapperProps,
   type TabbedFormProps,
   type TabbedFormTab,

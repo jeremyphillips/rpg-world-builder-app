@@ -19,13 +19,24 @@ import {
   identityFields,
 } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import {
+  embeddedArrayResolverField,
+  prefixFormItems,
+} from '../../lib/forms/tabbed-form-resolver-fields'
 import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
 import { SpeciesRulesTab } from '../components/species-rules-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
+import { heritageScalarFields } from './species-heritage-form-fields'
+import {
+  LEVEL_LIMITS_FIELD_PREFIX,
+  multiclassingPolicyFields,
+  MULTICLASSING_FIELD_PREFIX,
+  speciesLevelLimitsFields,
+} from './species-rules-form-fields'
 import { heritageFormSchema } from './species-heritage-form-fields'
 import { speciesCharacterCreationFormSchema } from './species-rules-form-fields'
 import { refineSpeciesCharacterCreationForm } from './species-rules-form-values'
-import { traitRowFormSchema } from './species-trait-form-fields'
+import { traitItemFields, traitRowFormSchema } from './species-trait-form-fields'
 
 const creatureSizeOptions = toOptions(
   CREATURE_SIZES,
@@ -131,6 +142,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Traits',
       fields: [],
       errorPaths: ['traits'],
+      resolverFields: [embeddedArrayResolverField('traits', 'Traits', traitItemFields(ctx))],
       header: createElement(SpeciesTraitsTab, { formCtx: ctx }),
     },
     {
@@ -138,6 +150,10 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Heritage',
       fields: [],
       errorPaths: ['heritage'],
+      resolverFields: [
+        ...prefixFormItems(heritageScalarFields(ctx), 'heritage'),
+        embeddedArrayResolverField('heritage.options', 'Heritage options', traitItemFields(ctx)),
+      ],
       header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },
     {
@@ -145,6 +161,10 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Rules',
       fields: [],
       errorPaths: ['characterCreation'],
+      resolverFields: [
+        ...prefixFormItems(multiclassingPolicyFields(ctx), MULTICLASSING_FIELD_PREFIX),
+        ...prefixFormItems(speciesLevelLimitsFields(ctx), LEVEL_LIMITS_FIELD_PREFIX),
+      ],
       header: createElement(SpeciesRulesTab, { formCtx: ctx }),
     },
   ]

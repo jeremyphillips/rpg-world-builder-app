@@ -63,6 +63,21 @@ when fields live outside the tab's `fields` array.
 Content catalog examples: `buildSpeciesTabs` and `buildClassTabs` in the dashboard
 species/class `*-form-fields.ts` modules.
 
+### `resolverFields` for validation message copy
+
+The Zod resolver builds its field error map from `tab.fields` only. Header/master-detail
+editors that render via `FormItems` + `namePrefix` must also supply matching
+`resolverFields` on the tab — same `FormItem` shapes with **full** RHF paths
+(`heritage.name`, `traits`, `characterCreation.levelLimits.classLevelCaps`, …).
+These configs are **not rendered**; they exist solely so tier-1 validation copy uses
+field labels instead of Zod defaults.
+
+Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
+badges and the footer summary; `resolverFields` drives inline message copy.
+
+Dashboard helpers: `prefixFormItems` and `embeddedArrayResolverField` in
+`tabbed-form-resolver-fields.ts`.
+
 ## Field anatomy & the a11y contract
 
 Every field resolves to the same structure ([field.client.tsx](../src/components/ui/field.client.tsx)):

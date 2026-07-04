@@ -151,7 +151,7 @@ export function contentFormFields(
   ctx: ContentFormCtx,
 ): FormItem[] {
   if (def.buildTabs) {
-    return def.buildTabs(ctx).flatMap((tab) => tab.fields)
+    return def.buildTabs(ctx).flatMap((tab) => [...tab.fields, ...(tab.resolverFields ?? [])])
   }
   return def.buildFields(ctx)
 }

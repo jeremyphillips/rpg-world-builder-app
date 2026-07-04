@@ -22,6 +22,7 @@ import {
 } from './tabbed-form-panels.client'
 
 export type { TabbedFormFooterWrapperProps, TabbedFormTab }
+export { collectTabbedFormResolverItems } from './tabbed-form-panels.client'
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Merged Zod schema covering all tabs' fields combined. */

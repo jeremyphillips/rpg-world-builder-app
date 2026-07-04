@@ -34,10 +34,21 @@ export interface TabbedFormTab {
    */
   errorPaths?: string[]
   /**
+   * Field configs merged into the Zod resolver error map only — not rendered.
+   * Use for header/master-detail editors whose controls register under paths
+   * outside `fields` (e.g. `heritage.name` with `namePrefix` in the tab header).
+   */
+  resolverFields?: FormItem[]
+  /**
    * Optional non-field UI rendered above this tab's fields (intro copy, links,
    * placeholders). Omit fields for a panel that is entirely non-input content.
    */
   header?: React.ReactNode
+}
+
+/** Merges visible tab fields with supplemental resolver-only configs. */
+export function collectTabbedFormResolverItems(tabs: readonly TabbedFormTab[]): FormItem[] {
+  return tabs.flatMap((tab) => [...tab.fields, ...(tab.resolverFields ?? [])])
 }
 
 export interface TabbedFormFooterWrapperProps {
@@ -60,10 +71,11 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
   mode,
 }: UseTabbedFormSetupOptions<TFieldValues>) {
   const allItems = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
+  const resolverItems = React.useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
 
   const resolver = React.useMemo(
-    () => makeResolver<TFieldValues>(schema, allItems),
-    [schema, allItems],
+    () => makeResolver<TFieldValues>(schema, resolverItems),
+    [schema, resolverItems],
   )
 
   const resolvedDefaults = React.useMemo(
@@ -117,10 +129,7 @@ function TabbedFormTabPanel({
         <div className={panelClassName}>
           {tab.header}
           {tab.fields.length > 0 ? (
-            <FormItems
-              items={tab.fields}
-              idPrefix={getTabPanelIdPrefix(formId, tab.id)}
-            />
+            <FormItems items={tab.fields} idPrefix={getTabPanelIdPrefix(formId, tab.id)} />
           ) : null}
         </div>
       </ArrayItemPresentationContext.Provider>

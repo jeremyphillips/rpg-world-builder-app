@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
@@ -269,14 +270,63 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('tab', { name: /Notes.*1 field needs attention/i }),
-      ).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /Notes.*1 field needs attention/i })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      )
     })
     const notesInput = screen.getByLabelText('Notes')
     expect(notesInput).toHaveFocus()
     expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
     expect(screen.getByRole('tab', { name: /Notes/ })).toHaveTextContent('1')
+  })
+
+  it('uses resolverFields for tier-1 validation copy on header-only paths', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1),
+      meta: z.object({ title: z.string().min(1) }),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'meta',
+        label: 'Meta',
+        fields: [],
+        resolverFields: [{ type: 'text', name: 'meta.title', label: 'Title', required: true }],
+        header: (
+          <FormItems
+            items={[{ type: 'text', name: 'title', label: 'Title', required: true }]}
+            idPrefix="meta"
+            namePrefix="meta"
+          />
+        ),
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', meta: { title: '' } }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('tab', { name: 'Meta' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Title is required.')).toBeInTheDocument()
+    })
   })
 
   it('auto-switches to the first invalid tab and focuses the tab-scoped control', async () => {

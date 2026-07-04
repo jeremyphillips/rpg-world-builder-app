@@ -12,16 +12,26 @@ import { type TabbedFormTab } from '@rpg/ui/form'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import {
+  embeddedArrayResolverField,
+  prefixFormItems,
+} from '../../lib/forms/tabbed-form-resolver-fields'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import { coreAttributesFields } from './class-basics-form-fields'
-import { createFeatureRowFormSchema } from './class-feature-form-fields'
+import { classFeatureItemFields, createFeatureRowFormSchema } from './class-feature-form-fields'
 import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import { proficienciesFields, proficienciesFormSchema } from './class-proficiencies-form-fields'
 import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
 import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
+import {
+  STARTING_EQUIPMENT_FIELD_NAME,
+  STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
+  startingEquipmentChooseFields,
+  startingEquipmentOptionItemFields,
+} from './character-creation/class-starting-equipment-form-fields'
 
 function campaignLevelField(maxLevel: number) {
   return z.coerce.number().pipe(campaignLevelSchema(maxLevel))
@@ -88,6 +98,9 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Features',
       fields: [resourcesArrayField(ctx)],
       errorPaths: ['features'],
+      resolverFields: [
+        embeddedArrayResolverField('features', 'Features', classFeatureItemFields(ctx)),
+      ],
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
@@ -106,6 +119,14 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Character creation',
       fields: [],
       errorPaths: ['characterCreation'],
+      resolverFields: [
+        ...prefixFormItems(startingEquipmentChooseFields(), STARTING_EQUIPMENT_FIELD_NAME),
+        embeddedArrayResolverField(
+          STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
+          'Starting equipment packages',
+          startingEquipmentOptionItemFields(ctx),
+        ),
+      ],
       header: createElement(ClassCharacterCreationTab, { formCtx: ctx }),
     },
   ]
