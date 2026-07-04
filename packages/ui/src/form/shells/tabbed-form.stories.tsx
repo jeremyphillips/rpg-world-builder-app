@@ -145,3 +145,93 @@ export const WithFormError: Story = {
     formError: 'Something went wrong. Please try again.',
   },
 }
+
+const validationSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  tagline: z.string().min(1, 'Tagline is required'),
+  startingLevel: z.number().int().min(1).max(25),
+})
+
+type ValidationCampaignForm = z.infer<typeof validationSchema>
+
+const validationTabs: TabbedFormTab[] = [
+  tabs[0]!,
+  {
+    id: 'rules',
+    label: 'Rules',
+    fields: [
+      {
+        type: 'text',
+        name: 'tagline',
+        label: 'Tagline',
+        required: true,
+        hint: 'A short hook shown on the campaign card.',
+      },
+      ...tabs[1]!.fields,
+    ],
+  },
+  tabs[2]!,
+]
+
+/** Identity valid, Rules required field empty — Save shows badge, auto-switch, and summary. */
+export const ValidationErrors: StoryObj = {
+  render: () => (
+    <TabbedForm<ValidationCampaignForm>
+      schema={validationSchema}
+      tabs={validationTabs}
+      onSubmit={action('submit')}
+      className="max-w-3xl"
+      defaultValues={{ name: 'The Sunless Citadel', tagline: '', startingLevel: 1 }}
+      footer={<FormSaveFooter submitLabel="Save changes" />}
+    />
+  ),
+}
+
+const arrayValidationSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  features: z.array(
+    z.object({
+      label: z.string().min(1, 'Label is required'),
+    }),
+  ),
+})
+
+type ArrayValidationForm = z.infer<typeof arrayValidationSchema>
+
+const arrayValidationTabs: TabbedFormTab[] = [
+  {
+    id: 'identity',
+    label: 'Identity',
+    fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+  },
+  {
+    id: 'features',
+    label: 'Features',
+    fields: [
+      {
+        kind: 'array',
+        name: 'features',
+        legend: 'Features',
+        addLabel: 'Add feature',
+        min: 1,
+        itemVariant: 'detailed',
+        itemCollapsible: true,
+        fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
+      },
+    ],
+  },
+]
+
+/** Collapsed array item with a nested invalid field — expand keys, badge, and focus ladder. */
+export const CollapsedArrayValidation: StoryObj = {
+  render: () => (
+    <TabbedForm<ArrayValidationForm>
+      schema={arrayValidationSchema}
+      tabs={arrayValidationTabs}
+      onSubmit={action('submit')}
+      className="max-w-3xl"
+      defaultValues={{ name: 'Valid name', features: [{ label: '' }] }}
+      footer={<FormSaveFooter submitLabel="Save changes" />}
+    />
+  ),
+}

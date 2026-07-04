@@ -6,8 +6,9 @@ Composable layouts and chrome beyond a plain `<Form>` fields list.
 
 Settings-style multi-tab form; single Save validates merged schema. All panels stay mounted.
 
-**Validation gap:** errors on inactive tabs are not shown on tab triggers — if Save appears
-to do nothing, check other tabs.
+After the first failed submit: tab triggers show error counts, Save switches to the first invalid
+tab and focuses its control, and the sticky footer shows a summary with **Review {tab}** links.
+Inactive panels suppress per-field error text until their tab is active.
 
 **Sticky chrome** (default `stickyChrome={true}`): tab list `sticky top-0`; `FormActionsBar`
 sticky bottom with footer. Pass `stickyChrome={false}` for flat layout. Sheet pattern: use

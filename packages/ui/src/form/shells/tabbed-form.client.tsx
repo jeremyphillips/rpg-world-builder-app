@@ -11,6 +11,7 @@ import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
+import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -147,6 +148,15 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     [tabs],
   )
 
+  const validationSummary = (
+    <TabbedFormErrorSummary
+      tabs={tabs}
+      fields={allFields}
+      formId={formId}
+      onActiveTabChange={setActiveTabId}
+    />
+  )
+
   const panels = (
     <TabbedFormPanels
       tabs={tabs}
@@ -185,6 +195,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         stickyChrome={stickyChrome}
         stickyActionsBarClassName={stickyActionsBarClassName}
         formError={formError}
+        validationSummary={validationSummary}
         resolvedFooter={resolvedFooter}
       />
     </SchemaFormShell>

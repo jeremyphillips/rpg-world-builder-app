@@ -31,9 +31,11 @@ you need — and consider whether the gap belongs in the renderer.
 
 All tab panels stay mounted so every field registers and Save validates the **merged** schema.
 
-**Known gap:** field errors on an **inactive** tab are not shown on the tab trigger — a failed
-submit can look like a no-op until the author switches tabs. Deferred shell work and the full
-gap inventory → [validation-messages.md](../../contracts/docs/validation-messages.md#deferred-gap-list).
+After the first failed submit, invalid tabs show **count badges** on their triggers, the form
+**auto-switches** to the first invalid tab and focuses its control, and a **footer summary**
+(`role="status"`) lists affected tabs with **Review {tab}** actions. Badges and the summary
+live-update as errors are fixed and disappear when validation passes. Inactive panels still
+suppress inline error text until their tab is active.
 
 Optional non-field UI: `TabbedFormTab.header`. Sticky chrome, sheets, and footers:
 [patterns.md](./forms/patterns.md#tabbedform).

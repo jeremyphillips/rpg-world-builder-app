@@ -79,6 +79,7 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
     resolver,
     defaultValues: formDefaults,
     mode,
+    reValidateMode: 'onChange',
   })
 
   return { form }
@@ -181,13 +182,15 @@ interface TabbedFormFooterRegionProps {
   stickyChrome: boolean
   stickyActionsBarClassName?: string
   formError?: string | null
+  validationSummary?: React.ReactNode
   resolvedFooter: React.ReactNode
 }
 
 function TabbedFormFlatFooter({
   formError,
+  validationSummary,
   resolvedFooter,
-}: Pick<TabbedFormFooterRegionProps, 'formError' | 'resolvedFooter'>) {
+}: Pick<TabbedFormFooterRegionProps, 'formError' | 'validationSummary' | 'resolvedFooter'>) {
   return (
     <>
       {formError ? (
@@ -195,6 +198,7 @@ function TabbedFormFlatFooter({
           {formError}
         </Text>
       ) : null}
+      {validationSummary}
       {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
     </>
   )
@@ -206,6 +210,7 @@ export function TabbedFormFooterRegion({
   stickyChrome,
   stickyActionsBarClassName,
   formError,
+  validationSummary,
   resolvedFooter,
 }: TabbedFormFooterRegionProps) {
   if (footerWrapper) {
@@ -215,13 +220,23 @@ export function TabbedFormFooterRegion({
 
   if (stickyChrome) {
     return (
-      <FormActionsBar className={stickyActionsBarClassName} formError={formError}>
+      <FormActionsBar
+        className={stickyActionsBarClassName}
+        formError={formError}
+        validationSummary={validationSummary}
+      >
         {resolvedFooter}
       </FormActionsBar>
     )
   }
 
-  return <TabbedFormFlatFooter formError={formError} resolvedFooter={resolvedFooter} />
+  return (
+    <TabbedFormFlatFooter
+      formError={formError}
+      validationSummary={validationSummary}
+      resolvedFooter={resolvedFooter}
+    />
+  )
 }
 
 export function resolveTabbedFormShellClassName(
