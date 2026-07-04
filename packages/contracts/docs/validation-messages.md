@@ -69,6 +69,9 @@ expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ 
 - List fields use "Add …": `Add at least one wealth tier.`
 - Interpolate concrete values (levels, caps, labels) rather than restating the rule
   abstractly.
+- **Stand alone outside tab/panel context** — messages must make sense on a tab
+  trigger or summary line without the surrounding panel (so TabbedForm indicators
+  can reuse them later without rewrites).
 - Label helpers for interpolation live in `src/validation/messages.ts`:
   `midSentenceLabel` (lowercase unless initialism), `withArticle` (`a`/`an`),
   `singularizeLabel` (`Wealth tiers` → `Wealth tier`).

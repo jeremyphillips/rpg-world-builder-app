@@ -15,6 +15,7 @@ import {
   languageIdSchema,
 } from '../../vocab/language'
 import { equipmentGrantSchema } from './equipment-grant'
+import { grantValidationMessages } from './grant-messages'
 import {
   armorTrainingGrantSchema,
   skillProficiencyGrantSchema,
@@ -57,7 +58,7 @@ export const innateSpellEntrySchema = innateSpellEntryBaseSchema.superRefine((va
   if (val.kind === 'always_prepared' && val.frequency !== undefined) {
     ctx.addIssue({
       code: 'custom',
-      message: 'frequency is not allowed when kind is always_prepared',
+      message: grantValidationMessages.frequencyNotAllowedAlwaysPrepared(),
       path: ['frequency'],
     })
   }
@@ -90,7 +91,7 @@ export const languageChoiceGrantSchema = contentPoolChoiceSchema
     if (val.from === undefined && val.categories === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: 'language choices require a fixed language list or language categories',
+        message: grantValidationMessages.languageChoicePoolRequired(),
         path: ['from'],
       })
     }
@@ -138,7 +139,7 @@ export const featChoiceGrantSchema = z
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
       ctx.addIssue({
         code: 'custom',
-        message: 'allowAnyQualifying is only allowed when category is epic-boon or general',
+        message: grantValidationMessages.allowAnyQualifyingCategoryOnly(),
         path: ['allowAnyQualifying'],
       })
     }
@@ -299,7 +300,7 @@ const languageChoiceContentGrantSchema = z
     if (val.from === undefined && val.categories === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: 'language choices require a fixed language list or language categories',
+        message: grantValidationMessages.languageChoicePoolRequired(),
         path: ['from'],
       })
     }
@@ -319,7 +320,7 @@ const featChoiceContentGrantSchema = z
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
       ctx.addIssue({
         code: 'custom',
-        message: 'allowAnyQualifying is only allowed when category is epic-boon or general',
+        message: grantValidationMessages.allowAnyQualifyingCategoryOnly(),
         path: ['allowAnyQualifying'],
       })
     }
@@ -350,7 +351,7 @@ const spellsContentGrantSchema = z
     if (val.mode === 'always_prepared' && val.frequency !== undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: 'frequency is not allowed when mode is always_prepared',
+        message: grantValidationMessages.frequencyNotAllowedAlwaysPrepared(),
         path: ['frequency'],
       })
     }
@@ -447,7 +448,7 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
   if (defaultIndexes.length > 1) {
     ctx.addIssue({
       code: 'custom',
-      message: 'at most one default grant group (no unlock) is allowed',
+      message: grantValidationMessages.atMostOneDefaultGrantGroup(),
     })
     return
   }
@@ -455,7 +456,7 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
   if (defaultIndexes.length === 1 && defaultIndexes[0] !== 0) {
     ctx.addIssue({
       code: 'custom',
-      message: 'default grant group must be the first element',
+      message: grantValidationMessages.defaultGrantGroupMustBeFirst(),
     })
     return
   }
@@ -466,7 +467,7 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
   if (new Set(levels).size !== levels.length) {
     ctx.addIssue({
       code: 'custom',
-      message: 'grant group unlock levels must be unique',
+      message: grantValidationMessages.grantGroupUnlockLevelsUnique(),
     })
     return
   }
@@ -475,7 +476,7 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
     if (levelGroups[i]!.unlock!.level <= levelGroups[i - 1]!.unlock!.level) {
       ctx.addIssue({
         code: 'custom',
-        message: 'grant groups must be sorted in ascending unlock level order',
+        message: grantValidationMessages.grantGroupsSortedByUnlock(),
       })
       return
     }
@@ -644,8 +645,7 @@ export const grantContentTraitSchema = z
     if (!isGrantGroupsEligible(val.grantGroups)) {
       ctx.addIssue({
         code: 'custom',
-        message:
-          'grant traits require a single atomic grant (one sense, resistance, movement bonus, or language)',
+        message: grantValidationMessages.grantTraitSingleAtomicGrant(),
         path: ['grantGroups'],
       })
     }

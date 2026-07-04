@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { spellValidationMessages } from './spell-messages'
+
 export const spellMaterialComponentSchema = z.object({
   description: z.string().min(1),
 })
@@ -13,7 +15,7 @@ export const spellComponentsSchema = z
     material: spellMaterialComponentSchema.optional(),
   })
   .refine((val) => val.verbal === true || val.somatic === true || val.material !== undefined, {
-    message: 'At least one spell component (verbal, somatic, or material) is required',
+    message: spellValidationMessages.componentRequired(),
   })
 
 export type SpellComponents = z.infer<typeof spellComponentsSchema>

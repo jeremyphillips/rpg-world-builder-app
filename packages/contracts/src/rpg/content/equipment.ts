@@ -58,6 +58,8 @@ export {
 
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
+export { equipmentVariantValidationMessages } from './equipment/equipment-variant-messages'
+
 export {
   formatHolySymbolUsage,
   getHolySymbolUsageLabel,

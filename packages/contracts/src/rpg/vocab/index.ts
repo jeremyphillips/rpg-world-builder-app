@@ -1,5 +1,7 @@
 export * from './types'
+export * from './vocabulary-messages'
 export * from './vocabulary'
+export * from './ability-messages'
 export * from './ability'
 export * from './alignment'
 export * from './creature-size'

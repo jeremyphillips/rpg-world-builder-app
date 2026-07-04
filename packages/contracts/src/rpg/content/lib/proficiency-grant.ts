@@ -18,6 +18,7 @@ import {
 } from '../../vocab/weapon/category'
 import { getSkillName, getSkillSentenceForm, skillSchema } from '../skill-proficiency'
 import { contentPoolChoiceSchema } from './choice'
+import { grantValidationMessages } from './grant-messages'
 
 // ---------------------------------------------------------------------------
 // Proficiency grants — fixed lists and pool choices for weapon, tool, skill,
@@ -46,7 +47,7 @@ function refineFixedSlugsOrCategories(
   if (!hasSlugs && !hasCategories) {
     ctx.addIssue({
       code: 'custom',
-      message: 'Fixed grants require at least one specific item or category',
+      message: grantValidationMessages.fixedProficiencyRequiresTarget(),
       path: [slugPath],
     })
   }

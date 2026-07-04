@@ -8,6 +8,7 @@ import {
   formatEquipmentGrantSentence,
   formatEquipmentPoolLabel,
 } from './equipment-grant'
+import { grantValidationMessages } from './grant-messages'
 
 describe('equipmentPoolSchema', () => {
   it('accepts an explicit slug list', () => {
@@ -57,7 +58,10 @@ describe('equipmentPoolSchema', () => {
     expect(result.success).toBe(false)
     if (result.success) throw new Error('Expected invalid filtered pool')
     expect(result.error.issues[0]?.message).toBe(
-      'Tool category filters only apply to Tool equipment',
+      grantValidationMessages.categoryFilterWrongKind({
+        filterLabel: 'Tool category',
+        equipmentKindLabel: 'Tool',
+      }),
     )
   })
 
@@ -70,7 +74,10 @@ describe('equipmentPoolSchema', () => {
     expect(result.success).toBe(false)
     if (result.success) throw new Error('Expected invalid filtered pool')
     expect(result.error?.issues[0]?.message).toBe(
-      'Weapon category filters only apply to Weapon equipment',
+      grantValidationMessages.categoryFilterWrongKind({
+        filterLabel: 'Weapon category',
+        equipmentKindLabel: 'Weapon',
+      }),
     )
   })
 
@@ -125,7 +132,10 @@ describe('equipmentPoolSchema', () => {
     expect(result.success).toBe(false)
     if (result.success) throw new Error('Expected invalid filtered pool')
     expect(result.error?.issues[0]?.message).toBe(
-      'Vehicle category filters are not allowed when equipment kind is Mount',
+      grantValidationMessages.categoryFilterNotAllowedForKind({
+        filterLabel: 'Vehicle category',
+        equipmentKindLabel: 'Mount',
+      }),
     )
   })
 })

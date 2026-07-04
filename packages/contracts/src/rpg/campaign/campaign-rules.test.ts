@@ -18,6 +18,8 @@ import {
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 
+import { levelValidationMessages } from '../primitives/level-messages'
+
 import { baseCharacterCreationPatch } from '../../test/fixtures/character-creation-patch'
 
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
@@ -173,14 +175,14 @@ describe('validateExtendedMaxLevel', () => {
   it('rejects equal standard and extended max', () => {
     expect(validateExtendedMaxLevel(30, 30)).toEqual({
       valid: false,
-      message: 'Extended maximum level must be higher than the standard maximum level.',
+      message: levelValidationMessages.extendedMaxMustExceedStandard(),
     })
   })
 
   it('returns specific minimum message when extended max is too low', () => {
     expect(validateExtendedMaxLevel(20, 15)).toEqual({
       valid: false,
-      message: 'Extended maximum must be at least 21 because the standard maximum is 20.',
+      message: levelValidationMessages.extendedMaxMinimum({ minimum: 21, standardMax: 20 }),
     })
   })
 

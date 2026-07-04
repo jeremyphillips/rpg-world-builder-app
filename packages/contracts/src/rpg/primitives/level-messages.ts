@@ -37,4 +37,20 @@ export const levelValidationMessages = {
     'validation.level.outOfBounds',
     ({ maxLevel }) => `Level must be between 1 and ${maxLevel}.`,
   ),
+  /** Extended max equals the standard max — must be strictly higher. */
+  extendedMaxMustExceedStandard: defineMessage(
+    'validation.level.extendedMaxMustExceedStandard',
+    () => 'Extended maximum level must be higher than the standard maximum level.',
+  ),
+  /** Extended max is below the minimum allowed above standard max. */
+  extendedMaxMinimum: defineMessage<{ minimum: number; standardMax: number }>(
+    'validation.level.extendedMaxMinimum',
+    ({ minimum, standardMax }) =>
+      `Extended maximum must be at least ${minimum} because the standard maximum is ${standardMax}.`,
+  ),
+  /** Extended max is below standard max with no room for a specific minimum. */
+  extendedMaxTooLow: defineMessage(
+    'validation.level.extendedMaxTooLow',
+    () => 'Extended maximum must be higher than the standard maximum.',
+  ),
 }

@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
+import { abilityValidationMessages } from './ability-messages'
 
 // ---------------------------------------------------------------------------
 // Abilities — the six creature ability scores (shared by classes, monsters,
@@ -141,6 +142,8 @@ export const abilityScoreSchema = z.number().int().min(ABILITY_SCORE_MIN).max(AB
 export const characterAbilityScoreSchema = abilityScoreSchema.refine(
   (n) => n <= CHARACTER_ABILITY_SCORE_MAX,
   {
-    message: `Ability score must not exceed ${CHARACTER_ABILITY_SCORE_MAX}`,
+    message: abilityValidationMessages.characterScoreMaxExceeded({
+      max: CHARACTER_ABILITY_SCORE_MAX,
+    }),
   },
 )

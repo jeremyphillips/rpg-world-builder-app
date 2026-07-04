@@ -40,6 +40,7 @@ import { getTermSentenceForm, pluralizeTermLabel } from '../../vocab/types'
 import { equipmentKindSchema, getEquipmentKindEntry, getEquipmentKindLabel } from '../equipment'
 import { equipmentModifierSchema } from '../equipment/modifier'
 import { contentPoolChoiceSchema } from './choice'
+import { grantValidationMessages } from './grant-messages'
 
 // ---------------------------------------------------------------------------
 // Equipment grants — fixed items and pool choices for starting equipment,
@@ -108,9 +109,10 @@ function refineFilteredEquipmentPool(
     ) {
       ctx.addIssue({
         code: 'custom',
-        message: `${FILTERED_POOL_CATEGORY_LABELS[field]} filters are not allowed when equipment kind is ${getEquipmentKindLabel(
-          val.equipmentKind,
-        )}`,
+        message: grantValidationMessages.categoryFilterNotAllowedForKind({
+          filterLabel: FILTERED_POOL_CATEGORY_LABELS[field],
+          equipmentKindLabel: getEquipmentKindLabel(val.equipmentKind),
+        }),
         path: [field],
       })
       continue
@@ -122,9 +124,10 @@ function refineFilteredEquipmentPool(
       )?.[0]
       ctx.addIssue({
         code: 'custom',
-        message: `${FILTERED_POOL_CATEGORY_LABELS[field]} filters only apply to ${getEquipmentKindLabel(
-          expectedKind ?? val.equipmentKind,
-        )} equipment`,
+        message: grantValidationMessages.categoryFilterWrongKind({
+          filterLabel: FILTERED_POOL_CATEGORY_LABELS[field],
+          equipmentKindLabel: getEquipmentKindLabel(expectedKind ?? val.equipmentKind),
+        }),
         path: [field],
       })
     }

@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../primitives/level'
 import { classSlugSchema } from './classes/class'
+import { speciesCharacterCreationValidationMessages } from './species-character-creation-messages'
 
 // ---------------------------------------------------------------------------
 // Species character-creation data — optional, species-authored inputs consumed
@@ -53,7 +54,7 @@ export const speciesClassPolicySchema = z
     ) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Select at least one class for this class policy mode',
+        message: speciesCharacterCreationValidationMessages.classPolicyRequiresClasses(),
         path: ['classIds'],
       })
     }
@@ -92,7 +93,7 @@ export const speciesLevelLimitsSchema = z
       if (seen.has(cap.classId)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Each class can have at most one level cap',
+          message: speciesCharacterCreationValidationMessages.duplicateClassLevelCap(),
           path: ['classLevelCaps', index, 'classId'],
         })
       }
