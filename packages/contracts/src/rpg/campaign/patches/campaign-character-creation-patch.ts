@@ -122,57 +122,94 @@ export type ResolvedCampaignCharacterCreationPatch = z.infer<
   typeof resolvedCampaignCharacterCreationPatchSchema
 >
 
+type CharacterCreationPatchValidationContext = {
+  patch: CampaignCharacterCreationPatch
+  ctx: z.RefinementCtx
+  pathPrefix: (string | number)[]
+}
+
+function validateStartingLevelWithinEffectiveMax(
+  { patch, ctx, pathPrefix }: CharacterCreationPatchValidationContext,
+  effectiveMax: number,
+): void {
+  const startingLevel = patch.startingLevel
+  if (startingLevel === undefined || startingLevel <= effectiveMax) return
+
+  ctx.addIssue({
+    code: 'custom',
+    message: 'Starting level cannot exceed max character level',
+    path: [...pathPrefix, 'startingLevel'],
+  })
+}
+
+function validateExtendedProgressionMaxLevel(
+  { patch, ctx, pathPrefix }: CharacterCreationPatchValidationContext,
+  standardMaxCharacterLevel: number,
+): void {
+  const extended = patch.progression?.extendedProgression
+  if (!extended) return
+
+  const result = validateExtendedMaxLevel(standardMaxCharacterLevel, extended.maxLevel)
+  if (result.valid) return
+
+  ctx.addIssue({
+    code: 'custom',
+    message: result.message,
+    path: [...pathPrefix, 'progression', 'extendedProgression', 'maxLevel'],
+  })
+}
+
+function validateSubclassChoicesPatchInput({
+  patch,
+  ctx,
+  pathPrefix,
+}: CharacterCreationPatchValidationContext): void {
+  if (patch.subclasses?.enabled === undefined) return
+
+  const result = validateSubclassChoicesEnabledChange()
+  if (result.valid) return
+
+  ctx.addIssue({
+    code: 'custom',
+    message: result.message ?? 'Subclass choice changes are not allowed.',
+    path: [...pathPrefix, 'subclasses', 'enabled'],
+  })
+}
+
+function validateStartingWealthTiersInPatchInput({
+  patch,
+  ctx,
+  pathPrefix,
+}: CharacterCreationPatchValidationContext): void {
+  const tiers = patch.startingWealth?.tiers
+  if (tiers === undefined) return
+
+  const effectiveMax = resolveMaxCharacterLevel(patch)
+  refineLevelRangeTable(tiers, ctx, {
+    pathPrefix: [...pathPrefix, 'startingWealth', 'tiers'],
+    maxLevel: effectiveMax,
+    requireStartAt: 1,
+    requireEndAt: effectiveMax,
+  })
+}
+
 function validateCharacterCreationPatchInput(
   patch: CampaignCharacterCreationPatch,
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[] = [],
   options: { skipStartingWealthTiers?: boolean } = {},
 ): void {
+  const validationContext: CharacterCreationPatchValidationContext = { patch, ctx, pathPrefix }
   const standardMaxCharacterLevel = patch.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const extended = patch.progression?.extendedProgression
   const effectiveMax = extended?.maxLevel ?? standardMaxCharacterLevel
 
-  const startingLevel = patch.startingLevel
-  if (startingLevel !== undefined && startingLevel > effectiveMax) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Starting level cannot exceed max character level',
-      path: [...pathPrefix, 'startingLevel'],
-    })
-  }
+  validateStartingLevelWithinEffectiveMax(validationContext, effectiveMax)
+  validateExtendedProgressionMaxLevel(validationContext, standardMaxCharacterLevel)
+  validateSubclassChoicesPatchInput(validationContext)
 
-  if (extended) {
-    const result = validateExtendedMaxLevel(standardMaxCharacterLevel, extended.maxLevel)
-    if (!result.valid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: result.message,
-        path: [...pathPrefix, 'progression', 'extendedProgression', 'maxLevel'],
-      })
-    }
-  }
-
-  if (patch.subclasses?.enabled !== undefined) {
-    const result = validateSubclassChoicesEnabledChange()
-    if (!result.valid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: result.message ?? 'Subclass choice changes are not allowed.',
-        path: [...pathPrefix, 'subclasses', 'enabled'],
-      })
-    }
-  }
-
-  const tiers = patch.startingWealth?.tiers
-  if (tiers !== undefined && !options.skipStartingWealthTiers) {
-    const effectiveMax = resolveMaxCharacterLevel(patch)
-
-    refineLevelRangeTable(tiers, ctx, {
-      pathPrefix: [...pathPrefix, 'startingWealth', 'tiers'],
-      maxLevel: effectiveMax,
-      requireStartAt: 1,
-      requireEndAt: effectiveMax,
-    })
+  if (!options.skipStartingWealthTiers) {
+    validateStartingWealthTiersInPatchInput(validationContext)
   }
 }
 
@@ -222,28 +259,39 @@ export type UpdateCampaignCharacterCreationInput = z.infer<
 >
 
 /** Applies campaign defaults to a sparse character-creation patch. */
+function resolveCharacterCreationProgression(
+  patch: CampaignCharacterCreationPatch | undefined,
+): ResolvedCampaignCharacterCreationProgression {
+  const standardMaxCharacterLevel = patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+  const extendedProgression = patch?.progression?.extendedProgression
+
+  return extendedProgression === undefined
+    ? { maxCharacterLevel: standardMaxCharacterLevel }
+    : { maxCharacterLevel: standardMaxCharacterLevel, extendedProgression }
+}
+
+function resolveCharacterCreationSpecies(
+  patch: CampaignCharacterCreationPatch | undefined,
+): ResolvedCampaignCharacterCreationPatch['species'] {
+  return {
+    creatureTypePolicy: patch?.species?.creatureTypePolicy ?? {
+      mode: DEFAULT_CREATURE_TYPE_POLICY.mode,
+      ids: [...DEFAULT_CREATURE_TYPE_POLICY.ids] as CreatureTypeId[],
+    },
+  }
+}
+
 export function resolveCharacterCreationPatch(
   patch: CampaignCharacterCreationPatch | undefined,
   startingWealthSeed: StartingWealthRules,
 ): ResolvedCampaignCharacterCreationPatch {
-  const standardMaxCharacterLevel = patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
-  const extendedProgression = patch?.progression?.extendedProgression
-
   return {
     startingLevel: patch?.startingLevel ?? DEFAULT_STARTING_LEVEL,
     importedCharacters: {
       policy: patch?.importedCharacters?.policy ?? DEFAULT_IMPORTED_CHARACTERS_POLICY,
     },
-    progression: {
-      maxCharacterLevel: standardMaxCharacterLevel,
-      ...(extendedProgression !== undefined && { extendedProgression }),
-    },
-    species: {
-      creatureTypePolicy: patch?.species?.creatureTypePolicy ?? {
-        mode: DEFAULT_CREATURE_TYPE_POLICY.mode,
-        ids: [...DEFAULT_CREATURE_TYPE_POLICY.ids] as CreatureTypeId[],
-      },
-    },
+    progression: resolveCharacterCreationProgression(patch),
+    species: resolveCharacterCreationSpecies(patch),
     multiclassing: resolveMulticlassingRules(patch?.multiclassing),
     subclasses: resolveSubclassingRules(patch?.subclasses),
     startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),

@@ -4,10 +4,14 @@ import type { GrantGroups } from '@rpg/contracts'
 import {
   formatDamageTypeRowSummary,
   formatFeatChoiceRowSummary,
+  formatGrantRowPrimary,
+  formatGrantRowSummary,
   formatLanguageRowSummary,
   formatResistanceRowSummary,
   formatSenseRowSummary,
   formatSpellRowTitle,
+  GRANT_TYPE_MISSING_PRIMARY,
+  type GrantRowHeaderContext,
 } from './grant-form-fields'
 import {
   GRANT_ROW_TYPE_LABELS,
@@ -382,5 +386,65 @@ describe('grant row summaries', () => {
     )
     expect(formatLanguageRowSummary('common')).toBe('Character knows Common.')
     expect(formatFeatChoiceRowSummary('general', 2)).toBe('Character chooses 2 general feats.')
+  })
+})
+
+const grantRowHeaderContext = {
+  rowLabels: GRANT_ROW_TYPE_LABELS,
+  equipmentOptions: [],
+  weaponOptions: [],
+  toolOptions: [],
+  armorOptions: [],
+  skillOptions: [],
+  spellOptions: [
+    { value: 'power-word-heal', label: 'Power Word Heal' },
+    { value: 'power-word-kill', label: 'Power Word Kill' },
+  ],
+} satisfies GrantRowHeaderContext
+
+describe('formatGrantRowSummary', () => {
+  it('dispatches grant types to the matching row summary formatter', () => {
+    expect(
+      formatGrantRowSummary(
+        { grantType: 'resistances', resistances: ['poison'] },
+        grantRowHeaderContext,
+      ),
+    ).toBe('Character gains Resistance to poison damage.')
+    expect(
+      formatGrantRowSummary(
+        { grantType: 'featChoice', featCategory: 'general', featChoose: 2 },
+        grantRowHeaderContext,
+      ),
+    ).toBe('Character chooses 2 general feats.')
+    expect(formatGrantRowSummary({ grantType: 'spells' }, grantRowHeaderContext)).toBe('')
+    expect(formatGrantRowSummary({}, grantRowHeaderContext)).toBe('')
+  })
+})
+
+describe('formatGrantRowPrimary', () => {
+  it('dispatches grant types to the matching row title formatter', () => {
+    expect(
+      formatGrantRowPrimary(
+        {
+          grantType: 'spells',
+          spellIds: ['power-word-heal', 'power-word-kill'],
+        },
+        0,
+        grantRowHeaderContext,
+      ),
+    ).toBe('Power Word Heal, Power Word Kill')
+    expect(formatGrantRowPrimary({ grantType: 'movement' }, 0, grantRowHeaderContext)).toBe(
+      'Movement bonus',
+    )
+    expect(formatGrantRowPrimary({ grantType: 'languages' }, 0, grantRowHeaderContext)).toBe(
+      'Language',
+    )
+  })
+
+  it('shows a repair label when grantType is missing', () => {
+    expect(formatGrantRowPrimary({}, 0, grantRowHeaderContext)).toBe(GRANT_TYPE_MISSING_PRIMARY)
+    expect(formatGrantRowPrimary({ grantType: '' }, 0, grantRowHeaderContext)).toBe(
+      GRANT_TYPE_MISSING_PRIMARY,
+    )
   })
 })

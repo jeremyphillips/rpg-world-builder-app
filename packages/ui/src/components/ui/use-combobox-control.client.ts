@@ -26,12 +26,14 @@ export function useComboboxControl({
   disabled,
   loading,
   placeholder,
+  enableSearch = true,
 }: ComboboxFieldControlProps) {
   const generatedId = React.useId()
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
   const [activeIndex, setActiveIndex] = React.useState(0)
   const searchInputRef = React.useRef<HTMLInputElement>(null)
+  const listboxRef = React.useRef<HTMLDivElement>(null)
 
   const listboxId = `${generatedId}-listbox`
   const searchId = `${generatedId}-search`
@@ -99,8 +101,8 @@ export function useComboboxControl({
     toggleOption(option.value)
   }, [filteredOptions, highlightedIndex, toggleOption])
 
-  const handleSearchKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleNavigationKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
       const action = resolveSearchKeyAction(event.key)
       if (!action) return
 
@@ -127,12 +129,26 @@ export function useComboboxControl({
     searchInputRef.current?.focus()
   }, [])
 
+  const focusListbox = React.useCallback(() => {
+    listboxRef.current?.focus()
+  }, [])
+
+  const focusPanelOnOpen = React.useCallback(() => {
+    if (enableSearch) {
+      focusSearchInput()
+      return
+    }
+    focusListbox()
+  }, [enableSearch, focusListbox, focusSearchInput])
+
   return {
     open,
+    enableSearch,
     listboxId,
     searchId,
     generatedId,
     searchInputRef,
+    listboxRef,
     filteredOptions,
     highlightedIndex,
     selectedOptions,
@@ -145,9 +161,9 @@ export function useComboboxControl({
     handleOpenChange,
     toggleOption,
     removeValue,
-    handleSearchKeyDown,
+    handleNavigationKeyDown,
     handleQueryChange,
-    focusSearchInput,
+    focusPanelOnOpen,
     setActiveIndex,
   }
 }

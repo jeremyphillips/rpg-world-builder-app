@@ -35,5 +35,7 @@ export interface ComboboxFieldControlProps {
   size: FieldSize
   placeholder: string
   emptyMessage: string
+  /** When false, the panel omits the search row and keyboard nav targets the listbox. */
+  enableSearch?: boolean
   renderSelectedItem?: ComboboxRenderSelectedItem
 }

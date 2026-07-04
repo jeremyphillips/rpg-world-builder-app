@@ -1,16 +1,8 @@
 import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
 
-import type {
-  ChipsFieldConfig,
-  ChooseFromChipsFieldConfig,
-  ComboboxFieldConfig,
-  FieldConfig,
-  FormItem,
-  InlineChooseCountFieldConfig,
-  InlineSentenceFieldConfig,
-  InputSelectFieldConfig,
-  LevelRangeFieldConfig,
-} from '../field-config'
+import type { FieldConfig, FormItem } from '../field-config'
+import { fieldCategory } from './field-error-map-category.lib'
+import { registerFieldPaths, type RegistryEntry } from './field-error-map-register.lib'
 
 // ---------------------------------------------------------------------------
 // Field-aware Zod error map (tier 1 of the validation-message architecture).
@@ -20,14 +12,6 @@ import type {
 // Zod only consults this map when the issue has no message of its own.
 // See packages/contracts/docs/validation-messages.md.
 // ---------------------------------------------------------------------------
-
-/** How a field's values behave for message selection, independent of widget chrome. */
-type FieldMessageCategory = 'text' | 'number' | 'choice' | 'multi' | 'boolean' | 'array'
-
-type RegistryEntry = {
-  label: string
-  category: FieldMessageCategory
-}
 
 /**
  * The subset of Zod 4's raw issue shape the map reads. Duck-typed (like
@@ -44,95 +28,12 @@ export interface RawZodIssueLike {
   maximum?: number | bigint
 }
 
-function isMultiChoice(field: ChipsFieldConfig | ComboboxFieldConfig): boolean {
-  return field.multiple !== false
-}
-
-/** Static category per field type; chips/combobox/inputSelect refine on config below. */
-const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
-  text: 'text',
-  textarea: 'text',
-  markdown: 'text',
-  richtext: 'text',
-  json: 'text',
-  number: 'number',
-  inputUnit: 'number',
-  inlineChooseCount: 'number',
-  inlineSentence: 'number',
-  editableGrid: 'number',
-  diceFormula: 'number',
-  levelRange: 'number',
-  select: 'choice',
-  radio: 'choice',
-  radioCard: 'choice',
-  chips: 'multi',
-  combobox: 'multi',
-  chooseFromChips: 'multi',
-  file: 'multi',
-  checkbox: 'boolean',
-  switch: 'boolean',
-  inputSelect: 'text',
-}
-
-function fieldCategory(field: FieldConfig): FieldMessageCategory {
-  if (field.type === 'chips' || field.type === 'combobox') {
-    return isMultiChoice(field) ? 'multi' : 'choice'
-  }
-  if (field.type === 'inputSelect') {
-    return (field as InputSelectFieldConfig).inputType === 'number' ? 'number' : 'text'
-  }
-  return TYPE_CATEGORIES[field.type]
-}
-
 function registerField(
   registry: Map<string, RegistryEntry>,
   prefix: string,
   field: FieldConfig,
 ): void {
-  const key = (name: string) => (prefix ? `${prefix}.${name}` : name)
-
-  if (field.type === 'levelRange') {
-    const levelRange = field as LevelRangeFieldConfig
-    const entry: RegistryEntry = { label: field.label, category: 'number' }
-    registry.set(key(levelRange.minName ?? levelRange.name), entry)
-    registry.set(key(levelRange.maxName ?? 'maxLevel'), entry)
-    return
-  }
-
-  registry.set(key(field.name), { label: field.label, category: fieldCategory(field) })
-
-  if (field.type === 'chooseFromChips') {
-    const chooseFrom = field as ChooseFromChipsFieldConfig
-    registry.set(key(chooseFrom.chooseName), { label: field.label, category: 'number' })
-  }
-
-  if (field.type === 'inlineChooseCount') {
-    const inlineField = field as InlineChooseCountFieldConfig
-    if (inlineField.selectName) {
-      registry.set(key(inlineField.selectName), {
-        label: inlineField.selectLabel ?? field.label,
-        category: 'choice',
-      })
-    }
-  }
-
-  if (field.type === 'inlineSentence') {
-    const inlineField = field as InlineSentenceFieldConfig
-    for (const segment of inlineField.segments) {
-      if (segment.kind === 'number') {
-        registry.set(key(segment.name), { label: field.label, category: 'number' })
-      }
-      if (segment.kind === 'select') {
-        registry.set(key(segment.name), {
-          label: segment.ariaLabel ?? field.label,
-          category: 'choice',
-        })
-      }
-    }
-    if (inlineField.below) {
-      registry.set(key(inlineField.below.name), { label: field.label, category: 'multi' })
-    }
-  }
+  registerFieldPaths(registry, prefix, field, fieldCategory(field))
 }
 
 function registerItems(

@@ -6,13 +6,26 @@ system overview.
 
 ## Quality gate
 
-Work is **not done** until the pre-commit gate passes. The source of truth is
-[`.husky/pre-commit`](.husky/pre-commit); if this list drifts, the hook wins.
-Currently:
+Work is **not done** until the tiered gates pass. Hook scripts are the source of
+truth ([`.husky/pre-commit`](.husky/pre-commit),
+[`.husky/pre-push`](.husky/pre-push)); package scripts in root `package.json`
+(`gate:*`, `*:affected`) must stay in sync.
+
+**Pre-commit** (fast, affected scope — packages changed since `HEAD` plus
+dependents via Turbo):
 
 ```text
-pnpm lint-staged → pnpm typecheck → pnpm coverage → fallow dupes --production --format human → fallow health --production --complexity --coverage --format human
+pnpm lint-staged → pnpm typecheck:affected → pnpm test:affected → pnpm gate:fallow-dupes → pnpm gate:fallow-health
 ```
+
+**Pre-push** (full suite before sharing):
+
+```text
+pnpm gate:pre-push  →  pnpm coverage → pnpm gate:fallow-health:coverage → pnpm build
+```
+
+**CI** mirrors pre-push coverage and fallow checks on every PR. Skip hooks
+locally only when necessary: `HUSKY=0 git commit` / `HUSKY=0 git push`.
 
 ## fallow (code health)
 
@@ -20,7 +33,8 @@ Use the `/fallow` skill for code-health work. Use judgement per finding: fix it
 in code, or — if a fix isn't worth it — propose an inline suppression or a
 `.fallowrc.json` tweak and **consult the user before ignoring**. Production
 complexity thresholds live in `.fallowrc.json` `health`; CRAP uses Istanbul
-coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`.
+coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
+(pre-push and CI — not pre-commit).
 
 ## Types
 

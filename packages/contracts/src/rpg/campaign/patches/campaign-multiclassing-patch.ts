@@ -105,28 +105,40 @@ export type ResolvedCampaignMulticlassingPatch = z.infer<
 // Resolver + helpers
 // ---------------------------------------------------------------------------
 
+type MulticlassingRequirementsPatch = NonNullable<CampaignMulticlassingPatch['requirements']>
+
+function resolvePrimaryAbilityMinimumRequirement(
+  patch?: MulticlassingRequirementsPatch['primaryAbilityMinimum'],
+): ResolvedCampaignMulticlassingPatch['requirements']['primaryAbilityMinimum'] {
+  return {
+    enabled: patch?.enabled ?? DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+    minimumScore: patch?.minimumScore ?? DEFAULT_PRIMARY_ABILITY_MINIMUM,
+  }
+}
+
+function resolveMulticlassingRequirements(
+  requirements?: CampaignMulticlassingPatch['requirements'],
+): ResolvedCampaignMulticlassingPatch['requirements'] {
+  return {
+    primaryAbilityMinimum: resolvePrimaryAbilityMinimumRequirement(
+      requirements?.primaryAbilityMinimum,
+    ),
+    speciesPolicy: {
+      enabled: requirements?.speciesPolicy?.enabled ?? DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
+    },
+    speciesLevelLimits: {
+      enabled: requirements?.speciesLevelLimits?.enabled ?? DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
+    },
+  }
+}
+
 /** Applies campaign defaults to a sparse multiclassing patch. */
 export function resolveMulticlassingRules(
   patch?: CampaignMulticlassingPatch,
 ): ResolvedCampaignMulticlassingPatch {
-  const requirements = patch?.requirements
-
   return {
     enabled: patch?.enabled ?? DEFAULT_MULTICLASSING_ENABLED,
-    requirements: {
-      primaryAbilityMinimum: {
-        enabled:
-          requirements?.primaryAbilityMinimum?.enabled ?? DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
-        minimumScore:
-          requirements?.primaryAbilityMinimum?.minimumScore ?? DEFAULT_PRIMARY_ABILITY_MINIMUM,
-      },
-      speciesPolicy: {
-        enabled: requirements?.speciesPolicy?.enabled ?? DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
-      },
-      speciesLevelLimits: {
-        enabled: requirements?.speciesLevelLimits?.enabled ?? DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
-      },
-    },
+    requirements: resolveMulticlassingRequirements(patch?.requirements),
   }
 }
 

@@ -199,6 +199,43 @@ function normalizeFilteredPoolCategories(pool: Record<string, unknown>): Record<
   return result
 }
 
+function poolFromLegacyFrom(
+  fromRecord: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const equipmentSlugs = fromRecord.equipmentSlugs
+  if (Array.isArray(equipmentSlugs) && equipmentSlugs.length > 0) {
+    return { source: 'explicit', equipmentSlugs }
+  }
+
+  const toolCategories = fromRecord.toolCategories
+  if (Array.isArray(toolCategories) && toolCategories.length > 0) {
+    return {
+      source: 'filtered',
+      equipmentKind: 'tool',
+      toolCategory: toolCategories[0],
+    }
+  }
+
+  return undefined
+}
+
+function resolveChoiceGrantPool(
+  rawPool: unknown,
+  legacyFrom: unknown,
+): Record<string, unknown> | undefined {
+  let pool = rawPool
+
+  if (pool === undefined && typeof legacyFrom === 'object' && legacyFrom !== null) {
+    pool = poolFromLegacyFrom(legacyFrom as Record<string, unknown>)
+  }
+
+  if (typeof pool === 'object' && pool !== null) {
+    return normalizeFilteredPoolCategories(pool as Record<string, unknown>)
+  }
+
+  return undefined
+}
+
 /**
  * Maps legacy starting-equipment `from` pools to `pool` for records written before
  * the equipment-grant primitive (overlay patches, homebrew, stale Mongo rows).
@@ -211,39 +248,9 @@ export function normalizeEquipmentChoiceGrant(input: unknown): unknown {
   if (record.kind !== 'choice') return input
 
   const { from: legacyFrom, label: _legacyLabel, pool: rawPool, ...rest } = record
+  const pool = resolveChoiceGrantPool(rawPool, legacyFrom)
 
-  let pool = rawPool
-
-  if (pool === undefined && typeof legacyFrom === 'object' && legacyFrom !== null) {
-    const fromRecord = legacyFrom as Record<string, unknown>
-
-    const equipmentSlugs = fromRecord.equipmentSlugs
-    if (Array.isArray(equipmentSlugs) && equipmentSlugs.length > 0) {
-      pool = { source: 'explicit', equipmentSlugs }
-    } else {
-      const toolCategories = fromRecord.toolCategories
-      if (Array.isArray(toolCategories) && toolCategories.length > 0) {
-        pool = {
-          source: 'filtered',
-          equipmentKind: 'tool',
-          toolCategory: toolCategories[0],
-        }
-      }
-    }
-  }
-
-  if (typeof pool === 'object' && pool !== null) {
-    pool = normalizeFilteredPoolCategories(pool as Record<string, unknown>)
-  }
-
-  if (pool === undefined) {
-    return rest
-  }
-
-  return {
-    ...rest,
-    pool,
-  }
+  return pool === undefined ? rest : { ...rest, pool }
 }
 
 export const equipmentChoiceGrantObjectSchema = contentPoolChoiceSchema

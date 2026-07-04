@@ -19,11 +19,10 @@ import type {
 } from '../components/ui/rich-text-link-picker.client'
 import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
+import type { WeightedSearchField } from '../lib/search'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import {
-  isInlineSentenceBoundSegment,
-} from '../components/ui/inline-sentence-field.lib'
+import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBelowChips,
   InlineSentenceSegment,
@@ -756,6 +755,22 @@ export interface ArrayConfig {
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
 
+  /** Searchable template menu for the add control; replaces the plain add button when set. */
+  addMenu?: {
+    groups: { id: string; label: string }[]
+    items: {
+      id: string
+      label: string
+      description?: string
+      groupId?: string
+      searchTerms?: WeightedSearchField[]
+      appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
+      isDuplicate?: (items: unknown[]) => boolean
+      duplicatePolicy?: 'allow' | 'warn' | 'block'
+    }[]
+    enableSearch?: boolean
+  }
+
   /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
   filterSelectDependsOn?: string[]
 
@@ -950,6 +965,33 @@ export function fieldDefaultValue(field: FieldConfig): unknown {
   return TYPE_DEFAULTS[field.type]
 }
 
+function assignLevelRangeDefaults(
+  field: LevelRangeFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  const minName = field.minName ?? field.name
+  const maxName = field.maxName ?? 'maxLevel'
+  values[minName] = field.defaultMinValue ?? TYPE_DEFAULTS.number
+  values[maxName] = field.defaultMaxValue ?? TYPE_DEFAULTS.number
+}
+
+function assignDependentFieldDefaults(field: FieldConfig, values: Record<string, unknown>): void {
+  if (field.type === 'chooseFromChips') {
+    const chooseField = field as ChooseFromChipsFieldConfig
+    values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
+    return
+  }
+
+  if (field.type !== 'inlineChooseCount') return
+
+  const inlineField = field as InlineChooseCountFieldConfig
+  const selectName = inlineField.selectName
+  if (!selectName) return
+
+  values[selectName] =
+    inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
+}
+
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
   if (field.type === 'inlineSentence') {
     assignInlineSentenceDefaults(field, values)
@@ -957,26 +999,12 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
   }
 
   if (field.type === 'levelRange') {
-    const levelRangeField = field as LevelRangeFieldConfig
-    const minName = levelRangeField.minName ?? levelRangeField.name
-    const maxName = levelRangeField.maxName ?? 'maxLevel'
-    values[minName] = levelRangeField.defaultMinValue ?? TYPE_DEFAULTS.number
-    values[maxName] = levelRangeField.defaultMaxValue ?? TYPE_DEFAULTS.number
+    assignLevelRangeDefaults(field as LevelRangeFieldConfig, values)
     return
   }
 
   values[field.name] = fieldDefaultValue(field)
-  if (field.type === 'chooseFromChips') {
-    const chooseField = field as ChooseFromChipsFieldConfig
-    values[chooseField.chooseName] = chooseField.chooseDefaultValue ?? TYPE_DEFAULTS.number
-  }
-  if (field.type === 'inlineChooseCount') {
-    const inlineField = field as InlineChooseCountFieldConfig
-    if (inlineField.selectName) {
-      values[inlineField.selectName] =
-        inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
-    }
-  }
+  assignDependentFieldDefaults(field, values)
 }
 
 /** Builds the `defaultValues` object RHF needs from a form's items. */

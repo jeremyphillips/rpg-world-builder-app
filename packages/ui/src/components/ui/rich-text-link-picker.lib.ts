@@ -1,3 +1,4 @@
+import { scoreItem, type WeightedSearchField } from '../../lib/search'
 import type {
   RichTextLinkPickerInternalOption,
   RichTextLinkPickerValue,
@@ -23,6 +24,22 @@ export function isRichTextLinkContentTypeFilterActive(contentType: string): bool
   return contentType !== RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL
 }
 
+function internalLinkSearchFields(option: RichTextLinkPickerInternalOption): WeightedSearchField[] {
+  const fields: WeightedSearchField[] = [{ text: option.title, weight: 1, role: 'label' }]
+  if (option.sourceLabel) {
+    fields.push({ text: option.sourceLabel, weight: 1, role: 'description' })
+  }
+  fields.push({ text: option.href, weight: 1, role: 'alias' })
+  return fields
+}
+
+function internalLinkOptionMatchesQuery(
+  option: RichTextLinkPickerInternalOption,
+  query: string,
+): boolean {
+  return scoreItem({ fields: internalLinkSearchFields(option) }, query) > 0
+}
+
 export function filterInternalLinkOptions(
   internalOptions: RichTextLinkPickerInternalOption[],
   contentType: string,
@@ -34,9 +51,7 @@ export function filterInternalLinkOptions(
       return false
     }
     if (!query) return true
-    return [option.title, option.sourceLabel, option.href].some((value) =>
-      value?.toLowerCase().includes(query),
-    )
+    return internalLinkOptionMatchesQuery(option, query)
   })
 }
 

@@ -39,8 +39,14 @@ jobs:
       - name: Dead code check
         run: pnpm analyze
 
-      - name: Test
-        run: pnpm test
+      - name: Test with coverage
+        run: pnpm coverage
+
+      - name: Duplication check
+        run: pnpm gate:fallow-dupes
+
+      - name: Complexity and CRAP check
+        run: pnpm gate:fallow-health:coverage
 
   build:
     needs: ci

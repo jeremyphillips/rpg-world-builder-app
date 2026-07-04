@@ -9,6 +9,17 @@ export { ThemeSwitch } from './components/ui/theme-switch.client'
 
 export { cn } from './lib/utils'
 export { sanitizeHtml } from './lib/sanitize-html'
+export {
+  matchTier,
+  rankItems,
+  scoreField,
+  scoreItem,
+  normalizeSearchQuery,
+  type MatchTier,
+  type SearchableItem,
+  type SearchFieldRole,
+  type WeightedSearchField,
+} from './lib/search'
 export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
@@ -198,6 +209,20 @@ export {
   type RichTextLinkPickerInternalOption,
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
+export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
+export {
+  ButtonDropdown,
+  type ButtonDropdownGroup,
+  type ButtonDropdownItem,
+  type ButtonDropdownProps,
+} from './components/ui/button-dropdown.client'
+export {
+  previewCardRootVariants,
+  previewCardBodyVariants,
+  previewCardTitleVariants,
+  previewCardDescriptionVariants,
+  type PreviewCardRootVariantProps,
+} from './components/ui/preview-card.variants'
 export {
   RichTextLinkPreviewCard,
   type RichTextLinkPreviewCardProps,

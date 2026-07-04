@@ -24,24 +24,35 @@ describe('RichTextLinkPreviewCard', () => {
     expect(screen.getByText('Spell')).toHaveClass('eyebrow-style-xs')
   })
 
-  it('supports selection and clear actions', async () => {
+  it('supports selection via a button root', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
-    const onClear = vi.fn()
     render(
       <RichTextLinkPreviewCard
         contentType="spell"
         title="Fireball"
         sourceLabel="Homebrew"
         onSelect={onSelect}
-        onClear={onClear}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: /Spell Fireball Homebrew/i }))
-    await user.click(screen.getByRole('button', { name: 'Clear selected internal link' }))
-
     expect(onSelect).toHaveBeenCalledTimes(1)
+  })
+
+  it('supports clear via endSlot on a div root', async () => {
+    const user = userEvent.setup()
+    const onClear = vi.fn()
+    render(
+      <RichTextLinkPreviewCard
+        contentType="spell"
+        title="Fireball"
+        sourceLabel="Homebrew"
+        onClear={onClear}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Clear selected internal link' }))
     expect(onClear).toHaveBeenCalledTimes(1)
   })
 

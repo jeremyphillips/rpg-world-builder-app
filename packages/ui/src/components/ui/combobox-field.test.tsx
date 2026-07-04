@@ -168,6 +168,50 @@ describe('ComboboxField', () => {
     expect(search.closest('[class*="dark:bg-input/30"]')).not.toBeNull()
   })
 
+  it('omits the search row when enableSearch is false', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+        enableSearch={false}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    expect(
+      screen.queryByRole('searchbox', { name: 'Search Specific weapons' }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Specific weapons' })).not.toHaveClass('invisible')
+    expect(screen.getByRole('listbox', { name: 'Specific weapons' })).toHaveFocus()
+  })
+
+  it('navigates and selects via listbox keyboard when enableSearch is false', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapon"
+        label="Primary weapon"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        enableSearch={false}
+        onChange={onChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Primary weapon' }))
+    const listbox = screen.getByRole('listbox', { name: 'Primary weapon' })
+    expect(listbox).toHaveFocus()
+
+    await user.keyboard('{ArrowDown}{Enter}')
+    expect(onChange).toHaveBeenCalledWith('dart')
+  })
+
   it('filters options while searching', async () => {
     const user = userEvent.setup()
     render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)
@@ -299,6 +343,21 @@ describe('ComboboxField', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
     expect(screen.queryByText('Pick one.')).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Spells' })).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('has no accessibility violations when search is disabled', async () => {
+    const { container } = render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+        enableSearch={false}
+      />,
+    )
+    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
+    expect(results.violations).toEqual([])
   })
 
   it('has no accessibility violations (multi)', async () => {

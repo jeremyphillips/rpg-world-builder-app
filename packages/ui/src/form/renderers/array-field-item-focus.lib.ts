@@ -8,6 +8,21 @@ export function scrollArrayItemElementIntoView(element: Element): void {
   }
 }
 
+const ARRAY_ITEM_FOCUSABLE_SELECTOR = [
+  'input:not([type="hidden"]):not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button[role="combobox"]:not([disabled])',
+].join(', ')
+
+/** Best-effort focus of the first eligible control inside an array item row. */
+export function focusFirstEligibleArrayItemControl(container: Element): void {
+  const element = container.querySelector(ARRAY_ITEM_FOCUSABLE_SELECTOR)
+  if (element && 'focus' in element && typeof element.focus === 'function') {
+    element.focus({ preventScroll: true })
+  }
+}
+
 /** Focuses the control for one issue, or scrolls its array row into view. */
 export function focusDomIssueTarget(
   issue: FormIssue,

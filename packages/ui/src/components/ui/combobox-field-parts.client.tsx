@@ -33,6 +33,8 @@ interface ComboboxTriggerProps {
   loading?: boolean
   disabled?: boolean
   muted: boolean
+  /** When false, the trigger stays visible while the panel is open. */
+  hideWhenOpen?: boolean
   onBlur?: () => void
 }
 
@@ -44,6 +46,7 @@ export function ComboboxTrigger({
   loading,
   disabled,
   muted,
+  hideWhenOpen = true,
   onBlur,
 }: ComboboxTriggerProps) {
   return (
@@ -62,7 +65,7 @@ export function ComboboxTrigger({
             fieldControlVariants({ size }),
             'items-center justify-between gap-2 text-left [&>span]:line-clamp-1',
             muted && 'text-muted-foreground',
-            open && comboboxTriggerOpenVariants(),
+            open && hideWhenOpen && comboboxTriggerOpenVariants(),
           )}
         >
           <span className="truncate">{triggerText}</span>
@@ -159,6 +162,7 @@ interface ComboboxPanelProps {
   searchId: string
   size: FieldSize
   multiple: boolean
+  enableSearch?: boolean
   query: string
   emptyMessage: string
   activeOptionId?: string
@@ -168,8 +172,9 @@ interface ComboboxPanelProps {
   atMax: boolean
   generatedId: string
   searchInputRef: React.RefObject<HTMLInputElement | null>
+  listboxRef: React.RefObject<HTMLDivElement | null>
   onQueryChange: (value: string) => void
-  onSearchKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  onNavigationKeyDown: (event: React.KeyboardEvent) => void
   onOpenAutoFocus: () => void
   onHighlight: (index: number) => void
   onSelect: (value: string) => void
@@ -181,6 +186,7 @@ export function ComboboxPanel({
   searchId,
   size,
   multiple,
+  enableSearch = true,
   query,
   emptyMessage,
   activeOptionId,
@@ -190,8 +196,9 @@ export function ComboboxPanel({
   atMax,
   generatedId,
   searchInputRef,
+  listboxRef,
   onQueryChange,
-  onSearchKeyDown,
+  onNavigationKeyDown,
   onOpenAutoFocus,
   onHighlight,
   onSelect,
@@ -202,30 +209,36 @@ export function ComboboxPanel({
         align="start"
         side="bottom"
         avoidCollisions
-        sideOffset={-COMBOBOX_TRIGGER_OVERLAP_OFFSET[size]}
+        sideOffset={enableSearch ? -COMBOBOX_TRIGGER_OVERLAP_OFFSET[size] : 4}
         className={comboboxContentVariants()}
         onOpenAutoFocus={(event) => {
           event.preventDefault()
           onOpenAutoFocus()
         }}
       >
-        <ComboboxSearchField
-          label={label}
-          listboxId={listboxId}
-          searchId={searchId}
-          size={size}
-          query={query}
-          activeOptionId={activeOptionId}
-          searchInputRef={searchInputRef}
-          onQueryChange={onQueryChange}
-          onSearchKeyDown={onSearchKeyDown}
-        />
+        {enableSearch ? (
+          <ComboboxSearchField
+            label={label}
+            listboxId={listboxId}
+            searchId={searchId}
+            size={size}
+            query={query}
+            activeOptionId={activeOptionId}
+            searchInputRef={searchInputRef}
+            onQueryChange={onQueryChange}
+            onSearchKeyDown={onNavigationKeyDown}
+          />
+        ) : null}
 
         <div
+          ref={listboxRef}
           id={listboxId}
           role="listbox"
+          tabIndex={enableSearch ? undefined : -1}
           aria-label={label}
           aria-multiselectable={multiple || undefined}
+          aria-activedescendant={enableSearch ? undefined : activeOptionId}
+          onKeyDown={enableSearch ? undefined : onNavigationKeyDown}
           className={comboboxListVariants()}
         >
           {filteredOptions.length > 0 ? (
