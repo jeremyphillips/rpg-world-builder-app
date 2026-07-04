@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { characterValidationMessages } from './character-messages'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
 import { languageIdSchema } from '../../vocab/language'
@@ -46,7 +47,7 @@ export const characterToolProficiencyEntrySchema = z
     if ((val.toolId === undefined) === (val.toolCategory === undefined)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Choose exactly one of toolId or toolCategory',
+        message: characterValidationMessages.toolProficiencyExclusiveTarget(),
         path: ['toolId'],
       })
     }
@@ -65,7 +66,7 @@ export const characterWeaponProficiencyEntrySchema = z
     if ((val.weaponId === undefined) === (val.weaponCategory === undefined)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Choose exactly one of weaponId or weaponCategory',
+        message: characterValidationMessages.weaponProficiencyExclusiveTarget(),
         path: ['weaponId'],
       })
     }
