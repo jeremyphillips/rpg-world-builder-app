@@ -91,11 +91,22 @@ field category:
 | `too_small` array                       | multi / array container | `Add at least one {item label}.` (label singularized)              |
 | `invalid_value` / `invalid_union` empty | choice / multi          | `Choose {a label}.`                                                |
 | `invalid_value` / `invalid_union` other | choice / multi          | `Choose a valid {label}.`                                          |
+| `invalid_value` other                   | text / number / boolean | `{label} has an invalid value.`                                    |
+| `invalid_union`                         | non-choice              | `Complete the required fields for this option.`                    |
+| `invalid_format` `email`                | any                     | `Enter a valid email address.`                                     |
+| `invalid_format` `url`                  | any                     | `Enter a valid URL.`                                               |
+| `invalid_format` `regex` on `slug`      | text                    | `Use lowercase letters, numbers, and hyphens only.`                |
+| `invalid_format` other                  | any                     | `{label} has an invalid format.`                                   |
+| `too_small` / `too_big` other origins   | any                     | `{label} is too small.` / `{label} is too large.`                  |
+| `too_small` / `too_big` array `exact`   | array / multi           | `Add exactly {n} {items label}.`                                   |
+| registered path, unhandled code         | any                     | `{label} is invalid.` (catch-all safety net)                       |
 
-Anything else returns `undefined` → Zod's default message. Categories cover
+Unregistered paths still return `undefined` → Zod's default message. Categories cover
 every `FieldType` (chips/combobox split on `multiple`, `chooseFromChips`
 registers both the chip path and the count path, `levelRange` registers the
-min/max names, arrays register their `legend`).
+min/max names, `editableGrid` registers each column key, `diceFormula` registers
+count/faces/modifier/currency subpaths, `slot` fields register by name, arrays
+register their `legend` with `itemLabel` derived from `itemHeader` when present).
 
 ## Adding a new domain catalog
 

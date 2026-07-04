@@ -6,6 +6,8 @@
 
 import type {
   ChooseFromChipsFieldConfig,
+  DiceFormulaFieldConfig,
+  EditableGridFieldConfig,
   FieldConfig,
   InlineChooseCountFieldConfig,
   InlineSentenceFieldConfig,
@@ -16,6 +18,8 @@ import type { FieldMessageCategory } from './field-error-map-category.lib'
 export type RegistryEntry = {
   label: string
   category: FieldMessageCategory
+  /** Mid-sentence singular item label for array min/max copy (from `itemHeader`). */
+  itemLabel?: string
 }
 
 type RegistryKey = (name: string) => string
@@ -74,6 +78,40 @@ function registerInlineSentenceField(
   }
 }
 
+function registerEditableGridField(
+  registry: Map<string, RegistryEntry>,
+  key: RegistryKey,
+  field: EditableGridFieldConfig,
+): void {
+  for (const column of field.columns) {
+    const columnLabel = typeof column.label === 'string' ? column.label : field.label
+    const category = column.control === 'select' ? 'choice' : 'number'
+    registry.set(key(`${field.name}.${column.key}`), { label: columnLabel, category })
+  }
+}
+
+function registerDiceFormulaField(
+  registry: Map<string, RegistryEntry>,
+  key: RegistryKey,
+  field: DiceFormulaFieldConfig,
+): void {
+  const entry: RegistryEntry = { label: field.label, category: 'number' }
+  const base = field.name
+
+  registry.set(key(`${base}.count`), entry)
+  registry.set(key(`${base}.faces`), entry)
+  registry.set(key(`${base}.modifier.amount`), entry)
+  registry.set(key(`${base}.modifier.operator`), { label: field.label, category: 'choice' })
+
+  const currencyName = field.currencyUnit?.name
+  if (currencyName) {
+    registry.set(key(currencyName), {
+      label: field.label,
+      category: 'choice',
+    })
+  }
+}
+
 export function registerFieldPaths(
   registry: Map<string, RegistryEntry>,
   prefix: string,
@@ -104,5 +142,13 @@ export function registerFieldPaths(
 
   if (field.type === 'inlineSentence') {
     registerInlineSentenceField(registry, key, field as InlineSentenceFieldConfig)
+  }
+
+  if (field.type === 'editableGrid') {
+    registerEditableGridField(registry, key, field as EditableGridFieldConfig)
+  }
+
+  if (field.type === 'diceFormula') {
+    registerDiceFormulaField(registry, key, field as DiceFormulaFieldConfig)
   }
 }
