@@ -35,11 +35,6 @@ export const EQUIPMENT_POOL_CATEGORY_ANY = '__any__' as const
 
 /** Equipment grant validation messages (tier 3 form overrides). */
 export const equipmentGrantValidationMessages = {
-  fixedEquipmentRequired: defineMessage(
-    'validation.equipmentGrant.fixedEquipmentRequired',
-    () => 'Specific items require equipment',
-    () => 'Missing equipment',
-  ),
   explicitPoolSlugsRequired: defineMessage(
     'validation.equipmentGrant.explicitPoolSlugsRequired',
     () => 'Specific item lists require at least one equipment item',

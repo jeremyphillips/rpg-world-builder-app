@@ -53,4 +53,19 @@ export const levelValidationMessages = {
     'validation.level.extendedMaxTooLow',
     () => 'Extended maximum must be higher than the standard maximum.',
   ),
+  /** Starting level exceeds the campaign's effective maximum character level. */
+  startingLevelExceedsMax: defineMessage(
+    'validation.level.startingLevelExceedsMax',
+    () => 'Starting level cannot exceed the maximum character level.',
+  ),
+  /** Extended progression tier name is missing when extended progression is enabled. */
+  extendedTierNameRequired: defineMessage(
+    'validation.level.extendedTierNameRequired',
+    () => 'Tier name is required for extended progression.',
+  ),
+  /** Extended max level is missing when extended progression is enabled. */
+  extendedMaxLevelRequired: defineMessage(
+    'validation.level.extendedMaxLevelRequired',
+    () => 'Extended maximum level is required for extended progression.',
+  ),
 }

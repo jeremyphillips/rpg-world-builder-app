@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useRef } from 'react'
-import { FormProvider, useForm, useWatch, type Resolver } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { Badge, Button, InfoTooltip, Switch, Text } from '@rpg/ui'
-import { FormItems } from '@rpg/ui/form'
+import { FormItems, makeResolver } from '@rpg/ui/form'
 import type { Subclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
@@ -57,8 +56,13 @@ export function SubclassEditorPanel({
     onValuesChangeRef.current = onValuesChange
   }, [onValuesChange])
 
+  const resolver = useMemo(
+    () => makeResolver<SubclassFormValues>(subclassFormDef.schema, fields),
+    [fields],
+  )
+
   const form = useForm<SubclassFormValues>({
-    resolver: zodResolver(subclassFormDef.schema) as Resolver<SubclassFormValues>,
+    resolver,
     defaultValues,
     mode: 'onSubmit',
   })

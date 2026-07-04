@@ -14,7 +14,7 @@ import {
 // ---------------------------------------------------------------------------
 
 export const identitySchema = z.object({
-  name: z.string().min(1, 'Campaign name is required').max(100),
+  name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   banner: z.array(z.custom<File>((v: unknown) => v instanceof File)).optional(),
 })

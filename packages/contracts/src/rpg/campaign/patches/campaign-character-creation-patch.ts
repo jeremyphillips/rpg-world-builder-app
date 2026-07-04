@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primitives/level'
+import { levelValidationMessages } from '../../primitives/level-messages'
 import { refineLevelRangeTable } from '../../primitives/level-range-table'
 import { creatureTypeSchema, type CreatureTypeId } from '../../vocab/creature-type'
 import { resolveMaxCharacterLevel } from '../campaign-rules'
@@ -137,7 +138,7 @@ function validateStartingLevelWithinEffectiveMax(
 
   ctx.addIssue({
     code: 'custom',
-    message: 'Starting level cannot exceed max character level',
+    message: levelValidationMessages.startingLevelExceedsMax(),
     path: [...pathPrefix, 'startingLevel'],
   })
 }

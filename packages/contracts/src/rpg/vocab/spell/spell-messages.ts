@@ -9,4 +9,8 @@ export const spellValidationMessages = {
     'validation.spell.componentRequired',
     () => 'Select at least one spell component (verbal, somatic, or material).',
   ),
+  materialDescriptionRequired: defineMessage(
+    'validation.spell.materialDescriptionRequired',
+    () => 'Material description is required when the material component is selected.',
+  ),
 }

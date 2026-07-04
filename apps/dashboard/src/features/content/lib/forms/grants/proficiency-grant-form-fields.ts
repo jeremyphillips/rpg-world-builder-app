@@ -46,16 +46,6 @@ export const ARMOR_TRAINING_POOL_SOURCES = ['explicit', 'filtered'] as const
 
 /** Proficiency grant validation messages (tier 3 form overrides). */
 export const proficiencyGrantValidationMessages = {
-  specificSlugsRequired: defineMessage(
-    'validation.proficiencyGrant.specificSlugsRequired',
-    () => 'Specific grants require at least one item',
-    () => 'Missing items',
-  ),
-  categoriesRequired: defineMessage(
-    'validation.proficiencyGrant.categoriesRequired',
-    () => 'Category grants require at least one category',
-    () => 'Missing categories',
-  ),
   explicitPoolSlugsRequired: defineMessage(
     'validation.proficiencyGrant.explicitPoolSlugsRequired',
     () => 'Specific lists require at least one item',
@@ -64,11 +54,6 @@ export const proficiencyGrantValidationMessages = {
   explicitSkillPoolRequired: defineMessage(
     'validation.proficiencyGrant.explicitSkillPoolRequired',
     () => 'Selected skill lists require at least one skill',
-    () => 'Missing skills',
-  ),
-  fixedSkillIdsRequired: defineMessage(
-    'validation.proficiencyGrant.fixedSkillIdsRequired',
-    () => 'Specific skill grants require at least one skill',
     () => 'Missing skills',
   ),
 }
