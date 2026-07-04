@@ -8,11 +8,11 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { ArmorEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 
-function optionalArmorAc(values: EquipmentInputBuildCtx['values']): Partial<ArmorInput> {
+function optionalArmorAc(values: EquipmentInputBuildCtx<'armor'>['values']): Partial<ArmorInput> {
   if (values.armorCategory === 'shields') {
     return values.acBonus !== undefined ? { acBonus: values.acBonus } : {}
   }
@@ -22,7 +22,7 @@ function optionalArmorAc(values: EquipmentInputBuildCtx['values']): Partial<Armo
 export function armorFormValuesFromEntity(
   item: ArmorEquipment,
 ): Pick<
-  EquipmentFormValues,
+  ArmorEquipmentFormValues,
   | 'armorCategory'
   | 'material'
   | 'baseAc'
@@ -49,7 +49,7 @@ export function buildArmorInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'armor'>): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'armor',

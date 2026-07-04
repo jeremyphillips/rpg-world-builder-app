@@ -4,7 +4,8 @@ import { createEquipmentInputSchema, type Equipment, type EquipmentKind } from '
 import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { STORY_RULESET_ID } from '../../../lib/fixtures/constants'
-import { equipmentFormDef, type EquipmentFormValues } from '../equipment-form-def'
+import type { EquipmentFormValuesFor } from '../equipment-form-fields'
+import { equipmentFormDef } from '../equipment-form-def'
 
 /** Seed equipment of one kind from the fixture ruleset. */
 export function seedEquipmentOfKind(kind: EquipmentKind): Equipment[] {
@@ -34,9 +35,11 @@ export function expectComposedKindGroups(
   return fields
 }
 
-/** Seed item → form values, typed as the full form shape. */
-export function toEquipmentFormValues(item: Equipment): EquipmentFormValues {
-  return equipmentFormDef.toFormValues(item) as EquipmentFormValues
+/** Seed item → kind-narrowed form values for per-family assertions. */
+export function toEquipmentFormValues<K extends EquipmentKind>(
+  item: Extract<Equipment, { kind: K }>,
+): EquipmentFormValuesFor<K> {
+  return equipmentFormDef.toFormValues(item) as EquipmentFormValuesFor<K>
 }
 
 /** Asserts the toFormValues → toInput → createEquipmentInputSchema.parse round-trip. */

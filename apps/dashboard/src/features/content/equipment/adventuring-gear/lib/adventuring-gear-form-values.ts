@@ -9,7 +9,7 @@ import {
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import { parseNewlineList } from '../../lib/parse-newline-list'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { AdventuringGearEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 /** Joins mechanical property lines for the unified equipment form textarea. */
 export function formatPropertiesText(items: string[] | undefined): string | undefined {
@@ -19,7 +19,7 @@ export function formatPropertiesText(items: string[] | undefined): string | unde
 export function adventuringGearFormValuesFromEntity(
   item: AdventuringGearEquipment,
 ): Pick<
-  EquipmentFormValues,
+  AdventuringGearEquipmentFormValues,
   | 'gearKind'
   | 'bundleSize'
   | 'storage'
@@ -44,7 +44,7 @@ export function buildAdventuringGearInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'adventuring_gear'>): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'adventuring_gear',

@@ -13,13 +13,13 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { MountEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 export function mountFormValuesFromEntity(
   item: MountEquipment,
-): Pick<EquipmentFormValues, 'carryingCapacity' | 'speed'> {
+): Pick<MountEquipmentFormValues, 'carryingCapacity' | 'speed'> {
   return {
-    carryingCapacity: massToForm(item.carryingCapacity),
+    carryingCapacity: massToForm(item.carryingCapacity) ?? { value: 0, unit: 'lb' },
     speed: item.speed,
   }
 }
@@ -29,7 +29,7 @@ export function buildMountInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'mount'>): CreateEquipmentInput {
   const carryingCapacity = massFromForm(values.carryingCapacity)
   const speed = speedRateFromForm(values.speed)
   return createEquipmentInputSchema.parse({

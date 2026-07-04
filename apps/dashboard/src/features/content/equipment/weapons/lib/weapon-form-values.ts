@@ -10,13 +10,13 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<EquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
+): Pick<WeaponEquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
   if (!damage) return { damageKind: 'none' }
   if (damage.kind === 'dice') {
     return {
@@ -33,7 +33,7 @@ export function damageToForm(
 export function weaponFormValuesFromEntity(
   item: WeaponEquipment,
 ): Pick<
-  EquipmentFormValues,
+  WeaponEquipmentFormValues,
   | 'category'
   | 'mode'
   | 'damageKind'
@@ -63,7 +63,7 @@ export function weaponFormValuesFromEntity(
   }
 }
 
-function damageFromForm(values: EquipmentInputBuildCtx['values']): WeaponInput['damage'] {
+function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
   if (values.damageKind === 'none' || values.damageKind === undefined) return undefined
   if (values.damageKind === 'flat') {
     return values.damageAmount !== undefined
@@ -80,7 +80,9 @@ function damageFromForm(values: EquipmentInputBuildCtx['values']): WeaponInput['
   return undefined
 }
 
-function optionalWeaponDamage(values: EquipmentInputBuildCtx['values']): Partial<WeaponInput> {
+function optionalWeaponDamage(
+  values: EquipmentInputBuildCtx<'weapon'>['values'],
+): Partial<WeaponInput> {
   const damage = damageFromForm(values)
   if (!damage) return {}
   return {
@@ -89,7 +91,9 @@ function optionalWeaponDamage(values: EquipmentInputBuildCtx['values']): Partial
   }
 }
 
-function optionalVersatileDamage(values: EquipmentInputBuildCtx['values']): Partial<WeaponInput> {
+function optionalVersatileDamage(
+  values: EquipmentInputBuildCtx<'weapon'>['values'],
+): Partial<WeaponInput> {
   if (!(values.properties ?? []).includes('versatile')) return {}
   if (values.versatileDamage?.count === undefined || values.versatileDamage?.faces === undefined) {
     return {}
@@ -103,7 +107,9 @@ function optionalVersatileDamage(values: EquipmentInputBuildCtx['values']): Part
   }
 }
 
-function optionalWeaponRange(values: EquipmentInputBuildCtx['values']): Partial<WeaponInput> {
+function optionalWeaponRange(
+  values: EquipmentInputBuildCtx<'weapon'>['values'],
+): Partial<WeaponInput> {
   if (values.rangeNormal === undefined) return {}
   return {
     range: {
@@ -118,7 +124,7 @@ export function buildWeaponInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'weapon'>): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'weapon',

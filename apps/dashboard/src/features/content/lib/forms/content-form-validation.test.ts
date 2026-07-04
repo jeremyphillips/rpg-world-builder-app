@@ -1,7 +1,7 @@
 /**
  * Phase 4 validation sweep for every registered content form def.
  */
-import { describe, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { EQUIPMENT_KINDS, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import {
   assertFieldPathsRegistered,
@@ -49,6 +49,8 @@ import {
 import { createSpeciesFormSchema } from '../../species/lib/species-form-fields'
 import { createFeatFormSchema } from '../../feats/lib/feat-form-fields'
 import { equipmentFormDef } from '../../equipment/lib/equipment-form-def'
+import { resolveEquipmentFormSchema } from '../../equipment/lib/equipment-form-fields'
+import { costToFormDefaults } from './fields/content-economy-form-fields'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 
@@ -68,12 +70,17 @@ const HERITAGE_FORM_EXEMPT = ['heritage.id', 'heritage.choose'] as const
 /** Grant union variants explode many schema paths; grant rows are tested at row scope. */
 const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 
+/** Family routes omit the Kind select — discriminant is fixed by route context. */
+const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
+
 const COMMON_SCHEMA_EXEMPT = [
   ...SLOT_IGNORE,
   ...SLUG_EXEMPT,
   ...HERITAGE_FORM_EXEMPT,
   ...GRANT_NESTED_EXEMPT,
 ] as const
+
+const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEMPT] as const
 
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {
   const ctx = routeKey === 'equipment' ? { equipmentKind: 'weapon' as const } : {}
@@ -82,35 +89,123 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
     assertFieldPathsRegistered(contentFormFields(def, ctx))
   })
 
-  if (routeKey !== 'equipment') {
-    it('registers schema leaf paths in the field error map', () => {
-      const fields = contentFormFields(def, ctx)
-      const schema = def.resolveSchema?.(ctx) ?? def.schema
-      const exempt = COMMON_SCHEMA_EXEMPT
+  it('registers schema leaf paths in the field error map', () => {
+    const fields = contentFormFields(def, ctx)
+    const schema = def.resolveSchema?.(ctx) ?? def.schema
+    const exempt = routeKey === 'equipment' ? EQUIPMENT_SCHEMA_EXEMPT : COMMON_SCHEMA_EXEMPT
 
-      assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
+    assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
+  })
+
+  it('rejects invalid submit without Zod default messages', () => {
+    const fields = contentFormFields(def, ctx)
+    const schema = def.resolveSchema?.(ctx) ?? def.schema
+
+    assertInvalidSubmitUsesRefinedMessages(schema, fields, {
+      invalidValue: invalidValueFor(routeKey),
+      unionWhitelist: [/^grant\b/, /^grants\b/, /^features\b/, /^traits\b/, /^heritage\b/],
     })
+  })
+})
 
-    it('rejects invalid submit without Zod default messages', () => {
-      const fields = contentFormFields(def, ctx)
-      const schema = def.resolveSchema?.(ctx) ?? def.schema
+describe.each(EQUIPMENT_KINDS)('equipment form validation — %s', (kind) => {
+  const ctx = { equipmentKind: kind }
+  const fields = contentFormFields(equipmentFormDef, ctx)
+  const schema = resolveEquipmentFormSchema(ctx)
 
+  it('registers every configured form field path', () => {
+    assertFieldPathsRegistered(fields)
+  })
+
+  it('registers schema leaf paths in the field error map', () => {
+    assertRegistryCoverage(schema, fields, { exemptPaths: EQUIPMENT_SCHEMA_EXEMPT })
+  })
+
+  it('smoke: rejects empty name without Zod default messages', () => {
+    assertInvalidSubmitUsesRefinedMessages(schema, fields, {
+      invalidValue: smokeInvalidValueFor(kind),
+    })
+  })
+
+  if (kind !== 'magic_item') {
+    it('kind-specific: rejects invalid required kind field', () => {
       assertInvalidSubmitUsesRefinedMessages(schema, fields, {
-        invalidValue: invalidValueFor(routeKey),
-        unionWhitelist: [/^grant\b/, /^grants\b/, /^features\b/, /^traits\b/, /^heritage\b/],
+        invalidValue: kindFieldInvalidValueFor(kind),
       })
     })
   }
 })
 
-describe('equipment form validation by kind', () => {
-  for (const kind of EQUIPMENT_KINDS) {
-    it(`${kind} registers field paths`, () => {
-      const fields = contentFormFields(equipmentFormDef, { equipmentKind: kind })
-      assertFieldPathsRegistered(fields)
-    })
-  }
+describe('resolveEquipmentFormSchema dispatcher', () => {
+  it.each(EQUIPMENT_KINDS)('%s schema discriminant matches kind', (kind) => {
+    const schema = resolveEquipmentFormSchema({ equipmentKind: kind })
+    const result = schema.safeParse(minimalValidEquipmentFor(kind))
+    expect(result.success).toBe(true)
+    if (result.success) expect(result.data.kind).toBe(kind)
+  })
 })
+
+function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Record<string, unknown> {
+  const base = { name: 'Test item', cost: costToFormDefaults() }
+
+  switch (kind) {
+    case 'weapon':
+      return {
+        ...base,
+        kind,
+        category: 'simple',
+        mode: 'melee',
+        mastery: 'cleave',
+      }
+    case 'armor':
+      return { ...base, kind, armorCategory: 'light' }
+    case 'adventuring_gear':
+      return { ...base, kind, gearKind: 'general' }
+    case 'tool':
+      return { ...base, kind, toolCategory: 'artisan', ability: 'str' }
+    case 'mount':
+      return {
+        ...base,
+        kind,
+        carryingCapacity: { value: 480, unit: 'lb' },
+        speed: { value: 40, unit: 'ft' },
+      }
+    case 'vehicle':
+      return { ...base, kind, vehicleCategory: 'water', speed: { value: 4, unit: 'mph' } }
+    case 'service':
+      return { ...base, kind, serviceCategory: 'lodging' }
+    case 'magic_item':
+      return { ...base, kind }
+    default:
+      return { ...base, kind }
+  }
+}
+
+function smokeInvalidValueFor(kind: (typeof EQUIPMENT_KINDS)[number]): unknown {
+  return { ...minimalValidEquipmentFor(kind), name: '' }
+}
+
+function kindFieldInvalidValueFor(kind: (typeof EQUIPMENT_KINDS)[number]): Record<string, unknown> {
+  const valid = minimalValidEquipmentFor(kind)
+
+  switch (kind) {
+    case 'weapon':
+      return { ...valid, category: '' }
+    case 'armor':
+      return { ...valid, armorCategory: '' }
+    case 'adventuring_gear':
+      return { ...valid, gearKind: '' }
+    case 'tool':
+      return { ...valid, toolCategory: '' }
+    case 'mount':
+    case 'vehicle':
+      return { ...valid, speed: undefined }
+    case 'service':
+      return { ...valid, serviceCategory: '' }
+    default:
+      return valid
+  }
+}
 
 function invalidValueFor(routeKey: string): unknown {
   switch (routeKey) {
@@ -166,7 +261,7 @@ function invalidValueFor(routeKey: string): unknown {
         suggestedClasses: [],
       }
     case 'equipment':
-      return { name: '', kind: 'weapon' }
+      return smokeInvalidValueFor('weapon')
     default:
       return {}
   }

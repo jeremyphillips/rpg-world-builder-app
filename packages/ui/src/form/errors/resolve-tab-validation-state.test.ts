@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import type { FieldErrors } from 'react-hook-form'
 
 import { classifyFormIssues } from './classify-form-issue'
-import { flattenFormIssues } from './flatten-form-issues'
 import { sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import {
@@ -52,7 +51,7 @@ const grantsTab: TabValidationTab = {
 const tabs: TabValidationTab[] = [identityTab, rulesTab, grantsTab]
 const allFields = tabs.flatMap((tab) => tab.fields)
 
-function issuesFromErrors(errors: Parameters<typeof flattenFormIssues>[0]) {
+function issuesFromErrors(errors: FieldErrors) {
   return prepareFormIssues(errors, allFields)
 }
 

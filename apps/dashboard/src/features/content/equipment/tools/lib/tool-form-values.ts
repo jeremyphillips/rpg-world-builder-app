@@ -9,7 +9,7 @@ import {
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import { parseNewlineList } from '../../lib/parse-newline-list'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { ToolEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 /** Joins craft item lines for the unified equipment form textarea. */
 export function formatCraftsText(items: string[] | undefined): string | undefined {
@@ -18,7 +18,7 @@ export function formatCraftsText(items: string[] | undefined): string | undefine
 
 export function toolFormValuesFromEntity(
   item: ToolEquipment,
-): Pick<EquipmentFormValues, 'toolCategory' | 'ability' | 'utilizes' | 'craftsText'> {
+): Pick<ToolEquipmentFormValues, 'toolCategory' | 'ability' | 'utilizes' | 'craftsText'> {
   return {
     toolCategory: item.toolCategory,
     ability: item.ability,
@@ -32,7 +32,7 @@ export function buildToolInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'tool'>): CreateEquipmentInput {
   const crafts = parseNewlineList(values.craftsText)
 
   return createEquipmentInputSchema.parse({

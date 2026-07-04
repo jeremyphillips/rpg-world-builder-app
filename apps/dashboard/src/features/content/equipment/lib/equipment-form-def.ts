@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
 import { costToFormDefaults } from '../../lib/forms/fields/content-economy-form-fields'
@@ -6,13 +7,15 @@ import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import {
   buildEquipmentFields,
   equipmentFormSchema,
+  resolveEquipmentFormSchema,
   type EquipmentFormValues,
 } from './equipment-form-fields'
 import { equipmentFormToInput, equipmentToFormValues } from './equipment-form-values'
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
   routeKey: 'equipment',
-  schema: equipmentFormSchema,
+  schema: equipmentFormSchema as z.ZodType<EquipmentFormValues>,
+  resolveSchema: resolveEquipmentFormSchema,
   coverage: 'roundtrip-only',
   createDefaultValues: {
     kind: 'adventuring_gear',

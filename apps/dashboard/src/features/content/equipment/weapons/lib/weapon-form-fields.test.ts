@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { WeaponEquipment } from '@rpg/contracts'
 import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
 import {
@@ -273,7 +274,7 @@ describe('weapon form round-trips', () => {
   it('maps net to damageKind none', () => {
     const net = WEAPON_SEEDS.find((item) => item.slug === 'net')
     expect(net).toBeDefined()
-    const formValues = toEquipmentFormValues(net!)
+    const formValues = toEquipmentFormValues(net! as WeaponEquipment)
     expect(formValues.damageKind).toBe('none')
   })
 })

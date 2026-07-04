@@ -13,11 +13,13 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { VehicleEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type VehicleInput = Extract<CreateEquipmentInput, { kind: 'vehicle' }>
 
-function optionalVehicleFields(values: EquipmentInputBuildCtx['values']): Partial<VehicleInput> {
+function optionalVehicleFields(
+  values: EquipmentInputBuildCtx<'vehicle'>['values'],
+): Partial<VehicleInput> {
   const cargoCapacity = massFromForm(values.cargoCapacity)
   const speed = speedRateFromForm(values.speed)
   return {
@@ -34,7 +36,7 @@ function optionalVehicleFields(values: EquipmentInputBuildCtx['values']): Partia
 export function vehicleFormValuesFromEntity(
   item: VehicleEquipment,
 ): Pick<
-  EquipmentFormValues,
+  VehicleEquipmentFormValues,
   | 'vehicleCategory'
   | 'speed'
   | 'cargoCapacity'
@@ -61,7 +63,7 @@ export function buildVehicleInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'vehicle'>): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'vehicle',
