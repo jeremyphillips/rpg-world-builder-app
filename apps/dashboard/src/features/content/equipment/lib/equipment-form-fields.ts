@@ -192,6 +192,20 @@ export const equipmentKindScopedFormSchema = z.discriminatedUnion('kind', [
 
 export type EquipmentFormValues = z.infer<typeof equipmentKindScopedFormSchema>
 
+export type WeaponEquipmentFormValues = z.infer<typeof weaponEquipmentFormSchema>
+export type ArmorEquipmentFormValues = z.infer<typeof armorEquipmentFormSchema>
+export type AdventuringGearEquipmentFormValues = z.infer<typeof adventuringGearEquipmentFormSchema>
+export type ToolEquipmentFormValues = z.infer<typeof toolEquipmentFormSchema>
+export type MountEquipmentFormValues = z.infer<typeof mountEquipmentFormSchema>
+export type VehicleEquipmentFormValues = z.infer<typeof vehicleEquipmentFormSchema>
+export type ServiceEquipmentFormValues = z.infer<typeof serviceEquipmentFormSchema>
+export type MagicItemEquipmentFormValues = z.infer<typeof magicItemEquipmentFormSchema>
+
+export type EquipmentFormValuesFor<K extends EquipmentKind> = Extract<
+  EquipmentFormValues,
+  { kind: K }
+>
+
 const kindSchemas: Record<EquipmentKind, z.ZodTypeAny> = {
   weapon: weaponEquipmentFormSchema,
   armor: armorEquipmentFormSchema,

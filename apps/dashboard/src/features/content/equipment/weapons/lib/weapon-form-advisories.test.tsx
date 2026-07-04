@@ -3,7 +3,7 @@ import type { WeaponPropertyModeAdvisory } from '@rpg/contracts'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
 
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
 import {
   blockWeaponSaveForInvalidMastery,
   formatWeaponPropertyAdvisoryConfirmMessage,
@@ -15,9 +15,14 @@ describe('getWeaponFormPropertyAdvisories', () => {
   it('returns advisories for incompatible selected properties', () => {
     expect(
       getWeaponFormPropertyAdvisories({
+        kind: 'weapon',
+        name: 'Test',
+        cost: { amount: 0, currency: 'gp' },
+        category: 'simple',
         mode: 'ranged',
+        mastery: 'vex',
         properties: ['reach', 'finesse'],
-      } as EquipmentFormValues),
+      } satisfies WeaponEquipmentFormValues),
     ).toEqual([
       {
         property: 'reach',
@@ -32,18 +37,26 @@ describe('weaponFormHasInvalidMastery', () => {
   it('flags cleave with ranged mode', () => {
     expect(
       weaponFormHasInvalidMastery({
+        kind: 'weapon',
+        name: 'Test',
+        cost: { amount: 0, currency: 'gp' },
+        category: 'simple',
         mode: 'ranged',
         mastery: 'cleave',
-      } as EquipmentFormValues),
+      } satisfies WeaponEquipmentFormValues),
     ).toBe(true)
   })
 
   it('allows compatible mastery selections', () => {
     expect(
       weaponFormHasInvalidMastery({
+        kind: 'weapon',
+        name: 'Test',
+        cost: { amount: 0, currency: 'gp' },
+        category: 'simple',
         mode: 'ranged',
         mastery: 'vex',
-      } as EquipmentFormValues),
+      } satisfies WeaponEquipmentFormValues),
     ).toBe(false)
   })
 })
@@ -51,11 +64,15 @@ describe('weaponFormHasInvalidMastery', () => {
 describe('blockWeaponSaveForInvalidMastery', () => {
   it('sets a mastery field error and returns true when blocked', () => {
     const { result } = renderHook(() =>
-      useForm<EquipmentFormValues>({
+      useForm<WeaponEquipmentFormValues>({
         defaultValues: {
+          kind: 'weapon',
+          name: 'Test',
+          cost: { amount: 0, currency: 'gp' },
+          category: 'simple',
           mode: 'ranged',
           mastery: 'cleave',
-        } as EquipmentFormValues,
+        },
       }),
     )
 
@@ -75,11 +92,15 @@ describe('blockWeaponSaveForInvalidMastery', () => {
 
   it('returns false when mastery is compatible', () => {
     const { result } = renderHook(() =>
-      useForm<EquipmentFormValues>({
+      useForm<WeaponEquipmentFormValues>({
         defaultValues: {
+          kind: 'weapon',
+          name: 'Test',
+          cost: { amount: 0, currency: 'gp' },
+          category: 'simple',
           mode: 'ranged',
           mastery: 'vex',
-        } as EquipmentFormValues,
+        },
       }),
     )
 

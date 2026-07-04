@@ -10,7 +10,7 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { ServiceEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 export function durationFromForm(
   duration: { value?: number; unit?: ServiceDurationUnit } | undefined,
@@ -23,13 +23,13 @@ export function durationFromForm(
 
 export function durationToForm(
   duration: ServiceDuration | undefined,
-): EquipmentFormValues['duration'] {
+): ServiceEquipmentFormValues['duration'] {
   return duration ? { value: duration.value, unit: duration.unit } : undefined
 }
 
 export function serviceFormValuesFromEntity(
   item: ServiceEquipment,
-): Pick<EquipmentFormValues, 'serviceCategory' | 'duration' | 'notes'> {
+): Pick<ServiceEquipmentFormValues, 'serviceCategory' | 'duration' | 'notes'> {
   return {
     serviceCategory: item.serviceCategory,
     duration: durationToForm(item.duration),
@@ -38,7 +38,10 @@ export function serviceFormValuesFromEntity(
 }
 
 /** Maps service form values to a create/update API input fragment. */
-export function buildServiceInput({ values, ctx }: EquipmentInputBuildCtx): CreateEquipmentInput {
+export function buildServiceInput({
+  values,
+  ctx,
+}: EquipmentInputBuildCtx<'service'>): CreateEquipmentInput {
   const duration = durationFromForm(values.duration)
 
   return createEquipmentInputSchema.parse({

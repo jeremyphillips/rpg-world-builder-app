@@ -166,11 +166,12 @@ user-facing surface appears.
 
 ### Equipment unified schema
 
-Per-kind **field-path** registration is covered in
-`content-form-validation.test.ts`. Full-schema **invalid-submit** per equipment
-kind is blocked by the single multi-kind `equipmentFormSchema` shape — variant
-refinement copy is verified in per-family `*-form-fields.test.ts` via
-`createEquipmentInputSchema.parse()` at submit time.
+**Status:** closed (BENCH-074) — kind-scoped form schemas
+(`resolveEquipmentFormSchema`) match each family route's rendered fields.
+`content-form-validation.test.ts` runs `assertRegistryCoverage` and
+`assertInvalidSubmitUsesRefinedMessages` per `EQUIPMENT_KIND`. The unscoped hub
+still uses flat `equipmentFormSchema` (no submit). Per-family `build*Input` /
+`createEquipmentInputSchema.parse()` tests remain the submit-time domain contract.
 
 ### Future seams
 

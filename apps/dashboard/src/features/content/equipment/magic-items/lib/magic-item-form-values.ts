@@ -8,12 +8,12 @@ import {
   equipmentInputBase,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
-import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+import type { MagicItemEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 export function magicItemFormValuesFromEntity(
   item: MagicItemEquipment,
 ): Pick<
-  EquipmentFormValues,
+  MagicItemEquipmentFormValues,
   | 'rarity'
   | 'requiresAttunement'
   | 'attunementRequirement'
@@ -34,7 +34,7 @@ export function buildMagicItemInput({
   values,
   ctx,
   weight,
-}: EquipmentInputBuildCtx): CreateEquipmentInput {
+}: EquipmentInputBuildCtx<'magic_item'>): CreateEquipmentInput {
   return createEquipmentInputSchema.parse({
     ...equipmentInputBase(values, ctx),
     kind: 'magic_item',

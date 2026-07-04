@@ -23,17 +23,22 @@ import { buildServiceInput, serviceFormValuesFromEntity } from '../services/lib/
 import { buildToolInput, toolFormValuesFromEntity } from '../tools/lib/tool-form-values'
 import { buildVehicleInput, vehicleFormValuesFromEntity } from '../vehicles/lib/vehicle-form-values'
 import { buildWeaponInput, weaponFormValuesFromEntity } from '../weapons/lib/weapon-form-values'
-import type { EquipmentFormValues } from './equipment-form-fields'
+import type { EquipmentFormValues, EquipmentFormValuesFor } from './equipment-form-fields'
 import type { EquipmentInputBuildCtx } from './equipment-form-values-base'
 
-function sharedWeightToForm(entity: Equipment): EquipmentFormValues['weight'] {
+function sharedWeightToForm(
+  entity: Equipment,
+): EquipmentFormValuesFor<'weapon'>['weight'] | undefined {
   if (entity.kind === 'service') return undefined
   return weightToForm(entity.weight)
 }
 
-function sharedFormValues(
-  entity: Equipment,
-): Pick<EquipmentFormValues, 'name' | 'slug' | 'description' | 'kind' | 'cost' | 'weight'> {
+function sharedFormValues(entity: Equipment): Pick<
+  EquipmentFormValues,
+  'name' | 'slug' | 'description' | 'kind' | 'cost'
+> & {
+  weight?: EquipmentFormValuesFor<'weapon'>['weight']
+} {
   return {
     name: entity.name,
     slug: entity.slug,
@@ -133,18 +138,26 @@ export function equipmentToFormValues(entity: Equipment) {
   }
 }
 
-const kindInputBuilders: Record<
-  EquipmentKind,
-  (ctx: EquipmentInputBuildCtx) => CreateEquipmentInput
-> = {
-  weapon: buildWeaponInput,
-  armor: buildArmorInput,
-  adventuring_gear: buildAdventuringGearInput,
-  tool: buildToolInput,
-  mount: buildMountInput,
-  vehicle: buildVehicleInput,
-  service: buildServiceInput,
-  magic_item: buildMagicItemInput,
+function equipmentInputWeight(
+  kind: EquipmentKind,
+  values: EquipmentFormValues,
+): ReturnType<typeof weightFromForm> {
+  if (kind === 'service') return undefined
+  return weightFromForm((values as EquipmentFormValuesFor<typeof kind>).weight)
+}
+
+type KindInputBuilder = (ctx: EquipmentInputBuildCtx<EquipmentKind>) => CreateEquipmentInput
+
+const kindInputBuilders: Record<EquipmentKind, KindInputBuilder> = {
+  weapon: (ctx) => buildWeaponInput(ctx as EquipmentInputBuildCtx<'weapon'>),
+  armor: (ctx) => buildArmorInput(ctx as EquipmentInputBuildCtx<'armor'>),
+  adventuring_gear: (ctx) =>
+    buildAdventuringGearInput(ctx as EquipmentInputBuildCtx<'adventuring_gear'>),
+  tool: (ctx) => buildToolInput(ctx as EquipmentInputBuildCtx<'tool'>),
+  mount: (ctx) => buildMountInput(ctx as EquipmentInputBuildCtx<'mount'>),
+  vehicle: (ctx) => buildVehicleInput(ctx as EquipmentInputBuildCtx<'vehicle'>),
+  service: (ctx) => buildServiceInput(ctx as EquipmentInputBuildCtx<'service'>),
+  magic_item: (ctx) => buildMagicItemInput(ctx as EquipmentInputBuildCtx<'magic_item'>),
 }
 
 /** Maps unified equipment form values to a create/update API input. */
@@ -153,7 +166,12 @@ export function equipmentFormToInput(
   ctx?: ContentFormInputCtx<Equipment>,
 ): CreateEquipmentInput {
   const kind = ctx?.equipmentKind ?? values.kind
-  const weight = kind !== 'service' ? weightFromForm(values.weight) : undefined
-  const input = kindInputBuilders[kind]({ values: { ...values, kind }, ctx, weight })
+  const buildCtx = {
+    values: values as EquipmentFormValuesFor<typeof kind>,
+    ctx,
+    weight: equipmentInputWeight(kind, values),
+  } as EquipmentInputBuildCtx<typeof kind>
+
+  const input = kindInputBuilders[kind](buildCtx)
   return finalizeContentInput(input, ctx) as CreateEquipmentInput
 }
