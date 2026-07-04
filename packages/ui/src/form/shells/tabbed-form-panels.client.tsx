@@ -13,7 +13,9 @@ import { ArrayItemPresentationContext } from '../context/array-item-presentation
 import { useFormSectionContext } from '../context/form-section.context'
 import { makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
+import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
 import { FormActionsBar } from '../chrome/form-actions-bar'
+import { TabbedFormTabIssueBadge } from './tabbed-form-tab-issue-badge.client'
 import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
@@ -25,6 +27,11 @@ export interface TabbedFormTab {
   id: string
   label: string
   fields: FormItem[]
+  /**
+   * Extra root paths whose validation issues belong to this tab (merged with
+   * prefixes inferred from `fields`; supplements only — does not replace them).
+   */
+  errorPaths?: string[]
   /**
    * Optional non-field UI rendered above this tab's fields (intro copy, links,
    * placeholders). Omit fields for a panel that is entirely non-input content.
@@ -123,6 +130,11 @@ export function TabbedFormPanels({
 }: TabbedFormPanelsProps) {
   const { rhythm } = useFormSectionContext()
   const [activeTabId, setActiveTabId] = React.useState(tabs[0]?.id ?? '')
+  const { tabStates } = useTabbedFormTabValidationState(tabs)
+  const tabStateById = React.useMemo(
+    () => new Map(tabStates.map((state) => [state.tabId, state])),
+    [tabStates],
+  )
   const panelClassName = cn(
     fieldStackRhythmVariants({ rhythm }),
     stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
@@ -132,11 +144,15 @@ export function TabbedFormPanels({
     <Tabs value={activeTabId} onValueChange={setActiveTabId} variant="line">
       <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
         <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
+          {tabs.map((tab) => {
+            const issueCount = tabStateById.get(tab.id)?.count ?? 0
+            return (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+                <TabbedFormTabIssueBadge count={issueCount} />
+              </TabsTrigger>
+            )
+          })}
         </TabsList>
       </div>
       {tabs.map((tab) => (
