@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { loadSeedEquipment } from '@rpg/catalog/equipment'
-import { createEquipmentInputSchema } from '@rpg/contracts'
 import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
-import { equipmentFormDef, type EquipmentFormValues } from '../../lib/equipment-form-def'
+import {
+  expectComposedKindGroups,
+  expectSeedRoundTrip,
+  seedEquipmentOfKind,
+  toEquipmentFormValues,
+} from '../../lib/test-utils/equipment-form-test-utils'
 import { weaponFormFieldGroup } from './weapon-form-fields'
 import { damageToForm } from './weapon-form-values'
 
-const WEAPON_SEEDS = loadSeedEquipment('srd-cc-5.2.1').filter((item) => item.kind === 'weapon')
+const WEAPON_SEEDS = seedEquipmentOfKind('weapon')
 
 function assertWeaponGroup(item: FormItem): GroupConfig {
   if (!('kind' in item) || item.kind !== 'group') {
@@ -40,16 +43,7 @@ function damageRowFromWeaponGroup(weaponGroup: GroupConfig) {
 
 describe('weapon kindFieldGroups', () => {
   it('buildFields composes identity, economy, and registered weapon group', () => {
-    const fields = equipmentFormDef.buildFields({ equipmentKind: 'weapon' })
-    const legends = fields
-      .filter(
-        (field): field is Extract<(typeof fields)[number], { kind: 'group' }> =>
-          'kind' in field && field.kind === 'group',
-      )
-      .map((field) => field.legend)
-
-    expect(legends).toEqual(['Identity', 'Economy', 'Weapon'])
-    expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: 'Weapon' })
+    expectComposedKindGroups('weapon', 'Weapon')
   })
 
   it('uses subsection legend size on the nested Damage group', () => {
@@ -245,14 +239,12 @@ describe('damageToForm', () => {
 describe('weapon form round-trips', () => {
   for (const item of WEAPON_SEEDS) {
     it(`${item.slug}: toFormValues → toInput → schema.parse`, () => {
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
-      const input = equipmentFormDef.toInput(formValues)
-      expect(() => createEquipmentInputSchema.parse(input)).not.toThrow()
+      expectSeedRoundTrip(item)
     })
 
     it(`${item.slug}: preserves weapon fields`, () => {
       if (item.kind !== 'weapon') return
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
+      const formValues = toEquipmentFormValues(item)
       expect(formValues.category).toBe(item.category)
       expect(formValues.mode).toBe(item.mode)
       expect(formValues.mastery).toBe(item.mastery)
@@ -261,7 +253,7 @@ describe('weapon form round-trips', () => {
 
     it(`${item.slug}: preserves dice damage as damageDice`, () => {
       if (item.kind !== 'weapon' || item.damage?.kind !== 'dice') return
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
+      const formValues = toEquipmentFormValues(item)
       expect(formValues.damageDice).toEqual({
         count: item.damage.count,
         faces: item.damage.faces,
@@ -270,7 +262,7 @@ describe('weapon form round-trips', () => {
 
     it(`${item.slug}: preserves versatile damage as versatileDamage`, () => {
       if (item.kind !== 'weapon' || !item.versatileDamage) return
-      const formValues = equipmentFormDef.toFormValues(item) as EquipmentFormValues
+      const formValues = toEquipmentFormValues(item)
       expect(formValues.versatileDamage).toEqual({
         count: item.versatileDamage.count,
         faces: item.versatileDamage.faces,
@@ -281,7 +273,7 @@ describe('weapon form round-trips', () => {
   it('maps net to damageKind none', () => {
     const net = WEAPON_SEEDS.find((item) => item.slug === 'net')
     expect(net).toBeDefined()
-    const formValues = equipmentFormDef.toFormValues(net!) as EquipmentFormValues
+    const formValues = toEquipmentFormValues(net!)
     expect(formValues.damageKind).toBe('none')
   })
 })

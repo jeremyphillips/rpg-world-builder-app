@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CheckboxField } from './checkbox-field'
 
@@ -27,8 +27,7 @@ describe('CheckboxField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<CheckboxField id="homebrew" label="Allow homebrew" />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('stacks inline label and hint in the same column beside the checkbox', () => {

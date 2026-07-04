@@ -3,12 +3,17 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { getErrorMessage, registerInputSchema, type RegisterInput } from '@rpg/contracts'
+import {
+  CROSS_APP_PATHS,
+  getErrorMessage,
+  registerInputSchema,
+  type RegisterInput,
+} from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
-import { DASHBOARD_PATH, login, register } from '../api/auth-client'
+import { login, register } from '../api/auth-client'
 import { signupFields } from '../lib/auth-form-fields'
 
 export interface SignupFormProps {
@@ -27,7 +32,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       await register(values)
       // Establish a session immediately so signup lands in the dashboard.
       await login({ email: values.email, password: values.password })
-      ;(onSuccess ?? (() => window.location.assign(DASHBOARD_PATH)))()
+      ;(onSuccess ?? (() => window.location.assign(CROSS_APP_PATHS.dashboard)))()
     } catch (err) {
       setFormError(getErrorMessage(err, 'Unable to create your account. Please try again.'))
     }

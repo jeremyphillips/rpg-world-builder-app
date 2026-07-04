@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { RICH_TEXT_LINK_ATTRS } from '../../lib/rich-text-link-attrs'
 import { RichTextEditor } from './rich-text-editor.client'
@@ -94,8 +94,7 @@ describe('RichTextEditor', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RichTextEditor aria-label="Biography" />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('opens the link panel instead of using a prompt', async () => {
@@ -169,7 +168,6 @@ describe('RichTextEditor', () => {
     const { container } = render(
       <RichTextEditor aria-label="Biography" linkable internalLinkOptions={internalLinkOptions} />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

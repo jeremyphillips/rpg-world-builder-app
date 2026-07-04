@@ -1,9 +1,16 @@
+import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import userEvent, { type UserEvent } from '@testing-library/user-event'
+import {
+  FormProvider,
+  useForm,
+  useWatch,
+  type DefaultValues,
+  type FieldValues,
+} from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { z } from 'zod'
+import { z, type ZodType } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
 import { FormUnsavedChangesGuard } from './form-unsaved-changes-guard'
@@ -75,14 +82,62 @@ function BackNavigationForm() {
   )
 }
 
-function renderDirtyForm() {
+function renderFormRoute(element: ReactElement) {
   return renderWithDataRouter(
     [
-      { path: '/form', element: <DirtyForm /> },
+      { path: '/form', element },
       { path: '/away', element: <div>Away page</div> },
     ],
     { initialEntries: ['/form'] },
   )
+}
+
+function renderDirtyForm() {
+  return renderFormRoute(<DirtyForm />)
+}
+
+const guardedRichTextFields: FormItem[] = [
+  { type: 'text', name: 'name', label: 'Name', required: true },
+  { type: 'richtext', name: 'description', label: 'Description' },
+]
+
+function renderGuardedRichTextForm<TValues extends FieldValues>(
+  schema: ZodType<TValues>,
+  defaultValues: DefaultValues<TValues>,
+) {
+  return renderFormRoute(
+    <Form
+      schema={schema}
+      fields={guardedRichTextFields}
+      defaultValues={defaultValues}
+      onSubmit={() => undefined}
+      footer={() => (
+        <>
+          <FormUnsavedChangesGuard />
+          <Link to="/away">Leave</Link>
+        </>
+      )}
+    />,
+  )
+}
+
+async function awaitGuardedRichTextFormReady() {
+  await screen.findByRole('textbox', { name: 'Description' })
+  await waitFor(() => {
+    expect(screen.getByRole('link', { name: 'Leave' })).toBeInTheDocument()
+  })
+}
+
+async function editNameToChanged(user: UserEvent) {
+  await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+  await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+}
+
+async function leaveAndExpectAwayWithoutPrompt(user: UserEvent) {
+  await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+  expect(await screen.findByText('Away page')).toBeInTheDocument()
+  expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
 }
 
 describe('FormUnsavedChangesGuard', () => {
@@ -90,18 +145,14 @@ describe('FormUnsavedChangesGuard', () => {
     const user = userEvent.setup()
     renderDirtyForm()
 
-    await user.click(screen.getByRole('link', { name: 'Leave' }))
-
-    expect(await screen.findByText('Away page')).toBeInTheDocument()
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await leaveAndExpectAwayWithoutPrompt(user)
   })
 
   it('prompts before navigating away from a dirty form', async () => {
     const user = userEvent.setup()
     renderDirtyForm()
 
-    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    await editNameToChanged(user)
     await user.click(screen.getByRole('link', { name: 'Leave' }))
 
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
@@ -114,8 +165,7 @@ describe('FormUnsavedChangesGuard', () => {
     const user = userEvent.setup()
     renderDirtyForm()
 
-    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    await editNameToChanged(user)
     await user.click(screen.getByRole('link', { name: 'Leave' }))
     await user.click(await screen.findByRole('button', { name: 'Discard' }))
 
@@ -126,8 +176,7 @@ describe('FormUnsavedChangesGuard', () => {
     const user = userEvent.setup()
     renderDirtyForm()
 
-    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    await editNameToChanged(user)
     await user.click(screen.getByRole('link', { name: 'Leave' }))
     await user.click(await screen.findByRole('button', { name: 'Keep editing' }))
 
@@ -138,19 +187,10 @@ describe('FormUnsavedChangesGuard', () => {
 
   it('allows navigation when hidden unregistered fields make isDirty true without user edits', async () => {
     const user = userEvent.setup()
-    renderWithDataRouter(
-      [
-        { path: '/form', element: <ConditionalHiddenFieldForm /> },
-        { path: '/away', element: <div>Away page</div> },
-      ],
-      { initialEntries: ['/form'] },
-    )
+    renderFormRoute(<ConditionalHiddenFieldForm />)
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Original')
-    await user.click(screen.getByRole('link', { name: 'Leave' }))
-
-    expect(await screen.findByText('Away page')).toBeInTheDocument()
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await leaveAndExpectAwayWithoutPrompt(user)
   })
 
   it('allows navigation when an empty rich text description initializes without user edits', async () => {
@@ -159,44 +199,11 @@ describe('FormUnsavedChangesGuard', () => {
       name: z.string().min(1),
       description: z.string().optional(),
     })
-    const fields: FormItem[] = [
-      { type: 'text', name: 'name', label: 'Name', required: true },
-      { type: 'richtext', name: 'description', label: 'Description' },
-    ]
 
-    renderWithDataRouter(
-      [
-        {
-          path: '/form',
-          element: (
-            <Form
-              schema={schema}
-              fields={fields}
-              defaultValues={{ name: 'Test item', description: undefined }}
-              onSubmit={() => undefined}
-              footer={() => (
-                <>
-                  <FormUnsavedChangesGuard />
-                  <Link to="/away">Leave</Link>
-                </>
-              )}
-            />
-          ),
-        },
-        { path: '/away', element: <div>Away page</div> },
-      ],
-      { initialEntries: ['/form'] },
-    )
+    renderGuardedRichTextForm(schema, { name: 'Test item', description: undefined })
+    await awaitGuardedRichTextFormReady()
 
-    await screen.findByRole('textbox', { name: 'Description' })
-    await waitFor(() => {
-      expect(screen.getByRole('link', { name: 'Leave' })).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByRole('link', { name: 'Leave' }))
-
-    expect(await screen.findByText('Away page')).toBeInTheDocument()
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await leaveAndExpectAwayWithoutPrompt(user)
   })
 
   it('allows navigation when a plain-text catalog description initializes without user edits', async () => {
@@ -206,48 +213,14 @@ describe('FormUnsavedChangesGuard', () => {
       slug: z.string().optional(),
       description: z.string().optional(),
     })
-    const fields: FormItem[] = [
-      { type: 'text', name: 'name', label: 'Name', required: true },
-      { type: 'richtext', name: 'description', label: 'Description' },
-    ]
 
-    renderWithDataRouter(
-      [
-        {
-          path: '/form',
-          element: (
-            <Form
-              schema={schema}
-              fields={fields}
-              defaultValues={{
-                name: 'Athletics',
-                description:
-                  'Jump farther than normal, stay afloat in rough water, or break something.',
-              }}
-              onSubmit={() => undefined}
-              footer={() => (
-                <>
-                  <FormUnsavedChangesGuard />
-                  <Link to="/away">Leave</Link>
-                </>
-              )}
-            />
-          ),
-        },
-        { path: '/away', element: <div>Away page</div> },
-      ],
-      { initialEntries: ['/form'] },
-    )
-
-    await screen.findByRole('textbox', { name: 'Description' })
-    await waitFor(() => {
-      expect(screen.getByRole('link', { name: 'Leave' })).toBeInTheDocument()
+    renderGuardedRichTextForm(schema, {
+      name: 'Athletics',
+      description: 'Jump farther than normal, stay afloat in rough water, or break something.',
     })
+    await awaitGuardedRichTextFormReady()
 
-    await user.click(screen.getByRole('link', { name: 'Leave' }))
-
-    expect(await screen.findByText('Away page')).toBeInTheDocument()
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await leaveAndExpectAwayWithoutPrompt(user)
   })
 
   it('continues POP back navigation when the user confirms discard', async () => {
@@ -260,8 +233,7 @@ describe('FormUnsavedChangesGuard', () => {
       { initialEntries: ['/start', '/form'], initialIndex: 1 },
     )
 
-    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    await editNameToChanged(user)
     await user.click(screen.getByRole('button', { name: 'Back' }))
     await user.click(await screen.findByRole('button', { name: 'Discard' }))
 

@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../../lib/master-detail/master-detail-constants'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 describe('MasterDetailValidationBanner', () => {
   it('renders nothing when not visible', () => {
@@ -20,7 +18,6 @@ describe('MasterDetailValidationBanner', () => {
 
   it('has no axe accessibility violations when visible', async () => {
     const { container } = render(<MasterDetailValidationBanner visible />)
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 
 vi.mock('./content-client', () => ({
   createContent: vi.fn(),
   updateContent: vi.fn(),
 }))
 
+import { makeTestQueryClient } from '@/test/render'
 import { createContent, updateContent } from './content-client'
 import {
   createContentMutationHooks,
@@ -19,7 +20,7 @@ const mockCreateContent = vi.mocked(createContent)
 const mockUpdateContent = vi.mocked(updateContent)
 
 function makeTestWrapper() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const queryClient = makeTestQueryClient()
   const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
   function Wrapper({ children }: { children: ReactNode }) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -29,7 +30,7 @@ function makeTestWrapper() {
 
 describe('invalidateContentWriteQueries', () => {
   it('invalidates the primary list key and any extras', () => {
-    const queryClient = new QueryClient()
+    const queryClient = makeTestQueryClient()
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
     const primaryKey = (id: string) => ['campaigns', id, 'content', 'classes'] as const
     const extraKey = (id: string) => ['campaigns', id, 'content', 'skill-proficiencies'] as const

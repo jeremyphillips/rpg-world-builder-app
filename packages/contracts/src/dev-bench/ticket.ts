@@ -17,6 +17,7 @@ export const TICKET_TYPES = [
   'chore',
   'research',
   'design',
+  'enhancement',
 ] as const
 
 export const ticketTypeSchema = z.enum(TICKET_TYPES)
@@ -31,6 +32,7 @@ export const TICKET_TYPE_LABELS: Record<TicketType, string> = {
   chore: 'Chore',
   research: 'Research',
   design: 'Design',
+  enhancement: 'Enhancement',
 }
 
 export function getTicketTypeLabel(type: string): string {

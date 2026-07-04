@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-// TODO: install axe-core in apps/dashboard (it lives in packages/ui only)
-// import axe from 'axe-core'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { QueryClientProvider } from '@tanstack/react-query'
 
 import { renderWithDataRouter } from '@/lib/test-router'
+import { makeTestQueryClient } from '@/test/render'
 
 vi.mock('@/features/user/api/user-client')
 
@@ -15,9 +15,7 @@ import { ChangePasswordSection } from './change-password-section'
 const changePassword = vi.mocked(changePasswordFn)
 
 function renderSection() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  })
+  const queryClient = makeTestQueryClient()
   return renderWithDataRouter([
     {
       path: '/',
@@ -100,10 +98,8 @@ describe('ChangePasswordSection', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Current password is incorrect')
   })
 
-  // TODO: enable once axe-core is added to apps/dashboard devDependencies
-  // it('has no axe accessibility violations', async () => {
-  //   const { container } = renderSection()
-  //   const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-  //   expect(results.violations).toEqual([])
-  // })
+  it('has no axe accessibility violations', async () => {
+    const { container } = renderSection()
+    await expectNoAxeViolations(container)
+  })
 })

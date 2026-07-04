@@ -1,7 +1,7 @@
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { TextField } from './text-field'
 
@@ -48,7 +48,6 @@ describe('TextField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<TextField id="email" label="Email" type="email" />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

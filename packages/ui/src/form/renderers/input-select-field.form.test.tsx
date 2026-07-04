@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 
 const costSchema = z.object({
   cost: z.object({
@@ -52,9 +53,7 @@ describe('Form inputSelect field', () => {
     ]
 
     renderInputSelectForm(fields, onSubmit)
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ cost: { amount: 15, currency: 'gp' } })
+    await submitAndExpectPayload(user, onSubmit, { cost: { amount: 15, currency: 'gp' } })
   })
 
   it('round-trips value and unit edits through submit', async () => {
@@ -85,9 +84,7 @@ describe('Form inputSelect field', () => {
     await user.clear(input)
     await user.type(input, '25')
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ cost: { amount: 25, currency: 'gp' } })
+    await submitAndExpectPayload(user, onSubmit, { cost: { amount: 25, currency: 'gp' } })
   })
 
   it('resolves valueDigits from a watched kind field', () => {
@@ -227,9 +224,7 @@ describe('Form inputSelect field', () => {
     await user.clear(input)
     await user.type(input, '12')
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ weight: { value: 12, unit: 'lb' } })
+    await submitAndExpectPayload(user, onSubmit, { weight: { value: 12, unit: 'lb' } })
   })
 
   it('stores plain numbers while displaying grouped cost values', async () => {
@@ -256,9 +251,7 @@ describe('Form inputSelect field', () => {
     await user.type(input, '3000')
     expect(input).toHaveValue('3,000')
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ cost: { amount: 3000, currency: 'gp' } })
+    await submitAndExpectPayload(user, onSubmit, { cost: { amount: 3000, currency: 'gp' } })
   })
 
   it('seeds value and unit defaults when a conditional inputSelect becomes visible', async () => {

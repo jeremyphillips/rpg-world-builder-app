@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { Text } from '@rpg/ui'
 
 import { PageLoadState } from './page-load-state'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 describe('PageLoadState', () => {
   it('renders a loading spinner', () => {
@@ -42,7 +40,6 @@ describe('PageLoadState', () => {
         <Text>Ready content</Text>
       </PageLoadState>,
     )
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

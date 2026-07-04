@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { NumberField } from './number-field'
 
@@ -24,8 +24,7 @@ describe('NumberField', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<NumberField id="count" label="Count" />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('renders a settings-row layout when labelPosition is settings', () => {
@@ -54,7 +53,6 @@ describe('NumberField', () => {
         digits={2}
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

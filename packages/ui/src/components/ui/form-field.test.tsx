@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { FormField } from './form-field'
 
@@ -64,7 +64,10 @@ describe('FormField', () => {
     const label = screen.getByText('Minimum ability score')
     const hint = screen.getByText('Applied to every primary ability.')
     expect(label.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(hint.compareDocumentPosition(screen.getByTestId('control')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      hint.compareDocumentPosition(screen.getByTestId('control')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('has no axe accessibility violations with settings layout', async () => {
@@ -78,8 +81,7 @@ describe('FormField', () => {
         <input id="score" />
       </FormField>,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('prefers the error over the hint', () => {
@@ -98,7 +100,6 @@ describe('FormField', () => {
         <input id="name" />
       </FormField>,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

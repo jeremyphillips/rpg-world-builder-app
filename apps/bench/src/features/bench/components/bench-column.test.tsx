@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 import { DndContext } from '@dnd-kit/core'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { upNextTicket } from '../test-fixtures'
@@ -50,7 +50,6 @@ describe('BenchColumn', () => {
       onMoveTicket: () => undefined,
     })
 
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

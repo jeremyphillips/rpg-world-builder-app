@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import { Form } from './form.client'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -54,9 +55,7 @@ describe('Form', () => {
     const onSubmit = vi.fn()
     renderForm(onSubmit)
     await user.type(screen.getByLabelText('Name'), 'Tasha')
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ name: 'Tasha', hasNickname: false })
+    await submitAndExpectPayload(user, onSubmit, { name: 'Tasha', hasNickname: false })
   })
 
   it('blocks submit and shows the message when a visible field is invalid', async () => {
@@ -90,8 +89,7 @@ describe('Form', () => {
       />,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('uses sm control scale when rhythm is compact', () => {
@@ -199,9 +197,7 @@ describe('Form', () => {
     )
 
     await user.type(screen.getByLabelText('Name'), 'Tasha')
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ name: 'Tasha', hasExtra: false })
+    await submitAndExpectPayload(user, onSubmit, { name: 'Tasha', hasExtra: false })
   })
 
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {

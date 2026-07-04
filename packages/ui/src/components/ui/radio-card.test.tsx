@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { RadioCard } from './radio-card.client'
 
@@ -54,8 +54,7 @@ describe('RadioCard', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RadioCard aria-label="Edition preset" options={options} />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('selects an option when controlPosition is right', async () => {

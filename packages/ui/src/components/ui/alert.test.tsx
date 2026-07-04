@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { Button } from './button.client'
@@ -51,9 +51,6 @@ describe('Alert', () => {
         actions={<Button size="sm">Enable subclasses</Button>}
       />,
     )
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

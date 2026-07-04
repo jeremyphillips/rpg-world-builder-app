@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
 import { ChipsField } from './chips-field.client'
@@ -287,8 +287,7 @@ describe('ChipsField', () => {
         value={['dungeon_crawl']}
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no accessibility violations (single)', async () => {
@@ -301,8 +300,7 @@ describe('ChipsField', () => {
         value="casual"
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no accessibility violations when required and in error state', async () => {
@@ -317,7 +315,6 @@ describe('ChipsField', () => {
         error="Select at least one."
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

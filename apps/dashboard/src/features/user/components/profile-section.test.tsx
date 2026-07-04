@@ -1,10 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-// TODO: install axe-core in apps/dashboard (it lives in packages/ui only)
-// import axe from 'axe-core'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { AuthMeResponse, SessionUser } from '@rpg/contracts'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { QueryClientProvider } from '@tanstack/react-query'
+import type { SessionUser } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
 
@@ -14,28 +13,21 @@ vi.mock('@/features/user/api/user-client')
 import { useSession as useSessionFn } from '@/features/auth'
 import { updateProfile as updateProfileFn } from '@/features/user/api/user-client'
 import * as apiClient from '@/lib/api-client'
+import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
+import { makeTestQueryClient } from '@/test/render'
 import { ProfileSection } from './profile-section'
 
 const useSession = vi.mocked(useSessionFn)
 const updateProfile = vi.mocked(updateProfileFn)
 
 function mockSession(data: SessionUser) {
-  const session: AuthMeResponse = { user: data, activeCampaign: null }
-  useSession.mockReturnValue({ data: session } as ReturnType<typeof useSessionFn>)
+  useSession.mockReturnValue({ data: makeAuthMe(data) } as ReturnType<typeof useSessionFn>)
 }
 
-const session: SessionUser = {
-  id: 'u1',
-  email: 'dm@example.com',
-  displayName: 'Dungeon Master',
-  role: 'user',
-  lastSelectedCampaignId: null,
-}
+const session = makeSessionUser()
 
 function renderSection() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  })
+  const queryClient = makeTestQueryClient()
   return renderWithDataRouter([
     {
       path: '/',
@@ -131,11 +123,9 @@ describe('ProfileSection', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email already in use')
   })
 
-  // TODO: enable once axe-core is added to apps/dashboard devDependencies
-  // it('has no axe accessibility violations', async () => {
-  //   const { container } = renderSection()
-  //   await screen.findByDisplayValue('Dungeon Master')
-  //   const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-  //   expect(results.violations).toEqual([])
-  // })
+  it('has no axe accessibility violations', async () => {
+    const { container } = renderSection()
+    await screen.findByDisplayValue('Dungeon Master')
+    await expectNoAxeViolations(container)
+  })
 })

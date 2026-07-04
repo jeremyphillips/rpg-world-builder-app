@@ -1,10 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { FeatureItem } from './feature-item'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 function renderFeatureItem(feature: Parameters<typeof FeatureItem>[0]['feature']) {
   return render(
@@ -60,8 +58,7 @@ describe('FeatureItem', () => {
       name: 'Bonus Proficiencies',
       description: '<p>You gain proficiency with three skills of your choice.</p>',
     })
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe accessibility violations for a multi-paragraph feature', async () => {
@@ -71,8 +68,7 @@ describe('FeatureItem', () => {
       description:
         '<p>You have learned to cast spells through your bardic arts.</p><p><strong>Cantrips.</strong> You know two cantrips.</p>',
     })
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe accessibility violations for a heading-only feature', async () => {
@@ -80,7 +76,6 @@ describe('FeatureItem', () => {
       level: 19,
       name: 'Epic Boon',
     })
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

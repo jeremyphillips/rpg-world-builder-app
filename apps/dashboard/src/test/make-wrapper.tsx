@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
+
+import { makeTestQueryClient } from './render'
 
 /**
  * Creates a fresh QueryClient wrapper for each test.
@@ -9,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
  * const { result } = renderHook(() => useMyHook(), { wrapper: makeQueryWrapper() })
  */
 export function makeQueryWrapper() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const queryClient = makeTestQueryClient()
   return function Wrapper({ children }: { children: ReactNode }) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   }

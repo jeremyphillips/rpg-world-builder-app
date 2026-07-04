@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import {
@@ -11,6 +11,7 @@ import {
   type FormItem,
 } from '../field-config'
 import { Form } from '../shells/form.client'
+import { submitAndExpectPayload } from '../test-utils'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -82,10 +83,7 @@ describe('Form combobox field', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Weapon proficiencies' }))
     await user.click(screen.getByRole('option', { name: 'Dagger' }))
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ weapons: ['dagger'] })
+    await submitAndExpectPayload(user, onSubmit, { weapons: ['dagger'] })
   })
 
   it('has no axe violations when rendered through the form renderer', async () => {
@@ -97,7 +95,6 @@ describe('Form combobox field', () => {
         footer={<button type="submit">Save</button>}
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

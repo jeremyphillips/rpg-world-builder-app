@@ -12,3 +12,4 @@ export {
   type ValidationIssue,
 } from './form-validation-test-utils'
 export { collectSchemaLeafPaths } from './collect-schema-paths.lib'
+export { submitAndExpectPayload, type SubmitAndExpectPayloadOptions } from './submit-test-utils'

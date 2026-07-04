@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   CREATURE_TYPE_SET_ID,
@@ -11,6 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
+import { makeTestQueryClient } from '@/test/render'
 
 import { buildAttackResolutionModeVocabulary } from '../lib/vocabulary/sets/attack-resolution-modes'
 import { buildCreatureTypeVocabulary } from '../lib/vocabulary/sets/creature-types'
@@ -161,12 +162,7 @@ function mockResolvedRulesData() {
 }
 
 function renderDetail(configId = 'character-configuration', campaignId = 'camp_1') {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  })
+  const queryClient = makeTestQueryClient()
 
   return renderWithDataRouter(
     [
@@ -227,7 +223,7 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   it('shows an unknown state for invalid config ids', () => {
     renderDetail('missing')
 
-    expect(screen.getByText('This rules configuration page is not available.')).toBeInTheDocument()
+    expect(screen.getByText(/not available/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to Homebrew' })).toBeInTheDocument()
   })
 
@@ -239,8 +235,6 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
     })
-    expect(
-      screen.getByText('You can view these rules but only campaign owners can edit them.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/only campaign owners can edit/i)).toBeInTheDocument()
   })
 })

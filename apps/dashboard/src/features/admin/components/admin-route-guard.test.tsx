@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { Route, Routes } from 'react-router-dom'
 
 vi.mock('@/features/auth', () => ({
   useSession: vi.fn(),
@@ -9,26 +8,21 @@ vi.mock('@/features/auth', () => ({
 }))
 
 import { useSession, useIsElevatedPlatformRole } from '@/features/auth'
+import { renderWithProviders } from '@/test/render'
 import { AdminRouteGuard } from './admin-route-guard'
 
 const mockUseSession = vi.mocked(useSession)
 const mockUseIsElevatedPlatformRole = vi.mocked(useIsElevatedPlatformRole)
 
 function renderGuard(initialEntry = '/admin/users') {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[initialEntry]}>
-        <Routes>
-          <Route path="/" element={<div>home</div>} />
-          <Route path="/admin" element={<AdminRouteGuard />}>
-            <Route path="users" element={<div>admin users</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/" element={<div>home</div>} />
+      <Route path="/admin" element={<AdminRouteGuard />}>
+        <Route path="users" element={<div>admin users</div>} />
+      </Route>
+    </Routes>,
+    { initialEntries: [initialEntry] },
   )
 }
 

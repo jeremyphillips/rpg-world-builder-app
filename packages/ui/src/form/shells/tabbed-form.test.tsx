@@ -1,11 +1,12 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
   formStickyTabsTransparentClasses,
@@ -107,9 +108,12 @@ describe('TabbedForm', () => {
       />,
     )
     await user.type(screen.getByRole('textbox', { name: /Campaign name/i }), 'The Sunless Citadel')
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ name: 'The Sunless Citadel' })
+    await submitAndExpectPayload(
+      user,
+      onSubmit,
+      { name: 'The Sunless Citadel' },
+      { match: 'object' },
+    )
   })
 
   it('renders tab header content above fields', async () => {
@@ -328,7 +332,6 @@ describe('TabbedForm', () => {
         footer={<button type="submit">Save</button>}
       />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

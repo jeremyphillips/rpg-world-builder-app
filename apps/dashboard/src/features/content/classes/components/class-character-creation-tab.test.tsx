@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
@@ -9,8 +9,6 @@ import { pickClass } from '../../lib/fixtures/pick'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 function TabShell({
   startingEquipment,
@@ -147,8 +145,7 @@ describe('ClassCharacterCreationTab', () => {
 
   it('has no axe accessibility violations in the empty state', async () => {
     const { container } = render(<TabShell />)
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe accessibility violations with monk starting equipment', async () => {
@@ -163,8 +160,7 @@ describe('ClassCharacterCreationTab', () => {
         }}
       />,
     )
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe accessibility violations with bard starting equipment', async () => {
@@ -181,7 +177,6 @@ describe('ClassCharacterCreationTab', () => {
         }}
       />,
     )
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

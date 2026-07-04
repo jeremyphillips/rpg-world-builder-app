@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { BacklogTicketCard } from './backlog-ticket-card'
 import { sampleTicket } from '../test-fixtures'
@@ -24,7 +24,6 @@ describe('BacklogTicketCard', () => {
     const { container } = renderWithQuery(
       <BacklogTicketCard ticket={sampleTicket} onSelect={vi.fn()} />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

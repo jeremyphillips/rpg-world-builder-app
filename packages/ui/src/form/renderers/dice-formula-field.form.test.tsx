@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 import {
   DEFAULT_DICE_FORMULA_VALUE,
   DEFAULT_DICE_FORMULA_WITH_MODIFIER,
@@ -48,9 +49,7 @@ describe('Form diceFormula field', () => {
     ]
 
     renderDiceFormulaForm(fields, onSubmit)
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ roll: DEFAULT_DICE_FORMULA_VALUE })
+    await submitAndExpectPayload(user, onSubmit, { roll: DEFAULT_DICE_FORMULA_VALUE })
   })
 
   it('submits required-mode defaults as 1d6+1', async () => {
@@ -66,9 +65,7 @@ describe('Form diceFormula field', () => {
     ]
 
     renderDiceFormulaForm(fields, onSubmit)
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ roll: DEFAULT_DICE_FORMULA_WITH_MODIFIER })
+    await submitAndExpectPayload(user, onSubmit, { roll: DEFAULT_DICE_FORMULA_WITH_MODIFIER })
   })
 
   it('round-trips optional modifier add/remove through submit', async () => {
@@ -86,15 +83,11 @@ describe('Form diceFormula field', () => {
     renderDiceFormulaForm(fields, onSubmit)
 
     await user.click(screen.getByRole('button', { name: 'Add modifier' }))
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({
+    await submitAndExpectPayload(user, onSubmit, {
       roll: { count: 1, faces: 6, modifier: { operator: '+', amount: 1 } },
     })
 
     await user.click(screen.getByRole('button', { name: 'Remove modifier' }))
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(2))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ roll: DEFAULT_DICE_FORMULA_VALUE })
+    await submitAndExpectPayload(user, onSubmit, { roll: DEFAULT_DICE_FORMULA_VALUE }, { times: 2 })
   })
 })

@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ResolvedVocabularyOptionSet } from '@rpg/contracts'
 
 vi.mock('@/features/campaign', () => ({
@@ -11,6 +9,7 @@ vi.mock('@/features/campaign', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { makeTestQueryClient, renderWithProviders } from '@/test/render'
 import { VocabularyDetailContent } from './vocabulary-detail-content'
 
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
@@ -37,16 +36,12 @@ const mockSet: ResolvedVocabularyOptionSet = {
 }
 
 function renderDetail(setId = 'creature-types', campaignId = 'camp_1') {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const queryClient = makeTestQueryClient()
   queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', setId], mockSet)
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <VocabularyDetailContent campaignId={campaignId} setId={setId} />
-      </MemoryRouter>
-    </QueryClientProvider>,
-  )
+  return renderWithProviders(<VocabularyDetailContent campaignId={campaignId} setId={setId} />, {
+    queryClient,
+  })
 }
 
 describe('VocabularyDetailContent', () => {
