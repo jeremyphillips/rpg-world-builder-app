@@ -75,8 +75,10 @@ field labels instead of Zod defaults.
 Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
 badges and the footer summary; `resolverFields` drives inline message copy.
 
-Dashboard helpers: `prefixFormItems` and `embeddedArrayResolverField` in
-`tabbed-form-resolver-fields.ts`.
+Dashboard helpers: `prefixFormItems`, `embeddedArrayResolverField`, and
+`embeddedMasterDetailTabValidation` in `tabbed-form-resolver-fields.ts` (dashboard).
+Dev-only warnings fire when header-only tabs omit wiring; set
+`skipHeaderOnlyValidationWiring` on non-form chrome tabs.
 
 ## Field anatomy & the a11y contract
 

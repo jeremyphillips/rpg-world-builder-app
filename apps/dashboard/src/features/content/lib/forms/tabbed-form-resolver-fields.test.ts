@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { embeddedArrayResolverField, prefixFormItems } from './tabbed-form-resolver-fields'
+import {
+  embeddedArrayResolverField,
+  embeddedMasterDetailTabValidation,
+  prefixFormItems,
+} from './tabbed-form-resolver-fields'
 
 describe('prefixFormItems', () => {
   it('prefixes leaf fields and nested dotted names', () => {
@@ -53,5 +57,38 @@ describe('embeddedArrayResolverField', () => {
       name: 'traits',
       legend: 'Traits',
     })
+  })
+})
+
+describe('embeddedMasterDetailTabValidation', () => {
+  const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]
+
+  it('returns paired errorPaths and resolverFields for a master-detail array', () => {
+    expect(
+      embeddedMasterDetailTabValidation({
+        path: 'traits',
+        legend: 'Traits',
+        fields: itemFields,
+      }),
+    ).toEqual({
+      errorPaths: ['traits'],
+      resolverFields: [
+        {
+          kind: 'array',
+          name: 'traits',
+          legend: 'Traits',
+          fields: itemFields,
+        },
+      ],
+    })
+  })
+
+  it('defaults legend from itemLabel then path', () => {
+    const wiring = embeddedMasterDetailTabValidation({
+      path: 'traits',
+      itemLabel: 'Trait',
+      fields: itemFields,
+    })
+    expect(wiring.resolverFields[0]).toMatchObject({ legend: 'Trait' })
   })
 })

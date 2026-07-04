@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import type { ZodType } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
 import { costToFormDefaults } from '../../lib/forms/fields/content-economy-form-fields'
@@ -14,7 +14,7 @@ import { equipmentFormToInput, equipmentToFormValues } from './equipment-form-va
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
   routeKey: 'equipment',
-  schema: equipmentFormSchema as z.ZodType<EquipmentFormValues>,
+  schema: equipmentFormSchema as ZodType<EquipmentFormValues>,
   resolveSchema: resolveEquipmentFormSchema,
   coverage: 'roundtrip-only',
   createDefaultValues: {

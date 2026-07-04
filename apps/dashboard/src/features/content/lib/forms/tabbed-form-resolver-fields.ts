@@ -1,4 +1,4 @@
-import { isContainer, type FormItem } from '@rpg/ui/form'
+import { isContainer, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 function joinFieldPath(prefix: string, name: string): string {
   return prefix ? `${prefix}.${name}` : name
@@ -50,5 +50,31 @@ export function embeddedArrayResolverField(
     name,
     legend,
     fields: [...itemFields],
+  }
+}
+
+export type EmbeddedMasterDetailTabValidationConfig = {
+  /** Root RHF path — used for `errorPaths` and the resolver array `name`. */
+  path: string
+  /** Tier-1 array legend for validation copy (defaults to `itemLabel`, then `path`). */
+  legend?: string
+  /** Singular item label; used as legend fallback when `legend` is omitted. */
+  itemLabel?: string
+  fields: readonly FormItem[]
+}
+
+/**
+ * Returns paired `errorPaths` + `resolverFields` for embedded master-detail tabs.
+ * Spread onto a `TabbedFormTab` alongside `fields: []` and a `header` editor.
+ */
+export function embeddedMasterDetailTabValidation(
+  config: EmbeddedMasterDetailTabValidationConfig,
+): Required<Pick<TabbedFormTab, 'errorPaths' | 'resolverFields'>> {
+  const { path, fields } = config
+  const legend = config.legend ?? config.itemLabel ?? path
+
+  return {
+    errorPaths: [path],
+    resolverFields: [embeddedArrayResolverField(path, legend, fields)],
   }
 }

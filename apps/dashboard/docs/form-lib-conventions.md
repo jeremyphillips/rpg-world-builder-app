@@ -64,10 +64,35 @@ Public auth: `apps/public/src/features/auth/lib/auth-form-validation.test.ts`.
 Out-of-scope deferrals (non-form schemas, future i18n/API seams)
 → [validation-messages.md](../../../../packages/contracts/docs/validation-messages.md#deferred-gap-list).
 
-Header-only `TabbedForm` tabs (`fields: []` + `header` master-detail editors) must set
-`errorPaths` for tab badges/summary and `resolverFields` for tier-1 validation copy — see
-[forms.md § errorPaths](../../../packages/ui/docs/forms.md#errorpaths-for-header-only-tabs)
-and [forms.md § resolverFields](../../../packages/ui/docs/forms.md#resolverfields-for-validation-message-copy).
+### TabbedForm header-only tabs
+
+Header-only tabs (`fields: []` + `header` master-detail editors) must wire validation
+for tab badges, footer summary, and tier-1 message copy:
+
+- **`errorPaths`** — RHF root paths owned by the tab (tab badges + footer summary).
+  See [forms.md § errorPaths](../../../packages/ui/docs/forms.md#errorpaths-for-header-only-tabs).
+- **`resolverFields`** — matching `FormItem` configs with full RHF paths (not
+  rendered). See
+  [forms.md § resolverFields](../../../packages/ui/docs/forms.md#resolverfields-for-validation-message-copy).
+
+**Pairing rule:** declare both on every header-only tab that edits embedded form
+paths. `errorPaths` drives tab UX; `resolverFields` drives validation message copy.
+
+**Dashboard helpers** (`tabbed-form-resolver-fields.ts`):
+
+- `embeddedMasterDetailTabValidation({ path, legend, fields })` — returns paired
+  `errorPaths` + `resolverFields` for a single embedded array (copy/paste onto the tab).
+- `prefixFormItems(items, prefix)` — prefix scalar/nested resolver fields (e.g.
+  `heritage.name`).
+- `embeddedArrayResolverField(name, legend, itemFields)` — resolver-only array config.
+
+**Reference implementations:** `buildSpeciesTabs` and `buildClassTabs` in
+`species-form-fields.ts` / `class-form-fields.ts`. Non-form chrome tabs (e.g. class
+subclasses management) set `skipHeaderOnlyValidationWiring: true`.
+
+**Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in
+`tabbed-form-validation-test-utils.ts` — used by `content-form-validation.test.ts`
+and co-located form tests.
 
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses
