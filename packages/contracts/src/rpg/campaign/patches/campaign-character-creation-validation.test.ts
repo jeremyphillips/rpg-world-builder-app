@@ -82,7 +82,7 @@ describe('updateCampaignCharacterCreationInputSchema', () => {
       },
       expected: {
         path: ['startingLevel'],
-        message: 'Starting level cannot exceed max character level',
+        message: levelValidationMessages.startingLevelExceedsMax(),
       },
     },
     {
@@ -96,7 +96,7 @@ describe('updateCampaignCharacterCreationInputSchema', () => {
       },
       expected: {
         path: ['startingLevel'],
-        message: 'Starting level cannot exceed max character level',
+        message: levelValidationMessages.startingLevelExceedsMax(),
       },
     },
     {

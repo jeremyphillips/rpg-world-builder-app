@@ -4,6 +4,7 @@ import { gearKindSchema } from '../../vocab/equipment/gear-kind'
 import { holySymbolUsageSchema } from '../../vocab/equipment/holy-symbol-usage'
 import { slugSchema } from '../lib/envelope'
 import type { EquipmentBaseFields } from './base'
+import { equipmentVariantValidationMessages } from './equipment-variant-messages'
 
 /** Kind-specific fields for `kind: adventuring_gear`. Spread onto {@link EquipmentBaseFields}. */
 export const adventuringGearEquipmentKindFields = {
@@ -37,14 +38,14 @@ export function refineAdventuringGearEquipment(
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['holySymbolUsage'],
-        message: '`holySymbolUsage` is required when gearKind is holy_symbol',
+        message: equipmentVariantValidationMessages.holySymbolUsageRequired(),
       })
     }
   } else if (val.holySymbolUsage !== undefined) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['holySymbolUsage'],
-      message: '`holySymbolUsage` is only allowed when gearKind is holy_symbol',
+      message: equipmentVariantValidationMessages.holySymbolUsageForbidden(),
     })
   }
 
@@ -56,7 +57,7 @@ export function refineAdventuringGearEquipment(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['alsoWeaponSlug'],
-      message: '`alsoWeaponSlug` is only allowed on arcane or druidic focus gear',
+      message: equipmentVariantValidationMessages.alsoWeaponSlugForbidden(),
     })
   }
 }

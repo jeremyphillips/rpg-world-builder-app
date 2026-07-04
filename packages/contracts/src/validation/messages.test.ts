@@ -151,6 +151,54 @@ describe('fieldValidationMessages', () => {
       formatFieldMessage(fieldValidationMessages.duplicateItem({ itemLabel: 'class' })),
       'This class is already used.',
     ],
+    [
+      'invalidEmail',
+      formatFieldMessage(fieldValidationMessages.invalidEmail()),
+      'Enter a valid email address.',
+    ],
+    ['invalidUrl', formatFieldMessage(fieldValidationMessages.invalidUrl()), 'Enter a valid URL.'],
+    [
+      'invalidFormat',
+      formatFieldMessage(fieldValidationMessages.invalidFormat({ label: 'Slug' })),
+      'Slug has an invalid format.',
+    ],
+    [
+      'invalidSlug',
+      formatFieldMessage(fieldValidationMessages.invalidSlug()),
+      'Use lowercase letters, numbers, and hyphens only.',
+    ],
+    [
+      'invalidValue',
+      formatFieldMessage(fieldValidationMessages.invalidValue({ label: 'Mode' })),
+      'Mode has an invalid value.',
+    ],
+    [
+      'incompleteUnionOption',
+      formatFieldMessage(fieldValidationMessages.incompleteUnionOption()),
+      'Complete the required fields for this option.',
+    ],
+    [
+      'exactItemsCount',
+      formatFieldMessage(
+        fieldValidationMessages.exactItemsCount({ itemsLabel: 'wealth tiers', count: 3 }),
+      ),
+      'Add exactly 3 wealth tiers.',
+    ],
+    [
+      'tooSmallGeneric',
+      formatFieldMessage(fieldValidationMessages.tooSmallGeneric({ label: 'Date' })),
+      'Date is too small.',
+    ],
+    [
+      'tooBigGeneric',
+      formatFieldMessage(fieldValidationMessages.tooBigGeneric({ label: 'Date' })),
+      'Date is too large.',
+    ],
+    [
+      'invalidField',
+      formatFieldMessage(fieldValidationMessages.invalidField({ label: 'Notes' })),
+      'Notes is invalid.',
+    ],
   ])('%s formats the boilerplate copy', (_name, actual, expected) => {
     expect(actual).toBe(expected)
   })

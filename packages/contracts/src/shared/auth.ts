@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
+import { authValidationMessages } from './auth-messages'
+
 /** Shared password policy for auth inputs. Tighten (complexity) later if needed. */
-export const passwordSchema = z.string().min(8).max(128)
+export const passwordSchema = z
+  .string()
+  .min(8, authValidationMessages.passwordMinLength({ min: 8 }))
+  .max(128, authValidationMessages.passwordMaxLength({ max: 128 }))
 
 export const loginInputSchema = z.object({
   email: z.email(),

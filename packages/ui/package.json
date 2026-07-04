@@ -19,6 +19,10 @@
       "types": "./src/form/index.ts",
       "default": "./src/form/index.ts"
     },
+    "./form/test-utils": {
+      "types": "./src/form/test-utils/index.ts",
+      "default": "./src/form/test-utils/index.ts"
+    },
     "./storybook/with-theme-context": {
       "types": "./src/storybook/with-theme-context.tsx",
       "default": "./src/storybook/with-theme-context.tsx"

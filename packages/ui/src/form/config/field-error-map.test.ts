@@ -6,7 +6,7 @@ import { formatFieldMessage } from '@rpg/contracts'
 import { makeFieldErrorMap } from './field-error-map'
 import type { FormItem } from '../field-config'
 
-const fields: FormItem[] = [
+const testFields: FormItem[] = [
   { type: 'text', name: 'name', label: 'Name', required: true },
   { type: 'number', name: 'quantity', label: 'Quantity', min: 1 },
   { type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true },
@@ -36,7 +36,13 @@ const fields: FormItem[] = [
   },
 ]
 
-function messageFor(schema: z.ZodType, value: unknown, path?: (string | number)[]): string {
+function messageFor(
+  schema: z.ZodType,
+  value: unknown,
+  options?: { path?: (string | number)[]; fields?: FormItem[] },
+): string {
+  const fields = options?.fields ?? testFields
+  const path = options?.path
   const result = schema.safeParse(value, { error: makeFieldErrorMap(fields) })
   if (result.success) throw new Error('expected parse failure')
   const issue = path
@@ -108,11 +114,15 @@ describe('makeFieldErrorMap', () => {
       tiers: z.array(z.object({ label: z.string().min(1), minLevel: z.number().min(1) })),
     })
 
-    expect(messageFor(schema, { tiers: [{ label: '', minLevel: 1 }] }, ['tiers', 0, 'label'])).toBe(
-      'Tier label is required.',
-    )
     expect(
-      messageFor(schema, { tiers: [{ label: 'A', minLevel: 0 }] }, ['tiers', 0, 'minLevel']),
+      messageFor(schema, { tiers: [{ label: '', minLevel: 1 }] }, { path: ['tiers', 0, 'label'] }),
+    ).toBe('Tier label is required.')
+    expect(
+      messageFor(
+        schema,
+        { tiers: [{ label: 'A', minLevel: 0 }] },
+        { path: ['tiers', 0, 'minLevel'] },
+      ),
     ).toBe('Level range must be at least 1.')
   })
 
@@ -122,12 +132,13 @@ describe('makeFieldErrorMap', () => {
     })
 
     expect(
-      messageFor(schema, { tiers: [{ bonusGold: { baseGp: -1 } }] }, [
-        'tiers',
-        0,
-        'bonusGold',
-        'baseGp',
-      ]),
+      messageFor(
+        schema,
+        { tiers: [{ bonusGold: { baseGp: -1 } }] },
+        {
+          path: ['tiers', 0, 'bonusGold', 'baseGp'],
+        },
+      ),
     ).toBe('Base must be at least 0.')
   })
 
@@ -137,6 +148,56 @@ describe('makeFieldErrorMap', () => {
     })
 
     expect(messageFor(schema, { quantity: 3 })).toBe('Domain rule message')
+  })
+
+  it('formats invalid email via invalid_format', () => {
+    const emailFields: FormItem[] = [{ type: 'text', name: 'email', label: 'Email' }]
+    const schema = z.object({ email: z.email() })
+
+    expect(messageFor(schema, { email: 'bad' }, { fields: emailFields, path: ['email'] })).toBe(
+      'Enter a valid email address.',
+    )
+  })
+
+  it('formats slug regex via invalid_format', () => {
+    const slugFields: FormItem[] = [{ type: 'text', name: 'slug', label: 'Slug' }]
+    const schema = z.object({ slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) })
+
+    expect(messageFor(schema, { slug: 'Bad' }, { fields: slugFields, path: ['slug'] })).toBe(
+      'Use lowercase letters, numbers, and hyphens only.',
+    )
+  })
+
+  it('formats non-choice invalid_value with invalidValue copy', () => {
+    const schema = z.object({ active: z.literal(true) })
+    const boolFields: FormItem[] = [{ type: 'switch', name: 'active', label: 'Active' }]
+
+    expect(messageFor(schema, { active: false }, { fields: boolFields, path: ['active'] })).toBe(
+      'Active has an invalid value.',
+    )
+  })
+
+  it('formats exact-length array containers', () => {
+    const exactFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'tiers',
+        legend: 'Wealth tiers',
+        fields: [{ type: 'text', name: 'label', label: 'Label' }],
+      },
+    ]
+    const schema = z.object({ tiers: z.array(z.object({ label: z.string() })).length(2) })
+
+    expect(messageFor(schema, { tiers: [] }, { fields: exactFields, path: ['tiers'] })).toBe(
+      'Add exactly 2 wealth tiers.',
+    )
+  })
+
+  it('uses catch-all for registered paths with unhandled issue codes', () => {
+    const map = makeFieldErrorMap([{ type: 'text', name: 'name', label: 'Name' }])
+    expect(formatFieldMessage(map({ code: 'custom_unknown', path: ['name'] })!)).toBe(
+      'Name is invalid.',
+    )
   })
 
   it('falls back to the Zod default for unregistered paths', () => {

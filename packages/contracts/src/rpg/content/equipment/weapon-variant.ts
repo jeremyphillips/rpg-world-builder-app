@@ -11,6 +11,7 @@ import {
   type WeaponProperty,
 } from '../../vocab/weapon'
 import type { EquipmentBaseFields } from './base'
+import { equipmentVariantValidationMessages } from './equipment-variant-messages'
 
 // ---------------------------------------------------------------------------
 // Damage types — weapons deal only physical damage.
@@ -117,7 +118,7 @@ export function refineWeaponEquipment(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: hasDamage ? ['damageType'] : ['damage'],
-      message: '`damage` and `damageType` must both be present or both be absent',
+      message: equipmentVariantValidationMessages.damageDamageTypeTogether(),
     })
   }
 
@@ -127,14 +128,14 @@ export function refineWeaponEquipment(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['versatileDamage'],
-      message: '`versatileDamage` is required when the `versatile` property is set',
+      message: equipmentVariantValidationMessages.versatileDamageRequired(),
     })
   }
   if (!hasVersatile && hasVersatileDamage) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['versatileDamage'],
-      message: '`versatileDamage` must be absent when the `versatile` property is not set',
+      message: equipmentVariantValidationMessages.versatileDamageForbidden(),
     })
   }
 }

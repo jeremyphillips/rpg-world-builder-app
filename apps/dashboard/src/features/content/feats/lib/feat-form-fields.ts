@@ -5,7 +5,7 @@ import {
   FEAT_CATEGORY_IDS,
   FEAT_PART_ENTRIES,
   MAX_CHARACTER_LEVEL,
-  defineMessage,
+  featValidationMessages,
   slugSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -23,14 +23,6 @@ const featCategoryOptions = toOptions(
   ) as Record<(typeof FEAT_CATEGORY_IDS)[number], string>,
 )
 
-/** Feat form validation messages (tier 3 form overrides). */
-export const featValidationMessages = {
-  repeatableNotesOnlyWhenRepeatable: defineMessage(
-    'validation.feat.repeatableNotesOnlyWhenRepeatable',
-    () => 'Repeat constraints are only allowed when the feat is repeatable',
-  ),
-}
-
 export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
     .object({
@@ -47,7 +39,7 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
       if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
         ctx.addIssue({
           code: 'custom',
-          message: featValidationMessages.repeatableNotesOnlyWhenRepeatable(),
+          message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
           path: ['repeatableNotes'],
         })
       }

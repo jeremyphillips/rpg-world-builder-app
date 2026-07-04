@@ -88,4 +88,51 @@ export const fieldValidationMessages = {
     'validation.field.duplicateItem',
     ({ itemLabel }) => `This ${itemLabel} is already used.`,
   ),
+  /** Email format check (`z.email()`). */
+  invalidEmail: defineMessage(
+    'validation.field.invalidEmail',
+    () => 'Enter a valid email address.',
+  ),
+  /** URL format check. */
+  invalidUrl: defineMessage('validation.field.invalidUrl', () => 'Enter a valid URL.'),
+  /** Regex / pattern mismatch on a text-like field. */
+  invalidFormat: defineMessage<{ label: string }>(
+    'validation.field.invalidFormat',
+    ({ label }) => `${label} has an invalid format.`,
+  ),
+  /** Content slug pattern (`slugSchema`). */
+  invalidSlug: defineMessage(
+    'validation.field.invalidSlug',
+    () => 'Use lowercase letters, numbers, and hyphens only.',
+  ),
+  /** Value present but not among allowed options (non-choice fields). */
+  invalidValue: defineMessage<{ label: string }>(
+    'validation.field.invalidValue',
+    ({ label }) => `${label} has an invalid value.`,
+  ),
+  /** Discriminated union row missing required branch fields. */
+  incompleteUnionOption: defineMessage(
+    'validation.field.incompleteUnionOption',
+    () => 'Complete the required fields for this option.',
+  ),
+  /** Array must contain exactly `count` entries. */
+  exactItemsCount: defineMessage<{ itemsLabel: string; count: number }>(
+    'validation.field.exactItemsCount',
+    ({ itemsLabel, count }) => `Add exactly ${count} ${itemsLabel}.`,
+  ),
+  /** Fallback when `too_small` origin is not handled above. */
+  tooSmallGeneric: defineMessage<{ label: string }>(
+    'validation.field.tooSmallGeneric',
+    ({ label }) => `${label} is too small.`,
+  ),
+  /** Fallback when `too_big` origin is not handled above. */
+  tooBigGeneric: defineMessage<{ label: string }>(
+    'validation.field.tooBigGeneric',
+    ({ label }) => `${label} is too large.`,
+  ),
+  /** Last-resort for registered paths with no specific formatter match. */
+  invalidField: defineMessage<{ label: string }>(
+    'validation.field.invalidField',
+    ({ label }) => `${label} is invalid.`,
+  ),
 }

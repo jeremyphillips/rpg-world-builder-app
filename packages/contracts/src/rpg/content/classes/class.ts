@@ -18,6 +18,7 @@ import { skillSchema } from '../skill-proficiency'
 
 import { classCharacterCreationSchema } from '../starting-equipment'
 import { spellcastingSchema } from './spellcasting'
+import { classValidationMessages } from './class-messages'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -39,7 +40,10 @@ function refineClassFeatureGrantUnlockLevels(
     if (group.unlock !== undefined && group.unlock.level <= feature.level) {
       ctx.addIssue({
         code: 'custom',
-        message: `Grant group unlock level (${group.unlock.level}) must be greater than the feature level (${feature.level})`,
+        message: classValidationMessages.grantGroupUnlockAfterFeatureLevel({
+          unlockLevel: group.unlock.level,
+          featureLevel: feature.level,
+        }),
         path: ['grantGroups'],
       })
     }

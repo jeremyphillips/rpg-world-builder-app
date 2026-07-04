@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { vocabularyValidationMessages } from './vocabulary-messages'
+
 // ---------------------------------------------------------------------------
 // Campaign vocabulary — reusable option sets (creature types, damage types, …)
 // scoped to a campaign ruleset. System seed data lives in catalog JSON; campaign
@@ -177,7 +179,7 @@ export type PatchVocabularySystemEntryInput = z.infer<typeof patchVocabularySyst
 /** Zod schema that accepts only ids present in a resolved vocabulary set. */
 export function createVocabularyMemberSchema(activeIds: ReadonlySet<string>) {
   return vocabularyOptionIdSchema.refine((id) => activeIds.has(id), {
-    message: 'Value is not a recognized vocabulary option for this campaign',
+    message: vocabularyValidationMessages.unrecognizedOption(),
   })
 }
 

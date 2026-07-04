@@ -12,6 +12,7 @@ import {
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   defineMessage,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  levelValidationMessages,
   MAX_CHARACTER_LEVEL,
   creatureTypeSchema,
   refineLevelRangeTable,
@@ -45,20 +46,6 @@ import { mapStartingWealthToFormValues } from './starting-wealth-form-values'
 
 /** Character configuration validation messages (tier 3 form overrides). */
 export const characterConfigurationValidationMessages = {
-  startingLevelExceedsMax: defineMessage(
-    'validation.characterConfiguration.startingLevelExceedsMax',
-    () => 'Starting level cannot exceed max character level',
-  ),
-  extendedTierNameRequired: defineMessage(
-    'validation.characterConfiguration.extendedTierNameRequired',
-    () => 'Tier name is required when extended progression is enabled',
-    () => 'Missing tier name',
-  ),
-  extendedMaxLevelRequired: defineMessage(
-    'validation.characterConfiguration.extendedMaxLevelRequired',
-    () => 'Extended maximum level is required when extended progression is enabled',
-    () => 'Missing extended max',
-  ),
   creatureTypeUnavailable: defineMessage(
     'validation.characterConfiguration.creatureTypeUnavailable',
     () => 'Creature type is not available in this campaign vocabulary',
@@ -122,7 +109,7 @@ const createRulesSchema = z
     if (values.startingLevel > MAX_CHARACTER_LEVEL) {
       ctx.addIssue({
         code: 'custom',
-        message: characterConfigurationValidationMessages.startingLevelExceedsMax(),
+        message: levelValidationMessages.startingLevelExceedsMax(),
         path: ['startingLevel'],
       })
     }
@@ -176,7 +163,7 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
   if (values.startingLevel > effectiveMax) {
     ctx.addIssue({
       code: 'custom',
-      message: characterConfigurationValidationMessages.startingLevelExceedsMax(),
+      message: levelValidationMessages.startingLevelExceedsMax(),
       path: ['startingLevel'],
     })
   }
@@ -194,7 +181,7 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
   if (tierName.length === 0) {
     ctx.addIssue({
       code: 'custom',
-      message: characterConfigurationValidationMessages.extendedTierNameRequired(),
+      message: levelValidationMessages.extendedTierNameRequired(),
       path: ['extendedTierName'],
     })
   }
@@ -202,7 +189,7 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
   if (values.extendedMaxLevel === undefined) {
     ctx.addIssue({
       code: 'custom',
-      message: characterConfigurationValidationMessages.extendedMaxLevelRequired(),
+      message: levelValidationMessages.extendedMaxLevelRequired(),
       path: ['extendedMaxLevel'],
     })
     return

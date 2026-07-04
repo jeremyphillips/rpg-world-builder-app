@@ -8,6 +8,7 @@ import {
   slugSchema,
 } from './lib/envelope'
 import { requirementExpressionSchema } from './lib/requirement-expression'
+import { featValidationMessages } from './feat-messages'
 
 // ---------------------------------------------------------------------------
 // Feat — prose-first catalog content. Benefit prose lives in `description` for
@@ -25,7 +26,7 @@ export const featRepeatableSchema = z
     if (!val.allowed && val.notes !== undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: 'notes are only allowed when repeatable.allowed is true',
+        message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
         path: ['notes'],
       })
     }

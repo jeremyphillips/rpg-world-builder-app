@@ -37,4 +37,35 @@ export const levelValidationMessages = {
     'validation.level.outOfBounds',
     ({ maxLevel }) => `Level must be between 1 and ${maxLevel}.`,
   ),
+  /** Extended max equals the standard max — must be strictly higher. */
+  extendedMaxMustExceedStandard: defineMessage(
+    'validation.level.extendedMaxMustExceedStandard',
+    () => 'Extended maximum level must be higher than the standard maximum level.',
+  ),
+  /** Extended max is below the minimum allowed above standard max. */
+  extendedMaxMinimum: defineMessage<{ minimum: number; standardMax: number }>(
+    'validation.level.extendedMaxMinimum',
+    ({ minimum, standardMax }) =>
+      `Extended maximum must be at least ${minimum} because the standard maximum is ${standardMax}.`,
+  ),
+  /** Extended max is below standard max with no room for a specific minimum. */
+  extendedMaxTooLow: defineMessage(
+    'validation.level.extendedMaxTooLow',
+    () => 'Extended maximum must be higher than the standard maximum.',
+  ),
+  /** Starting level exceeds the campaign's effective maximum character level. */
+  startingLevelExceedsMax: defineMessage(
+    'validation.level.startingLevelExceedsMax',
+    () => 'Starting level cannot exceed the maximum character level.',
+  ),
+  /** Extended progression tier name is missing when extended progression is enabled. */
+  extendedTierNameRequired: defineMessage(
+    'validation.level.extendedTierNameRequired',
+    () => 'Tier name is required for extended progression.',
+  ),
+  /** Extended max level is missing when extended progression is enabled. */
+  extendedMaxLevelRequired: defineMessage(
+    'validation.level.extendedMaxLevelRequired',
+    () => 'Extended maximum level is required for extended progression.',
+  ),
 }

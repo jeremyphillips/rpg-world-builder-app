@@ -5,26 +5,18 @@ import Link from 'next/link'
 
 import { getErrorMessage, loginInputSchema, type LoginInput } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
-import { Form, type FormItem } from '@rpg/ui/form'
+import { Form } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
 import { DASHBOARD_PATH, login } from '../api/auth-client'
+import { loginFields } from '../lib/auth-form-fields'
 
 export interface LoginFormProps {
   /** Called after a successful login. Defaults to a same-origin redirect to the dashboard. */
   onSuccess?: () => void
 }
 
-const fields: FormItem[] = [
-  { type: 'text', name: 'email', label: 'Email', inputType: 'email', autoComplete: 'email' },
-  {
-    type: 'text',
-    name: 'password',
-    label: 'Password',
-    inputType: 'password',
-    autoComplete: 'current-password',
-  },
-]
+const fields = loginFields
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
   const [formError, setFormError] = useState<string | null>(null)

@@ -4,6 +4,7 @@ import { armorCategorySchema } from '../../vocab/armor/category'
 import { armorMaterialSchema } from '../../vocab/armor/material'
 import { abilityScoreSchema } from '../../vocab/ability'
 import type { EquipmentBaseFields } from './base'
+import { equipmentVariantValidationMessages } from './equipment-variant-messages'
 
 export {
   ARMOR_MATERIALS,
@@ -55,14 +56,14 @@ export function refineArmorEquipment(
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['acBonus'],
-        message: '`acBonus` is required for shields',
+        message: equipmentVariantValidationMessages.shieldAcBonusRequired(),
       })
     }
   } else if (val.baseAc === undefined) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['baseAc'],
-      message: '`baseAc` is required for body armor',
+      message: equipmentVariantValidationMessages.bodyArmorBaseAcRequired(),
     })
   }
 }

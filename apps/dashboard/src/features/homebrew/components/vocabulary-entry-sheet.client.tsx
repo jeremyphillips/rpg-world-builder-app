@@ -1,18 +1,21 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { Button, SelectField, Sheet, TextareaField, TextField } from '@rpg/ui'
+import { useMemo } from 'react'
+import { Button, Sheet } from '@rpg/ui'
+import { Form } from '@rpg/ui/form'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { VOCABULARY_STATUS_LABELS } from '../lib/vocabulary/labels'
+import {
+  vocabularyEntryCreateFields,
+  vocabularyEntryCreateFormSchema,
+  vocabularyEntryEditFields,
+  vocabularyEntryEditFormSchema,
+  type VocabularyEntryCreateFormValues,
+  type VocabularyEntryEditFormValues,
+  type VocabularyEntryFormValues,
+} from '../lib/vocabulary/vocabulary-entry-form-fields'
 
-export type VocabularyEntryFormValues = {
-  id: string
-  label: string
-  description: string
-  status: 'active' | 'disabled'
-}
+export type { VocabularyEntryFormValues } from '../lib/vocabulary/vocabulary-entry-form-fields'
 
 type VocabularyEntrySheetProps = {
   open: boolean
@@ -23,11 +26,6 @@ type VocabularyEntrySheetProps = {
   onSubmit: (values: VocabularyEntryFormValues) => void
 }
 
-const STATUS_OPTIONS = (['active', 'disabled'] as const).map((status) => ({
-  label: VOCABULARY_STATUS_LABELS[status],
-  value: status,
-}))
-
 /** Add/edit vocabulary entry form in a side sheet. */
 export function VocabularyEntrySheet({
   open,
@@ -37,95 +35,82 @@ export function VocabularyEntrySheet({
   isPending,
   onSubmit,
 }: VocabularyEntrySheetProps) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    control,
-    formState: { errors },
-  } = useForm<VocabularyEntryFormValues>({
-    defaultValues: { id: '', label: '', description: '', status: 'active' },
-  })
+  const isEdit = mode === 'edit'
+  const headline = isEdit ? 'Edit vocabulary entry' : 'Add vocabulary entry'
+  const formKey = isEdit && entry ? `edit-${entry.id}` : 'create'
 
-  const status = useWatch({ control, name: 'status' })
+  const schema = isEdit ? vocabularyEntryEditFormSchema : vocabularyEntryCreateFormSchema
+  const fields = isEdit ? vocabularyEntryEditFields : vocabularyEntryCreateFields
 
-  useEffect(() => {
-    if (!open) return
-    if (mode === 'edit' && entry) {
-      reset({
+  const defaultValues = useMemo(() => {
+    if (isEdit && entry) {
+      return {
         id: entry.id,
         label: entry.label,
         description: entry.description ?? '',
         status: entry.status,
-      })
-      return
+      } satisfies VocabularyEntryEditFormValues
     }
-    reset({ id: '', label: '', description: '', status: 'active' })
-  }, [open, mode, entry, reset])
 
-  const headline = mode === 'create' ? 'Add vocabulary entry' : 'Edit vocabulary entry'
+    return {
+      id: '',
+      label: '',
+      description: '',
+    } satisfies VocabularyEntryCreateFormValues
+  }, [entry, isEdit])
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content {...(mode === 'edit' ? { 'aria-describedby': undefined } : {})}>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col">
-          <Sheet.Header
-            headline={headline}
-            description={
-              mode === 'create' ? 'Custom entries appear as Custom in this campaign.' : undefined
-            }
-          />
-          <Sheet.Body className="space-y-4">
-            {mode === 'create' ? (
-              <TextField
-                id="vocabulary-entry-id"
-                label="Id"
-                hint="Lowercase slug, e.g. fey-kin"
-                required
-                {...register('id', { required: 'Id is required.' })}
-                error={errors.id?.message}
-              />
-            ) : (
-              <TextField id="vocabulary-entry-id" label="Id" value={entry?.id ?? ''} disabled />
+      <Sheet.Content {...(isEdit ? { 'aria-describedby': undefined } : {})}>
+        <Sheet.Header
+          headline={headline}
+          description={isEdit ? undefined : 'Custom entries appear as Custom in this campaign.'}
+        />
+        {open ? (
+          <Form
+            key={formKey}
+            id="vocabulary-entry"
+            schema={schema}
+            fields={fields}
+            defaultValues={defaultValues}
+            className="flex min-h-0 flex-1 flex-col overflow-hidden"
+            contentClassName="flex-1 overflow-y-auto p-6 pt-0"
+            rhythm="compact"
+            stickyFooter
+            onSubmit={(values) => {
+              if (isEdit) {
+                const editValues = values as VocabularyEntryEditFormValues
+                onSubmit({
+                  id: editValues.id,
+                  label: editValues.label,
+                  description: editValues.description ?? '',
+                  status: editValues.status,
+                })
+                return
+              }
+
+              const createValues = values as VocabularyEntryCreateFormValues
+              onSubmit({
+                id: createValues.id,
+                label: createValues.label,
+                description: createValues.description ?? '',
+                status: 'active',
+              })
+            }}
+            footer={() => (
+              <div className="flex w-full items-center justify-end gap-2">
+                <Sheet.Close asChild>
+                  <Button type="button" variant="outline" disabled={isPending}>
+                    Cancel
+                  </Button>
+                </Sheet.Close>
+                <Button type="submit" disabled={isPending}>
+                  {isEdit ? 'Save' : 'Create'}
+                </Button>
+              </div>
             )}
-            <TextField
-              id="vocabulary-entry-label"
-              label="Name"
-              required
-              {...register('label', { required: 'Name is required.' })}
-              error={errors.label?.message}
-            />
-            <TextareaField
-              id="vocabulary-entry-description"
-              label="Description"
-              {...register('description')}
-            />
-            {mode === 'edit' ? (
-              <SelectField
-                id="vocabulary-entry-status"
-                label="Status"
-                options={STATUS_OPTIONS}
-                value={status}
-                onValueChange={(value) =>
-                  setValue('status', value as VocabularyEntryFormValues['status'], {
-                    shouldDirty: true,
-                  })
-                }
-              />
-            ) : null}
-          </Sheet.Body>
-          <Sheet.Footer>
-            <Sheet.Close asChild>
-              <Button type="button" variant="outline" disabled={isPending}>
-                Cancel
-              </Button>
-            </Sheet.Close>
-            <Button type="submit" disabled={isPending}>
-              {mode === 'create' ? 'Create' : 'Save'}
-            </Button>
-          </Sheet.Footer>
-        </form>
+          />
+        ) : null}
       </Sheet.Content>
     </Sheet.Root>
   )

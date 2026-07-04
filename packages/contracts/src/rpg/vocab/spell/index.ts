@@ -1,3 +1,4 @@
+export * from './spell-messages'
 export * from './school'
 export * from './role-tag'
 export * from './function-tag'

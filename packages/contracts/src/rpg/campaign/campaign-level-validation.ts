@@ -1,4 +1,5 @@
 import { ABSOLUTE_MAX_CHARACTER_LEVEL } from '../primitives/level'
+import { levelValidationMessages } from '../primitives/level-messages'
 
 export type ExtendedMaxValidationResult = { valid: true } | { valid: false; message: string }
 
@@ -11,19 +12,19 @@ export function validateExtendedMaxLevel(
     if (extendedMax === standardMax) {
       return {
         valid: false,
-        message: 'Extended maximum level must be higher than the standard maximum level.',
+        message: levelValidationMessages.extendedMaxMustExceedStandard(),
       }
     }
     const minimum = standardMax + 1
     if (minimum <= ABSOLUTE_MAX_CHARACTER_LEVEL) {
       return {
         valid: false,
-        message: `Extended maximum must be at least ${minimum} because the standard maximum is ${standardMax}.`,
+        message: levelValidationMessages.extendedMaxMinimum({ minimum, standardMax }),
       }
     }
     return {
       valid: false,
-      message: 'Extended maximum must be higher than the standard maximum.',
+      message: levelValidationMessages.extendedMaxTooLow(),
     }
   }
   return { valid: true }

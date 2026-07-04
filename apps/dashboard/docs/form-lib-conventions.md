@@ -45,6 +45,22 @@ Three tiers — see
   `startingWealthValidationMessages` in `starting-wealth-form-fields.ts`) —
   never inline message literals, and assert tests through the catalog.
 
+### Validation verification (Phase 4)
+
+Co-located `*-form-validation.test.ts` modules (or the shared
+`content-form-validation.test.ts` sweep) import `@rpg/ui/form/test-utils` and
+assert:
+
+1. **Field paths registered** — `assertFieldPathsRegistered(fields)`
+2. **Schema coverage** — `assertRegistryCoverage(schema, fields)` with
+   `exemptPaths` for derived `slug`, slot-tab prefixes, and grant-union explosion
+3. **No Zod defaults on invalid submit** —
+   `assertInvalidSubmitUsesRefinedMessages(schema, fields, { invalidValue })`
+
+Dashboard forms: `apps/dashboard/src/lib/form-validation/dashboard-form-validation.test.ts`.
+Content catalog: `apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts`.
+Public auth: `apps/public/src/features/auth/lib/auth-form-validation.test.ts`.
+
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses
 `minLevelSelectable` / `maxLevelSelectable`; edits cascade via

@@ -7,8 +7,8 @@ import type { FormItem } from '@rpg/ui/form'
  * the file is uploaded via `uploadFile` to obtain the key before patching.
  */
 export const accountFormSchema = z.object({
-  displayName: z.string().min(1, 'Display name is required').max(80),
-  email: z.email('Enter a valid email address'),
+  displayName: z.string().min(1).max(80),
+  email: z.email(),
   avatar: z.array(z.custom<File>((v: unknown) => v instanceof File)).optional(),
 })
 

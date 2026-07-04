@@ -5,28 +5,18 @@ import Link from 'next/link'
 
 import { getErrorMessage, registerInputSchema, type RegisterInput } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
-import { Form, type FormItem } from '@rpg/ui/form'
+import { Form } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
 import { DASHBOARD_PATH, login, register } from '../api/auth-client'
+import { signupFields } from '../lib/auth-form-fields'
 
 export interface SignupFormProps {
   /** Called after a successful signup. Defaults to a same-origin redirect to the dashboard. */
   onSuccess?: () => void
 }
 
-const fields: FormItem[] = [
-  { type: 'text', name: 'displayName', label: 'Display name', autoComplete: 'nickname' },
-  { type: 'text', name: 'email', label: 'Email', inputType: 'email', autoComplete: 'email' },
-  {
-    type: 'text',
-    name: 'password',
-    label: 'Password',
-    inputType: 'password',
-    autoComplete: 'new-password',
-    hint: 'At least 8 characters.',
-  },
-]
+const fields = signupFields
 
 export function SignupForm({ onSuccess }: SignupFormProps) {
   const [formError, setFormError] = useState<string | null>(null)

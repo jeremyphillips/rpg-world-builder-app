@@ -121,14 +121,32 @@ import { CreateCampaignInput } from '@rpg/contracts'
 
 Schemas stay message-free. `makeResolver` builds a field-aware error map
 (`makeFieldErrorMap`) that formats raw Zod issues (`invalid_type`, `too_small`,
-`invalid_value`, …) into shared boilerplate copy from `@rpg/contracts`
-(`fieldValidationMessages`), interpolating the field's configured `label` —
-e.g. `z.number().min(1)` on a field labeled `Level` renders
-`Level must be at least 1.` Array containers use their `legend`
-(`Add at least one wealth tier.`). Custom `.refine` / `superRefine` messages
-always win; unregistered paths (slot content, unmapped issue codes) fall back
-to Zod defaults. Tiers, naming, and copy style →
+`invalid_format`, `invalid_value`, `invalid_union`, …) into shared boilerplate
+copy from `@rpg/contracts` (`fieldValidationMessages`), interpolating the field's
+configured `label` — e.g. `z.number().min(1)` on a field labeled `Level` renders
+`Level must be at least 1.` Array containers use their `legend` (or `itemHeader`
+for singular item copy: `Add at least one grant.`). Registered paths always
+receive catalog copy; a last-resort `{label} is invalid.` catch-all covers
+unhandled issue codes. Custom `.refine` / `superRefine` messages always win;
+**unregistered** paths (unknown field names) still fall back to Zod defaults.
+See `field-error-map-fixture.stories.tsx` for a synthetic form covering each
+edge case. Tiers, naming, and copy style →
 [packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
+
+### Verifying validation messages in tests
+
+Co-located form tests import helpers from `@rpg/ui/form/test-utils`:
+
+| Helper                                                          | Purpose                                                                                       |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                            |
+| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions)        |
+| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist` / `unionWhitelist` |
+| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                                   |
+
+Pass a targeted `invalidValue` when `{}` parses successfully or triggers unrelated
+paths (tabbed forms, equipment kinds). Master-detail sub-forms (trait rows,
+starting-equipment options, …) get their own `*-form-validation.test.ts` cases.
 
 Contract enums → `toOptions` with a label map keyed by the enum type:
 
