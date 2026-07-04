@@ -22,6 +22,7 @@ import {
   formStickyTabsClasses,
   formTabPanelsBottomPaddingClasses,
 } from '../chrome/form-chrome.variants'
+import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
 
 /** A single tab definition: an id, a display label, and its ordered fields. */
 export interface TabbedFormTab {
@@ -44,6 +45,11 @@ export interface TabbedFormTab {
    * placeholders). Omit fields for a panel that is entirely non-input content.
    */
   header?: React.ReactNode
+  /**
+   * When true, skips dev warnings and dashboard test assertions for header-only
+   * validation wiring (e.g. non-form chrome tabs like subclass management).
+   */
+  skipHeaderOnlyValidationWiring?: boolean
 }
 
 /** Merges visible tab fields with supplemental resolver-only configs. */
@@ -93,6 +99,10 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
     mode,
     reValidateMode: 'onChange',
   })
+
+  React.useEffect(() => {
+    warnHeaderOnlyTabValidationWiring(tabs)
+  }, [tabs])
 
   return { form }
 }

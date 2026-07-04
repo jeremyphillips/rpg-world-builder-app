@@ -46,11 +46,13 @@ import {
   speciesLevelLimitsFields,
   speciesLevelLimitsFormSchema,
 } from '../../species/lib/species-rules-form-fields'
-import { createSpeciesFormSchema } from '../../species/lib/species-form-fields'
+import { createSpeciesFormSchema, buildSpeciesTabs } from '../../species/lib/species-form-fields'
 import { createFeatFormSchema } from '../../feats/lib/feat-form-fields'
 import { equipmentFormDef } from '../../equipment/lib/equipment-form-def'
 import { resolveEquipmentFormSchema } from '../../equipment/lib/equipment-form-fields'
 import { costToFormDefaults } from './fields/content-economy-form-fields'
+import { assertHeaderOnlyTabsHaveValidationWiring } from './tabbed-form-validation-test-utils'
+import { buildClassTabs } from '../../classes/lib/class-form-fields'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 
@@ -386,6 +388,18 @@ describe('content form schema factories', () => {
     const schema = createFeatFormSchema(MAX_CHARACTER_LEVEL)
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: invalidValueFor('feats'),
+    })
+  })
+})
+
+describe('TabbedForm header-only validation wiring', () => {
+  it('species tabs wire errorPaths and resolverFields on master-detail tabs', () => {
+    assertHeaderOnlyTabsHaveValidationWiring(buildSpeciesTabs({}))
+  })
+
+  it('class tabs wire errorPaths and resolverFields on master-detail tabs', () => {
+    assertHeaderOnlyTabsHaveValidationWiring(buildClassTabs({}), {
+      exemptTabIds: ['subclasses'],
     })
   })
 })

@@ -14,6 +14,7 @@ import { identityFields } from '../../lib/forms/fields/content-identity-form-fie
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
+  embeddedMasterDetailTabValidation,
   prefixFormItems,
 } from '../../lib/forms/tabbed-form-resolver-fields'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
@@ -97,16 +98,18 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'features',
       label: 'Features',
       fields: [resourcesArrayField(ctx)],
-      errorPaths: ['features'],
-      resolverFields: [
-        embeddedArrayResolverField('features', 'Features', classFeatureItemFields(ctx)),
-      ],
+      ...embeddedMasterDetailTabValidation({
+        path: 'features',
+        legend: 'Features',
+        fields: classFeatureItemFields(ctx),
+      }),
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },
     {
       id: 'subclasses',
       label: 'Subclasses',
       fields: [],
+      skipHeaderOnlyValidationWiring: true,
       header: createElement(ClassSubclassesTab, {
         campaignId: ctx.campaignId,
         classId: ctx.entityId,

@@ -21,6 +21,7 @@ import {
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
+  embeddedMasterDetailTabValidation,
   prefixFormItems,
 } from '../../lib/forms/tabbed-form-resolver-fields'
 import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
@@ -141,8 +142,11 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'traits',
       label: 'Traits',
       fields: [],
-      errorPaths: ['traits'],
-      resolverFields: [embeddedArrayResolverField('traits', 'Traits', traitItemFields(ctx))],
+      ...embeddedMasterDetailTabValidation({
+        path: 'traits',
+        legend: 'Traits',
+        fields: traitItemFields(ctx),
+      }),
       header: createElement(SpeciesTraitsTab, { formCtx: ctx }),
     },
     {
