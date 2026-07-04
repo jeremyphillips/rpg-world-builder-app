@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { DismissibleBadge } from './dismissible-badge.client'
@@ -39,7 +39,6 @@ describe('DismissibleBadge', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<DismissibleBadge label="Dagger" onDismiss={vi.fn()} />)
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

@@ -61,6 +61,9 @@ Dashboard forms: `apps/dashboard/src/lib/form-validation/dashboard-form-validati
 Content catalog: `apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts`.
 Public auth: `apps/public/src/features/auth/lib/auth-form-validation.test.ts`.
 
+Out-of-scope deferrals (TabbedForm shell, non-form schemas, future i18n/API seams)
+→ [validation-messages.md](../../../../packages/contracts/docs/validation-messages.md#deferred-gap-list).
+
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses
 `minLevelSelectable` / `maxLevelSelectable`; edits cascade via

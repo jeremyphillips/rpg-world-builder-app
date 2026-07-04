@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { SiteHeaderUserMenu } from './site-header-user-menu.client'
 
@@ -24,16 +24,12 @@ describe('SiteHeaderUserMenu', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
 
-    const { violations } = await axe.run(view.container)
-    expect(violations).toHaveLength(0)
+    await expectNoAxeViolations(view.container)
   })
 
   it('shows the active campaign when one is set', async () => {
     render(
-      <SiteHeaderUserMenu
-        user={user}
-        activeCampaign={{ id: 'c1', name: 'Sunless Citadel' }}
-      />,
+      <SiteHeaderUserMenu user={user} activeCampaign={{ id: 'c1', name: 'Sunless Citadel' }} />,
     )
     await userEvent.click(screen.getByRole('button', { name: /dungeon master/i }))
 

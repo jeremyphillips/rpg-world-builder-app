@@ -1,43 +1,28 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { MemoryRouter } from 'react-router-dom'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
+import { TestFormShell } from '@/test/form-shell'
+import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
-      <div data-testid={`detail-${namePrefix?.replace(/\./g, '-')}`}>{namePrefix}</div>
-    ),
-  }
+  const { stubUiFormItems } = await import('@/test/mocks/ui-form')
+  return stubUiFormItems(importOriginal)
 })
 
 function TabShell({ formCtx }: { formCtx: ContentFormCtx }) {
-  const form = useForm({ defaultValues: {} })
   return (
-    <MemoryRouter>
-      <FormProvider {...form}>
-        <SpeciesRulesTab formCtx={formCtx} />
-      </FormProvider>
-    </MemoryRouter>
+    <TestFormShell>
+      <SpeciesRulesTab formCtx={formCtx} />
+    </TestFormShell>
   )
 }
 
 function rulesCtx(multiclassing: ReturnType<typeof defaultMulticlassingRules>): ContentFormCtx {
-  return {
-    campaignId: 'camp_1',
-    campaignRules: {
-      ...defaultCampaignRules(),
-      multiclassing,
-    },
-  }
+  return makeContentFormCtx({ campaignRules: { multiclassing } })
 }
 
 describe('SpeciesRulesTab', () => {
@@ -125,9 +110,6 @@ describe('SpeciesRulesTab', () => {
       expect(screen.getByTestId('detail-characterCreation-multiclassing')).toBeInTheDocument()
     })
 
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

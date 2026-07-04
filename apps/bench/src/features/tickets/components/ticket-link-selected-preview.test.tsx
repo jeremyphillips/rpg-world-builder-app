@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { TicketLinkSelectedPreview } from './ticket-link-selected-preview'
 import { sampleTicket } from '../test-fixtures'
@@ -89,9 +89,6 @@ describe('TicketLinkSelectedPreview', () => {
       />,
     )
 
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

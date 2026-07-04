@@ -160,6 +160,12 @@ function invalidValueFor(routeKey: string): unknown {
         prerequisiteEditor: { mode: 'all', requirements: [] },
         repeatableAllowed: false,
       }
+    case 'skill-proficiencies':
+      return {
+        name: '',
+        ability: 'str',
+        suggestedClasses: [],
+      }
     case 'equipment':
       return { name: '', kind: 'weapon' }
     default:
@@ -187,6 +193,14 @@ describe('embedded content sub-forms validation', () => {
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(heritageFormSchema, fields, {
       exemptPaths: [...SERVER_ROW_EXEMPT, 'choose', /^options\b/, ...GRANT_NESTED_EXEMPT],
+    })
+    assertInvalidSubmitUsesRefinedMessages(heritageFormSchema, fields, {
+      invalidValue: {
+        name: '',
+        choose: 1,
+        options: [{ kind: 'custom', name: 'Option', grants: [] }],
+      },
+      unionWhitelist: [/^options\b/],
     })
   })
 

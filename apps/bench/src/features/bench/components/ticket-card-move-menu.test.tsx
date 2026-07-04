@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { upNextTicket } from '../test-fixtures'
 import { TicketCardMoveMenu } from './ticket-card-move-menu'
@@ -36,7 +36,6 @@ describe('TicketCardMoveMenu', () => {
       <TicketCardMoveMenu ticket={upNextTicket} onMove={() => undefined} />,
     )
 
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { Spinner } from './spinner'
 
@@ -32,9 +32,6 @@ describe('Spinner', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<Spinner />)
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

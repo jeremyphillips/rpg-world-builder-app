@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { FileDropzone } from './file-dropzone.client'
 
@@ -134,26 +134,17 @@ describe('FileDropzone', () => {
 
   it('has no axe accessibility violations (empty state)', async () => {
     const { container } = render(<FileDropzone value={[]} onChange={() => undefined} />)
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe accessibility violations (with files)', async () => {
     const file = makeFile('hero.jpg', 'image/jpeg')
     const { container } = render(<FileDropzone value={[file]} onChange={() => undefined} />)
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 
   it('has no axe violations in disabled state', async () => {
     const { container } = render(<FileDropzone value={[]} onChange={() => undefined} disabled />)
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

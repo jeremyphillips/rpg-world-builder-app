@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -44,9 +44,6 @@ describe('EpicDetailForm', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false }, 'landmark-unique': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import { submitAndExpectPayload } from '../test-utils'
 
 const walkSpeedSchema = z.object({
   speed: z.object({
@@ -45,9 +46,7 @@ describe('Form inputUnit field', () => {
     expect(screen.getByText('ft.')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ range: 60 })
+    await submitAndExpectPayload(user, onSubmit, { range: 60 })
   })
 
   it('round-trips scalar value edits through submit', async () => {
@@ -78,9 +77,7 @@ describe('Form inputUnit field', () => {
     const input = screen.getByLabelText('Walk speed value')
     fireEvent.change(input, { target: { value: '35' } })
 
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit.mock.lastCall?.[0]).toEqual({ speed: { walk: 35 } })
+    await submitAndExpectPayload(user, onSubmit, { speed: { walk: 35 } })
   })
 
   it('resolves valueDigits from a watched field', () => {

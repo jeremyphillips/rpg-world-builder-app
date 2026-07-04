@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { TicketCreateDialog } from './ticket-create-dialog'
@@ -74,7 +74,6 @@ describe('TicketCreateDialog', () => {
       expect(screen.getByLabelText(/^description$/i)).toBeInTheDocument()
     })
 
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

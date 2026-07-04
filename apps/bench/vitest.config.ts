@@ -1,20 +1,11 @@
-import { defineConfig, mergeConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import base from '@rpg/config/vitest/base'
+import { defineConfig } from 'vitest/config'
 
-export default mergeConfig(
-  base,
-  defineConfig({
-    plugins: [react()],
-    test: {
-      environment: 'jsdom',
-      setupFiles: ['./vitest.setup.ts'],
-      include: ['src/**/*.test.{ts,tsx}'],
-    },
-    resolve: {
-      alias: {
-        '@': new URL('./src', import.meta.url).pathname,
-      },
-    },
-  }),
-)
+// Split into node (pure lib) and jsdom (component) projects so pure .test.ts
+// files skip jsdom environment + Testing Library setup entirely. Leaf configs
+// are separate files because the repo-root vitest config globs app configs as
+// projects and cannot expand nested `test.projects`.
+export default defineConfig({
+  test: {
+    projects: ['./vitest.node.config.ts', './vitest.jsdom.config.ts'],
+  },
+})

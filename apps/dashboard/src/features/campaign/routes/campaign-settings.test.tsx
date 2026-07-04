@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { CampaignListItem } from '@rpg/contracts'
+import { QueryClientProvider } from '@tanstack/react-query'
 
 import { renderWithDataRouter } from '@/lib/test-router'
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeTestQueryClient } from '@/test/render'
 
 vi.mock('../api/campaign-client', () => ({
   listCampaigns: vi.fn(),
@@ -21,8 +22,7 @@ import { CampaignSettings } from './campaign-settings'
 const listCampaigns = vi.mocked(listCampaignsFn)
 const updateCampaign = vi.mocked(updateCampaignFn)
 
-const campaign: CampaignListItem = {
-  id: 'c1',
+const campaign = makeCampaignListItem({
   identity: { name: 'Sunless Citadel', description: 'A dungeon delve.' },
   configuration: {
     flavor: {
@@ -30,19 +30,10 @@ const campaign: CampaignListItem = {
       mood: ['heroic'],
     },
   },
-  status: 'active',
-  visibility: 'private',
-  rulesetId: 'srd-cc-5.2.1',
-  createdBy: 'u1',
-  campaignRole: 'owner',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-}
+})
 
 function renderSettings(campaignId = 'c1') {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  })
+  const queryClient = makeTestQueryClient()
 
   return renderWithDataRouter(
     [

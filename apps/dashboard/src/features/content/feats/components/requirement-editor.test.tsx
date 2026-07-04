@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
@@ -20,8 +20,6 @@ import {
 import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { FormSectionProvider } from '@rpg/ui/form'
 import { RequirementEditor } from './requirement-editor.client'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 function EditorShell({
   prerequisiteEditor = requirementEditorDefaultValue(),
@@ -181,7 +179,6 @@ describe('RequirementEditor', () => {
     const { container } = render(
       <EditorShell prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)} />,
     )
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

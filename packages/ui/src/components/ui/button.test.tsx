@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { Button } from './button.client'
 
@@ -42,11 +42,6 @@ describe('Button', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<Button>Accessible</Button>)
-    // color-contrast relies on canvas, which jsdom does not implement; it is
-    // covered instead by Storybook's addon-a11y in a real browser.
-    const results = await axe.run(container, {
-      rules: { 'color-contrast': { enabled: false } },
-    })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

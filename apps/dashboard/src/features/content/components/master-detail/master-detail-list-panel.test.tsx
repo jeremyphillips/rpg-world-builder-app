@@ -1,12 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel.client'
 import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
-
-const axeOptions = { rules: { 'color-contrast': { enabled: false } } }
 
 const items: MasterDetailListItem[] = [
   { id: 'a', title: 'Rage', eyebrow: 'Level 1' },
@@ -129,7 +127,6 @@ describe('MasterDetailListPanel', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(<MasterDetailListPanel {...baseProps()} onMove={vi.fn()} />)
-    const results = await axe.run(container, axeOptions)
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

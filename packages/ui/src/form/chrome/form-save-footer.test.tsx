@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { FormSaveFooter } from './form-save-footer'
 
@@ -31,7 +31,6 @@ describe('FormSaveFooter', () => {
     const { container } = render(
       <FormSaveFooter submitLabel="Save" isSuccess successMessage="Saved." />,
     )
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })

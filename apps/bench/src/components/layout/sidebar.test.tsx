@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import axe from 'axe-core'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 
 import { BENCH_NAV_ITEMS } from '@/app/routes'
@@ -27,7 +27,6 @@ describe('Sidebar', () => {
       </MemoryRouter>,
     )
 
-    const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })
-    expect(results.violations).toEqual([])
+    await expectNoAxeViolations(container)
   })
 })
