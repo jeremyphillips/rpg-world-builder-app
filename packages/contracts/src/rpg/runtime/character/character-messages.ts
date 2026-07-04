@@ -1,5 +1,9 @@
 import { defineMessage } from '../../../validation/define-message'
 
+/** `Choose either {optionA} or {optionB}.` — local until a second domain needs it. */
+const exclusiveEitherCopy = (optionA: string, optionB: string) =>
+  `Choose either ${optionA} or ${optionB}.`
+
 // ---------------------------------------------------------------------------
 // Character validation messages (tier 2 domain catalog).
 // Rules describing valid character data — reusable across builder, sheet,
@@ -15,11 +19,11 @@ export const characterValidationMessages = {
   ),
   toolProficiencyExclusiveTarget: defineMessage(
     'validation.character.toolProficiencyExclusiveTarget',
-    () => 'Choose either a tool or a tool category.',
+    () => exclusiveEitherCopy('a tool', 'a tool category'),
   ),
   weaponProficiencyExclusiveTarget: defineMessage(
     'validation.character.weaponProficiencyExclusiveTarget',
-    () => 'Choose either a weapon or a weapon category.',
+    () => exclusiveEitherCopy('a weapon', 'a weapon category'),
   ),
   selectionSourceIdRequired: defineMessage(
     'validation.character.selectionSourceIdRequired',

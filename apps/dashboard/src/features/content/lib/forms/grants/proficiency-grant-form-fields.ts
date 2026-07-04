@@ -48,12 +48,12 @@ export const ARMOR_TRAINING_POOL_SOURCES = ['explicit', 'filtered'] as const
 export const proficiencyGrantValidationMessages = {
   explicitPoolSlugsRequired: defineMessage(
     'validation.proficiencyGrant.explicitPoolSlugsRequired',
-    () => 'Specific lists require at least one item',
+    () => 'Specific lists require at least one item.',
     () => 'Missing pool items',
   ),
   explicitSkillPoolRequired: defineMessage(
     'validation.proficiencyGrant.explicitSkillPoolRequired',
-    () => 'Selected skill lists require at least one skill',
+    () => 'Selected skill lists require at least one skill.',
     () => 'Missing skills',
   ),
 }

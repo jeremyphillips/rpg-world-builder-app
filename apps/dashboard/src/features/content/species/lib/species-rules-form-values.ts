@@ -3,6 +3,7 @@ import {
   defaultSpeciesMulticlassing,
   defineMessage,
   levelValidationMessages,
+  requiredWhenCopy,
   speciesLevelLimitsSchema,
   speciesMulticlassingSchema,
   type Species,
@@ -17,7 +18,7 @@ import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
 export const speciesCharacterCreationFormValidationMessages = {
   maxCharacterLevelRequired: defineMessage(
     'validation.speciesCharacterCreationForm.maxCharacterLevelRequired',
-    () => 'Max character level is required when the limit is enabled.',
+    () => requiredWhenCopy('Max character level', 'the limit is enabled'),
   ),
 }
 

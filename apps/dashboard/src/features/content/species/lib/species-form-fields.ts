@@ -51,11 +51,11 @@ const creatureSizeOptions = toOptions(
 export const speciesValidationMessages = {
   creatureTypeNotAllowed: defineMessage(
     'validation.species.creatureTypeNotAllowed',
-    () => 'Creature type is not allowed for character sheets in this campaign',
+    () => 'Creature type is not allowed for character sheets in this campaign.',
   ),
   creatureTypeUnavailable: defineMessage(
     'validation.species.creatureTypeUnavailable',
-    () => 'Creature type is not available in this campaign vocabulary',
+    () => 'Creature type is not available in this campaign vocabulary.',
   ),
 }
 
