@@ -68,4 +68,10 @@ export const levelValidationMessages = {
     'validation.level.extendedMaxLevelRequired',
     () => 'Extended maximum level is required for extended progression.',
   ),
+  /** A level exceeds the campaign's effective maximum character level. */
+  overCampaignMax: defineMessage<{ maxLevel: number }>(
+    'validation.level.overCampaignMax',
+    ({ maxLevel }) => `Level cannot exceed the campaign max of ${maxLevel}.`,
+    ({ maxLevel }) => `Exceeds campaign max (${maxLevel})`,
+  ),
 }

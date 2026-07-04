@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { characterValidationMessages } from './character-messages'
+
 // ---------------------------------------------------------------------------
 // Source / provenance records
 // ---------------------------------------------------------------------------
@@ -44,7 +46,7 @@ export const characterSelectionSourceSchema = z
     if (val.kind !== 'manual' && val.sourceId === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: 'sourceId is required unless the source kind is manual',
+        message: characterValidationMessages.selectionSourceIdRequired(),
         path: ['sourceId'],
       })
     }

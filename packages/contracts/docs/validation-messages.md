@@ -61,6 +61,42 @@ expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ 
 | File           | `<domain>-messages.ts` next to the domain module; small domains may keep an in-file section instead | `rpg/primitives/level-messages.ts` |
 | Global catalog | `fieldValidationMessages` in `src/validation/messages.ts`                                           | —                                  |
 
+| Catalog const                                    | Scope prefix                                | Owns                                                                 |
+| ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------- |
+| `levelValidationMessages`                        | `validation.level.*`                        | Level bounds, tables, campaign max (`overCampaignMax`)               |
+| `characterValidationMessages`                    | `validation.character.*`                    | Valid character data (duplicate class, proficiency targets, sources) |
+| `featValidationMessages`                         | `validation.feat.*`                         | Feat persisted business rules                                        |
+| `requirementEditorValidationMessages`            | `validation.requirementEditor.*`            | Prerequisite builder UI state (dashboard)                            |
+| `speciesCharacterCreationValidationMessages`     | `validation.speciesCharacterCreation.*`     | Persisted species creation domain                                    |
+| `speciesCharacterCreationFormValidationMessages` | `validation.speciesCharacterCreationForm.*` | Species creation form-only rules (dashboard)                         |
+
+Future `validation.requirement.*` holds persisted requirement-expression rules when
+`requirement-expression.ts` gains `superRefine` validation; editor-only rules stay in
+`validation.requirementEditor.*`.
+
+### Character validation catalogs
+
+**Base catalog (tier 2):** `characterValidationMessages` in
+`rpg/runtime/character/character-messages.ts` — rules describing valid character data,
+not a specific UI surface. First consumers live under `runtime/character/`, but ids use
+`validation.character.*` so builder, sheet, level-up, and import flows can reuse the copy.
+
+**Dependency direction:** surface-specific catalogs may import and reuse
+`characterValidationMessages`; the base catalog must not depend on builder, sheet, or
+level-up concepts.
+
+**Future surface catalogs** (add only when those UI flows ship):
+
+| Catalog const                          | Scope prefix                      | Owns                                                                  |
+| -------------------------------------- | --------------------------------- | --------------------------------------------------------------------- |
+| `characterBuilderValidationMessages`   | `validation.characterBuilder.*`   | Builder workflow copy (incomplete steps, pending draft choices)       |
+| `characterSheetFormValidationMessages` | `validation.characterSheetForm.*` | Sheet editor workflow copy (unsaved edits, sheet-specific sequencing) |
+| `characterLevelUpValidationMessages`   | `validation.characterLevelUp.*`   | Level-up wizard workflow copy (sequencing, pending choices)           |
+
+Species level-limit forms use `levelValidationMessages.overCampaignMax` for campaign-cap
+violations; the form-only “required when limit enabled” rule stays in
+`speciesCharacterCreationFormValidationMessages` (tier 3).
+
 ## Copy style
 
 - Full sentences, sentence case, trailing period.
@@ -152,17 +188,13 @@ bound to a `<Form>` / `WizardStepForm` / `TabbedForm` field config. Most issues
 are developer- or server-facing; migrate to `defineMessage` catalogs when a
 user-facing surface appears.
 
-| Module                                                      | Inline / hardcoded copy                                                                    | When to catalog                                |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| `rpg/runtime/character/core.ts`                             | Duplicate class in level table                                                             | Character builder / sheet editor               |
-| `rpg/runtime/character/selection-sources.ts`                | `sourceId` required unless kind is manual                                                  | Selection-source editor                        |
-| `rpg/runtime/character/proficiencies.ts`                    | Exclusive `toolId` vs `toolCategory`; `weaponId` vs `weaponCategory`                       | Proficiency picker UI                          |
-| `rpg/campaign/patches/campaign-character-creation-patch.ts` | Mostly `levelValidationMessages`; one fallback: `Subclass choice changes are not allowed.` | Campaign patch API responses (if user-visible) |
-| `rpg/content/lib/multiclassing-validation.ts`               | Six eligibility strings (ability floor, species/class caps, campaign toggle)               | Multiclass step in character builder           |
-| `dev-bench/code-ref.ts`                                     | `lineEnd` ≥ `lineStart`                                                                    | Dev Bench ticket editor                        |
-| `dev-bench/hex-color.ts`                                    | Hex format (`#RRGGBB`)                                                                     | Dev Bench epic badge color                     |
-| `apps/api/src/env.ts`                                       | `JWT_SECRET` min length (startup)                                                          | Never — server config only                     |
-| `apps/api/src/features/dev-bench/bench-query.ts`            | `bucket` / `status` mutual exclusion                                                       | Dev Bench query validation (API)               |
+| Module                                           | Inline / hardcoded copy                                                      | When to catalog                      |
+| ------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------ |
+| `rpg/content/lib/multiclassing-validation.ts`    | Six eligibility strings (ability floor, species/class caps, campaign toggle) | Multiclass step in character builder |
+| `dev-bench/code-ref.ts`                          | `lineEnd` ≥ `lineStart`                                                      | Dev Bench ticket editor              |
+| `dev-bench/hex-color.ts`                         | Hex format (`#RRGGBB`)                                                       | Dev Bench epic badge color           |
+| `apps/api/src/env.ts`                            | `JWT_SECRET` min length (startup)                                            | Never — server config only           |
+| `apps/api/src/features/dev-bench/bench-query.ts` | `bucket` / `status` mutual exclusion                                         | Dev Bench query validation (API)     |
 
 ### Equipment unified schema
 

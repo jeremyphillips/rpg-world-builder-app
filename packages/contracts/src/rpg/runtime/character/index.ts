@@ -1,3 +1,4 @@
+export * from './character-messages'
 export * from './core'
 export * from './selection-sources'
 export * from './proficiencies'

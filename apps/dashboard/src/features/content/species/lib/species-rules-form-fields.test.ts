@@ -5,6 +5,8 @@ import {
   defaultSpeciesLevelLimits,
   defaultMulticlassingRules,
   defaultSubclassingRules,
+  levelValidationMessages,
+  MAX_CHARACTER_LEVEL,
 } from '@rpg/contracts'
 
 import { type StackConfig, type FormItem } from '@rpg/ui/form'
@@ -245,7 +247,7 @@ describe('species-rules-form-fields conversions', () => {
     })
   })
 
-  it('rejects level limits above the campaign cap', () => {
+  it('rejects max character level above the campaign max', () => {
     const issues: Array<{ message?: string; path?: PropertyKey[] }> = []
     refineSpeciesCharacterCreationForm(
       {
@@ -269,7 +271,46 @@ describe('species-rules-form-fields conversions', () => {
       } as Parameters<typeof refineSpeciesCharacterCreationForm>[2],
     )
 
-    expect(issues[0]?.message).toContain('campaign cap')
+    expect(issues[0]?.message).toBe(
+      levelValidationMessages.overCampaignMax({ maxLevel: MAX_CHARACTER_LEVEL }),
+    )
+    expect(issues[0]?.path).toEqual(['characterCreation', 'levelLimits', 'maxCharacterLevel'])
+  })
+
+  it('rejects class level cap above the campaign max', () => {
+    const issues: Array<{ message?: string; path?: PropertyKey[] }> = []
+    refineSpeciesCharacterCreationForm(
+      {
+        levelLimits: {
+          limitMaxCharacterLevel: false,
+          maxCharacterLevel: undefined,
+          enableClassLevelCaps: true,
+          classLevelCaps: [{ classId: 'wizard', maxLevel: 25 }],
+        },
+      },
+      { campaignRules: defaultCampaignRules() },
+      {
+        addIssue: (issue) => {
+          if (typeof issue === 'object' && issue !== null && 'message' in issue) {
+            issues.push({
+              message: issue.message,
+              path: issue.path,
+            })
+          }
+        },
+      } as Parameters<typeof refineSpeciesCharacterCreationForm>[2],
+    )
+
+    expect(issues[0]?.message).toBe(
+      levelValidationMessages.overCampaignMax({ maxLevel: MAX_CHARACTER_LEVEL }),
+    )
+    expect(issues[0]?.path).toEqual([
+      'characterCreation',
+      'levelLimits',
+      'classLevelCaps',
+      0,
+      'maxLevel',
+    ])
   })
 })
 

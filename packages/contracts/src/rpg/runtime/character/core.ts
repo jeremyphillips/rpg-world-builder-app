@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../../primitives/level'
+import { characterValidationMessages } from './character-messages'
 import { characterAbilityScoreSchema } from '../../vocab/ability'
 import { creatureRuntimeHitPointsSchema } from '../../content/creature'
 
@@ -34,7 +35,7 @@ export const characterClassesSchema = z
       if (seen.has(entry.classId)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'A character cannot include the same class more than once',
+          message: characterValidationMessages.duplicateClass(),
           path: [index, 'classId'],
         })
       }

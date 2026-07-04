@@ -2,6 +2,7 @@ import type { RefinementCtx } from 'zod'
 import {
   defaultSpeciesMulticlassing,
   defineMessage,
+  levelValidationMessages,
   speciesLevelLimitsSchema,
   speciesMulticlassingSchema,
   type Species,
@@ -12,20 +13,11 @@ import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rul
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
 
-/** Species character-creation validation messages (tier 3 form overrides). */
-export const speciesCharacterCreationValidationMessages = {
+/** Species character-creation form validation messages (tier 3 form overrides). */
+export const speciesCharacterCreationFormValidationMessages = {
   maxCharacterLevelRequired: defineMessage(
-    'validation.speciesCharacterCreation.maxCharacterLevelRequired',
-    () => 'Max character level is required when the limit is enabled',
-  ),
-  maxCharacterLevelExceedsCampaign: defineMessage<{ campaignMax: number }>(
-    'validation.speciesCharacterCreation.maxCharacterLevelExceedsCampaign',
-    ({ campaignMax }) => `Max character level cannot exceed the campaign cap (${campaignMax})`,
-  ),
-  classLevelCapExceedsCampaign: defineMessage<{ campaignMax: number }>(
-    'validation.speciesCharacterCreation.classLevelCapExceedsCampaign',
-    ({ campaignMax }) => `Class level cap cannot exceed the campaign cap (${campaignMax})`,
-    () => 'Cap exceeds campaign',
+    'validation.speciesCharacterCreationForm.maxCharacterLevelRequired',
+    () => 'Max character level is required when the limit is enabled.',
   ),
 }
 
@@ -144,15 +136,13 @@ export function refineSpeciesCharacterCreationForm(
     if (maxLevel === undefined) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: speciesCharacterCreationValidationMessages.maxCharacterLevelRequired(),
+        message: speciesCharacterCreationFormValidationMessages.maxCharacterLevelRequired(),
         path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
       })
     } else if (maxLevel > campaignMax) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: speciesCharacterCreationValidationMessages.maxCharacterLevelExceedsCampaign({
-          campaignMax,
-        }),
+        message: levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
         path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
       })
     }
@@ -164,9 +154,7 @@ export function refineSpeciesCharacterCreationForm(
     if (cap.maxLevel > campaignMax) {
       refinementCtx.addIssue({
         code: 'custom',
-        message: speciesCharacterCreationValidationMessages.classLevelCapExceedsCampaign({
-          campaignMax,
-        }),
+        message: levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
         path: ['characterCreation', 'levelLimits', 'classLevelCaps', index, 'maxLevel'],
       })
     }

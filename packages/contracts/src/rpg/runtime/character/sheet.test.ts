@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { characterValidationMessages } from './character-messages'
 import { characterSchema, getCharacterTotalLevel } from './sheet'
 import { characterSelectionSourceSchema } from './selection-sources'
 import {
@@ -221,17 +222,19 @@ describe('characterSchema', () => {
   })
 
   it('rejects duplicate class entries', () => {
-    expect(
-      characterSchema.safeParse({
-        ...baseCharacter,
-        characterType: 'pc',
-        userId: 'user_1',
-        classes: [
-          { classId: 'srd-cc-5.2.1:fighter', level: 3 },
-          { classId: 'srd-cc-5.2.1:fighter', level: 4 },
-        ],
-      }).success,
-    ).toBe(false)
+    const result = characterSchema.safeParse({
+      ...baseCharacter,
+      characterType: 'pc',
+      userId: 'user_1',
+      classes: [
+        { classId: 'srd-cc-5.2.1:fighter', level: 3 },
+        { classId: 'srd-cc-5.2.1:fighter', level: 4 },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues[0]?.message).toBe(characterValidationMessages.duplicateClass())
   })
 
   it('defaults omitted languages to an empty list', () => {
@@ -253,7 +256,13 @@ describe('characterSelectionSourceSchema', () => {
   })
 
   it('requires sourceId for catalog-backed sources', () => {
-    expect(characterSelectionSourceSchema.safeParse({ kind: 'feat' }).success).toBe(false)
+    const result = characterSelectionSourceSchema.safeParse({ kind: 'feat' })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues[0]?.message).toBe(
+      characterValidationMessages.selectionSourceIdRequired(),
+    )
   })
 
   it('accepts character creation and starting wealth provenance kinds', () => {
@@ -311,20 +320,28 @@ describe('characterEquipmentEntrySchema', () => {
 
 describe('character proficiency entries', () => {
   it('requires exactly one tool proficiency target', () => {
-    expect(
-      characterToolProficiencyEntrySchema.safeParse({
-        toolId: 'srd-cc-5.2.1:dice-set',
-        toolCategory: 'gaming_set',
-        rank: 'proficient',
-      }).success,
-    ).toBe(false)
+    const result = characterToolProficiencyEntrySchema.safeParse({
+      toolId: 'srd-cc-5.2.1:dice-set',
+      toolCategory: 'gaming_set',
+      rank: 'proficient',
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues[0]?.message).toBe(
+      characterValidationMessages.toolProficiencyExclusiveTarget(),
+    )
   })
 
   it('requires exactly one weapon proficiency target', () => {
-    expect(
-      characterWeaponProficiencyEntrySchema.safeParse({
-        rank: 'proficient',
-      }).success,
-    ).toBe(false)
+    const result = characterWeaponProficiencyEntrySchema.safeParse({
+      rank: 'proficient',
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.error.issues[0]?.message).toBe(
+      characterValidationMessages.weaponProficiencyExclusiveTarget(),
+    )
   })
 })

@@ -17,6 +17,7 @@ import {
   resolveMulticlassingRules,
   resolvedCampaignMulticlassingPatchSchema,
 } from './campaign-multiclassing-patch'
+import { campaignPatchValidationMessages } from './campaign-patch-messages'
 import {
   campaignSubclassingPatchSchema,
   resolveSubclassingRules,
@@ -172,7 +173,7 @@ function validateSubclassChoicesPatchInput({
 
   ctx.addIssue({
     code: 'custom',
-    message: result.message ?? 'Subclass choice changes are not allowed.',
+    message: result.message ?? campaignPatchValidationMessages.subclassChoicesChangeNotAllowed(),
     path: [...pathPrefix, 'subclasses', 'enabled'],
   })
 }
