@@ -16,6 +16,7 @@ import {
   CampaignDetailRoute,
   CampaignSessionsRoute,
   CampaignSettingsRoute,
+  CharacterCreateRoute,
   CharacterDetailRoute,
   CharactersOverviewRoute,
   ClassCreateRoute,
@@ -397,7 +398,10 @@ const router = createBrowserRouter(
         },
         {
           element: <ConcentrationShell />,
-          children: [{ path: 'campaigns/new', element: <CampaignCreateRoute /> }],
+          children: [
+            { path: 'campaigns/new', element: <CampaignCreateRoute /> },
+            { path: 'characters/new', element: <CharacterCreateRoute /> },
+          ],
         },
       ],
     },
