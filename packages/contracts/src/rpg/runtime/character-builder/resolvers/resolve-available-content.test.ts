@@ -1,0 +1,216 @@
+import { describe, expect, it } from 'vitest'
+
+import type { ClassStored } from '../../../content/classes/class'
+import { equipmentSchema } from '../../../content/equipment'
+import type { Species } from '../../../content/species'
+import type { Spell } from '../../../content/spell'
+import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
+import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
+import type { CharacterBuildContext } from '../context'
+import { DEFAULT_ABILITY_GENERATION_RULES } from '../ability-generation'
+import { startingWealthSeed } from '../test-fixtures'
+import { resolveAvailableContent } from './resolve-available-content'
+
+const timestamps = {
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+} as const
+
+function makeStoredClass(slug: string, name: string): ClassStored {
+  return {
+    id: `srd-cc-5.2.1:${slug}`,
+    slug,
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    campaignId: null,
+    ...timestamps,
+    name,
+    primaryAbilities: ['str'],
+    hitDie: 10,
+    proficiencies: {
+      savingThrows: ['str', 'con'],
+      armor: ['light'],
+      weapons: { categories: ['simple'] },
+      skills: { choose: 2 },
+    },
+    features: [],
+  }
+}
+
+function makeSpecies(slug: string, creatureType: Species['creatureType']): Species {
+  return {
+    id: `srd-cc-5.2.1:${slug}`,
+    slug,
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    campaignId: null,
+    ...timestamps,
+    name: slug,
+    description: `<p>${slug}</p>`,
+    creatureType,
+    sizes: ['medium'],
+    speed: { walk: 30 },
+    traits: [],
+  }
+}
+
+function makeSpell(slug: string, classIds: Spell['classIds']): Spell {
+  return {
+    id: `srd-cc-5.2.1:${slug}`,
+    slug,
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    campaignId: null,
+    ...timestamps,
+    name: slug,
+    description: `<p>${slug}</p>`,
+    school: 'evocation',
+    level: 0,
+    classIds,
+    castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+    range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
+    duration: { kind: 'instantaneous' },
+    components: { verbal: true, somatic: true },
+  }
+}
+
+function makeContext(
+  overrides: Partial<CharacterBuildContext> & {
+    creatureTypePolicy?: CharacterBuildContext['characterCreationRules']['species']['creatureTypePolicy']
+  } = {},
+): CharacterBuildContext {
+  const { creatureTypePolicy, ...rest } = overrides
+  const baseRules = {
+    ...resolveCharacterCreationPatch(undefined, startingWealthSeed),
+    abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+  }
+
+  return {
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+    rulesetId: 'srd-cc-5.2.1',
+    catalog: {
+      species: [],
+      classes: [],
+      spells: [],
+      equipment: [],
+      skillProficiencies: [],
+    },
+    characterCreationRules: {
+      ...baseRules,
+      species: {
+        creatureTypePolicy: creatureTypePolicy ?? baseRules.species.creatureTypePolicy,
+      },
+    },
+    permissions: { canCreateCharacter: true },
+    ...rest,
+  }
+}
+
+describe('resolveAvailableContent', () => {
+  it('filters species by resolved creatureTypePolicy (default humanoid only)', () => {
+    const context = makeContext({
+      catalog: {
+        species: [makeSpecies('dwarf', 'humanoid'), makeSpecies('pixie', 'fey')],
+        classes: [],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.species.map((entry) => entry.slug)).toEqual(['dwarf'])
+  })
+
+  it('includes species matching a widened creatureTypePolicy', () => {
+    const context = makeContext({
+      creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] },
+      catalog: {
+        species: [makeSpecies('dwarf', 'humanoid'), makeSpecies('pixie', 'fey')],
+        classes: [],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.species.map((entry) => entry.slug).sort()).toEqual(['dwarf', 'pixie'])
+  })
+
+  it('applies the MVP-A non-caster class filter (remove with BENCH-091)', () => {
+    const fighter = withDerivedClassSkillFrom(makeStoredClass('fighter', 'Fighter'), [])
+    const wizard = withDerivedClassSkillFrom(makeStoredClass('wizard', 'Wizard'), [])
+    const context = makeContext({
+      catalog: {
+        species: [],
+        classes: [fighter, wizard],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+  })
+
+  it('filters spells to those learnable by available classes', () => {
+    const fighter = withDerivedClassSkillFrom(makeStoredClass('fighter', 'Fighter'), [])
+    const wizard = withDerivedClassSkillFrom(makeStoredClass('wizard', 'Wizard'), [])
+    const context = makeContext({
+      catalog: {
+        species: [],
+        classes: [fighter, wizard],
+        spells: [
+          makeSpell('fire-bolt', ['wizard']),
+          makeSpell('true-strike', ['bard', 'sorcerer', 'warlock', 'wizard']),
+        ],
+        equipment: [],
+        skillProficiencies: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.spells).toEqual([])
+  })
+
+  it('passes equipment through unchanged', () => {
+    const equipment = equipmentSchema.parse({
+      id: 'srd-cc-5.2.1:longsword',
+      slug: 'longsword',
+      rulesetId: 'srd-cc-5.2.1',
+      source: 'system',
+      campaignId: null,
+      ...timestamps,
+      kind: 'weapon',
+      name: 'Longsword',
+      cost: { amount: 15, currency: 'gp' },
+      category: 'martial',
+      mode: 'melee',
+      damage: { kind: 'dice', count: 1, faces: 8 },
+      damageType: 'slashing',
+      properties: [],
+      mastery: 'sap',
+    })
+
+    const context = makeContext({
+      catalog: {
+        species: [],
+        classes: [],
+        spells: [],
+        equipment: [equipment],
+        skillProficiencies: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.equipment).toEqual([equipment])
+  })
+})
