@@ -8,6 +8,7 @@ import {
   getAlignmentEntry,
   getAlignmentLabel,
   getAlignmentSentenceForm,
+  optionalAlignmentSchema,
 } from './alignment'
 
 describe('alignmentSchema', () => {
@@ -20,6 +21,13 @@ describe('alignmentSchema', () => {
   it('rejects unknown alignments', () => {
     expect(alignmentSchema.safeParse('true-neutral').success).toBe(false)
     expect(alignmentSchema.safeParse('lg').success).toBe(true)
+  })
+})
+
+describe('optionalAlignmentSchema', () => {
+  it('treats blank select sentinels as unset', () => {
+    expect(optionalAlignmentSchema.parse('')).toBeUndefined()
+    expect(optionalAlignmentSchema.parse('lg')).toBe('lg')
   })
 })
 

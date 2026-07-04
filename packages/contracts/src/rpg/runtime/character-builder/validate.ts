@@ -37,7 +37,7 @@ function issue(
   message: string,
   extra: Omit<CharacterBuildValidationIssue, 'code' | 'message'> = {},
 ): CharacterBuildValidationIssue {
-  return { code, message, ...extra }
+  return { code, message: formatFieldMessage(message), ...extra }
 }
 
 function validateIdentity(
@@ -122,12 +122,10 @@ function validateAbilities(
       issues.push(
         issue(
           'ability_score_out_of_range',
-          formatFieldMessage(
-            abilityValidationMessages.characterScoreOutOfRange({
-              min: ABILITY_SCORE_MIN,
-              max: CHARACTER_ABILITY_SCORE_MAX,
-            }),
-          ),
+          abilityValidationMessages.characterScoreOutOfRange({
+            min: ABILITY_SCORE_MIN,
+            max: CHARACTER_ABILITY_SCORE_MAX,
+          }),
           { path: `abilities.scores.${ability}`, stepId: 'abilities' },
         ),
       )

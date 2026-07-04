@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
@@ -93,9 +93,12 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     navigateToStep(nextStepId)
   }
 
-  const applyDraftPatch = (patch: Partial<CharacterBuilderDraft>) => {
-    patchDraft(patch)
-  }
+  const applyDraftPatch = useCallback(
+    (patch: Partial<CharacterBuilderDraft>) => {
+      patchDraft(patch)
+    },
+    [patchDraft],
+  )
 
   const attemptStepAdvance = (patch?: Partial<CharacterBuilderDraft>) => {
     const nextDraft = patch ? mergeCharacterBuilderDraft(draft, patch) : draft

@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { render, screen } from '@testing-library/react'
-
-import { ConcentrationShell } from '@/components/layout/concentration-shell'
 
 vi.mock('./character-create', () => ({
   CharacterCreate: () => <div>Character create screen</div>,
@@ -20,15 +18,15 @@ describe('character routes', () => {
     const router = createMemoryRouter(
       [
         {
-          path: 'characters',
+          element: <Outlet />,
           children: [
             {
-              element: <ConcentrationShell />,
-              children: [{ path: 'new', element: <CharacterCreate /> }],
+              path: 'characters',
+              children: [{ path: ':characterId', element: <CharacterDetail /> }],
             },
-            { path: ':characterId', element: <CharacterDetail /> },
           ],
         },
+        { path: 'characters/new', element: <CharacterCreate /> },
       ],
       { initialEntries: ['/characters/new'] },
     )

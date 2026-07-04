@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { ALIGNMENTS, alignmentSchema, getAlignmentLabel } from '@rpg/contracts'
+import { ALIGNMENTS, getAlignmentLabel, optionalAlignmentSchema } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 export const identityFormSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().optional(),
-  alignment: alignmentSchema.optional(),
+  alignment: optionalAlignmentSchema,
 })
 
 export type IdentityFormValues = z.infer<typeof identityFormSchema>

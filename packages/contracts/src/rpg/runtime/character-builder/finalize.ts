@@ -3,6 +3,7 @@ import type { CreateCharacterInput } from '../character/create-input'
 import type { CharacterEquipment } from '../character/equipment-inventory'
 import type { CharacterSpellEntry } from '../character/equipment-inventory'
 import { levelOneMaxHp } from '../character/derive/index'
+import { formatFieldMessage } from '../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../vocab/ability'
 import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import { characterBuilderValidationMessages } from './character-builder-messages'
@@ -20,7 +21,7 @@ export class CharacterBuildFinalizationError extends Error {
   readonly validationIssues
 
   constructor(validationIssues: CharacterBuildValidationResult['issues']) {
-    super(characterBuilderValidationMessages.finalizationFailed())
+    super(formatFieldMessage(characterBuilderValidationMessages.finalizationFailed()))
     this.name = 'CharacterBuildFinalizationError'
     this.validationIssues = validationIssues
   }
@@ -42,7 +43,7 @@ function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Abil
     throw new CharacterBuildFinalizationError([
       {
         code: 'abilities_incomplete',
-        message: characterBuilderValidationMessages.abilitiesIncomplete(),
+        message: formatFieldMessage(characterBuilderValidationMessages.abilitiesIncomplete()),
         path: 'abilities.scores',
         stepId: 'abilities',
       },
@@ -56,7 +57,7 @@ function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Abil
       throw new CharacterBuildFinalizationError([
         {
           code: 'abilities_incomplete',
-          message: characterBuilderValidationMessages.abilitiesIncomplete(),
+          message: formatFieldMessage(characterBuilderValidationMessages.abilitiesIncomplete()),
           path: 'abilities.scores',
           stepId: 'abilities',
         },

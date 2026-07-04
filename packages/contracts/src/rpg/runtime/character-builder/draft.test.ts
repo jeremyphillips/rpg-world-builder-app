@@ -49,6 +49,15 @@ describe('characterBuilderDraftSchema', () => {
     const draft = { ...createEmptyCharacterBuilderDraft(), currentStepId: 'background' }
     expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(false)
   })
+
+  it('drops blank alignment sentinels from persisted identity', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna', description: 'Steady', alignment: '' },
+    }
+    const parsed = characterBuilderDraftSchema.parse(draft)
+    expect(parsed.identity).toEqual({ name: 'Verna', description: 'Steady' })
+  })
 })
 
 describe('parsePersistedCharacterBuilderState', () => {

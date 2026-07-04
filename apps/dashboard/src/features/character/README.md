@@ -32,11 +32,11 @@ Folder layout and the feature-boundary rule are documented in
 
 ## Routes
 
-| Path                       | Screen                                   |
-| -------------------------- | ---------------------------------------- |
-| `/characters`              | My characters list                       |
-| `/characters/new`          | Character builder (`ConcentrationShell`) |
-| `/characters/:characterId` | Character detail                         |
+| Path                       | Screen                                                     |
+| -------------------------- | ---------------------------------------------------------- |
+| `/characters`              | My characters list                                         |
+| `/characters/new`          | Character builder (concentration mode, outside `AppShell`) |
+| `/characters/:characterId` | Character detail                                           |
 
 ## Related docs
 

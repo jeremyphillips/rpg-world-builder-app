@@ -40,6 +40,7 @@ export function CharacterBuilderStepContent({
         <IdentityStep
           draft={draft}
           validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
         />
       )

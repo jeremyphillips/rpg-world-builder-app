@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
-import { alignmentSchema } from '../../vocab/alignment'
+import { optionalAlignmentSchema } from '../../vocab/alignment'
 import { abilityGenerationMethodSchema } from './ability-generation'
 import { characterBuilderStepIdSchema } from './step-ids'
 
@@ -17,7 +17,7 @@ export const characterBuilderDraftIdentitySchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   imageKey: z.string().optional(),
-  alignment: alignmentSchema.optional(),
+  alignment: optionalAlignmentSchema,
 })
 
 export type CharacterBuilderDraftIdentity = z.infer<typeof characterBuilderDraftIdentitySchema>
