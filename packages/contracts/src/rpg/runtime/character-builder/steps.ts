@@ -81,25 +81,56 @@ export const BUILDER_STEPS: readonly BuilderStep[] = [
 // ---------------------------------------------------------------------------
 // Step → ChoiceType mapping
 //
-// Determines which ChoiceSets belong to each step, enabling
-// getBuilderStepStatus to filter and check the right ChoiceSets.
-// Species: heritage trait picks (choiceType 'trait').
-// Proficiencies: any proficiency-category choices from class or species grants.
-// Equipment: starting equipment package picks.
-// Spells: cantrip and known/prepared spell picks.
+// `CHOICE_TYPE_STEP` is the single source of truth; `STEP_CHOICE_TYPES` is the
+// inverted index for step-scoped ChoiceSet filtering.
 // ---------------------------------------------------------------------------
 
-const STEP_CHOICE_TYPES: Partial<Record<CharacterBuilderStepId, ReadonlySet<ChoiceType>>> = {
-  species: new Set<ChoiceType>(['trait']),
-  proficiencies: new Set<ChoiceType>([
-    'skillProficiency',
-    'weaponProficiency',
-    'toolProficiency',
-    'armorTraining',
-    'language',
-  ]),
-  equipment: new Set<ChoiceType>(['equipment']),
-  spells: new Set<ChoiceType>(['cantrip', 'spell']),
+export const CHOICE_TYPE_STEP = {
+  trait: 'species',
+  skillProficiency: 'proficiencies',
+  weaponProficiency: 'proficiencies',
+  toolProficiency: 'proficiencies',
+  armorTraining: 'proficiencies',
+  language: 'proficiencies',
+  equipment: 'equipment',
+  cantrip: 'spells',
+  spell: 'spells',
+} as const satisfies Record<ChoiceType, CharacterBuilderStepId>
+
+function invertChoiceTypeStep(
+  mapping: Record<ChoiceType, CharacterBuilderStepId>,
+): Partial<Record<CharacterBuilderStepId, ReadonlySet<ChoiceType>>> {
+  const byStep = new Map<CharacterBuilderStepId, Set<ChoiceType>>()
+
+  for (const choiceType of Object.keys(mapping) as ChoiceType[]) {
+    const stepId = mapping[choiceType]
+    const types = byStep.get(stepId) ?? new Set<ChoiceType>()
+    types.add(choiceType)
+    byStep.set(stepId, types)
+  }
+
+  return Object.fromEntries(byStep) as Partial<
+    Record<CharacterBuilderStepId, ReadonlySet<ChoiceType>>
+  >
+}
+
+const STEP_CHOICE_TYPES = invertChoiceTypeStep(CHOICE_TYPE_STEP)
+
+/** Inverted index of {@link CHOICE_TYPE_STEP} — choice types grouped by step id. */
+export const STEP_CHOICE_TYPES_BY_STEP = STEP_CHOICE_TYPES
+
+/** Step ids that collect ChoiceSet selections (excludes identity, class, abilities, review). */
+export const CHOICE_STEP_IDS = [
+  ...new Set(Object.values(CHOICE_TYPE_STEP)),
+] as const satisfies readonly CharacterBuilderStepId[]
+
+export function isChoiceStep(stepId: CharacterBuilderStepId): boolean {
+  return stepId in STEP_CHOICE_TYPES
+}
+
+/** Routes a ChoiceSet to the wizard step that owns its choice type. */
+export function getChoiceSetStepId(choiceSet: ChoiceSet): CharacterBuilderStepId {
+  return CHOICE_TYPE_STEP[choiceSet.choiceType]
 }
 
 function getChoiceSetsForStep(

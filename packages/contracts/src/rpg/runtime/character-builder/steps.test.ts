@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import { CHARACTER_BUILDER_STEP_IDS } from './step-ids'
-import { BUILDER_STEPS, getBuilderStepStatus } from './steps'
+import {
+  BUILDER_STEPS,
+  CHOICE_STEP_IDS,
+  CHOICE_TYPE_STEP,
+  getBuilderStepStatus,
+  getChoiceSetStepId,
+  isChoiceStep,
+  STEP_CHOICE_TYPES_BY_STEP,
+} from './steps'
 import type { BuilderStep } from './steps'
+import { CHOICE_TYPES } from './choice-set'
 import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
 import type { ChoiceSet } from './choice-set'
@@ -106,6 +115,53 @@ describe('BUILDER_STEPS', () => {
     expect(typeof step.id).toBe('string')
     expect(typeof step.label).toBe('string')
     expect(typeof step.description).toBe('string')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Choice type → step mapping
+// ---------------------------------------------------------------------------
+
+describe('choice type step mapping', () => {
+  it('maps every choice type to a builder step', () => {
+    for (const choiceType of CHOICE_TYPES) {
+      expect(CHOICE_TYPE_STEP[choiceType]).toBeDefined()
+    }
+  })
+
+  it('derives STEP_CHOICE_TYPES_BY_STEP as the inverse of CHOICE_TYPE_STEP', () => {
+    for (const choiceType of CHOICE_TYPES) {
+      const stepId = CHOICE_TYPE_STEP[choiceType]
+      expect(STEP_CHOICE_TYPES_BY_STEP[stepId]?.has(choiceType)).toBe(true)
+    }
+
+    for (const [stepId, choiceTypes] of Object.entries(STEP_CHOICE_TYPES_BY_STEP)) {
+      for (const choiceType of choiceTypes ?? []) {
+        expect(CHOICE_TYPE_STEP[choiceType]).toBe(stepId)
+      }
+    }
+  })
+
+  it('exports choice step ids derived from the forward mapping', () => {
+    expect([...CHOICE_STEP_IDS].sort()).toEqual(['equipment', 'proficiencies', 'species', 'spells'])
+    expect(isChoiceStep('species')).toBe(true)
+    expect(isChoiceStep('identity')).toBe(false)
+  })
+
+  it('routes choice sets via getChoiceSetStepId', () => {
+    expect(
+      getChoiceSetStepId({
+        ...makeSkillChoiceSet(),
+        choiceType: 'skillProficiency',
+      }),
+    ).toBe('proficiencies')
+
+    expect(
+      getChoiceSetStepId({
+        ...makeEquipmentChoiceSet(),
+        choiceType: 'equipment',
+      }),
+    ).toBe('equipment')
   })
 })
 

@@ -11,7 +11,7 @@ import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
 //   - Never mutate inputs; always return a new value.
 //   - Keep each function to a single formula so cyclomatic stays at 1.
 //
-// buildCharacterPreview (BENCH-080) composes these into a full derived model.
+// buildCharacterPreview composes deriveCharacterProfile via preview-adapter.ts.
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -115,3 +115,5 @@ export function spellAttackBonus(spellcastingAbilityScore: number, profBonus: nu
 export function unarmoredAc(dexScore: number): number {
   return 10 + abilityModifier(dexScore)
 }
+
+export * from './profile'
