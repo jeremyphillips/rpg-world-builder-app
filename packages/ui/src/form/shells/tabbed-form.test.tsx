@@ -271,10 +271,54 @@ describe('TabbedForm', () => {
     await waitFor(() => {
       expect(
         screen.getByRole('tab', { name: /Notes.*1 field needs attention/i }),
-      ).toBeInTheDocument()
+      ).toHaveAttribute('aria-selected', 'true')
     })
+    const notesInput = screen.getByLabelText('Notes')
+    expect(notesInput).toHaveFocus()
     expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
     expect(screen.getByRole('tab', { name: /Notes/ })).toHaveTextContent('1')
+  })
+
+  it('auto-switches to the first invalid tab and focuses the tab-scoped control', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        id="campaign-form"
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Notes')).toHaveFocus()
+    })
+    expect(screen.getByLabelText('Notes')).toHaveAttribute('id', 'campaign-form-notes-notes')
+    expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('propagates issue badges to a hidden tab after a failed submit', async () => {
@@ -329,6 +373,9 @@ describe('TabbedForm', () => {
     await waitFor(() => {
       expect(screen.getByLabelText('Label')).toHaveAttribute('aria-invalid', 'true')
     })
+
+    expect(screen.getByRole('tab', { name: /Grants/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByLabelText('Label')).toHaveFocus()
 
     await waitFor(() => {
       expect(

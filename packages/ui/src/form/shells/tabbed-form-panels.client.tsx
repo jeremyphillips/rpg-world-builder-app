@@ -15,6 +15,7 @@ import { makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
 import { FormActionsBar } from '../chrome/form-actions-bar'
+import { getTabPanelIdPrefix } from './tabbed-form-id.lib'
 import { TabbedFormTabIssueBadge } from './tabbed-form-tab-issue-badge.client'
 import {
   formFooterSpacingClasses,
@@ -86,6 +87,8 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
 interface TabbedFormPanelsProps {
   tabs: TabbedFormTab[]
   formId: string
+  activeTabId: string
+  onActiveTabChange: (tabId: string) => void
   stickyChrome: boolean
   stickyTabsClassName?: string
   /** When true, skip extra bottom padding (external footer owns spacing). */
@@ -106,14 +109,17 @@ function TabbedFormTabPanel({
   const isActive = activeTabId === tab.id
 
   return (
-    <TabsContent value={tab.id} forceMount>
+    <TabsContent value={tab.id} forceMount data-tab-panel={tab.id}>
       <ArrayItemPresentationContext.Provider
         value={{ suppressFieldErrorText: !isActive, rowSummaryId: undefined }}
       >
         <div className={panelClassName}>
           {tab.header}
           {tab.fields.length > 0 ? (
-            <FormItems items={tab.fields} idPrefix={`${formId}-${tab.id}`} />
+            <FormItems
+              items={tab.fields}
+              idPrefix={getTabPanelIdPrefix(formId, tab.id)}
+            />
           ) : null}
         </div>
       </ArrayItemPresentationContext.Provider>
@@ -124,12 +130,13 @@ function TabbedFormTabPanel({
 export function TabbedFormPanels({
   tabs,
   formId,
+  activeTabId,
+  onActiveTabChange,
   stickyChrome,
   stickyTabsClassName,
   omitPanelBottomPadding,
 }: TabbedFormPanelsProps) {
   const { rhythm } = useFormSectionContext()
-  const [activeTabId, setActiveTabId] = React.useState(tabs[0]?.id ?? '')
   const { tabStates } = useTabbedFormTabValidationState(tabs)
   const tabStateById = React.useMemo(
     () => new Map(tabStates.map((state) => [state.tabId, state])),
@@ -141,13 +148,13 @@ export function TabbedFormPanels({
   )
 
   return (
-    <Tabs value={activeTabId} onValueChange={setActiveTabId} variant="line">
+    <Tabs value={activeTabId} onValueChange={onActiveTabChange} variant="line">
       <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
         <TabsList>
           {tabs.map((tab) => {
             const issueCount = tabStateById.get(tab.id)?.count ?? 0
             return (
-              <TabsTrigger key={tab.id} value={tab.id}>
+              <TabsTrigger key={tab.id} value={tab.id} data-tab-trigger={tab.id}>
                 {tab.label}
                 <TabbedFormTabIssueBadge count={issueCount} />
               </TabsTrigger>
