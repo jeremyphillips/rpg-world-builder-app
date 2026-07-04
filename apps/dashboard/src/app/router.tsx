@@ -74,6 +74,10 @@ const router = createBrowserRouter(
               children: [
                 { index: true, element: <CharactersOverviewRoute /> },
                 {
+                  element: <ConcentrationShell />,
+                  children: [{ path: 'new', element: <CharacterCreateRoute /> }],
+                },
+                {
                   path: ':characterId',
                   element: <CharacterDetailRoute />,
                   handle: {
@@ -398,10 +402,7 @@ const router = createBrowserRouter(
         },
         {
           element: <ConcentrationShell />,
-          children: [
-            { path: 'campaigns/new', element: <CampaignCreateRoute /> },
-            { path: 'characters/new', element: <CharacterCreateRoute /> },
-          ],
+          children: [{ path: 'campaigns/new', element: <CampaignCreateRoute /> }],
         },
       ],
     },

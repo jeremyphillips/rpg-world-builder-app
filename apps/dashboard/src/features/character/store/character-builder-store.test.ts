@@ -33,6 +33,14 @@ describe('character-builder-store', () => {
     resetCharacterBuilderStoreCache()
   })
 
+  it('marks the store hydrated after automatic rehydration', async () => {
+    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-hydrate')
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+  })
+
   it('persists only the version-wrapped draft', async () => {
     const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-a')
     store.getState().patchDraft({
