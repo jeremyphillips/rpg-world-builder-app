@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
-  getBuilderStepStatus,
   type CharacterBuildCatalogIndex,
+  type CharacterBuilderDraft,
+  type CharacterBuildValidationIssue,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
 import { buttonVariants, Heading, Spinner } from '@rpg/ui'
@@ -18,6 +20,9 @@ import {
   getAdjacentBuilderStepId,
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
+import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
+import { getBuilderStepFormId } from '../lib/steps/builder-step-form-ids'
+import { issuesForStep, validateBuilderStepSubmit } from '../lib/validate-builder-step'
 import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.client'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
@@ -26,7 +31,7 @@ import {
   characterBuilderShellHeaderClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
-import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
+import { CharacterBuilderStepContent } from './character-builder-step-content.client'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 export type CharacterBuilderShellProps = {
@@ -39,6 +44,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
   const patchDraft = useCharacterBuilderStore(context, (state) => state.patchDraft)
+  const [validationIssues, setValidationIssues] = useState<CharacterBuildValidationIssue[]>([])
 
   const preview = useCharacterPreview(draft, catalogIndex, context.characterCreationRules)
 
@@ -52,9 +58,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
   const resolvedChoiceSets = null
-  const stepStatus = getBuilderStepStatus(currentStepId, draft, resolvedChoiceSets)
+  const stepValidationIssues = issuesForStep(validationIssues, currentStepId)
 
   const navigateToStep = (stepId: typeof currentStepId) => {
+    setValidationIssues([])
     patchDraft({
       currentStepId: stepId,
       touchedStepIds: appendTouchedStepId(draft.touchedStepIds, stepId),
@@ -65,6 +72,24 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     const nextStepId = getAdjacentBuilderStepId(currentStepId, direction)
     if (!nextStepId) return
     navigateToStep(nextStepId)
+  }
+
+  const applyDraftPatch = (patch: Partial<CharacterBuilderDraft>) => {
+    patchDraft(patch)
+  }
+
+  const attemptStepAdvance = (patch?: Partial<CharacterBuilderDraft>) => {
+    const nextDraft = patch ? mergeCharacterBuilderDraft(draft, patch) : draft
+    if (patch) patchDraft(patch)
+
+    const result = validateBuilderStepSubmit(nextDraft, context, currentStepId)
+    if (!result.ok) {
+      setValidationIssues(result.issues)
+      return
+    }
+
+    setValidationIssues([])
+    shiftStep('forward')
   }
 
   return (
@@ -88,14 +113,22 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
             resolvedChoiceSets={resolvedChoiceSets}
             onStepSelect={navigateToStep}
           />
-          <CharacterBuilderStepPanel stepId={currentStepId} status={stepStatus} />
+          <CharacterBuilderStepContent
+            stepId={currentStepId}
+            context={context}
+            draft={draft}
+            validationIssues={stepValidationIssues}
+            onDraftChange={applyDraftPatch}
+            onStepComplete={attemptStepAdvance}
+          />
           <CharacterBuilderPreviewPanel preview={preview} />
         </div>
 
         <CharacterBuilderFooter
           currentStepId={currentStepId}
+          continueFormId={getBuilderStepFormId(currentStepId)}
           onBack={() => shiftStep('back')}
-          onContinue={() => shiftStep('forward')}
+          onContinue={() => attemptStepAdvance()}
           onCreateCharacter={() => {
             // Wired in a later phase: finalizeCharacterBuild → POST /api/characters
           }}

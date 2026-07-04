@@ -22,6 +22,7 @@ Folder layout and the feature-boundary rule are documented in
 | Step rail          | `components/character-builder-step-rail.client.tsx`        |
 | Preview panel      | `components/character-builder-preview-panel.client.tsx`    |
 | Preview hook       | `hooks/use-character-preview.ts`                           |
+| Step forms         | `lib/steps/*-form-fields.ts`, `lib/steps/*-form-values.ts` |
 
 ## Routes
 

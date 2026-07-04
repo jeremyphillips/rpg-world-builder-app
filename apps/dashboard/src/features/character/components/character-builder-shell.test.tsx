@@ -48,7 +48,7 @@ describe('CharacterBuilderShell', () => {
     expect(screen.getByRole('heading', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Exit' })).toHaveAttribute('href', '/characters')
 
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await userEvent.click(screen.getByRole('button', { name: /^Species/ }))
     expect(screen.getByRole('heading', { name: 'Species' })).toBeInTheDocument()
   })
 
