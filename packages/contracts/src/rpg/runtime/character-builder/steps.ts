@@ -88,6 +88,7 @@ export const BUILDER_STEPS: readonly BuilderStep[] = [
 
 export const CHOICE_TYPE_STEP = {
   trait: 'species',
+  feat: 'proficiencies',
   skillProficiency: 'proficiencies',
   weaponProficiency: 'proficiencies',
   toolProficiency: 'proficiencies',
