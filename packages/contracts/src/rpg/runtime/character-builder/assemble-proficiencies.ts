@@ -75,8 +75,8 @@ function selectedSkillProficiencies(
 
 /**
  * Merges class-fixed weapon/armor proficiencies with skill proficiencies from
- * ChoiceSet selections. Species heritage and other grant sources land in
- * BENCH-087.
+ * ChoiceSet selections. Species heritage and grant-derived proficiencies from
+ * {@link resolveAvailableChoices} can extend this in follow-on work.
  */
 export function assembleCharacterProficiencies(
   draft: CharacterBuilderDraft,

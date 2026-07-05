@@ -22,6 +22,7 @@ export const CHOICE_TYPES = [
   'armorTraining',
   'language',
   'trait',
+  'feat',
   'equipment',
   'cantrip',
   'spell',
