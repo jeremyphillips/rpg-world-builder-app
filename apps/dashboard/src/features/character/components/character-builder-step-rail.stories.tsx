@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 
+import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
+
+const catalogIndex = indexCharacterBuildCatalog(
+  createPopulatedStandaloneBuilderContextFixture().catalog,
+)
 
 const meta = {
   title: 'Character Builder/CharacterBuilderStepRail',
@@ -18,7 +23,9 @@ export const IdentityActive: Story = {
     <CharacterBuilderStepRail
       draft={createEmptyCharacterBuilderDraft()}
       currentStepId="identity"
+      catalogIndex={catalogIndex}
       resolvedChoiceSets={null}
+      validationIssues={[]}
       onStepSelect={() => undefined}
     />
   ),
@@ -35,7 +42,24 @@ export const AbilitiesActive: Story = {
         touchedStepIds: ['identity', 'species', 'class'],
       }}
       currentStepId="abilities"
+      catalogIndex={catalogIndex}
       resolvedChoiceSets={null}
+      validationIssues={[]}
+      onStepSelect={() => undefined}
+    />
+  ),
+}
+
+export const IdentityWarning: Story = {
+  render: () => (
+    <CharacterBuilderStepRail
+      draft={createEmptyCharacterBuilderDraft()}
+      currentStepId="identity"
+      catalogIndex={catalogIndex}
+      resolvedChoiceSets={null}
+      validationIssues={[
+        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+      ]}
       onStepSelect={() => undefined}
     />
   ),

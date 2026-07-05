@@ -23,9 +23,12 @@ export const characterBuilderShellFooterClasses =
 export const characterBuilderStepRailClasses = 'space-y-1'
 
 export const characterBuilderStepRailItemClasses =
-  'flex w-full items-start justify-between gap-2 rounded-md px-3 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
 
-export const characterBuilderStepRailItemActiveClasses = 'bg-muted/40'
+export const characterBuilderStepRailItemActiveClasses =
+  'bg-muted/40 before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary'
+
+export const characterBuilderStepRailIconClasses = 'mt-0.5 size-4 shrink-0'
 
 export const characterBuilderStepPanelClasses =
   'min-w-0 space-y-4 rounded-lg border border-border p-6'

@@ -2,19 +2,22 @@
 
 import {
   BUILDER_STEPS,
-  getBuilderStepStatus,
-  type BuilderStepStatus,
+  type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
+  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
-import { Badge, cn, Text } from '@rpg/ui'
+import { cn, Text } from '@rpg/ui'
+import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
 
 import {
-  builderStepStatusBadgeVariant,
-  getBuilderStepStatusLabel,
-} from '../lib/builder-step-status-display'
+  resolveStepVisualStatus,
+  stepStatusAriaLabel,
+  type StepStatus,
+} from '../lib/builder-step-visual-status'
 import {
   characterBuilderStepRailClasses,
+  characterBuilderStepRailIconClasses,
   characterBuilderStepRailItemActiveClasses,
   characterBuilderStepRailItemClasses,
 } from './character-builder-shell.variants'
@@ -22,35 +25,71 @@ import {
 export type CharacterBuilderStepRailProps = {
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
+  catalogIndex: CharacterBuildCatalogIndex
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
   resolvedChoiceSets: null
+  validationIssues: CharacterBuildValidationIssue[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
+}
+
+const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
+  notStarted: Circle,
+  inProgress: CircleDot,
+  complete: CheckCircle2,
+  warning: CircleAlert,
+  locked: Lock,
+}
+
+const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
+  notStarted: 'text-muted-foreground',
+  inProgress: 'text-primary',
+  complete: 'text-muted-foreground',
+  warning: 'text-destructive',
+  locked: 'text-muted-foreground',
 }
 
 export function CharacterBuilderStepRail({
   draft,
   currentStepId,
+  catalogIndex,
   resolvedChoiceSets,
+  validationIssues,
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
   return (
     <nav aria-label="Character builder steps">
       <ol className={characterBuilderStepRailClasses}>
         {BUILDER_STEPS.map((step) => {
-          const status = getBuilderStepStatus(step.id, draft, resolvedChoiceSets)
+          const visualStatus = resolveStepVisualStatus({
+            stepId: step.id,
+            draft,
+            currentStepId,
+            resolvedChoiceSets,
+            validationIssues,
+            catalogIndex,
+          })
           const isActive = currentStepId === step.id
+          const Icon = STEP_STATUS_ICONS[visualStatus]
 
           return (
             <li key={step.id}>
               <button
                 type="button"
                 aria-current={isActive ? 'step' : undefined}
+                aria-label={stepStatusAriaLabel(step.label, visualStatus, isActive)}
                 className={cn(
                   characterBuilderStepRailItemClasses,
                   isActive && characterBuilderStepRailItemActiveClasses,
                 )}
                 onClick={() => onStepSelect(step.id)}
               >
+                <Icon
+                  aria-hidden
+                  className={cn(
+                    characterBuilderStepRailIconClasses,
+                    STEP_STATUS_ICON_CLASSES[visualStatus],
+                  )}
+                />
                 <span className="min-w-0 space-y-0.5">
                   <Text as="span" variant="body" className="block font-medium">
                     {step.label}
@@ -59,27 +98,11 @@ export function CharacterBuilderStepRail({
                     {step.description}
                   </Text>
                 </span>
-                <StepStatusBadge
-                  label={getBuilderStepStatusLabel(step.id, status, resolvedChoiceSets)}
-                  status={status}
-                />
               </button>
             </li>
           )
         })}
       </ol>
     </nav>
-  )
-}
-
-function StepStatusBadge({ status, label }: { status: BuilderStepStatus; label: string }) {
-  return (
-    <Badge
-      size="sm"
-      variant={builderStepStatusBadgeVariant(status)}
-      className="shrink-0 self-start"
-    >
-      {label}
-    </Badge>
   )
 }

@@ -172,7 +172,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
             <CharacterBuilderStepRail
               draft={draft}
               currentStepId={currentStepId}
+              catalogIndex={catalogIndex}
               resolvedChoiceSets={resolvedChoiceSets}
+              validationIssues={validationIssues}
               onStepSelect={navigateToStep}
             />
           </div>
