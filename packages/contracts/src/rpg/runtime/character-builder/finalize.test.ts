@@ -9,7 +9,7 @@ import { builderTestContext } from './test-fixtures'
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
     ...createEmptyCharacterBuilderDraft(),
-    identity: { name: 'Verna', alignment: 'ng', description: 'A veteran soldier.' },
+    identity: { name: 'Verna', alignment: 'ng', narrative: { backstory: 'A veteran soldier.' } },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: {
@@ -34,6 +34,11 @@ describe('finalizeCharacterBuild', () => {
     const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
     expect(input.hitPoints).toEqual({ base: 11, temporary: 0 })
     expect(input.xp).toBe(0)
+  })
+
+  it('carries narrative from the draft identity', () => {
+    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
   })
 
   it('carries class proficiency sources', () => {

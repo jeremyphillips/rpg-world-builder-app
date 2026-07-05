@@ -9,6 +9,7 @@ import {
   getErrorMessage,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
+  type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
@@ -20,9 +21,11 @@ import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import {
+  appendAttemptedStepId,
   appendTouchedStepId,
   getAdjacentBuilderStepId,
   isReviewBuilderStep,
+  mergeAttemptedStepIds,
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
@@ -36,8 +39,10 @@ import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 import {
-  characterBuilderShellGridClasses,
+  characterBuilderShellBodyClasses,
+  characterBuilderShellColumnClasses,
   characterBuilderShellHeaderClasses,
+  characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
 import { CharacterBuilderStepContent } from './character-builder-step-content.client'
@@ -61,6 +66,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     (state) => state.clearPersistedDraft,
   )
   const [validationIssues, setValidationIssues] = useState<CharacterBuildValidationIssue[]>([])
+  const [attemptedStepIds, setAttemptedStepIds] = useState<CharacterBuilderStepId[]>([])
   const [createError, setCreateError] = useState<string | null>(null)
 
   const preview = useCharacterPreview(draft, catalogIndex, context.characterCreationRules)
@@ -118,6 +124,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
     const result = validateBuilderStepSubmit(nextDraft, context, currentStepId)
     if (!result.ok) {
+      setAttemptedStepIds((previous) => appendAttemptedStepId(previous, currentStepId))
       setValidationIssues(result.issues)
       return
     }
@@ -133,6 +140,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
     const validation = validateBuilderFinalSubmit(draft, context)
     if (!validation.ok) {
+      const issueStepIds = validation.issues.flatMap((issue) =>
+        issue.stepId ? [issue.stepId] : [],
+      )
+      setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
       setValidationIssues(validation.issues)
       return
     }
@@ -144,6 +155,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
       navigate(ROUTES.characters.detail(character.id))
     } catch (error) {
       if (error instanceof CharacterBuildFinalizationError) {
+        const issueStepIds = error.validationIssues.flatMap((issue) =>
+          issue.stepId ? [issue.stepId] : [],
+        )
+        setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
         setValidationIssues(error.validationIssues)
         return
       }
@@ -166,23 +181,38 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
           </Link>
         </header>
 
-        <div className={characterBuilderShellGridClasses}>
-          <CharacterBuilderStepRail
-            draft={draft}
-            currentStepId={currentStepId}
-            resolvedChoiceSets={resolvedChoiceSets}
-            onStepSelect={navigateToStep}
-          />
-          <CharacterBuilderStepContent
-            stepId={currentStepId}
-            context={context}
-            draft={draft}
-            preview={preview}
-            validationIssues={stepValidationIssues}
-            onDraftChange={applyDraftPatch}
-            onStepComplete={attemptStepAdvance}
-          />
-          <CharacterBuilderPreviewPanel preview={preview} />
+        <div className={characterBuilderShellBodyClasses}>
+          <div className={characterBuilderShellColumnClasses}>
+            <CharacterBuilderStepRail
+              draft={draft}
+              currentStepId={currentStepId}
+              catalogIndex={catalogIndex}
+              resolvedChoiceSets={resolvedChoiceSets}
+              validationIssues={validationIssues}
+              attemptedStepIds={attemptedStepIds}
+              standardArray={context.characterCreationRules.abilityGeneration.standardArray}
+              onStepSelect={navigateToStep}
+            />
+          </div>
+          <div className={characterBuilderShellColumnClasses}>
+            <CharacterBuilderStepContent
+              stepId={currentStepId}
+              context={context}
+              draft={draft}
+              preview={preview}
+              validationIssues={stepValidationIssues}
+              onDraftChange={applyDraftPatch}
+              onStepComplete={attemptStepAdvance}
+            />
+          </div>
+          <div className={characterBuilderShellPreviewColumnClasses}>
+            <CharacterBuilderPreviewPanel
+              draft={draft}
+              context={context}
+              catalogIndex={catalogIndex}
+              preview={preview}
+            />
+          </div>
         </div>
 
         {isReviewBuilderStep(currentStepId) && createError ? (

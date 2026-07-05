@@ -1,3 +1,4 @@
+import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
@@ -5,17 +6,18 @@ import { getSkillName } from '../../../content/skill-proficiency'
 import { getSlotRow, SLOT_TABLES } from '../../../content/spell-slots'
 import { proficiencyBonus } from '../../../primitives/level'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
+import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
 import type { CharacterProficiencies } from '../proficiencies'
 import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
 import {
   abilityModifier,
   hasSavingThrowProficiency,
-  levelOneMaxHp,
+  resolveLevelOneMaxHp,
+  resolveUnarmoredAc,
   savingThrowBonus,
   skillModifier,
   spellAttackBonus,
   spellSaveDc,
-  unarmoredAc,
 } from './index'
 
 // ---------------------------------------------------------------------------
@@ -26,6 +28,8 @@ import {
 
 export type CharacterDerivationInput = {
   level: number
+  /** Ruleset base AC (ascending mode). Defaults to the SRD ascending base when omitted. */
+  armorClassBase?: ArmorClassBase
   abilityScores?: Partial<Record<Ability, number>>
   characterClass?: CharacterClass
   proficiencies: CharacterProficiencies
@@ -166,18 +170,21 @@ export function deriveSpellcastingStats(
  * character-like input. Tolerant of missing class or ability scores.
  */
 export function deriveCharacterProfile(input: CharacterDerivationInput): CharacterDerivedProfile {
-  const profBonus = input.characterClass ? proficiencyBonus(input.level) : undefined
+  const acBase = input.armorClassBase ?? DEFAULT_ARMOR_CLASS_BASE
+  const profBonus = proficiencyBonus(input.level)
   const conScore = input.abilityScores?.con
   const dexScore = input.abilityScores?.dex
 
   return {
     abilityScores: deriveAbilityScores(input.abilityScores),
     proficiencyBonus: profBonus,
-    maxHp:
-      input.characterClass && typeof conScore === 'number'
-        ? levelOneMaxHp(input.characterClass.hitDie, conScore)
-        : undefined,
-    ac: typeof dexScore === 'number' ? unarmoredAc(dexScore) : undefined,
+    maxHp: input.characterClass
+      ? resolveLevelOneMaxHp({
+          hitDie: input.characterClass.hitDie,
+          conScore,
+        })
+      : undefined,
+    ac: resolveUnarmoredAc({ acBase, dexScore }),
     savingThrows: deriveSavingThrows(input, profBonus),
     skills: deriveSkillModifiers(input, profBonus),
     spellcasting: deriveSpellcastingStats(input, profBonus),

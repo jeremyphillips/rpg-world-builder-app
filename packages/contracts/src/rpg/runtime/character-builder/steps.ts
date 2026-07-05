@@ -1,4 +1,5 @@
 import { ABILITY_IDS } from '../../vocab/ability'
+import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuilderDraft } from './draft'
@@ -116,6 +117,16 @@ function invertChoiceTypeStep(
 
 const STEP_CHOICE_TYPES = invertChoiceTypeStep(CHOICE_TYPE_STEP)
 
+/**
+ * Choice steps that stay `deferred` until resolvers supply ChoiceSets.
+ * Species is excluded — primary species selection is always available in the shell.
+ */
+const DEFERRED_UNTIL_CHOICE_SETS_RESOLVED = new Set<CharacterBuilderStepId>([
+  'proficiencies',
+  'equipment',
+  'spells',
+])
+
 /** Inverted index of {@link CHOICE_TYPE_STEP} — choice types grouped by step id. */
 export const STEP_CHOICE_TYPES_BY_STEP = STEP_CHOICE_TYPES
 
@@ -163,11 +174,20 @@ function isClassComplete(draft: CharacterBuilderDraft): boolean {
   return typeof draft.class.classId === 'string' && draft.class.classId.length > 0
 }
 
-function isAbilitiesComplete(draft: CharacterBuilderDraft): boolean {
+function isAbilitiesComplete(
+  draft: CharacterBuilderDraft,
+  standardArray: readonly number[] = STANDARD_ARRAY,
+): boolean {
   if (!draft.abilities.method) return false
   const scores = draft.abilities.scores
   if (!scores) return false
-  return ABILITY_IDS.every((ability) => typeof scores[ability] === 'number')
+  if (!ABILITY_IDS.every((ability) => typeof scores[ability] === 'number')) return false
+
+  if (draft.abilities.method === 'standard-array') {
+    return isStandardArrayAssignment(scores, standardArray)
+  }
+
+  return true
 }
 
 function isChoiceStepComplete(
@@ -198,6 +218,7 @@ type StepCompletionArgs = [
   draft: CharacterBuilderDraft,
   stepChoiceSets: ChoiceSet[],
   resolvedChoiceSets: readonly ChoiceSet[] | null,
+  standardArray: readonly number[],
 ]
 
 const STEP_COMPLETION_CHECKS: Record<
@@ -207,7 +228,8 @@ const STEP_COMPLETION_CHECKS: Record<
   identity: (draft) => isIdentityComplete(draft),
   species: (draft, stepChoiceSets) => isSpeciesComplete(draft, stepChoiceSets),
   class: (draft) => isClassComplete(draft),
-  abilities: (draft) => isAbilitiesComplete(draft),
+  abilities: (draft, _stepChoiceSets, _resolvedChoiceSets, standardArray) =>
+    isAbilitiesComplete(draft, standardArray),
   proficiencies: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
   equipment: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
   spells: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
@@ -218,6 +240,33 @@ const STEP_COMPLETION_CHECKS: Record<
 // ---------------------------------------------------------------------------
 // getBuilderStepStatus — the single entry point for step status computation.
 // ---------------------------------------------------------------------------
+
+export type GetBuilderStepStatusOptions = {
+  /** Standard array values for abilities-step multiset completion. Defaults to SRD. */
+  standardArray?: readonly number[]
+}
+
+/**
+ * Whether a step's required draft content is satisfied, ignoring navigation
+ * position (`draft.currentStepId`). Use for rail icons and other cases where
+ * "complete" must persist while revisiting an active step.
+ */
+export function isBuilderStepComplete(
+  stepId: CharacterBuilderStepId,
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
+  options?: GetBuilderStepStatusOptions,
+): boolean {
+  if (DEFERRED_UNTIL_CHOICE_SETS_RESOLVED.has(stepId) && resolvedChoiceSets === null) {
+    return false
+  }
+
+  const stepChoiceSets =
+    resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
+  const standardArray = options?.standardArray ?? STANDARD_ARRAY
+
+  return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets, standardArray)
+}
 
 /**
  * Computes the display status of a builder step.
@@ -240,16 +289,15 @@ export function getBuilderStepStatus(
   stepId: CharacterBuilderStepId,
   draft: CharacterBuilderDraft,
   resolvedChoiceSets: readonly ChoiceSet[] | null,
+  options?: GetBuilderStepStatusOptions,
 ): BuilderStepStatus {
   if (draft.currentStepId === stepId) return 'active'
 
-  const isChoiceStep = stepId in STEP_CHOICE_TYPES
-  if (isChoiceStep && resolvedChoiceSets === null) return 'deferred'
+  if (DEFERRED_UNTIL_CHOICE_SETS_RESOLVED.has(stepId) && resolvedChoiceSets === null) {
+    return 'deferred'
+  }
 
-  const stepChoiceSets =
-    resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
-
-  return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets)
+  return isBuilderStepComplete(stepId, draft, resolvedChoiceSets, options)
     ? 'complete'
     : 'incomplete'
 }

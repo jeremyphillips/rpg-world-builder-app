@@ -2,13 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import {
   abilityModifier,
+  baseArmorClass,
   hasSavingThrowProficiency,
   levelOneMaxHp,
+  resolveLevelOneMaxHp,
+  resolveUnarmoredAc,
   savingThrowBonus,
   skillModifier,
   spellAttackBonus,
   spellSaveDc,
   unarmoredAc,
+  unarmoredAcFromDexModifier,
 } from './index'
 
 // ---------------------------------------------------------------------------
@@ -166,11 +170,26 @@ describe('spellAttackBonus', () => {
 })
 
 // ---------------------------------------------------------------------------
-// unarmoredAc
+// baseArmorClass / unarmoredAcFromDexModifier / unarmoredAc / resolveUnarmoredAc
 // ---------------------------------------------------------------------------
 
+describe('baseArmorClass', () => {
+  it('returns the ruleset base unchanged', () => {
+    expect(baseArmorClass(10)).toBe(10)
+    expect(baseArmorClass(9)).toBe(9)
+  })
+})
+
+describe('unarmoredAcFromDexModifier', () => {
+  it('adds the DEX modifier to the ruleset base', () => {
+    expect(unarmoredAcFromDexModifier(10, 0)).toBe(10)
+    expect(unarmoredAcFromDexModifier(10, 2)).toBe(12)
+    expect(unarmoredAcFromDexModifier(9, -1)).toBe(8)
+  })
+})
+
 describe('unarmoredAc', () => {
-  it('returns 10 + DEX modifier', () => {
+  it('returns ruleset base + DEX modifier', () => {
     expect(unarmoredAc(10)).toBe(10) // DEX 10, mod 0
     expect(unarmoredAc(14)).toBe(12) // DEX 14, mod +2
     expect(unarmoredAc(16)).toBe(13) // DEX 16, mod +3
@@ -178,5 +197,32 @@ describe('unarmoredAc', () => {
 
   it('handles low DEX (DEX 8 → AC 9)', () => {
     expect(unarmoredAc(8)).toBe(9)
+  })
+
+  it('respects a non-default ruleset base', () => {
+    expect(unarmoredAc(10, 9)).toBe(9)
+    expect(unarmoredAc(14, 9)).toBe(11)
+  })
+})
+
+describe('resolveLevelOneMaxHp', () => {
+  it('uses a neutral CON modifier when conScore is unset', () => {
+    expect(resolveLevelOneMaxHp({ hitDie: 10, conScore: undefined })).toBe(10)
+    expect(resolveLevelOneMaxHp({ hitDie: 8, conScore: undefined, defaultConModifier: 0 })).toBe(8)
+  })
+
+  it('derives the modifier from conScore when set', () => {
+    expect(resolveLevelOneMaxHp({ hitDie: 10, conScore: 14 })).toBe(12)
+  })
+})
+
+describe('resolveUnarmoredAc', () => {
+  it('uses a neutral DEX modifier when dexScore is unset', () => {
+    expect(resolveUnarmoredAc({ acBase: 10, dexScore: undefined })).toBe(10)
+    expect(resolveUnarmoredAc({ acBase: 9, dexScore: undefined, defaultDexModifier: 0 })).toBe(9)
+  })
+
+  it('derives the modifier from dexScore when set', () => {
+    expect(resolveUnarmoredAc({ acBase: 10, dexScore: 14 })).toBe(12)
   })
 })

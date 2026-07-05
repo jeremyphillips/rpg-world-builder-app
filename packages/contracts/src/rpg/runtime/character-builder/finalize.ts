@@ -1,7 +1,7 @@
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'
 import type { CharacterEquipment } from '../character/equipment-inventory'
-import type { CharacterSpellEntry } from '../character/equipment-inventory'
+import type { CharacterSpellEntry } from '../character/spells'
 import { levelOneMaxHp } from '../character/derive/index'
 import { formatFieldMessage } from '../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../vocab/ability'
@@ -145,7 +145,7 @@ export function finalizeCharacterBuild(
     spells: selectedSpells(draft, choiceSets),
     equipment: EMPTY_EQUIPMENT,
     wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
-    narrative: draft.identity.description ? { backstory: draft.identity.description } : undefined,
+    narrative: draft.identity.narrative,
     feats: [],
   }
 

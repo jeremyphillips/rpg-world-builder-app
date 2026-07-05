@@ -12,7 +12,7 @@ describe('IdentityDraftSync', () => {
     const emptyDraft = createEmptyCharacterBuilderDraft()
     const restoredDraft = {
       ...emptyDraft,
-      identity: { name: 'Verna', description: 'Steady' },
+      identity: { name: 'Verna', narrative: { personalityTraits: ['Steady'] } },
     }
 
     const { rerender } = render(
@@ -63,6 +63,33 @@ describe('IdentityDraftSync', () => {
     await waitFor(() => {
       expect(onDraftChange).toHaveBeenCalledWith(
         expect.objectContaining({ identity: expect.objectContaining({ name: 'Verna' }) }),
+      )
+    })
+  })
+
+  it('mirrors narrative ideal edits into the builder draft', async () => {
+    const onDraftChange = vi.fn()
+    const draft = createEmptyCharacterBuilderDraft()
+
+    render(
+      <IdentityStep
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+        onStepComplete={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /Add ideal/i }))
+    await userEvent.type(screen.getByLabelText(/^Ideals$/i), 'Protect the weak.')
+
+    await waitFor(() => {
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identity: expect.objectContaining({
+            narrative: expect.objectContaining({ ideals: ['Protect the weak.'] }),
+          }),
+        }),
       )
     })
   })

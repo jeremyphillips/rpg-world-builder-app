@@ -65,6 +65,7 @@ export function CharacterBuilderStepContent({
     case 'abilities':
       return (
         <AbilitiesStep
+          context={context}
           draft={draft}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}

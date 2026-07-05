@@ -1,5 +1,7 @@
+import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { ClassHitDie } from '../../../primitives/dice'
 import type { Ability } from '../../../vocab/ability'
+import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
 import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
 
 // ---------------------------------------------------------------------------
@@ -32,7 +34,24 @@ export function abilityModifier(score: number): number {
  * Single class only — multiclass HP aggregation lives in buildCharacterPreview.
  */
 export function levelOneMaxHp(hitDie: ClassHitDie, conScore: number): number {
-  return hitDie + abilityModifier(conScore)
+  return resolveLevelOneMaxHp({ hitDie, conScore })
+}
+
+export type ResolveLevelOneMaxHpInput = {
+  hitDie: ClassHitDie
+  conScore: number | undefined
+  /** Used when `conScore` is unset — preview default, not an assigned ability score. */
+  defaultConModifier?: number
+}
+
+/** Resolves level-1 max HP, applying a neutral CON modifier when no score is set. */
+export function resolveLevelOneMaxHp({
+  hitDie,
+  conScore,
+  defaultConModifier = 0,
+}: ResolveLevelOneMaxHpInput): number {
+  const conModifier = typeof conScore === 'number' ? abilityModifier(conScore) : defaultConModifier
+  return hitDie + conModifier
 }
 
 // ---------------------------------------------------------------------------
@@ -107,13 +126,43 @@ export function spellAttackBonus(spellcastingAbilityScore: number, profBonus: nu
 // Armour class
 // ---------------------------------------------------------------------------
 
+/** Ruleset base AC before DEX or equipment adjustments (ascending mode). */
+export function baseArmorClass(acBase: ArmorClassBase): number {
+  return acBase
+}
+
+/** Unarmored AC from a ruleset base and a DEX modifier (may be neutral 0). */
+export function unarmoredAcFromDexModifier(acBase: ArmorClassBase, dexModifier: number): number {
+  return acBase + dexModifier
+}
+
 /**
- * Unarmored AC: 10 + DEX modifier.
+ * Unarmored AC from a DEX score and ruleset base.
  * Equipment-based AC (armor + shield, Mage Armor, Unarmored Defense features)
  * is handled in the MVP-B derive extension (BENCH-088).
  */
-export function unarmoredAc(dexScore: number): number {
-  return 10 + abilityModifier(dexScore)
+export function unarmoredAc(
+  dexScore: number,
+  acBase: ArmorClassBase = DEFAULT_ARMOR_CLASS_BASE,
+): number {
+  return unarmoredAcFromDexModifier(acBase, abilityModifier(dexScore))
+}
+
+export type ResolveUnarmoredAcInput = {
+  acBase: ArmorClassBase
+  dexScore: number | undefined
+  /** Used when `dexScore` is unset — preview default, not an assigned ability score. */
+  defaultDexModifier?: number
+}
+
+/** Resolves unarmored AC, applying a neutral DEX modifier when no score is set. */
+export function resolveUnarmoredAc({
+  acBase,
+  dexScore,
+  defaultDexModifier = 0,
+}: ResolveUnarmoredAcInput): number {
+  const dexModifier = typeof dexScore === 'number' ? abilityModifier(dexScore) : defaultDexModifier
+  return unarmoredAcFromDexModifier(acBase, dexModifier)
 }
 
 export * from './profile'

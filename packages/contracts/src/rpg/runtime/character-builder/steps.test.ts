@@ -7,6 +7,7 @@ import {
   CHOICE_TYPE_STEP,
   getBuilderStepStatus,
   getChoiceSetStepId,
+  isBuilderStepComplete,
   isChoiceStep,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
@@ -183,6 +184,29 @@ describe('getBuilderStepStatus — active', () => {
 })
 
 // ---------------------------------------------------------------------------
+// isBuilderStepComplete — content checks ignore navigation position
+// ---------------------------------------------------------------------------
+
+describe('isBuilderStepComplete', () => {
+  it('returns true for a complete step even when it is the currentStepId', () => {
+    const draft = makeDraft({
+      currentStepId: 'identity',
+      identity: { name: 'Verna' },
+    })
+    expect(isBuilderStepComplete('identity', draft, null)).toBe(true)
+  })
+
+  it('returns false for an incomplete step that is the currentStepId', () => {
+    const draft = makeDraft({ currentStepId: 'identity' })
+    expect(isBuilderStepComplete('identity', draft, null)).toBe(false)
+  })
+
+  it('returns false for deferred choice steps when resolvedChoiceSets is null', () => {
+    expect(isBuilderStepComplete('proficiencies', makeDraft(), null)).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // getBuilderStepStatus — identity step
 // ---------------------------------------------------------------------------
 
@@ -214,6 +238,7 @@ describe('getBuilderStepStatus — species', () => {
   it('returns complete with speciesId and no ChoiceSets needed', () => {
     const draft = makeDraft({ species: { speciesId: 'srd-cc-5.2.1:dwarf' } })
     expect(getBuilderStepStatus('species', draft, [])).toBe('complete')
+    expect(getBuilderStepStatus('species', draft, null)).toBe('complete')
   })
 
   it('returns incomplete when heritage ChoiceSet is unsatisfied', () => {
@@ -291,6 +316,16 @@ describe('getBuilderStepStatus — abilities', () => {
       },
     })
     expect(getBuilderStepStatus('abilities', draft, null)).toBe('complete')
+  })
+
+  it('returns incomplete when standard-array scores duplicate a value', () => {
+    const draft = makeDraft({
+      abilities: {
+        method: 'standard-array',
+        scores: { str: 15, dex: 15, con: 13, int: 12, wis: 10, cha: 8 },
+      },
+    })
+    expect(getBuilderStepStatus('abilities', draft, null)).toBe('incomplete')
   })
 
   it('accepts manual method', () => {

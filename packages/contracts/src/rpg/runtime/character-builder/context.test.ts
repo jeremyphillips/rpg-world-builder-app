@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import { indexCharacterBuildCatalog, resolvedCharacterCreationRulesSchema } from './context'
@@ -56,6 +57,7 @@ describe('resolvedCharacterCreationRulesSchema', () => {
     const rules = {
       ...resolveCharacterCreationPatch(undefined, startingWealthSeed),
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
     }
 
     const result = resolvedCharacterCreationRulesSchema.safeParse(rules)
@@ -64,6 +66,7 @@ describe('resolvedCharacterCreationRulesSchema', () => {
       expect(result.data.startingLevel).toBe(1)
       expect(result.data.abilityGeneration.methods).toEqual(['standard-array', 'manual'])
       expect(result.data.abilityGeneration.standardArray).toEqual([15, 14, 13, 12, 10, 8])
+      expect(result.data.armorClass).toEqual({ mode: 'ascending', base: 10 })
     }
   })
 })

@@ -40,6 +40,7 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
       characterCreationRules: {
         ...query.data.patch.characterCreation,
         abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+        armorClass: query.data.patch.mechanics.armorClass,
       },
       permissions: { canCreateCharacter: true },
     }

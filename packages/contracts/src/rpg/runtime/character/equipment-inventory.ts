@@ -4,23 +4,8 @@ import { equipmentModifierSchema } from '../../content/equipment/modifier'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------
-// Spells, equipment, wealth, feats, and narrative
+// Equipment, wealth, and feats
 // ---------------------------------------------------------------------------
-
-export const CHARACTER_SPELL_PREPARATION_STATES = ['known', 'prepared', 'always_prepared'] as const
-
-export const characterSpellPreparationStateSchema = z.enum(CHARACTER_SPELL_PREPARATION_STATES)
-
-export type CharacterSpellPreparationState = z.infer<typeof characterSpellPreparationStateSchema>
-
-export const characterSpellEntrySchema = z.object({
-  spellId: z.string().min(1),
-  preparationState: characterSpellPreparationStateSchema.optional(),
-  sources: characterSelectionSourcesSchema,
-  notes: z.string().optional(),
-})
-
-export type CharacterSpellEntry = z.infer<typeof characterSpellEntrySchema>
 
 export const characterEquipmentEntrySchema = z.object({
   /** Optional stable row id for duplicate or customized copies of the same item. */
@@ -66,13 +51,3 @@ export const characterFeatEntrySchema = z.object({
 })
 
 export type CharacterFeatEntry = z.infer<typeof characterFeatEntrySchema>
-
-export const characterNarrativeSchema = z.object({
-  personalityTraits: z.array(z.string().min(1)).optional(),
-  ideals: z.string().optional(),
-  bonds: z.string().optional(),
-  flaws: z.string().optional(),
-  backstory: z.string().optional(),
-})
-
-export type CharacterNarrative = z.infer<typeof characterNarrativeSchema>

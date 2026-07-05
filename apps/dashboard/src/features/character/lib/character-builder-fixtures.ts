@@ -1,6 +1,7 @@
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
   DEFAULT_SYSTEM_RULESET_ID,
+  defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
   withDerivedClassSkillFrom,
@@ -95,6 +96,7 @@ export function createStandaloneBuilderContextFixture(
     characterCreationRules: {
       ...resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(rulesetId)),
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
     permissions: { canCreateCharacter: true },
     ...overrides,

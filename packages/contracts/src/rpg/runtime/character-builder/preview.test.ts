@@ -31,7 +31,19 @@ describe('buildCharacterPreview', () => {
     ).not.toThrow()
   })
 
-  it('returns partial preview without class-selected HP/AC', () => {
+  it('returns baseline preview stats without class or DEX', () => {
+    const preview = buildCharacterPreview(
+      createEmptyCharacterBuilderDraft(),
+      indexCharacterBuildCatalog(builderTestCatalog),
+      builderTestRules,
+    )
+
+    expect(preview.maxHp).toBeUndefined()
+    expect(preview.ac).toBe(10)
+    expect(preview.proficiencyBonus).toBe(2)
+  })
+
+  it('returns partial preview without class-selected HP', () => {
     const preview = buildCharacterPreview(
       {
         ...createEmptyCharacterBuilderDraft(),
@@ -43,7 +55,21 @@ describe('buildCharacterPreview', () => {
 
     expect(preview.maxHp).toBeUndefined()
     expect(preview.ac).toBe(12)
-    expect(preview.proficiencyBonus).toBeUndefined()
+    expect(preview.proficiencyBonus).toBe(2)
+  })
+
+  it('derives hit die max HP when class is selected before abilities', () => {
+    const preview = buildCharacterPreview(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      },
+      indexCharacterBuildCatalog(builderTestCatalog),
+      builderTestRules,
+    )
+
+    expect(preview.maxHp).toBe(10)
+    expect(preview.ac).toBe(10)
   })
 
   it('derives level-1 fighter stats from a complete draft', () => {

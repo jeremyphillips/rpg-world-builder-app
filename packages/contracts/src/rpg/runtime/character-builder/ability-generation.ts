@@ -31,6 +31,66 @@ export const DEFAULT_ABILITY_GENERATION_RULES = {
   standardArray: [...STANDARD_ARRAY],
 } as const satisfies AbilityGenerationRules
 
+const STANDARD_ARRAY_METHOD = 'standard-array' as const satisfies AbilityGenerationMethod
+
+/**
+ * Picks the ability-generation method the builder should use when the player
+ * cannot choose. Prefers standard array when the rules allow it.
+ */
+export function resolveAbilityGenerationMethod(
+  rules: AbilityGenerationRules,
+): AbilityGenerationMethod {
+  if (rules.methods.includes(STANDARD_ARRAY_METHOD)) {
+    return STANDARD_ARRAY_METHOD
+  }
+
+  return rules.methods[0]!
+}
+
+/** Numeric scores currently assigned in ability order. */
+export function getAssignedStandardArrayScores(scores: Partial<Record<Ability, number>>): number[] {
+  return ABILITY_IDS.map((ability) => scores[ability]).filter(
+    (score): score is number => typeof score === 'number',
+  )
+}
+
+/** Count of abilities with a numeric score assigned. */
+export function getAssignedScoreCount(scores: Partial<Record<Ability, number>>): number {
+  return getAssignedStandardArrayScores(scores).length
+}
+
+/**
+ * Values from `standardArray` not yet assigned. Each value appears at most once
+ * in the result (multiset subtraction).
+ */
+export function getAvailableStandardArrayScores(
+  scores: Partial<Record<Ability, number>>,
+  standardArray: readonly number[],
+): number[] {
+  const available = [...standardArray]
+
+  for (const ability of ABILITY_IDS) {
+    const assigned = scores[ability]
+    if (typeof assigned !== 'number') continue
+
+    const index = available.indexOf(assigned)
+    if (index !== -1) {
+      available.splice(index, 1)
+    }
+  }
+
+  return available.sort((left, right) => right - left)
+}
+
+/** Returns the ability that owns `score`, if any. */
+export function findAbilityAssignedToScore(
+  scores: Partial<Record<Ability, number>>,
+  score: number,
+  excludeAbility?: Ability,
+): Ability | undefined {
+  return ABILITY_IDS.find((ability) => ability !== excludeAbility && scores[ability] === score)
+}
+
 /**
  * Returns true when `scores` uses each value from `standardArray` exactly once.
  * Incomplete assignments return false.
