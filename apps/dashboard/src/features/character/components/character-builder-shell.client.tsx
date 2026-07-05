@@ -36,7 +36,8 @@ import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 import {
-  characterBuilderShellGridClasses,
+  characterBuilderShellBodyClasses,
+  characterBuilderShellColumnClasses,
   characterBuilderShellHeaderClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
@@ -166,23 +167,29 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
           </Link>
         </header>
 
-        <div className={characterBuilderShellGridClasses}>
-          <CharacterBuilderStepRail
-            draft={draft}
-            currentStepId={currentStepId}
-            resolvedChoiceSets={resolvedChoiceSets}
-            onStepSelect={navigateToStep}
-          />
-          <CharacterBuilderStepContent
-            stepId={currentStepId}
-            context={context}
-            draft={draft}
-            preview={preview}
-            validationIssues={stepValidationIssues}
-            onDraftChange={applyDraftPatch}
-            onStepComplete={attemptStepAdvance}
-          />
-          <CharacterBuilderPreviewPanel preview={preview} />
+        <div className={characterBuilderShellBodyClasses}>
+          <div className={characterBuilderShellColumnClasses}>
+            <CharacterBuilderStepRail
+              draft={draft}
+              currentStepId={currentStepId}
+              resolvedChoiceSets={resolvedChoiceSets}
+              onStepSelect={navigateToStep}
+            />
+          </div>
+          <div className={characterBuilderShellColumnClasses}>
+            <CharacterBuilderStepContent
+              stepId={currentStepId}
+              context={context}
+              draft={draft}
+              preview={preview}
+              validationIssues={stepValidationIssues}
+              onDraftChange={applyDraftPatch}
+              onStepComplete={attemptStepAdvance}
+            />
+          </div>
+          <div className={characterBuilderShellColumnClasses}>
+            <CharacterBuilderPreviewPanel preview={preview} />
+          </div>
         </div>
 
         {isReviewBuilderStep(currentStepId) && createError ? (

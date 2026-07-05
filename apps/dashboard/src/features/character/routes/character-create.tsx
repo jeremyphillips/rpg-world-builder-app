@@ -3,6 +3,7 @@ import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { PageLoadState } from '@/components/layout/page-load-state'
 
 import { CharacterBuilderShell } from '../components/character-builder-shell.client'
+import { characterBuilderRouteClasses } from '../components/character-builder-shell.variants'
 import { useBuildContext } from '../hooks/use-build-context'
 
 export function CharacterCreate() {
@@ -10,7 +11,7 @@ export function CharacterCreate() {
   const { context, catalogIndex, isPending, isError, error } = useBuildContext(rulesetId)
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-screen-2xl flex-col px-6 py-8">
+    <div className={characterBuilderRouteClasses}>
       <PageLoadState
         isPending={isPending}
         isError={isError}
@@ -18,7 +19,9 @@ export function CharacterCreate() {
         defaultErrorLabel="Could not load character builder."
       >
         {context && catalogIndex ? (
-          <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
+          <div className="flex min-h-0 flex-1 flex-col">
+            <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
+          </div>
         ) : null}
       </PageLoadState>
     </div>
