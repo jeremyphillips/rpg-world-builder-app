@@ -1,9 +1,8 @@
-import { type ContentTrait } from '@rpg/contracts'
+import { type ContentTrait, resolveGrantGroupsFromContent } from '@rpg/contracts'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import {
   grantGroupsToFormRows,
-  grantsToFormRows,
   formRowsToGrantGroups,
 } from '../../lib/forms/grants/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
@@ -20,10 +19,7 @@ export function traitToFormRow(trait: ContentTrait): TraitRowForm {
       grants: grantGroupsToFormRows(trait.grantGroups),
     }
   }
-  // Custom trait: prefer grantGroups (new model), fall back to legacy grants bag.
-  const grants = trait.grantGroups?.length
-    ? grantGroupsToFormRows(trait.grantGroups)
-    : grantsToFormRows(trait.grants)
+  const grants = grantGroupsToFormRows(resolveGrantGroupsFromContent(trait))
   return {
     id: trait.id,
     kind: 'custom',

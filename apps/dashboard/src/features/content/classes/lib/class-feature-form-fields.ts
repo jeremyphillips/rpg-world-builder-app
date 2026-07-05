@@ -3,6 +3,7 @@ import {
   CLASS_FEATURE_KINDS,
   campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
+  resolveGrantGroupsFromContent,
   type ClassFeature,
   type ClassFeatureKind,
 } from '@rpg/contracts'
@@ -22,7 +23,6 @@ import {
 import {
   grantGroupsToFormRows,
   formRowsToGrantGroups,
-  grantsToFormRows,
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
@@ -108,9 +108,9 @@ export function classFeatureItemFields(
 }
 
 export function featureToFormRow(feature: ClassFeature): FeatureRowForm {
-  const grants = feature.grantGroups?.length
-    ? grantGroupsToFormRows(feature.grantGroups)
-    : grantsToFormRows(feature.grants)
+  const grants = grantGroupsToFormRows(
+    resolveGrantGroupsFromContent(feature, { level: feature.level }),
+  )
   return {
     id: feature.id,
     kind: feature.kind,

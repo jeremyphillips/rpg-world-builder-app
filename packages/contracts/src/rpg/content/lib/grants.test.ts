@@ -24,6 +24,7 @@ import {
   languageChoiceGrantSchema,
   normalizeContentTrait,
   normalizeGrantGroups,
+  resolveGrantGroupsFromContent,
 } from './grants'
 import { resolveTraitDisplay } from './trait-display'
 
@@ -942,5 +943,69 @@ describe('isGrantGroupsEligible', () => {
 
   it('rejects spells-only grant (not eligible kind)', () => {
     expect(isGrantGroupsEligible([{ grants: [spellGrant] }])).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// resolveGrantGroupsFromContent
+// ---------------------------------------------------------------------------
+
+describe('resolveGrantGroupsFromContent', () => {
+  it('returns normalized grantGroups on custom content', () => {
+    const groups = resolveGrantGroupsFromContent({
+      kind: 'custom',
+      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+
+    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+  })
+
+  it('returns an empty array when grantGroups is absent', () => {
+    expect(resolveGrantGroupsFromContent({ kind: 'custom' })).toEqual([])
+  })
+
+  it('normalizes grant-kind traits from grantGroups', () => {
+    const groups = resolveGrantGroupsFromContent({
+      kind: 'grant',
+      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+
+    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+  })
+
+  it('resolves class-feature-shaped content with parent unlock', () => {
+    const groups = resolveGrantGroupsFromContent(
+      {
+        kind: 'custom',
+        grantGroups: [
+          {
+            unlock: { level: 3 },
+            grants: [
+              {
+                kind: 'spells',
+                ability: 'wis',
+                mode: 'always_prepared',
+                spellIds: ['speak-with-animals'],
+              },
+            ],
+          },
+        ],
+      },
+      { level: 1 },
+    )
+
+    expect(groups).toEqual([
+      {
+        unlock: { level: 3 },
+        grants: [
+          {
+            kind: 'spells',
+            ability: 'wis',
+            mode: 'always_prepared',
+            spellIds: ['speak-with-animals'],
+          },
+        ],
+      },
+    ])
   })
 })

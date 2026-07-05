@@ -596,6 +596,26 @@ export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
   return kind === 'sense' || kind === 'resistances' || kind === 'movement' || kind === 'languages'
 }
 
+// ---------------------------------------------------------------------------
+// Grant group resolution — canonical read surface for traits, features, etc.
+// ---------------------------------------------------------------------------
+
+/** Minimal shape shared by {@link ContentTrait}, class features, heritage options, etc. */
+export type GrantGroupSource = {
+  kind: string
+  grantGroups?: GrantGroups
+}
+
+/** Returns normalized grant groups for grant-bearing content, or `[]` when absent. */
+export function resolveGrantGroupsFromContent(
+  content: GrantGroupSource,
+  parentUnlock?: GrantUnlock,
+): GrantGroup[] {
+  if (!content.grantGroups?.length) return []
+
+  return normalizeGrantGroups(content.grantGroups, parentUnlock)
+}
+
 // --- Trait building block ---------------------------------------------------
 
 export const CONTENT_TRAIT_KINDS = ['custom', 'grant'] as const
