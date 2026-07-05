@@ -20,6 +20,7 @@ import {
   characterBuilderStepRailIconClasses,
   characterBuilderStepRailItemActiveClasses,
   characterBuilderStepRailItemClasses,
+  characterBuilderStepRailItemLabelActiveClasses,
 } from './character-builder-shell.variants'
 
 export type CharacterBuilderStepRailProps = {
@@ -29,12 +30,13 @@ export type CharacterBuilderStepRailProps = {
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
   resolvedChoiceSets: null
   validationIssues: CharacterBuildValidationIssue[]
+  attemptedStepIds: readonly CharacterBuilderStepId[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
 }
 
 const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
   notStarted: Circle,
-  inProgress: CircleDot,
+  current: CircleDot,
   complete: CheckCircle2,
   warning: CircleAlert,
   locked: Lock,
@@ -42,8 +44,8 @@ const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
 
 const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
   notStarted: 'text-muted-foreground',
-  inProgress: 'text-primary',
-  complete: 'text-muted-foreground',
+  current: 'text-foreground',
+  complete: 'text-success',
   warning: 'text-destructive',
   locked: 'text-muted-foreground',
 }
@@ -54,6 +56,7 @@ export function CharacterBuilderStepRail({
   catalogIndex,
   resolvedChoiceSets,
   validationIssues,
+  attemptedStepIds,
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
   return (
@@ -66,6 +69,7 @@ export function CharacterBuilderStepRail({
             currentStepId,
             resolvedChoiceSets,
             validationIssues,
+            attemptedStepIds,
             catalogIndex,
           })
           const isActive = currentStepId === step.id
@@ -76,7 +80,7 @@ export function CharacterBuilderStepRail({
               <button
                 type="button"
                 aria-current={isActive ? 'step' : undefined}
-                aria-label={stepStatusAriaLabel(step.label, visualStatus, isActive)}
+                aria-label={stepStatusAriaLabel(step.label, visualStatus)}
                 className={cn(
                   characterBuilderStepRailItemClasses,
                   isActive && characterBuilderStepRailItemActiveClasses,
@@ -91,7 +95,14 @@ export function CharacterBuilderStepRail({
                   )}
                 />
                 <span className="min-w-0 space-y-0.5">
-                  <Text as="span" variant="body" className="block font-medium">
+                  <Text
+                    as="span"
+                    variant="body"
+                    className={cn(
+                      'block font-medium',
+                      isActive && characterBuilderStepRailItemLabelActiveClasses,
+                    )}
+                  >
                     {step.label}
                   </Text>
                   <Text as="span" variant="muted" className="block text-xs">

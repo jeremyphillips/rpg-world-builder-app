@@ -9,37 +9,7 @@ const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 
 describe('resolveStepVisualStatus', () => {
-  it('returns notStarted for untouched incomplete steps', () => {
-    const draft = createEmptyCharacterBuilderDraft()
-
-    expect(
-      resolveStepVisualStatus({
-        stepId: 'species',
-        draft,
-        currentStepId: 'identity',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        catalogIndex,
-      }),
-    ).toBe('notStarted')
-  })
-
-  it('returns inProgress for the active step', () => {
-    const draft = createEmptyCharacterBuilderDraft()
-
-    expect(
-      resolveStepVisualStatus({
-        stepId: 'identity',
-        draft: { ...draft, currentStepId: 'identity' },
-        currentStepId: 'identity',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        catalogIndex,
-      }),
-    ).toBe('inProgress')
-  })
-
-  it('returns inProgress for touched incomplete steps', () => {
+  it('returns notStarted for incomplete steps that were only visited', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       touchedStepIds: ['species' as const],
@@ -52,9 +22,26 @@ describe('resolveStepVisualStatus', () => {
         currentStepId: 'identity',
         resolvedChoiceSets: null,
         validationIssues: [],
+        attemptedStepIds: [],
         catalogIndex,
       }),
-    ).toBe('inProgress')
+    ).toBe('notStarted')
+  })
+
+  it('returns current for the active step only', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    expect(
+      resolveStepVisualStatus({
+        stepId: 'identity',
+        draft,
+        currentStepId: 'identity',
+        resolvedChoiceSets: null,
+        validationIssues: [],
+        attemptedStepIds: [],
+        catalogIndex,
+      }),
+    ).toBe('current')
   })
 
   it('returns complete when the builder step is complete', () => {
@@ -71,12 +58,13 @@ describe('resolveStepVisualStatus', () => {
         currentStepId: 'species',
         resolvedChoiceSets: null,
         validationIssues: [],
+        attemptedStepIds: [],
         catalogIndex,
       }),
     ).toBe('complete')
   })
 
-  it('returns warning only after attempted validation issues exist', () => {
+  it('returns warning only after an attempted submit with blocking issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -88,12 +76,31 @@ describe('resolveStepVisualStatus', () => {
         validationIssues: [
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ],
+        attemptedStepIds: ['identity'],
         catalogIndex,
       }),
     ).toBe('warning')
   })
 
-  it('does not return warning before a step is touched or active', () => {
+  it('does not return warning without an attempted submit', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    expect(
+      resolveStepVisualStatus({
+        stepId: 'identity',
+        draft,
+        currentStepId: 'identity',
+        resolvedChoiceSets: null,
+        validationIssues: [
+          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+        ],
+        attemptedStepIds: [],
+        catalogIndex,
+      }),
+    ).toBe('current')
+  })
+
+  it('does not return warning for other steps with unresolved issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -105,6 +112,7 @@ describe('resolveStepVisualStatus', () => {
         validationIssues: [
           { code: 'species.required', message: 'Species is required.', stepId: 'species' },
         ],
+        attemptedStepIds: ['identity'],
         catalogIndex,
       }),
     ).toBe('notStarted')
@@ -123,6 +131,7 @@ describe('resolveStepVisualStatus', () => {
         currentStepId: 'identity',
         resolvedChoiceSets: null,
         validationIssues: [],
+        attemptedStepIds: [],
         catalogIndex,
       }),
     ).toBe('locked')

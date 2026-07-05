@@ -37,3 +37,18 @@ export function appendTouchedStepId(
 ): CharacterBuilderStepId[] {
   return touchedStepIds.includes(stepId) ? [...touchedStepIds] : [...touchedStepIds, stepId]
 }
+
+export function appendAttemptedStepId(
+  attemptedStepIds: readonly CharacterBuilderStepId[],
+  stepId: CharacterBuilderStepId,
+): CharacterBuilderStepId[] {
+  return attemptedStepIds.includes(stepId) ? [...attemptedStepIds] : [...attemptedStepIds, stepId]
+}
+
+export function mergeAttemptedStepIds(
+  attemptedStepIds: readonly CharacterBuilderStepId[],
+  stepIds: readonly CharacterBuilderStepId[],
+): CharacterBuilderStepId[] {
+  const merged = new Set([...attemptedStepIds, ...stepIds])
+  return [...merged]
+}

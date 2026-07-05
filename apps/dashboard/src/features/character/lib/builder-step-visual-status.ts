@@ -9,7 +9,7 @@ import {
 
 import { issuesForStep } from './validate-builder-step'
 
-export type StepStatus = 'notStarted' | 'inProgress' | 'complete' | 'warning' | 'locked'
+export type StepStatus = 'notStarted' | 'current' | 'complete' | 'warning' | 'locked'
 
 export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
@@ -17,6 +17,7 @@ export type ResolveStepVisualStatusInput = {
   currentStepId: CharacterBuilderStepId
   resolvedChoiceSets: null
   validationIssues: CharacterBuildValidationIssue[]
+  attemptedStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex
 }
 
@@ -39,40 +40,36 @@ export function resolveStepVisualStatus({
   currentStepId,
   resolvedChoiceSets,
   validationIssues,
+  attemptedStepIds,
   catalogIndex,
 }: ResolveStepVisualStatusInput): StepStatus {
   if (stepId === 'spells' && isSpellsStepLocked(draft, catalogIndex)) {
     return 'locked'
   }
 
-  const builderStatus = getBuilderStepStatus(stepId, draft, resolvedChoiceSets)
-  const isActive = currentStepId === stepId
-  const isTouched = draft.touchedStepIds.includes(stepId)
-  const hasAttemptedIssues = issuesForStep(validationIssues, stepId).length > 0
+  const hasBlockingIssues = issuesForStep(validationIssues, stepId).length > 0
+  const hasAttemptedStep = attemptedStepIds.includes(stepId)
 
-  if (hasAttemptedIssues && (isTouched || isActive)) {
+  if (hasAttemptedStep && hasBlockingIssues) {
     return 'warning'
   }
 
+  const builderStatus = getBuilderStepStatus(stepId, draft, resolvedChoiceSets)
   if (builderStatus === 'complete') {
     return 'complete'
   }
 
-  if (isActive || isTouched) {
-    return 'inProgress'
+  if (currentStepId === stepId) {
+    return 'current'
   }
 
   return 'notStarted'
 }
 
-export function stepStatusAriaLabel(
-  stepLabel: string,
-  status: StepStatus,
-  isActive: boolean,
-): string {
+export function stepStatusAriaLabel(stepLabel: string, status: StepStatus): string {
   const statusLabels: Record<StepStatus, string> = {
     notStarted: 'not started',
-    inProgress: isActive ? 'current step' : 'in progress',
+    current: 'current step',
     complete: 'complete',
     warning: 'has validation issues',
     locked: 'locked',

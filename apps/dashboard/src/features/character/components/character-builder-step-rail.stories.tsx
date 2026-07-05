@@ -26,6 +26,7 @@ export const IdentityActive: Story = {
       catalogIndex={catalogIndex}
       resolvedChoiceSets={null}
       validationIssues={[]}
+      attemptedStepIds={[]}
       onStepSelect={() => undefined}
     />
   ),
@@ -45,6 +46,7 @@ export const AbilitiesActive: Story = {
       catalogIndex={catalogIndex}
       resolvedChoiceSets={null}
       validationIssues={[]}
+      attemptedStepIds={[]}
       onStepSelect={() => undefined}
     />
   ),
@@ -60,6 +62,7 @@ export const IdentityWarning: Story = {
       validationIssues={[
         { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
       ]}
+      attemptedStepIds={['identity']}
       onStepSelect={() => undefined}
     />
   ),

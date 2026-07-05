@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
@@ -112,19 +112,20 @@ describe('CharacterBuilderShell', () => {
     renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     await screen.findByRole('heading', { name: 'Identity' })
-    await userEvent.click(screen.getByRole('button', { name: /^Abilities/ }))
+    const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
+    await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
     const strengthSelect = await screen.findByLabelText(/^Strength$/i)
     await userEvent.click(strengthSelect)
     await userEvent.click(screen.getByRole('option', { name: '15' }))
 
-    await userEvent.click(screen.getByRole('button', { name: /^Review/ }))
+    await userEvent.click(within(stepRail).getByRole('button', { name: /Review/i }))
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Review' })).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByRole('button', { name: /^Abilities/ }))
+    await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
     await waitFor(() => {
       expect(screen.getByLabelText(/^Strength$/i)).toHaveTextContent('15')

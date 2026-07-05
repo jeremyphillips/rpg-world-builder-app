@@ -17,6 +17,10 @@ export const characterBuilderShellBodyClasses =
 
 export const characterBuilderShellColumnClasses = 'min-h-0 min-w-0 overflow-y-auto'
 
+/** Preview column — defers scroll to the panel body so the eyebrow stays visible. */
+export const characterBuilderShellPreviewColumnClasses =
+  'flex min-h-0 min-w-0 flex-col overflow-hidden'
+
 export const characterBuilderShellFooterClasses =
   'shrink-0 border-t border-border bg-background py-4'
 
@@ -28,13 +32,30 @@ export const characterBuilderStepRailItemClasses =
 export const characterBuilderStepRailItemActiveClasses =
   'bg-muted/40 before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary'
 
+export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold text-foreground'
+
 export const characterBuilderStepRailIconClasses = 'mt-0.5 size-4 shrink-0'
+
+export const characterBuilderPreviewAccordionTriggerClasses =
+  'text-base font-medium leading-none hover:no-underline'
+
+export const characterBuilderPreviewAccordionTriggerStackClasses =
+  'flex min-w-0 flex-1 flex-col items-start gap-0.5 pr-2 text-left'
 
 export const characterBuilderStepPanelClasses =
   'min-w-0 space-y-4 rounded-lg border border-border p-6'
 
-export const characterBuilderPreviewPanelClasses =
-  'min-w-0 space-y-4 rounded-lg border border-border bg-muted/20 p-4'
+export const characterBuilderPreviewPanelRootClasses = 'flex min-h-0 min-w-0 flex-1 flex-col gap-2'
+
+/** Scrollable bordered preview body — eyebrow sits above this container. */
+export const characterBuilderPreviewPanelBodyClasses =
+  'flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-muted/20'
+
+export const characterBuilderPreviewPanelBodyInnerClasses = 'min-w-0 p-4'
+
+export const characterBuilderPreviewIdentitySummaryClasses = 'space-y-1 border-b border-border pb-4'
+
+export const characterBuilderPreviewCombatGridClasses = 'grid grid-cols-2 gap-3'
 
 export const characterBuilderPreviewStatGridClasses = 'grid grid-cols-3 gap-3'
 

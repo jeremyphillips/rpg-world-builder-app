@@ -21,6 +21,7 @@ describe('CharacterBuilderStepRail', () => {
         catalogIndex={catalogIndex}
         resolvedChoiceSets={null}
         validationIssues={[]}
+        attemptedStepIds={[]}
         onStepSelect={() => undefined}
       />,
     )
@@ -32,7 +33,7 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
-  it('shows a warning icon only after attempted validation issues', () => {
+  it('shows a warning icon only after an attempted submit with blocking issues', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
@@ -42,6 +43,7 @@ describe('CharacterBuilderStepRail', () => {
         validationIssues={[
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ]}
+        attemptedStepIds={['identity']}
         onStepSelect={() => undefined}
       />,
     )
@@ -61,6 +63,7 @@ describe('CharacterBuilderStepRail', () => {
         catalogIndex={catalogIndex}
         resolvedChoiceSets={null}
         validationIssues={[]}
+        attemptedStepIds={[]}
         onStepSelect={onStepSelect}
       />,
     )
@@ -77,6 +80,7 @@ describe('CharacterBuilderStepRail', () => {
         catalogIndex={catalogIndex}
         resolvedChoiceSets={null}
         validationIssues={[]}
+        attemptedStepIds={[]}
         onStepSelect={() => undefined}
       />,
     )
