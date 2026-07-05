@@ -247,6 +247,28 @@ export type GetBuilderStepStatusOptions = {
 }
 
 /**
+ * Whether a step's required draft content is satisfied, ignoring navigation
+ * position (`draft.currentStepId`). Use for rail icons and other cases where
+ * "complete" must persist while revisiting an active step.
+ */
+export function isBuilderStepComplete(
+  stepId: CharacterBuilderStepId,
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
+  options?: GetBuilderStepStatusOptions,
+): boolean {
+  if (DEFERRED_UNTIL_CHOICE_SETS_RESOLVED.has(stepId) && resolvedChoiceSets === null) {
+    return false
+  }
+
+  const stepChoiceSets =
+    resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
+  const standardArray = options?.standardArray ?? STANDARD_ARRAY
+
+  return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets, standardArray)
+}
+
+/**
  * Computes the display status of a builder step.
  *
  * @param stepId             - The step to evaluate.
@@ -275,11 +297,7 @@ export function getBuilderStepStatus(
     return 'deferred'
   }
 
-  const stepChoiceSets =
-    resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
-  const standardArray = options?.standardArray ?? STANDARD_ARRAY
-
-  return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets, standardArray)
+  return isBuilderStepComplete(stepId, draft, resolvedChoiceSets, options)
     ? 'complete'
     : 'incomplete'
 }

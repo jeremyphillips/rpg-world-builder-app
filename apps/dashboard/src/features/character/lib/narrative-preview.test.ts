@@ -34,4 +34,13 @@ describe('narrative preview helpers', () => {
       }),
     ).toBe('complete')
   })
+
+  it('marks narrative partial when some slots are filled', () => {
+    expect(
+      getNarrativePreviewStatus({
+        ideals: ['Honor'],
+        backstory: '<p>Origin story.</p>',
+      }),
+    ).toBe('partial')
+  })
 })

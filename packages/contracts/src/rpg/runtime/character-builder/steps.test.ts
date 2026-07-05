@@ -7,6 +7,7 @@ import {
   CHOICE_TYPE_STEP,
   getBuilderStepStatus,
   getChoiceSetStepId,
+  isBuilderStepComplete,
   isChoiceStep,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
@@ -179,6 +180,29 @@ describe('getBuilderStepStatus — active', () => {
     const draft = makeCompleteDraft()
     draft.currentStepId = 'species'
     expect(getBuilderStepStatus('species', draft, [])).toBe('active')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// isBuilderStepComplete — content checks ignore navigation position
+// ---------------------------------------------------------------------------
+
+describe('isBuilderStepComplete', () => {
+  it('returns true for a complete step even when it is the currentStepId', () => {
+    const draft = makeDraft({
+      currentStepId: 'identity',
+      identity: { name: 'Verna' },
+    })
+    expect(isBuilderStepComplete('identity', draft, null)).toBe(true)
+  })
+
+  it('returns false for an incomplete step that is the currentStepId', () => {
+    const draft = makeDraft({ currentStepId: 'identity' })
+    expect(isBuilderStepComplete('identity', draft, null)).toBe(false)
+  })
+
+  it('returns false for deferred choice steps when resolvedChoiceSets is null', () => {
+    expect(isBuilderStepComplete('proficiencies', makeDraft(), null)).toBe(false)
   })
 })
 

@@ -36,6 +36,11 @@ describe('finalizeCharacterBuild', () => {
     expect(input.xp).toBe(0)
   })
 
+  it('carries narrative from the draft identity', () => {
+    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
+  })
+
   it('carries class proficiency sources', () => {
     const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
 

@@ -39,6 +39,30 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
+  it('keeps the complete icon when revisiting a finished step', () => {
+    render(
+      <CharacterBuilderStepRail
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          identity: { name: 'Tarin', alignment: 'lg' },
+          currentStepId: 'identity',
+        }}
+        currentStepId="identity"
+        catalogIndex={catalogIndex}
+        resolvedChoiceSets={null}
+        validationIssues={[]}
+        attemptedStepIds={[]}
+        standardArray={standardArray}
+        onStepSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Identity, complete/i })).toHaveAttribute(
+      'aria-current',
+      'step',
+    )
+  })
+
   it('shows a warning icon only after an attempted submit with blocking issues', () => {
     render(
       <CharacterBuilderStepRail
@@ -58,6 +82,28 @@ describe('CharacterBuilderStepRail', () => {
     expect(
       screen.getByRole('button', { name: /Identity, has validation issues/i }),
     ).toBeInTheDocument()
+  })
+
+  it('does not show a warning icon before Continue is attempted', () => {
+    render(
+      <CharacterBuilderStepRail
+        draft={createEmptyCharacterBuilderDraft()}
+        currentStepId="identity"
+        catalogIndex={catalogIndex}
+        resolvedChoiceSets={null}
+        validationIssues={[
+          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+        ]}
+        attemptedStepIds={[]}
+        standardArray={standardArray}
+        onStepSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Identity, current step/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Identity, has validation issues/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('calls onStepSelect when a step is clicked', async () => {

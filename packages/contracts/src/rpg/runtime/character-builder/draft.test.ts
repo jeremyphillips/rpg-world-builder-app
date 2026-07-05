@@ -65,6 +65,22 @@ describe('characterBuilderDraftSchema', () => {
       narrative: { personalityTraits: ['Steady'] },
     })
   })
+
+  it('strips legacy identity.description on parse', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: {
+        name: 'Verna',
+        description: 'Legacy single-field bio.',
+        narrative: { backstory: 'Current backstory.' },
+      },
+    }
+    const parsed = characterBuilderDraftSchema.parse(draft)
+    expect(parsed.identity).toEqual({
+      name: 'Verna',
+      narrative: { backstory: 'Current backstory.' },
+    })
+  })
 })
 
 describe('parsePersistedCharacterBuilderState', () => {
@@ -81,6 +97,17 @@ describe('parsePersistedCharacterBuilderState', () => {
     const persisted = {
       version: CHARACTER_BUILDER_DRAFT_VERSION + 1,
       draft: createEmptyCharacterBuilderDraft(),
+    }
+    expect(parsePersistedCharacterBuilderState(persisted)).toBeNull()
+  })
+
+  it('returns null for legacy v1 persisted drafts', () => {
+    const persisted = {
+      version: 1,
+      draft: {
+        ...createEmptyCharacterBuilderDraft(),
+        identity: { name: 'Verna', description: 'Legacy bio.' },
+      },
     }
     expect(parsePersistedCharacterBuilderState(persisted)).toBeNull()
   })

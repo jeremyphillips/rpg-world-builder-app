@@ -66,4 +66,31 @@ describe('IdentityDraftSync', () => {
       )
     })
   })
+
+  it('mirrors narrative ideal edits into the builder draft', async () => {
+    const onDraftChange = vi.fn()
+    const draft = createEmptyCharacterBuilderDraft()
+
+    render(
+      <IdentityStep
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+        onStepComplete={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /Add ideal/i }))
+    await userEvent.type(screen.getByLabelText(/^Ideals$/i), 'Protect the weak.')
+
+    await waitFor(() => {
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identity: expect.objectContaining({
+            narrative: expect.objectContaining({ ideals: ['Protect the weak.'] }),
+          }),
+        }),
+      )
+    })
+  })
 })

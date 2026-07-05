@@ -75,3 +75,20 @@ export const IdentityWarning: Story = {
     />
   ),
 }
+
+export const IssuesBeforeAttempt: Story = {
+  render: () => (
+    <CharacterBuilderStepRail
+      draft={createEmptyCharacterBuilderDraft()}
+      currentStepId="identity"
+      catalogIndex={catalogIndex}
+      resolvedChoiceSets={null}
+      validationIssues={[
+        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+      ]}
+      attemptedStepIds={[]}
+      standardArray={standardArray}
+      onStepSelect={() => undefined}
+    />
+  ),
+}

@@ -17,4 +17,13 @@ describe('isNonEmptyCharacterBuilderDraft', () => {
       }),
     ).toBe(true)
   })
+
+  it('returns true when only narrative fields are filled', () => {
+    expect(
+      isNonEmptyCharacterBuilderDraft({
+        ...createEmptyCharacterBuilderDraft(),
+        identity: { narrative: { backstory: 'A soldier.' } },
+      }),
+    ).toBe(true)
+  })
 })

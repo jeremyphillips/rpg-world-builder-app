@@ -70,6 +70,23 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('complete')
   })
 
+  it('returns complete when revisiting an active step that is already complete', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Tarin', alignment: 'lg' as const },
+      currentStepId: 'identity' as const,
+      touchedStepIds: ['identity' as const],
+    }
+
+    expect(
+      resolveStatus({
+        stepId: 'identity',
+        draft,
+        currentStepId: 'identity',
+      }),
+    ).toBe('complete')
+  })
+
   it('returns complete for species after selection when choice sets are unresolved', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
