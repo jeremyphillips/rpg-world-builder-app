@@ -1,7 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+
+import {
+  createEmptyCharacterBuilderDraft,
+  createPersistedCharacterBuilderState,
+  getCharacterBuilderStorageKey,
+} from '@rpg/contracts'
 
 import { renderWithProviders } from '@/test/render'
 
@@ -29,6 +35,17 @@ function installSessionStorageMock(): void {
 }
 
 describe('CharacterBuilderShell', () => {
+  beforeAll(() => {
+    if (!HTMLElement.prototype.hasPointerCapture) {
+      HTMLElement.prototype.hasPointerCapture = () => false
+      HTMLElement.prototype.setPointerCapture = () => {}
+      HTMLElement.prototype.releasePointerCapture = () => {}
+    }
+    if (!HTMLElement.prototype.scrollIntoView) {
+      HTMLElement.prototype.scrollIntoView = () => {}
+    }
+  })
+
   beforeEach(() => {
     installSessionStorageMock()
     sessionStorage.clear()
@@ -59,5 +76,58 @@ describe('CharacterBuilderShell', () => {
 
     await screen.findByRole('button', { name: 'Continue' })
     await expectNoAxeViolations(container)
+  })
+
+  it('restores identity fields after continuing a persisted draft', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+    const persistedDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna', description: 'Steady' },
+      currentStepId: 'identity' as const,
+      touchedStepIds: ['identity' as const],
+    }
+
+    sessionStorage.setItem(
+      getCharacterBuilderStorageKey(context),
+      JSON.stringify({
+        state: createPersistedCharacterBuilderState(persistedDraft),
+        version: 0,
+      }),
+    )
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    expect(await screen.findByText('Continue your character?')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Continue previous draft' }))
+
+    expect(await screen.findByDisplayValue('Verna')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Steady')).toBeInTheDocument()
+  })
+
+  it('keeps ability scores when navigating away via the step rail without submitting', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('heading', { name: 'Identity' })
+    await userEvent.click(screen.getByRole('button', { name: /^Abilities/ }))
+
+    const strengthSelect = await screen.findByLabelText(/^Strength$/i)
+    await userEvent.click(strengthSelect)
+    await userEvent.click(screen.getByRole('option', { name: '15' }))
+
+    await userEvent.click(screen.getByRole('button', { name: /^Review/ }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Review' })).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByRole('button', { name: /^Abilities/ }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^Strength$/i)).toHaveTextContent('15')
+    })
   })
 })

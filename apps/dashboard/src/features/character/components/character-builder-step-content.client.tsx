@@ -67,6 +67,7 @@ export function CharacterBuilderStepContent({
         <AbilitiesStep
           draft={draft}
           validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
         />
       )

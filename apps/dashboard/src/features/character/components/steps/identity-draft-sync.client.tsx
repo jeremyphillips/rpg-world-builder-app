@@ -8,6 +8,7 @@ import type { CharacterBuilderDraft, CharacterBuilderDraftIdentity } from '@rpg/
 import type { IdentityFormValues } from '../../lib/steps/identity-form-fields'
 import {
   areIdentityDraftsEqual,
+  identityDraftToFormValues,
   identityFormValuesToDraft,
 } from '../../lib/steps/identity-form-values'
 
@@ -16,29 +17,38 @@ type IdentityDraftSyncProps = {
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
-/** Mirrors identity form edits into the persisted builder draft while the user types. */
+/** Keeps identity form state and the persisted builder draft in sync (both directions). */
 export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraftSyncProps) {
-  const { control } = useFormContext<IdentityFormValues>()
+  const { control, reset } = useFormContext<IdentityFormValues>()
   const name = useWatch({ control, name: 'name' })
   const description = useWatch({ control, name: 'description' })
   const alignment = useWatch({ control, name: 'alignment' })
   const onDraftChangeRef = useRef(onDraftChange)
+  const priorDraftRef = useRef(draftIdentity)
 
   onDraftChangeRef.current = onDraftChange
 
   useEffect(() => {
-    const nextIdentity = identityFormValuesToDraft({
+    const previousDraft = priorDraftRef.current
+    const draftChanged = !areIdentityDraftsEqual(previousDraft, draftIdentity)
+    const formIdentity = identityFormValuesToDraft({
       name: name ?? '',
       description,
       alignment,
     })
 
-    if (areIdentityDraftsEqual(draftIdentity, nextIdentity)) {
+    if (draftChanged) {
+      priorDraftRef.current = draftIdentity
+      if (!areIdentityDraftsEqual(draftIdentity, formIdentity)) {
+        reset(identityDraftToFormValues(draftIdentity))
+      }
       return
     }
 
-    onDraftChangeRef.current({ identity: nextIdentity })
-  }, [alignment, description, draftIdentity, name])
+    if (!areIdentityDraftsEqual(draftIdentity, formIdentity)) {
+      onDraftChangeRef.current({ identity: formIdentity })
+    }
+  }, [alignment, description, draftIdentity, name, reset])
 
   return null
 }

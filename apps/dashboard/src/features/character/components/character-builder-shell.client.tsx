@@ -53,6 +53,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const navigate = useNavigate()
   const { mutateAsync: createCharacterMutation, isPending: isCreating } = useCreateCharacter()
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
+  const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
   const patchDraft = useCharacterBuilderStore(context, (state) => state.patchDraft)
   const clearPersistedDraft = useCharacterBuilderStore(
@@ -64,11 +65,29 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
   const preview = useCharacterPreview(draft, catalogIndex, context.characterCreationRules)
 
+  const applyDraftPatch = useCallback(
+    (patch: Partial<CharacterBuilderDraft>) => {
+      patchDraft(patch)
+    },
+    [patchDraft],
+  )
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
         <Spinner />
       </div>
+    )
+  }
+
+  if (hasPendingRestore) {
+    return (
+      <>
+        <CharacterBuilderDraftRestore context={context} />
+        <div className="flex flex-1 items-center justify-center py-16">
+          <Spinner />
+        </div>
+      </>
     )
   }
 
@@ -92,13 +111,6 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     if (!nextStepId) return
     navigateToStep(nextStepId)
   }
-
-  const applyDraftPatch = useCallback(
-    (patch: Partial<CharacterBuilderDraft>) => {
-      patchDraft(patch)
-    },
-    [patchDraft],
-  )
 
   const attemptStepAdvance = (patch?: Partial<CharacterBuilderDraft>) => {
     const nextDraft = patch ? mergeCharacterBuilderDraft(draft, patch) : draft
