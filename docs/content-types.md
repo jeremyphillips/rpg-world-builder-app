@@ -41,7 +41,7 @@ the class body.
 Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a single atomic grant: one sense, one resistance, walk speed override, or one language. Hybrids (Drow: senses + innate spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
-- **Aggregate** mechanics (e.g. species stat-row senses) with `getTraitGrants(trait)` — read raw grants, not derived prose.
+- **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
 - **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
