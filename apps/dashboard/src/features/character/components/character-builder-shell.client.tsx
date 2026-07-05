@@ -190,6 +190,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={validationIssues}
               attemptedStepIds={attemptedStepIds}
+              standardArray={context.characterCreationRules.abilityGeneration.standardArray}
               onStepSelect={navigateToStep}
             />
           </div>

@@ -19,6 +19,7 @@ export type ResolveStepVisualStatusInput = {
   validationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex
+  standardArray: readonly number[]
 }
 
 function isSpellsStepLocked(
@@ -42,6 +43,7 @@ export function resolveStepVisualStatus({
   validationIssues,
   attemptedStepIds,
   catalogIndex,
+  standardArray,
 }: ResolveStepVisualStatusInput): StepStatus {
   if (stepId === 'spells' && isSpellsStepLocked(draft, catalogIndex)) {
     return 'locked'
@@ -54,7 +56,9 @@ export function resolveStepVisualStatus({
     return 'warning'
   }
 
-  const builderStatus = getBuilderStepStatus(stepId, draft, resolvedChoiceSets)
+  const builderStatus = getBuilderStepStatus(stepId, draft, resolvedChoiceSets, {
+    standardArray,
+  })
   if (builderStatus === 'complete') {
     return 'complete'
   }

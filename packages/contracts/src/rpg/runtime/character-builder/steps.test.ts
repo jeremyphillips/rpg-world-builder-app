@@ -294,6 +294,16 @@ describe('getBuilderStepStatus — abilities', () => {
     expect(getBuilderStepStatus('abilities', draft, null)).toBe('complete')
   })
 
+  it('returns incomplete when standard-array scores duplicate a value', () => {
+    const draft = makeDraft({
+      abilities: {
+        method: 'standard-array',
+        scores: { str: 15, dex: 15, con: 13, int: 12, wis: 10, cha: 8 },
+      },
+    })
+    expect(getBuilderStepStatus('abilities', draft, null)).toBe('incomplete')
+  })
+
   it('accepts manual method', () => {
     const draft = makeDraft({
       abilities: {

@@ -3,10 +3,28 @@ import { describe, expect, it } from 'vitest'
 import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
-import { resolveStepVisualStatus } from './builder-step-visual-status'
+import {
+  resolveStepVisualStatus,
+  type ResolveStepVisualStatusInput,
+} from './builder-step-visual-status'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+const standardArray = context.characterCreationRules.abilityGeneration.standardArray
+
+function resolveStatus(
+  input: Pick<ResolveStepVisualStatusInput, 'stepId' | 'draft' | 'currentStepId'> &
+    Partial<ResolveStepVisualStatusInput>,
+): ReturnType<typeof resolveStepVisualStatus> {
+  return resolveStepVisualStatus({
+    resolvedChoiceSets: null,
+    validationIssues: [],
+    attemptedStepIds: [],
+    catalogIndex,
+    standardArray,
+    ...input,
+  })
+}
 
 describe('resolveStepVisualStatus', () => {
   it('returns notStarted for incomplete steps that were only visited', () => {
@@ -16,14 +34,10 @@ describe('resolveStepVisualStatus', () => {
     }
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'species',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('notStarted')
   })
@@ -32,14 +46,10 @@ describe('resolveStepVisualStatus', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'identity',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('current')
   })
@@ -52,14 +62,10 @@ describe('resolveStepVisualStatus', () => {
     }
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'identity',
         draft,
         currentStepId: 'species',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('complete')
   })
@@ -71,14 +77,10 @@ describe('resolveStepVisualStatus', () => {
     }
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'species',
         draft,
         currentStepId: 'class',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('complete')
   })
@@ -87,16 +89,14 @@ describe('resolveStepVisualStatus', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'identity',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
         validationIssues: [
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ],
         attemptedStepIds: ['identity'],
-        catalogIndex,
       }),
     ).toBe('warning')
   })
@@ -105,16 +105,13 @@ describe('resolveStepVisualStatus', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'identity',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
         validationIssues: [
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('current')
   })
@@ -123,16 +120,14 @@ describe('resolveStepVisualStatus', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'species',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
         validationIssues: [
           { code: 'species.required', message: 'Species is required.', stepId: 'species' },
         ],
         attemptedStepIds: ['identity'],
-        catalogIndex,
       }),
     ).toBe('notStarted')
   })
@@ -144,15 +139,29 @@ describe('resolveStepVisualStatus', () => {
     }
 
     expect(
-      resolveStepVisualStatus({
+      resolveStatus({
         stepId: 'spells',
         draft,
         currentStepId: 'identity',
-        resolvedChoiceSets: null,
-        validationIssues: [],
-        attemptedStepIds: [],
-        catalogIndex,
       }),
     ).toBe('locked')
+  })
+
+  it('does not mark abilities complete when standard-array scores duplicate a value', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      abilities: {
+        method: 'standard-array' as const,
+        scores: { str: 15, dex: 15, con: 13, int: 12, wis: 10, cha: 8 },
+      },
+    }
+
+    expect(
+      resolveStatus({
+        stepId: 'abilities',
+        draft,
+        currentStepId: 'identity',
+      }),
+    ).toBe('notStarted')
   })
 })

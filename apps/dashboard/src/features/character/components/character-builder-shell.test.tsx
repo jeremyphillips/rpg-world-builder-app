@@ -115,7 +115,7 @@ describe('CharacterBuilderShell', () => {
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
-    const strengthSelect = await screen.findByLabelText(/^Strength$/i)
+    const strengthSelect = await screen.findByRole('combobox', { name: /Strength score/i })
     await userEvent.click(strengthSelect)
     await userEvent.click(screen.getByRole('option', { name: '15' }))
 
@@ -128,7 +128,7 @@ describe('CharacterBuilderShell', () => {
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/^Strength$/i)).toHaveTextContent('15')
+      expect(screen.getByRole('combobox', { name: /Strength score/i })).toHaveTextContent('15')
     })
   })
 })

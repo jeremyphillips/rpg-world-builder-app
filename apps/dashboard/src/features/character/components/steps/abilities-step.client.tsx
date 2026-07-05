@@ -1,10 +1,18 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { CharacterBuilderDraft, CharacterBuildValidationIssue } from '@rpg/contracts'
+import {
+  resolveAbilityGenerationMethod,
+  type CharacterBuildContext,
+  type CharacterBuilderDraft,
+  type CharacterBuildValidationIssue,
+} from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
-import { abilitiesFormFields, abilitiesFormSchema } from '../../lib/steps/abilities-form-fields'
+import {
+  abilitiesFormSchema,
+  buildAbilitiesStepFormFields,
+} from '../../lib/steps/abilities-form-fields'
 import {
   abilitiesDraftToFormValues,
   abilitiesFormValuesToDraft,
@@ -12,8 +20,10 @@ import {
 import { BUILDER_STEP_FORM_IDS } from '../../lib/steps/builder-step-form-ids'
 import { AbilitiesDraftSync } from './abilities-draft-sync.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
+import { StandardArrayAssignment } from './standard-array-assignment.client'
 
 export type AbilitiesStepProps = {
+  context: CharacterBuildContext
   draft: CharacterBuilderDraft
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
@@ -21,23 +31,31 @@ export type AbilitiesStepProps = {
 }
 
 export function AbilitiesStep({
+  context,
   draft,
   validationIssues,
   onDraftChange,
   onStepComplete,
 }: AbilitiesStepProps) {
+  const abilityGeneration = context.characterCreationRules.abilityGeneration
+  const resolvedMethod = resolveAbilityGenerationMethod(abilityGeneration)
+
   const fields = useMemo(
-    () => [
-      ...abilitiesFormFields,
-      {
-        kind: 'slot' as const,
-        name: '_abilitiesDraftSync',
-        render: () => (
-          <AbilitiesDraftSync draftAbilities={draft.abilities} onDraftChange={onDraftChange} />
+    () =>
+      buildAbilitiesStepFormFields({
+        method: resolvedMethod,
+        renderStandardArrayAssignment: () => (
+          <StandardArrayAssignment standardArray={abilityGeneration.standardArray} />
         ),
-      },
-    ],
-    [draft.abilities, onDraftChange],
+        renderDraftSync: () => (
+          <AbilitiesDraftSync
+            context={context}
+            draftAbilities={draft.abilities}
+            onDraftChange={onDraftChange}
+          />
+        ),
+      }),
+    [abilityGeneration.standardArray, context, draft.abilities, onDraftChange, resolvedMethod],
   )
 
   return (
@@ -49,7 +67,7 @@ export function AbilitiesStep({
         defaultValues={abilitiesDraftToFormValues(draft.abilities)}
         mode="onChange"
         onSubmit={(values) => {
-          onStepComplete({ abilities: abilitiesFormValuesToDraft(values) })
+          onStepComplete({ abilities: abilitiesFormValuesToDraft(values, resolvedMethod) })
         }}
       />
     </BuilderStepFrame>

@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  DEFAULT_ABILITY_GENERATION_RULES,
+  indexCharacterBuildCatalog,
+} from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
@@ -11,6 +15,7 @@ import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 const catalogIndex = indexCharacterBuildCatalog(
   createPopulatedStandaloneBuilderContextFixture().catalog,
 )
+const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
 
 describe('CharacterBuilderStepRail', () => {
   it('renders all builder steps and marks the active step', () => {
@@ -22,6 +27,7 @@ describe('CharacterBuilderStepRail', () => {
         resolvedChoiceSets={null}
         validationIssues={[]}
         attemptedStepIds={[]}
+        standardArray={standardArray}
         onStepSelect={() => undefined}
       />,
     )
@@ -44,6 +50,7 @@ describe('CharacterBuilderStepRail', () => {
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ]}
         attemptedStepIds={['identity']}
+        standardArray={standardArray}
         onStepSelect={() => undefined}
       />,
     )
@@ -64,6 +71,7 @@ describe('CharacterBuilderStepRail', () => {
         resolvedChoiceSets={null}
         validationIssues={[]}
         attemptedStepIds={[]}
+        standardArray={standardArray}
         onStepSelect={onStepSelect}
       />,
     )
@@ -81,6 +89,7 @@ describe('CharacterBuilderStepRail', () => {
         resolvedChoiceSets={null}
         validationIssues={[]}
         attemptedStepIds={[]}
+        standardArray={standardArray}
         onStepSelect={() => undefined}
       />,
     )

@@ -1,4 +1,8 @@
-import { ABILITY_IDS, type CharacterBuilderDraftAbilities } from '@rpg/contracts'
+import {
+  ABILITY_IDS,
+  type AbilityGenerationMethod,
+  type CharacterBuilderDraftAbilities,
+} from '@rpg/contracts'
 
 import type { AbilitiesFormValues } from './abilities-form-fields'
 
@@ -23,7 +27,6 @@ export function abilitiesDraftToFormValues(
   const scores = abilities.scores ?? {}
 
   return {
-    method: abilities.method ?? 'standard-array',
     str: scores.str,
     dex: scores.dex,
     con: scores.con,
@@ -35,6 +38,7 @@ export function abilitiesDraftToFormValues(
 
 export function abilitiesFormValuesToDraft(
   values: AbilitiesFormValues,
+  method: AbilityGenerationMethod,
 ): CharacterBuilderDraftAbilities {
   const scores = Object.fromEntries(
     ABILITY_IDS.map((ability) => {
@@ -44,7 +48,7 @@ export function abilitiesFormValuesToDraft(
   )
 
   return {
-    method: values.method,
+    method,
     scores,
   }
 }

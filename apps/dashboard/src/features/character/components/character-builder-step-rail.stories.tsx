@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  DEFAULT_ABILITY_GENERATION_RULES,
+  indexCharacterBuildCatalog,
+} from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
@@ -8,6 +12,7 @@ import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 const catalogIndex = indexCharacterBuildCatalog(
   createPopulatedStandaloneBuilderContextFixture().catalog,
 )
+const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
 
 const meta = {
   title: 'Character Builder/CharacterBuilderStepRail',
@@ -27,6 +32,7 @@ export const IdentityActive: Story = {
       resolvedChoiceSets={null}
       validationIssues={[]}
       attemptedStepIds={[]}
+      standardArray={standardArray}
       onStepSelect={() => undefined}
     />
   ),
@@ -47,6 +53,7 @@ export const AbilitiesActive: Story = {
       resolvedChoiceSets={null}
       validationIssues={[]}
       attemptedStepIds={[]}
+      standardArray={standardArray}
       onStepSelect={() => undefined}
     />
   ),
@@ -63,6 +70,7 @@ export const IdentityWarning: Story = {
         { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
       ]}
       attemptedStepIds={['identity']}
+      standardArray={standardArray}
       onStepSelect={() => undefined}
     />
   ),

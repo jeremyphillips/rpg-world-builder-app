@@ -31,6 +31,7 @@ export type CharacterBuilderStepRailProps = {
   resolvedChoiceSets: null
   validationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
+  standardArray: readonly number[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
 }
 
@@ -57,6 +58,7 @@ export function CharacterBuilderStepRail({
   resolvedChoiceSets,
   validationIssues,
   attemptedStepIds,
+  standardArray,
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
   return (
@@ -71,6 +73,7 @@ export function CharacterBuilderStepRail({
             validationIssues,
             attemptedStepIds,
             catalogIndex,
+            standardArray,
           })
           const isActive = currentStepId === step.id
           const Icon = STEP_STATUS_ICONS[visualStatus]
