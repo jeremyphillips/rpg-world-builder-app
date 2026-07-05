@@ -9,7 +9,7 @@ import { builderTestContext } from './test-fixtures'
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
     ...createEmptyCharacterBuilderDraft(),
-    identity: { name: 'Verna', alignment: 'ng', description: 'A veteran soldier.' },
+    identity: { name: 'Verna', alignment: 'ng', narrative: { backstory: 'A veteran soldier.' } },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: {

@@ -12,7 +12,7 @@ describe('IdentityDraftSync', () => {
     const emptyDraft = createEmptyCharacterBuilderDraft()
     const restoredDraft = {
       ...emptyDraft,
-      identity: { name: 'Verna', description: 'Steady' },
+      identity: { name: 'Verna', narrative: { personalityTraits: ['Steady'] } },
     }
 
     const { rerender } = render(

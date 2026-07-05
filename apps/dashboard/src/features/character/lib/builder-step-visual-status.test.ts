@@ -64,6 +64,25 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('complete')
   })
 
+  it('returns complete for species after selection when choice sets are unresolved', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+    }
+
+    expect(
+      resolveStepVisualStatus({
+        stepId: 'species',
+        draft,
+        currentStepId: 'class',
+        resolvedChoiceSets: null,
+        validationIssues: [],
+        attemptedStepIds: [],
+        catalogIndex,
+      }),
+    ).toBe('complete')
+  })
+
   it('returns warning only after an attempted submit with blocking issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 

@@ -94,6 +94,17 @@ describe('deriveCharacterProfile', () => {
     expect(profile.ac).toBe(10)
   })
 
+  it('derives hit die max HP with neutral CON modifier when con is unset', () => {
+    const profile = deriveCharacterProfile({
+      level: 1,
+      characterClass: fighterClass,
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+      skillProficiencies: [],
+    })
+
+    expect(profile.maxHp).toBe(10)
+  })
+
   it('derives level-1 fighter stats from complete input', () => {
     const profile = deriveCharacterProfile(completeInput)
 

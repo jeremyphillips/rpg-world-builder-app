@@ -12,7 +12,7 @@ import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
 import {
   abilityModifier,
   hasSavingThrowProficiency,
-  levelOneMaxHp,
+  resolveLevelOneMaxHp,
   resolveUnarmoredAc,
   savingThrowBonus,
   skillModifier,
@@ -178,10 +178,12 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
   return {
     abilityScores: deriveAbilityScores(input.abilityScores),
     proficiencyBonus: profBonus,
-    maxHp:
-      input.characterClass && typeof conScore === 'number'
-        ? levelOneMaxHp(input.characterClass.hitDie, conScore)
-        : undefined,
+    maxHp: input.characterClass
+      ? resolveLevelOneMaxHp({
+          hitDie: input.characterClass.hitDie,
+          conScore,
+        })
+      : undefined,
     ac: resolveUnarmoredAc({ acBase, dexScore }),
     savingThrows: deriveSavingThrows(input, profBonus),
     skills: deriveSkillModifiers(input, profBonus),

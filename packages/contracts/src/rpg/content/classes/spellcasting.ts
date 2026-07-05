@@ -24,6 +24,8 @@ export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_LABELS
   ...SpellPreparationMode[],
 ]
 
+export const spellPreparationModeSchema = z.enum(SPELL_PREPARATION_MODES)
+
 /**
  * Cantrips known is tabular data, not a closed taxonomy, so the schema stores an
  * inline, self-contained progression. This stays open to homebrew/patches:
@@ -54,7 +56,7 @@ export const spellcastingSchema = z.object({
   description: z.string().optional(),
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
-  preparation: z.enum(SPELL_PREPARATION_MODES),
+  preparation: spellPreparationModeSchema,
   cantrips: cantripsProgressionSchema.optional(),
   spellsAvailable: spellsAvailableProgressionSchema.optional(),
 })

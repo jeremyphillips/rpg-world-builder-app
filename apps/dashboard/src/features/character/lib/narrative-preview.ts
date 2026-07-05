@@ -17,9 +17,9 @@ export function narrativeFieldCount(narrative: CharacterNarrative | undefined): 
 
   let count = 0
   if (hasTraitContent(narrative.personalityTraits)) count++
-  if (hasStringContent(narrative.ideals)) count++
-  if (hasStringContent(narrative.bonds)) count++
-  if (hasStringContent(narrative.flaws)) count++
+  if (hasTraitContent(narrative.ideals)) count++
+  if (hasTraitContent(narrative.bonds)) count++
+  if (hasTraitContent(narrative.flaws)) count++
   if (hasStringContent(narrative.backstory)) count++
   return count
 }

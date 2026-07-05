@@ -116,6 +116,16 @@ function invertChoiceTypeStep(
 
 const STEP_CHOICE_TYPES = invertChoiceTypeStep(CHOICE_TYPE_STEP)
 
+/**
+ * Choice steps that stay `deferred` until resolvers supply ChoiceSets.
+ * Species is excluded — primary species selection is always available in the shell.
+ */
+const DEFERRED_UNTIL_CHOICE_SETS_RESOLVED = new Set<CharacterBuilderStepId>([
+  'proficiencies',
+  'equipment',
+  'spells',
+])
+
 /** Inverted index of {@link CHOICE_TYPE_STEP} — choice types grouped by step id. */
 export const STEP_CHOICE_TYPES_BY_STEP = STEP_CHOICE_TYPES
 
@@ -243,8 +253,9 @@ export function getBuilderStepStatus(
 ): BuilderStepStatus {
   if (draft.currentStepId === stepId) return 'active'
 
-  const isChoiceStep = stepId in STEP_CHOICE_TYPES
-  if (isChoiceStep && resolvedChoiceSets === null) return 'deferred'
+  if (DEFERRED_UNTIL_CHOICE_SETS_RESOLVED.has(stepId) && resolvedChoiceSets === null) {
+    return 'deferred'
+  }
 
   const stepChoiceSets =
     resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []

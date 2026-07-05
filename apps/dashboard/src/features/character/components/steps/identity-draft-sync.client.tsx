@@ -21,7 +21,7 @@ type IdentityDraftSyncProps = {
 export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraftSyncProps) {
   const { control, reset } = useFormContext<IdentityFormValues>()
   const name = useWatch({ control, name: 'name' })
-  const description = useWatch({ control, name: 'description' })
+  const narrative = useWatch({ control, name: 'narrative' })
   const alignment = useWatch({ control, name: 'alignment' })
   const onDraftChangeRef = useRef(onDraftChange)
   const priorDraftRef = useRef(draftIdentity)
@@ -33,7 +33,12 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     const draftChanged = !areIdentityDraftsEqual(previousDraft, draftIdentity)
     const formIdentity = identityFormValuesToDraft({
       name: name ?? '',
-      description,
+      narrative: narrative ?? {
+        personalityTraits: [],
+        ideals: [],
+        bonds: [],
+        flaws: [],
+      },
       alignment,
     })
 
@@ -48,7 +53,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     if (!areIdentityDraftsEqual(draftIdentity, formIdentity)) {
       onDraftChangeRef.current({ identity: formIdentity })
     }
-  }, [alignment, description, draftIdentity, name, reset])
+  }, [alignment, draftIdentity, name, narrative, reset])
 
   return null
 }

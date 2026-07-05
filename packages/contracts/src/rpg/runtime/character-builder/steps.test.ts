@@ -214,6 +214,7 @@ describe('getBuilderStepStatus — species', () => {
   it('returns complete with speciesId and no ChoiceSets needed', () => {
     const draft = makeDraft({ species: { speciesId: 'srd-cc-5.2.1:dwarf' } })
     expect(getBuilderStepStatus('species', draft, [])).toBe('complete')
+    expect(getBuilderStepStatus('species', draft, null)).toBe('complete')
   })
 
   it('returns incomplete when heritage ChoiceSet is unsatisfied', () => {

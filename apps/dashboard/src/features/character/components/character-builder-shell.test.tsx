@@ -83,7 +83,7 @@ describe('CharacterBuilderShell', () => {
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
     const persistedDraft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Verna', description: 'Steady' },
+      identity: { name: 'Verna', narrative: { personalityTraits: ['Steady'] } },
       currentStepId: 'identity' as const,
       touchedStepIds: ['identity' as const],
     }

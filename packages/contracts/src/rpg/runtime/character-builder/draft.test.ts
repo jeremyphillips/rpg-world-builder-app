@@ -53,10 +53,17 @@ describe('characterBuilderDraftSchema', () => {
   it('drops blank alignment sentinels from persisted identity', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Verna', description: 'Steady', alignment: '' },
+      identity: {
+        name: 'Verna',
+        narrative: { personalityTraits: ['Steady'] },
+        alignment: '',
+      },
     }
     const parsed = characterBuilderDraftSchema.parse(draft)
-    expect(parsed.identity).toEqual({ name: 'Verna', description: 'Steady' })
+    expect(parsed.identity).toEqual({
+      name: 'Verna',
+      narrative: { personalityTraits: ['Steady'] },
+    })
   })
 })
 

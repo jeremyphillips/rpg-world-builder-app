@@ -84,22 +84,22 @@ function PreviewNarrativeSection({
                   <dd>{narrative.personalityTraits.join(', ')}</dd>
                 </div>
               ) : null}
-              {narrative?.ideals?.trim() ? (
+              {narrative?.ideals?.length ? (
                 <div>
                   <dt className="text-muted-foreground">Ideals</dt>
-                  <dd>{narrative.ideals}</dd>
+                  <dd>{narrative.ideals.join(', ')}</dd>
                 </div>
               ) : null}
-              {narrative?.bonds?.trim() ? (
+              {narrative?.bonds?.length ? (
                 <div>
                   <dt className="text-muted-foreground">Bonds</dt>
-                  <dd>{narrative.bonds}</dd>
+                  <dd>{narrative.bonds.join(', ')}</dd>
                 </div>
               ) : null}
-              {narrative?.flaws?.trim() ? (
+              {narrative?.flaws?.length ? (
                 <div>
                   <dt className="text-muted-foreground">Flaws</dt>
-                  <dd>{narrative.flaws}</dd>
+                  <dd>{narrative.flaws.join(', ')}</dd>
                 </div>
               ) : null}
               {narrative?.backstory?.trim() ? (

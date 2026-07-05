@@ -8,9 +8,11 @@ import {
   getCharacterTotalLevel,
   type PcCharacter,
 } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Heading, RichTextContent, Text } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+
+import { narrativeFieldCount } from '../lib/narrative-preview'
 
 import {
   characterBuilderPreviewAbilityGridClasses,
@@ -67,12 +69,45 @@ export function CharacterDetailContent({ character }: CharacterDetailContentProp
         </dl>
       </div>
 
-      {character.narrative?.backstory ? (
-        <div className="space-y-1">
+      {narrativeFieldCount(character.narrative) > 0 ? (
+        <div className="space-y-2">
           <Text as="p" variant="body" className="font-medium">
-            Description
+            Narrative
           </Text>
-          <Text variant="muted">{character.narrative.backstory}</Text>
+          <dl className="space-y-2 text-sm">
+            {character.narrative?.personalityTraits?.length ? (
+              <div>
+                <dt className="text-muted-foreground">Personality traits</dt>
+                <dd>{character.narrative.personalityTraits.join(', ')}</dd>
+              </div>
+            ) : null}
+            {character.narrative?.ideals?.length ? (
+              <div>
+                <dt className="text-muted-foreground">Ideals</dt>
+                <dd>{character.narrative.ideals.join(', ')}</dd>
+              </div>
+            ) : null}
+            {character.narrative?.bonds?.length ? (
+              <div>
+                <dt className="text-muted-foreground">Bonds</dt>
+                <dd>{character.narrative.bonds.join(', ')}</dd>
+              </div>
+            ) : null}
+            {character.narrative?.flaws?.length ? (
+              <div>
+                <dt className="text-muted-foreground">Flaws</dt>
+                <dd>{character.narrative.flaws.join(', ')}</dd>
+              </div>
+            ) : null}
+            {character.narrative?.backstory?.trim() ? (
+              <div>
+                <dt className="text-muted-foreground">Backstory</dt>
+                <dd>
+                  <RichTextContent html={character.narrative.backstory} size="sm" tone="muted" />
+                </dd>
+              </div>
+            ) : null}
+          </dl>
         </div>
       ) : null}
     </div>

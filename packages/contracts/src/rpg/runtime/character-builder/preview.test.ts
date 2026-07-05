@@ -58,6 +58,20 @@ describe('buildCharacterPreview', () => {
     expect(preview.proficiencyBonus).toBe(2)
   })
 
+  it('derives hit die max HP when class is selected before abilities', () => {
+    const preview = buildCharacterPreview(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      },
+      indexCharacterBuildCatalog(builderTestCatalog),
+      builderTestRules,
+    )
+
+    expect(preview.maxHp).toBe(10)
+    expect(preview.ac).toBe(10)
+  })
+
   it('derives level-1 fighter stats from a complete draft', () => {
     const preview = buildCharacterPreview(
       makeCompleteDraft(),

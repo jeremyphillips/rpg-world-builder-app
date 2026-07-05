@@ -11,8 +11,8 @@ describe('narrative preview helpers', () => {
     expect(narrativeFieldCount(undefined)).toBe(0)
     expect(
       narrativeFieldCount({
-        ideals: 'Honor',
-        bonds: 'My clan',
+        ideals: ['Honor'],
+        bonds: ['My clan'],
       }),
     ).toBe(2)
   })
@@ -27,9 +27,9 @@ describe('narrative preview helpers', () => {
     expect(
       getNarrativePreviewStatus({
         personalityTraits: ['Brave'],
-        ideals: 'Justice',
-        bonds: 'Family',
-        flaws: 'Pride',
+        ideals: ['Justice'],
+        bonds: ['Family'],
+        flaws: ['Pride'],
         backstory: '<p>Origin story.</p>',
       }),
     ).toBe('complete')

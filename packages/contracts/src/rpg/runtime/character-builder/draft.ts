@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
 import { optionalAlignmentSchema } from '../../vocab/alignment'
+import { characterNarrativeSchema } from '../character/narrative'
 import { abilityGenerationMethodSchema } from './ability-generation'
 import { characterBuilderStepIdSchema } from './step-ids'
 
@@ -15,7 +16,7 @@ import { characterBuilderStepIdSchema } from './step-ids'
 
 export const characterBuilderDraftIdentitySchema = z.object({
   name: z.string().optional(),
-  description: z.string().optional(),
+  narrative: characterNarrativeSchema.optional(),
   imageKey: z.string().optional(),
   alignment: optionalAlignmentSchema,
 })
@@ -81,7 +82,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 1
+export const CHARACTER_BUILDER_DRAFT_VERSION = 2
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

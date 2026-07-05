@@ -44,16 +44,19 @@ export const PartialDraft: Story = {
     const populatedCatalogIndex = indexCharacterBuildCatalog(populatedContext.catalog)
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Verna', alignment: 'ng' as const },
+      identity: {
+        name: 'Verna',
+        alignment: 'ng' as const,
+        narrative: {
+          ideals: ['Protect the weak.'],
+          backstory: '<p>A soldier turned adventurer.</p>',
+        },
+      },
       species: { speciesId: 'srd-cc-5.2.1:dwarf' },
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
       abilities: {
         method: 'manual' as const,
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
-      },
-      narrative: {
-        ideals: 'Protect the weak.',
-        backstory: '<p>A soldier turned adventurer.</p>',
       },
     }
 

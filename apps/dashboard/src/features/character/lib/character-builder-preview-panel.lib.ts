@@ -11,12 +11,10 @@ export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
 
 export type CharacterBuilderPreviewSectionId = (typeof CHARACTER_BUILDER_PREVIEW_SECTIONS)[number]
 
-type DraftWithNarrative = CharacterBuilderDraft & { narrative?: CharacterNarrative }
-
 export function getBuilderDraftNarrative(
   draft: CharacterBuilderDraft,
 ): CharacterNarrative | undefined {
-  return (draft as DraftWithNarrative).narrative
+  return draft.identity.narrative
 }
 
 export function formatPreviewOptionalNumber(value: number | undefined, prefix = ''): string {

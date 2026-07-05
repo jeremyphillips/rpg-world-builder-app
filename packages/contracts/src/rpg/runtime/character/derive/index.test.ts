@@ -5,6 +5,7 @@ import {
   baseArmorClass,
   hasSavingThrowProficiency,
   levelOneMaxHp,
+  resolveLevelOneMaxHp,
   resolveUnarmoredAc,
   savingThrowBonus,
   skillModifier,
@@ -201,6 +202,17 @@ describe('unarmoredAc', () => {
   it('respects a non-default ruleset base', () => {
     expect(unarmoredAc(10, 9)).toBe(9)
     expect(unarmoredAc(14, 9)).toBe(11)
+  })
+})
+
+describe('resolveLevelOneMaxHp', () => {
+  it('uses a neutral CON modifier when conScore is unset', () => {
+    expect(resolveLevelOneMaxHp({ hitDie: 10, conScore: undefined })).toBe(10)
+    expect(resolveLevelOneMaxHp({ hitDie: 8, conScore: undefined, defaultConModifier: 0 })).toBe(8)
+  })
+
+  it('derives the modifier from conScore when set', () => {
+    expect(resolveLevelOneMaxHp({ hitDie: 10, conScore: 14 })).toBe(12)
   })
 })
 

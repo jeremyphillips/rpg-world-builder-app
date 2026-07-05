@@ -34,7 +34,24 @@ export function abilityModifier(score: number): number {
  * Single class only — multiclass HP aggregation lives in buildCharacterPreview.
  */
 export function levelOneMaxHp(hitDie: ClassHitDie, conScore: number): number {
-  return hitDie + abilityModifier(conScore)
+  return resolveLevelOneMaxHp({ hitDie, conScore })
+}
+
+export type ResolveLevelOneMaxHpInput = {
+  hitDie: ClassHitDie
+  conScore: number | undefined
+  /** Used when `conScore` is unset — preview default, not an assigned ability score. */
+  defaultConModifier?: number
+}
+
+/** Resolves level-1 max HP, applying a neutral CON modifier when no score is set. */
+export function resolveLevelOneMaxHp({
+  hitDie,
+  conScore,
+  defaultConModifier = 0,
+}: ResolveLevelOneMaxHpInput): number {
+  const conModifier = typeof conScore === 'number' ? abilityModifier(conScore) : defaultConModifier
+  return hitDie + conModifier
 }
 
 // ---------------------------------------------------------------------------

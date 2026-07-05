@@ -54,7 +54,7 @@ describe('character-builder-store', () => {
     const raw = sessionStorage.getItem('character-builder:test:standalone:ruleset-a')
     const parsed = JSON.parse(raw!) as { state: unknown }
     const persisted = parsed.state as ReturnType<typeof createPersistedCharacterBuilderState>
-    expect(persisted.version).toBe(1)
+    expect(persisted.version).toBe(2)
     expect(persisted.draft.identity.name).toBe('Verna')
     expect(persisted).not.toHaveProperty('catalog')
     expect(persisted).not.toHaveProperty('context')
@@ -79,7 +79,7 @@ describe('character-builder-store', () => {
   it('rehydrates identity progress without alignment', async () => {
     const persistedDraft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Verna', description: 'Steady' },
+      identity: { name: 'Verna', narrative: { personalityTraits: ['Steady'] } },
       touchedStepIds: ['identity' as const],
     }
     sessionStorage.setItem(
@@ -101,7 +101,7 @@ describe('character-builder-store', () => {
     expect(store.getState().hasPendingRestore).toBe(true)
     expect(store.getState().pendingRestoredDraft?.identity).toEqual({
       name: 'Verna',
-      description: 'Steady',
+      narrative: { personalityTraits: ['Steady'] },
     })
   })
 
