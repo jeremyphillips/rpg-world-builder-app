@@ -6,6 +6,7 @@ import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
 import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
 import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
+import { defaultCampaignMechanicsPatch } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterBuildContext } from '../context'
 import { DEFAULT_ABILITY_GENERATION_RULES } from '../ability-generation'
 import { startingWealthSeed } from '../test-fixtures'
@@ -83,6 +84,7 @@ function makeContext(
   const baseRules = {
     ...resolveCharacterCreationPatch(undefined, startingWealthSeed),
     abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+    armorClass: defaultCampaignMechanicsPatch().armorClass,
   }
 
   return {

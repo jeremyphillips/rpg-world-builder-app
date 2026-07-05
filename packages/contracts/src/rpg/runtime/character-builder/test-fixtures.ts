@@ -2,6 +2,7 @@ import type { ClassStored } from '../../content/classes/class'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type { Species } from '../../content/species'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { withDerivedClassSkillFrom } from '../../content/skill-class-association'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
@@ -86,6 +87,7 @@ export const builderTestCatalog: CharacterBuildCatalog = {
 export const builderTestRules = {
   ...resolveCharacterCreationPatch(undefined, startingWealthSeed),
   abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+  armorClass: defaultCampaignMechanicsPatch().armorClass,
 }
 
 export const builderTestContext: CharacterBuildContext = {

@@ -70,7 +70,7 @@ describe('deriveCharacterProfile', () => {
     ).not.toThrow()
   })
 
-  it('derives partial stats when class is missing', () => {
+  it('derives baseline defenses from level and ruleset AC base when class is missing', () => {
     const profile = deriveCharacterProfile({
       level: 1,
       abilityScores: { dex: 14 },
@@ -78,9 +78,20 @@ describe('deriveCharacterProfile', () => {
       skillProficiencies: [athleticsSkill],
     })
 
-    expect(profile.proficiencyBonus).toBeUndefined()
+    expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBeUndefined()
     expect(profile.ac).toBe(12)
+  })
+
+  it('derives ruleset base AC with neutral DEX modifier when dex is unset', () => {
+    const profile = deriveCharacterProfile({
+      level: 1,
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+      skillProficiencies: [],
+    })
+
+    expect(profile.proficiencyBonus).toBe(2)
+    expect(profile.ac).toBe(10)
   })
 
   it('derives level-1 fighter stats from complete input', () => {

@@ -7,6 +7,7 @@ import type { SkillProficiency } from '../../content/skill-proficiency'
 import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
 import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/patches/campaign-character-creation-patch'
+import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
 import { abilityGenerationRulesSchema } from './ability-generation'
 import type {
   CharacterBuilderMode,
@@ -68,6 +69,7 @@ export function indexCharacterBuildCatalog(
 export const resolvedCharacterCreationRulesSchema =
   resolvedCampaignCharacterCreationPatchSchema.extend({
     abilityGeneration: abilityGenerationRulesSchema,
+    armorClass: resolvedArmorClassSchema,
   })
 
 export type ResolvedCharacterCreationRules = z.infer<typeof resolvedCharacterCreationRulesSchema>

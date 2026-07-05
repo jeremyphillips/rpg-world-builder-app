@@ -16,6 +16,7 @@ export function toCharacterDerivationInput(
 
   return {
     level: rules.startingLevel,
+    armorClassBase: rules.armorClass.base,
     abilityScores: draft.abilities.scores,
     characterClass,
     proficiencies: assembleCharacterProficiencies(draft, catalogIndex, choiceSets, characterClass),
