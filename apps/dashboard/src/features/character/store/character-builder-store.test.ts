@@ -33,6 +33,14 @@ describe('character-builder-store', () => {
     resetCharacterBuilderStoreCache()
   })
 
+  it('marks the store hydrated after automatic rehydration', async () => {
+    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-hydrate')
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+  })
+
   it('persists only the version-wrapped draft', async () => {
     const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-a')
     store.getState().patchDraft({
@@ -59,10 +67,42 @@ describe('character-builder-store', () => {
     )
 
     const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-b')
-    await store.persist.rehydrate()
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
 
     expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
     expect(store.getState().hasPendingRestore).toBe(false)
+  })
+
+  it('rehydrates identity progress without alignment', async () => {
+    const persistedDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna', description: 'Steady' },
+      touchedStepIds: ['identity' as const],
+    }
+    sessionStorage.setItem(
+      'character-builder:test:standalone:ruleset-rehydrate-identity',
+      JSON.stringify({
+        state: createPersistedCharacterBuilderState(persistedDraft),
+        version: 0,
+      }),
+    )
+
+    const store = createCharacterBuilderStore(
+      'character-builder:test:standalone:ruleset-rehydrate-identity',
+    )
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
+    expect(store.getState().hasPendingRestore).toBe(true)
+    expect(store.getState().pendingRestoredDraft?.identity).toEqual({
+      name: 'Verna',
+      description: 'Steady',
+    })
   })
 
   it('surfaces a restore prompt for a non-empty prior draft', async () => {
@@ -80,7 +120,10 @@ describe('character-builder-store', () => {
     )
 
     const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-c')
-    await store.persist.rehydrate()
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
 
     expect(store.getState().hasPendingRestore).toBe(true)
     expect(store.getState().pendingRestoredDraft).toEqual(persistedDraft)

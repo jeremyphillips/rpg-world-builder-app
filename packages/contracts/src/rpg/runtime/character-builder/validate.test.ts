@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { characterBuilderValidationMessages } from './character-builder-messages'
 import { formatFieldMessage } from '../../../validation/define-message'
 import { abilityValidationMessages } from '../../vocab/ability-messages'
 import { createEmptyCharacterBuilderDraft } from './draft'
@@ -67,6 +68,10 @@ describe('validateCharacterBuild', () => {
     expect(
       invalidStandard.issues.some((issue) => issue.code === 'standard_array_exact_assignment'),
     ).toBe(true)
+    expect(
+      invalidStandard.issues.find((issue) => issue.code === 'standard_array_exact_assignment')
+        ?.message,
+    ).toBe(formatFieldMessage(characterBuilderValidationMessages.standardArrayExactAssignment()))
 
     const manualOk = validateCharacterBuild(
       makeCompleteDraft({
@@ -100,6 +105,7 @@ describe('validateCharacterBuild', () => {
     expect(belowMin.issues[0]?.message).toBe(
       formatFieldMessage(abilityValidationMessages.characterScoreOutOfRange({ min: 1, max: 20 })),
     )
+    expect(belowMin.issues[0]?.message).not.toContain('"f":')
   })
 
   it('finalSubmit requires alignment and all core steps', () => {

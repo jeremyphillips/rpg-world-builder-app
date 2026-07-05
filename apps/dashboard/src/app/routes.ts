@@ -6,6 +6,7 @@ export const ROUTES = {
   home: '/',
   characters: {
     list: '/characters',
+    new: '/characters/new',
     detail: (characterId: string) => `/characters/${characterId}`,
   },
   account: '/account',
