@@ -3,11 +3,9 @@ import { resolveClassFeatureGrantChoices } from './resolve-class-feature-grant-c
 import { resolveClassSkillChoices } from './resolve-class-skill-choices'
 import { resolveRulesetLanguageChoices } from './resolve-ruleset-language-choices'
 import { resolveSpellcastingChoices } from './resolve-spellcasting-choices'
+import { resolveSpeciesHeritageChoices } from './resolve-species-heritage-choices'
+import { resolveSpeciesTraitGrantChoices } from './resolve-species-trait-grant-choices'
 import { resolveStartingEquipmentChoices } from './resolve-starting-equipment-choices'
-import {
-  resolveSpeciesHeritageChoices,
-  resolveSpeciesTraitGrantChoices,
-} from './resolve-species-trait-grant-choices'
 
 /**
  * Ordered registry of choice-source resolvers. `resolveAvailableChoices` iterates

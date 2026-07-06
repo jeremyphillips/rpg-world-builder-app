@@ -1,6 +1,6 @@
 import type { ContentGrant } from '../../../content/lib/grants'
 import { getFeatCategoryLabel } from '../../../vocab/feat'
-import { getLanguageSentenceForm } from '../../../vocab/language'
+import { getLanguageLabel } from '../../../vocab/language'
 import {
   formatArmorTrainingPoolLabel,
   formatSkillProficiencyPoolLabel,
@@ -9,6 +9,7 @@ import {
 } from '../../../content/lib/proficiency-grant'
 import type { EquipmentGrant } from '../../../content/lib/equipment-grant'
 import { formatEquipmentPoolLabel } from '../../../content/lib/equipment-grant'
+import { resolveLanguagesFromChoiceSource } from '../../creature/languages'
 import type { ChoiceSet, ChoiceSourceType, ChoiceType } from '../choice-set'
 import { buildChoiceSetId } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
@@ -90,11 +91,26 @@ function featChoiceSet(
 function languageChoiceSet(
   grant: Extract<ContentGrant, { kind: 'languageChoice' }>,
   ctx: GrantChoiceSetContext,
+  catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet {
-  const options = (grant.from ?? []).map((id) => ({
-    id,
-    label: getLanguageSentenceForm(id),
-  }))
+  const from = grant.from ?? []
+  const categories = grant.categories ?? []
+  const resolved = resolveLanguagesFromChoiceSource({
+    languages: catalogIndex.languages,
+    from,
+    categories,
+  })
+
+  const options =
+    from.length > 0
+      ? from.map((id) => {
+          const language = resolved.find((row) => row.id === id)
+          return {
+            id,
+            label: language?.label ?? getLanguageLabel(id),
+          }
+        })
+      : resolved.map((language) => ({ id: language.id, label: language.label }))
 
   return buildGrantChoiceSet(
     ctx,
@@ -232,7 +248,7 @@ const GRANT_CHOICE_SET_CONVERTERS: {
   [K in ContentGrant['kind']]?: GrantChoiceSetConverter<K>
 } = {
   featChoice: (grant, ctx) => [featChoiceSet(grant, ctx)],
-  languageChoice: (grant, ctx) => [languageChoiceSet(grant, ctx)],
+  languageChoice: (grant, ctx, catalogIndex) => [languageChoiceSet(grant, ctx, catalogIndex)],
   skillProficiency: (grant, ctx, catalogIndex) =>
     toChoiceSets(skillProficiencyChoiceSet(grant, ctx, catalogIndex)),
   weaponProficiency: (grant, ctx) => toChoiceSets(weaponProficiencyChoiceSet(grant, ctx)),

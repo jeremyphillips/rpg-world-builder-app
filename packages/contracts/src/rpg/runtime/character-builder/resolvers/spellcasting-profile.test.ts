@@ -12,9 +12,9 @@ import {
 import {
   cantripsKnownAtLevel,
   maxSelectableSpellLevel,
-  resolveSpellcastingProfile,
   spellsAvailableAtLevel,
-} from './spellcasting-profile'
+} from '../../creature/spellcasting'
+import { resolveSpellcastingProfile } from './spellcasting-profile'
 
 function draftWith(overrides: Partial<CharacterBuilderDraft>): CharacterBuilderDraft {
   return { ...createEmptyCharacterBuilderDraft(), ...overrides }

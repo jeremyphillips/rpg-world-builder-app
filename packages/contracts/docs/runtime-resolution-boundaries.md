@@ -4,15 +4,16 @@ Guidance for splitting and naming resolution logic under `packages/contracts/src
 Use this when refactoring existing resolvers (equipment, spellcasting, proficiencies, …)
 or adding new creature-like behavior.
 
-**Reference implementation:** language proficiency split (Phase 3 of the language
-proficiency refactor).
+**Reference implementations:** language proficiencies (original) and the
+character-builder `resolvers/` directory refactor — each domain follows creature →
+character → builder ChoiceSets → `assemble-*.ts` orchestration.
 
-| Layer                 | Module                                                                | Question it answers                                                                   |
-| --------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Creature              | `runtime/creature/languages.ts`                                       | Given catalog data, what ids/options does this grant or choice source represent?      |
-| Character             | `runtime/character/languages.ts`                                      | What proficiency payload should the stored character have (ids merged, rows deduped)? |
-| Builder orchestration | `runtime/character-builder/assemble-language-proficiencies.ts`        | How do grants + draft selections + sources become finalize rows?                      |
-| Builder ChoiceSets    | `runtime/character-builder/resolvers/resolve-language-choice-sets.ts` | What must the player pick during creation?                                            |
+| Layer                 | Module                                                                        | Question it answers                                                              |
+| --------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Creature              | `runtime/creature/{domain}.ts`                                                | Given catalog data, what ids/options does this grant or choice source represent? |
+| Character             | `runtime/character/{domain}.ts`                                               | What stored-sheet payload should rows have (merged, deduped)?                    |
+| Builder orchestration | `runtime/character-builder/assemble-{domain}.ts`                              | How do grants + draft selections + sources become finalize rows?                 |
+| Builder ChoiceSets    | `runtime/character-builder/resolvers/resolve-{scope}-{domain}-choice-sets.ts` | What must the player pick during creation?                                       |
 
 See also [character-builder-resolvers.md](character-builder-resolvers.md) for the
 choice-source registry catalog and [structure.md](structure.md) for package-layer
@@ -64,7 +65,7 @@ from a layer below it in this diagram, it is in the wrong module.
 
 **Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `damage-resistances.ts`.
 
-**Exists today:** `creature/languages.ts`
+**Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/spellcasting.ts`
 
 ---
 
@@ -332,13 +333,12 @@ When cleaning up an existing resolution file:
 
 1. **Name the question** each exported function answers (creature / character / builder).
 2. **List forbidden imports** for that layer; move code that violates them.
-3. **Split mixed files** — e.g. `starting-equipment-resolution.ts` contains
-   `resolveStartingEquipmentChoiceSets`, `assembleStartingEquipment`, and pool helpers;
-   target state:
-   - Creature-style pool expansion → `creature/equipment.ts` (or `content/lib` if already neutral)
-   - Character inventory rows → `character/equipment-inventory.ts` (assembly)
-   - ChoiceSets → `resolve-starting-equipment-choice-sets.ts`
-   - Finalize orchestration → `assemble-starting-equipment.ts`
+3. **Split mixed files** — e.g. `spellcasting-resolution.ts` combines choice-set
+   builders and finalize assembly; target state:
+   - Creature-style pool expansion → `creature/{domain}.ts`
+   - Character inventory rows → `character/{domain}.ts`
+   - ChoiceSets → `resolve-{scope}-{domain}-choice-sets.ts`
+   - Finalize orchestration → `assemble-{domain}.ts` (builder root)
 4. **Rename** to filename conventions above; update `choice-sources.ts` and barrels.
 5. **Move tests** with the code — one test file per layer module.
 6. **Delete** old broad modules; avoid permanent re-export barrels.
@@ -366,14 +366,15 @@ Move logic to `character/` when:
 
 Track refactors against this doc. Not exhaustive — update as files move.
 
-| Current module                               | Issue                                                         | Target split                                                                                         |
-| -------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `resolvers/starting-equipment-resolution.ts` | ChoiceSets + finalize assembly + pool options in one file     | `resolve-starting-equipment-choice-sets.ts`, `assemble-starting-equipment.ts`, creature pool helpers |
-| `resolvers/resolve-class-skill-choices.ts`   | Name uses `-choices` not `-choice-sets`                       | Rename to `resolve-class-skill-choice-sets.ts`                                                       |
-| `resolvers/spellcasting-resolution.ts`       | `-resolution` combines assembly                               | `assemble-spellcasting.ts` + choice-set resolver                                                     |
-| `resolvers/equipment-pool-options.ts`        | Neutral pool logic inside builder                             | Consider `creature/equipment.ts`                                                                     |
-| `assemble-proficiencies.ts`                  | Mixes class-fixed + skill selections + language orchestration | Keep as aggregate; per-domain orchestration in `assemble-*.ts`                                       |
-| `character/derive/index.ts`                  | Mixes `resolve*` and `derive*`                                | Acceptable within derive; do not add grant expansion here                                            |
+**Character-builder `resolvers/` refactor:** complete. Domains use `resolve-*-choice-sets.ts`
+
+- thin `resolve-*-choices.ts` adapters; finalize orchestration lives in `assemble-*.ts`;
+  creature primitives in `runtime/creature/`.
+
+| Current module              | Issue                          | Disposition                                               |
+| --------------------------- | ------------------------------ | --------------------------------------------------------- |
+| `character/derive/index.ts` | Mixes `resolve*` and `derive*` | Acceptable within derive; do not add grant expansion here |
+| `creature/proficiencies.ts` | Not yet created                | Deferred until grant finalize needs shared pool expansion |
 
 ---
 

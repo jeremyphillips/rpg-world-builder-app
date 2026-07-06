@@ -1,5 +1,5 @@
 import type { ChoiceSourceResolver } from './choice-source-resolver'
-import { resolveStartingEquipmentChoiceSets } from './starting-equipment-resolution'
+import { resolveStartingEquipmentChoiceSets } from './resolve-starting-equipment-choice-sets'
 
 export const resolveStartingEquipmentChoices: ChoiceSourceResolver = (
   draft,

@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema } from '../../../content/equipment'
-import type { ClassStored } from '../../../content/classes/class'
-import { createEmptyCharacterBuilderDraft } from '../draft'
-import { indexCharacterBuildCatalog } from '../context'
-import {
-  assembleStartingEquipment,
-  startingEquipmentChoiceSetId,
-} from './starting-equipment-resolution'
+import { equipmentSchema } from '../../content/equipment'
+import type { ClassStored } from '../../content/classes/class'
+import { assembleStartingEquipment } from './assemble-starting-equipment'
+import { createEmptyCharacterBuilderDraft } from './draft'
+import { indexCharacterBuildCatalog } from './context'
+import { startingEquipmentChoiceSetId } from './resolvers/resolve-starting-equipment-choice-sets'
 
 const RULESET = 'srd-cc-5.2.1' as const
 

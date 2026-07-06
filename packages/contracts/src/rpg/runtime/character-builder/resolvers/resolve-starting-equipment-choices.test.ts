@@ -8,7 +8,7 @@ import { resolveStartingEquipmentChoices } from './resolve-starting-equipment-ch
 import {
   nestedStartingEquipmentChoiceSetId,
   startingEquipmentChoiceSetId,
-} from './starting-equipment-resolution'
+} from './resolve-starting-equipment-choice-sets'
 
 const RULESET = 'srd-cc-5.2.1' as const
 

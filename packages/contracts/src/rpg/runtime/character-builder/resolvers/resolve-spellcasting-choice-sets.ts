@@ -1,11 +1,7 @@
 import type { Spell } from '../../../content/spell'
-import type { CharacterSpellEntry } from '../../character/spells'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
 import { buildChoiceSetId, type ChoiceSet, type ChoiceSetOption } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
 import type { SpellcastingProfile } from './spellcasting-profile'
-import { resolveSpellcastingProfile } from './spellcasting-profile'
 
 export function spellcastingCantripsChoiceSetId(classId: string): string {
   return buildChoiceSetId('spellcasting', classId, 'cantrips')
@@ -26,7 +22,8 @@ function spellOptionsForClass(
     .map((spell) => ({ id: spell.id, label: spell.name }))
 }
 
-export function buildSpellcastingChoiceSets(
+/** Builds cantrip and prepared-spell ChoiceSets from a spellcasting profile. */
+export function resolveSpellcastingChoiceSets(
   profile: SpellcastingProfile,
   characterClassSlug: string,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -66,46 +63,4 @@ export function buildSpellcastingChoiceSets(
   }
 
   return choiceSets
-}
-
-export function classSpellcastingSource(
-  classId: string,
-  grantId: 'cantrips' | 'spells',
-): CharacterSelectionSource[] {
-  return [{ kind: 'classSpellcasting', sourceId: classId, grantId }]
-}
-
-export function spellcastingGrantId(choiceSet: ChoiceSet): 'cantrips' | 'spells' | undefined {
-  if (choiceSet.choiceType === 'cantrip') return 'cantrips'
-  if (choiceSet.choiceType === 'spell') return 'spells'
-  return undefined
-}
-
-export function assembleClassSpellcasting(
-  draft: CharacterBuilderDraft,
-  context: Parameters<typeof resolveSpellcastingProfile>[1],
-  choiceSets: readonly ChoiceSet[],
-): CharacterSpellEntry[] {
-  const profile = resolveSpellcastingProfile(draft, context)
-  if (!profile) return []
-
-  const spells: CharacterSpellEntry[] = []
-
-  for (const choiceSet of choiceSets) {
-    const grantId = spellcastingGrantId(choiceSet)
-    if (!grantId) continue
-
-    const selections = draft.choiceSelections[choiceSet.id] ?? []
-    const preparationState = grantId === 'cantrips' ? undefined : profile.preparation
-
-    for (const spellId of selections) {
-      spells.push({
-        spellId,
-        preparationState,
-        sources: classSpellcastingSource(profile.classId, grantId),
-      })
-    }
-  }
-
-  return spells
 }

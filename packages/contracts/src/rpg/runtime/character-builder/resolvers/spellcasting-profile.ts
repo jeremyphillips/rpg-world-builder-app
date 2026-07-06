@@ -1,11 +1,14 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import {
   isSpellcastingActiveAtLevel,
-  type Spellcasting,
   type SpellPreparationMode,
 } from '../../../content/classes/spellcasting'
-import { getSlotRow, SLOT_TABLES } from '../../../content/spell-slots'
 import type { Ability } from '../../../vocab/ability'
+import {
+  cantripsKnownAtLevel,
+  maxSelectableSpellLevel,
+  spellsAvailableAtLevel,
+} from '../../creature/spellcasting'
 import { buildChoiceSetId } from '../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
@@ -26,40 +29,6 @@ export type SpellcastingProfile = {
   /** Highest spell level selectable at the current class level (from slot progression). */
   maxSelectableSpellLevel: number
   choiceSetIds: { cantrips?: string; spells?: string }
-}
-
-function progressionValueAtLevel<T extends { level: number }>(
-  entries: readonly T[] | undefined,
-  classLevel: number,
-  getValue: (entry: T) => number,
-): number {
-  if (!entries?.length) return 0
-
-  return entries
-    .filter((entry) => entry.level <= classLevel)
-    .reduce((best, entry) => Math.max(best, getValue(entry)), 0)
-}
-
-export function cantripsKnownAtLevel(spellcasting: Spellcasting, classLevel: number): number {
-  return progressionValueAtLevel(spellcasting.cantrips, classLevel, (entry) => entry.known)
-}
-
-export function spellsAvailableAtLevel(spellcasting: Spellcasting, classLevel: number): number {
-  return progressionValueAtLevel(spellcasting.spellsAvailable, classLevel, (entry) => entry.count)
-}
-
-/** Highest spell level with at least one slot at the given character level. */
-export function maxSelectableSpellLevel(spellcasting: Spellcasting, classLevel: number): number {
-  const row = getSlotRow(SLOT_TABLES[spellcasting.progression], classLevel) ?? []
-  let maxLevel = 0
-
-  for (let index = 0; index < row.length; index++) {
-    if ((row[index] ?? 0) > 0) {
-      maxLevel = index + 1
-    }
-  }
-
-  return maxLevel
 }
 
 function buildProfile(characterClass: CharacterClass, classLevel: number): SpellcastingProfile {

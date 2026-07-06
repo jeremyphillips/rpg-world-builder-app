@@ -8,8 +8,8 @@ import { characterBuilderValidationMessages } from './character-builder-messages
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
-import { assembleClassSpellcasting } from './resolvers/spellcasting-resolution'
-import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
+import { assembleClassSpellcasting } from './assemble-spellcasting'
+import { assembleStartingEquipment } from './assemble-starting-equipment'
 import { validateCharacterBuild, type CharacterBuildValidationResult } from './validate'
 
 // ---------------------------------------------------------------------------
