@@ -70,10 +70,8 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
     doc: HomebrewDoc,
     update: Record<string, unknown>,
   ) => Record<string, unknown>
-  /** Runs after normalized input is ready, before parse on update (e.g. class skill edge sync). */
-  beforeUpdateParse?: (ctx: ContentWriteContext) => Promise<void>
   /** Runs after input is parsed, before slug checks and persistence. */
   validateBeforeWrite?: (ctx: ContentWriteContext) => Promise<void>
-  /** Runs after a successful write; may return an enriched entity (e.g. derived class skills). */
+  /** Runs after a successful write; may return a parsed/enriched entity for the API response. */
   afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
 }

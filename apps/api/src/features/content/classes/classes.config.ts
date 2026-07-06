@@ -1,4 +1,4 @@
-import type { CharacterClass } from '@rpg/contracts'
+import type { CharacterClass, ClassStored } from '@rpg/contracts'
 import {
   classStoredBodySchema,
   classStoredSchema,
@@ -11,7 +11,7 @@ import type { ZodType } from 'zod'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
-import { classAfterWrite, classBeforeUpdateParse } from './class-write-hooks'
+import { parseClassReadModel } from './derive-classes-catalog'
 import { ClassPatchModel } from './class-patch.model'
 import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
 import { loadSeedClassesStored, seedClassSlugs } from '@rpg/catalog/classes'
@@ -88,8 +88,7 @@ export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
   toHomebrewEntity: toHomebrewClass,
   bodyFromCreateInput,
   prepareHomebrewUpdate,
-  beforeUpdateParse: classBeforeUpdateParse,
-  afterWrite: classAfterWrite,
+  afterWrite: async (ctx) => parseClassReadModel(ctx.entity as ClassStored),
 }
 
 export const classRegistration = {
