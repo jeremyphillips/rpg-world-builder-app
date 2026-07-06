@@ -53,6 +53,34 @@ export const characterBuilderValidationMessages = {
         ? `Choose only one option for ${label}.`
         : `Choose at most ${max} options for ${label}.`,
   ),
+  chooseCantrips: defineMessage<{ count: number }>(
+    'validation.characterBuilder.chooseCantrips',
+    ({ count }) => (count === 1 ? 'Choose 1 more cantrip.' : `Choose ${count} more cantrips.`),
+  ),
+  chooseSpells: defineMessage<{ count: number }>(
+    'validation.characterBuilder.chooseSpells',
+    ({ count }) =>
+      count === 1 ? 'Choose 1 more prepared spell.' : `Choose ${count} more prepared spells.`,
+  ),
+  removeCantrips: defineMessage<{ count: number }>(
+    'validation.characterBuilder.removeCantrips',
+    ({ count }) => (count === 1 ? 'Remove 1 cantrip.' : `Remove ${count} cantrips.`),
+  ),
+  removeSpells: defineMessage<{ count: number }>(
+    'validation.characterBuilder.removeSpells',
+    ({ count }) => (count === 1 ? 'Remove 1 prepared spell.' : `Remove ${count} prepared spells.`),
+  ),
+  spellNoLongerAvailable: defineMessage<{ spellLabel: string }>(
+    'validation.characterBuilder.spellNoLongerAvailable',
+    ({ spellLabel }) => `${spellLabel} is no longer available for this class.`,
+  ),
+  spellNotSelectableAtLevel: defineMessage<{ spellLabel: string; maxLevel: number }>(
+    'validation.characterBuilder.spellNotSelectableAtLevel',
+    ({ spellLabel, maxLevel }) =>
+      maxLevel === 1
+        ? `${spellLabel} is not a level 1 spell.`
+        : `${spellLabel} is above the highest spell level you can select.`,
+  ),
   finalizationFailed: defineMessage(
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',

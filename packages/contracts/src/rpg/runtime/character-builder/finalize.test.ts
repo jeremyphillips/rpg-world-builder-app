@@ -5,6 +5,13 @@ import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
 import { CharacterBuildFinalizationError, finalizeCharacterBuild } from './finalize'
 import { builderTestContext } from './test-fixtures'
+import {
+  spellcastingTestContext,
+  wizardCantrips,
+  wizardClass,
+  wizardLevelOneSpells,
+} from './spellcasting-test-fixtures'
+import { resolveAvailableChoices } from './resolvers/resolve-choices'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
@@ -167,5 +174,45 @@ describe('finalizeCharacterBuild', () => {
       vehicles: [],
       mounts: [],
     })
+  })
+
+  it('assembles class spellcasting with classSpellcasting provenance', () => {
+    const draft = makeCompleteDraft({
+      species: { speciesId: 'srd-cc-5.2.1:fixture-dwarf' },
+      class: { classId: wizardClass.id, level: 1 },
+    })
+    const choiceSets = resolveAvailableChoices(draft, spellcastingTestContext)
+    const cantripIds = wizardCantrips.slice(0, 3).map((spell) => spell.id)
+    const spellIds = wizardLevelOneSpells.slice(0, 4).map((spell) => spell.id)
+
+    const input = finalizeCharacterBuild(
+      {
+        ...draft,
+        choiceSelections: {
+          [`spellcasting:${wizardClass.id}:cantrips`]: cantripIds,
+          [`spellcasting:${wizardClass.id}:spells`]: spellIds,
+        },
+      },
+      spellcastingTestContext,
+      { resolvedChoiceSets: choiceSets },
+    )
+
+    expect(input.spells).toHaveLength(7)
+    expect(input.spells?.filter((entry) => entry.preparationState === undefined)).toHaveLength(3)
+    expect(input.spells?.filter((entry) => entry.preparationState === 'prepared')).toHaveLength(4)
+    expect(input.spells?.[0]?.sources).toEqual([
+      {
+        kind: 'classSpellcasting',
+        sourceId: wizardClass.id,
+        grantId: 'cantrips',
+      },
+    ])
+    expect(input.spells?.[3]?.sources).toEqual([
+      {
+        kind: 'classSpellcasting',
+        sourceId: wizardClass.id,
+        grantId: 'spells',
+      },
+    ])
   })
 })

@@ -6,10 +6,11 @@ tracks status, purpose, and promotion path for each resolver.
 
 ## Public API
 
-| Resolver                  | Status                      | Purpose                                                                      |
-| ------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| `resolveAvailableContent` | **Implemented** (BENCH-081) | Filters species, classes, spells, and equipment by character-creation rules. |
-| `resolveAvailableChoices` | **Implemented** (BENCH-087) | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
+| Resolver                     | Status                      | Purpose                                                                      |
+| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| `resolveAvailableContent`    | **Implemented** (BENCH-081) | Filters species, classes, spells, and equipment by character-creation rules. |
+| `resolveAvailableChoices`    | **Implemented** (BENCH-087) | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
+| `resolveSpellcastingProfile` | **Implemented** (BENCH-089) | Structural spellcasting facts for the Spells step; null for non-casters.     |
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
 
@@ -24,7 +25,7 @@ concatenates results.
 | `resolveClassSkillChoices`        | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
 | `resolveClassFeatureGrantChoices` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
 | `resolveStartingEquipmentChoices` | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
-| `resolveSpellcastingChoices`      | **Deferred** (BENCH-089)    | Cantrip and spell known/prepared ChoiceSets.                                                                                |
+| `resolveSpellcastingChoices`      | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                      |
 
 ### Grant traversal contract
 
@@ -53,7 +54,7 @@ Resolvers never read the deprecated `grants` bag directly.
 
 | Resolver                      | Disposition                                                    |
 | ----------------------------- | -------------------------------------------------------------- |
-| `resolveSpellcastingProfile`  | BENCH-089 — exported when spell step ships                     |
+| `resolveSpellPickerItems`     | BENCH-105 — spell picker row state; blocked on BENCH-089       |
 | `resolveAvailableFeats`       | Deferred — no full feat catalog in `CharacterBuildCatalog` yet |
 | Campaign allow/deny filtering | Plugs into `resolveAvailableContent` when campaign scope ships |
 

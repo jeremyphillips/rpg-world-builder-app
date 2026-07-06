@@ -1,15 +1,14 @@
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'
-import type { CharacterSpellEntry } from '../character/spells'
 import { levelOneMaxHp } from '../character/derive/index'
 import { formatFieldMessage } from '../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../vocab/ability'
 import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import { characterBuilderValidationMessages } from './character-builder-messages'
-import type { ChoiceSet } from './choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
+import { assembleClassSpellcasting } from './resolvers/spellcasting-resolution'
 import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
 import { validateCharacterBuild, type CharacterBuildValidationResult } from './validate'
 
@@ -57,30 +56,6 @@ function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Abil
   }
 
   return complete
-}
-
-function selectedSpells(
-  draft: CharacterBuilderDraft,
-  choiceSets: readonly ChoiceSet[],
-): CharacterSpellEntry[] {
-  const spells: CharacterSpellEntry[] = []
-
-  for (const choiceSet of choiceSets) {
-    if (choiceSet.choiceType !== 'cantrip' && choiceSet.choiceType !== 'spell') continue
-
-    const preparationState = choiceSet.choiceType === 'cantrip' ? 'known' : 'prepared'
-    const selections = draft.choiceSelections[choiceSet.id] ?? []
-
-    for (const spellId of selections) {
-      spells.push({
-        spellId,
-        preparationState,
-        sources: [{ kind: 'classFeature', sourceId: choiceSet.sourceId, grantId: choiceSet.id }],
-      })
-    }
-  }
-
-  return spells
 }
 
 /**
@@ -133,7 +108,7 @@ export function finalizeCharacterBuild(
     },
     proficiencies,
     languages: [],
-    spells: selectedSpells(draft, choiceSets),
+    spells: assembleClassSpellcasting(draft, context, choiceSets),
     equipment,
     wealth,
     narrative: draft.identity.narrative,
