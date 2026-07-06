@@ -58,7 +58,7 @@ export async function updateCharacterCreationPatch(
   return getRulesetPatchRead(campaignId)
 }
 
-export { writeInitialCharacterCreation, writeInitialMechanics }
+export { resolveStoredMechanicsPatch, writeInitialCharacterCreation, writeInitialMechanics }
 
 export {
   applySparsePatchUpdate,

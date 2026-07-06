@@ -58,6 +58,7 @@ const completeInput: CharacterDerivationInput = {
     weapons: [],
     armor: [],
     tools: [],
+    languages: [],
   },
   skillProficiencies: [athleticsSkill],
 }
@@ -67,7 +68,7 @@ describe('deriveCharacterProfile', () => {
     expect(() =>
       deriveCharacterProfile({
         level: 1,
-        proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+        proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
         skillProficiencies: [],
       }),
     ).not.toThrow()
@@ -77,7 +78,7 @@ describe('deriveCharacterProfile', () => {
     const profile = deriveCharacterProfile({
       level: 1,
       abilityScores: { dex: 14 },
-      proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
       skillProficiencies: [athleticsSkill],
     })
 
@@ -89,7 +90,7 @@ describe('deriveCharacterProfile', () => {
   it('derives ruleset base AC with neutral DEX modifier when dex is unset', () => {
     const profile = deriveCharacterProfile({
       level: 1,
-      proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
       skillProficiencies: [],
     })
 
@@ -101,7 +102,7 @@ describe('deriveCharacterProfile', () => {
     const profile = deriveCharacterProfile({
       level: 1,
       characterClass: fighterClass,
-      proficiencies: { skills: [], weapons: [], armor: [], tools: [] },
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
       skillProficiencies: [],
     })
 

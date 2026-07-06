@@ -101,6 +101,7 @@ describe('assembleStartingEquipment', () => {
       spells: [],
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
+      languages: [],
     })
 
     const draft = {
@@ -149,6 +150,7 @@ describe('assembleStartingEquipment', () => {
       spells: [],
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
+      languages: [],
     })
 
     const draft = {

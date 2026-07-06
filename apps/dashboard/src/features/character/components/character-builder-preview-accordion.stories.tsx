@@ -23,7 +23,12 @@ export default meta
 type Story = StoryObj<typeof CharacterBuilderPreviewAccordion>
 
 function renderAccordionStory(draft = createEmptyCharacterBuilderDraft()) {
-  const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+  const preview = buildCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+  )
   const narrative = draft.identity.narrative
   const characterClass = draft.class.classId
     ? catalogIndex.classes.get(draft.class.classId)

@@ -13,6 +13,7 @@ const emptyCatalog: CharacterBuildCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  languages: [],
 }
 
 describe('indexCharacterBuildCatalog', () => {

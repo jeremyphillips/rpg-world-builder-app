@@ -25,7 +25,12 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+    )
 
     render(
       <CharacterBuilderPreviewPanel
@@ -75,7 +80,12 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+    )
 
     render(
       <CharacterBuilderPreviewPanel
@@ -99,7 +109,12 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+    )
     const user = userEvent.setup()
 
     render(
@@ -130,7 +145,12 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+    )
 
     const { container } = render(
       <CharacterBuilderPreviewPanel

@@ -7,6 +7,7 @@ import { areRequiredChoiceSetsSatisfied, isChoiceSetSatisfied } from './choice-s
 import type { ChoiceSet } from './choice-set'
 import { characterBuilderPreviewMessages } from './character-builder-preview-messages'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
+import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
 import { toCharacterDerivationInput } from './preview-adapter'
@@ -130,10 +131,17 @@ export function buildCharacterPreview(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
+  rulesetId: SystemRulesetId,
   options: CharacterBuildEngineOptions = {},
 ): CharacterBuildPreview {
   const choiceSets = options.resolvedChoiceSets ?? []
-  const derivationInput = toCharacterDerivationInput(draft, catalogIndex, rules, choiceSets)
+  const derivationInput = toCharacterDerivationInput(
+    draft,
+    catalogIndex,
+    rules,
+    choiceSets,
+    rulesetId,
+  )
   const derived = deriveCharacterProfile(derivationInput)
 
   return {

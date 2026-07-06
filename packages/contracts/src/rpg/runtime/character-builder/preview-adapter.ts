@@ -2,6 +2,7 @@ import type { CharacterDerivationInput } from '../character/derive/profile'
 import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
+import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { CharacterBuilderDraft } from './draft'
 import {
   assembleStartingEquipment,
@@ -14,6 +15,7 @@ export function toCharacterDerivationInput(
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
   choiceSets: readonly ChoiceSet[],
+  rulesetId: SystemRulesetId,
 ): CharacterDerivationInput {
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
@@ -25,7 +27,10 @@ export function toCharacterDerivationInput(
     armorClassBase: rules.armorClass.base,
     abilityScores: draft.abilities.scores,
     characterClass,
-    proficiencies: assembleCharacterProficiencies(draft, catalogIndex, choiceSets, characterClass),
+    proficiencies: assembleCharacterProficiencies(draft, catalogIndex, choiceSets, characterClass, {
+      rulesetId,
+      characterCreationRules: rules,
+    }),
     skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
     equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
   }

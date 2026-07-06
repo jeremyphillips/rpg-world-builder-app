@@ -9,6 +9,7 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
+  resolveCharacterCreationPatch,
   type Campaign,
   type CreatureTypeId,
 } from '@rpg/contracts'
@@ -330,16 +331,20 @@ describe('mapRulesetPatchToRulesValues', () => {
   it('maps resolved patch data to flat rules form values', () => {
     expect(
       mapRulesetPatchToRulesValues({
-        startingLevel: 3,
-        importedCharacters: { policy: 'approval_required' },
-        progression: {
-          maxCharacterLevel: 25,
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
-        species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+        ...resolveCharacterCreationPatch(
+          {
+            startingLevel: 3,
+            importedCharacters: { policy: 'approval_required' },
+            progression: {
+              maxCharacterLevel: 25,
+              extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+            },
+            species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+          },
+          getStandardStartingWealthRules('srd-cc-5.2.1'),
+        ),
         multiclassing: defaultMulticlassingRules(),
         subclasses: defaultSubclassingRules(),
-        startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
       }),
     ).toEqual({
       startingLevel: 3,

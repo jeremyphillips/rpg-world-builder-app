@@ -5,7 +5,44 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
-import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
+import type {
+  CharacterBuildCatalog,
+  CharacterBuildContext,
+  CharacterBuildLanguageOption,
+} from './context'
+
+export const builderTestLanguages = [
+  {
+    id: 'common',
+    label: 'Common',
+    description: 'Trade language.',
+    category: 'standard',
+  },
+  {
+    id: 'elvish',
+    label: 'Elvish',
+    description: 'Elven language.',
+    category: 'standard',
+  },
+  {
+    id: 'dwarvish',
+    label: 'Dwarvish',
+    description: 'Dwarven language.',
+    category: 'standard',
+  },
+  {
+    id: 'draconic',
+    label: 'Draconic',
+    description: 'Draconic language.',
+    category: 'standard',
+  },
+  {
+    id: 'abyssal',
+    label: 'Abyssal',
+    description: 'Infernal language.',
+    category: 'rare',
+  },
+] as const satisfies readonly CharacterBuildLanguageOption[]
 
 export const startingWealthSeed: StartingWealthRules = {
   name: 'Standard starting wealth',
@@ -85,6 +122,7 @@ export const builderTestCatalog: CharacterBuildCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  languages: [...builderTestLanguages],
 }
 
 export const builderTestRules = {

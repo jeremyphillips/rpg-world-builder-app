@@ -19,7 +19,12 @@ function renderAccordion(
   draft = createEmptyCharacterBuilderDraft(),
   narrative = draft.identity.narrative,
 ) {
-  const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+  const preview = buildCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+  )
   const narrativeCount = [
     narrative?.personalityTraits?.length,
     narrative?.ideals?.length,

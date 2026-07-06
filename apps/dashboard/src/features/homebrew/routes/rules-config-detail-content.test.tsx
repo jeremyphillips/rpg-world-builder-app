@@ -7,6 +7,7 @@ import {
   defaultMulticlassingRules,
   defaultSubclassingRules,
   defaultCampaignMechanicsPatch,
+  resolveCharacterCreationPatch,
   type RulesetPatchRead,
 } from '@rpg/contracts'
 
@@ -88,15 +89,17 @@ const useEditionPresetVocabularyMock = vi.mocked(useEditionPresetVocabulary)
 const useAttackResolutionModeVocabularyMock = vi.mocked(useAttackResolutionModeVocabulary)
 
 const mockPatch: RulesetPatchRead = {
-  characterCreation: {
-    startingLevel: 3,
-    importedCharacters: { policy: 'approval_required' },
-    progression: { maxCharacterLevel: 20 },
-    species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
-    multiclassing: defaultMulticlassingRules(),
-    subclasses: defaultSubclassingRules(),
-    startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
-  },
+  characterCreation: resolveCharacterCreationPatch(
+    {
+      startingLevel: 3,
+      importedCharacters: { policy: 'approval_required' },
+      progression: { maxCharacterLevel: 20 },
+      species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
+      multiclassing: defaultMulticlassingRules(),
+      subclasses: defaultSubclassingRules(),
+    },
+    getStandardStartingWealthRules('srd-cc-5.2.1'),
+  ),
   mechanics: defaultCampaignMechanicsPatch(),
 }
 

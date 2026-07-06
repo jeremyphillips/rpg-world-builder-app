@@ -28,6 +28,7 @@ const emptyCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  languages: [],
 }
 
 const rulesPatch = {

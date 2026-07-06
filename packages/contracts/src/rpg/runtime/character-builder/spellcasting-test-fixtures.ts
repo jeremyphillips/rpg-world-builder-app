@@ -203,6 +203,7 @@ export const spellcastingTestCatalog: CharacterBuildCatalog = {
   ],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  languages: [],
 }
 
 export const spellcastingTestContext: CharacterBuildContext = {

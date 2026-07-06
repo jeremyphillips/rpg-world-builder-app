@@ -69,7 +69,12 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const [attemptedStepIds, setAttemptedStepIds] = useState<CharacterBuilderStepId[]>([])
   const [createError, setCreateError] = useState<string | null>(null)
 
-  const preview = useCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+  const preview = useCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+  )
 
   const applyDraftPatch = useCallback(
     (patch: Partial<CharacterBuilderDraft>) => {

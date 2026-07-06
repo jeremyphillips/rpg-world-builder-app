@@ -12,6 +12,9 @@ import {
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
 import { resolveAvailableChoices } from './resolvers/resolve-choices'
+import { resolveLanguageChoiceSets } from './resolvers/resolve-languages'
+import { indexCharacterBuildCatalog } from './context'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
@@ -105,6 +108,57 @@ describe('finalizeCharacterBuild', () => {
         ],
       },
     ])
+  })
+
+  it('assembles language proficiencies under proficiencies.languages', () => {
+    const originChoiceSetId = `ruleset:srd-cc-5.2.1:${ORIGIN_LANGUAGES_CHOICE_ID}`
+    const draft = makeCompleteDraft({
+      choiceSelections: {
+        [originChoiceSetId]: ['elvish', 'dwarvish'],
+      },
+    })
+    const choiceSets = resolveLanguageChoiceSets(
+      builderTestContext,
+      indexCharacterBuildCatalog(builderTestContext.catalog),
+    )
+
+    const input = finalizeCharacterBuild(draft, builderTestContext, {
+      resolvedChoiceSets: choiceSets,
+    })
+
+    expect(input.proficiencies.languages).toEqual([
+      {
+        language: 'common',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: 'language-grants',
+          },
+        ],
+      },
+      {
+        language: 'elvish',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: originChoiceSetId,
+          },
+        ],
+      },
+      {
+        language: 'dwarvish',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: originChoiceSetId,
+          },
+        ],
+      },
+    ])
+    expect((input as Record<string, unknown>)['languages']).toBeUndefined()
   })
 
   it('throws CharacterBuildFinalizationError when validation fails', () => {

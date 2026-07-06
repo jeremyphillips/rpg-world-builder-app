@@ -1,3 +1,5 @@
 export * from './resolve-available-content'
+export * from './resolve-languages'
+export * from './resolve-ruleset-language-choices'
 export * from './resolve-choices'
 export * from './spellcasting-profile'

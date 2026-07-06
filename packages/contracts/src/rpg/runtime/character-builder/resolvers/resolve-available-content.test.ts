@@ -96,6 +96,7 @@ function makeContext(
       spells: [],
       equipment: [],
       skillProficiencies: [],
+      languages: [],
     },
     characterCreationRules: {
       ...baseRules,
@@ -117,6 +118,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        languages: [],
       },
     })
 
@@ -134,6 +136,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        languages: [],
       },
     })
 
@@ -152,6 +155,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        languages: [],
       },
     })
 
@@ -173,6 +177,7 @@ describe('resolveAvailableContent', () => {
         ],
         equipment: [],
         skillProficiencies: [],
+        languages: [],
       },
     })
 
@@ -207,6 +212,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [equipment],
         skillProficiencies: [],
+        languages: [],
       },
     })
 
