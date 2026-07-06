@@ -1,5 +1,44 @@
 [
   {
+    "id": "srd-cc-5.2.1:acid-splash",
+    "slug": "acid-splash",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Acid Splash",
+    "level": 0,
+    "description": "<p>You create an acidic bubble at a point within range, where it explodes in a 5-foot-radius Sphere. Each creature in that Sphere must succeed on a Dexterity saving throw or take 1d6 Acid damage.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["acid"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:chill-touch",
     "slug": "chill-touch",
     "rulesetId": "srd-cc-5.2.1",
@@ -16,10 +55,23 @@
       "damageTypes": ["necrotic"],
       "roles": ["damage", "debuff"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
     "deliveryMethod": "melee-spell-attack"
   },
   {
@@ -38,8 +90,20 @@
     "tags": {
       "functions": ["creation", "deception", "utility"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 120, "unit": "ft" } },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
     "duration": {
       "kind": "timed",
       "value": 1,
@@ -50,7 +114,9 @@
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "a bit of phosphorus" }
+      "material": {
+        "description": "a bit of phosphorus"
+      }
     }
   },
   {
@@ -70,10 +136,105 @@
       "roles": ["detection"],
       "functions": ["environment", "foreknowledge", "utility"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:eldritch-blast",
+    "slug": "eldritch-blast",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Eldritch Blast",
+    "level": 0,
+    "description": "<p>You hurl a beam of crackling energy. Make a ranged spell attack against one creature or object in range. On a hit, the target takes 1d10 Force damage.</p><p><strong>Cantrip Upgrade.</strong> The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.</p>",
+    "school": "evocation",
+    "classIds": ["warlock"],
+    "tags": {
+      "damageTypes": ["force"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack"
+  },
+  {
+    "id": "srd-cc-5.2.1:elementalism",
+    "slug": "elementalism",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Elementalism",
+    "level": 0,
+    "description": "<p>You exert control over the elements, creating one of the following effects within range.</p><p><strong>Beckon Air.</strong> You create a breeze strong enough to ripple cloth, stir dust, rustle leaves, and close open doors and shutters, all in a 5-foot Cube. Doors and shutters being held open by someone or something aren't affected.</p><p><strong>Beckon Earth.</strong> You create a thin shroud of dust or sand that covers surfaces in a 5-foot-square area, or you cause a single word to appear in your handwriting in a patch of dirt or sand.</p><p><strong>Beckon Fire.</strong> You create a thin cloud of harmless embers and colored, scented smoke in a 5-foot Cube. You choose the color and scent, and the embers can light candles, torches, or lamps in that area. The smoke's scent lingers for 1 minute.</p><p><strong>Beckon Water.</strong> You create a spray of cool mist that lightly dampens creatures and objects in a 5-foot Cube. Alternatively, you create 1 cup of clean water either in an open container or on a surface, and the water evaporates in 1 minute.</p><p><strong>Sculpt Element.</strong> You cause dirt, sand, fire, smoke, mist, or water that can fit in a 1-foot Cube to assume a crude shape (such as that of a creature) for 1 hour.</p>",
+    "school": "transmutation",
+    "classIds": ["druid", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:fire-bolt",
@@ -92,11 +253,144 @@
       "damageTypes": ["fire"],
       "roles": ["damage"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 120, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
     "deliveryMethod": "ranged-spell-attack"
+  },
+  {
+    "id": "srd-cc-5.2.1:guidance",
+    "slug": "guidance",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Guidance",
+    "level": 0,
+    "description": "<p>You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to any ability check using the chosen skill.</p>",
+    "school": "divination",
+    "classIds": ["cleric", "druid"],
+    "tags": {
+      "roles": ["buff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:light",
+    "slug": "light",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Light",
+    "level": 0,
+    "description": "<p>You touch one Large or smaller object that isn't being worn or carried by someone else. Until the spell ends, the object sheds Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. The light can be colored as you like.</p><p>Covering the object with something opaque blocks the light. The spell ends if you cast it again.</p>",
+    "school": "evocation",
+    "classIds": ["bard", "cleric", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "material": {
+        "description": "a firefly or phosphorescent moss"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:mage-hand",
+    "slug": "mage-hand",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mage Hand",
+    "level": 0,
+    "description": "<p>A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration. The hand vanishes if it is ever more than 30 feet away from you or if you cast this spell again.</p><p>When you cast the spell, you can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial.</p><p>As a Magic action on your later turns, you can control the hand thus again. As part of that action, you can move the hand up to 30 feet.</p><p>The hand can't attack, activate magic items, or carry more than 10 pounds.</p>",
+    "school": "conjuration",
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:mending",
@@ -114,13 +408,67 @@
     "tags": {
       "functions": ["utility"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "minute" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "instantaneous" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "minute"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "two lodestones" }
+      "material": {
+        "description": "two lodestones"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:message",
+    "slug": "message",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Message",
+    "level": 0,
+    "description": "<p>You point toward a creature within range and whisper a message. The target (and only the target) hears the message and can reply in a whisper that only you can hear.</p><p>You can cast this spell through solid objects if you are familiar with the target and know it is beyond the barrier. Magical silence; 1 foot of stone, metal, or wood; or a thin sheet of lead blocks the spell.</p>",
+    "school": "transmutation",
+    "classIds": ["bard", "druid", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["communication"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "round"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "a copper wire"
+      }
     }
   },
   {
@@ -139,12 +487,30 @@
     "tags": {
       "functions": ["deception", "utility"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
-    "duration": { "kind": "timed", "value": 1, "unit": "minute" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
     "components": {
       "somatic": true,
-      "material": { "description": "a bit of fleece" }
+      "material": {
+        "description": "a bit of fleece"
+      }
     }
   },
   {
@@ -160,10 +526,27 @@
     "school": "necromancy",
     "level": 0,
     "classIds": ["druid", "sorcerer", "warlock", "wizard"],
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
     "deliveryMethod": "ranged-spell-attack"
   },
   {
@@ -179,10 +562,145 @@
     "school": "transmutation",
     "level": 0,
     "classIds": ["bard", "sorcerer", "warlock", "wizard"],
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 10, "unit": "ft" } },
-    "duration": { "kind": "timed", "value": 1, "unit": "hour", "upTo": true },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 10,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:resistance",
+    "slug": "resistance",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Resistance",
+    "level": 0,
+    "description": "<p>You touch a willing creature and choose a damage type: Acid, Bludgeoning, Cold, Fire, Lightning, Necrotic, Piercing, Poison, Radiant, Slashing, or Thunder. When the creature takes damage of the chosen type before the spell ends, the creature reduces the total damage taken by 1d4. A creature can benefit from this spell only once per turn.</p>",
+    "school": "abjuration",
+    "classIds": ["cleric", "druid"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:sacred-flame",
+    "slug": "sacred-flame",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sacred Flame",
+    "level": 0,
+    "description": "<p>Flame-like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 Radiant damage. The target gains no benefit from Half Cover or Three-Quarters Cover for this save.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "school": "evocation",
+    "classIds": ["cleric"],
+    "tags": {
+      "damageTypes": ["radiant"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:spare-the-dying",
+    "slug": "spare-the-dying",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Spare the Dying",
+    "level": 0,
+    "description": "<p>Choose a creature within range that has 0 Hit Points and isn't dead. The creature becomes Stable.</p><p><strong>Cantrip Upgrade.</strong> The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet).</p>",
+    "school": "necromancy",
+    "classIds": ["cleric", "druid"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 15,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:thaumaturgy",
@@ -197,9 +715,64 @@
     "school": "transmutation",
     "level": 0,
     "classIds": ["cleric"],
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
-    "duration": { "kind": "timed", "value": 1, "unit": "minute", "upTo": true },
-    "components": { "verbal": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "upTo": true
+    },
+    "components": {
+      "verbal": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:true-strike",
+    "slug": "true-strike",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "True Strike",
+    "level": 0,
+    "description": "<p>Guided by a flash of magical insight, you make one attack with the weapon used in the spell's casting. The attack uses your spellcasting ability for the attack and damage rolls instead of using Strength or Dexterity. If the attack deals damage, it can be Radiant damage or the weapon's normal damage type (your choice).</p><p><strong>Cantrip Upgrade.</strong> Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>",
+    "school": "divination",
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["buff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "a weapon with which you have proficiency and that is worth 1+ CP"
+      }
+    }
   }
 ]

@@ -1,6 +1,5 @@
 import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { createContentMutationHooks } from '../../lib/list/use-content-mutations'
-import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { listClasses } from '../api/classes-api'
 
 const classesContentList = createContentQueryHook(
@@ -18,6 +17,4 @@ export const classesQueryKey = classesContentList.queryKey
 export const useClasses = classesContentList.useQuery
 
 export const { useCreateContent: useCreateClass, useUpdateContent: useUpdateClass } =
-  createContentMutationHooks('classes', classesQueryKey, {
-    invalidateQueryKeys: (campaignId) => [skillProficienciesQueryKey(campaignId)],
-  })
+  createContentMutationHooks('classes', classesQueryKey)

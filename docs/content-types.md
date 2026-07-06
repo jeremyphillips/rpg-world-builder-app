@@ -41,7 +41,7 @@ the class body.
 Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a single atomic grant: one sense, one resistance, walk speed override, or one language. Hybrids (Drow: senses + innate spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
-- **Aggregate** mechanics (e.g. species stat-row senses) with `getTraitGrants(trait)` — read raw grants, not derived prose.
+- **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
 - **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
@@ -239,7 +239,7 @@ Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`derive
 
 ### Known gaps (revisit later)
 
-- **Cross-catalog slug references** — Some fields still store class **slugs**, not opaque ids (e.g. `spell.classIds`, `skillProficiency.suggestedClasses`). Locking a target’s slug does not break these while the slug stays unchanged; deleting and re-creating content under a new slug **will** break slug-based refs. No cascade migration exists.
+- **Cross-catalog slug references** — Some fields still store class **slugs**, not opaque ids (e.g. `spell.classIds`, skill slugs in `characterCreation.proficiencies.skills.choices[].from`). Locking a target’s slug does not break these while the slug stays unchanged; deleting and re-creating content under a new slug **will** break slug-based refs. No cascade migration exists.
 - **Character model** — Not built yet. When added, characters should reference catalog records by envelope **`id`**, not slug or nested trait id, unless tracking per-feature state requires `(classId, featureId)`.
 - **Delete + re-add** — Removing a nested trait/feature and adding a “new” row with the same display name gets a fresh derived id. Any future character state keyed by nested ids would not carry over.
 - **Draft → publish** — A future draft state may defer slug assignment until publish. Existing homebrew created today is already published/locked; migration should not be required.
@@ -856,31 +856,31 @@ See [packages/ui/docs/forms/field-types.md](../packages/ui/docs/forms/field-type
 
 ## Skill ↔ class association
 
-The class↔skill proficiency edge is **single-writer** on the skill record:
+Class is the **single writer** for starting skill proficiency choices:
 
-| Field                             | Location                 | Role                                                                                                                                                                                            |
-| --------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`suggestedClasses`**            | `skill-proficiency` body | **Authoritative** — class slugs that suggest this skill for starting proficiency selection (required on create).                                                                                |
-| **`proficiencies.skills.choose`** | `class` stored body      | How many skills the player picks at class creation (persisted).                                                                                                                                 |
-| **`proficiencies.skills.from`**   | `class` read model only  | **Derived** at API/catalog read time via `skillSlugsSuggestingClass()` in `@rpg/contracts` (`content/skill-class-association.ts`). Not stored in seed JSON, Mongo homebrew, or overlay patches. |
+| Field                                                  | Location                  | Role                                                                      |
+| ------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------- |
+| **`proficiencies.skills.items`**                       | `class.proficiencies`     | Auto-granted skill proficiencies (fixed grants at class creation).        |
+| **`characterCreation.proficiencies.skills.choices[]`** | `class.characterCreation` | Player skill picks at class creation (`choose` + `from` pool per choice). |
 
 ### Write paths
 
-- **Skill form** — edits `suggestedClasses` directly (chips over campaign classes).
-- **Class form** — skill option chips bind to derived `from` in form state; on save the dashboard sends a transient `from` array for API fan-out only. The API strips `from` before persistence and runs `syncSuggestedClassesFromClass()` to patch affected skill records.
+- **Class form — Proficiencies tab** — edits auto-granted skills via `proficiencies.skills.items` chips.
+- **Class form — Character creation tab** — edits the first skill choice (`choices[0]` only until multi-package UI ships): choose count + `from` chips. Ephemeral empty defaults are omitted on save when not meaningful (`choose > 0` and `from` non-empty).
+- **Skill form** — no class association fields; authoring lives on the class.
 
 ### Read paths
 
-- **Skill detail** — **Suggested classes** (links from `suggestedClasses`).
-- **Class detail** — **Suggested proficiencies** (derived from skills; `Choose N:` from `skills.choose`).
-- **`GET …/content/classes`** — merges stored classes with derived `skills.from` per campaign skills list.
+- **Skill detail** — **Class skill choices** via `classesOfferingSkillChoice()` (inverse scan of class `characterCreation.proficiencies.skills.choices`).
+- **Class detail** — **Suggested proficiencies** from `skillSlugsFromClassChoices()` and `choices[0].choose`.
+- **`GET …/content/classes`** — returns stored class shape; no skill-list derivation at read time.
 
-Helpers: `skillSlugsSuggestingClass`, `diffClassSkillEdges`, `deriveClassesSkillFrom`, `stripClassSkillFromFromInput`.
+Helpers: `skillSlugsFromClassChoices`, `classesOfferingSkillChoice`.
 
 ### Known gaps (revisit later)
 
-- **`suggestedClasses` uses class slugs**, not opaque class ids — same cross-catalog slug-ref risk as `spell.classIds` (see [Known gaps](#known-gaps-revisit-later)).
-- **Character-builder gating** will read `suggestedClasses`; not built yet.
+- **First choice only in dashboard** — form binds `choices[0]`; multi-package skill choices deferred.
+- **Skill slugs in choice pools** — same cross-catalog slug-ref risk as `spell.classIds` (see [Known gaps](#known-gaps-revisit-later)).
 - **DM “allow any skill” override** — deferred.
 
 ---

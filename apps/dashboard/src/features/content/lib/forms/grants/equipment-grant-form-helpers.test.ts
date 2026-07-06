@@ -19,9 +19,9 @@ import {
 } from './equipment-grant-form-values'
 
 describe('equipmentGrantToFormRow / equipmentGrantFromFormRow', () => {
-  it('round-trips a fixed grant', () => {
+  it('round-trips a granted item', () => {
     const grant = {
-      kind: 'fixed' as const,
+      kind: 'grant' as const,
       equipmentSlug: 'dagger',
       quantity: 2,
       equipped: true,
@@ -116,10 +116,10 @@ describe('equipmentGrantTitle', () => {
     { value: 'rapier', label: 'Rapier' },
   ]
 
-  it('includes quantity when fixed equipment count is greater than one', () => {
+  it('includes quantity when granted equipment count is greater than one', () => {
     expect(
       equipmentGrantTitle(
-        { itemKind: 'fixed', equipmentSlug: 'javelin', quantity: 4 },
+        { itemKind: 'grant', equipmentSlug: 'javelin', quantity: 4 },
         0,
         equipmentOptions,
       ),
@@ -173,13 +173,13 @@ describe('equipmentGrantSummary', () => {
     ).toBe('Character chooses 1 musical instrument.')
   })
 
-  it('returns an empty string for incomplete fixed rows', () => {
-    expect(equipmentGrantSummary({ itemKind: 'fixed' } as EquipmentGrantItemForm, [])).toBe('')
+  it('returns an empty string for incomplete granted rows', () => {
+    expect(equipmentGrantSummary({ itemKind: 'grant' } as EquipmentGrantItemForm, [])).toBe('')
   })
 })
 
 describe('equipmentGrantItemFields', () => {
-  it('uses single-select combobox for fixed equipment slugs in a row with quantity', () => {
+  it('uses single-select combobox for granted equipment slugs in a row with quantity', () => {
     const fields = equipmentGrantItemFields({
       options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
     })
@@ -287,13 +287,13 @@ describe('equipmentGrantChoiceItemFormSchema validation', () => {
 })
 
 describe('equipmentGrantItemFormSchema', () => {
-  it('parses fixed and choice rows', () => {
+  it('parses granted and choice rows', () => {
     expect(
       equipmentGrantItemFormSchema.parse({
-        itemKind: 'fixed',
+        itemKind: 'grant',
         equipmentSlug: 'dagger',
         quantity: 1,
       }),
-    ).toMatchObject({ itemKind: 'fixed', equipmentSlug: 'dagger' })
+    ).toMatchObject({ itemKind: 'grant', equipmentSlug: 'dagger' })
   })
 })

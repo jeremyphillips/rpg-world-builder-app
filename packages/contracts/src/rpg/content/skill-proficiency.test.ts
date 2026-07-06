@@ -49,7 +49,6 @@ const athleticsBody = {
   name: 'Athletics',
   description: 'Difficult situations you face while climbing, jumping, or swimming.',
   ability: 'str',
-  suggestedClasses: ['barbarian', 'fighter', 'paladin'],
 } as const
 
 const timestamps = {
@@ -85,15 +84,6 @@ describe('skillProficiencySchema', () => {
     expect(skillProficiencySchema.safeParse(minimal).success).toBe(true)
   })
 
-  it('requires at least one suggested class', () => {
-    expect(skillProficiencySchema.safeParse({ ...athletics, suggestedClasses: [] }).success).toBe(
-      false,
-    )
-    expect(
-      skillProficiencySchema.safeParse({ ...athletics, suggestedClasses: undefined }).success,
-    ).toBe(false)
-  })
-
   it('rejects an invalid governing ability', () => {
     expect(skillProficiencySchema.safeParse({ ...athletics, ability: 'luck' }).success).toBe(false)
   })
@@ -120,16 +110,6 @@ describe('createSkillProficiencyInputSchema', () => {
       createSkillProficiencyInputSchema.safeParse({ ...athleticsBody, slug: 'Athletics' }).success,
     ).toBe(false)
   })
-
-  it('requires at least one suggested class', () => {
-    expect(
-      createSkillProficiencyInputSchema.safeParse({
-        ...athleticsBody,
-        suggestedClasses: [],
-        slug: 'athletics',
-      }).success,
-    ).toBe(false)
-  })
 })
 
 describe('updateSkillProficiencyInputSchema', () => {
@@ -140,9 +120,6 @@ describe('updateSkillProficiencyInputSchema', () => {
 
   it('still validates provided fields', () => {
     expect(updateSkillProficiencyInputSchema.safeParse({ ability: 'luck' }).success).toBe(false)
-    expect(updateSkillProficiencyInputSchema.safeParse({ suggestedClasses: [] }).success).toBe(
-      false,
-    )
   })
 })
 

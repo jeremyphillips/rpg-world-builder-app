@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { getAbilityLabel, skillSlugsSuggestingClass } from '@rpg/contracts'
+import { getAbilityLabel, skillSlugsFromClassChoices } from '@rpg/contracts'
 import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -89,19 +89,18 @@ function titleCase(str: string): string {
 
 function SuggestedProficienciesList({
   campaignId,
-  classSlug,
   choose,
+  skillSlugs,
   skillProficiencies,
   isPending,
 }: {
   campaignId: string
-  classSlug: string
   choose: number
+  skillSlugs: string[]
   skillProficiencies: SkillProficiency[]
   isPending: boolean
 }) {
-  const suggestedSkillSlugs = skillSlugsSuggestingClass(classSlug, skillProficiencies)
-  if (!isPending && suggestedSkillSlugs.length === 0) return null
+  if (!isPending && skillSlugs.length === 0) return null
 
   const skillsBySlug = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
 
@@ -117,7 +116,7 @@ function SuggestedProficienciesList({
         <Text variant="muted">Loading…</Text>
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
-          {suggestedSkillSlugs.map((slug) => {
+          {skillSlugs.map((slug) => {
             const skill = skillsBySlug.get(slug)
             return (
               <li key={slug}>
@@ -147,7 +146,9 @@ function ClassStatsSection({ characterClass }: { characterClass: CharacterClass 
   const savingThrowsLabel = proficiencies.savingThrows.map(getAbilityLabel).join(', ')
   const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
   const armorLabel =
-    proficiencies.armor.length > 0 ? proficiencies.armor.map(titleCase).join(', ') : 'None'
+    proficiencies.armor.categories.length > 0
+      ? proficiencies.armor.categories.map(titleCase).join(', ')
+      : 'None'
 
   return (
     <div className="space-y-3">
@@ -201,8 +202,10 @@ export function ClassDetailContent({
       >
         <SuggestedProficienciesList
           campaignId={campaignId}
-          classSlug={characterClass.slug}
-          choose={characterClass.proficiencies.skills.choose}
+          choose={
+            characterClass.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose ?? 0
+          }
+          skillSlugs={skillSlugsFromClassChoices(characterClass)}
           skillProficiencies={skillProficiencies}
           isPending={skillsPending}
         />

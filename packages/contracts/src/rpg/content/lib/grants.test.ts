@@ -24,6 +24,7 @@ import {
   languageChoiceGrantSchema,
   normalizeContentTrait,
   normalizeGrantGroups,
+  resolveGrantGroupsFromContent,
 } from './grants'
 import { resolveTraitDisplay } from './trait-display'
 
@@ -58,7 +59,7 @@ describe('isGrantEligibleGrants', () => {
   it('rejects equipment-only grants', () => {
     expect(
       isGrantEligibleGrants({
-        equipment: [{ kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 }],
+        equipment: [{ kind: 'grant', equipmentSlug: 'dagger', quantity: 1 }],
       }),
     ).toBe(false)
   })
@@ -305,7 +306,7 @@ describe('contentGrantsSchema', () => {
   it('parses equipment grant arrays', () => {
     const grants = {
       equipment: [
-        { kind: 'fixed' as const, equipmentSlug: 'dagger', quantity: 1 },
+        { kind: 'grant' as const, equipmentSlug: 'dagger', quantity: 1 },
         {
           kind: 'choice' as const,
           choose: 1,
@@ -591,13 +592,13 @@ describe('contentGrantSchema — featChoice', () => {
 })
 
 describe('contentGrantSchema — equipment', () => {
-  it('parses a fixed equipment grant', () => {
+  it('parses a granted equipment item', () => {
     expect(
       contentGrantSchema.parse({
         kind: 'equipment',
-        grant: { kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 },
+        grant: { kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
       }),
-    ).toMatchObject({ kind: 'equipment', grant: { kind: 'fixed', equipmentSlug: 'dagger' } })
+    ).toMatchObject({ kind: 'equipment', grant: { kind: 'grant', equipmentSlug: 'dagger' } })
   })
 })
 
@@ -942,5 +943,69 @@ describe('isGrantGroupsEligible', () => {
 
   it('rejects spells-only grant (not eligible kind)', () => {
     expect(isGrantGroupsEligible([{ grants: [spellGrant] }])).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// resolveGrantGroupsFromContent
+// ---------------------------------------------------------------------------
+
+describe('resolveGrantGroupsFromContent', () => {
+  it('returns normalized grantGroups on custom content', () => {
+    const groups = resolveGrantGroupsFromContent({
+      kind: 'custom',
+      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+
+    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+  })
+
+  it('returns an empty array when grantGroups is absent', () => {
+    expect(resolveGrantGroupsFromContent({ kind: 'custom' })).toEqual([])
+  })
+
+  it('normalizes grant-kind traits from grantGroups', () => {
+    const groups = resolveGrantGroupsFromContent({
+      kind: 'grant',
+      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+
+    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+  })
+
+  it('resolves class-feature-shaped content with parent unlock', () => {
+    const groups = resolveGrantGroupsFromContent(
+      {
+        kind: 'custom',
+        grantGroups: [
+          {
+            unlock: { level: 3 },
+            grants: [
+              {
+                kind: 'spells',
+                ability: 'wis',
+                mode: 'always_prepared',
+                spellIds: ['speak-with-animals'],
+              },
+            ],
+          },
+        ],
+      },
+      { level: 1 },
+    )
+
+    expect(groups).toEqual([
+      {
+        unlock: { level: 3 },
+        grants: [
+          {
+            kind: 'spells',
+            ability: 'wis',
+            mode: 'always_prepared',
+            spellIds: ['speak-with-animals'],
+          },
+        ],
+      },
+    ])
   })
 })

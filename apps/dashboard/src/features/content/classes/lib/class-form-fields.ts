@@ -28,6 +28,10 @@ import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
 import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
 import {
+  characterCreationProficienciesFormSchema,
+  characterCreationSkillChoiceFields,
+} from './character-creation/class-character-creation-proficiencies-form-fields'
+import {
   STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
   startingEquipmentChooseFields,
@@ -68,6 +72,7 @@ export function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     characterCreation: z
       .object({
         startingEquipment: startingEquipmentFormSchema.optional(),
+        proficiencies: characterCreationProficienciesFormSchema.optional(),
       })
       .optional(),
   })
@@ -129,6 +134,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           'Starting equipment packages',
           startingEquipmentOptionItemFields(ctx),
         ),
+        ...characterCreationSkillChoiceFields(ctx),
       ],
       header: createElement(ClassCharacterCreationTab, { formCtx: ctx }),
     },

@@ -8,11 +8,7 @@ import { ATHLETICS, PERCEPTION, STEALTH } from '../fixtures'
 import { SkillDetailContent } from './skill-proficiency-detail'
 
 function catalogClassesForStories() {
-  const slugs = new Set<string>()
-  for (const skill of [ATHLETICS, STEALTH, PERCEPTION]) {
-    skill.suggestedClasses?.forEach((slug) => slugs.add(slug))
-  }
-  return [...slugs].map((slug) => pickClass(slug))
+  return ['fighter', 'barbarian', 'rogue'].map((slug) => pickClass(slug))
 }
 
 const withSkillDetailProviders: Decorator = (Story) => {

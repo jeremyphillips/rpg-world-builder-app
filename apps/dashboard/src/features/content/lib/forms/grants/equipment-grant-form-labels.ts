@@ -1,5 +1,5 @@
 export const EQUIPMENT_GRANT_ITEM_KIND_LABELS = {
-  fixed: 'Specific item',
+  grant: 'Specific item',
   choice: 'Choice from pool',
 } as const
 

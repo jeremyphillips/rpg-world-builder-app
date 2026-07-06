@@ -15,18 +15,18 @@ const DRUID_STARTING_EQUIPMENT = {
       description:
         "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
       items: [
-        { kind: 'fixed', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
-        { kind: 'fixed', equipmentSlug: 'shield', quantity: 1, equipped: true },
-        { kind: 'fixed', equipmentSlug: 'sickle', quantity: 1, equipped: true },
+        { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
+        { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
+        { kind: 'grant', equipmentSlug: 'sickle', quantity: 1, equipped: true },
         {
-          kind: 'fixed',
+          kind: 'grant',
           equipmentSlug: 'quarterstaff',
           quantity: 1,
           equipped: false,
           modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
         },
-        { kind: 'fixed', equipmentSlug: 'explorers-pack', quantity: 1 },
-        { kind: 'fixed', equipmentSlug: 'herbalism-kit', quantity: 1 },
+        { kind: 'grant', equipmentSlug: 'explorers-pack', quantity: 1 },
+        { kind: 'grant', equipmentSlug: 'herbalism-kit', quantity: 1 },
       ],
       wealth: { gp: 9 },
     },
@@ -41,7 +41,7 @@ const DRUID_STARTING_EQUIPMENT = {
 }
 
 describe('startingEquipmentChoiceSchema', () => {
-  it('accepts fixed items, modifiers, and wealth on options', () => {
+  it('accepts granted items, modifiers, and wealth on options', () => {
     expect(startingEquipmentChoiceSchema.parse(DRUID_STARTING_EQUIPMENT)).toEqual(
       DRUID_STARTING_EQUIPMENT,
     )
@@ -139,6 +139,24 @@ describe('classCharacterCreationSchema', () => {
       }),
     ).toEqual({
       startingEquipment: DRUID_STARTING_EQUIPMENT,
+    })
+  })
+
+  it('accepts proficiencies-only character creation', () => {
+    expect(
+      classCharacterCreationSchema.parse({
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+          },
+        },
+      }),
+    ).toMatchObject({
+      proficiencies: {
+        skills: {
+          choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+        },
+      },
     })
   })
 })

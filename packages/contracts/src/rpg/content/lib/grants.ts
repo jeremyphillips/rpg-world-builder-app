@@ -326,7 +326,7 @@ const featChoiceContentGrantSchema = z
     }
   })
 
-/** Single equipment grant (a fixed item or a pool choice). */
+/** Single equipment grant (a granted item or a pool choice). */
 const equipmentContentGrantSchema = z.object({
   kind: z.literal('equipment'),
   grant: equipmentGrantSchema,
@@ -594,6 +594,26 @@ export function isGrantGroupsEligible(groups: GrantGroup[]): boolean {
   if (group!.grants.length !== 1) return false
   const kind = group!.grants[0]!.kind
   return kind === 'sense' || kind === 'resistances' || kind === 'movement' || kind === 'languages'
+}
+
+// ---------------------------------------------------------------------------
+// Grant group resolution — canonical read surface for traits, features, etc.
+// ---------------------------------------------------------------------------
+
+/** Minimal shape shared by {@link ContentTrait}, class features, heritage options, etc. */
+export type GrantGroupSource = {
+  kind: string
+  grantGroups?: GrantGroups
+}
+
+/** Returns normalized grant groups for grant-bearing content, or `[]` when absent. */
+export function resolveGrantGroupsFromContent(
+  content: GrantGroupSource,
+  parentUnlock?: GrantUnlock,
+): GrantGroup[] {
+  if (!content.grantGroups?.length) return []
+
+  return normalizeGrantGroups(content.grantGroups, parentUnlock)
 }
 
 // --- Trait building block ---------------------------------------------------
