@@ -23,4 +23,8 @@ export const characterBuilderPreviewMessages = {
     'validation.characterBuilderPreview.requiredChoicesIncomplete',
     () => 'Some required choices are incomplete.',
   ),
+  unarmoredDefenseNotModeled: defineMessage<{ featureName: string }>(
+    'validation.characterBuilderPreview.unarmoredDefenseNotModeled',
+    ({ featureName }) => `${featureName} may change AC; not reflected in preview.`,
+  ),
 }

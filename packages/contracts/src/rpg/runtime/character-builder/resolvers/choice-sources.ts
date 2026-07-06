@@ -1,6 +1,7 @@
 import type { ChoiceSourceResolver } from './choice-source-resolver'
 import { resolveClassFeatureGrantChoices } from './resolve-class-feature-grant-choices'
 import { resolveClassSkillChoices } from './resolve-class-skill-choices'
+import { resolveStartingEquipmentChoices } from './resolve-starting-equipment-choices'
 import {
   resolveSpeciesHeritageChoices,
   resolveSpeciesTraitGrantChoices,
@@ -16,6 +17,6 @@ export const CHOICE_SOURCE_RESOLVERS: readonly ChoiceSourceResolver[] = [
   resolveSpeciesTraitGrantChoices,
   resolveClassSkillChoices,
   resolveClassFeatureGrantChoices,
-  // BENCH-088: resolveStartingEquipmentChoices,
+  resolveStartingEquipmentChoices,
   // BENCH-089: resolveSpellcastingChoices,
 ]

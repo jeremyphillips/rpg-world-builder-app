@@ -138,8 +138,8 @@ export function unarmoredAcFromDexModifier(acBase: ArmorClassBase, dexModifier: 
 
 /**
  * Unarmored AC from a DEX score and ruleset base.
- * Equipment-based AC (armor + shield, Mage Armor, Unarmored Defense features)
- * is handled in the MVP-B derive extension (BENCH-088).
+ * Equipment-based AC (armor + shield) is handled via {@link resolveEquippedArmorClass}
+ * when `equippedArmor` is supplied on {@link CharacterDerivationInput}.
  */
 export function unarmoredAc(
   dexScore: number,
@@ -165,4 +165,5 @@ export function resolveUnarmoredAc({
   return unarmoredAcFromDexModifier(acBase, dexModifier)
 }
 
+export * from './armor-class'
 export * from './profile'

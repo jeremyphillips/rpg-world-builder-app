@@ -1,3 +1,4 @@
+import type { ArmorEquipment } from '../../../content/equipment'
 import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting'
@@ -19,6 +20,7 @@ import {
   spellAttackBonus,
   spellSaveDc,
 } from './index'
+import { resolveEquippedArmorClass } from './armor-class'
 
 // ---------------------------------------------------------------------------
 // Character derived profile — reusable derivation over partial character-like
@@ -34,6 +36,8 @@ export type CharacterDerivationInput = {
   characterClass?: CharacterClass
   proficiencies: CharacterProficiencies
   skillProficiencies: readonly SkillProficiency[]
+  /** Equipped armor variants for equipment-based AC; omit for unarmored preview. */
+  equippedArmor?: readonly ArmorEquipment[]
 }
 
 export type CharacterDerivedAbilityScore = {
@@ -184,7 +188,14 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
           conScore,
         })
       : undefined,
-    ac: resolveUnarmoredAc({ acBase, dexScore }),
+    ac:
+      input.equippedArmor && input.equippedArmor.length > 0
+        ? resolveEquippedArmorClass({
+            acBase,
+            dexModifier: typeof dexScore === 'number' ? abilityModifier(dexScore) : 0,
+            equippedArmor: input.equippedArmor,
+          })
+        : resolveUnarmoredAc({ acBase, dexScore }),
     savingThrows: deriveSavingThrows(input, profBonus),
     skills: deriveSkillModifiers(input, profBonus),
     spellcasting: deriveSpellcastingStats(input, profBonus),
