@@ -260,7 +260,6 @@ function invalidValueFor(routeKey: string): unknown {
       return {
         name: '',
         ability: 'str',
-        suggestedClasses: [],
       }
     case 'equipment':
       return smokeInvalidValueFor('weapon')

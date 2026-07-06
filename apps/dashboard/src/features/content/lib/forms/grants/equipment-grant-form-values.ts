@@ -2,7 +2,7 @@ import type {
   EquipmentChoiceGrant,
   EquipmentGrant,
   EquipmentPool,
-  FixedEquipmentGrant,
+  GrantedEquipmentItem,
 } from '@rpg/contracts'
 import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
@@ -10,8 +10,8 @@ import type { FieldOption } from '@rpg/ui/form'
 import { EQUIPMENT_POOL_CATEGORY_ANY } from './equipment-grant-form-fields'
 import type {
   EquipmentGrantChoiceItemForm,
-  EquipmentGrantFixedItemForm,
   EquipmentGrantItemForm,
+  GrantedEquipmentItemForm,
 } from './equipment-grant-form-fields'
 
 function formatExplicitPoolTitle(slugs: string[], equipmentOptions: FieldOption[]): string {
@@ -120,9 +120,9 @@ export function equipmentPoolFromFormRow(row: EquipmentGrantChoiceItemForm): Equ
   return pool
 }
 
-function fixedGrantToFormRow(grant: FixedEquipmentGrant): EquipmentGrantItemForm {
+function grantedItemToFormRow(grant: GrantedEquipmentItem): EquipmentGrantItemForm {
   return {
-    itemKind: 'fixed',
+    itemKind: 'grant',
     equipmentSlug: grant.equipmentSlug,
     quantity: grant.quantity,
     equipped: grant.equipped,
@@ -138,12 +138,12 @@ function choiceGrantToFormRow(grant: EquipmentChoiceGrant): EquipmentGrantItemFo
 }
 
 export function equipmentGrantToFormRow(grant: EquipmentGrant): EquipmentGrantItemForm {
-  return grant.kind === 'fixed' ? fixedGrantToFormRow(grant) : choiceGrantToFormRow(grant)
+  return grant.kind === 'grant' ? grantedItemToFormRow(grant) : choiceGrantToFormRow(grant)
 }
 
-function fixedGrantFromFormRow(row: EquipmentGrantFixedItemForm): FixedEquipmentGrant {
-  const grant: FixedEquipmentGrant = {
-    kind: 'fixed',
+function grantedItemFromFormRow(row: GrantedEquipmentItemForm): GrantedEquipmentItem {
+  const grant: GrantedEquipmentItem = {
+    kind: 'grant',
     equipmentSlug: row.equipmentSlug,
     quantity: row.quantity ?? 1,
   }
@@ -162,7 +162,7 @@ function choiceGrantFromFormRow(row: EquipmentGrantChoiceItemForm): EquipmentCho
 }
 
 export function equipmentGrantFromFormRow(row: EquipmentGrantItemForm): EquipmentGrant {
-  return row.itemKind === 'fixed' ? fixedGrantFromFormRow(row) : choiceGrantFromFormRow(row)
+  return row.itemKind === 'grant' ? grantedItemFromFormRow(row) : choiceGrantFromFormRow(row)
 }
 
 export function equipmentGrantTitle(
@@ -172,7 +172,7 @@ export function equipmentGrantTitle(
 ): string {
   if (!row) return `Item ${index + 1}`
 
-  if (row.itemKind === 'fixed') {
+  if (row.itemKind === 'grant') {
     const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
     const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
     const quantity = row.quantity ?? 1
@@ -196,7 +196,7 @@ export function equipmentGrantSummary(
   equipmentOptions: FieldOption[] = [],
 ): string {
   if (!row?.itemKind) return ''
-  if (row.itemKind === 'fixed' && !row.equipmentSlug) return ''
+  if (row.itemKind === 'grant' && !row.equipmentSlug) return ''
 
   const resolveEquipmentName = (slug: string) =>
     equipmentOptions.find((option) => option.value === slug)?.label

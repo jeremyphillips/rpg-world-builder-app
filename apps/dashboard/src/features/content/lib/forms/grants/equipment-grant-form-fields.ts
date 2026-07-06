@@ -47,7 +47,7 @@ export const equipmentGrantValidationMessages = {
   ),
 }
 
-export const EQUIPMENT_GRANT_ITEM_KINDS = ['fixed', 'choice'] as const
+export const EQUIPMENT_GRANT_ITEM_KINDS = ['grant', 'choice'] as const
 
 export const EQUIPMENT_POOL_SOURCES = ['explicit', 'filtered'] as const
 
@@ -93,8 +93,8 @@ function categoryOptionsWithAny(options: { value: string; label: string }[]) {
   return [{ value: EQUIPMENT_POOL_CATEGORY_ANY, label: 'Any' }, ...options]
 }
 
-export const equipmentGrantFixedItemFormSchema = z.object({
-  itemKind: z.literal('fixed'),
+export const grantedEquipmentItemFormSchema = z.object({
+  itemKind: z.literal('grant'),
   equipmentSlug: z.string().min(1),
   quantity: z.coerce.number().int().min(1).default(1),
   equipped: z.boolean().optional(),
@@ -140,13 +140,13 @@ export const equipmentGrantChoiceItemFormSchema = z
   })
 
 export const equipmentGrantItemFormSchema = z.discriminatedUnion('itemKind', [
-  equipmentGrantFixedItemFormSchema,
+  grantedEquipmentItemFormSchema,
   equipmentGrantChoiceItemFormSchema,
 ])
 
 export type EquipmentGrantItemForm = z.infer<typeof equipmentGrantItemFormSchema>
 
-export type EquipmentGrantFixedItemForm = Extract<EquipmentGrantItemForm, { itemKind: 'fixed' }>
+export type GrantedEquipmentItemForm = Extract<EquipmentGrantItemForm, { itemKind: 'grant' }>
 
 export type EquipmentGrantChoiceItemForm = Extract<EquipmentGrantItemForm, { itemKind: 'choice' }>
 
@@ -202,7 +202,7 @@ function visibleForFilteredEquipmentKind(
   )!
 }
 
-export function fixedEquipmentGrantFields(
+export function grantedEquipmentItemFields(
   ctx: ContentFormCtx,
   guard?: FieldVisibility,
 ): FormItem[] {
@@ -211,7 +211,7 @@ export function fixedEquipmentGrantFields(
   return [
     {
       kind: 'row',
-      visibility: visibleForItemKind('fixed', guard),
+      visibility: visibleForItemKind('grant', guard),
       fields: [
         {
           type: 'combobox',
@@ -238,7 +238,7 @@ export function fixedEquipmentGrantFields(
       type: 'switch',
       name: 'equipped',
       label: 'Equipped',
-      visibility: visibleForItemKind('fixed', guard),
+      visibility: visibleForItemKind('grant', guard),
     },
   ]
 }
@@ -355,11 +355,11 @@ export function equipmentGrantItemFields(
       label: opts.kindSelectLabel ?? 'Grant type',
       options: itemKindOptions,
       required: true,
-      defaultValue: 'fixed',
+      defaultValue: 'grant',
       visibility: guard,
       width: '1/2',
     },
-    ...fixedEquipmentGrantFields(ctx, guard),
+    ...grantedEquipmentItemFields(ctx, guard),
     ...(opts.extraFields ?? []),
     ...equipmentChoiceGrantFields(ctx, guard),
   ]

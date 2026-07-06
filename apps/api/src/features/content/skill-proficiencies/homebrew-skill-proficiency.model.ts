@@ -13,7 +13,6 @@ const homebrewSkillProficiencySchema = new Schema(
   {
     ...homebrewContentIdentityFields,
     ability: { type: String, enum: [...ABILITY_IDS], required: true },
-    suggestedClasses: [{ type: String }],
   },
   { timestamps: true },
 )

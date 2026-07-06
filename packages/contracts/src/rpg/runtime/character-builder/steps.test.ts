@@ -41,7 +41,7 @@ function makeCompleteDraft(): CharacterBuilderDraft {
 
 function makeSkillChoiceSet(overrides: Partial<ChoiceSet> = {}): ChoiceSet {
   return {
-    id: 'class:srd-cc-5.2.1:fighter:skills',
+    id: 'class:srd-cc-5.2.1:fighter:class-skills',
     sourceType: 'class',
     sourceId: 'srd-cc-5.2.1:fighter',
     choiceType: 'skillProficiency',
@@ -360,7 +360,10 @@ describe('getBuilderStepStatus — proficiencies', () => {
   it('returns complete when all required ChoiceSets are satisfied', () => {
     const draft = makeDraft({
       choiceSelections: {
-        'class:srd-cc-5.2.1:fighter:skills': ['srd-cc-5.2.1:athletics', 'srd-cc-5.2.1:perception'],
+        'class:srd-cc-5.2.1:fighter:class-skills': [
+          'srd-cc-5.2.1:athletics',
+          'srd-cc-5.2.1:perception',
+        ],
       },
     })
     expect(getBuilderStepStatus('proficiencies', draft, [makeSkillChoiceSet()])).toBe('complete')
@@ -422,7 +425,10 @@ describe('getBuilderStepStatus — review', () => {
   it('returns complete when all steps (including choice steps) are complete', () => {
     const draft = makeCompleteDraft()
     draft.choiceSelections = {
-      'class:srd-cc-5.2.1:fighter:skills': ['srd-cc-5.2.1:athletics', 'srd-cc-5.2.1:perception'],
+      'class:srd-cc-5.2.1:fighter:class-skills': [
+        'srd-cc-5.2.1:athletics',
+        'srd-cc-5.2.1:perception',
+      ],
       'class:srd-cc-5.2.1:fighter:starting-equipment': ['pack-a'],
     }
     const choiceSets = [makeSkillChoiceSet(), makeEquipmentChoiceSet()]

@@ -13,15 +13,11 @@ const abilityOptions = toOptions(
   >,
 )
 
-const SUGGESTED_CLASSES_HINT =
-  'Classes that suggest this skill for starting proficiency selection. Used by the character builder to restrict skill picks.'
-
 export const skillProficiencyFormSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
   description: z.string().optional(),
   ability: abilitySchema,
-  suggestedClasses: z.array(z.string()).min(1),
 })
 
 export type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>
@@ -40,14 +36,6 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
           options: abilityOptions,
           multiple: false,
           required: true,
-        },
-        {
-          type: 'chips',
-          name: 'suggestedClasses',
-          label: 'Suggested classes',
-          options: ctx.options?.classes ?? [],
-          required: true,
-          hint: SUGGESTED_CLASSES_HINT,
         },
       ],
     },

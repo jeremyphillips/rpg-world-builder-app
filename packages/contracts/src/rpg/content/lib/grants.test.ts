@@ -59,7 +59,7 @@ describe('isGrantEligibleGrants', () => {
   it('rejects equipment-only grants', () => {
     expect(
       isGrantEligibleGrants({
-        equipment: [{ kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 }],
+        equipment: [{ kind: 'grant', equipmentSlug: 'dagger', quantity: 1 }],
       }),
     ).toBe(false)
   })
@@ -306,7 +306,7 @@ describe('contentGrantsSchema', () => {
   it('parses equipment grant arrays', () => {
     const grants = {
       equipment: [
-        { kind: 'fixed' as const, equipmentSlug: 'dagger', quantity: 1 },
+        { kind: 'grant' as const, equipmentSlug: 'dagger', quantity: 1 },
         {
           kind: 'choice' as const,
           choose: 1,
@@ -592,13 +592,13 @@ describe('contentGrantSchema — featChoice', () => {
 })
 
 describe('contentGrantSchema — equipment', () => {
-  it('parses a fixed equipment grant', () => {
+  it('parses a granted equipment item', () => {
     expect(
       contentGrantSchema.parse({
         kind: 'equipment',
-        grant: { kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 },
+        grant: { kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
       }),
-    ).toMatchObject({ kind: 'equipment', grant: { kind: 'fixed', equipmentSlug: 'dagger' } })
+    ).toMatchObject({ kind: 'equipment', grant: { kind: 'grant', equipmentSlug: 'dagger' } })
   })
 })
 

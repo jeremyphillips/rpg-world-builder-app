@@ -1,6 +1,6 @@
 import type {
   StartingEquipmentChoice,
-  StartingEquipmentFixedItem,
+  StartingEquipmentGrantedItem,
   StartingEquipmentItem,
   StartingEquipmentOption,
 } from '@rpg/contracts'
@@ -24,9 +24,9 @@ import {
 } from './class-starting-equipment-form-fields'
 
 function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
-  if (item.kind === 'fixed') {
+  if (item.kind === 'grant') {
     return {
-      itemKind: 'fixed',
+      itemKind: 'grant',
       equipmentSlug: item.equipmentSlug,
       quantity: item.quantity,
       equipped: item.equipped,
@@ -40,8 +40,8 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
 }
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
-  if (row.itemKind === 'fixed') {
-    const grant = equipmentGrantFromFormRow(row) as StartingEquipmentFixedItem
+  if (row.itemKind === 'grant') {
+    const grant = equipmentGrantFromFormRow(row) as StartingEquipmentGrantedItem
     if (row.modifiers?.length) {
       grant.modifiers = row.modifiers
     }

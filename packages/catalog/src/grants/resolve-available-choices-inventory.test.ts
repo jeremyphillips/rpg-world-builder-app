@@ -41,7 +41,7 @@ function choiceShapeKeys(choiceSets: ReturnType<typeof resolveAvailableChoices>)
 
   for (const choiceSet of choiceSets) {
     if (choiceSet.id.endsWith(':heritage')) keys.add('heritage')
-    if (choiceSet.id.endsWith(':skills')) keys.add('classSkills:choose:from')
+    if (choiceSet.id.endsWith(':class-skills')) keys.add('classSkills:choose:from')
     if (choiceSet.choiceType === 'feat') {
       keys.add(
         choiceSet.label.toLowerCase().includes('fighting')
@@ -87,17 +87,18 @@ describe('resolveAvailableChoices against srd-cc-5.2.1 seeds', () => {
         class: { classId: characterClass.id, level: 1 as const },
       }
 
+      const skillChoice = characterClass.characterCreation?.proficiencies?.skills?.choices?.[0]
       const skills = resolveAvailableChoices(draft, context).find((choiceSet) =>
-        choiceSet.id.endsWith(':skills'),
+        choiceSet.id.endsWith(':class-skills'),
       )
 
       expect(skills, characterClass.slug).toMatchObject({
         choiceType: 'skillProficiency',
-        min: characterClass.proficiencies.skills.choose,
-        max: characterClass.proficiencies.skills.choose,
+        min: skillChoice?.choose,
+        max: skillChoice?.choose,
         required: true,
       })
-      expect(skills?.options.length).toBe(characterClass.proficiencies.skills.from?.length ?? 0)
+      expect(skills?.options.length).toBe(skillChoice?.from.length ?? 0)
     }
   })
 

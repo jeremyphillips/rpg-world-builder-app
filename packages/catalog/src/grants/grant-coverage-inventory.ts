@@ -175,9 +175,10 @@ function accumulateClassFeatures(cls: CharacterClass, acc: InventoryAccumulator)
 }
 
 function accumulateClass(cls: CharacterClass, acc: InventoryAccumulator): void {
-  if (cls.proficiencies.skills.choose > 0) {
+  const skillChoice = cls.characterCreation?.proficiencies?.skills?.choices?.[0]
+  if (skillChoice && skillChoice.choose > 0) {
     acc.choiceShapes.add('classSkills:choose:from')
-    acc.classSkillChoose[cls.slug] = cls.proficiencies.skills.choose
+    acc.classSkillChoose[cls.slug] = skillChoice.choose
   }
 
   accumulateStartingEquipmentChoices(cls, acc)

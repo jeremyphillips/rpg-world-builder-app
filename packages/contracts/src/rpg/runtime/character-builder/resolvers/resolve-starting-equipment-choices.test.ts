@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
-import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
 import type { ClassStored } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft } from '../draft'
 import { indexCharacterBuildCatalog, type CharacterBuildCatalog } from '../context'
@@ -63,9 +62,9 @@ const storedBard: ClassStored = {
   hitDie: 8,
   proficiencies: {
     savingThrows: ['dex', 'cha'],
-    armor: ['light'],
-    weapons: { categories: ['simple'] },
-    skills: { choose: 3 },
+    armor: { categories: ['light'], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
   },
   features: [],
   characterCreation: {
@@ -76,7 +75,7 @@ const storedBard: ClassStored = {
           id: 'standard',
           label: 'Standard Equipment',
           items: [
-            { kind: 'fixed', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
+            { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
             {
               kind: 'choice',
               choose: 1,
@@ -100,12 +99,12 @@ const storedBard: ClassStored = {
   },
 }
 
-const bardClass = withDerivedClassSkillFrom(storedBard, [])
+const bardClass = storedBard
 
 function catalogFor(classes: ClassStored[]): CharacterBuildCatalog {
   return {
     species: [],
-    classes: classes.map((stored) => withDerivedClassSkillFrom(stored, [])),
+    classes,
     spells: [],
     equipment: [leatherArmor, lute],
     skillProficiencies: [],

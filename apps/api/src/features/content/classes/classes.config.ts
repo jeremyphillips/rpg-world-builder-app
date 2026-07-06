@@ -3,7 +3,6 @@ import {
   classStoredBodySchema,
   classStoredSchema,
   createClassInputSchema,
-  stripClassSkillFromFromInput,
   updateClassInputSchema,
 } from '@rpg/contracts'
 
@@ -28,10 +27,6 @@ interface ClassPatchRecord {
 }
 
 function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass {
-  const proficiencies = stripClassSkillFromFromInput({
-    proficiencies: doc.proficiencies,
-  }).proficiencies as CharacterClass['proficiencies']
-
   return {
     id: String(doc._id),
     slug: doc.slug,
@@ -46,13 +41,14 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     primaryAbilities: doc.primaryAbilities,
     hitDie: doc.hitDie,
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
-    proficiencies,
+    proficiencies: doc.proficiencies as CharacterClass['proficiencies'],
+    ...(doc.characterCreation != null && { characterCreation: doc.characterCreation }),
     features: doc.features ?? [],
   } as CharacterClass
 }
 
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
-  const { slug: _slug, ...body } = stripClassSkillFromFromInput(input)
+  const { slug: _slug, ...body } = input
   return body
 }
 
@@ -60,7 +56,7 @@ function prepareHomebrewUpdate(
   _doc: HomebrewDoc,
   update: Record<string, unknown>,
 ): Record<string, unknown> {
-  return stripClassSkillFromFromInput(update)
+  return update
 }
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {

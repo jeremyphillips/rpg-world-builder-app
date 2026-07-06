@@ -22,6 +22,7 @@ const homebrewClassSchema = new Schema(
     hitDie: { type: Number, enum: [...CLASS_HIT_DICE], required: true },
     spellcasting: { type: Schema.Types.Mixed },
     proficiencies: { type: Schema.Types.Mixed, required: true },
+    characterCreation: { type: Schema.Types.Mixed },
     features: { type: [Schema.Types.Mixed], default: [] },
   },
   { timestamps: true },

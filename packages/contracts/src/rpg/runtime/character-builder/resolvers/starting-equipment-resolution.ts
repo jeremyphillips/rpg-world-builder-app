@@ -2,7 +2,7 @@ import type { ArmorEquipment, Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
 import type {
   EquipmentChoiceGrant,
-  FixedEquipmentGrant,
+  GrantedEquipmentItem,
 } from '../../../content/lib/equipment-grant'
 import { formatEquipmentPoolLabel } from '../../../content/lib/equipment-grant'
 import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
@@ -63,9 +63,9 @@ export function readSelectedStartingEquipmentOptionId(
   return draft.choiceSelections[startingEquipmentChoiceSetId(classId)]?.[0]
 }
 
-export type ResolvedStartingEquipmentFixedItem = {
-  kind: 'fixed'
-  grant: FixedEquipmentGrant
+export type ResolvedStartingEquipmentGrantedItem = {
+  kind: 'grant'
+  grant: GrantedEquipmentItem
   equipmentId: string
   equipment: Equipment | undefined
 }
@@ -79,7 +79,7 @@ export type ResolvedStartingEquipmentItemChoice = {
 }
 
 export type ResolvedStartingEquipmentItem =
-  | ResolvedStartingEquipmentFixedItem
+  | ResolvedStartingEquipmentGrantedItem
   | ResolvedStartingEquipmentItemChoice
 
 /** Resolved starting-equipment option with catalog lookups for finalize and BENCH-095. */
@@ -105,14 +105,14 @@ function wealthGrantToCharacterWealth(grant: CharacterWealthGrant | undefined): 
   }
 }
 
-function resolveFixedItem(
-  grant: FixedEquipmentGrant,
+function resolveGrantedItem(
+  grant: GrantedEquipmentItem,
   rulesetId: string,
   catalogIndex: CharacterBuildCatalogIndex,
-): ResolvedStartingEquipmentFixedItem {
+): ResolvedStartingEquipmentGrantedItem {
   const equipmentId = toEquipmentContentId(rulesetId, grant.equipmentSlug)
   return {
-    kind: 'fixed',
+    kind: 'grant',
     grant,
     equipmentId,
     equipment: catalogIndex.equipment.get(equipmentId),
@@ -151,8 +151,8 @@ export function resolveStartingEquipmentOption(
     option,
     wealth: option.wealth,
     items: option.items.map((item, itemIndex) =>
-      item.kind === 'fixed'
-        ? resolveFixedItem(item, rulesetId, catalogIndex)
+      item.kind === 'grant'
+        ? resolveGrantedItem(item, rulesetId, catalogIndex)
         : resolveItemChoice(item, characterClass.id, option.id, itemIndex, draft, catalogIndex),
     ),
   }
@@ -160,7 +160,7 @@ export function resolveStartingEquipmentOption(
 
 function equipmentEntryFromGrant(
   equipmentId: string,
-  grant: FixedEquipmentGrant,
+  grant: GrantedEquipmentItem,
   sources: CharacterSelectionSource[],
 ): CharacterEquipmentEntry {
   return {
@@ -189,7 +189,7 @@ function appendResolvedItem(
   item: ResolvedStartingEquipmentItem,
   sources: CharacterSelectionSource[],
 ): CharacterEquipment {
-  if (item.kind === 'fixed') {
+  if (item.kind === 'grant') {
     if (!item.equipment) return inventory
     return appendEquipmentEntry(
       inventory,
@@ -321,10 +321,10 @@ export function resolveStartingEquipmentChoiceSets(
   return choiceSets
 }
 
-/** Returns true when a fixed starting item slug resolves in the catalog. */
-export function isStartingFixedItemAvailable(
+/** Returns true when a granted starting item slug resolves in the catalog. */
+export function isStartingGrantedItemAvailable(
   rulesetId: string,
-  grant: FixedEquipmentGrant,
+  grant: GrantedEquipmentItem,
   catalogIndex: CharacterBuildCatalogIndex,
 ): boolean {
   return catalogIndex.equipment.has(resolveEquipmentContentId(rulesetId, grant.equipmentSlug))

@@ -1,4 +1,3 @@
-import { withDerivedClassSkillFrom } from '../../content/skill-class-association'
 import { classSchema, type ClassStored } from '../../content/classes/class'
 import type { Spell } from '../../content/spell'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
@@ -19,15 +18,20 @@ const baseMeta = {
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
-export const nonCasterClass = withDerivedClassSkillFrom(
-  {
-    ...storedFighter,
-    id: `${RULESET}:fixture-fighter`,
-    slug: 'fixture-fighter',
-    rulesetId: RULESET,
-  } satisfies ClassStored,
-  [],
-)
+const defaultSkillChoices = {
+  proficiencies: {
+    skills: {
+      choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+    },
+  },
+}
+
+export const nonCasterClass = {
+  ...storedFighter,
+  id: `${RULESET}:fixture-fighter`,
+  slug: 'fixture-fighter',
+  rulesetId: RULESET,
+} satisfies ClassStored
 
 export const wizardStored: ClassStored = {
   ...baseMeta,
@@ -39,10 +43,11 @@ export const wizardStored: ClassStored = {
   hitDie: 6,
   proficiencies: {
     savingThrows: ['int', 'wis'],
-    armor: [],
-    weapons: { categories: ['simple'] },
-    skills: { choose: 2 },
+    armor: { categories: [], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
   },
+  characterCreation: defaultSkillChoices,
   features: [],
   spellcasting: {
     level: 1,
@@ -54,7 +59,7 @@ export const wizardStored: ClassStored = {
   },
 }
 
-export const wizardClass = classSchema.parse(withDerivedClassSkillFrom(wizardStored, []))
+export const wizardClass = classSchema.parse(wizardStored)
 
 export const paladinStored: ClassStored = {
   ...baseMeta,
@@ -66,10 +71,11 @@ export const paladinStored: ClassStored = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['wis', 'cha'],
-    armor: ['light', 'medium', 'heavy', 'shields'],
-    weapons: { categories: ['simple', 'martial'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light', 'medium', 'heavy', 'shields'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
   },
+  characterCreation: defaultSkillChoices,
   features: [],
   spellcasting: {
     level: 1,
@@ -80,7 +86,7 @@ export const paladinStored: ClassStored = {
   },
 }
 
-export const paladinClass = classSchema.parse(withDerivedClassSkillFrom(paladinStored, []))
+export const paladinClass = classSchema.parse(paladinStored)
 
 export const warlockStored: ClassStored = {
   ...baseMeta,
@@ -92,10 +98,11 @@ export const warlockStored: ClassStored = {
   hitDie: 8,
   proficiencies: {
     savingThrows: ['wis', 'cha'],
-    armor: ['light'],
-    weapons: { categories: ['simple'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light'], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
   },
+  characterCreation: defaultSkillChoices,
   features: [],
   spellcasting: {
     level: 1,
@@ -107,7 +114,7 @@ export const warlockStored: ClassStored = {
   },
 }
 
-export const warlockClass = classSchema.parse(withDerivedClassSkillFrom(warlockStored, []))
+export const warlockClass = classSchema.parse(warlockStored)
 
 function spell(slug: string, level: number, classSlugs: string[], name = slug): Spell {
   return {
@@ -181,7 +188,6 @@ export const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
-  suggestedClasses: ['fighter'],
 } as const satisfies SkillProficiency
 
 export const spellcastingTestCatalog: CharacterBuildCatalog = {

@@ -32,12 +32,26 @@ function classFixedWeaponProficiencies(
   }))
 }
 
+const CLASS_SKILL_PROFICIENCY_SOURCE = (classId: string): CharacterSelectionSource[] => [
+  { kind: 'classFeature', sourceId: classId, grantId: 'skill-proficiencies' },
+]
+
 function classFixedArmorProficiencies(
   characterClass: CharacterClass,
 ): CharacterArmorProficiencyEntry[] {
-  return characterClass.proficiencies.armor.map((armorCategory) => ({
+  return characterClass.proficiencies.armor.categories.map((armorCategory) => ({
     armorCategory,
     sources: CLASS_ARMOR_PROFICIENCY_SOURCE(characterClass.id),
+  }))
+}
+
+function classFixedSkillProficiencies(
+  characterClass: CharacterClass,
+): CharacterSkillProficiencyEntry[] {
+  return characterClass.proficiencies.skills.items.map((skill) => ({
+    skill,
+    rank: 'proficient' as const,
+    sources: CLASS_SKILL_PROFICIENCY_SOURCE(characterClass.id),
   }))
 }
 
@@ -89,7 +103,10 @@ export function assembleCharacterProficiencies(
   }
 
   return {
-    skills: selectedSkillProficiencies(draft, catalogIndex, choiceSets),
+    skills: [
+      ...classFixedSkillProficiencies(characterClass),
+      ...selectedSkillProficiencies(draft, catalogIndex, choiceSets),
+    ],
     weapons: classFixedWeaponProficiencies(characterClass),
     armor: classFixedArmorProficiencies(characterClass),
     tools: [],

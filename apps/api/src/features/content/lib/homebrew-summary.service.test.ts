@@ -22,9 +22,16 @@ describe('getHomebrewContentSummary', () => {
       hitDie: 10,
       proficiencies: {
         savingThrows: ['str', 'con'],
-        armor: ['light', 'medium'],
-        weapons: { categories: ['simple', 'martial'] },
-        skills: { choose: 2 },
+        armor: { categories: ['light', 'medium'], items: [] },
+        weapons: { categories: ['simple', 'martial'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'acrobatics'] }],
+          },
+        },
       },
     })
 
