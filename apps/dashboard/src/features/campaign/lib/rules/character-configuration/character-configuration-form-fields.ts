@@ -224,14 +224,13 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
   const languageChoice = {
     id: 'origin-languages',
     choose: values.languageProficiencyChoice.choose,
-    from: values.languageProficiencyChoice.from,
+    from: [],
     categories: values.languageProficiencyChoice.categories,
   }
   if (languageChoice.choose > 0 && !isMeaningfulLanguageProficiencyChoice(languageChoice)) {
     ctx.addIssue({
       code: 'custom',
-      message:
-        'Choose a language category or specific language pool when choose count is greater than zero.',
+      message: 'Choose at least one language category when choose count is greater than zero.',
       path: ['languageProficiencyChoice', 'categories'],
     })
   }
@@ -442,6 +441,7 @@ type CharacterConfigurationSection = {
 type CharacterConfigFormOptions = {
   creatureTypeOptions: FieldOption[]
   languageOptions: FieldOption[]
+  languageCategoryOptions: FieldOption[]
 }
 
 type CharacterRuleFieldDef = {
@@ -551,7 +551,8 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     id: 'proficiencies',
     surfaces: ['config'],
     configSection: { id: 'proficiencies', label: 'Proficiencies' },
-    buildFormItems: ({ languageOptions }) => languageProficiencyFields(languageOptions),
+    buildFormItems: ({ languageOptions, languageCategoryOptions }) =>
+      languageProficiencyFields(languageOptions, languageCategoryOptions),
   },
   {
     id: 'maxCharacterLevel',
@@ -602,8 +603,13 @@ function fieldsForSurface(surface: CharacterRuleSurface): CharacterRuleFieldDef[
 export function buildRulesConfigLayoutFields(
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
+  languageCategoryOptions: FieldOption[] = [],
 ): FormItem[] {
-  const options: CharacterConfigFormOptions = { creatureTypeOptions, languageOptions }
+  const options: CharacterConfigFormOptions = {
+    creatureTypeOptions,
+    languageOptions,
+    languageCategoryOptions,
+  }
   return fieldsForSurface('config').flatMap((field) => {
     const items = field.buildFormItems(options)
     const section = field.configSection
@@ -622,6 +628,7 @@ export function buildRulesFieldsForSurface(
   surface: CharacterRuleSurface,
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
+  languageCategoryOptions: FieldOption[] = [],
 ): FormItem[] {
   if (surface === 'create') {
     return [
@@ -638,7 +645,11 @@ export function buildRulesFieldsForSurface(
     ]
   }
 
-  const options: CharacterConfigFormOptions = { creatureTypeOptions, languageOptions }
+  const options: CharacterConfigFormOptions = {
+    creatureTypeOptions,
+    languageOptions,
+    languageCategoryOptions,
+  }
   return fieldsForSurface('config').flatMap((field) => field.buildFormItems(options))
 }
 

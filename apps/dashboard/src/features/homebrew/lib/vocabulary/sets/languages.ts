@@ -1,10 +1,10 @@
 import {
   DEFAULT_SYSTEM_RULESET_ID,
-  LANGUAGE_CATEGORIES,
-  LANGUAGE_CATEGORY_ENTRIES,
+  getLanguageCategoryLabel,
   LANGUAGE_SET_ID,
   type LanguageCategory,
   type ResolvedVocabularyOptionSet,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 import { getSeedLanguageCategory } from '@rpg/catalog/vocabulary'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
@@ -20,13 +20,11 @@ export type LanguageVocabulary = {
 /** Build label/active-id maps from a resolved languages set. */
 export function buildLanguageVocabulary(
   set: Pick<ResolvedVocabularyOptionSet, 'options'>,
+  rulesetId: SystemRulesetId = DEFAULT_SYSTEM_RULESET_ID,
 ): LanguageVocabulary {
   const base = buildLabelActiveVocabulary(set)
   const categoryById = Object.fromEntries(
-    set.options.map((option) => [
-      option.id,
-      getSeedLanguageCategory(DEFAULT_SYSTEM_RULESET_ID, option.id),
-    ]),
+    set.options.map((option) => [option.id, getSeedLanguageCategory(rulesetId, option.id)]),
   )
   return { ...base, categoryById }
 }
@@ -43,13 +41,22 @@ export function buildActiveLanguageFieldOptions(
   return toOptions([...vocabulary.activeIds].sort(), vocabulary.labelById)
 }
 
-/** Static language category options for grant/choice authoring fields. */
-export function buildLanguageCategoryFieldOptions(): FieldOption[] {
+/** Category chips derived from active campaign language vocabulary — not a static enum list. */
+export function buildActiveLanguageCategoryFieldOptions(
+  vocabulary: LanguageVocabulary | undefined,
+): FieldOption[] {
+  if (!vocabulary) return []
+
+  const categories = new Set<string>()
+  for (const id of vocabulary.activeIds) {
+    const category = vocabulary.categoryById[id]
+    if (category) categories.add(category)
+  }
+
+  const sorted = [...categories].sort()
   return toOptions(
-    LANGUAGE_CATEGORIES,
-    Object.fromEntries(
-      LANGUAGE_CATEGORIES.map((category) => [category, LANGUAGE_CATEGORY_ENTRIES[category].label]),
-    ) as Record<(typeof LANGUAGE_CATEGORIES)[number], string>,
+    sorted,
+    Object.fromEntries(sorted.map((category) => [category, getLanguageCategoryLabel(category)])),
   )
 }
 

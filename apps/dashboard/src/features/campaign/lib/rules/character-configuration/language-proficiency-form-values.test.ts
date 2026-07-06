@@ -30,17 +30,15 @@ describe('language-proficiency-form-values', () => {
       buildLanguageProficiencyPatchInput({
         languageProficiencyGrants: {
           items: ['common', 'elvish'],
-          categories: ['rare'],
         },
         languageProficiencyChoice: {
           choose: 1,
           categories: ['standard'],
-          from: [],
         },
       }),
     ).toEqual({
       proficiencyGrants: {
-        languages: { items: ['common', 'elvish'], categories: ['rare'] },
+        languages: { items: ['common', 'elvish'], categories: [] },
       },
       proficiencyChoices: {
         languages: [
@@ -54,6 +52,28 @@ describe('language-proficiency-form-values', () => {
         ],
       },
     })
+  })
+
+  it('canonicalizes unsupported grant categories and explicit choice pools on save', () => {
+    const patch = buildLanguageProficiencyPatchInput(
+      mapLanguageProficiencyRulesToFormValues({
+        ...resolved,
+        proficiencyGrants: {
+          languages: { items: ['common'], categories: ['standard'] },
+        },
+        proficiencyChoices: {
+          languages: [
+            {
+              ...defaultChoice,
+              from: ['elvish'],
+            },
+          ],
+        },
+      }),
+    )
+
+    expect(patch.proficiencyGrants?.languages?.categories).toEqual([])
+    expect(patch.proficiencyChoices?.languages?.[0]?.from).toEqual([])
   })
 
   it('preserves an existing choice id and label on save', () => {

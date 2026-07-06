@@ -83,16 +83,6 @@ export function resolveRulesSchemaWithVocabulary(options: {
           })
         }
       }
-
-      for (const id of values.languageProficiencyChoice.from) {
-        if (!activeLanguageIds.has(id)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: characterConfigurationValidationMessages.languageUnavailable(),
-            path: ['languageProficiencyChoice', 'from'],
-          })
-        }
-      }
     }
   })
 }
@@ -101,6 +91,7 @@ export function resolveRulesSchemaWithVocabulary(options: {
 export function buildRulesConfigFields(
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
+  languageCategoryOptions: FieldOption[] = [],
 ): FormItem[] {
-  return buildRulesConfigLayoutFields(creatureTypeOptions, languageOptions)
+  return buildRulesConfigLayoutFields(creatureTypeOptions, languageOptions, languageCategoryOptions)
 }

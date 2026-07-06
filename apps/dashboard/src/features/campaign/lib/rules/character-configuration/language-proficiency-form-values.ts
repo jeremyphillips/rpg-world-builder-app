@@ -12,7 +12,6 @@ import type { LanguageProficiencyRulesForm } from './language-proficiency-form-f
 const DEFAULT_LANGUAGE_CHOICE_FORM = {
   choose: DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].choose,
   categories: [...DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].categories],
-  from: [...DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].from],
 } as const
 
 /** Maps resolved ruleset language proficiency rules into flat form state (first choice only). */
@@ -25,12 +24,10 @@ export function mapLanguageProficiencyRulesToFormValues(
   return {
     languageProficiencyGrants: {
       items: [...grants.items],
-      categories: [...grants.categories],
     },
     languageProficiencyChoice: {
       choose: choice?.choose ?? DEFAULT_LANGUAGE_CHOICE_FORM.choose,
       categories: [...(choice?.categories ?? DEFAULT_LANGUAGE_CHOICE_FORM.categories)],
-      from: [...(choice?.from ?? DEFAULT_LANGUAGE_CHOICE_FORM.from)],
     },
   }
 }
@@ -39,17 +36,18 @@ export function languageProficiencyRulesDefaultValues(): LanguageProficiencyRule
   return {
     languageProficiencyGrants: {
       items: [...DEFAULT_LANGUAGE_PROFICIENCY_GRANT.items],
-      categories: [...DEFAULT_LANGUAGE_PROFICIENCY_GRANT.categories],
     },
     languageProficiencyChoice: {
       choose: DEFAULT_LANGUAGE_CHOICE_FORM.choose,
       categories: [...DEFAULT_LANGUAGE_CHOICE_FORM.categories],
-      from: [...DEFAULT_LANGUAGE_CHOICE_FORM.from],
     },
   }
 }
 
-/** Persists language grants and the first language choice package from form state. */
+/**
+ * Persists language grants and the first language choice package from form state.
+ * Unsupported grant categories and explicit choice pools are canonicalized to `[]`.
+ */
 export function buildLanguageProficiencyPatchInput(
   values: LanguageProficiencyRulesForm,
   existingChoice?: LanguageProficiencyChoice,
@@ -57,12 +55,12 @@ export function buildLanguageProficiencyPatchInput(
   proficiencyGrants: NonNullable<UpdateCampaignCharacterCreationInput['proficiencyGrants']>
   proficiencyChoices: NonNullable<UpdateCampaignCharacterCreationInput['proficiencyChoices']>
 } {
-  const { items, categories } = values.languageProficiencyGrants
+  const { items } = values.languageProficiencyGrants
   const choice = values.languageProficiencyChoice
 
   return {
     proficiencyGrants: {
-      languages: { items, categories },
+      languages: { items, categories: [] },
     },
     proficiencyChoices: {
       languages: [
@@ -73,7 +71,7 @@ export function buildLanguageProficiencyPatchInput(
             : { label: DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].label }),
           choose: choice.choose,
           categories: choice.categories,
-          from: choice.from,
+          from: [],
         },
       ],
     },

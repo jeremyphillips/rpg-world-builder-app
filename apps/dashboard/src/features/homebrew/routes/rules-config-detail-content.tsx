@@ -82,6 +82,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
   } = useCreatureTypeVocabulary(campaignId)
   const {
     vocabulary: languageVocabulary,
+    categoryOptions,
     isPending: isLanguageVocabularyPending,
     isError: isLanguageVocabularyError,
   } = useLanguageVocabulary(campaignId)
@@ -104,10 +105,10 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
     const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(creatureTypeVocabulary)
     const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
     return disableFormItems(
-      buildRulesConfigFields(creatureTypeOptions, languageOptions),
+      buildRulesConfigFields(creatureTypeOptions, languageOptions, categoryOptions),
       !canManage,
     )
-  }, [canManage, creatureTypeVocabulary, languageVocabulary])
+  }, [canManage, creatureTypeVocabulary, languageVocabulary, categoryOptions])
 
   const defaultValues = useMemo(
     () => (patch ? mapRulesetPatchToRulesValues(patch.characterCreation) : undefined),
