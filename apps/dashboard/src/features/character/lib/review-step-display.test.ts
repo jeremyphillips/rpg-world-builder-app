@@ -22,9 +22,9 @@ describe('review-step-display', () => {
       },
     ]
 
-    expect(resolveReviewDisplayIssues(createEmptyCharacterBuilderDraft(), context, issues)).toBe(
-      issues,
-    )
+    expect(
+      resolveReviewDisplayIssues(createEmptyCharacterBuilderDraft(), context, issues, []),
+    ).toBe(issues)
   })
 
   it('formats ability method labels', () => {
@@ -45,6 +45,8 @@ describe('review-step-display', () => {
       },
     }
 
-    expect(resolveReviewReadyMessage(draft, context, [])).toBe('Your character is ready to create.')
+    expect(resolveReviewReadyMessage(draft, context, [], [])).toBe(
+      'Your character is ready to create.',
+    )
   })
 })

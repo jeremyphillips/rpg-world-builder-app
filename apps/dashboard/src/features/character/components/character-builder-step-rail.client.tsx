@@ -6,6 +6,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
 import { cn, Text } from '@rpg/ui'
 import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
@@ -28,7 +29,7 @@ export type CharacterBuilderStepRailProps = {
   currentStepId: CharacterBuilderStepId
   catalogIndex: CharacterBuildCatalogIndex
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
-  resolvedChoiceSets: null
+  resolvedChoiceSets: readonly ChoiceSet[] | null
   validationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
   standardArray: readonly number[]

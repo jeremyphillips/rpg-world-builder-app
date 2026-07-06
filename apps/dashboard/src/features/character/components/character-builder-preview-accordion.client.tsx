@@ -1,6 +1,11 @@
 'use client'
 
-import { ABILITY_IDS, type CharacterBuildPreview, type CharacterNarrative } from '@rpg/contracts'
+import {
+  ABILITY_IDS,
+  type CharacterBuildCatalogIndex,
+  type CharacterBuildPreview,
+  type CharacterNarrative,
+} from '@rpg/contracts'
 import {
   Accordion,
   AccordionContent,
@@ -10,6 +15,7 @@ import {
   Text,
 } from '@rpg/ui'
 
+import { resolveLanguagePreviewLabel } from '../lib/language-preview-label'
 import { getNarrativePreviewStatusLabel } from '../lib/narrative-preview'
 import {
   formatPreviewAbilityCell,
@@ -35,6 +41,7 @@ import {
 
 export type CharacterBuilderPreviewAccordionProps = {
   preview: CharacterBuildPreview
+  catalogIndex: CharacterBuildCatalogIndex
   narrative: CharacterNarrative | undefined
   narrativeCount: number
   skillChoiceCount: number | undefined
@@ -171,9 +178,11 @@ function PreviewAbilitiesSection({ preview }: { preview: CharacterBuildPreview }
 
 function PreviewProficienciesSection({
   preview,
+  catalogIndex,
   skillChoiceCount,
 }: {
   preview: CharacterBuildPreview
+  catalogIndex: CharacterBuildCatalogIndex
   skillChoiceCount: number | undefined
 }) {
   const proficientSaves = preview.savingThrows.filter((save) => save.proficient)
@@ -216,6 +225,22 @@ function PreviewProficienciesSection({
             ) : (
               <CharacterBuilderPreviewSubsectionHint>
                 No skills chosen yet.
+              </CharacterBuilderPreviewSubsectionHint>
+            )}
+          </CharacterBuilderPreviewSubsection>
+
+          <CharacterBuilderPreviewSubsection title="Languages">
+            {preview.proficiencies.languages.length > 0 ? (
+              <ul className="space-y-1 text-sm">
+                {preview.proficiencies.languages.map((entry) => (
+                  <li key={entry.language} className="text-muted-foreground">
+                    {resolveLanguagePreviewLabel(entry.language, catalogIndex)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <CharacterBuilderPreviewSubsectionHint>
+                No languages yet.
               </CharacterBuilderPreviewSubsectionHint>
             )}
           </CharacterBuilderPreviewSubsection>
@@ -294,6 +319,7 @@ function PreviewSpellsSection({ spellcastingActive }: { spellcastingActive: bool
 
 export function CharacterBuilderPreviewAccordion({
   preview,
+  catalogIndex,
   narrative,
   narrativeCount,
   skillChoiceCount,
@@ -311,7 +337,11 @@ export function CharacterBuilderPreviewAccordion({
       <PreviewNarrativeSection narrative={narrative} narrativeCount={narrativeCount} />
       <PreviewCombatSection preview={preview} />
       <PreviewAbilitiesSection preview={preview} />
-      <PreviewProficienciesSection preview={preview} skillChoiceCount={skillChoiceCount} />
+      <PreviewProficienciesSection
+        preview={preview}
+        catalogIndex={catalogIndex}
+        skillChoiceCount={skillChoiceCount}
+      />
       <PreviewEquipmentSection preview={preview} hasCharacterClass={hasCharacterClass} />
       <PreviewSpellsSection spellcastingActive={spellcastingActive} />
     </Accordion>

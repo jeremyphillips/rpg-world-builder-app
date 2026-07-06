@@ -7,6 +7,7 @@ import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
 } from '@rpg/contracts'
 
 import {
@@ -25,11 +26,13 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
     const preview = buildCharacterPreview(
       draft,
       catalogIndex,
       context.characterCreationRules,
       context.rulesetId,
+      { resolvedChoiceSets },
     )
 
     render(
@@ -80,11 +83,13 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
     const preview = buildCharacterPreview(
       draft,
       catalogIndex,
       context.characterCreationRules,
       context.rulesetId,
+      { resolvedChoiceSets },
     )
 
     render(
@@ -109,11 +114,13 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
     const preview = buildCharacterPreview(
       draft,
       catalogIndex,
       context.characterCreationRules,
       context.rulesetId,
+      { resolvedChoiceSets },
     )
     const user = userEvent.setup()
 
@@ -145,11 +152,13 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
     const preview = buildCharacterPreview(
       draft,
       catalogIndex,
       context.characterCreationRules,
       context.rulesetId,
+      { resolvedChoiceSets },
     )
 
     const { container } = render(

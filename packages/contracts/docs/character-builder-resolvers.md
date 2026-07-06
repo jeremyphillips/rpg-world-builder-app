@@ -4,6 +4,8 @@ Canonical catalog of resolver functions for the character builder engine. The
 public import surface is `character-builder/resolvers/index.ts`; this document
 tracks status, purpose, and promotion path for each resolver.
 
+**Layer boundaries and naming:** [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)
+
 ## Public API
 
 | Resolver                     | Status                      | Purpose                                                                      |

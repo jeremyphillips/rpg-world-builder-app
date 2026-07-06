@@ -6,12 +6,14 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildPreview,
   CharacterBuildValidationIssue,
+  ChoiceSet,
 } from '@rpg/contracts'
 
 import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
 import { IdentityStep } from './steps/identity-step.client'
+import { ProficienciesStep } from './steps/proficiencies-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
 
@@ -20,6 +22,7 @@ export type CharacterBuilderStepContentProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
   preview: CharacterBuildPreview | null
+  resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
@@ -30,6 +33,7 @@ export function CharacterBuilderStepContent({
   context,
   draft,
   preview,
+  resolvedChoiceSets,
   validationIssues,
   onDraftChange,
   onStepComplete,
@@ -78,10 +82,19 @@ export function CharacterBuilderStepContent({
           context={context}
           draft={draft}
           preview={preview}
+          resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
         />
       )
     case 'proficiencies':
+      return (
+        <ProficienciesStep
+          draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     case 'equipment':
     case 'spells':
       return <CharacterBuilderStepPanel stepId={stepId} status="deferred" />

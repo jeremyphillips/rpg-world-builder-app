@@ -4,17 +4,19 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
 
 export function resolveReviewDisplayIssues(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   validationIssues: CharacterBuildValidationIssue[],
+  resolvedChoiceSets: readonly ChoiceSet[],
 ): CharacterBuildValidationIssue[] {
   if (validationIssues.length > 0) return validationIssues
 
   const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets: [],
+    resolvedChoiceSets,
   })
 
   return validation.ok ? [] : validation.issues
@@ -24,11 +26,12 @@ export function resolveReviewReadyMessage(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   displayIssues: CharacterBuildValidationIssue[],
+  resolvedChoiceSets: readonly ChoiceSet[],
 ): string | null {
   if (displayIssues.length > 0) return null
 
   const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets: [],
+    resolvedChoiceSets,
   })
 
   return validation.ok

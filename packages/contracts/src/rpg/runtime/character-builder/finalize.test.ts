@@ -12,8 +12,7 @@ import {
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
 import { resolveAvailableChoices } from './resolvers/resolve-choices'
-import { resolveLanguageChoiceSets } from './resolvers/resolve-languages'
-import { indexCharacterBuildCatalog } from './context'
+import { resolveLanguageChoiceSets } from './resolvers/resolve-language-choice-sets'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
@@ -117,10 +116,7 @@ describe('finalizeCharacterBuild', () => {
         [originChoiceSetId]: ['elvish', 'dwarvish'],
       },
     })
-    const choiceSets = resolveLanguageChoiceSets(
-      builderTestContext,
-      indexCharacterBuildCatalog(builderTestContext.catalog),
-    )
+    const choiceSets = resolveLanguageChoiceSets(makeCompleteDraft(), builderTestContext)
 
     const input = finalizeCharacterBuild(draft, builderTestContext, {
       resolvedChoiceSets: choiceSets,

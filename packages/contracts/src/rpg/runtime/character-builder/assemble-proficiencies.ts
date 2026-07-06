@@ -7,8 +7,8 @@ import type {
 } from '../character/proficiencies'
 import type { CharacterSelectionSource } from '../character/selection-sources'
 import type { ChoiceSet } from './choice-set'
-import type { CharacterLanguageAssemblyContext } from './resolvers/resolve-languages'
-import { assembleLanguageProficiencies } from './resolvers/resolve-languages'
+import type { CharacterLanguageAssemblyContext } from './assemble-language-proficiencies'
+import { assembleLanguageProficiencyEntries } from './assemble-language-proficiencies'
 import type { CharacterBuildCatalogIndex } from './context'
 import type { CharacterBuilderDraft } from './draft'
 
@@ -102,7 +102,7 @@ export function assembleCharacterProficiencies(
   languageContext?: CharacterLanguageAssemblyContext,
 ): CharacterProficiencies {
   const languages = languageContext
-    ? assembleLanguageProficiencies(draft, languageContext, catalogIndex, choiceSets)
+    ? assembleLanguageProficiencyEntries(draft, languageContext, catalogIndex.languages, choiceSets)
     : []
 
   if (!characterClass) {

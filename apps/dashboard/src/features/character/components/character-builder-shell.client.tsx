@@ -17,6 +17,7 @@ import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
+import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
@@ -69,11 +70,14 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const [attemptedStepIds, setAttemptedStepIds] = useState<CharacterBuilderStepId[]>([])
   const [createError, setCreateError] = useState<string | null>(null)
 
+  const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
+
   const preview = useCharacterPreview(
     draft,
     catalogIndex,
     context.characterCreationRules,
     context.rulesetId,
+    resolvedChoiceSets,
   )
 
   const applyDraftPatch = useCallback(
@@ -103,7 +107,6 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   }
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
-  const resolvedChoiceSets = null
   const onReview = isReviewBuilderStep(currentStepId)
   const stepValidationIssues = onReview
     ? validationIssues
@@ -127,7 +130,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     const nextDraft = patch ? mergeCharacterBuilderDraft(draft, patch) : draft
     if (patch) patchDraft(patch)
 
-    const result = validateBuilderStepSubmit(nextDraft, context, currentStepId)
+    const result = validateBuilderStepSubmit(nextDraft, context, currentStepId, resolvedChoiceSets)
     if (!result.ok) {
       setAttemptedStepIds((previous) => appendAttemptedStepId(previous, currentStepId))
       setValidationIssues(result.issues)
@@ -143,7 +146,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     setValidationIssues([])
     setCreateError(null)
 
-    const validation = validateBuilderFinalSubmit(draft, context)
+    const validation = validateBuilderFinalSubmit(draft, context, resolvedChoiceSets)
     if (!validation.ok) {
       const issueStepIds = validation.issues.flatMap((issue) =>
         issue.stepId ? [issue.stepId] : [],
@@ -154,7 +157,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     }
 
     try {
-      const input = finalizeCharacterBuild(draft, context)
+      const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
       const character = await createCharacterMutation(input)
       await clearPersistedDraft()
       navigate(ROUTES.characters.detail(character.id))
@@ -205,6 +208,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               context={context}
               draft={draft}
               preview={preview}
+              resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={stepValidationIssues}
               onDraftChange={applyDraftPatch}
               onStepComplete={attemptStepAdvance}
