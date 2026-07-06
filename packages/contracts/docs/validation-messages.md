@@ -91,6 +91,18 @@ level-up concepts.
 copy (incomplete steps, pending draft choices). It may reuse `characterValidationMessages`;
 the base catalog must not depend on it.
 
+Spell ChoiceSet validation (BENCH-089) adds spell-specific ids alongside the generic
+`choiceSetUnsatisfied` / `choiceSetTooMany` pair:
+
+| Id                                                      | When                                                        |
+| ------------------------------------------------------- | ----------------------------------------------------------- |
+| `validation.characterBuilder.chooseCantrips`            | Required cantrip ChoiceSet below `min`                      |
+| `validation.characterBuilder.chooseSpells`              | Required spell ChoiceSet below `min`                        |
+| `validation.characterBuilder.removeCantrips`            | Cantrip ChoiceSet above `max`                               |
+| `validation.characterBuilder.removeSpells`              | Spell ChoiceSet above `max`                                 |
+| `validation.characterBuilder.spellNoLongerAvailable`    | Selected spell id not in re-derived options                 |
+| `validation.characterBuilder.spellNotSelectableAtLevel` | Selected spell exists but exceeds `maxSelectableSpellLevel` |
+
 **Future surface catalogs** (add only when those UI flows ship):
 
 | Catalog const                          | Scope prefix                      | Owns                                                                  |
