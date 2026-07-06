@@ -20,6 +20,8 @@ function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): Char
   }
 }
 
+const RULESET_ID = 'srd-cc-5.2.1' as const
+
 describe('buildCharacterPreview', () => {
   it('does not throw on an empty draft', () => {
     expect(() =>
@@ -27,6 +29,7 @@ describe('buildCharacterPreview', () => {
         createEmptyCharacterBuilderDraft(),
         indexCharacterBuildCatalog(builderTestCatalog),
         builderTestRules,
+        RULESET_ID,
       ),
     ).not.toThrow()
   })
@@ -36,6 +39,7 @@ describe('buildCharacterPreview', () => {
       createEmptyCharacterBuilderDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBeUndefined()
@@ -51,6 +55,7 @@ describe('buildCharacterPreview', () => {
       },
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBeUndefined()
@@ -66,6 +71,7 @@ describe('buildCharacterPreview', () => {
       },
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBe(10)
@@ -77,6 +83,7 @@ describe('buildCharacterPreview', () => {
       makeCompleteDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.proficiencyBonus).toBe(2)
@@ -97,6 +104,7 @@ describe('buildCharacterPreview', () => {
       makeCompleteDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
       {
         resolvedChoiceSets: [
           {
@@ -122,6 +130,7 @@ describe('buildCharacterPreview', () => {
       createEmptyCharacterBuilderDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.warnings).toContain('Name is not set.')

@@ -7,6 +7,7 @@ import type {
   CharacterBuilderDraft,
   CharacterBuildPreview,
   CharacterBuildValidationIssue,
+  ChoiceSet,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
@@ -21,18 +22,25 @@ export type ReviewStepProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
   preview: CharacterBuildPreview | null
+  resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues?: CharacterBuildValidationIssue[]
 }
 
-export function ReviewStep({ context, draft, preview, validationIssues = [] }: ReviewStepProps) {
+export function ReviewStep({
+  context,
+  draft,
+  preview,
+  resolvedChoiceSets,
+  validationIssues = [],
+}: ReviewStepProps) {
   const displayIssues = useMemo(
-    () => resolveReviewDisplayIssues(draft, context, validationIssues),
-    [context, draft, validationIssues],
+    () => resolveReviewDisplayIssues(draft, context, validationIssues, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets, validationIssues],
   )
 
   const readyMessage = useMemo(
-    () => resolveReviewReadyMessage(draft, context, displayIssues),
-    [context, draft, displayIssues],
+    () => resolveReviewReadyMessage(draft, context, displayIssues, resolvedChoiceSets),
+    [context, draft, displayIssues, resolvedChoiceSets],
   )
 
   return (

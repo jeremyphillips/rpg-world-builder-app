@@ -40,8 +40,8 @@ export const minimalStandalonePcInput: CreateCharacterInput = {
       },
     ],
     tools: [],
+    languages: [],
   },
-  languages: [],
   spells: [],
   equipment: {
     weapons: [],

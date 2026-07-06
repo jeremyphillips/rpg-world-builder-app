@@ -5,6 +5,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
 
 import { issuesForStep } from './validate-builder-step'
@@ -15,7 +16,7 @@ export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
-  resolvedChoiceSets: null
+  resolvedChoiceSets: readonly ChoiceSet[] | null
   validationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex

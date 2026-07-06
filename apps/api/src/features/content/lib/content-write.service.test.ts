@@ -326,7 +326,9 @@ describe('createHomebrewContent (classes)', () => {
     const rogue = (await resolveClassesForCampaign(campaign.id)).find(
       (cls) => cls.slug === 'rogue',
     )!
-    const rogueChoice = rogue.characterCreation?.proficiencies?.skills?.choices?.[0]!
+    const rogueChoice = rogue.characterCreation?.proficiencies?.skills?.choices?.[0]
+    expect(rogueChoice).toBeDefined()
+    if (!rogueChoice) throw new Error('expected rogue skill choice')
 
     await updateContentEntity(classWriteConfig, campaign.id, rogue.id, {
       characterCreation: {

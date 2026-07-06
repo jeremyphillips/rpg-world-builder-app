@@ -85,6 +85,7 @@ export function finalizeCharacterBuild(
     catalogIndex,
     choiceSets,
     characterClass,
+    context,
   )
   const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
 
@@ -107,7 +108,6 @@ export function finalizeCharacterBuild(
       temporary: 0,
     },
     proficiencies,
-    languages: [],
     spells: assembleClassSpellcasting(draft, context, choiceSets),
     equipment,
     wealth,

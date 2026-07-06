@@ -1,4 +1,5 @@
 import type {
+  CharacterBuildLanguageOption,
   CharacterClass,
   Equipment,
   RulesetPatchRead,
@@ -34,6 +35,7 @@ export type BuilderCatalogLists = {
   spells: Spell[]
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
+  languages: CharacterBuildLanguageOption[]
 }
 
 async function listRulesetContent<T>(
@@ -70,18 +72,30 @@ export async function listRulesetSkillProficiencies(
   return listRulesetContent(rulesetId, BUILDER_CATALOG_CONTENT[4])
 }
 
+export async function listRulesetLanguages(
+  rulesetId: SystemRulesetId,
+): Promise<CharacterBuildLanguageOption[]> {
+  const body = await request<Record<string, CharacterBuildLanguageOption[]>>(
+    `/api/rulesets/${rulesetId}/languages`,
+    undefined,
+    RULESET_CONTENT_ERROR,
+  )
+  return body.languages as CharacterBuildLanguageOption[]
+}
+
 export async function fetchBuilderCatalog(
   rulesetId: SystemRulesetId,
 ): Promise<BuilderCatalogLists> {
-  const [species, classes, spells, equipment, skillProficiencies] = await Promise.all([
+  const [species, classes, spells, equipment, skillProficiencies, languages] = await Promise.all([
     listRulesetSpecies(rulesetId),
     listRulesetClasses(rulesetId),
     listRulesetSpells(rulesetId),
     listRulesetEquipment(rulesetId),
     listRulesetSkillProficiencies(rulesetId),
+    listRulesetLanguages(rulesetId),
   ])
 
-  return { species, classes, spells, equipment, skillProficiencies }
+  return { species, classes, spells, equipment, skillProficiencies, languages }
 }
 
 export async function fetchCharacterCreationRules(

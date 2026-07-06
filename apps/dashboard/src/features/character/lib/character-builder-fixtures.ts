@@ -11,6 +11,7 @@ import {
   type Species,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
+import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 const emptyCatalog: StandaloneBuildContext['catalog'] = {
@@ -19,6 +20,7 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  languages: [],
 }
 
 const storedFighter = {
@@ -84,6 +86,7 @@ export const populatedBuilderCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  languages: [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
 } satisfies CharacterBuildCatalog
 
 export function createStandaloneBuilderContextFixture(

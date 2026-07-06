@@ -108,6 +108,7 @@ function catalogFor(classes: ClassStored[]): CharacterBuildCatalog {
     spells: [],
     equipment: [leatherArmor, lute],
     skillProficiencies: [],
+    languages: [],
   }
 }
 

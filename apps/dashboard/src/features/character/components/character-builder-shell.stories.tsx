@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   createStandaloneBuilderCatalogIndexFixture,
-  createStandaloneBuilderContextFixture,
+  createPopulatedStandaloneBuilderContextFixture,
 } from '../lib/character-builder-fixtures'
 import { CharacterBuilderShell } from './character-builder-shell.client'
 
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof CharacterBuilderShell>
 
 export const Default: Story = {
   render: () => {
-    const context = createStandaloneBuilderContextFixture()
+    const context = createPopulatedStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
     return (

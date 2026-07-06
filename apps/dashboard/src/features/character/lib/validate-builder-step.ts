@@ -5,25 +5,28 @@ import {
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
   type CharacterBuildValidationResult,
+  type ChoiceSet,
 } from '@rpg/contracts'
 
 export function validateBuilderStepSubmit(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   stepId: CharacterBuilderStepId,
+  resolvedChoiceSets: readonly ChoiceSet[],
 ): CharacterBuildValidationResult {
   return validateCharacterBuild(draft, context, 'stepSubmit', {
     stepId,
-    resolvedChoiceSets: [],
+    resolvedChoiceSets,
   })
 }
 
 export function validateBuilderFinalSubmit(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
+  resolvedChoiceSets: readonly ChoiceSet[],
 ): CharacterBuildValidationResult {
   return validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets: [],
+    resolvedChoiceSets,
   })
 }
 

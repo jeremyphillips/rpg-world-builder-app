@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
+import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { skillSchema } from '../skill-proficiency'
 
@@ -116,3 +117,22 @@ export const toolProficiencyChoiceGroupSchema = z
   })
 
 export type ToolProficiencyChoiceGroup = z.infer<typeof toolProficiencyChoiceGroupSchema>
+
+export const languageProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
+  categories: z.array(languageCategorySchema).default([]),
+  items: z.array(languageIdSchema).default([]),
+})
+
+export type LanguageProficiencyGrantSet = z.infer<typeof languageProficiencyGrantSetSchema>
+
+export const languageProficiencyChoiceSchema = proficiencyChoiceSchema.extend({
+  from: z.array(languageIdSchema).default([]),
+  categories: z.array(languageCategorySchema).default([]),
+})
+
+export type LanguageProficiencyChoice = z.infer<typeof languageProficiencyChoiceSchema>
+
+/** A language choice is meaningful when the player must pick from items and/or categories. */
+export function isMeaningfulLanguageProficiencyChoice(choice: LanguageProficiencyChoice): boolean {
+  return choice.choose > 0 && (choice.from.length > 0 || choice.categories.length > 0)
+}

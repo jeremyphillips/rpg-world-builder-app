@@ -10,10 +10,19 @@ function draftWith(overrides: Partial<CharacterBuilderDraft>): CharacterBuilderD
 }
 
 describe('resolveAvailableChoices', () => {
-  it('returns no ChoiceSets when species and class are unset', () => {
-    expect(resolveAvailableChoices(createEmptyCharacterBuilderDraft(), builderTestContext)).toEqual(
-      [],
+  it('returns ruleset language ChoiceSets even when species and class are unset', () => {
+    const choiceSets = resolveAvailableChoices(
+      createEmptyCharacterBuilderDraft(),
+      builderTestContext,
     )
+
+    expect(choiceSets).toEqual([
+      expect.objectContaining({
+        id: 'ruleset:srd-cc-5.2.1:origin-languages',
+        sourceType: 'ruleset',
+        choiceType: 'language',
+      }),
+    ])
   })
 
   it('emits class skill ChoiceSet when a class with skill picks is selected', () => {

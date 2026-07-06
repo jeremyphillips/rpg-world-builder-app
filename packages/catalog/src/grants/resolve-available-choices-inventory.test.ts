@@ -11,6 +11,7 @@ import { DEFAULT_ABILITY_GENERATION_RULES } from '@rpg/contracts'
 import { loadSeedClasses } from '../classes'
 import { loadSeedSpecies } from '../species'
 import { loadSeedSkillProficiencies } from '../skill-proficiencies'
+import { listLanguageSeedOptions } from '../vocabulary'
 import { standardStartingWealthSeed } from '../starting-wealth/test-fixtures'
 
 const RULESET = 'srd-cc-5.2.1' as const
@@ -26,6 +27,7 @@ function seedBuildContext(): CharacterBuildContext {
       spells: [],
       equipment: [],
       skillProficiencies: loadSeedSkillProficiencies(RULESET),
+      languages: [...listLanguageSeedOptions(RULESET)],
     },
     characterCreationRules: {
       ...resolveCharacterCreationPatch(undefined, standardStartingWealthSeed()),

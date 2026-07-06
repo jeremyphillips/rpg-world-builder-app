@@ -84,6 +84,7 @@ export function CharacterBuilderPreviewPanel({
           ) : (
             <CharacterBuilderPreviewAccordion
               preview={preview}
+              catalogIndex={catalogIndex}
               narrative={narrative}
               narrativeCount={narrativeCount}
               skillChoiceCount={

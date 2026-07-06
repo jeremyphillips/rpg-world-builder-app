@@ -25,7 +25,6 @@ export function toCharacter(doc: CharacterRecord): PcCharacter {
     abilityScores: doc.abilityScores,
     hitPoints: doc.hitPoints,
     proficiencies: doc.proficiencies,
-    languages: doc.languages ?? [],
     spells: doc.spells ?? [],
     equipment: doc.equipment,
     wealth: doc.wealth,

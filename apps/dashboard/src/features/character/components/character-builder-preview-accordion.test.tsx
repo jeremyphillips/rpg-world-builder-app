@@ -7,6 +7,7 @@ import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
@@ -19,7 +20,14 @@ function renderAccordion(
   draft = createEmptyCharacterBuilderDraft(),
   narrative = draft.identity.narrative,
 ) {
-  const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+  const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+  const preview = buildCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+    { resolvedChoiceSets },
+  )
   const narrativeCount = [
     narrative?.personalityTraits?.length,
     narrative?.ideals?.length,
@@ -34,6 +42,7 @@ function renderAccordion(
   return render(
     <CharacterBuilderPreviewAccordion
       preview={preview}
+      catalogIndex={catalogIndex}
       narrative={narrative}
       narrativeCount={narrativeCount}
       skillChoiceCount={
@@ -68,6 +77,12 @@ describe('CharacterBuilderPreviewAccordion', () => {
     expect(screen.getByText('A soldier turned adventurer.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Combat/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Abilities/i })).toBeInTheDocument()
+  })
+
+  it('shows granted common in the languages preview subsection', () => {
+    renderAccordion()
+
+    expect(screen.getByText('Common')).toBeInTheDocument()
   })
 
   it('toggles accordion sections with aria-expanded', async () => {

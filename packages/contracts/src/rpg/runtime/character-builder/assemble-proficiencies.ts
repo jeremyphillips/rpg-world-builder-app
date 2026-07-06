@@ -7,6 +7,8 @@ import type {
 } from '../character/proficiencies'
 import type { CharacterSelectionSource } from '../character/selection-sources'
 import type { ChoiceSet } from './choice-set'
+import type { CharacterLanguageAssemblyContext } from './assemble-language-proficiencies'
+import { assembleLanguageProficiencyEntries } from './assemble-language-proficiencies'
 import type { CharacterBuildCatalogIndex } from './context'
 import type { CharacterBuilderDraft } from './draft'
 
@@ -97,9 +99,14 @@ export function assembleCharacterProficiencies(
   catalogIndex: CharacterBuildCatalogIndex,
   choiceSets: readonly ChoiceSet[],
   characterClass: CharacterClass | undefined,
+  languageContext?: CharacterLanguageAssemblyContext,
 ): CharacterProficiencies {
+  const languages = languageContext
+    ? assembleLanguageProficiencyEntries(draft, languageContext, catalogIndex.languages, choiceSets)
+    : []
+
   if (!characterClass) {
-    return { skills: [], weapons: [], armor: [], tools: [] }
+    return { skills: [], weapons: [], armor: [], tools: [], languages }
   }
 
   return {
@@ -110,5 +117,6 @@ export function assembleCharacterProficiencies(
     weapons: classFixedWeaponProficiencies(characterClass),
     armor: classFixedArmorProficiencies(characterClass),
     tools: [],
+    languages,
   }
 }

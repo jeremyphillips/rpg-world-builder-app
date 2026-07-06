@@ -7,7 +7,13 @@
 // ChoiceSet id.
 // ---------------------------------------------------------------------------
 
-export const CHOICE_SOURCE_TYPES = ['species', 'heritage', 'class', 'spellcasting'] as const
+export const CHOICE_SOURCE_TYPES = [
+  'species',
+  'heritage',
+  'class',
+  'ruleset',
+  'spellcasting',
+] as const
 
 export type ChoiceSourceType = (typeof CHOICE_SOURCE_TYPES)[number]
 
@@ -45,7 +51,7 @@ export type ChoiceSetOption = {
  *   - `class:srd-cc-5.2.1:wizard:skills`
  *   - `species:srd-cc-5.2.1:elf:heritage`
  *   - `class:srd-cc-5.2.1:fighter:starting-equipment`
- *   - `spellcasting:srd-cc-5.2.1:wizard:cantrips`
+ *   - `ruleset:srd-cc-5.2.1:origin-languages`
  *   - `spellcasting:srd-cc-5.2.1:wizard:spells`
  *
  * Options carry display metadata resolved from the catalog.

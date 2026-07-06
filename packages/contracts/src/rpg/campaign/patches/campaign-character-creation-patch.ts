@@ -17,6 +17,12 @@ import {
   resolveMulticlassingRules,
   resolvedCampaignMulticlassingPatchSchema,
 } from './campaign-multiclassing-patch'
+import {
+  characterCreationProficiencyChoicesPatchSchema,
+  characterCreationProficiencyGrantsPatchSchema,
+  resolveCharacterCreationProficiencyRules,
+  resolvedCharacterCreationProficiencyRulesSchema,
+} from '../../content/character-creation-proficiencies'
 import { campaignPatchValidationMessages } from './campaign-patch-messages'
 import {
   campaignSubclassingPatchSchema,
@@ -91,6 +97,8 @@ export const campaignCharacterCreationPatchSchema = z
     multiclassing: campaignMulticlassingPatchSchema.optional(),
     subclasses: campaignSubclassingPatchSchema.optional(),
     startingWealth: startingWealthRulesPatchSchema.optional(),
+    proficiencyGrants: characterCreationProficiencyGrantsPatchSchema.optional(),
+    proficiencyChoices: characterCreationProficiencyChoicesPatchSchema.optional(),
   })
   .strict()
 
@@ -118,6 +126,8 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
   multiclassing: resolvedCampaignMulticlassingPatchSchema,
   subclasses: resolvedCampaignSubclassingPatchSchema,
   startingWealth: startingWealthRulesSchema,
+  proficiencyGrants: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyGrants,
+  proficiencyChoices: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyChoices,
 })
 
 export type ResolvedCampaignCharacterCreationPatch = z.infer<
@@ -297,5 +307,6 @@ export function resolveCharacterCreationPatch(
     multiclassing: resolveMulticlassingRules(patch?.multiclassing),
     subclasses: resolveSubclassingRules(patch?.subclasses),
     startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),
+    ...resolveCharacterCreationProficiencyRules(patch),
   }
 }

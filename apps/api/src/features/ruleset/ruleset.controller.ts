@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express'
 
 import { HttpError } from '../../lib/http-error'
-import { getContentWriteConfig } from '../content/content-types'
+import { getContentWriteConfig } from '../content'
 import {
   assertSupportedRulesetId,
   getStandaloneRulesetPatchRead,
   isRulesetContentType,
+  listRulesetLanguageOptions,
   listSystemContentForRuleset,
 } from './ruleset.service'
 
@@ -28,4 +29,11 @@ export async function getCharacterCreationRules(req: Request, res: Response): Pr
 
   const patch = getStandaloneRulesetPatchRead(rulesetId)
   res.status(200).json({ patch })
+}
+
+export async function listLanguages(req: Request, res: Response): Promise<void> {
+  const { rulesetId } = req.params as { rulesetId: string }
+  assertSupportedRulesetId(rulesetId)
+
+  res.status(200).json({ languages: listRulesetLanguageOptions(rulesetId) })
 }

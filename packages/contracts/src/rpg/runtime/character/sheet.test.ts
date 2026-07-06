@@ -85,29 +85,29 @@ const baseCharacter = {
         sources: [{ kind: 'manual', notes: 'Campaign award' }],
       },
     ],
+    languages: [
+      {
+        language: 'thieves-cant',
+        sources: [
+          {
+            kind: 'classFeature',
+            sourceId: 'srd-cc-5.2.1:rogue',
+            grantId: 'thieves-cant',
+          },
+        ],
+      },
+      {
+        language: 'elvish',
+        sources: [
+          {
+            kind: 'classFeature',
+            sourceId: 'srd-cc-5.2.1:ranger',
+            grantId: 'roving',
+          },
+        ],
+      },
+    ],
   },
-  languages: [
-    {
-      language: 'thieves-cant',
-      sources: [
-        {
-          kind: 'classFeature',
-          sourceId: 'srd-cc-5.2.1:rogue',
-          grantId: 'thieves-cant',
-        },
-      ],
-    },
-    {
-      language: 'elvish',
-      sources: [
-        {
-          kind: 'classFeature',
-          sourceId: 'srd-cc-5.2.1:ranger',
-          grantId: 'roving',
-        },
-      ],
-    },
-  ],
   spells: [
     {
       spellId: 'srd-cc-5.2.1:light',
@@ -175,7 +175,10 @@ describe('characterSchema', () => {
     expect(parsed.characterType).toBe('pc')
     expect(getCharacterTotalLevel(parsed)).toBe(7)
     expect(parsed.equipment.gear).toEqual([])
-    expect(parsed.languages.map((entry) => entry.language)).toEqual(['thieves-cant', 'elvish'])
+    expect(parsed.proficiencies.languages.map((entry) => entry.language)).toEqual([
+      'thieves-cant',
+      'elvish',
+    ])
     expect(parsed.wealth).toEqual({ cp: 0, sp: 0, gp: 125, pp: 0 })
   })
 
@@ -237,16 +240,20 @@ describe('characterSchema', () => {
     expect(result.error.issues[0]?.message).toBe(characterValidationMessages.duplicateClass())
   })
 
-  it('defaults omitted languages to an empty list', () => {
-    const { languages: _languages, ...withoutLanguages } = baseCharacter
+  it('defaults omitted language proficiencies to an empty list', () => {
+    const {
+      proficiencies: { languages: _languages, ...proficienciesWithoutLanguages },
+      ...withoutLanguageProficiencies
+    } = baseCharacter
 
     const parsed = characterSchema.parse({
-      ...withoutLanguages,
+      ...withoutLanguageProficiencies,
+      proficiencies: proficienciesWithoutLanguages,
       characterType: 'pc',
       userId: 'user_1',
     })
 
-    expect(parsed.languages).toEqual([])
+    expect(parsed.proficiencies.languages).toEqual([])
   })
 })
 

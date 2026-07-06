@@ -17,6 +17,7 @@ export const CHARACTER_SELECTION_SOURCE_KINDS = [
   'classSpellcasting',
   'backgroundStartingEquipment',
   'startingWealthTier',
+  'characterCreation',
   'manual',
 ] as const
 
@@ -36,6 +37,7 @@ export type CharacterSelectionSourceKind = z.infer<typeof characterSelectionSour
  * - `classSpellcasting` — `sourceId` = class content id, `grantId` = `cantrips` or `spells`
  * - `backgroundStartingEquipment` — reserved for future background content; same shape as class
  * - `startingWealthTier` — `sourceId` = starting wealth table id, `grantId` = tier id
+ * - `characterCreation` — `sourceId` = ruleset id, `grantId` = proficiency choice/grant id
  */
 export const characterSelectionSourceSchema = z
   .object({
