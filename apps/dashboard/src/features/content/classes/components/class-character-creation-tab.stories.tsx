@@ -3,7 +3,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
-import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
@@ -27,19 +26,14 @@ type Story = StoryObj<typeof meta>
 
 function TabStory({
   startingEquipment,
-  proficiencies,
   entitySource,
 }: {
   startingEquipment?: StartingEquipmentForm
-  proficiencies?: ReturnType<typeof characterCreationProficienciesToFormValues>
   entitySource?: ContentFormCtx['entitySource']
 }) {
   const form = useForm({
     defaultValues: {
-      characterCreation: {
-        ...(proficiencies ?? characterCreationProficienciesToFormValues()),
-        ...(startingEquipment ? { startingEquipment } : {}),
-      },
+      characterCreation: startingEquipment ? { startingEquipment } : undefined,
     },
   })
   return (
@@ -48,10 +42,6 @@ function TabStory({
     </FormProvider>
   )
 }
-
-const rogueProficiencies = characterCreationProficienciesToFormValues(
-  pickClass('rogue').characterCreation,
-)
 
 export const Empty: Story = {
   render: () => <TabStory />,
@@ -63,16 +53,6 @@ export const MonkStartingEquipment: Story = {
 
 export const BardStartingEquipment: Story = {
   render: () => <TabStory entitySource="system" startingEquipment={bardStartingEquipment} />,
-}
-
-export const RogueSkillChoices: Story = {
-  render: () => (
-    <TabStory
-      entitySource="system"
-      proficiencies={rogueProficiencies}
-      startingEquipment={monkStartingEquipment}
-    />
-  ),
 }
 
 export const HomebrewWithStartingEquipment: Story = {
@@ -88,7 +68,7 @@ export const HomebrewWithStartingEquipment: Story = {
             description: '<p>Leather armor and a dagger.</p>',
             items: [
               {
-                itemKind: 'grant',
+                itemKind: 'fixed',
                 equipmentSlug: 'dagger',
                 quantity: 1,
                 equipped: true,

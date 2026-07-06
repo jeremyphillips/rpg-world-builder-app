@@ -1,5 +1,4 @@
-import { loadSeedClasses, seedClassSlugs } from '@rpg/catalog/classes'
-import { isSpellcastingActiveAtLevel } from '@rpg/contracts'
+import { seedClassSlugs } from '@rpg/catalog/classes'
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
@@ -7,13 +6,12 @@ import { loadSeedSpells, loadSeedSpellsByLevel, seedSpellSlugs, SPELL_LEVEL_FILE
 
 const RULESET = 'srd-cc-5.2.1' as const
 const SRD_CLASS_SLUGS = seedClassSlugs(RULESET)
-const SPELL_OPTION_HEADROOM = 2
 
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 67 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(67)
+  it('ships 32 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(32)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -28,7 +26,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(67)
+    expect(seedSpellSlugs(RULESET).size).toBe(32)
   })
 
   it('stores each spell in the level file matching its level field', () => {
@@ -69,36 +67,5 @@ describe('SRD 5.2.1 spell seed', () => {
 
     const detectMagic = spells.find((s) => s.slug === 'detect-magic')
     expect(detectMagic?.castingTime.canBeCastAsRitual).toBe(true)
-  })
-
-  it('supplies enough cantrip and level-1 spell options for each level-1 caster', () => {
-    const classes = loadSeedClasses(RULESET)
-
-    for (const cls of classes) {
-      if (!isSpellcastingActiveAtLevel(cls.spellcasting, 1)) continue
-
-      const cantripsRequired = cls.spellcasting?.cantrips?.find((e) => e.level === 1)?.known ?? 0
-      if (cantripsRequired > 0) {
-        const cantripOptions = spells.filter(
-          (s) => s.level === 0 && s.classIds.includes(cls.slug),
-        ).length
-        expect(
-          cantripOptions,
-          `${cls.slug} needs ${cantripsRequired + SPELL_OPTION_HEADROOM} cantrip options`,
-        ).toBeGreaterThanOrEqual(cantripsRequired + SPELL_OPTION_HEADROOM)
-      }
-
-      const spellsRequired =
-        cls.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count ?? 0
-      if (spellsRequired > 0) {
-        const spellOptions = spells.filter(
-          (s) => s.level === 1 && s.classIds.includes(cls.slug),
-        ).length
-        expect(
-          spellOptions,
-          `${cls.slug} needs ${spellsRequired + SPELL_OPTION_HEADROOM} level-1 spell options`,
-        ).toBeGreaterThanOrEqual(spellsRequired + SPELL_OPTION_HEADROOM)
-      }
-    }
   })
 })

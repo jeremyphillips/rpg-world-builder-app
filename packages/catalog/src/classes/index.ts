@@ -1,16 +1,26 @@
 import { z } from 'zod'
-import { classSchema, classStoredSchema, subclassSchema } from '@rpg/contracts'
+import {
+  classSchema,
+  classStoredSchema,
+  deriveClassesSkillFrom,
+  subclassSchema,
+} from '@rpg/contracts'
 import type { CharacterClass, ClassStored, Subclass, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
+import { loadSeedSkillProficiencies } from '../skill-proficiencies'
 import classesRaw from './data/srd-cc-5.2.1/classes.json'
 import subclassesRaw from './data/srd-cc-5.2.1/subclasses.json'
 
-// Validate the shipped catalog against the stored contract at module load.
+// Validate the shipped catalog against the stored contract at module load (no derived
+// `skills.from` in seed JSON). Read models derive skill options from skill SSOT.
 const SRD_521_CLASSES_STORED = z.array(classStoredSchema).parse(classesRaw)
 const SRD_521_SUBCLASSES = z.array(subclassSchema).parse(subclassesRaw)
 
-const SRD_521_CLASSES = SRD_521_CLASSES_STORED.map((cls) => classSchema.parse(cls))
+const SRD_521_SKILLS = loadSeedSkillProficiencies('srd-cc-5.2.1')
+const SRD_521_CLASSES = deriveClassesSkillFrom(SRD_521_CLASSES_STORED, SRD_521_SKILLS).map((cls) =>
+  classSchema.parse(cls),
+)
 
 interface RulesetSeed {
   classesStored: ClassStored[]
@@ -32,7 +42,7 @@ export function loadSeedClassesStored(rulesetId: SystemRulesetId): ClassStored[]
   return SEED_BY_RULESET[rulesetId].classesStored
 }
 
-/** Read models — same persisted shape as stored (class-owned skill choices). */
+/** Read models with API-derived `proficiencies.skills.from`. */
 export function loadSeedClasses(rulesetId: SystemRulesetId): CharacterClass[] {
   return SEED_BY_RULESET[rulesetId].classes
 }

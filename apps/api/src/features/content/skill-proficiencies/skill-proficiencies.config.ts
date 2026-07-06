@@ -40,6 +40,9 @@ function toHomebrewSkillProficiency(doc: HomebrewDoc): SkillProficiency {
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     ability: record.ability,
+    ...(record.suggestedClasses !== undefined && {
+      suggestedClasses: record.suggestedClasses,
+    }),
   } as SkillProficiency
 }
 

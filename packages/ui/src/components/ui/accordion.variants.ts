@@ -48,7 +48,7 @@ export const accordionContentInnerVariants = cva('', {
     variant: {
       default: 'px-4 pb-4 pt-0',
       // px-1 inset keeps focus rings (ring-2 + ring-offset-2) inside overflow-hidden content.
-      section: 'pb-3 pt-1',
+      section: 'px-1 pb-4 pt-4',
     },
   },
   defaultVariants: {

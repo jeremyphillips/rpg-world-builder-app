@@ -1,6 +1,7 @@
 import type {
   Ability,
   ContentGrant,
+  ContentGrants,
   DamageTypeId,
   FeatCategory,
   GrantGroup,
@@ -61,6 +62,10 @@ function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
     featReplaceable: false,
     featRecommendedIds: [],
   }
+}
+
+function optionalGrantRow(row: GrantRowForm | undefined): GrantRowForm[] {
+  return row ? [row] : []
 }
 
 function formUnlockLevel(unlockLevel?: number): GrantRowForm['unlockLevel'] {
@@ -364,4 +369,189 @@ export function formRowsToGrantGroups(
   }
 
   return normalizeGrantGroups(groups, parentUnlock)
+}
+
+// ---------------------------------------------------------------------------
+// Legacy bridge: ContentGrants bag ↔ flat GrantRowForm[]
+//
+// Used for loading features / custom traits that still carry the old `grants`
+// bag (no `grantGroups`). Deprecated — consumers should prefer
+// `grantGroupsToFormRows` / `formRowsToGrantGroups`.
+// ---------------------------------------------------------------------------
+
+function senseGrantsToRows(senses: ContentGrants['senses']): GrantRowForm[] {
+  return (senses ?? []).map((sense) => ({
+    ...emptyGrantRow('senses'),
+    senseType: sense.type,
+    senseRange: sense.range,
+  }))
+}
+
+function resistancesToRow(resistances: ContentGrants['resistances']): GrantRowForm | undefined {
+  if (!resistances?.length) return undefined
+  return { ...emptyGrantRow('resistances'), resistances }
+}
+
+function damageTypesToRow(damageType: ContentGrants['damageType']): GrantRowForm | undefined {
+  if (!damageType?.length) return undefined
+  return { ...emptyGrantRow('damageType'), damageType }
+}
+
+function movementToRow(movement: ContentGrants['movement']): GrantRowForm | undefined {
+  if (!movement) return undefined
+  return {
+    ...emptyGrantRow('movement'),
+    movementMode: movement.mode,
+    movementOperation: movement.operation,
+    movementValue: movement.value,
+    movementUnit: movement.unit,
+  }
+}
+
+function languageGrantsToRows(languages: ContentGrants['languages']): GrantRowForm[] {
+  return (languages ?? []).map((language) => ({ ...emptyGrantRow('languages'), language }))
+}
+
+/** Each innate spell entry becomes a `spells` row, preserving the level as `unlockLevel`. */
+function innateSpellsToSpellRows(innateSpells: ContentGrants['innateSpells']): GrantRowForm[] {
+  if (!innateSpells) return []
+  return innateSpells.entries.map((entry) => ({
+    ...emptyGrantRow('spells'),
+    unlockLevel: entry.level,
+    spellAbility: innateSpells.ability,
+    spellMode: entry.kind ?? 'free_cast',
+    spellFrequency: entry.frequency,
+    spellIds: entry.spellIds,
+  }))
+}
+
+function featChoiceToRow(featChoice: ContentGrants['featChoice']): GrantRowForm | undefined {
+  if (!featChoice) return undefined
+  return {
+    ...emptyGrantRow('featChoice'),
+    featCategory: featChoice.category,
+    featChoose: featChoice.choose,
+    featAllowAnyQualifying: featChoice.allowAnyQualifying ?? false,
+    featReplaceable: featChoice.replaceable ?? false,
+    featRecommendedIds: featChoice.recommendedFeatIds ?? [],
+  }
+}
+
+function equipmentGrantsToRows(equipment: ContentGrants['equipment']): GrantRowForm[] {
+  return (equipment ?? []).map((grant) => ({
+    grantType: 'equipment',
+    ...equipmentGrantToFormRow(grant),
+  }))
+}
+
+/**
+ * Converts a legacy `ContentGrants` bag into flat grant-row form values.
+ *
+ * @deprecated Prefer `grantGroupsToFormRows` for the atomic model. This bridge
+ *   exists for features and custom traits that carry only a `grants` bag (no
+ *   `grantGroups`). It will be removed once all catalog seeds and homebrew are
+ *   migrated.
+ */
+export function grantsToFormRows(grants: ContentGrants | undefined): GrantRowForm[] {
+  if (!grants) return []
+  return [
+    ...senseGrantsToRows(grants.senses),
+    ...optionalGrantRow(resistancesToRow(grants.resistances)),
+    ...optionalGrantRow(damageTypesToRow(grants.damageType)),
+    ...optionalGrantRow(movementToRow(grants.movement)),
+    ...languageGrantsToRows(grants.languages),
+    ...innateSpellsToSpellRows(grants.innateSpells),
+    ...optionalGrantRow(featChoiceToRow(grants.featChoice)),
+    ...equipmentGrantsToRows(grants.equipment),
+  ]
+}
+
+function applySensesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const senseRows = rows.filter((row) => row.grantType === 'senses' && row.senseType)
+  if (!senseRows.length) return
+  result.senses = senseRows.map((row) => ({
+    type: row.senseType as SenseId,
+    range: row.senseRange ?? 60,
+  }))
+}
+
+function applyResistancesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'resistances')
+  if (!row?.resistances?.length) return
+  result.resistances = row.resistances as DamageTypeId[]
+}
+
+function applyDamageTypesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'damageType')
+  if (!row?.damageType?.length) return
+  result.damageType = row.damageType as DamageTypeId[]
+}
+
+function applyMovementFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'movement')
+  if (!row?.movementMode || !row.movementOperation || row.movementValue === undefined) return
+  result.movement = {
+    mode: row.movementMode,
+    operation: row.movementOperation,
+    value: row.movementValue,
+    unit: row.movementUnit ?? 'ft',
+  }
+}
+
+function applyLanguagesFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const languageRows = rows.filter((r) => r.grantType === 'languages' && r.language)
+  if (!languageRows.length) return
+  result.languages = languageRows.map((r) => r.language!)
+}
+
+function applyFeatChoiceFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const row = rows.find((r) => r.grantType === 'featChoice')
+  if (!row?.featCategory) return
+
+  const choose = row.featChoose ?? 1
+  const featChoice: ContentGrants['featChoice'] = {
+    category: row.featCategory as FeatCategory,
+    choose,
+  }
+  if (row.featAllowAnyQualifying) {
+    featChoice.allowAnyQualifying = true
+  }
+  if (row.featReplaceable) {
+    featChoice.replaceable = true
+  }
+  if (row.featRecommendedIds?.length) {
+    featChoice.recommendedFeatIds = row.featRecommendedIds
+  }
+  result.featChoice = featChoice
+}
+
+function applyEquipmentFromRows(result: ContentGrants, rows: GrantRowForm[]): void {
+  const equipmentRows = rows.filter((row) => row.grantType === 'equipment' && row.itemKind)
+  if (!equipmentRows.length) return
+
+  result.equipment = equipmentRows.map((row) =>
+    equipmentGrantFromFormRow(row as EquipmentGrantItemForm),
+  )
+}
+
+/**
+ * Folds grant-row form values back into a legacy `ContentGrants` bag.
+ *
+ * @deprecated Prefer `formRowsToGrantGroups` for the atomic model. This bridge
+ *   exists for consumers that still produce a `grants` bag. It will be removed
+ *   once all consumers are migrated to `grantGroups`.
+ */
+export function formRowsToGrants(rows: GrantRowForm[]): ContentGrants | undefined {
+  if (!rows.length) return undefined
+
+  const result: ContentGrants = {}
+  applySensesFromRows(result, rows)
+  applyResistancesFromRows(result, rows)
+  applyDamageTypesFromRows(result, rows)
+  applyMovementFromRows(result, rows)
+  applyLanguagesFromRows(result, rows)
+  applyFeatChoiceFromRows(result, rows)
+  applyEquipmentFromRows(result, rows)
+
+  return Object.keys(result).length ? result : undefined
 }

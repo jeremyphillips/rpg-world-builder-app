@@ -1,4 +1,4 @@
-import { skillSlugsFromClassChoices } from '@rpg/contracts'
+import { describe, expect, it } from 'vitest'
 
 import { createCampaign } from '../../campaign'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
@@ -20,8 +20,9 @@ describe('resolveCatalogForCampaign (classes)', () => {
     expect(classes).toHaveLength(12)
     expect(classes.find((c) => c.id === 'srd-cc-5.2.1:fighter')?.hitDie).toBe(10)
     expect(classes.every((c) => c.source === 'system')).toBe(true)
-    const fighter = classes.find((c) => c.slug === 'fighter')!
-    expect(skillSlugsFromClassChoices(fighter).length).toBeGreaterThan(0)
+    expect(
+      classes.find((c) => c.slug === 'fighter')?.proficiencies.skills.from.length,
+    ).toBeGreaterThan(0)
   })
 
   it('deep-merges a campaign overlay patch onto the system class', async () => {
@@ -54,52 +55,17 @@ describe('resolveCatalogForCampaign (classes)', () => {
         savingThrows: ['str', 'con'],
         armor: ['light', 'medium'],
         weapons: { categories: ['simple', 'martial'] },
-        skills: { choose: 2, from: ['athletics', 'stealth'] },
+        skills: { choose: 2 },
       },
       features: [],
     })
 
-    const classes = await resolveClassesForCampaign(campaign.id)
+    const classes = await resolveCatalogForCampaign(classContentConfig, campaign.id)
     const homebrew = classes.find((c) => c.slug === 'blood-hunter')
 
     expect(classes).toHaveLength(13)
     expect(homebrew?.source).toBe('homebrew')
     expect(homebrew?.campaignId).toBe(campaign.id)
-    expect(homebrew?.proficiencies.armor).toEqual({ categories: ['light', 'medium'], items: [] })
-    expect(homebrew?.proficiencies.skills).toEqual({ categories: [], items: [] })
-    expect(homebrew?.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).toEqual([
-      'athletics',
-      'stealth',
-    ])
-  })
-
-  it('strips proficiencies.skills choose/from pollution without overriding characterCreation choices', async () => {
-    const campaign = await makeTestCampaign()
-    await ClassPatchModel.create({
-      campaignId: campaign.id,
-      targetId: 'srd-cc-5.2.1:fighter',
-      patch: {
-        proficiencies: {
-          skills: { categories: [], items: [], choose: 99, from: ['medicine'] },
-        },
-      },
-    })
-
-    const fighter = (await resolveClassesForCampaign(campaign.id)).find(
-      (c) => c.slug === 'fighter',
-    )!
-
-    expect(fighter.proficiencies.skills).toEqual({ categories: [], items: [] })
-    expect(fighter.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).toEqual([
-      'acrobatics',
-      'athletics',
-      'history',
-      'intimidation',
-      'perception',
-    ])
-    expect(fighter.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).not.toContain(
-      'medicine',
-    )
   })
 
   it('scopes patches and homebrew to their own campaign', async () => {

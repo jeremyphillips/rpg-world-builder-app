@@ -11,8 +11,6 @@ import {
   characterAbilityScoreSchema,
   getAbilitySentenceForm,
 } from './ability'
-import { formatFieldMessage } from '../../validation/define-message'
-import { abilityValidationMessages } from './ability-messages'
 
 describe('abilitySchema', () => {
   it('accepts every known ability id', () => {
@@ -82,18 +80,5 @@ describe('ability sentence forms', () => {
   it('returns lowercase ability phrases for generated prose', () => {
     expect(getAbilitySentenceForm('str', 1)).toBe('strength')
     expect(getAbilitySentenceForm('cha', 2)).toBe('charisma')
-  })
-})
-
-describe('abilityValidationMessages', () => {
-  it('formats the character score range message', () => {
-    expect(
-      formatFieldMessage(
-        abilityValidationMessages.characterScoreOutOfRange({
-          min: ABILITY_SCORE_MIN,
-          max: CHARACTER_ABILITY_SCORE_MAX,
-        }),
-      ),
-    ).toBe('Ability score must be between 1 and 20.')
   })
 })

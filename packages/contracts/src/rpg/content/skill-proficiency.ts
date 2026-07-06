@@ -36,14 +36,25 @@ export function getSkillSentenceForm(id: string, count = 1, label = getSkillName
 
 // ---------------------------------------------------------------------------
 // Skill Proficiency — a single skill as a first-class catalog content type.
-// Class↔skill edges are owned by class.characterCreation.proficiencies (see
-// skill-class-association for inverse read helpers).
+// Extends the shared content envelope with a governing ability (the stat used
+// when rolling checks) and class slugs that suggest this skill for starting
+// proficiency selection.
 // ---------------------------------------------------------------------------
+
+/** Class slugs that suggest this skill (min 1). Authoritative for the class↔skill edge. */
+export const suggestedClassesSchema = z.array(z.string()).min(1)
 
 /** The editable shape: what a form authors and what a patch overrides. */
 export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
   /** The ability score used when making this skill check (e.g. `str` for Athletics). */
   ability: abilitySchema,
+  /**
+   * Class slugs that suggest this skill for starting proficiency selection.
+   * Authoritative write surface for the class↔skill association; class
+   * `proficiencies.skills.from` is derived from this field at read time.
+   * Stores slugs (not class ids) — see `docs/content-types.md` known gaps.
+   */
+  suggestedClasses: suggestedClassesSchema,
 })
 
 export type SkillProficiencyBody = z.infer<typeof skillProficiencyBodySchema>

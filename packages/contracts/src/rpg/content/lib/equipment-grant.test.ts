@@ -4,7 +4,7 @@ import {
   equipmentChoiceGrantSchema,
   equipmentGrantSchema,
   equipmentPoolSchema,
-  grantedEquipmentItemSchema,
+  fixedEquipmentGrantSchema,
   formatEquipmentGrantSentence,
   formatEquipmentPoolLabel,
 } from './equipment-grant'
@@ -140,10 +140,10 @@ describe('equipmentPoolSchema', () => {
   })
 })
 
-describe('grantedEquipmentItemSchema', () => {
+describe('fixedEquipmentGrantSchema', () => {
   it('defaults quantity to 1', () => {
-    expect(grantedEquipmentItemSchema.parse({ kind: 'grant', equipmentSlug: 'dagger' })).toEqual({
-      kind: 'grant',
+    expect(fixedEquipmentGrantSchema.parse({ kind: 'fixed', equipmentSlug: 'dagger' })).toEqual({
+      kind: 'fixed',
       equipmentSlug: 'dagger',
       quantity: 1,
     })
@@ -151,15 +151,15 @@ describe('grantedEquipmentItemSchema', () => {
 
   it('accepts equipped state and modifiers', () => {
     expect(
-      grantedEquipmentItemSchema.parse({
-        kind: 'grant',
+      fixedEquipmentGrantSchema.parse({
+        kind: 'fixed',
         equipmentSlug: 'quarterstaff',
         quantity: 1,
         equipped: false,
         modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
       }),
     ).toMatchObject({
-      kind: 'grant',
+      kind: 'fixed',
       modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
     })
   })
@@ -259,9 +259,9 @@ describe('equipmentChoiceGrantSchema', () => {
 })
 
 describe('equipmentGrantSchema', () => {
-  it('round-trips granted and choice grants', () => {
-    const granted = {
-      kind: 'grant' as const,
+  it('round-trips fixed and choice grants', () => {
+    const fixed = {
+      kind: 'fixed' as const,
       equipmentSlug: 'leather-armor',
       quantity: 1,
       equipped: true,
@@ -276,7 +276,7 @@ describe('equipmentGrantSchema', () => {
       },
     }
 
-    expect(equipmentGrantSchema.parse(granted)).toEqual(granted)
+    expect(equipmentGrantSchema.parse(fixed)).toEqual(fixed)
     expect(equipmentGrantSchema.parse(choice)).toEqual(choice)
   })
 })
@@ -361,17 +361,17 @@ describe('formatEquipmentPoolLabel', () => {
 })
 
 describe('formatEquipmentGrantSentence', () => {
-  it('formats granted items with naive pluralization', () => {
+  it('formats fixed grants with naive pluralization', () => {
     expect(
       formatEquipmentGrantSentence(
-        { kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
+        { kind: 'fixed', equipmentSlug: 'dagger', quantity: 1 },
         () => 'Dagger',
       ),
     ).toBe('Character receives 1 dagger.')
 
     expect(
       formatEquipmentGrantSentence(
-        { kind: 'grant', equipmentSlug: 'dagger', quantity: 2 },
+        { kind: 'fixed', equipmentSlug: 'dagger', quantity: 2 },
         () => 'Dagger',
       ),
     ).toBe('Character receives 2 daggers.')
@@ -504,7 +504,7 @@ describe('formatEquipmentGrantSentence', () => {
     ).toBe('Character chooses 1 item from: Rope, Torch, Rations.')
   })
 
-  it('returns an empty string for incomplete granted items', () => {
-    expect(formatEquipmentGrantSentence({ kind: 'grant', equipmentSlug: '', quantity: 1 })).toBe('')
+  it('returns an empty string for incomplete fixed grants', () => {
+    expect(formatEquipmentGrantSentence({ kind: 'fixed', equipmentSlug: '', quantity: 1 })).toBe('')
   })
 })

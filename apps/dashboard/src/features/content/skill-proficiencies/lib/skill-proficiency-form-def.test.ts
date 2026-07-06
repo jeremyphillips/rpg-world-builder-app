@@ -30,6 +30,7 @@ describe('skillProficiencyFormDef round-trips', () => {
       const input = skillProficiencyFormDef.toInput(formValues)
       expect(input.name).toBe(skill.name)
       expect(input.ability).toBe(skill.ability)
+      expect(input.suggestedClasses).toEqual(skill.suggestedClasses)
     })
   }
 })
@@ -39,9 +40,11 @@ describe('skillProficiencyFormDef create vs update modes', () => {
     const formValues: SkillProficiencyFormValues = {
       name: 'Custom Skill',
       ability: 'dex',
+      suggestedClasses: ['rogue'],
     }
     const input = skillProficiencyFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Skill'))
+    expect(input.suggestedClasses).toEqual(['rogue'])
   })
 
   it('update: omits slug when entity context is present', () => {

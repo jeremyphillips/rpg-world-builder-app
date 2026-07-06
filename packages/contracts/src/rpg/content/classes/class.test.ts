@@ -25,28 +25,22 @@ const fighterStoredBody = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['str', 'con'],
-    armor: { categories: ['light', 'medium', 'heavy', 'shields'], items: [] },
-    weapons: { categories: ['simple', 'martial'], items: [] },
-    skills: { categories: [], items: [] },
-  },
-  characterCreation: {
-    proficiencies: {
-      skills: {
-        choices: [
-          {
-            id: 'class-skills',
-            label: 'Fighter Skills',
-            choose: 2,
-            from: ['acrobatics', 'athletics', 'history'],
-          },
-        ],
-      },
-    },
+    armor: ['light', 'medium', 'heavy', 'shields'],
+    weapons: { categories: ['simple', 'martial'] },
+    skills: { choose: 2 },
   },
   features: [
     { kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 },
     { kind: 'subclass-choice', id: 'fighter-subclass', name: 'Fighter Subclass', level: 3 },
   ],
+} as const
+
+const fighterBody = {
+  ...fighterStoredBody,
+  proficiencies: {
+    ...fighterStoredBody.proficiencies,
+    skills: { choose: 2, from: ['acrobatics', 'athletics', 'history'] },
+  },
 } as const
 
 const timestamps = {
@@ -61,7 +55,7 @@ const fighter = {
   source: 'system',
   campaignId: null,
   ...timestamps,
-  ...fighterStoredBody,
+  ...fighterBody,
 } as const
 
 describe('classHasSpellcasting', () => {
@@ -99,7 +93,7 @@ describe('classSchema', () => {
   it('allows 1–3 saving throws (relaxed for homebrew) but rejects 0 or 4', () => {
     const withSaves = (savingThrows: string[]) => ({
       ...fighter,
-      proficiencies: { ...fighter.proficiencies, savingThrows },
+      proficiencies: { ...fighterBody.proficiencies, savingThrows },
     })
     expect(classSchema.safeParse(withSaves(['str'])).success).toBe(true)
     expect(classSchema.safeParse(withSaves(['str', 'con', 'dex'])).success).toBe(true)
@@ -157,17 +151,10 @@ describe('createClassInputSchema', () => {
     ).toBe(false)
   })
 
-  it('rejects legacy proficiencies.skills.choose shape', () => {
-    expect(
-      createClassInputSchema.safeParse({
-        ...fighterStoredBody,
-        slug: 'fighter',
-        proficiencies: {
-          ...fighterStoredBody.proficiencies,
-          skills: { choose: 2 },
-        },
-      }).success,
-    ).toBe(false)
+  it('rejects persisted skills.from on create', () => {
+    expect(createClassInputSchema.safeParse({ ...fighterBody, slug: 'fighter' }).success).toBe(
+      false,
+    )
   })
 })
 
@@ -342,16 +329,24 @@ describe('subclassCampaignAvailabilitySchema', () => {
 
 describe('classBodySchema', () => {
   it('is the read surface (no envelope fields)', () => {
-    expect(classBodySchema.safeParse(fighterStoredBody).success).toBe(true)
+    expect(classBodySchema.safeParse(fighterBody).success).toBe(true)
     expect('id' in classBodySchema.shape).toBe(false)
   })
 })
 
 describe('classStoredBodySchema', () => {
-  it('parses class-owned skill choices under characterCreation', () => {
+  it('is the persisted surface without derived skills.from', () => {
     expect(classStoredBodySchema.safeParse(fighterStoredBody).success).toBe(true)
+    expect(
+      classStoredBodySchema.safeParse({
+        ...fighterStoredBody,
+        proficiencies: {
+          ...fighterStoredBody.proficiencies,
+          skills: { choose: 2, from: ['athletics'] },
+        },
+      }).success,
+    ).toBe(false)
   })
-
   it('parses tool proficiencies with categories and items', () => {
     expect(
       classStoredBodySchema.safeParse({
@@ -363,25 +358,10 @@ describe('classStoredBodySchema', () => {
       }).success,
     ).toBe(true)
   })
-
-  it('rejects placeholder-only skill choice groups', () => {
-    expect(
-      classStoredBodySchema.safeParse({
-        ...fighterStoredBody,
-        characterCreation: {
-          proficiencies: {
-            skills: {
-              choices: [{ id: 'class-skills', choose: 0, from: [] }],
-            },
-          },
-        },
-      }).success,
-    ).toBe(false)
-  })
 })
 
 describe('classStoredSchema', () => {
-  it('parses seed/homebrew records with class-owned proficiency choices', () => {
+  it('parses seed/homebrew records without skills.from', () => {
     expect(
       classStoredSchema.safeParse({
         id: 'srd-cc-5.2.1:fighter',

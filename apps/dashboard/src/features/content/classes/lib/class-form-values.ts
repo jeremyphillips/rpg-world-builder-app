@@ -2,6 +2,7 @@ import {
   MAX_CHARACTER_LEVEL,
   type CharacterClass,
   type ClassProficiencies,
+  type ClassProficienciesWrite,
   type ClassResource,
   type CreateClassInput,
   type Spellcasting,
@@ -21,7 +22,6 @@ import {
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
 import { startingEquipmentFromFormValues } from './character-creation/class-starting-equipment-form-values'
-import { characterCreationProficienciesFromFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 
 type ResourceRowForm = {
   name: string
@@ -31,7 +31,7 @@ type ResourceRowForm = {
 export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor.categories,
+    armor: proficiencies.armor,
     weapons: {
       categories: proficiencies.weapons.categories,
       items: proficiencies.weapons.items ?? [],
@@ -40,28 +40,26 @@ export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
       categories: proficiencies.tools?.categories ?? [],
       items: proficiencies.tools?.items ?? [],
     },
-    skills: {
-      items: proficiencies.skills.items ?? [],
-    },
+    skills: proficiencies.skills,
   }
 }
 
 function normalizeClassToolProficiencies(
   tools: ClassFormValues['proficiencies']['tools'],
-): ClassProficiencies['tools'] {
+): ClassProficienciesWrite['tools'] {
   const categories = [...tools.categories]
   const items = tools.items ?? []
   if (categories.length === 0 && items.length === 0) return undefined
   return {
     categories,
-    items: [...items],
+    ...(items.length ? { items: [...items] } : {}),
   }
 }
 
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-): ClassProficiencies {
+): ClassProficienciesWrite {
   const tools = normalizeClassToolProficiencies(proficiencies.tools)
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
@@ -71,29 +69,10 @@ function proficienciesFromFormValues(
 
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: { categories: proficiencies.armor, items: [] },
+    armor: proficiencies.armor,
     weapons,
     ...(tools ? { tools } : {}),
-    skills: { categories: [], items: proficiencies.skills.items ?? [] },
-  }
-}
-
-function classCharacterCreationInputFromForm(
-  values: ClassFormValues,
-  entity?: CharacterClass,
-): CreateClassInput['characterCreation'] | undefined {
-  const startingEquipment = startingEquipmentFromFormValues(
-    values.characterCreation?.startingEquipment,
-    entity?.characterCreation?.startingEquipment,
-  )
-  const proficiencies = characterCreationProficienciesFromFormValues(
-    values.characterCreation?.proficiencies,
-    entity,
-  )
-  if (!startingEquipment && !proficiencies) return undefined
-  return {
-    ...(startingEquipment ? { startingEquipment } : {}),
-    ...(proficiencies ? { proficiencies } : {}),
+    skills: { choose: proficiencies.skills.choose },
   }
 }
 
@@ -109,6 +88,30 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
     name: row.name,
     entries: row.entries,
   }
+}
+
+function classProficienciesInputFromForm(values: ClassFormValues) {
+  return {
+    ...proficienciesFromFormValues(
+      values.proficiencies,
+      values.weaponProficiencyMode === 'individual',
+    ),
+    skills: {
+      choose: values.proficiencies.skills.choose,
+      from: values.proficiencies.skills.from,
+    },
+  }
+}
+
+function classCharacterCreationInputFromForm(
+  values: ClassFormValues,
+  entity?: CharacterClass,
+): CreateClassInput['characterCreation'] | undefined {
+  const startingEquipment = startingEquipmentFromFormValues(
+    values.characterCreation?.startingEquipment,
+    entity?.characterCreation?.startingEquipment,
+  )
+  return startingEquipment ? { startingEquipment } : undefined
 }
 
 function classResourcesInputFromForm(
@@ -130,10 +133,7 @@ export function buildClassCreateInput(
     primaryAbilities: values.primaryAbilities,
     hitDie: values.hitDie,
     spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-    proficiencies: proficienciesFromFormValues(
-      values.proficiencies,
-      values.weaponProficiencyMode === 'individual',
-    ),
+    proficiencies: classProficienciesInputFromForm(values),
     features: featuresFromFormValues(values.features, ctx?.entity?.features),
     resources: classResourcesInputFromForm(values.resources),
     ...(characterCreation ? { characterCreation } : {}),
@@ -235,12 +235,7 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
     armor: [],
     weapons: { categories: [], items: [] },
     tools: { categories: [], items: [] },
-    skills: { items: [] },
-  },
-  characterCreation: {
-    proficiencies: {
-      skills: { choose: 2, from: [] },
-    },
+    skills: { choose: 2, from: [] },
   },
   features: [
     createSubclassChoiceFeature({ classSlug: 'new-class', className: 'New Class' }),

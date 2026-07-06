@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { formatSlugAsLabel } from '@rpg/contracts'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -43,20 +44,20 @@ function renderSkillDetail(skill: typeof ATHLETICS) {
   )
 }
 
-describe('SkillDetailContent class skill choices', () => {
+describe('SkillDetailContent suggested classes', () => {
   beforeEach(() => {
     useClasses.mockReset()
   })
 
-  it('renders the class skill choices section heading', () => {
+  it('renders the suggested classes section heading', () => {
     mockClassesQuery({ data: [FIGHTER] })
 
     renderSkillDetail(ATHLETICS)
 
-    expect(screen.getByRole('heading', { name: 'Class skill choices' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Suggested classes' })).toBeInTheDocument()
   })
 
-  it('links to the catalog class id for a class offering this skill', () => {
+  it('links to the catalog class id for a known slug', () => {
     mockClassesQuery({ data: [FIGHTER] })
 
     renderSkillDetail(ATHLETICS)
@@ -68,12 +69,16 @@ describe('SkillDetailContent class skill choices', () => {
     )
   })
 
-  it('omits the section when no class offers this skill', () => {
+  it('renders unknown slugs as text without a link', () => {
     mockClassesQuery({ data: [] })
 
-    renderSkillDetail(ATHLETICS)
+    const skill = { ...ATHLETICS, suggestedClasses: ['orphan-slug'] }
+    renderSkillDetail(skill)
 
-    expect(screen.queryByRole('heading', { name: 'Class skill choices' })).not.toBeInTheDocument()
+    expect(screen.getByText(formatSlugAsLabel('orphan-slug'))).toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: formatSlugAsLabel('orphan-slug') }),
+    ).not.toBeInTheDocument()
   })
 
   it('links homebrew classes by catalog id', () => {
@@ -85,7 +90,8 @@ describe('SkillDetailContent class skill choices', () => {
     }
     mockClassesQuery({ data: [homebrewFighter] })
 
-    renderSkillDetail(ATHLETICS)
+    const skill = { ...ATHLETICS, suggestedClasses: ['custom-fighter'] }
+    renderSkillDetail(skill)
 
     const link = screen.getByRole('link', { name: 'My Fighter' })
     expect(link).toHaveAttribute('href', ROUTES.content.classes.detail(STORY_CAMPAIGN_ID, 'abc123'))

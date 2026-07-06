@@ -13,17 +13,12 @@
     "hitDie": 12,
     "proficiencies": {
       "savingThrows": ["str", "con"],
-      "armor": {
-        "categories": ["light", "medium", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "shields"],
       "weapons": {
-        "categories": ["simple", "martial"],
-        "items": []
+        "categories": ["simple", "martial"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -36,18 +31,18 @@
             "description": "Greataxe, 4 Javelins, Explorer's Pack, and 15 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "greataxe",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "javelin",
                 "quantity": 4
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -66,18 +61,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Barbarian Skills",
-              "choose": 2,
-              "from": ["animal-handling", "athletics", "nature", "perception", "survival"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -464,17 +447,12 @@
     },
     "proficiencies": {
       "savingThrows": ["dex", "cha"],
-      "armor": {
-        "categories": ["light"],
-        "items": []
-      },
+      "armor": ["light"],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 3
       }
     },
     "characterCreation": {
@@ -487,13 +465,13 @@
             "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 2,
                 "equipped": true
@@ -508,7 +486,7 @@
                 }
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "entertainers-pack",
                 "quantity": 1
               }
@@ -527,32 +505,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Bard Skills",
-              "choose": 3,
-              "from": [
-                "acrobatics",
-                "animal-handling",
-                "arcana",
-                "deception",
-                "history",
-                "insight",
-                "intimidation",
-                "investigation",
-                "performance",
-                "persuasion",
-                "religion",
-                "sleight-of-hand",
-                "stealth"
-              ]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -859,17 +811,12 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": {
-        "categories": ["light", "medium", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "shields"],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -882,30 +829,30 @@
             "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "chain-shirt",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "mace",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "priests-pack",
                 "quantity": 1
               }
@@ -924,18 +871,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Cleric Skills",
-              "choose": 2,
-              "from": ["history", "insight", "medicine", "persuasion", "religion"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -1220,17 +1155,12 @@
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
-      "armor": {
-        "categories": ["light", "medium", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "shields"],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -1243,36 +1173,36 @@
             "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "sickle",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "wooden-staff",
                 "quantity": 1,
                 "equipped": false
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "herbalism-kit",
                 "quantity": 1
               }
@@ -1291,18 +1221,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Druid Skills",
-              "choose": 2,
-              "from": ["animal-handling", "insight", "medicine", "nature", "perception", "survival"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -1509,17 +1427,12 @@
     "hitDie": 10,
     "proficiencies": {
       "savingThrows": ["str", "con"],
-      "armor": {
-        "categories": ["light", "medium", "heavy", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "heavy", "shields"],
       "weapons": {
-        "categories": ["simple", "martial"],
-        "items": []
+        "categories": ["simple", "martial"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -1532,29 +1445,29 @@
             "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "chain-mail",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "greatsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "flail",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "javelin",
                 "quantity": 8
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -1569,40 +1482,40 @@
             "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, and 11 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "studded-leather",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "scimitar",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shortsword",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "longbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -1621,18 +1534,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Fighter Skills",
-              "choose": 2,
-              "from": ["acrobatics", "athletics", "history", "intimidation", "perception"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -1934,17 +1835,12 @@
     "hitDie": 8,
     "proficiencies": {
       "savingThrows": ["str", "dex"],
-      "armor": {
-        "categories": [],
-        "items": []
-      },
+      "armor": [],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -1957,18 +1853,18 @@
             "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument chosen for the tool proficiency above, Explorer's Pack, and 11 GP. FOLLOWUP: proficiencyLinkedChoice — structured item choice deferred until class tool proficiency selection is modeled.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "spear",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 5
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -1987,18 +1883,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Monk Skills",
-              "choose": 2,
-              "from": ["acrobatics", "history", "insight", "religion", "stealth"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -2419,17 +2303,12 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": {
-        "categories": ["light", "medium", "heavy", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "heavy", "shields"],
       "weapons": {
-        "categories": ["simple", "martial"],
-        "items": []
+        "categories": ["simple", "martial"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -2442,35 +2321,35 @@
             "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "chain-mail",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "longsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "javelin",
                 "quantity": 6
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "priests-pack",
                 "quantity": 1
               }
@@ -2489,26 +2368,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Paladin Skills",
-              "choose": 2,
-              "from": [
-                "athletics",
-                "history",
-                "insight",
-                "intimidation",
-                "medicine",
-                "persuasion",
-                "religion"
-              ]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -2815,17 +2674,12 @@
     },
     "proficiencies": {
       "savingThrows": ["str", "dex"],
-      "armor": {
-        "categories": ["light", "medium", "shields"],
-        "items": []
-      },
+      "armor": ["light", "medium", "shields"],
       "weapons": {
-        "categories": ["simple", "martial"],
-        "items": []
+        "categories": ["simple", "martial"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 3
       }
     },
     "characterCreation": {
@@ -2838,45 +2692,45 @@
             "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer's Pack, and 7 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "studded-leather",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "scimitar",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shortsword",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "longbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "sprig-of-mistletoe",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -2895,27 +2749,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Ranger Skills",
-              "choose": 3,
-              "from": [
-                "animal-handling",
-                "insight",
-                "investigation",
-                "nature",
-                "perception",
-                "persuasion",
-                "stealth",
-                "survival"
-              ]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -3177,21 +3010,16 @@
     "hitDie": 8,
     "proficiencies": {
       "savingThrows": ["dex", "int"],
-      "armor": {
-        "categories": ["light"],
-        "items": []
-      },
+      "armor": ["light"],
       "weapons": {
-        "categories": ["simple", "martial"],
-        "items": []
+        "categories": ["simple", "martial"]
       },
       "tools": {
         "categories": [],
         "items": ["thieves-tools"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 4
       }
     },
     "characterCreation": {
@@ -3204,46 +3032,46 @@
             "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 2,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shortsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "shortbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "thieves-tools",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "burglars-pack",
                 "quantity": 1
               }
@@ -3262,28 +3090,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Rogue Skills",
-              "choose": 4,
-              "from": [
-                "acrobatics",
-                "deception",
-                "insight",
-                "intimidation",
-                "investigation",
-                "perception",
-                "performance",
-                "sleight-of-hand",
-                "stealth"
-              ]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -3616,17 +3422,13 @@
     },
     "proficiencies": {
       "savingThrows": ["con", "cha"],
-      "armor": {
-        "categories": [],
-        "items": []
-      },
+      "armor": [],
       "weapons": {
         "categories": [],
         "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -3639,23 +3441,23 @@
             "description": "Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, and 28 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "spear",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "crystal",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -3674,18 +3476,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Sorcerer Skills",
-              "choose": 2,
-              "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -4004,17 +3794,12 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": {
-        "categories": ["light"],
-        "items": []
-      },
+      "armor": ["light"],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -4027,34 +3812,34 @@
             "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "sickle",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "orb",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "book-occult-lore",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "scholars-pack",
                 "quantity": 1
               }
@@ -4073,18 +3858,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Warlock Skills",
-              "choose": 2,
-              "from": ["arcana", "history", "intimidation", "investigation", "nature", "religion"]
-            }
-          ]
-        }
       }
     },
     "features": [
@@ -4396,17 +4169,12 @@
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
-      "armor": {
-        "categories": [],
-        "items": []
-      },
+      "armor": [],
       "weapons": {
-        "categories": ["simple"],
-        "items": []
+        "categories": ["simple"]
       },
       "skills": {
-        "categories": [],
-        "items": []
+        "choose": 2
       }
     },
     "characterCreation": {
@@ -4419,29 +4187,29 @@
             "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
             "items": [
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "arcane-staff",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "robe",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "spellbook",
                 "quantity": 1
               },
               {
-                "kind": "grant",
+                "kind": "fixed",
                 "equipmentSlug": "scholars-pack",
                 "quantity": 1
               }
@@ -4460,18 +4228,6 @@
             }
           }
         ]
-      },
-      "proficiencies": {
-        "skills": {
-          "choices": [
-            {
-              "id": "class-skills",
-              "label": "Wizard Skills",
-              "choose": 2,
-              "from": ["arcana", "history", "investigation", "religion"]
-            }
-          ]
-        }
       }
     },
     "features": [

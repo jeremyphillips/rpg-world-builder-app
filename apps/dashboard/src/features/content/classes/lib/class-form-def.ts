@@ -1,11 +1,8 @@
 import { type CharacterClass, type CreateClassInput } from '@rpg/contracts'
 
-import {
-  contentFormRegistry,
-  contentFormFields,
-  type ContentFormDef,
-} from '../../lib/forms/content-form-registry'
+import { contentFormRegistry, contentFormFields, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import {
   buildClassTabs,
@@ -23,7 +20,6 @@ import {
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
-import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 
 const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
   routeKey: 'classes',
@@ -48,16 +44,13 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     proficiencies: proficienciesToFormValues(entity.proficiencies),
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
-    characterCreation: {
-      proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
-      ...(entity.characterCreation?.startingEquipment
-        ? {
-            startingEquipment: startingEquipmentToFormValues(
-              entity.characterCreation.startingEquipment,
-            ),
-          }
-        : {}),
-    },
+    characterCreation: entity.characterCreation?.startingEquipment
+      ? {
+          startingEquipment: startingEquipmentToFormValues(
+            entity.characterCreation.startingEquipment,
+          ),
+        }
+      : undefined,
   }),
 
   toInput: (values, ctx) =>
@@ -65,6 +58,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
+  invalidateQueryKeys: (campaignId) => [skillProficienciesQueryKey(campaignId)],
 
   extractEmbeddedSeedRowIds: (entity) => ({
     features: entity.features.map((feature) => feature.id),

@@ -24,7 +24,7 @@ describe('startingEquipment round-trip', () => {
 
     const standard = formValues.options.find((option) => option.id === 'standard')
     expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
-    expect(standard?.items.every((item) => item.itemKind === 'grant')).toBe(true)
+    expect(standard?.items.every((item) => item.itemKind === 'fixed')).toBe(true)
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
@@ -58,14 +58,14 @@ describe('startingEquipment round-trip', () => {
     const formValues = startingEquipmentToFormValues(startingEquipment!)
     const woodenStaff = formValues.options
       .find((option) => option.id === 'standard')
-      ?.items.find((item) => item.itemKind === 'grant' && item.equipmentSlug === 'wooden-staff')
+      ?.items.find((item) => item.itemKind === 'fixed' && item.equipmentSlug === 'wooden-staff')
 
     expect(woodenStaff).toMatchObject({
-      itemKind: 'grant',
+      itemKind: 'fixed',
       equipmentSlug: 'wooden-staff',
       equipped: false,
     })
-    expect(woodenStaff?.itemKind === 'grant' ? woodenStaff.modifiers : undefined).toBeUndefined()
+    expect(woodenStaff?.itemKind === 'fixed' ? woodenStaff.modifiers : undefined).toBeUndefined()
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
@@ -100,20 +100,20 @@ describe('startingEquipmentItemTitle', () => {
     { value: 'greataxe', label: 'Greataxe' },
   ]
 
-  it('includes quantity when granted equipment count is greater than one', () => {
+  it('includes quantity when fixed equipment count is greater than one', () => {
     expect(
       startingEquipmentItemTitle(
-        { itemKind: 'grant', equipmentSlug: 'javelin', quantity: 4 },
+        { itemKind: 'fixed', equipmentSlug: 'javelin', quantity: 4 },
         0,
         equipmentOptions,
       ),
     ).toBe('Javelin x4')
   })
 
-  it('omits quantity suffix for a single granted item', () => {
+  it('omits quantity suffix for a single fixed item', () => {
     expect(
       startingEquipmentItemTitle(
-        { itemKind: 'grant', equipmentSlug: 'greataxe', quantity: 1 },
+        { itemKind: 'fixed', equipmentSlug: 'greataxe', quantity: 1 },
         0,
         equipmentOptions,
       ),
@@ -122,7 +122,7 @@ describe('startingEquipmentItemTitle', () => {
 })
 
 describe('startingEquipmentItemFields', () => {
-  it('uses single-select combobox for granted equipment slugs in a row with quantity', () => {
+  it('uses single-select combobox for fixed equipment slugs in a row with quantity', () => {
     const fields = startingEquipmentItemFields({
       options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
     })

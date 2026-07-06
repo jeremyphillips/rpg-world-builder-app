@@ -62,12 +62,6 @@ export const ALIGNMENTS = Object.keys(ALIGNMENT_ENTRIES) as [Alignment, ...Align
 
 export const alignmentSchema = z.enum(ALIGNMENTS)
 
-/** Coerces blank select sentinels before enum validation (forms, persisted drafts). */
-export const optionalAlignmentSchema = z.preprocess(
-  (value) => (typeof value === 'string' && value.length === 0 ? undefined : value),
-  alignmentSchema.optional(),
-)
-
 /** Returns the reference entry for an alignment id, if known. */
 export function getAlignmentEntry(id: string): GameTermEntry | undefined {
   return ALIGNMENT_ENTRIES[id as Alignment]

@@ -34,7 +34,7 @@ export default [
             { from: ['content'], allow: ['validation', 'vocab', 'primitives', 'content'] },
             {
               from: ['runtime'],
-              allow: ['validation', 'vocab', 'primitives', 'content', 'runtime', 'campaign'],
+              allow: ['validation', 'vocab', 'primitives', 'content', 'runtime'],
             },
             {
               from: ['campaign'],

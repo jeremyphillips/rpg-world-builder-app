@@ -10,7 +10,7 @@ describe('normalizeClassWeaponProficiencies', () => {
         items: ['dagger'],
         hasSpecificWeapons: false,
       }),
-    ).toEqual({ categories: ['simple', 'martial'], items: [] })
+    ).toEqual({ categories: ['simple', 'martial'] })
   })
 
   it('returns named weapons only when the toggle is on', () => {
@@ -30,6 +30,6 @@ describe('normalizeClassWeaponProficiencies', () => {
         items: [],
         hasSpecificWeapons: true,
       }),
-    ).toEqual({ categories: [], items: [] })
+    ).toEqual({ categories: [] })
   })
 })

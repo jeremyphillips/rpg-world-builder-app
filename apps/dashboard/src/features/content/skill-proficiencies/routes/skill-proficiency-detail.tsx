@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
-import { classesOfferingSkillChoice, getAbilityLabel } from '@rpg/contracts'
+import { getAbilityLabel, formatSlugAsLabel } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -14,40 +14,48 @@ import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 
-const CLASS_SKILL_CHOICE_CHIP_CLASS =
+const SUGGESTED_CLASS_CHIP_CLASS =
   'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
 
-function ClassSkillChoicesList({
+function SuggestedClassesList({
   campaignId,
-  skillSlug,
+  suggestedClasses,
 }: {
   campaignId: string
-  skillSlug: string
+  suggestedClasses: string[]
 }) {
   const { data: classes = [], isPending } = useClasses(campaignId)
-  const offeringClasses = classesOfferingSkillChoice(skillSlug, classes)
 
-  if (offeringClasses.length === 0 && !isPending) return null
+  if (suggestedClasses.length === 0) return null
+
+  const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
 
   return (
-    <section aria-labelledby="class-skill-choices-heading">
-      <Heading variant="label" as="h2" id="class-skill-choices-heading" className="mb-3">
-        Class skill choices
+    <section aria-labelledby="suggested-classes-heading">
+      <Heading variant="label" as="h2" id="suggested-classes-heading" className="mb-3">
+        Suggested classes
       </Heading>
       {isPending ? (
         <Text variant="muted">Loading…</Text>
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
-          {offeringClasses.map((cls) => (
-            <li key={cls.slug}>
-              <Link
-                to={ROUTES.content.classes.detail(campaignId, cls.id)}
-                className={CLASS_SKILL_CHOICE_CHIP_CLASS}
-              >
-                {cls.name}
-              </Link>
-            </li>
-          ))}
+          {suggestedClasses.map((slug) => {
+            const cls = classesBySlug.get(slug)
+            return (
+              <li key={slug}>
+                {cls ? (
+                  <Link
+                    to={ROUTES.content.classes.detail(campaignId, cls.id)}
+                    className={SUGGESTED_CLASS_CHIP_CLASS}
+                  >
+                    {cls.name}
+                  </Link>
+                ) : (
+                  <span className={SUGGESTED_CLASS_CHIP_CLASS}>{formatSlugAsLabel(slug)}</span>
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>
@@ -75,7 +83,12 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
           <div className="space-y-8">
             <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
             {skill.description ? <Text variant="muted">{skill.description}</Text> : null}
-            <ClassSkillChoicesList campaignId={campaignId} skillSlug={skill.slug} />
+            {skill.suggestedClasses.length > 0 && (
+              <SuggestedClassesList
+                campaignId={campaignId}
+                suggestedClasses={skill.suggestedClasses}
+              />
+            )}
           </div>
         }
       />

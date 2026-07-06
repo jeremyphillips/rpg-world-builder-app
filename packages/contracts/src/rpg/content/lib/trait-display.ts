@@ -2,7 +2,13 @@ import { getDamageTypeSentenceForm } from '../../vocab/damage/vocabulary'
 import { getLanguageSentenceForm } from '../../vocab/language'
 import { formatMovementBonusDescription } from '../../vocab/movement-mode'
 import { getSenseLabel, getSenseSentenceForm } from '../../vocab/sense'
-import type { ContentTrait, CustomContentTrait, GrantContentTrait, GrantGroups } from './grants'
+import type {
+  ContentGrants,
+  ContentTrait,
+  CustomContentTrait,
+  GrantContentTrait,
+  GrantGroups,
+} from './grants'
 
 export type TraitDisplay = {
   name: string
@@ -62,6 +68,15 @@ export function resolveTraitDisplay(trait: ContentTrait): TraitDisplay {
     return resolveGrantTraitDisplay(trait)
   }
   return resolveCustomTraitDisplay(trait)
+}
+
+/**
+ * Reads structured grants from either trait variant (for stat aggregation).
+ * Custom traits may carry a legacy `grants` bag; grant traits use `grantGroups`.
+ */
+export function getTraitGrants(trait: ContentTrait): ContentGrants | undefined {
+  if (trait.kind === 'custom') return trait.grants
+  return undefined
 }
 
 /** Resolves display name for list labels and breadcrumbs. */

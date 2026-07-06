@@ -10,10 +10,10 @@ import {
 import {
   characterEquipmentSchema,
   characterFeatEntrySchema,
+  characterNarrativeSchema,
+  characterSpellEntrySchema,
   characterWealthSchema,
 } from './equipment-inventory'
-import { characterNarrativeSchema } from './narrative'
-import { characterSpellEntrySchema } from './spells'
 import { characterLanguageEntrySchema, characterProficienciesSchema } from './proficiencies'
 
 // ---------------------------------------------------------------------------

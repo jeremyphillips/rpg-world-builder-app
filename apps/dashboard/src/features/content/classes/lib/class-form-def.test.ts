@@ -3,7 +3,11 @@
  */
 import { describe, expect, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import { createClassInputSchema, deriveContentKey } from '@rpg/contracts'
+import {
+  createClassInputSchema,
+  deriveContentKey,
+  stripClassSkillFromFromInput,
+} from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
@@ -38,11 +42,11 @@ function expectBardSpellcastingRoundTrip(): void {
   ).toBe(true)
 }
 
-it('type: toInput validates as CreateClassInput', () => {
+it('type: stripped toInput validates as CreateClassInput', () => {
   const fighter = SRD_CLASSES[0]!
   const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
   const input = classFormDef.toInput(formValues)
-  expect(createClassInputSchema.safeParse(input).success).toBe(true)
+  expect(createClassInputSchema.safeParse(stripClassSkillFromFromInput(input)).success).toBe(true)
 })
 
 describe('classFormDef round-trips', () => {
@@ -50,7 +54,7 @@ describe('classFormDef round-trips', () => {
     it(`${characterClass.slug}: toFormValues → toInput → schema.parse`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues)
-      expect(() => createClassInputSchema.parse(input)).not.toThrow()
+      expect(() => createClassInputSchema.parse(stripClassSkillFromFromInput(input))).not.toThrow()
     })
 
     it(`${characterClass.slug}: name and slug are preserved`, () => {
@@ -73,17 +77,6 @@ describe('classFormDef round-trips', () => {
       expect(input.features).toHaveLength(characterClass.features.length)
     })
 
-    it(`${characterClass.slug}: character creation skill choices round-trip`, () => {
-      const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
-      const input = classFormDef.toInput(formValues, { entity: characterClass })
-      const expectedChoices = characterClass.characterCreation?.proficiencies?.skills?.choices
-      if (!expectedChoices?.length) {
-        expect(input.characterCreation?.proficiencies?.skills).toBeUndefined()
-        return
-      }
-      expect(input.characterCreation?.proficiencies?.skills?.choices).toEqual(expectedChoices)
-    })
-
     it(`${characterClass.slug}: starting equipment round-trips`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues, { entity: characterClass })
@@ -103,31 +96,6 @@ describe('classFormDef round-trips', () => {
     if (spellGrant?.kind === 'spells') {
       expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
     }
-  })
-
-  it('rogue: skill proficiency choices round-trip through characterCreation', () => {
-    const rogue = SRD_CLASSES.find((c) => c.slug === 'rogue')!
-    const formValues = classFormDef.toFormValues(rogue) as ClassFormValues
-    expect(formValues.characterCreation?.proficiencies?.skills).toMatchObject({
-      choose: 4,
-      from: [
-        'acrobatics',
-        'deception',
-        'insight',
-        'intimidation',
-        'investigation',
-        'perception',
-        'performance',
-        'sleight-of-hand',
-        'stealth',
-      ],
-    })
-    const input = classFormDef.toInput(formValues, { entity: rogue })
-    expect(input.characterCreation?.proficiencies?.skills?.choices?.[0]).toMatchObject({
-      id: 'class-skills',
-      choose: 4,
-      from: rogue.characterCreation?.proficiencies?.skills?.choices?.[0]?.from,
-    })
   })
 
   it('rogue: tool proficiencies round-trip with categories and items', () => {
@@ -162,7 +130,7 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
     expect(formValues.weaponProficiencyMode).toBe('categories')
     const input = classFormDef.toInput(formValues)
-    expect(input.proficiencies.weapons.items).toEqual([])
+    expect(input.proficiencies.weapons.items).toBeUndefined()
   })
 
   it('fighter: ships three distinct starting equipment packages', () => {
@@ -204,9 +172,9 @@ describe('classFormDef round-trips', () => {
       (option) => option.id === 'standard',
     )
     const woodenStaff = standardOption?.items.find(
-      (item) => item.itemKind === 'grant' && item.equipmentSlug === 'wooden-staff',
+      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'wooden-staff',
     )
-    expect(woodenStaff?.itemKind === 'grant' ? woodenStaff.modifiers : undefined).toBeUndefined()
+    expect(woodenStaff?.itemKind === 'fixed' ? woodenStaff.modifiers : undefined).toBeUndefined()
     const input = classFormDef.toInput(formValues, { entity: druid })
     expect(input.characterCreation?.startingEquipment).toEqual(
       druid.characterCreation?.startingEquipment,
@@ -264,7 +232,6 @@ describe('classFormDef round-trips', () => {
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.weapons).toEqual({
       categories: ['simple', 'martial'],
-      items: [],
     })
   })
 

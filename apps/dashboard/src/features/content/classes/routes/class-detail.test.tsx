@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { skillSlugsFromClassChoices } from '@rpg/contracts'
+import { skillSlugsSuggestingClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
@@ -32,13 +32,15 @@ import { FIGHTER, SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassDetailContent } from './class-detail'
 import { useCampaignRules } from '@/features/campaign'
 
+const ATHLETICS = pickSkillProficiency('athletics')
+const STEALTH = pickSkillProficiency('stealth')
+
 function renderClassDetail({
   subclasses = [] as typeof SUBCLASSES_FOR_FIGHTER,
 }: {
   subclasses?: typeof SUBCLASSES_FOR_FIGHTER
 } = {}) {
-  const expectedSlugs = skillSlugsFromClassChoices(FIGHTER)
-  const skillProficiencies = expectedSlugs.map((slug) => pickSkillProficiency(slug))
+  const skillProficiencies = [ATHLETICS, STEALTH]
   return render(
     <MemoryRouter>
       <ClassDetailContent
@@ -62,12 +64,11 @@ describe('ClassDetailContent suggested proficiencies', () => {
     renderClassDetail()
 
     expect(screen.getByRole('heading', { name: 'Suggested proficiencies' })).toBeInTheDocument()
-    const skillChoice = FIGHTER.characterCreation?.proficiencies?.skills?.choices?.[0]
-    expect(screen.getByText(`Choose ${skillChoice?.choose}`)).toBeInTheDocument()
+    expect(screen.getByText(`Choose ${FIGHTER.proficiencies.skills.choose}`)).toBeInTheDocument()
 
-    const expectedSlugs = skillSlugsFromClassChoices(FIGHTER)
+    const expectedSlugs = skillSlugsSuggestingClass(FIGHTER.slug, [ATHLETICS, STEALTH])
     for (const slug of expectedSlugs) {
-      const skill = pickSkillProficiency(slug)
+      const skill = slug === ATHLETICS.slug ? ATHLETICS : STEALTH
       const link = screen.getByRole('link', { name: skill.name })
       expect(link).toHaveAttribute(
         'href',

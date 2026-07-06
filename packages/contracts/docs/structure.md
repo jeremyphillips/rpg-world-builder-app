@@ -23,9 +23,8 @@ packages/contracts/src/
     content/            # catalog content types (species, weapons, classes, …)
       lib/              # envelope, grants, content-key, content-type-keys, …
       classes/          # class body, spellcasting, subclasses
-    runtime/            # stored character sheets + builder runtime (not catalog content)
+    runtime/            # stored character sheets (not catalog content)
       character/        # sheet schema, provenance, proficiencies, inventory
-      character-builder/ # builder draft, context, choice/step vocabulary
     campaign/           # campaign identity, rules, selection, patches/
   platform/             # backward-compat shim → shared + rpg/campaign
   public/               # scaffold (marketing/CMS — future)
@@ -52,7 +51,6 @@ flowchart BT
   runtime --> content
   runtime --> primitives
   runtime --> vocab
-  runtime --> campaign
   content --> primitives
   content --> vocab
   primitives --> vocab
@@ -91,26 +89,21 @@ barrel (the root barrel picks up `shared/` and `rpg/*` automatically).
 
 Acyclic **downward** imports only — lower layers never import higher layers.
 
-| Layer               | May import                                                                                      | Must not import                                                               |
-| ------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `validation/`       | `validation/` only                                                                              | everything else                                                               |
-| `shared/`           | `validation/`, `shared/`, `rpg/primitives/`                                                     | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                 |
-| `rpg/vocab/`        | `validation/`, `rpg/vocab/`                                                                     | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/` |
-| `rpg/primitives/`   | `validation/`, `rpg/vocab/`, `rpg/primitives/`                                                  | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                    |
-| `rpg/content/`      | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                                  | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                    |
-| `rpg/runtime/`      | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/` | `shared/`                                                                     |
-| `rpg/campaign/`     | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/campaign/`, `shared/`                      | `rpg/content/`, `rpg/runtime/`                                                |
-| `public/`           | `public/` only                                                                                  | everything else                                                               |
-| `dev-bench/`        | `dev-bench/` only                                                                               | everything else                                                               |
-| `index.ts` (barrel) | `validation/` + `shared/` + `rpg/*`                                                             | `dev-bench/`, `public/` (use subpath exports)                                 |
+| Layer               | May import                                                                     | Must not import                                                               |
+| ------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `validation/`       | `validation/` only                                                             | everything else                                                               |
+| `shared/`           | `validation/`, `shared/`, `rpg/primitives/`                                    | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                 |
+| `rpg/vocab/`        | `validation/`, `rpg/vocab/`                                                    | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/` |
+| `rpg/primitives/`   | `validation/`, `rpg/vocab/`, `rpg/primitives/`                                 | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                    |
+| `rpg/content/`      | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                 | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                    |
+| `rpg/runtime/`      | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/` | `rpg/campaign/`, `shared/`                                                    |
+| `rpg/campaign/`     | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/campaign/`, `shared/`     | `rpg/content/`, `rpg/runtime/`                                                |
+| `public/`           | `public/` only                                                                 | everything else                                                               |
+| `dev-bench/`        | `dev-bench/` only                                                              | everything else                                                               |
+| `index.ts` (barrel) | `validation/` + `shared/` + `rpg/*`                                            | `dev-bench/`, `public/` (use subpath exports)                                 |
 
 **Not enforced:** requiring `rpg/content/` to reach `rpg/vocab/` only via
 `rpg/primitives/`. Content types legitimately import vocab schemas directly.
-
-**Why `rpg/runtime/` may import `rpg/campaign/`:** the character builder runtime
-consumes resolved campaign rules (`ResolvedCharacterCreationRules` extends the
-resolved character-creation patch). Campaign never imports runtime, so the
-graph stays acyclic.
 
 Deep relative imports and barrel imports are both valid within the allowed graph.
 

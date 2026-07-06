@@ -43,12 +43,8 @@ import { contentPoolChoiceSchema } from './choice'
 import { grantValidationMessages } from './grant-messages'
 
 // ---------------------------------------------------------------------------
-// Equipment grants — specific items and pool choices for starting equipment,
-// traits, and contentGrants.equipment payloads.
-//
-// Core vocabulary (equipment-grant discriminant):
-// - grant — automatic; a specific thing the character receives
-// - choice — unresolved player decision; pick from a pool at character creation
+// Equipment grants — fixed items and pool choices for starting equipment,
+// traits, and future contentGrants.equipment payloads.
 // ---------------------------------------------------------------------------
 
 const EQUIPMENT_KIND_CATEGORY_FIELDS = {
@@ -169,8 +165,8 @@ export const equipmentPoolSchema = z.discriminatedUnion('source', [
 
 export type EquipmentPool = z.infer<typeof equipmentPoolSchema>
 
-export const grantedEquipmentItemSchema = z.object({
-  kind: z.literal('grant'),
+export const fixedEquipmentGrantSchema = z.object({
+  kind: z.literal('fixed'),
   /** Bare equipment slug; resolved to `{rulesetId}:{slug}` at build time. */
   equipmentSlug: z.string().min(1),
   quantity: z.number().int().min(1).default(1),
@@ -178,7 +174,7 @@ export const grantedEquipmentItemSchema = z.object({
   modifiers: z.array(equipmentModifierSchema).optional(),
 })
 
-export type GrantedEquipmentItem = z.infer<typeof grantedEquipmentItemSchema>
+export type FixedEquipmentGrant = z.infer<typeof fixedEquipmentGrantSchema>
 
 const LEGACY_CATEGORY_FIELD_MAP = [
   ['toolCategories', 'toolCategory'],
@@ -289,7 +285,7 @@ function normalizeEquipmentGrant(input: unknown): unknown {
 
 export const equipmentGrantSchema = z.preprocess(
   normalizeEquipmentGrant,
-  z.discriminatedUnion('kind', [grantedEquipmentItemSchema, equipmentChoiceGrantObjectSchema]),
+  z.discriminatedUnion('kind', [fixedEquipmentGrantSchema, equipmentChoiceGrantObjectSchema]),
 )
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
@@ -357,7 +353,7 @@ export function formatEquipmentGrantSentence(
   grant: EquipmentGrant,
   resolveEquipmentName?: (slug: string) => string | undefined,
 ): string {
-  if (grant.kind === 'grant') {
+  if (grant.kind === 'fixed') {
     const name = resolveEquipmentName?.(grant.equipmentSlug) ?? grant.equipmentSlug
     if (!name) return ''
     const quantity = grant.quantity ?? 1

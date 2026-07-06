@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { Button, Heading, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
@@ -24,7 +24,6 @@ import {
   type StartingEquipmentOptionForm,
 } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentDefaultValues } from '../lib/character-creation/class-starting-equipment-form-values'
-import { characterCreationProficienciesFields } from '../lib/character-creation/class-character-creation-proficiencies-form-fields'
 
 export interface ClassCharacterCreationTabProps {
   formCtx: ContentFormCtx
@@ -86,35 +85,19 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 }
 
 /**
- * Character creation tab: starting equipment (optional) and class-owned skill
- * proficiency choices under `characterCreation.proficiencies`.
+ * Character creation tab: optional starting equipment with a top-level choose
+ * count and master-detail packages (`standard`, `gold`, etc.) each containing
+ * fixed items, pool choices, wealth grants, and modifiers.
  */
 export function ClassCharacterCreationTab({ formCtx }: ClassCharacterCreationTabProps) {
   const startingEquipment = useWatch({ name: STARTING_EQUIPMENT_FIELD_NAME }) as
     | StartingEquipmentForm
     | undefined
-  const proficienciesFields = useMemo(
-    () => characterCreationProficienciesFields(formCtx),
-    [formCtx],
-  )
   const hasStartingEquipment = startingEquipment != null && typeof startingEquipment === 'object'
 
-  return (
-    <div className="space-y-8">
-      <section aria-labelledby="class-starting-equipment-heading">
-        <Heading variant="section" as="h3" id="class-starting-equipment-heading" className="mb-4">
-          Starting equipment
-        </Heading>
-        {hasStartingEquipment ? (
-          <StartingEquipmentEditor formCtx={formCtx} />
-        ) : (
-          <StartingEquipmentEmptyState formCtx={formCtx} />
-        )}
-      </section>
+  if (!hasStartingEquipment) {
+    return <StartingEquipmentEmptyState formCtx={formCtx} />
+  }
 
-      <section aria-labelledby="class-character-creation-proficiencies-heading">
-        <FormItems items={proficienciesFields} idPrefix="class-character-creation" />
-      </section>
-    </div>
-  )
+  return <StartingEquipmentEditor formCtx={formCtx} />
 }

@@ -74,7 +74,8 @@ export const proficienciesFormSchema = z.object({
     items: z.array(z.string()).optional(),
   }),
   skills: z.object({
-    items: z.array(skillSchema),
+    choose: z.coerce.number().int().min(0),
+    from: z.array(skillSchema),
   }),
 })
 
@@ -94,6 +95,7 @@ function visibleWhenIndividualWeapons(): FieldVisibility {
 
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   const skillOptions = ctx.options?.skills ?? []
+  const skillCount = skillOptions.length
 
   return [
     {
@@ -155,10 +157,25 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Skills & Tools',
       fields: [
         {
-          type: 'chips',
-          name: 'proficiencies.skills.items',
-          label: 'Granted skill proficiencies',
-          options: skillOptions,
+          type: 'inlineSentence',
+          name: 'proficiencies.skills.from',
+          label: '',
+          required: true,
+          segments: [
+            { kind: 'text', value: 'Character chooses', tone: 'label' },
+            {
+              kind: 'number',
+              name: 'proficiencies.skills.choose',
+              min: 0,
+              ...(skillCount > 0 ? { max: skillCount } : {}),
+            },
+            { kind: 'text', value: 'Skill Proficiencies from:', tone: 'label' },
+          ],
+          below: {
+            kind: 'chips',
+            name: 'proficiencies.skills.from',
+            options: skillOptions,
+          },
         },
         {
           type: 'chips',

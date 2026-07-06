@@ -1,10 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
 import {
-  flattenGrantGroups,
   formatSpeed,
   getCreatureSizeLabel,
-  resolveGrantGroupsFromContent,
+  getTraitGrants,
   resolveTraitDisplay,
 } from '@rpg/contracts'
 import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
@@ -32,11 +31,7 @@ function collectSenses(
   traits: SpeciesTrait[],
   senseVocabulary: ReturnType<typeof useSenseVocabulary>['vocabulary'],
 ): string {
-  const senses = traits.flatMap((trait) =>
-    flattenGrantGroups(resolveGrantGroupsFromContent(trait))
-      .map(({ grant }) => grant)
-      .filter((grant): grant is Extract<typeof grant, { kind: 'sense' }> => grant.kind === 'sense'),
-  )
+  const senses = traits.flatMap((t) => getTraitGrants(t)?.senses ?? [])
   if (senses.length === 0) return 'None'
   return senses
     .map((s) => `${getSenseLabelFromVocabulary(senseVocabulary, s.type)} ${s.range} ft.`)

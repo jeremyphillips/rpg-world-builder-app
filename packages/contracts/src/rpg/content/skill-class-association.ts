@@ -1,38 +1,77 @@
-import type { ClassStored } from './classes/class'
-import type { SkillId } from './skill-proficiency'
-import { isMeaningfulProficiencyChoice } from './lib/proficiency-grant-set'
+import type { CharacterClass, ClassStored } from './classes/class'
+import type { SkillId, SkillProficiency } from './skill-proficiency'
 
-/** Minimal class fields for class-owned skill choice read helpers. */
-export type ClassSkillChoiceSource = Pick<ClassStored, 'slug' | 'characterCreation'>
+/** Minimal skill fields needed for class↔skill association helpers. */
+export type SkillClassAssociationSkill = Pick<SkillProficiency, 'slug' | 'suggestedClasses'>
 
-function meaningfulSkillChoices(cls: ClassSkillChoiceSource) {
-  return (cls.characterCreation?.proficiencies?.skills?.choices ?? []).filter(
-    isMeaningfulProficiencyChoice,
-  )
+/**
+ * Skill slugs whose `suggestedClasses` includes `classSlug`.
+ * Used to derive class skill menus from the skill-side SSOT.
+ */
+export function skillSlugsSuggestingClass(
+  classSlug: string,
+  skills: readonly SkillClassAssociationSkill[],
+): SkillId[] {
+  return skills
+    .filter((skill) => skill.suggestedClasses.includes(classSlug))
+    .map((skill) => skill.slug as SkillId)
+    .sort((a, b) => a.localeCompare(b))
 }
 
-/** Skill slugs offered in any meaningful class skill choice group. */
-export function skillSlugsFromClassChoices(cls: ClassSkillChoiceSource): SkillId[] {
-  const slugs = new Set<string>()
-  for (const choice of meaningfulSkillChoices(cls)) {
-    for (const slug of choice.from) {
-      slugs.add(slug)
-    }
+/** Added/removed skill slugs between two class skill-option lists (fan-out diff). */
+export function diffClassSkillEdges(
+  previousSkillSlugs: readonly string[],
+  nextSkillSlugs: readonly string[],
+): { added: string[]; removed: string[] } {
+  const previous = new Set(previousSkillSlugs)
+  const next = new Set(nextSkillSlugs)
+  return {
+    added: [...next].filter((slug) => !previous.has(slug)).sort((a, b) => a.localeCompare(b)),
+    removed: [...previous].filter((slug) => !next.has(slug)).sort((a, b) => a.localeCompare(b)),
   }
-  return [...slugs].sort((a, b) => a.localeCompare(b)) as SkillId[]
 }
 
-/** Class records whose skill choice pools include `skillSlug` (inverse read). */
-export type ClassOfferingSkillChoice = Pick<
-  ClassStored,
-  'slug' | 'id' | 'name' | 'characterCreation'
->
+/** Attach API-derived `proficiencies.skills.from` from the skill-side SSOT. */
+export function withDerivedClassSkillFrom(
+  cls: ClassStored,
+  skills: readonly SkillClassAssociationSkill[],
+): CharacterClass {
+  return {
+    ...cls,
+    proficiencies: {
+      ...cls.proficiencies,
+      skills: {
+        choose: cls.proficiencies.skills.choose,
+        from: skillSlugsSuggestingClass(cls.slug, skills),
+      },
+    },
+  }
+}
 
-export function classesOfferingSkillChoice(
-  skillSlug: string,
-  classes: readonly ClassOfferingSkillChoice[],
-): ClassOfferingSkillChoice[] {
-  return classes
-    .filter((cls) => meaningfulSkillChoices(cls).some((choice) => choice.from.includes(skillSlug)))
-    .sort((a, b) => a.slug.localeCompare(b.slug))
+/** Derive read models for a class list (stable sort on `from`). */
+export function deriveClassesSkillFrom(
+  classes: readonly ClassStored[],
+  skills: readonly SkillClassAssociationSkill[],
+): CharacterClass[] {
+  return classes.map((cls) => withDerivedClassSkillFrom(cls, skills))
+}
+
+/** Remove transient `proficiencies.skills.from` before persisting a class write. */
+export function stripClassSkillFromFromInput(
+  input: Record<string, unknown>,
+): Record<string, unknown> {
+  const proficiencies = input.proficiencies
+  if (!proficiencies || typeof proficiencies !== 'object') return input
+
+  const skills = (proficiencies as Record<string, unknown>).skills
+  if (!skills || typeof skills !== 'object') return input
+
+  const { from: _from, ...skillsWithoutFrom } = skills as Record<string, unknown>
+  return {
+    ...input,
+    proficiencies: {
+      ...(proficiencies as Record<string, unknown>),
+      skills: skillsWithoutFrom,
+    },
+  }
 }

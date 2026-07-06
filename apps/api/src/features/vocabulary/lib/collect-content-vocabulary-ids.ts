@@ -1,62 +1,30 @@
-import { flattenGrantGroups, resolveGrantGroupsFromContent } from '@rpg/contracts'
-import type { ContentGrant, GrantGroups } from '@rpg/contracts'
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-function addIds(ids: readonly string[], target: Set<string>): void {
-  for (const id of ids) target.add(id)
+function collectDamageTypeIdsFromGrants(grants: Record<string, unknown>, ids: Set<string>): void {
+  const damageType = grants.damageType
+  if (Array.isArray(damageType)) {
+    for (const id of damageType) {
+      if (typeof id === 'string') ids.add(id)
+    }
+  }
+
+  const resistances = grants.resistances
+  if (Array.isArray(resistances)) {
+    for (const id of resistances) {
+      if (typeof id === 'string') ids.add(id)
+    }
+  }
 }
 
-function collectSenseVocabulary(
-  grant: Extract<ContentGrant, { kind: 'sense' }>,
-  senseIds: Set<string>,
-): void {
-  senseIds.add(grant.type)
-}
-
-function collectDamageVocabulary(
-  grant: Extract<ContentGrant, { kind: 'resistances' | 'damageType' }>,
-  damageIds: Set<string>,
-): void {
-  addIds(grant.damageTypes, damageIds)
-}
-
-function collectLanguageVocabulary(
-  grant: Extract<ContentGrant, { kind: 'languages' }>,
-  languageIds: Set<string>,
-): void {
-  addIds(grant.languageIds, languageIds)
-}
-
-function collectLanguageChoiceVocabulary(
-  grant: Extract<ContentGrant, { kind: 'languageChoice' }>,
-  languageIds: Set<string>,
-): void {
-  if (grant.from) addIds(grant.from, languageIds)
-}
-
-function collectVocabularyIdsFromGrant(
-  grant: ContentGrant,
-  damageIds: Set<string>,
-  senseIds: Set<string>,
-  languageIds: Set<string>,
-): void {
-  switch (grant.kind) {
-    case 'sense':
-      collectSenseVocabulary(grant, senseIds)
-      break
-    case 'resistances':
-    case 'damageType':
-      collectDamageVocabulary(grant, damageIds)
-      break
-    case 'languages':
-      collectLanguageVocabulary(grant, languageIds)
-      break
-    case 'languageChoice':
-      collectLanguageChoiceVocabulary(grant, languageIds)
-      break
+function collectSenseTypeIdsFromGrants(grants: Record<string, unknown>, ids: Set<string>): void {
+  const senses = grants.senses
+  if (!Array.isArray(senses)) return
+  for (const sense of senses) {
+    if (isRecord(sense) && typeof sense.type === 'string') {
+      ids.add(sense.type)
+    }
   }
 }
 
@@ -66,18 +34,27 @@ function collectFromTrait(
   senseIds: Set<string>,
   languageIds: Set<string>,
 ): void {
-  if (!isRecord(trait)) return
+  if (!isRecord(trait) || !isRecord(trait.grants)) return
+  collectDamageTypeIdsFromGrants(trait.grants, damageIds)
+  collectSenseTypeIdsFromGrants(trait.grants, senseIds)
+  collectLanguageIdsFromGrants(trait.grants, languageIds)
+}
 
-  const groups = resolveGrantGroupsFromContent(
-    {
-      kind: String(trait.kind ?? 'custom'),
-      grantGroups: trait.grantGroups as GrantGroups | undefined,
-    },
-    { level: 1 },
-  )
+function collectLanguageIdsFromGrants(grants: Record<string, unknown>, ids: Set<string>): void {
+  const languages = grants.languages
+  if (Array.isArray(languages)) {
+    for (const id of languages) {
+      if (typeof id === 'string') ids.add(id)
+    }
+  }
 
-  for (const { grant } of flattenGrantGroups(groups)) {
-    collectVocabularyIdsFromGrant(grant, damageIds, senseIds, languageIds)
+  const languageChoices = grants.languageChoices
+  if (!Array.isArray(languageChoices)) return
+  for (const choice of languageChoices) {
+    if (!isRecord(choice) || !Array.isArray(choice.from)) continue
+    for (const id of choice.from) {
+      if (typeof id === 'string') ids.add(id)
+    }
   }
 }
 

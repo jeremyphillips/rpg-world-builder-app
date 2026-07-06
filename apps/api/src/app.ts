@@ -6,11 +6,9 @@ import { errorHandler, notFound } from './middleware/error-handler'
 import { loadEnv } from './env'
 import { authRouter } from './features/auth'
 import { campaignRouter } from './features/campaign'
-import { characterRouter } from './features/character'
 import { contentRouter, homebrewRouter } from './features/content'
 import { benchRouter } from './features/dev-bench'
 import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
-import { rulesetRouter } from './features/ruleset'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
 import { userRouter } from './features/user'
 
@@ -40,8 +38,6 @@ export function createApp(): Express {
   })
   api.use('/auth', authRouter)
   api.use('/campaigns', campaignRouter)
-  api.use('/characters', characterRouter)
-  api.use('/rulesets', rulesetRouter)
   api.use('/campaigns/:campaignId/content', contentRouter)
   api.use('/campaigns/:campaignId/vocabulary', vocabularyRouter)
   api.use('/campaigns/:campaignId/ruleset-patch', rulesetPatchRouter)

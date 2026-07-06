@@ -8,11 +8,11 @@ export function normalizeClassWeaponProficiencies(input: {
   categories: readonly WeaponCategory[]
   items?: readonly string[]
   hasSpecificWeapons: boolean
-}): { categories: WeaponCategory[]; items: string[] } {
+}): { categories: WeaponCategory[]; items?: string[] } {
   if (input.hasSpecificWeapons) {
     const items = input.items ?? []
-    return { categories: [], items: [...items] }
+    return items.length ? { categories: [], items: [...items] } : { categories: [] }
   }
 
-  return { categories: [...input.categories], items: [] }
+  return { categories: [...input.categories] }
 }
