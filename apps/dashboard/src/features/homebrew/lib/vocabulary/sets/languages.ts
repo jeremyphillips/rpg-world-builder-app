@@ -1,5 +1,7 @@
 import {
   DEFAULT_SYSTEM_RULESET_ID,
+  LANGUAGE_CATEGORIES,
+  LANGUAGE_CATEGORY_ENTRIES,
   LANGUAGE_SET_ID,
   type LanguageCategory,
   type ResolvedVocabularyOptionSet,
@@ -39,6 +41,16 @@ export function buildActiveLanguageFieldOptions(
 ): FieldOption[] {
   if (!vocabulary) return []
   return toOptions([...vocabulary.activeIds].sort(), vocabulary.labelById)
+}
+
+/** Static language category options for grant/choice authoring fields. */
+export function buildLanguageCategoryFieldOptions(): FieldOption[] {
+  return toOptions(
+    LANGUAGE_CATEGORIES,
+    Object.fromEntries(
+      LANGUAGE_CATEGORIES.map((category) => [category, LANGUAGE_CATEGORY_ENTRIES[category].label]),
+    ) as Record<(typeof LANGUAGE_CATEGORIES)[number], string>,
+  )
 }
 
 export function getLanguageLabelFromVocabulary(

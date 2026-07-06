@@ -65,6 +65,7 @@ export function characterCreationProficienciesFields(ctx: ContentFormCtx): FormI
         {
           kind: 'group',
           legend: 'Skill Proficiencies',
+          legendSize: 'subsection',
           fields: characterCreationSkillChoiceFields(ctx),
         },
       ],

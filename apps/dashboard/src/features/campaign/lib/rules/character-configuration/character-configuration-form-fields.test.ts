@@ -122,6 +122,8 @@ describe('character-configuration-form-fields', () => {
       expect(fieldNames).toContain('subclassChoicesEnabled')
       expect(fieldNames).toContain('startingWealth.name')
       expect(fieldNames).toContain('startingWealth.tiers')
+      expect(fieldNames).toContain('languageProficiencyGrants.items')
+      expect(fieldNames).toContain('languageProficiencyChoice.categories')
     })
   })
 
@@ -145,6 +147,7 @@ describe('character-configuration-form-fields', () => {
     it('derives config anchor nav from the field registry', () => {
       expect(CHARACTER_CONFIGURATION_SECTIONS.map((section) => section.id)).toEqual([
         'creation',
+        'proficiencies',
         'standard-max-level',
         'extended-progression',
         'creature-type-policy',
@@ -166,6 +169,7 @@ describe('character-configuration-form-fields', () => {
           'creation',
           'starting-level',
           'starting-wealth',
+          'proficiencies',
           'standard-max-level',
           'extended-progression',
           'creature-type-policy',
