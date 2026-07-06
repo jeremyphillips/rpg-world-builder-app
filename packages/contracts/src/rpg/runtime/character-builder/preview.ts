@@ -1,4 +1,5 @@
 import type { CharacterDerivedProfile } from '../character/derive/profile'
+import { isArmorEquipment } from '../../content/equipment'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import type { CharacterProficiencies } from '../character/proficiencies'
 import { formatFieldMessage } from '../../../validation/define-message'
@@ -9,6 +10,7 @@ import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from 
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
 import { toCharacterDerivationInput } from './preview-adapter'
+import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
 
 // ---------------------------------------------------------------------------
 // CharacterBuildPreview — builder right-panel model. Composes the global
@@ -61,8 +63,21 @@ function resolveBuilderUnresolvedChoiceSetIds(
     .map((choiceSet) => choiceSet.id)
 }
 
+function hasEquippedBodyArmor(
+  catalogIndex: CharacterBuildCatalogIndex,
+  draft: CharacterBuilderDraft,
+): boolean {
+  const { equipment } = assembleStartingEquipment(draft, catalogIndex)
+  return equipment.armor.some((entry) => {
+    if (!entry.equipped) return false
+    const item = catalogIndex.equipment.get(entry.equipmentId)
+    return item && isArmorEquipment(item) && item.category !== 'shields'
+  })
+}
+
 function resolveBuilderWarnings(
   draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
   choiceSets: readonly ChoiceSet[],
 ): string[] {
   const warnings: string[] = []
@@ -84,6 +99,22 @@ function resolveBuilderWarnings(
     !areRequiredChoiceSetsSatisfied(choiceSets, draft.choiceSelections)
   ) {
     warnings.push(formatFieldMessage(characterBuilderPreviewMessages.requiredChoicesIncomplete()))
+  }
+
+  const classId = draft.class.classId
+  const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
+  const unarmoredDefense = characterClass?.features.find(
+    (feature) => feature.id === 'unarmored-defense',
+  )
+
+  if (unarmoredDefense && !hasEquippedBodyArmor(catalogIndex, draft)) {
+    warnings.push(
+      formatFieldMessage(
+        characterBuilderPreviewMessages.unarmoredDefenseNotModeled({
+          featureName: unarmoredDefense.name,
+        }),
+      ),
+    )
   }
 
   return warnings
@@ -110,6 +141,6 @@ export function buildCharacterPreview(
     proficiencies: derivationInput.proficiencies,
     equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets),
     unresolvedChoiceSetIds: resolveBuilderUnresolvedChoiceSetIds(draft, choiceSets),
-    warnings: resolveBuilderWarnings(draft, choiceSets),
+    warnings: resolveBuilderWarnings(draft, catalogIndex, choiceSets),
   }
 }

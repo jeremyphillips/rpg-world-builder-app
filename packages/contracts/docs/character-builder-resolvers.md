@@ -17,14 +17,14 @@ Ordered modules in `resolvers/choice-sources.ts`. Each entry has signature
 `(draft, context, catalogIndex) => ChoiceSet[]`. `resolveAvailableChoices`
 concatenates results.
 
-| Entry                             | Status                   | Emits                                                                                                                       |
-| --------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `resolveSpeciesHeritageChoices`   | **Implemented**          | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
-| `resolveSpeciesTraitGrantChoices` | **Implemented**          | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
-| `resolveClassSkillChoices`        | **Implemented**          | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
-| `resolveClassFeatureGrantChoices` | **Implemented**          | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
-| `resolveStartingEquipmentChoices` | **Deferred** (BENCH-088) | Starting-equipment package picks.                                                                                           |
-| `resolveSpellcastingChoices`      | **Deferred** (BENCH-089) | Cantrip and spell known/prepared ChoiceSets.                                                                                |
+| Entry                             | Status                      | Emits                                                                                                                       |
+| --------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `resolveSpeciesHeritageChoices`   | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
+| `resolveSpeciesTraitGrantChoices` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
+| `resolveClassSkillChoices`        | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
+| `resolveClassFeatureGrantChoices` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
+| `resolveStartingEquipmentChoices` | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
+| `resolveSpellcastingChoices`      | **Deferred** (BENCH-089)    | Cantrip and spell known/prepared ChoiceSets.                                                                                |
 
 ### Grant traversal contract
 
@@ -45,8 +45,8 @@ Resolvers never read the deprecated `grants` bag directly.
 | `classSkills:choose:from`   | `resolveClassSkillChoices`                                                 |
 | `featChoice:origin`         | `resolveSpeciesTraitGrantChoices` (`required: false` — MVP defers feat UI) |
 | `featChoice:fighting-style` | `resolveClassFeatureGrantChoices` (`required: false`)                      |
-| `starting-equipment`        | BENCH-088                                                                  |
-| `equipment:filtered:tool`   | BENCH-088 (nested package pick)                                            |
+| `starting-equipment`        | `resolveStartingEquipmentChoices`                                          |
+| `equipment:filtered:tool`   | `resolveStartingEquipmentChoices` (nested package pick)                    |
 | `damageType:heritage`       | Not a top-level ChoiceSet — applied when heritage option is selected       |
 
 ## Deferred / folded resolvers

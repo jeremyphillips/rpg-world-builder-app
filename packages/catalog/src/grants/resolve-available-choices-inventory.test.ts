@@ -101,7 +101,7 @@ describe('resolveAvailableChoices against srd-cc-5.2.1 seeds', () => {
     }
   })
 
-  it('documents BENCH-087 choice shapes present in seeds (excluding BENCH-088/089)', () => {
+  it('documents BENCH-087 choice shapes present in seeds (excluding BENCH-089)', () => {
     const shapes = new Set<string>()
 
     for (const species of context.catalog.species) {
@@ -142,5 +142,30 @@ describe('resolveAvailableChoices against srd-cc-5.2.1 seeds', () => {
       'featChoice:origin',
       'heritage',
     ])
+  })
+
+  it('emits starting-equipment ChoiceSets for every seeded class with packages', () => {
+    for (const characterClass of context.catalog.classes) {
+      if (!characterClass.characterCreation?.startingEquipment) continue
+
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: characterClass.id, level: 1 as const },
+      }
+
+      const startingEquipment = resolveAvailableChoices(draft, context).find((choiceSet) =>
+        choiceSet.id.endsWith(':starting-equipment'),
+      )
+
+      expect(startingEquipment, characterClass.slug).toMatchObject({
+        choiceType: 'equipment',
+        min: 1,
+        max: 1,
+        required: true,
+        options: characterClass.characterCreation.startingEquipment.options.map((option) => ({
+          id: option.id,
+        })),
+      })
+    }
   })
 })

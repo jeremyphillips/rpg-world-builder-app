@@ -105,4 +105,67 @@ describe('finalizeCharacterBuild', () => {
       finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext),
     ).toThrow(CharacterBuildFinalizationError)
   })
+
+  it('assembles starting equipment and wealth when resolved choice sets are provided', () => {
+    const storedFighterWithEquipment = {
+      ...builderTestContext.catalog.classes[0]!,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'pack-a',
+              label: 'Pack A',
+              items: [],
+              wealth: { gp: 10 },
+            },
+          ],
+        },
+      },
+    }
+
+    const context = {
+      ...builderTestContext,
+      catalog: {
+        ...builderTestContext.catalog,
+        classes: [storedFighterWithEquipment],
+      },
+    }
+
+    const input = finalizeCharacterBuild(
+      makeCompleteDraft({
+        class: { classId: storedFighterWithEquipment.id, level: 1 },
+        choiceSelections: {
+          'class:srd-cc-5.2.1:fighter:starting-equipment': ['pack-a'],
+        },
+      }),
+      context,
+      {
+        resolvedChoiceSets: [
+          {
+            id: 'class:srd-cc-5.2.1:fighter:starting-equipment',
+            sourceType: 'class',
+            sourceId: 'srd-cc-5.2.1:fighter',
+            choiceType: 'equipment',
+            label: 'Choose Starting Equipment',
+            min: 1,
+            max: 1,
+            options: [{ id: 'pack-a', label: 'Pack A' }],
+            required: true,
+          },
+        ],
+      },
+    )
+
+    expect(input.wealth).toEqual({ cp: 0, sp: 0, gp: 10, pp: 0 })
+    expect(input.equipment).toEqual({
+      weapons: [],
+      armor: [],
+      tools: [],
+      gear: [],
+      magicItems: [],
+      vehicles: [],
+      mounts: [],
+    })
+  })
 })

@@ -1,6 +1,5 @@
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'
-import type { CharacterEquipment } from '../character/equipment-inventory'
 import type { CharacterSpellEntry } from '../character/spells'
 import { levelOneMaxHp } from '../character/derive/index'
 import { formatFieldMessage } from '../../../validation/define-message'
@@ -11,6 +10,7 @@ import type { ChoiceSet } from './choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
+import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
 import { validateCharacterBuild, type CharacterBuildValidationResult } from './validate'
 
 // ---------------------------------------------------------------------------
@@ -25,16 +25,6 @@ export class CharacterBuildFinalizationError extends Error {
     this.name = 'CharacterBuildFinalizationError'
     this.validationIssues = validationIssues
   }
-}
-
-const EMPTY_EQUIPMENT: CharacterEquipment = {
-  weapons: [],
-  armor: [],
-  tools: [],
-  gear: [],
-  magicItems: [],
-  vehicles: [],
-  mounts: [],
 }
 
 function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Ability, number> {
@@ -121,6 +111,7 @@ export function finalizeCharacterBuild(
     choiceSets,
     characterClass,
   )
+  const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
 
   const input: CreateCharacterInput = {
     characterType: 'pc',
@@ -143,8 +134,8 @@ export function finalizeCharacterBuild(
     proficiencies,
     languages: [],
     spells: selectedSpells(draft, choiceSets),
-    equipment: EMPTY_EQUIPMENT,
-    wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+    equipment,
+    wealth,
     narrative: draft.identity.narrative,
     feats: [],
   }
