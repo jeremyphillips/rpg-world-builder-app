@@ -13,7 +13,7 @@ import { characterSelectionSourcesSchema } from './selection-sources'
  *
  * Schemas and types only — merge/dedupe assembly for languages lives in
  * {@link ./languages.ts}; builder finalize orchestration lives under
- * `character-builder/assemble-*.ts` (see `runtime-resolution-boundaries.md`).
+ * `character-builder/assembly/` (see `runtime-resolution-boundaries.md`).
  *
  * **Future — grant-derived proficiencies:** Species and class-feature grants already
  * emit skill/weapon/tool/armor ChoiceSets via `grant-choice-sets.ts`, but finalize

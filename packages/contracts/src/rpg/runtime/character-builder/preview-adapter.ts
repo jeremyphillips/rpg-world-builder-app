@@ -1,11 +1,11 @@
 import type { CharacterDerivationInput } from '../character/derive/profile'
-import { assembleCharacterProficiencies } from './assemble-proficiencies'
+import { assembleCharacterProficiencies } from './assembly/assemble-proficiencies'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
 import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { CharacterBuilderDraft } from './draft'
 import { resolveEquippedArmorFromInventory } from '../character/equipment-inventory'
-import { assembleStartingEquipment } from './assemble-starting-equipment'
+import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
 
 /** Adapts a builder draft into the global character derivation input shape. */
 export function toCharacterDerivationInput(

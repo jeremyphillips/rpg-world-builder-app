@@ -11,8 +11,8 @@ import {
   wizardClass,
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
-import { resolveAvailableChoices } from './resolvers/resolve-choices'
-import { resolveLanguageChoiceSets } from './resolvers/resolve-language-choice-sets'
+import { resolveAvailableChoices } from './resolvers/registry/resolve-choices'
+import { resolveLanguageChoiceSets } from './resolvers/ruleset/resolve-language-choice-sets'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {

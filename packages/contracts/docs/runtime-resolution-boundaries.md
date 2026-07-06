@@ -12,7 +12,7 @@ character → builder ChoiceSets → `assemble-*.ts` orchestration.
 | --------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Creature              | `runtime/creature/{domain}.ts`                                                | Given catalog data, what ids/options does this grant or choice source represent? |
 | Character             | `runtime/character/{domain}.ts`                                               | What stored-sheet payload should rows have (merged, deduped)?                    |
-| Builder orchestration | `runtime/character-builder/assemble-{domain}.ts`                              | How do grants + draft selections + sources become finalize rows?                 |
+| Builder orchestration | `runtime/character-builder/assembly/assemble-{domain}.ts`                     | How do grants + draft selections + sources become finalize rows?                 |
 | Builder ChoiceSets    | `runtime/character-builder/resolvers/resolve-{scope}-{domain}-choice-sets.ts` | What must the player pick during creation?                                       |
 
 See also [character-builder-resolvers.md](character-builder-resolvers.md) for the
@@ -127,13 +127,16 @@ to `creature/` first.
 
 #### Builder sub-areas
 
-| Area                   | Path pattern                                     | Role                                                                              |
-| ---------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
-| ChoiceSet resolvers    | `resolvers/resolve-*-choice-sets.ts`             | Registry-facing; returns `ChoiceSet[]`                                            |
-| Choice-source adapters | `resolvers/resolve-{source}-{domain}-choices.ts` | Thin `ChoiceSourceResolver` wrapper (may delegate to `*-choice-sets.ts`)          |
-| Finalize orchestration | `assemble-{domain}.ts` (builder root)            | Draft + context + resolved ChoiceSets → character rows with sources               |
-| Aggregate assembly     | `assemble-{aggregate}.ts`                        | Composes multiple domains for preview/finalize (e.g. `assemble-proficiencies.ts`) |
-| Registry               | `resolvers/choice-sources.ts`                    | Ordered `CHOICE_SOURCE_RESOLVERS` list                                            |
+| Area                   | Path pattern                                                  | Role                                                                              |
+| ---------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Catalog scope filter   | `resolve-available-content.ts` (builder root)                 | Filters catalog rows by creation rules; not a `ChoiceSourceResolver`              |
+| ChoiceSet resolvers    | `resolvers/{domain}/resolve-*-choice-sets.ts`                 | Registry-facing; returns `ChoiceSet[]`                                            |
+| Choice-source adapters | `resolvers/{domain}/resolve-{source}-{domain}-choices.ts`     | Thin `ChoiceSourceResolver` wrapper (may delegate to `*-choice-sets.ts`)          |
+| Grant infrastructure   | `resolvers/grants/`                                           | `contentGrantToChoiceSets`, `unlockedGrantChoiceSets`                             |
+| Registry               | `resolvers/registry/choice-sources.ts`                        | Ordered `CHOICE_SOURCE_RESOLVERS` list                                            |
+| Finalize orchestration | `assembly/assemble-{domain}.ts`                               | Draft + context + resolved ChoiceSets → character rows with sources               |
+| Aggregate assembly     | `assembly/assemble-{aggregate}.ts`                            | Composes multiple domains for preview/finalize (e.g. `assemble-proficiencies.ts`) |
+| Validation             | `validate/` (`types`, step fields, choice-sets, orchestrator) | Step and choice-set validation by phase                                           |
 
 ---
 
@@ -190,8 +193,8 @@ assembly step.
 | `{aspect}.ts`                             | `runtime/character/derive/`    | `armor-class.ts`, `profile.ts`                            |
 | `resolve-{scope}-{domain}-choice-sets.ts` | `character-builder/resolvers/` | `resolve-language-choice-sets.ts`                         |
 | `resolve-{scope}-{domain}-choices.ts`     | `character-builder/resolvers/` | Thin adapter only; **migrate** impl to `*-choice-sets.ts` |
-| `assemble-{domain}.ts`                    | `character-builder/`           | `assemble-language-proficiencies.ts`                      |
-| `assemble-{aggregate}.ts`                 | `character-builder/`           | `assemble-proficiencies.ts`                               |
+| `assemble-{domain}.ts`                    | `character-builder/assembly/`  | `assemble-language-proficiencies.ts`                      |
+| `assemble-{aggregate}.ts`                 | `character-builder/assembly/`  | `assemble-proficiencies.ts`                               |
 | `{domain}-pool-options.ts`                | `character-builder/resolvers/` | Shared option builders (no `ChoiceSet` id); keep small    |
 
 ### `scope` segment (builder ChoiceSet files)
@@ -285,8 +288,8 @@ Finalization must follow this order per domain:
 5. Write to character.{domain}     (never parallel deprecated top-level fields)
 ```
 
-Languages today: steps 1–5 live in `assemble-language-proficiencies.ts`, which calls
-`creature/languages` + `character/languages` and is invoked from `assemble-proficiencies.ts`.
+Languages today: steps 1–5 live in `assembly/assemble-language-proficiencies.ts`, which calls
+`creature/languages` + `character/languages` and is invoked from `assembly/assemble-proficiencies.ts`.
 
 ---
 
