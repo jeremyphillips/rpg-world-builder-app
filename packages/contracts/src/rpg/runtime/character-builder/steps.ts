@@ -280,7 +280,7 @@ export function isBuilderStepComplete(
  *                  (proficiencies, equipment, spells) return `'deferred'`.
  *
  *   Pass `[]`    → resolvers ran but found no ChoiceSets for this step
- *                  (e.g. a class with only fixed-grant equipment). The step is
+ *                  (e.g. a class with only granted starting equipment). The step is
  *                  treated as complete — no choices are needed.
  *
  *   Pass a non-empty array → resolvers ran; required ChoiceSets are checked

@@ -36,18 +36,18 @@
             "description": "Greataxe, 4 Javelins, Explorer's Pack, and 15 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "greataxe",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "javelin",
                 "quantity": 4
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -487,13 +487,13 @@
             "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 2,
                 "equipped": true
@@ -508,7 +508,7 @@
                 }
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "entertainers-pack",
                 "quantity": 1
               }
@@ -882,30 +882,30 @@
             "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "chain-shirt",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "mace",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "priests-pack",
                 "quantity": 1
               }
@@ -1243,36 +1243,36 @@
             "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "sickle",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "wooden-staff",
                 "quantity": 1,
                 "equipped": false
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "herbalism-kit",
                 "quantity": 1
               }
@@ -1532,29 +1532,29 @@
             "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "chain-mail",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "greatsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "flail",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "javelin",
                 "quantity": 8
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -1569,40 +1569,40 @@
             "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, and 11 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "studded-leather",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "scimitar",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shortsword",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "longbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -1957,18 +1957,18 @@
             "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument chosen for the tool proficiency above, Explorer's Pack, and 11 GP. FOLLOWUP: proficiencyLinkedChoice — structured item choice deferred until class tool proficiency selection is modeled.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "spear",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 5
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -2442,35 +2442,35 @@
             "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "chain-mail",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shield",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "longsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "javelin",
                 "quantity": 6
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "holy-symbol-amulet",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "priests-pack",
                 "quantity": 1
               }
@@ -2838,45 +2838,45 @@
             "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer's Pack, and 7 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "studded-leather",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "scimitar",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shortsword",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "longbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "sprig-of-mistletoe",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "explorers-pack",
                 "quantity": 1
               }
@@ -3204,46 +3204,46 @@
             "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 2,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shortsword",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "shortbow",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "arrows",
                 "quantity": 20
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "quiver",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "thieves-tools",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "burglars-pack",
                 "quantity": 1
               }
@@ -3639,23 +3639,23 @@
             "description": "Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer's Pack, and 28 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "spear",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "crystal",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dungeoneers-pack",
                 "quantity": 1
               }
@@ -4027,34 +4027,34 @@
             "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "leather-armor",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "sickle",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "orb",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "book-occult-lore",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "scholars-pack",
                 "quantity": 1
               }
@@ -4419,29 +4419,29 @@
             "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
             "items": [
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "dagger",
                 "quantity": 2
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "arcane-staff",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "robe",
                 "quantity": 1,
                 "equipped": true
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "spellbook",
                 "quantity": 1
               },
               {
-                "kind": "fixed",
+                "kind": "grant",
                 "equipmentSlug": "scholars-pack",
                 "quantity": 1
               }

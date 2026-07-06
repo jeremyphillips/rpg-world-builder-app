@@ -75,8 +75,8 @@ const storedDruid: ClassStored = {
           id: 'standard',
           label: 'Standard Equipment',
           items: [
-            { kind: 'fixed', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
-            { kind: 'fixed', equipmentSlug: 'shield', quantity: 1, equipped: true },
+            { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
+            { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
           ],
           wealth: { gp: 9 },
         },

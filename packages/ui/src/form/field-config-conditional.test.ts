@@ -44,7 +44,7 @@ describe('combineFieldVisibilityAll', () => {
 
     expect(combined.dependsOn).toEqual(['grantType', 'itemKind'])
     expect(combined.visibleWhen({ grantType: 'equipment', itemKind: 'choice' })).toBe(true)
-    expect(combined.visibleWhen({ grantType: 'equipment', itemKind: 'fixed' })).toBe(false)
+    expect(combined.visibleWhen({ grantType: 'equipment', itemKind: 'grant' })).toBe(false)
     expect(combined.visibleWhen({ grantType: 'feat', itemKind: 'choice' })).toBe(false)
   })
 })

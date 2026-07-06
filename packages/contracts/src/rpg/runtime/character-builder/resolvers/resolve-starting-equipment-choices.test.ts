@@ -75,7 +75,7 @@ const storedBard: ClassStored = {
           id: 'standard',
           label: 'Standard Equipment',
           items: [
-            { kind: 'fixed', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
+            { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
             {
               kind: 'choice',
               choose: 1,

@@ -88,7 +88,7 @@ export const HomebrewWithStartingEquipment: Story = {
             description: '<p>Leather armor and a dagger.</p>',
             items: [
               {
-                itemKind: 'fixed',
+                itemKind: 'grant',
                 equipmentSlug: 'dagger',
                 quantity: 1,
                 equipped: true,

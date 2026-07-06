@@ -15,7 +15,7 @@ import {
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
   equipmentGrantChoiceItemFormSchema,
-  equipmentGrantFixedItemFormSchema,
+  grantedEquipmentItemFormSchema,
   equipmentGrantItemFields,
   EQUIPMENT_GRANT_ITEM_KINDS,
 } from '../../../lib/forms/grants/equipment-grant-form-fields'
@@ -60,14 +60,14 @@ export const startingEquipmentModifierFormSchema = z.object({
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
-export const startingEquipmentFixedItemFormSchema = equipmentGrantFixedItemFormSchema.extend({
+export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema.extend({
   modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
 })
 
 export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
 
 export const startingEquipmentItemFormSchema = z.discriminatedUnion('itemKind', [
-  startingEquipmentFixedItemFormSchema,
+  startingEquipmentGrantedItemFormSchema,
   startingEquipmentChoiceItemFormSchema,
 ])
 
@@ -132,7 +132,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       addLabel: 'Add modifier',
       itemCollapsible: true,
-      visibility: visibleForItemKind('fixed'),
+      visibility: visibleForItemKind('grant'),
       itemHeader: {
         fallback: () => 'Modifier',
         primary: (values) => {

@@ -326,7 +326,7 @@ const featChoiceContentGrantSchema = z
     }
   })
 
-/** Single equipment grant (a fixed item or a pool choice). */
+/** Single equipment grant (a granted item or a pool choice). */
 const equipmentContentGrantSchema = z.object({
   kind: z.literal('equipment'),
   grant: equipmentGrantSchema,

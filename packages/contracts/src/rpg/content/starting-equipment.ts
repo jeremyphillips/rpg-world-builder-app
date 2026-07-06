@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/choice'
 import {
   equipmentChoiceGrantObjectSchema,
-  fixedEquipmentGrantSchema,
+  grantedEquipmentItemSchema,
   normalizeEquipmentChoiceGrant,
 } from './lib/equipment-grant'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
@@ -16,9 +16,9 @@ import {
 // Starting equipment — class/background character-creation gear packages.
 // ---------------------------------------------------------------------------
 
-export const startingEquipmentFixedItemSchema = fixedEquipmentGrantSchema
+export const startingEquipmentGrantedItemSchema = grantedEquipmentItemSchema
 
-export type StartingEquipmentFixedItem = z.infer<typeof startingEquipmentFixedItemSchema>
+export type StartingEquipmentGrantedItem = z.infer<typeof startingEquipmentGrantedItemSchema>
 
 /**
  * Structured pick within a starting package (e.g. Bard musical instrument).
@@ -42,7 +42,7 @@ export const startingEquipmentItemSchema = z.preprocess(
       ? normalizeEquipmentChoiceGrant(input)
       : input,
   z.discriminatedUnion('kind', [
-    startingEquipmentFixedItemSchema,
+    startingEquipmentGrantedItemSchema,
     equipmentChoiceGrantObjectSchema,
   ]),
 )

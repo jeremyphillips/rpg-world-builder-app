@@ -204,9 +204,9 @@ describe('classFormDef round-trips', () => {
       (option) => option.id === 'standard',
     )
     const woodenStaff = standardOption?.items.find(
-      (item) => item.itemKind === 'fixed' && item.equipmentSlug === 'wooden-staff',
+      (item) => item.itemKind === 'grant' && item.equipmentSlug === 'wooden-staff',
     )
-    expect(woodenStaff?.itemKind === 'fixed' ? woodenStaff.modifiers : undefined).toBeUndefined()
+    expect(woodenStaff?.itemKind === 'grant' ? woodenStaff.modifiers : undefined).toBeUndefined()
     const input = classFormDef.toInput(formValues, { entity: druid })
     expect(input.characterCreation?.startingEquipment).toEqual(
       druid.characterCreation?.startingEquipment,
