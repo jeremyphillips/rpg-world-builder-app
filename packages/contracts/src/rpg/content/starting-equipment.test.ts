@@ -141,6 +141,24 @@ describe('classCharacterCreationSchema', () => {
       startingEquipment: DRUID_STARTING_EQUIPMENT,
     })
   })
+
+  it('accepts proficiencies-only character creation', () => {
+    expect(
+      classCharacterCreationSchema.parse({
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+          },
+        },
+      }),
+    ).toMatchObject({
+      proficiencies: {
+        skills: {
+          choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+        },
+      },
+    })
+  })
 })
 
 describe('resolveEquipmentContentId', () => {

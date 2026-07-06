@@ -4,7 +4,6 @@ import type { Species } from '../../content/species'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
-import { withDerivedClassSkillFrom } from '../../content/skill-class-association'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 
@@ -36,16 +35,21 @@ export const storedFighter: ClassStored = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['str', 'con'],
-    armor: ['light', 'medium'],
-    weapons: { categories: ['simple', 'martial'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light', 'medium'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
+      },
+    },
   },
   features: [],
 }
 
-export const fighterClass = withDerivedClassSkillFrom(storedFighter, [
-  { slug: 'athletics', suggestedClasses: ['fighter'] },
-])
+export const fighterClass = storedFighter
 
 export const athleticsSkill = {
   id: 'srd-cc-5.2.1:athletics',
@@ -57,7 +61,6 @@ export const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
-  suggestedClasses: ['fighter'],
 } as const satisfies SkillProficiency
 
 export const dwarfSpecies = {

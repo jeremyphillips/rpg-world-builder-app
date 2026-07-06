@@ -14,7 +14,6 @@ export function skillProficiencyToFormValues(entity: SkillProficiency): SkillPro
     slug: entity.slug,
     description: entity.description,
     ability: entity.ability,
-    suggestedClasses: entity.suggestedClasses,
   }
 }
 
@@ -27,7 +26,6 @@ export function buildSkillProficiencyCreateInput(
     name: values.name,
     description: values.description || undefined,
     ability: values.ability,
-    suggestedClasses: values.suggestedClasses,
   })
   return finalizeContentInput(input, ctx) as CreateSkillProficiencyInput
 }

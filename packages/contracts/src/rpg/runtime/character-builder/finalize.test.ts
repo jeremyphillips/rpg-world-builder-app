@@ -71,14 +71,14 @@ describe('finalizeCharacterBuild', () => {
     const input = finalizeCharacterBuild(
       makeCompleteDraft({
         choiceSelections: {
-          'class:srd-cc-5.2.1:fighter:skills': ['srd-cc-5.2.1:athletics'],
+          'class:srd-cc-5.2.1:fighter:class-skills': ['srd-cc-5.2.1:athletics'],
         },
       }),
       builderTestContext,
       {
         resolvedChoiceSets: [
           {
-            id: 'class:srd-cc-5.2.1:fighter:skills',
+            id: 'class:srd-cc-5.2.1:fighter:class-skills',
             sourceType: 'class',
             sourceId: 'srd-cc-5.2.1:fighter',
             choiceType: 'skillProficiency',
@@ -100,7 +100,7 @@ describe('finalizeCharacterBuild', () => {
           {
             kind: 'classFeature',
             sourceId: 'srd-cc-5.2.1:fighter',
-            grantId: 'class:srd-cc-5.2.1:fighter:skills',
+            grantId: 'class:srd-cc-5.2.1:fighter:class-skills',
           },
         ],
       },
@@ -117,6 +117,11 @@ describe('finalizeCharacterBuild', () => {
     const storedFighterWithEquipment = {
       ...builderTestContext.catalog.classes[0]!,
       characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+          },
+        },
         startingEquipment: {
           choose: 1,
           options: [
@@ -189,6 +194,7 @@ describe('finalizeCharacterBuild', () => {
       {
         ...draft,
         choiceSelections: {
+          'class:srd-cc-5.2.1:fixture-wizard:class-skills': [`${wizardClass.rulesetId}:athletics`],
           [`spellcasting:${wizardClass.id}:cantrips`]: cantripIds,
           [`spellcasting:${wizardClass.id}:spells`]: spellIds,
         },

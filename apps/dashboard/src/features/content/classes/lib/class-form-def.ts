@@ -1,8 +1,11 @@
 import { type CharacterClass, type CreateClassInput } from '@rpg/contracts'
 
-import { contentFormRegistry, contentFormFields, type ContentFormDef } from '../../lib/forms/content-form-registry'
+import {
+  contentFormRegistry,
+  contentFormFields,
+  type ContentFormDef,
+} from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
-import { skillProficienciesQueryKey } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import {
   buildClassTabs,
@@ -41,7 +44,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     weaponProficiencyMode:
       (entity.proficiencies.weapons.items?.length ?? 0) > 0 ? 'individual' : 'categories',
     spellcasting: spellcastingToFormValues(entity.spellcasting),
-    proficiencies: proficienciesToFormValues(entity.proficiencies),
+    proficiencies: proficienciesToFormValues(entity.proficiencies, entity.characterCreation),
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
     characterCreation: entity.characterCreation?.startingEquipment
@@ -58,7 +61,6 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
-  invalidateQueryKeys: (campaignId) => [skillProficienciesQueryKey(campaignId)],
 
   extractEmbeddedSeedRowIds: (entity) => ({
     features: entity.features.map((feature) => feature.id),

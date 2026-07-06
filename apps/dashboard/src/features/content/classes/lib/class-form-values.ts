@@ -2,7 +2,6 @@ import {
   MAX_CHARACTER_LEVEL,
   type CharacterClass,
   type ClassProficiencies,
-  type ClassProficienciesWrite,
   type ClassResource,
   type CreateClassInput,
   type Spellcasting,
@@ -28,10 +27,14 @@ type ResourceRowForm = {
   entries: { level: number; value: number }[]
 }
 
-export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
+export function proficienciesToFormValues(
+  proficiencies: ClassProficiencies,
+  characterCreation?: CharacterClass['characterCreation'],
+) {
+  const skillChoice = characterCreation?.proficiencies?.skills?.choices?.[0]
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor,
+    armor: proficiencies.armor.categories,
     weapons: {
       categories: proficiencies.weapons.categories,
       items: proficiencies.weapons.items ?? [],
@@ -40,26 +43,29 @@ export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
       categories: proficiencies.tools?.categories ?? [],
       items: proficiencies.tools?.items ?? [],
     },
-    skills: proficiencies.skills,
+    skills: {
+      choose: skillChoice?.choose ?? 0,
+      from: skillChoice?.from ?? [],
+    },
   }
 }
 
 function normalizeClassToolProficiencies(
   tools: ClassFormValues['proficiencies']['tools'],
-): ClassProficienciesWrite['tools'] {
+): ClassProficiencies['tools'] {
   const categories = [...tools.categories]
   const items = tools.items ?? []
   if (categories.length === 0 && items.length === 0) return undefined
   return {
     categories,
-    ...(items.length ? { items: [...items] } : {}),
+    items: [...items],
   }
 }
 
 function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
-): ClassProficienciesWrite {
+): ClassProficiencies {
   const tools = normalizeClassToolProficiencies(proficiencies.tools)
   const weapons = normalizeClassWeaponProficiencies({
     categories: proficiencies.weapons.categories,
@@ -69,10 +75,22 @@ function proficienciesFromFormValues(
 
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor,
+    armor: { categories: proficiencies.armor, items: [] },
     weapons,
     ...(tools ? { tools } : {}),
-    skills: { choose: proficiencies.skills.choose },
+    skills: { categories: [], items: [] },
+  }
+}
+
+function skillChoicesFromFormValues(
+  proficiencies: ClassFormValues['proficiencies'],
+): NonNullable<CreateClassInput['characterCreation']>['proficiencies'] | undefined {
+  const { choose, from } = proficiencies.skills
+  if (choose <= 0 || from.length === 0) return undefined
+  return {
+    skills: {
+      choices: [{ id: 'class-skills', choose, from }],
+    },
   }
 }
 
@@ -90,19 +108,6 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   }
 }
 
-function classProficienciesInputFromForm(values: ClassFormValues) {
-  return {
-    ...proficienciesFromFormValues(
-      values.proficiencies,
-      values.weaponProficiencyMode === 'individual',
-    ),
-    skills: {
-      choose: values.proficiencies.skills.choose,
-      from: values.proficiencies.skills.from,
-    },
-  }
-}
-
 function classCharacterCreationInputFromForm(
   values: ClassFormValues,
   entity?: CharacterClass,
@@ -111,7 +116,12 @@ function classCharacterCreationInputFromForm(
     values.characterCreation?.startingEquipment,
     entity?.characterCreation?.startingEquipment,
   )
-  return startingEquipment ? { startingEquipment } : undefined
+  const proficiencies = skillChoicesFromFormValues(values.proficiencies)
+  if (!startingEquipment && !proficiencies) return undefined
+  return {
+    ...(startingEquipment ? { startingEquipment } : {}),
+    ...(proficiencies ? { proficiencies } : {}),
+  }
 }
 
 function classResourcesInputFromForm(
@@ -133,7 +143,10 @@ export function buildClassCreateInput(
     primaryAbilities: values.primaryAbilities,
     hitDie: values.hitDie,
     spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-    proficiencies: classProficienciesInputFromForm(values),
+    proficiencies: proficienciesFromFormValues(
+      values.proficiencies,
+      values.weaponProficiencyMode === 'individual',
+    ),
     features: featuresFromFormValues(values.features, ctx?.entity?.features),
     resources: classResourcesInputFromForm(values.resources),
     ...(characterCreation ? { characterCreation } : {}),

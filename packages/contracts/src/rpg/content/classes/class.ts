@@ -1,8 +1,6 @@
 import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
-import { armorCategorySchema } from '../../vocab/armor/category'
-import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { hitDieSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
 import {
@@ -13,8 +11,12 @@ import {
 } from '../lib/envelope'
 import { customContentTraitSchema, normalizeContentTrait } from '../lib/grants'
 import type { GrantGroup } from '../lib/grants'
-import { toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { skillSchema } from '../skill-proficiency'
+import {
+  armorProficiencyGrantSetSchema,
+  skillProficiencyGrantSetSchema,
+  toolProficiencyGrantSetSchema,
+  weaponProficiencyGrantSetSchema,
+} from '../lib/proficiency-grant-set'
 
 import { classCharacterCreationSchema } from '../starting-equipment'
 import { spellcastingSchema } from './spellcasting'
@@ -70,43 +72,12 @@ export const subclassFeatureSchema = classFeatureSchema
 
 export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
-/** Persisted / write surface — `from` is not stored; API derives it at read time. */
-export const classSkillProficienciesWriteSchema = z
-  .object({
-    choose: z.number().int().min(0),
-  })
-  .strict()
-
-export type ClassSkillProficienciesWrite = z.infer<typeof classSkillProficienciesWriteSchema>
-
-/** Read surface — `from` is derived from `skill.suggestedClasses` (see skill-class-association). */
-export const classSkillProficienciesReadSchema = classSkillProficienciesWriteSchema.extend({
-  from: z.array(skillSchema),
-})
-
-export type ClassSkillProficienciesRead = z.infer<typeof classSkillProficienciesReadSchema>
-
-export const classProficienciesWriteSchema = z.object({
+export const classProficienciesSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
-  armor: z.array(armorCategorySchema),
-  weapons: z.object({
-    categories: z.array(weaponCategorySchema),
-    items: z.array(z.string()).optional(), // weapon ids (future weapon content)
-  }),
-  tools: z
-    .object({
-      categories: z.array(toolCategorySchema),
-      items: z.array(z.string()).optional(),
-    })
-    .optional(),
-  skills: classSkillProficienciesWriteSchema,
-})
-
-export type ClassProficienciesWrite = z.infer<typeof classProficienciesWriteSchema>
-
-/** Read model for class proficiencies (includes derived skill options). */
-export const classProficienciesSchema = classProficienciesWriteSchema.extend({
-  skills: classSkillProficienciesReadSchema,
+  armor: armorProficiencyGrantSetSchema,
+  weapons: weaponProficiencyGrantSetSchema,
+  tools: toolProficiencyGrantSetSchema.optional(),
+  skills: skillProficiencyGrantSetSchema,
 })
 
 export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
@@ -133,12 +104,12 @@ export type ClassResource = z.infer<typeof classResourceSchema>
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
-/** Persisted body — seed, homebrew Mongo, and overlay patches (no derived `skills.from`). */
+/** Persisted body — seed, homebrew Mongo, and overlay patches. */
 export const classStoredBodySchema = contentBodyBaseSchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
-  proficiencies: classProficienciesWriteSchema,
+  proficiencies: classProficienciesSchema,
   features: z.array(classFeatureSchema),
   resources: z.array(classResourceSchema).optional(),
   characterCreation: classCharacterCreationSchema.optional(),
@@ -146,10 +117,8 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
 
 export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 
-/** Read body — API responses and dashboard catalog picks (derived `skills.from`). */
-export const classBodySchema = classStoredBodySchema.extend({
-  proficiencies: classProficienciesSchema,
-})
+/** Read body — same shape as stored (class-owned proficiency choices). */
+export const classBodySchema = classStoredBodySchema
 
 export type ClassBody = z.infer<typeof classBodySchema>
 
@@ -167,7 +136,7 @@ export function subclassChoiceFeatureId(classSlug: string): string {
 export const classStoredSchema = contentMetaSchema.extend(classStoredBodySchema.shape)
 export type ClassStored = z.infer<typeof classStoredSchema>
 
-/** Read record = envelope + read body (`proficiencies.skills.from` is API-derived). */
+/** Read record = envelope + body. */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)
 export type CharacterClass = z.infer<typeof classSchema>
 

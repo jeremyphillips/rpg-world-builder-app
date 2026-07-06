@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
-import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
 import type { ClassStored } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft } from '../draft'
 import { indexCharacterBuildCatalog } from '../context'
@@ -63,9 +62,9 @@ const storedDruid: ClassStored = {
   hitDie: 8,
   proficiencies: {
     savingThrows: ['int', 'wis'],
-    armor: ['light', 'shields'],
-    weapons: { categories: ['simple'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light', 'shields'], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
   },
   features: [],
   characterCreation: {
@@ -92,7 +91,7 @@ const storedDruid: ClassStored = {
   },
 }
 
-const druidClass = withDerivedClassSkillFrom(storedDruid, [])
+const druidClass = storedDruid
 
 describe('assembleStartingEquipment', () => {
   it('assembles equipped armor entries and wealth from the selected package', () => {

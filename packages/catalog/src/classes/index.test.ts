@@ -8,11 +8,10 @@ import {
   loadSeedSubclasses,
   seedClassSlugs,
 } from './index'
-import { loadSeedSkillProficiencies } from '../skill-proficiencies'
 import {
   normalizeGrantGroups,
   subclassChoiceFeatureId,
-  skillSlugsSuggestingClass,
+  skillSlugsFromClassChoices,
   type CharacterClass,
 } from '@rpg/contracts'
 
@@ -701,10 +700,16 @@ describe('SRD 5.2.1 class seed', () => {
     expect(signatureSpells?.description).toContain('Short or Long Rest')
   })
 
-  it('derives class skill options from skill suggestedClasses SSOT', () => {
-    const skills = loadSeedSkillProficiencies(RULESET)
+  it('stores class skill options under characterCreation.proficiencies', () => {
     for (const cls of classes) {
-      expect(cls.proficiencies.skills.from).toEqual(skillSlugsSuggestingClass(cls.slug, skills))
+      const from = skillSlugsFromClassChoices(cls)
+      const choice = cls.characterCreation?.proficiencies?.skills?.choices?.[0]
+      if (from.length === 0) {
+        expect(choice).toBeUndefined()
+        continue
+      }
+      expect(choice?.from).toEqual(from)
+      expect(choice?.choose).toBeGreaterThan(0)
     }
   })
 
@@ -725,9 +730,13 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Fighter ships three distinct starting equipment packages', () => {
     const fighter = getClassBySlug(RULESET, 'fighter')
-    expect(fighter.characterCreation?.startingEquipment.options.map((option) => option.id)).toEqual(
-      ['heavy', 'skirmisher', 'gold'],
-    )
+    const startingEquipment = fighter.characterCreation?.startingEquipment
+    expect(startingEquipment).toBeDefined()
+    expect(startingEquipment!.options.map((option) => option.id)).toEqual([
+      'heavy',
+      'skirmisher',
+      'gold',
+    ])
   })
 
   it('gold alternatives match SRD starting wealth amounts', () => {
@@ -747,9 +756,8 @@ describe('SRD 5.2.1 class seed', () => {
     }
 
     for (const cls of classes) {
-      const goldOption = cls.characterCreation?.startingEquipment.options.find(
-        (option) => option.id === 'gold',
-      )
+      const startingEquipment = cls.characterCreation?.startingEquipment
+      const goldOption = startingEquipment?.options.find((option) => option.id === 'gold')
       expect(goldOption, `${cls.slug} missing gold starting equipment option`).toBeDefined()
       expect(goldOption!.wealth).toEqual({ gp: expectedGoldGp[cls.slug] })
     }
@@ -757,9 +765,9 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
     const monk = getClassBySlug(RULESET, 'monk')
-    const standard = monk.characterCreation?.startingEquipment.options.find(
-      (option) => option.id === 'standard',
-    )
+    const startingEquipment = monk.characterCreation?.startingEquipment
+    expect(startingEquipment).toBeDefined()
+    const standard = startingEquipment!.options.find((option) => option.id === 'standard')
     expect(standard?.description).toContain('Artisan')
     expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
     expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)

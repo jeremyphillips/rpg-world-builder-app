@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
 import type { ClassStored } from '../../../content/classes/class'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import {
@@ -22,16 +21,21 @@ const storedFighter: ClassStored = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['str', 'con'],
-    armor: ['light', 'medium'],
-    weapons: { categories: ['simple', 'martial'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light', 'medium'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
+      },
+    },
   },
   features: [],
 }
 
-const fighterClass = withDerivedClassSkillFrom(storedFighter, [
-  { slug: 'athletics', suggestedClasses: ['fighter'] },
-])
+const fighterClass = storedFighter
 
 const athleticsSkill = {
   id: 'srd-cc-5.2.1:athletics',
@@ -43,7 +47,6 @@ const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
-  suggestedClasses: ['fighter'],
 } as const satisfies SkillProficiency
 
 const completeInput: CharacterDerivationInput = {

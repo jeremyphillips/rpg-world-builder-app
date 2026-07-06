@@ -13,12 +13,17 @@
     "hitDie": 12,
     "proficiencies": {
       "savingThrows": ["str", "con"],
-      "armor": ["light", "medium", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": ["simple", "martial"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -61,6 +66,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Barbarian Skills",
+              "choose": 2,
+              "from": ["animal-handling", "athletics", "nature", "perception", "survival"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -447,12 +464,17 @@
     },
     "proficiencies": {
       "savingThrows": ["dex", "cha"],
-      "armor": ["light"],
+      "armor": {
+        "categories": ["light"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 3
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -505,6 +527,32 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Bard Skills",
+              "choose": 3,
+              "from": [
+                "acrobatics",
+                "animal-handling",
+                "arcana",
+                "deception",
+                "history",
+                "insight",
+                "intimidation",
+                "investigation",
+                "performance",
+                "persuasion",
+                "religion",
+                "sleight-of-hand",
+                "stealth"
+              ]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -811,12 +859,17 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": ["light", "medium", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -871,6 +924,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Cleric Skills",
+              "choose": 2,
+              "from": ["history", "insight", "medicine", "persuasion", "religion"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -1155,12 +1220,17 @@
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
-      "armor": ["light", "medium", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -1221,6 +1291,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Druid Skills",
+              "choose": 2,
+              "from": ["animal-handling", "insight", "medicine", "nature", "perception", "survival"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -1427,12 +1509,17 @@
     "hitDie": 10,
     "proficiencies": {
       "savingThrows": ["str", "con"],
-      "armor": ["light", "medium", "heavy", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "heavy", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": ["simple", "martial"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -1534,6 +1621,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Fighter Skills",
+              "choose": 2,
+              "from": ["acrobatics", "athletics", "history", "intimidation", "perception"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -1835,12 +1934,17 @@
     "hitDie": 8,
     "proficiencies": {
       "savingThrows": ["str", "dex"],
-      "armor": [],
+      "armor": {
+        "categories": [],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -1883,6 +1987,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Monk Skills",
+              "choose": 2,
+              "from": ["acrobatics", "history", "insight", "religion", "stealth"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -2303,12 +2419,17 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": ["light", "medium", "heavy", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "heavy", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": ["simple", "martial"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -2368,6 +2489,26 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Paladin Skills",
+              "choose": 2,
+              "from": [
+                "athletics",
+                "history",
+                "insight",
+                "intimidation",
+                "medicine",
+                "persuasion",
+                "religion"
+              ]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -2674,12 +2815,17 @@
     },
     "proficiencies": {
       "savingThrows": ["str", "dex"],
-      "armor": ["light", "medium", "shields"],
+      "armor": {
+        "categories": ["light", "medium", "shields"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": ["simple", "martial"],
+        "items": []
       },
       "skills": {
-        "choose": 3
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -2749,6 +2895,27 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Ranger Skills",
+              "choose": 3,
+              "from": [
+                "animal-handling",
+                "insight",
+                "investigation",
+                "nature",
+                "perception",
+                "persuasion",
+                "stealth",
+                "survival"
+              ]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -3010,16 +3177,21 @@
     "hitDie": 8,
     "proficiencies": {
       "savingThrows": ["dex", "int"],
-      "armor": ["light"],
+      "armor": {
+        "categories": ["light"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple", "martial"]
+        "categories": ["simple", "martial"],
+        "items": []
       },
       "tools": {
         "categories": [],
         "items": ["thieves-tools"]
       },
       "skills": {
-        "choose": 4
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -3090,6 +3262,28 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Rogue Skills",
+              "choose": 4,
+              "from": [
+                "acrobatics",
+                "deception",
+                "insight",
+                "intimidation",
+                "investigation",
+                "perception",
+                "performance",
+                "sleight-of-hand",
+                "stealth"
+              ]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -3422,13 +3616,17 @@
     },
     "proficiencies": {
       "savingThrows": ["con", "cha"],
-      "armor": [],
+      "armor": {
+        "categories": [],
+        "items": []
+      },
       "weapons": {
         "categories": [],
         "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -3476,6 +3674,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Sorcerer Skills",
+              "choose": 2,
+              "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -3794,12 +4004,17 @@
     },
     "proficiencies": {
       "savingThrows": ["wis", "cha"],
-      "armor": ["light"],
+      "armor": {
+        "categories": ["light"],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -3858,6 +4073,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Warlock Skills",
+              "choose": 2,
+              "from": ["arcana", "history", "intimidation", "investigation", "nature", "religion"]
+            }
+          ]
+        }
       }
     },
     "features": [
@@ -4169,12 +4396,17 @@
     },
     "proficiencies": {
       "savingThrows": ["int", "wis"],
-      "armor": [],
+      "armor": {
+        "categories": [],
+        "items": []
+      },
       "weapons": {
-        "categories": ["simple"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
-        "choose": 2
+        "categories": [],
+        "items": []
       }
     },
     "characterCreation": {
@@ -4228,6 +4460,18 @@
             }
           }
         ]
+      },
+      "proficiencies": {
+        "skills": {
+          "choices": [
+            {
+              "id": "class-skills",
+              "label": "Wizard Skills",
+              "choose": 2,
+              "from": ["arcana", "history", "investigation", "religion"]
+            }
+          ]
+        }
       }
     },
     "features": [

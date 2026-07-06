@@ -4,7 +4,6 @@ import {
   defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
-  withDerivedClassSkillFrom,
   type CharacterBuildCatalog,
   type CharacterBuildCatalogIndex,
   type ClassStored,
@@ -35,16 +34,21 @@ const storedFighter = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['str', 'con'],
-    armor: ['light', 'medium'],
-    weapons: { categories: ['simple', 'martial'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light', 'medium'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
+      },
+    },
   },
   features: [],
 } as const satisfies ClassStored
 
-const fighterClass = withDerivedClassSkillFrom(storedFighter, [
-  { slug: 'athletics', suggestedClasses: ['fighter'] },
-])
+const fighterClass = storedFighter
 
 const dwarfSpecies = {
   id: 'srd-cc-5.2.1:dwarf',
@@ -72,7 +76,6 @@ const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
-  suggestedClasses: ['fighter'],
 } as const satisfies SkillProficiency
 
 export const populatedBuilderCatalog = {

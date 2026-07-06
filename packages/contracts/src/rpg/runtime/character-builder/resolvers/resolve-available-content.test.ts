@@ -4,7 +4,6 @@ import type { ClassStored } from '../../../content/classes/class'
 import { equipmentSchema } from '../../../content/equipment'
 import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
-import { withDerivedClassSkillFrom } from '../../../content/skill-class-association'
 import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterBuildContext } from '../context'
@@ -30,9 +29,9 @@ function makeStoredClass(slug: string, name: string): ClassStored {
     hitDie: 10,
     proficiencies: {
       savingThrows: ['str', 'con'],
-      armor: ['light'],
-      weapons: { categories: ['simple'] },
-      skills: { choose: 2 },
+      armor: { categories: ['light'], items: [] },
+      weapons: { categories: ['simple'], items: [] },
+      skills: { categories: [], items: [] },
     },
     features: [],
   }
@@ -144,8 +143,8 @@ describe('resolveAvailableContent', () => {
   })
 
   it('applies the MVP-A non-caster class filter (remove with BENCH-091)', () => {
-    const fighter = withDerivedClassSkillFrom(makeStoredClass('fighter', 'Fighter'), [])
-    const wizard = withDerivedClassSkillFrom(makeStoredClass('wizard', 'Wizard'), [])
+    const fighter = makeStoredClass('fighter', 'Fighter')
+    const wizard = makeStoredClass('wizard', 'Wizard')
     const context = makeContext({
       catalog: {
         species: [],
@@ -162,8 +161,8 @@ describe('resolveAvailableContent', () => {
   })
 
   it('filters spells to those learnable by available classes', () => {
-    const fighter = withDerivedClassSkillFrom(makeStoredClass('fighter', 'Fighter'), [])
-    const wizard = withDerivedClassSkillFrom(makeStoredClass('wizard', 'Wizard'), [])
+    const fighter = makeStoredClass('fighter', 'Fighter')
+    const wizard = makeStoredClass('wizard', 'Wizard')
     const context = makeContext({
       catalog: {
         species: [],

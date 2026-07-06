@@ -7,6 +7,10 @@ import {
   normalizeEquipmentChoiceGrant,
 } from './lib/equipment-grant'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
+import {
+  skillProficiencyChoiceGroupSchema,
+  toolProficiencyChoiceGroupSchema,
+} from './lib/proficiency-grant-set'
 
 // ---------------------------------------------------------------------------
 // Starting equipment — class/background character-creation gear packages.
@@ -58,9 +62,21 @@ export const startingEquipmentChoiceSchema = contentChoiceSchema.extend({
 
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>
 
-export const classCharacterCreationSchema = z.object({
-  startingEquipment: startingEquipmentChoiceSchema,
+export const characterCreationProficienciesSchema = z.object({
+  skills: skillProficiencyChoiceGroupSchema.optional(),
+  tools: toolProficiencyChoiceGroupSchema.optional(),
 })
+
+export type CharacterCreationProficiencies = z.infer<typeof characterCreationProficienciesSchema>
+
+export const classCharacterCreationSchema = z
+  .object({
+    startingEquipment: startingEquipmentChoiceSchema.optional(),
+    proficiencies: characterCreationProficienciesSchema.optional(),
+  })
+  .refine((value) => value.startingEquipment !== undefined || value.proficiencies !== undefined, {
+    message: 'characterCreation requires startingEquipment and/or proficiencies',
+  })
 
 export type ClassCharacterCreation = z.infer<typeof classCharacterCreationSchema>
 

@@ -100,7 +100,7 @@ describe('buildCharacterPreview', () => {
       {
         resolvedChoiceSets: [
           {
-            id: 'class:srd-cc-5.2.1:fighter:skills',
+            id: 'class:srd-cc-5.2.1:fighter:class-skills',
             sourceType: 'class',
             sourceId: 'srd-cc-5.2.1:fighter',
             choiceType: 'skillProficiency',
@@ -114,7 +114,7 @@ describe('buildCharacterPreview', () => {
       },
     )
 
-    expect(preview.unresolvedChoiceSetIds).toEqual(['class:srd-cc-5.2.1:fighter:skills'])
+    expect(preview.unresolvedChoiceSetIds).toEqual(['class:srd-cc-5.2.1:fighter:class-skills'])
   })
 
   it('surfaces advisory warnings for incomplete drafts', () => {

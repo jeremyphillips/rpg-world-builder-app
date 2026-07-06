@@ -1,5 +1,5 @@
 import type { ContentSource, SystemRulesetId } from '@rpg/contracts'
-import { ContentKeyError, stripClassSkillFromFromInput } from '@rpg/contracts'
+import { ContentKeyError } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
@@ -63,10 +63,10 @@ function normalizeWriteInput(
 }
 
 function stripPersistedClassPatch<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
+  _config: ContentWriteConfig<T>,
   input: Record<string, unknown>,
 ): Record<string, unknown> {
-  return config.typeName === 'classes' ? stripClassSkillFromFromInput(input) : input
+  return input
 }
 
 function prepareSystemPatchMerge<T extends StoredEntity>(

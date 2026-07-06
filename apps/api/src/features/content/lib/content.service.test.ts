@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { skillSlugsFromClassChoices } from '@rpg/contracts'
 
 import { createCampaign } from '../../campaign'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
@@ -20,9 +20,8 @@ describe('resolveCatalogForCampaign (classes)', () => {
     expect(classes).toHaveLength(12)
     expect(classes.find((c) => c.id === 'srd-cc-5.2.1:fighter')?.hitDie).toBe(10)
     expect(classes.every((c) => c.source === 'system')).toBe(true)
-    expect(
-      classes.find((c) => c.slug === 'fighter')?.proficiencies.skills.from.length,
-    ).toBeGreaterThan(0)
+    const fighter = classes.find((c) => c.slug === 'fighter')!
+    expect(skillSlugsFromClassChoices(fighter).length).toBeGreaterThan(0)
   })
 
   it('deep-merges a campaign overlay patch onto the system class', async () => {

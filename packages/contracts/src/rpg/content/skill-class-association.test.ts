@@ -1,55 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  diffClassSkillEdges,
-  skillSlugsSuggestingClass,
-  stripClassSkillFromFromInput,
-  withDerivedClassSkillFrom,
-} from './skill-class-association'
-import type { SkillClassAssociationSkill } from './skill-class-association'
+import { classesOfferingSkillChoice, skillSlugsFromClassChoices } from './skill-class-association'
 import type { ClassStored } from './classes/class'
-
-const skills: SkillClassAssociationSkill[] = [
-  { slug: 'athletics', suggestedClasses: ['barbarian', 'fighter'] },
-  { slug: 'stealth', suggestedClasses: ['rogue', 'ranger'] },
-  { slug: 'arcana', suggestedClasses: ['wizard'] },
-]
-
-describe('skillSlugsSuggestingClass', () => {
-  it('returns skill slugs that list the class', () => {
-    expect(skillSlugsSuggestingClass('fighter', skills)).toEqual(['athletics'])
-    expect(skillSlugsSuggestingClass('rogue', skills)).toEqual(['stealth'])
-  })
-
-  it('returns an empty array when no skills suggest the class', () => {
-    expect(skillSlugsSuggestingClass('cleric', skills)).toEqual([])
-  })
-
-  it('sorts results alphabetically', () => {
-    const many: SkillClassAssociationSkill[] = [
-      { slug: 'survival', suggestedClasses: ['ranger'] },
-      { slug: 'athletics', suggestedClasses: ['ranger'] },
-      { slug: 'nature', suggestedClasses: ['ranger'] },
-    ]
-    expect(skillSlugsSuggestingClass('ranger', many)).toEqual(['athletics', 'nature', 'survival'])
-  })
-})
-
-describe('diffClassSkillEdges', () => {
-  it('detects added and removed skill slugs', () => {
-    expect(diffClassSkillEdges(['athletics', 'stealth'], ['athletics', 'arcana'])).toEqual({
-      added: ['arcana'],
-      removed: ['stealth'],
-    })
-  })
-
-  it('returns empty arrays when lists are unchanged', () => {
-    expect(diffClassSkillEdges(['athletics'], ['athletics'])).toEqual({
-      added: [],
-      removed: [],
-    })
-  })
-})
 
 const storedFighter: ClassStored = {
   id: 'srd-cc-5.2.1:fighter',
@@ -64,26 +16,70 @@ const storedFighter: ClassStored = {
   hitDie: 10,
   proficiencies: {
     savingThrows: ['str', 'con'],
-    armor: ['light'],
-    weapons: { categories: ['simple'] },
-    skills: { choose: 2 },
+    armor: { categories: ['light'], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
   },
   features: [],
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+      },
+    },
+  },
 }
 
-describe('withDerivedClassSkillFrom', () => {
-  it('attaches sorted skill slugs from the skill-side SSOT', () => {
-    const read = withDerivedClassSkillFrom(storedFighter, skills)
-    expect(read.proficiencies.skills.from).toEqual(['athletics'])
+const storedRogue: ClassStored = {
+  ...storedFighter,
+  id: 'srd-cc-5.2.1:rogue',
+  slug: 'rogue',
+  name: 'Rogue',
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 4, from: ['stealth', 'acrobatics'] }],
+      },
+    },
+  },
+}
+
+describe('skillSlugsFromClassChoices', () => {
+  it('returns sorted skill slugs from meaningful class skill choices', () => {
+    expect(skillSlugsFromClassChoices(storedFighter)).toEqual(['athletics', 'stealth'])
+  })
+
+  it('returns an empty array when no meaningful choices exist', () => {
+    expect(
+      skillSlugsFromClassChoices({
+        slug: 'cleric',
+        characterCreation: undefined,
+      }),
+    ).toEqual([])
+  })
+
+  it('ignores placeholder choice rows', () => {
+    expect(
+      skillSlugsFromClassChoices({
+        slug: 'cleric',
+        characterCreation: {
+          proficiencies: {
+            skills: {
+              choices: [{ id: 'class-skills', choose: 0, from: [] }],
+            },
+          },
+        },
+      }),
+    ).toEqual([])
   })
 })
 
-describe('stripClassSkillFromFromInput', () => {
-  it('removes skills.from before persistence validation', () => {
-    expect(
-      stripClassSkillFromFromInput({
-        proficiencies: { skills: { choose: 2, from: ['athletics'] } },
-      }),
-    ).toEqual({ proficiencies: { skills: { choose: 2 } } })
+describe('classesOfferingSkillChoice', () => {
+  it('returns classes whose skill pools include the slug', () => {
+    expect(classesOfferingSkillChoice('stealth', [storedFighter, storedRogue])).toEqual([
+      expect.objectContaining({ slug: 'fighter' }),
+      expect.objectContaining({ slug: 'rogue' }),
+    ])
+    expect(classesOfferingSkillChoice('arcana', [storedFighter, storedRogue])).toEqual([])
   })
 })

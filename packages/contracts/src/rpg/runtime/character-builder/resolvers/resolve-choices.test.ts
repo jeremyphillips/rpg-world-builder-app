@@ -22,10 +22,10 @@ describe('resolveAvailableChoices', () => {
     })
 
     const choiceSets = resolveAvailableChoices(draft, builderTestContext)
-    const skills = choiceSets.find((choiceSet) => choiceSet.id.endsWith(':skills'))
+    const skills = choiceSets.find((choiceSet) => choiceSet.id.endsWith(':class-skills'))
 
     expect(skills).toMatchObject({
-      id: 'class:srd-cc-5.2.1:fighter:skills',
+      id: 'class:srd-cc-5.2.1:fighter:class-skills',
       sourceType: 'class',
       choiceType: 'skillProficiency',
       min: 2,

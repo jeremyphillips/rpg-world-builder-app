@@ -3,11 +3,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import {
-  createClassInputSchema,
-  deriveContentKey,
-  stripClassSkillFromFromInput,
-} from '@rpg/contracts'
+import { createClassInputSchema, deriveContentKey } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
@@ -42,11 +38,11 @@ function expectBardSpellcastingRoundTrip(): void {
   ).toBe(true)
 }
 
-it('type: stripped toInput validates as CreateClassInput', () => {
+it('type: toInput validates as CreateClassInput', () => {
   const fighter = SRD_CLASSES[0]!
   const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
   const input = classFormDef.toInput(formValues)
-  expect(createClassInputSchema.safeParse(stripClassSkillFromFromInput(input)).success).toBe(true)
+  expect(createClassInputSchema.safeParse(input).success).toBe(true)
 })
 
 describe('classFormDef round-trips', () => {
@@ -54,7 +50,7 @@ describe('classFormDef round-trips', () => {
     it(`${characterClass.slug}: toFormValues → toInput → schema.parse`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues)
-      expect(() => createClassInputSchema.parse(stripClassSkillFromFromInput(input))).not.toThrow()
+      expect(() => createClassInputSchema.parse(input)).not.toThrow()
     })
 
     it(`${characterClass.slug}: name and slug are preserved`, () => {
@@ -130,7 +126,7 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
     expect(formValues.weaponProficiencyMode).toBe('categories')
     const input = classFormDef.toInput(formValues)
-    expect(input.proficiencies.weapons.items).toBeUndefined()
+    expect(input.proficiencies.weapons.items).toEqual([])
   })
 
   it('fighter: ships three distinct starting equipment packages', () => {
@@ -232,6 +228,7 @@ describe('classFormDef round-trips', () => {
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.weapons).toEqual({
       categories: ['simple', 'martial'],
+      items: [],
     })
   })
 
