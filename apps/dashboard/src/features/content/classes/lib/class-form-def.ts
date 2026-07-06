@@ -23,6 +23,7 @@ import {
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
+import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 
 const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
   routeKey: 'classes',
@@ -44,16 +45,19 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     weaponProficiencyMode:
       (entity.proficiencies.weapons.items?.length ?? 0) > 0 ? 'individual' : 'categories',
     spellcasting: spellcastingToFormValues(entity.spellcasting),
-    proficiencies: proficienciesToFormValues(entity.proficiencies, entity.characterCreation),
+    proficiencies: proficienciesToFormValues(entity.proficiencies),
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
-    characterCreation: entity.characterCreation?.startingEquipment
-      ? {
-          startingEquipment: startingEquipmentToFormValues(
-            entity.characterCreation.startingEquipment,
-          ),
-        }
-      : undefined,
+    characterCreation: {
+      proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
+      ...(entity.characterCreation?.startingEquipment
+        ? {
+            startingEquipment: startingEquipmentToFormValues(
+              entity.characterCreation.startingEquipment,
+            ),
+          }
+        : {}),
+    },
   }),
 
   toInput: (values, ctx) =>

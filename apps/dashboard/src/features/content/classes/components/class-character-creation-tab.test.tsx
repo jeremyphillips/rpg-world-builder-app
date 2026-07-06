@@ -6,20 +6,26 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
+import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
 
 function TabShell({
   startingEquipment,
+  proficiencies,
   formCtx,
 }: {
   startingEquipment?: StartingEquipmentForm
+  proficiencies?: ReturnType<typeof characterCreationProficienciesToFormValues>
   formCtx?: ContentFormCtx
 }) {
   const form = useForm({
     defaultValues: {
-      characterCreation: startingEquipment ? { startingEquipment } : undefined,
+      characterCreation: {
+        ...(proficiencies ? { proficiencies } : characterCreationProficienciesToFormValues()),
+        ...(startingEquipment ? { startingEquipment } : {}),
+      },
     },
   })
 
@@ -45,6 +51,13 @@ const bardStartingEquipment = startingEquipmentToFormValues(
 const monkSeedIds = monkStartingEquipment.options.map((option) => option.id!)
 
 describe('ClassCharacterCreationTab', () => {
+  it('shows skill proficiency choices even when there is no starting equipment', () => {
+    render(<TabShell />)
+    expect(screen.getByText('Character can choose')).toBeInTheDocument()
+    expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
+    expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
+  })
+
   it('shows the empty state when there is no starting equipment', () => {
     render(<TabShell />)
     expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
@@ -63,7 +76,7 @@ describe('ClassCharacterCreationTab', () => {
       ).toBeInTheDocument()
     })
     expect(screen.getByText('package(s) from list')).toBeInTheDocument()
-    expect(screen.getByText('Character can choose')).toBeInTheDocument()
+    expect(screen.getAllByText('Character can choose').length).toBeGreaterThanOrEqual(1)
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -141,6 +154,26 @@ describe('ClassCharacterCreationTab', () => {
     await user.click(screen.getByRole('switch', { name: /Active in campaign/i }))
 
     expect(screen.getByText('Inactive')).toBeInTheDocument()
+  })
+
+  it('renders rogue skill choices when pre-filled', () => {
+    const rogueProficiencies = characterCreationProficienciesToFormValues(
+      pickClass('rogue').characterCreation,
+    )
+    render(
+      <TabShell
+        proficiencies={rogueProficiencies}
+        startingEquipment={monkStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
+    )
+    const chooseSpinbuttons = screen.getAllByRole('spinbutton')
+    expect(chooseSpinbuttons.some((input) => input.getAttribute('value') === '4')).toBe(true)
   })
 
   it('has no axe accessibility violations in the empty state', async () => {

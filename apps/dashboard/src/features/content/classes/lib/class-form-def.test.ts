@@ -73,6 +73,17 @@ describe('classFormDef round-trips', () => {
       expect(input.features).toHaveLength(characterClass.features.length)
     })
 
+    it(`${characterClass.slug}: character creation skill choices round-trip`, () => {
+      const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+      const input = classFormDef.toInput(formValues, { entity: characterClass })
+      const expectedChoices = characterClass.characterCreation?.proficiencies?.skills?.choices
+      if (!expectedChoices?.length) {
+        expect(input.characterCreation?.proficiencies?.skills).toBeUndefined()
+        return
+      }
+      expect(input.characterCreation?.proficiencies?.skills?.choices).toEqual(expectedChoices)
+    })
+
     it(`${characterClass.slug}: starting equipment round-trips`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues, { entity: characterClass })
@@ -92,6 +103,31 @@ describe('classFormDef round-trips', () => {
     if (spellGrant?.kind === 'spells') {
       expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
     }
+  })
+
+  it('rogue: skill proficiency choices round-trip through characterCreation', () => {
+    const rogue = SRD_CLASSES.find((c) => c.slug === 'rogue')!
+    const formValues = classFormDef.toFormValues(rogue) as ClassFormValues
+    expect(formValues.characterCreation?.proficiencies?.skills).toMatchObject({
+      choose: 4,
+      from: [
+        'acrobatics',
+        'deception',
+        'insight',
+        'intimidation',
+        'investigation',
+        'perception',
+        'performance',
+        'sleight-of-hand',
+        'stealth',
+      ],
+    })
+    const input = classFormDef.toInput(formValues, { entity: rogue })
+    expect(input.characterCreation?.proficiencies?.skills?.choices?.[0]).toMatchObject({
+      id: 'class-skills',
+      choose: 4,
+      from: rogue.characterCreation?.proficiencies?.skills?.choices?.[0]?.from,
+    })
   })
 
   it('rogue: tool proficiencies round-trip with categories and items', () => {

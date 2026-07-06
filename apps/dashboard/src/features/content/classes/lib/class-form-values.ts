@@ -21,17 +21,14 @@ import {
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
 import { startingEquipmentFromFormValues } from './character-creation/class-starting-equipment-form-values'
+import { characterCreationProficienciesFromFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 
 type ResourceRowForm = {
   name: string
   entries: { level: number; value: number }[]
 }
 
-export function proficienciesToFormValues(
-  proficiencies: ClassProficiencies,
-  characterCreation?: CharacterClass['characterCreation'],
-) {
-  const skillChoice = characterCreation?.proficiencies?.skills?.choices?.[0]
+export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
   return {
     savingThrows: proficiencies.savingThrows,
     armor: proficiencies.armor.categories,
@@ -44,8 +41,7 @@ export function proficienciesToFormValues(
       items: proficiencies.tools?.items ?? [],
     },
     skills: {
-      choose: skillChoice?.choose ?? 0,
-      from: skillChoice?.from ?? [],
+      items: proficiencies.skills.items ?? [],
     },
   }
 }
@@ -78,19 +74,26 @@ function proficienciesFromFormValues(
     armor: { categories: proficiencies.armor, items: [] },
     weapons,
     ...(tools ? { tools } : {}),
-    skills: { categories: [], items: [] },
+    skills: { categories: [], items: proficiencies.skills.items ?? [] },
   }
 }
 
-function skillChoicesFromFormValues(
-  proficiencies: ClassFormValues['proficiencies'],
-): NonNullable<CreateClassInput['characterCreation']>['proficiencies'] | undefined {
-  const { choose, from } = proficiencies.skills
-  if (choose <= 0 || from.length === 0) return undefined
+function classCharacterCreationInputFromForm(
+  values: ClassFormValues,
+  entity?: CharacterClass,
+): CreateClassInput['characterCreation'] | undefined {
+  const startingEquipment = startingEquipmentFromFormValues(
+    values.characterCreation?.startingEquipment,
+    entity?.characterCreation?.startingEquipment,
+  )
+  const proficiencies = characterCreationProficienciesFromFormValues(
+    values.characterCreation?.proficiencies,
+    entity,
+  )
+  if (!startingEquipment && !proficiencies) return undefined
   return {
-    skills: {
-      choices: [{ id: 'class-skills', choose, from }],
-    },
+    ...(startingEquipment ? { startingEquipment } : {}),
+    ...(proficiencies ? { proficiencies } : {}),
   }
 }
 
@@ -105,22 +108,6 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
   return {
     name: row.name,
     entries: row.entries,
-  }
-}
-
-function classCharacterCreationInputFromForm(
-  values: ClassFormValues,
-  entity?: CharacterClass,
-): CreateClassInput['characterCreation'] | undefined {
-  const startingEquipment = startingEquipmentFromFormValues(
-    values.characterCreation?.startingEquipment,
-    entity?.characterCreation?.startingEquipment,
-  )
-  const proficiencies = skillChoicesFromFormValues(values.proficiencies)
-  if (!startingEquipment && !proficiencies) return undefined
-  return {
-    ...(startingEquipment ? { startingEquipment } : {}),
-    ...(proficiencies ? { proficiencies } : {}),
   }
 }
 
@@ -248,7 +235,12 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
     armor: [],
     weapons: { categories: [], items: [] },
     tools: { categories: [], items: [] },
-    skills: { choose: 2, from: [] },
+    skills: { items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      skills: { choose: 2, from: [] },
+    },
   },
   features: [
     createSubclassChoiceFeature({ classSlug: 'new-class', className: 'New Class' }),
