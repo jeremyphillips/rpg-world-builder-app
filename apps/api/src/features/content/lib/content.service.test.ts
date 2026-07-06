@@ -52,9 +52,16 @@ describe('resolveCatalogForCampaign (classes)', () => {
       hitDie: 10,
       proficiencies: {
         savingThrows: ['str', 'con'],
-        armor: ['light', 'medium'],
-        weapons: { categories: ['simple', 'martial'] },
-        skills: { choose: 2, from: ['athletics', 'stealth'] },
+        armor: { categories: ['light', 'medium'], items: [] },
+        weapons: { categories: ['simple', 'martial'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
+          },
+        },
       },
       features: [],
     })
@@ -65,7 +72,6 @@ describe('resolveCatalogForCampaign (classes)', () => {
     expect(classes).toHaveLength(13)
     expect(homebrew?.source).toBe('homebrew')
     expect(homebrew?.campaignId).toBe(campaign.id)
-    expect(homebrew?.proficiencies.armor).toEqual({ categories: ['light', 'medium'], items: [] })
     expect(homebrew?.proficiencies.skills).toEqual({ categories: [], items: [] })
     expect(homebrew?.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).toEqual([
       'athletics',
@@ -73,14 +79,14 @@ describe('resolveCatalogForCampaign (classes)', () => {
     ])
   })
 
-  it('strips proficiencies.skills choose/from pollution without overriding characterCreation choices', async () => {
+  it('preserves characterCreation skill choices when a patch only touches proficiencies.skills', async () => {
     const campaign = await makeTestCampaign()
     await ClassPatchModel.create({
       campaignId: campaign.id,
       targetId: 'srd-cc-5.2.1:fighter',
       patch: {
         proficiencies: {
-          skills: { categories: [], items: [], choose: 99, from: ['medicine'] },
+          skills: { categories: [], items: [] },
         },
       },
     })
@@ -97,9 +103,6 @@ describe('resolveCatalogForCampaign (classes)', () => {
       'intimidation',
       'perception',
     ])
-    expect(fighter.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).not.toContain(
-      'medicine',
-    )
   })
 
   it('scopes patches and homebrew to their own campaign', async () => {

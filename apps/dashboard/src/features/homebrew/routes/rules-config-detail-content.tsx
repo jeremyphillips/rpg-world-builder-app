@@ -21,7 +21,7 @@ import {
   mapRulesetPatchToRulesValues,
   MECHANICS_CONFIGURATION_SECTIONS,
   mechanicsValuesSchema,
-  resolveRulesSchema,
+  resolveRulesSchemaWithVocabulary,
   type MechanicsValues,
   type RulesValues,
   useCanManageCampaign,
@@ -32,10 +32,12 @@ import { createRulesConfigSaveFooter } from '../components/rules-config-save-foo
 import { buildEditionPresetFieldOptions } from '../lib/vocabulary/sets/edition-presets'
 import { buildAttackResolutionModeFieldOptions } from '../lib/vocabulary/sets/attack-resolution-modes'
 import { buildActiveCreatureTypeFieldOptions } from '../lib/vocabulary/sets/creature-types'
+import { buildActiveLanguageFieldOptions } from '../lib/vocabulary/sets/languages'
 import { disableFormItems } from '@/lib/disable-form-items'
 import { findRulesConfigEntry, type RulesConfigId } from '../lib/hub/rules-config-registry'
 import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
 import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
+import { useLanguageVocabulary } from '../hooks/use-language-vocabulary'
 import { useEditionPresetVocabulary } from '../hooks/use-edition-preset-vocabulary'
 import { usePatchCharacterCreationMutation } from '../hooks/use-patch-character-creation-mutation'
 import { usePatchMechanicsMutation } from '../hooks/use-patch-mechanics-mutation'
@@ -74,22 +76,39 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
   const canManage = useCanManageCampaign(campaignId)
   const { data: patch, isPending, isError } = useRulesetPatch(campaignId)
   const {
-    vocabulary,
-    isPending: isVocabularyPending,
-    isError: isVocabularyError,
+    vocabulary: creatureTypeVocabulary,
+    isPending: isCreatureTypeVocabularyPending,
+    isError: isCreatureTypeVocabularyError,
   } = useCreatureTypeVocabulary(campaignId)
+  const {
+    vocabulary: languageVocabulary,
+    categoryOptions,
+    isPending: isLanguageVocabularyPending,
+    isError: isLanguageVocabularyError,
+  } = useLanguageVocabulary(campaignId)
   const {
     mutateAsync,
     isPending: isSaving,
     isSuccess,
   } = usePatchCharacterCreationMutation(campaignId)
 
-  const schema = useMemo(() => resolveRulesSchema(vocabulary?.activeIds), [vocabulary?.activeIds])
+  const schema = useMemo(
+    () =>
+      resolveRulesSchemaWithVocabulary({
+        activeCreatureTypeIds: creatureTypeVocabulary?.activeIds,
+        activeLanguageIds: languageVocabulary?.activeIds,
+      }),
+    [creatureTypeVocabulary?.activeIds, languageVocabulary?.activeIds],
+  )
 
   const fields = useMemo(() => {
-    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(vocabulary)
-    return disableFormItems(buildRulesConfigFields(creatureTypeOptions), !canManage)
-  }, [canManage, vocabulary])
+    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(creatureTypeVocabulary)
+    const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
+    return disableFormItems(
+      buildRulesConfigFields(creatureTypeOptions, languageOptions, categoryOptions),
+      !canManage,
+    )
+  }, [canManage, creatureTypeVocabulary, languageVocabulary, categoryOptions])
 
   const defaultValues = useMemo(
     () => (patch ? mapRulesetPatchToRulesValues(patch.characterCreation) : undefined),
@@ -101,6 +120,8 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
       buildCharacterCreationPatchInput(values, {
         includeDefaultMulticlassing: true,
         includeDefaultSubclassing: true,
+        includeDefaultLanguageProficiencies: true,
+        existingLanguageChoice: patch?.characterCreation.proficiencyChoices.languages[0],
       }),
     )
     form.reset(values)
@@ -113,8 +134,8 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
 
   return (
     <PageLoadState
-      isPending={isPending || isVocabularyPending}
-      isError={isError || isVocabularyError}
+      isPending={isPending || isCreatureTypeVocabularyPending || isLanguageVocabularyPending}
+      isError={isError || isCreatureTypeVocabularyError || isLanguageVocabularyError}
       defaultErrorLabel="Could not load character configuration."
     >
       {defaultValues ? (

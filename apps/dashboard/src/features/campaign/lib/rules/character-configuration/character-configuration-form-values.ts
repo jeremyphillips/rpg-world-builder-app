@@ -12,6 +12,7 @@ import {
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
+  resolveCharacterCreationPatch,
   sameStringSet,
 } from '@rpg/contracts'
 import type { CampaignMulticlassingPatch, CampaignSubclassingPatch } from '@rpg/contracts'
@@ -22,12 +23,18 @@ import {
   buildStartingWealthPatchInput,
   mapStartingWealthToFormValues,
 } from './starting-wealth-form-values'
+import {
+  buildLanguageProficiencyPatchInput,
+  mapLanguageProficiencyRulesToFormValues,
+} from './language-proficiency-form-values'
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type BuildCharacterCreationPatchInputOptions = {
   includeDefaultMulticlassing?: boolean
   includeDefaultSubclassing?: boolean
+  includeDefaultLanguageProficiencies?: boolean
+  existingLanguageChoice?: ResolvedCampaignCharacterCreationPatch['proficiencyChoices']['languages'][number]
 }
 
 function pickDefined<T extends Record<string, unknown>>(values: T): Partial<T> | undefined {
@@ -151,6 +158,9 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     startingWealth: mapStartingWealthToFormValues(
       getStandardStartingWealthRules(DEFAULT_RULESET_ID),
     ),
+    ...mapLanguageProficiencyRulesToFormValues(
+      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID)),
+    ),
   }
 }
 
@@ -194,6 +204,19 @@ export function buildCharacterCreationPatchInput(
     patch.startingWealth = startingWealthPatch
   }
 
+  if (options.includeDefaultLanguageProficiencies) {
+    Object.assign(
+      patch,
+      buildLanguageProficiencyPatchInput(
+        {
+          languageProficiencyGrants: values.languageProficiencyGrants,
+          languageProficiencyChoice: values.languageProficiencyChoice,
+        },
+        options.existingLanguageChoice,
+      ),
+    )
+  }
+
   return patch
 }
 
@@ -229,5 +252,6 @@ export function mapRulesetPatchToRulesValues(
       characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
     subclassChoicesEnabled: characterCreation.subclasses.enabled,
     startingWealth: mapStartingWealthToFormValues(characterCreation.startingWealth),
+    ...mapLanguageProficiencyRulesToFormValues(characterCreation),
   }
 }

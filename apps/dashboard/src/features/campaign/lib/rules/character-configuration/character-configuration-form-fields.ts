@@ -12,6 +12,7 @@ import {
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   defineMessage,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  isMeaningfulLanguageProficiencyChoice,
   levelValidationMessages,
   MAX_CHARACTER_LEVEL,
   creatureTypeSchema,
@@ -43,12 +44,22 @@ import {
   startingWealthFormSchema,
 } from './starting-wealth-form-fields'
 import { mapStartingWealthToFormValues } from './starting-wealth-form-values'
+import {
+  languageProficiencyChoiceFormSchema,
+  languageProficiencyFields,
+  languageProficiencyGrantsFormSchema,
+} from './language-proficiency-form-fields'
+import { languageProficiencyRulesDefaultValues } from './language-proficiency-form-values'
 
 /** Character configuration validation messages (tier 3 form overrides). */
 export const characterConfigurationValidationMessages = {
   creatureTypeUnavailable: defineMessage(
     'validation.characterConfiguration.creatureTypeUnavailable',
     () => 'Creature type is not available in this campaign vocabulary.',
+  ),
+  languageUnavailable: defineMessage(
+    'validation.characterConfiguration.languageUnavailable',
+    () => 'Language is not available in this campaign vocabulary.',
   ),
 }
 
@@ -93,6 +104,12 @@ const configRulesObjectSchema = z.object({
   subclassChoicesEnabled: z.boolean().default(DEFAULT_SUBCLASS_CHOICES_ENABLED),
   startingWealth: startingWealthFormSchema.default(() =>
     mapStartingWealthToFormValues(getStandardStartingWealthRules('srd-cc-5.2.1')),
+  ),
+  languageProficiencyGrants: languageProficiencyGrantsFormSchema.default(
+    () => languageProficiencyRulesDefaultValues().languageProficiencyGrants,
+  ),
+  languageProficiencyChoice: languageProficiencyChoiceFormSchema.default(
+    () => languageProficiencyRulesDefaultValues().languageProficiencyChoice,
   ),
 })
 
@@ -201,6 +218,20 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
       code: 'custom',
       message: result.message,
       path: ['extendedMaxLevel'],
+    })
+  }
+
+  const languageChoice = {
+    id: 'origin-languages',
+    choose: values.languageProficiencyChoice.choose,
+    from: [],
+    categories: values.languageProficiencyChoice.categories,
+  }
+  if (languageChoice.choose > 0 && !isMeaningfulLanguageProficiencyChoice(languageChoice)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Choose at least one language category when choose count is greater than zero.',
+      path: ['languageProficiencyChoice', 'categories'],
     })
   }
 }
@@ -407,11 +438,17 @@ type CharacterConfigurationSection = {
   label: string
 }
 
+type CharacterConfigFormOptions = {
+  creatureTypeOptions: FieldOption[]
+  languageOptions: FieldOption[]
+  languageCategoryOptions: FieldOption[]
+}
+
 type CharacterRuleFieldDef = {
   id: string
   surfaces: readonly CharacterRuleSurface[]
   configSection?: CharacterConfigurationSection
-  buildFormItems: (creatureTypeOptions: FieldOption[]) => FormItem[]
+  buildFormItems: (options: CharacterConfigFormOptions) => FormItem[]
   buildReviewRow?: (values: Partial<RulesValues>) => RulesReviewRow | undefined
 }
 
@@ -511,6 +548,13 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     buildFormItems: () => creationSectionItems(),
   },
   {
+    id: 'proficiencies',
+    surfaces: ['config'],
+    configSection: { id: 'proficiencies', label: 'Proficiencies' },
+    buildFormItems: ({ languageOptions, languageCategoryOptions }) =>
+      languageProficiencyFields(languageOptions, languageCategoryOptions),
+  },
+  {
     id: 'maxCharacterLevel',
     surfaces: ['config'],
     configSection: { id: 'standard-max-level', label: 'Standard max level' },
@@ -526,7 +570,7 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     id: 'allowedCharacterCreatureTypes',
     surfaces: ['config'],
     configSection: { id: 'creature-type-policy', label: 'Creature types' },
-    buildFormItems: (creatureTypeOptions) => [
+    buildFormItems: ({ creatureTypeOptions }) => [
       allowedCharacterCreatureTypesField(creatureTypeOptions),
     ],
   },
@@ -556,9 +600,18 @@ function fieldsForSurface(surface: CharacterRuleSurface): CharacterRuleFieldDef[
   return CHARACTER_RULE_FIELD_REGISTRY.filter((field) => field.surfaces.includes(surface))
 }
 
-export function buildRulesConfigLayoutFields(creatureTypeOptions: FieldOption[]): FormItem[] {
+export function buildRulesConfigLayoutFields(
+  creatureTypeOptions: FieldOption[],
+  languageOptions: FieldOption[] = [],
+  languageCategoryOptions: FieldOption[] = [],
+): FormItem[] {
+  const options: CharacterConfigFormOptions = {
+    creatureTypeOptions,
+    languageOptions,
+    languageCategoryOptions,
+  }
   return fieldsForSurface('config').flatMap((field) => {
-    const items = field.buildFormItems(creatureTypeOptions)
+    const items = field.buildFormItems(options)
     const section = field.configSection
     if (!section) return items
     return applySectionAnchor(section, items)
@@ -574,6 +627,8 @@ export function buildRulesSchemaForSurface(surface: CharacterRuleSurface) {
 export function buildRulesFieldsForSurface(
   surface: CharacterRuleSurface,
   creatureTypeOptions: FieldOption[],
+  languageOptions: FieldOption[] = [],
+  languageCategoryOptions: FieldOption[] = [],
 ): FormItem[] {
   if (surface === 'create') {
     return [
@@ -590,7 +645,12 @@ export function buildRulesFieldsForSurface(
     ]
   }
 
-  return fieldsForSurface('config').flatMap((field) => field.buildFormItems(creatureTypeOptions))
+  const options: CharacterConfigFormOptions = {
+    creatureTypeOptions,
+    languageOptions,
+    languageCategoryOptions,
+  }
+  return fieldsForSurface('config').flatMap((field) => field.buildFormItems(options))
 }
 
 export function buildRulesReviewRowsForSurface(

@@ -11,6 +11,7 @@ export {
   createRulesFields,
   createRulesSchema,
   resolveRulesSchema,
+  resolveRulesSchemaWithVocabulary,
   rulesSchema,
   type CharacterConfigurationSectionId,
   type CreateRulesValues,
