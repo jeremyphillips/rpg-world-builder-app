@@ -240,7 +240,8 @@ const STEP_COMPLETION_CHECKS: Record<
   abilities: (draft, _stepChoiceSets, _resolvedChoiceSets, standardArray) =>
     isAbilitiesComplete(draft, standardArray),
   proficiencies: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
-  equipment: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
+  equipment: (draft, stepChoiceSets) =>
+    draft.equipment?.skipped === true || isChoiceStepComplete(draft, stepChoiceSets),
   spells: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
   review: (draft, _stepChoiceSets, resolvedChoiceSets) =>
     isReviewComplete(draft, resolvedChoiceSets),

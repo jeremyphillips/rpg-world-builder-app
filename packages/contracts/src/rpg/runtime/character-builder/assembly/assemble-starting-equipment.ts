@@ -158,6 +158,10 @@ export function assembleStartingEquipment(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
 ): { equipment: CharacterEquipment; wealth: CharacterWealth } {
+  if (draft.equipment?.skipped) {
+    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
+  }
+
   if (draft.equipment) {
     const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
     return {

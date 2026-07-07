@@ -8,12 +8,11 @@ import type {
   CharacterBuildValidationIssue,
   ChoiceSet,
 } from '@rpg/contracts'
-
-import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
 import { IdentityStep } from './steps/identity-step.client'
 import { ProficienciesStep } from './steps/proficiencies-step.client'
+import { EquipmentStep } from './steps/equipment-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
 import { SpellsStep } from './steps/spells-step.client'
@@ -97,7 +96,15 @@ export function CharacterBuilderStepContent({
         />
       )
     case 'equipment':
-      return <CharacterBuilderStepPanel stepId={stepId} status="deferred" />
+      return (
+        <EquipmentStep
+          context={context}
+          draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     case 'spells':
       return (
         <SpellsStep
