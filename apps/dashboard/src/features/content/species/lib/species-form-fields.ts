@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { vocabularySelectField } from '@/features/homebrew'
+import { buildActiveLanguageFieldOptions, vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import {
@@ -76,6 +76,7 @@ export function createSpeciesFormSchema(
       speed: z.object({
         walk: z.coerce.number().int().min(0),
       }),
+      languageAffinities: z.array(z.string()).optional(),
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
       characterCreation: speciesCharacterCreationFormSchema.optional(),
@@ -120,6 +121,13 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
           defaultValue: 30,
         }),
       ],
+    },
+    {
+      type: 'chips',
+      name: 'languageAffinities',
+      label: 'Language affinities',
+      hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
+      options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
     },
     {
       type: 'chips',

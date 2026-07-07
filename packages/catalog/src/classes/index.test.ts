@@ -302,12 +302,15 @@ describe('SRD 5.2.1 class seed', () => {
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
     const druidic = druid.features.find((f) => f.id === 'druidic')
-    const druidicSpell = druidic?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    const druidicGrants = druidic?.grantGroups?.[0]?.grants ?? []
+    const druidicSpell = druidicGrants.find((g) => g.kind === 'spells')
     expect(druidicSpell).toMatchObject({
       kind: 'spells',
       mode: 'always_prepared',
       spellIds: ['speak-with-animals'],
     })
+    const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
+    expect(druidicLanguage).toEqual({ kind: 'languages', languageIds: ['druidic'] })
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
     expect(wildShape?.description).toContain('<strong>Beast Shapes.</strong>')
     expect(wildShape?.description).toContain('<strong>Game Statistics.</strong>')

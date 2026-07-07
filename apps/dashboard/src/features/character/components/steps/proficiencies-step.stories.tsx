@@ -1,22 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import {
-  buildCharacterPreview,
-  createEmptyCharacterBuilderDraft,
-  indexCharacterBuildCatalog,
-  resolveAvailableChoices,
-} from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import {
   createEmptyProficienciesStepPreviewFixture,
-  createProficienciesStepRogueContextFixture,
-  proficienciesStepRogueClass,
+  createProficienciesStepOriginLanguagesFixture,
+  createProficienciesStepRogueFixture,
+  createProficienciesStepRogueWithSkillSelectionsFixture,
+  createProficienciesStepRogueWithStaleSkillFixture,
 } from '../../lib/proficiencies-step.fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import { ProficienciesStep } from './proficiencies-step.client'
 
-const originLanguagesContext = createPopulatedStandaloneBuilderContextFixture()
-const rogueContext = createProficienciesStepRogueContextFixture()
+const emptyContext = createStandaloneBuilderContextFixture()
 
 const meta = {
   title: 'Character Builder/ProficienciesStep',
@@ -30,7 +26,7 @@ type Story = StoryObj<typeof ProficienciesStep>
 export const Empty: Story = {
   render: () => (
     <ProficienciesStep
-      context={originLanguagesContext}
+      context={emptyContext}
       draft={createEmptyCharacterBuilderDraft()}
       preview={createEmptyProficienciesStepPreviewFixture()}
       resolvedChoiceSets={[]}
@@ -42,20 +38,12 @@ export const Empty: Story = {
 
 export const OriginLanguages: Story = {
   render: () => {
-    const draft = createEmptyCharacterBuilderDraft()
-    const resolvedChoiceSets = resolveAvailableChoices(draft, originLanguagesContext)
-    const catalogIndex = indexCharacterBuildCatalog(originLanguagesContext.catalog)
-    const preview = buildCharacterPreview(
-      draft,
-      catalogIndex,
-      originLanguagesContext.characterCreationRules,
-      originLanguagesContext.rulesetId,
-      { resolvedChoiceSets },
-    )
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepOriginLanguagesFixture()
 
     return (
       <ProficienciesStep
-        context={originLanguagesContext}
+        context={context}
         draft={draft}
         preview={preview}
         resolvedChoiceSets={resolvedChoiceSets}
@@ -68,23 +56,47 @@ export const OriginLanguages: Story = {
 
 export const Rogue: Story = {
   render: () => {
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      class: { classId: proficienciesStepRogueClass.id, level: 1 as const },
-    }
-    const resolvedChoiceSets = resolveAvailableChoices(draft, rogueContext)
-    const catalogIndex = indexCharacterBuildCatalog(rogueContext.catalog)
-    const preview = buildCharacterPreview(
-      draft,
-      catalogIndex,
-      rogueContext.characterCreationRules,
-      rogueContext.rulesetId,
-      { resolvedChoiceSets },
-    )
+    const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
 
     return (
       <ProficienciesStep
-        context={rogueContext}
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const RogueWithSelections: Story = {
+  render: () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepRogueWithSkillSelectionsFixture()
+
+    return (
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const RogueStaleSelection: Story = {
+  render: () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepRogueWithStaleSkillFixture()
+
+    return (
+      <ProficienciesStep
+        context={context}
         draft={draft}
         preview={preview}
         resolvedChoiceSets={resolvedChoiceSets}

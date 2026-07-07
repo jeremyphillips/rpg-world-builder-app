@@ -8,19 +8,23 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import {
   createEmptyProficienciesStepPreviewFixture,
+  createProficienciesStepOriginLanguagesFixture,
   createProficienciesStepRogueFixture,
+  createProficienciesStepRogueWithStaleSkillFixture,
+  proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
 } from '../../lib/proficiencies-step.fixtures'
 import { PROFICIENCIES_STEP_EMPTY_MESSAGE } from '../../lib/proficiencies-step.lib'
+import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from '../proficiencies/proficiency-selected-row.client'
 import { ProficienciesStep } from './proficiencies-step.client'
 
-const originLanguagesContext = createStandaloneBuilderContextFixture()
+const emptyContext = createStandaloneBuilderContextFixture()
 
 describe('ProficienciesStep', () => {
   it('renders the empty-step message when no sections are visible', () => {
     render(
       <ProficienciesStep
-        context={originLanguagesContext}
+        context={emptyContext}
         draft={createEmptyCharacterBuilderDraft()}
         preview={createEmptyProficienciesStepPreviewFixture()}
         resolvedChoiceSets={[]}
@@ -59,6 +63,104 @@ describe('ProficienciesStep', () => {
     expect(within(skillsChoiceSection).getByText('Selected: 0 / 2')).toBeInTheDocument()
   })
 
+  it('shows only sections with grants or choices', () => {
+    const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tools' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Weapons' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Armor' })).toBeInTheDocument()
+  })
+
+  it('renders the origin language choice section without class grants', () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepOriginLanguagesFixture()
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Origin Languages' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add language' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Saving Throws' })).not.toBeInTheDocument()
+  })
+
+  it('shows a stale badge for invalid skill selections', () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepRogueWithStaleSkillFixture()
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText(PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL)).toBeInTheDocument()
+    expect(screen.getByText('Stealth')).toBeInTheDocument()
+  })
+
+  it('opens the language picker drawer from the origin languages choice', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepOriginLanguagesFixture()
+    const languageChoiceSetId = resolvedChoiceSets.find(
+      (choiceSet) => choiceSet.choiceType === 'language',
+    )!.id
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add language' }))
+    expect(screen.getByRole('heading', { name: 'Add language' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search languages' })).toBeInTheDocument()
+
+    const dialog = screen.getByRole('dialog', { name: 'Add language' })
+    const elvishRow = within(dialog)
+      .getByText('Elvish')
+      .closest('[data-picker-item-key]') as HTMLElement
+    await user.click(within(elvishRow).getByRole('button', { name: 'Add' }))
+    expect(onDraftChange).toHaveBeenCalledWith({
+      choiceSelections: {
+        [languageChoiceSetId]: ['elvish'],
+      },
+    })
+  })
+
   it('persists skill removals in draft.choiceSelections', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
@@ -91,6 +193,74 @@ describe('ProficienciesStep', () => {
         [skillChoiceSetId]: [],
       },
     })
+  })
+
+  it('opens the picker drawer and persists skill selections', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
+    const skillChoiceSetId = resolvedChoiceSets.find(
+      (choiceSet) => choiceSet.choiceType === 'skillProficiency',
+    )!.id
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add skill proficiency' }))
+    expect(screen.getByRole('heading', { name: 'Add skill proficiency' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search skills' })).toBeInTheDocument()
+
+    const acrobaticsRow = screen
+      .getByText('Acrobatics')
+      .closest('[data-picker-item-key]') as HTMLElement
+    await user.click(within(acrobaticsRow).getByRole('button', { name: 'Add' }))
+    expect(onDraftChange).toHaveBeenCalledWith({
+      choiceSelections: {
+        [skillChoiceSetId]: [proficienciesStepAcrobaticsSkill.id],
+      },
+    })
+  })
+
+  it('shows Manage label when selection is full and keeps the drawer trigger enabled', async () => {
+    const user = userEvent.setup()
+    const base = createProficienciesStepRogueFixture()
+    const skillChoiceSetId = base.resolvedChoiceSets.find(
+      (choiceSet) => choiceSet.choiceType === 'skillProficiency',
+    )!.id
+    const { context, preview, resolvedChoiceSets } = base
+    const draft = {
+      ...base.draft,
+      choiceSelections: {
+        [skillChoiceSetId]: [proficienciesStepStealthSkill.id, proficienciesStepAcrobaticsSkill.id],
+      },
+    }
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    const manageButton = screen.getByRole('button', { name: 'Manage skill choices' })
+    expect(manageButton).toBeEnabled()
+
+    await user.click(manageButton)
+    expect(screen.getByRole('heading', { name: 'Manage skill choices' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
+    expect(screen.getAllByRole('button', { name: 'Remove' }).length).toBeGreaterThan(0)
   })
 
   it('builds preview when none is passed', () => {

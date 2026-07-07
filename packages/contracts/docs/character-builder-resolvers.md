@@ -59,6 +59,7 @@ Registry entries are **thin adapters** (`resolve-*-choices.ts`) that delegate to
 | `resolveSpeciesHeritageChoices`   | `species/`      | `resolve-species-heritage-choice-sets.ts`    | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
 | `resolveSpeciesTraitGrantChoices` | `species/`      | `resolve-species-trait-grant-choice-sets.ts` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
 | `resolveClassSkillChoices`        | `class/`        | `resolve-class-skill-choice-sets.ts`         | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
+| `resolveClassToolChoices`         | `class/`        | `resolve-class-tool-choice-sets.ts`          | **Implemented** (BENCH-116) | Class `characterCreation.proficiencies.tools` pick (`toolProficiency`).                                                     |
 | `resolveClassFeatureGrantChoices` | `class/`        | `resolve-class-feature-grant-choice-sets.ts` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
 | `resolveStartingEquipmentChoices` | `equipment/`    | `resolve-starting-equipment-choice-sets.ts`  | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
 | `resolveSpellcastingChoices`      | `spellcasting/` | `resolve-spellcasting-choice-sets.ts`        | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                      |
@@ -80,6 +81,7 @@ Resolvers never read the deprecated `grants` bag directly.
 | --------------------------- | -------------------------------------------------------------------------- |
 | `heritage`                  | `resolveSpeciesHeritageChoices`                                            |
 | `classSkills:choose:from`   | `resolveClassSkillChoices`                                                 |
+| `classTools:choose:from`    | `resolveClassToolChoices`                                                  |
 | `featChoice:origin`         | `resolveSpeciesTraitGrantChoices` (`required: false` — MVP defers feat UI) |
 | `featChoice:fighting-style` | `resolveClassFeatureGrantChoices` (`required: false`)                      |
 | `starting-equipment`        | `resolveStartingEquipmentChoices`                                          |
@@ -92,14 +94,24 @@ Finalize and preview call these modules after `resolveAvailableChoices`. Each
 composes creature primitives, draft selections, and character assembly with
 `CharacterSelectionSource` provenance.
 
-| Module                                        | Domain             | Called from                           |
-| --------------------------------------------- | ------------------ | ------------------------------------- |
-| `assembly/assemble-language-proficiencies.ts` | Languages          | `assemble-proficiencies.ts`, finalize |
-| `assembly/assemble-skill-proficiencies.ts`    | Skills             | `assemble-proficiencies.ts`           |
-| `mergeSkillProficiencyEntries`                | Skills (dedupe)    | `assemble-skill-proficiencies.ts`     |
-| `assembly/assemble-starting-equipment.ts`     | Equipment + wealth | `finalize.ts`, `preview.ts`           |
-| `assembly/assemble-spellcasting.ts`           | Spells             | `finalize.ts`                         |
-| `assembly/assemble-proficiencies.ts`          | Aggregate          | `finalize.ts`, `preview-adapter.ts`   |
+| Module                                        | Domain                                                                                     | Called from                           |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------- |
+| `assembly/assemble-language-proficiencies.ts` | Languages (ruleset grants, origin ChoiceSet picks, class-feature fixed `languages` grants) | `assemble-proficiencies.ts`, finalize |
+| `assembly/assemble-skill-proficiencies.ts`    | Skills                                                                                     | `assemble-proficiencies.ts`           |
+| `assembly/assemble-tool-proficiencies.ts`     | Tools                                                                                      | `assemble-proficiencies.ts`           |
+| `mergeSkillProficiencyEntries`                | Skills (dedupe)                                                                            | `assemble-skill-proficiencies.ts`     |
+| `mergeToolProficiencyEntries`                 | Tools (dedupe)                                                                             | `assemble-tool-proficiencies.ts`      |
+| `assembly/assemble-starting-equipment.ts`     | Equipment + wealth                                                                         | `finalize.ts`, `preview.ts`           |
+| `assembly/assemble-spellcasting.ts`           | Spells                                                                                     | `finalize.ts`                         |
+| `assembly/assemble-proficiencies.ts`          | Aggregate                                                                                  | `finalize.ts`, `preview-adapter.ts`   |
+
+`assemble-language-proficiencies.ts` merges three language sources at finalize:
+
+1. Ruleset automatic grants (e.g. Common via `proficiencyGrants.languages`)
+2. Draft selections from language ChoiceSets (e.g. origin languages)
+3. Fixed `languages` grants from unlocked class features (e.g. Druidic on the Druid class)
+
+Species trait / heritage fixed language grants remain follow-on work.
 
 ## Creature primitives (`runtime/creature/`)
 

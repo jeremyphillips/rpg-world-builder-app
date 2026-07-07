@@ -1,4 +1,5 @@
 import type { ClassStored } from '../../content/classes/class'
+import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
@@ -77,11 +78,81 @@ export const rogueClass: ClassStored = {
   features: [],
 }
 
+export const luteTool = {
+  id: 'srd-cc-5.2.1:lute',
+  slug: 'lute',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Lute',
+  description: '',
+  cost: { amount: 35, currency: 'gp' },
+  weight: { value: 2, unit: 'lb' },
+  kind: 'tool',
+  toolCategory: 'musical_instrument',
+  ability: 'cha',
+  utilizes: [{ description: 'Play a known tune', dc: 10 }],
+} as const satisfies Equipment
+
+export const fluteTool = {
+  id: 'srd-cc-5.2.1:flute',
+  slug: 'flute',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Flute',
+  description: '',
+  cost: { amount: 2, currency: 'gp' },
+  weight: { value: 1, unit: 'lb' },
+  kind: 'tool',
+  toolCategory: 'musical_instrument',
+  ability: 'dex',
+  utilizes: [{ description: 'Play a known tune', dc: 10 }],
+} as const satisfies Equipment
+
+export const bardClass: ClassStored = {
+  id: 'srd-cc-5.2.1:bard',
+  slug: 'bard',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Bard',
+  primaryAbilities: ['cha'],
+  hitDie: 8,
+  proficiencies: {
+    savingThrows: ['dex', 'cha'],
+    armor: { categories: ['light'], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      tools: {
+        choices: [
+          {
+            id: 'class-tools',
+            label: 'Bard Tools',
+            choose: 1,
+            from: ['lute', 'flute'],
+          },
+        ],
+      },
+    },
+  },
+  features: [],
+}
+
 export const proficiencyTestCatalog: CharacterBuildCatalog = {
   species: [dwarfSpecies],
-  classes: [rogueClass],
+  classes: [rogueClass, bardClass],
   spells: [],
-  equipment: [],
+  equipment: [luteTool, fluteTool],
   skillProficiencies: [stealthSkill, acrobaticsSkill, perceptionSkill],
   languages: [...builderTestLanguages],
 }

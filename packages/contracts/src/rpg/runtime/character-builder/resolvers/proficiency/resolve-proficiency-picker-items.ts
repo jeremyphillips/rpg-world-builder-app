@@ -3,6 +3,7 @@ import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
+import { resolveToolIdFromOption } from '../../assembly/assemble-tool-proficiencies'
 import {
   PICKER_DISABLED_REASON_SELECTION_FULL,
   type PickerItemStateBase,
@@ -48,6 +49,15 @@ function findGrantedLanguageEntry(proficiencies: CharacterProficiencies, optionI
   return proficiencies.languages.find((entry) => entry.language === optionId)
 }
 
+function findGrantedToolEntry(
+  proficiencies: CharacterProficiencies,
+  optionId: string,
+  catalogIndex: CharacterBuildCatalogIndex,
+) {
+  const toolId = resolveToolIdFromOption(optionId, catalogIndex)
+  return proficiencies.tools.find((entry) => entry.toolId === toolId)
+}
+
 function findGrantedEntry(
   choiceSet: ChoiceSet,
   optionId: string,
@@ -59,6 +69,8 @@ function findGrantedEntry(
       return findGrantedSkillEntry(proficiencies, optionId, catalogIndex)
     case 'language':
       return findGrantedLanguageEntry(proficiencies, optionId)
+    case 'toolProficiency':
+      return findGrantedToolEntry(proficiencies, optionId, catalogIndex)
     default:
       return undefined
   }

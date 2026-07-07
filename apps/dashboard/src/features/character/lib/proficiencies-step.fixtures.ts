@@ -18,7 +18,11 @@ import {
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
+import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
+
 const RULESET = DEFAULT_SYSTEM_RULESET_ID
+
+export const PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID = 'removed-skill' as const
 
 const timestamps = {
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -217,4 +221,60 @@ export function createProficienciesStepRogueFixture(
   })
 
   return { context, draft, resolvedChoiceSets, preview, model }
+}
+
+export function createProficienciesStepOriginLanguagesFixture() {
+  const context = createPopulatedStandaloneBuilderContextFixture()
+  const draft = createEmptyCharacterBuilderDraft()
+  const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const preview = buildCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+    { resolvedChoiceSets },
+  )
+  const model = resolveProficiencyStepModel({
+    draft,
+    context,
+    preview,
+    choiceSets: resolvedChoiceSets,
+  })
+
+  return { context, draft, resolvedChoiceSets, preview, model }
+}
+
+export function createProficienciesStepRogueWithSkillSelectionsFixture(
+  skillIds: readonly string[] = [
+    proficienciesStepStealthSkill.id,
+    proficienciesStepAcrobaticsSkill.id,
+  ],
+) {
+  const base = createProficienciesStepRogueFixture()
+  const skillChoiceSetId = base.resolvedChoiceSets.find(
+    (choiceSet) => choiceSet.choiceType === 'skillProficiency',
+  )!.id
+
+  return createProficienciesStepRogueFixture({
+    choiceSelections: {
+      [skillChoiceSetId]: [...skillIds],
+    },
+  })
+}
+
+export function createProficienciesStepRogueWithStaleSkillFixture() {
+  const base = createProficienciesStepRogueFixture()
+  const skillChoiceSetId = base.resolvedChoiceSets.find(
+    (choiceSet) => choiceSet.choiceType === 'skillProficiency',
+  )!.id
+
+  return createProficienciesStepRogueFixture({
+    choiceSelections: {
+      [skillChoiceSetId]: [
+        proficienciesStepStealthSkill.id,
+        PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
+      ],
+    },
+  })
 }

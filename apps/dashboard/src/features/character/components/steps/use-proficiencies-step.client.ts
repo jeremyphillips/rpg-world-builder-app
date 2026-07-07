@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import {
   buildCharacterPreview,
   indexCharacterBuildCatalog,
+  resolveProficiencyPickerItems,
   resolveProficiencyStepModel,
 } from '@rpg/contracts'
 
@@ -44,8 +45,35 @@ export function useProficienciesStep({
     [context, draft, effectivePreview, resolvedChoiceSets],
   )
 
+  const activeChoiceSet = useMemo(
+    () => resolvedChoiceSets.find((choiceSet) => choiceSet.id === openChoiceSetId),
+    [openChoiceSetId, resolvedChoiceSets],
+  )
+
+  const pickerItems = useMemo(() => {
+    if (!activeChoiceSet) return []
+    return resolveProficiencyPickerItems({
+      draft,
+      context,
+      choiceSetId: activeChoiceSet.id,
+      proficiencies: effectivePreview.proficiencies,
+    })
+  }, [activeChoiceSet, context, draft, effectivePreview.proficiencies])
+
   const openChoiceSet = (choiceSetId: string) => {
     setOpenChoiceSetId(choiceSetId)
+  }
+
+  const closeChoiceSet = () => {
+    setOpenChoiceSetId(null)
+  }
+
+  const addChoiceSelection = (choiceSetId: string, optionId: string) => {
+    const selections = draft.choiceSelections[choiceSetId] ?? []
+    if (selections.includes(optionId)) return
+    onDraftChange({
+      choiceSelections: withChoiceSetSelections(draft, choiceSetId, [...selections, optionId]),
+    })
   }
 
   const removeChoiceSelection = (choiceSetId: string, optionId: string) => {
@@ -61,10 +89,12 @@ export function useProficienciesStep({
 
   return {
     model,
-    openChoiceSetId,
-    setOpenChoiceSetId,
+    activeChoiceSet,
+    pickerItems,
     openChoiceSet,
+    closeChoiceSet,
+    addChoiceSelection,
     removeChoiceSelection,
-    onDraftChange,
+    draft,
   }
 }

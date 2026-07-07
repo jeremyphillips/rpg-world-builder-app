@@ -118,6 +118,11 @@ function proficiencySelectionLabel(
     return skillRow?.name ?? optionId
   }
 
+  if (choiceSet.choiceType === 'toolProficiency') {
+    const equipment = catalogIndex.equipment.get(optionId)
+    return equipment?.name ?? optionId
+  }
+
   return optionId
 }
 

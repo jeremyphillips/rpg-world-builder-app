@@ -3,6 +3,7 @@
 import { Text } from '@rpg/ui'
 
 import { PROFICIENCIES_STEP_EMPTY_MESSAGE } from '../../lib/proficiencies-step.lib'
+import { ProficiencyPickerDrawer } from '../proficiencies/proficiency-picker-drawer.client'
 import { ProficiencySection } from '../proficiencies/proficiency-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import type { ProficienciesStepProps } from './proficiencies-step.types'
@@ -14,7 +15,16 @@ export function ProficienciesStepView({
 }: Pick<ProficienciesStepProps, 'validationIssues'> & {
   step: ReturnType<typeof useProficienciesStep>
 }) {
-  const { model, openChoiceSet, removeChoiceSelection } = step
+  const {
+    model,
+    activeChoiceSet,
+    pickerItems,
+    draft,
+    openChoiceSet,
+    closeChoiceSet,
+    addChoiceSelection,
+    removeChoiceSelection,
+  } = step
 
   if (model.sections.length === 0) {
     return (
@@ -36,6 +46,20 @@ export function ProficienciesStepView({
           />
         ))}
       </div>
+
+      {activeChoiceSet ? (
+        <ProficiencyPickerDrawer
+          open
+          onOpenChange={(open) => {
+            if (!open) closeChoiceSet()
+          }}
+          choiceSet={activeChoiceSet}
+          selectedIds={draft.choiceSelections[activeChoiceSet.id] ?? []}
+          items={pickerItems}
+          onSelectOption={(optionId) => addChoiceSelection(activeChoiceSet.id, optionId)}
+          onRemoveOption={(optionId) => removeChoiceSelection(activeChoiceSet.id, optionId)}
+        />
+      ) : null}
     </BuilderStepFrame>
   )
 }

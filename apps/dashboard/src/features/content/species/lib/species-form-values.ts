@@ -14,6 +14,7 @@ export const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
   creatureType: 'humanoid',
   sizes: ['medium'],
   speed: { walk: 30 },
+  languageAffinities: [],
   traits: [],
 }
 
@@ -25,6 +26,7 @@ export function speciesToFormValues(entity: Species): SpeciesFormValues {
     creatureType: entity.creatureType,
     sizes: entity.sizes,
     speed: { walk: entity.speed.walk },
+    languageAffinities: entity.languageAffinities ?? [],
     traits: entity.traits.map(traitToFormRow),
     heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
     characterCreation: characterCreationToFormValues(entity.characterCreation),
@@ -45,6 +47,9 @@ export function buildSpeciesCreateInput(
       creatureType: values.creatureType,
       sizes: values.sizes,
       speed: { walk: values.speed.walk },
+      ...(values.languageAffinities && values.languageAffinities.length > 0
+        ? { languageAffinities: values.languageAffinities }
+        : {}),
       traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
       heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
       ...(characterCreation ? { characterCreation } : {}),

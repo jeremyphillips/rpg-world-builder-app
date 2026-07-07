@@ -20,6 +20,7 @@ import {
   innateSpellEntrySchema,
   innateSpellsSchema,
 } from './lib/grants'
+import { languageIdSchema } from '../vocab/language'
 import { speciesCharacterCreationSchema } from './species-character-creation'
 
 // ---------------------------------------------------------------------------
@@ -73,6 +74,11 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
   speed: speedSchema,
+  /**
+   * Recommended language ids for origin picks. Marks selectable ChoiceSet options
+   * as recommended in the UI; does not grant languages or expand selectable pools.
+   */
+  languageAffinities: z.array(languageIdSchema).optional(),
   traits: z.array(contentTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */

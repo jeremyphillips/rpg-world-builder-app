@@ -7,7 +7,9 @@ import { PROFICIENCY_STALE_REASON } from '@rpg/contracts'
 
 import {
   createProficienciesStepRogueFixture,
+  createProficienciesStepRogueWithStaleSkillFixture,
   proficienciesStepStealthSkill,
+  PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
 } from '../../lib/proficiencies-step.fixtures'
 import {
   PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL,
@@ -41,19 +43,13 @@ describe('ProficiencySelectedRow', () => {
   })
 
   it('shows a stale badge when the row is stale', () => {
-    const base = createProficienciesStepRogueFixture()
-    const skillChoiceSetId = base.resolvedChoiceSets.find(
-      (choiceSet) => choiceSet.choiceType === 'skillProficiency',
-    )!.id
-    const { model } = createProficienciesStepRogueFixture({
-      choiceSelections: {
-        [skillChoiceSetId]: [proficienciesStepStealthSkill.id, 'removed-skill'],
-      },
-    })
+    const { model } = createProficienciesStepRogueWithStaleSkillFixture()
 
     const staleRow = model.sections
       .find((section) => section.kind === 'skills')!
-      .choices[0]!.selectedRows.find((row) => row.optionId === 'removed-skill')!
+      .choices[0]!.selectedRows.find(
+        (row) => row.optionId === PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
+      )!
 
     render(<ProficiencySelectedRow row={staleRow} onRemove={() => undefined} />)
 

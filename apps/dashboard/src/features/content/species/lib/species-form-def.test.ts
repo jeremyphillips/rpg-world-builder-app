@@ -99,6 +99,24 @@ describe('speciesFormDef round-trips', () => {
     ).toBe(true)
   })
 
+  it('dwarf: languageAffinities round-trip through form values', () => {
+    const dwarf = SRD_SPECIES.find((s) => s.slug === 'dwarf')!
+    const formValues = speciesFormDef.toFormValues(dwarf) as SpeciesFormValues
+    expect(formValues.languageAffinities).toEqual(['dwarvish'])
+
+    const input = speciesFormDef.toInput(formValues)
+    expect(input.languageAffinities).toEqual(['dwarvish'])
+  })
+
+  it('human: omits languageAffinities when empty on save', () => {
+    const human = SRD_SPECIES.find((s) => s.slug === 'human')!
+    const formValues = speciesFormDef.toFormValues(human) as SpeciesFormValues
+    expect(formValues.languageAffinities).toEqual([])
+
+    const input = speciesFormDef.toInput(formValues)
+    expect(input.languageAffinities).toBeUndefined()
+  })
+
   it('elf: darkvision sense grant is preserved (grantGroups)', () => {
     const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
     const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
