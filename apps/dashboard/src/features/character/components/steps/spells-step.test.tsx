@@ -112,6 +112,37 @@ describe('SpellsStep', () => {
     })
   })
 
+  it('shows Manage cantrips when the cantrip ChoiceSet is full and keeps the drawer trigger enabled', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: spellsStepWizardClass.id, level: 1 as const },
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+    const cantripChoiceSetId = resolvedChoiceSets.find(
+      (choiceSet) => choiceSet.choiceType === 'cantrip',
+    )!.id
+
+    render(
+      <SpellsStep
+        context={context}
+        draft={{
+          ...draft,
+          choiceSelections: {
+            [cantripChoiceSetId]: spellsStepWizardCantrips.map((spell) => spell.id),
+          },
+        }}
+        preview={null}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    const manageButton = screen.getByRole('button', { name: 'Manage cantrips' })
+    expect(manageButton).toBeEnabled()
+    expect(screen.getByText('Selection full')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations for a wizard draft', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
