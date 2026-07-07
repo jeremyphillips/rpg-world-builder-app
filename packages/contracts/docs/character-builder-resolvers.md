@@ -22,7 +22,8 @@ this document tracks the full internal layout, status, and promotion path.
 | `deriveEquipmentBudgetSummary`            | `resolvers/equipment/equipment-budget.ts`                            | Starting/spent/remaining wealth for the equipment picker.                    |
 | `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | Annotates equipment rows with picker state + `searchText`.                   |
 | `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | Package option card enrichment for the Equipment step.                       |
-| `formatProficiencySourceLabel`            | `resolvers/proficiency/format-proficiency-source-label.ts`           | MVP provenance labels for proficiency step rows (BENCH-118 unifies).         |
+| `formatSelectionSourceLabel`              | `runtime/character/format-selection-source-label.ts`                 | Shared provenance labels for equipment and proficiency rows (BENCH-118).     |
+| `formatProficiencySourceLabel`            | `resolvers/proficiency/format-proficiency-source-label.ts`           | Thin wrapper over `formatSelectionSourceLabel` with proficiency `rowKind`.   |
 | `formatSavingThrowProficiencyLabel`       | `resolvers/proficiency/format-saving-throw-proficiency-label.ts`     | Saving throw row label (`DEX · Dexterity`).                                  |
 | `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | Sectioned grants + ChoiceSet summaries for the Proficiencies step.           |
 | `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | Proficiency picker row state (granted overlap + selection full).             |
@@ -162,16 +163,23 @@ Finalize and preview call these modules after `resolveAvailableChoices`. Each
 composes creature primitives, draft selections, and character assembly with
 `CharacterSelectionSource` provenance.
 
-| Module                                        | Domain                                                                                     | Called from                           |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------- |
-| `assembly/assemble-language-proficiencies.ts` | Languages (ruleset grants, origin ChoiceSet picks, class-feature fixed `languages` grants) | `assemble-proficiencies.ts`, finalize |
-| `assembly/assemble-skill-proficiencies.ts`    | Skills                                                                                     | `assemble-proficiencies.ts`           |
-| `assembly/assemble-tool-proficiencies.ts`     | Tools                                                                                      | `assemble-proficiencies.ts`           |
-| `mergeSkillProficiencyEntries`                | Skills (dedupe)                                                                            | `assemble-skill-proficiencies.ts`     |
-| `mergeToolProficiencyEntries`                 | Tools (dedupe)                                                                             | `assemble-tool-proficiencies.ts`      |
-| `assembly/assemble-starting-equipment.ts`     | Equipment + wealth                                                                         | `finalize.ts`, `preview.ts`           |
-| `assembly/assemble-spellcasting.ts`           | Spells                                                                                     | `finalize.ts`                         |
-| `assembly/assemble-proficiencies.ts`          | Aggregate                                                                                  | `finalize.ts`, `preview-adapter.ts`   |
+| Module                                         | Domain                                                                                     | Called from                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------- |
+| `assembly/assemble-language-proficiencies.ts`  | Languages (ruleset grants, origin ChoiceSet picks, class-feature fixed `languages` grants) | `assemble-proficiencies.ts`, finalize |
+| `assembly/assemble-skill-proficiencies.ts`     | Skills (class-fixed, grant-derived, ChoiceSet picks)                                       | `assemble-proficiencies.ts`           |
+| `assembly/assemble-tool-proficiencies.ts`      | Tools (class-fixed, grant-derived, ChoiceSet picks)                                        | `assemble-proficiencies.ts`           |
+| `assembly/assemble-weapon-proficiencies.ts`    | Weapons (class-fixed, grant-derived, ChoiceSet picks)                                      | `assemble-proficiencies.ts`           |
+| `assembly/assemble-armor-proficiencies.ts`     | Armor (class-fixed, grant-derived, ChoiceSet picks)                                        | `assemble-proficiencies.ts`           |
+| `assembly/assemble-grant-proficiencies.ts`     | Fixed grant rows from species traits, heritage, and class features                         | domain `assemble-*-proficiencies.ts`  |
+| `assembly/collect-sourced-grants.ts`           | Unlocked grant walk with provenance                                                        | `assemble-grant-proficiencies.ts`     |
+| `assembly/selection-source-from-choice-set.ts` | ChoiceSet source metadata → `CharacterSelectionSource`                                     | domain `assemble-*-proficiencies.ts`  |
+| `mergeSkillProficiencyEntries`                 | Skills (dedupe)                                                                            | `assemble-skill-proficiencies.ts`     |
+| `mergeToolProficiencyEntries`                  | Tools (dedupe)                                                                             | `assemble-tool-proficiencies.ts`      |
+| `mergeWeaponProficiencyEntries`                | Weapons (dedupe)                                                                           | `assemble-weapon-proficiencies.ts`    |
+| `mergeArmorProficiencyEntries`                 | Armor (dedupe)                                                                             | `assemble-armor-proficiencies.ts`     |
+| `assembly/assemble-starting-equipment.ts`      | Equipment + wealth                                                                         | `finalize.ts`, `preview.ts`           |
+| `assembly/assemble-spellcasting.ts`            | Spells                                                                                     | `finalize.ts`                         |
+| `assembly/assemble-proficiencies.ts`           | Aggregate                                                                                  | `finalize.ts`, `preview-adapter.ts`   |
 
 `assemble-language-proficiencies.ts` merges three language sources at finalize:
 
@@ -179,25 +187,27 @@ composes creature primitives, draft selections, and character assembly with
 2. Draft selections from language ChoiceSets (e.g. origin languages)
 3. Fixed `languages` grants from unlocked class features (e.g. Druidic on the Druid class)
 
-Species trait / heritage fixed language grants remain follow-on work.
+Species trait / heritage fixed language grants remain follow-on work. Grant-derived
+skill/weapon/tool/armor proficiencies finalize via `assemble-grant-proficiencies.ts`
+and domain `assemble-*-proficiencies.ts` modules (BENCH-117).
 
 ## Creature primitives (`runtime/creature/`)
 
 Promoted catalog/grant expansion reused across builder, NPC, and future monster surfaces.
 Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
-| Module            | Exports (examples)                                                   | Consumed by                                     |
-| ----------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
-| `languages.ts`    | `resolveLanguagesFromChoiceSource`, `resolveLanguageIdsFromGrantSet` | Language ChoiceSets, finalize, grant ChoiceSets |
-| `equipment.ts`    | `listEquipmentMatchingPool`, `toEquipmentContentId`                  | Equipment pool options, starting equipment      |
-| `spellcasting.ts` | `cantripsKnownAtLevel`, `maxSelectableSpellLevel`                    | `spellcasting-profile.ts`                       |
+| Module             | Exports (examples)                                                                                                          | Consumed by                                     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `languages.ts`     | `resolveLanguagesFromChoiceSource`, `resolveLanguageIdsFromGrantSet`                                                        | Language ChoiceSets, finalize, grant ChoiceSets |
+| `proficiencies.ts` | `listSkillsMatchingPool`, `listWeaponsMatchingPool`, `listToolsMatchingPool`, `listArmorMatchingPool`, `*PoolChoiceOptions` | Grant proficiency ChoiceSets, finalize          |
+| `equipment.ts`     | `listEquipmentMatchingPool`, `toEquipmentContentId`                                                                         | Equipment pool options, starting equipment      |
+| `spellcasting.ts`  | `cantripsKnownAtLevel`, `maxSelectableSpellLevel`                                                                           | `spellcasting-profile.ts`                       |
 
 ### Promotion backlog
 
-| Candidate                   | Disposition                                                                                         |
-| --------------------------- | --------------------------------------------------------------------------------------------------- |
-| `creature/proficiencies.ts` | Deferred — filtered `any` skill/weapon/tool pools need finalize assembly first                      |
-| `validate/` split           | Done — `types`, `issue`, `validate-step-fields`, `validate-choice-sets`, `validate-character-build` |
+| Candidate         | Disposition                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| `validate/` split | Done — `types`, `issue`, `validate-step-fields`, `validate-choice-sets`, `validate-character-build` |
 
 ## Deferred / folded resolvers
 

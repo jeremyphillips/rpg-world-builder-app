@@ -21,6 +21,7 @@ import {
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterSelectionSource,
+  formatSelectionSourceLabel,
   type ChoiceSet,
   type Equipment,
   type EquipmentBudgetSummary,
@@ -219,26 +220,12 @@ export function readSelectedStartingEquipmentOption(
   return readSelectedStartingEquipmentOptionId(draft, classId)
 }
 
+/** @deprecated Use {@link formatSelectionSourceLabel} from `@rpg/contracts`. */
 export function formatEquipmentSourceLabel(
   sources: CharacterSelectionSource[] | undefined,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
-  const source = sources?.[0]
-  if (!source) return 'Unknown source'
-
-  if (source.kind === 'manual') return 'Added manually'
-
-  if (source.kind === 'startingGold') {
-    return 'Purchased with starting gold'
-  }
-
-  if (source.kind === 'classStartingEquipment') {
-    const characterClass = source.sourceId ? catalogIndex.classes.get(source.sourceId) : undefined
-    const className = characterClass?.name ?? 'class'
-    return `From ${className} starting equipment`
-  }
-
-  return 'Starting equipment'
+  return formatSelectionSourceLabel(sources, catalogIndex)
 }
 
 export function listEquipmentInventoryRows(

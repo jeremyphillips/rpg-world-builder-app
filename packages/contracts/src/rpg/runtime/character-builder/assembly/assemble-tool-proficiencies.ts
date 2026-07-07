@@ -1,17 +1,18 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { CharacterToolProficiencyEntry } from '../../character/proficiencies'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
+import { assembleGrantToolProficiencyEntries } from './assemble-grant-proficiencies'
+import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 
 // ---------------------------------------------------------------------------
 // Character Builder tool proficiency finalization — merges class-fixed tools
 // with ChoiceSet selections and provenance.
 // ---------------------------------------------------------------------------
 
-const CLASS_TOOL_PROFICIENCY_SOURCE = (classId: string): CharacterSelectionSource[] => [
-  { kind: 'classFeature', sourceId: classId, grantId: 'tool-proficiencies' },
+const CLASS_TOOL_PROFICIENCY_SOURCE = (classId: string) => [
+  { kind: 'classFeature' as const, sourceId: classId, grantId: 'tool-proficiencies' },
 ]
 
 function classFixedToolProficiencies(
@@ -34,22 +35,6 @@ function classFixedToolProficiencies(
   return [...fromCategories, ...fromItems]
 }
 
-function toolProficiencySource(choiceSet: ChoiceSet): CharacterSelectionSource[] {
-  return [{ kind: 'classFeature', sourceId: choiceSet.sourceId, grantId: choiceSet.id }]
-}
-
-/** Resolves a tool slug from a ChoiceSet option id or catalog equipment row. */
-export function resolveToolIdFromOption(
-  optionId: string,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  const equipment = catalogIndex.equipment.get(optionId)
-  if (equipment) return equipment.slug
-
-  const colonIndex = optionId.indexOf(':')
-  return colonIndex >= 0 ? optionId.slice(colonIndex + 1) : optionId
-}
-
 function selectedToolProficiencies(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -65,7 +50,7 @@ function selectedToolProficiencies(
       entries.push({
         toolId: resolveToolIdFromOption(optionId, catalogIndex),
         rank: 'proficient',
-        sources: toolProficiencySource(choiceSet),
+        sources: selectionSourceFromChoiceSet(choiceSet),
       })
     }
   }
@@ -109,10 +94,21 @@ export function assembleToolProficiencyEntries(
   choiceSets: readonly ChoiceSet[],
   characterClass: CharacterClass | undefined,
 ): CharacterToolProficiencyEntry[] {
-  if (!characterClass) return []
+  const classEntries = characterClass ? classFixedToolProficiencies(characterClass) : []
+  const grantEntries = assembleGrantToolProficiencyEntries(draft, catalogIndex, characterClass)
+  const selectedEntries = selectedToolProficiencies(draft, catalogIndex, choiceSets)
 
-  return mergeToolProficiencyEntries([
-    ...classFixedToolProficiencies(characterClass),
-    ...selectedToolProficiencies(draft, catalogIndex, choiceSets),
-  ])
+  return mergeToolProficiencyEntries([...classEntries, ...grantEntries, ...selectedEntries])
+}
+
+/** Resolves a tool slug from a ChoiceSet option id or catalog equipment row. */
+export function resolveToolIdFromOption(
+  optionId: string,
+  catalogIndex: CharacterBuildCatalogIndex,
+): string {
+  const equipment = catalogIndex.equipment.get(optionId)
+  if (equipment) return equipment.slug
+
+  const colonIndex = optionId.indexOf(':')
+  return colonIndex >= 0 ? optionId.slice(colonIndex + 1) : optionId
 }

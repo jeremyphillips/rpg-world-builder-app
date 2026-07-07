@@ -1,15 +1,19 @@
 import type { ContentGrant } from '../../../../content/lib/grants'
 import { getFeatCategoryLabel } from '../../../../vocab/feat'
 import { getLanguageLabel } from '../../../../vocab/language'
-import {
-  formatArmorTrainingPoolLabel,
-  formatSkillProficiencyPoolLabel,
-  formatToolProficiencyPoolLabel,
-  formatWeaponProficiencyPoolLabel,
-} from '../../../../content/lib/proficiency-grant'
-import type { EquipmentGrant } from '../../../../content/lib/equipment-grant'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
+import type { EquipmentGrant } from '../../../../content/lib/equipment-grant'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
+import {
+  armorPoolChoiceOptions,
+  listArmorMatchingPool,
+  listSkillsMatchingPool,
+  listToolsMatchingPool,
+  listWeaponsMatchingPool,
+  skillPoolChoiceOptions,
+  toolPoolChoiceOptions,
+  weaponPoolChoiceOptions,
+} from '../../../creature/proficiencies'
 import type { ChoiceSet, ChoiceSourceType, ChoiceType } from '../../choice-set'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -19,6 +23,11 @@ export type GrantChoiceSetContext = {
   sourceId: string
   slot: string
   label?: string
+}
+
+function rulesetIdFromContentId(contentId: string): string {
+  const colonIndex = contentId.indexOf(':')
+  return colonIndex >= 0 ? contentId.slice(0, colonIndex) : contentId
 }
 
 function resolveSkillOptionLabel(
@@ -134,7 +143,9 @@ function skillProficiencyChoiceSet(
   const options =
     pool.source === 'explicit'
       ? pool.skillIds.map((id) => ({ id, label: resolveSkillOptionLabel(id, catalogIndex) }))
-      : [{ id: pool.source, label: formatSkillProficiencyPoolLabel(pool) }]
+      : skillPoolChoiceOptions(
+          listSkillsMatchingPool({ pool, skills: catalogIndex.skillProficiencies }),
+        )
 
   return buildGrantChoiceSet(
     ctx,
@@ -150,14 +161,22 @@ function skillProficiencyChoiceSet(
 function weaponProficiencyChoiceSet(
   grant: Extract<ContentGrant, { kind: 'weaponProficiency' }>,
   ctx: GrantChoiceSetContext,
+  catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet | undefined {
   if (grant.grant.kind !== 'choice') return undefined
 
   const pool = grant.grant.pool
+  const rulesetId = rulesetIdFromContentId(ctx.sourceId)
   const options =
     pool.source === 'explicit'
       ? pool.weaponSlugs.map((id) => ({ id, label: id }))
-      : [{ id: pool.source, label: formatWeaponProficiencyPoolLabel(pool) }]
+      : weaponPoolChoiceOptions(
+          listWeaponsMatchingPool({
+            pool,
+            equipment: catalogIndex.equipment,
+            rulesetId,
+          }),
+        )
 
   return buildGrantChoiceSet(
     ctx,
@@ -173,14 +192,22 @@ function weaponProficiencyChoiceSet(
 function toolProficiencyChoiceSet(
   grant: Extract<ContentGrant, { kind: 'toolProficiency' }>,
   ctx: GrantChoiceSetContext,
+  catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet | undefined {
   if (grant.grant.kind !== 'choice') return undefined
 
   const pool = grant.grant.pool
+  const rulesetId = rulesetIdFromContentId(ctx.sourceId)
   const options =
     pool.source === 'explicit'
       ? pool.toolSlugs.map((id) => ({ id, label: id }))
-      : [{ id: pool.source, label: formatToolProficiencyPoolLabel(pool) }]
+      : toolPoolChoiceOptions(
+          listToolsMatchingPool({
+            pool,
+            equipment: catalogIndex.equipment,
+            rulesetId,
+          }),
+        )
 
   return buildGrantChoiceSet(
     ctx,
@@ -196,14 +223,22 @@ function toolProficiencyChoiceSet(
 function armorTrainingChoiceSet(
   grant: Extract<ContentGrant, { kind: 'armorTraining' }>,
   ctx: GrantChoiceSetContext,
+  catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet | undefined {
   if (grant.grant.kind !== 'choice') return undefined
 
   const pool = grant.grant.pool
+  const rulesetId = rulesetIdFromContentId(ctx.sourceId)
   const options =
     pool.source === 'explicit'
       ? pool.armorSlugs.map((id) => ({ id, label: id }))
-      : [{ id: pool.source, label: formatArmorTrainingPoolLabel(pool) }]
+      : armorPoolChoiceOptions(
+          listArmorMatchingPool({
+            pool,
+            equipment: catalogIndex.equipment,
+            rulesetId,
+          }),
+        )
 
   return buildGrantChoiceSet(
     ctx,
@@ -251,9 +286,12 @@ const GRANT_CHOICE_SET_CONVERTERS: {
   languageChoice: (grant, ctx, catalogIndex) => [languageChoiceSet(grant, ctx, catalogIndex)],
   skillProficiency: (grant, ctx, catalogIndex) =>
     toChoiceSets(skillProficiencyChoiceSet(grant, ctx, catalogIndex)),
-  weaponProficiency: (grant, ctx) => toChoiceSets(weaponProficiencyChoiceSet(grant, ctx)),
-  toolProficiency: (grant, ctx) => toChoiceSets(toolProficiencyChoiceSet(grant, ctx)),
-  armorTraining: (grant, ctx) => toChoiceSets(armorTrainingChoiceSet(grant, ctx)),
+  weaponProficiency: (grant, ctx, catalogIndex) =>
+    toChoiceSets(weaponProficiencyChoiceSet(grant, ctx, catalogIndex)),
+  toolProficiency: (grant, ctx, catalogIndex) =>
+    toChoiceSets(toolProficiencyChoiceSet(grant, ctx, catalogIndex)),
+  armorTraining: (grant, ctx, catalogIndex) =>
+    toChoiceSets(armorTrainingChoiceSet(grant, ctx, catalogIndex)),
   equipment: (grant, ctx, catalogIndex) =>
     toChoiceSets(equipmentGrantChoiceSet(grant, ctx, catalogIndex)),
 }
