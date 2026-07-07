@@ -296,6 +296,11 @@ export {
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
+  CatalogPickerSheet,
+  type CatalogPickerSheetProps,
+  type CatalogPickerTab,
+} from './components/ui/catalog-picker-sheet.client'
+export {
   sheetBodyVariants,
   sheetContentVariants,
   type SheetContentVariantProps,
