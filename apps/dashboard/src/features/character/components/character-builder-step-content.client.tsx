@@ -26,6 +26,7 @@ export type CharacterBuilderStepContentProps = {
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
+  onNavigateToStep: (stepId: CharacterBuilderStepId) => void
 }
 
 export function CharacterBuilderStepContent({
@@ -37,6 +38,7 @@ export function CharacterBuilderStepContent({
   validationIssues,
   onDraftChange,
   onStepComplete,
+  onNavigateToStep,
 }: CharacterBuilderStepContentProps) {
   switch (stepId) {
     case 'identity':
@@ -84,6 +86,7 @@ export function CharacterBuilderStepContent({
           preview={preview}
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
+          onNavigateToStep={onNavigateToStep}
         />
       )
     case 'proficiencies':

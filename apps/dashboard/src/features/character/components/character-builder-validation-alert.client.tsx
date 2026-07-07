@@ -5,9 +5,15 @@ import { Text } from '@rpg/ui'
 
 export type CharacterBuilderValidationAlertProps = {
   issues: CharacterBuildValidationIssue[]
+  heading?: string
 }
 
-export function CharacterBuilderValidationAlert({ issues }: CharacterBuilderValidationAlertProps) {
+const DEFAULT_HEADING = 'Fix the following before continuing:'
+
+export function CharacterBuilderValidationAlert({
+  issues,
+  heading = DEFAULT_HEADING,
+}: CharacterBuilderValidationAlertProps) {
   if (issues.length === 0) return null
 
   return (
@@ -16,7 +22,7 @@ export function CharacterBuilderValidationAlert({ issues }: CharacterBuilderVali
       className="rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3"
     >
       <Text variant="destructive" className="font-medium">
-        Fix the following before continuing:
+        {heading}
       </Text>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-destructive">
         {issues.map((issue) => (

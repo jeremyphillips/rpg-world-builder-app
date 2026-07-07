@@ -26,6 +26,7 @@ function resolveStatus(
     context,
     resolvedChoiceSets: null,
     validationIssues: [],
+    draftValidationIssues: [],
     attemptedStepIds: [],
     catalogIndex,
     standardArray,
@@ -125,7 +126,7 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('warning')
   })
 
-  it('does not return warning without an attempted submit', () => {
+  it('does not return warning without an attempted submit or touched step', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -140,7 +141,25 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('current')
   })
 
-  it('does not return warning for other steps with unresolved issues', () => {
+  it('returns warning when a touched step has draft validation issues', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      touchedStepIds: ['identity' as const],
+    }
+
+    expect(
+      resolveStatus({
+        stepId: 'identity',
+        draft,
+        currentStepId: 'species',
+        draftValidationIssues: [
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
+        ],
+      }),
+    ).toBe('warning')
+  })
+
+  it('does not return warning for untouched steps with draft validation issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -148,12 +167,61 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'species',
         draft,
         currentStepId: 'identity',
-        validationIssues: [
-          { code: 'species.required', message: 'Species is required.', stepId: 'species' },
+        draftValidationIssues: [
+          { code: 'species_required', message: 'Choose a species.', stepId: 'species' },
         ],
-        attemptedStepIds: ['identity'],
       }),
     ).toBe('notStarted')
+  })
+
+  it('does not mark a step complete when draft validation still has issues', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+    }
+
+    expect(
+      resolveStatus({
+        stepId: 'species',
+        draft,
+        currentStepId: 'class',
+        resolvedChoiceSets: [],
+        draftValidationIssues: [
+          {
+            code: 'choice_set_unsatisfied',
+            message: 'Choose an option for Heritage.',
+            stepId: 'species',
+          },
+        ],
+      }),
+    ).toBe('notStarted')
+  })
+
+  it('keeps non-caster spells locked even when draft validation has spell issues', () => {
+    const spellsContext = createSpellsStepContextFixture()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+      touchedStepIds: ['spells' as const],
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, spellsContext)
+
+    expect(
+      resolveStatus({
+        stepId: 'spells',
+        draft,
+        currentStepId: 'identity',
+        context: spellsContext,
+        resolvedChoiceSets,
+        draftValidationIssues: [
+          {
+            code: 'choice_set_unsatisfied',
+            message: 'Choose 1 more cantrip.',
+            stepId: 'spells',
+          },
+        ],
+      }),
+    ).toBe('locked')
   })
 
   it('returns locked for spells when the class has no level-1 spellcasting', () => {
@@ -174,6 +242,22 @@ describe('resolveStepVisualStatus', () => {
       }),
     ).toBe('locked')
     expect(stepStatusAriaLabel('Spells', 'locked')).toBe('Spells, not applicable')
+  })
+
+  it('does not return warning for other steps with unresolved submit issues', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    expect(
+      resolveStatus({
+        stepId: 'species',
+        draft,
+        currentStepId: 'identity',
+        validationIssues: [
+          { code: 'species.required', message: 'Species is required.', stepId: 'species' },
+        ],
+        attemptedStepIds: ['identity'],
+      }),
+    ).toBe('notStarted')
   })
 
   it('returns not started for spells before a class is selected', () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
@@ -33,6 +33,7 @@ import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft
 import { getBuilderStepFormId } from '../lib/steps/builder-step-form-ids'
 import {
   issuesForStep,
+  resolveBuilderDraftValidationIssues,
   validateBuilderFinalSubmit,
   validateBuilderStepSubmit,
 } from '../lib/validate-builder-step'
@@ -87,6 +88,16 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     [patchDraft],
   )
 
+  const canCreateCharacter = useMemo(
+    () => validateBuilderFinalSubmit(draft, context, resolvedChoiceSets).ok,
+    [context, draft, resolvedChoiceSets],
+  )
+
+  const draftValidationIssues = useMemo(
+    () => resolveBuilderDraftValidationIssues(draft, context, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets],
+  )
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -108,6 +119,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
   const onReview = isReviewBuilderStep(currentStepId)
+
   const stepValidationIssues = onReview
     ? validationIssues
     : issuesForStep(validationIssues, currentStepId)
@@ -198,6 +210,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               catalogIndex={catalogIndex}
               resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={validationIssues}
+              draftValidationIssues={draftValidationIssues}
               attemptedStepIds={attemptedStepIds}
               standardArray={context.characterCreationRules.abilityGeneration.standardArray}
               onStepSelect={navigateToStep}
@@ -213,6 +226,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               validationIssues={stepValidationIssues}
               onDraftChange={applyDraftPatch}
               onStepComplete={attemptStepAdvance}
+              onNavigateToStep={navigateToStep}
             />
           </div>
           <div className={characterBuilderShellPreviewColumnClasses}>
@@ -234,6 +248,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
         <CharacterBuilderFooter
           currentStepId={currentStepId}
           continueFormId={getBuilderStepFormId(currentStepId)}
+          canCreateCharacter={canCreateCharacter}
           isCreating={isCreating}
           onBack={() => shiftStep('back')}
           onContinue={() => attemptStepAdvance()}

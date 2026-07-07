@@ -25,6 +25,7 @@ const railProps = {
   catalogIndex,
   resolvedChoiceSets: null,
   validationIssues: [] as CharacterBuildValidationIssue[],
+  draftValidationIssues: [] as CharacterBuildValidationIssue[],
   attemptedStepIds: [] as CharacterBuilderStepId[],
   standardArray,
   onStepSelect: () => undefined,
@@ -102,6 +103,26 @@ describe('CharacterBuilderStepRail', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('shows a warning icon when a touched step has draft validation issues', () => {
+    render(
+      <CharacterBuilderStepRail
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          touchedStepIds: ['identity'],
+        }}
+        currentStepId="species"
+        {...railProps}
+        draftValidationIssues={[
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
+        ]}
+      />,
+    )
+
+    expect(
+      screen.getByRole('button', { name: /Identity, has validation issues/i }),
+    ).toBeInTheDocument()
+  })
+
   it('calls onStepSelect when a step is clicked', async () => {
     const onStepSelect = vi.fn()
 
@@ -133,6 +154,7 @@ describe('CharacterBuilderStepRail', () => {
         catalogIndex={indexCharacterBuildCatalog(spellsContext.catalog)}
         resolvedChoiceSets={resolveAvailableChoices(draft, spellsContext)}
         validationIssues={[]}
+        draftValidationIssues={[]}
         attemptedStepIds={[]}
         standardArray={standardArray}
         onStepSelect={() => undefined}

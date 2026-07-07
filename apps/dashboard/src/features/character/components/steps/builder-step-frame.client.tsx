@@ -15,12 +15,14 @@ import { characterBuilderStepPanelClasses } from '../character-builder-shell.var
 export type BuilderStepFrameProps = {
   stepId: CharacterBuilderStepId
   validationIssues?: CharacterBuildValidationIssue[]
+  validationHeading?: string
   children: ReactNode
 }
 
 export function BuilderStepFrame({
   stepId,
   validationIssues = [],
+  validationHeading,
   children,
 }: BuilderStepFrameProps) {
   const step = BUILDER_STEPS.find((entry) => entry.id === stepId)
@@ -38,7 +40,7 @@ export function BuilderStepFrame({
         <Text variant="muted">{step.description}</Text>
       </div>
 
-      <CharacterBuilderValidationAlert issues={validationIssues} />
+      <CharacterBuilderValidationAlert issues={validationIssues} heading={validationHeading} />
       {children}
     </section>
   )
