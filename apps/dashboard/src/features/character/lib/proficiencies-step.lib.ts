@@ -13,14 +13,6 @@ export function choiceSetsForProficienciesStep(choiceSets: readonly ChoiceSet[])
   return choiceSets.filter((choiceSet) => PROFICIENCIES_CHOICE_TYPES.has(choiceSet.choiceType))
 }
 
-export function formatChoiceSetSelectionHint(choiceSet: ChoiceSet): string | undefined {
-  if (choiceSet.min === choiceSet.max) {
-    return choiceSet.min === 1 ? 'Choose 1 option' : `Choose ${choiceSet.min} options`
-  }
-
-  return `Choose ${choiceSet.min}–${choiceSet.max} options`
-}
-
 export function isProficienciesStep(stepId: CharacterBuilderStepId): boolean {
   return stepId === 'proficiencies'
 }
