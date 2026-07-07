@@ -81,6 +81,10 @@ export const characterBuilderValidationMessages = {
         ? `${spellLabel} is not a level 1 spell.`
         : `${spellLabel} is above the highest spell level you can select.`,
   ),
+  proficiencyNoLongerAvailable: defineMessage<{ proficiencyLabel: string }>(
+    'validation.characterBuilder.proficiencyNoLongerAvailable',
+    ({ proficiencyLabel }) => `${proficiencyLabel} is no longer available.`,
+  ),
   finalizationFailed: defineMessage(
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',

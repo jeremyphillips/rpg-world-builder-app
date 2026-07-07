@@ -56,6 +56,30 @@ function selectedSkillProficiencies(
   return entries
 }
 
+/** Merges skill proficiency rows, combining sources when the same skill appears twice. */
+export function mergeSkillProficiencyEntries(
+  entries: CharacterSkillProficiencyEntry[],
+): CharacterSkillProficiencyEntry[] {
+  const bySkill = new Map<string, CharacterSkillProficiencyEntry>()
+
+  for (const entry of entries) {
+    const existing = bySkill.get(entry.skill)
+    if (!existing) {
+      bySkill.set(entry.skill, entry)
+      continue
+    }
+
+    bySkill.set(entry.skill, {
+      skill: entry.skill,
+      rank:
+        entry.rank === 'expertise' || existing.rank === 'expertise' ? 'expertise' : 'proficient',
+      sources: [...(existing.sources ?? []), ...(entry.sources ?? [])],
+    })
+  }
+
+  return [...bySkill.values()]
+}
+
 /** Returns finalized skill proficiency rows from class-fixed grants and ChoiceSet picks. */
 export function assembleSkillProficiencyEntries(
   draft: CharacterBuilderDraft,
@@ -65,8 +89,8 @@ export function assembleSkillProficiencyEntries(
 ): CharacterSkillProficiencyEntry[] {
   if (!characterClass) return []
 
-  return [
+  return mergeSkillProficiencyEntries([
     ...classFixedSkillProficiencies(characterClass),
     ...selectedSkillProficiencies(draft, catalogIndex, choiceSets),
-  ]
+  ])
 }

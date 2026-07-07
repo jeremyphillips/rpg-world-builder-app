@@ -38,6 +38,36 @@ function classFixedArmorProficiencies(characterClass: CharacterClass) {
   }))
 }
 
+function classFixedToolProficiencies(characterClass: CharacterClass) {
+  const tools = characterClass.proficiencies.tools ?? { categories: [], items: [] }
+
+  const fromCategories = tools.categories.map((toolCategory) => ({
+    toolCategory,
+    rank: 'proficient' as const,
+    sources: [
+      {
+        kind: 'classFeature' as const,
+        sourceId: characterClass.id,
+        grantId: 'tool-proficiencies',
+      },
+    ],
+  }))
+
+  const fromItems = tools.items.map((toolId) => ({
+    toolId,
+    rank: 'proficient' as const,
+    sources: [
+      {
+        kind: 'classFeature' as const,
+        sourceId: characterClass.id,
+        grantId: 'tool-proficiencies',
+      },
+    ],
+  }))
+
+  return [...fromCategories, ...fromItems]
+}
+
 /**
  * Merges class-fixed weapon/armor proficiencies with skill and language rows from
  * domain orchestration modules. Species heritage and grant-derived proficiencies
@@ -62,7 +92,7 @@ export function assembleCharacterProficiencies(
     skills: assembleSkillProficiencyEntries(draft, catalogIndex, choiceSets, characterClass),
     weapons: classFixedWeaponProficiencies(characterClass),
     armor: classFixedArmorProficiencies(characterClass),
-    tools: [],
+    tools: classFixedToolProficiencies(characterClass),
     languages,
   }
 }

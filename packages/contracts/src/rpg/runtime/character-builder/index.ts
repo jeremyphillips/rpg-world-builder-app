@@ -28,8 +28,18 @@ export * from './resolvers/equipment/resolve-starting-equipment-option-summaries
 export * from './resolvers/spellcasting/format-spell-picker-metadata'
 export * from './resolvers/spellcasting/resolve-spell-picker-items'
 export * from './resolvers/spellcasting/spellcasting-profile'
+export * from './resolvers/proficiency/format-proficiency-source-label'
+export * from './resolvers/proficiency/format-saving-throw-proficiency-label'
+export * from './resolvers/proficiency/resolve-proficiency-picker-items'
+export * from './resolvers/proficiency/resolve-proficiency-step-model'
 export * from './step-ids'
 export * from './steps'
 export * from './storage-key'
 export * from './validate/types'
 export { validateCharacterBuild } from './validate/validate-character-build'
+export {
+  validateChoiceSets,
+  validateChoiceSetsForStep,
+  validateProficiencyChoiceSets,
+  validateSpellChoiceSets,
+} from './validate/validate-choice-sets'

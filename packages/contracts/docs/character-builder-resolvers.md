@@ -19,6 +19,11 @@ this document tracks the full internal layout, status, and promotion path.
 | `deriveEquipmentBudgetSummary`            | `resolvers/equipment/equipment-budget.ts`                            | Starting/spent/remaining wealth for the equipment picker.                    |
 | `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | Annotates equipment rows with picker state + `searchText`.                   |
 | `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | Package option card enrichment for the Equipment step.                       |
+| `formatProficiencySourceLabel`            | `resolvers/proficiency/format-proficiency-source-label.ts`           | MVP provenance labels for proficiency step rows (BENCH-118 unifies).         |
+| `formatSavingThrowProficiencyLabel`       | `resolvers/proficiency/format-saving-throw-proficiency-label.ts`     | Saving throw row label (`DEX · Dexterity`).                                  |
+| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | Sectioned grants + ChoiceSet summaries for the Proficiencies step.           |
+| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | Proficiency picker row state (granted overlap + selection full).             |
+| `validateProficiencyChoiceSets`           | `validate/validate-choice-sets.ts`                                   | Stale proficiency selections (`proficiency_no_longer_available`).            |
 
 ## Directory layout
 
@@ -35,6 +40,7 @@ character-builder/
     class/        skill + feature grant ChoiceSets
     equipment/    starting equipment + pool choice options
     spellcasting/ spellcasting profile + cantrip/spell ChoiceSets
+    proficiency/  proficiencies step view model + picker items (BENCH-115)
 ```
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
@@ -90,6 +96,7 @@ composes creature primitives, draft selections, and character assembly with
 | --------------------------------------------- | ------------------ | ------------------------------------- |
 | `assembly/assemble-language-proficiencies.ts` | Languages          | `assemble-proficiencies.ts`, finalize |
 | `assembly/assemble-skill-proficiencies.ts`    | Skills             | `assemble-proficiencies.ts`           |
+| `mergeSkillProficiencyEntries`                | Skills (dedupe)    | `assemble-skill-proficiencies.ts`     |
 | `assembly/assemble-starting-equipment.ts`     | Equipment + wealth | `finalize.ts`, `preview.ts`           |
 | `assembly/assemble-spellcasting.ts`           | Spells             | `finalize.ts`                         |
 | `assembly/assemble-proficiencies.ts`          | Aggregate          | `finalize.ts`, `preview-adapter.ts`   |
@@ -117,6 +124,8 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 | Resolver                                  | Disposition                                                          |
 | ----------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | **Implemented** (BENCH-105) — spell picker row state + metadata            |
+| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | **Implemented** (BENCH-115) — proficiencies step view model                |
+| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | **Implemented** (BENCH-115) — proficiency picker row state                 |
 | `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | **Implemented** (BENCH-095) — package grants + proficient weapon/armor ids |
 | `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | **Implemented** (BENCH-095) — equipment picker row state + search text     |
 | `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | **Implemented** (BENCH-095) — starting package card summaries              |
