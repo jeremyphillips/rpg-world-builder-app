@@ -15,8 +15,13 @@ import { createStandaloneBuilderContextFixture } from '../../lib/character-build
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogFixture,
+  equipmentStepLeatherArmorFixture,
 } from '../../lib/equipment-step.fixtures'
-import { EQUIPMENT_STEP_NO_CLASS_MESSAGE } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_STEP_BROWSE_LABEL,
+  EQUIPMENT_STEP_CUSTOMIZE_LABEL,
+  EQUIPMENT_STEP_NO_CLASS_MESSAGE,
+} from '../../lib/equipment-step.lib'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({
@@ -101,6 +106,96 @@ describe('EquipmentStep', () => {
         equipment: expect.objectContaining({ mode: 'package' }),
       }),
     )
+  })
+
+  it('shows budget and browse controls after selecting gold', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    expect(screen.getByText('Budget')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
+    expect(screen.getAllByText('90 GP').length).toBeGreaterThanOrEqual(1)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+
+    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+  })
+
+  it('adds a gold purchase from the picker drawer', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const { onDraftChange } = renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        equipment: expect.objectContaining({
+          purchases: [
+            {
+              equipmentId: equipmentStepLeatherArmorFixture.id,
+              quantity: 1,
+              sourceMode: 'startingGold',
+            },
+          ],
+        }),
+      }),
+    )
+  })
+
+  it('shows customize controls for a selected package', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
+          'srd-cc-5.2.1:lute',
+        ],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_CUSTOMIZE_LABEL })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_CUSTOMIZE_LABEL }))
+
+    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

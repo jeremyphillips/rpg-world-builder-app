@@ -9,4 +9,8 @@ export const equipmentInventorySummaryRowClasses =
 
 export const equipmentInventorySummaryRowMetaClasses = 'flex flex-wrap items-center gap-2'
 
+export const equipmentInventorySummaryQuantityClasses = 'flex flex-wrap items-center gap-2'
+
 export const equipmentInventorySummarySourceClasses = 'text-muted-foreground'
+
+export const equipmentInventorySummaryActionsClasses = 'flex flex-wrap items-center gap-2'

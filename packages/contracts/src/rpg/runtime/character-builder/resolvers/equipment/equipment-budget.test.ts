@@ -9,6 +9,7 @@ import {
   copperToWealth,
   deriveEquipmentBudgetSummary,
   formatWealth,
+  maxAffordableEquipmentQuantity,
   moneyToCopper,
   subtractFromWealth,
   wealthToCopper,
@@ -87,6 +88,16 @@ describe('equipment-budget helpers', () => {
   it('round-trips copper totals through copperToWealth', () => {
     expect(copperToWealth(953)).toEqual({ cp: 3, sp: 5, gp: 9, pp: 0 })
     expect(copperToWealth(0)).toEqual({ cp: 0, sp: 0, gp: 0, pp: 0 })
+  })
+
+  it('computes max affordable quantity from remaining budget', () => {
+    const budget = {
+      starting: { cp: 0, sp: 0, gp: 10, pp: 0 },
+      spent: { cp: 0, sp: 0, gp: 4, pp: 0 },
+      remaining: { cp: 0, sp: 0, gp: 6, pp: 0 },
+    }
+
+    expect(maxAffordableEquipmentQuantity(rope, budget, 2)).toBe(8)
   })
 })
 

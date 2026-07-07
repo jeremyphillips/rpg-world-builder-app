@@ -7,16 +7,23 @@ import {
 } from '@rpg/contracts'
 
 import {
+  buildEquipmentAddPurchasePatch,
+  buildEquipmentRemoveEntryPatch,
   buildEquipmentSelectionPatch,
+  buildEquipmentSetPurchaseQuantityPatch,
   formatEquipmentSourceLabel,
   formatStartingEquipmentOptionMeta,
   hasSelectableStartingEquipmentOption,
   isStartingGoldOptionId,
+  isUniqueEquipmentOwnedInDraft,
+  listEquipmentInventoryRowsFromDraft,
+  resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
 } from './equipment-step.lib'
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepLeatherArmorFixture,
 } from './equipment-step.fixtures'
 
 describe('equipment-step.lib', () => {
@@ -69,6 +76,171 @@ describe('equipment-step.lib', () => {
     expect(
       formatEquipmentSourceLabel([{ kind: 'startingGold' }], equipmentStepCatalogIndexFixture),
     ).toBe('Purchased with starting gold')
+  })
+
+  it('builds purchase and removal patches', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const addPatch = buildEquipmentAddPurchasePatch({
+      draft,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipmentId: 'srd-cc-5.2.1:leather-armor',
+      sourceMode: resolvePurchaseSourceMode('gold'),
+    })
+
+    expect(addPatch?.equipment?.purchases).toEqual([
+      {
+        equipmentId: 'srd-cc-5.2.1:leather-armor',
+        quantity: 1,
+        sourceMode: 'startingGold',
+      },
+    ])
+
+    const duplicatePatch = buildEquipmentAddPurchasePatch({
+      draft: { ...draft, equipment: addPatch?.equipment },
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipmentId: 'srd-cc-5.2.1:leather-armor',
+      sourceMode: resolvePurchaseSourceMode('gold'),
+    })
+
+    expect(duplicatePatch).toBeUndefined()
+
+    const withPurchase = {
+      ...draft,
+      equipment: addPatch?.equipment,
+    }
+
+    const removePatch = buildEquipmentRemoveEntryPatch({
+      draft: withPurchase,
+      target: { kind: 'purchase', purchaseIndex: 0 },
+    })
+
+    expect(removePatch.equipment?.purchases).toEqual([])
+  })
+
+  it('stacks consumable purchases and updates quantity with budget-aware patches', () => {
+    const rationsId = 'srd-cc-5.2.1:rations'
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [
+          rationsId,
+          {
+            id: rationsId,
+            slug: 'rations',
+            rulesetId: 'srd-cc-5.2.1',
+            source: 'system',
+            campaignId: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            name: 'Rations',
+            description: '',
+            kind: 'adventuring_gear',
+            gearKind: 'consumable',
+            cost: { amount: 5, currency: 'sp' },
+            weight: { value: 2, unit: 'lb' },
+          },
+        ],
+      ]),
+    }
+
+    const addPatch = buildEquipmentAddPurchasePatch({
+      draft,
+      catalogIndex,
+      equipmentId: rationsId,
+      sourceMode: 'startingGold',
+      quantity: 2,
+    })
+
+    expect(addPatch?.equipment?.purchases).toEqual([
+      { equipmentId: rationsId, quantity: 2, sourceMode: 'startingGold' },
+    ])
+
+    const quantityPatch = buildEquipmentSetPurchaseQuantityPatch({
+      draft: { ...draft, equipment: addPatch?.equipment },
+      catalogIndex,
+      purchaseIndex: 0,
+      quantity: 4,
+    })
+
+    expect(quantityPatch?.equipment?.purchases).toEqual([
+      { equipmentId: rationsId, quantity: 4, sourceMode: 'startingGold' },
+    ])
+  })
+
+  it('detects unique equipment already owned in draft inventory', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      isUniqueEquipmentOwnedInDraft(
+        draft,
+        equipmentStepCatalogIndexFixture,
+        equipmentStepLeatherArmorFixture.id,
+      ),
+    ).toBe(true)
+  })
+
+  it('lists removable inventory rows from draft decisions', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
+
+    expect(rows).toHaveLength(1)
+    expect(rows[0]?.removeTarget).toEqual({
+      kind: 'package',
+      packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+    })
   })
 })
 

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
+import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
@@ -60,6 +61,25 @@ export const HideNonProficient: Story = {
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
     filterOutNonProficient: true,
+    onAddItem: () => undefined,
+  },
+}
+
+export const CharacterPreview: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerItemsFixture,
+    budget: equipmentPickerBudgetFixture,
+    filterOutUnaffordable: false,
+    showCharacterPreview: true,
+    characterPreviewContext: {
+      level: 1,
+      armorClassBase: DEFAULT_ARMOR_CLASS_BASE,
+      abilityScores: { str: 16, dex: 14 },
+      equippedArmor: [],
+      budget: equipmentPickerBudgetFixture,
+    },
     onAddItem: () => undefined,
   },
 }

@@ -2,31 +2,44 @@
 
 import { useMemo } from 'react'
 
-import type { CharacterBuildCatalogIndex, CharacterEquipment } from '@rpg/contracts'
-import { Badge, Heading, Text } from '@rpg/ui'
+import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuilderDraft,
+  EquipmentBudgetSummary,
+} from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
 
-import { listEquipmentInventoryRows } from '../../lib/equipment-step.lib'
+import {
+  listEquipmentInventoryRowsFromDraft,
+  type EquipmentInventoryQuantityTarget,
+  type EquipmentInventoryRemoveTarget,
+} from '../../lib/equipment-step.lib'
+import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
+import { equipmentInventoryRowKey } from './equipment-inventory-summary.lib'
 import {
   equipmentInventorySummaryClasses,
   equipmentInventorySummaryGroupClasses,
   equipmentInventorySummaryListClasses,
-  equipmentInventorySummaryRowClasses,
-  equipmentInventorySummaryRowMetaClasses,
-  equipmentInventorySummarySourceClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
-  inventory: CharacterEquipment
+  draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
+  onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
 
 export function EquipmentInventorySummary({
-  inventory,
+  draft,
   catalogIndex,
+  budget,
+  onRemoveItem,
+  onSetPurchaseQuantity,
 }: EquipmentInventorySummaryProps) {
   const rows = useMemo(
-    () => listEquipmentInventoryRows(inventory, catalogIndex),
-    [catalogIndex, inventory],
+    () => listEquipmentInventoryRowsFromDraft(draft, catalogIndex),
+    [catalogIndex, draft],
   )
 
   if (rows.length === 0) {
@@ -49,23 +62,13 @@ export function EquipmentInventorySummary({
           </Heading>
           <ul className={equipmentInventorySummaryListClasses}>
             {groupRows.map((row) => (
-              <li key={`${row.group}-${row.entry.equipmentId}-${row.sourceLabel}`}>
-                <div className={equipmentInventorySummaryRowClasses}>
-                  <div className={equipmentInventorySummaryRowMetaClasses}>
-                    <Text as="span">
-                      {row.entry.quantity > 1 ? `${row.entry.quantity}× ` : ''}
-                      {row.equipmentName}
-                    </Text>
-                    {row.entry.equipped ? (
-                      <Badge variant="secondary" size="sm">
-                        Equipped
-                      </Badge>
-                    ) : null}
-                  </div>
-                  <Text variant="small" className={equipmentInventorySummarySourceClasses}>
-                    {row.sourceLabel}
-                  </Text>
-                </div>
+              <li key={equipmentInventoryRowKey(row)}>
+                <EquipmentInventoryRowItem
+                  row={row}
+                  budget={budget}
+                  onRemoveItem={onRemoveItem}
+                  onSetPurchaseQuantity={onSetPurchaseQuantity}
+                />
               </li>
             ))}
           </ul>

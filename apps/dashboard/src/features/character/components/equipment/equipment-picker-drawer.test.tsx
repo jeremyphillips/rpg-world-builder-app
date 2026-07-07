@@ -8,7 +8,10 @@ import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
 } from './equipment-picker-drawer.fixtures'
-import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from './equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_IN_INVENTORY_LABEL,
+  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+} from './equipment-picker-drawer.types'
 
 describe('EquipmentPickerDrawer', () => {
   it('shows non-proficient warning badges and unaffordable disabled rows', () => {
@@ -44,7 +47,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByText('Longsword')).toBeInTheDocument()
   })
 
-  it('calls onAddItem with quantity 1 on repeat adds', async () => {
+  it('calls onAddItem with the selected quantity for stackable items', async () => {
     const user = userEvent.setup()
     const onAddItem = vi.fn()
 
@@ -52,19 +55,37 @@ describe('EquipmentPickerDrawer', () => {
       <EquipmentPickerDrawer
         open
         onOpenChange={vi.fn()}
-        items={equipmentPickerItemsFixture}
+        items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
         onAddItem={onAddItem}
       />,
     )
 
-    const addButton = screen.getAllByRole('button', { name: 'Add' })[0]!
-    await user.click(addButton)
-    await user.click(screen.getByRole('button', { name: 'Add another (2)' }))
+    const ropeRow = equipmentPickerItemsFixture[2]!
 
-    expect(onAddItem).toHaveBeenCalledTimes(2)
-    expect(onAddItem).toHaveBeenNthCalledWith(1, equipmentPickerItemsFixture[0], 1)
-    expect(onAddItem).toHaveBeenNthCalledWith(2, equipmentPickerItemsFixture[0], 1)
+    await user.click(screen.getByLabelText('Increment'))
+    await user.click(screen.getByLabelText('Increment'))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
+  })
+
+  it('blocks repeat adds for unique items already in inventory', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        ownedPurchaseQuantities={{ [longsword.equipment.id]: 1 }}
+        isUniqueEquipmentOwned={() => true}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: EQUIPMENT_PICKER_IN_INVENTORY_LABEL })).toBeDisabled()
   })
 
   it('has no axe accessibility violations', async () => {

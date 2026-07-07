@@ -346,3 +346,5 @@ export function isWeaponEquipment(e: Equipment): e is WeaponEquipment {
 export function isArmorEquipment(e: Equipment): e is ArmorEquipment {
   return e.kind === 'armor'
 }
+
+export { isEquipmentStackable } from './equipment/stackable'

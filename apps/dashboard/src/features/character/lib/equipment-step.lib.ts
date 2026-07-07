@@ -1,18 +1,31 @@
 import {
+  assembleCharacterProficiencies,
+  deriveEquipmentBudgetSummary,
+  deriveRecommendedEquipment,
+  equipmentPoolSummaryLabel,
   formatWealth,
+  isEquipmentStackable,
+  maxAffordableEquipmentQuantity,
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
+  resolveEquipmentPickerItems,
   resolveEquipmentPoolChoiceOptions,
-  equipmentPoolSummaryLabel,
+  resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
+  startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
+  type CharacterBuilderDraftEquipmentPurchase,
   type CharacterClass,
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterSelectionSource,
   type ChoiceSet,
+  type Equipment,
+  type EquipmentBudgetSummary,
+  type EquipmentPickerItem,
+  type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
   type StartingEquipmentOptionSummaryGrant,
   type StartingEquipmentOptionSummaryItem,
@@ -35,6 +48,38 @@ export const EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE = 'Change starting equipment
 export const EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION =
   'You customized your equipment after choosing a package. Manual purchases stay in your inventory with their original source. Continue switching?'
 
+export const EQUIPMENT_STEP_BROWSE_LABEL = 'Browse equipment'
+
+export const EQUIPMENT_STEP_CUSTOMIZE_LABEL = 'Customize equipment'
+
+export const EQUIPMENT_STEP_CUSTOMIZED_MESSAGE =
+  'Manual changes are tracked separately from your class starting equipment.'
+
+export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
+
+export type EquipmentPickerFlow = 'gold' | 'customize'
+
+export type EquipmentInventoryRemoveTarget =
+  | { kind: 'package'; packageItemKey: string }
+  | { kind: 'purchase'; purchaseIndex: number }
+
+export type EquipmentInventoryQuantityTarget = {
+  kind: 'purchase'
+  purchaseIndex: number
+}
+
+export type EquipmentInventoryRow = {
+  group: keyof CharacterEquipment
+  groupLabel: string
+  entry: CharacterEquipmentEntry
+  equipment?: Equipment
+  equipmentName: string
+  sourceLabel: string
+  isStackable: boolean
+  removeTarget?: EquipmentInventoryRemoveTarget
+  quantityTarget?: EquipmentInventoryQuantityTarget
+}
+
 export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
   weapons: 'Weapons',
   armor: 'Armor',
@@ -46,14 +91,6 @@ export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
 } as const satisfies Record<keyof CharacterEquipment, string>
 
 const EQUIPMENT_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.equipment
-
-export type EquipmentInventoryRow = {
-  group: keyof CharacterEquipment
-  groupLabel: string
-  entry: CharacterEquipmentEntry
-  equipmentName: string
-  sourceLabel: string
-}
 
 export type StartingEquipmentNestedPool = {
   itemIndex: number
@@ -224,13 +261,46 @@ export function listEquipmentInventoryRows(
         group,
         groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS[group],
         entry,
+        equipment,
         equipmentName: equipment?.name ?? entry.equipmentId,
         sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
+        isStackable: equipment ? isEquipmentStackable(equipment) : false,
       })
     }
   }
 
   return rows
+}
+
+/** Returns true when a unique item is already present in the draft inventory. */
+export function isUniqueEquipmentOwnedInDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  equipmentId: string,
+): boolean {
+  return listEquipmentInventoryRowsFromDraft(draft, catalogIndex).some(
+    (row) => row.entry.equipmentId === equipmentId && !row.isStackable,
+  )
+}
+
+/** Returns the purchase quantity for an equipment id and source mode, if present. */
+export function readEquipmentPurchaseQuantity(
+  draft: CharacterBuilderDraft,
+  equipmentId: string,
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode'],
+): number {
+  const purchase = (draft.equipment?.purchases ?? []).find(
+    (entry) => entry.equipmentId === equipmentId && entry.sourceMode === sourceMode,
+  )
+  return purchase?.quantity ?? 0
+}
+
+export function resolveMaxAffordablePurchaseQuantity(args: {
+  equipment: Equipment
+  budget: EquipmentBudgetSummary
+  currentQuantity: number
+}): number {
+  return maxAffordableEquipmentQuantity(args.equipment, args.budget, args.currentQuantity)
 }
 
 export function buildEquipmentSkipPatch(): CharacterBuilderDraft['equipment'] {
@@ -265,6 +335,397 @@ export function buildEquipmentSelectionPatch(args: {
       removedPackageItemKeys: [],
       customized: draft.equipment?.customized ?? false,
       skipped: false,
+    },
+  }
+}
+
+export function shouldShowEquipmentShopping(
+  draft: CharacterBuilderDraft,
+  selectedOptionId: string | undefined,
+): boolean {
+  return Boolean(selectedOptionId) && !draft.equipment?.skipped
+}
+
+export function resolveEquipmentPickerFlow(
+  selectedOptionId: string | undefined,
+): EquipmentPickerFlow | undefined {
+  if (!selectedOptionId) return undefined
+  return isStartingGoldOptionId(selectedOptionId) ? 'gold' : 'customize'
+}
+
+export function resolvePurchaseSourceMode(
+  flow: EquipmentPickerFlow,
+): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
+  return flow === 'gold' ? 'startingGold' : 'manual'
+}
+
+export function resolveEquipmentStepBudget(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): EquipmentBudgetSummary | undefined {
+  return deriveEquipmentBudgetSummary(draft, catalogIndex)
+}
+
+export function resolveEquipmentStepPickerItems(args: {
+  draft: CharacterBuilderDraft
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  choiceSets: readonly ChoiceSet[]
+}): EquipmentPickerItem[] {
+  const { draft, characterClass, catalogIndex, choiceSets } = args
+  const proficiencies = assembleCharacterProficiencies(
+    draft,
+    catalogIndex,
+    choiceSets,
+    characterClass,
+  )
+  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+  const recommendedEquipmentIds = deriveRecommendedEquipment({
+    characterClass,
+    catalogIndex,
+    proficiencies,
+  })
+
+  return resolveEquipmentPickerItems({
+    equipment: [...catalogIndex.equipment.values()],
+    proficiencies,
+    recommendedEquipmentIds,
+    budget,
+  })
+}
+
+function inventoryGroupForEquipment(
+  equipment: NonNullable<ReturnType<CharacterBuildCatalogIndex['equipment']['get']>>,
+): keyof CharacterEquipment {
+  switch (equipment.kind) {
+    case 'weapon':
+      return 'weapons'
+    case 'armor':
+      return 'armor'
+    case 'tool':
+      return 'tools'
+    case 'adventuring_gear':
+    case 'service':
+      return 'gear'
+    case 'magic_item':
+      return 'magicItems'
+    case 'vehicle':
+      return 'vehicles'
+    case 'mount':
+      return 'mounts'
+  }
+}
+
+function packageEntryFromResolvedItem(
+  item: ReturnType<typeof resolveStartingEquipmentOption>['items'][number],
+  sources: CharacterSelectionSource[],
+): CharacterEquipmentEntry | undefined {
+  if (item.kind === 'grant') {
+    if (!item.equipment) return undefined
+    return {
+      equipmentId: item.equipmentId,
+      quantity: item.grant.quantity ?? 1,
+      equipped: item.grant.equipped,
+      modifiers: item.grant.modifiers,
+      sources,
+    }
+  }
+
+  if (!item.selectedEquipmentId || !item.equipment) return undefined
+
+  return {
+    equipmentId: item.selectedEquipmentId,
+    quantity: 1,
+    sources,
+  }
+}
+
+function purchaseSourcesForDraft(
+  purchase: CharacterBuilderDraftEquipmentPurchase,
+  classId: string,
+  optionId: string,
+): CharacterSelectionSource[] {
+  if (purchase.sourceMode === 'manual') return [{ kind: 'manual' }]
+  return [{ kind: 'startingGold', sourceId: classId, grantId: optionId }]
+}
+
+function purchaseRowFromEntry(args: {
+  entry: CharacterEquipmentEntry
+  equipment: Equipment
+  catalogIndex: CharacterBuildCatalogIndex
+  purchaseIndex?: number
+  packageItemKey?: string
+}): EquipmentInventoryRow {
+  const { entry, equipment, catalogIndex, purchaseIndex, packageItemKey } = args
+  const group = inventoryGroupForEquipment(equipment)
+  const stackable = isEquipmentStackable(equipment)
+
+  return {
+    group,
+    groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS[group],
+    entry,
+    equipment,
+    equipmentName: equipment.name,
+    sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
+    isStackable: stackable,
+    removeTarget:
+      packageItemKey !== undefined
+        ? { kind: 'package', packageItemKey }
+        : stackable
+          ? undefined
+          : { kind: 'purchase', purchaseIndex: purchaseIndex! },
+    quantityTarget:
+      purchaseIndex !== undefined && stackable ? { kind: 'purchase', purchaseIndex } : undefined,
+  }
+}
+
+function listPackageInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  characterClass: CharacterClass
+  option: StartingEquipmentOption
+  classId: string
+  selectedOptionId: string
+}): EquipmentInventoryRow[] {
+  const { draft, catalogIndex, characterClass, option, classId, selectedOptionId } = args
+  const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
+  const packageSources: CharacterSelectionSource[] = [
+    { kind: 'classStartingEquipment', sourceId: classId, grantId: selectedOptionId },
+  ]
+  const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
+
+  return resolved.items.flatMap((item, itemIndex) => {
+    const packageItemKey = startingEquipmentPackageItemKey(classId, selectedOptionId, itemIndex)
+    if (removedKeys.has(packageItemKey)) return []
+
+    const entry = packageEntryFromResolvedItem(item, packageSources)
+    if (!entry) return []
+
+    const equipment = catalogIndex.equipment.get(entry.equipmentId)
+    if (!equipment) return []
+
+    return [purchaseRowFromEntry({ entry, equipment, catalogIndex, packageItemKey })]
+  })
+}
+
+function listPurchaseInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  classId: string
+  selectedOptionId: string
+}): EquipmentInventoryRow[] {
+  const { draft, catalogIndex, classId, selectedOptionId } = args
+
+  return (draft.equipment?.purchases ?? []).flatMap((purchase, purchaseIndex) => {
+    const equipment = catalogIndex.equipment.get(purchase.equipmentId)
+    if (!equipment) return []
+
+    const sources = purchaseSourcesForDraft(purchase, classId, selectedOptionId)
+    const entry: CharacterEquipmentEntry = {
+      equipmentId: purchase.equipmentId,
+      quantity: purchase.quantity,
+      sources,
+    }
+
+    return [
+      {
+        ...purchaseRowFromEntry({ entry, equipment, catalogIndex, purchaseIndex }),
+        sourceLabel: formatEquipmentSourceLabel(sources, catalogIndex),
+      },
+    ]
+  })
+}
+
+function canAddEquipmentPurchase(args: {
+  equipment: Equipment
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  quantity: number
+}): boolean {
+  const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity } = args
+  if (!isEquipmentStackable(equipment)) {
+    if (quantity !== 1) return false
+    if (readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode) > 0) return false
+    if (isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId)) return false
+  }
+  return true
+}
+
+/** Lists inventory rows with removal targets derived from draft decisions. */
+export function listEquipmentInventoryRowsFromDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): EquipmentInventoryRow[] {
+  const classId = draft.class.classId
+  if (!classId) return []
+
+  const characterClass = catalogIndex.classes.get(classId)
+  const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  if (!characterClass || !startingEquipment || !selectedOptionId) return []
+
+  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
+  if (!option) return []
+
+  const packageRows =
+    draft.equipment?.mode === 'gold'
+      ? []
+      : listPackageInventoryRows({
+          draft,
+          catalogIndex,
+          characterClass,
+          option,
+          classId,
+          selectedOptionId,
+        })
+
+  return [
+    ...packageRows,
+    ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId }),
+  ]
+}
+
+function upsertEquipmentPurchase(
+  purchases: CharacterBuilderDraftEquipmentPurchase[],
+  equipmentId: string,
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode'],
+  quantity: number,
+): CharacterBuilderDraftEquipmentPurchase[] {
+  const existingIndex = purchases.findIndex(
+    (purchase) => purchase.equipmentId === equipmentId && purchase.sourceMode === sourceMode,
+  )
+
+  if (existingIndex < 0) {
+    return [...purchases, { equipmentId, quantity, sourceMode }]
+  }
+
+  const existing = purchases[existingIndex]!
+  return purchases.map((purchase, index) =>
+    index === existingIndex ? { ...existing, quantity: existing.quantity + quantity } : purchase,
+  )
+}
+
+function buildEquipmentDraftFromPurchase(args: {
+  draft: CharacterBuilderDraft
+  purchases: CharacterBuilderDraftEquipmentPurchase[]
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+}): CharacterBuilderDraft['equipment'] {
+  const { draft, purchases, sourceMode } = args
+
+  return {
+    mode: draft.equipment?.mode ?? (sourceMode === 'startingGold' ? 'gold' : 'package'),
+    purchases,
+    removedPackageItemKeys: draft.equipment?.removedPackageItemKeys ?? [],
+    customized: sourceMode === 'manual' ? true : (draft.equipment?.customized ?? false),
+    skipped: false,
+  }
+}
+
+export function buildEquipmentAddPurchasePatch(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  quantity?: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1 } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+
+  if (
+    quantity < 1 ||
+    !equipment ||
+    !canAddEquipmentPurchase({ equipment, draft, catalogIndex, equipmentId, sourceMode, quantity })
+  ) {
+    return undefined
+  }
+
+  return {
+    equipment: buildEquipmentDraftFromPurchase({
+      draft,
+      sourceMode,
+      purchases: upsertEquipmentPurchase(
+        [...(draft.equipment?.purchases ?? [])],
+        equipmentId,
+        sourceMode,
+        quantity,
+      ),
+    }),
+  }
+}
+
+export function buildEquipmentSetPurchaseQuantityPatch(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  purchaseIndex: number
+  quantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, catalogIndex, purchaseIndex, quantity } = args
+  const current = draft.equipment
+  if (!current) return undefined
+
+  const purchase = current.purchases[purchaseIndex]
+  if (!purchase) return undefined
+
+  const equipment = catalogIndex.equipment.get(purchase.equipmentId)
+  if (!equipment || !isEquipmentStackable(equipment)) return undefined
+
+  if (quantity < 1) {
+    return buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'purchase', purchaseIndex },
+    })
+  }
+
+  const purchases = current.purchases.map((entry, index) =>
+    index === purchaseIndex ? { ...entry, quantity } : entry,
+  )
+
+  return {
+    equipment: {
+      ...current,
+      purchases,
+    },
+  }
+}
+
+export function buildEquipmentRemoveEntryPatch(args: {
+  draft: CharacterBuilderDraft
+  target: EquipmentInventoryRemoveTarget
+}): Partial<CharacterBuilderDraft> {
+  const { draft, target } = args
+  const current = draft.equipment ?? {
+    mode: 'package' as const,
+    purchases: [],
+    removedPackageItemKeys: [],
+    customized: false,
+  }
+
+  if (target.kind === 'package') {
+    const removedPackageItemKeys = current.removedPackageItemKeys.includes(target.packageItemKey)
+      ? current.removedPackageItemKeys
+      : [...current.removedPackageItemKeys, target.packageItemKey]
+
+    return {
+      equipment: {
+        ...current,
+        removedPackageItemKeys,
+        customized: true,
+      },
+    }
+  }
+
+  const purchases = current.purchases.flatMap((purchase, index) => {
+    if (index !== target.purchaseIndex) return [purchase]
+    if (purchase.quantity > 1) return [{ ...purchase, quantity: purchase.quantity - 1 }]
+    return []
+  })
+
+  return {
+    equipment: {
+      ...current,
+      purchases,
     },
   }
 }
