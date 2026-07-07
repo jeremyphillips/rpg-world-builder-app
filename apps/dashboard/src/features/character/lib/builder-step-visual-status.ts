@@ -1,7 +1,8 @@
 import {
   isBuilderStepComplete,
-  isSpellcastingActiveAtLevel,
+  resolveSpellcastingProfile,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
@@ -16,6 +17,7 @@ export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
+  context: CharacterBuildContext
   resolvedChoiceSets: readonly ChoiceSet[] | null
   validationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
@@ -23,30 +25,23 @@ export type ResolveStepVisualStatusInput = {
   standardArray: readonly number[]
 }
 
-function isSpellsStepLocked(
-  draft: CharacterBuilderDraft,
-  catalogIndex: CharacterBuildCatalogIndex,
-): boolean {
-  const classId = draft.class.classId
-  if (!classId) return false
-
-  const characterClass = catalogIndex.classes.get(classId)
-  if (!characterClass) return false
-
-  return !isSpellcastingActiveAtLevel(characterClass.spellcasting, draft.class.level)
+function isSpellsStepLocked(draft: CharacterBuilderDraft, context: CharacterBuildContext): boolean {
+  if (!draft.class.classId) return false
+  return resolveSpellcastingProfile(draft, context) === null
 }
 
 export function resolveStepVisualStatus({
   stepId,
   draft,
   currentStepId,
+  context,
   resolvedChoiceSets,
   validationIssues,
   attemptedStepIds,
-  catalogIndex,
+  catalogIndex: _catalogIndex,
   standardArray,
 }: ResolveStepVisualStatusInput): StepStatus {
-  const isLocked = stepId === 'spells' && isSpellsStepLocked(draft, catalogIndex)
+  const isLocked = stepId === 'spells' && isSpellsStepLocked(draft, context)
   if (isLocked) {
     return 'locked'
   }

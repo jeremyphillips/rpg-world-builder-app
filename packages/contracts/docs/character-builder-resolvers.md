@@ -8,11 +8,17 @@ this document tracks the full internal layout, status, and promotion path.
 
 ## Public API
 
-| Export                       | Module                                           | Purpose                                                                      |
-| ---------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `resolveAvailableContent`    | `resolve-available-content.ts` (builder root)    | Filters species, classes, spells, and equipment by character-creation rules. |
-| `resolveAvailableChoices`    | `resolvers/registry/resolve-choices.ts`          | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
-| `resolveSpellcastingProfile` | `resolvers/spellcasting/spellcasting-profile.ts` | Structural spellcasting facts for the Spells step; null for non-casters.     |
+| Export                                    | Module                                                               | Purpose                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `resolveAvailableContent`                 | `resolve-available-content.ts` (builder root)                        | Filters species, classes, spells, and equipment by character-creation rules. |
+| `resolveAvailableChoices`                 | `resolvers/registry/resolve-choices.ts`                              | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
+| `resolveSpellcastingProfile`              | `resolvers/spellcasting/spellcasting-profile.ts`                     | Structural spellcasting facts for the Spells step; null for non-casters.     |
+| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | Enriches spell ChoiceSet options into picker rows for the spell drawer.      |
+| `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | Recommended equipment ids for the picker Recommended tab.                    |
+| `deriveEquipmentDraftEntries`             | `resolvers/equipment/derive-equipment-draft-entries.ts`              | Package items minus removals plus draft purchases with selection sources.    |
+| `deriveEquipmentBudgetSummary`            | `resolvers/equipment/equipment-budget.ts`                            | Starting/spent/remaining wealth for the equipment picker.                    |
+| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | Annotates equipment rows with picker state + `searchText`.                   |
+| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | Package option card enrichment for the Equipment step.                       |
 
 ## Directory layout
 
@@ -108,11 +114,14 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
 ## Deferred / folded resolvers
 
-| Resolver                      | Disposition                                                    |
-| ----------------------------- | -------------------------------------------------------------- |
-| `resolveSpellPickerItems`     | BENCH-105 — spell picker row state; blocked on BENCH-089       |
-| `resolveAvailableFeats`       | Deferred — no full feat catalog in `CharacterBuildCatalog` yet |
-| Campaign allow/deny filtering | Plugs into `resolveAvailableContent` when campaign scope ships |
+| Resolver                                  | Disposition                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | **Implemented** (BENCH-105) — spell picker row state + metadata            |
+| `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | **Implemented** (BENCH-095) — package grants + proficient weapon/armor ids |
+| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | **Implemented** (BENCH-095) — equipment picker row state + search text     |
+| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | **Implemented** (BENCH-095) — starting package card summaries              |
+| `resolveAvailableFeats`                   | Deferred — no full feat catalog in `CharacterBuildCatalog` yet       |
+| Campaign allow/deny filtering             | Plugs into `resolveAvailableContent` when campaign scope ships       |
 
 ## Related helpers
 

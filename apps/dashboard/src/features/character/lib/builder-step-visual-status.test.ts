@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
+import { createSpellsStepContextFixture } from './spells-step.fixtures'
 import {
   resolveStepVisualStatus,
   type ResolveStepVisualStatusInput,
@@ -17,6 +18,7 @@ function resolveStatus(
     Partial<ResolveStepVisualStatusInput>,
 ): ReturnType<typeof resolveStepVisualStatus> {
   return resolveStepVisualStatus({
+    context,
     resolvedChoiceSets: null,
     validationIssues: [],
     attemptedStepIds: [],
@@ -150,6 +152,7 @@ describe('resolveStepVisualStatus', () => {
   })
 
   it('returns locked for spells when the class has no level-1 spellcasting', () => {
+    const context = createSpellsStepContextFixture()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
@@ -160,6 +163,7 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'spells',
         draft,
         currentStepId: 'identity',
+        context,
       }),
     ).toBe('locked')
   })
