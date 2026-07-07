@@ -1,33 +1,55 @@
 # Character builder resolvers
 
-Canonical catalog of resolver functions for the character builder engine. The
-public import surface is `character-builder/resolvers/index.ts`; this document
-tracks status, purpose, and promotion path for each resolver.
+Canonical catalog of resolver and assembly modules for the character builder engine.
+The public import surface is `character-builder/index.ts` (re-exported via `@rpg/contracts`);
+this document tracks the full internal layout, status, and promotion path.
 
 **Layer boundaries and naming:** [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)
 
 ## Public API
 
-| Resolver                     | Status                      | Purpose                                                                      |
-| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| `resolveAvailableContent`    | **Implemented** (BENCH-081) | Filters species, classes, spells, and equipment by character-creation rules. |
-| `resolveAvailableChoices`    | **Implemented** (BENCH-087) | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
-| `resolveSpellcastingProfile` | **Implemented** (BENCH-089) | Structural spellcasting facts for the Spells step; null for non-casters.     |
+| Export                       | Module                                           | Purpose                                                                      |
+| ---------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `resolveAvailableContent`    | `resolve-available-content.ts` (builder root)    | Filters species, classes, spells, and equipment by character-creation rules. |
+| `resolveAvailableChoices`    | `resolvers/registry/resolve-choices.ts`          | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
+| `resolveSpellcastingProfile` | `resolvers/spellcasting/spellcasting-profile.ts` | Structural spellcasting facts for the Spells step; null for non-casters.     |
+
+## Directory layout
+
+```text
+character-builder/
+  resolve-available-content.ts   catalog scope filter (not a ChoiceSourceResolver)
+  assembly/                      finalize orchestration (assemble-*.ts)
+  validate/                      draft/step validation by phase
+  resolvers/
+    registry/     choice-sources, resolve-choices, choice-source-resolver
+    grants/       grant-choice-sets, unlocked-grant-choice-sets
+    ruleset/      language ChoiceSets
+    species/      heritage + trait grant ChoiceSets
+    class/        skill + feature grant ChoiceSets
+    equipment/    starting equipment + pool choice options
+    spellcasting/ spellcasting profile + cantrip/spell ChoiceSets
+```
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
 
-Ordered modules in `resolvers/choice-sources.ts`. Each entry has signature
+Ordered modules in `resolvers/registry/choice-sources.ts`. Each entry has signature
 `(draft, context, catalogIndex) => ChoiceSet[]`. `resolveAvailableChoices`
 concatenates results.
 
-| Entry                             | Status                      | Emits                                                                                                                       |
-| --------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `resolveSpeciesHeritageChoices`   | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
-| `resolveSpeciesTraitGrantChoices` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
-| `resolveClassSkillChoices`        | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
-| `resolveClassFeatureGrantChoices` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
-| `resolveStartingEquipmentChoices` | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
-| `resolveSpellcastingChoices`      | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                      |
+Registry entries are **thin adapters** (`resolve-*-choices.ts`) that delegate to
+**implementation modules** (`resolve-*-choice-sets.ts`). See
+`ruleset/resolve-ruleset-language-choices.ts` → `ruleset/resolve-language-choice-sets.ts`.
+
+| Entry (adapter)                   | Folder          | Implementation module                        | Status                      | Emits                                                                                                                       |
+| --------------------------------- | --------------- | -------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `resolveRulesetLanguageChoices`   | `ruleset/`      | `resolve-language-choice-sets.ts`            | **Implemented**             | Ruleset origin language picks (`language`).                                                                                 |
+| `resolveSpeciesHeritageChoices`   | `species/`      | `resolve-species-heritage-choice-sets.ts`    | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
+| `resolveSpeciesTraitGrantChoices` | `species/`      | `resolve-species-trait-grant-choice-sets.ts` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
+| `resolveClassSkillChoices`        | `class/`        | `resolve-class-skill-choice-sets.ts`         | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
+| `resolveClassFeatureGrantChoices` | `class/`        | `resolve-class-feature-grant-choice-sets.ts` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
+| `resolveStartingEquipmentChoices` | `equipment/`    | `resolve-starting-equipment-choice-sets.ts`  | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
+| `resolveSpellcastingChoices`      | `spellcasting/` | `resolve-spellcasting-choice-sets.ts`        | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                      |
 
 ### Grant traversal contract
 
@@ -52,6 +74,38 @@ Resolvers never read the deprecated `grants` bag directly.
 | `equipment:filtered:tool`   | `resolveStartingEquipmentChoices` (nested package pick)                    |
 | `damageType:heritage`       | Not a top-level ChoiceSet — applied when heritage option is selected       |
 
+## Builder orchestration (`character-builder/assembly/`)
+
+Finalize and preview call these modules after `resolveAvailableChoices`. Each
+composes creature primitives, draft selections, and character assembly with
+`CharacterSelectionSource` provenance.
+
+| Module                                        | Domain             | Called from                           |
+| --------------------------------------------- | ------------------ | ------------------------------------- |
+| `assembly/assemble-language-proficiencies.ts` | Languages          | `assemble-proficiencies.ts`, finalize |
+| `assembly/assemble-skill-proficiencies.ts`    | Skills             | `assemble-proficiencies.ts`           |
+| `assembly/assemble-starting-equipment.ts`     | Equipment + wealth | `finalize.ts`, `preview.ts`           |
+| `assembly/assemble-spellcasting.ts`           | Spells             | `finalize.ts`                         |
+| `assembly/assemble-proficiencies.ts`          | Aggregate          | `finalize.ts`, `preview-adapter.ts`   |
+
+## Creature primitives (`runtime/creature/`)
+
+Promoted catalog/grant expansion reused across builder, NPC, and future monster surfaces.
+Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
+
+| Module            | Exports (examples)                                                   | Consumed by                                     |
+| ----------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
+| `languages.ts`    | `resolveLanguagesFromChoiceSource`, `resolveLanguageIdsFromGrantSet` | Language ChoiceSets, finalize, grant ChoiceSets |
+| `equipment.ts`    | `listEquipmentMatchingPool`, `toEquipmentContentId`                  | Equipment pool options, starting equipment      |
+| `spellcasting.ts` | `cantripsKnownAtLevel`, `maxSelectableSpellLevel`                    | `spellcasting-profile.ts`                       |
+
+### Promotion backlog
+
+| Candidate                   | Disposition                                                                                         |
+| --------------------------- | --------------------------------------------------------------------------------------------------- |
+| `creature/proficiencies.ts` | Deferred — filtered `any` skill/weapon/tool pools need finalize assembly first                      |
+| `validate/` split           | Done — `types`, `issue`, `validate-step-fields`, `validate-choice-sets`, `validate-character-build` |
+
 ## Deferred / folded resolvers
 
 | Resolver                      | Disposition                                                    |
@@ -62,8 +116,9 @@ Resolvers never read the deprecated `grants` bag directly.
 
 ## Related helpers
 
-| Helper                       | Location                                  | Purpose                                                  |
-| ---------------------------- | ----------------------------------------- | -------------------------------------------------------- |
-| `contentGrantToChoiceSets`   | `resolvers/grant-choice-sets.ts`          | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`. |
-| `unlockedGrantChoiceSets`    | `resolvers/unlocked-grant-choice-sets.ts` | Shared grant-group walk for traits and features.         |
-| `indexCharacterBuildCatalog` | `context.ts`                              | Builds by-id lookup maps for resolver consumption.       |
+| Helper                              | Location                                               | Purpose                                                  |
+| ----------------------------------- | ------------------------------------------------------ | -------------------------------------------------------- |
+| `contentGrantToChoiceSets`          | `resolvers/grants/grant-choice-sets.ts`                | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`. |
+| `unlockedGrantChoiceSets`           | `resolvers/grants/unlocked-grant-choice-sets.ts`       | Shared grant-group walk for traits and features.         |
+| `resolveEquipmentPoolChoiceOptions` | `resolvers/equipment/equipment-pool-choice-options.ts` | Maps creature pool rows to `ChoiceSetOption[]`.          |
+| `indexCharacterBuildCatalog`        | `context.ts`                                           | Builds by-id lookup maps for resolver consumption.       |

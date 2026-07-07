@@ -11,7 +11,7 @@ import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
 import { toCharacterDerivationInput } from './preview-adapter'
-import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
+import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
 
 // ---------------------------------------------------------------------------
 // CharacterBuildPreview — builder right-panel model. Composes the global

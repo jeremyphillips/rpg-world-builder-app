@@ -1,13 +1,11 @@
 import type { CharacterDerivationInput } from '../character/derive/profile'
-import { assembleCharacterProficiencies } from './assemble-proficiencies'
+import { assembleCharacterProficiencies } from './assembly/assemble-proficiencies'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
 import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { CharacterBuilderDraft } from './draft'
-import {
-  assembleStartingEquipment,
-  resolveEquippedArmorVariants,
-} from './resolvers/starting-equipment-resolution'
+import { resolveEquippedArmorFromInventory } from '../character/equipment-inventory'
+import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
 
 /** Adapts a builder draft into the global character derivation input shape. */
 export function toCharacterDerivationInput(
@@ -20,7 +18,10 @@ export function toCharacterDerivationInput(
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
   const { equipment } = assembleStartingEquipment(draft, catalogIndex)
-  const equippedArmor = resolveEquippedArmorVariants(equipment, catalogIndex)
+  const equippedArmor = resolveEquippedArmorFromInventory({
+    equipment,
+    catalog: catalogIndex.equipment,
+  })
 
   return {
     level: rules.startingLevel,
