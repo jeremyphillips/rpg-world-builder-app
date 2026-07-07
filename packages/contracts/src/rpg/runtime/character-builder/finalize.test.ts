@@ -231,6 +231,97 @@ describe('finalizeCharacterBuild', () => {
     })
   })
 
+  it('assembles equipment entries and remaining wealth from the draft equipment section', () => {
+    const rope = {
+      id: 'srd-cc-5.2.1:rope',
+      slug: 'rope',
+      rulesetId: 'srd-cc-5.2.1' as const,
+      source: 'system' as const,
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Rope',
+      description: '',
+      cost: { amount: 2, currency: 'gp' as const },
+      weight: { value: 5, unit: 'lb' as const },
+      kind: 'adventuring_gear' as const,
+      gearKind: 'general' as const,
+    }
+
+    const storedFighterWithEquipment = {
+      ...builderTestContext.catalog.classes[0]!,
+      characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+          },
+        },
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'pack-a',
+              label: 'Pack A',
+              items: [],
+              wealth: { gp: 10 },
+            },
+          ],
+        },
+      },
+    }
+
+    const context = {
+      ...builderTestContext,
+      catalog: {
+        ...builderTestContext.catalog,
+        classes: [storedFighterWithEquipment],
+        equipment: [...builderTestContext.catalog.equipment, rope],
+      },
+    }
+
+    const input = finalizeCharacterBuild(
+      makeCompleteDraft({
+        class: { classId: storedFighterWithEquipment.id, level: 1 },
+        choiceSelections: {
+          'class:srd-cc-5.2.1:fighter:starting-equipment': ['pack-a'],
+        },
+        equipment: {
+          mode: 'package',
+          purchases: [{ equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold' }],
+          removedPackageItemKeys: [],
+          customized: true,
+        },
+      }),
+      context,
+      {
+        resolvedChoiceSets: [
+          {
+            id: 'class:srd-cc-5.2.1:fighter:starting-equipment',
+            sourceType: 'class',
+            sourceId: 'srd-cc-5.2.1:fighter',
+            choiceType: 'equipment',
+            label: 'Choose Starting Equipment',
+            min: 1,
+            max: 1,
+            options: [{ id: 'pack-a', label: 'Pack A' }],
+            required: true,
+          },
+        ],
+      },
+    )
+
+    expect(input.wealth).toEqual({ cp: 0, sp: 0, gp: 8, pp: 0 })
+    expect(input.equipment.gear).toEqual([
+      {
+        equipmentId: rope.id,
+        quantity: 1,
+        sources: [
+          { kind: 'startingGold', sourceId: storedFighterWithEquipment.id, grantId: 'pack-a' },
+        ],
+      },
+    ])
+  })
+
   it('assembles class spellcasting with classSpellcasting provenance', () => {
     const draft = makeCompleteDraft({
       species: { speciesId: 'srd-cc-5.2.1:fixture-dwarf' },

@@ -15,6 +15,8 @@ this document tracks the full internal layout, status, and promotion path.
 | `resolveSpellcastingProfile`              | `resolvers/spellcasting/spellcasting-profile.ts`                     | Structural spellcasting facts for the Spells step; null for non-casters.     |
 | `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | Enriches spell ChoiceSet options into picker rows for the spell drawer.      |
 | `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | Recommended equipment ids for the picker Recommended tab.                    |
+| `deriveEquipmentDraftEntries`             | `resolvers/equipment/derive-equipment-draft-entries.ts`              | Package items minus removals plus draft purchases with selection sources.    |
+| `deriveEquipmentBudgetSummary`            | `resolvers/equipment/equipment-budget.ts`                            | Starting/spent/remaining wealth for the equipment picker.                    |
 | `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | Annotates equipment rows with picker state + `searchText`.                   |
 | `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | Package option card enrichment for the Equipment step.                       |
 

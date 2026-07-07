@@ -9,6 +9,22 @@ import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-sta
 
 const RULESET = 'srd-cc-5.2.1' as const
 
+const rope = equipmentSchema.parse({
+  id: `${RULESET}:rope`,
+  slug: 'rope',
+  rulesetId: RULESET,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rope',
+  description: '',
+  cost: { amount: 1, currency: 'gp' },
+  weight: { value: 5, unit: 'lb' },
+  kind: 'adventuring_gear',
+  gearKind: 'general',
+})
+
 const leatherArmor = equipmentSchema.parse({
   id: `${RULESET}:leather-armor`,
   slug: 'leather-armor',
@@ -171,5 +187,49 @@ describe('assembleStartingEquipment', () => {
       vehicles: [],
       mounts: [],
     })
+  })
+
+  it('derives remaining wealth and customized inventory when the equipment section is present', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [druidClass],
+      spells: [],
+      equipment: [leatherArmor, shield, rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: druidClass.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: `${RULESET}:rope`,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+          },
+        ],
+        removedPackageItemKeys: [`${druidClass.id}:standard:0`],
+        customized: true,
+      },
+    }
+
+    const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
+
+    expect(wealth).toEqual({ cp: 0, sp: 0, gp: 8, pp: 0 })
+    expect(equipment.armor).toHaveLength(1)
+    expect(equipment.armor[0]?.equipmentId).toBe(shield.id)
+    expect(equipment.gear).toEqual([
+      {
+        equipmentId: `${RULESET}:rope`,
+        quantity: 1,
+        sources: [{ kind: 'startingGold', sourceId: druidClass.id, grantId: 'standard' }],
+      },
+    ])
   })
 })

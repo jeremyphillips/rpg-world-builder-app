@@ -145,7 +145,7 @@ describe('resolveAvailableContent', () => {
     expect(result.species.map((entry) => entry.slug).sort()).toEqual(['dwarf', 'pixie'])
   })
 
-  it('applies the MVP-A non-caster class filter (remove with BENCH-091)', () => {
+  it('includes all classes from the catalog', () => {
     const fighter = makeStoredClass('fighter', 'Fighter')
     const wizard = makeStoredClass('wizard', 'Wizard')
     const context = makeContext({
@@ -161,7 +161,7 @@ describe('resolveAvailableContent', () => {
 
     const result = resolveAvailableContent(context)
 
-    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+    expect(result.classes.map((entry) => entry.slug).sort()).toEqual(['fighter', 'wizard'])
   })
 
   it('filters spells to those learnable by available classes', () => {
@@ -183,7 +183,7 @@ describe('resolveAvailableContent', () => {
 
     const result = resolveAvailableContent(context)
 
-    expect(result.spells).toEqual([])
+    expect(result.spells.map((entry) => entry.slug).sort()).toEqual(['fire-bolt', 'true-strike'])
   })
 
   it('passes equipment through unchanged', () => {

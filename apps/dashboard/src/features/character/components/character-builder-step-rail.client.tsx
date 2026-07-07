@@ -3,6 +3,7 @@
 import {
   BUILDER_STEPS,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
@@ -27,6 +28,7 @@ import {
 export type CharacterBuilderStepRailProps = {
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
+  context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
   resolvedChoiceSets: readonly ChoiceSet[] | null
@@ -55,6 +57,7 @@ const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
 export function CharacterBuilderStepRail({
   draft,
   currentStepId,
+  context,
   catalogIndex,
   resolvedChoiceSets,
   validationIssues,
@@ -70,6 +73,7 @@ export function CharacterBuilderStepRail({
             stepId: step.id,
             draft,
             currentStepId,
+            context,
             resolvedChoiceSets,
             validationIssues,
             attemptedStepIds,

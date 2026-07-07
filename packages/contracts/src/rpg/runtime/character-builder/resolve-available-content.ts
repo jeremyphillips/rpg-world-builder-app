@@ -17,9 +17,6 @@ export type AvailableContent = {
   equipment: Equipment[]
 }
 
-/** MVP-A: hide caster classes until spell ChoiceSets ship (BENCH-091). */
-const MVP_A_AVAILABLE_CLASS_SLUGS = new Set(['barbarian', 'fighter', 'monk', 'rogue'])
-
 function filterSpeciesByCreatureTypePolicy(
   species: readonly Species[],
   context: CharacterBuildContext,
@@ -29,10 +26,6 @@ function filterSpeciesByCreatureTypePolicy(
   )
   const allowed = new Set(allowedTypes)
   return species.filter((entry) => allowed.has(entry.creatureType))
-}
-
-function filterClassesForMvpA(classes: readonly CharacterClass[]): CharacterClass[] {
-  return classes.filter((entry) => MVP_A_AVAILABLE_CLASS_SLUGS.has(entry.slug))
 }
 
 function filterSpellsByClassSlugs(
@@ -46,7 +39,7 @@ function filterSpellsByClassSlugs(
 /** Returns catalog options filtered by resolved character-creation rules. */
 export function resolveAvailableContent(context: CharacterBuildContext): AvailableContent {
   const species = filterSpeciesByCreatureTypePolicy(context.catalog.species, context)
-  const classes = filterClassesForMvpA(context.catalog.classes)
+  const classes = [...context.catalog.classes]
   const classSlugs = new Set(classes.map((entry) => entry.slug))
   const spells = filterSpellsByClassSlugs(context.catalog.spells, classSlugs)
 

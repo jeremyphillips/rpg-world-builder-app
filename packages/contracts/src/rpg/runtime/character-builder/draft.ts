@@ -50,6 +50,45 @@ export const characterBuilderDraftAbilitiesSchema = z.object({
 
 export type CharacterBuilderDraftAbilities = z.infer<typeof characterBuilderDraftAbilitiesSchema>
 
+export const characterBuilderDraftEquipmentModeSchema = z.enum(['package', 'gold'])
+
+export type CharacterBuilderDraftEquipmentMode = z.infer<
+  typeof characterBuilderDraftEquipmentModeSchema
+>
+
+export const characterBuilderDraftEquipmentPurchaseSourceModeSchema = z.enum([
+  'startingGold',
+  'manual',
+])
+
+export type CharacterBuilderDraftEquipmentPurchaseSourceMode = z.infer<
+  typeof characterBuilderDraftEquipmentPurchaseSourceModeSchema
+>
+
+export const characterBuilderDraftEquipmentPurchaseSchema = z.object({
+  equipmentId: z.string().min(1),
+  quantity: z.number().int().min(1),
+  /** Stamped when the purchase is added; never reinterpreted from mode or catalog. */
+  sourceMode: characterBuilderDraftEquipmentPurchaseSourceModeSchema,
+})
+
+export type CharacterBuilderDraftEquipmentPurchase = z.infer<
+  typeof characterBuilderDraftEquipmentPurchaseSchema
+>
+
+export const characterBuilderDraftEquipmentSchema = z.object({
+  mode: characterBuilderDraftEquipmentModeSchema,
+  purchases: z.array(characterBuilderDraftEquipmentPurchaseSchema).default([]),
+  /**
+   * Package slot keys `${classId}:${optionId}:${itemIndex}` removed from the
+   * selected starting package (index into option `items[]`, not equipmentId).
+   */
+  removedPackageItemKeys: z.array(z.string().min(1)).default([]),
+  customized: z.boolean().default(false),
+})
+
+export type CharacterBuilderDraftEquipment = z.infer<typeof characterBuilderDraftEquipmentSchema>
+
 export const characterBuilderDraftSchema = z.object({
   identity: characterBuilderDraftIdentitySchema,
   species: characterBuilderDraftSpeciesSchema,
@@ -60,6 +99,8 @@ export const characterBuilderDraftSchema = z.object({
    * keyed by deterministic ChoiceSet id (choice-set.ts, BENCH-078).
    */
   choiceSelections: z.record(z.string(), z.array(z.string().min(1))),
+  /** Equipment decisions only — inventory and wealth are derived at finalize. */
+  equipment: characterBuilderDraftEquipmentSchema.optional(),
   currentStepId: characterBuilderStepIdSchema.optional(),
   touchedStepIds: z.array(characterBuilderStepIdSchema),
 })

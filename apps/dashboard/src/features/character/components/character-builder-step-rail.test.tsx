@@ -7,15 +7,26 @@ import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
+  type CharacterBuilderStepId,
+  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
-const catalogIndex = indexCharacterBuildCatalog(
-  createPopulatedStandaloneBuilderContextFixture().catalog,
-)
+const context = createPopulatedStandaloneBuilderContextFixture()
+const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
+
+const railProps = {
+  context,
+  catalogIndex,
+  resolvedChoiceSets: null,
+  validationIssues: [] as CharacterBuildValidationIssue[],
+  attemptedStepIds: [] as CharacterBuilderStepId[],
+  standardArray,
+  onStepSelect: () => undefined,
+}
 
 describe('CharacterBuilderStepRail', () => {
   it('renders all builder steps and marks the active step', () => {
@@ -23,12 +34,7 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="species"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 
@@ -48,12 +54,7 @@ describe('CharacterBuilderStepRail', () => {
           currentStepId: 'identity',
         }}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 
@@ -68,14 +69,11 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
+        {...railProps}
         validationIssues={[
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ]}
         attemptedStepIds={['identity']}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
       />,
     )
 
@@ -89,14 +87,10 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
+        {...railProps}
         validationIssues={[
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
       />,
     )
 
@@ -113,11 +107,7 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
+        {...railProps}
         onStepSelect={onStepSelect}
       />,
     )
@@ -131,12 +121,7 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 

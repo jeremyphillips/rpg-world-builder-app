@@ -81,6 +81,29 @@ describe('characterBuilderDraftSchema', () => {
       narrative: { backstory: 'Current backstory.' },
     })
   })
+
+  it('parses the optional equipment section with defaults', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      equipment: {
+        mode: 'package',
+        purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
+      },
+    }
+    const parsed = characterBuilderDraftSchema.parse(draft)
+    expect(parsed.equipment).toEqual({
+      mode: 'package',
+      purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
+      removedPackageItemKeys: [],
+      customized: false,
+    })
+  })
+
+  it('rehydrates persisted drafts without an equipment section', () => {
+    const draft = makeDraftInProgress()
+    expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(true)
+    expect(draft.equipment).toBeUndefined()
+  })
 })
 
 describe('parsePersistedCharacterBuilderState', () => {

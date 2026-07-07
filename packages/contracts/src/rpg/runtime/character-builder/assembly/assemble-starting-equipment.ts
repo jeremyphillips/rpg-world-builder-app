@@ -18,6 +18,8 @@ import {
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
+import { deriveEquipmentBudgetSummary } from '../resolvers/equipment/equipment-budget'
+import { deriveEquipmentDraftEntries } from '../resolvers/equipment/derive-equipment-draft-entries'
 import {
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
@@ -151,11 +153,19 @@ function appendResolvedItem(
   })
 }
 
-/** Assembles finalized equipment and wealth from the selected starting-equipment package. */
+/** Assembles finalized equipment and wealth from draft equipment decisions. */
 export function assembleStartingEquipment(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
 ): { equipment: CharacterEquipment; wealth: CharacterWealth } {
+  if (draft.equipment) {
+    const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+    return {
+      equipment: deriveEquipmentDraftEntries(draft, catalogIndex),
+      wealth: budget?.remaining ?? characterWealthFromGrant(undefined),
+    }
+  }
+
   const classId = draft.class.classId
   if (!classId) {
     return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }

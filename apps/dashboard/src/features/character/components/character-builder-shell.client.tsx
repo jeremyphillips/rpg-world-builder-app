@@ -194,6 +194,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
             <CharacterBuilderStepRail
               draft={draft}
               currentStepId={currentStepId}
+              context={context}
               catalogIndex={catalogIndex}
               resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={validationIssues}

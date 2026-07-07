@@ -16,6 +16,7 @@ import { IdentityStep } from './steps/identity-step.client'
 import { ProficienciesStep } from './steps/proficiencies-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
+import { SpellsStep } from './steps/spells-step.client'
 
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
@@ -96,8 +97,18 @@ export function CharacterBuilderStepContent({
         />
       )
     case 'equipment':
-    case 'spells':
       return <CharacterBuilderStepPanel stepId={stepId} status="deferred" />
+    case 'spells':
+      return (
+        <SpellsStep
+          context={context}
+          draft={draft}
+          preview={preview}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     default:
       return null
   }
