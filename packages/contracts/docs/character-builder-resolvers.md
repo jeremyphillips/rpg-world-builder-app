@@ -87,6 +87,9 @@ Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
 
 User-facing copy lives in `characterBuilderStepReadinessMessages`
 (`character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
+Section-level proficiency choice empty copy uses
+`characterBuilderProficiencyChoiceEmptyMessages` and
+`formatProficiencyChoiceEmptyMessage(choiceType)`.
 
 ### Dashboard rail mapping
 
@@ -102,8 +105,11 @@ Implemented in `apps/dashboard/.../builder-step-visual-status.ts` when
 | `complete`         | `complete`                                      | —                |
 
 Step bodies render `BuilderStepReadinessPanel` from readiness `message` /
-`helperText`; proficiencies filters non-language sections when
-`classDependentBlocked` is true.
+`helperText`:
+
+- Full-block (`blocked` without `classDependentBlocked`): muted empty-state copy
+- Partial-block proficiencies (`classDependentBlocked`): info inline notice;
+  origin-language choices remain visible; class-dependent sections stay hidden
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
 

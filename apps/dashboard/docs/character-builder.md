@@ -26,8 +26,17 @@ layer from contracts instead of ad-hoc empty/blocked branches in each step view.
 ### Proficiencies partial block
 
 When no class is selected, readiness is `blocked` with `classDependentBlocked: true`.
-The step still renders **origin-language** choice sections; class-dependent sections
-(saving throws, skills, tools, weapons, armor) are hidden until a class is chosen.
+The step shows the class dependency notice while preserving origin language choices;
+class-dependent choice sections (saving throws, skills, tools, weapons, armor) remain
+hidden until a class is chosen.
+
+### Dependency presentation
+
+| State                           | Presentation                                                                  |
+| ------------------------------- | ----------------------------------------------------------------------------- |
+| Equipment / Spells `blocked`    | Muted message (`BuilderStepReadinessPanel`)                                   |
+| Proficiencies partial `blocked` | Info `Alert` above available content                                          |
+| Preview sidebar (no class)      | Same contracts readiness strings via `character-builder-preview-panel.lib.ts` |
 
 ### Copy hierarchy
 

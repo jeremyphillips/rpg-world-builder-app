@@ -56,11 +56,11 @@ describe('CharacterBuilderPreviewPanel', () => {
     expect(screen.getByText('HP')).toBeInTheDocument()
     expect(screen.queryByText('Max HP')).not.toBeInTheDocument()
     expect(screen.getByText('STR')).toBeInTheDocument()
-    expect(screen.getByText('Choose a class to see options')).toBeInTheDocument()
+    expect(screen.getByText('Choose a class to see class proficiencies.')).toBeInTheDocument()
     expect(
       screen.getByText('Class saving throws appear after you choose a class.'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Not applicable for this class.')).toBeInTheDocument()
+    expect(screen.getByText('Choose a class to see spell options.')).toBeInTheDocument()
   })
 
   it('renders populated identity and class proficiencies when available', () => {

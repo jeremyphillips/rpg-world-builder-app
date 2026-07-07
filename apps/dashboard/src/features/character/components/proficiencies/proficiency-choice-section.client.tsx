@@ -6,13 +6,12 @@
 // Proficiencies adds sourceLabel per row via BuilderInventoryRow; spells lack source today.
 // Extract when aligning spell selected rows (post-MVP polish).
 
-import type { ProficiencyChoiceSummary } from '@rpg/contracts'
+import { formatProficiencyChoiceEmptyMessage, type ProficiencyChoiceSummary } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
 import {
   formatChoiceSetDrawerTriggerLabel,
   formatProficiencySelectionCounter,
-  PROFICIENCIES_STEP_NO_CHOICES_SELECTED_MESSAGE,
   PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
   PROFICIENCIES_STEP_SELECTION_FULL_REASON,
 } from '../../lib/proficiencies-step.lib'
@@ -75,7 +74,7 @@ export function ProficiencyChoiceSection({
           ))}
         </ul>
       ) : (
-        <Text variant="muted">{PROFICIENCIES_STEP_NO_CHOICES_SELECTED_MESSAGE}</Text>
+        <Text variant="muted">{formatProficiencyChoiceEmptyMessage(choiceSet.choiceType)}</Text>
       )}
     </section>
   )

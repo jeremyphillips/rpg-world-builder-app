@@ -25,7 +25,7 @@ describe('ProficiencyChoiceSection', () => {
     expect(screen.getByRole('heading', { name: 'Rogue Skills' })).toBeInTheDocument()
     expect(screen.getByText('Selected: 0 / 2')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add skill proficiency' })).toBeEnabled()
-    expect(screen.getByText('No proficiencies selected yet.')).toBeInTheDocument()
+    expect(screen.getByText('No skills chosen yet.')).toBeInTheDocument()
   })
 
   it('shows Manage label when the ChoiceSet is full and keeps the drawer trigger enabled', () => {

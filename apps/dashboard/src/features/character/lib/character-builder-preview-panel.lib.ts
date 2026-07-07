@@ -1,4 +1,5 @@
-import type { CharacterBuilderDraft, CharacterNarrative } from '@rpg/contracts'
+import type { CharacterBuilderDraft, CharacterNarrative, ClassStored } from '@rpg/contracts'
+import { characterBuilderStepReadinessMessages, formatStepReadinessMessage } from '@rpg/contracts'
 
 export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
   'narrative',
@@ -37,10 +38,59 @@ export function formatPreviewAbilityCell(
   return `${score} (${modLabel})`
 }
 
-export function resolveProficienciesSectionHint(skillChoiceCount: number | undefined): string {
+function hasClassDependentProficiencyChoiceSlots(characterClass: ClassStored | undefined): boolean {
+  const proficiencies = characterClass?.characterCreation?.proficiencies
+  if (!proficiencies) return false
+
+  const hasSkillChoices = (proficiencies.skills?.choices ?? []).some((choice) => choice.choose > 0)
+  const hasToolChoices = (proficiencies.tools?.choices ?? []).some((choice) => choice.choose > 0)
+
+  return hasSkillChoices || hasToolChoices
+}
+
+export type ResolveProficienciesSectionHintArgs = {
+  hasCharacterClass: boolean
+  characterClass?: ClassStored
+  skillChoiceCount?: number
+}
+
+export function resolveProficienciesSectionHint({
+  hasCharacterClass,
+  characterClass,
+  skillChoiceCount,
+}: ResolveProficienciesSectionHintArgs): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(
+      characterBuilderStepReadinessMessages.proficienciesBlockedNoClass,
+    )
+  }
+
+  if (!hasClassDependentProficiencyChoiceSlots(characterClass)) {
+    return ''
+  }
+
   if (skillChoiceCount) {
     return `${skillChoiceCount} skill choice${skillChoiceCount === 1 ? '' : 's'} remaining`
   }
 
-  return 'Choose a class to see options'
+  return ''
+}
+
+export function resolveEquipmentPreviewEmptyHint(hasCharacterClass: boolean): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(characterBuilderStepReadinessMessages.equipmentBlockedNoClass)
+  }
+
+  return 'Nothing selected yet.'
+}
+
+export function resolveSpellsPreviewEmptyHint(
+  hasCharacterClass: boolean,
+  spellcastingActive: boolean,
+): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(characterBuilderStepReadinessMessages.spellsBlockedNoClass)
+  }
+
+  return spellcastingActive ? 'Choose starting spells.' : 'Not applicable for this class.'
 }

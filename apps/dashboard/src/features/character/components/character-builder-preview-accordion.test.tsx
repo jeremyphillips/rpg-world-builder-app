@@ -49,6 +49,7 @@ function renderAccordion(
         characterClass?.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose
       }
       hasCharacterClass={characterClass !== undefined}
+      characterClass={characterClass}
       spellcastingActive={false}
     />,
   )

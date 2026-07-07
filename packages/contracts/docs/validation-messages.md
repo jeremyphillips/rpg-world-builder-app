@@ -109,7 +109,12 @@ Spell ChoiceSet validation (BENCH-089) adds spell-specific ids alongside the gen
 Spells, and Proficiencies. Ids use `validation.characterBuilder.readiness.*`
 (e.g. `equipmentBlockedNoClass`, `spellsNotApplicableNoSpellcasting`,
 `proficienciesBlockedNoClassHelper`). Parameterized messages accept `className`
-and/or `level`. Readiness copy is distinct from validation issues; see
+and/or `level`. Blocked copy uses the grammar `Choose a class to see …`.
+
+**Proficiency choice empty** (`characterBuilderProficiencyChoiceEmptyMessages`) —
+section-level empty copy keyed by `choiceType` (e.g. `No languages chosen yet.`).
+Formatted via `formatProficiencyChoiceEmptyMessage`. Readiness copy is distinct
+from validation issues; see
 [character-builder-resolvers.md](character-builder-resolvers.md#builder-step-readiness-bench-120).
 
 **Future surface catalogs** (add only when those UI flows ship):

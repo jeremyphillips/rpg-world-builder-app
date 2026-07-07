@@ -15,6 +15,10 @@ import {
 // ---------------------------------------------------------------------------
 
 export { BUILDER_STEP_READINESS_STEP_IDS, type BuilderStepReadinessStepId }
+export {
+  formatProficiencyChoiceEmptyMessage,
+  formatStepReadinessMessage,
+} from './step-readiness-helpers'
 
 export type BuilderStepReadiness =
   | 'blocked'
