@@ -30,6 +30,24 @@ export function validateBuilderFinalSubmit(
   })
 }
 
+export function validateBuilderDraft(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  resolvedChoiceSets: readonly ChoiceSet[],
+): CharacterBuildValidationResult {
+  return validateCharacterBuild(draft, context, 'draft', {
+    resolvedChoiceSets,
+  })
+}
+
+export function resolveBuilderDraftValidationIssues(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  resolvedChoiceSets: readonly ChoiceSet[],
+): CharacterBuildValidationIssue[] {
+  return validateBuilderDraft(draft, context, resolvedChoiceSets).issues
+}
+
 export function issuesForStep(
   issues: CharacterBuildValidationIssue[],
   stepId: CharacterBuilderStepId,

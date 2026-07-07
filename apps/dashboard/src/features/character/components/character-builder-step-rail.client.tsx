@@ -32,7 +32,10 @@ export type CharacterBuilderStepRailProps = {
   catalogIndex: CharacterBuildCatalogIndex
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
   resolvedChoiceSets: readonly ChoiceSet[] | null
+  /** Submit-time validation issues surfaced after a failed Continue or Create. */
   validationIssues: CharacterBuildValidationIssue[]
+  /** Live draft-phase issues that drive proactive rail status. */
+  draftValidationIssues: CharacterBuildValidationIssue[]
   attemptedStepIds: readonly CharacterBuilderStepId[]
   standardArray: readonly number[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
@@ -61,6 +64,7 @@ export function CharacterBuilderStepRail({
   catalogIndex,
   resolvedChoiceSets,
   validationIssues,
+  draftValidationIssues,
   attemptedStepIds,
   standardArray,
   onStepSelect,
@@ -76,6 +80,7 @@ export function CharacterBuilderStepRail({
             context,
             resolvedChoiceSets,
             validationIssues,
+            draftValidationIssues,
             attemptedStepIds,
             catalogIndex,
             standardArray,

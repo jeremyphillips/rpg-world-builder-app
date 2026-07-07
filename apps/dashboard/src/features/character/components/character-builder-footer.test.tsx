@@ -1,52 +1,35 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 
 describe('CharacterBuilderFooter', () => {
-  it('submits the active step form when Continue is shown', async () => {
-    const onContinue = vi.fn()
-
-    render(
-      <form id="identity-form" onSubmit={(event) => event.preventDefault()}>
-        <CharacterBuilderFooter
-          currentStepId="identity"
-          continueFormId="identity-form"
-          onBack={() => undefined}
-          onContinue={onContinue}
-          onCreateCharacter={() => undefined}
-        />
-      </form>,
-    )
-
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(onContinue).not.toHaveBeenCalled()
-  })
-
-  it('shows Create character on the review step', () => {
+  it('disables create when the character is not ready', () => {
     render(
       <CharacterBuilderFooter
         currentStepId="review"
-        onBack={() => undefined}
-        onContinue={() => undefined}
-        onCreateCharacter={() => undefined}
+        canCreateCharacter={false}
+        onBack={vi.fn()}
+        onContinue={vi.fn()}
+        onCreateCharacter={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Create character' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create character' })).toBeDisabled()
+    expect(
+      screen.getByText('Resolve the issues above before creating your character.'),
+    ).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  it('has no axe accessibility violations on review', async () => {
     const { container } = render(
       <CharacterBuilderFooter
-        currentStepId="class"
-        continueFormId="class-form"
-        onBack={() => undefined}
-        onContinue={() => undefined}
-        onCreateCharacter={() => undefined}
+        currentStepId="review"
+        canCreateCharacter={false}
+        onBack={vi.fn()}
+        onContinue={vi.fn()}
+        onCreateCharacter={vi.fn()}
       />,
     )
 

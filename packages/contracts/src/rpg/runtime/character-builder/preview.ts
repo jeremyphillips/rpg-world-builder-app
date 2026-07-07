@@ -3,7 +3,8 @@ import { isArmorEquipment } from '../../content/equipment'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import type { CharacterProficiencies } from '../character/proficiencies'
 import { formatFieldMessage } from '../../../validation/define-message'
-import { areRequiredChoiceSetsSatisfied, isChoiceSetSatisfied } from './choice-set'
+import { areRequiredChoiceSetsSatisfied } from './choice-set'
+import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 import type { ChoiceSet } from './choice-set'
 import { characterBuilderPreviewMessages } from './character-builder-preview-messages'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
@@ -55,13 +56,9 @@ function resolveBuilderUnresolvedChoiceSetIds(
   draft: CharacterBuilderDraft,
   choiceSets: readonly ChoiceSet[],
 ): string[] {
-  return choiceSets
-    .filter(
-      (choiceSet) =>
-        choiceSet.required &&
-        !isChoiceSetSatisfied(choiceSet, draft.choiceSelections[choiceSet.id] ?? []),
-    )
-    .map((choiceSet) => choiceSet.id)
+  return resolveUnresolvedChoiceSetSummaries(draft, choiceSets).map(
+    (summary) => summary.choiceSetId,
+  )
 }
 
 function hasEquippedBodyArmor(

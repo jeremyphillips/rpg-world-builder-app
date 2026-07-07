@@ -26,6 +26,15 @@ export const IdentityStep: Story = {
 export const ReviewStep: Story = {
   args: {
     currentStepId: 'review',
+    canCreateCharacter: true,
+    isCreating: false,
+  },
+}
+
+export const ReviewStepBlocked: Story = {
+  args: {
+    currentStepId: 'review',
+    canCreateCharacter: false,
     isCreating: false,
   },
 }
@@ -33,6 +42,7 @@ export const ReviewStep: Story = {
 export const Creating: Story = {
   args: {
     currentStepId: 'review',
+    canCreateCharacter: true,
     isCreating: true,
   },
 }
