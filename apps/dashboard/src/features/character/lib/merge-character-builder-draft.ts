@@ -12,6 +12,18 @@ export function mergeCharacterBuilderDraft(
     class: patch.class ? { ...draft.class, ...patch.class } : draft.class,
     abilities: patch.abilities ? { ...draft.abilities, ...patch.abilities } : draft.abilities,
     choiceSelections: patch.choiceSelections ?? draft.choiceSelections,
+    equipment:
+      patch.equipment !== undefined
+        ? {
+            ...(draft.equipment ?? {
+              mode: 'package',
+              purchases: [],
+              removedPackageItemKeys: [],
+              customized: false,
+            }),
+            ...patch.equipment,
+          }
+        : draft.equipment,
     touchedStepIds: patch.touchedStepIds ?? draft.touchedStepIds,
   }
 }

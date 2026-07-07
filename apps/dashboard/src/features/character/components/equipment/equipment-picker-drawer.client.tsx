@@ -2,12 +2,11 @@
 
 import * as React from 'react'
 
-import { Badge, Button, CatalogPickerSheet, PreviewCard, Text, cn } from '@rpg/ui'
-import { getEquipmentKindLabel, type EquipmentKind } from '@rpg/contracts'
+import { Badge, Button, CatalogPickerSheet, NumberInput, PreviewCard, Text, cn } from '@rpg/ui'
+import { getEquipmentKindLabel, isEquipmentStackable, type EquipmentKind } from '@rpg/contracts'
 
 import {
   filterEquipmentPickerItems,
-  formatEquipmentBudgetWealth,
   formatEquipmentPickerDetails,
   formatEquipmentPickerSummaryLine,
   getEquipmentPickerBadgeLabel,
@@ -16,53 +15,26 @@ import {
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
+import { formatEquipmentPickerItemDetails } from './equipment-picker-character-preview.lib'
 import {
+  EQUIPMENT_PICKER_ADD_QUANTITY_LABEL,
+  EQUIPMENT_PICKER_IN_INVENTORY_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
+import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import {
-  equipmentPickerBudgetClasses,
-  equipmentPickerBudgetLabelClasses,
-  equipmentPickerBudgetValueClasses,
   equipmentPickerDisabledRowClasses,
   equipmentPickerKindChipActiveClasses,
   equipmentPickerKindChipInactiveClasses,
   equipmentPickerKindFiltersClasses,
+  equipmentPickerQuantityControlsClasses,
   equipmentPickerWarningBadgeClasses,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
-
-function EquipmentBudgetHeader({
-  budget,
-}: {
-  budget: NonNullable<EquipmentPickerDrawerProps['budget']>
-}) {
-  return (
-    <dl className={equipmentPickerBudgetClasses}>
-      <div>
-        <dt className={equipmentPickerBudgetLabelClasses}>Starting</dt>
-        <dd className={equipmentPickerBudgetValueClasses}>
-          {formatEquipmentBudgetWealth(budget.starting)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentPickerBudgetLabelClasses}>Spent</dt>
-        <dd className={equipmentPickerBudgetValueClasses}>
-          {formatEquipmentBudgetWealth(budget.spent)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentPickerBudgetLabelClasses}>Remaining</dt>
-        <dd className={equipmentPickerBudgetValueClasses}>
-          {formatEquipmentBudgetWealth(budget.remaining)}
-        </dd>
-      </div>
-    </dl>
-  )
-}
 
 function EquipmentKindFilters({
   kinds,
@@ -100,17 +72,25 @@ function EquipmentKindFilters({
 function EquipmentPickerRow({
   item,
   budget,
-  addCount,
+  ownedQuantity,
+  uniqueOwned,
+  addQuantity,
+  onAddQuantityChange,
   onAdd,
 }: {
   item: EquipmentPickerItem
   budget?: EquipmentPickerDrawerProps['budget']
-  addCount: number
+  ownedQuantity: number
+  uniqueOwned: boolean
+  addQuantity: number
+  onAddQuantityChange: (quantity: number) => void
   onAdd: () => void
 }) {
   const disabled = isEquipmentPickerItemDisabled(item)
   const badgeLabel = getEquipmentPickerBadgeLabel(item)
   const disabledNote = getEquipmentPickerDisabledNote(item, budget)
+  const stackable = isEquipmentStackable(item.equipment)
+  const uniqueBlocked = !stackable && (uniqueOwned || ownedQuantity > 0)
 
   return (
     <div className={cn(disabled ? equipmentPickerDisabledRowClasses : undefined)}>
@@ -127,9 +107,29 @@ function EquipmentPickerRow({
                 {badgeLabel}
               </Badge>
             ) : null}
-            <Button type="button" size="sm" disabled={disabled} onClick={onAdd}>
-              {addCount > 0 ? `Add another (${addCount + 1})` : 'Add'}
-            </Button>
+            {stackable ? (
+              <div className={equipmentPickerQuantityControlsClasses}>
+                <NumberInput
+                  aria-label={`${EQUIPMENT_PICKER_ADD_QUANTITY_LABEL} for ${item.equipment.name}`}
+                  size="sm"
+                  digits={2}
+                  min={1}
+                  value={addQuantity}
+                  disabled={disabled}
+                  onChange={(event) => {
+                    const next = Number(event.target.value)
+                    onAddQuantityChange(Number.isFinite(next) && next >= 1 ? next : 1)
+                  }}
+                />
+                <Button type="button" size="sm" disabled={disabled} onClick={onAdd}>
+                  {ownedQuantity > 0 ? `Add (${ownedQuantity + addQuantity})` : 'Add'}
+                </Button>
+              </div>
+            ) : (
+              <Button type="button" size="sm" disabled={disabled || uniqueBlocked} onClick={onAdd}>
+                {uniqueBlocked ? EQUIPMENT_PICKER_IN_INVENTORY_LABEL : 'Add'}
+              </Button>
+            )}
           </div>
         }
       />
@@ -147,6 +147,10 @@ export function EquipmentPickerDrawer({
   allowedKinds,
   filterOutUnaffordable = true,
   filterOutNonProficient = false,
+  showCharacterPreview = false,
+  characterPreviewContext,
+  ownedPurchaseQuantities = {},
+  isUniqueEquipmentOwned,
   onAddItem,
 }: EquipmentPickerDrawerProps) {
   const kindOptions = React.useMemo(
@@ -154,11 +158,11 @@ export function EquipmentPickerDrawer({
     [allowedKinds, items],
   )
   const [selectedKinds, setSelectedKinds] = React.useState(kindOptions)
-  const [addCounts, setAddCounts] = React.useState<Record<string, number>>({})
+  const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
 
   React.useEffect(() => {
     if (!open) {
-      setAddCounts({})
+      setAddQuantities({})
       setSelectedKinds(kindOptions)
     }
   }, [kindOptions, open])
@@ -196,14 +200,18 @@ export function EquipmentPickerDrawer({
   const handleAddItem = React.useCallback(
     (item: EquipmentPickerItem) => {
       const itemKey = item.equipment.id
-      setAddCounts((current) => ({
-        ...current,
-        [itemKey]: (current[itemKey] ?? 0) + 1,
-      }))
-      onAddItem(item, 1)
+      const quantity = addQuantities[itemKey] ?? 1
+      onAddItem(item, quantity)
+      if (isEquipmentStackable(item.equipment)) {
+        setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
+      }
     },
-    [onAddItem],
+    [addQuantities, onAddItem],
   )
+
+  const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
+    setAddQuantities((current) => ({ ...current, [itemKey]: quantity }))
+  }, [])
 
   return (
     <CatalogPickerSheet
@@ -232,13 +240,24 @@ export function EquipmentPickerDrawer({
         <EquipmentPickerRow
           item={item}
           budget={budget}
-          addCount={addCounts[item.equipment.id] ?? 0}
+          ownedQuantity={ownedPurchaseQuantities[item.equipment.id] ?? 0}
+          uniqueOwned={isUniqueEquipmentOwned?.(item.equipment.id) ?? false}
+          addQuantity={addQuantities[item.equipment.id] ?? 1}
+          onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
           onAdd={() => handleAddItem(item)}
         />
       )}
       renderItemDetails={(item) => (
         <Text as="p" variant="muted" className="whitespace-pre-line">
-          {formatEquipmentPickerDetails(item.equipment)}
+          {formatEquipmentPickerItemDetails(
+            item.equipment,
+            {
+              showCharacterPreview,
+              characterPreviewContext,
+              isProficient: item.state.isProficient,
+            },
+            formatEquipmentPickerDetails(item.equipment),
+          )}
         </Text>
       )}
     />

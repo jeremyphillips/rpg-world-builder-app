@@ -1,5 +1,7 @@
 import type { EquipmentBudgetSummary, EquipmentKind, EquipmentPickerItem } from '@rpg/contracts'
 
+import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
+
 export type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
@@ -11,6 +13,10 @@ export const EQUIPMENT_PICKER_TAB_ALL = 'all'
 
 export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 
+export const EQUIPMENT_PICKER_IN_INVENTORY_LABEL = 'In inventory'
+
+export const EQUIPMENT_PICKER_ADD_QUANTITY_LABEL = 'Quantity to add'
+
 export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -20,5 +26,10 @@ export type EquipmentPickerDrawerProps = {
   allowedKinds?: readonly EquipmentKind[]
   filterOutUnaffordable?: boolean
   filterOutNonProficient?: boolean
+  showCharacterPreview?: boolean
+  characterPreviewContext?: EquipmentPickerCharacterPreviewContext
+  /** Purchased quantities for the active source mode, keyed by equipment id. */
+  ownedPurchaseQuantities?: Readonly<Record<string, number>>
+  isUniqueEquipmentOwned?: (equipmentId: string) => boolean
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
 }

@@ -85,6 +85,8 @@ export const characterBuilderDraftEquipmentSchema = z.object({
    */
   removedPackageItemKeys: z.array(z.string().min(1)).default([]),
   customized: z.boolean().default(false),
+  /** User continued without starting equipment when no valid options exist. */
+  skipped: z.boolean().optional(),
 })
 
 export type CharacterBuilderDraftEquipment = z.infer<typeof characterBuilderDraftEquipmentSchema>

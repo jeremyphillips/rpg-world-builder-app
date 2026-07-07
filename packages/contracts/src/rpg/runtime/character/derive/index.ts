@@ -166,4 +166,6 @@ export function resolveUnarmoredAc({
 }
 
 export * from './armor-class'
+export * from './preview-equipped-armor'
 export * from './profile'
+export * from './weapon-attack'

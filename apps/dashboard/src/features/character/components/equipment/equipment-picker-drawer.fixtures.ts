@@ -54,7 +54,7 @@ export const equipmentPickerRopeFixture = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Rope',
   kind: 'adventuring_gear',
-  gearKind: 'general',
+  gearKind: 'consumable',
   cost: { amount: 1, currency: 'gp' },
   weight: { value: 5, unit: 'lb' },
   description: '<p>Hempen rope, 50 feet.</p>',

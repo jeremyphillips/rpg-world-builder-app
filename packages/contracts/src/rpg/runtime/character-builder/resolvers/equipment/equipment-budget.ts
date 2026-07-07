@@ -73,6 +73,19 @@ export function isEquipmentAffordable(
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.remaining)
 }
 
+/** Maximum quantity affordable from the current remaining budget. */
+export function maxAffordableEquipmentQuantity(
+  equipment: Equipment,
+  budget: EquipmentBudgetSummary,
+  currentQuantity = 0,
+): number {
+  const unitCost = moneyToCopper(equipment.cost)
+  if (unitCost <= 0) return Math.max(currentQuantity, 1)
+
+  const additional = Math.floor(wealthToCopper(budget.remaining) / unitCost)
+  return currentQuantity + additional
+}
+
 function sumPurchaseCostCp(
   purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
   catalogIndex: CharacterBuildCatalogIndex,

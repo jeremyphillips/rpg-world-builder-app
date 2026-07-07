@@ -169,6 +169,10 @@ export function validateChoiceSetsForStep(
   choiceSets: readonly ChoiceSet[],
   stepId: CharacterBuilderStepId,
 ): CharacterBuildValidationIssue[] {
+  if (stepId === 'equipment' && draft.equipment?.skipped === true) {
+    return []
+  }
+
   const filtered = choiceSets.filter((choiceSet) => getChoiceSetStepId(choiceSet) === stepId)
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 
