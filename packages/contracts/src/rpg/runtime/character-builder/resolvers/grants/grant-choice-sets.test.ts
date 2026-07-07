@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import { indexCharacterBuildCatalog } from '../../context'
 import { contentGrantToChoiceSets } from './grant-choice-sets'
-import { builderTestCatalog } from '../../test-fixtures'
+import { athleticsSkill, builderTestCatalog } from '../../test-fixtures'
+import { acrobaticsSkill, luteTool, stealthSkill } from '../../proficiency-test-fixtures'
+
+const catalogWithSkillsAndEquipment = {
+  ...builderTestCatalog,
+  skillProficiencies: [athleticsSkill, stealthSkill, acrobaticsSkill],
+  equipment: [luteTool],
+}
 
 describe('contentGrantToChoiceSets — languageChoice', () => {
   const catalogIndex = indexCharacterBuildCatalog(builderTestCatalog)
@@ -41,5 +48,47 @@ describe('contentGrantToChoiceSets — languageChoice', () => {
       { id: 'elvish', label: 'Elvish' },
       { id: 'unknown-language', label: 'Unknown Language' },
     ])
+  })
+})
+
+describe('contentGrantToChoiceSets — proficiency pools', () => {
+  const catalogIndex = indexCharacterBuildCatalog(catalogWithSkillsAndEquipment)
+
+  it('expands any skill pools against the catalog vocabulary', () => {
+    const [choiceSet] = contentGrantToChoiceSets(
+      {
+        kind: 'skillProficiency',
+        grant: { kind: 'choice', choose: 1, pool: { source: 'any' } },
+      },
+      {
+        sourceType: 'species',
+        sourceId: 'srd-cc-5.2.1:elf',
+        slot: 'trait:training:skillProficiency',
+      },
+      catalogIndex,
+    )
+
+    expect(choiceSet?.options).toEqual([
+      { id: acrobaticsSkill.id, label: 'Acrobatics' },
+      { id: athleticsSkill.id, label: 'Athletics' },
+      { id: stealthSkill.id, label: 'Stealth' },
+    ])
+  })
+
+  it('expands any tool pools against catalog equipment', () => {
+    const [choiceSet] = contentGrantToChoiceSets(
+      {
+        kind: 'toolProficiency',
+        grant: { kind: 'choice', choose: 1, pool: { source: 'any' } },
+      },
+      {
+        sourceType: 'species',
+        sourceId: 'srd-cc-5.2.1:elf',
+        slot: 'trait:training:toolProficiency',
+      },
+      catalogIndex,
+    )
+
+    expect(choiceSet?.options).toEqual([{ id: luteTool.id, label: 'Lute' }])
   })
 })

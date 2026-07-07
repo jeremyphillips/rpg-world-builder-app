@@ -19,6 +19,14 @@ export const NoHeritageChoices: Story = {
   render: () => <SpeciesDetailContent species={ORC} campaignId={STORY_CAMPAIGN_ID} />,
 }
 
+export const WithLanguageAffinities: Story = {
+  render: () => <SpeciesDetailContent species={ELF} campaignId={STORY_CAMPAIGN_ID} />,
+}
+
+export const NoLanguageAffinities: Story = {
+  render: () => <SpeciesDetailContent species={ORC} campaignId={STORY_CAMPAIGN_ID} />,
+}
+
 export const WithLineageHeritageChoice: Story = {
   render: () => <SpeciesDetailContent species={ELF} campaignId={STORY_CAMPAIGN_ID} />,
 }

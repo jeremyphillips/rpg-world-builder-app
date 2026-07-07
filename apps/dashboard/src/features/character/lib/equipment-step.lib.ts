@@ -21,6 +21,7 @@ import {
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterSelectionSource,
+  formatSelectionSourceLabel,
   type ChoiceSet,
   type Equipment,
   type EquipmentBudgetSummary,
@@ -32,11 +33,6 @@ import {
 } from '@rpg/contracts'
 
 export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
-
-export const EQUIPMENT_STEP_NO_CLASS_MESSAGE = 'Choose a class before selecting starting equipment.'
-
-export const EQUIPMENT_STEP_NO_STARTING_EQUIPMENT_MESSAGE =
-  'No starting equipment choices are required for this class.'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -224,26 +220,12 @@ export function readSelectedStartingEquipmentOption(
   return readSelectedStartingEquipmentOptionId(draft, classId)
 }
 
+/** @deprecated Use {@link formatSelectionSourceLabel} from `@rpg/contracts`. */
 export function formatEquipmentSourceLabel(
   sources: CharacterSelectionSource[] | undefined,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
-  const source = sources?.[0]
-  if (!source) return 'Unknown source'
-
-  if (source.kind === 'manual') return 'Added manually'
-
-  if (source.kind === 'startingGold') {
-    return 'Purchased with starting gold'
-  }
-
-  if (source.kind === 'classStartingEquipment') {
-    const characterClass = source.sourceId ? catalogIndex.classes.get(source.sourceId) : undefined
-    const className = characterClass?.name ?? 'class'
-    return `From ${className} starting equipment`
-  }
-
-  return 'Starting equipment'
+  return formatSelectionSourceLabel(sources, catalogIndex)
 }
 
 export function listEquipmentInventoryRows(

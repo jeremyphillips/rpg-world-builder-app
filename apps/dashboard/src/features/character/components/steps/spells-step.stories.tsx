@@ -44,6 +44,23 @@ export const NonCaster: Story = {
   },
 }
 
+export const NoClass: Story = {
+  render: () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    return (
+      <SpellsStep
+        context={context}
+        draft={draft}
+        preview={null}
+        resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
 export const Wizard: Story = {
   render: () => {
     const draft = {

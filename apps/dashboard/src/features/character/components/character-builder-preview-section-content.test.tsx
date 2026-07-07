@@ -13,7 +13,7 @@ describe('CharacterBuilderPreviewSectionContent', () => {
     render(
       <CharacterBuilderPreviewSectionContent
         layout="subsections"
-        hint="Choose a class to see options"
+        hint="Choose a class to see class proficiencies."
       >
         <CharacterBuilderPreviewSubsection title="Skills">
           <CharacterBuilderPreviewSubsectionHint>
@@ -23,7 +23,7 @@ describe('CharacterBuilderPreviewSectionContent', () => {
       </CharacterBuilderPreviewSectionContent>,
     )
 
-    expect(screen.getByText('Choose a class to see options')).toHaveClass('text-xs')
+    expect(screen.getByText('Choose a class to see class proficiencies.')).toHaveClass('text-xs')
     expect(screen.getByText('Skills')).toBeInTheDocument()
     expect(screen.getByText('No skills chosen yet.')).toHaveClass('text-xs')
   })
@@ -32,7 +32,7 @@ describe('CharacterBuilderPreviewSectionContent', () => {
     const { container } = render(
       <CharacterBuilderPreviewSectionContent
         layout="subsections"
-        hint="Choose a class to see options"
+        hint="Choose a class to see class proficiencies."
       >
         <CharacterBuilderPreviewSubsection title="Saving throws">
           <CharacterBuilderPreviewSubsectionHint>

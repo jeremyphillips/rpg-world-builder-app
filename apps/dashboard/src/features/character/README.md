@@ -27,6 +27,7 @@ Folder layout and the feature-boundary rule are documented in
 | Preview hook       | `hooks/use-character-preview.ts`                           |
 | Step panel (stub)  | `components/character-builder-step-panel.client.tsx`       |
 | Step frame         | `components/steps/builder-step-frame.client.tsx`           |
+| Readiness panel    | `components/steps/builder-step-readiness-panel.client.tsx` |
 | Validation alert   | `components/character-builder-validation-alert.client.tsx` |
 | Footer             | `components/character-builder-footer.client.tsx`           |
 
@@ -40,5 +41,6 @@ Folder layout and the feature-boundary rule are documented in
 
 ## Related docs
 
+- [character-builder.md](../../docs/character-builder.md) — dashboard builder integration (readiness, rail)
 - [feature-structure.md](../../docs/feature-structure.md)
 - [routing.md](../../../../docs/routing.md)

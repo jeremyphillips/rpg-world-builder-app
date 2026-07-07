@@ -3,7 +3,10 @@ import type { CharacterProficiencies } from '../../character/proficiencies'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterLanguageAssemblyContext } from './assemble-language-proficiencies'
 import { assembleLanguageProficiencyEntries } from './assemble-language-proficiencies'
+import { assembleArmorProficiencyEntries } from './assemble-armor-proficiencies'
 import { assembleSkillProficiencyEntries } from './assemble-skill-proficiencies'
+import { assembleToolProficiencyEntries } from './assemble-tool-proficiencies'
+import { assembleWeaponProficiencyEntries } from './assemble-weapon-proficiencies'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
 
@@ -11,37 +14,9 @@ import type { CharacterBuilderDraft } from '../draft'
 // Proficiency aggregate assembly — composes per-domain orchestration modules.
 // ---------------------------------------------------------------------------
 
-function classFixedWeaponProficiencies(characterClass: CharacterClass) {
-  return characterClass.proficiencies.weapons.categories.map((weaponCategory) => ({
-    weaponCategory,
-    rank: 'proficient' as const,
-    sources: [
-      {
-        kind: 'classFeature' as const,
-        sourceId: characterClass.id,
-        grantId: 'weapon-proficiencies',
-      },
-    ],
-  }))
-}
-
-function classFixedArmorProficiencies(characterClass: CharacterClass) {
-  return characterClass.proficiencies.armor.categories.map((armorCategory) => ({
-    armorCategory,
-    sources: [
-      {
-        kind: 'classFeature' as const,
-        sourceId: characterClass.id,
-        grantId: 'armor-proficiencies',
-      },
-    ],
-  }))
-}
-
 /**
- * Merges class-fixed weapon/armor proficiencies with skill and language rows from
- * domain orchestration modules. Species heritage and grant-derived proficiencies
- * from {@link resolveAvailableChoices} can extend this in follow-on work.
+ * Merges class-fixed, grant-derived, and ChoiceSet-selected proficiency rows
+ * across all domains for preview and finalize.
  */
 export function assembleCharacterProficiencies(
   draft: CharacterBuilderDraft,
@@ -51,18 +26,20 @@ export function assembleCharacterProficiencies(
   languageContext?: CharacterLanguageAssemblyContext,
 ): CharacterProficiencies {
   const languages = languageContext
-    ? assembleLanguageProficiencyEntries(draft, languageContext, catalogIndex.languages, choiceSets)
+    ? assembleLanguageProficiencyEntries(
+        draft,
+        languageContext,
+        catalogIndex.languages,
+        choiceSets,
+        characterClass,
+      )
     : []
-
-  if (!characterClass) {
-    return { skills: [], weapons: [], armor: [], tools: [], languages }
-  }
 
   return {
     skills: assembleSkillProficiencyEntries(draft, catalogIndex, choiceSets, characterClass),
-    weapons: classFixedWeaponProficiencies(characterClass),
-    armor: classFixedArmorProficiencies(characterClass),
-    tools: [],
+    weapons: assembleWeaponProficiencyEntries(draft, catalogIndex, choiceSets, characterClass),
+    armor: assembleArmorProficiencyEntries(draft, catalogIndex, choiceSets, characterClass),
+    tools: assembleToolProficiencyEntries(draft, catalogIndex, choiceSets, characterClass),
     languages,
   }
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { Heading, RichTextContent } from '@rpg/ui'
+import { Heading, RichTextContent, Text } from '@rpg/ui'
 import {
   flattenGrantGroups,
   formatSpeed,
@@ -13,7 +13,9 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import {
   useCreatureTypeVocabulary,
+  useLanguageVocabulary,
   useSenseVocabulary,
+  getLanguageLabelFromVocabulary,
   getSenseLabelFromVocabulary,
 } from '@/features/homebrew'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
@@ -58,6 +60,30 @@ function TraitItem({ trait }: { trait: SpeciesTrait }) {
         <RichTextContent html={display.descriptionHtml} size="md" tone="muted" />
       )}
     </li>
+  )
+}
+
+function LanguageAffinitiesSection({
+  languageAffinities,
+  campaignId,
+}: {
+  languageAffinities: Species['languageAffinities']
+  campaignId: string
+}) {
+  const { vocabulary } = useLanguageVocabulary(campaignId)
+  if (!languageAffinities?.length) return null
+
+  const labels = languageAffinities
+    .map((id) => getLanguageLabelFromVocabulary(vocabulary, id))
+    .join(', ')
+
+  return (
+    <section aria-labelledby="language-affinities-heading">
+      <Heading variant="section" as="h2" id="language-affinities-heading" className="mb-4">
+        Language affinities
+      </Heading>
+      <Text variant="muted">{labels}</Text>
+    </section>
   )
 }
 
@@ -153,6 +179,10 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
           ) : undefined
         }
       >
+        <LanguageAffinitiesSection
+          languageAffinities={species.languageAffinities}
+          campaignId={campaignId}
+        />
         <TraitsList traits={species.traits} />
         {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
       </ContentDetailLayout>

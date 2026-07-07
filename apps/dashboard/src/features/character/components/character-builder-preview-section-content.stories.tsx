@@ -20,7 +20,7 @@ export const SubsectionsLayout: Story = {
     <div className="max-w-xs rounded-lg border border-border bg-muted/20">
       <CharacterBuilderPreviewSectionContent
         layout="subsections"
-        hint="Choose a class to see options"
+        hint="Choose a class to see class proficiencies."
       >
         <CharacterBuilderPreviewSubsection title="Saving throws">
           <CharacterBuilderPreviewSubsectionHint>
@@ -47,7 +47,7 @@ export const DefaultLayout: Story = {
     <div className="max-w-xs rounded-lg border border-border bg-muted/20">
       <CharacterBuilderPreviewSectionContent>
         <CharacterBuilderPreviewSubsectionHint>
-          Choose starting equipment.
+          Choose a class to see equipment options.
         </CharacterBuilderPreviewSubsectionHint>
       </CharacterBuilderPreviewSectionContent>
     </div>

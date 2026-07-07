@@ -7,13 +7,19 @@ import {
   type SpellcastingProfile,
 } from '@rpg/contracts'
 
-const SPELLS_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.spells
+import {
+  BUILDER_SELECTION_FULL_NOTICE,
+  formatChoiceSetDrawerTriggerLabel,
+  formatSelectionCounter,
+  isChoiceSetSelectionFull,
+  isChoiceSetSelectionOverSelected,
+} from './selection-counter.lib'
 
-export const SPELLS_STEP_NON_CASTER_MESSAGE = 'This class does not use spellcasting at level 1.'
+const SPELLS_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.spells
 
 export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Pending ability scores'
 
-export const SPELLS_STEP_SELECTION_FULL_REASON = 'Selection full'
+export const SPELLS_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
 
 /** ChoiceSets owned by the spells builder step. */
 export function choiceSetsForSpellsStep(choiceSets: readonly ChoiceSet[]): ChoiceSet[] {
@@ -23,28 +29,19 @@ export function choiceSetsForSpellsStep(choiceSets: readonly ChoiceSet[]): Choic
 }
 
 export function formatSpellChoiceAddLabel(choiceSet: ChoiceSet): string {
-  if (choiceSet.choiceType === 'cantrip') return 'Add cantrip'
-  if (choiceSet.choiceType === 'spell') return 'Add spell'
-  return `Add ${choiceSet.label.toLowerCase()}`
+  return formatChoiceSetDrawerTriggerLabel(choiceSet, {
+    selectedCount: 0,
+    max: choiceSet.max,
+  })
 }
 
-export function formatSpellSelectionCounter(selectedCount: number, max: number): string {
-  return `Selected: ${selectedCount} / ${max}`
-}
+export const formatSpellSelectionCounter = formatSelectionCounter
 
-export function isSpellChoiceSetFull(
-  choiceSet: ChoiceSet,
-  selectedIds: readonly string[],
-): boolean {
-  return selectedIds.length >= choiceSet.max
-}
+export const isSpellChoiceSetFull = isChoiceSetSelectionFull
 
-export function isSpellChoiceSetOverSelected(
-  choiceSet: ChoiceSet,
-  selectedIds: readonly string[],
-): boolean {
-  return selectedIds.length > choiceSet.max
-}
+export const isSpellChoiceSetOverSelected = isChoiceSetSelectionOverSelected
+
+export { formatChoiceSetDrawerTriggerLabel }
 
 export function resolveSelectedSpellLabels(
   choiceSet: ChoiceSet,

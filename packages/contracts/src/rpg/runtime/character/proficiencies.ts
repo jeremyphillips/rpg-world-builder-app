@@ -14,22 +14,6 @@ import { characterSelectionSourcesSchema } from './selection-sources'
  * Schemas and types only — merge/dedupe assembly for languages lives in
  * {@link ./languages.ts}; builder finalize orchestration lives under
  * `character-builder/assembly/` (see `runtime-resolution-boundaries.md`).
- *
- * **Future — grant-derived proficiencies:** Species and class-feature grants already
- * emit skill/weapon/tool/armor ChoiceSets via `grant-choice-sets.ts`, but finalize
- * does not yet write those selections into these rows (class-fixed armor/weapons and
- * class skill picks are handled today). When that ships:
- *
- * 1. Add `runtime/creature/proficiencies.ts` to expand filtered / `any` grant pools
- *    against catalog vocabulary (today those pools often emit a single placeholder
- *    ChoiceSet option, not real catalog rows).
- * 2. Add character-layer merge helpers here (or co-located `*-assembly` modules) for
- *    deduped skill/weapon/tool rows with combined `sources`.
- * 3. Add builder `assemble-*-proficiencies.ts` orchestration that reads grant
- *    ChoiceSet selections and attaches provenance — mirroring languages.
- *
- * Defer `creature/proficiencies.ts` until finalize needs shared pool expansion, not
- * only ChoiceSet UI stubs.
  */
 // ---------------------------------------------------------------------------
 // Proficiencies

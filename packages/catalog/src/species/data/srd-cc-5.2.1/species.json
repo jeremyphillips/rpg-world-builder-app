@@ -14,6 +14,7 @@
     "speed": {
       "walk": 30
     },
+    "languageAffinities": ["draconic"],
     "traits": [
       {
         "kind": "custom",
@@ -271,6 +272,7 @@
     "speed": {
       "walk": 30
     },
+    "languageAffinities": ["dwarvish"],
     "traits": [
       {
         "kind": "grant",
@@ -331,6 +333,7 @@
     "speed": {
       "walk": 30
     },
+    "languageAffinities": ["elvish"],
     "traits": [
       {
         "kind": "grant",
@@ -530,6 +533,7 @@
     "speed": {
       "walk": 30
     },
+    "languageAffinities": ["gnomish"],
     "traits": [
       {
         "kind": "grant",
@@ -620,6 +624,7 @@
     "speed": {
       "walk": 35
     },
+    "languageAffinities": ["giant"],
     "traits": [
       {
         "kind": "custom",
@@ -722,6 +727,7 @@
     "speed": {
       "walk": 30
     },
+    "languageAffinities": ["halfling"],
     "traits": [
       {
         "kind": "custom",

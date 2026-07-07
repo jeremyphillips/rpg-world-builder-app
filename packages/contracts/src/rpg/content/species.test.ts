@@ -112,6 +112,16 @@ describe('speciesSchema', () => {
     expect(speciesSchema.safeParse(minimal).success).toBe(true)
   })
 
+  it('parses optional languageAffinities', () => {
+    const withAffinities = { ...ELF_SYSTEM, languageAffinities: ['elvish'] }
+    expect(speciesSchema.safeParse(withAffinities).success).toBe(true)
+    expect(speciesSchema.parse(withAffinities).languageAffinities).toEqual(['elvish'])
+
+    expect(
+      speciesSchema.safeParse({ ...ELF_SYSTEM, languageAffinities: ['not a language id'] }).success,
+    ).toBe(false)
+  })
+
   it('rejects invalid creature type slug shapes', () => {
     expect(speciesSchema.safeParse({ ...ELF_SYSTEM, creatureType: 'Bad Type' }).success).toBe(false)
     expect(speciesSchema.safeParse({ ...ELF_SYSTEM, sizes: ['colossal'] }).success).toBe(false)

@@ -11,6 +11,8 @@ import {
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
 
+import { characterBuilderStepReadinessMessages, formatFieldMessage } from '@rpg/contracts'
+
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import {
   equipmentStepBardClassFixture,
@@ -20,13 +22,16 @@ import {
 import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_STEP_CUSTOMIZE_LABEL,
-  EQUIPMENT_STEP_NO_CLASS_MESSAGE,
 } from '../../lib/equipment-step.lib'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({
   catalog: equipmentStepCatalogFixture,
 })
+
+const equipmentBlockedNoClassMessage = formatFieldMessage(
+  characterBuilderStepReadinessMessages.equipmentBlockedNoClass(),
+)
 
 function renderEquipmentStep(
   draft: CharacterBuilderDraft = {
@@ -55,7 +60,7 @@ describe('EquipmentStep', () => {
   it('prompts for a class before showing equipment options', () => {
     renderEquipmentStep(createEmptyCharacterBuilderDraft())
 
-    expect(screen.getByText(EQUIPMENT_STEP_NO_CLASS_MESSAGE)).toBeInTheDocument()
+    expect(screen.getByText(equipmentBlockedNoClassMessage)).toBeInTheDocument()
   })
 
   it('renders package and gold starting equipment options', () => {

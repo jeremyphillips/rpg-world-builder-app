@@ -1,11 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { createEmptyCharacterBuilderDraft, resolveAvailableChoices } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import {
+  createEmptyProficienciesStepPreviewFixture,
+  createProficienciesStepOriginLanguagesFixture,
+  createProficienciesStepRogueFixture,
+  createProficienciesStepRogueWithSkillSelectionsFixture,
+  createProficienciesStepRogueWithStaleSkillFixture,
+} from '../../lib/proficiencies-step.fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import { ProficienciesStep } from './proficiencies-step.client'
 
-const context = createPopulatedStandaloneBuilderContextFixture()
+const emptyContext = createStandaloneBuilderContextFixture()
 
 const meta = {
   title: 'Character Builder/ProficienciesStep',
@@ -16,14 +23,83 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof ProficienciesStep>
 
+export const Empty: Story = {
+  render: () => (
+    <ProficienciesStep
+      context={emptyContext}
+      draft={createEmptyCharacterBuilderDraft()}
+      preview={createEmptyProficienciesStepPreviewFixture()}
+      resolvedChoiceSets={[]}
+      validationIssues={[]}
+      onDraftChange={() => undefined}
+    />
+  ),
+}
+
 export const OriginLanguages: Story = {
   render: () => {
-    const draft = createEmptyCharacterBuilderDraft()
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepOriginLanguagesFixture()
 
     return (
       <ProficienciesStep
+        context={context}
         draft={draft}
-        resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const Rogue: Story = {
+  render: () => {
+    const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
+
+    return (
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const RogueWithSelections: Story = {
+  render: () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepRogueWithSkillSelectionsFixture()
+
+    return (
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const RogueStaleSelection: Story = {
+  render: () => {
+    const { context, draft, preview, resolvedChoiceSets } =
+      createProficienciesStepRogueWithStaleSkillFixture()
+
+    return (
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
       />

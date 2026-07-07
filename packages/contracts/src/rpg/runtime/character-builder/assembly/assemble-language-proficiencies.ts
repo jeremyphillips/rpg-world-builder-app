@@ -1,4 +1,9 @@
 import type { LanguageSeedOption } from '../../../vocab/language'
+import type { CharacterClass } from '../../../content/classes/class'
+import {
+  getUnlockedGrantsAtLevel,
+  resolveGrantGroupsFromContent,
+} from '../../../content/lib/grants'
 import { resolveLanguageIdsFromGrantSet } from '../../creature/languages'
 import {
   assembleLanguageProficiencyIds,
@@ -56,12 +61,47 @@ function selectedLanguageIds(
   return ids
 }
 
+function classFeatureLanguageSource(
+  classId: string,
+  featureId: string,
+): CharacterSelectionSource[] {
+  return [{ kind: 'classFeature', sourceId: classId, grantId: featureId }]
+}
+
+function classFeatureLanguageProficiencies(
+  characterClass: CharacterClass,
+  characterLevel: number,
+): CharacterProficiencies['languages'] {
+  const entries: CharacterProficiencies['languages'] = []
+
+  for (const feature of characterClass.features) {
+    if (feature.level > characterLevel) continue
+
+    const groups = resolveGrantGroupsFromContent(feature, { level: feature.level })
+    const grants = getUnlockedGrantsAtLevel(groups, characterLevel, feature.level)
+
+    for (const grant of grants) {
+      if (grant.kind !== 'languages') continue
+
+      for (const language of grant.languageIds) {
+        entries.push({
+          language,
+          sources: classFeatureLanguageSource(characterClass.id, feature.id),
+        })
+      }
+    }
+  }
+
+  return entries
+}
+
 /** Returns finalized `proficiencies.languages` rows for preview/finalization. */
 export function assembleLanguageProficiencyEntries(
   draft: CharacterBuilderDraft,
   context: CharacterLanguageAssemblyContext,
   languages: readonly LanguageSeedOption[],
   choiceSets: readonly ChoiceSet[],
+  characterClass?: CharacterClass,
 ): CharacterProficiencies['languages'] {
   const grantSources = characterCreationLanguageGrantSources(context.rulesetId)
   const grantedIds = grantedLanguageIds(context, languages)
@@ -88,5 +128,9 @@ export function assembleLanguageProficiencyEntries(
     return rows
   })
 
-  return mergeLanguageProficiencyEntries(entries)
+  const classFeatureEntries = characterClass
+    ? classFeatureLanguageProficiencies(characterClass, draft.class.level)
+    : []
+
+  return mergeLanguageProficiencyEntries([...entries, ...classFeatureEntries])
 }

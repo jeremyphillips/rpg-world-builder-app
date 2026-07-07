@@ -121,11 +121,23 @@ export function collectSenseTypeIdsFromBody(body: Record<string, unknown>): stri
   return [...ids]
 }
 
+function collectLanguageAffinitiesFromBody(
+  body: Record<string, unknown>,
+  languageIds: Set<string>,
+): void {
+  const affinities = body.languageAffinities
+  if (!Array.isArray(affinities)) return
+  for (const id of affinities) {
+    if (typeof id === 'string') languageIds.add(id)
+  }
+}
+
 /** Collects language ids referenced in species-like content body fields. */
 export function collectLanguageIdsFromBody(body: Record<string, unknown>): string[] {
   const ids = new Set<string>()
   collectFromTraits(body.traits, new Set(), new Set(), ids)
   collectFromHeritage(body.heritage, new Set(), new Set(), ids)
+  collectLanguageAffinitiesFromBody(body, ids)
   return [...ids]
 }
 

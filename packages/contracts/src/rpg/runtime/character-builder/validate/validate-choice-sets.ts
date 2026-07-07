@@ -11,6 +11,15 @@ import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from './issue'
 import type { CharacterBuildValidationIssue } from './types'
 
+const PROFICIENCY_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
+  'skillProficiency',
+  'weaponProficiency',
+  'toolProficiency',
+  'armorTraining',
+  'language',
+  'feat',
+])
+
 function isSpellChoiceType(choiceType: ChoiceSet['choiceType']): boolean {
   return choiceType === 'cantrip' || choiceType === 'spell'
 }
@@ -91,6 +100,58 @@ function spellSelectionIssues(
         { stepId, choiceSetId: choiceSet.id, path: `choiceSelections.${choiceSet.id}` },
       ),
     )
+  }
+
+  return issues
+}
+
+function proficiencySelectionLabel(
+  choiceSet: ChoiceSet,
+  optionId: string,
+  catalogIndex: CharacterBuildCatalogIndex,
+): string {
+  const option = choiceSet.options.find((entry) => entry.id === optionId)
+  if (option) return option.label
+
+  if (choiceSet.choiceType === 'skillProficiency') {
+    const skillRow = catalogIndex.skillProficiencies.get(optionId)
+    return skillRow?.name ?? optionId
+  }
+
+  if (choiceSet.choiceType === 'toolProficiency') {
+    const equipment = catalogIndex.equipment.get(optionId)
+    return equipment?.name ?? optionId
+  }
+
+  return optionId
+}
+
+export function validateProficiencyChoiceSets(
+  draft: CharacterBuilderDraft,
+  choiceSets: readonly ChoiceSet[],
+  catalogIndex: CharacterBuildCatalogIndex,
+): CharacterBuildValidationIssue[] {
+  const issues: CharacterBuildValidationIssue[] = []
+
+  for (const choiceSet of choiceSets) {
+    if (!PROFICIENCY_CHOICE_TYPES.has(choiceSet.choiceType)) continue
+
+    const selections = draft.choiceSelections[choiceSet.id] ?? []
+    const stepId = getChoiceSetStepId(choiceSet)
+    const optionIds = new Set(choiceSet.options.map((option) => option.id))
+
+    for (const optionId of selections) {
+      if (optionIds.has(optionId)) continue
+
+      const proficiencyLabel = proficiencySelectionLabel(choiceSet, optionId, catalogIndex)
+      issues.push(
+        validationIssue(
+          'proficiency_no_longer_available',
+          characterBuilderValidationMessages.proficiencyNoLongerAvailable({ proficiencyLabel }),
+          { stepId, choiceSetId: choiceSet.id, path: `choiceSelections.${choiceSet.id}` },
+        ),
+      )
+    }
   }
 
   return issues
@@ -178,6 +239,13 @@ export function validateChoiceSetsForStep(
 
   if (stepId === 'spells') {
     return [...validateSpellChoiceSets(draft, filtered, catalogIndex, context)]
+  }
+
+  if (stepId === 'proficiencies') {
+    return [
+      ...validateChoiceSets(draft, filtered),
+      ...validateProficiencyChoiceSets(draft, filtered, catalogIndex),
+    ]
   }
 
   return validateChoiceSets(draft, filtered)

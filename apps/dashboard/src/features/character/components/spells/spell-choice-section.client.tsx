@@ -4,7 +4,7 @@ import type { ChoiceSet } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
 import {
-  formatSpellChoiceAddLabel,
+  formatChoiceSetDrawerTriggerLabel,
   formatSpellSelectionCounter,
   isSpellChoiceSetFull,
   isSpellChoiceSetOverSelected,
@@ -35,6 +35,10 @@ export function SpellChoiceSection({
   const selectedSpells = resolveSelectedSpellLabels(choiceSet, selectedIds)
   const selectionFull = isSpellChoiceSetFull(choiceSet, selectedIds)
   const overSelected = isSpellChoiceSetOverSelected(choiceSet, selectedIds)
+  const drawerTriggerLabel = formatChoiceSetDrawerTriggerLabel(choiceSet, {
+    selectedCount: selectedIds.length,
+    max: choiceSet.max,
+  })
 
   return (
     <section className={spellChoiceSectionClasses} aria-labelledby={`${choiceSet.id}-heading`}>
@@ -47,8 +51,8 @@ export function SpellChoiceSection({
             {formatSpellSelectionCounter(selectedIds.length, choiceSet.max)}
           </Text>
         </div>
-        <Button type="button" size="sm" disabled={selectionFull} onClick={onAdd}>
-          {formatSpellChoiceAddLabel(choiceSet)}
+        <Button type="button" size="sm" onClick={onAdd}>
+          {drawerTriggerLabel}
         </Button>
       </div>
 

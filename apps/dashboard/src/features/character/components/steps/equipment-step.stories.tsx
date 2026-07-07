@@ -26,6 +26,18 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof EquipmentStep>
 
+export const NoClass: Story = {
+  render: () => (
+    <EquipmentStep
+      context={context}
+      draft={createEmptyCharacterBuilderDraft()}
+      resolvedChoiceSets={[]}
+      validationIssues={[]}
+      onDraftChange={() => undefined}
+    />
+  ),
+}
+
 export const BardStartingEquipment: Story = {
   render: () => {
     const draft = {
