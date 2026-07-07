@@ -3,7 +3,11 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  characterBuilderStepReadinessMessages,
+  createEmptyCharacterBuilderDraft,
+  formatFieldMessage,
+} from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import {
@@ -14,14 +18,20 @@ import {
   proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
 } from '../../lib/proficiencies-step.fixtures'
-import { PROFICIENCIES_STEP_EMPTY_MESSAGE } from '../../lib/proficiencies-step.lib'
 import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from '../proficiencies/proficiency-selected-row.client'
 import { ProficienciesStep } from './proficiencies-step.client'
 
 const emptyContext = createStandaloneBuilderContextFixture()
 
+const proficienciesBlockedNoClassMessage = formatFieldMessage(
+  characterBuilderStepReadinessMessages.proficienciesBlockedNoClass(),
+)
+const proficienciesBlockedHelperMessage = formatFieldMessage(
+  characterBuilderStepReadinessMessages.proficienciesBlockedNoClassHelper(),
+)
+
 describe('ProficienciesStep', () => {
-  it('renders the empty-step message when no sections are visible', () => {
+  it('renders blocked copy when no class is selected and no sections are visible', () => {
     render(
       <ProficienciesStep
         context={emptyContext}
@@ -33,7 +43,8 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByText(PROFICIENCIES_STEP_EMPTY_MESSAGE)).toBeInTheDocument()
+    expect(screen.getByText(proficienciesBlockedNoClassMessage)).toBeInTheDocument()
+    expect(screen.getByText(proficienciesBlockedHelperMessage)).toBeInTheDocument()
   })
 
   it('renders Rogue grant rows and the skill choice counter', () => {
@@ -100,6 +111,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
+    expect(screen.getByText(proficienciesBlockedNoClassMessage)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Origin Languages' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add language' })).toBeInTheDocument()

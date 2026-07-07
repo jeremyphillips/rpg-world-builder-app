@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import {
   buildCharacterPreview,
   indexCharacterBuildCatalog,
+  resolveBuilderStepReadiness,
   resolveProficiencyPickerItems,
   resolveProficiencyStepModel,
 } from '@rpg/contracts'
@@ -43,6 +44,11 @@ export function useProficienciesStep({
         choiceSets: resolvedChoiceSets,
       }),
     [context, draft, effectivePreview, resolvedChoiceSets],
+  )
+
+  const readiness = useMemo(
+    () => resolveBuilderStepReadiness('proficiencies', draft, context, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets],
   )
 
   const activeChoiceSet = useMemo(
@@ -89,6 +95,7 @@ export function useProficienciesStep({
 
   return {
     model,
+    readiness,
     activeChoiceSet,
     pickerItems,
     openChoiceSet,

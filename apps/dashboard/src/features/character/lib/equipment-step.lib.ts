@@ -33,11 +33,6 @@ import {
 
 export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
-export const EQUIPMENT_STEP_NO_CLASS_MESSAGE = 'Choose a class before selecting starting equipment.'
-
-export const EQUIPMENT_STEP_NO_STARTING_EQUIPMENT_MESSAGE =
-  'No starting equipment choices are required for this class.'
-
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
 

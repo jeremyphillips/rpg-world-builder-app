@@ -13,8 +13,11 @@ this document tracks the full internal layout, status, and promotion path.
 | `resolveAvailableContent`                 | `resolve-available-content.ts` (builder root)                        | Filters species, classes, spells, and equipment by character-creation rules. |
 | `resolveAvailableChoices`                 | `resolvers/registry/resolve-choices.ts`                              | Derives pending `ChoiceSet[]` from draft + catalog context.                  |
 | `resolveSpellcastingProfile`              | `resolvers/spellcasting/spellcasting-profile.ts`                     | Structural spellcasting facts for the Spells step; null for non-casters.     |
+| `resolveSpellStepApplicability`           | `resolvers/spellcasting/resolve-spell-step-applicability.ts`         | Spells-step blocked / notApplicable / applicable gate before choice checks.  |
+| `resolveBuilderStepReadiness`             | `step-readiness.ts`                                                  | Derived readiness for Equipment, Spells, and Proficiencies empty/default UI. |
 | `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | Enriches spell ChoiceSet options into picker rows for the spell drawer.      |
 | `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | Recommended equipment ids for the picker Recommended tab.                    |
+| `deriveRecommendedLanguageIds`            | `resolvers/proficiency/derive-recommended-language-ids.ts`           | Species affinity ids intersected with a language ChoiceSet option pool.      |
 | `deriveEquipmentDraftEntries`             | `resolvers/equipment/derive-equipment-draft-entries.ts`              | Package items minus removals plus draft purchases with selection sources.    |
 | `deriveEquipmentBudgetSummary`            | `resolvers/equipment/equipment-budget.ts`                            | Starting/spent/remaining wealth for the equipment picker.                    |
 | `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | Annotates equipment rows with picker state + `searchText`.                   |
@@ -30,6 +33,8 @@ this document tracks the full internal layout, status, and promotion path.
 ```text
 character-builder/
   resolve-available-content.ts   catalog scope filter (not a ChoiceSourceResolver)
+  step-readiness.ts              derived empty/default state for advanced steps (BENCH-120)
+  step-readiness-helpers.ts      choice-set filtering + message formatting for readiness
   assembly/                      finalize orchestration (assemble-*.ts)
   validate/                      draft/step validation by phase
   resolvers/
@@ -38,10 +43,67 @@ character-builder/
     ruleset/      language ChoiceSets
     species/      heritage + trait grant ChoiceSets
     class/        skill + feature grant ChoiceSets
-    equipment/    starting equipment + pool choice options
-    spellcasting/ spellcasting profile + cantrip/spell ChoiceSets
-    proficiency/  proficiencies step view model + picker items (BENCH-115)
+    equipment/    starting equipment + pool choice options + step readiness
+    spellcasting/ spellcasting profile + cantrip/spell ChoiceSets + step readiness
+    proficiency/  proficiencies step view model + picker items + step readiness (BENCH-115)
 ```
+
+## Builder step readiness (BENCH-120)
+
+Derived **empty/default** state for the Equipment, Spells, and Proficiencies steps.
+Readiness guides step-body copy and dashboard rail affordances; it does **not**
+replace `validateCharacterBuild` or `isBuilderStepComplete`.
+
+### Types
+
+| Type                        | Values / fields                                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `BuilderStepReadiness`      | `blocked` · `notApplicable` · `readyEmpty` · `readyWithChoices` · `complete`                                   |
+| `BuilderStepReadinessState` | `readiness`, optional `message` / `helperText`, optional `classDependentBlocked` (proficiencies partial block) |
+
+### Entry point
+
+```typescript
+resolveBuilderStepReadiness(
+  stepId: 'proficiencies' | 'equipment' | 'spells',
+  draft,
+  context,
+  resolvedChoiceSets,
+): BuilderStepReadinessState
+```
+
+Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
+(uses `resolveSpellStepApplicability` first), and `resolveProficienciesStepReadiness`.
+
+### Semantics (summary)
+
+| Readiness          | Meaning                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| `blocked`          | Upstream choice missing (no class). Proficiencies: partial — origin languages still apply. |
+| `notApplicable`    | Dependencies met; step does not apply (non-caster, inactive spellcasting).                 |
+| `readyEmpty`       | Applicable; nothing to pick (e.g. class with no starting equipment ChoiceSets).            |
+| `readyWithChoices` | Unresolved editable choices — render full step UI.                                         |
+| `complete`         | Required choices satisfied, or skip/empty complete path.                                   |
+
+User-facing copy lives in `characterBuilderStepReadinessMessages`
+(`character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
+
+### Dashboard rail mapping
+
+Implemented in `apps/dashboard/.../builder-step-visual-status.ts` when
+`resolvedChoiceSets !== null`:
+
+| Readiness          | Rail `StepStatus`                               | Aria label note  |
+| ------------------ | ----------------------------------------------- | ---------------- |
+| `blocked`          | `notStarted` (or `current` when step is active) | —                |
+| `notApplicable`    | `locked`                                        | "not applicable" |
+| `readyEmpty`       | `complete`                                      | —                |
+| `readyWithChoices` | existing completion / current logic             | —                |
+| `complete`         | `complete`                                      | —                |
+
+Step bodies render `BuilderStepReadinessPanel` from readiness `message` /
+`helperText`; proficiencies filters non-language sections when
+`classDependentBlocked` is true.
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
 
@@ -134,13 +196,14 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 ## Deferred / folded resolvers
 
 | Resolver                                  | Disposition                                                          |
-| ----------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | **Implemented** (BENCH-105) — spell picker row state + metadata            |
-| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | **Implemented** (BENCH-115) — proficiencies step view model                |
-| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | **Implemented** (BENCH-115) — proficiency picker row state                 |
-| `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | **Implemented** (BENCH-095) — package grants + proficient weapon/armor ids |
-| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | **Implemented** (BENCH-095) — equipment picker row state + search text     |
-| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | **Implemented** (BENCH-095) — starting package card summaries              |
+| ----------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | **Implemented** (BENCH-105) — spell picker row state + metadata                        |
+| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | **Implemented** (BENCH-115) — proficiencies step view model                            |
+| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | **Implemented** (BENCH-115) — proficiency picker row state                             |
+| `deriveRecommendedEquipment`              | `resolvers/equipment/derive-recommended-equipment.ts`                | **Implemented** (BENCH-095) — package grants + proficient weapon/armor ids             |
+| `deriveRecommendedLanguageIds`            | `resolvers/proficiency/derive-recommended-language-ids.ts`           | **Implemented** — species `languageAffinities ∩` ChoiceSet options; never expands pool |
+| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | **Implemented** (BENCH-095) — equipment picker row state + search text                 |
+| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | **Implemented** (BENCH-095) — starting package card summaries                          |
 | `resolveAvailableFeats`                   | Deferred — no full feat catalog in `CharacterBuildCatalog` yet       |
 | Campaign allow/deny filtering             | Plugs into `resolveAvailableContent` when campaign scope ships       |
 

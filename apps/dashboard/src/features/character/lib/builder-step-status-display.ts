@@ -7,7 +7,7 @@ export const BUILDER_STEP_STATUS_LABELS: Record<BuilderStepStatus, string> = {
   deferred: 'Later',
 }
 
-/** MVP-A: spells show as skipped while choice resolvers are deferred and classes are non-casters. */
+/** MVP-A: deferred spells before choice resolvers run use the not-applicable label. */
 export function getBuilderStepStatusLabel(
   stepId: CharacterBuilderStepId,
   status: BuilderStepStatus,
@@ -24,7 +24,7 @@ export function getBuilderStepStatusLabel(
   resolvedChoiceSets?: readonly unknown[] | null,
 ): string {
   if (stepId === 'spells' && status === 'deferred' && resolvedChoiceSets === null) {
-    return 'Skipped'
+    return 'Not applicable'
   }
 
   return BUILDER_STEP_STATUS_LABELS[status]

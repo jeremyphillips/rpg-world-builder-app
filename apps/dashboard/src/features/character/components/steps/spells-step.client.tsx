@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import {
+  resolveBuilderStepReadiness,
   resolveSpellcastingProfile,
   resolveSpellPickerItems,
   type CharacterBuildContext,
@@ -11,11 +12,15 @@ import {
   type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
-import { choiceSetsForSpellsStep, SPELLS_STEP_NON_CASTER_MESSAGE } from '../../lib/spells-step.lib'
+import {
+  isBuilderStepReadinessMessageOnly,
+  showsBuilderStepReviewMessage,
+} from '../../lib/builder-step-readiness.lib'
+import { choiceSetsForSpellsStep } from '../../lib/spells-step.lib'
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { BuilderStepFrame } from './builder-step-frame.client'
+import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import { SpellChoiceSection } from '../spells/spell-choice-section.client'
 import { SpellPickerDrawer } from '../spells/spell-picker-drawer.client'
 import { SpellcastingSummaryCard } from '../spells/spellcasting-summary-card.client'
@@ -37,6 +42,10 @@ export function SpellsStep({
   validationIssues,
   onDraftChange,
 }: SpellsStepProps) {
+  const readiness = useMemo(
+    () => resolveBuilderStepReadiness('spells', draft, context, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets],
+  )
   const profile = useMemo(() => resolveSpellcastingProfile(draft, context), [context, draft])
   const choiceSets = useMemo(
     () => choiceSetsForSpellsStep(resolvedChoiceSets),
@@ -54,17 +63,23 @@ export function SpellsStep({
     })
   }, [activeChoiceSet, context, draft])
 
-  if (!profile) {
+  if (isBuilderStepReadinessMessageOnly(readiness)) {
     return (
       <BuilderStepFrame stepId="spells" validationIssues={validationIssues}>
-        <Text variant="muted">{SPELLS_STEP_NON_CASTER_MESSAGE}</Text>
+        <BuilderStepReadinessPanel state={readiness} />
       </BuilderStepFrame>
     )
   }
 
+  if (!profile) return null
+
   return (
     <BuilderStepFrame stepId="spells" validationIssues={validationIssues}>
       <div className="space-y-6">
+        {showsBuilderStepReviewMessage(readiness) ? (
+          <BuilderStepReadinessPanel state={readiness} />
+        ) : null}
+
         <SpellcastingSummaryCard profile={profile} preview={preview} />
 
         {choiceSets.map((choiceSet) => {

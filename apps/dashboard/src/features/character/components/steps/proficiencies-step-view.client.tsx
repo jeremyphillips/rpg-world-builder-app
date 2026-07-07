@@ -1,11 +1,14 @@
 'use client'
 
-import { Text } from '@rpg/ui'
-
-import { PROFICIENCIES_STEP_EMPTY_MESSAGE } from '../../lib/proficiencies-step.lib'
+import {
+  isBuilderStepReadinessMessageOnly,
+  showsBuilderStepReviewMessage,
+  visibleProficiencySections,
+} from '../../lib/builder-step-readiness.lib'
 import { ProficiencyPickerDrawer } from '../proficiencies/proficiency-picker-drawer.client'
 import { ProficiencySection } from '../proficiencies/proficiency-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
+import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { ProficienciesStepProps } from './proficiencies-step.types'
 import type { useProficienciesStep } from './use-proficiencies-step.client'
 
@@ -17,6 +20,7 @@ export function ProficienciesStepView({
 }) {
   const {
     model,
+    readiness,
     activeChoiceSet,
     pickerItems,
     draft,
@@ -26,10 +30,15 @@ export function ProficienciesStepView({
     removeChoiceSelection,
   } = step
 
-  if (model.sections.length === 0) {
+  const visibleSections = visibleProficiencySections(
+    model.sections,
+    readiness.classDependentBlocked,
+  )
+
+  if (isBuilderStepReadinessMessageOnly(readiness)) {
     return (
       <BuilderStepFrame stepId="proficiencies" validationIssues={validationIssues}>
-        <Text variant="muted">{PROFICIENCIES_STEP_EMPTY_MESSAGE}</Text>
+        <BuilderStepReadinessPanel state={readiness} />
       </BuilderStepFrame>
     )
   }
@@ -37,7 +46,11 @@ export function ProficienciesStepView({
   return (
     <BuilderStepFrame stepId="proficiencies" validationIssues={validationIssues}>
       <div className="space-y-8">
-        {model.sections.map((section) => (
+        {readiness.classDependentBlocked || showsBuilderStepReviewMessage(readiness) ? (
+          <BuilderStepReadinessPanel state={readiness} />
+        ) : null}
+
+        {visibleSections.map((section) => (
           <ProficiencySection
             key={section.kind}
             section={section}

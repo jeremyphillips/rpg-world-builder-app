@@ -14,9 +14,6 @@ import {
 
 const PROFICIENCIES_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.proficiencies
 
-export const PROFICIENCIES_STEP_EMPTY_MESSAGE =
-  'No proficiency choices are required for this character.' as const
-
 export const PROFICIENCIES_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
 
 export const PROFICIENCIES_STEP_NO_CHOICES_SELECTED_MESSAGE =

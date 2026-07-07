@@ -4,6 +4,7 @@ import { useMemo, useState, type ComponentProps } from 'react'
 
 import {
   indexCharacterBuildCatalog,
+  resolveBuilderStepReadiness,
   resolveStartingEquipmentOptionSummaries,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -54,6 +55,10 @@ export function useEquipmentStep(args: {
   const equipmentChoiceSets = useMemo(
     () => choiceSetsForEquipmentStep(resolvedChoiceSets),
     [resolvedChoiceSets],
+  )
+  const readiness = useMemo(
+    () => resolveBuilderStepReadiness('equipment', draft, context, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets],
   )
   const startingEquipmentChoiceSet = classId
     ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
@@ -218,5 +223,6 @@ export function useEquipmentStep(args: {
     },
     isUniqueEquipmentOwned: (equipmentId: string) =>
       isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId),
+    readiness,
   }
 }

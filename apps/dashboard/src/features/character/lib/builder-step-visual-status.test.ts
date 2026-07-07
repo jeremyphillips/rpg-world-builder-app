@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  indexCharacterBuildCatalog,
+  resolveAvailableChoices,
+} from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
 import { createSpellsStepContextFixture } from './spells-step.fixtures'
 import {
   resolveStepVisualStatus,
+  stepStatusAriaLabel,
   type ResolveStepVisualStatusInput,
 } from './builder-step-visual-status'
 
@@ -157,6 +162,7 @@ describe('resolveStepVisualStatus', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
     }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
 
     expect(
       resolveStatus({
@@ -164,8 +170,57 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
         context,
+        resolvedChoiceSets,
       }),
     ).toBe('locked')
+    expect(stepStatusAriaLabel('Spells', 'locked')).toBe('Spells, not applicable')
+  })
+
+  it('returns not started for spells before a class is selected', () => {
+    const context = createSpellsStepContextFixture()
+    const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'spells',
+        draft,
+        currentStepId: 'identity',
+        context,
+        resolvedChoiceSets,
+      }),
+    ).toBe('notStarted')
+  })
+
+  it('returns current for a blocked proficiencies step while origin languages are editable', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'proficiencies',
+        draft,
+        currentStepId: 'proficiencies',
+        resolvedChoiceSets,
+      }),
+    ).toBe('current')
+  })
+
+  it('returns complete for equipment when the class has no starting equipment choices', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'equipment',
+        draft,
+        currentStepId: 'identity',
+        resolvedChoiceSets,
+      }),
+    ).toBe('complete')
   })
 
   it('does not mark abilities complete when standard-array scores duplicate a value', () => {

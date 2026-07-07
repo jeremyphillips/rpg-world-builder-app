@@ -7,11 +7,13 @@ import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createSpellsStepContextFixture } from '../lib/spells-step.fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
@@ -114,6 +116,30 @@ describe('CharacterBuilderStepRail', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /Class, not started/i }))
     expect(onStepSelect).toHaveBeenCalledWith('class')
+  })
+
+  it('marks non-caster spells as not applicable once choice sets are resolved', () => {
+    const spellsContext = createSpellsStepContextFixture()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+    }
+
+    render(
+      <CharacterBuilderStepRail
+        draft={draft}
+        currentStepId="identity"
+        context={spellsContext}
+        catalogIndex={indexCharacterBuildCatalog(spellsContext.catalog)}
+        resolvedChoiceSets={resolveAvailableChoices(draft, spellsContext)}
+        validationIssues={[]}
+        attemptedStepIds={[]}
+        standardArray={standardArray}
+        onStepSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Spells, not applicable/i })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

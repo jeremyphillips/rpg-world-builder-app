@@ -94,14 +94,23 @@ the base catalog must not depend on it.
 Spell ChoiceSet validation (BENCH-089) adds spell-specific ids alongside the generic
 `choiceSetUnsatisfied` / `choiceSetTooMany` pair:
 
-| Id                                                      | When                                                        |
-| ------------------------------------------------------- | ----------------------------------------------------------- |
-| `validation.characterBuilder.chooseCantrips`            | Required cantrip ChoiceSet below `min`                      |
-| `validation.characterBuilder.chooseSpells`              | Required spell ChoiceSet below `min`                        |
-| `validation.characterBuilder.removeCantrips`            | Cantrip ChoiceSet above `max`                               |
-| `validation.characterBuilder.removeSpells`              | Spell ChoiceSet above `max`                                 |
-| `validation.characterBuilder.spellNoLongerAvailable`    | Selected spell id not in re-derived options                 |
-| `validation.characterBuilder.spellNotSelectableAtLevel` | Selected spell exists but exceeds `maxSelectableSpellLevel` |
+| Id                                                                      | When                                                               |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `validation.characterBuilder.chooseCantrips`                            | Required cantrip ChoiceSet below `min`                             |
+| `validation.characterBuilder.chooseSpells`                              | Required spell ChoiceSet below `min`                               |
+| `validation.characterBuilder.removeCantrips`                            | Cantrip ChoiceSet above `max`                                      |
+| `validation.characterBuilder.removeSpells`                              | Spell ChoiceSet above `max`                                        |
+| `validation.characterBuilder.spellNoLongerAvailable`                    | Selected spell id not in re-derived options                        |
+| `validation.characterBuilder.spellNotSelectableAtLevel`                 | Selected spell exists but exceeds `maxSelectableSpellLevel`        |
+| `validation.characterBuilder.speciesRequiredForLanguageRecommendations` | Language ChoiceSet visible but no species selected (affinity hint) |
+
+**Builder step readiness** (`characterBuilderStepReadinessMessages` in
+`character-builder-messages.ts`) — empty/default/blocked copy for Equipment,
+Spells, and Proficiencies. Ids use `validation.characterBuilder.readiness.*`
+(e.g. `equipmentBlockedNoClass`, `spellsNotApplicableNoSpellcasting`,
+`proficienciesBlockedNoClassHelper`). Parameterized messages accept `className`
+and/or `level`. Readiness copy is distinct from validation issues; see
+[character-builder-resolvers.md](character-builder-resolvers.md#builder-step-readiness-bench-120).
 
 **Future surface catalogs** (add only when those UI flows ship):
 

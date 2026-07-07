@@ -113,6 +113,7 @@ export const dwarfSpecies = {
   creatureType: 'humanoid',
   sizes: ['medium'],
   speed: { walk: 30 },
+  languageAffinities: ['dwarvish'],
   traits: [],
 } as const satisfies Species
 

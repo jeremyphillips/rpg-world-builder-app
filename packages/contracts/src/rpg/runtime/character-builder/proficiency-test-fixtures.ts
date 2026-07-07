@@ -7,6 +7,8 @@ import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 import { builderTestLanguages, dwarfSpecies, startingWealthSeed } from './test-fixtures'
 
+export { dwarfSpecies }
+
 export const stealthSkill = {
   id: 'srd-cc-5.2.1:stealth',
   slug: 'stealth',

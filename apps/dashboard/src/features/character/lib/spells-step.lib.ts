@@ -17,8 +17,6 @@ import {
 
 const SPELLS_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.spells
 
-export const SPELLS_STEP_NON_CASTER_MESSAGE = 'This class does not use spellcasting at level 1.'
-
 export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Pending ability scores'
 
 export const SPELLS_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE

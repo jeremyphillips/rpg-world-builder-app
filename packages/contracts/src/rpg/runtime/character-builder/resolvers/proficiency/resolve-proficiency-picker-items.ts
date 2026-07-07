@@ -9,6 +9,7 @@ import {
   type PickerItemStateBase,
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
+import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
 import { formatProficiencySourceLabel } from './format-proficiency-source-label'
 
 export type ProficiencyPickerItemState = PickerItemStateBase & {
@@ -90,6 +91,7 @@ function resolveProficiencyPickerItemState(
   selectedIds: readonly string[],
   proficiencies: CharacterProficiencies,
   catalogIndex: CharacterBuildCatalogIndex,
+  recommendedLanguageIds: ReadonlySet<string>,
 ): ProficiencyPickerItemState {
   const isAlreadySelected = selectedIds.includes(optionId)
   const isSelectionFull = selectedIds.length >= choiceSet.max
@@ -103,9 +105,11 @@ function resolveProficiencyPickerItemState(
     disabledReasons.push(PICKER_DISABLED_REASON_SELECTION_FULL)
   }
 
+  const isRecommended = choiceSet.choiceType === 'language' && recommendedLanguageIds.has(optionId)
+
   return {
     isAvailable: true,
-    isRecommended: false,
+    isRecommended,
     isAlreadySelected,
     isAlreadyGranted,
     isSelectionFull,
@@ -128,6 +132,14 @@ export function resolveProficiencyPickerItems({
 
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
   const selectedIds = draft.choiceSelections[choiceSetId] ?? []
+  const recommendedLanguageIds =
+    choiceSet.choiceType === 'language'
+      ? deriveRecommendedLanguageIds({
+          draft,
+          catalogIndex,
+          choiceSetOptionIds: choiceSet.options.map((option) => option.id),
+        })
+      : new Set<string>()
 
   return choiceSet.options.map((option) => ({
     optionId: option.id,
@@ -138,6 +150,7 @@ export function resolveProficiencyPickerItems({
       selectedIds,
       proficiencies,
       catalogIndex,
+      recommendedLanguageIds,
     ),
   }))
 }
