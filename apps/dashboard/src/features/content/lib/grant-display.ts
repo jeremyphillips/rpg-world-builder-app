@@ -1,3 +1,61 @@
+/**
+ * Compact grant summary display — translates `grantGroups` into inline and
+ * grouped-by-level summaries for builder sheets, cards, and detail surfaces.
+ *
+ * Contracts authoring prose (`formatSenseGrantSentence`, `formatSpellsGrantSentence`, …)
+ * is too verbose for compact UI; this module owns short labels. A grant kind without
+ * a compact renderer here is not a model gap — only display work pending per the
+ * support matrix below.
+ *
+ * Traversal: always use `resolveGrantGroupsFromContent` and
+ * `getGrantGroupEffectiveUnlock` from `@rpg/contracts` (groups without `unlock` are
+ * the default group at `parentLevel`, typically 1 for species/heritage).
+ *
+ * ## Ad hoc replacement inventory
+ *
+ * Sites that format grants outside this module — replace incrementally, not all at once.
+ *
+ * - `apps/dashboard/src/features/content/species/lib/species-display.ts` — `collectSenses`:
+ *   sense stat row → sense summary items (Phase 4, pending)
+ * - `apps/dashboard/src/features/content/species/lib/species-display.ts` —
+ *   `mapHeritageOptionToDetailItem`: grant summary lines via this helper (Phase 2, done)
+ * - `apps/dashboard/src/features/content/species/lib/species-display.ts` — card
+ *   `summaryItems`: trait names only → `formatGrantSummaryInline` (Phase 4, pending)
+ * - `packages/contracts/src/rpg/content/lib/trait-display.ts` — `deriveGrantGroupDisplay`:
+ *   partial grant → prose HTML; eventually delegate compact labels (Phase 4+, pending)
+ * - `apps/dashboard/src/features/content/classes/lib/class-display.ts` —
+ *   `mapFeatureToDetailItem`: prose only → grouped grant summaries (Phase 4, pending)
+ * - `apps/dashboard/src/features/content/classes/lib/class-display.ts` — proficiencies:
+ *   parallel category formatters (out of grant-summary scope)
+ * - `apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts`:
+ *   per-type authoring row headers; spells has title but no row summary (Phase 4, optional)
+ * - `packages/contracts/src/rpg/runtime/character-builder/resolvers/species/resolve-species-heritage-choice-sets.ts`:
+ *   option label = trait name only → inline grant summary on picker cards (Phase 4, pending)
+ * - `apps/dashboard/src/features/character/lib/builder-species-option-display.lib.ts`:
+ *   maps `summaryLines`, omits `body` when grants exist (Phase 2, done)
+ *
+ * Related shared grant layer (not replacement targets): `grant-form-*` authoring,
+ * `collect-sourced-grants.ts` runtime assembly, `GrantGroupSource` in contracts.
+ *
+ * ## Compact renderer support matrix
+ *
+ * | Grant kind | Model | Renderer | Notes |
+ * |------------|-------|----------|-------|
+ * | `sense` | yes | yes | e.g. `Darkvision 120 ft` |
+ * | `spells` | yes | yes | e.g. `Dancing Lights cantrip` |
+ * | `movement` | yes | no | follow-up |
+ * | `resistances` | yes | no | follow-up |
+ * | `languages` | yes | no | follow-up |
+ * | proficiencies (`weaponProficiency`, `toolProficiency`, `skillProficiency`, `armorTraining`) | yes | no | follow-up |
+ * | `equipment` | yes | no | follow-up |
+ * | `featChoice` | yes | no | follow-up |
+ * | unrecognized kind | — | fallback | `Additional benefit` when sole unsummarized item |
+ *
+ * Terminology:
+ * - **Unrecognized** — `ContentGrant` kind not in schema / unknown at runtime (`kind: 'unrecognized'`).
+ * - **Not rendered yet** — known valid kind recognized by `KNOWN_CONTENT_GRANT_KINDS` but no compact
+ *   label builder yet (`kind: 'notRenderedYet'`). Formatters collapse these to `N more benefit(s)`.
+ */
 import {
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
