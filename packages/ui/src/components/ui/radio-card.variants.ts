@@ -1,9 +1,65 @@
 import { cva } from 'class-variance-authority'
 
+const radioCardBase =
+  'group relative flex w-full cursor-pointer flex-col rounded-xl border border-border bg-card text-left text-card-foreground shadow-sm transition-colors hover:border-primary/50 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent/30 data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive'
+
 /** Card-style radio option: selected, hover, and focus states use design tokens only. */
-export const radioCardVariants = cva(
-  'group relative flex w-full cursor-pointer flex-col gap-2 rounded-xl border border-border bg-card p-4 sm:p-6 text-left text-card-foreground shadow-sm transition-colors hover:border-primary/50 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent/30 data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive',
+export const radioCardVariants = cva(radioCardBase, {
+  variants: {
+    density: {
+      default: 'gap-2 p-4 sm:p-6',
+      compact: 'gap-1 p-3',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
+/** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
+export const radioCardShellVariants = cva(
+  'relative rounded-xl border border-border bg-card text-left text-card-foreground shadow-sm transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background',
+  {
+    variants: {
+      density: {
+        default: 'p-4 sm:p-6',
+        compact: 'p-3',
+      },
+      selected: {
+        true: 'border-primary bg-accent/30 ring-1 ring-primary/20',
+        false: 'hover:border-primary/50 hover:bg-accent/50',
+      },
+    },
+    defaultVariants: {
+      density: 'default',
+      selected: false,
+    },
+  },
 )
+
+/** Grid for radio + title row + right-aligned details link on one line. */
+export const radioCardDetailsGridVariants = cva(
+  'grid w-full grid-cols-[auto_1fr_auto] items-start gap-x-3',
+  {
+    variants: {
+      density: {
+        default: 'gap-y-2',
+        compact: 'gap-y-1',
+      },
+    },
+    defaultVariants: {
+      density: 'default',
+    },
+  },
+)
+
+/** Radix item wrapper — children participate in the parent details grid. */
+export const radioCardItemWithDetailsVariants = cva(
+  'contents cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
+)
+
+/** Right-aligned details link aligned with the title row. */
+export const radioCardDetailsInlineSlotVariants = cva('col-start-3 row-start-1 shrink-0 self-start')
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
 export const radioCardControlVariants = cva(
@@ -14,17 +70,32 @@ export const radioCardIndicatorVariants = cva(
   'opacity-0 transition-opacity group-data-[state=checked]:opacity-100',
 )
 
-export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col gap-2')
+export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
+  variants: {
+    density: {
+      default: 'gap-2',
+      compact: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
-export const radioCardRootLayoutVariants = cva('flex items-start gap-4', {
+export const radioCardRootLayoutVariants = cva('flex items-start', {
   variants: {
     controlPosition: {
-      left: '',
-      right: 'flex-row-reverse',
+      left: 'gap-4',
+      right: 'flex-row-reverse gap-4',
+    },
+    density: {
+      default: '',
+      compact: 'gap-3',
     },
   },
   defaultVariants: {
     controlPosition: 'left',
+    density: 'default',
   },
 })
 
@@ -32,4 +103,8 @@ export const radioCardMetaListVariants = cva('flex flex-wrap gap-1.5')
 
 export const radioCardTitleVariants = cva('text-md font-bold')
 
-export const radioCardTitleRowVariants = cva('flex flex-wrap items-center gap-2')
+export const radioCardTitleRowVariants = cva('flex min-w-0 flex-wrap items-center gap-2')
+
+export const radioCardSummaryVariants = cva('text-muted-foreground')
+
+export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')

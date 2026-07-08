@@ -10,6 +10,7 @@ import {
 } from '@rpg/contracts'
 import { RadioCard, Text } from '@rpg/ui'
 
+import { formatClassCardOption } from '../../lib/builder-option-display.lib'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
 export type ClassStepProps = {
@@ -24,9 +25,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
     const { classes } = resolveAvailableContent(context)
     return classes.map((entry) => ({
       value: entry.id,
-      label: entry.name,
-      description: `Hit die d${entry.hitDie}`,
-      meta: entry.primaryAbilities.map((ability) => ability.toUpperCase()),
+      ...formatClassCardOption(entry),
     }))
   }, [context])
 
@@ -41,6 +40,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
   return (
     <BuilderStepFrame stepId="class" validationIssues={validationIssues}>
       <RadioCard
+        density="compact"
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {
           onDraftChange({

@@ -71,4 +71,90 @@ describe('RadioCard', () => {
     await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
     expect(onValueChange).toHaveBeenCalledWith('3e')
   })
+
+  it('renders compact summary items as an inline line', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            description: 'Humanoid',
+            summaryItems: ['Darkvision', 'Dwarven Resilience'],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Darkvision · Dwarven Resilience')).toBeInTheDocument()
+  })
+
+  it('opens details without selecting the card', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    const onDetails = vi.fn()
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        value=""
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            description: 'Humanoid',
+            onDetails,
+          },
+        ]}
+        onValueChange={onValueChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Details' }))
+    expect(onDetails).toHaveBeenCalledTimes(1)
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it('exposes a focusable details control in compact mode', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            onDetails: vi.fn(),
+            detailsLabel: 'View details',
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'View details' })).toBeInTheDocument()
+  })
+
+  it('renders the details link inline with the title row', () => {
+    const { container } = render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            description: 'Humanoid',
+            onDetails: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    const detailsSlot = container.querySelector('[class*="col-start-3"]')
+    const title = screen.getByText('Dwarf')
+
+    expect(detailsSlot).toContainElement(screen.getByRole('button', { name: 'Details' }))
+    expect(detailsSlot).toHaveClass('row-start-1')
+    expect(title.closest('[class*="col-start-2"]')).toHaveClass('row-start-1')
+  })
 })

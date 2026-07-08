@@ -81,10 +81,15 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   description?: React.ReactNode
   /** Merged onto the dialog title element (overrides default heading styles). */
   headlineClassName?: string
+  /** Right-aligned slot on the title row (e.g. primary action). */
+  endSlot?: React.ReactNode
 }
 
 const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
-  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
+  (
+    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    ref,
+  ) => (
     <SheetHeaderBase
       ref={ref}
       className={className}
@@ -92,6 +97,7 @@ const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
       headline={headline}
       description={description}
       headlineClassName={headlineClassName}
+      endSlot={endSlot}
       {...props}
     >
       {children}

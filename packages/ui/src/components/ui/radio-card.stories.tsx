@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { action } from 'storybook/actions'
 
 import { RadioCard } from './radio-card.client'
 
@@ -94,5 +95,36 @@ export const RadioOnRightTwoColumnGrid: Story = {
     className: 'grid-cols-1 sm:grid-cols-2',
     options: gridOptions,
     defaultValue: '5e',
+  },
+}
+
+const compactBuilderOptions = [
+  {
+    label: 'Dwarf',
+    value: 'dwarf',
+    description: 'Humanoid',
+    summaryItems: ['Darkvision', 'Dwarven Resilience', 'Forge Wise'],
+    onDetails: action('onDetails'),
+  },
+  {
+    label: 'Dragonborn',
+    value: 'dragonborn',
+    description: 'Humanoid',
+    onDetails: action('onDetails'),
+  },
+  {
+    label: 'Fighter',
+    value: 'fighter',
+    description: 'Strength · d10 Hit Die',
+  },
+]
+
+/** Builder species/class cards: compact density, inline summary, optional Details. */
+export const Compact: Story = {
+  args: {
+    'aria-label': 'Character builder option',
+    density: 'compact',
+    options: compactBuilderOptions,
+    defaultValue: 'dwarf',
   },
 }
