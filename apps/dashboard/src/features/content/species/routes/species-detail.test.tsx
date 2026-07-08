@@ -8,6 +8,7 @@ import {
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
 } from '@/features/homebrew'
+import { SPECIES_STAT_LABELS } from '@/features/content'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
@@ -65,18 +66,19 @@ describe('SpeciesDetailContent language affinities', () => {
     } as ReturnType<typeof useLanguageVocabulary>)
   })
 
-  it('renders language affinities above traits when present', () => {
+  it('renders language affinities as a stat row when present', () => {
     renderSpeciesDetail(ELF)
 
-    expect(screen.getByRole('heading', { name: 'Language affinities' })).toBeInTheDocument()
+    expect(screen.getByText(SPECIES_STAT_LABELS.languageAffinities)).toBeInTheDocument()
     expect(screen.getByText('Elvish')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Language affinities' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
   })
 
-  it('omits the language affinities section when absent', () => {
+  it('omits the language affinities stat row when absent', () => {
     renderSpeciesDetail(ORC)
 
-    expect(screen.queryByRole('heading', { name: 'Language affinities' })).not.toBeInTheDocument()
+    expect(screen.queryByText(SPECIES_STAT_LABELS.languageAffinities)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
   })
 

@@ -21,6 +21,16 @@ export {
 export { SkillProficiencyCreate } from './skill-proficiencies/routes/skill-proficiency-create'
 export { SkillProficiencyEdit } from './skill-proficiencies/routes/skill-proficiency-edit'
 export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
+export {
+  buildSpeciesCardViewModel,
+  buildSpeciesDetailViewModel,
+  SPECIES_STAT_LABELS,
+  SPECIES_SECTION_LABELS,
+  type SpeciesCardViewModel,
+  type SpeciesDetailItem,
+  type SpeciesDetailViewModel,
+  type SpeciesDisplayVocabulary,
+} from './species'
 export { SpeciesCreate } from './species/routes/species-create'
 export { SpeciesEdit } from './species/routes/species-edit'
 export { FeatsOverview, FeatDetail, FeatCreate, FeatEdit, useFeats, featsQueryKey } from './feats'

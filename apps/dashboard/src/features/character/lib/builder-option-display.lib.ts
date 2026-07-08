@@ -1,27 +1,28 @@
 import {
-  formatSpeed,
   getAbilityLabel,
-  getCreatureSizeLabel,
-  resolveTraitDisplay,
   type CharacterBuildLanguageOption,
   type CharacterClass,
   type Species,
 } from '@rpg/contracts'
 
-import { buildSeedCreatureTypeVocabulary, getCreatureTypeLabel } from '@/features/homebrew'
+import {
+  buildSeedCreatureTypeVocabulary,
+  buildSeedSenseVocabulary,
+  getCreatureTypeLabel,
+  getSenseLabelFromVocabulary,
+} from '@/features/homebrew'
+import {
+  buildSpeciesCardViewModel,
+  buildSpeciesDetailViewModel,
+  SPECIES_SECTION_LABELS,
+} from '@/features/content'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
 const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
+const senseVocabulary = buildSeedSenseVocabulary()
 
 export const BUILDER_SPECIES_EYEBROW = 'Species'
-
-const METADATA_LABEL_CREATURE_TYPE = 'Creature Type'
-const METADATA_LABEL_SIZE = 'Size'
-const METADATA_LABEL_SPEED = 'Speed'
-const METADATA_LABEL_LANGUAGE_AFFINITIES = 'Language affinities'
-
-const SECTION_TITLE_TRAITS = 'Traits'
 
 function resolveLanguageLabel(
   languages: readonly CharacterBuildLanguageOption[],
@@ -30,12 +31,18 @@ function resolveLanguageLabel(
   return languages.find((entry) => entry.id === languageId)?.label ?? languageId
 }
 
-export function formatSpeciesCardOption(species: Species) {
+function buildBuilderSpeciesVocabulary(languages: readonly CharacterBuildLanguageOption[]) {
   return {
-    label: species.name,
-    description: getCreatureTypeLabel(creatureTypeVocabulary, species.creatureType),
-    summaryItems: species.traits.map((trait) => resolveTraitDisplay(trait).name),
+    resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
+    resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
+    resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
   }
+}
+
+export function formatSpeciesCardOption(species: Species) {
+  return buildSpeciesCardViewModel(species, {
+    resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(creatureTypeVocabulary, id),
+  })
 }
 
 export function formatClassCardOption(characterClass: CharacterClass) {
@@ -59,64 +66,34 @@ export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
 ): SpeciesDetailsSheetContent {
-  const metadata: SpeciesDetailsSheetContent['metadata'] = [
-    {
-      label: METADATA_LABEL_CREATURE_TYPE,
-      value: getCreatureTypeLabel(creatureTypeVocabulary, species.creatureType),
-    },
-    {
-      label: METADATA_LABEL_SIZE,
-      value: species.sizes.map(getCreatureSizeLabel).join(' or '),
-    },
-    {
-      label: METADATA_LABEL_SPEED,
-      value: formatSpeed(species.speed),
-    },
-  ]
+  const viewModel = buildSpeciesDetailViewModel(species, buildBuilderSpeciesVocabulary(languages))
 
-  if (species.languageAffinities?.length) {
-    metadata.push({
-      label: METADATA_LABEL_LANGUAGE_AFFINITIES,
-      value: species.languageAffinities
-        .map((languageId) => resolveLanguageLabel(languages, languageId))
-        .join(', '),
-    })
-  }
+  const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {
+    if (section.id === 'traits') {
+      return {
+        title: SPECIES_SECTION_LABELS.traits,
+        items: section.items.map((item) => ({
+          title: item.title,
+          body: item.bodyHtml,
+        })),
+      }
+    }
 
-  const sections: BuilderOptionDetailsSection[] = []
-
-  if (species.traits.length > 0) {
-    sections.push({
-      title: SECTION_TITLE_TRAITS,
-      items: species.traits.map((trait) => {
-        const display = resolveTraitDisplay(trait)
-        return {
-          title: display.name,
-          body: display.descriptionHtml,
-        }
-      }),
-    })
-  }
-
-  if (species.heritage) {
-    sections.push({
-      title: species.heritage.name,
-      description: species.heritage.description,
-      items: species.heritage.options.map((option) => {
-        const display = resolveTraitDisplay(option)
-        return {
-          title: display.name,
-          body: display.descriptionHtml,
-        }
-      }),
-    })
-  }
+    return {
+      title: section.title,
+      description: section.descriptionHtml,
+      items: section.items.map((item) => ({
+        title: item.title,
+        body: item.bodyHtml,
+      })),
+    }
+  })
 
   return {
     title: species.name,
     eyebrow: BUILDER_SPECIES_EYEBROW,
-    descriptionHtml: species.description,
-    metadata,
+    descriptionHtml: viewModel.descriptionHtml,
+    metadata: viewModel.statRows.map(({ label, value }) => ({ label, value })),
     sections,
   }
 }
