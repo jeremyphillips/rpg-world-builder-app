@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useCallback, useMemo, useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -6,14 +7,19 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_SYSTEM_RULESET_ID,
+  resolveAvailableChoices,
+  type CharacterBuilderDraft,
   type Species,
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
+import { getDrowHeritageSpellCatalog } from '@/features/content/lib/fixtures/grant-display-fixtures'
+import { pickSpecies } from '@/features/content/lib/fixtures/pick'
 import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
+import { MANAGE_HERITAGE_LABEL } from '../../lib/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step.client'
 
 const dwarfWithTraits = {
@@ -37,7 +43,9 @@ const dwarfWithTraits = {
   ],
 } as const satisfies Species
 
-function createContext() {
+const elf = pickSpecies('elf')
+
+function createDwarfContext() {
   return createStandaloneBuilderContextFixture({
     catalog: {
       ...populatedBuilderCatalog,
@@ -47,40 +55,112 @@ function createContext() {
   })
 }
 
+function createElfContext() {
+  return createStandaloneBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      species: [elf],
+      spells: getDrowHeritageSpellCatalog(),
+      languages: [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
+    },
+  })
+}
+
+function renderSpeciesStep({
+  context,
+  draft = createEmptyCharacterBuilderDraft(),
+  onDraftChange = vi.fn(),
+}: {
+  context: ReturnType<typeof createDwarfContext>
+  draft?: CharacterBuilderDraft
+  onDraftChange?: (patch: Partial<CharacterBuilderDraft>) => void
+}) {
+  const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+  return render(
+    <SpeciesStep
+      context={context}
+      draft={draft}
+      resolvedChoiceSets={resolvedChoiceSets}
+      validationIssues={[]}
+      onDraftChange={onDraftChange}
+    />,
+  )
+}
+
+function StatefulSpeciesStep({
+  context,
+  initialDraft = createEmptyCharacterBuilderDraft(),
+  onDraftChangeSpy,
+}: {
+  context: ReturnType<typeof createElfContext>
+  initialDraft?: CharacterBuilderDraft
+  onDraftChangeSpy?: (patch: Partial<CharacterBuilderDraft>) => void
+}) {
+  const [draft, setDraft] = useState(initialDraft)
+  const resolvedChoiceSets = useMemo(
+    () => resolveAvailableChoices(draft, context),
+    [context, draft],
+  )
+
+  const onDraftChange = useCallback(
+    (patch: Partial<CharacterBuilderDraft>) => {
+      onDraftChangeSpy?.(patch)
+      setDraft((current) => ({
+        ...current,
+        ...patch,
+        species: { ...current.species, ...patch.species },
+        choiceSelections: { ...current.choiceSelections, ...patch.choiceSelections },
+      }))
+    },
+    [onDraftChangeSpy],
+  )
+
+  return (
+    <SpeciesStep
+      context={context}
+      draft={draft}
+      resolvedChoiceSets={resolvedChoiceSets}
+      validationIssues={[]}
+      onDraftChange={onDraftChange}
+    />
+  )
+}
+
+function speciesCard(speciesId: string) {
+  return document.getElementById(`character-builder-species-${speciesId}`)
+}
+
 describe('SpeciesStep', () => {
+  beforeEach(() => {
+    if (!HTMLElement.prototype.scrollIntoView) {
+      HTMLElement.prototype.scrollIntoView = vi.fn()
+    }
+  })
+
   it('selects a species when the card is clicked', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
-    const context = createContext()
+    const context = createDwarfContext()
 
-    render(
-      <SpeciesStep
-        context={context}
-        draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-      />,
-    )
+    renderSpeciesStep({ context, onDraftChange })
 
     await user.click(screen.getByRole('radio', { name: /Dwarf/i }))
     expect(onDraftChange).toHaveBeenCalledWith({
-      species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+      species: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        heritageId: undefined,
+      },
+      choiceSelections: {},
     })
   })
 
   it('opens details without changing selection', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
-    const context = createContext()
+    const context = createDwarfContext()
 
-    render(
-      <SpeciesStep
-        context={context}
-        draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-      />,
-    )
+    renderSpeciesStep({ context, onDraftChange })
 
     await user.click(screen.getByRole('button', { name: 'Details' }))
 
@@ -92,16 +172,9 @@ describe('SpeciesStep', () => {
   it('selects from the sheet and closes it', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
-    const context = createContext()
+    const context = createDwarfContext()
 
-    render(
-      <SpeciesStep
-        context={context}
-        draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-      />,
-    )
+    renderSpeciesStep({ context, onDraftChange })
 
     await user.click(screen.getByRole('button', { name: 'Details' }))
     await user.click(
@@ -109,20 +182,102 @@ describe('SpeciesStep', () => {
     )
 
     expect(onDraftChange).toHaveBeenCalledWith({
-      species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+      species: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        heritageId: undefined,
+      },
+      choiceSelections: {},
     })
     expect(screen.queryByRole('heading', { name: 'Traits' })).not.toBeInTheDocument()
   })
 
+  it('shows heritage required on the selected Elf card and inline heritage section', async () => {
+    const user = userEvent.setup()
+    const context = createElfContext()
+
+    render(<StatefulSpeciesStep context={context} />)
+
+    await user.click(screen.getByRole('radio', { name: /Elf/i }))
+
+    expect(speciesCard(elf.id)).toHaveTextContent('Heritage required')
+    expect(screen.getByRole('region', { name: 'Elven Lineage' })).toBeInTheDocument()
+    expect(screen.getByText('Required')).toBeInTheDocument()
+    expect(screen.getByText('Choose one option.')).toBeInTheDocument()
+  })
+
+  it('calls onDraftChange when Drow heritage is selected', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const context = createElfContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: elf.id },
+    }
+
+    renderSpeciesStep({ context, draft, onDraftChange })
+
+    await user.click(screen.getByRole('radio', { name: /Drow/i }))
+
+    const heritageChoiceSetId = `species:${elf.id}:heritage`
+    expect(onDraftChange).toHaveBeenCalledWith({
+      choiceSelections: {
+        [heritageChoiceSetId]: ['drow'],
+      },
+      species: {
+        speciesId: elf.id,
+        heritageId: 'drow',
+      },
+    })
+  })
+
+  it('shows resolved heritage copy when Drow is selected', () => {
+    const context = createElfContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: elf.id, heritageId: 'drow' },
+      choiceSelections: {
+        [`species:${elf.id}:heritage`]: ['drow'],
+      },
+    }
+
+    renderSpeciesStep({ context, draft })
+
+    expect(speciesCard(elf.id)).toHaveTextContent('Drow heritage')
+    expect(screen.getByText('Drow selected')).toBeInTheDocument()
+    expect(screen.queryByText('Choose one option.')).not.toBeInTheDocument()
+  })
+
+  it('shows Manage heritage in the sheet and scrolls to the dependent section', async () => {
+    const user = userEvent.setup()
+    const scrollIntoView = vi.fn()
+    HTMLElement.prototype.scrollIntoView = scrollIntoView
+
+    const context = createElfContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: elf.id },
+    }
+
+    renderSpeciesStep({ context, draft })
+
+    await user.click(screen.getByRole('button', { name: 'Details' }))
+
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByRole('button', { name: MANAGE_HERITAGE_LABEL })).toBeInTheDocument()
+
+    await user.click(within(dialog).getByRole('button', { name: MANAGE_HERITAGE_LABEL }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+  })
+
   it('has no axe accessibility violations', async () => {
-    const { container } = render(
-      <SpeciesStep
-        context={createContext()}
-        draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={vi.fn()}
-      />,
-    )
+    const context = createElfContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: elf.id },
+    }
+    const { container } = renderSpeciesStep({ context, draft })
 
     await expectNoAxeViolations(container)
   })
