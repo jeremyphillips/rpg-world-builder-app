@@ -233,7 +233,7 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
   {
     id: 'movement-bonus',
     label: GRANT_TYPE_LABELS.movement,
-    description: 'Grant or modify a movement speed.',
+    description: 'Grant a movement speed, increase a speed, or match one speed to another.',
     groupId: 'combat-traits',
     grantType: 'movement',
     createDefault: () => ({
