@@ -123,7 +123,7 @@ export const spellsStepDwarfSpecies = {
   description: '<p>Stout and hardy folk.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   traits: [],
 } as const satisfies Species
 

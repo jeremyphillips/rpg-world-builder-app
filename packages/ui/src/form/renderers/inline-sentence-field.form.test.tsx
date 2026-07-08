@@ -237,4 +237,61 @@ describe('InlineSentenceField form integration', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect(onSubmit).toHaveBeenCalledWith({ choose: 1, skills: ['athletics'] }, expect.anything())
   })
+
+  it('hides bound segments when segment visibility is false', () => {
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'movement',
+        label: 'Movement',
+        hideLabel: true,
+        segments: [
+          {
+            kind: 'select',
+            name: 'movementOperation',
+            options: [
+              { value: 'increase', label: 'increases by' },
+              { value: 'set', label: 'is' },
+            ],
+            defaultValue: 'increase',
+          },
+          {
+            kind: 'select',
+            name: 'movementFeet',
+            options: [{ value: '5', label: '+5 ft' }],
+            defaultValue: '5',
+            visibility: {
+              dependsOn: ['movementOperation'],
+              visibleWhen: (watched) => watched['movementOperation'] === 'increase',
+            },
+          },
+          {
+            kind: 'select',
+            name: 'movementFeet',
+            options: [{ value: '30', label: '30 ft' }],
+            defaultValue: '30',
+            visibility: {
+              dependsOn: ['movementOperation'],
+              visibleWhen: (watched) => watched['movementOperation'] === 'set',
+            },
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          movementOperation: z.string(),
+          movementFeet: z.string().optional(),
+        })}
+        fields={fields}
+        defaultValues={{ movementOperation: 'increase', movementFeet: '5' }}
+        onSubmit={vi.fn()}
+        footer={null}
+      />,
+    )
+
+    expect(screen.getAllByRole('combobox')).toHaveLength(2)
+  })
 })

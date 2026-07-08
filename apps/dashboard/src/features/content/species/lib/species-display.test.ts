@@ -11,6 +11,10 @@ import {
 } from '@/features/homebrew'
 
 import { pickSpecies } from '../../lib/fixtures/pick'
+import {
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  getDrowHeritageSpellCatalog,
+} from '../../lib/fixtures/grant-display-fixtures'
 
 import {
   buildSpeciesCardViewModel,
@@ -49,6 +53,7 @@ function buildVocabulary(languages: ReturnType<typeof listLanguageSeedOptions>) 
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label ?? id,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSpell: () => undefined,
   }
 }
 
@@ -72,7 +77,7 @@ describe('species-display', () => {
     expect(statRows).toEqual([
       { label: SPECIES_STAT_LABELS.creatureType, value: 'Humanoid' },
       { label: SPECIES_STAT_LABELS.size, value: 'Medium' },
-      { label: SPECIES_STAT_LABELS.speed, value: '30 ft.' },
+      { label: SPECIES_STAT_LABELS.movement, value: 'Walk 30 ft' },
       { label: SPECIES_STAT_LABELS.senses, value: 'Darkvision 120 ft.' },
       { label: SPECIES_STAT_LABELS.languageAffinities, value: dwarvishLabel },
     ])
@@ -158,6 +163,28 @@ describe('species-display', () => {
       title: 'Draconic Ancestry',
       descriptionHtml: '<p>Choose your ancestor.</p>',
       items: [{ id: 'black', title: 'Black', bodyHtml: '<p>Acid damage.</p>' }],
+    })
+  })
+
+  it('builds grouped grant summaries for catalog Drow heritage options', () => {
+    const elf = pickSpecies('elf')
+    const vocabularyWithSpells = {
+      ...vocabulary,
+      resolveSpell: (slug: string) => {
+        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.slug === slug)
+        return spell ? { name: spell.name, level: spell.level } : undefined
+      },
+    }
+
+    const { sections } = buildSpeciesDetailViewModel(elf, vocabularyWithSpells)
+    const heritage = sections.find((section) => section.id === 'heritage')
+    const drow = heritage?.items.find((item) => item.id === 'drow')
+
+    expect(drow).toMatchObject({
+      id: 'drow',
+      title: 'Drow',
+      summaryLines: [...DROW_HERITAGE_SHEET_SUMMARY_LINES],
+      summaryInline: 'Darkvision 120 ft · Dancing Lights · Faerie Fire · Darkness',
     })
   })
 })

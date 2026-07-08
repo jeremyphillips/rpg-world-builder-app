@@ -20,7 +20,7 @@ const speciesWithSkillGrant = {
   description: '<p>Graceful and keen.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   languageAffinities: ['elvish'],
   traits: [
     {

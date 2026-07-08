@@ -5,7 +5,7 @@ import { alignmentSchema } from '../vocab/alignment'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { senseSchema } from '../vocab/sense'
-import { speedSchema } from '../vocab/movement-mode'
+import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 
 /**
@@ -13,7 +13,7 @@ import { skillSchema } from './skill-proficiency'
  *
  * Future monster schemas should compose these pieces into a catalog content
  * record: `contentMetaSchema.extend(monsterBodySchema.shape)`, with stat-block
- * fields such as size, creatureType, speed, senses, challenge rating, actions,
+ * fields such as size, creatureType, movement, senses, challenge rating, actions,
  * and explicit skill/save modifiers. Do not model monsters by extending
  * `characterSchema`; characters are owned sheets (see `rpg/runtime/`), monsters are content records.
  */
@@ -25,7 +25,7 @@ import { skillSchema } from './skill-proficiency'
 export const creatureAlignmentSchema = alignmentSchema
 export const creatureSizeRefSchema = creatureSizeSchema
 export const creatureTypeRefSchema = creatureTypeSchema
-export const creatureSpeedSchema = speedSchema
+export const creatureMovementSchema = movementSpeedsSchema
 export const creatureSensesSchema = z.array(senseSchema).default([])
 
 // ---------------------------------------------------------------------------

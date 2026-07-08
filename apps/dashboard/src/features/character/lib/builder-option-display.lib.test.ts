@@ -4,6 +4,11 @@ import { DEFAULT_SYSTEM_RULESET_ID, type Species } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
+import {
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  getDrowHeritageSpellCatalog,
+} from '@/features/content/lib/fixtures/grant-display-fixtures'
+import { pickSpecies } from '@/features/content/lib/fixtures/pick'
 
 import {
   buildSpeciesDetailsSheetContent,
@@ -64,7 +69,7 @@ describe('builder-option-display.lib', () => {
       expect.arrayContaining([
         { label: SPECIES_STAT_LABELS.creatureType, value: 'Humanoid' },
         { label: SPECIES_STAT_LABELS.size, value: 'Medium' },
-        { label: SPECIES_STAT_LABELS.speed, value: '30 ft.' },
+        { label: SPECIES_STAT_LABELS.movement, value: 'Walk 30 ft' },
         { label: SPECIES_STAT_LABELS.senses, value: 'Darkvision 120 ft.' },
         { label: SPECIES_STAT_LABELS.languageAffinities, value: dwarvishLabel },
       ]),
@@ -72,5 +77,46 @@ describe('builder-option-display.lib', () => {
     expect(content.sections[0]?.title).toBe(SPECIES_SECTION_LABELS.traits)
     expect(content.sections[0]?.items?.[0]?.title).toBe('Darkvision')
     expect(content.sections[0]?.items?.[1]?.title).toBe('Dwarven Resilience')
+  })
+
+  it('builds catalog Elf heritage grant summary lines without prose body', () => {
+    const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
+    const elf = pickSpecies('elf')
+    const content = buildSpeciesDetailsSheetContent(elf, languages, getDrowHeritageSpellCatalog())
+    const heritageSection = content.sections.find((section) => section.title === 'Elven Lineage')
+    const drowItem = heritageSection?.items?.find((item) => item.title === 'Drow')
+
+    expect(drowItem).toEqual({
+      title: 'Drow',
+      summaryLines: [...DROW_HERITAGE_SHEET_SUMMARY_LINES],
+    })
+    expect(drowItem).not.toHaveProperty('body')
+  })
+
+  it('keeps prose body for heritage options without grant groups', () => {
+    const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
+    const speciesWithProseOnlyHeritage = {
+      ...dwarfWithTraits,
+      heritage: {
+        id: 'test-heritage',
+        name: 'Test Heritage',
+        description: '<p>Choose an option.</p>',
+        choose: 1,
+        options: [
+          {
+            kind: 'custom',
+            id: 'option-a',
+            name: 'Option A',
+            description: '<p>Acid resistance prose.</p>',
+          },
+        ],
+      },
+    } as const satisfies Species
+    const content = buildSpeciesDetailsSheetContent(speciesWithProseOnlyHeritage, languages, [])
+    const heritageSection = content.sections.find((section) => section.title === 'Test Heritage')
+    const optionItem = heritageSection?.items?.[0]
+
+    expect(optionItem?.body).toContain('Acid resistance prose')
+    expect(optionItem).not.toHaveProperty('summaryLines')
   })
 })

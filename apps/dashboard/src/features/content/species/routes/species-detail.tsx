@@ -115,6 +115,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSpell: () => undefined,
   })
 
   return (

@@ -86,6 +86,61 @@ describe('BuilderOptionDetailsSheet', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('renders grant summary lines for heritage options', () => {
+    render(
+      <BuilderOptionDetailsSheet
+        {...baseProps}
+        sections={[
+          {
+            title: 'Elven Lineage',
+            items: [
+              {
+                title: 'Drow',
+                summaryLines: [
+                  'L1: Darkvision 120 ft · Dancing Lights cantrip',
+                  'L3: Faerie Fire spell',
+                  'L5: Darkness spell',
+                ],
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('L1: Darkvision 120 ft · Dancing Lights cantrip')).toBeInTheDocument()
+    expect(screen.getByText('L3: Faerie Fire spell')).toBeInTheDocument()
+    expect(screen.getByText('L5: Darkness spell')).toBeInTheDocument()
+    expect(
+      screen.queryByText('You have Darkvision with a range of 60 feet.'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations when heritage summary lines are shown', async () => {
+    const { container } = render(
+      <BuilderOptionDetailsSheet
+        {...baseProps}
+        sections={[
+          {
+            title: 'Elven Lineage',
+            items: [
+              {
+                title: 'Drow',
+                summaryLines: [
+                  'L1: Darkvision 120 ft · Dancing Lights cantrip',
+                  'L3: Faerie Fire spell',
+                  'L5: Darkness spell',
+                ],
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    await expectNoAxeViolations(container)
+  })
+
   it('renders choice pool summary with a disclosure tooltip', async () => {
     const user = userEvent.setup()
     render(

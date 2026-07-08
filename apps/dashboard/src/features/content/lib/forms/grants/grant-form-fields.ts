@@ -4,8 +4,8 @@ import {
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
-  formatMovementBonusAuthoringSummary,
-  formatMovementBonusTitle,
+  formatMovementGrantAuthoringSummary,
+  formatMovementGrantCompact,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   getMovementModeGrantLabel,
@@ -14,11 +14,14 @@ import {
   MOVEMENT_MODES,
   MOVEMENT_OPERATION_ENTRIES,
   MOVEMENT_OPERATIONS,
+  MOVEMENT_SPEED_FEET,
   SENSE_RANGES,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
+  type MovementGrantPayload,
   type MovementMode,
+  type MovementOperation,
   type SenseId,
   type UsageFrequency,
 } from '@rpg/contracts'
@@ -89,12 +92,52 @@ const movementBonusOptions: FieldOption[] = MOVEMENT_BONUS_FEET.map((feet) => ({
   label: `+${feet} ft`,
 }))
 
+const movementSpeedOptions: FieldOption[] = MOVEMENT_SPEED_FEET.map((feet) => ({
+  value: String(feet),
+  label: `${feet} ft`,
+}))
+
+function visibleWhenMovementOperation(operation: MovementOperation): FieldVisibility {
+  return {
+    dependsOn: ['grantType', 'movementOperation'],
+    visibleWhen: (watched) =>
+      watched['grantType'] === 'movement' && watched['movementOperation'] === operation,
+  }
+}
+
+function movementFormValuesToGrantPayload(values: {
+  movementMode?: string
+  movementOperation?: string
+  movementFeet?: number | string
+  movementMatchMode?: string
+}): MovementGrantPayload | undefined {
+  if (!values.movementMode || !values.movementOperation) return undefined
+  const mode = values.movementMode as MovementMode
+  const operation = values.movementOperation as MovementOperation
+
+  if (operation === 'match') {
+    if (!values.movementMatchMode || values.movementMatchMode === mode) return undefined
+    return { mode, operation, matchMode: values.movementMatchMode as MovementMode }
+  }
+
+  const feetRaw = values.movementFeet
+  if (feetRaw === undefined || feetRaw === '') return undefined
+  const feet = typeof feetRaw === 'number' ? feetRaw : Number(feetRaw)
+  if (!Number.isFinite(feet)) return undefined
+
+  if (operation === 'increase') {
+    return { mode, operation, feet: feet as (typeof MOVEMENT_BONUS_FEET)[number] }
+  }
+
+  return { mode, operation, feet: feet as (typeof MOVEMENT_SPEED_FEET)[number] }
+}
+
 function movementInlineSentenceField(
   overrides?: Partial<InlineSentenceFieldConfig>,
 ): InlineSentenceFieldConfig {
   return {
     type: 'inlineSentence',
-    name: 'movementValue',
+    name: 'movement',
     label: 'Movement',
     segments: [
       {
@@ -102,24 +145,43 @@ function movementInlineSentenceField(
         name: 'movementMode',
         options: movementModeOptions,
         defaultValue: 'walk',
-        width: 'lg',
+        width: 'auto',
         ariaLabel: 'Movement mode',
       },
       {
         kind: 'select',
         name: 'movementOperation',
         options: movementOperationOptions,
-        defaultValue: 'bonus',
-        width: 'md',
+        defaultValue: 'increase',
+        width: 'auto',
         ariaLabel: 'Movement operation',
       },
       {
         kind: 'select',
-        name: 'movementValue',
+        name: 'movementFeet',
         options: movementBonusOptions,
         defaultValue: '5',
-        width: 'sm',
-        ariaLabel: 'Movement bonus',
+        digits: 3,
+        ariaLabel: 'Movement bonus in feet',
+        visibility: visibleWhenMovementOperation('increase'),
+      },
+      {
+        kind: 'select',
+        name: 'movementFeet',
+        options: movementSpeedOptions,
+        defaultValue: '30',
+        width: 'auto',
+        ariaLabel: 'Movement speed in feet',
+        visibility: visibleWhenMovementOperation('set'),
+      },
+      {
+        kind: 'select',
+        name: 'movementMatchMode',
+        options: movementModeOptions,
+        defaultValue: 'walk',
+        width: 'auto',
+        ariaLabel: 'Movement mode to match',
+        visibility: visibleWhenMovementOperation('match'),
       },
     ],
     ...overrides,
@@ -127,35 +189,27 @@ function movementInlineSentenceField(
 }
 
 /** Formats a concise title for a movement grant row header. */
-export function formatMovementRowTitle(
-  mode: string | undefined,
-  value: number | string | undefined,
-): string {
-  if (!mode || value === undefined || value === '') return 'Movement bonus'
-  const numericValue = typeof value === 'number' ? value : Number(value)
-  if (!Number.isFinite(numericValue)) return 'Movement bonus'
-  return `Movement — ${formatMovementBonusTitle({
-    mode: mode as MovementMode,
-    operation: 'bonus',
-    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
-    unit: 'ft',
-  })}`
+export function formatMovementRowTitle(values: {
+  movementMode?: string
+  movementOperation?: string
+  movementFeet?: number | string
+  movementMatchMode?: string
+}): string {
+  const grant = movementFormValuesToGrantPayload(values)
+  if (!grant) return 'Movement'
+  return `Movement — ${formatMovementGrantCompact(grant)}`
 }
 
 /** Formats the authoring summary for a movement grant row header. */
-export function formatMovementRowSummary(
-  mode: string | undefined,
-  value: number | string | undefined,
-): string {
-  if (!mode || value === undefined || value === '') return ''
-  const numericValue = typeof value === 'number' ? value : Number(value)
-  if (!Number.isFinite(numericValue)) return ''
-  return formatMovementBonusAuthoringSummary({
-    mode: mode as MovementMode,
-    operation: 'bonus',
-    value: numericValue as (typeof MOVEMENT_BONUS_FEET)[number],
-    unit: 'ft',
-  })
+export function formatMovementRowSummary(values: {
+  movementMode?: string
+  movementOperation?: string
+  movementFeet?: number | string
+  movementMatchMode?: string
+}): string {
+  const grant = movementFormValuesToGrantPayload(values)
+  if (!grant) return ''
+  return formatMovementGrantAuthoringSummary(grant)
 }
 
 export function formatResistanceRowSummary(damageTypes: string[] | undefined): string {
@@ -394,11 +448,7 @@ const GRANT_ROW_SUMMARY_BY_TYPE: Partial<Record<string, GrantRowSummaryFormatter
       values['senseType'] as string | undefined,
       values['senseRange'] as number | string | undefined,
     ),
-  movement: (values) =>
-    formatMovementRowSummary(
-      values['movementMode'] as string | undefined,
-      values['movementValue'] as number | string | undefined,
-    ),
+  movement: (values) => formatMovementRowSummary(values),
   languages: (values) => formatLanguageRowSummary(values['language'] as string | undefined),
   featChoice: (values) =>
     formatFeatChoiceRowSummary(
@@ -441,11 +491,7 @@ const GRANT_ROW_PRIMARY_BY_TYPE: Partial<Record<string, GrantRowPrimaryFormatter
     skillProficiencyGrantTitle(values as SkillProficiencyItemForm, index, ctx.skillOptions),
   armorTraining: (values, index, ctx) =>
     armorTrainingGrantTitle(values as ArmorTrainingItemForm, index, ctx.armorOptions),
-  movement: (values) =>
-    formatMovementRowTitle(
-      values['movementMode'] as string | undefined,
-      values['movementValue'] as number | string | undefined,
-    ),
+  movement: (values) => formatMovementRowTitle(values),
   spells: (values, _index, ctx) =>
     formatSpellRowTitle(values['spellIds'] as string[] | undefined, ctx.spellOptions),
 }

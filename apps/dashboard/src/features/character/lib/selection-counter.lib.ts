@@ -1,4 +1,5 @@
 import type { ChoiceSet, ChoiceType } from '@rpg/contracts'
+import { getProficiencyGrantAddLabel } from '@rpg/contracts'
 
 export const BUILDER_SELECTION_FULL_NOTICE = 'Selection full' as const
 
@@ -10,11 +11,14 @@ type ChoiceSetDrawerLabelPair = {
 const CHOICE_SET_DRAWER_LABELS: Partial<Record<ChoiceType, ChoiceSetDrawerLabelPair>> = {
   cantrip: { add: 'Add cantrip', manage: 'Manage cantrips' },
   spell: { add: 'Add spell', manage: 'Manage spells' },
-  skillProficiency: { add: 'Add skill proficiency', manage: 'Manage skill choices' },
+  skillProficiency: { add: getProficiencyGrantAddLabel('skill'), manage: 'Manage skill choices' },
   language: { add: 'Add language', manage: 'Manage language choices' },
-  toolProficiency: { add: 'Add tool proficiency', manage: 'Manage tool choices' },
-  weaponProficiency: { add: 'Add weapon proficiency', manage: 'Manage weapon choices' },
-  armorTraining: { add: 'Add armor training', manage: 'Manage armor choices' },
+  toolProficiency: { add: getProficiencyGrantAddLabel('tool'), manage: 'Manage tool choices' },
+  weaponProficiency: {
+    add: getProficiencyGrantAddLabel('weapon'),
+    manage: 'Manage weapon choices',
+  },
+  armorTraining: { add: getProficiencyGrantAddLabel('armor'), manage: 'Manage armor choices' },
   feat: { add: 'Add feat', manage: 'Manage feat choices' },
 }
 

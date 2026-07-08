@@ -7,10 +7,13 @@ import {
   customContentTraitSchema,
   featChoiceGrantSchema,
   flattenGrantGroups,
+  formatDamageTypeGrantCompact,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageChoiceGrantSentence,
+  formatLanguageGrantCompact,
   formatLanguageGrantSentence,
+  formatResistanceGrantCompact,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   formatSpellsGrantSentence,
@@ -210,11 +213,26 @@ describe('grant sentence formatters', () => {
     )
   })
 
+  it('formats compact damage and resistance grant labels', () => {
+    expect(formatDamageTypeGrantCompact(['acid'])).toBe('Acid damage type')
+    expect(formatDamageTypeGrantCompact(['fire', 'cold'])).toBe('Fire and Cold damage types')
+    expect(formatResistanceGrantCompact(['acid'])).toBe('Acid resistance')
+    expect(formatResistanceGrantCompact(['fire', 'cold'])).toBe('Fire and Cold resistance')
+  })
+
   it('formats sense and language grants with sentence forms', () => {
     expect(formatSenseGrantSentence({ type: 'darkvision', range: 60 })).toBe(
       'Character gains Darkvision with a range of 60 feet.',
     )
     expect(formatLanguageGrantSentence(['common'])).toBe('Character knows Common.')
+  })
+
+  it('formats compact language grant labels', () => {
+    expect(formatLanguageGrantCompact(['common'])).toBe('Common language')
+    expect(formatLanguageGrantCompact(['common', 'elvish'])).toBe('Common, Elvish languages')
+    expect(formatLanguageGrantCompact(['common', 'elvish', 'draconic'])).toBe(
+      'Common, Elvish, Draconic languages',
+    )
   })
 
   it('formats language and feat choices with counted forms', () => {
@@ -499,21 +517,19 @@ describe('contentGrantSchema — damageType', () => {
 })
 
 describe('contentGrantSchema — movement', () => {
-  it('parses a walk speed bonus', () => {
+  it('parses a walk speed increase', () => {
     expect(
       contentGrantSchema.parse({
         kind: 'movement',
         mode: 'walk',
-        operation: 'bonus',
-        value: 5,
-        unit: 'ft',
+        operation: 'increase',
+        feet: 5,
       }),
     ).toEqual({
       kind: 'movement',
       mode: 'walk',
-      operation: 'bonus',
-      value: 5,
-      unit: 'ft',
+      operation: 'increase',
+      feet: 5,
     })
   })
 })
@@ -908,7 +924,7 @@ describe('isGrantGroupsEligible', () => {
     expect(
       isGrantGroupsEligible([
         {
-          grants: [{ kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' }],
+          grants: [{ kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
         },
       ]),
     ).toBe(true)

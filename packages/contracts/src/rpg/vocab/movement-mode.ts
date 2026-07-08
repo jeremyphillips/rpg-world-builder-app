@@ -5,8 +5,7 @@ import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Movement modes — the closed SRD 5.2.1 movement types shared by species,
-// monsters, and any creature with a speed block. `walk` is the baseline mode
-// every creature has; extra modes are modeled as `{ mode, feet }` entries.
+// monsters, and any creature with a movement block.
 // ---------------------------------------------------------------------------
 
 export const MOVEMENT_MODE_ENTRIES = {
@@ -88,47 +87,107 @@ export function getMovementModeLabel(id: string): string {
 /** Speed in feet for a single movement mode. */
 export const speedFeetSchema = z.number().int().min(0)
 
-/** An extra movement mode and its speed in feet (e.g. Fly 60 ft). */
-export const movementSpeedSchema = z.object({
-  mode: extraMovementModeSchema,
-  feet: speedFeetSchema,
-})
+/**
+ * Preset baseline movement speeds (in feet) shown as a select in authoring UIs.
+ * 5-foot increments through 120 ft — covers common species and monster speeds.
+ */
+export const MOVEMENT_SPEED_FEET = [
+  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115,
+  120,
+] as const
 
-export type MovementSpeed = z.infer<typeof movementSpeedSchema>
+export type MovementSpeedFeet = (typeof MOVEMENT_SPEED_FEET)[number]
+
+export const movementSpeedFeetSchema = z.union(
+  MOVEMENT_SPEED_FEET.map((feet) => z.literal(feet)) as [
+    z.ZodLiteral<MovementSpeedFeet>,
+    z.ZodLiteral<MovementSpeedFeet>,
+    ...z.ZodLiteral<MovementSpeedFeet>[],
+  ],
+)
 
 /**
- * Creature movement speeds. `walk` is always present; additional modes are
- * listed in `modes` when the creature has them. Reused (as a partial) for
- * lineage overrides.
+ * Canonical creature movement map. At least one mode is required; `walk` is not
+ * mandated — flying-only or burrowing-only creatures are valid.
  */
-export const speedSchema = z.object({
-  walk: speedFeetSchema,
-  modes: z.array(movementSpeedSchema).optional(),
-})
+export type MovementSpeeds = Partial<Record<MovementMode, number>>
 
-export type Speed = z.infer<typeof speedSchema>
+export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
+  .record(z.string(), speedFeetSchema)
+  .superRefine((movement, ctx) => {
+    const keys = Object.keys(movement)
+    if (keys.length < 1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'At least one movement mode is required.',
+      })
+      return
+    }
+    for (const key of keys) {
+      if (!movementModeSchema.safeParse(key).success) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Invalid movement mode: ${key}`,
+          path: [key],
+        })
+      }
+    }
+  })
+
+export type CreatureLikeMovement = {
+  movement: MovementSpeeds
+}
+
+/** Normalizes movement for any creature-like content record. */
+export function resolveCreatureMovement(entity: CreatureLikeMovement): MovementSpeeds {
+  const result: Partial<Record<MovementMode, number>> = {}
+  for (const mode of MOVEMENT_MODES) {
+    const feet = entity.movement[mode]
+    if (feet !== undefined) {
+      result[mode] = feet
+    }
+  }
+  return result as MovementSpeeds
+}
 
 /**
- * Preset walk-speed values (in feet) shown as a select in authoring UIs. The
- * underlying schema stays numeric — these presets are a UI affordance only.
+ * Dashboard detail/overview formatter (mode-labeled, readable).
+ *
+ * @example formatMovementDisplay({ walk: 30 }) // → "Walk 30 ft"
+ * @example formatMovementDisplay({ walk: 30, fly: 60 }) // → "Walk 30 ft, Fly 60 ft"
  */
-export const STANDARD_SPEEDS = [20, 25, 30, 35, 40] as const
-export type StandardSpeed = (typeof STANDARD_SPEEDS)[number]
+export function formatMovementDisplay(speeds: MovementSpeeds): string {
+  return MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
+    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ft`)
+    .join(', ')
+}
 
 // ---------------------------------------------------------------------------
-// Movement grants — bonus speed from traits and features
+// Movement grants — set, increase, or match speed from traits and features
 // ---------------------------------------------------------------------------
 
-export const MOVEMENT_OPERATIONS = ['bonus'] as const
+// TODO(primitives): When a second grant type adopts set|increase|match,
+// extract MOVEMENT_OPERATIONS + operation-discriminated feet schemas to
+// packages/contracts/src/rpg/primitives/numeric-modifier.ts and compose here.
+
+export const MOVEMENT_OPERATIONS = ['set', 'increase', 'match'] as const
 
 export type MovementOperation = (typeof MOVEMENT_OPERATIONS)[number]
 
 export const movementOperationSchema = z.enum(MOVEMENT_OPERATIONS)
 
 export const MOVEMENT_OPERATION_ENTRIES = {
-  bonus: {
+  set: {
+    label: 'is',
+    description: 'Establishes or replaces the speed for that movement mode.',
+  },
+  increase: {
     label: 'increases by',
     description: 'Adds to the creature’s existing speed for that movement mode.',
+  },
+  match: {
+    label: 'equals',
+    description: 'Sets this mode’s speed to the resolved value of another mode.',
   },
 } as const satisfies Record<MovementOperation, GameTermEntry>
 
@@ -146,15 +205,63 @@ export const movementBonusFeetSchema = z.union([
   z.literal(30),
 ])
 
-/** Payload shared by movement grants in content traits and the legacy grants bag. */
-export const movementGrantPayloadSchema = z.object({
+const movementGrantConditionSchema = z.string().min(1).optional()
+
+export const movementGrantSetSchema = z.object({
   mode: movementModeSchema,
-  operation: movementOperationSchema,
-  value: movementBonusFeetSchema,
-  unit: z.literal('ft'),
+  operation: z.literal('set'),
+  feet: movementSpeedFeetSchema,
+  condition: movementGrantConditionSchema,
 })
 
+export const movementGrantIncreaseSchema = z.object({
+  mode: movementModeSchema,
+  operation: z.literal('increase'),
+  feet: movementBonusFeetSchema,
+  condition: movementGrantConditionSchema,
+})
+
+export const movementGrantMatchSchema = z.object({
+  mode: movementModeSchema,
+  operation: z.literal('match'),
+  matchMode: movementModeSchema,
+  condition: movementGrantConditionSchema,
+})
+
+/**
+ * Payload shared by movement grants in content traits and the legacy grants bag.
+ *
+ * Future runtime resolution (`applyMovementGrants`):
+ *
+ * - Baseline `movement` on the creature provides starting speeds per mode.
+ * - `set` — adds or replaces the value for `mode` (if mode absent, establishes it).
+ * - `increase` — adds `feet` to the current resolved value for `mode` (missing mode → treat as 0 before add).
+ * - `match` — sets `mode` to the resolved value of `matchMode` after that mode is resolved.
+ * - Grants apply in deterministic order: collect by provenance order, then `set` → `match` → `increase` within a stable sort (document exact sort key when implementing).
+ * - Display formatters are separate from resolution.
+ */
+export const movementGrantPayloadSchema = z
+  .discriminatedUnion('operation', [
+    movementGrantSetSchema,
+    movementGrantIncreaseSchema,
+    movementGrantMatchSchema,
+  ])
+  .superRefine((grant, ctx) => {
+    if (grant.operation === 'match' && grant.mode === grant.matchMode) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'matchMode must differ from mode.',
+        path: ['matchMode'],
+      })
+    }
+  })
+
 export type MovementGrantPayload = z.infer<typeof movementGrantPayloadSchema>
+
+/** Authoring label for a movement grant operation (e.g. "increases by"). */
+export function getMovementOperationAuthoringLabel(operation: MovementOperation): string {
+  return MOVEMENT_OPERATION_ENTRIES[operation].label
+}
 
 /** Authoring label for a movement mode in grant sentences (e.g. "Walking speed"). */
 export function getMovementModeGrantLabel(mode: MovementMode): string {
@@ -169,30 +276,45 @@ export function getMovementModeGrantPhrase(mode: MovementMode): string {
   return `${getMovementModeLabel(mode).toLowerCase()} speed`
 }
 
-/** Compact title fragment: "+5 ft walking speed". */
-export function formatMovementBonusTitle(grant: MovementGrantPayload): string {
-  return `+${grant.value} ${grant.unit} ${getMovementModeGrantPhrase(grant.mode)}`
+function formatMovementGrantModeCompactLabel(mode: MovementMode): string {
+  return `${getMovementModeLabel(mode)} speed`
 }
 
-/** Trait description sentence: "Your walking speed increases by 5 feet." */
-export function formatMovementBonusDescription(grant: MovementGrantPayload): string {
-  return `Your ${getMovementModeGrantPhrase(grant.mode)} increases by ${grant.value} feet.`
+/** Compact summary label: "Walk speed +5 ft", "Burrow speed 20 ft", etc. */
+export function formatMovementGrantCompact(grant: MovementGrantPayload): string {
+  const modeLabel = formatMovementGrantModeCompactLabel(grant.mode)
+  switch (grant.operation) {
+    case 'set':
+      return `${modeLabel} ${grant.feet} ft`
+    case 'increase':
+      return `${modeLabel} +${grant.feet} ft`
+    case 'match':
+      return `${modeLabel} equal to ${formatMovementGrantModeCompactLabel(grant.matchMode)}`
+  }
+}
+
+/** Trait description sentence: "Your walking speed increases by 5 ft." */
+export function formatMovementGrantSentence(grant: MovementGrantPayload): string {
+  const phrase = getMovementModeGrantPhrase(grant.mode)
+  switch (grant.operation) {
+    case 'set':
+      return `You gain a ${phrase} of ${grant.feet} ft.`
+    case 'increase':
+      return `Your ${phrase} increases by ${grant.feet} ft.`
+    case 'match':
+      return `Your ${phrase} equals your ${getMovementModeGrantPhrase(grant.matchMode)}.`
+  }
 }
 
 /** Authoring summary for grant rows: "Character's walking speed increases by 5 ft." */
-export function formatMovementBonusAuthoringSummary(grant: MovementGrantPayload): string {
-  return `Character's ${getMovementModeGrantPhrase(grant.mode)} increases by ${grant.value} ft.`
-}
-
-/**
- * Human-readable speed string (e.g. "30 ft." or "30 ft., Fly 60 ft.").
- *
- * @example formatSpeed({ walk: 30 }) // → "30 ft."
- * @example formatSpeed({ walk: 30, modes: [{ mode: 'fly', feet: 60 }] }) // → "30 ft., Fly 60 ft."
- */
-export function formatSpeed(speed: Speed): string {
-  const extras = (speed.modes ?? []).map(
-    ({ mode, feet }) => `${getMovementModeLabel(mode)} ${feet} ft.`,
-  )
-  return [`${speed.walk} ft.`, ...extras].join(', ')
+export function formatMovementGrantAuthoringSummary(grant: MovementGrantPayload): string {
+  const phrase = getMovementModeGrantPhrase(grant.mode)
+  switch (grant.operation) {
+    case 'set':
+      return `Character's ${phrase} is ${grant.feet} ft.`
+    case 'increase':
+      return `Character's ${phrase} increases by ${grant.feet} ft.`
+    case 'match':
+      return `Character's ${phrase} equals ${getMovementModeGrantPhrase(grant.matchMode)}.`
+  }
 }

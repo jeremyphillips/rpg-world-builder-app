@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from '../types'
+import { getTermSentenceForm, type GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Tool categories — artisan sets, kits, instruments, and specialty tools.
@@ -31,10 +31,18 @@ export const TOOL_CATEGORY_ENTRIES = {
   gaming_set: {
     label: 'Gaming Set',
     description: 'Dice, cards, or another game set used for ability checks.',
+    sentence: {
+      singular: 'gaming set',
+      plural: 'gaming sets',
+    },
   },
   musical_instrument: {
     label: 'Musical Instrument',
     description: 'An instrument used for performance checks.',
+    sentence: {
+      singular: 'musical instrument',
+      plural: 'musical instruments',
+    },
   },
   navigator: {
     label: "Navigator's Tools",
@@ -70,4 +78,11 @@ export function getToolCategoryEntry(category: string): GameTermEntry | undefine
 /** Returns the display label for a tool category. Falls back to the raw value. */
 export function getToolCategoryLabel(category: string): string {
   return getToolCategoryEntry(category)?.label ?? category
+}
+
+/** Counted noun phrase for generated tool-category prose. */
+export function getToolCategorySentenceForm(category: string, count = 1): string {
+  const entry = getToolCategoryEntry(category)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: category, description: '' }, count)
 }

@@ -61,6 +61,19 @@ export {
 } from './lib/forms/shells/content-create-shell'
 export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
 export {
+  buildGrantSummaryModel,
+  buildSpellGrantVocabulary,
+  formatGrantSummaryByLevel,
+  formatGrantSummaryInline,
+  GRANT_SUMMARY_JOIN,
+  type GrantDisplayVocabulary,
+  type GrantSummaryFormatOptions,
+  type GrantSummaryGroup,
+  type GrantSummaryItem,
+  type GrantSummaryKind,
+  type GrantSummaryModel,
+} from './lib/grant-display'
+export {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormCtx,

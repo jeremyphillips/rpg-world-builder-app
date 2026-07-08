@@ -11,7 +11,7 @@
     "description": "<p>Your lineage stems from a dragon progenitor whose essence fuels your magical gifts.</p>",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "languageAffinities": ["draconic"],
@@ -269,7 +269,7 @@
     "name": "Dwarf",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "languageAffinities": ["dwarvish"],
@@ -330,7 +330,7 @@
     "name": "Elf",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "languageAffinities": ["elvish"],
@@ -473,9 +473,8 @@
                 {
                   "kind": "movement",
                   "mode": "walk",
-                  "operation": "bonus",
-                  "value": 5,
-                  "unit": "ft"
+                  "operation": "increase",
+                  "feet": 5
                 },
                 {
                   "kind": "spells",
@@ -530,7 +529,7 @@
     "name": "Gnome",
     "creatureType": "humanoid",
     "sizes": ["small"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "languageAffinities": ["gnomish"],
@@ -621,7 +620,7 @@
     "name": "Goliath",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": {
+    "movement": {
       "walk": 35
     },
     "languageAffinities": ["giant"],
@@ -724,7 +723,7 @@
     "name": "Halfling",
     "creatureType": "humanoid",
     "sizes": ["small"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "languageAffinities": ["halfling"],
@@ -766,7 +765,7 @@
     "name": "Human",
     "creatureType": "humanoid",
     "sizes": ["medium", "small"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "traits": [
@@ -813,7 +812,7 @@
     "name": "Orc",
     "creatureType": "humanoid",
     "sizes": ["medium"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "traits": [
@@ -857,7 +856,7 @@
     "name": "Tiefling",
     "creatureType": "humanoid",
     "sizes": ["medium", "small"],
-    "speed": {
+    "movement": {
       "walk": 30
     },
     "traits": [

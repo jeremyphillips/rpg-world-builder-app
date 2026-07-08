@@ -216,7 +216,7 @@ function invalidValueFor(routeKey: string): unknown {
         name: '',
         creatureType: 'humanoid',
         sizes: [],
-        speed: { walk: 30 },
+        movement: [{ mode: 'walk', feet: 30 }],
         traits: [],
       }
     case 'classes':
@@ -351,7 +351,7 @@ describe('content form schema factories', () => {
         name: 'Elf',
         creatureType: 'humanoid',
         sizes: ['medium'],
-        speed: { walk: 30 },
+        movement: [{ mode: 'walk', feet: 30 }],
         traits: [],
         heritage: {
           name: '',

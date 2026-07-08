@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
+  getWeaponCategoryCompactLabel,
   getWeaponCategoryEntry,
   getWeaponCategoryLabel,
+  getWeaponCategorySentenceForm,
   weaponCategorySchema,
 } from './category'
 
@@ -36,5 +38,12 @@ describe('weapon category vocabulary', () => {
   it('returns labels and falls back for unknown categories', () => {
     expect(getWeaponCategoryLabel('simple')).toBe('Simple Weapon')
     expect(getWeaponCategoryLabel('custom')).toBe('custom')
+  })
+
+  it('returns sentence and compact forms', () => {
+    expect(getWeaponCategorySentenceForm('simple', 1)).toBe('simple weapon')
+    expect(getWeaponCategorySentenceForm('simple', 2)).toBe('simple weapons')
+    expect(getWeaponCategoryCompactLabel('simple')).toBe('Simple weapons')
+    expect(getWeaponCategoryCompactLabel('martial')).toBe('Martial weapons')
   })
 })

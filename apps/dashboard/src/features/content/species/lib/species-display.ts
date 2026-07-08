@@ -1,19 +1,26 @@
 import {
   flattenGrantGroups,
-  formatSpeed,
+  formatMovementDisplay,
   getCreatureSizeLabel,
+  resolveCreatureMovement,
   resolveGrantGroupsFromContent,
   resolveTraitDisplay,
   type Species,
   type SpeciesTrait,
 } from '@rpg/contracts'
 
+import {
+  buildGrantSummaryModel,
+  formatGrantSummaryByLevel,
+  formatGrantSummaryInline,
+  type GrantDisplayVocabulary,
+} from '../../lib/grant-display'
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 
 export const SPECIES_STAT_LABELS = {
   creatureType: 'Creature Type',
   size: 'Size',
-  speed: 'Speed',
+  movement: 'Movement',
   senses: 'Senses',
   languageAffinities: 'Language affinities',
 } as const
@@ -23,10 +30,17 @@ export const SPECIES_SECTION_LABELS = { traits: 'Traits' } as const
 export type SpeciesDisplayVocabulary = {
   resolveCreatureTypeLabel: (id: string) => string
   resolveLanguageLabel: (id: string) => string
-  resolveSenseLabel: (type: string) => string
-}
+} & Pick<GrantDisplayVocabulary, 'resolveSenseLabel' | 'resolveSpell'>
 
-export type SpeciesDetailItem = { id: string; title: string; bodyHtml?: string }
+export type SpeciesDetailItem = {
+  id: string
+  title: string
+  bodyHtml?: string
+  /** Grouped grant summary lines, e.g. `L1: Darkvision 120 ft · Dancing Lights cantrip`. */
+  summaryLines?: string[]
+  /** Flat grant summary for compact surfaces. */
+  summaryInline?: string
+}
 
 export type SpeciesCardViewModel = {
   label: string
@@ -76,8 +90,8 @@ function buildSpeciesStatRows(
       value: species.sizes.map(getCreatureSizeLabel).join(' or '),
     },
     {
-      label: SPECIES_STAT_LABELS.speed,
-      value: formatSpeed(species.speed),
+      label: SPECIES_STAT_LABELS.movement,
+      value: formatMovementDisplay(resolveCreatureMovement(species)),
     },
     {
       label: SPECIES_STAT_LABELS.senses,
@@ -101,6 +115,37 @@ function mapTraitToDetailItem(trait: SpeciesTrait): SpeciesDetailItem {
     id: trait.id,
     title: display.name,
     bodyHtml: display.descriptionHtml,
+  }
+}
+
+function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDisplayVocabulary {
+  return {
+    resolveSenseLabel: vocabulary.resolveSenseLabel,
+    resolveSpell: vocabulary.resolveSpell,
+  }
+}
+
+function mapHeritageOptionToDetailItem(
+  trait: SpeciesTrait,
+  vocabulary: SpeciesDisplayVocabulary,
+): SpeciesDetailItem {
+  const display = resolveTraitDisplay(trait)
+  const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
+  const summaryModel = buildGrantSummaryModel(trait.grantGroups, grantVocabulary, {
+    parentLevel: 1,
+  })
+  const groupedSummary = formatGrantSummaryByLevel(summaryModel, { includeTypeSuffix: true })
+
+  if (groupedSummary.length === 0) {
+    return mapTraitToDetailItem(trait)
+  }
+
+  return {
+    id: trait.id,
+    title: display.name,
+    bodyHtml: display.descriptionHtml,
+    summaryLines: groupedSummary.map(({ label, text }) => `${label}: ${text}`),
+    summaryInline: formatGrantSummaryInline(summaryModel),
   }
 }
 
@@ -135,7 +180,9 @@ export function buildSpeciesDetailViewModel(
       heritageId: species.heritage.id,
       title: species.heritage.name,
       descriptionHtml: species.heritage.description,
-      items: species.heritage.options.map(mapTraitToDetailItem),
+      items: species.heritage.options.map((option) =>
+        mapHeritageOptionToDetailItem(option, vocabulary),
+      ),
     })
   }
 

@@ -326,7 +326,7 @@ describe('formatGrantRowPrimary', () => {
       ),
     ).toBe('Power Word Heal, Power Word Kill')
     expect(formatGrantRowPrimary({ grantType: 'movement' }, 0, grantRowHeaderContext)).toBe(
-      'Movement bonus',
+      'Movement',
     )
     expect(formatGrantRowPrimary({ grantType: 'languages' }, 0, grantRowHeaderContext)).toBe(
       'Language',

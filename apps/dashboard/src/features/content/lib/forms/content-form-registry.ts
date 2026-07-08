@@ -101,7 +101,7 @@ export interface ContentFormDef<
   toFormValues: (entity: TEntity) => Partial<TFormValues>
   /**
    * Initial values for the create shell. Merged over synthesized field defaults
-   * from `buildFields` (e.g. nested `speed.walk` needs `{ speed: { walk } }`).
+   * from `buildFields` (e.g. nested `movement` rows need `{ movement: [{ mode, feet }] }`).
    */
   createDefaultValues?: Partial<TFormValues>
   /**

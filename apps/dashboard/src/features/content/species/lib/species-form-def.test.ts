@@ -7,10 +7,6 @@
  * - Missing required schema fields with no corresponding form field
  * - `toInput` producing values that don't satisfy the contract schema
  * - Accidental type widening in `toInput`'s return type
- *
- * NOTE on `speed.modes`: Phase 3 only authors `speed.walk`; extra movement
- * modes are not surfaced in the form and are therefore not preserved in the
- * round-trip. SRD playable species have only walk speed, so the fixtures pass.
  */
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpecies } from '@rpg/catalog/species'
@@ -52,12 +48,12 @@ describe('speciesFormDef round-trips', () => {
       expect(input.slug).toBe(species.slug)
     })
 
-    it(`${species.slug}: creatureType, sizes, and walk speed are preserved`, () => {
+    it(`${species.slug}: creatureType, sizes, and movement are preserved`, () => {
       const formValues = speciesFormDef.toFormValues(species) as SpeciesFormValues
       const input = speciesFormDef.toInput(formValues)
       expect(input.creatureType).toBe(species.creatureType)
       expect(input.sizes).toEqual(species.sizes)
-      expect(input.speed.walk).toBe(species.speed.walk)
+      expect(input.movement).toEqual(species.movement)
     })
 
     it(`${species.slug}: trait count is preserved`, () => {
