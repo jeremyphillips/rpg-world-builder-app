@@ -3,7 +3,7 @@ import type { GrantGroup, SpeciesTrait } from '@rpg/contracts'
 
 import { GRANT_SUMMARY_JOIN, type GrantDisplayVocabulary } from '../grant-display'
 
-import { pickSpecies, pickSpell } from './pick'
+import { pickClass, pickEquipment, pickSpecies, pickSpell } from './pick'
 import { STORY_RULESET_ID } from './constants'
 
 /** Catalog Wood Elf heritage option grant groups from the Elf species seed. */
@@ -22,10 +22,42 @@ export function getCatalogWoodElfHeritageOption(): SpeciesTrait {
   return woodElf
 }
 
+/** Catalog Druidic feature grant groups from the Druid class seed. */
+export function getCatalogDruidDruidicGrantGroups(): GrantGroup[] {
+  const druidic = getCatalogDruidDruidicFeature()
+  return druidic.grantGroups ?? []
+}
+
+/** Catalog Druidic class feature from the Druid class seed. */
+export function getCatalogDruidDruidicFeature() {
+  const druid = pickClass('druid')
+  const druidic = druid.features.find((feature) => feature.id === 'druidic')
+  if (!druidic) {
+    throw new Error('Expected Druid seed to include a Druidic class feature')
+  }
+  return druidic
+}
+
 /** Catalog Drow heritage option grant groups from the Elf species seed. */
 export function getCatalogDrowHeritageGrantGroups(): GrantGroup[] {
   const drow = getCatalogDrowHeritageOption()
   return drow.grantGroups ?? []
+}
+
+/** Catalog Black Dragon heritage option grant groups from the Dragonborn species seed. */
+export function getCatalogBlackDragonHeritageGrantGroups(): GrantGroup[] {
+  const blackDragon = getCatalogBlackDragonHeritageOption()
+  return blackDragon.grantGroups ?? []
+}
+
+/** Catalog Black Dragon heritage option from the Dragonborn species seed. */
+export function getCatalogBlackDragonHeritageOption(): SpeciesTrait {
+  const dragonborn = pickSpecies('dragonborn')
+  const blackDragon = dragonborn.heritage?.options.find((option) => option.id === 'black')
+  if (!blackDragon) {
+    throw new Error('Expected Dragonborn seed to include a Black heritage option')
+  }
+  return blackDragon
 }
 
 /** Catalog Drow heritage option from the Elf species seed. */
@@ -36,6 +68,17 @@ export function getCatalogDrowHeritageOption(): SpeciesTrait {
     throw new Error('Expected Elf seed to include a Drow heritage option')
   }
   return drow
+}
+
+/** Vocabulary resolving catalog equipment names and kinds for grant summaries. */
+export function buildCatalogEquipmentGrantVocabulary(): Pick<
+  GrantDisplayVocabulary,
+  'resolveEquipmentName' | 'resolveEquipmentKind'
+> {
+  return {
+    resolveEquipmentName: (slug) => pickEquipment(slug).name,
+    resolveEquipmentKind: (slug) => pickEquipment(slug).kind,
+  }
 }
 
 /** Vocabulary resolving catalog spell names for Drow lineage grants. */

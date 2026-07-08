@@ -37,7 +37,13 @@ import {
   weaponCategorySchema,
 } from '../../vocab/weapon/category'
 import { getTermSentenceForm, pluralizeTermLabel } from '../../vocab/types'
-import { equipmentKindSchema, getEquipmentKindEntry, getEquipmentKindLabel } from '../equipment'
+import { formatVocabularySlugLabel } from '../../vocab/format-slug-label'
+import {
+  equipmentKindSchema,
+  getEquipmentKindEntry,
+  getEquipmentKindLabel,
+  type EquipmentKind,
+} from '../equipment'
 import { equipmentModifierSchema } from '../equipment/modifier'
 import { contentPoolChoiceSchema } from './choice'
 import { grantValidationMessages } from './grant-messages'
@@ -379,4 +385,92 @@ export function formatEquipmentGrantSentence(
   const poolForm = formatEquipmentPoolSentenceForm(pool, choose)
   if (!poolForm) return ''
   return `Character chooses ${choose} ${poolForm}.`
+}
+
+export type EquipmentGrantCompactResolver = {
+  resolveEquipmentName?: (slug: string) => string | undefined
+  resolveEquipmentKind?: (slug: string) => EquipmentKind | undefined
+}
+
+function formatCompactListSuffix(
+  labels: string[],
+  suffixSingular: string,
+  suffixPlural: string,
+): string | undefined {
+  if (labels.length === 0) return undefined
+  if (labels.length === 1) return `${labels[0]} ${suffixSingular}`
+  return `${labels.join(', ')} ${suffixPlural}`
+}
+
+function resolveEquipmentSlugLabel(slug: string, resolver?: EquipmentGrantCompactResolver): string {
+  return resolver?.resolveEquipmentName?.(slug) ?? formatVocabularySlugLabel(slug)
+}
+
+function resolveEquipmentSlugKind(
+  slug: string,
+  resolver?: EquipmentGrantCompactResolver,
+): EquipmentKind | undefined {
+  return resolver?.resolveEquipmentKind?.(slug)
+}
+
+function formatEquipmentItemLabelsCompact(
+  labels: string[],
+  kinds: (EquipmentKind | undefined)[],
+): string | undefined {
+  if (labels.length === 0) return undefined
+
+  if (labels.every((_, index) => kinds[index] === 'service')) {
+    return formatCompactListSuffix(labels, 'service', 'services')
+  }
+
+  const parts = labels.map((label, index) =>
+    kinds[index] === 'service' ? `${label} service` : label,
+  )
+  return parts.join(', ')
+}
+
+function collectGrantedEquipmentLabels(
+  grant: GrantedEquipmentItem,
+  resolver?: EquipmentGrantCompactResolver,
+): { labels: string[]; kinds: (EquipmentKind | undefined)[] } {
+  const name = resolveEquipmentSlugLabel(grant.equipmentSlug, resolver)
+  const kind = resolveEquipmentSlugKind(grant.equipmentSlug, resolver)
+  const quantity = grant.quantity ?? 1
+
+  return {
+    labels: Array.from({ length: quantity }, () => name),
+    kinds: Array.from({ length: quantity }, () => kind),
+  }
+}
+
+/**
+ * Compact summary label for equipment grants.
+ * Adventuring gear, mounts, vehicles, and magic items use the resolved name only;
+ * services append `service` / `services`.
+ */
+export function formatEquipmentGrantCompact(
+  grant: EquipmentGrant,
+  resolver?: EquipmentGrantCompactResolver,
+): string | undefined {
+  if (grant.kind === 'grant') {
+    if (!grant.equipmentSlug) return undefined
+    const { labels, kinds } = collectGrantedEquipmentLabels(grant, resolver)
+    return formatEquipmentItemLabelsCompact(labels, kinds)
+  }
+
+  const pool = grant.pool
+  if (pool.source === 'explicit') {
+    const labels = pool.equipmentSlugs.map((slug) => resolveEquipmentSlugLabel(slug, resolver))
+    const kinds = pool.equipmentSlugs.map((slug) => resolveEquipmentSlugKind(slug, resolver))
+    return formatEquipmentItemLabelsCompact(labels, kinds)
+  }
+
+  const poolLabel = formatEquipmentPoolLabel(pool)
+  if (!poolLabel) return undefined
+
+  if (pool.equipmentKind === 'service') {
+    return formatCompactListSuffix([poolLabel], 'service', 'services')
+  }
+
+  return poolLabel
 }

@@ -2,7 +2,11 @@ import { z } from 'zod'
 
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../vocab/ability'
-import { getDamageTypeSentenceForm, damageTypeIdSchema } from '../../vocab/damage/vocabulary'
+import {
+  getDamageTypeLabel,
+  getDamageTypeSentenceForm,
+  damageTypeIdSchema,
+} from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
 import {
   movementGrantIncreaseSchema,
@@ -15,6 +19,7 @@ import { getUsageFrequencySentenceForm, usageFrequencySchema } from '../../vocab
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
 import {
   getLanguageCategorySentenceForm,
+  getLanguageLabel,
   getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
@@ -108,6 +113,15 @@ export function formatLanguageGrantSentence(languageIds: readonly string[]): str
   return `Character knows ${joinNaturalList(languageIds.map((id) => getLanguageSentenceForm(id)))}.`
 }
 
+/** Compact summary label: "Common language", "Common, Elvish languages", etc. */
+export function formatLanguageGrantCompact(languageIds: readonly string[]): string {
+  const labels = languageIds.map((id) => getLanguageLabel(id))
+  if (languageIds.length === 1) {
+    return `${labels[0]} language`
+  }
+  return `${labels.join(', ')} languages`
+}
+
 export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {
   const languageWord = grant.choose === 1 ? 'language' : 'languages'
   if (grant.from?.length) {
@@ -167,10 +181,22 @@ export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): s
   )}.`
 }
 
+/** Compact summary label: "Acid damage type", "Fire and Cold damage types", etc. */
+export function formatDamageTypeGrantCompact(damageTypes: readonly string[]): string {
+  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
+  return damageTypes.length === 1 ? `${labels} damage type` : `${labels} damage types`
+}
+
 export function formatResistanceGrantSentence(damageTypes: readonly string[]): string {
   return `Character gains Resistance to ${joinNaturalList(
     damageTypes.map((id) => getDamageTypeSentenceForm(id)),
   )}.`
+}
+
+/** Compact summary label: "Acid resistance", "Fire and Cold resistance", etc. */
+export function formatResistanceGrantCompact(damageTypes: readonly string[]): string {
+  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
+  return `${labels} resistance`
 }
 
 // --- Grants bag (legacy — kept for catalog backward compat) -----------------

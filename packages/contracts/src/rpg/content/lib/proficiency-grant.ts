@@ -10,6 +10,7 @@ import {
   getToolCategoryLabel,
   toolCategorySchema,
 } from '../../vocab/equipment/tool-category'
+import { formatVocabularySlugLabel } from '../../vocab/format-slug-label'
 import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '../../vocab/types'
 import {
   getWeaponCategoryEntry,
@@ -518,6 +519,120 @@ function formatArmorChoiceSentence(choose: number, pool: ArmorTrainingPool): str
     return `Character chooses ${choose} armor training from selected armor.`
   }
   return `Character chooses ${choose} armor training.`
+}
+
+function formatCompactListSuffix(
+  labels: string[],
+  suffixSingular: string,
+  suffixPlural: string,
+): string | undefined {
+  if (labels.length === 0) return undefined
+  if (labels.length === 1) return `${labels[0]} ${suffixSingular}`
+  return `${labels.join(', ')} ${suffixPlural}`
+}
+
+function formatWeaponCategoryCompactLabel(category: string): string {
+  if (category === 'simple') return 'Simple weapons'
+  if (category === 'martial') return 'Martial weapons'
+  return `${getWeaponCategoryLabel(category)} weapons`
+}
+
+function formatArmorCategoryCompactLabel(category: string): string {
+  if (category === 'shields') return 'Shield'
+  const entry = getArmorCategoryEntry(category)
+  if (!entry) return formatVocabularySlugLabel(category)
+  return entry.label.replace(/ Armor$/, ' armor')
+}
+
+function collectFixedWeaponCompactLabels(
+  grant: FixedWeaponProficiencyGrant,
+  resolveWeaponName?: (slug: string) => string | undefined,
+): string[] {
+  const labels: string[] = []
+  grant.weaponSlugs?.forEach((slug) => {
+    labels.push(resolveWeaponName?.(slug) ?? formatVocabularySlugLabel(slug))
+  })
+  grant.weaponCategories?.forEach((category) => {
+    labels.push(formatWeaponCategoryCompactLabel(category))
+  })
+  return labels
+}
+
+function collectFixedToolCompactLabels(
+  grant: FixedToolProficiencyGrant,
+  resolveToolName?: (slug: string) => string | undefined,
+): string[] {
+  const labels: string[] = []
+  grant.toolSlugs?.forEach((slug) => {
+    labels.push(resolveToolName?.(slug) ?? formatVocabularySlugLabel(slug))
+  })
+  grant.toolCategories?.forEach((category) => {
+    labels.push(getToolCategoryLabel(category))
+  })
+  return labels
+}
+
+function collectFixedArmorCompactLabels(
+  grant: FixedArmorTrainingGrant,
+  resolveArmorName?: (slug: string) => string | undefined,
+): string[] {
+  const labels: string[] = []
+  grant.armorSlugs?.forEach((slug) => {
+    labels.push(resolveArmorName?.(slug) ?? formatVocabularySlugLabel(slug))
+  })
+  grant.armorCategories?.forEach((category) => {
+    labels.push(formatArmorCategoryCompactLabel(category))
+  })
+  return labels
+}
+
+/** Compact summary label: "Simple weapons proficiency", "Longsword, Rapier proficiencies", etc. */
+export function formatWeaponProficiencyGrantCompact(
+  grant: WeaponProficiencyGrant,
+  resolveWeaponName?: (slug: string) => string | undefined,
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  return formatCompactListSuffix(
+    collectFixedWeaponCompactLabels(grant, resolveWeaponName),
+    'proficiency',
+    'proficiencies',
+  )
+}
+
+/** Compact summary label: "Thieves' Tools proficiency", "Gaming Set, Lute proficiencies", etc. */
+export function formatToolProficiencyGrantCompact(
+  grant: ToolProficiencyGrant,
+  resolveToolName?: (slug: string) => string | undefined,
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  return formatCompactListSuffix(
+    collectFixedToolCompactLabels(grant, resolveToolName),
+    'proficiency',
+    'proficiencies',
+  )
+}
+
+/** Compact summary label: "Athletics proficiency", "Athletics, Stealth proficiencies", etc. */
+export function formatSkillProficiencyGrantCompact(
+  grant: SkillProficiencyGrant,
+  resolveSkillName?: (id: string) => string | undefined,
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  const labels = grant.skillIds.map((id) => resolveSkillName?.(id) ?? getSkillName(id))
+  return formatCompactListSuffix(labels, 'proficiency', 'proficiencies')
+}
+
+/** Compact summary label: "Light armor training", "Light armor, Medium armor training", etc. */
+export function formatArmorTrainingGrantCompact(
+  grant: ArmorTrainingGrant,
+  resolveArmorName?: (slug: string) => string | undefined,
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  return formatCompactListSuffix(
+    collectFixedArmorCompactLabels(grant, resolveArmorName),
+    'training',
+    'training',
+  )
 }
 
 /** Human-readable summary for weapon proficiency grant array item headers. */

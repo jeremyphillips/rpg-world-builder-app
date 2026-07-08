@@ -44,10 +44,14 @@
  * | `sense` | yes | yes | e.g. `Darkvision 120 ft` |
  * | `spells` | yes | yes | e.g. `Dancing Lights cantrip` |
  * | `movement` | yes | yes | e.g. `Walk speed +5 ft` |
- * | `resistances` | yes | no | follow-up |
- * | `languages` | yes | no | follow-up |
- * | proficiencies (`weaponProficiency`, `toolProficiency`, `skillProficiency`, `armorTraining`) | yes | no | follow-up |
- * | `equipment` | yes | no | follow-up |
+ * | `damageType` | yes | yes | e.g. `Acid damage type` |
+ * | `resistances` | yes | yes | e.g. `Acid resistance` |
+ * | `languages` | yes | yes | e.g. `Common language`, `Common, Elvish languages` |
+ * | `skillProficiency` | yes | yes | e.g. `Athletics proficiency` |
+ * | `toolProficiency` | yes | yes | e.g. `Thieves' Tools proficiency` |
+ * | `weaponProficiency` | yes | yes | e.g. `Simple weapons proficiency` |
+ * | `armorTraining` | yes | yes | e.g. `Light armor training` |
+ * | `equipment` | yes | yes | name only; services use `{Name} service` / `{A}, {B} services` |
  * | `featChoice` | yes | no | follow-up |
  * | unrecognized kind | — | fallback | `Additional benefit` when sole unsummarized item |
  *
@@ -57,10 +61,19 @@
  *   label builder yet (`kind: 'notRenderedYet'`). Formatters collapse these to `N more benefit(s)`.
  */
 import {
+  formatDamageTypeGrantCompact,
+  formatLanguageGrantCompact,
   formatMovementGrantCompact,
+  formatResistanceGrantCompact,
+  formatArmorTrainingGrantCompact,
+  formatEquipmentGrantCompact,
+  formatSkillProficiencyGrantCompact,
+  formatToolProficiencyGrantCompact,
+  formatWeaponProficiencyGrantCompact,
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
   type ContentGrant,
+  type EquipmentKind,
   type GrantGroup,
   type Spell,
 } from '@rpg/contracts'
@@ -71,6 +84,12 @@ export const GRANT_SUMMARY_JOIN = ' · ' as const
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
   resolveSpell: (slug: string) => { name: string; level: number } | undefined
+  resolveSkillName?: (id: string) => string | undefined
+  resolveToolName?: (slug: string) => string | undefined
+  resolveWeaponName?: (slug: string) => string | undefined
+  resolveArmorName?: (slug: string) => string | undefined
+  resolveEquipmentName?: (slug: string) => string | undefined
+  resolveEquipmentKind?: (slug: string) => EquipmentKind | undefined
 }
 
 export type GrantSummaryKind =
@@ -78,7 +97,11 @@ export type GrantSummaryKind =
   | 'spell'
   | 'cantrip'
   | 'proficiency'
+  | 'damageType'
   | 'resistance'
+  | 'language'
+  | 'training'
+  | 'equipment'
   | 'speed'
   | 'trait'
   | 'notRenderedYet'
@@ -196,55 +219,21 @@ function mapSpellGrantToItems(
   })
 }
 
-function mapGrantToItems(
-  grant: ContentGrant,
-  vocabulary: GrantDisplayVocabulary,
+function mapCompactProficiencyGrantToItems(
+  label: string | undefined,
   idPrefix: string,
+  sourceGrantKind: string,
+  summaryKind: Extract<GrantSummaryKind, 'proficiency' | 'training' | 'equipment'>,
   level: number,
 ): GrantSummaryItem[] {
-  if (grant.kind === 'sense') {
+  if (!label) {
     return [
       {
-        id: `${idPrefix}:sense`,
-        label: formatSenseCompactLabel(grant, vocabulary),
-        kind: 'sense',
-        supported: true,
-        sourceGrantKind: grant.kind,
-        level,
-      },
-    ]
-  }
-
-  if (grant.kind === 'spells') {
-    return mapSpellGrantToItems(grant, vocabulary, idPrefix, level)
-  }
-
-  if (grant.kind === 'movement') {
-    return [
-      {
-        id: `${idPrefix}:movement`,
-        label: formatMovementGrantCompact(grant),
-        kind: 'speed',
-        supported: true,
-        sourceGrantKind: grant.kind,
-        level,
-      },
-    ]
-  }
-
-  if (!isKnownGrantKind(grant.kind)) {
-    const rawKind =
-      typeof grant === 'object' && grant !== null && 'kind' in grant
-        ? String((grant as { kind: unknown }).kind)
-        : 'unknown'
-
-    return [
-      {
-        id: `${idPrefix}:unrecognized`,
+        id: `${idPrefix}:notRendered`,
         label: '',
-        kind: 'unrecognized',
+        kind: 'notRenderedYet',
         supported: false,
-        sourceGrantKind: rawKind,
+        sourceGrantKind,
         level,
       },
     ]
@@ -252,14 +241,214 @@ function mapGrantToItems(
 
   return [
     {
-      id: `${idPrefix}:${grant.kind}`,
-      label: '',
-      kind: 'notRenderedYet',
-      supported: false,
-      sourceGrantKind: grant.kind,
+      id: idPrefix,
+      label,
+      kind: summaryKind,
+      supported: true,
+      sourceGrantKind,
       level,
     },
   ]
+}
+
+function createSupportedGrantItems(
+  idPrefix: string,
+  suffix: string,
+  label: string,
+  kind: GrantSummaryKind,
+  sourceGrantKind: string,
+  level: number,
+): GrantSummaryItem[] {
+  return [
+    {
+      id: `${idPrefix}:${suffix}`,
+      label,
+      kind,
+      supported: true,
+      sourceGrantKind,
+      level,
+    },
+  ]
+}
+
+function mapUnrecognizedGrantToItems(
+  grant: unknown,
+  idPrefix: string,
+  level: number,
+): GrantSummaryItem[] {
+  const rawKind =
+    typeof grant === 'object' && grant !== null && 'kind' in grant
+      ? String((grant as { kind: unknown }).kind)
+      : 'unknown'
+
+  return [
+    {
+      id: `${idPrefix}:unrecognized`,
+      label: '',
+      kind: 'unrecognized',
+      supported: false,
+      sourceGrantKind: rawKind,
+      level,
+    },
+  ]
+}
+
+function mapNotRenderedGrantToItems(
+  sourceGrantKind: string,
+  idPrefix: string,
+  level: number,
+): GrantSummaryItem[] {
+  return [
+    {
+      id: `${idPrefix}:${sourceGrantKind}`,
+      label: '',
+      kind: 'notRenderedYet',
+      supported: false,
+      sourceGrantKind,
+      level,
+    },
+  ]
+}
+
+type GrantItemMapper = (
+  grant: ContentGrant,
+  vocabulary: GrantDisplayVocabulary,
+  idPrefix: string,
+  level: number,
+) => GrantSummaryItem[]
+
+const GRANT_ITEM_MAPPERS: Partial<Record<ContentGrant['kind'], GrantItemMapper>> = {
+  sense: (grant, vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'sense',
+      formatSenseCompactLabel(grant as Extract<ContentGrant, { kind: 'sense' }>, vocabulary),
+      'sense',
+      grant.kind,
+      level,
+    ),
+  spells: (grant, vocabulary, idPrefix, level) =>
+    mapSpellGrantToItems(
+      grant as Extract<ContentGrant, { kind: 'spells' }>,
+      vocabulary,
+      idPrefix,
+      level,
+    ),
+  movement: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'movement',
+      formatMovementGrantCompact(grant as Extract<ContentGrant, { kind: 'movement' }>),
+      'speed',
+      grant.kind,
+      level,
+    ),
+  damageType: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'damageType',
+      formatDamageTypeGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'damageType' }>).damageTypes,
+      ),
+      'damageType',
+      grant.kind,
+      level,
+    ),
+  resistances: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'resistances',
+      formatResistanceGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'resistances' }>).damageTypes,
+      ),
+      'resistance',
+      grant.kind,
+      level,
+    ),
+  languages: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'languages',
+      formatLanguageGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'languages' }>).languageIds,
+      ),
+      'language',
+      grant.kind,
+      level,
+    ),
+  skillProficiency: (grant, vocabulary, idPrefix, level) =>
+    mapCompactProficiencyGrantToItems(
+      formatSkillProficiencyGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'skillProficiency' }>).grant,
+        vocabulary.resolveSkillName,
+      ),
+      `${idPrefix}:skillProficiency`,
+      grant.kind,
+      'proficiency',
+      level,
+    ),
+  toolProficiency: (grant, vocabulary, idPrefix, level) =>
+    mapCompactProficiencyGrantToItems(
+      formatToolProficiencyGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'toolProficiency' }>).grant,
+        vocabulary.resolveToolName,
+      ),
+      `${idPrefix}:toolProficiency`,
+      grant.kind,
+      'proficiency',
+      level,
+    ),
+  weaponProficiency: (grant, vocabulary, idPrefix, level) =>
+    mapCompactProficiencyGrantToItems(
+      formatWeaponProficiencyGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'weaponProficiency' }>).grant,
+        vocabulary.resolveWeaponName,
+      ),
+      `${idPrefix}:weaponProficiency`,
+      grant.kind,
+      'proficiency',
+      level,
+    ),
+  armorTraining: (grant, vocabulary, idPrefix, level) =>
+    mapCompactProficiencyGrantToItems(
+      formatArmorTrainingGrantCompact(
+        (grant as Extract<ContentGrant, { kind: 'armorTraining' }>).grant,
+        vocabulary.resolveArmorName,
+      ),
+      `${idPrefix}:armorTraining`,
+      grant.kind,
+      'training',
+      level,
+    ),
+  equipment: (grant, vocabulary, idPrefix, level) =>
+    mapCompactProficiencyGrantToItems(
+      formatEquipmentGrantCompact((grant as Extract<ContentGrant, { kind: 'equipment' }>).grant, {
+        resolveEquipmentName: vocabulary.resolveEquipmentName,
+        resolveEquipmentKind: vocabulary.resolveEquipmentKind,
+      }),
+      `${idPrefix}:equipment`,
+      grant.kind,
+      'equipment',
+      level,
+    ),
+}
+
+function mapGrantToItems(
+  grant: ContentGrant,
+  vocabulary: GrantDisplayVocabulary,
+  idPrefix: string,
+  level: number,
+): GrantSummaryItem[] {
+  const mapper = GRANT_ITEM_MAPPERS[grant.kind]
+  if (mapper) {
+    return mapper(grant, vocabulary, idPrefix, level)
+  }
+
+  if (!isKnownGrantKind(grant.kind)) {
+    return mapUnrecognizedGrantToItems(grant, idPrefix, level)
+  }
+
+  return mapNotRenderedGrantToItems(grant.kind, idPrefix, level)
 }
 
 function formatSupportedItemLabel(item: GrantSummaryItem, includeTypeSuffix?: boolean): string {
