@@ -148,6 +148,9 @@ export {
   RadioCard,
   RadioCardItem,
   radioCardVariants,
+  RADIO_CARD_DEFAULT_DETAILS_LABEL,
+  RADIO_CARD_SUMMARY_SEPARATOR,
+  type RadioCardDensity,
   type RadioCardOption,
   type RadioCardProps,
   type RadioCardItemProps,
@@ -295,6 +298,14 @@ export {
 } from './components/ui/modal.variants'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
+export {
+  BuilderOptionDetailsSheet,
+  type BuilderOptionDetailsSheetProps,
+  type BuilderOptionDetailsMetadata,
+  type BuilderOptionDetailsSection,
+  type BuilderOptionDetailsSectionItem,
+} from './components/ui/builder-option-details-sheet.client'
+export type { BuilderOptionPrimaryActionPlacement } from './components/ui/builder-option-details-sheet.variants'
 export {
   CatalogPickerSheet,
   type CatalogPickerSheetProps,

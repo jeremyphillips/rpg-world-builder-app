@@ -9,6 +9,8 @@ export const headingVariants = cva('', {
       subsection: 'heading-style-subsection',
       group: 'heading-style-group',
       card: 'heading-style-card',
+      sheetTitle: 'heading-style-sheet-title',
+      sheetSection: 'heading-style-sheet-section',
       alert: 'heading-style-alert',
       nav: 'heading-style-nav',
       brand: 'heading-style-brand',
