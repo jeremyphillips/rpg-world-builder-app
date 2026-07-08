@@ -85,4 +85,31 @@ describe('BuilderOptionDetailsSheet', () => {
     const { container } = render(<BuilderOptionDetailsSheet {...baseProps} />)
     await expectNoAxeViolations(container)
   })
+
+  it('renders choice pool summary with a disclosure tooltip', async () => {
+    const user = userEvent.setup()
+    render(
+      <BuilderOptionDetailsSheet
+        {...baseProps}
+        sections={[
+          {
+            title: 'Proficiencies',
+            items: [
+              {
+                title: 'Skills',
+                optionPool: {
+                  summary: 'Choose 2 from 5 options',
+                  optionLabels: ['Acrobatics', 'Athletics', 'History'],
+                },
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Choose 2 from 5 options')).toBeInTheDocument()
+    await user.hover(screen.getByRole('button', { name: 'Skills options' }))
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Acrobatics, Athletics, History')
+  })
 })

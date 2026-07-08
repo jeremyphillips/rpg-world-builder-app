@@ -1,9 +1,7 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { getAbilityLabel, skillSlugsFromClassChoices } from '@rpg/contracts'
-import type { CharacterClass, SkillProficiency, Subclass } from '@rpg/contracts'
+import { type CharacterClass, type SkillProficiency, type Subclass } from '@rpg/contracts'
 
-import { ROUTES } from '@/app/routes'
 import { WidePage } from '@/components/layout/wide-page'
 import { useCampaignRules } from '@/features/campaign'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -13,36 +11,16 @@ import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
-import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
-import { FeatureItem } from '../lib/feature-item'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ClassProgressionTable } from '../components/class-progression-table'
+import { ClassProficienciesSection } from '../components/class-proficiencies-section.client'
+import { FeatureItem } from '../lib/feature-item'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
-
-const SUGGESTED_SKILL_CHIP_CLASS =
-  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
-
-function FeaturesList({
-  className,
-  features,
-}: {
-  className: string
-  features: CharacterClass['features']
-}) {
-  const sorted = [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
-  return (
-    <section aria-labelledby="features-heading">
-      <Heading variant="section" as="h2" id="features-heading" className="mb-4">
-        {className} Class Features
-      </Heading>
-      <ul className="space-y-4" role="list">
-        {sorted.map((feature) => (
-          <FeatureItem key={feature.id} feature={feature} />
-        ))}
-      </ul>
-    </section>
-  )
-}
+import {
+  buildClassDetailViewModel,
+  type ClassDetailViewModel,
+  type ClassFeatureDetailItem,
+} from '../lib/class-display'
 
 function SubclassFeaturesList({ features }: { features: Subclass['features'] }) {
   if (features.length === 0) return null
@@ -83,81 +61,67 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   )
 }
 
-function titleCase(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-function SuggestedProficienciesList({
-  campaignId,
-  choose,
-  skillSlugs,
-  skillProficiencies,
-  isPending,
+function ClassFeaturesSection({
+  section,
 }: {
-  campaignId: string
-  choose: number
-  skillSlugs: string[]
-  skillProficiencies: SkillProficiency[]
-  isPending: boolean
+  section: Extract<ClassDetailViewModel['sections'][number], { id: 'features' }>
 }) {
-  if (!isPending && skillSlugs.length === 0) return null
-
-  const skillsBySlug = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
-
   return (
-    <section aria-labelledby="suggested-proficiencies-heading">
-      <Heading variant="section" as="h2" id="suggested-proficiencies-heading" className="mb-3">
-        Suggested proficiencies
+    <section aria-labelledby="features-heading">
+      <Heading variant="section" as="h2" id="features-heading" className="mb-4">
+        {section.title}
       </Heading>
-      <Text variant="muted" className="mb-3">
-        Choose {choose}
-      </Text>
-      {isPending ? (
-        <Text variant="muted">Loading…</Text>
-      ) : (
-        <ul className="flex flex-wrap gap-2" role="list">
-          {skillSlugs.map((slug) => {
-            const skill = skillsBySlug.get(slug)
-            return (
-              <li key={slug}>
-                {skill ? (
-                  <Link
-                    to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}
-                    className={SUGGESTED_SKILL_CHIP_CLASS}
-                  >
-                    {skill.name}
-                  </Link>
-                ) : (
-                  <span className={SUGGESTED_SKILL_CHIP_CLASS}>{slug}</span>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      <ul className="space-y-4" role="list">
+        {section.items.map((item) => (
+          <ClassFeatureItem key={item.id} item={item} />
+        ))}
+      </ul>
     </section>
   )
 }
 
-function ClassStatsSection({ characterClass }: { characterClass: CharacterClass }) {
-  const { hitDie, primaryAbilities, proficiencies } = characterClass
-
-  const primaryAbilitiesLabel = primaryAbilities.map(getAbilityLabel).join(', ')
-  const savingThrowsLabel = proficiencies.savingThrows.map(getAbilityLabel).join(', ')
-  const weaponsLabel = proficiencies.weapons.categories.map(titleCase).join(', ')
-  const armorLabel =
-    proficiencies.armor.categories.length > 0
-      ? proficiencies.armor.categories.map(titleCase).join(', ')
-      : 'None'
-
+function ClassFeatureItem({ item }: { item: ClassFeatureDetailItem }) {
   return (
-    <div className="space-y-3">
-      <ContentStatRow label="Hit Die" value={`d${hitDie} per level`} />
-      <ContentStatRow label="Primary Abilities" value={primaryAbilitiesLabel} />
-      <ContentStatRow label="Saving Throws" value={savingThrowsLabel} />
-      <ContentStatRow label="Weapon Proficiencies" value={weaponsLabel} />
-      <ContentStatRow label="Armor Training" value={armorLabel} />
-    </div>
+    <FeatureItem
+      feature={{
+        level: item.level,
+        name: item.title,
+        description: item.bodyHtml,
+      }}
+    />
+  )
+}
+
+function ClassDetailSections({
+  sections,
+  campaignId,
+  skillProficiencies,
+  skillsPending,
+  vocabulary,
+}: {
+  sections: ClassDetailViewModel['sections']
+  campaignId: string
+  skillProficiencies: ClassDetailContentProps['skillProficiencies']
+  skillsPending: boolean
+  vocabulary: { resolveToolLabel: (slug: string) => string }
+}) {
+  return (
+    <>
+      {sections.map((section) =>
+        section.id === 'proficiencies' ? (
+          <ClassProficienciesSection
+            key={section.id}
+            section={section}
+            campaignId={campaignId}
+            skillProficiencies={skillProficiencies}
+            skillsPending={skillsPending}
+            vocabulary={vocabulary}
+          />
+        ) : (
+          <ClassFeaturesSection key={section.id} section={section} />
+        ),
+      )}
+    </>
   )
 }
 
@@ -168,6 +132,7 @@ type ClassDetailContentProps = {
   subclasses: Subclass[]
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  showProgressionTable?: boolean
 }
 
 export function ClassDetailContent({
@@ -177,6 +142,7 @@ export function ClassDetailContent({
   subclasses,
   skillProficiencies,
   skillsPending,
+  showProgressionTable = true,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
   const campaignRules = useCampaignRules(campaignId)
@@ -184,6 +150,19 @@ export function ClassDetailContent({
   const visibleFeatures = subclassingEnabled
     ? characterClass.features
     : characterClass.features.filter((feature) => !isSubclassChoiceFeatureRow(feature))
+
+  const vocabulary = {
+    resolveToolLabel: (slug: string) =>
+      slug
+        .split('-')
+        .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
+        .join(' '),
+  }
+
+  const viewModel = buildClassDetailViewModel(characterClass, vocabulary, {
+    surface: 'content-detail',
+    features: visibleFeatures,
+  })
 
   return (
     <WidePage spacing="relaxed">
@@ -193,28 +172,25 @@ export function ClassDetailContent({
         imageName={characterClass.name}
         campaignId={campaignId}
         editHref={contentEditHref('classes', campaignId, classId)}
-        metadata={<ClassStatsSection characterClass={characterClass} />}
+        statRows={viewModel.statRows}
         descriptionContent={
-          characterClass.description ? (
-            <RichTextContent html={characterClass.description} size="md" tone="muted" />
+          viewModel.descriptionHtml ? (
+            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
           ) : undefined
         }
       >
-        <SuggestedProficienciesList
+        <ClassDetailSections
+          sections={viewModel.sections}
           campaignId={campaignId}
-          choose={
-            characterClass.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose ?? 0
-          }
-          skillSlugs={skillSlugsFromClassChoices(characterClass)}
           skillProficiencies={skillProficiencies}
-          isPending={skillsPending}
+          skillsPending={skillsPending}
+          vocabulary={vocabulary}
         />
-        {visibleFeatures.length > 0 && (
-          <FeaturesList className={characterClass.name} features={visibleFeatures} />
-        )}
         {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
       </ContentDetailLayout>
-      <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
+      {showProgressionTable ? (
+        <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
+      ) : null}
     </WidePage>
   )
 }

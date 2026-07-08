@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   resolveAvailableContent,
@@ -8,10 +8,16 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
-import { RadioCard, Text } from '@rpg/ui'
+import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
-import { formatClassCardOption } from '../../lib/builder-option-display.lib'
+import {
+  buildClassDetailsSheetContent,
+  formatClassCardOption,
+} from '../../lib/builder-option-display.lib'
 import { BuilderStepFrame } from './builder-step-frame.client'
+
+const SELECT_CLASS_ACTION_LABEL = 'Select class'
+const SELECTED_CLASS_LABEL = 'Selected'
 
 export type ClassStepProps = {
   context: CharacterBuildContext
@@ -21,13 +27,31 @@ export type ClassStepProps = {
 }
 
 export function ClassStep({ context, draft, validationIssues, onDraftChange }: ClassStepProps) {
-  const options = useMemo(() => {
-    const { classes } = resolveAvailableContent(context)
-    return classes.map((entry) => ({
-      value: entry.id,
-      ...formatClassCardOption(entry),
-    }))
-  }, [context])
+  const [detailsClassId, setDetailsClassId] = useState<string | null>(null)
+
+  const classes = useMemo(() => resolveAvailableContent(context).classes, [context])
+
+  const options = useMemo(
+    () =>
+      classes.map((entry) => ({
+        value: entry.id,
+        ...formatClassCardOption(entry),
+        onDetails: () => setDetailsClassId(entry.id),
+      })),
+    [classes],
+  )
+
+  const detailsClass = useMemo(
+    () => classes.find((entry) => entry.id === detailsClassId) ?? null,
+    [classes, detailsClassId],
+  )
+
+  const detailsContent = useMemo(() => {
+    if (!detailsClass) return null
+    return buildClassDetailsSheetContent(detailsClass, context.catalog)
+  }, [context.catalog, detailsClass])
+
+  const isDetailsClassSelected = detailsClassId != null && draft.class.classId === detailsClassId
 
   if (options.length === 0) {
     return (
@@ -53,6 +77,40 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
         options={options}
         idPrefix="character-builder-class"
       />
+
+      {detailsContent ? (
+        <BuilderOptionDetailsSheet
+          open={detailsClassId != null}
+          onOpenChange={(open) => {
+            if (!open) setDetailsClassId(null)
+          }}
+          title={detailsContent.title}
+          eyebrow={detailsContent.eyebrow}
+          descriptionHtml={detailsContent.descriptionHtml}
+          metadata={detailsContent.metadata}
+          sections={detailsContent.sections}
+          primaryAction={
+            isDetailsClassSelected ? (
+              <Badge variant="secondary">{SELECTED_CLASS_LABEL}</Badge>
+            ) : (
+              <Button
+                onClick={() => {
+                  if (!detailsClassId) return
+                  onDraftChange({
+                    class: {
+                      ...draft.class,
+                      classId: detailsClassId,
+                    },
+                  })
+                  setDetailsClassId(null)
+                }}
+              >
+                {SELECT_CLASS_ACTION_LABEL}
+              </Button>
+            )
+          }
+        />
+      ) : null}
     </BuilderStepFrame>
   )
 }

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_SYSTEM_RULESET_ID, type Species } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
+import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
+
 import {
   buildSpeciesDetailsSheetContent,
   formatClassCardOption,
@@ -50,7 +52,7 @@ describe('builder-option-display.lib', () => {
     })
   })
 
-  it('builds species detail sheet metadata, traits, and language affinities', () => {
+  it('builds species detail sheet metadata, traits, language affinities, and senses', () => {
     const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
     const content = buildSpeciesDetailsSheetContent(dwarfWithTraits, languages)
     const dwarvishLabel =
@@ -60,13 +62,14 @@ describe('builder-option-display.lib', () => {
     expect(content.eyebrow).toBe('Species')
     expect(content.metadata).toEqual(
       expect.arrayContaining([
-        { label: 'Creature Type', value: 'Humanoid' },
-        { label: 'Size', value: 'Medium' },
-        { label: 'Speed', value: '30 ft.' },
-        { label: 'Language affinities', value: dwarvishLabel },
+        { label: SPECIES_STAT_LABELS.creatureType, value: 'Humanoid' },
+        { label: SPECIES_STAT_LABELS.size, value: 'Medium' },
+        { label: SPECIES_STAT_LABELS.speed, value: '30 ft.' },
+        { label: SPECIES_STAT_LABELS.senses, value: 'Darkvision 120 ft.' },
+        { label: SPECIES_STAT_LABELS.languageAffinities, value: dwarvishLabel },
       ]),
     )
-    expect(content.sections[0]?.title).toBe('Traits')
+    expect(content.sections[0]?.title).toBe(SPECIES_SECTION_LABELS.traits)
     expect(content.sections[0]?.items?.[0]?.title).toBe('Darkvision')
     expect(content.sections[0]?.items?.[1]?.title).toBe('Dwarven Resilience')
   })

@@ -139,3 +139,68 @@ export const MetadataOnly: Story = {
     )
   },
 }
+
+export const ClassProficiencyChoices: Story = {
+  args: {
+    title: 'Fighter',
+    eyebrow: 'Class',
+    descriptionHtml: '<p>A master of martial combat.</p>',
+    metadata: [
+      { label: 'Hit Die', value: 'd10' },
+      { label: 'Primary Abilities', value: 'Strength, Dexterity' },
+      { label: 'Saving Throws', value: 'Strength, Constitution' },
+    ],
+    sections: [
+      {
+        title: 'Proficiencies',
+        items: [
+          {
+            title: 'Armor Training',
+            body: 'Light armor, Medium armor, Heavy armor, Shields',
+          },
+          {
+            title: 'Weapons',
+            body: 'Simple weapons, Martial weapons',
+          },
+          {
+            title: 'Skills',
+            optionPool: {
+              summary: 'Choose 2 from 5 options',
+              optionLabels: ['Acrobatics', 'Athletics', 'History', 'Intimidation', 'Perception'],
+            },
+          },
+        ],
+      },
+      {
+        title: 'Fighter Class Features',
+        items: [
+          {
+            title: 'Fighting Style',
+            body: '<p>You gain a Fighting Style feat of your choice.</p>',
+          },
+          {
+            title: 'Second Wind',
+            body: '<p>Regain hit points as a Bonus Action.</p>',
+          },
+        ],
+      },
+    ],
+  },
+  render: function Render(args) {
+    const [open, setOpen] = useState(false)
+
+    return (
+      <>
+        <Button className="m-8" onClick={() => setOpen(true)}>
+          Open class details
+        </Button>
+        <BuilderOptionDetailsSheet
+          {...args}
+          open={open}
+          onOpenChange={setOpen}
+          primaryAction={<Button onClick={() => setOpen(false)}>Select class</Button>}
+        />
+      </>
+    )
+  },
+}

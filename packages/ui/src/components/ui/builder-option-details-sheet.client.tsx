@@ -8,6 +8,7 @@ import { headingVariants } from './heading.variants'
 import { RichTextContent } from './rich-text-content'
 import { Sheet } from './sheet.client'
 import { Text } from './text'
+import { InfoTooltip } from './tooltip.client'
 import {
   builderOptionDetailsMetadataListVariants,
   builderOptionDetailsSectionVariants,
@@ -23,6 +24,10 @@ export type BuilderOptionDetailsSectionItem = {
   title: string
   body?: React.ReactNode
   metadata?: string[]
+  optionPool?: {
+    summary: string
+    optionLabels: string[]
+  }
 }
 
 export type BuilderOptionDetailsSection = {
@@ -70,7 +75,16 @@ function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
           {item.metadata.join(' · ')}
         </Text>
       ) : null}
-      {item.body ? (
+      {item.optionPool ? (
+        <div className="flex flex-wrap items-center gap-x-1 gap-y-1">
+          <Text variant="muted" as="span">
+            {item.optionPool.summary}
+          </Text>
+          <InfoTooltip aria-label={`${item.title} options`}>
+            {item.optionPool.optionLabels.join(', ')}
+          </InfoTooltip>
+        </div>
+      ) : item.body ? (
         typeof item.body === 'string' ? (
           <RichTextContent html={item.body} size="md" tone="muted" />
         ) : (

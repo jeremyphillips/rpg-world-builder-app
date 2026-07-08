@@ -13,17 +13,18 @@ Delete-locking is **derived** because species traits and heritage have no per-ro
 
 ## Key files
 
-| Area                               | Path                                                                                                                  |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Form def                           | `lib/species-form-def.ts`                                                                                             |
-| Form fields / values               | `lib/species-form-fields.ts`, `species-form-values.ts`                                                                |
-| Trait row fields / values / labels | `lib/species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts`                    |
-| Heritage fields / values / labels  | `lib/species-heritage-form-fields.ts`, `species-heritage-form-values.ts`, `species-heritage-form-labels.ts`           |
-| Rules tab fields / values / labels | `lib/species-rules-form-fields.ts`, `species-rules-form-values.ts`, `species-rules-form-labels.ts`                    |
-| Creature type field options        | `lib/creature-type-field-options.ts`                                                                                  |
-| Shared master-detail lock helper   | [`content/lib/master-detail/is-embedded-row-system-locked.ts`](../lib/master-detail/is-embedded-row-system-locked.ts) |
-| Traits tab (master-detail)         | `components/species-traits-tab.client.tsx`                                                                            |
-| Heritage tab (master-detail)       | `components/species-heritage-tab.client.tsx`                                                                          |
+| Area                                | Path                                                                                                                  |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Form def                            | `lib/species-form-def.ts`                                                                                             |
+| Form fields / values                | `lib/species-form-fields.ts`, `species-form-values.ts`                                                                |
+| Trait row fields / values / labels  | `lib/species-trait-form-fields.ts`, `species-trait-form-values.ts`, `species-trait-form-labels.ts`                    |
+| Heritage fields / values / labels   | `lib/species-heritage-form-fields.ts`, `species-heritage-form-values.ts`, `species-heritage-form-labels.ts`           |
+| Rules tab fields / values / labels  | `lib/species-rules-form-fields.ts`, `species-rules-form-values.ts`, `species-rules-form-labels.ts`                    |
+| Creature type field options         | `lib/creature-type-field-options.ts`                                                                                  |
+| Display registry (detail + builder) | `lib/species-display.ts` — labels and view models for detail route, builder sheet, and overview filter                |
+| Shared master-detail lock helper    | [`content/lib/master-detail/is-embedded-row-system-locked.ts`](../lib/master-detail/is-embedded-row-system-locked.ts) |
+| Traits tab (master-detail)          | `components/species-traits-tab.client.tsx`                                                                            |
+| Heritage tab (master-detail)        | `components/species-heritage-tab.client.tsx`                                                                          |
 
 ## Related docs
 
