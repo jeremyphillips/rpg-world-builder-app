@@ -36,7 +36,7 @@ function toHomebrewSpecies(doc: HomebrewDoc): Species {
     ...(record.description !== undefined && { description: record.description }),
     creatureType: record.creatureType,
     sizes: record.sizes ?? [],
-    speed: record.speed as Species['speed'],
+    movement: record.movement as Species['movement'],
     traits: (record.traits ?? []) as Species['traits'],
     ...(record.heritage != null && {
       heritage: record.heritage as Species['heritage'],

@@ -1,7 +1,8 @@
 import {
   flattenGrantGroups,
-  formatSpeed,
+  formatMovementDisplay,
   getCreatureSizeLabel,
+  resolveCreatureMovement,
   resolveGrantGroupsFromContent,
   resolveTraitDisplay,
   type Species,
@@ -19,7 +20,7 @@ import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 export const SPECIES_STAT_LABELS = {
   creatureType: 'Creature Type',
   size: 'Size',
-  speed: 'Speed',
+  movement: 'Movement',
   senses: 'Senses',
   languageAffinities: 'Language affinities',
 } as const
@@ -89,8 +90,8 @@ function buildSpeciesStatRows(
       value: species.sizes.map(getCreatureSizeLabel).join(' or '),
     },
     {
-      label: SPECIES_STAT_LABELS.speed,
-      value: formatSpeed(species.speed),
+      label: SPECIES_STAT_LABELS.movement,
+      value: formatMovementDisplay(resolveCreatureMovement(species)),
     },
     {
       label: SPECIES_STAT_LABELS.senses,

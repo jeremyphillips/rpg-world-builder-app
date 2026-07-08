@@ -160,7 +160,7 @@ describe('SRD 5.2.1 species seed', () => {
 
   it('Goliath has speed 35', () => {
     const goliath = species.find((s) => s.slug === 'goliath')!
-    expect(goliath.speed.walk).toBe(35)
+    expect(goliath.movement.walk).toBe(35)
   })
 
   it('Dwarf grants poison resistance', () => {

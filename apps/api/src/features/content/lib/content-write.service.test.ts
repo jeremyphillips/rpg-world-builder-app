@@ -484,7 +484,7 @@ describe('createHomebrewContent (species)', () => {
     name: 'Custom Folk',
     creatureType: 'humanoid',
     sizes: ['medium'],
-    speed: { walk: 30 },
+    movement: { walk: 30 },
     traits: [],
   }
 

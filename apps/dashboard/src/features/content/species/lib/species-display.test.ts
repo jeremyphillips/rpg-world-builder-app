@@ -77,7 +77,7 @@ describe('species-display', () => {
     expect(statRows).toEqual([
       { label: SPECIES_STAT_LABELS.creatureType, value: 'Humanoid' },
       { label: SPECIES_STAT_LABELS.size, value: 'Medium' },
-      { label: SPECIES_STAT_LABELS.speed, value: '30 ft.' },
+      { label: SPECIES_STAT_LABELS.movement, value: 'Walk 30 ft' },
       { label: SPECIES_STAT_LABELS.senses, value: 'Darkvision 120 ft.' },
       { label: SPECIES_STAT_LABELS.languageAffinities, value: dwarvishLabel },
     ])

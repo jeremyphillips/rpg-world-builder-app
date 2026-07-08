@@ -25,7 +25,7 @@ const humanWithoutAffinities = {
   description: '<p>Versatile.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   traits: [],
 } as const satisfies Species
 
@@ -41,7 +41,7 @@ const dragonbornWithDraconic = {
   description: '<p>Draconic ancestry.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   languageAffinities: ['draconic'],
   traits: [],
 } as const satisfies Species

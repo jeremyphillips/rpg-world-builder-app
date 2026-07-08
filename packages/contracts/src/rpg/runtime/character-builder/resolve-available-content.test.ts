@@ -49,7 +49,7 @@ function makeSpecies(slug: string, creatureType: Species['creatureType']): Speci
     description: `<p>${slug}</p>`,
     creatureType,
     sizes: ['medium'],
-    speed: { walk: 30 },
+    movement: { walk: 30 },
     traits: [],
   }
 }

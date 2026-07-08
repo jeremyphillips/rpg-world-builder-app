@@ -8,13 +8,14 @@ import {
   formatMovementBonusAuthoringSummary,
   formatMovementBonusDescription,
   formatMovementBonusTitle,
-  formatSpeed,
+  formatMovementDisplay,
   getMovementModeEntry,
   getMovementModeGrantLabel,
   getMovementModeLabel,
   movementGrantPayloadSchema,
   movementModeSchema,
-  speedSchema,
+  movementSpeedsSchema,
+  resolveCreatureMovement,
 } from './movement-mode'
 
 describe('movementModeSchema', () => {
@@ -39,37 +40,31 @@ describe('extraMovementModeSchema', () => {
   })
 })
 
-describe('speedSchema', () => {
-  it('accepts walk-only speed', () => {
-    expect(speedSchema.parse({ walk: 30 })).toEqual({ walk: 30 })
+describe('movementSpeedsSchema', () => {
+  it('accepts walk-only movement', () => {
+    expect(movementSpeedsSchema.parse({ walk: 30 })).toEqual({ walk: 30 })
   })
 
-  it('accepts walk plus extra modes', () => {
-    expect(
-      speedSchema.parse({
-        walk: 30,
-        modes: [
-          { mode: 'fly', feet: 60 },
-          { mode: 'swim', feet: 30 },
-        ],
-      }),
-    ).toEqual({
+  it('accepts multiple modes without requiring walk', () => {
+    expect(movementSpeedsSchema.parse({ walk: 30, fly: 60 })).toEqual({ walk: 30, fly: 60 })
+    expect(movementSpeedsSchema.parse({ fly: 60 })).toEqual({ fly: 60 })
+  })
+
+  it('rejects an empty movement map', () => {
+    expect(movementSpeedsSchema.safeParse({}).success).toBe(false)
+  })
+
+  it('rejects unknown mode keys', () => {
+    expect(movementSpeedsSchema.safeParse({ teleport: 30 }).success).toBe(false)
+  })
+})
+
+describe('resolveCreatureMovement', () => {
+  it('returns movement modes in canonical order', () => {
+    expect(resolveCreatureMovement({ movement: { fly: 60, walk: 30 } })).toEqual({
       walk: 30,
-      modes: [
-        { mode: 'fly', feet: 60 },
-        { mode: 'swim', feet: 30 },
-      ],
+      fly: 60,
     })
-  })
-
-  it('rejects missing walk', () => {
-    expect(speedSchema.safeParse({ modes: [{ mode: 'fly', feet: 60 }] }).success).toBe(false)
-  })
-
-  it('rejects walk in modes array', () => {
-    expect(speedSchema.safeParse({ walk: 30, modes: [{ mode: 'walk', feet: 30 }] }).success).toBe(
-      false,
-    )
   })
 })
 
@@ -129,20 +124,18 @@ describe('movement grant vocabulary', () => {
   })
 })
 
-describe('formatSpeed', () => {
-  it('formats walk-only speed', () => {
-    expect(formatSpeed({ walk: 30 })).toBe('30 ft.')
+describe('formatMovementDisplay', () => {
+  it('formats walk-only movement', () => {
+    expect(formatMovementDisplay({ walk: 30 })).toBe('Walk 30 ft')
   })
 
-  it('formats walk plus extra modes', () => {
-    expect(
-      formatSpeed({
-        walk: 30,
-        modes: [
-          { mode: 'fly', feet: 60 },
-          { mode: 'swim', feet: 30 },
-        ],
-      }),
-    ).toBe('30 ft., Fly 60 ft., Swim 30 ft.')
+  it('formats multiple modes in canonical order', () => {
+    expect(formatMovementDisplay({ walk: 30, fly: 60, swim: 30 })).toBe(
+      'Walk 30 ft, Fly 60 ft, Swim 30 ft',
+    )
+  })
+
+  it('formats fly-only movement', () => {
+    expect(formatMovementDisplay({ fly: 60 })).toBe('Fly 60 ft')
   })
 })

@@ -13,7 +13,7 @@ const ELF_BODY = {
   imageKey: '/assets/system/species/elf.webp',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   traits: [
     {
       kind: 'grant' as const,
@@ -96,8 +96,8 @@ describe('speciesSchema', () => {
     const { creatureType: _creatureType, ...missingType } = ELF_SYSTEM
     expect(speciesSchema.safeParse(missingType).success).toBe(false)
 
-    const { speed: _speed, ...missingSpeed } = ELF_SYSTEM
-    expect(speciesSchema.safeParse(missingSpeed).success).toBe(false)
+    const { movement: _movement, ...missingMovement } = ELF_SYSTEM
+    expect(speciesSchema.safeParse(missingMovement).success).toBe(false)
 
     expect(speciesSchema.safeParse({ ...ELF_SYSTEM, sizes: [] }).success).toBe(false)
   })
@@ -145,7 +145,7 @@ describe('createSpeciesInputSchema', () => {
 describe('updateSpeciesInputSchema', () => {
   it('allows partial updates', () => {
     expect(updateSpeciesInputSchema.safeParse({}).success).toBe(true)
-    expect(updateSpeciesInputSchema.safeParse({ speed: { walk: 25 } }).success).toBe(true)
+    expect(updateSpeciesInputSchema.safeParse({ movement: { walk: 25 } }).success).toBe(true)
   })
 })
 
@@ -155,7 +155,7 @@ describe('speciesPatchSchema', () => {
       id: 'patch-1',
       createdAt: '2024-05-21T00:00:00.000Z',
       updatedAt: '2024-05-21T00:00:00.000Z',
-      patch: { speed: { walk: 25 } },
+      patch: { movement: { walk: 25 } },
     }
     expect(speciesPatchSchema.safeParse(base).success).toBe(false)
     expect(

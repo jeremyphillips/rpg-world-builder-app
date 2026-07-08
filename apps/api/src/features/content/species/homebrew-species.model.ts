@@ -58,7 +58,7 @@ const homebrewSpeciesSchema = new Schema(
     ...homebrewContentIdentityFields,
     creatureType: { type: String, required: true, trim: true },
     sizes: [{ type: String, enum: [...CREATURE_SIZES] }],
-    speed: { type: Schema.Types.Mixed, required: true },
+    movement: { type: Schema.Types.Mixed, required: true },
     traits: { type: [Schema.Types.Mixed], default: [] },
     heritage: { type: Schema.Types.Mixed },
     characterCreation: { type: speciesCharacterCreationSchema, default: undefined },

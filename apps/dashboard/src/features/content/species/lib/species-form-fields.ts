@@ -14,10 +14,7 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { buildActiveLanguageFieldOptions, vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
-import {
-  feetInputUnitField,
-  identityFields,
-} from '../../lib/forms/fields/content-identity-form-fields'
+import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
@@ -37,6 +34,11 @@ import {
 import { heritageFormSchema } from './species-heritage-form-fields'
 import { speciesCharacterCreationFormSchema } from './species-rules-form-fields'
 import { refineSpeciesCharacterCreationForm } from './species-rules-form-values'
+import {
+  movementArrayField,
+  movementRowFormSchema,
+  refineSpeciesMovementRows,
+} from './species-movement-form-fields'
 import { traitItemFields, traitRowFormSchema } from './species-trait-form-fields'
 
 const creatureSizeOptions = toOptions(
@@ -73,9 +75,7 @@ export function createSpeciesFormSchema(
       description: z.string().optional(),
       creatureType: creatureTypeSchema,
       sizes: z.array(creatureSizeSchema).min(1),
-      speed: z.object({
-        walk: z.coerce.number().int().min(0),
-      }),
+      movement: z.array(movementRowFormSchema).min(1),
       languageAffinities: z.array(z.string()).optional(),
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
@@ -96,6 +96,7 @@ export function createSpeciesFormSchema(
           path: ['creatureType'],
         })
       }
+      refineSpeciesMovementRows(values.movement, ctx)
       refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
     })
 }
@@ -115,13 +116,9 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           width: 'lg',
         }),
-        feetInputUnitField('speed.walk', 'Walk speed', {
-          required: true,
-          width: 'auto',
-          defaultValue: 30,
-        }),
       ],
     },
+    movementArrayField(),
     {
       type: 'chips',
       name: 'languageAffinities',

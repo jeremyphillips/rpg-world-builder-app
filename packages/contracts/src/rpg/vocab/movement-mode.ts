@@ -5,8 +5,7 @@ import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Movement modes — the closed SRD 5.2.1 movement types shared by species,
-// monsters, and any creature with a speed block. `walk` is the baseline mode
-// every creature has; extra modes are modeled as `{ mode, feet }` entries.
+// monsters, and any creature with a movement block.
 // ---------------------------------------------------------------------------
 
 export const MOVEMENT_MODE_ENTRIES = {
@@ -88,32 +87,80 @@ export function getMovementModeLabel(id: string): string {
 /** Speed in feet for a single movement mode. */
 export const speedFeetSchema = z.number().int().min(0)
 
-/** An extra movement mode and its speed in feet (e.g. Fly 60 ft). */
-export const movementSpeedSchema = z.object({
-  mode: extraMovementModeSchema,
-  feet: speedFeetSchema,
-})
+/**
+ * Preset baseline movement speeds (in feet) shown as a select in authoring UIs.
+ * 5-foot increments through 120 ft — covers common species and monster speeds.
+ */
+export const MOVEMENT_SPEED_FEET = [
+  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115,
+  120,
+] as const
 
-export type MovementSpeed = z.infer<typeof movementSpeedSchema>
+export type MovementSpeedFeet = (typeof MOVEMENT_SPEED_FEET)[number]
+
+export const movementSpeedFeetSchema = z.union(
+  MOVEMENT_SPEED_FEET.map((feet) => z.literal(feet)) as [
+    z.ZodLiteral<MovementSpeedFeet>,
+    z.ZodLiteral<MovementSpeedFeet>,
+    ...z.ZodLiteral<MovementSpeedFeet>[],
+  ],
+)
 
 /**
- * Creature movement speeds. `walk` is always present; additional modes are
- * listed in `modes` when the creature has them. Reused (as a partial) for
- * lineage overrides.
+ * Canonical creature movement map. At least one mode is required; `walk` is not
+ * mandated — flying-only or burrowing-only creatures are valid.
  */
-export const speedSchema = z.object({
-  walk: speedFeetSchema,
-  modes: z.array(movementSpeedSchema).optional(),
-})
+export type MovementSpeeds = Partial<Record<MovementMode, number>>
 
-export type Speed = z.infer<typeof speedSchema>
+export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
+  .record(z.string(), speedFeetSchema)
+  .superRefine((movement, ctx) => {
+    const keys = Object.keys(movement)
+    if (keys.length < 1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'At least one movement mode is required.',
+      })
+      return
+    }
+    for (const key of keys) {
+      if (!movementModeSchema.safeParse(key).success) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Invalid movement mode: ${key}`,
+          path: [key],
+        })
+      }
+    }
+  })
+
+export type CreatureLikeMovement = {
+  movement: MovementSpeeds
+}
+
+/** Normalizes movement for any creature-like content record. */
+export function resolveCreatureMovement(entity: CreatureLikeMovement): MovementSpeeds {
+  const result: Partial<Record<MovementMode, number>> = {}
+  for (const mode of MOVEMENT_MODES) {
+    const feet = entity.movement[mode]
+    if (feet !== undefined) {
+      result[mode] = feet
+    }
+  }
+  return result as MovementSpeeds
+}
 
 /**
- * Preset walk-speed values (in feet) shown as a select in authoring UIs. The
- * underlying schema stays numeric — these presets are a UI affordance only.
+ * Dashboard detail/overview formatter (mode-labeled, readable).
+ *
+ * @example formatMovementDisplay({ walk: 30 }) // → "Walk 30 ft"
+ * @example formatMovementDisplay({ walk: 30, fly: 60 }) // → "Walk 30 ft, Fly 60 ft"
  */
-export const STANDARD_SPEEDS = [20, 25, 30, 35, 40] as const
-export type StandardSpeed = (typeof STANDARD_SPEEDS)[number]
+export function formatMovementDisplay(speeds: MovementSpeeds): string {
+  return MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
+    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ft`)
+    .join(', ')
+}
 
 // ---------------------------------------------------------------------------
 // Movement grants — bonus speed from traits and features
@@ -182,17 +229,4 @@ export function formatMovementBonusDescription(grant: MovementGrantPayload): str
 /** Authoring summary for grant rows: "Character's walking speed increases by 5 ft." */
 export function formatMovementBonusAuthoringSummary(grant: MovementGrantPayload): string {
   return `Character's ${getMovementModeGrantPhrase(grant.mode)} increases by ${grant.value} ft.`
-}
-
-/**
- * Human-readable speed string (e.g. "30 ft." or "30 ft., Fly 60 ft.").
- *
- * @example formatSpeed({ walk: 30 }) // → "30 ft."
- * @example formatSpeed({ walk: 30, modes: [{ mode: 'fly', feet: 60 }] }) // → "30 ft., Fly 60 ft."
- */
-export function formatSpeed(speed: Speed): string {
-  const extras = (speed.modes ?? []).map(
-    ({ mode, feet }) => `${getMovementModeLabel(mode)} ${feet} ft.`,
-  )
-  return [`${speed.walk} ft.`, ...extras].join(', ')
 }

@@ -8,7 +8,7 @@ import {
 } from './lib/envelope'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { speedSchema } from '../vocab/movement-mode'
+import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { contentNamedChoiceSchema } from './lib/choice'
 import {
   contentGrantsSchema,
@@ -73,7 +73,7 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   creatureType: creatureTypeSchema,
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
-  speed: speedSchema,
+  movement: movementSpeedsSchema,
   /**
    * Recommended language ids for origin picks. Marks selectable ChoiceSet options
    * as recommended in the UI; does not grant languages or expand selectable pools.
