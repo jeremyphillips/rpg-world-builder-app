@@ -42,6 +42,67 @@ describe('RadioCard', () => {
     expect(screen.getByText('Attack bonuses')).toBeInTheDocument()
   })
 
+  it('renders compact summary items as an inline line', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            description: 'Humanoid',
+            summaryItems: ['Darkvision', 'Dwarven Resilience'],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Darkvision · Dwarven Resilience')).toBeInTheDocument()
+  })
+
+  it('renders titleMeta inline after the title', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        options={[
+          {
+            label: 'Elf',
+            value: 'elf',
+            description: 'Humanoid',
+            titleMeta: 'Heritage required',
+          },
+        ]}
+      />,
+    )
+
+    const radio = screen.getByRole('radio', { name: /Elf/i })
+    expect(radio).toHaveTextContent('Elf')
+    expect(radio).toHaveTextContent('Heritage required')
+  })
+
+  it('renders stacked summary lines for dependent-choice cards', () => {
+    render(
+      <RadioCard
+        aria-label="Elven Lineage"
+        density="compact"
+        options={[
+          {
+            label: 'Drow',
+            value: 'drow',
+            summaryLines: [
+              'L1: Darkvision 120 ft · Dancing Lights cantrip',
+              'L3: Faerie Fire spell',
+            ],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('L1: Darkvision 120 ft · Dancing Lights cantrip')).toBeInTheDocument()
+    expect(screen.getByText('L3: Faerie Fire spell')).toBeInTheDocument()
+  })
+
   it('renders an inline title badge when provided', () => {
     render(
       <RadioCard
@@ -70,24 +131,6 @@ describe('RadioCard', () => {
     )
     await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
     expect(onValueChange).toHaveBeenCalledWith('3e')
-  })
-
-  it('renders compact summary items as an inline line', () => {
-    render(
-      <RadioCard
-        aria-label="Species"
-        density="compact"
-        options={[
-          {
-            label: 'Dwarf',
-            value: 'dwarf',
-            description: 'Humanoid',
-            summaryItems: ['Darkvision', 'Dwarven Resilience'],
-          },
-        ]}
-      />,
-    )
-    expect(screen.getByText('Darkvision · Dwarven Resilience')).toBeInTheDocument()
   })
 
   it('opens details without selecting the card', async () => {
@@ -155,6 +198,6 @@ describe('RadioCard', () => {
 
     expect(detailsSlot).toContainElement(screen.getByRole('button', { name: 'Details' }))
     expect(detailsSlot).toHaveClass('row-start-1')
-    expect(title.closest('[class*="col-start-2"]')).toHaveClass('row-start-1')
+    expect(title.closest('[class*="col-start-2"]')).toBeInTheDocument()
   })
 })

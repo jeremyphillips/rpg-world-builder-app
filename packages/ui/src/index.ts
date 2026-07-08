@@ -155,6 +155,13 @@ export {
   type RadioCardProps,
   type RadioCardItemProps,
 } from './components/ui/radio-card.client'
+export {
+  AttentionFrame,
+  ATTENTION_FRAME_DURATION_MS,
+  ATTENTION_FRAME_REDUCED_MOTION_HOLD_MS,
+  type AttentionFrameProps,
+} from './components/ui/attention-frame.client'
+export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'

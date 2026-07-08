@@ -105,6 +105,11 @@ export const radioCardTitleVariants = cva('text-md font-bold')
 
 export const radioCardTitleRowVariants = cva('flex min-w-0 flex-wrap items-center gap-2')
 
+/** Inline muted copy immediately after the card title (e.g. dependent-choice status). */
+export const radioCardTitleMetaVariants = cva('text-muted-foreground')
+
+export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
+
 export const radioCardSummaryVariants = cva('text-muted-foreground')
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')

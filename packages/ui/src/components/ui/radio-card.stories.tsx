@@ -128,3 +128,51 @@ export const Compact: Story = {
     defaultValue: 'dwarf',
   },
 }
+
+/** Builder dependent-choice cards: stacked grant summaries. */
+export const DependentChoice: Story = {
+  args: {
+    'aria-label': 'Elven Lineage',
+    density: 'compact',
+    defaultValue: 'drow',
+    options: [
+      {
+        label: 'Drow',
+        value: 'drow',
+        summaryLines: [
+          'L1: Darkvision 120 ft · Dancing Lights cantrip',
+          'L3: Faerie Fire spell',
+          'L5: Darkness spell',
+        ],
+      },
+      {
+        label: 'High Elf',
+        value: 'high-elf',
+        summaryLines: [
+          'L1: Prestidigitation cantrip',
+          'L3: Detect Magic spell',
+          'L5: Misty Step spell',
+        ],
+      },
+    ],
+  },
+}
+
+/** Parent species card with inline titleMeta. */
+export const ParentChoiceTitleMeta: Story = {
+  args: {
+    'aria-label': 'Species',
+    density: 'compact',
+    defaultValue: 'elf',
+    options: [
+      {
+        label: 'Elf',
+        value: 'elf',
+        description: 'Humanoid',
+        titleMeta: 'Heritage required',
+        summaryItems: ['Darkvision', 'Fey Ancestry', 'Keen Senses', 'Trance'],
+        onDetails: action('onDetails'),
+      },
+    ],
+  },
+}

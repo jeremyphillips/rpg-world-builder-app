@@ -19,7 +19,9 @@ import {
   radioCardMetaListVariants,
   radioCardRootLayoutVariants,
   radioCardShellVariants,
+  radioCardSummaryLinesVariants,
   radioCardSummaryVariants,
+  radioCardTitleMetaVariants,
   radioCardTitleRowVariants,
   radioCardTitleVariants,
   radioCardVariants,
@@ -39,9 +41,13 @@ export interface RadioCardOption {
   description?: string
   /** Optional badge rendered inline with the title (e.g. "Recommended"). */
   badge?: string
+  /** Inline muted text immediately after the title (e.g. "Heritage required"). */
+  titleMeta?: string
   meta?: string[]
   /** Compact density: trait names or other summary chips rendered inline. */
   summaryItems?: string[]
+  /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
+  summaryLines?: string[]
   onDetails?: () => void
   detailsLabel?: string
 }
@@ -52,8 +58,10 @@ export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
   label: string
   description?: string
   badge?: string
+  titleMeta?: string
   meta?: string[]
   summaryItems?: string[]
+  summaryLines?: string[]
   density?: RadioCardDensity
   /** Horizontal placement of the decorative radio control within the card. */
   controlPosition?: 'left' | 'right'
@@ -69,15 +77,121 @@ function RadioCardDetailsLink({ label, onDetails }: { label: string; onDetails: 
 
 type RadioCardItemContentProps = Pick<
   RadioCardItemProps,
-  'label' | 'description' | 'badge' | 'meta' | 'summaryItems' | 'density' | 'controlPosition'
+  | 'label'
+  | 'description'
+  | 'badge'
+  | 'titleMeta'
+  | 'meta'
+  | 'summaryItems'
+  | 'summaryLines'
+  | 'density'
+  | 'controlPosition'
 >
+
+function RadioCardTitleMeta({ titleMeta }: { titleMeta: string }) {
+  return (
+    <span className={cn(textVariants({ variant: 'small' }), radioCardTitleMetaVariants())}>
+      {titleMeta}
+    </span>
+  )
+}
+
+function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
+  return (
+    <div className={radioCardSummaryLinesVariants()}>
+      {summaryLines.map((line) => (
+        <span
+          key={line}
+          className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}
+        >
+          {line}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function RadioCardControl({ className }: { className?: string }) {
+  return (
+    <span className={cn(radioCardControlVariants(), 'mt-0.5', className)} aria-hidden="true">
+      <span className={radioCardIndicatorVariants()}>
+        <Circle className="size-3 fill-primary text-primary" />
+      </span>
+    </span>
+  )
+}
+
+type RadioCardTitleRowContentProps = {
+  label: string
+  titleMeta?: string
+  badge?: string
+}
+
+function RadioCardTitleRowContent({ label, titleMeta, badge }: RadioCardTitleRowContentProps) {
+  return (
+    <div className={radioCardTitleRowVariants()}>
+      <span className={radioCardTitleVariants()}>{label}</span>
+      {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
+      {badge ? (
+        <Badge variant="default" size="sm">
+          {badge}
+        </Badge>
+      ) : null}
+    </div>
+  )
+}
+
+type RadioCardSecondaryContentProps = {
+  description?: string
+  summaryText?: string
+  summaryLines?: string[]
+  meta?: string[]
+  showMeta?: boolean
+}
+
+function RadioCardSecondaryContent({
+  description,
+  summaryText,
+  summaryLines,
+  meta,
+  showMeta = false,
+}: RadioCardSecondaryContentProps) {
+  return (
+    <>
+      {description ? (
+        <span className={textVariants({ variant: 'small' })}>{description}</span>
+      ) : null}
+      {summaryText ? (
+        <span className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}>
+          {summaryText}
+        </span>
+      ) : null}
+      {summaryLines && summaryLines.length > 0 ? (
+        <RadioCardSummaryLines summaryLines={summaryLines} />
+      ) : null}
+      {showMeta && meta && meta.length > 0 ? (
+        <ul className={radioCardMetaListVariants()} aria-hidden="true">
+          {meta.map((chip) => (
+            <li key={chip}>
+              <Badge variant="secondary" size="sm">
+                {chip}
+              </Badge>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  )
+}
 
 function RadioCardItemContent({
   label,
   description,
   badge,
+  titleMeta,
   meta,
   summaryItems,
+  summaryLines,
   density = 'default',
   controlPosition = 'left',
 }: RadioCardItemContentProps) {
@@ -89,39 +203,16 @@ function RadioCardItemContent({
 
   return (
     <div className={radioCardRootLayoutVariants({ controlPosition, density })}>
-      <span className={cn(radioCardControlVariants(), 'mt-0.5')} aria-hidden="true">
-        <span className={radioCardIndicatorVariants()}>
-          <Circle className="size-3 fill-primary text-primary" />
-        </span>
-      </span>
+      <RadioCardControl />
       <div className={radioCardBodyVariants({ density })}>
-        <div className={radioCardTitleRowVariants()}>
-          <span className={radioCardTitleVariants()}>{label}</span>
-          {badge ? (
-            <Badge variant="default" size="sm">
-              {badge}
-            </Badge>
-          ) : null}
-        </div>
-        {description ? (
-          <span className={textVariants({ variant: 'small' })}>{description}</span>
-        ) : null}
-        {summaryText ? (
-          <span className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}>
-            {summaryText}
-          </span>
-        ) : null}
-        {!isCompact && meta && meta.length > 0 ? (
-          <ul className={radioCardMetaListVariants()} aria-hidden="true">
-            {meta.map((chip) => (
-              <li key={chip}>
-                <Badge variant="secondary" size="sm">
-                  {chip}
-                </Badge>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <RadioCardTitleRowContent label={label} titleMeta={titleMeta} badge={badge} />
+        <RadioCardSecondaryContent
+          description={description}
+          summaryText={summaryText}
+          summaryLines={summaryLines}
+          meta={meta}
+          showMeta={!isCompact}
+        />
       </div>
     </div>
   )
@@ -137,8 +228,10 @@ const RadioCardItem = React.forwardRef<
       label,
       description,
       badge,
+      titleMeta,
       meta,
       summaryItems,
+      summaryLines,
       density = 'default',
       controlPosition = 'left',
       disabled,
@@ -156,8 +249,10 @@ const RadioCardItem = React.forwardRef<
         label={label}
         description={description}
         badge={badge}
+        titleMeta={titleMeta}
         meta={meta}
         summaryItems={summaryItems}
+        summaryLines={summaryLines}
         density={density}
         controlPosition={controlPosition}
       />
@@ -194,39 +289,21 @@ function RadioCardOptionWithDetails({
           disabled={option.disabled}
           className={cn(radioCardItemWithDetailsVariants(), 'group')}
         >
-          <span
-            className={cn(radioCardControlVariants(), 'col-start-1 row-start-1 mt-0.5')}
-            aria-hidden="true"
+          <RadioCardControl className="col-start-1 row-start-1" />
+          <div
+            className={cn(radioCardBodyVariants({ density }), 'col-start-2 row-start-1 min-w-0')}
           >
-            <span className={radioCardIndicatorVariants()}>
-              <Circle className="size-3 fill-primary text-primary" />
-            </span>
-          </span>
-          <div className={cn(radioCardTitleRowVariants(), 'col-start-2 row-start-1 min-w-0')}>
-            <span className={radioCardTitleVariants()}>{option.label}</span>
-            {option.badge ? (
-              <Badge variant="default" size="sm">
-                {option.badge}
-              </Badge>
-            ) : null}
+            <RadioCardTitleRowContent
+              label={option.label}
+              titleMeta={option.titleMeta}
+              badge={option.badge}
+            />
+            <RadioCardSecondaryContent
+              description={option.description}
+              summaryText={summaryText}
+              summaryLines={option.summaryLines}
+            />
           </div>
-          {option.description ? (
-            <span className={cn(textVariants({ variant: 'small' }), 'col-start-2 row-start-2')}>
-              {option.description}
-            </span>
-          ) : null}
-          {summaryText ? (
-            <span
-              className={cn(
-                textVariants({ variant: 'small' }),
-                radioCardSummaryVariants(),
-                'col-start-2',
-                option.description ? 'row-start-3' : 'row-start-2',
-              )}
-            >
-              {summaryText}
-            </span>
-          ) : null}
         </RadioGroupPrimitive.Item>
         <div className={radioCardDetailsInlineSlotVariants()}>
           <RadioCardDetailsLink label={detailsLabel} onDetails={option.onDetails!} />
@@ -284,8 +361,10 @@ function RadioCard({
             label={option.label}
             description={option.description}
             badge={option.badge}
+            titleMeta={option.titleMeta}
             meta={option.meta}
             summaryItems={option.summaryItems}
+            summaryLines={option.summaryLines}
             density={density}
             controlPosition={controlPosition}
           />
