@@ -1,5 +1,7 @@
 import {
   buildChoiceSetId,
+  characterBuilderDependentChoiceMessages,
+  formatFieldMessage,
   getChoiceSetStepId,
   type CharacterBuildLanguageOption,
   type ChoiceSet,
@@ -15,11 +17,6 @@ import {
   getSenseLabelFromVocabulary,
 } from '@/features/homebrew'
 import { buildSpeciesDetailViewModel, buildSpellGrantVocabulary } from '@/features/content'
-
-export const DEPENDENT_CHOICE_REQUIRED_STATUS = 'Required' as const
-
-/** Generic helper when a required dependent choice has no selection yet. */
-export const DEPENDENT_CHOICE_HELPER_TEXT = 'Choose one option.' as const
 
 export type DependentChoiceSectionCopy = {
   statusText: string
@@ -38,13 +35,15 @@ export function resolveDependentChoiceSectionCopy({
 }: ResolveDependentChoiceSectionCopyInput): DependentChoiceSectionCopy {
   if (required || !selectedOptionLabel) {
     return {
-      statusText: DEPENDENT_CHOICE_REQUIRED_STATUS,
-      helperText: DEPENDENT_CHOICE_HELPER_TEXT,
+      statusText: formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
+      helperText: formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
     }
   }
 
   return {
-    statusText: `${selectedOptionLabel} selected`,
+    statusText: formatFieldMessage(
+      characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel }),
+    ),
     helperText: undefined,
   }
 }

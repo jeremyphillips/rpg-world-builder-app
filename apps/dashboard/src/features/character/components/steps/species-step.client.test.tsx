@@ -5,8 +5,11 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import {
+  characterBuilderDependentChoiceMessages,
   createEmptyCharacterBuilderDraft,
   DEFAULT_SYSTEM_RULESET_ID,
+  DEPENDENT_CHOICE_KINDS,
+  formatFieldMessage,
   resolveAvailableChoices,
   type CharacterBuilderDraft,
   type Species,
@@ -199,10 +202,22 @@ describe('SpeciesStep', () => {
 
     await user.click(screen.getByRole('radio', { name: /Elf/i }))
 
-    expect(speciesCard(elf.id)).toHaveTextContent('Heritage required')
+    expect(speciesCard(elf.id)).toHaveTextContent(
+      formatFieldMessage(
+        characterBuilderDependentChoiceMessages.parentChoiceRequired({
+          kind: DEPENDENT_CHOICE_KINDS.heritage,
+        }),
+      ),
+    )
     expect(screen.getByRole('region', { name: 'Elven Lineage' })).toBeInTheDocument()
-    expect(screen.getByText('Required')).toBeInTheDocument()
-    expect(screen.getByText('Choose one option.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+    ).toBeInTheDocument()
   })
 
   it('calls onDraftChange when Drow heritage is selected', async () => {
@@ -242,9 +257,24 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, draft })
 
-    expect(speciesCard(elf.id)).toHaveTextContent('Drow heritage')
-    expect(screen.getByText('Drow selected')).toBeInTheDocument()
-    expect(screen.queryByText('Choose one option.')).not.toBeInTheDocument()
+    expect(speciesCard(elf.id)).toHaveTextContent(
+      formatFieldMessage(
+        characterBuilderDependentChoiceMessages.parentChoiceSelected({
+          selectedOptionLabel: 'Drow',
+          kind: DEPENDENT_CHOICE_KINDS.heritage,
+        }),
+      ),
+    )
+    expect(
+      screen.getByText(
+        formatFieldMessage(
+          characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
+        ),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+    ).not.toBeInTheDocument()
   })
 
   it('shows Manage heritage in the sheet and scrolls to the dependent section', async () => {

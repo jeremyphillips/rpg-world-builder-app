@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  characterBuilderDependentChoiceMessages,
+  DEPENDENT_CHOICE_KINDS,
+  formatFieldMessage,
+} from '@rpg/contracts'
+
+import {
   DEPENDENT_KIND_HERITAGE,
   formatParentChoiceTitleMeta,
   MANAGE_HERITAGE_LABEL,
@@ -13,7 +19,13 @@ describe('builder-parent-choice-status.lib', () => {
         dependentKindLabel: DEPENDENT_KIND_HERITAGE,
         required: true,
       }),
-    ).toBe('Heritage required')
+    ).toBe(
+      formatFieldMessage(
+        characterBuilderDependentChoiceMessages.parentChoiceRequired({
+          kind: DEPENDENT_CHOICE_KINDS.heritage,
+        }),
+      ),
+    )
   })
 
   it('formats resolved parent title meta', () => {
@@ -23,10 +35,19 @@ describe('builder-parent-choice-status.lib', () => {
         required: false,
         selectedOptionLabel: 'Drow',
       }),
-    ).toBe('Drow heritage')
+    ).toBe(
+      formatFieldMessage(
+        characterBuilderDependentChoiceMessages.parentChoiceSelected({
+          selectedOptionLabel: 'Drow',
+          kind: DEPENDENT_CHOICE_KINDS.heritage,
+        }),
+      ),
+    )
   })
 
-  it('exports explicit manage label constant for species heritage', () => {
-    expect(MANAGE_HERITAGE_LABEL).toBe('Manage heritage')
+  it('exports explicit manage label from contracts messages', () => {
+    expect(MANAGE_HERITAGE_LABEL).toBe(
+      formatFieldMessage(characterBuilderDependentChoiceMessages.manageHeritage()),
+    )
   })
 })

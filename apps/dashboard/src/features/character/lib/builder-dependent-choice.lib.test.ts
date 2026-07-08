@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID, type ChoiceSet } from '@rpg/contracts'
+import {
+  characterBuilderDependentChoiceMessages,
+  DEFAULT_SYSTEM_RULESET_ID,
+  formatFieldMessage,
+  type ChoiceSet,
+} from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import {
@@ -10,7 +15,6 @@ import {
 import { pickSpecies } from '@/features/content/lib/fixtures/pick'
 
 import {
-  DEPENDENT_CHOICE_REQUIRED_STATUS,
   findSpeciesHeritageChoiceSet,
   mapHeritageOptionsToDependentCardOptions,
   resolveDependentChoiceSectionCopy,
@@ -23,8 +27,8 @@ describe('builder-dependent-choice.lib', () => {
         required: true,
       }),
     ).toEqual({
-      statusText: DEPENDENT_CHOICE_REQUIRED_STATUS,
-      helperText: 'Choose one option.',
+      statusText: formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
+      helperText: formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
     })
   })
 
@@ -35,7 +39,9 @@ describe('builder-dependent-choice.lib', () => {
         selectedOptionLabel: 'Drow',
       }),
     ).toEqual({
-      statusText: 'Drow selected',
+      statusText: formatFieldMessage(
+        characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
+      ),
       helperText: undefined,
     })
   })

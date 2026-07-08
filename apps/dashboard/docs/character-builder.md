@@ -46,7 +46,17 @@ hidden until a class is chosen.
 
 Readiness does not replace `validateCharacterBuild` on Continue / Create.
 
+### Copy layers
+
+Dependent-choice workflow strings (heritage, future subclass) use a three-layer model:
+rules vocabulary, content/ChoiceSet labels, and builder UI messages. Heritage is the
+reference implementation.
+
+See [character-builder-copy.md](character-builder-copy.md).
+
 ## Related docs
+
+- [character-builder-copy.md](character-builder-copy.md)
 
 - [feature-structure.md](feature-structure.md)
 - [feature-conventions.md](feature-conventions.md)

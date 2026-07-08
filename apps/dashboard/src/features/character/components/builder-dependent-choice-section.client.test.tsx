@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import {
+  characterBuilderDependentChoiceMessages,
+  DEFAULT_SYSTEM_RULESET_ID,
+  formatFieldMessage,
+} from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import {
@@ -37,8 +41,14 @@ describe('BuilderDependentChoiceSection', () => {
     )
 
     expect(screen.getByRole('region', { name: 'Elven Lineage' })).toBeInTheDocument()
-    expect(screen.getByText('Required')).toBeInTheDocument()
-    expect(screen.getByText('Choose one option.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+    ).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Drow/i })).toBeInTheDocument()
   })
 
@@ -58,8 +68,16 @@ describe('BuilderDependentChoiceSection', () => {
       />,
     )
 
-    expect(screen.getByText('Drow selected')).toBeInTheDocument()
-    expect(screen.queryByText('Choose one option.')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(
+        formatFieldMessage(
+          characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
+        ),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+    ).not.toBeInTheDocument()
   })
 
   it('calls onValueChange when a heritage option is selected', async () => {
