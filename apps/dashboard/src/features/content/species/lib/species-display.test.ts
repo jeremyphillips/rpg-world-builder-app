@@ -49,6 +49,7 @@ function buildVocabulary(languages: ReturnType<typeof listLanguageSeedOptions>) 
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label ?? id,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSpell: () => undefined,
   }
 }
 
@@ -158,6 +159,91 @@ describe('species-display', () => {
       title: 'Draconic Ancestry',
       descriptionHtml: '<p>Choose your ancestor.</p>',
       items: [{ id: 'black', title: 'Black', bodyHtml: '<p>Acid damage.</p>' }],
+    })
+  })
+
+  it('builds grouped grant summaries for heritage options with grant groups', () => {
+    const elfWithDrowHeritage = {
+      ...dwarfWithTraits,
+      name: 'Elf',
+      heritage: {
+        id: 'elven-lineage',
+        name: 'Elven Lineage',
+        description: '<p>Choose a lineage.</p>',
+        choose: 1,
+        options: [
+          {
+            kind: 'custom',
+            id: 'drow',
+            name: 'Drow',
+            description: '<p>Prose fallback.</p>',
+            grantGroups: [
+              {
+                grants: [
+                  { kind: 'sense', type: 'darkvision', range: 120 },
+                  {
+                    kind: 'spells',
+                    ability: 'cha',
+                    mode: 'free_cast',
+                    spellIds: ['dancing-lights'],
+                    frequency: 'at_will',
+                  },
+                ],
+              },
+              {
+                unlock: { level: 3 },
+                grants: [
+                  {
+                    kind: 'spells',
+                    ability: 'cha',
+                    mode: 'free_cast',
+                    spellIds: ['faerie-fire'],
+                    frequency: 'once_per_long_rest',
+                  },
+                ],
+              },
+              {
+                unlock: { level: 5 },
+                grants: [
+                  {
+                    kind: 'spells',
+                    ability: 'cha',
+                    mode: 'free_cast',
+                    spellIds: ['darkness'],
+                    frequency: 'once_per_long_rest',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    } as const satisfies Species
+
+    const vocabularyWithSpells = {
+      ...vocabulary,
+      resolveSpell: (slug: string) => {
+        const spells: Record<string, { name: string; level: number }> = {
+          'dancing-lights': { name: 'Dancing Lights', level: 0 },
+          'faerie-fire': { name: 'Faerie Fire', level: 1 },
+          darkness: { name: 'Darkness', level: 2 },
+        }
+        return spells[slug]
+      },
+    }
+
+    const { sections } = buildSpeciesDetailViewModel(elfWithDrowHeritage, vocabularyWithSpells)
+    const heritage = sections.find((section) => section.id === 'heritage')
+
+    expect(heritage?.items[0]).toMatchObject({
+      id: 'drow',
+      title: 'Drow',
+      summaryLines: [
+        'L1: Darkvision 120 ft · Dancing Lights cantrip',
+        'L3: Faerie Fire spell',
+        'L5: Darkness spell',
+      ],
+      summaryInline: 'Darkvision 120 ft · Dancing Lights · Faerie Fire · Darkness',
     })
   })
 })

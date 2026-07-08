@@ -31,7 +31,16 @@ const speciesFixture = {
     {
       title: 'Heritage',
       description: '<p>Choose a heritage option during character creation.</p>',
-      items: [{ title: 'Mountain Dwarf', body: '<p>Extra armor training.</p>' }],
+      items: [
+        {
+          title: 'Drow',
+          summaryLines: [
+            'L1: Darkvision 120 ft · Dancing Lights cantrip',
+            'L3: Faerie Fire spell',
+            'L5: Darkness spell',
+          ],
+        },
+      ],
     },
   ],
 }

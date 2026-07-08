@@ -1,4 +1,4 @@
-import { type CharacterBuildLanguageOption, type Species } from '@rpg/contracts'
+import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
 
 import {
   buildSeedCreatureTypeVocabulary,
@@ -9,7 +9,9 @@ import {
 import {
   buildSpeciesCardViewModel,
   buildSpeciesDetailViewModel,
+  buildSpellGrantVocabulary,
   SPECIES_SECTION_LABELS,
+  type SpeciesDetailItem,
 } from '@/features/content'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
@@ -26,11 +28,31 @@ function resolveLanguageLabel(
   return languages.find((entry) => entry.id === languageId)?.label ?? languageId
 }
 
-function buildBuilderSpeciesVocabulary(languages: readonly CharacterBuildLanguageOption[]) {
+function buildBuilderSpeciesVocabulary(
+  languages: readonly CharacterBuildLanguageOption[],
+  spells: readonly Spell[],
+) {
+  const resolveSpell = buildSpellGrantVocabulary(spells)
+
   return {
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSpell,
+  }
+}
+
+function mapSpeciesDetailItemToSheetItem(item: SpeciesDetailItem) {
+  if (item.summaryLines?.length) {
+    return {
+      title: item.title,
+      summaryLines: item.summaryLines,
+    }
+  }
+
+  return {
+    title: item.title,
+    body: item.bodyHtml,
   }
 }
 
@@ -51,27 +73,25 @@ export type SpeciesDetailsSheetContent = {
 export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
+  spells: readonly Spell[] = [],
 ): SpeciesDetailsSheetContent {
-  const viewModel = buildSpeciesDetailViewModel(species, buildBuilderSpeciesVocabulary(languages))
+  const viewModel = buildSpeciesDetailViewModel(
+    species,
+    buildBuilderSpeciesVocabulary(languages, spells),
+  )
 
   const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {
     if (section.id === 'traits') {
       return {
         title: SPECIES_SECTION_LABELS.traits,
-        items: section.items.map((item) => ({
-          title: item.title,
-          body: item.bodyHtml,
-        })),
+        items: section.items.map(mapSpeciesDetailItemToSheetItem),
       }
     }
 
     return {
       title: section.title,
       description: section.descriptionHtml,
-      items: section.items.map((item) => ({
-        title: item.title,
-        body: item.bodyHtml,
-      })),
+      items: section.items.map(mapSpeciesDetailItemToSheetItem),
     }
   })
 

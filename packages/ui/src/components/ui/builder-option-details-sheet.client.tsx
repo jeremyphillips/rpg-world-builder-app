@@ -23,6 +23,8 @@ export type BuilderOptionDetailsMetadata = {
 export type BuilderOptionDetailsSectionItem = {
   title: string
   body?: React.ReactNode
+  /** Level-grouped grant summary lines rendered below the title. */
+  summaryLines?: string[]
   metadata?: string[]
   optionPool?: {
     summary: string
@@ -70,7 +72,17 @@ function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
       <Heading variant="subsection" as="h3">
         {item.title}
       </Heading>
-      {item.metadata && item.metadata.length > 0 ? (
+      {item.summaryLines && item.summaryLines.length > 0 ? (
+        item.summaryLines.map((line, index) => (
+          <Text
+            key={`${item.title}-summary-${index}`}
+            variant="small"
+            className="text-muted-foreground"
+          >
+            {line}
+          </Text>
+        ))
+      ) : item.metadata && item.metadata.length > 0 ? (
         <Text variant="small" className="text-muted-foreground">
           {item.metadata.join(' · ')}
         </Text>
@@ -84,7 +96,7 @@ function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
             {item.optionPool.optionLabels.join(', ')}
           </InfoTooltip>
         </div>
-      ) : item.body ? (
+      ) : item.summaryLines && item.summaryLines.length > 0 ? null : item.body ? (
         typeof item.body === 'string' ? (
           <RichTextContent html={item.body} size="md" tone="muted" />
         ) : (

@@ -48,8 +48,12 @@ export function SpeciesStep({ context, draft, validationIssues, onDraftChange }:
 
   const detailsContent = useMemo(() => {
     if (!detailsSpecies) return null
-    return buildSpeciesDetailsSheetContent(detailsSpecies, context.catalog.languages)
-  }, [context.catalog.languages, detailsSpecies])
+    return buildSpeciesDetailsSheetContent(
+      detailsSpecies,
+      context.catalog.languages,
+      context.catalog.spells,
+    )
+  }, [context.catalog.languages, context.catalog.spells, detailsSpecies])
 
   const isDetailsSpeciesSelected =
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId
