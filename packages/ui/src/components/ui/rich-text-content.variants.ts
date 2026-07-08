@@ -7,7 +7,7 @@ const PROSE_MUTED_TOKENS =
   '[--tw-prose-body:var(--color-muted-foreground)] [--tw-prose-headings:var(--color-muted-foreground)] [--tw-prose-bold:var(--color-muted-foreground)] text-muted-foreground'
 
 /** Base `prose` classes for TipTap HTML — shared by read and edit surfaces. */
-export const richTextProseBase = 'prose max-w-none'
+export const richTextProseBase = 'prose max-w-none [&_p_strong]:text-foreground'
 
 /** Maps field size tokens to typography plugin prose modifiers. */
 export const richTextProseSizeClasses = {
