@@ -1,4 +1,8 @@
-import { isFieldOptionGroup, type FieldOption, type SelectFieldOptionListItem } from '../../form/field-config'
+import {
+  isFieldOptionGroup,
+  type FieldOption,
+  type SelectFieldOptionListItem,
+} from '../../form/field-config'
 import { cn } from '../../lib/utils'
 import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
 
@@ -14,6 +18,41 @@ export function isInlineSentenceBoundSegment(
   segment: InlineSentenceSegment,
 ): segment is InlineSentenceNumberSegment | InlineSentenceSelectSegment {
   return segment.kind === 'number' || segment.kind === 'select'
+}
+
+/** Max distinct bound paths per inline sentence (one controller each). */
+export const MAX_INLINE_SENTENCE_BOUND_CONTROLLERS = 8
+
+/** Distinct bound RHF paths for controller wiring (duplicate names share one controller). */
+export function inlineSentenceUniqueBoundNames(
+  segments: readonly InlineSentenceSegment[],
+  below?: InlineSentenceBelowChips,
+): string[] {
+  return [...new Set(inlineSentenceBoundNames(segments, below))]
+}
+
+/** Collects `dependsOn` paths from bound segments that declare visibility. */
+export function inlineSentenceSegmentVisibilityDeps(
+  segments: readonly InlineSentenceSegment[],
+): string[] {
+  const deps = new Set<string>()
+  for (const segment of segments) {
+    if (!isInlineSentenceBoundSegment(segment) || !segment.visibility) continue
+    for (const dep of segment.visibility.dependsOn) deps.add(dep)
+  }
+  return [...deps]
+}
+
+/** Filters bound segments by optional per-segment visibility; text segments always remain. */
+export function filterVisibleInlineSentenceSegments(
+  segments: readonly InlineSentenceSegment[],
+  watched: Record<string, unknown>,
+): InlineSentenceSegment[] {
+  return segments.filter((segment) => {
+    if (!isInlineSentenceBoundSegment(segment)) return true
+    if (!segment.visibility) return true
+    return segment.visibility.visibleWhen(watched)
+  })
 }
 
 /** Bound RHF paths declared by inline sentence segments and optional below chips. */

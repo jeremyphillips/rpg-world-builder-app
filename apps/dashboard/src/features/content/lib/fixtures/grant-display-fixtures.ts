@@ -6,6 +6,22 @@ import { GRANT_SUMMARY_JOIN, type GrantDisplayVocabulary } from '../grant-displa
 import { pickSpecies, pickSpell } from './pick'
 import { STORY_RULESET_ID } from './constants'
 
+/** Catalog Wood Elf heritage option grant groups from the Elf species seed. */
+export function getCatalogWoodElfHeritageGrantGroups(): GrantGroup[] {
+  const woodElf = getCatalogWoodElfHeritageOption()
+  return woodElf.grantGroups ?? []
+}
+
+/** Catalog Wood Elf heritage option from the Elf species seed. */
+export function getCatalogWoodElfHeritageOption(): SpeciesTrait {
+  const elf = pickSpecies('elf')
+  const woodElf = elf.heritage?.options.find((option) => option.id === 'wood-elf')
+  if (!woodElf) {
+    throw new Error('Expected Elf seed to include a Wood Elf heritage option')
+  }
+  return woodElf
+}
+
 /** Catalog Drow heritage option grant groups from the Elf species seed. */
 export function getCatalogDrowHeritageGrantGroups(): GrantGroup[] {
   const drow = getCatalogDrowHeritageOption()

@@ -43,7 +43,7 @@
  * |------------|-------|----------|-------|
  * | `sense` | yes | yes | e.g. `Darkvision 120 ft` |
  * | `spells` | yes | yes | e.g. `Dancing Lights cantrip` |
- * | `movement` | yes | no | follow-up |
+ * | `movement` | yes | yes | e.g. `Walk speed +5 ft` |
  * | `resistances` | yes | no | follow-up |
  * | `languages` | yes | no | follow-up |
  * | proficiencies (`weaponProficiency`, `toolProficiency`, `skillProficiency`, `armorTraining`) | yes | no | follow-up |
@@ -57,6 +57,7 @@
  *   label builder yet (`kind: 'notRenderedYet'`). Formatters collapse these to `N more benefit(s)`.
  */
 import {
+  formatMovementGrantCompact,
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
   type ContentGrant,
@@ -216,6 +217,19 @@ function mapGrantToItems(
 
   if (grant.kind === 'spells') {
     return mapSpellGrantToItems(grant, vocabulary, idPrefix, level)
+  }
+
+  if (grant.kind === 'movement') {
+    return [
+      {
+        id: `${idPrefix}:movement`,
+        label: formatMovementGrantCompact(grant),
+        kind: 'speed',
+        supported: true,
+        sourceGrantKind: grant.kind,
+        level,
+      },
+    ]
   }
 
   if (!isKnownGrantKind(grant.kind)) {

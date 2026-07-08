@@ -473,9 +473,8 @@
                 {
                   "kind": "movement",
                   "mode": "walk",
-                  "operation": "bonus",
-                  "value": 5,
-                  "unit": "ft"
+                  "operation": "increase",
+                  "feet": 5
                 },
                 {
                   "kind": "spells",

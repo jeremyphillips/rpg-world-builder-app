@@ -3,6 +3,11 @@ import type { FieldDigits } from './field-digit-metrics'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 
+export type InlineSentenceSegmentVisibility = {
+  dependsOn: string[]
+  visibleWhen: (watched: Record<string, unknown>) => boolean
+}
+
 export type InlineSentenceTextSegment = {
   kind: 'text'
   value: string
@@ -18,6 +23,8 @@ export type InlineSentenceNumberSegment = {
   defaultValue?: number
   /** sr-only label for the number input. Defaults to `${fieldLabel} count` in the renderer. */
   ariaLabel?: string
+  /** When omitted, the segment always renders. Same contract as `FieldVisibility`. */
+  visibility?: InlineSentenceSegmentVisibility
 }
 
 export type InlineSentenceSelectSegment = {
@@ -34,6 +41,8 @@ export type InlineSentenceSelectSegment = {
   defaultValue?: string
   /** sr-only label override when it differs from the field legend. */
   ariaLabel?: string
+  /** When omitted, the segment always renders. Same contract as `FieldVisibility`. */
+  visibility?: InlineSentenceSegmentVisibility
 }
 
 export type InlineSentenceSegment =

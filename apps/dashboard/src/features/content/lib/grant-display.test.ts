@@ -6,6 +6,7 @@ import {
   buildCatalogDrowGrantDisplayVocabulary,
   DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
   getCatalogDrowHeritageGrantGroups,
+  getCatalogWoodElfHeritageGrantGroups,
 } from './fixtures/grant-display-fixtures'
 import {
   buildGrantSummaryModel,
@@ -20,9 +21,8 @@ const vocabulary = buildCatalogDrowGrantDisplayVocabulary()
 const movementGrant = {
   kind: 'movement',
   mode: 'walk',
-  operation: 'bonus',
-  value: 5,
-  unit: 'ft',
+  operation: 'increase',
+  feet: 5,
 } as const satisfies GrantGroup['grants'][number]
 
 describe('buildGrantSummaryModel', () => {
@@ -66,16 +66,33 @@ describe('buildGrantSummaryModel', () => {
     })
   })
 
-  it('marks known grant kinds without compact renderers as notRenderedYet', () => {
+  it('renders movement grants with compact speed labels', () => {
     const model = buildGrantSummaryModel([{ grants: [movementGrant] }], vocabulary)
 
     expect(model.flatItems[0]).toMatchObject({
-      kind: 'notRenderedYet',
-      supported: false,
+      kind: 'speed',
+      supported: true,
       sourceGrantKind: 'movement',
-      label: '',
+      label: 'Walk speed +5 ft',
     })
-    expect(model.notRenderedCount).toBe(1)
+    expect(model.notRenderedCount).toBeUndefined()
+  })
+
+  it('renders catalog Wood Elf heritage movement alongside spells', () => {
+    const groups = getCatalogWoodElfHeritageGrantGroups()
+    const model = buildGrantSummaryModel([groups[0]!], vocabulary)
+
+    expect(model.flatItems[0]).toMatchObject({
+      kind: 'speed',
+      supported: true,
+      label: 'Walk speed +5 ft',
+    })
+    expect(model.flatItems[1]).toMatchObject({
+      kind: 'cantrip',
+      supported: true,
+      label: 'Druidcraft',
+    })
+    expect(formatGrantSummaryInline(model)).toBe(`Walk speed +5 ft${GRANT_SUMMARY_JOIN}Druidcraft`)
   })
 
   it('marks unrecognized grant kinds separately from notRenderedYet', () => {
@@ -124,7 +141,10 @@ describe('formatGrantSummaryInline', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, movementGrant],
+          grants: [
+            { kind: 'sense', type: 'darkvision', range: 120 },
+            { kind: 'resistances', damageTypes: ['fire'] },
+          ],
         },
       ],
       vocabulary,
@@ -149,7 +169,10 @@ describe('formatGrantSummaryByLevel', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [movementGrant, { ...movementGrant, value: 10 }],
+          grants: [
+            { kind: 'resistances', damageTypes: ['fire'] },
+            { kind: 'languages', languageIds: ['elvish'] },
+          ],
         },
       ],
       vocabulary,
@@ -159,11 +182,15 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryInline(model)).toBe('2 benefits')
   })
 
-  it('collapses visible grants with hidden known grants into N more benefits', () => {
+  it('includes movement in visible grant summaries when mixed with hidden grants', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, movementGrant],
+          grants: [
+            { kind: 'sense', type: 'darkvision', range: 120 },
+            movementGrant,
+            { kind: 'resistances', damageTypes: ['fire'] },
+          ],
         },
       ],
       vocabulary,
@@ -172,7 +199,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model)).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
+        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Walk speed +5 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
       },
     ])
   })
@@ -204,7 +231,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model)).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
+        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Walk speed +5 ft`,
       },
     ])
   })
@@ -213,7 +240,10 @@ describe('formatGrantSummaryByLevel', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, movementGrant],
+          grants: [
+            { kind: 'sense', type: 'darkvision', range: 120 },
+            { kind: 'resistances', damageTypes: ['fire'] },
+          ],
         },
       ],
       vocabulary,
@@ -222,7 +252,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model, { exposeUnsupportedGrants: true })).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Unsupported grant: movement`,
+        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Unsupported grant: resistances`,
       },
     ])
   })

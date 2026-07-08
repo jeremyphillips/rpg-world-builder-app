@@ -4,7 +4,12 @@ import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../vocab/ability'
 import { getDamageTypeSentenceForm, damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { absoluteLevelSchema } from '../../primitives/level'
-import { movementGrantPayloadSchema } from '../../vocab/movement-mode'
+import {
+  movementGrantIncreaseSchema,
+  movementGrantMatchSchema,
+  movementGrantPayloadSchema,
+  movementGrantSetSchema,
+} from '../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../vocab/sense'
 import { getUsageFrequencySentenceForm, usageFrequencySchema } from '../../vocab/usage-frequency'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
@@ -253,10 +258,12 @@ const damageTypeContentGrantSchema = z.object({
   damageTypes: z.array(damageTypeIdSchema).min(1),
 })
 
-/** Movement bonus — increases speed for a movement mode (e.g. Wood Elf +5 ft walk). */
-const movementContentGrantSchema = movementGrantPayloadSchema.extend({
-  kind: z.literal('movement'),
-})
+/** Movement grant — set, increase, or match speed for a movement mode. */
+const movementContentGrantSchema = z.discriminatedUnion('operation', [
+  movementGrantSetSchema.extend({ kind: z.literal('movement') }),
+  movementGrantIncreaseSchema.extend({ kind: z.literal('movement') }),
+  movementGrantMatchSchema.extend({ kind: z.literal('movement') }),
+])
 
 /** Weapon proficiency grant — fixed weapons/categories or a pool choice. */
 const weaponProficiencyContentGrantSchema = z.object({

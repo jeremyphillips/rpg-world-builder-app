@@ -3,11 +3,7 @@ import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'
-import {
-  DEFAULT_MOVEMENT_ROW,
-  movementRecordToRows,
-  movementRowsToRecord,
-} from './species-movement-form-fields'
+import { movementRecordToRows, movementRowsToRecord } from './species-movement-form-fields'
 import {
   characterCreationFromFormValues,
   characterCreationToFormValues,
@@ -18,7 +14,7 @@ import { traitToFormRow, traitsFromFormValues } from './species-trait-form-value
 export const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
   creatureType: 'humanoid',
   sizes: ['medium'],
-  movement: [DEFAULT_MOVEMENT_ROW],
+  movement: [{ mode: 'walk', feet: 30 }],
   languageAffinities: [],
   traits: [],
 }

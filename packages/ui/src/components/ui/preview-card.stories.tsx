@@ -43,7 +43,7 @@ export const TransparentSelectable: Story = {
   args: {
     tone: 'transparent',
     title: 'Movement bonus',
-    description: 'Increase a movement mode speed by a preset number of feet.',
+    description: 'Grant or modify a movement speed.',
     interactive: true,
     onSelect: action('onSelect'),
   },

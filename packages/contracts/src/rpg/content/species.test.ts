@@ -55,7 +55,7 @@ const ELF_BODY = {
         name: 'Wood Elf',
         description: '<p>Your Speed is 35 feet.</p>',
         grants: {
-          movement: { mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' },
+          movement: { mode: 'walk', operation: 'increase', feet: 5 },
         },
       },
     ],

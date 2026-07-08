@@ -499,21 +499,19 @@ describe('contentGrantSchema — damageType', () => {
 })
 
 describe('contentGrantSchema — movement', () => {
-  it('parses a walk speed bonus', () => {
+  it('parses a walk speed increase', () => {
     expect(
       contentGrantSchema.parse({
         kind: 'movement',
         mode: 'walk',
-        operation: 'bonus',
-        value: 5,
-        unit: 'ft',
+        operation: 'increase',
+        feet: 5,
       }),
     ).toEqual({
       kind: 'movement',
       mode: 'walk',
-      operation: 'bonus',
-      value: 5,
-      unit: 'ft',
+      operation: 'increase',
+      feet: 5,
     })
   })
 })
@@ -908,7 +906,7 @@ describe('isGrantGroupsEligible', () => {
     expect(
       isGrantGroupsEligible([
         {
-          grants: [{ kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' }],
+          grants: [{ kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
         },
       ]),
     ).toBe(true)

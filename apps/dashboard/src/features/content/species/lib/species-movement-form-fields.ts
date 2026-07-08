@@ -22,11 +22,11 @@ export const movementRowFormSchema = z.object({
   feet: z.coerce.number().int().min(1),
 })
 
-export type MovementRowFormValues = z.infer<typeof movementRowFormSchema>
+export type MovementRowFormValues = z.input<typeof movementRowFormSchema>
 
 export const DEFAULT_MOVEMENT_ROW: MovementRowFormValues = {
   mode: 'walk',
-  feet: 30,
+  feet: '30',
 }
 
 const movementModeOptions = MOVEMENT_MODES.map((mode) => ({
@@ -36,7 +36,7 @@ const movementModeOptions = MOVEMENT_MODES.map((mode) => ({
 
 const movementFeetOptions = MOVEMENT_SPEED_FEET.map((feet) => ({
   value: String(feet),
-  label: `${feet} ft`,
+  label: String(feet),
 }))
 
 export function movementArrayField(): FormItem {
@@ -87,7 +87,9 @@ export function movementArrayField(): FormItem {
   }
 }
 
-export function movementRecordToRows(movement: MovementSpeeds): MovementRowFormValues[] {
+export function movementRecordToRows(
+  movement: MovementSpeeds,
+): Array<{ mode: MovementMode; feet: number }> {
   return MOVEMENT_MODES.filter((mode) => movement[mode] !== undefined).map((mode) => ({
     mode,
     feet: movement[mode]!,
@@ -97,7 +99,8 @@ export function movementRecordToRows(movement: MovementSpeeds): MovementRowFormV
 export function movementRowsToRecord(rows: MovementRowFormValues[]): MovementSpeeds {
   const record: Partial<Record<MovementMode, number>> = {}
   for (const row of rows) {
-    record[row.mode] = row.feet
+    const feet = typeof row.feet === 'number' ? row.feet : Number(row.feet)
+    record[row.mode] = feet
   }
   return record as MovementSpeeds
 }

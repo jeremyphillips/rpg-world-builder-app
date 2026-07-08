@@ -116,9 +116,8 @@ describe('SRD 5.2.1 species seed', () => {
     expect(speedGrant).toEqual({
       kind: 'movement',
       mode: 'walk',
-      operation: 'bonus',
-      value: 5,
-      unit: 'ft',
+      operation: 'increase',
+      feet: 5,
     })
   })
 

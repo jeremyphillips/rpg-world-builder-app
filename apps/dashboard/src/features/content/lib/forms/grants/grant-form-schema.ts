@@ -16,7 +16,6 @@ import {
   toolCategorySchema,
   movementModeSchema,
   movementOperationSchema,
-  movementBonusFeetSchema,
   usageFrequencySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
@@ -60,7 +59,7 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
   resistances: 'Damage resistance',
   senses: 'Special sense',
   damageType: 'Damage type',
-  movement: 'Movement bonus',
+  movement: 'Movement',
   weaponProficiency: 'Weapon proficiency',
   toolProficiency: 'Tool proficiency',
   skillProficiency: 'Skill proficiency',
@@ -171,8 +170,8 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       senseRange: z.coerce.number().int().min(0).optional(),
       movementMode: movementModeSchema.optional(),
       movementOperation: movementOperationSchema.optional(),
-      movementValue: movementBonusFeetSchema.optional(),
-      movementUnit: z.literal('ft').optional(),
+      movementFeet: z.coerce.number().optional(),
+      movementMatchMode: movementModeSchema.optional(),
       language: languageIdSchema.optional(),
       /** Spellcasting ability for a `spells` row. */
       spellAbility: abilitySchema.optional(),

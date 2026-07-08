@@ -72,8 +72,8 @@ describe('grant template registry', () => {
     expect(getGrantTemplateById('movement-bonus')?.createDefault()).toMatchObject({
       grantType: 'movement',
       movementMode: 'walk',
-      movementOperation: 'bonus',
-      movementValue: '5',
+      movementOperation: 'increase',
+      movementFeet: '5',
     })
   })
 

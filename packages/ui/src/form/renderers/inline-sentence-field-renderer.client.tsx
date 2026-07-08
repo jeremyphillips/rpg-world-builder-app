@@ -5,8 +5,11 @@ import { useController } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../components/ui/inline-sentence-field.client'
 import {
-  inlineSentenceBoundNames,
+  filterVisibleInlineSentenceSegments,
+  inlineSentenceSegmentVisibilityDeps,
+  inlineSentenceUniqueBoundNames,
   isInlineSentenceBoundSegment,
+  MAX_INLINE_SENTENCE_BOUND_CONTROLLERS,
 } from '../../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBoundChips,
@@ -16,6 +19,7 @@ import type {
 } from '../../components/ui/inline-sentence-field.types'
 import { resolveFirstFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { resolveSelectPlaceholder } from '../config/field-placeholder.lib'
+import { useDependsOnValues } from '../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../field-config'
 
 export interface InlineSentenceFieldRendererProps {
@@ -29,35 +33,99 @@ function resolveFullName(namePrefix: string | undefined, name: string): string {
   return namePrefix ? `${namePrefix}.${name}` : name
 }
 
-/** RHF adapter for `InlineSentenceField` — one controller per bound segment. */
+function useInlineSentenceControllers(uniqueBoundNames: readonly string[], namePrefix?: string) {
+  const resolve = (index: number) =>
+    resolveFullName(namePrefix, uniqueBoundNames[index] ?? `__inlineSentenceUnused${index}`)
+
+  const controller0 = useController({
+    name: resolve(0),
+    disabled: uniqueBoundNames.length < 1,
+  })
+  const controller1 = useController({
+    name: resolve(1),
+    disabled: uniqueBoundNames.length < 2,
+  })
+  const controller2 = useController({
+    name: resolve(2),
+    disabled: uniqueBoundNames.length < 3,
+  })
+  const controller3 = useController({
+    name: resolve(3),
+    disabled: uniqueBoundNames.length < 4,
+  })
+  const controller4 = useController({
+    name: resolve(4),
+    disabled: uniqueBoundNames.length < 5,
+  })
+  const controller5 = useController({
+    name: resolve(5),
+    disabled: uniqueBoundNames.length < 6,
+  })
+  const controller6 = useController({
+    name: resolve(6),
+    disabled: uniqueBoundNames.length < 7,
+  })
+  const controller7 = useController({
+    name: resolve(7),
+    disabled: uniqueBoundNames.length < 8,
+  })
+
+  return useMemo(
+    () => [
+      controller0,
+      controller1,
+      controller2,
+      controller3,
+      controller4,
+      controller5,
+      controller6,
+      controller7,
+    ],
+    [
+      controller0,
+      controller1,
+      controller2,
+      controller3,
+      controller4,
+      controller5,
+      controller6,
+      controller7,
+    ],
+  )
+}
+
+/** RHF adapter for `InlineSentenceField` — one controller per distinct bound segment. */
 export function InlineSentenceFieldRenderer({
   config,
   id,
   namePrefix,
   error,
 }: InlineSentenceFieldRendererProps) {
-  const boundNames = useMemo(
-    () => inlineSentenceBoundNames(config.segments, config.below),
+  const segmentVisibilityDeps = useMemo(
+    () => inlineSentenceSegmentVisibilityDeps(config.segments),
+    [config.segments],
+  )
+  const segmentVisibilityValues = useDependsOnValues(segmentVisibilityDeps, namePrefix)
+  const visibleSegments = useMemo(
+    () => filterVisibleInlineSentenceSegments(config.segments, segmentVisibilityValues),
+    [config.segments, segmentVisibilityValues],
+  )
+
+  const uniqueBoundNames = useMemo(
+    () => inlineSentenceUniqueBoundNames(config.segments, config.below),
     [config.below, config.segments],
   )
 
-  const controller0 = useController({
-    name: resolveFullName(namePrefix, boundNames[0] ?? '__inlineSentenceUnused0'),
-    disabled: boundNames.length < 1,
-  })
-  const controller1 = useController({
-    name: resolveFullName(namePrefix, boundNames[1] ?? '__inlineSentenceUnused1'),
-    disabled: boundNames.length < 2,
-  })
-  const controller2 = useController({
-    name: resolveFullName(namePrefix, boundNames[2] ?? '__inlineSentenceUnused2'),
-    disabled: boundNames.length < 3,
-  })
+  const controllers = useInlineSentenceControllers(uniqueBoundNames, namePrefix)
+  const controllerByName = useMemo(() => {
+    const map = new Map<string, (typeof controllers)[number]>()
+    for (const [index, name] of uniqueBoundNames.entries()) {
+      if (index >= MAX_INLINE_SENTENCE_BOUND_CONTROLLERS) break
+      map.set(name, controllers[index]!)
+    }
+    return map
+  }, [controllers, uniqueBoundNames])
 
-  const controllers = useMemo(
-    () => [controller0, controller1, controller2],
-    [controller0, controller1, controller2],
-  )
   const combinedError = resolveFirstFieldErrorMessage(
     ...controllers.map(({ fieldState }) => fieldState.error?.message),
     error,
@@ -65,13 +133,11 @@ export function InlineSentenceFieldRenderer({
 
   const controls = useMemo(() => {
     const result: InlineSentenceBoundControl[] = []
-    let boundIndex = 0
 
-    for (const segment of config.segments) {
+    for (const segment of visibleSegments) {
       if (!isInlineSentenceBoundSegment(segment)) continue
 
-      const controller = controllers[boundIndex]
-      boundIndex += 1
+      const controller = controllerByName.get(segment.name)
       if (!controller) continue
 
       const { field } = controller
@@ -111,13 +177,12 @@ export function InlineSentenceFieldRenderer({
     }
 
     return result
-  }, [config.label, config.segments, controllers, id])
+  }, [config.label, controllerByName, id, visibleSegments])
 
   const belowControl = useMemo((): InlineSentenceBoundChips | undefined => {
     if (!config.below) return undefined
 
-    const belowIndex = boundNames.indexOf(config.below.name)
-    const controller = controllers[belowIndex]
+    const controller = controllerByName.get(config.below.name)
     if (!controller) return undefined
 
     const { field } = controller
@@ -135,13 +200,13 @@ export function InlineSentenceFieldRenderer({
       onChange: field.onChange,
       onBlur: field.onBlur,
     }
-  }, [boundNames, config.below, config.chipSize, controllers, id])
+  }, [config.below, config.chipSize, controllerByName, id])
 
   return (
     <InlineSentenceField
       id={id}
       label={config.label}
-      segments={config.segments}
+      segments={visibleSegments}
       controls={controls}
       below={config.below}
       belowControl={belowControl}

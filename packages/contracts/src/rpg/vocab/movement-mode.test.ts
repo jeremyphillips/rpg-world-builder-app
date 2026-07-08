@@ -5,13 +5,14 @@ import {
   MOVEMENT_MODES,
   MOVEMENT_MODE_ENTRIES,
   extraMovementModeSchema,
-  formatMovementBonusAuthoringSummary,
-  formatMovementBonusDescription,
-  formatMovementBonusTitle,
+  formatMovementGrantAuthoringSummary,
+  formatMovementGrantCompact,
+  formatMovementGrantSentence,
   formatMovementDisplay,
   getMovementModeEntry,
   getMovementModeGrantLabel,
   getMovementModeLabel,
+  getMovementOperationAuthoringLabel,
   movementGrantPayloadSchema,
   movementModeSchema,
   movementSpeedsSchema,
@@ -96,31 +97,69 @@ describe('movement mode vocabulary', () => {
 })
 
 describe('movement grant vocabulary', () => {
-  it('parses movement grant payloads', () => {
+  it('parses movement grant payloads for each operation', () => {
     expect(
       movementGrantPayloadSchema.parse({
         mode: 'walk',
-        operation: 'bonus',
-        value: 5,
-        unit: 'ft',
+        operation: 'increase',
+        feet: 5,
       }),
-    ).toEqual({ mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' })
+    ).toEqual({ mode: 'walk', operation: 'increase', feet: 5 })
+
+    expect(
+      movementGrantPayloadSchema.parse({
+        mode: 'burrow',
+        operation: 'set',
+        feet: 20,
+      }),
+    ).toEqual({ mode: 'burrow', operation: 'set', feet: 20 })
+
+    expect(
+      movementGrantPayloadSchema.parse({
+        mode: 'climb',
+        operation: 'match',
+        matchMode: 'walk',
+      }),
+    ).toEqual({ mode: 'climb', operation: 'match', matchMode: 'walk' })
   })
 
-  it('formats movement bonus display strings', () => {
-    const grant = {
+  it('rejects match grants where matchMode equals mode', () => {
+    expect(
+      movementGrantPayloadSchema.safeParse({
+        mode: 'walk',
+        operation: 'match',
+        matchMode: 'walk',
+      }).success,
+    ).toBe(false)
+  })
+
+  it('formats movement grant display strings across tiers', () => {
+    const increaseGrant = {
       mode: 'walk' as const,
-      operation: 'bonus' as const,
-      value: 5 as const,
-      unit: 'ft' as const,
+      operation: 'increase' as const,
+      feet: 5 as const,
     }
     expect(getMovementModeGrantLabel('walk')).toBe('Walking speed')
     expect(getMovementModeGrantLabel('fly')).toBe('Flying speed')
-    expect(formatMovementBonusTitle(grant)).toBe('+5 ft walking speed')
-    expect(formatMovementBonusDescription(grant)).toBe('Your walking speed increases by 5 feet.')
-    expect(formatMovementBonusAuthoringSummary(grant)).toBe(
+    expect(getMovementOperationAuthoringLabel('increase')).toBe('increases by')
+    expect(formatMovementGrantCompact(increaseGrant)).toBe('Walk speed +5 ft')
+    expect(formatMovementGrantSentence(increaseGrant)).toBe('Your walking speed increases by 5 ft.')
+    expect(formatMovementGrantAuthoringSummary(increaseGrant)).toBe(
       "Character's walking speed increases by 5 ft.",
     )
+
+    expect(formatMovementGrantCompact({ mode: 'burrow', operation: 'set', feet: 20 })).toBe(
+      'Burrow speed 20 ft',
+    )
+    expect(formatMovementGrantSentence({ mode: 'burrow', operation: 'set', feet: 20 })).toBe(
+      'You gain a burrowing speed of 20 ft.',
+    )
+    expect(
+      formatMovementGrantCompact({ mode: 'climb', operation: 'match', matchMode: 'walk' }),
+    ).toBe('Climb speed equal to Walk speed')
+    expect(
+      formatMovementGrantSentence({ mode: 'climb', operation: 'match', matchMode: 'walk' }),
+    ).toBe('Your climbing speed equals your walking speed.')
   })
 })
 
