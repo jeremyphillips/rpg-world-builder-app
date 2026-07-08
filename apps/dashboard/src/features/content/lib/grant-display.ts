@@ -90,6 +90,19 @@ function formatMoreBenefitsLabel(count: number): string {
   return count === 1 ? '1 more benefit' : `${count} more benefits`
 }
 
+function formatBenefitCountLabel(count: number): string {
+  return count === 1 ? '1 benefit' : `${count} benefits`
+}
+
+function isRenderableGrant(item: GrantSummaryItem): boolean {
+  return item.supported
+}
+
+/** Known valid grants without a compact renderer yet — countable for overflow/totals. */
+function isHiddenKnownValidGrant(item: GrantSummaryItem): boolean {
+  return item.kind === 'notRenderedYet'
+}
+
 function formatSenseCompactLabel(
   grant: Extract<ContentGrant, { kind: 'sense' }>,
   vocabulary: GrantDisplayVocabulary,
@@ -203,9 +216,8 @@ function appendNotRenderedDisplayParts(
   supportedCount: number,
   exposeUnsupportedGrants?: boolean,
 ): string[] {
-  if (notRendered.length === 0) {
-    return parts
-  }
+  const hiddenKnownValid = notRendered.filter(isHiddenKnownValidGrant)
+  const unrecognized = notRendered.filter((item) => item.kind === 'unrecognized')
 
   if (exposeUnsupportedGrants) {
     return [
@@ -214,22 +226,26 @@ function appendNotRenderedDisplayParts(
     ]
   }
 
-  if (supportedCount > 0) {
-    return [...parts, formatMoreBenefitsLabel(notRendered.length)]
+  if (supportedCount > 0 && hiddenKnownValid.length > 0) {
+    return [...parts, formatMoreBenefitsLabel(hiddenKnownValid.length)]
   }
 
-  if (notRendered.length === 1 && notRendered[0]!.kind === 'unrecognized') {
-    return [...parts, 'Additional benefit']
+  if (supportedCount === 0 && hiddenKnownValid.length > 0) {
+    return [formatBenefitCountLabel(hiddenKnownValid.length)]
   }
 
-  return [...parts, formatMoreBenefitsLabel(notRendered.length)]
+  if (unrecognized.length > 0 && supportedCount === 0 && hiddenKnownValid.length === 0) {
+    return parts
+  }
+
+  return parts
 }
 
 function buildDisplayParts(
   items: GrantSummaryItem[],
   options?: Pick<GrantSummaryFormatOptions, 'includeTypeSuffix' | 'exposeUnsupportedGrants'>,
 ): string[] {
-  const supported = items.filter((item) => item.supported)
+  const supported = items.filter(isRenderableGrant)
   const notRendered = items.filter((item) => !item.supported)
   const parts = buildSupportedDisplayParts(supported, options?.includeTypeSuffix)
 
@@ -302,7 +318,7 @@ export function buildGrantSummaryModel(
   })
 
   const flatItems = groups.flatMap((group) => group.items)
-  const notRenderedCount = flatItems.filter((item) => !item.supported).length
+  const notRenderedCount = flatItems.filter(isHiddenKnownValidGrant).length
 
   return {
     groups,

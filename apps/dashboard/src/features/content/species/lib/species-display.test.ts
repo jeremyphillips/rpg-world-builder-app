@@ -11,6 +11,10 @@ import {
 } from '@/features/homebrew'
 
 import { pickSpecies } from '../../lib/fixtures/pick'
+import {
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  getDrowHeritageSpellCatalog,
+} from '../../lib/fixtures/grant-display-fixtures'
 
 import {
   buildSpeciesCardViewModel,
@@ -162,87 +166,24 @@ describe('species-display', () => {
     })
   })
 
-  it('builds grouped grant summaries for heritage options with grant groups', () => {
-    const elfWithDrowHeritage = {
-      ...dwarfWithTraits,
-      name: 'Elf',
-      heritage: {
-        id: 'elven-lineage',
-        name: 'Elven Lineage',
-        description: '<p>Choose a lineage.</p>',
-        choose: 1,
-        options: [
-          {
-            kind: 'custom',
-            id: 'drow',
-            name: 'Drow',
-            description: '<p>Prose fallback.</p>',
-            grantGroups: [
-              {
-                grants: [
-                  { kind: 'sense', type: 'darkvision', range: 120 },
-                  {
-                    kind: 'spells',
-                    ability: 'cha',
-                    mode: 'free_cast',
-                    spellIds: ['dancing-lights'],
-                    frequency: 'at_will',
-                  },
-                ],
-              },
-              {
-                unlock: { level: 3 },
-                grants: [
-                  {
-                    kind: 'spells',
-                    ability: 'cha',
-                    mode: 'free_cast',
-                    spellIds: ['faerie-fire'],
-                    frequency: 'once_per_long_rest',
-                  },
-                ],
-              },
-              {
-                unlock: { level: 5 },
-                grants: [
-                  {
-                    kind: 'spells',
-                    ability: 'cha',
-                    mode: 'free_cast',
-                    spellIds: ['darkness'],
-                    frequency: 'once_per_long_rest',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    } as const satisfies Species
-
+  it('builds grouped grant summaries for catalog Drow heritage options', () => {
+    const elf = pickSpecies('elf')
     const vocabularyWithSpells = {
       ...vocabulary,
       resolveSpell: (slug: string) => {
-        const spells: Record<string, { name: string; level: number }> = {
-          'dancing-lights': { name: 'Dancing Lights', level: 0 },
-          'faerie-fire': { name: 'Faerie Fire', level: 1 },
-          darkness: { name: 'Darkness', level: 2 },
-        }
-        return spells[slug]
+        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.slug === slug)
+        return spell ? { name: spell.name, level: spell.level } : undefined
       },
     }
 
-    const { sections } = buildSpeciesDetailViewModel(elfWithDrowHeritage, vocabularyWithSpells)
+    const { sections } = buildSpeciesDetailViewModel(elf, vocabularyWithSpells)
     const heritage = sections.find((section) => section.id === 'heritage')
+    const drow = heritage?.items.find((item) => item.id === 'drow')
 
-    expect(heritage?.items[0]).toMatchObject({
+    expect(drow).toMatchObject({
       id: 'drow',
       title: 'Drow',
-      summaryLines: [
-        'L1: Darkvision 120 ft · Dancing Lights cantrip',
-        'L3: Faerie Fire spell',
-        'L5: Darkness spell',
-      ],
+      summaryLines: [...DROW_HERITAGE_SHEET_SUMMARY_LINES],
       summaryInline: 'Darkvision 120 ft · Dancing Lights · Faerie Fire · Darkness',
     })
   })

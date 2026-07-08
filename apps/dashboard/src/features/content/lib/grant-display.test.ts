@@ -3,25 +3,19 @@ import { describe, expect, it } from 'vitest'
 import type { GrantGroup, Spell } from '@rpg/contracts'
 
 import {
+  buildCatalogDrowGrantDisplayVocabulary,
+  DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
+  getCatalogDrowHeritageGrantGroups,
+} from './fixtures/grant-display-fixtures'
+import {
   buildGrantSummaryModel,
   buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
   GRANT_SUMMARY_JOIN,
-  type GrantDisplayVocabulary,
 } from './grant-display'
 
-const vocabulary: GrantDisplayVocabulary = {
-  resolveSenseLabel: (type) => (type === 'darkvision' ? 'Darkvision' : type),
-  resolveSpell: (slug) => {
-    const spells: Record<string, { name: string; level: number }> = {
-      'dancing-lights': { name: 'Dancing Lights', level: 0 },
-      'faerie-fire': { name: 'Faerie Fire', level: 1 },
-      darkness: { name: 'Darkness', level: 2 },
-    }
-    return spells[slug]
-  },
-}
+const vocabulary = buildCatalogDrowGrantDisplayVocabulary()
 
 const movementGrant = {
   kind: 'movement',
@@ -31,45 +25,6 @@ const movementGrant = {
   unit: 'ft',
 } as const satisfies GrantGroup['grants'][number]
 
-const drowGrantGroups = [
-  {
-    grants: [
-      { kind: 'sense', type: 'darkvision', range: 120 },
-      {
-        kind: 'spells',
-        ability: 'cha',
-        mode: 'free_cast',
-        spellIds: ['dancing-lights'],
-        frequency: 'at_will',
-      },
-    ],
-  },
-  {
-    unlock: { level: 3 },
-    grants: [
-      {
-        kind: 'spells',
-        ability: 'cha',
-        mode: 'free_cast',
-        spellIds: ['faerie-fire'],
-        frequency: 'once_per_long_rest',
-      },
-    ],
-  },
-  {
-    unlock: { level: 5 },
-    grants: [
-      {
-        kind: 'spells',
-        ability: 'cha',
-        mode: 'free_cast',
-        spellIds: ['darkness'],
-        frequency: 'once_per_long_rest',
-      },
-    ],
-  },
-] as const satisfies readonly GrantGroup[]
-
 describe('buildGrantSummaryModel', () => {
   it('returns empty model for missing grant groups', () => {
     expect(buildGrantSummaryModel(undefined, vocabulary)).toEqual({
@@ -78,14 +33,37 @@ describe('buildGrantSummaryModel', () => {
     })
   })
 
-  it('groups Drow heritage grants by effective unlock level', () => {
-    const model = buildGrantSummaryModel([...drowGrantGroups], vocabulary)
+  it('groups catalog Drow heritage grants by effective unlock level', () => {
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(model.groups.map((group) => group.level)).toEqual([1, 3, 5])
     expect(model.groups[0]?.label).toBe('L1')
     expect(model.groups[1]?.label).toBe('L3')
     expect(model.groups[2]?.label).toBe('L5')
     expect(model.flatItems).toHaveLength(4)
+  })
+
+  it('marks supported catalog Drow items with source grant kinds', () => {
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
+
+    expect(model.flatItems[0]).toMatchObject({
+      kind: 'sense',
+      supported: true,
+      sourceGrantKind: 'sense',
+      label: 'Darkvision 120 ft',
+    })
+    expect(model.flatItems[1]).toMatchObject({
+      kind: 'cantrip',
+      supported: true,
+      sourceGrantKind: 'spells',
+      label: 'Dancing Lights',
+    })
+    expect(model.flatItems[2]).toMatchObject({
+      kind: 'spell',
+      supported: true,
+      sourceGrantKind: 'spells',
+      label: 'Faerie Fire',
+    })
   })
 
   it('marks known grant kinds without compact renderers as notRenderedYet', () => {
@@ -117,7 +95,7 @@ describe('buildGrantSummaryModel', () => {
 
 describe('formatGrantSummaryInline', () => {
   it('joins supported flat items with the summary separator', () => {
-    const model = buildGrantSummaryModel([...drowGrantGroups], vocabulary)
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model)).toBe(
       ['Darkvision 120 ft', 'Dancing Lights', 'Faerie Fire', 'Darkness'].join(GRANT_SUMMARY_JOIN),
@@ -125,7 +103,7 @@ describe('formatGrantSummaryInline', () => {
   })
 
   it('can include spell type suffixes', () => {
-    const model = buildGrantSummaryModel([...drowGrantGroups], vocabulary)
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
       ['Darkvision 120 ft', 'Dancing Lights cantrip', 'Faerie Fire spell', 'Darkness spell'].join(
@@ -135,7 +113,7 @@ describe('formatGrantSummaryInline', () => {
   })
 
   it('truncates with +N more when maxItems is exceeded', () => {
-    const model = buildGrantSummaryModel([...drowGrantGroups], vocabulary)
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model, { maxItems: 2 })).toBe(
       `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Dancing Lights${GRANT_SUMMARY_JOIN}+2 more`,
@@ -159,32 +137,76 @@ describe('formatGrantSummaryInline', () => {
 })
 
 describe('formatGrantSummaryByLevel', () => {
-  it('renders grouped L1, L3, and L5 summaries for Drow', () => {
-    const model = buildGrantSummaryModel([...drowGrantGroups], vocabulary)
+  it('renders grouped L1, L3, and L5 summaries for catalog Drow', () => {
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryByLevel(model, { includeTypeSuffix: true })).toEqual([
+      ...DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
+    ])
+  })
+
+  it('renders a total benefit count without "more" when only hidden known grants exist', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [movementGrant, { ...movementGrant, value: 10 }],
+        },
+      ],
+      vocabulary,
+    )
+
+    expect(formatGrantSummaryByLevel(model)).toEqual([{ label: 'L1', text: '2 benefits' }])
+    expect(formatGrantSummaryInline(model)).toBe('2 benefits')
+  })
+
+  it('collapses visible grants with hidden known grants into N more benefits', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, movementGrant],
+        },
+      ],
+      vocabulary,
+    )
+
+    expect(formatGrantSummaryByLevel(model)).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Dancing Lights cantrip`,
-      },
-      {
-        label: 'L3',
-        text: 'Faerie Fire spell',
-      },
-      {
-        label: 'L5',
-        text: 'Darkness spell',
+        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
       },
     ])
   })
 
-  it('uses Additional benefit only for a sole unrecognized grant', () => {
+  it('omits level summary when only unrecognized grants exist', () => {
     const model = buildGrantSummaryModel(
       [{ grants: [{ kind: 'futureGrant' } as never] }],
       vocabulary,
     )
 
-    expect(formatGrantSummaryByLevel(model)).toEqual([{ label: 'L1', text: 'Additional benefit' }])
+    expect(formatGrantSummaryByLevel(model)).toEqual([])
+    expect(formatGrantSummaryInline(model)).toBe('')
+  })
+
+  it('does not count unrecognized grants toward hidden overflow benefits', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            { kind: 'sense', type: 'darkvision', range: 120 },
+            movementGrant,
+            { kind: 'futureGrant' } as never,
+          ],
+        },
+      ],
+      vocabulary,
+    )
+
+    expect(formatGrantSummaryByLevel(model)).toEqual([
+      {
+        label: 'L1',
+        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
+      },
+    ])
   })
 
   it('exposes unsupported grant kinds in dev/test mode', () => {
