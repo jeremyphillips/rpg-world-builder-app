@@ -10,10 +10,14 @@ import type {
 } from '@rpg/contracts'
 import {
   formatArmorTrainingGrantSentence,
+  formatProficiencyGrantChooseFromAnyScopePhrase,
+  formatProficiencyGrantChooseFromSelectedPhrase,
+  formatProficiencyGrantChoosePhrase,
   formatSkillProficiencyGrantSentence,
   formatToolProficiencyGrantSentence,
   formatWeaponProficiencyGrantSentence,
   getArmorCategoryLabel,
+  getProficiencyDomainLabel,
   getSkillName,
   getToolCategoryLabel,
   getWeaponCategoryLabel,
@@ -200,12 +204,12 @@ function weaponPoolTitleDetail(row: WeaponProficiencyPoolItemForm): string {
         }),
       )
     }
-    return `choose ${choose} weapon proficiency`
+    return formatProficiencyGrantChoosePhrase('weapon', choose)
   }
   if (row.poolSource === 'explicit') {
-    return `choose ${choose} from selected weapons`
+    return formatProficiencyGrantChooseFromSelectedPhrase('weapon', choose)
   }
-  return `choose ${choose} weapon proficiency`
+  return formatProficiencyGrantChoosePhrase('weapon', choose)
 }
 
 export function weaponProficiencyGrantTitle(
@@ -213,27 +217,27 @@ export function weaponProficiencyGrantTitle(
   index: number,
   weaponOptions: FieldOption[] = [],
 ): string {
-  if (!row?.proficiencySource) return `Weapon proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.weaponProficiencySlugs ?? []).map(
       (slug) => weaponOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `Weapon proficiency ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} weapons`
-    return grantTypePrefix('Weapon proficiency', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('weapon'), detail)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.weaponProficiencyCategories ?? []).map((category) =>
       getWeaponCategoryLabel(category),
     )
-    if (!labels.length) return `Weapon proficiency ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix('Weapon proficiency', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('weapon'), detail)
   }
 
-  return grantTypePrefix('Weapon proficiency', weaponPoolTitleDetail(row))
+  return grantTypePrefix(getProficiencyDomainLabel('weapon'), weaponPoolTitleDetail(row))
 }
 
 export function weaponProficiencyGrantSummary(
@@ -363,7 +367,8 @@ export function toolProficiencyGrantFromFormRow(
 
 function toolPoolTitleDetail(row: ToolProficiencyPoolItemForm): string {
   const choose = row.choose ?? 1
-  if (row.poolSource === 'any') return `choose ${choose} from any tools`
+  if (row.poolSource === 'any')
+    return formatProficiencyGrantChooseFromAnyScopePhrase('tool', choose)
   if (row.poolSource === 'filtered') {
     const category = categoryFormValueToDomain(row.toolProficiencyPoolCategory)
     if (category) {
@@ -381,9 +386,9 @@ function toolPoolTitleDetail(row: ToolProficiencyPoolItemForm): string {
         }),
       )
     }
-    return `choose ${choose} tool proficiency`
+    return formatProficiencyGrantChoosePhrase('tool', choose)
   }
-  return `choose ${choose} from selected tools`
+  return formatProficiencyGrantChooseFromSelectedPhrase('tool', choose)
 }
 
 export function toolProficiencyGrantTitle(
@@ -391,27 +396,27 @@ export function toolProficiencyGrantTitle(
   index: number,
   toolOptions: FieldOption[] = [],
 ): string {
-  if (!row?.proficiencySource) return `Tool proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.toolProficiencySlugs ?? []).map(
       (slug) => toolOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `Tool proficiency ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} tools`
-    return grantTypePrefix('Tool proficiency', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('tool'), detail)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.toolProficiencyCategories ?? []).map((category) =>
       getToolCategoryLabel(category),
     )
-    if (!labels.length) return `Tool proficiency ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix('Tool proficiency', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('tool'), detail)
   }
 
-  return grantTypePrefix('Tool proficiency', toolPoolTitleDetail(row))
+  return grantTypePrefix(getProficiencyDomainLabel('tool'), toolPoolTitleDetail(row))
 }
 
 export function toolProficiencyGrantSummary(
@@ -511,9 +516,10 @@ function skillPoolTitleDetail(
   skillOptions: FieldOption[],
 ): string {
   const choose = row.choose ?? 1
-  if (row.poolSource === 'any') return `choose ${choose} from any skills`
+  if (row.poolSource === 'any')
+    return formatProficiencyGrantChooseFromAnyScopePhrase('skill', choose)
   const ids = row.skillProficiencyPoolIds ?? []
-  if (!ids.length) return `choose ${choose} skill proficiency`
+  if (!ids.length) return formatProficiencyGrantChoosePhrase('skill', choose)
   return `choose ${choose} from ${formatSkillPoolTitle(ids, skillOptions)}`
 }
 
@@ -522,15 +528,21 @@ export function skillProficiencyGrantTitle(
   index: number,
   skillOptions: FieldOption[] = [],
 ): string {
-  if (!row?.proficiencySource) return `Skill proficiency ${index + 1}`
+  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('skill')} ${index + 1}`
 
   if (row.proficiencySource === 'specific') {
     const ids = row.skillProficiencyIds ?? []
-    if (!ids.length) return `Skill proficiency ${index + 1}`
-    return grantTypePrefix('Skill proficiency', formatSkillPoolTitle(ids, skillOptions))
+    if (!ids.length) return `${getProficiencyDomainLabel('skill')} ${index + 1}`
+    return grantTypePrefix(
+      getProficiencyDomainLabel('skill'),
+      formatSkillPoolTitle(ids, skillOptions),
+    )
   }
 
-  return grantTypePrefix('Skill proficiency', skillPoolTitleDetail(row, skillOptions))
+  return grantTypePrefix(
+    getProficiencyDomainLabel('skill'),
+    skillPoolTitleDetail(row, skillOptions),
+  )
 }
 
 export function skillProficiencyGrantSummary(
@@ -661,9 +673,9 @@ function armorPoolTitleDetail(row: ArmorTrainingPoolItemForm): string {
         }),
       )
     }
-    return `choose ${choose} armor training`
+    return formatProficiencyGrantChoosePhrase('armor', choose)
   }
-  return `choose ${choose} from selected armor`
+  return formatProficiencyGrantChooseFromSelectedPhrase('armor', choose)
 }
 
 export function armorTrainingGrantTitle(
@@ -671,27 +683,27 @@ export function armorTrainingGrantTitle(
   index: number,
   armorOptions: FieldOption[] = [],
 ): string {
-  if (!row?.proficiencySource) return `Armor training ${index + 1}`
+  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.armorTrainingSlugs ?? []).map(
       (slug) => armorOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `Armor training ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} armor`
-    return grantTypePrefix('Armor training', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('armor'), detail)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.armorTrainingCategories ?? []).map((category) =>
       getArmorCategoryLabel(category),
     )
-    if (!labels.length) return `Armor training ${index + 1}`
+    if (!labels.length) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
     const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix('Armor training', detail)
+    return grantTypePrefix(getProficiencyDomainLabel('armor'), detail)
   }
 
-  return grantTypePrefix('Armor training', armorPoolTitleDetail(row))
+  return grantTypePrefix(getProficiencyDomainLabel('armor'), armorPoolTitleDetail(row))
 }
 
 export function armorTrainingGrantSummary(

@@ -20,6 +20,7 @@ import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/fea
 import {
   getLanguageCategorySentenceForm,
   getLanguageLabel,
+  getLanguageProficiencySentenceForm,
   getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
@@ -117,13 +118,13 @@ export function formatLanguageGrantSentence(languageIds: readonly string[]): str
 export function formatLanguageGrantCompact(languageIds: readonly string[]): string {
   const labels = languageIds.map((id) => getLanguageLabel(id))
   if (languageIds.length === 1) {
-    return `${labels[0]} language`
+    return `${labels[0]} ${getLanguageProficiencySentenceForm(1)}`
   }
-  return `${labels.join(', ')} languages`
+  return `${labels.join(', ')} ${getLanguageProficiencySentenceForm(2)}`
 }
 
 export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {
-  const languageWord = grant.choose === 1 ? 'language' : 'languages'
+  const languageWord = getLanguageProficiencySentenceForm(grant.choose ?? 1)
   if (grant.from?.length) {
     return `Character chooses ${grant.choose} ${languageWord} from ${joinNaturalList(
       grant.from.map((id) => getLanguageSentenceForm(id)),

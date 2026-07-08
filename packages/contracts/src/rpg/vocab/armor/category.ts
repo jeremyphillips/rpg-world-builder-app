@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from '../types'
+import { formatVocabularySlugLabel } from '../format-slug-label'
+import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Armor categories — the closed SRD 5.2.1 category set. Used by class
@@ -41,6 +42,10 @@ export const ARMOR_CATEGORY_ENTRIES = {
   shields: {
     label: 'Shield',
     description: 'Utilize action to don or doff.',
+    sentence: {
+      singular: 'shield',
+      plural: 'shields',
+    },
   },
 } as const satisfies Record<ArmorCategory, GameTermEntry>
 
@@ -52,4 +57,26 @@ export function getArmorCategoryEntry(c: string): GameTermEntry | undefined {
 /** Returns the display label for an armor category. Falls back to the raw value. */
 export function getArmorCategoryLabel(c: string): string {
   return getArmorCategoryEntry(c)?.label ?? c
+}
+
+/** Counted noun phrase for generated armor-category prose (e.g. "suit of light armor"). */
+export function getArmorCategorySentenceForm(category: string, count = 1): string {
+  const entry = getArmorCategoryEntry(category)
+  if (entry) return getTermSentenceForm(entry, count)
+  return getTermSentenceForm({ label: category, description: '' }, count)
+}
+
+/** Lowercase scope phrase for armor training choice pools (e.g. "heavy armor"). */
+export function getArmorCategoryScopeForm(category: string): string {
+  const entry = getArmorCategoryEntry(category)
+  if (entry) return getTermLabelSingular(entry.label)
+  return getTermLabelSingular(formatVocabularySlugLabel(category))
+}
+
+/** Compact summary label for armor training grants (e.g. "Light armor"). */
+export function getArmorCategoryCompactLabel(category: string): string {
+  if (category === 'shields') return 'Shield'
+  const entry = getArmorCategoryEntry(category)
+  if (!entry) return formatVocabularySlugLabel(category)
+  return entry.label.replace(/ Armor$/, ' armor')
 }

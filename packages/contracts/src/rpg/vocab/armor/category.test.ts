@@ -4,8 +4,11 @@ import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   armorCategorySchema,
+  getArmorCategoryCompactLabel,
   getArmorCategoryEntry,
   getArmorCategoryLabel,
+  getArmorCategoryScopeForm,
+  getArmorCategorySentenceForm,
 } from './category'
 
 describe('armorCategorySchema', () => {
@@ -36,5 +39,13 @@ describe('armor category vocabulary', () => {
   it('returns labels and falls back for unknown categories', () => {
     expect(getArmorCategoryLabel('light')).toBe('Light Armor')
     expect(getArmorCategoryLabel('custom')).toBe('custom')
+  })
+
+  it('returns sentence, scope, and compact forms', () => {
+    expect(getArmorCategorySentenceForm('light', 2)).toBe('suits of light armor')
+    expect(getArmorCategoryScopeForm('heavy')).toBe('heavy armor')
+    expect(getArmorCategoryScopeForm('shields')).toBe('shield')
+    expect(getArmorCategoryCompactLabel('light')).toBe('Light armor')
+    expect(getArmorCategoryCompactLabel('shields')).toBe('Shield')
   })
 })

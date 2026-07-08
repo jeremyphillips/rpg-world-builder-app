@@ -4,6 +4,7 @@ import {
   LANGUAGE_SET_ID,
   getLanguageCategorySentenceForm,
   getLanguageLabel,
+  getLanguageProficiencySentenceForm,
   getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
@@ -52,5 +53,7 @@ describe('language vocabulary', () => {
     expect(getLanguageSentenceForm('common')).toBe('Common')
     expect(getLanguageCategorySentenceForm('standard', 1)).toBe('standard language')
     expect(getLanguageCategorySentenceForm('standard', 2)).toBe('standard languages')
+    expect(getLanguageProficiencySentenceForm(1)).toBe('language')
+    expect(getLanguageProficiencySentenceForm(2)).toBe('languages')
   })
 })
