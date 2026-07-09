@@ -99,15 +99,7 @@ function PackageOptionCard({
     () => listNestedPoolsForOption(characterClass, summary.optionId, catalogIndex),
     [catalogIndex, characterClass, summary.optionId],
   )
-  const nestedSelections = useMemo(() => {
-    const pending = pendingNestedSelections[summary.optionId] ?? {}
-    return {
-      ...draft.choiceSelections,
-      ...pending,
-    }
-  }, [draft.choiceSelections, pendingNestedSelections, summary.optionId])
-  const nestedResolved = areNestedPoolsResolved(nestedPools, nestedSelections)
-  const disabled = !summary.isSelectable || !nestedResolved
+  const disabled = !summary.isSelectable
   const meta = formatStartingEquipmentOptionMeta(summary)
   const isSelected = selectedOptionId === summary.optionId
 
@@ -127,7 +119,7 @@ function PackageOptionCard({
         className="border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0"
       />
 
-      {nestedPools.length > 0 ? (
+      {isSelected && nestedPools.length > 0 ? (
         <div
           className={startingEquipmentOptionCardNestedFieldsClasses}
           onPointerDown={(event) => event.stopPropagation()}
@@ -258,14 +250,11 @@ export function StartingEquipmentOptionCards({
       onValueChange={(optionId) => {
         if (!optionId) return
 
-        const nestedPools = listNestedPoolsForOption(characterClass, optionId, catalogIndex)
         const pending = pendingNestedSelections[optionId] ?? {}
         const nestedSelections = {
           ...draft.choiceSelections,
           ...pending,
         }
-
-        if (!areNestedPoolsResolved(nestedPools, nestedSelections)) return
 
         onSelectOption(optionId, nestedSelections)
       }}

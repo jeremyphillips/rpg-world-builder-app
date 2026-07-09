@@ -43,13 +43,11 @@ function renderAccordion(
     <CharacterBuilderPreviewAccordion
       preview={preview}
       catalogIndex={catalogIndex}
+      draft={draft}
+      resolvedChoiceSets={resolvedChoiceSets}
       narrative={narrative}
       narrativeCount={narrativeCount}
-      skillChoiceCount={
-        characterClass?.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose
-      }
       hasCharacterClass={characterClass !== undefined}
-      characterClass={characterClass}
       spellcastingActive={false}
     />,
   )
@@ -84,6 +82,21 @@ describe('CharacterBuilderPreviewAccordion', () => {
     renderAccordion()
 
     expect(screen.getByText('Common')).toBeInTheDocument()
+    expect(screen.queryByText('No languages yet.')).not.toBeInTheDocument()
+  })
+
+  it('shows pending saving throws and selected skill names', () => {
+    renderAccordion({
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      choiceSelections: {
+        'class:srd-cc-5.2.1:fighter:class-skills': ['srd-cc-5.2.1:athletics'],
+      },
+    })
+
+    expect(screen.getByText(/STR pending, CON pending/)).toBeInTheDocument()
+    expect(screen.getByText('Athletics')).toBeInTheDocument()
+    expect(screen.getByText('1 skill choice remaining')).toBeInTheDocument()
   })
 
   it('toggles accordion sections with aria-expanded', async () => {

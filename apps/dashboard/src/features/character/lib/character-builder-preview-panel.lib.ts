@@ -1,4 +1,4 @@
-import type { CharacterBuilderDraft, CharacterNarrative, ClassStored } from '@rpg/contracts'
+import type { CharacterBuilderDraft, CharacterNarrative } from '@rpg/contracts'
 import { characterBuilderStepReadinessMessages, formatStepReadinessMessage } from '@rpg/contracts'
 
 export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
@@ -38,39 +38,17 @@ export function formatPreviewAbilityCell(
   return `${score} (${modLabel})`
 }
 
-function hasClassDependentProficiencyChoiceSlots(characterClass: ClassStored | undefined): boolean {
-  const proficiencies = characterClass?.characterCreation?.proficiencies
-  if (!proficiencies) return false
-
-  const hasSkillChoices = (proficiencies.skills?.choices ?? []).some((choice) => choice.choose > 0)
-  const hasToolChoices = (proficiencies.tools?.choices ?? []).some((choice) => choice.choose > 0)
-
-  return hasSkillChoices || hasToolChoices
-}
-
 export type ResolveProficienciesSectionHintArgs = {
   hasCharacterClass: boolean
-  characterClass?: ClassStored
-  skillChoiceCount?: number
 }
 
 export function resolveProficienciesSectionHint({
   hasCharacterClass,
-  characterClass,
-  skillChoiceCount,
 }: ResolveProficienciesSectionHintArgs): string {
   if (!hasCharacterClass) {
     return formatStepReadinessMessage(
       characterBuilderStepReadinessMessages.proficienciesBlockedNoClass,
     )
-  }
-
-  if (!hasClassDependentProficiencyChoiceSlots(characterClass)) {
-    return ''
-  }
-
-  if (skillChoiceCount) {
-    return `${skillChoiceCount} skill choice${skillChoiceCount === 1 ? '' : 's'} remaining`
   }
 
   return ''

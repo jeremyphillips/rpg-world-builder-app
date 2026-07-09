@@ -87,28 +87,51 @@ describe('EquipmentStep', () => {
     )
   })
 
-  it('requires nested pool picks before selecting a package', async () => {
+  it('selects standard equipment before nested instrument choice is required', async () => {
     const user = userEvent.setup()
     const { onDraftChange } = renderEquipmentStep()
 
+    expect(screen.queryByRole('combobox', { name: 'Musical Instrument' })).not.toBeInTheDocument()
+
     await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
-
-    expect(onDraftChange).not.toHaveBeenCalled()
-
-    await user.click(screen.getByRole('combobox', { name: 'Musical Instrument' }))
-    await user.keyboard('{ArrowDown}{Enter}')
-
-    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
           [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        }),
+        equipment: expect.objectContaining({ mode: 'package' }),
+      }),
+    )
+  })
+
+  it('shows nested instrument pick after selecting standard equipment', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const { onDraftChange } = renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('combobox', { name: 'Musical Instrument' }))
+    await user.keyboard('{ArrowDown}{Enter}')
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        choiceSelections: expect.objectContaining({
           [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
             'srd-cc-5.2.1:lute',
           ],
         }),
-        equipment: expect.objectContaining({ mode: 'package' }),
       }),
     )
   })

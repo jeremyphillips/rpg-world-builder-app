@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
+import { pickSpecies } from '@/features/content/lib/fixtures/pick'
+
+import {
+  createPopulatedStandaloneBuilderContextFixture,
+  populatedBuilderCatalog,
+} from './character-builder-fixtures'
 import {
   getPreviewAlignmentLine,
   getPreviewIdentityName,
@@ -37,8 +42,22 @@ describe('preview identity summary helpers', () => {
     }
 
     expect(getPreviewIdentityName(draft)).toBe('Tarin')
-    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe('Level 1 Fighter')
+    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe('Level 1 · Fighter')
     expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe('Dwarf')
     expect(getPreviewAlignmentLine(draft)).toBe('Lawful Good')
+  })
+
+  it('appends heritage to the species line when set', () => {
+    const elf = pickSpecies('elf')
+    const catalogIndex = indexCharacterBuildCatalog({
+      ...populatedBuilderCatalog,
+      species: [...populatedBuilderCatalog.species, elf],
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: elf.id, heritageId: 'high-elf' },
+    }
+
+    expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe('Elf · High Elf')
   })
 })

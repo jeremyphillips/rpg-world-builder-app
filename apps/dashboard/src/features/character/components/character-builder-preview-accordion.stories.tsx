@@ -42,13 +42,11 @@ function renderAccordionStory(draft = createEmptyCharacterBuilderDraft()) {
       <CharacterBuilderPreviewAccordion
         preview={preview}
         catalogIndex={catalogIndex}
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
         narrative={narrative}
         narrativeCount={narrativeFieldCount(narrative)}
-        skillChoiceCount={
-          characterClass?.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose
-        }
         hasCharacterClass={characterClass !== undefined}
-        characterClass={characterClass}
         spellcastingActive={false}
       />
     </div>

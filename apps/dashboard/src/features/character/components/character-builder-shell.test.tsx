@@ -105,6 +105,26 @@ describe('CharacterBuilderShell', () => {
     expect(screen.getByDisplayValue('Steady')).toBeInTheDocument()
   })
 
+  it('shows validation alert and rail error when Continue fails on abilities', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('heading', { name: 'Identity' })
+    const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
+    await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
+
+    await screen.findByRole('heading', { name: 'Abilities', level: 2 })
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
+    expect(screen.getByRole('heading', { name: 'Abilities', level: 2 })).toBeInTheDocument()
+    expect(
+      within(stepRail).getByRole('button', { name: /Abilities, has blocking validation issues/i }),
+    ).toBeInTheDocument()
+  })
+
   it('keeps ability scores when navigating away via the step rail without submitting', async () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
