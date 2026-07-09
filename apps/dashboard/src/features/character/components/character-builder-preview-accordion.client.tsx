@@ -29,9 +29,9 @@ import { getNarrativePreviewStatusLabel } from '../lib/narrative-preview'
 import {
   formatPreviewAbilityCell,
   formatPreviewOptionalNumber,
+  formatPreviewSpellsSubsection,
   resolveEquipmentPreviewEmptyHint,
   resolveProficienciesSectionHint,
-  resolveSpellsPreviewEmptyHint,
 } from '../lib/character-builder-preview-panel.lib'
 import {
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
@@ -87,13 +87,7 @@ function PreviewNarrativeSection({
         </span>
       </AccordionTrigger>
       <AccordionContent>
-        {narrativeCount === 0 ? (
-          <CharacterBuilderPreviewSectionContent>
-            <CharacterBuilderPreviewSubsectionHint>
-              {getNarrativePreviewStatusLabel(0)}
-            </CharacterBuilderPreviewSubsectionHint>
-          </CharacterBuilderPreviewSectionContent>
-        ) : (
+        {narrativeCount === 0 ? null : (
           <CharacterBuilderPreviewSectionContent>
             <dl className="space-y-2 text-sm">
               {narrative?.personalityTraits?.length ? (
@@ -315,12 +309,23 @@ function PreviewEquipmentSection({
 }
 
 function PreviewSpellsSection({
+  draft,
+  resolvedChoiceSets,
   hasCharacterClass,
   spellcastingActive,
 }: {
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
   hasCharacterClass: boolean
   spellcastingActive: boolean
 }) {
+  const subsection = formatPreviewSpellsSubsection(
+    draft,
+    resolvedChoiceSets,
+    hasCharacterClass,
+    spellcastingActive,
+  )
+
   return (
     <AccordionItem value="spells">
       <AccordionTrigger className={characterBuilderPreviewAccordionTriggerClasses}>
@@ -328,9 +333,13 @@ function PreviewSpellsSection({
       </AccordionTrigger>
       <AccordionContent>
         <CharacterBuilderPreviewSectionContent>
-          <CharacterBuilderPreviewSubsectionHint>
-            {resolveSpellsPreviewEmptyHint(hasCharacterClass, spellcastingActive)}
-          </CharacterBuilderPreviewSubsectionHint>
+          {subsection.resolvedText ? (
+            <p className="text-sm text-muted-foreground">{subsection.resolvedText}</p>
+          ) : subsection.emptyHint ? (
+            <CharacterBuilderPreviewSubsectionHint>
+              {subsection.emptyHint}
+            </CharacterBuilderPreviewSubsectionHint>
+          ) : null}
         </CharacterBuilderPreviewSectionContent>
       </AccordionContent>
     </AccordionItem>
@@ -367,6 +376,8 @@ export function CharacterBuilderPreviewAccordion({
       />
       <PreviewEquipmentSection preview={preview} hasCharacterClass={hasCharacterClass} />
       <PreviewSpellsSection
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
         hasCharacterClass={hasCharacterClass}
         spellcastingActive={spellcastingActive}
       />

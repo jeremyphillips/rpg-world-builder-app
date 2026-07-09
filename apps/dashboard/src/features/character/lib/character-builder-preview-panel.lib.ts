@@ -1,4 +1,4 @@
-import type { CharacterBuilderDraft, CharacterNarrative } from '@rpg/contracts'
+import type { CharacterBuilderDraft, CharacterNarrative, ChoiceSet } from '@rpg/contracts'
 import { characterBuilderStepReadinessMessages, formatStepReadinessMessage } from '@rpg/contracts'
 
 export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
@@ -71,4 +71,49 @@ export function resolveSpellsPreviewEmptyHint(
   }
 
   return spellcastingActive ? 'Choose starting spells.' : 'Not applicable for this class.'
+}
+
+export type PreviewSpellsSubsection = {
+  resolvedText: string | null
+  emptyHint: string | null
+}
+
+export function collectPreviewSpellLabels(
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[],
+): string[] {
+  const labels: string[] = []
+
+  for (const choiceSet of resolvedChoiceSets) {
+    if (choiceSet.choiceType !== 'cantrip' && choiceSet.choiceType !== 'spell') continue
+
+    const selections = draft.choiceSelections[choiceSet.id] ?? []
+    for (const selectedId of selections) {
+      const option = choiceSet.options.find((entry) => entry.id === selectedId)
+      labels.push(option?.label ?? selectedId)
+    }
+  }
+
+  return labels
+}
+
+export function formatPreviewSpellsSubsection(
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[],
+  hasCharacterClass: boolean,
+  spellcastingActive: boolean,
+): PreviewSpellsSubsection {
+  const labels = collectPreviewSpellLabels(draft, resolvedChoiceSets)
+
+  if (labels.length > 0) {
+    return {
+      resolvedText: labels.join(', '),
+      emptyHint: null,
+    }
+  }
+
+  return {
+    resolvedText: null,
+    emptyHint: resolveSpellsPreviewEmptyHint(hasCharacterClass, spellcastingActive),
+  }
 }

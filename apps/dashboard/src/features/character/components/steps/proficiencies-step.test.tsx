@@ -199,7 +199,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Stealth' }))
     expect(onDraftChange).toHaveBeenCalledWith({
       choiceSelections: {
         [skillChoiceSetId]: [],

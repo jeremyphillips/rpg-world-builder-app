@@ -15,9 +15,11 @@ import {
   PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
   PROFICIENCIES_STEP_SELECTION_FULL_REASON,
 } from '../../lib/proficiencies-step.lib'
+import { shouldShowSelectionFullNotice } from '../../lib/selection-counter.lib'
 import { ProficiencySelectedRow } from './proficiency-selected-row.client'
 import {
   proficiencyChoiceSectionClasses,
+  proficiencyChoiceSectionCounterRowClasses,
   proficiencyChoiceSectionHeaderClasses,
   proficiencyChoiceSectionOverSelectionClasses,
   proficiencyChoiceSectionSelectedListClasses,
@@ -39,6 +41,7 @@ export function ProficiencyChoiceSection({
     selectedCount,
     max,
   })
+  const showSelectionFull = shouldShowSelectionFullNotice(choiceSet, isFull, drawerTriggerLabel)
 
   return (
     <section
@@ -46,18 +49,20 @@ export function ProficiencyChoiceSection({
       aria-labelledby={`${choiceSet.id}-heading`}
     >
       <div className={proficiencyChoiceSectionHeaderClasses}>
-        <div className="space-y-1">
-          <Heading variant="subsection" as="h3" id={`${choiceSet.id}-heading`}>
-            {choiceSet.label}
-          </Heading>
-          <Text variant="muted">{formatProficiencySelectionCounter(selectedCount, max)}</Text>
-        </div>
+        <Heading variant="subsection" as="h3" id={`${choiceSet.id}-heading`}>
+          {choiceSet.label}
+        </Heading>
         <Button type="button" size="sm" onClick={onOpenDrawer}>
           {drawerTriggerLabel}
         </Button>
       </div>
 
-      {isFull ? <Text variant="muted">{PROFICIENCIES_STEP_SELECTION_FULL_REASON}</Text> : null}
+      <div className={proficiencyChoiceSectionCounterRowClasses}>
+        <Text variant="muted">{formatProficiencySelectionCounter(selectedCount, max)}</Text>
+        {showSelectionFull ? (
+          <Text variant="muted">{PROFICIENCIES_STEP_SELECTION_FULL_REASON}</Text>
+        ) : null}
+      </div>
 
       {isOverSelected ? (
         <p className={proficiencyChoiceSectionOverSelectionClasses} role="status">

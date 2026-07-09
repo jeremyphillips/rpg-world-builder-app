@@ -7,25 +7,37 @@ import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  isSpellcastingActiveAtLevel,
   resolveAvailableChoices,
+  type CharacterBuildContext,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import {
+  createSpellsStepContextFixture,
+  spellsStepWizardCantrips,
+  spellsStepWizardClass,
+} from '../lib/spells-step.fixtures'
 import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
-const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 
 function renderAccordion(
   draft = createEmptyCharacterBuilderDraft(),
   narrative = draft.identity.narrative,
+  options: {
+    renderContext?: CharacterBuildContext
+    spellcastingActive?: boolean
+  } = {},
 ) {
-  const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+  const renderContext = options.renderContext ?? context
+  const renderCatalogIndex = indexCharacterBuildCatalog(renderContext.catalog)
+  const resolvedChoiceSets = resolveAvailableChoices(draft, renderContext)
   const preview = buildCharacterPreview(
     draft,
-    catalogIndex,
-    context.characterCreationRules,
-    context.rulesetId,
+    renderCatalogIndex,
+    renderContext.characterCreationRules,
+    renderContext.rulesetId,
     { resolvedChoiceSets },
   )
   const narrativeCount = [
@@ -36,19 +48,23 @@ function renderAccordion(
     narrative?.backstory?.trim(),
   ].filter(Boolean).length
   const characterClass = draft.class.classId
-    ? catalogIndex.classes.get(draft.class.classId)
+    ? renderCatalogIndex.classes.get(draft.class.classId)
     : undefined
+  const spellcastingActive =
+    options.spellcastingActive ??
+    (characterClass !== undefined &&
+      isSpellcastingActiveAtLevel(characterClass.spellcasting, draft.class.level))
 
   return render(
     <CharacterBuilderPreviewAccordion
       preview={preview}
-      catalogIndex={catalogIndex}
+      catalogIndex={renderCatalogIndex}
       draft={draft}
       resolvedChoiceSets={resolvedChoiceSets}
       narrative={narrative}
       narrativeCount={narrativeCount}
       hasCharacterClass={characterClass !== undefined}
-      spellcastingActive={false}
+      spellcastingActive={spellcastingActive}
     />,
   )
 }
@@ -83,6 +99,31 @@ describe('CharacterBuilderPreviewAccordion', () => {
 
     expect(screen.getByText('Common')).toBeInTheDocument()
     expect(screen.queryByText('No languages yet.')).not.toBeInTheDocument()
+  })
+
+  it('shows empty narrative status only in the accordion trigger', () => {
+    renderAccordion()
+
+    expect(screen.getAllByText('Nothing added yet.')).toHaveLength(1)
+  })
+
+  it('lists selected cantrips in the spells preview subsection', () => {
+    const spellsContext = createSpellsStepContextFixture()
+    const cantripChoiceSetId = `spellcasting:${spellsStepWizardClass.id}:cantrips`
+
+    renderAccordion(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: spellsStepWizardClass.id, level: 1 },
+        choiceSelections: {
+          [cantripChoiceSetId]: [spellsStepWizardCantrips[0]!.id, spellsStepWizardCantrips[1]!.id],
+        },
+      },
+      undefined,
+      { renderContext: spellsContext },
+    )
+
+    expect(screen.getByText('Arcane Bolt, Mage Hand')).toBeInTheDocument()
   })
 
   it('shows pending saving throws and selected skill names', () => {

@@ -74,7 +74,7 @@ describe('ProficiencyChoiceSection', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }))
+    await user.click(screen.getByRole('button', { name: 'Remove Stealth' }))
     expect(onRemove).toHaveBeenCalledWith(proficienciesStepStealthSkill.id)
   })
 

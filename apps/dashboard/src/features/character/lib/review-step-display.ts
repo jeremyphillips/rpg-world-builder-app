@@ -7,21 +7,6 @@ import {
   type ChoiceSet,
 } from '@rpg/contracts'
 
-export function resolveReviewDisplayIssues(
-  draft: CharacterBuilderDraft,
-  context: CharacterBuildContext,
-  validationIssues: CharacterBuildValidationIssue[],
-  resolvedChoiceSets: readonly ChoiceSet[],
-): CharacterBuildValidationIssue[] {
-  if (validationIssues.length > 0) return validationIssues
-
-  const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets,
-  })
-
-  return validation.ok ? [] : validation.issues
-}
-
 export function resolveReviewReadyMessage(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,

@@ -6,7 +6,6 @@ import {
   type CharacterBuildPreview,
   type SpellcastingProfile,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
 import {
   formatSpellAttackBonus,
@@ -52,10 +51,6 @@ export function SpellcastingSummaryCard({ profile, preview }: SpellcastingSummar
         <SummaryField label="Spell attack" value={formatSpellAttackBonus(spellcasting)} />
         <SummaryField label="Spell slots" value={formatSpellSlotSummary(spellcasting)} />
       </dl>
-      <Text variant="muted">
-        {profile.className} spellcasting at level 1. Incomplete ability scores do not block spell
-        selection.
-      </Text>
     </div>
   )
 }

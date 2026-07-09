@@ -1,32 +1,39 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { Trash2 } from 'lucide-react'
 
-import { Button, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import {
   builderInventoryRowActionsClasses,
   builderInventoryRowClasses,
   builderInventoryRowMetaClasses,
+  builderInventoryRowRemoveButtonClasses,
   builderInventoryRowSourceClasses,
 } from './builder-inventory-row.variants'
 
-export const BUILDER_INVENTORY_ROW_REMOVE_LABEL = 'Remove' as const
+export const BUILDER_INVENTORY_ROW_REMOVE_LABEL_PREFIX = 'Remove' as const
+
+export function formatBuilderInventoryRowRemoveLabel(label: string): string {
+  return `${BUILDER_INVENTORY_ROW_REMOVE_LABEL_PREFIX} ${label}`
+}
 
 export type BuilderInventoryRowProps = {
   label: ReactNode
+  /** Plain-text label used for the icon-only remove button aria-label. */
+  itemLabel: string
   meta?: ReactNode
-  sourceLabel: string
+  sourceLabel?: string
   onRemove?: () => void
-  removeLabel?: string
 }
 
 export function BuilderInventoryRow({
   label,
+  itemLabel,
   meta,
   sourceLabel,
   onRemove,
-  removeLabel = BUILDER_INVENTORY_ROW_REMOVE_LABEL,
 }: BuilderInventoryRowProps) {
   return (
     <div className={builderInventoryRowClasses}>
@@ -35,13 +42,20 @@ export function BuilderInventoryRow({
         {meta}
       </div>
       <div className={builderInventoryRowActionsClasses}>
-        <Text variant="small" className={builderInventoryRowSourceClasses}>
-          {sourceLabel}
-        </Text>
+        {sourceLabel ? (
+          <Text variant="caption" className={builderInventoryRowSourceClasses}>
+            {sourceLabel}
+          </Text>
+        ) : null}
         {onRemove ? (
-          <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-            {removeLabel}
-          </Button>
+          <button
+            type="button"
+            className={builderInventoryRowRemoveButtonClasses}
+            aria-label={formatBuilderInventoryRowRemoveLabel(itemLabel)}
+            onClick={onRemove}
+          >
+            <Trash2 aria-hidden className="size-4" />
+          </button>
         ) : null}
       </div>
     </div>

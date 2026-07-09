@@ -7,6 +7,7 @@ import {
   formatSelectionCounter,
   isChoiceSetFull,
   isChoiceSetOverSelected,
+  shouldShowSelectionFullNotice,
 } from './selection-counter.lib'
 
 const cantripChoiceSet = {
@@ -45,5 +46,29 @@ describe('selection-counter.lib', () => {
         { selectedCount: 4, max: 4 },
       ),
     ).toBe('Manage spells')
+  })
+
+  it('shows selection full for proficiencies but not spells when Manage is active', () => {
+    const skillChoiceSet = {
+      choiceType: 'skillProficiency',
+      label: 'Rogue Skills',
+      max: 2,
+    } as ChoiceSet
+
+    expect(
+      shouldShowSelectionFullNotice(
+        skillChoiceSet,
+        true,
+        formatChoiceSetDrawerTriggerLabel(skillChoiceSet, { selectedCount: 2, max: 2 }),
+      ),
+    ).toBe(true)
+
+    expect(
+      shouldShowSelectionFullNotice(
+        cantripChoiceSet,
+        true,
+        formatChoiceSetDrawerTriggerLabel(cantripChoiceSet, { selectedCount: 3, max: 3 }),
+      ),
+    ).toBe(false)
   })
 })

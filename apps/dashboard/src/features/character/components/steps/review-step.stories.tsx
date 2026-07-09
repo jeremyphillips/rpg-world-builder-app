@@ -62,7 +62,7 @@ export const Incomplete: Story = {
       spellcasting: null,
       equipmentSummary: [],
       unresolvedChoiceSetIds: ['class:srd-cc-5.2.1:fighter:class-skills'],
-      warnings: ['Class is not selected.'],
+      warnings: [],
     },
   },
 }

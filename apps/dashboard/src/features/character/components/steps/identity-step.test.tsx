@@ -1,5 +1,6 @@
 import { beforeAll, afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
@@ -68,6 +69,33 @@ describe('IdentityStep', () => {
     expect(screen.getByLabelText(/Alignment/i)).toBeInTheDocument()
     expect(await screen.findByLabelText(/Backstory/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
+  })
+
+  it('treats alignment chips as single-select', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+
+    render(
+      <IdentityStep
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: 'Neutral Good' }))
+
+    await waitFor(() => {
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identity: expect.objectContaining({ alignment: 'ng' }),
+        }),
+      )
+    })
+
+    expect(screen.queryByText('Choose a valid alignment.')).not.toBeInTheDocument()
   })
 
   it('surfaces step validation issues from the builder frame', () => {

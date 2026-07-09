@@ -11,6 +11,10 @@ export type ProficiencyGrantedRowProps = {
 
 export function ProficiencyGrantedRow({ row }: ProficiencyGrantedRowProps) {
   return (
-    <BuilderInventoryRow label={<Text as="span">{row.label}</Text>} sourceLabel={row.sourceLabel} />
+    <BuilderInventoryRow
+      label={<Text as="span">{row.label}</Text>}
+      itemLabel={row.label}
+      sourceLabel={row.sourceLabel}
+    />
   )
 }
