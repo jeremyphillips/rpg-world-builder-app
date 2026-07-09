@@ -12,7 +12,6 @@ import { characterBuilderShellFooterClasses } from './character-builder-shell.va
 
 export type CharacterBuilderFooterProps = {
   currentStepId: CharacterBuilderStepId
-  continueFormId?: string
   canCreateCharacter?: boolean
   onBack: () => void
   onContinue: () => void
@@ -22,7 +21,6 @@ export type CharacterBuilderFooterProps = {
 
 export function CharacterBuilderFooter({
   currentStepId,
-  continueFormId,
   canCreateCharacter = true,
   onBack,
   onContinue,
@@ -53,10 +51,6 @@ export function CharacterBuilderFooter({
           {onReview ? (
             <Button type="button" disabled={createDisabled} onClick={onCreateCharacter}>
               {isCreating ? 'Creating…' : 'Create character'}
-            </Button>
-          ) : canContinue && continueFormId ? (
-            <Button type="submit" form={continueFormId}>
-              Continue
             </Button>
           ) : canContinue ? (
             <Button type="button" onClick={onContinue}>

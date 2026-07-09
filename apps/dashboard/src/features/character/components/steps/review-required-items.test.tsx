@@ -3,39 +3,39 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { ReviewUnresolvedChoices } from './review-unresolved-choices.client'
+import { ReviewRequiredItems } from './review-required-items.client'
 
-describe('ReviewUnresolvedChoices', () => {
-  it('renders nothing when there are no unresolved choices', () => {
+describe('ReviewRequiredItems', () => {
+  it('renders nothing when there are no required items', () => {
     const { container } = render(
-      <ReviewUnresolvedChoices unresolvedChoices={[]} onNavigateToStep={vi.fn()} />,
+      <ReviewRequiredItems requiredItems={[]} onNavigateToStep={vi.fn()} />,
     )
 
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('lists unresolved choices with navigation to the owning step', async () => {
+  it('lists required items with navigation to the owning step', async () => {
     const user = userEvent.setup()
     const onNavigateToStep = vi.fn()
 
     render(
-      <ReviewUnresolvedChoices
-        unresolvedChoices={[
+      <ReviewRequiredItems
+        requiredItems={[
           {
-            choiceSetId: 'class:srd-cc-5.2.1:fighter:class-skills',
+            id: 'choiceSet:class:srd-cc-5.2.1:fighter:class-skills',
+            kind: 'choiceSet',
             label: 'Choose Skills',
+            message: 'Choose at least 2 options for Choose Skills.',
             stepId: 'proficiencies',
             stepLabel: 'Proficiencies',
-            min: 2,
-            max: 2,
-            selectedCount: 0,
-            message: 'Choose at least 2 options for Choose Skills.',
+            progress: { current: 0, total: 2, max: 2 },
           },
         ]}
         onNavigateToStep={onNavigateToStep}
       />,
     )
 
+    expect(screen.getByText('Required items')).toBeInTheDocument()
     expect(screen.getByText('Choose Skills')).toBeInTheDocument()
     expect(screen.getByText('Choose at least 2 options for Choose Skills.')).toBeInTheDocument()
     expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
@@ -46,17 +46,16 @@ describe('ReviewUnresolvedChoices', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <ReviewUnresolvedChoices
-        unresolvedChoices={[
+      <ReviewRequiredItems
+        requiredItems={[
           {
-            choiceSetId: 'class:srd-cc-5.2.1:fighter:class-skills',
-            label: 'Choose Skills',
-            stepId: 'proficiencies',
-            stepLabel: 'Proficiencies',
-            min: 2,
-            max: 2,
-            selectedCount: 1,
-            message: 'Choose at least 2 options for Choose Skills.',
+            id: 'stepField:abilities:abilities_incomplete',
+            kind: 'stepField',
+            label: 'Ability Scores',
+            message: 'Assign a score to every ability.',
+            stepId: 'abilities',
+            stepLabel: 'Abilities',
+            progress: { current: 4, total: 6 },
           },
         ]}
         onNavigateToStep={vi.fn()}

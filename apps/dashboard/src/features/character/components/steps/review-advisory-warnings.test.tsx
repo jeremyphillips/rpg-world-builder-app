@@ -11,16 +11,20 @@ describe('ReviewAdvisoryWarnings', () => {
   })
 
   it('lists advisory warnings', () => {
-    render(<ReviewAdvisoryWarnings warnings={['Name is not set.', 'Class is not selected.']} />)
+    render(
+      <ReviewAdvisoryWarnings
+        warnings={['Your Constitution is low for Barbarian.', 'You have no martial weapons.']}
+      />,
+    )
 
     expect(screen.getByText('Advisory notes')).toBeInTheDocument()
-    expect(screen.getByText('Name is not set.')).toBeInTheDocument()
-    expect(screen.getByText('Class is not selected.')).toBeInTheDocument()
+    expect(screen.getByText('Your Constitution is low for Barbarian.')).toBeInTheDocument()
+    expect(screen.getByText('You have no martial weapons.')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <ReviewAdvisoryWarnings warnings={['Name is not set.', 'Class is not selected.']} />,
+      <ReviewAdvisoryWarnings warnings={['Your Constitution is low for Barbarian.']} />,
     )
 
     await expectNoAxeViolations(container)

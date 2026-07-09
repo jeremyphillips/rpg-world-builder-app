@@ -47,7 +47,7 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(screen.getByText('Lute')).toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: 'Remove' })[0]!)
+    await user.click(screen.getAllByRole('button', { name: 'Remove Leather Armor' })[0]!)
 
     expect(onRemoveItem).toHaveBeenCalledWith({
       kind: 'package',

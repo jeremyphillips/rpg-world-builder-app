@@ -3,7 +3,6 @@ import { isArmorEquipment } from '../../content/equipment'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import type { CharacterProficiencies } from '../character/proficiencies'
 import { formatFieldMessage } from '../../../validation/define-message'
-import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 import type { ChoiceSet } from './choice-set'
 import { characterBuilderPreviewMessages } from './character-builder-preview-messages'
@@ -73,31 +72,11 @@ function hasEquippedBodyArmor(
   })
 }
 
-function resolveBuilderWarnings(
+function resolveBuilderAdvisoryWarnings(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
-  choiceSets: readonly ChoiceSet[],
 ): string[] {
   const warnings: string[] = []
-
-  if (!draft.identity.name?.trim()) {
-    warnings.push(formatFieldMessage(characterBuilderPreviewMessages.nameNotSet()))
-  }
-
-  if (!draft.species.speciesId) {
-    warnings.push(formatFieldMessage(characterBuilderPreviewMessages.speciesNotSelected()))
-  }
-
-  if (!draft.class.classId) {
-    warnings.push(formatFieldMessage(characterBuilderPreviewMessages.classNotSelected()))
-  }
-
-  if (
-    choiceSets.length > 0 &&
-    !areRequiredChoiceSetsSatisfied(choiceSets, draft.choiceSelections)
-  ) {
-    warnings.push(formatFieldMessage(characterBuilderPreviewMessages.requiredChoicesIncomplete()))
-  }
 
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
@@ -146,6 +125,6 @@ export function buildCharacterPreview(
     proficiencies: derivationInput.proficiencies,
     equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets),
     unresolvedChoiceSetIds: resolveBuilderUnresolvedChoiceSetIds(draft, choiceSets),
-    warnings: resolveBuilderWarnings(draft, catalogIndex, choiceSets),
+    warnings: resolveBuilderAdvisoryWarnings(draft, catalogIndex),
   }
 }

@@ -29,6 +29,7 @@ describe('AbilitiesStep', () => {
         validationIssues={[]}
         onDraftChange={vi.fn()}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -52,6 +53,7 @@ describe('AbilitiesStep', () => {
         ]}
         onDraftChange={vi.fn()}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -72,6 +74,7 @@ describe('AbilitiesStep', () => {
         validationIssues={[]}
         onDraftChange={vi.fn()}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 

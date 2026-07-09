@@ -33,6 +33,7 @@ export const Empty: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -51,6 +52,7 @@ export const PartialAssignment: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -69,6 +71,7 @@ export const CompleteAssignment: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -88,6 +91,7 @@ export const WithValidationIssues: Story = {
       ]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -100,6 +104,7 @@ export const ManualEntry: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }

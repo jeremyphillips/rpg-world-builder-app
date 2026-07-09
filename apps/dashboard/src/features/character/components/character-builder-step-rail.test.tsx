@@ -24,9 +24,8 @@ const railProps = {
   context,
   catalogIndex,
   resolvedChoiceSets: null,
-  validationIssues: [] as CharacterBuildValidationIssue[],
   draftValidationIssues: [] as CharacterBuildValidationIssue[],
-  attemptedStepIds: [] as CharacterBuilderStepId[],
+  validationVisibleStepIds: [] as CharacterBuilderStepId[],
   standardArray,
   onStepSelect: () => undefined,
 }
@@ -67,43 +66,41 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
-  it('shows a warning icon only after an attempted submit with blocking issues', () => {
+  it('shows an error icon only for validation-visible steps', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
-        currentStepId="identity"
+        currentStepId="species"
         {...railProps}
-        validationIssues={[
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-        ]}
-        attemptedStepIds={['identity']}
+        validationVisibleStepIds={['identity']}
       />,
     )
 
     expect(
-      screen.getByRole('button', { name: /Identity, has validation issues/i }),
+      screen.getByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Species, current step/i })).toBeInTheDocument()
   })
 
-  it('does not show a warning icon before Continue is attempted', () => {
+  it('does not show an error icon before Continue marks a step validation-visible', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
         {...railProps}
-        validationIssues={[
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+        draftValidationIssues={[
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
         ]}
       />,
     )
 
     expect(screen.getByRole('button', { name: /Identity, current step/i })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Identity, has validation issues/i }),
+      screen.queryByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).not.toBeInTheDocument()
   })
 
-  it('shows a warning icon when a touched step has draft validation issues', () => {
+  it('does not show an error icon for field edits alone', () => {
     render(
       <CharacterBuilderStepRail
         draft={{
@@ -118,9 +115,10 @@ describe('CharacterBuilderStepRail', () => {
       />,
     )
 
+    expect(screen.getByRole('button', { name: /Identity, not started/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /Identity, has validation issues/i }),
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('calls onStepSelect when a step is clicked', async () => {
@@ -139,6 +137,28 @@ describe('CharacterBuilderStepRail', () => {
     expect(onStepSelect).toHaveBeenCalledWith('class')
   })
 
+  it('moves focus and selection with arrow keys', async () => {
+    const user = userEvent.setup()
+    const onStepSelect = vi.fn()
+
+    render(
+      <CharacterBuilderStepRail
+        draft={createEmptyCharacterBuilderDraft()}
+        currentStepId="identity"
+        {...railProps}
+        onStepSelect={onStepSelect}
+      />,
+    )
+
+    const identityButton = screen.getByRole('button', { name: /Identity, current step/i })
+    identityButton.focus()
+
+    await user.keyboard('{ArrowDown}')
+
+    expect(onStepSelect).toHaveBeenCalledWith('species')
+    expect(screen.getByRole('button', { name: /Species, not started/i })).toHaveFocus()
+  })
+
   it('marks non-caster spells as not applicable once choice sets are resolved', () => {
     const spellsContext = createSpellsStepContextFixture()
     const draft = {
@@ -153,9 +173,8 @@ describe('CharacterBuilderStepRail', () => {
         context={spellsContext}
         catalogIndex={indexCharacterBuildCatalog(spellsContext.catalog)}
         resolvedChoiceSets={resolveAvailableChoices(draft, spellsContext)}
-        validationIssues={[]}
         draftValidationIssues={[]}
-        attemptedStepIds={[]}
+        validationVisibleStepIds={[]}
         standardArray={standardArray}
         onStepSelect={() => undefined}
       />,

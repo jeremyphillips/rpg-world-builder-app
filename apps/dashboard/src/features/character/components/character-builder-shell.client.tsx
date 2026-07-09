@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
@@ -22,6 +22,13 @@ import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import {
+  mergeValidationVisibleStepIds,
+  pruneValidationVisibleStepIds,
+  removeValidationVisibleStepId,
+} from '../lib/builder-validation-visible-steps.lib'
+import { runBuilderFormContinueHandler } from '../lib/builder-form-continue-registry'
+import { patchTouchesDraftContent } from '../lib/character-builder-draft-touch.lib'
+import {
   appendAttemptedStepId,
   appendTouchedStepId,
   getAdjacentBuilderStepId,
@@ -30,7 +37,6 @@ import {
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
-import { getBuilderStepFormId } from '../lib/steps/builder-step-form-ids'
 import {
   issuesForStep,
   resolveBuilderDraftValidationIssues,
@@ -68,7 +74,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     (state) => state.clearPersistedDraft,
   )
   const [validationIssues, setValidationIssues] = useState<CharacterBuildValidationIssue[]>([])
-  const [attemptedStepIds, setAttemptedStepIds] = useState<CharacterBuilderStepId[]>([])
+  const [, setAttemptedStepIds] = useState<CharacterBuilderStepId[]>([])
+  const [validationVisibleStepIds, setValidationVisibleStepIds] = useState<
+    CharacterBuilderStepId[]
+  >([])
   const [createError, setCreateError] = useState<string | null>(null)
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
@@ -83,9 +92,15 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
   const applyDraftPatch = useCallback(
     (patch: Partial<CharacterBuilderDraft>) => {
-      patchDraft(patch)
+      const stepId = resolveCurrentStepId(draft.currentStepId)
+      const shouldTouch = patchTouchesDraftContent(patch)
+      patchDraft(
+        shouldTouch
+          ? { ...patch, touchedStepIds: appendTouchedStepId(draft.touchedStepIds, stepId) }
+          : patch,
+      )
     },
-    [patchDraft],
+    [draft.currentStepId, draft.touchedStepIds, patchDraft],
   )
 
   const canCreateCharacter = useMemo(
@@ -97,6 +112,23 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     () => resolveBuilderDraftValidationIssues(draft, context, resolvedChoiceSets),
     [context, draft, resolvedChoiceSets],
   )
+
+  const railValidationVisibleStepIds = useMemo(
+    () =>
+      pruneValidationVisibleStepIds(draft, context, validationVisibleStepIds, resolvedChoiceSets),
+    [context, draft, resolvedChoiceSets, validationVisibleStepIds],
+  )
+
+  useEffect(() => {
+    if (railValidationVisibleStepIds.length === validationVisibleStepIds.length) {
+      const isUnchanged = railValidationVisibleStepIds.every(
+        (stepId, index) => stepId === validationVisibleStepIds[index],
+      )
+      if (isUnchanged) return
+    }
+
+    setValidationVisibleStepIds(railValidationVisibleStepIds)
+  }, [railValidationVisibleStepIds, validationVisibleStepIds])
 
   if (!hasHydrated) {
     return (
@@ -125,11 +157,14 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     : issuesForStep(validationIssues, currentStepId)
 
   const navigateToStep = (stepId: typeof currentStepId) => {
-    setValidationIssues([])
-    patchDraft({
-      currentStepId: stepId,
-      touchedStepIds: appendTouchedStepId(draft.touchedStepIds, stepId),
-    })
+    if (railValidationVisibleStepIds.includes(stepId)) {
+      const result = validateBuilderStepSubmit(draft, context, stepId, resolvedChoiceSets)
+      setValidationIssues(result.ok ? [] : result.issues)
+    } else {
+      setValidationIssues([])
+    }
+
+    patchDraft({ currentStepId: stepId })
   }
 
   const shiftStep = (direction: 'back' | 'forward') => {
@@ -139,19 +174,56 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   }
 
   const attemptStepAdvance = (patch?: Partial<CharacterBuilderDraft>) => {
-    const nextDraft = patch ? mergeCharacterBuilderDraft(draft, patch) : draft
-    if (patch) patchDraft(patch)
+    const touchedPatch = patch
+      ? {
+          ...patch,
+          touchedStepIds: appendTouchedStepId(draft.touchedStepIds, currentStepId),
+        }
+      : undefined
+    const nextDraft = touchedPatch ? mergeCharacterBuilderDraft(draft, touchedPatch) : draft
+    if (touchedPatch) patchDraft(touchedPatch)
 
     const result = validateBuilderStepSubmit(nextDraft, context, currentStepId, resolvedChoiceSets)
     if (!result.ok) {
       setAttemptedStepIds((previous) => appendAttemptedStepId(previous, currentStepId))
+      setValidationVisibleStepIds((previous) =>
+        mergeValidationVisibleStepIds(previous, [currentStepId]),
+      )
       setValidationIssues(result.issues)
       return
     }
 
+    setValidationVisibleStepIds((previous) =>
+      removeValidationVisibleStepId(previous, currentStepId),
+    )
     setValidationIssues([])
     setCreateError(null)
     shiftStep('forward')
+  }
+
+  const handleFormContinueValidationFailed = (patch: Partial<CharacterBuilderDraft>) => {
+    const touchedPatch = {
+      ...patch,
+      touchedStepIds: appendTouchedStepId(draft.touchedStepIds, currentStepId),
+    }
+    patchDraft(touchedPatch)
+    const nextDraft = mergeCharacterBuilderDraft(draft, touchedPatch)
+    setAttemptedStepIds((previous) => appendAttemptedStepId(previous, currentStepId))
+    setValidationVisibleStepIds((previous) =>
+      mergeValidationVisibleStepIds(previous, [currentStepId]),
+    )
+    const result = validateBuilderStepSubmit(nextDraft, context, currentStepId, resolvedChoiceSets)
+    setValidationIssues(result.ok ? [] : result.issues)
+  }
+
+  const handleContinue = () => {
+    const formHandler = runBuilderFormContinueHandler(currentStepId)
+    if (formHandler) {
+      void formHandler()
+      return
+    }
+
+    attemptStepAdvance()
   }
 
   const handleCreateCharacter = async () => {
@@ -164,6 +236,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
         issue.stepId ? [issue.stepId] : [],
       )
       setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+      setValidationVisibleStepIds((previous) =>
+        mergeValidationVisibleStepIds(previous, issueStepIds),
+      )
       setValidationIssues(validation.issues)
       return
     }
@@ -179,6 +254,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
           issue.stepId ? [issue.stepId] : [],
         )
         setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+        setValidationVisibleStepIds((previous) =>
+          mergeValidationVisibleStepIds(previous, issueStepIds),
+        )
         setValidationIssues(error.validationIssues)
         return
       }
@@ -209,9 +287,8 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               context={context}
               catalogIndex={catalogIndex}
               resolvedChoiceSets={resolvedChoiceSets}
-              validationIssues={validationIssues}
               draftValidationIssues={draftValidationIssues}
-              attemptedStepIds={attemptedStepIds}
+              validationVisibleStepIds={railValidationVisibleStepIds}
               standardArray={context.characterCreationRules.abilityGeneration.standardArray}
               onStepSelect={navigateToStep}
             />
@@ -226,6 +303,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               validationIssues={stepValidationIssues}
               onDraftChange={applyDraftPatch}
               onStepComplete={attemptStepAdvance}
+              onFormContinueValidationFailed={handleFormContinueValidationFailed}
               onNavigateToStep={navigateToStep}
             />
           </div>
@@ -247,11 +325,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
         <CharacterBuilderFooter
           currentStepId={currentStepId}
-          continueFormId={getBuilderStepFormId(currentStepId)}
           canCreateCharacter={canCreateCharacter}
           isCreating={isCreating}
           onBack={() => shiftStep('back')}
-          onContinue={() => attemptStepAdvance()}
+          onContinue={handleContinue}
           onCreateCharacter={() => {
             void handleCreateCharacter()
           }}

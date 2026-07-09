@@ -26,6 +26,7 @@ export type CharacterBuilderStepContentProps = {
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
+  onFormContinueValidationFailed: (patch: Partial<CharacterBuilderDraft>) => void
   onNavigateToStep: (stepId: CharacterBuilderStepId) => void
 }
 
@@ -38,6 +39,7 @@ export function CharacterBuilderStepContent({
   validationIssues,
   onDraftChange,
   onStepComplete,
+  onFormContinueValidationFailed,
   onNavigateToStep,
 }: CharacterBuilderStepContentProps) {
   switch (stepId) {
@@ -48,6 +50,7 @@ export function CharacterBuilderStepContent({
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
+          onFormContinueValidationFailed={onFormContinueValidationFailed}
         />
       )
     case 'species':
@@ -77,6 +80,7 @@ export function CharacterBuilderStepContent({
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
+          onFormContinueValidationFailed={onFormContinueValidationFailed}
         />
       )
     case 'review':

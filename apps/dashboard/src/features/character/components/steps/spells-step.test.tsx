@@ -170,7 +170,7 @@ describe('SpellsStep', () => {
 
     const manageButton = screen.getByRole('button', { name: 'Manage cantrips' })
     expect(manageButton).toBeEnabled()
-    expect(screen.getByText('Selection full')).toBeInTheDocument()
+    expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations for a wizard draft', async () => {

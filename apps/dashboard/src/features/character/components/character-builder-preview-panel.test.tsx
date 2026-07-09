@@ -102,7 +102,7 @@ describe('CharacterBuilderPreviewPanel', () => {
     )
 
     expect(screen.getByText('Verna')).toBeInTheDocument()
-    expect(screen.getByText('Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.getByText('Level 1 · Fighter')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
     expect(screen.getByText('Neutral Good')).toBeInTheDocument()
     expect(screen.getByText('2 fields added.')).toBeInTheDocument()

@@ -6,17 +6,17 @@ import { Button, Heading, Text } from '@rpg/ui'
 import {
   formatChoiceSetDrawerTriggerLabel,
   formatSpellSelectionCounter,
-  isSpellChoiceSetFull,
   isSpellChoiceSetOverSelected,
   resolveSelectedSpellLabels,
-  SPELLS_STEP_SELECTION_FULL_REASON,
 } from '../../lib/spells-step.lib'
+import { shouldShowSelectionFullNotice } from '../../lib/selection-counter.lib'
+import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import {
   spellChoiceSectionClasses,
+  spellChoiceSectionCounterRowClasses,
   spellChoiceSectionHeaderClasses,
   spellChoiceSectionOverSelectionClasses,
   spellChoiceSectionSelectedListClasses,
-  spellChoiceSectionSelectedRowClasses,
 } from './spell-choice-section.variants'
 
 export type SpellChoiceSectionProps = {
@@ -33,30 +33,30 @@ export function SpellChoiceSection({
   onRemove,
 }: SpellChoiceSectionProps) {
   const selectedSpells = resolveSelectedSpellLabels(choiceSet, selectedIds)
-  const selectionFull = isSpellChoiceSetFull(choiceSet, selectedIds)
+  const selectedCount = selectedIds.length
+  const isFull = selectedCount >= choiceSet.max
   const overSelected = isSpellChoiceSetOverSelected(choiceSet, selectedIds)
   const drawerTriggerLabel = formatChoiceSetDrawerTriggerLabel(choiceSet, {
-    selectedCount: selectedIds.length,
+    selectedCount,
     max: choiceSet.max,
   })
+  const showSelectionFull = shouldShowSelectionFullNotice(choiceSet, isFull, drawerTriggerLabel)
 
   return (
     <section className={spellChoiceSectionClasses} aria-labelledby={`${choiceSet.id}-heading`}>
       <div className={spellChoiceSectionHeaderClasses}>
-        <div className="space-y-1">
-          <Heading variant="subsection" as="h3" id={`${choiceSet.id}-heading`}>
-            {choiceSet.label}
-          </Heading>
-          <Text variant="muted">
-            {formatSpellSelectionCounter(selectedIds.length, choiceSet.max)}
-          </Text>
-        </div>
+        <Heading variant="subsection" as="h3" id={`${choiceSet.id}-heading`}>
+          {choiceSet.label}
+        </Heading>
         <Button type="button" size="sm" onClick={onAdd}>
           {drawerTriggerLabel}
         </Button>
       </div>
 
-      {selectionFull ? <Text variant="muted">{SPELLS_STEP_SELECTION_FULL_REASON}</Text> : null}
+      <div className={spellChoiceSectionCounterRowClasses}>
+        <Text variant="muted">{formatSpellSelectionCounter(selectedCount, choiceSet.max)}</Text>
+        {showSelectionFull ? <Text variant="muted">Selection full</Text> : null}
+      </div>
 
       {overSelected ? (
         <p className={spellChoiceSectionOverSelectionClasses} role="status">
@@ -67,13 +67,16 @@ export function SpellChoiceSection({
       {selectedSpells.length > 0 ? (
         <ul className={spellChoiceSectionSelectedListClasses}>
           {selectedSpells.map((spell) => (
-            <li key={spell.id} className={spellChoiceSectionSelectedRowClasses}>
-              <Text as="span" variant="body">
-                {spell.label}
-              </Text>
-              <Button type="button" size="sm" variant="outline" onClick={() => onRemove(spell.id)}>
-                Remove
-              </Button>
+            <li key={spell.id}>
+              <BuilderInventoryRow
+                label={
+                  <Text as="span" variant="body">
+                    {spell.label}
+                  </Text>
+                }
+                itemLabel={spell.label}
+                onRemove={() => onRemove(spell.id)}
+              />
             </li>
           ))}
         </ul>

@@ -4,8 +4,9 @@ import {
   ABILITY_IDS,
   type CharacterBuildCatalogIndex,
   type CharacterBuildPreview,
+  type CharacterBuilderDraft,
   type CharacterNarrative,
-  type ClassStored,
+  type ChoiceSet,
 } from '@rpg/contracts'
 import {
   Accordion,
@@ -16,15 +17,21 @@ import {
   Text,
 } from '@rpg/ui'
 
-import { resolveLanguagePreviewLabel } from '../lib/language-preview-label'
+import {
+  countProficiencyChoicesRemaining,
+  formatPreviewLanguagesSubsection,
+  formatPreviewSavingThrowsSubsection,
+  formatPreviewSkillsSubsection,
+  formatPreviewToolsSubsection,
+  type PreviewProficiencySubsection,
+} from '../lib/format-preview-proficiency-subsection.lib'
 import { getNarrativePreviewStatusLabel } from '../lib/narrative-preview'
 import {
   formatPreviewAbilityCell,
   formatPreviewOptionalNumber,
-  formatPreviewSignedNumber,
+  formatPreviewSpellsSubsection,
   resolveEquipmentPreviewEmptyHint,
   resolveProficienciesSectionHint,
-  resolveSpellsPreviewEmptyHint,
 } from '../lib/character-builder-preview-panel.lib'
 import {
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
@@ -45,11 +52,11 @@ import {
 export type CharacterBuilderPreviewAccordionProps = {
   preview: CharacterBuildPreview
   catalogIndex: CharacterBuildCatalogIndex
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
   narrative: CharacterNarrative | undefined
   narrativeCount: number
-  skillChoiceCount: number | undefined
   hasCharacterClass: boolean
-  characterClass?: ClassStored
   spellcastingActive: boolean
 }
 
@@ -80,13 +87,7 @@ function PreviewNarrativeSection({
         </span>
       </AccordionTrigger>
       <AccordionContent>
-        {narrativeCount === 0 ? (
-          <CharacterBuilderPreviewSectionContent>
-            <CharacterBuilderPreviewSubsectionHint>
-              {getNarrativePreviewStatusLabel(0)}
-            </CharacterBuilderPreviewSubsectionHint>
-          </CharacterBuilderPreviewSectionContent>
-        ) : (
+        {narrativeCount === 0 ? null : (
           <CharacterBuilderPreviewSectionContent>
             <dl className="space-y-2 text-sm">
               {narrative?.personalityTraits?.length ? (
@@ -180,24 +181,60 @@ function PreviewAbilitiesSection({ preview }: { preview: CharacterBuildPreview }
   )
 }
 
+function PreviewProficiencySubsectionContent({
+  subsection,
+}: {
+  subsection: PreviewProficiencySubsection
+}) {
+  return (
+    <div className="space-y-1">
+      {subsection.resolvedText ? (
+        <p className="text-sm text-muted-foreground">{subsection.resolvedText}</p>
+      ) : null}
+      {subsection.emptyHint ? (
+        <CharacterBuilderPreviewSubsectionHint>
+          {subsection.emptyHint}
+        </CharacterBuilderPreviewSubsectionHint>
+      ) : null}
+      {subsection.remainingText ? (
+        <CharacterBuilderPreviewSubsectionHint>
+          {subsection.remainingText}
+        </CharacterBuilderPreviewSubsectionHint>
+      ) : null}
+    </div>
+  )
+}
+
 function PreviewProficienciesSection({
   preview,
   catalogIndex,
+  draft,
+  resolvedChoiceSets,
   hasCharacterClass,
-  characterClass,
-  skillChoiceCount,
 }: {
   preview: CharacterBuildPreview
   catalogIndex: CharacterBuildCatalogIndex
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
   hasCharacterClass: boolean
-  characterClass?: ClassStored
-  skillChoiceCount: number | undefined
 }) {
-  const proficientSaves = preview.savingThrows.filter((save) => save.proficient)
+  const skillChoicesRemaining = countProficiencyChoicesRemaining(
+    resolvedChoiceSets,
+    draft,
+    'skillProficiency',
+  )
+  const languageChoicesRemaining = countProficiencyChoicesRemaining(
+    resolvedChoiceSets,
+    draft,
+    'language',
+  )
+  const toolChoicesRemaining = countProficiencyChoicesRemaining(
+    resolvedChoiceSets,
+    draft,
+    'toolProficiency',
+  )
   const sectionHint = resolveProficienciesSectionHint({
     hasCharacterClass,
-    characterClass,
-    skillChoiceCount,
   })
 
   return (
@@ -208,70 +245,31 @@ function PreviewProficienciesSection({
       <AccordionContent className="p-0">
         <CharacterBuilderPreviewSectionContent layout="subsections" hint={sectionHint || undefined}>
           <CharacterBuilderPreviewSubsection title="Saving throws">
-            {proficientSaves.length > 0 ? (
-              <ul className="space-y-1 text-sm">
-                {proficientSaves.map((save) => (
-                  <li key={save.ability} className="text-muted-foreground">
-                    {save.ability.toUpperCase()} {formatPreviewSignedNumber(save.bonus)}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CharacterBuilderPreviewSubsectionHint>
-                Class saving throws appear after you choose a class.
-              </CharacterBuilderPreviewSubsectionHint>
-            )}
+            <PreviewProficiencySubsectionContent
+              subsection={formatPreviewSavingThrowsSubsection(preview, hasCharacterClass)}
+            />
           </CharacterBuilderPreviewSubsection>
 
           <CharacterBuilderPreviewSubsection title="Skills">
-            {preview.proficiencies.skills.length > 0 ? (
-              <ul className="space-y-1 text-sm">
-                {preview.proficiencies.skills.map((skill) => (
-                  <li key={skill.skill} className="text-muted-foreground">
-                    {skill.skill}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CharacterBuilderPreviewSubsectionHint>
-                No skills chosen yet.
-              </CharacterBuilderPreviewSubsectionHint>
-            )}
+            <PreviewProficiencySubsectionContent
+              subsection={formatPreviewSkillsSubsection(preview, skillChoicesRemaining)}
+            />
           </CharacterBuilderPreviewSubsection>
 
           <CharacterBuilderPreviewSubsection title="Languages">
-            {preview.proficiencies.languages.length > 0 ? (
-              <ul className="space-y-1 text-sm">
-                {preview.proficiencies.languages.map((entry) => (
-                  <li key={entry.language} className="text-muted-foreground">
-                    {resolveLanguagePreviewLabel(entry.language, catalogIndex)}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CharacterBuilderPreviewSubsectionHint>
-                No languages yet.
-              </CharacterBuilderPreviewSubsectionHint>
-            )}
+            <PreviewProficiencySubsectionContent
+              subsection={formatPreviewLanguagesSubsection(
+                preview,
+                catalogIndex,
+                languageChoicesRemaining,
+              )}
+            />
           </CharacterBuilderPreviewSubsection>
 
           <CharacterBuilderPreviewSubsection title="Tools">
-            {preview.proficiencies.tools.length > 0 ? (
-              <ul className="space-y-1 text-sm">
-                {preview.proficiencies.tools.map((tool, index) => (
-                  <li
-                    key={tool.toolId ?? tool.toolCategory ?? index}
-                    className="text-muted-foreground"
-                  >
-                    {tool.toolId ?? tool.toolCategory ?? 'Tool proficiency'}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <CharacterBuilderPreviewSubsectionHint>
-                No tool proficiencies yet.
-              </CharacterBuilderPreviewSubsectionHint>
-            )}
+            <PreviewProficiencySubsectionContent
+              subsection={formatPreviewToolsSubsection(preview, catalogIndex, toolChoicesRemaining)}
+            />
           </CharacterBuilderPreviewSubsection>
         </CharacterBuilderPreviewSectionContent>
       </AccordionContent>
@@ -311,12 +309,23 @@ function PreviewEquipmentSection({
 }
 
 function PreviewSpellsSection({
+  draft,
+  resolvedChoiceSets,
   hasCharacterClass,
   spellcastingActive,
 }: {
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
   hasCharacterClass: boolean
   spellcastingActive: boolean
 }) {
+  const subsection = formatPreviewSpellsSubsection(
+    draft,
+    resolvedChoiceSets,
+    hasCharacterClass,
+    spellcastingActive,
+  )
+
   return (
     <AccordionItem value="spells">
       <AccordionTrigger className={characterBuilderPreviewAccordionTriggerClasses}>
@@ -324,9 +333,13 @@ function PreviewSpellsSection({
       </AccordionTrigger>
       <AccordionContent>
         <CharacterBuilderPreviewSectionContent>
-          <CharacterBuilderPreviewSubsectionHint>
-            {resolveSpellsPreviewEmptyHint(hasCharacterClass, spellcastingActive)}
-          </CharacterBuilderPreviewSubsectionHint>
+          {subsection.resolvedText ? (
+            <p className="text-sm text-muted-foreground">{subsection.resolvedText}</p>
+          ) : subsection.emptyHint ? (
+            <CharacterBuilderPreviewSubsectionHint>
+              {subsection.emptyHint}
+            </CharacterBuilderPreviewSubsectionHint>
+          ) : null}
         </CharacterBuilderPreviewSectionContent>
       </AccordionContent>
     </AccordionItem>
@@ -336,11 +349,11 @@ function PreviewSpellsSection({
 export function CharacterBuilderPreviewAccordion({
   preview,
   catalogIndex,
+  draft,
+  resolvedChoiceSets,
   narrative,
   narrativeCount,
-  skillChoiceCount,
   hasCharacterClass,
-  characterClass,
   spellcastingActive,
 }: CharacterBuilderPreviewAccordionProps) {
   return (
@@ -357,12 +370,14 @@ export function CharacterBuilderPreviewAccordion({
       <PreviewProficienciesSection
         preview={preview}
         catalogIndex={catalogIndex}
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
         hasCharacterClass={hasCharacterClass}
-        characterClass={characterClass}
-        skillChoiceCount={skillChoiceCount}
       />
       <PreviewEquipmentSection preview={preview} hasCharacterClass={hasCharacterClass} />
       <PreviewSpellsSection
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
         hasCharacterClass={hasCharacterClass}
         spellcastingActive={spellcastingActive}
       />

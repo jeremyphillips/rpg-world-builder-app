@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 
 import {
-  resolveUnresolvedChoiceSetSummaries,
+  resolveReviewBlockingSummary,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
@@ -13,14 +13,11 @@ import {
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import {
-  resolveReviewDisplayIssues,
-  resolveReviewReadyMessage,
-} from '../../lib/review-step-display'
+import { resolveReviewReadyMessage } from '../../lib/review-step-display'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
+import { ReviewRequiredItems } from './review-required-items.client'
 import { ReviewStepSummary } from './review-step-summary.client'
-import { ReviewUnresolvedChoices } from './review-unresolved-choices.client'
 
 const REVIEW_VALIDATION_HEADING = 'Fix the following before creating:'
 
@@ -41,31 +38,27 @@ export function ReviewStep({
   validationIssues = [],
   onNavigateToStep,
 }: ReviewStepProps) {
-  const displayIssues = useMemo(
-    () => resolveReviewDisplayIssues(draft, context, validationIssues, resolvedChoiceSets),
+  const blockingSummary = useMemo(
+    () => resolveReviewBlockingSummary(draft, context, resolvedChoiceSets, validationIssues),
     [context, draft, resolvedChoiceSets, validationIssues],
   )
 
-  const unresolvedChoices = useMemo(
-    () => resolveUnresolvedChoiceSetSummaries(draft, resolvedChoiceSets),
-    [draft, resolvedChoiceSets],
-  )
-
   const readyMessage = useMemo(
-    () => resolveReviewReadyMessage(draft, context, displayIssues, resolvedChoiceSets),
-    [context, draft, displayIssues, resolvedChoiceSets],
+    () =>
+      resolveReviewReadyMessage(draft, context, blockingSummary.alertIssues, resolvedChoiceSets),
+    [blockingSummary.alertIssues, context, draft, resolvedChoiceSets],
   )
 
   return (
     <BuilderStepFrame
       stepId="review"
-      validationIssues={displayIssues}
+      validationIssues={blockingSummary.alertIssues}
       validationHeading={REVIEW_VALIDATION_HEADING}
     >
       <div className="space-y-6">
         <ReviewStepSummary context={context} draft={draft} preview={preview} />
-        <ReviewUnresolvedChoices
-          unresolvedChoices={unresolvedChoices}
+        <ReviewRequiredItems
+          requiredItems={blockingSummary.requiredItems}
           onNavigateToStep={onNavigateToStep}
         />
         <ReviewAdvisoryWarnings warnings={preview?.warnings ?? []} />

@@ -16,6 +16,7 @@ type Story = StoryObj<typeof BuilderInventoryRow>
 export const Granted: Story = {
   args: {
     label: <Text as="span">DEX · Dexterity</Text>,
+    itemLabel: 'DEX · Dexterity',
     sourceLabel: 'Granted by Rogue',
   },
 }
@@ -23,6 +24,7 @@ export const Granted: Story = {
 export const WithMetaAndRemove: Story = {
   args: {
     label: <Text as="span">Stealth</Text>,
+    itemLabel: 'Stealth',
     meta: (
       <Badge variant="secondary" size="sm">
         Stale

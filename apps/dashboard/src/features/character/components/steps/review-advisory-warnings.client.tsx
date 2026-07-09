@@ -2,6 +2,16 @@
 
 import { Alert } from '@rpg/ui'
 
+/**
+ * Non-blocking recommendations surfaced on the Review step.
+ *
+ * Blocking gaps (name, class, choice sets, ability scores) belong in
+ * `resolveReviewBlockingSummary` — not here.
+ *
+ * Future advisory examples:
+ * - `Your Constitution is low for Barbarian.`
+ * - `You have no martial weapons.`
+ */
 export type ReviewAdvisoryWarningsProps = {
   warnings: readonly string[]
 }

@@ -11,7 +11,7 @@ import { ReviewStep } from './review-step.client'
 describe('ReviewStep', () => {
   const context = createStandaloneBuilderContextFixture()
 
-  it('shows blocking issues, unresolved choices, and advisory warnings', async () => {
+  it('shows blocking issues, required items, and advisory warnings', async () => {
     const user = userEvent.setup()
     const onNavigateToStep = vi.fn()
 
@@ -36,7 +36,7 @@ describe('ReviewStep', () => {
           spellcasting: null,
           equipmentSummary: [],
           unresolvedChoiceSetIds: ['class:srd-cc-5.2.1:fighter:class-skills'],
-          warnings: ['Name is not set.'],
+          warnings: ['Unarmored Defense is not modeled in AC yet.'],
         }}
         resolvedChoiceSets={[
           {
@@ -64,10 +64,12 @@ describe('ReviewStep', () => {
     )
 
     expect(screen.getByText('Fix the following before creating:')).toBeInTheDocument()
-    expect(screen.getByText('Enter a character name.')).toBeInTheDocument()
+    expect(screen.getAllByText('Enter a character name.')).toHaveLength(2)
+    expect(screen.getByText('Required items')).toBeInTheDocument()
     expect(screen.getByText('Choose Skills')).toBeInTheDocument()
     expect(screen.getByText('Advisory notes')).toBeInTheDocument()
-    expect(screen.getByText('Name is not set.')).toBeInTheDocument()
+    expect(screen.getByText('Unarmored Defense is not modeled in AC yet.')).toBeInTheDocument()
+    expect(screen.queryByText('Name is not set.')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Go to Proficiencies' }))
     expect(onNavigateToStep).toHaveBeenCalledWith('proficiencies')

@@ -13,9 +13,7 @@ import {
   type ChoiceSet,
 } from '@rpg/contracts'
 
-import { issuesForStep } from './validate-builder-step'
-
-export type StepStatus = 'notStarted' | 'current' | 'complete' | 'warning' | 'locked'
+export type StepStatus = 'idle' | 'active' | 'complete' | 'error' | 'locked'
 
 export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
@@ -23,9 +21,8 @@ export type ResolveStepVisualStatusInput = {
   currentStepId: CharacterBuilderStepId
   context: CharacterBuildContext
   resolvedChoiceSets: readonly ChoiceSet[] | null
-  validationIssues: CharacterBuildValidationIssue[]
   draftValidationIssues: CharacterBuildValidationIssue[]
-  attemptedStepIds: readonly CharacterBuilderStepId[]
+  validationVisibleStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex
   standardArray: readonly number[]
 }
@@ -48,38 +45,24 @@ function stepStatusFromReadiness(
     case 'complete':
       return 'complete'
     case 'blocked':
-      return currentStepId === stepId ? 'current' : 'notStarted'
+      return currentStepId === stepId ? 'active' : 'idle'
     case 'readyWithChoices':
       return null
   }
 }
 
-function hasSubmitValidationWarning(
+function hasValidationVisibleError(
   stepId: CharacterBuilderStepId,
-  validationIssues: CharacterBuildValidationIssue[],
-  attemptedStepIds: readonly CharacterBuilderStepId[],
+  validationVisibleStepIds: readonly CharacterBuilderStepId[],
 ): boolean {
-  return attemptedStepIds.includes(stepId) && issuesForStep(validationIssues, stepId).length > 0
-}
-
-function hasDraftValidationWarning(
-  stepId: CharacterBuilderStepId,
-  draft: CharacterBuilderDraft,
-  draftValidationIssues: CharacterBuildValidationIssue[],
-  attemptedStepIds: readonly CharacterBuilderStepId[],
-): boolean {
-  if (issuesForStep(draftValidationIssues, stepId).length === 0) {
-    return false
-  }
-
-  return draft.touchedStepIds.includes(stepId) || attemptedStepIds.includes(stepId)
+  return validationVisibleStepIds.includes(stepId)
 }
 
 function hasDraftValidationIssues(
   stepId: CharacterBuilderStepId,
   draftValidationIssues: CharacterBuildValidationIssue[],
 ): boolean {
-  return issuesForStep(draftValidationIssues, stepId).length > 0
+  return draftValidationIssues.some((issue) => issue.stepId === stepId)
 }
 
 function resolveReadinessState(
@@ -107,7 +90,7 @@ function resolveReadinessVisualStatus(
   }
 
   if (readinessStatus === 'complete' && hasDraftValidationIssues(stepId, draftValidationIssues)) {
-    return currentStepId === stepId ? 'current' : 'notStarted'
+    return currentStepId === stepId ? 'active' : 'idle'
   }
 
   return readinessStatus
@@ -126,7 +109,7 @@ function resolveIncompleteVisualStatus(
     return 'complete'
   }
 
-  return currentStepId === stepId ? 'current' : 'notStarted'
+  return currentStepId === stepId ? 'active' : 'idle'
 }
 
 export function resolveStepVisualStatus({
@@ -135,9 +118,8 @@ export function resolveStepVisualStatus({
   currentStepId,
   context,
   resolvedChoiceSets,
-  validationIssues,
   draftValidationIssues,
-  attemptedStepIds,
+  validationVisibleStepIds,
   catalogIndex: _catalogIndex,
   standardArray,
 }: ResolveStepVisualStatusInput): StepStatus {
@@ -147,11 +129,8 @@ export function resolveStepVisualStatus({
     return 'locked'
   }
 
-  if (
-    hasSubmitValidationWarning(stepId, validationIssues, attemptedStepIds) ||
-    hasDraftValidationWarning(stepId, draft, draftValidationIssues, attemptedStepIds)
-  ) {
-    return 'warning'
+  if (hasValidationVisibleError(stepId, validationVisibleStepIds)) {
+    return 'error'
   }
 
   if (readinessState) {
@@ -177,10 +156,10 @@ export function resolveStepVisualStatus({
 }
 
 export const STEP_STATUS_ARIA_LABELS: Record<StepStatus, string> = {
-  notStarted: 'not started',
-  current: 'current step',
+  idle: 'not started',
+  active: 'current step',
   complete: 'complete',
-  warning: 'has validation issues',
+  error: 'has blocking validation issues',
   locked: 'not applicable',
 }
 

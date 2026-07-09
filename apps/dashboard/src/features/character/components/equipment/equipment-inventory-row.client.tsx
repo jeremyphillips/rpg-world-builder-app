@@ -5,7 +5,6 @@ import { Badge, NumberInput, Text } from '@rpg/ui'
 
 import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import {
-  EQUIPMENT_STEP_REMOVE_ITEM_LABEL,
   resolveMaxAffordablePurchaseQuantity,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
@@ -70,12 +69,12 @@ export function EquipmentInventoryRowItem({
   return (
     <BuilderInventoryRow
       label={label}
+      itemLabel={row.equipmentName}
       meta={meta}
       sourceLabel={row.sourceLabel}
       onRemove={
         row.removeTarget && onRemoveItem ? () => onRemoveItem(row.removeTarget!) : undefined
       }
-      removeLabel={EQUIPMENT_STEP_REMOVE_ITEM_LABEL}
     />
   )
 }

@@ -21,6 +21,7 @@ describe('IdentityDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -32,6 +33,7 @@ describe('IdentityDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -55,6 +57,7 @@ describe('IdentityDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -77,6 +80,7 @@ describe('IdentityDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 

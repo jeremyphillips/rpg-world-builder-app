@@ -16,6 +16,7 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
   return (
     <BuilderInventoryRow
       label={<Text as="span">{row.label}</Text>}
+      itemLabel={row.label}
       meta={
         row.isStale ? (
           <Badge variant="secondary" size="sm" title={row.staleReason}>
