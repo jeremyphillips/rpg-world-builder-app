@@ -25,9 +25,8 @@ function resolveStatus(
   return resolveStepVisualStatus({
     context,
     resolvedChoiceSets: null,
-    validationIssues: [],
     draftValidationIssues: [],
-    attemptedStepIds: [],
+    validationVisibleStepIds: [],
     catalogIndex,
     standardArray,
     ...input,
@@ -107,23 +106,20 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('complete')
   })
 
-  it('returns error only after an attempted submit with blocking issues', () => {
+  it('returns error only for validation-visible steps', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
       resolveStatus({
         stepId: 'identity',
         draft,
-        currentStepId: 'identity',
-        validationIssues: [
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-        ],
-        attemptedStepIds: ['identity'],
+        currentStepId: 'species',
+        validationVisibleStepIds: ['identity'],
       }),
     ).toBe('error')
   })
 
-  it('does not return error without an attempted submit', () => {
+  it('does not return error before a step is validation-visible', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -131,14 +127,11 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'identity',
         draft,
         currentStepId: 'identity',
-        validationIssues: [
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-        ],
       }),
     ).toBe('active')
   })
 
-  it('returns attention when a field-touched step has draft validation issues', () => {
+  it('does not promote field edits to rail error state', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       touchedStepIds: ['identity' as const],
@@ -153,10 +146,10 @@ describe('resolveStepVisualStatus', () => {
           { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
         ],
       }),
-    ).toBe('attention')
+    ).toBe('idle')
   })
 
-  it('does not return attention for untouched steps with draft validation issues', () => {
+  it('does not return error for untouched validation-visible candidates with draft issues only', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -241,7 +234,7 @@ describe('resolveStepVisualStatus', () => {
     expect(stepStatusAriaLabel('Spells', 'locked')).toBe('Spells, not applicable')
   })
 
-  it('does not return error for other steps with unresolved submit issues', () => {
+  it('does not return error for other steps with validation visible elsewhere', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -249,10 +242,7 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'species',
         draft,
         currentStepId: 'identity',
-        validationIssues: [
-          { code: 'species.required', message: 'Species is required.', stepId: 'species' },
-        ],
-        attemptedStepIds: ['identity'],
+        validationVisibleStepIds: ['identity'],
       }),
     ).toBe('idle')
   })

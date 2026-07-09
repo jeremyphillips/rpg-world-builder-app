@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback, useRef } from 'react'
 import {
   BUILDER_STEPS,
   type CharacterBuildCatalogIndex,
@@ -12,6 +13,11 @@ import {
 import { cn, Text } from '@rpg/ui'
 import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
 
+import {
+  resolveStepRailIndex,
+  resolveStepRailKeyboardDirection,
+  resolveStepRailKeyboardTarget,
+} from '../lib/character-builder-step-rail-keyboard.lib'
 import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
@@ -32,11 +38,10 @@ export type CharacterBuilderStepRailProps = {
   catalogIndex: CharacterBuildCatalogIndex
   /** Pass `null` in MVP-A so choice-dependent steps show as deferred. */
   resolvedChoiceSets: readonly ChoiceSet[] | null
-  /** Submit-time validation issues surfaced after a failed Continue or Create. */
-  validationIssues: CharacterBuildValidationIssue[]
-  /** Live draft-phase issues that drive proactive rail status. */
+  /** Live draft-phase issues used for completion/readiness only — not rail error icons. */
   draftValidationIssues: CharacterBuildValidationIssue[]
-  attemptedStepIds: readonly CharacterBuilderStepId[]
+  /** Steps that may show a rail error after a failed Continue or Create. */
+  validationVisibleStepIds: readonly CharacterBuilderStepId[]
   standardArray: readonly number[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
 }
@@ -45,7 +50,6 @@ const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
   idle: Circle,
   active: CircleDot,
   complete: CheckCircle2,
-  attention: CircleAlert,
   error: CircleAlert,
   locked: Lock,
 }
@@ -54,7 +58,6 @@ const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
   idle: 'text-muted-foreground',
   active: 'text-foreground',
   complete: 'text-success',
-  attention: 'text-destructive',
   error: 'text-destructive',
   locked: 'text-muted-foreground',
 }
@@ -65,25 +68,48 @@ export function CharacterBuilderStepRail({
   context,
   catalogIndex,
   resolvedChoiceSets,
-  validationIssues,
   draftValidationIssues,
-  attemptedStepIds,
+  validationVisibleStepIds,
   standardArray,
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
+  const stepButtonRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const currentStepIndex = resolveStepRailIndex(currentStepId)
+
+  const focusStepAtIndex = useCallback((index: number) => {
+    stepButtonRefs.current[index]?.focus()
+  }, [])
+
+  const handleStepRailKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      const direction = resolveStepRailKeyboardDirection(event.key)
+      if (!direction) return
+
+      const targetIndex = resolveStepRailKeyboardTarget(direction, currentStepIndex)
+      if (targetIndex === null || targetIndex === currentStepIndex) return
+
+      event.preventDefault()
+      const targetStep = BUILDER_STEPS[targetIndex]
+      if (!targetStep) return
+
+      focusStepAtIndex(targetIndex)
+      onStepSelect(targetStep.id)
+    },
+    [currentStepIndex, focusStepAtIndex, onStepSelect],
+  )
+
   return (
-    <nav aria-label="Character builder steps">
+    <nav aria-label="Character builder steps" onKeyDown={handleStepRailKeyDown}>
       <ol className={characterBuilderStepRailClasses}>
-        {BUILDER_STEPS.map((step) => {
+        {BUILDER_STEPS.map((step, index) => {
           const visualStatus = resolveStepVisualStatus({
             stepId: step.id,
             draft,
             currentStepId,
             context,
             resolvedChoiceSets,
-            validationIssues,
             draftValidationIssues,
-            attemptedStepIds,
+            validationVisibleStepIds,
             catalogIndex,
             standardArray,
           })
@@ -93,7 +119,11 @@ export function CharacterBuilderStepRail({
           return (
             <li key={step.id}>
               <button
+                ref={(element) => {
+                  stepButtonRefs.current[index] = element
+                }}
                 type="button"
+                tabIndex={isActive ? 0 : -1}
                 aria-current={isActive ? 'step' : undefined}
                 aria-label={stepStatusAriaLabel(step.label, visualStatus)}
                 className={cn(

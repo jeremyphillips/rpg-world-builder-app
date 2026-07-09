@@ -19,9 +19,8 @@ const railProps = {
   context,
   catalogIndex,
   resolvedChoiceSets: null,
-  validationIssues: [] as CharacterBuildValidationIssue[],
   draftValidationIssues: [] as CharacterBuildValidationIssue[],
-  attemptedStepIds: [] as CharacterBuilderStepId[],
+  validationVisibleStepIds: [] as CharacterBuilderStepId[],
   standardArray,
   onStepSelect: () => undefined,
 }
@@ -61,34 +60,18 @@ export const AbilitiesActive: Story = {
   ),
 }
 
-export const IdentityWarning: Story = {
+export const IdentityValidationVisible: Story = {
   render: () => (
     <CharacterBuilderStepRail
       draft={createEmptyCharacterBuilderDraft()}
-      currentStepId="identity"
+      currentStepId="species"
       {...railProps}
-      validationIssues={[
-        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-      ]}
-      attemptedStepIds={['identity']}
+      validationVisibleStepIds={['identity']}
     />
   ),
 }
 
-export const IssuesBeforeAttempt: Story = {
-  render: () => (
-    <CharacterBuilderStepRail
-      draft={createEmptyCharacterBuilderDraft()}
-      currentStepId="identity"
-      {...railProps}
-      validationIssues={[
-        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-      ]}
-    />
-  ),
-}
-
-export const TouchedStepDraftWarning: Story = {
+export const DraftIssuesBeforeValidationVisible: Story = {
   render: () => (
     <CharacterBuilderStepRail
       draft={{
