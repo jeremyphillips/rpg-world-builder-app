@@ -9,8 +9,8 @@ describe('review-step-display', () => {
   const context = createStandaloneBuilderContextFixture()
 
   it('formats ability method labels', () => {
-    expect(formatAbilityMethodLabel('manual')).toBe('Manual entry')
-    expect(formatAbilityMethodLabel('standard-array')).toBe('Standard array')
+    expect(formatAbilityMethodLabel('manual')).toBe('Custom scores')
+    expect(formatAbilityMethodLabel('standard-array')).toBe('Fixed scores')
     expect(formatAbilityMethodLabel(undefined)).toBe('Not set')
   })
 

@@ -8,7 +8,7 @@ import {
 
 import { abilitiesFormSchema, buildAbilitiesValidationFields } from './abilities-form-fields'
 
-const SLOT_IGNORE = [/^standardArrayAssignment/, /^_/] as const
+const SLOT_IGNORE = [/^fixedScoresAssignment/, /^_/] as const
 
 describe('abilities form validation', () => {
   for (const method of ABILITY_GENERATION_METHODS) {

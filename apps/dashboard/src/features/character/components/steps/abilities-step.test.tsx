@@ -21,7 +21,7 @@ beforeAll(() => {
 })
 
 describe('AbilitiesStep', () => {
-  it('renders the standard-array assignment UI', () => {
+  it('renders the fixed-scores assignment UI', () => {
     render(
       <AbilitiesStep
         context={context}
@@ -34,7 +34,7 @@ describe('AbilitiesStep', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Abilities' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Standard Array' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fixed scores' })).toBeInTheDocument()
     expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
   })
 
@@ -57,6 +57,7 @@ describe('AbilitiesStep', () => {
       />,
     )
 
+    expect(screen.getByRole('alert')).toHaveTextContent('Complete this step before continuing.')
     expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
   })
 

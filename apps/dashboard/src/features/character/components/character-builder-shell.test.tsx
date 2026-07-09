@@ -15,8 +15,18 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   createStandaloneBuilderContextFixture,
 } from '../lib/character-builder-fixtures'
+import { abilitiesFormCopy } from '../lib/steps/abilities-form-labels'
 import { resetCharacterBuilderStoreCache } from '../store/character-builder-store'
 import { CharacterBuilderShell } from './character-builder-shell.client'
+
+async function assignStrengthScore(score: number) {
+  await userEvent.click(
+    screen.getByRole('button', {
+      name: new RegExp(`${abilitiesFormCopy.chooseScore} for Strength`, 'i'),
+    }),
+  )
+  await userEvent.click(screen.getByRole('menuitem', { name: String(score) }))
+}
 
 function installSessionStorageMock(): void {
   const storage = new Map<string, string>()
@@ -135,9 +145,7 @@ describe('CharacterBuilderShell', () => {
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
-    const strengthSelect = await screen.findByRole('combobox', { name: /Strength score/i })
-    await userEvent.click(strengthSelect)
-    await userEvent.click(screen.getByRole('option', { name: '15' }))
+    await assignStrengthScore(15)
 
     await userEvent.click(within(stepRail).getByRole('button', { name: /Review/i }))
 
@@ -148,7 +156,7 @@ describe('CharacterBuilderShell', () => {
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: /Strength score/i })).toHaveTextContent('15')
+      expect(screen.getByLabelText('Strength score 15')).toBeInTheDocument()
     })
   })
 })

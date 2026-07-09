@@ -8,7 +8,7 @@ import { Form } from '@rpg/ui/form'
 
 import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
 import { abilitiesFormSchema } from '../../lib/steps/abilities-form-fields'
-import { StandardArrayAssignment } from './standard-array-assignment.client'
+import { FixedScoresAssignment } from './fixed-scores-assignment.client'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -23,6 +23,7 @@ beforeAll(() => {
 
 function renderAssignment(
   defaultValues: Record<string, number | undefined> = {},
+  options: { showInvalidStates?: boolean } = {},
   onSubmit: (values: Record<string, unknown>) => void = vi.fn(),
 ) {
   return render(
@@ -31,10 +32,11 @@ function renderAssignment(
       fields={[
         {
           kind: 'slot',
-          name: 'standardArrayAssignment',
+          name: 'fixedScoresAssignment',
           render: () => (
-            <StandardArrayAssignment
-              standardArray={DEFAULT_ABILITY_GENERATION_RULES.standardArray}
+            <FixedScoresAssignment
+              scorePool={DEFAULT_ABILITY_GENERATION_RULES.standardArray}
+              showInvalidStates={options.showInvalidStates}
             />
           ),
         },
@@ -49,25 +51,43 @@ function getScorePoolSection() {
   return screen.getByRole('region', { name: abilitiesFormCopy.availableScores })
 }
 
-describe('StandardArrayAssignment', () => {
+function getChooseScoreButton(abilityLabel: string) {
+  return screen.getByRole('button', {
+    name: new RegExp(`${abilitiesFormCopy.chooseScore} for ${abilityLabel}`, 'i'),
+  })
+}
+
+describe('FixedScoresAssignment', () => {
   it('shows the full score pool when nothing is assigned', () => {
     renderAssignment()
 
-    expect(screen.getByRole('heading', { name: 'Standard Array' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fixed scores' })).toBeInTheDocument()
+    expect(
+      screen.getByText('Drag each score onto an ability, or choose scores manually.'),
+    ).toBeInTheDocument()
     expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
 
     const pool = within(getScorePoolSection())
     for (const score of STANDARD_ARRAY) {
-      expect(pool.getByText(String(score))).toBeInTheDocument()
+      expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
     }
   })
 
-  it('assigns a score, updates the pool, and shows the modifier', async () => {
+  it('does not show invalid card styling before a failed continue attempt', () => {
+    const { container } = renderAssignment()
+    expect(container.querySelector('[class*="border-destructive"]')).not.toBeInTheDocument()
+  })
+
+  it('shows invalid styling on unassigned cards after a failed continue attempt', () => {
+    const { container } = renderAssignment({}, { showInvalidStates: true })
+    expect(container.querySelectorAll('[class*="border-destructive"]').length).toBeGreaterThan(0)
+  })
+
+  it('assigns a score via choose score, updates the pool, and shows the modifier', async () => {
     renderAssignment()
 
-    const strengthSelect = screen.getByRole('combobox', { name: /Strength score/i })
-    await userEvent.click(strengthSelect)
-    await userEvent.click(screen.getByRole('option', { name: '15' }))
+    await userEvent.click(getChooseScoreButton('Strength'))
+    await userEvent.click(screen.getByRole('menuitem', { name: '15' }))
 
     await waitFor(() => {
       expect(screen.getByText('5 scores remaining')).toBeInTheDocument()
@@ -77,31 +97,28 @@ describe('StandardArrayAssignment', () => {
     expect(screen.getByText('+2')).toBeInTheDocument()
   })
 
-  it('disables scores already assigned to another ability', async () => {
+  it('disables scores already assigned to another ability in choose score', async () => {
     renderAssignment({ str: 15 })
 
-    const dexteritySelect = screen.getByRole('combobox', { name: /Dexterity score/i })
-    await userEvent.click(dexteritySelect)
-
-    expect(screen.getByRole('option', { name: '15 — assigned to STR' })).toHaveAttribute(
+    await userEvent.click(getChooseScoreButton('Dexterity'))
+    expect(screen.getByRole('menuitem', { name: '15 — assigned to STR' })).toHaveAttribute(
       'aria-disabled',
       'true',
     )
   })
 
-  it('clears an assigned score and restores the pool', async () => {
+  it('clears an assigned score and restores the pool via choose score', async () => {
     renderAssignment({ str: 15, dex: 14 })
 
-    const strengthSelect = screen.getByRole('combobox', { name: /Strength score/i })
-    await userEvent.click(strengthSelect)
-    await userEvent.click(screen.getByRole('option', { name: '—' }))
+    await userEvent.click(getChooseScoreButton('Strength'))
+    await userEvent.click(screen.getByRole('menuitem', { name: '—' }))
 
     await waitFor(() => {
       expect(screen.getByText('5 scores remaining')).toBeInTheDocument()
     })
 
     const pool = within(getScorePoolSection())
-    expect(pool.getByText('15')).toBeInTheDocument()
+    expect(pool.getByRole('button', { name: 'Score 15' })).toBeInTheDocument()
   })
 
   it('hides the score pool when all values are assigned', () => {
@@ -118,6 +135,21 @@ describe('StandardArrayAssignment', () => {
     expect(
       screen.queryByRole('region', { name: abilitiesFormCopy.availableScores }),
     ).not.toBeInTheDocument()
+  })
+
+  it('keeps choose score visible for every ability card', () => {
+    renderAssignment()
+
+    for (const label of [
+      'Strength',
+      'Dexterity',
+      'Constitution',
+      'Intelligence',
+      'Wisdom',
+      'Charisma',
+    ]) {
+      expect(getChooseScoreButton(label)).toBeVisible()
+    }
   })
 
   it('has no axe accessibility violations', async () => {

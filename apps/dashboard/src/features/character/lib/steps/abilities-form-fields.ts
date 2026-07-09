@@ -72,15 +72,15 @@ export function abilitiesScoreResolverFields(): FormItem[] {
 
 export type BuildAbilitiesStepFormFieldsInput = {
   method: AbilityGenerationMethod
-  renderStandardArrayAssignment: () => ReactNode
+  renderFixedScoresAssignment: () => ReactNode
   renderDraftSync: () => ReactNode
   renderContinueRegistration: () => ReactNode
 }
 
-/** Composes the abilities step field list for standard-array or manual generation. */
+/** Composes the abilities step field list for fixed-score or manual generation. */
 export function buildAbilitiesStepFormFields({
   method,
-  renderStandardArrayAssignment,
+  renderFixedScoresAssignment,
   renderDraftSync,
   renderContinueRegistration,
 }: BuildAbilitiesStepFormFieldsInput): FormItem[] {
@@ -89,8 +89,8 @@ export function buildAbilitiesStepFormFields({
       ? [
           {
             kind: 'slot' as const,
-            name: 'standardArrayAssignment',
-            render: renderStandardArrayAssignment,
+            name: 'fixedScoresAssignment',
+            render: renderFixedScoresAssignment,
           },
         ]
       : buildAbilitiesFormFields(method)
@@ -110,13 +110,13 @@ export function buildAbilitiesStepFormFields({
   ]
 }
 
-/** Field list used by validation tests for standard-array (slot + resolver paths). */
+/** Field list used by validation tests for fixed-score assignment (slot + resolver paths). */
 export function buildAbilitiesValidationFields(method: AbilityGenerationMethod): FormItem[] {
   if (method === 'standard-array') {
     return [
       {
         kind: 'slot' as const,
-        name: 'standardArrayAssignment',
+        name: 'fixedScoresAssignment',
         render: () => null,
       },
       ...abilitiesScoreResolverFields(),

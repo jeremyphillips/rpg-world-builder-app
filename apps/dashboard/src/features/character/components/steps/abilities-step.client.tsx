@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import {
+  characterBuilderValidationMessages,
   resolveAbilityGenerationMethod,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -22,7 +23,7 @@ import { BUILDER_STEP_FORM_IDS } from '../../lib/steps/builder-step-form-ids'
 import { BuilderFormContinueRegistration } from '../builder/builder-form-continue-registration.client'
 import { AbilitiesDraftSync } from './abilities-draft-sync.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
-import { StandardArrayAssignment } from './standard-array-assignment.client'
+import { FixedScoresAssignment } from './fixed-scores-assignment.client'
 
 export type AbilitiesStepProps = {
   context: CharacterBuildContext
@@ -43,13 +44,17 @@ export function AbilitiesStep({
 }: AbilitiesStepProps) {
   const abilityGeneration = context.characterCreationRules.abilityGeneration
   const resolvedMethod = resolveAbilityGenerationMethod(abilityGeneration)
+  const showInvalidStates = validationIssues.length > 0
 
   const fields = useMemo(
     () =>
       buildAbilitiesStepFormFields({
         method: resolvedMethod,
-        renderStandardArrayAssignment: () => (
-          <StandardArrayAssignment standardArray={abilityGeneration.standardArray} />
+        renderFixedScoresAssignment: () => (
+          <FixedScoresAssignment
+            scorePool={abilityGeneration.standardArray}
+            showInvalidStates={showInvalidStates}
+          />
         ),
         renderDraftSync: () => (
           <AbilitiesDraftSync
@@ -77,11 +82,16 @@ export function AbilitiesStep({
       onFormContinueValidationFailed,
       onStepComplete,
       resolvedMethod,
+      showInvalidStates,
     ],
   )
 
   return (
-    <BuilderStepFrame stepId="abilities" validationIssues={validationIssues}>
+    <BuilderStepFrame
+      stepId="abilities"
+      validationIssues={validationIssues}
+      validationHeading={characterBuilderValidationMessages.stepIncomplete()}
+    >
       <Form
         id={BUILDER_STEP_FORM_IDS.abilities}
         schema={abilitiesFormSchema}
