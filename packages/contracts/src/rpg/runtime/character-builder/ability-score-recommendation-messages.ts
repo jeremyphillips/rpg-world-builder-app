@@ -48,4 +48,12 @@ export const characterBuilderAbilityRecommendationMessages = {
     'validation.characterBuilder.abilityRecommendation.badgeSecondary',
     () => 'Also useful',
   ),
+  autoFillRemaining: defineMessage(
+    'validation.characterBuilder.abilityRecommendation.autoFillRemaining',
+    () => 'Auto-fill remaining',
+  ),
+  clearScores: defineMessage(
+    'validation.characterBuilder.abilityRecommendation.clearScores',
+    () => 'Clear scores',
+  ),
 }

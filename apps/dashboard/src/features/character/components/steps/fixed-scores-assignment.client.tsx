@@ -18,10 +18,14 @@ import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
   abilityModifier,
+  characterBuilderAbilityRecommendationMessages,
+  fillEmptyAbilitiesWithClassRecommendations,
+  formatFieldMessage,
   getAbilityGenerationMethodAssignmentDescription,
   getAbilityGenerationMethodDisplayName,
   getAvailableStandardArrayScores,
   mergeSuggestedAssignmentIntoScores,
+  resolveAbilityScorePoolActionState,
   type Ability,
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
@@ -63,6 +67,7 @@ import {
 import { formatPreviewSignedNumber } from '../../lib/character-builder-preview-panel.lib'
 import { AbilityRecommendationPanel } from './ability-recommendation-panel.client'
 import { AbilityScoreCardBadge } from './ability-score-card-badge.client'
+import { AutoFillRemainingAction } from './auto-fill-remaining-action.client'
 import { abilityScoreCardColumnClasses } from './ability-recommendation.variants'
 import { ScoreToken } from './score-token.client'
 import {
@@ -83,6 +88,7 @@ import {
   fixedScoresScorePoolContainerDragOverClasses,
   fixedScoresScorePoolContainerProgressClasses,
   fixedScoresScorePoolContainerTokensClasses,
+  fixedScoresScorePoolHeaderClasses,
   fixedScoresTokenPoolSectionClasses,
 } from './fixed-scores-assignment.variants'
 
@@ -279,11 +285,17 @@ function ScorePoolSection({
   availableScores,
   remainingCount,
   activeDrag,
+  showPoolAction,
+  poolActionLabel,
+  onPoolAction,
 }: {
   poolId: string
   availableScores: readonly number[]
   remainingCount: number
   activeDrag: ActiveDragState
+  showPoolAction: boolean
+  poolActionLabel: string
+  onPoolAction: () => void
 }) {
   const isAssignedDrag = activeDrag?.kind === FIXED_SCORES_DND_KINDS.assigned
 
@@ -294,9 +306,14 @@ function ScorePoolSection({
 
   return (
     <section aria-labelledby={poolId} className={fixedScoresTokenPoolSectionClasses}>
-      <Text as="h4" id={poolId} variant="body" className="text-sm font-medium">
-        {abilitiesFormCopy.availableScores}
-      </Text>
+      <div className={fixedScoresScorePoolHeaderClasses}>
+        <Text as="h4" id={poolId} variant="body" className="text-sm font-medium">
+          {abilitiesFormCopy.availableScores}
+        </Text>
+        {showPoolAction ? (
+          <AutoFillRemainingAction label={poolActionLabel} onAutoFill={onPoolAction} />
+        ) : null}
+      </div>
       <div
         ref={setNodeRef}
         className={cn(
@@ -349,6 +366,13 @@ export function FixedScoresAssignment({
     [scores, scorePool],
   )
   const remainingCount = getFixedScoresRemainingCount(scores, scorePool)
+  const poolActionState = resolveAbilityScorePoolActionState(scores, classInput != null)
+  const showPoolAction = poolActionState !== 'hidden'
+  const poolActionLabel = formatFieldMessage(
+    poolActionState === 'clear'
+      ? characterBuilderAbilityRecommendationMessages.clearScores()
+      : characterBuilderAbilityRecommendationMessages.autoFillRemaining(),
+  )
 
   const methodHeading = getAbilityGenerationMethodDisplayName('standard-array')
   const methodDescription = getAbilityGenerationMethodAssignmentDescription('standard-array')
@@ -434,6 +458,23 @@ export function FixedScoresAssignment({
     [scores, syncScoresToForm],
   )
 
+  const handlePoolAction = useCallback(() => {
+    if (!classInput) return
+
+    if (poolActionState === 'clear') {
+      const emptyValues = ABILITY_IDS.reduce<AbilitiesFormValues>((values, ability) => {
+        values[ability] = undefined
+        return values
+      }, {} as AbilitiesFormValues)
+      form.reset(emptyValues, { keepDefaultValues: false })
+      return
+    }
+
+    syncScoresToForm(
+      fillEmptyAbilitiesWithClassRecommendations(scores, scorePool, classInput.primaryAbilities),
+    )
+  }, [classInput, form, poolActionState, scorePool, scores, syncScoresToForm])
+
   const overlayScore =
     activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool
       ? activeDrag.score
@@ -467,6 +508,9 @@ export function FixedScoresAssignment({
             availableScores={availableScores}
             remainingCount={remainingCount}
             activeDrag={activeDrag}
+            showPoolAction={showPoolAction}
+            poolActionLabel={poolActionLabel}
+            onPoolAction={handlePoolAction}
           />
 
           <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
