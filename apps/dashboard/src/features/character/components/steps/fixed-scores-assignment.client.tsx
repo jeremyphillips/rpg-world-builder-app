@@ -30,6 +30,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Text,
+  cn,
 } from '@rpg/ui'
 
 import {
@@ -50,6 +51,7 @@ import {
   fixedScoresAbilityDropDndId,
   fixedScoresAssignedDndId,
   fixedScoresCollisionDetection,
+  fixedScoresPoolContainerDndId,
   fixedScoresPoolDndId,
   resolveFixedScoresDragEnd,
   type FixedScoresAssignedDragData,
@@ -71,8 +73,10 @@ import {
   fixedScoresAbilityGridClasses,
   fixedScoresAssignmentIntroClasses,
   fixedScoresAssignmentRootClasses,
-  fixedScoresRemainingClasses,
-  fixedScoresTokenPoolClasses,
+  fixedScoresScorePoolContainerClasses,
+  fixedScoresScorePoolContainerDragOverClasses,
+  fixedScoresScorePoolContainerProgressClasses,
+  fixedScoresScorePoolContainerTokensClasses,
   fixedScoresTokenPoolSectionClasses,
 } from './fixed-scores-assignment.variants'
 
@@ -251,6 +255,62 @@ function AbilityScoreCard({
   )
 }
 
+function ScorePoolSection({
+  poolId,
+  availableScores,
+  remainingCount,
+  activeDrag,
+}: {
+  poolId: string
+  availableScores: readonly number[]
+  remainingCount: number
+  activeDrag: ActiveDragState
+}) {
+  const isAssignedDrag = activeDrag?.kind === FIXED_SCORES_DND_KINDS.assigned
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: fixedScoresPoolContainerDndId(),
+    data: { kind: FIXED_SCORES_DND_KINDS.poolContainer },
+  })
+
+  return (
+    <section aria-labelledby={poolId} className={fixedScoresTokenPoolSectionClasses}>
+      <Text as="h4" id={poolId} variant="body" className="text-sm font-medium">
+        {abilitiesFormCopy.availableScores}
+      </Text>
+      <div
+        ref={setNodeRef}
+        className={cn(
+          fixedScoresScorePoolContainerClasses,
+          isAssignedDrag && isOver && fixedScoresScorePoolContainerDragOverClasses,
+        )}
+      >
+        <div className={fixedScoresScorePoolContainerTokensClasses}>
+          {availableScores.map((score) => (
+            <ScoreToken
+              key={score}
+              value={score}
+              size="pool"
+              surface="token"
+              interactive
+              dragging={
+                activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool && activeDrag.score === score
+              }
+              dndId={fixedScoresPoolDndId(score)}
+              dndData={
+                { kind: FIXED_SCORES_DND_KINDS.pool, score } satisfies FixedScoresPoolDragData
+              }
+            />
+          ))}
+        </div>
+        <p className={fixedScoresScorePoolContainerProgressClasses} aria-live="polite">
+          {abilitiesFormCopy.scoresRemaining(remainingCount)}
+        </p>
+      </div>
+    </section>
+  )
+}
+
 /** Fixed-score pool and per-ability card assignment with drag/drop and choose-score fallback. */
 export function FixedScoresAssignment({
   scorePool,
@@ -366,10 +426,6 @@ export function FixedScoresAssignment({
         ) : null}
       </div>
 
-      <p className={fixedScoresRemainingClasses} aria-live="polite">
-        {abilitiesFormCopy.scoresRemaining(remainingCount)}
-      </p>
-
       <DndContext
         sensors={sensors}
         collisionDetection={fixedScoresCollisionDetection}
@@ -378,31 +434,12 @@ export function FixedScoresAssignment({
         onDragCancel={handleDragCancel}
       >
         <div className="space-y-6">
-          {availableScores.length > 0 ? (
-            <section aria-labelledby={poolId} className={fixedScoresTokenPoolSectionClasses}>
-              <Text as="h4" id={poolId} variant="body" className="text-sm font-medium">
-                {abilitiesFormCopy.availableScores}
-              </Text>
-              <div className={fixedScoresTokenPoolClasses}>
-                {availableScores.map((score) => (
-                  <ScoreToken
-                    key={score}
-                    value={score}
-                    size="pool"
-                    surface="token"
-                    interactive
-                    dragging={
-                      activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool && activeDrag.score === score
-                    }
-                    dndId={fixedScoresPoolDndId(score)}
-                    dndData={
-                      { kind: FIXED_SCORES_DND_KINDS.pool, score } satisfies FixedScoresPoolDragData
-                    }
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
+          <ScorePoolSection
+            poolId={poolId}
+            availableScores={availableScores}
+            remainingCount={remainingCount}
+            activeDrag={activeDrag}
+          />
 
           <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
             {ABILITY_IDS.map((ability) => (

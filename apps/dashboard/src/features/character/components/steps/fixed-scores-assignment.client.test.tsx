@@ -58,16 +58,18 @@ function getChooseScoreButton(abilityLabel: string) {
 }
 
 describe('FixedScoresAssignment', () => {
-  it('shows the full score pool when nothing is assigned', () => {
-    renderAssignment()
+  it('shows the score pool in a dashed container when nothing is assigned', () => {
+    const { container } = renderAssignment()
 
     expect(screen.getByRole('heading', { name: 'Fixed scores' })).toBeInTheDocument()
     expect(
       screen.getByText('Drag each score onto an ability, or choose scores manually.'),
     ).toBeInTheDocument()
-    expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
 
     const pool = within(getScorePoolSection())
+    expect(pool.getByText('6 scores remaining')).toBeInTheDocument()
+    expect(container.querySelector('.border-dashed')).toBeInTheDocument()
+
     for (const score of STANDARD_ARRAY) {
       expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
     }
@@ -121,8 +123,8 @@ describe('FixedScoresAssignment', () => {
     expect(pool.getByRole('button', { name: 'Score 15' })).toBeInTheDocument()
   })
 
-  it('hides the score pool when all values are assigned', () => {
-    renderAssignment({
+  it('keeps the dashed pool container visible when all values are assigned', () => {
+    const { container } = renderAssignment({
       str: 15,
       dex: 14,
       con: 13,
@@ -131,10 +133,10 @@ describe('FixedScoresAssignment', () => {
       cha: 8,
     })
 
-    expect(screen.getByText('All scores assigned')).toBeInTheDocument()
-    expect(
-      screen.queryByRole('region', { name: abilitiesFormCopy.availableScores }),
-    ).not.toBeInTheDocument()
+    const pool = within(getScorePoolSection())
+    expect(pool.getByText('All scores assigned')).toBeInTheDocument()
+    expect(pool.queryByRole('button', { name: /Score \d+/ })).not.toBeInTheDocument()
+    expect(container.querySelector('.border-dashed')).toBeInTheDocument()
   })
 
   it('keeps choose score visible for every ability card', () => {

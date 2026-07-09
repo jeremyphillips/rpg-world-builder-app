@@ -5,6 +5,7 @@ import type { Ability } from '@rpg/contracts'
 
 import {
   assignScoreFromPool,
+  clearAbilityScore,
   replaceScoreFromPool,
   swapAssignedScores,
 } from '../../lib/steps/fixed-scores-assignment.lib'
@@ -13,7 +14,10 @@ export const FIXED_SCORES_DND_KINDS = {
   pool: 'pool',
   assigned: 'assigned',
   abilityDrop: 'ability-drop',
+  poolContainer: 'pool-container',
 } as const
+
+export const FIXED_SCORES_POOL_CONTAINER_DND_ID = 'pool:container' as const
 
 export type FixedScoresPoolDragData = {
   kind: typeof FIXED_SCORES_DND_KINDS.pool
@@ -41,6 +45,14 @@ export function fixedScoresAssignedDndId(ability: Ability): string {
 
 export function fixedScoresAbilityDropDndId(ability: Ability): string {
   return `ability:${ability}`
+}
+
+export function fixedScoresPoolContainerDndId(): string {
+  return FIXED_SCORES_POOL_CONTAINER_DND_ID
+}
+
+export function isFixedScoresPoolContainerDrop(id: string | number): boolean {
+  return String(id) === FIXED_SCORES_POOL_CONTAINER_DND_ID
 }
 
 function parseFixedScoresAbilityId(value: string): Ability | undefined {
@@ -90,6 +102,11 @@ export const fixedScoresCollisionDetection: CollisionDetection = (args) => {
   })
   if (assignedCollision) return [assignedCollision]
 
+  const poolContainerCollision = collisions.find((collision) =>
+    isFixedScoresPoolContainerDrop(collision.id),
+  )
+  if (poolContainerCollision) return [poolContainerCollision]
+
   return collisions
 }
 
@@ -100,14 +117,21 @@ export function resolveFixedScoresDragEnd(
   const { active, over } = event
   if (!over) return null
 
-  const targetAbility = parseFixedScoresDropTarget(over.id)
-  if (!targetAbility) return null
-
   const activeData = active.data.current as
     | FixedScoresPoolDragData
     | FixedScoresAssignedDragData
     | undefined
   if (!activeData) return null
+
+  if (isFixedScoresPoolContainerDrop(over.id)) {
+    if (activeData.kind === FIXED_SCORES_DND_KINDS.assigned) {
+      return clearAbilityScore(scores, activeData.ability)
+    }
+    return null
+  }
+
+  const targetAbility = parseFixedScoresDropTarget(over.id)
+  if (!targetAbility) return null
 
   if (activeData.kind === FIXED_SCORES_DND_KINDS.pool) {
     const targetScore = scores[targetAbility]

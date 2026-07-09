@@ -4,7 +4,9 @@ import type { DragEndEvent } from '@dnd-kit/core'
 import {
   fixedScoresAbilityDropDndId,
   fixedScoresAssignedDndId,
+  fixedScoresPoolContainerDndId,
   fixedScoresPoolDndId,
+  isFixedScoresPoolContainerDrop,
   parseFixedScoresAbilityDropId,
   parseFixedScoresAssignedDndId,
   parseFixedScoresDropTarget,
@@ -24,6 +26,8 @@ function dragEnd(activeId: string, activeData: object, overId: string | null) {
 describe('fixed-scores-dnd.lib', () => {
   it('builds stable dnd ids', () => {
     expect(fixedScoresPoolDndId(15)).toBe('pool:15')
+    expect(fixedScoresPoolContainerDndId()).toBe('pool:container')
+    expect(isFixedScoresPoolContainerDrop('pool:container')).toBe(true)
     expect(fixedScoresAssignedDndId('str')).toBe('assigned:str')
     expect(fixedScoresAbilityDropDndId('dex')).toBe('ability:dex')
     expect(parseFixedScoresAbilityDropId('ability:con')).toBe('con')
@@ -85,6 +89,31 @@ describe('fixed-scores-dnd.lib', () => {
         fixedScoresAssignedDndId('dex'),
       ),
     ).toEqual({ str: 14, dex: 15 })
+  })
+
+  it('returns an assigned score to the pool when dropped on the pool container', () => {
+    expect(
+      dragEnd(
+        fixedScoresAssignedDndId('str'),
+        { kind: 'assigned', ability: 'str', score: 15 },
+        fixedScoresPoolContainerDndId(),
+      ),
+    ).toEqual({ dex: 14 })
+  })
+
+  it('no-ops when a pool token is dropped on the pool container', () => {
+    expect(
+      resolveFixedScoresDragEnd(
+        {
+          active: {
+            id: fixedScoresPoolDndId(12),
+            data: { current: { kind: 'pool', score: 12 } },
+          },
+          over: { id: fixedScoresPoolContainerDndId(), data: { current: {} } },
+        } as unknown as DragEndEvent,
+        { str: 15 },
+      ),
+    ).toBeNull()
   })
 
   it('no-ops for same ability, outside target, or missing over', () => {

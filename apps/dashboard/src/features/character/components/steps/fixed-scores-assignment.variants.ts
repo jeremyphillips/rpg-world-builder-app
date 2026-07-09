@@ -4,9 +4,16 @@ export const fixedScoresAssignmentIntroClasses = 'space-y-1'
 
 export const fixedScoresTokenPoolSectionClasses = 'space-y-2'
 
-export const fixedScoresTokenPoolClasses = 'flex flex-wrap gap-3'
+/** Dashed container for unassigned score tokens — expandable token set. */
+export const fixedScoresScorePoolContainerClasses =
+  'flex flex-col gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted/20 p-4 transition-colors'
 
-export const fixedScoresRemainingClasses = 'text-sm text-muted-foreground'
+export const fixedScoresScorePoolContainerDragOverClasses = 'border-primary/50 bg-muted/30'
+
+export const fixedScoresScorePoolContainerTokensClasses =
+  'flex min-h-16 flex-wrap items-center gap-3'
+
+export const fixedScoresScorePoolContainerProgressClasses = 'text-sm text-muted-foreground'
 
 export const fixedScoresAbilityGridClasses =
   'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6'
