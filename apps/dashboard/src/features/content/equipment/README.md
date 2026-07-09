@@ -27,6 +27,7 @@ Shared wiring lives under [`lib/`](./lib/):
 - [`lib/shared/equipment-family-paths.ts`](./lib/shared/equipment-family-paths.ts) — URL segment ↔ kind mapping
 - [`lib/shared/equipment-family-overview-columns.ts`](./lib/shared/equipment-family-overview-columns.ts) — lazy-loaded family overview table config (`loadFamilyTableConfig`)
 - [`lib/shared/equipment-detail-stat-rows.ts`](./lib/shared/equipment-detail-stat-rows.ts) — detail stat rows by kind
+- [`lib/equipment-display.ts`](./lib/equipment-display.ts) — display registry (picker header + detail view models, section titles)
 
 Each family uses `*-form-fields.ts` (UI) and `*-form-values.ts` (entity ↔ form mapping + `build*Input`).
 

@@ -5,6 +5,15 @@ export {
 } from './routes/equipment-family-overview'
 export { EquipmentFamilyCreate } from './routes/equipment-family-create'
 export { EquipmentDetail, EquipmentDetailContent } from './routes/equipment-detail'
+export { EquipmentDetailMetadata } from './components/equipment-detail-metadata.client'
+export {
+  buildEquipmentDetailViewModel,
+  buildEquipmentPickerHeaderViewModel,
+  EQUIPMENT_DETAILS_SECTION_TITLES,
+  EQUIPMENT_STAT_LABELS,
+  type EquipmentCardViewModel,
+  type EquipmentDetailViewModel,
+} from './lib/equipment-display'
 export { useEquipment, equipmentQueryKey } from './hooks/use-equipment'
 export {
   EQUIPMENT_FAMILY_PATHS,

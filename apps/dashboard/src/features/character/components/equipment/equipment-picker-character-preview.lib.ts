@@ -22,6 +22,8 @@ import {
 import type { EquipmentBudgetSummary } from './equipment-picker-drawer.types'
 import { formatEquipmentBudgetWealth } from './equipment-picker-drawer.lib'
 
+export const EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL = 'Character preview'
+
 export const EQUIPMENT_PICKER_PREVIEW_ATTACK_LABEL = 'Attack'
 export const EQUIPMENT_PICKER_PREVIEW_DAMAGE_LABEL = 'Damage'
 export const EQUIPMENT_PICKER_PREVIEW_AC_IF_EQUIPPED_LABEL = 'AC if equipped'

@@ -29,7 +29,7 @@ describe('CatalogPickerSheet', () => {
         items={items}
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
-        renderItem={(item) => <span>{item.name}</span>}
+        renderItemHeader={(item) => <span>{item.name}</span>}
       />,
     )
 
@@ -42,7 +42,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
   })
 
-  it('switches tabs and shows expandable details', async () => {
+  it('switches tabs and expands collapsible details via leading caret', async () => {
     const user = userEvent.setup()
 
     render(
@@ -53,13 +53,14 @@ describe('CatalogPickerSheet', () => {
         items={items}
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
+        getItemToolbarLabel={(item) => item.name}
         getItemTab={(item) => item.tab}
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },
           { id: 'all', label: 'All' },
         ]}
-        renderItem={(item) => <span>{item.name}</span>}
+        renderItemHeader={(item) => <span>{item.name}</span>}
         renderItemDetails={(item) => <p>Details for {item.name}</p>}
       />,
     )
@@ -70,8 +71,29 @@ describe('CatalogPickerSheet', () => {
     await user.click(screen.getByRole('tab', { name: /All/i }))
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Show details' }))
-    expect(screen.getByText('Details for Beta Item')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Expand Beta Item' }))
+    expect(screen.getByText('Details for Beta Item')).toBeVisible()
+  })
+
+  it('keeps legacy rows expandable via the right-side details button', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItem={(item) => <span>{item.name}</span>}
+        renderItemDetails={(item) => <p>Details for {item.name}</p>}
+      />,
+    )
+
+    const [alphaDetailsButton] = screen.getAllByRole('button', { name: 'Show details' })
+    await user.click(alphaDetailsButton!)
+    expect(screen.getByText('Details for Alpha Item')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
@@ -84,7 +106,7 @@ describe('CatalogPickerSheet', () => {
         items={items}
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
-        renderItem={(item) => <span>{item.name}</span>}
+        renderItemHeader={(item) => <span>{item.name}</span>}
       />,
     )
 
