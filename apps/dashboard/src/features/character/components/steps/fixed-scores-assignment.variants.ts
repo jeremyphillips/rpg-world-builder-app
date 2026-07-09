@@ -15,8 +15,7 @@ export const fixedScoresScorePoolContainerTokensClasses =
 
 export const fixedScoresScorePoolContainerProgressClasses = 'text-sm text-muted-foreground'
 
-export const fixedScoresAbilityGridClasses =
-  'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6'
+export const fixedScoresAbilityGridClasses = 'grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6'
 
 export const abilityScoreCardBaseClasses =
   'flex min-h-[8.5rem] w-full min-w-0 flex-col gap-1 rounded-md border p-4 transition-colors'
