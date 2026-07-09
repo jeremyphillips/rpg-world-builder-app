@@ -436,7 +436,6 @@
   font-weight: var(--font-weight-meta);
   letter-spacing: var(--tracking-eyebrow-xs);
   text-transform: uppercase;
-  color: var(--color-muted-foreground);
 }
 
 @utility eyebrow-style-sm {
@@ -444,7 +443,6 @@
   font-weight: var(--font-weight-meta);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-muted-foreground);
 }
 
 @utility eyebrow-style-md {
@@ -452,7 +450,6 @@
   font-weight: var(--font-weight-meta);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--color-muted-foreground);
 }
 
 @keyframes accordion-down {

@@ -6,13 +6,9 @@ import {
   type AbilityRecommendation,
   type Ability,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Eyebrow } from '@rpg/ui'
 
-import {
-  abilityRecommendationBadgePrimaryClasses,
-  abilityRecommendationBadgeSecondaryClasses,
-  abilityRecommendationBadgeSlotClasses,
-} from './ability-recommendation.variants'
+import { abilityRecommendationBadgeSlotClasses } from './ability-recommendation.variants'
 
 export type AbilityScoreCardBadgeProps = {
   ability: Ability
@@ -27,14 +23,14 @@ export function AbilityScoreCardBadge({ ability, recommendation }: AbilityScoreC
   return (
     <div className={abilityRecommendationBadgeSlotClasses} aria-hidden={!isPrimary && !isSecondary}>
       {isPrimary ? (
-        <Text as="span" className={abilityRecommendationBadgePrimaryClasses}>
+        <Eyebrow size="xs" tone="foreground">
           {formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgePrimary())}
-        </Text>
+        </Eyebrow>
       ) : null}
       {isSecondary ? (
-        <Text as="span" className={abilityRecommendationBadgeSecondaryClasses}>
+        <Eyebrow size="xs" tone="muted">
           {formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgeSecondary())}
-        </Text>
+        </Eyebrow>
       ) : null}
     </div>
   )

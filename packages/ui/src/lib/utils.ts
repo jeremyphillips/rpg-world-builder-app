@@ -20,6 +20,13 @@ const EYEBROW_STYLE_UTILITIES = [
   'eyebrow-style-md',
 ] as const
 
+const EYEBROW_STYLE_CONFLICT_GROUPS = [
+  'font-size',
+  'font-weight',
+  'tracking',
+  'text-transform',
+] as const
+
 const TYPOGRAPHY_CONFLICT_GROUPS = [
   'font-size',
   'font-weight',
@@ -90,14 +97,13 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
-      'eyebrow-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
+      'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
       'font-size': ['heading-style', 'eyebrow-style'],
       'font-weight': ['heading-style', 'eyebrow-style'],
       tracking: ['heading-style', 'eyebrow-style'],
       leading: ['heading-style'],
       'font-family': ['heading-style'],
-      'text-color': ['eyebrow-style'],
-      'text-transform': ['eyebrow-style'],
+      'text-transform': ['heading-style', 'eyebrow-style'],
     },
   },
 })

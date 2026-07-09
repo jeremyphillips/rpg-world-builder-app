@@ -7,9 +7,15 @@ export const eyebrowVariants = cva('', {
       sm: 'eyebrow-style-sm',
       md: 'eyebrow-style-md',
     },
+    tone: {
+      muted: 'text-muted-foreground',
+      foreground: 'text-foreground',
+      primary: 'text-primary',
+    },
   },
   defaultVariants: {
     size: 'sm',
+    tone: 'muted',
   },
 })
 
