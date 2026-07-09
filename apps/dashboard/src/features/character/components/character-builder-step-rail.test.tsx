@@ -67,7 +67,7 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
-  it('shows a warning icon only after an attempted submit with blocking issues', () => {
+  it('shows an error icon only after an attempted submit with blocking issues', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
@@ -81,11 +81,11 @@ describe('CharacterBuilderStepRail', () => {
     )
 
     expect(
-      screen.getByRole('button', { name: /Identity, has validation issues/i }),
+      screen.getByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).toBeInTheDocument()
   })
 
-  it('does not show a warning icon before Continue is attempted', () => {
+  it('does not show an error icon before Continue is attempted', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
@@ -99,11 +99,11 @@ describe('CharacterBuilderStepRail', () => {
 
     expect(screen.getByRole('button', { name: /Identity, current step/i })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Identity, has validation issues/i }),
+      screen.queryByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).not.toBeInTheDocument()
   })
 
-  it('shows a warning icon when a touched step has draft validation issues', () => {
+  it('shows an attention icon when a field-touched step has draft validation issues', () => {
     render(
       <CharacterBuilderStepRail
         draft={{
@@ -119,8 +119,26 @@ describe('CharacterBuilderStepRail', () => {
     )
 
     expect(
-      screen.getByRole('button', { name: /Identity, has validation issues/i }),
+      screen.getByRole('button', { name: /Identity, has incomplete fields/i }),
     ).toBeInTheDocument()
+  })
+
+  it('does not show attention when draft issues exist but the step was only navigated to', () => {
+    render(
+      <CharacterBuilderStepRail
+        draft={createEmptyCharacterBuilderDraft()}
+        currentStepId="species"
+        {...railProps}
+        draftValidationIssues={[
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Identity, not started/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Identity, has incomplete fields/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('calls onStepSelect when a step is clicked', async () => {

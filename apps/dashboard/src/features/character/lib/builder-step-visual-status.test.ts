@@ -35,11 +35,8 @@ function resolveStatus(
 }
 
 describe('resolveStepVisualStatus', () => {
-  it('returns notStarted for incomplete steps that were only visited', () => {
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      touchedStepIds: ['species' as const],
-    }
+  it('returns idle for incomplete steps without field edits', () => {
+    const draft = createEmptyCharacterBuilderDraft()
 
     expect(
       resolveStatus({
@@ -47,10 +44,10 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
-  it('returns current for the active step only', () => {
+  it('returns active for the current step only', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -59,7 +56,7 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('current')
+    ).toBe('active')
   })
 
   it('returns complete when the builder step is complete', () => {
@@ -110,7 +107,7 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('complete')
   })
 
-  it('returns warning only after an attempted submit with blocking issues', () => {
+  it('returns error only after an attempted submit with blocking issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -123,10 +120,10 @@ describe('resolveStepVisualStatus', () => {
         ],
         attemptedStepIds: ['identity'],
       }),
-    ).toBe('warning')
+    ).toBe('error')
   })
 
-  it('does not return warning without an attempted submit or touched step', () => {
+  it('does not return error without an attempted submit', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -138,10 +135,10 @@ describe('resolveStepVisualStatus', () => {
           { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
         ],
       }),
-    ).toBe('current')
+    ).toBe('active')
   })
 
-  it('returns warning when a touched step has draft validation issues', () => {
+  it('returns attention when a field-touched step has draft validation issues', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       touchedStepIds: ['identity' as const],
@@ -156,10 +153,10 @@ describe('resolveStepVisualStatus', () => {
           { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
         ],
       }),
-    ).toBe('warning')
+    ).toBe('attention')
   })
 
-  it('does not return warning for untouched steps with draft validation issues', () => {
+  it('does not return attention for untouched steps with draft validation issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -171,7 +168,7 @@ describe('resolveStepVisualStatus', () => {
           { code: 'species_required', message: 'Choose a species.', stepId: 'species' },
         ],
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
   it('does not mark a step complete when draft validation still has issues', () => {
@@ -194,7 +191,7 @@ describe('resolveStepVisualStatus', () => {
           },
         ],
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
   it('keeps non-caster spells locked even when draft validation has spell issues', () => {
@@ -244,7 +241,7 @@ describe('resolveStepVisualStatus', () => {
     expect(stepStatusAriaLabel('Spells', 'locked')).toBe('Spells, not applicable')
   })
 
-  it('does not return warning for other steps with unresolved submit issues', () => {
+  it('does not return error for other steps with unresolved submit issues', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -257,10 +254,10 @@ describe('resolveStepVisualStatus', () => {
         ],
         attemptedStepIds: ['identity'],
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
-  it('returns not started for spells before a class is selected', () => {
+  it('returns idle for spells before a class is selected', () => {
     const context = createSpellsStepContextFixture()
     const draft = createEmptyCharacterBuilderDraft()
     const resolvedChoiceSets = resolveAvailableChoices(draft, context)
@@ -273,10 +270,10 @@ describe('resolveStepVisualStatus', () => {
         context,
         resolvedChoiceSets,
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
-  it('returns current for a blocked proficiencies step while origin languages are editable', () => {
+  it('returns active for a blocked proficiencies step while origin languages are editable', () => {
     const draft = createEmptyCharacterBuilderDraft()
     const resolvedChoiceSets = resolveAvailableChoices(draft, context)
 
@@ -287,7 +284,7 @@ describe('resolveStepVisualStatus', () => {
         currentStepId: 'proficiencies',
         resolvedChoiceSets,
       }),
-    ).toBe('current')
+    ).toBe('active')
   })
 
   it('returns complete for equipment when the class has no starting equipment choices', () => {
@@ -322,6 +319,6 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 })

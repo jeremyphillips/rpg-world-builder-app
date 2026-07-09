@@ -19,7 +19,6 @@ type Story = StoryObj<typeof CharacterBuilderFooter>
 export const IdentityStep: Story = {
   args: {
     currentStepId: 'identity',
-    continueFormId: 'identity-form',
   },
 }
 

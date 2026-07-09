@@ -15,7 +15,7 @@ import {
 
 import { issuesForStep } from './validate-builder-step'
 
-export type StepStatus = 'notStarted' | 'current' | 'complete' | 'warning' | 'locked'
+export type StepStatus = 'idle' | 'active' | 'complete' | 'attention' | 'error' | 'locked'
 
 export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
@@ -48,13 +48,13 @@ function stepStatusFromReadiness(
     case 'complete':
       return 'complete'
     case 'blocked':
-      return currentStepId === stepId ? 'current' : 'notStarted'
+      return currentStepId === stepId ? 'active' : 'idle'
     case 'readyWithChoices':
       return null
   }
 }
 
-function hasSubmitValidationWarning(
+function hasSubmitValidationError(
   stepId: CharacterBuilderStepId,
   validationIssues: CharacterBuildValidationIssue[],
   attemptedStepIds: readonly CharacterBuilderStepId[],
@@ -62,17 +62,16 @@ function hasSubmitValidationWarning(
   return attemptedStepIds.includes(stepId) && issuesForStep(validationIssues, stepId).length > 0
 }
 
-function hasDraftValidationWarning(
+function hasDraftValidationAttention(
   stepId: CharacterBuilderStepId,
   draft: CharacterBuilderDraft,
   draftValidationIssues: CharacterBuildValidationIssue[],
-  attemptedStepIds: readonly CharacterBuilderStepId[],
 ): boolean {
   if (issuesForStep(draftValidationIssues, stepId).length === 0) {
     return false
   }
 
-  return draft.touchedStepIds.includes(stepId) || attemptedStepIds.includes(stepId)
+  return draft.touchedStepIds.includes(stepId)
 }
 
 function hasDraftValidationIssues(
@@ -107,7 +106,7 @@ function resolveReadinessVisualStatus(
   }
 
   if (readinessStatus === 'complete' && hasDraftValidationIssues(stepId, draftValidationIssues)) {
-    return currentStepId === stepId ? 'current' : 'notStarted'
+    return currentStepId === stepId ? 'active' : 'idle'
   }
 
   return readinessStatus
@@ -126,7 +125,7 @@ function resolveIncompleteVisualStatus(
     return 'complete'
   }
 
-  return currentStepId === stepId ? 'current' : 'notStarted'
+  return currentStepId === stepId ? 'active' : 'idle'
 }
 
 export function resolveStepVisualStatus({
@@ -147,11 +146,12 @@ export function resolveStepVisualStatus({
     return 'locked'
   }
 
-  if (
-    hasSubmitValidationWarning(stepId, validationIssues, attemptedStepIds) ||
-    hasDraftValidationWarning(stepId, draft, draftValidationIssues, attemptedStepIds)
-  ) {
-    return 'warning'
+  if (hasSubmitValidationError(stepId, validationIssues, attemptedStepIds)) {
+    return 'error'
+  }
+
+  if (hasDraftValidationAttention(stepId, draft, draftValidationIssues)) {
+    return 'attention'
   }
 
   if (readinessState) {
@@ -177,10 +177,11 @@ export function resolveStepVisualStatus({
 }
 
 export const STEP_STATUS_ARIA_LABELS: Record<StepStatus, string> = {
-  notStarted: 'not started',
-  current: 'current step',
+  idle: 'not started',
+  active: 'current step',
   complete: 'complete',
-  warning: 'has validation issues',
+  attention: 'has incomplete fields',
+  error: 'has blocking validation issues',
   locked: 'not applicable',
 }
 

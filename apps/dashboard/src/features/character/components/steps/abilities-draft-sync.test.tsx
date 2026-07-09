@@ -39,6 +39,7 @@ describe('AbilitiesDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -51,6 +52,7 @@ describe('AbilitiesDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -76,6 +78,7 @@ describe('AbilitiesDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -112,6 +115,7 @@ describe('AbilitiesDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 
@@ -132,6 +136,7 @@ describe('AbilitiesDraftSync', () => {
         validationIssues={[]}
         onDraftChange={onDraftChange}
         onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
       />,
     )
 

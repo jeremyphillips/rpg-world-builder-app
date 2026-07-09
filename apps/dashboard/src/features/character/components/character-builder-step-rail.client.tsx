@@ -42,18 +42,20 @@ export type CharacterBuilderStepRailProps = {
 }
 
 const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
-  notStarted: Circle,
-  current: CircleDot,
+  idle: Circle,
+  active: CircleDot,
   complete: CheckCircle2,
-  warning: CircleAlert,
+  attention: CircleAlert,
+  error: CircleAlert,
   locked: Lock,
 }
 
 const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
-  notStarted: 'text-muted-foreground',
-  current: 'text-foreground',
+  idle: 'text-muted-foreground',
+  active: 'text-foreground',
   complete: 'text-success',
-  warning: 'text-destructive',
+  attention: 'text-destructive',
+  error: 'text-destructive',
   locked: 'text-muted-foreground',
 }
 

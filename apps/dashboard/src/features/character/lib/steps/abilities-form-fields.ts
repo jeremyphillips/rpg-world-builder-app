@@ -74,6 +74,7 @@ export type BuildAbilitiesStepFormFieldsInput = {
   method: AbilityGenerationMethod
   renderStandardArrayAssignment: () => ReactNode
   renderDraftSync: () => ReactNode
+  renderContinueRegistration: () => ReactNode
 }
 
 /** Composes the abilities step field list for standard-array or manual generation. */
@@ -81,6 +82,7 @@ export function buildAbilitiesStepFormFields({
   method,
   renderStandardArrayAssignment,
   renderDraftSync,
+  renderContinueRegistration,
 }: BuildAbilitiesStepFormFieldsInput): FormItem[] {
   const items: FormItem[] =
     method === 'standard-array'
@@ -95,6 +97,11 @@ export function buildAbilitiesStepFormFields({
 
   return [
     ...items,
+    {
+      kind: 'slot' as const,
+      name: '_abilitiesContinueRegistration',
+      render: renderContinueRegistration,
+    },
     {
       kind: 'slot' as const,
       name: '_abilitiesDraftSync',
