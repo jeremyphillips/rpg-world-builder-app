@@ -40,6 +40,7 @@ import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft
 import {
   issuesForStep,
   resolveBuilderDraftValidationIssues,
+  resolveStepValidationIssuesAfterDraftChange,
   validateBuilderFinalSubmit,
   validateBuilderStepSubmit,
 } from '../lib/validate-builder-step'
@@ -81,6 +82,8 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const [createError, setCreateError] = useState<string | null>(null)
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
+
+  const currentStepId = resolveCurrentStepId(draft.currentStepId)
 
   const preview = useCharacterPreview(
     draft,
@@ -130,6 +133,22 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     setValidationVisibleStepIds(railValidationVisibleStepIds)
   }, [railValidationVisibleStepIds, validationVisibleStepIds])
 
+  useEffect(() => {
+    if (!validationVisibleStepIds.includes(currentStepId)) {
+      return
+    }
+
+    setValidationIssues((previous) =>
+      resolveStepValidationIssuesAfterDraftChange(
+        previous,
+        draft,
+        context,
+        currentStepId,
+        resolvedChoiceSets,
+      ),
+    )
+  }, [context, currentStepId, draft, resolvedChoiceSets, validationVisibleStepIds])
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -149,7 +168,6 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     )
   }
 
-  const currentStepId = resolveCurrentStepId(draft.currentStepId)
   const onReview = isReviewBuilderStep(currentStepId)
 
   const stepValidationIssues = onReview

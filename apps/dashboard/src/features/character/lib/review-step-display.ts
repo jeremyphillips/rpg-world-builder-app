@@ -1,4 +1,5 @@
 import {
+  getAbilityGenerationMethodDisplayName,
   getAlignmentLabel,
   validateCharacterBuild,
   type CharacterBuildContext,
@@ -27,9 +28,7 @@ export function resolveReviewReadyMessage(
 export function formatAbilityMethodLabel(
   method: CharacterBuilderDraft['abilities']['method'],
 ): string {
-  if (method === 'manual') return 'Manual entry'
-  if (method === 'standard-array') return 'Standard array'
-  return 'Not set'
+  return getAbilityGenerationMethodDisplayName(method)
 }
 
 export function resolveCatalogEntryName(

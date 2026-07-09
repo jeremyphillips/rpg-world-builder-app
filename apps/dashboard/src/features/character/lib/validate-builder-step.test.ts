@@ -5,6 +5,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { createStandaloneBuilderContextFixture } from './character-builder-fixtures'
 import {
   resolveBuilderDraftValidationIssues,
+  resolveStepValidationIssuesAfterDraftChange,
   validateBuilderDraft,
   validateBuilderFinalSubmit,
 } from './validate-builder-step'
@@ -48,5 +49,31 @@ describe('validate-builder-step', () => {
     expect(draftIssues.some((issue) => issue.code === 'alignment_required')).toBe(false)
     expect(finalSubmit.ok).toBe(false)
     expect(finalSubmit.issues.some((issue) => issue.code === 'alignment_required')).toBe(true)
+  })
+
+  it('replaces visible step issues after the draft is corrected', () => {
+    const emptyDraft = createEmptyCharacterBuilderDraft()
+    const namedDraft = {
+      ...emptyDraft,
+      identity: { name: 'Verna' },
+    }
+    const staleIssues = [
+      {
+        code: 'name_required',
+        message: 'Enter a character name.',
+        path: 'identity.name',
+        stepId: 'identity' as const,
+      },
+      {
+        code: 'species_required',
+        message: 'Choose a species.',
+        path: 'species.speciesId',
+        stepId: 'species' as const,
+      },
+    ]
+
+    expect(
+      resolveStepValidationIssuesAfterDraftChange(staleIssues, namedDraft, context, 'identity', []),
+    ).toEqual([staleIssues[1]])
   })
 })

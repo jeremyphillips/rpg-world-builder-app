@@ -2,9 +2,17 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  characterBuilderAbilityRecommendationMessages,
+  characterBuilderValidationMessages,
+  formatFieldMessage,
+} from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import {
+  createPopulatedStandaloneBuilderContextFixture,
+  createStandaloneBuilderContextFixture,
+} from '../../lib/character-builder-fixtures'
 import { AbilitiesStep } from './abilities-step.client'
 
 const context = createStandaloneBuilderContextFixture()
@@ -21,7 +29,7 @@ beforeAll(() => {
 })
 
 describe('AbilitiesStep', () => {
-  it('renders the standard-array assignment UI', () => {
+  it('renders the fixed-scores assignment UI', () => {
     render(
       <AbilitiesStep
         context={context}
@@ -34,8 +42,51 @@ describe('AbilitiesStep', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Abilities' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Standard Array' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fixed scores' })).toBeInTheDocument()
     expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
+  })
+
+  it('shows no-class recommendation helper when class is not selected', () => {
+    render(
+      <AbilitiesStep
+        context={context}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByText(formatFieldMessage(characterBuilderAbilityRecommendationMessages.noClass())),
+    ).toBeInTheDocument()
+  })
+
+  it('shows fighter recommendations when class is selected', () => {
+    render(
+      <AbilitiesStep
+        context={createPopulatedStandaloneBuilderContextFixture()}
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+        }}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByText(
+        formatFieldMessage(
+          characterBuilderAbilityRecommendationMessages.heading({ className: 'Fighter' }),
+        ),
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Strength is useful for Fighters\./)).toBeInTheDocument()
+    expect(screen.getByText(/Suggested: 15 → Strength\./)).toBeInTheDocument()
   })
 
   it('surfaces step validation issues from the builder frame', () => {
@@ -57,7 +108,11 @@ describe('AbilitiesStep', () => {
       />,
     )
 
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+    )
     expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
+    expect(screen.getByRole('alert').textContent).not.toMatch(/\{"f":/)
   })
 
   it('has no axe accessibility violations', async () => {

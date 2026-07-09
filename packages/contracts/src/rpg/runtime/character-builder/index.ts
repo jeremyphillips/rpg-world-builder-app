@@ -1,4 +1,7 @@
 export * from './ability-generation'
+export * from './ability-generation-methods'
+export * from './ability-score-recommendation-messages'
+export * from './ability-score-recommendations'
 export * from './assembly/assemble-language-proficiencies'
 export * from './assembly/assemble-proficiencies'
 export * from './assembly/assemble-skill-proficiencies'

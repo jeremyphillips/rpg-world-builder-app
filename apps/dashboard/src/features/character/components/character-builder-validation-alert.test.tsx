@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
+import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/contracts'
+
 import { CharacterBuilderValidationAlert } from './character-builder-validation-alert.client'
 
 describe('CharacterBuilderValidationAlert', () => {
@@ -25,6 +27,31 @@ describe('CharacterBuilderValidationAlert', () => {
     )
 
     expect(screen.getByRole('alert')).toHaveTextContent('Name is required.')
+  })
+
+  it('decodes structured validation headings before rendering', () => {
+    render(
+      <CharacterBuilderValidationAlert
+        heading={characterBuilderValidationMessages.stepIncomplete()}
+        issues={[
+          {
+            code: 'abilities_incomplete',
+            message: characterBuilderValidationMessages.abilitiesIncomplete(),
+            path: 'abilities.scores',
+            stepId: 'abilities',
+          },
+        ]}
+      />,
+    )
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+    )
+    expect(alert).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.abilitiesIncomplete()),
+    )
+    expect(alert.textContent).not.toMatch(/\{"f":/)
   })
 
   it('has no axe accessibility violations', async () => {

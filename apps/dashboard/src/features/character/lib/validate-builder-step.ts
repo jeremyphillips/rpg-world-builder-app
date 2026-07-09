@@ -54,3 +54,16 @@ export function issuesForStep(
 ): CharacterBuildValidationIssue[] {
   return issues.filter((issue) => issue.stepId === stepId)
 }
+
+/** Replaces a step's issues after draft edits while validation is visible for that step. */
+export function resolveStepValidationIssuesAfterDraftChange(
+  issues: readonly CharacterBuildValidationIssue[],
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  stepId: CharacterBuilderStepId,
+  resolvedChoiceSets: readonly ChoiceSet[],
+): CharacterBuildValidationIssue[] {
+  const remainingIssues = issues.filter((issue) => issue.stepId !== stepId)
+  const result = validateBuilderStepSubmit(draft, context, stepId, resolvedChoiceSets)
+  return result.ok ? remainingIssues : [...remainingIssues, ...result.issues]
+}
