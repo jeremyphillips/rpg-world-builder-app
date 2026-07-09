@@ -2,35 +2,33 @@
 
 import * as React from 'react'
 
-import { Badge, Button, CatalogPickerSheet, NumberInput, PreviewCard, Text, cn } from '@rpg/ui'
+import { Badge, Button, CatalogPickerSheet, Text, cn } from '@rpg/ui'
 import { getEquipmentKindLabel, isEquipmentStackable, type EquipmentKind } from '@rpg/contracts'
+
+import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 
 import {
   filterEquipmentPickerItems,
-  formatEquipmentPickerDetails,
-  formatEquipmentPickerSummaryLine,
   getEquipmentPickerBadgeLabel,
   getEquipmentPickerDisabledNote,
   getEquipmentPickerItemTab,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
-import { formatEquipmentPickerItemDetails } from './equipment-picker-character-preview.lib'
 import {
-  EQUIPMENT_PICKER_ADD_QUANTITY_LABEL,
-  EQUIPMENT_PICKER_IN_INVENTORY_LABEL,
+  EQUIPMENT_PICKER_ADDED_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
+import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import {
   equipmentPickerDisabledRowClasses,
   equipmentPickerKindChipActiveClasses,
   equipmentPickerKindChipInactiveClasses,
   equipmentPickerKindFiltersClasses,
-  equipmentPickerQuantityControlsClasses,
   equipmentPickerWarningBadgeClasses,
 } from './equipment-picker-drawer.variants'
 
@@ -69,70 +67,30 @@ function EquipmentKindFilters({
   )
 }
 
-function EquipmentPickerRow({
+function EquipmentPickerRowSummary({
   item,
   budget,
-  ownedQuantity,
-  uniqueOwned,
-  addQuantity,
-  onAddQuantityChange,
-  onAdd,
 }: {
   item: EquipmentPickerItem
   budget?: EquipmentPickerDrawerProps['budget']
-  ownedQuantity: number
-  uniqueOwned: boolean
-  addQuantity: number
-  onAddQuantityChange: (quantity: number) => void
-  onAdd: () => void
 }) {
-  const disabled = isEquipmentPickerItemDisabled(item)
   const badgeLabel = getEquipmentPickerBadgeLabel(item)
   const disabledNote = getEquipmentPickerDisabledNote(item, budget)
-  const stackable = isEquipmentStackable(item.equipment)
-  const uniqueBlocked = !stackable && (uniqueOwned || ownedQuantity > 0)
+
+  if (!badgeLabel && !disabledNote) return null
 
   return (
-    <div className={cn(disabled ? equipmentPickerDisabledRowClasses : undefined)}>
-      <PreviewCard
-        title={item.equipment.name}
-        description={formatEquipmentPickerSummaryLine(item.equipment)}
-        tone="transparent"
-        density="compact"
-        footerSlot={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
-        endSlot={
-          <div className="flex flex-col items-end gap-2">
-            {badgeLabel ? (
-              <Badge variant="outline" className={equipmentPickerWarningBadgeClasses}>
-                {badgeLabel}
-              </Badge>
-            ) : null}
-            {stackable ? (
-              <div className={equipmentPickerQuantityControlsClasses}>
-                <NumberInput
-                  aria-label={`${EQUIPMENT_PICKER_ADD_QUANTITY_LABEL} for ${item.equipment.name}`}
-                  size="sm"
-                  digits={2}
-                  min={1}
-                  value={addQuantity}
-                  disabled={disabled}
-                  onChange={(event) => {
-                    const next = Number(event.target.value)
-                    onAddQuantityChange(Number.isFinite(next) && next >= 1 ? next : 1)
-                  }}
-                />
-                <Button type="button" size="sm" disabled={disabled} onClick={onAdd}>
-                  {ownedQuantity > 0 ? `Add (${ownedQuantity + addQuantity})` : 'Add'}
-                </Button>
-              </div>
-            ) : (
-              <Button type="button" size="sm" disabled={disabled || uniqueBlocked} onClick={onAdd}>
-                {uniqueBlocked ? EQUIPMENT_PICKER_IN_INVENTORY_LABEL : 'Add'}
-              </Button>
-            )}
-          </div>
-        }
-      />
+    <div className="space-y-1">
+      {badgeLabel ? (
+        <Badge variant="outline" className={equipmentPickerWarningBadgeClasses}>
+          {badgeLabel}
+        </Badge>
+      ) : null}
+      {disabledNote ? (
+        <Text as="p" variant="muted" className="text-xs">
+          {disabledNote}
+        </Text>
+      ) : null}
     </div>
   )
 }
@@ -150,7 +108,6 @@ export function EquipmentPickerDrawer({
   showCharacterPreview = false,
   characterPreviewContext,
   ownedPurchaseQuantities = {},
-  isUniqueEquipmentOwned,
   onAddItem,
 }: EquipmentPickerDrawerProps) {
   const kindOptions = React.useMemo(
@@ -197,7 +154,14 @@ export function EquipmentPickerDrawer({
     [kindOptions],
   )
 
-  const handleAddItem = React.useCallback(
+  const handleQuickAdd = React.useCallback(
+    (item: EquipmentPickerItem) => {
+      onAddItem(item, 1)
+    },
+    [onAddItem],
+  )
+
+  const handleCommitAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
       const itemKey = item.equipment.id
       const quantity = addQuantities[itemKey] ?? 1
@@ -221,6 +185,7 @@ export function EquipmentPickerDrawer({
       description="Search the catalog and add items to your loadout."
       items={visibleItems}
       getItemKey={(item) => item.equipment.id}
+      getItemToolbarLabel={(item) => item.equipment.name}
       getSearchText={(item) => item.searchText}
       getItemTab={getEquipmentPickerItemTab}
       defaultTabId={defaultTab}
@@ -236,29 +201,62 @@ export function EquipmentPickerDrawer({
           onToggleKind={handleToggleKind}
         />
       }
-      renderItem={(item) => (
-        <EquipmentPickerRow
-          item={item}
+      renderItemHeader={(item) => {
+        const header = buildEquipmentPickerHeaderViewModel(item.equipment)
+        const disabled = isEquipmentPickerItemDisabled(item)
+
+        return (
+          <div
+            className={cn(
+              'min-w-0 space-y-1',
+              disabled ? equipmentPickerDisabledRowClasses : undefined,
+            )}
+          >
+            <span className="truncate text-sm font-medium">{header.title}</span>
+            <EquipmentPickerRowSummary item={item} budget={budget} />
+          </div>
+        )
+      }}
+      renderItemActions={(item) => {
+        const header = buildEquipmentPickerHeaderViewModel(item.equipment)
+        const owned = (ownedPurchaseQuantities[item.equipment.id] ?? 0) > 0
+        const disabled = isEquipmentPickerItemDisabled(item)
+
+        return (
+          <div className="flex items-center gap-2">
+            <Text as="span" variant="muted" className="shrink-0 tabular-nums">
+              {header.priceLabel}
+            </Text>
+            {owned ? (
+              <Text as="span" variant="muted">
+                {EQUIPMENT_PICKER_ADDED_LABEL}
+              </Text>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={disabled}
+                onClick={() => handleQuickAdd(item)}
+              >
+                Add
+              </Button>
+            )}
+          </div>
+        )
+      }}
+      renderItemDetails={(item) => (
+        <EquipmentPickerItemDetails
+          equipment={item.equipment}
+          itemState={item.state}
           budget={budget}
           ownedQuantity={ownedPurchaseQuantities[item.equipment.id] ?? 0}
-          uniqueOwned={isUniqueEquipmentOwned?.(item.equipment.id) ?? false}
           addQuantity={addQuantities[item.equipment.id] ?? 1}
           onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
-          onAdd={() => handleAddItem(item)}
+          onCommit={() => handleCommitAdd(item)}
+          showCharacterPreview={showCharacterPreview}
+          characterPreviewContext={characterPreviewContext}
         />
-      )}
-      renderItemDetails={(item) => (
-        <Text as="p" variant="muted" className="whitespace-pre-line">
-          {formatEquipmentPickerItemDetails(
-            item.equipment,
-            {
-              showCharacterPreview,
-              characterPreviewContext,
-              isProficient: item.state.isProficient,
-            },
-            formatEquipmentPickerDetails(item.equipment),
-          )}
-        </Text>
       )}
     />
   )

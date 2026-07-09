@@ -16,5 +16,3 @@ export const equipmentPickerKindChipInactiveClasses =
 export const equipmentPickerWarningBadgeClasses = 'border-accent bg-accent/20 text-foreground'
 
 export const equipmentPickerDisabledRowClasses = 'opacity-60'
-
-export const equipmentPickerQuantityControlsClasses = 'flex items-center gap-2'

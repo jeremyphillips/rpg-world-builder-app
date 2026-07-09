@@ -6,7 +6,6 @@ import {
 } from './equipment-picker-drawer.fixtures'
 import {
   filterEquipmentPickerItems,
-  formatEquipmentPickerSummaryLine,
   formatEquipmentUnaffordableReason,
   getEquipmentPickerBadgeLabel,
   getEquipmentPickerItemTab,
@@ -20,12 +19,6 @@ describe('equipment-picker-drawer.lib', () => {
   it('routes recommended items to the recommended tab', () => {
     expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[0]!)).toBe(
       EQUIPMENT_PICKER_TAB_RECOMMENDED,
-    )
-  })
-
-  it('formats kind-specific summary lines', () => {
-    expect(formatEquipmentPickerSummaryLine(equipmentPickerItemsFixture[0]!.equipment)).toMatch(
-      /Martial.*15 GP/,
     )
   })
 

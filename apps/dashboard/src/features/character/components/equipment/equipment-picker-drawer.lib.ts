@@ -1,18 +1,4 @@
-import {
-  formatMoney,
-  formatWeight,
-  getArmorAcDisplay,
-  getArmorCategoryLabel,
-  getEquipmentKindLabel,
-  formatWeaponDamage,
-  formatWeaponProperties,
-  formatWeaponRange,
-  getWeaponCategoryLabel,
-  getWeaponMasteryLabel,
-  getWeaponModeLabel,
-  type Equipment,
-  type EquipmentKind,
-} from '@rpg/contracts'
+import { formatMoney, type EquipmentKind } from '@rpg/contracts'
 
 import {
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -21,8 +7,6 @@ import {
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
-
-const SUMMARY_SEPARATOR = ' · '
 
 export function getEquipmentPickerItemTab(item: EquipmentPickerItem): string {
   return item.state.isRecommended ? EQUIPMENT_PICKER_TAB_RECOMMENDED : EQUIPMENT_PICKER_TAB_ALL
@@ -44,82 +28,6 @@ export function formatEquipmentUnaffordableReason(
   const need = formatMoney(item.equipment.cost)
   const have = budget ? formatEquipmentBudgetWealth(budget.remaining) : '—'
   return `Need ${need}, you have ${have}`
-}
-
-function formatOptionalWeight(equipment: Equipment): string | undefined {
-  return 'weight' in equipment && equipment.weight ? formatWeight(equipment.weight) : undefined
-}
-
-function formatWeaponSummary(equipment: Extract<Equipment, { kind: 'weapon' }>): string {
-  return [
-    getWeaponCategoryLabel(equipment.category),
-    getWeaponModeLabel(equipment.mode),
-    equipment.damage ? formatWeaponDamage(equipment.damage) : undefined,
-    formatWeaponProperties(equipment.properties),
-    getWeaponMasteryLabel(equipment.mastery),
-    formatMoney(equipment.cost),
-    formatOptionalWeight(equipment),
-  ]
-    .filter(Boolean)
-    .join(SUMMARY_SEPARATOR)
-}
-
-function formatArmorSummary(equipment: Extract<Equipment, { kind: 'armor' }>): string {
-  const stealth = equipment.stealthDisadvantage ? 'Stealth disadvantage' : 'No stealth penalty'
-  const strengthRequirement = equipment.strengthRequirement
-    ? `Str ${equipment.strengthRequirement}`
-    : undefined
-
-  return [
-    getArmorCategoryLabel(equipment.category),
-    getArmorAcDisplay(equipment),
-    strengthRequirement,
-    stealth,
-    formatMoney(equipment.cost),
-    formatOptionalWeight(equipment),
-  ]
-    .filter(Boolean)
-    .join(SUMMARY_SEPARATOR)
-}
-
-function formatGearSummary(equipment: Equipment): string {
-  return [
-    getEquipmentKindLabel(equipment.kind),
-    formatMoney(equipment.cost),
-    formatOptionalWeight(equipment),
-  ]
-    .filter(Boolean)
-    .join(SUMMARY_SEPARATOR)
-}
-
-export function formatEquipmentPickerSummaryLine(equipment: Equipment): string {
-  switch (equipment.kind) {
-    case 'weapon':
-      return formatWeaponSummary(equipment)
-    case 'armor':
-      return formatArmorSummary(equipment)
-    default:
-      return formatGearSummary(equipment)
-  }
-}
-
-export function formatEquipmentPickerDetails(equipment: Equipment): string {
-  const lines: string[] = [formatEquipmentPickerSummaryLine(equipment)]
-
-  if (equipment.kind === 'weapon' && equipment.range) {
-    lines.push(`Range: ${formatWeaponRange(equipment.range)}`)
-  }
-
-  if (equipment.description) {
-    lines.push(
-      equipment.description
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim(),
-    )
-  }
-
-  return lines.filter(Boolean).join('\n')
 }
 
 export function resolveEquipmentKindFilterOptions(

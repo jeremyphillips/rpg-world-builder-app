@@ -19,7 +19,6 @@ import {
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
   hasGoldStartingEquipmentOption,
-  isUniqueEquipmentOwnedInDraft,
   readSelectedStartingEquipmentOption,
   resolveEquipmentPickerFlow,
   resolveEquipmentStepBudget,
@@ -221,8 +220,6 @@ export function useEquipmentStep(args: {
         },
       })
     },
-    isUniqueEquipmentOwned: (equipmentId: string) =>
-      isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId),
     readiness,
   }
 }

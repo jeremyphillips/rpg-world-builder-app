@@ -56,7 +56,6 @@ export function EquipmentStepInteractive({
     applySelection,
     onRemoveItem,
     onNestedPoolChange,
-    isUniqueEquipmentOwned,
   } = step
 
   return (
@@ -109,7 +108,6 @@ export function EquipmentStepInteractive({
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
-        isUniqueEquipmentOwned={isUniqueEquipmentOwned}
         onAddItem={handleAddItem}
       />
 
