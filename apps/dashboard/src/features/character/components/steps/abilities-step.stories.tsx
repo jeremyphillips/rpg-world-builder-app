@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { createEmptyCharacterBuilderDraft, STANDARD_ARRAY } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import {
+  createPopulatedStandaloneBuilderContextFixture,
+  createStandaloneBuilderContextFixture,
+} from '../../lib/character-builder-fixtures'
 import { AbilitiesStep } from './abilities-step.client'
 
 const context = createStandaloneBuilderContextFixture()
+const populatedContext = createPopulatedStandaloneBuilderContextFixture()
 const manualContext = createStandaloneBuilderContextFixture({
   characterCreationRules: {
     ...context.characterCreationRules,
@@ -96,11 +100,45 @@ export const WithValidationIssues: Story = {
   ),
 }
 
+export const FighterRecommended: Story = {
+  render: () => (
+    <AbilitiesStep
+      context={populatedContext}
+      draft={{
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      }}
+      validationIssues={[]}
+      onDraftChange={() => undefined}
+      onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
+    />
+  ),
+}
+
 export const ManualEntry: Story = {
   render: () => (
     <AbilitiesStep
       context={manualContext}
       draft={createEmptyCharacterBuilderDraft()}
+      validationIssues={[]}
+      onDraftChange={() => undefined}
+      onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
+    />
+  ),
+}
+
+export const ManualEntryWithClass: Story = {
+  render: () => (
+    <AbilitiesStep
+      context={createPopulatedStandaloneBuilderContextFixture({
+        characterCreationRules: manualContext.characterCreationRules,
+      })}
+      draft={{
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      }}
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}

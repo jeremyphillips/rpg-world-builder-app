@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import {
   characterBuilderValidationMessages,
+  deriveAbilityScoreRecommendations,
   resolveAbilityGenerationMethod,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -24,6 +25,7 @@ import { BuilderFormContinueRegistration } from '../builder/builder-form-continu
 import { AbilitiesDraftSync } from './abilities-draft-sync.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import { FixedScoresAssignment } from './fixed-scores-assignment.client'
+import { ManualAbilitiesAssignment } from './manual-abilities-assignment.client'
 
 export type AbilitiesStepProps = {
   context: CharacterBuildContext
@@ -46,6 +48,31 @@ export function AbilitiesStep({
   const resolvedMethod = resolveAbilityGenerationMethod(abilityGeneration)
   const showInvalidStates = validationIssues.length > 0
 
+  const characterClass = useMemo(() => {
+    const classId = draft.class.classId
+    if (!classId) return undefined
+    return context.catalog.classes.find((entry) => entry.id === classId)
+  }, [context.catalog.classes, draft.class.classId])
+
+  const classInput = useMemo(() => {
+    if (!characterClass) return null
+    return {
+      className: characterClass.name,
+      primaryAbilities: characterClass.primaryAbilities,
+    }
+  }, [characterClass])
+
+  const recommendation = useMemo(
+    () =>
+      classInput
+        ? deriveAbilityScoreRecommendations(
+            [classInput],
+            resolvedMethod === 'standard-array' ? abilityGeneration.standardArray : undefined,
+          )
+        : null,
+    [abilityGeneration.standardArray, classInput, resolvedMethod],
+  )
+
   const fields = useMemo(
     () =>
       buildAbilitiesStepFormFields({
@@ -54,6 +81,15 @@ export function AbilitiesStep({
           <FixedScoresAssignment
             scorePool={abilityGeneration.standardArray}
             showInvalidStates={showInvalidStates}
+            classInput={classInput}
+            recommendation={recommendation}
+          />
+        ),
+        renderManualAbilitiesAssignment: () => (
+          <ManualAbilitiesAssignment
+            showInvalidStates={showInvalidStates}
+            classInput={classInput}
+            recommendation={recommendation}
           />
         ),
         renderDraftSync: () => (
@@ -76,11 +112,13 @@ export function AbilitiesStep({
       }),
     [
       abilityGeneration.standardArray,
+      classInput,
       context,
       draft.abilities,
       onDraftChange,
       onFormContinueValidationFailed,
       onStepComplete,
+      recommendation,
       resolvedMethod,
       showInvalidStates,
     ],

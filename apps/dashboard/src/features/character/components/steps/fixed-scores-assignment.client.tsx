@@ -21,7 +21,10 @@ import {
   getAbilityGenerationMethodAssignmentDescription,
   getAbilityGenerationMethodDisplayName,
   getAvailableStandardArrayScores,
+  scoresFromSuggestedAssignment,
   type Ability,
+  type AbilityScoreRecommendation,
+  type AbilityScoreRecommendationClassInput,
 } from '@rpg/contracts'
 import {
   Button,
@@ -58,6 +61,9 @@ import {
   type FixedScoresPoolDragData,
 } from '../../lib/steps/fixed-scores-dnd.lib'
 import { formatPreviewSignedNumber } from '../../lib/character-builder-preview-panel.lib'
+import { AbilityRecommendationPanel } from './ability-recommendation-panel.client'
+import { AbilityScoreCardBadge } from './ability-score-card-badge.client'
+import { abilityScoreCardColumnClasses } from './ability-recommendation.variants'
 import { ScoreToken } from './score-token.client'
 import {
   abilityScoreCardAbbrClasses,
@@ -83,6 +89,8 @@ import {
 export type FixedScoresAssignmentProps = {
   scorePool: readonly number[]
   showInvalidStates?: boolean
+  classInput?: AbilityScoreRecommendationClassInput | null
+  recommendation?: AbilityScoreRecommendation | null
 }
 
 type AbilityCardState =
@@ -163,6 +171,7 @@ function AbilityScoreCard({
   scorePool,
   showInvalidStates,
   activeDrag,
+  recommendation,
   onSelectScore,
 }: {
   ability: Ability
@@ -170,6 +179,7 @@ function AbilityScoreCard({
   scorePool: readonly number[]
   showInvalidStates: boolean
   activeDrag: ActiveDragState
+  recommendation: AbilityScoreRecommendation | null
   onSelectScore: (ability: Ability, value: string) => void
 }) {
   const entry = ABILITY_ENTRIES[ability]
@@ -195,63 +205,67 @@ function AbilityScoreCard({
       : abilitiesFormCopy.emptyModifier
 
   return (
-    <article
-      ref={setNodeRef}
-      className={abilityScoreCardClasses(cardState)}
-      aria-label={entry.label}
-    >
-      <header className={abilityScoreCardHeaderClasses}>
-        <div className={abilityScoreCardAbbrClasses}>{ability.toUpperCase()}</div>
-        <div className={abilityScoreCardNameClasses}>{entry.label}</div>
-      </header>
+    <div className={abilityScoreCardColumnClasses}>
+      <AbilityScoreCardBadge ability={ability} recommendation={recommendation} />
 
-      <div className={abilityScoreCardScoreAreaClasses}>
-        <div className={abilityScoreCardScoreSlotClasses}>
-          {typeof assignedScore === 'number' ? (
-            <ScoreToken
-              value={assignedScore}
-              size="assigned"
-              surface="plain"
-              interactive
-              sourceHidden={isDraggingFrom}
-              ariaLabel={`${entry.label} score ${assignedScore}`}
-              dndId={fixedScoresAssignedDndId(ability)}
-              dndData={
-                {
-                  kind: FIXED_SCORES_DND_KINDS.assigned,
-                  ability,
-                  score: assignedScore,
-                } satisfies FixedScoresAssignedDragData
-              }
-            />
-          ) : null}
-          {typeof assignedScore !== 'number' || isDraggingFrom ? (
-            <ScoreToken
-              label={abilitiesFormCopy.dropScoreHere}
-              size="assigned"
-              surface="placeholder"
-              interactive={false}
-              className={
-                isDraggingFrom ? abilityScoreCardScorePlaceholderOverlayClasses : undefined
-              }
-            />
-          ) : null}
+      <article
+        ref={setNodeRef}
+        className={abilityScoreCardClasses(cardState)}
+        aria-label={entry.label}
+      >
+        <header className={abilityScoreCardHeaderClasses}>
+          <div className={abilityScoreCardAbbrClasses}>{ability.toUpperCase()}</div>
+          <div className={abilityScoreCardNameClasses}>{entry.label}</div>
+        </header>
+
+        <div className={abilityScoreCardScoreAreaClasses}>
+          <div className={abilityScoreCardScoreSlotClasses}>
+            {typeof assignedScore === 'number' ? (
+              <ScoreToken
+                value={assignedScore}
+                size="assigned"
+                surface="plain"
+                interactive
+                sourceHidden={isDraggingFrom}
+                ariaLabel={`${entry.label} score ${assignedScore}`}
+                dndId={fixedScoresAssignedDndId(ability)}
+                dndData={
+                  {
+                    kind: FIXED_SCORES_DND_KINDS.assigned,
+                    ability,
+                    score: assignedScore,
+                  } satisfies FixedScoresAssignedDragData
+                }
+              />
+            ) : null}
+            {typeof assignedScore !== 'number' || isDraggingFrom ? (
+              <ScoreToken
+                label={abilitiesFormCopy.dropScoreHere}
+                size="assigned"
+                surface="placeholder"
+                interactive={false}
+                className={
+                  isDraggingFrom ? abilityScoreCardScorePlaceholderOverlayClasses : undefined
+                }
+              />
+            ) : null}
+          </div>
+          <span className={abilityScoreCardModifierClasses} aria-live="polite">
+            <span className="sr-only">Modifier </span>
+            {modifierLabel}
+          </span>
         </div>
-        <span className={abilityScoreCardModifierClasses} aria-live="polite">
-          <span className="sr-only">Modifier </span>
-          {modifierLabel}
-        </span>
-      </div>
 
-      <div className={abilityScoreCardChooseScoreSectionClasses}>
-        <ChooseScoreMenu
-          ability={ability}
-          scores={scores}
-          scorePool={scorePool}
-          onSelectScore={onSelectScore}
-        />
-      </div>
-    </article>
+        <div className={abilityScoreCardChooseScoreSectionClasses}>
+          <ChooseScoreMenu
+            ability={ability}
+            scores={scores}
+            scorePool={scorePool}
+            onSelectScore={onSelectScore}
+          />
+        </div>
+      </article>
+    </div>
   )
 }
 
@@ -315,6 +329,8 @@ function ScorePoolSection({
 export function FixedScoresAssignment({
   scorePool,
   showInvalidStates = false,
+  classInput = null,
+  recommendation = null,
 }: FixedScoresAssignmentProps) {
   const introId = useId()
   const poolId = useId()
@@ -406,6 +422,13 @@ export function FixedScoresAssignment({
     [scores, syncScoresToForm],
   )
 
+  const handleApplySuggestions = useCallback(
+    (suggestedAssignment: Partial<Record<Ability, number>>) => {
+      syncScoresToForm(scoresFromSuggestedAssignment(suggestedAssignment))
+    },
+    [syncScoresToForm],
+  )
+
   const overlayScore =
     activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool
       ? activeDrag.score
@@ -425,6 +448,14 @@ export function FixedScoresAssignment({
           </Text>
         ) : null}
       </div>
+
+      <AbilityRecommendationPanel
+        classInput={classInput}
+        recommendation={recommendation}
+        currentScores={scores}
+        showSuggestedAssignment
+        onApplySuggestions={handleApplySuggestions}
+      />
 
       <DndContext
         sensors={sensors}
@@ -450,6 +481,7 @@ export function FixedScoresAssignment({
                 scorePool={scorePool}
                 showInvalidStates={showInvalidStates}
                 activeDrag={activeDrag}
+                recommendation={recommendation}
                 onSelectScore={handleSelectScore}
               />
             ))}

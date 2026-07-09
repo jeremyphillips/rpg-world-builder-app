@@ -1,25 +1,7 @@
 import { z } from 'zod'
 import type { ReactNode } from 'react'
-import {
-  ABILITY_ENTRIES,
-  ABILITY_IDS,
-  ABILITY_SCORE_MIN,
-  CHARACTER_ABILITY_SCORE_MAX,
-  type Ability,
-  type AbilityGenerationMethod,
-} from '@rpg/contracts'
+import { ABILITY_ENTRIES, ABILITY_IDS, type AbilityGenerationMethod } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
-
-function manualAbilityScoreField(ability: Ability): FormItem {
-  return {
-    type: 'number',
-    name: ability,
-    label: ABILITY_ENTRIES[ability].label,
-    required: true,
-    min: ABILITY_SCORE_MIN,
-    max: CHARACTER_ABILITY_SCORE_MAX,
-  }
-}
 
 const abilityScoreSchema = z.coerce.number().int().optional()
 
@@ -46,33 +28,10 @@ export const abilitiesFormSchema = z
 
 export type AbilitiesFormValues = z.infer<typeof abilitiesFormSchema>
 
-export function buildAbilitiesFormFields(method: AbilityGenerationMethod): FormItem[] {
-  if (method === 'manual') {
-    return [
-      {
-        kind: 'group',
-        legend: 'Ability scores',
-        fields: ABILITY_IDS.map((ability) => manualAbilityScoreField(ability)),
-      },
-    ]
-  }
-
-  return []
-}
-
-/** Registers ability score paths for validation copy when the slot UI owns the controls. */
-export function abilitiesScoreResolverFields(): FormItem[] {
-  return ABILITY_IDS.map((ability) => ({
-    type: 'number' as const,
-    name: ability,
-    label: ABILITY_ENTRIES[ability].label,
-    required: true,
-  }))
-}
-
 export type BuildAbilitiesStepFormFieldsInput = {
   method: AbilityGenerationMethod
   renderFixedScoresAssignment: () => ReactNode
+  renderManualAbilitiesAssignment: () => ReactNode
   renderDraftSync: () => ReactNode
   renderContinueRegistration: () => ReactNode
 }
@@ -81,6 +40,7 @@ export type BuildAbilitiesStepFormFieldsInput = {
 export function buildAbilitiesStepFormFields({
   method,
   renderFixedScoresAssignment,
+  renderManualAbilitiesAssignment,
   renderDraftSync,
   renderContinueRegistration,
 }: BuildAbilitiesStepFormFieldsInput): FormItem[] {
@@ -93,7 +53,13 @@ export function buildAbilitiesStepFormFields({
             render: renderFixedScoresAssignment,
           },
         ]
-      : buildAbilitiesFormFields(method)
+      : [
+          {
+            kind: 'slot' as const,
+            name: 'manualAbilitiesAssignment',
+            render: renderManualAbilitiesAssignment,
+          },
+        ]
 
   return [
     ...items,
@@ -110,18 +76,28 @@ export function buildAbilitiesStepFormFields({
   ]
 }
 
+/** Registers ability score paths for validation copy when the slot UI owns the controls. */
+export function abilitiesScoreResolverFields(): FormItem[] {
+  return ABILITY_IDS.map((ability) => ({
+    type: 'number' as const,
+    name: ability,
+    label: ABILITY_ENTRIES[ability].label,
+    required: true,
+  }))
+}
+
 /** Field list used by validation tests for fixed-score assignment (slot + resolver paths). */
 export function buildAbilitiesValidationFields(method: AbilityGenerationMethod): FormItem[] {
-  if (method === 'standard-array') {
+  if (method === 'standard-array' || method === 'manual') {
     return [
       {
         kind: 'slot' as const,
-        name: 'fixedScoresAssignment',
+        name: method === 'standard-array' ? 'fixedScoresAssignment' : 'manualAbilitiesAssignment',
         render: () => null,
       },
       ...abilitiesScoreResolverFields(),
     ]
   }
 
-  return buildAbilitiesFormFields(method)
+  return []
 }

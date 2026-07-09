@@ -1,0 +1,171 @@
+import { describe, expect, it } from 'vitest'
+
+import { getAbilityLabel } from '../../vocab/ability'
+import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
+import {
+  deriveAbilityScoreRecommendations,
+  formatAbilityRecommendationBenefit,
+  formatAbilityRecommendationSuggestedInline,
+  isSuggestedAssignmentSatisfied,
+  resolveSuggestedAssignmentActionState,
+  scoresFromSuggestedAssignment,
+  willSuggestedAssignmentReplaceExisting,
+} from './ability-score-recommendations'
+
+describe('deriveAbilityScoreRecommendations', () => {
+  it('returns null when no class is selected', () => {
+    expect(deriveAbilityScoreRecommendations([], [15, 14, 13, 12, 10, 8])).toBeNull()
+  })
+
+  it('derives primary and secondary abilities from a single class', () => {
+    const result = deriveAbilityScoreRecommendations([
+      { className: 'Fighter', primaryAbilities: ['str', 'dex'] },
+    ])
+
+    expect(result).toEqual({
+      primary: ['str'],
+      secondary: ['dex'],
+    })
+  })
+
+  it('pairs highest source-array scores with primaryAbilities in order', () => {
+    const result = deriveAbilityScoreRecommendations(
+      [{ className: 'Fighter', primaryAbilities: ['str', 'dex'] }],
+      [15, 14, 13, 12, 10, 8],
+    )
+
+    expect(result?.suggestedAssignment).toEqual({
+      str: 15,
+      dex: 14,
+    })
+  })
+
+  it('derives suggested assignment from source array regardless of current assignments', () => {
+    const result = deriveAbilityScoreRecommendations(
+      [{ className: 'Fighter', primaryAbilities: ['str', 'dex'] }],
+      [15, 14, 13, 12, 10, 8],
+    )
+
+    expect(result?.suggestedAssignment).toEqual({ str: 15, dex: 14 })
+  })
+
+  it('omits suggested assignment when no score source is provided', () => {
+    const result = deriveAbilityScoreRecommendations([
+      { className: 'Wizard', primaryAbilities: ['int'] },
+    ])
+
+    expect(result).toEqual({
+      primary: ['int'],
+      secondary: [],
+    })
+    expect(result?.suggestedAssignment).toBeUndefined()
+  })
+})
+
+describe('formatAbilityRecommendationBenefit', () => {
+  it('formats dual-primary fighter benefit copy with plural verb', () => {
+    expect(
+      formatAbilityRecommendationBenefit({
+        className: 'Fighter',
+        primaryAbilities: ['str', 'dex'],
+      }),
+    ).toBe(
+      characterBuilderAbilityRecommendationMessages.benefit({
+        classNamePlural: 'Fighters',
+        abilitiesOrList: `${getAbilityLabel('str')} or ${getAbilityLabel('dex')}`,
+        verb: 'are',
+      }),
+    )
+  })
+
+  it('formats single-primary cleric benefit copy with singular verb', () => {
+    expect(
+      formatAbilityRecommendationBenefit({
+        className: 'Cleric',
+        primaryAbilities: ['wis'],
+      }),
+    ).toBe(
+      characterBuilderAbilityRecommendationMessages.benefit({
+        classNamePlural: 'Clerics',
+        abilitiesOrList: getAbilityLabel('wis'),
+        verb: 'is',
+      }),
+    )
+  })
+})
+
+describe('formatAbilityRecommendationSuggestedInline', () => {
+  it('joins suggested pairs into inline copy', () => {
+    expect(formatAbilityRecommendationSuggestedInline(['15 → Strength', '14 → Dexterity'])).toBe(
+      characterBuilderAbilityRecommendationMessages.suggestedInline({
+        pairs: '15 → Strength, 14 → Dexterity',
+      }),
+    )
+  })
+})
+
+describe('isSuggestedAssignmentSatisfied', () => {
+  const suggestion = { str: 15, dex: 14 } as const
+
+  it('returns true when suggested pairs match and no other abilities are assigned', () => {
+    expect(isSuggestedAssignmentSatisfied({ str: 15, dex: 14 }, suggestion)).toBe(true)
+  })
+
+  it('returns false when an extra ability is assigned', () => {
+    expect(isSuggestedAssignmentSatisfied({ str: 15, dex: 14, cha: 8 }, suggestion)).toBe(false)
+  })
+
+  it('returns false when a suggested pair does not match', () => {
+    expect(isSuggestedAssignmentSatisfied({ str: 13, dex: 14 }, suggestion)).toBe(false)
+  })
+})
+
+describe('resolveSuggestedAssignmentActionState', () => {
+  const suggestion = { str: 15, dex: 14 } as const
+
+  it('returns satisfied when the suggestion is already reflected in form state', () => {
+    expect(resolveSuggestedAssignmentActionState({ str: 15, dex: 14 }, suggestion)).toBe(
+      'satisfied',
+    )
+  })
+
+  it('returns unapplied when nothing conflicts with applying the suggestion', () => {
+    expect(resolveSuggestedAssignmentActionState({}, suggestion)).toBe('unapplied')
+  })
+
+  it('returns wouldReplace when applying would overwrite or clear assignments', () => {
+    expect(resolveSuggestedAssignmentActionState({ cha: 15 }, suggestion)).toBe('wouldReplace')
+    expect(resolveSuggestedAssignmentActionState({ str: 13, dex: 14 }, suggestion)).toBe(
+      'wouldReplace',
+    )
+  })
+})
+
+describe('willSuggestedAssignmentReplaceExisting', () => {
+  const suggestion = { str: 15, dex: 14 } as const
+
+  it('returns false when no scores are assigned', () => {
+    expect(willSuggestedAssignmentReplaceExisting({}, suggestion)).toBe(false)
+  })
+
+  it('returns false when current scores match the suggestion exactly', () => {
+    expect(willSuggestedAssignmentReplaceExisting({ str: 15, dex: 14 }, suggestion)).toBe(false)
+  })
+
+  it('returns true when a suggested ability has a different score', () => {
+    expect(willSuggestedAssignmentReplaceExisting({ str: 13, dex: 14 }, suggestion)).toBe(true)
+  })
+
+  it('returns true when a non-suggested ability has a score', () => {
+    expect(willSuggestedAssignmentReplaceExisting({ cha: 15 }, suggestion)).toBe(true)
+  })
+})
+
+describe('scoresFromSuggestedAssignment', () => {
+  it('returns only the suggested pairs', () => {
+    expect(scoresFromSuggestedAssignment({ str: 15, dex: 14 })).toEqual({
+      str: 15,
+      dex: 14,
+    })
+  })
+})

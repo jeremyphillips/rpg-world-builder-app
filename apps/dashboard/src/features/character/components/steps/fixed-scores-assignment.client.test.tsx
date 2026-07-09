@@ -3,7 +3,12 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { DEFAULT_ABILITY_GENERATION_RULES, STANDARD_ARRAY } from '@rpg/contracts'
+import {
+  DEFAULT_ABILITY_GENERATION_RULES,
+  STANDARD_ARRAY,
+  characterBuilderAbilityRecommendationMessages,
+  formatFieldMessage,
+} from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
 import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
@@ -21,9 +26,25 @@ beforeAll(() => {
   }
 })
 
+const fighterRecommendation = {
+  classInput: {
+    className: 'Fighter',
+    primaryAbilities: ['str', 'dex'] as const,
+  },
+  recommendation: {
+    primary: ['str'] as const,
+    secondary: ['dex'] as const,
+    suggestedAssignment: { str: 15, dex: 14 },
+  },
+}
+
 function renderAssignment(
   defaultValues: Record<string, number | undefined> = {},
-  options: { showInvalidStates?: boolean } = {},
+  options: {
+    showInvalidStates?: boolean
+    classInput?: (typeof fighterRecommendation)['classInput'] | null
+    recommendation?: (typeof fighterRecommendation)['recommendation'] | null
+  } = {},
   onSubmit: (values: Record<string, unknown>) => void = vi.fn(),
 ) {
   return render(
@@ -37,6 +58,8 @@ function renderAssignment(
             <FixedScoresAssignment
               scorePool={DEFAULT_ABILITY_GENERATION_RULES.standardArray}
               showInvalidStates={options.showInvalidStates}
+              classInput={options.classInput ?? null}
+              recommendation={options.recommendation ?? null}
             />
           ),
         },
@@ -180,5 +203,79 @@ describe('FixedScoresAssignment', () => {
     const { container } = renderAssignment({ str: 15, con: 13 })
 
     await expectNoAxeViolations(container)
+  })
+
+  it('shows class recommendations and suggested assignment when a class is selected', () => {
+    renderAssignment({}, fighterRecommendation)
+
+    expect(
+      screen.getByText(
+        formatFieldMessage(
+          characterBuilderAbilityRecommendationMessages.heading({ className: 'Fighter' }),
+        ),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.apply()),
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/are useful for Fighters\./)).toBeInTheDocument()
+    expect(screen.getByText(/Suggested: 15 → Strength, 14 → Dexterity\./)).toBeInTheDocument()
+    expect(
+      screen.getAllByText(
+        formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgePrimary()),
+      ),
+    ).toHaveLength(1)
+    expect(
+      screen.getAllByText(
+        formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgeSecondary()),
+      ),
+    ).toHaveLength(1)
+  })
+
+  it('labels the action Replace with suggestions when existing assignments conflict', () => {
+    renderAssignment({ cha: 15 }, fighterRecommendation)
+
+    expect(
+      screen.getByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.replace()),
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('shows disabled Applied when current assignments match the suggestion', () => {
+    renderAssignment({ str: 15, dex: 14 }, fighterRecommendation)
+
+    expect(
+      screen.getByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.applied()),
+      }),
+    ).toBeDisabled()
+    expect(
+      screen.queryByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.apply()),
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('applies suggestions and clears non-suggested assignments', async () => {
+    renderAssignment({ cha: 15 }, fighterRecommendation)
+
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.replace()),
+      }),
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Strength score 15' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Dexterity score 14' })).toBeInTheDocument()
+    })
+
+    expect(screen.queryByRole('button', { name: /Charisma score/ })).not.toBeInTheDocument()
+    expect(
+      within(getScorePoolSection()).queryByRole('button', { name: 'Score 15' }),
+    ).not.toBeInTheDocument()
   })
 })
