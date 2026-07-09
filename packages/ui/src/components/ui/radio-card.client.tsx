@@ -14,6 +14,7 @@ import {
   radioCardDetailsGridVariants,
   radioCardDetailsInlineSlotVariants,
   radioCardDetailsLinkVariants,
+  radioCardEmbeddedSlotVariants,
   radioCardIndicatorVariants,
   radioCardItemWithDetailsVariants,
   radioCardMetaListVariants,
@@ -48,6 +49,8 @@ export interface RadioCardOption {
   summaryItems?: string[]
   /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
   summaryLines?: string[]
+  /** Rendered inside the card shell when this option is selected (e.g. dependent-choice flow). */
+  embeddedContent?: React.ReactNode
   onDetails?: () => void
   detailsLabel?: string
 }
@@ -309,6 +312,9 @@ function RadioCardOptionWithDetails({
           <RadioCardDetailsLink label={detailsLabel} onDetails={option.onDetails!} />
         </div>
       </div>
+      {selected && option.embeddedContent ? (
+        <div className={radioCardEmbeddedSlotVariants({ density })}>{option.embeddedContent}</div>
+      ) : null}
     </div>
   )
 }

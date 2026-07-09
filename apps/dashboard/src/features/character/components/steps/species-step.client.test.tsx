@@ -130,8 +130,9 @@ function StatefulSpeciesStep({
   )
 }
 
-function speciesCard(speciesId: string) {
-  return document.getElementById(`character-builder-species-${speciesId}`)
+function speciesCard(speciesId: string): HTMLElement | null {
+  const radio = document.getElementById(`character-builder-species-${speciesId}`)
+  return radio?.closest('[class*="rounded-xl"]') ?? null
 }
 
 describe('SpeciesStep', () => {
@@ -194,7 +195,7 @@ describe('SpeciesStep', () => {
     expect(screen.queryByRole('heading', { name: 'Traits' })).not.toBeInTheDocument()
   })
 
-  it('shows heritage required on the selected Elf card and inline heritage section', async () => {
+  it('shows heritage required on the selected Elf card with inline heritage section', async () => {
     const user = userEvent.setup()
     const context = createElfContext()
 
@@ -202,21 +203,27 @@ describe('SpeciesStep', () => {
 
     await user.click(screen.getByRole('radio', { name: /Elf/i }))
 
-    expect(speciesCard(elf.id)).toHaveTextContent(
+    const elfCard = speciesCard(elf.id)
+    expect(elfCard).toHaveTextContent(
       formatFieldMessage(
         characterBuilderDependentChoiceMessages.parentChoiceRequired({
           kind: DEPENDENT_CHOICE_KINDS.heritage,
         }),
       ),
     )
-    expect(screen.getByRole('region', { name: 'Elven Lineage' })).toBeInTheDocument()
+    const heritageRegion = within(elfCard as HTMLElement).getByRole('region', {
+      name: 'Elven Lineage',
+    })
+    expect(heritageRegion).toBeInTheDocument()
     expect(
-      screen.getByText(
+      within(heritageRegion).getByText(
         formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+      within(heritageRegion).getByText(
+        formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
+      ),
     ).toBeInTheDocument()
   })
 
@@ -245,7 +252,7 @@ describe('SpeciesStep', () => {
     })
   })
 
-  it('shows resolved heritage copy when Drow is selected', () => {
+  it('shows resolved heritage copy inside the selected Elf card', () => {
     const context = createElfContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -257,7 +264,8 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, draft })
 
-    expect(speciesCard(elf.id)).toHaveTextContent(
+    const elfCard = speciesCard(elf.id)
+    expect(elfCard).toHaveTextContent(
       formatFieldMessage(
         characterBuilderDependentChoiceMessages.parentChoiceSelected({
           selectedOptionLabel: 'Drow',
@@ -265,23 +273,25 @@ describe('SpeciesStep', () => {
         }),
       ),
     )
+    const heritageRegion = within(elfCard as HTMLElement).getByRole('region', {
+      name: 'Elven Lineage',
+    })
     expect(
-      screen.getByText(
+      within(heritageRegion).getByText(
         formatFieldMessage(
           characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
         ),
       ),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
+      within(heritageRegion).queryByText(
+        formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
+      ),
     ).not.toBeInTheDocument()
   })
 
-  it('shows Manage heritage in the sheet and scrolls to the dependent section', async () => {
+  it('shows Manage heritage in the sheet and focuses the embedded heritage section', async () => {
     const user = userEvent.setup()
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
-
     const context = createElfContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -298,7 +308,9 @@ describe('SpeciesStep', () => {
     await user.click(within(dialog).getByRole('button', { name: MANAGE_HERITAGE_LABEL }))
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    expect(
+      within(speciesCard(elf.id) as HTMLElement).getByRole('region', { name: 'Elven Lineage' }),
+    ).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

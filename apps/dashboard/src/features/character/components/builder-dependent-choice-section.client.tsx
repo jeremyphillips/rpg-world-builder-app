@@ -18,6 +18,7 @@ import type { DependentChoiceSectionCopy } from '../lib/builder-dependent-choice
 import {
   builderDependentChoiceSectionClasses,
   builderDependentChoiceSectionCopyClasses,
+  builderDependentChoiceSectionEmbeddedClasses,
 } from './builder-dependent-choice-section.variants'
 
 export type BuilderDependentChoiceSectionProps = {
@@ -31,6 +32,8 @@ export type BuilderDependentChoiceSectionProps = {
   onValueChange: (optionId: string) => void
   sectionRef?: Ref<HTMLElement>
   idPrefix: string
+  /** Tighter rhythm when nested inside a parent RadioCard shell. */
+  embedded?: boolean
 }
 
 export function BuilderDependentChoiceSection({
@@ -42,6 +45,7 @@ export function BuilderDependentChoiceSection({
   onValueChange,
   sectionRef,
   idPrefix,
+  embedded = false,
 }: BuilderDependentChoiceSectionProps) {
   const headingId = `${idPrefix}-heading`
 
@@ -50,7 +54,11 @@ export function BuilderDependentChoiceSection({
       ref={sectionRef}
       role="region"
       aria-labelledby={headingId}
-      className={builderDependentChoiceSectionClasses}
+      className={
+        embedded
+          ? builderDependentChoiceSectionEmbeddedClasses
+          : builderDependentChoiceSectionClasses
+      }
     >
       <div className={builderDependentChoiceSectionCopyClasses}>
         <Heading variant="subsection" as="h3" id={headingId}>

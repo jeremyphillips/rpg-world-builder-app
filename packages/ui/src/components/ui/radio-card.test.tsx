@@ -113,6 +113,50 @@ describe('RadioCard', () => {
     expect(screen.getByText('Recommended')).toBeInTheDocument()
   })
 
+  it('renders embedded content inside the selected card shell', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        value="elf"
+        options={[
+          {
+            label: 'Elf',
+            value: 'elf',
+            description: 'Humanoid',
+            titleMeta: 'Heritage required',
+            onDetails: vi.fn(),
+            embeddedContent: <p>Gnomish Lineage picker</p>,
+          },
+        ]}
+      />,
+    )
+
+    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-xl"]')
+    expect(elfCard).toHaveTextContent('Gnomish Lineage picker')
+  })
+
+  it('hides embedded content when the option is not selected', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        value=""
+        options={[
+          {
+            label: 'Elf',
+            value: 'elf',
+            description: 'Humanoid',
+            onDetails: vi.fn(),
+            embeddedContent: <p>Gnomish Lineage picker</p>,
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.queryByText('Gnomish Lineage picker')).not.toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RadioCard aria-label="Edition preset" options={options} />)
     await expectNoAxeViolations(container)

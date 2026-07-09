@@ -113,3 +113,16 @@ export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
 export const radioCardSummaryVariants = cva('text-muted-foreground')
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
+
+/** Slot below the primary card row when a selected option reveals nested content. */
+export const radioCardEmbeddedSlotVariants = cva('border-t border-border', {
+  variants: {
+    density: {
+      default: 'mt-4 pt-4',
+      compact: 'mt-3 pt-3',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})

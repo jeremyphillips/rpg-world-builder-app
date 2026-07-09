@@ -55,3 +55,17 @@ export const Resolved: Story = {
     idPrefix: 'story-species-heritage',
   },
 }
+
+/** Nested inside a parent RadioCard shell (species / class dependent-choice pattern). */
+export const EmbeddedInParentCard: Story = {
+  args: {
+    title: 'Gnomish Lineage',
+    sectionCopy: resolveDependentChoiceSectionCopy({ required: true }),
+    dependentKindLabel: DEPENDENT_KIND_HERITAGE,
+    options: heritageOptions,
+    value: '',
+    onValueChange: () => undefined,
+    idPrefix: 'story-species-heritage-embedded',
+    embedded: true,
+  },
+}

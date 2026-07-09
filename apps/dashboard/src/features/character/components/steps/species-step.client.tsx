@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import {
   resolveAvailableContent,
@@ -62,7 +62,6 @@ export function SpeciesStep({
 }: SpeciesStepProps) {
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
   const [attentionActive, setAttentionActive] = useState(false)
-  const dependentSectionRef = useRef<HTMLElement>(null)
 
   const species = useMemo(() => resolveAvailableContent(context).species, [context])
 
@@ -89,20 +88,6 @@ export function SpeciesStep({
 
   const heritageUnresolved = heritageChoiceSet != null && !selectedHeritageOptionId
 
-  const scrollToDependentSection = useCallback(() => {
-    dependentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, [])
-
-  const focusDependentSection = useCallback(() => {
-    setAttentionActive(true)
-    scrollToDependentSection()
-  }, [scrollToDependentSection])
-
-  useEffect(() => {
-    if (!attentionActive) return
-    scrollToDependentSection()
-  }, [attentionActive, scrollToDependentSection])
-
   const handleSpeciesSelect = useCallback(
     (speciesId: string) => {
       const nextSpecies = species.find((entry) => entry.id === speciesId)
@@ -113,6 +98,53 @@ export function SpeciesStep({
     },
     [draft, onDraftChange, species],
   )
+
+  const heritageSectionCopy = useMemo(
+    () =>
+      resolveDependentChoiceSectionCopy({
+        required: heritageUnresolved,
+        selectedOptionLabel: selectedHeritageOptionLabel,
+      }),
+    [heritageUnresolved, selectedHeritageOptionLabel],
+  )
+
+  const heritageEmbeddedContent = useMemo(() => {
+    if (!heritageChoiceSet || !selectedSpecies) return null
+
+    return (
+      <AttentionFrame
+        active={attentionActive}
+        onAttentionComplete={() => setAttentionActive(false)}
+      >
+        <BuilderDependentChoiceSection
+          embedded
+          idPrefix={HERITAGE_SECTION_ID_PREFIX}
+          title={heritageChoiceSet.label}
+          sectionCopy={heritageSectionCopy}
+          dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+          options={mapHeritageOptionsToDependentCardOptions(
+            selectedSpecies,
+            context.catalog.languages,
+            context.catalog.spells,
+          )}
+          value={selectedHeritageOptionId ?? ''}
+          onValueChange={(optionId) => {
+            onDraftChange(buildHeritageSelectionPatch(draft, heritageChoiceSet.id, optionId))
+          }}
+        />
+      </AttentionFrame>
+    )
+  }, [
+    attentionActive,
+    context.catalog.languages,
+    context.catalog.spells,
+    draft,
+    heritageChoiceSet,
+    heritageSectionCopy,
+    onDraftChange,
+    selectedHeritageOptionId,
+    selectedSpecies,
+  ])
 
   const options = useMemo(
     () =>
@@ -133,28 +165,19 @@ export function SpeciesStep({
           value: entry.id,
           ...card,
           ...(titleMeta ? { titleMeta } : {}),
+          ...(isSelected && entry.heritage && heritageEmbeddedContent
+            ? { embeddedContent: heritageEmbeddedContent }
+            : {}),
           onDetails: () => setDetailsSpeciesId(entry.id),
         }
       }),
-    [selectedHeritageOptionId, selectedHeritageOptionLabel, selectedSpeciesId, species],
-  )
-
-  const heritageSectionOptions = useMemo(() => {
-    if (!selectedSpecies) return []
-    return mapHeritageOptionsToDependentCardOptions(
-      selectedSpecies,
-      context.catalog.languages,
-      context.catalog.spells,
-    )
-  }, [context.catalog.languages, context.catalog.spells, selectedSpecies])
-
-  const heritageSectionCopy = useMemo(
-    () =>
-      resolveDependentChoiceSectionCopy({
-        required: heritageUnresolved,
-        selectedOptionLabel: selectedHeritageOptionLabel,
-      }),
-    [heritageUnresolved, selectedHeritageOptionLabel],
+    [
+      heritageEmbeddedContent,
+      selectedHeritageOptionId,
+      selectedHeritageOptionLabel,
+      selectedSpeciesId,
+      species,
+    ],
   )
 
   const detailsSpecies = useMemo(
@@ -196,27 +219,6 @@ export function SpeciesStep({
         idPrefix="character-builder-species"
       />
 
-      {heritageChoiceSet ? (
-        <AttentionFrame
-          active={attentionActive}
-          onAttentionComplete={() => setAttentionActive(false)}
-          className="mt-4"
-        >
-          <BuilderDependentChoiceSection
-            sectionRef={dependentSectionRef}
-            idPrefix={HERITAGE_SECTION_ID_PREFIX}
-            title={heritageChoiceSet.label}
-            sectionCopy={heritageSectionCopy}
-            dependentKindLabel={DEPENDENT_KIND_HERITAGE}
-            options={heritageSectionOptions}
-            value={selectedHeritageOptionId ?? ''}
-            onValueChange={(optionId) => {
-              onDraftChange(buildHeritageSelectionPatch(draft, heritageChoiceSet.id, optionId))
-            }}
-          />
-        </AttentionFrame>
-      ) : null}
-
       {detailsContent ? (
         <BuilderOptionDetailsSheet
           open={detailsSpeciesId != null}
@@ -237,7 +239,7 @@ export function SpeciesStep({
                     type="button"
                     onClick={() => {
                       setDetailsSpeciesId(null)
-                      focusDependentSection()
+                      setAttentionActive(true)
                     }}
                   >
                     {MANAGE_HERITAGE_LABEL}

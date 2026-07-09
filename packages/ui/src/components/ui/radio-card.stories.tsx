@@ -176,3 +176,36 @@ export const ParentChoiceTitleMeta: Story = {
     ],
   },
 }
+
+/** Selected parent card revealing a dependent-choice region inside the shell. */
+export const EmbeddedDependentChoice: Story = {
+  args: {
+    'aria-label': 'Species',
+    density: 'compact',
+    defaultValue: 'gnome',
+    options: [
+      {
+        label: 'Gnome',
+        value: 'gnome',
+        description: 'Humanoid',
+        titleMeta: 'Heritage required',
+        summaryItems: ['Darkvision', 'Gnomish Cunning'],
+        onDetails: action('onDetails'),
+        embeddedContent: (
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">Gnomish Lineage</p>
+            <p className="text-sm text-muted-foreground">Required</p>
+            <p className="text-sm text-muted-foreground">Choose one option.</p>
+          </div>
+        ),
+      },
+      {
+        label: 'Dwarf',
+        value: 'dwarf',
+        description: 'Humanoid',
+        summaryItems: ['Darkvision', 'Dwarven Resilience'],
+        onDetails: action('onDetails'),
+      },
+    ],
+  },
+}
