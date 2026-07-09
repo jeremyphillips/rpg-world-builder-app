@@ -87,6 +87,10 @@ describe('score assignment mutations', () => {
     expect(swapAssignedScores({ str: 15, dex: 14 }, 'str', 'dex')).toEqual({ str: 14, dex: 15 })
   })
 
+  it('swaps an assigned score with an empty ability', () => {
+    expect(swapAssignedScores({ str: 15, dex: 14 }, 'str', 'con')).toEqual({ dex: 14, con: 15 })
+  })
+
   it('clears an assigned ability', () => {
     expect(clearAbilityScore({ str: 15, dex: 14 }, 'str')).toEqual({ dex: 14 })
   })

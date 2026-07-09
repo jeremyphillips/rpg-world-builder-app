@@ -152,6 +152,28 @@ describe('FixedScoresAssignment', () => {
     }
   })
 
+  it('renders drop placeholders without grab affordance on empty cards', () => {
+    renderAssignment()
+
+    const placeholders = screen.getAllByText(abilitiesFormCopy.dropScoreHere)
+    expect(placeholders).toHaveLength(6)
+    for (const placeholder of placeholders) {
+      expect(placeholder).not.toHaveClass('cursor-grab')
+      expect(placeholder.closest('button')).toBeNull()
+    }
+  })
+
+  it('uses token surface for pool scores and plain surface for assigned scores at rest', () => {
+    renderAssignment({ str: 15 })
+
+    const poolToken = within(getScorePoolSection()).getByRole('button', { name: 'Score 14' })
+    expect(poolToken).toHaveClass('bg-secondary', 'border-border')
+
+    const assignedScore = screen.getByRole('button', { name: 'Strength score 15' })
+    expect(assignedScore).toHaveClass('bg-transparent', 'px-0', 'w-fit', 'hover:px-4', 'hover:py-2')
+    expect(assignedScore).not.toHaveClass('bg-secondary')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = renderAssignment({ str: 15, con: 13 })
 

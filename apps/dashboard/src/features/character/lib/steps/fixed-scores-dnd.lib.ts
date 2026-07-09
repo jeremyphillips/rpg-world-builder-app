@@ -1,10 +1,10 @@
-import type { DragEndEvent } from '@dnd-kit/core'
+import type { CollisionDetection, DragEndEvent } from '@dnd-kit/core'
+import { pointerWithin } from '@dnd-kit/core'
 
 import type { Ability } from '@rpg/contracts'
 
 import {
   assignScoreFromPool,
-  moveAssignedScore,
   replaceScoreFromPool,
   swapAssignedScores,
 } from '../../lib/steps/fixed-scores-assignment.lib'
@@ -43,21 +43,54 @@ export function fixedScoresAbilityDropDndId(ability: Ability): string {
   return `ability:${ability}`
 }
 
+function parseFixedScoresAbilityId(value: string): Ability | undefined {
+  if (
+    value === 'str' ||
+    value === 'dex' ||
+    value === 'con' ||
+    value === 'int' ||
+    value === 'wis' ||
+    value === 'cha'
+  ) {
+    return value
+  }
+  return undefined
+}
+
 export function parseFixedScoresAbilityDropId(id: string | number): Ability | undefined {
   const value = String(id)
   if (!value.startsWith('ability:')) return undefined
-  const ability = value.slice('ability:'.length)
-  if (
-    ability === 'str' ||
-    ability === 'dex' ||
-    ability === 'con' ||
-    ability === 'int' ||
-    ability === 'wis' ||
-    ability === 'cha'
-  ) {
-    return ability
-  }
-  return undefined
+  return parseFixedScoresAbilityId(value.slice('ability:'.length))
+}
+
+export function parseFixedScoresAssignedDndId(id: string | number): Ability | undefined {
+  const value = String(id)
+  if (!value.startsWith('assigned:')) return undefined
+  return parseFixedScoresAbilityId(value.slice('assigned:'.length))
+}
+
+/** Resolves a drop target from either an ability card zone or an assigned score token. */
+export function parseFixedScoresDropTarget(id: string | number): Ability | undefined {
+  return parseFixedScoresAbilityDropId(id) ?? parseFixedScoresAssignedDndId(id)
+}
+
+/** Prefer ability-card drop zones, then foreign assigned tokens, for reliable empty-card drops. */
+export const fixedScoresCollisionDetection: CollisionDetection = (args) => {
+  const collisions = pointerWithin(args)
+  if (collisions.length === 0) return collisions
+
+  const abilityCollision = collisions.find((collision) =>
+    String(collision.id).startsWith('ability:'),
+  )
+  if (abilityCollision) return [abilityCollision]
+
+  const assignedCollision = collisions.find((collision) => {
+    const id = String(collision.id)
+    return id.startsWith('assigned:') && id !== String(args.active.id)
+  })
+  if (assignedCollision) return [assignedCollision]
+
+  return collisions
 }
 
 export function resolveFixedScoresDragEnd(
@@ -67,7 +100,7 @@ export function resolveFixedScoresDragEnd(
   const { active, over } = event
   if (!over) return null
 
-  const targetAbility = parseFixedScoresAbilityDropId(over.id)
+  const targetAbility = parseFixedScoresDropTarget(over.id)
   if (!targetAbility) return null
 
   const activeData = active.data.current as
@@ -87,10 +120,7 @@ export function resolveFixedScoresDragEnd(
     const fromAbility = activeData.ability
     if (fromAbility === targetAbility) return null
 
-    const targetScore = scores[targetAbility]
-    return typeof targetScore === 'number'
-      ? swapAssignedScores(scores, fromAbility, targetAbility)
-      : moveAssignedScore(scores, fromAbility, targetAbility)
+    return swapAssignedScores(scores, fromAbility, targetAbility)
   }
 
   return null

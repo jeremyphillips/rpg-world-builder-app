@@ -6,6 +6,8 @@ import {
   fixedScoresAssignedDndId,
   fixedScoresPoolDndId,
   parseFixedScoresAbilityDropId,
+  parseFixedScoresAssignedDndId,
+  parseFixedScoresDropTarget,
   resolveFixedScoresDragEnd,
 } from './fixed-scores-dnd.lib'
 
@@ -25,7 +27,9 @@ describe('fixed-scores-dnd.lib', () => {
     expect(fixedScoresAssignedDndId('str')).toBe('assigned:str')
     expect(fixedScoresAbilityDropDndId('dex')).toBe('ability:dex')
     expect(parseFixedScoresAbilityDropId('ability:con')).toBe('con')
-    expect(parseFixedScoresAbilityDropId('pool:15')).toBeUndefined()
+    expect(parseFixedScoresAssignedDndId('assigned:con')).toBe('con')
+    expect(parseFixedScoresDropTarget('assigned:dex')).toBe('dex')
+    expect(parseFixedScoresDropTarget('pool:15')).toBeUndefined()
   })
 
   it('assigns from pool to empty ability', () => {
@@ -69,6 +73,16 @@ describe('fixed-scores-dnd.lib', () => {
         fixedScoresAssignedDndId('str'),
         { kind: 'assigned', ability: 'str', score: 15 },
         fixedScoresAbilityDropDndId('dex'),
+      ),
+    ).toEqual({ str: 14, dex: 15 })
+  })
+
+  it('swaps assigned score onto another ability token', () => {
+    expect(
+      dragEnd(
+        fixedScoresAssignedDndId('str'),
+        { kind: 'assigned', ability: 'str', score: 15 },
+        fixedScoresAssignedDndId('dex'),
       ),
     ).toEqual({ str: 14, dex: 15 })
   })

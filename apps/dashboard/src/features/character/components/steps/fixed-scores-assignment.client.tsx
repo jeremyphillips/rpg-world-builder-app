@@ -6,14 +6,12 @@ import {
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
-  useDraggable,
   useDroppable,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -32,7 +30,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Text,
-  cn,
 } from '@rpg/ui'
 
 import {
@@ -52,30 +49,29 @@ import {
   FIXED_SCORES_DND_KINDS,
   fixedScoresAbilityDropDndId,
   fixedScoresAssignedDndId,
+  fixedScoresCollisionDetection,
   fixedScoresPoolDndId,
   resolveFixedScoresDragEnd,
   type FixedScoresAssignedDragData,
   type FixedScoresPoolDragData,
 } from '../../lib/steps/fixed-scores-dnd.lib'
 import { formatPreviewSignedNumber } from '../../lib/character-builder-preview-panel.lib'
+import { ScoreToken } from './score-token.client'
 import {
   abilityScoreCardAbbrClasses,
-  abilityScoreCardAssignedScoreClasses,
-  abilityScoreCardAssignedScoreDraggingClasses,
   abilityScoreCardChooseScoreClasses,
+  abilityScoreCardChooseScoreSectionClasses,
   abilityScoreCardHeaderClasses,
   abilityScoreCardModifierClasses,
   abilityScoreCardNameClasses,
-  abilityScoreCardPlaceholderClasses,
   abilityScoreCardScoreAreaClasses,
+  abilityScoreCardScorePlaceholderOverlayClasses,
+  abilityScoreCardScoreSlotClasses,
   abilityScoreCardClasses,
   fixedScoresAbilityGridClasses,
   fixedScoresAssignmentIntroClasses,
   fixedScoresAssignmentRootClasses,
-  fixedScoresDragOverlayTokenClasses,
   fixedScoresRemainingClasses,
-  fixedScoresScoreTokenClasses,
-  fixedScoresScoreTokenDraggingClasses,
   fixedScoresTokenPoolClasses,
   fixedScoresTokenPoolSectionClasses,
 } from './fixed-scores-assignment.variants'
@@ -113,69 +109,6 @@ function resolveAbilityCardState({
   if (showInvalidStates && typeof assignedScore !== 'number') return 'invalidAfterAttempt'
   if (typeof assignedScore === 'number') return 'filled'
   return 'empty'
-}
-
-function ScoreToken({ score, isDragging }: { score: number; isDragging?: boolean }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: fixedScoresPoolDndId(score),
-    data: { kind: FIXED_SCORES_DND_KINDS.pool, score } satisfies FixedScoresPoolDragData,
-  })
-
-  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
-
-  return (
-    <button
-      type="button"
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        fixedScoresScoreTokenClasses,
-        isDragging && fixedScoresScoreTokenDraggingClasses,
-      )}
-      aria-label={`Score ${score}`}
-      {...listeners}
-      {...attributes}
-    >
-      {score}
-    </button>
-  )
-}
-
-function AssignedScoreValue({
-  ability,
-  score,
-  isDragging,
-}: {
-  ability: Ability
-  score: number
-  isDragging?: boolean
-}) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: fixedScoresAssignedDndId(ability),
-    data: {
-      kind: FIXED_SCORES_DND_KINDS.assigned,
-      ability,
-      score,
-    } satisfies FixedScoresAssignedDragData,
-  })
-
-  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
-
-  return (
-    <span
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        abilityScoreCardAssignedScoreClasses,
-        isDragging && abilityScoreCardAssignedScoreDraggingClasses,
-      )}
-      aria-label={`${ABILITY_ENTRIES[ability].label} score ${score}`}
-      {...listeners}
-      {...attributes}
-    >
-      {score}
-    </span>
-  )
 }
 
 function ChooseScoreMenu({
@@ -269,25 +202,51 @@ function AbilityScoreCard({
       </header>
 
       <div className={abilityScoreCardScoreAreaClasses}>
-        {typeof assignedScore === 'number' && !isDraggingFrom ? (
-          <AssignedScoreValue ability={ability} score={assignedScore} />
-        ) : (
-          <span className={abilityScoreCardPlaceholderClasses}>
-            {abilitiesFormCopy.dropScoreHere}
-          </span>
-        )}
+        <div className={abilityScoreCardScoreSlotClasses}>
+          {typeof assignedScore === 'number' ? (
+            <ScoreToken
+              value={assignedScore}
+              size="assigned"
+              surface="plain"
+              interactive
+              sourceHidden={isDraggingFrom}
+              ariaLabel={`${entry.label} score ${assignedScore}`}
+              dndId={fixedScoresAssignedDndId(ability)}
+              dndData={
+                {
+                  kind: FIXED_SCORES_DND_KINDS.assigned,
+                  ability,
+                  score: assignedScore,
+                } satisfies FixedScoresAssignedDragData
+              }
+            />
+          ) : null}
+          {typeof assignedScore !== 'number' || isDraggingFrom ? (
+            <ScoreToken
+              label={abilitiesFormCopy.dropScoreHere}
+              size="assigned"
+              surface="placeholder"
+              interactive={false}
+              className={
+                isDraggingFrom ? abilityScoreCardScorePlaceholderOverlayClasses : undefined
+              }
+            />
+          ) : null}
+        </div>
         <span className={abilityScoreCardModifierClasses} aria-live="polite">
           <span className="sr-only">Modifier </span>
           {modifierLabel}
         </span>
       </div>
 
-      <ChooseScoreMenu
-        ability={ability}
-        scores={scores}
-        scorePool={scorePool}
-        onSelectScore={onSelectScore}
-      />
+      <div className={abilityScoreCardChooseScoreSectionClasses}>
+        <ChooseScoreMenu
+          ability={ability}
+          scores={scores}
+          scorePool={scorePool}
+          onSelectScore={onSelectScore}
+        />
+      </div>
     </article>
   )
 }
@@ -413,6 +372,7 @@ export function FixedScoresAssignment({
 
       <DndContext
         sensors={sensors}
+        collisionDetection={fixedScoresCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
@@ -427,9 +387,16 @@ export function FixedScoresAssignment({
                 {availableScores.map((score) => (
                   <ScoreToken
                     key={score}
-                    score={score}
-                    isDragging={
+                    value={score}
+                    size="pool"
+                    surface="token"
+                    interactive
+                    dragging={
                       activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool && activeDrag.score === score
+                    }
+                    dndId={fixedScoresPoolDndId(score)}
+                    dndData={
+                      { kind: FIXED_SCORES_DND_KINDS.pool, score } satisfies FixedScoresPoolDragData
                     }
                   />
                 ))}
@@ -453,16 +420,14 @@ export function FixedScoresAssignment({
         </div>
 
         <DragOverlay dropAnimation={null}>
-          {overlayScore !== null ? (
-            activeDrag?.kind === FIXED_SCORES_DND_KINDS.pool ? (
-              <div className={fixedScoresDragOverlayTokenClasses} aria-hidden>
-                {overlayScore}
-              </div>
-            ) : (
-              <span className={abilityScoreCardAssignedScoreClasses} aria-hidden>
-                {overlayScore}
-              </span>
-            )
+          {overlayScore !== null && activeDrag ? (
+            <ScoreToken
+              value={overlayScore}
+              size={activeDrag.kind === FIXED_SCORES_DND_KINDS.pool ? 'pool' : 'assigned'}
+              surface="token"
+              dragOverlay
+              interactive={false}
+            />
           ) : null}
         </DragOverlay>
       </DndContext>

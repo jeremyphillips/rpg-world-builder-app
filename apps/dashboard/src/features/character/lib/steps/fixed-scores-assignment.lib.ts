@@ -79,33 +79,34 @@ export function replaceScoreFromPool(
   return { ...scores, [ability]: score }
 }
 
-export function moveAssignedScore(
-  scores: Partial<Record<Ability, number>>,
-  fromAbility: Ability,
-  toAbility: Ability,
-): Partial<Record<Ability, number>> {
-  const score = scores[fromAbility]
-  if (typeof score !== 'number') return scores
-
-  const next = { ...scores, [toAbility]: score }
-  delete next[fromAbility]
-  return next
-}
-
 export function swapAssignedScores(
   scores: Partial<Record<Ability, number>>,
   fromAbility: Ability,
   toAbility: Ability,
 ): Partial<Record<Ability, number>> {
-  const fromScore = scores[fromAbility]
-  const toScore = scores[toAbility]
-  if (typeof fromScore !== 'number' || typeof toScore !== 'number') return scores
+  if (fromAbility === toAbility) return scores
 
-  return {
-    ...scores,
-    [fromAbility]: toScore,
-    [toAbility]: fromScore,
+  const fromScore = scores[fromAbility]
+  if (typeof fromScore !== 'number') return scores
+
+  const toScore = scores[toAbility]
+  const next = { ...scores, [toAbility]: fromScore }
+
+  if (typeof toScore === 'number') {
+    next[fromAbility] = toScore
+  } else {
+    delete next[fromAbility]
   }
+
+  return next
+}
+
+export function moveAssignedScore(
+  scores: Partial<Record<Ability, number>>,
+  fromAbility: Ability,
+  toAbility: Ability,
+): Partial<Record<Ability, number>> {
+  return swapAssignedScores(scores, fromAbility, toAbility)
 }
 
 export function clearAbilityScore(
