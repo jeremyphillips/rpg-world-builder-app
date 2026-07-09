@@ -55,6 +55,7 @@ export function CharacterBuilderStepContent({
         <SpeciesStep
           context={context}
           draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
         />

@@ -57,6 +57,7 @@ function drawerLabelsForChoiceSet(choiceSet: ChoiceSet): ChoiceSetDrawerLabelPai
   const labels = CHOICE_SET_DRAWER_LABELS[choiceSet.choiceType]
   if (labels) return labels
 
+  // Legacy escape hatch only — prefer explicit CHOICE_SET_DRAWER_LABELS entries for new choice types.
   const lower = choiceSet.label.toLowerCase()
   return {
     add: `Add ${lower}`,

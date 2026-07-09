@@ -1,44 +1,180 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import {
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import {
+  findSpeciesHeritageChoiceSet,
+  mapHeritageOptionsToDependentCardOptions,
+  resolveDependentChoiceSectionCopy,
+} from '../../lib/builder-dependent-choice.lib'
+import {
   buildSpeciesDetailsSheetContent,
   formatSpeciesCardOption,
 } from '../../lib/builder-option-display.lib'
+import {
+  DEPENDENT_KIND_HERITAGE,
+  formatParentChoiceTitleMeta,
+  CHANGE_HERITAGE_LABEL,
+} from '../../lib/builder-parent-choice-status.lib'
+import {
+  buildHeritageSelectionPatch,
+  buildSpeciesSelectionPatch,
+} from '../../lib/species-selection.lib'
+import { BuilderDependentChoiceSection } from '../builder-dependent-choice-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
 const SELECT_SPECIES_ACTION_LABEL = 'Select species'
 const SELECTED_SPECIES_LABEL = 'Selected'
+const HERITAGE_SECTION_ID_PREFIX = 'character-builder-species-heritage'
 
 export type SpeciesStepProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
-export function SpeciesStep({ context, draft, validationIssues, onDraftChange }: SpeciesStepProps) {
+function resolveSelectedHeritageOptionId(
+  draft: CharacterBuilderDraft,
+  heritageChoiceSet: ChoiceSet | undefined,
+): string | undefined {
+  if (draft.species.heritageId) return draft.species.heritageId
+  if (!heritageChoiceSet) return undefined
+  return draft.choiceSelections[heritageChoiceSet.id]?.[0]
+}
+
+export function SpeciesStep({
+  context,
+  draft,
+  resolvedChoiceSets,
+  validationIssues,
+  onDraftChange,
+}: SpeciesStepProps) {
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
+  const [heritagePanelExpanded, setHeritagePanelExpanded] = useState(false)
 
   const species = useMemo(() => resolveAvailableContent(context).species, [context])
 
+  const selectedSpeciesId = draft.species.speciesId
+  const selectedSpecies = useMemo(
+    () => species.find((entry) => entry.id === selectedSpeciesId) ?? null,
+    [selectedSpeciesId, species],
+  )
+
+  const heritageChoiceSet = useMemo(() => {
+    if (!selectedSpeciesId) return undefined
+    return findSpeciesHeritageChoiceSet(resolvedChoiceSets, selectedSpeciesId)
+  }, [resolvedChoiceSets, selectedSpeciesId])
+
+  const selectedHeritageOptionId = useMemo(
+    () => resolveSelectedHeritageOptionId(draft, heritageChoiceSet),
+    [draft, heritageChoiceSet],
+  )
+
+  const selectedHeritageOptionLabel = useMemo(() => {
+    if (!selectedHeritageOptionId || !heritageChoiceSet) return undefined
+    return heritageChoiceSet.options.find((option) => option.id === selectedHeritageOptionId)?.label
+  }, [heritageChoiceSet, selectedHeritageOptionId])
+
+  const heritageUnresolved = heritageChoiceSet != null && !selectedHeritageOptionId
+
+  const handleSpeciesSelect = useCallback(
+    (speciesId: string) => {
+      onDraftChange(buildSpeciesSelectionPatch(draft, speciesId))
+      setHeritagePanelExpanded(false)
+    },
+    [draft, onDraftChange],
+  )
+
+  const heritageSectionCopy = useMemo(
+    () =>
+      resolveDependentChoiceSectionCopy({
+        required: heritageUnresolved,
+        selectedOptionLabel: selectedHeritageOptionLabel,
+      }),
+    [heritageUnresolved, selectedHeritageOptionLabel],
+  )
+
+  const heritageEmbeddedContent = useMemo(() => {
+    if (!heritageChoiceSet || !selectedSpecies) return null
+
+    return (
+      <BuilderDependentChoiceSection
+        embedded
+        expanded={heritagePanelExpanded}
+        onExpandedChange={setHeritagePanelExpanded}
+        idPrefix={HERITAGE_SECTION_ID_PREFIX}
+        title={heritageChoiceSet.label}
+        sectionCopy={heritageSectionCopy}
+        dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+        options={mapHeritageOptionsToDependentCardOptions(
+          selectedSpecies,
+          context.catalog.languages,
+          context.catalog.spells,
+        )}
+        value={selectedHeritageOptionId ?? ''}
+        onValueChange={(optionId) => {
+          onDraftChange(buildHeritageSelectionPatch(draft, heritageChoiceSet.id, optionId))
+        }}
+      />
+    )
+  }, [
+    context.catalog.languages,
+    context.catalog.spells,
+    draft,
+    heritageChoiceSet,
+    heritagePanelExpanded,
+    heritageSectionCopy,
+    onDraftChange,
+    selectedHeritageOptionId,
+    selectedSpecies,
+  ])
+
   const options = useMemo(
     () =>
-      species.map((entry) => ({
-        value: entry.id,
-        ...formatSpeciesCardOption(entry),
-        onDetails: () => setDetailsSpeciesId(entry.id),
-      })),
-    [species],
+      species.map((entry) => {
+        const card = formatSpeciesCardOption(entry)
+        const isSelected = selectedSpeciesId === entry.id
+
+        let titleMeta: string | undefined
+        if (isSelected && entry.heritage) {
+          titleMeta = formatParentChoiceTitleMeta({
+            dependentKindLabel: DEPENDENT_KIND_HERITAGE,
+            required: !selectedHeritageOptionId,
+            selectedOptionLabel: selectedHeritageOptionLabel,
+          })
+        }
+
+        return {
+          value: entry.id,
+          ...card,
+          ...(titleMeta ? { titleMeta } : {}),
+          ...(isSelected && entry.heritage && heritageEmbeddedContent
+            ? {
+                embeddedContent: heritageEmbeddedContent,
+                embeddedSlotTone: 'panel' as const,
+              }
+            : {}),
+          onDetails: () => setDetailsSpeciesId(entry.id),
+        }
+      }),
+    [
+      heritageEmbeddedContent,
+      selectedHeritageOptionId,
+      selectedHeritageOptionLabel,
+      selectedSpeciesId,
+      species,
+    ],
   )
 
   const detailsSpecies = useMemo(
@@ -57,6 +193,7 @@ export function SpeciesStep({ context, draft, validationIssues, onDraftChange }:
 
   const isDetailsSpeciesSelected =
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId
+  const detailsSpeciesHasHeritage = detailsSpecies?.heritage != null
 
   if (options.length === 0) {
     return (
@@ -70,14 +207,10 @@ export function SpeciesStep({ context, draft, validationIssues, onDraftChange }:
     <BuilderStepFrame stepId="species" validationIssues={validationIssues}>
       <RadioCard
         density="compact"
-        value={draft.species.speciesId ?? ''}
+        value={selectedSpeciesId ?? ''}
         onValueChange={(speciesId) => {
-          onDraftChange({
-            species: {
-              ...draft.species,
-              speciesId: speciesId || undefined,
-            },
-          })
+          if (!speciesId) return
+          handleSpeciesSelect(speciesId)
         }}
         options={options}
         idPrefix="character-builder-species"
@@ -96,17 +229,28 @@ export function SpeciesStep({ context, draft, validationIssues, onDraftChange }:
           sections={detailsContent.sections}
           primaryAction={
             isDetailsSpeciesSelected ? (
-              <Badge variant="secondary">{SELECTED_SPECIES_LABEL}</Badge>
+              detailsSpeciesHasHeritage ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary">{SELECTED_SPECIES_LABEL}</Badge>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setDetailsSpeciesId(null)
+                      setHeritagePanelExpanded(true)
+                    }}
+                  >
+                    {CHANGE_HERITAGE_LABEL}
+                  </Button>
+                </div>
+              ) : (
+                <Badge variant="secondary">{SELECTED_SPECIES_LABEL}</Badge>
+              )
             ) : (
               <Button
+                type="button"
                 onClick={() => {
                   if (!detailsSpeciesId) return
-                  onDraftChange({
-                    species: {
-                      ...draft.species,
-                      speciesId: detailsSpeciesId,
-                    },
-                  })
+                  handleSpeciesSelect(detailsSpeciesId)
                   setDetailsSpeciesId(null)
                 }}
               >
