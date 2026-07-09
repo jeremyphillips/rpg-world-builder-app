@@ -52,7 +52,7 @@ describe('BuilderDependentChoiceSection', () => {
     expect(screen.getByRole('radio', { name: /Drow/i })).toBeInTheDocument()
   })
 
-  it('omits helper text when the dependent choice is resolved', () => {
+  it('omits helper text when the dependent choice is resolved and collapses to the selected row', () => {
     render(
       <BuilderDependentChoiceSection
         title="Elven Lineage"
@@ -78,6 +78,32 @@ describe('BuilderDependentChoiceSection', () => {
     expect(
       screen.queryByText(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())),
     ).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Drow/i })).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /High Elf/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change heritage' })).toBeInTheDocument()
+  })
+
+  it('expands all heritage options when Change heritage is clicked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <BuilderDependentChoiceSection
+        title="Elven Lineage"
+        sectionCopy={resolveDependentChoiceSectionCopy({
+          required: false,
+          selectedOptionLabel: 'Drow',
+        })}
+        dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+        options={heritageOptions}
+        value="drow"
+        onValueChange={() => undefined}
+        idPrefix="test-species-heritage"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Change heritage' }))
+
+    expect(screen.getByRole('radio', { name: /High Elf/i })).toBeInTheDocument()
   })
 
   it('calls onValueChange when a heritage option is selected', async () => {
@@ -98,6 +124,44 @@ describe('BuilderDependentChoiceSection', () => {
 
     await user.click(screen.getByRole('radio', { name: /Drow/i }))
     expect(onValueChange).toHaveBeenCalledWith('drow')
+  })
+
+  it('renders embedded panel heading at the 15px text-md scale', () => {
+    render(
+      <BuilderDependentChoiceSection
+        embedded
+        title="Elven Lineage"
+        sectionCopy={resolveDependentChoiceSectionCopy({ required: true })}
+        dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+        options={heritageOptions}
+        value=""
+        onValueChange={() => undefined}
+        idPrefix="test-species-heritage"
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Elven Lineage' })).toHaveClass('text-md')
+    expect(screen.getByText('Required')).toHaveClass('text-md')
+  })
+
+  it('renders resolved panel status at the 15px text-md scale', () => {
+    render(
+      <BuilderDependentChoiceSection
+        embedded
+        title="Elven Lineage"
+        sectionCopy={resolveDependentChoiceSectionCopy({
+          required: false,
+          selectedOptionLabel: 'Drow',
+        })}
+        dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+        options={heritageOptions}
+        value="drow"
+        onValueChange={() => undefined}
+        idPrefix="test-species-heritage"
+      />,
+    )
+
+    expect(screen.getByText('Selected: Drow')).toHaveClass('text-md')
   })
 
   it('has no axe accessibility violations', async () => {

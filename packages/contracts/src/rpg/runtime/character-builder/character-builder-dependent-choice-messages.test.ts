@@ -20,8 +20,8 @@ describe('characterBuilderDependentChoiceMessages', () => {
     expect(formatFieldMessage(characterBuilderDependentChoiceMessages.helperText())).toBe(
       'Choose one option.',
     )
-    expect(formatFieldMessage(characterBuilderDependentChoiceMessages.manageHeritage())).toBe(
-      'Manage heritage',
+    expect(formatFieldMessage(characterBuilderDependentChoiceMessages.changeHeritage())).toBe(
+      'Change heritage',
     )
     expect(
       formatFieldMessage(
@@ -42,6 +42,6 @@ describe('characterBuilderDependentChoiceMessages', () => {
       formatFieldMessage(
         characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
       ),
-    ).toBe('Drow selected')
+    ).toBe('Selected: Drow')
   })
 })

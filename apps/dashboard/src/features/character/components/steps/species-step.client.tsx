@@ -9,7 +9,7 @@ import {
   type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
-import { AttentionFrame, Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
+import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import {
   findSpeciesHeritageChoiceSet,
@@ -23,7 +23,7 @@ import {
 import {
   DEPENDENT_KIND_HERITAGE,
   formatParentChoiceTitleMeta,
-  MANAGE_HERITAGE_LABEL,
+  CHANGE_HERITAGE_LABEL,
 } from '../../lib/builder-parent-choice-status.lib'
 import {
   buildHeritageSelectionPatch,
@@ -61,7 +61,7 @@ export function SpeciesStep({
   onDraftChange,
 }: SpeciesStepProps) {
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
-  const [attentionActive, setAttentionActive] = useState(false)
+  const [heritagePanelExpanded, setHeritagePanelExpanded] = useState(false)
 
   const species = useMemo(() => resolveAvailableContent(context).species, [context])
 
@@ -90,13 +90,10 @@ export function SpeciesStep({
 
   const handleSpeciesSelect = useCallback(
     (speciesId: string) => {
-      const nextSpecies = species.find((entry) => entry.id === speciesId)
       onDraftChange(buildSpeciesSelectionPatch(draft, speciesId))
-      if (nextSpecies?.heritage) {
-        setAttentionActive(true)
-      }
+      setHeritagePanelExpanded(false)
     },
-    [draft, onDraftChange, species],
+    [draft, onDraftChange],
   )
 
   const heritageSectionCopy = useMemo(
@@ -112,34 +109,31 @@ export function SpeciesStep({
     if (!heritageChoiceSet || !selectedSpecies) return null
 
     return (
-      <AttentionFrame
-        active={attentionActive}
-        onAttentionComplete={() => setAttentionActive(false)}
-      >
-        <BuilderDependentChoiceSection
-          embedded
-          idPrefix={HERITAGE_SECTION_ID_PREFIX}
-          title={heritageChoiceSet.label}
-          sectionCopy={heritageSectionCopy}
-          dependentKindLabel={DEPENDENT_KIND_HERITAGE}
-          options={mapHeritageOptionsToDependentCardOptions(
-            selectedSpecies,
-            context.catalog.languages,
-            context.catalog.spells,
-          )}
-          value={selectedHeritageOptionId ?? ''}
-          onValueChange={(optionId) => {
-            onDraftChange(buildHeritageSelectionPatch(draft, heritageChoiceSet.id, optionId))
-          }}
-        />
-      </AttentionFrame>
+      <BuilderDependentChoiceSection
+        embedded
+        expanded={heritagePanelExpanded}
+        onExpandedChange={setHeritagePanelExpanded}
+        idPrefix={HERITAGE_SECTION_ID_PREFIX}
+        title={heritageChoiceSet.label}
+        sectionCopy={heritageSectionCopy}
+        dependentKindLabel={DEPENDENT_KIND_HERITAGE}
+        options={mapHeritageOptionsToDependentCardOptions(
+          selectedSpecies,
+          context.catalog.languages,
+          context.catalog.spells,
+        )}
+        value={selectedHeritageOptionId ?? ''}
+        onValueChange={(optionId) => {
+          onDraftChange(buildHeritageSelectionPatch(draft, heritageChoiceSet.id, optionId))
+        }}
+      />
     )
   }, [
-    attentionActive,
     context.catalog.languages,
     context.catalog.spells,
     draft,
     heritageChoiceSet,
+    heritagePanelExpanded,
     heritageSectionCopy,
     onDraftChange,
     selectedHeritageOptionId,
@@ -166,7 +160,10 @@ export function SpeciesStep({
           ...card,
           ...(titleMeta ? { titleMeta } : {}),
           ...(isSelected && entry.heritage && heritageEmbeddedContent
-            ? { embeddedContent: heritageEmbeddedContent }
+            ? {
+                embeddedContent: heritageEmbeddedContent,
+                embeddedSlotTone: 'panel' as const,
+              }
             : {}),
           onDetails: () => setDetailsSpeciesId(entry.id),
         }
@@ -239,10 +236,10 @@ export function SpeciesStep({
                     type="button"
                     onClick={() => {
                       setDetailsSpeciesId(null)
-                      setAttentionActive(true)
+                      setHeritagePanelExpanded(true)
                     }}
                   >
-                    {MANAGE_HERITAGE_LABEL}
+                    {CHANGE_HERITAGE_LABEL}
                   </Button>
                 </div>
               ) : (

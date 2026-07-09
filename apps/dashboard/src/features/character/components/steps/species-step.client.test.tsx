@@ -22,7 +22,7 @@ import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { MANAGE_HERITAGE_LABEL } from '../../lib/builder-parent-choice-status.lib'
+import { CHANGE_HERITAGE_LABEL } from '../../lib/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step.client'
 
 const dwarfWithTraits = {
@@ -290,7 +290,7 @@ describe('SpeciesStep', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows Manage heritage in the sheet and focuses the embedded heritage section', async () => {
+  it('shows Change heritage in the sheet and focuses the embedded heritage section', async () => {
     const user = userEvent.setup()
     const context = createElfContext()
     const draft = {
@@ -303,9 +303,9 @@ describe('SpeciesStep', () => {
     await user.click(screen.getByRole('button', { name: 'Details' }))
 
     const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByRole('button', { name: MANAGE_HERITAGE_LABEL })).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: CHANGE_HERITAGE_LABEL })).toBeInTheDocument()
 
-    await user.click(within(dialog).getByRole('button', { name: MANAGE_HERITAGE_LABEL }))
+    await user.click(within(dialog).getByRole('button', { name: CHANGE_HERITAGE_LABEL }))
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(

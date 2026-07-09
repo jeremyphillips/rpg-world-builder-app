@@ -23,9 +23,9 @@ export const characterBuilderDependentChoiceMessages = {
     'validation.characterBuilder.dependentChoice.helperText',
     () => 'Choose one option.',
   ),
-  manageHeritage: defineMessage(
-    'validation.characterBuilder.dependentChoice.manageHeritage',
-    () => 'Manage heritage',
+  changeHeritage: defineMessage(
+    'validation.characterBuilder.dependentChoice.changeHeritage',
+    () => 'Change heritage',
   ),
   parentChoiceRequired: defineMessage<{ kind: string }>(
     'validation.characterBuilder.dependentChoice.parentChoiceRequired',
@@ -37,6 +37,6 @@ export const characterBuilderDependentChoiceMessages = {
   ),
   optionSelected: defineMessage<{ selectedOptionLabel: string }>(
     'validation.characterBuilder.dependentChoice.optionSelected',
-    ({ selectedOptionLabel }) => `${selectedOptionLabel} selected`,
+    ({ selectedOptionLabel }) => `Selected: ${selectedOptionLabel}`,
   ),
 }

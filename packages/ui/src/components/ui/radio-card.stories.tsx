@@ -158,6 +158,36 @@ export const DependentChoice: Story = {
   },
 }
 
+/** Configuration-panel radio rows: lighter chrome than parent species cards. */
+export const RowVariant: Story = {
+  args: {
+    'aria-label': 'Elven Lineage',
+    variant: 'row',
+    density: 'compact',
+    defaultValue: 'drow',
+    options: [
+      {
+        label: 'Drow',
+        value: 'drow',
+        summaryLines: [
+          'L1: Darkvision 120 ft · Dancing Lights cantrip',
+          'L3: Faerie Fire spell',
+          'L5: Darkness spell',
+        ],
+      },
+      {
+        label: 'High Elf',
+        value: 'high-elf',
+        summaryLines: [
+          'L1: Prestidigitation cantrip',
+          'L3: Detect Magic spell',
+          'L5: Misty Step spell',
+        ],
+      },
+    ],
+  },
+}
+
 /** Parent species card with inline titleMeta. */
 export const ParentChoiceTitleMeta: Story = {
   args: {
@@ -191,10 +221,13 @@ export const EmbeddedDependentChoice: Story = {
         titleMeta: 'Heritage required',
         summaryItems: ['Darkvision', 'Gnomish Cunning'],
         onDetails: action('onDetails'),
+        embeddedSlotTone: 'panel',
         embeddedContent: (
           <div className="space-y-2">
-            <p className="text-sm font-semibold">Gnomish Lineage</p>
-            <p className="text-sm text-muted-foreground">Required</p>
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm font-semibold">Gnomish Lineage</p>
+              <p className="text-sm text-muted-foreground">Required</p>
+            </div>
             <p className="text-sm text-muted-foreground">Choose one option.</p>
           </div>
         ),

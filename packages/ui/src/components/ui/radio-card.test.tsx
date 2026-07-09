@@ -157,6 +157,61 @@ describe('RadioCard', () => {
     expect(screen.queryByText('Gnomish Lineage picker')).not.toBeInTheDocument()
   })
 
+  it('renders row variant without card shadow and with subtle selected fill', () => {
+    render(
+      <RadioCard
+        aria-label="Elven Lineage"
+        variant="row"
+        density="compact"
+        value="drow"
+        options={[
+          {
+            label: 'Drow',
+            value: 'drow',
+            summaryLines: ['L1: Darkvision 120 ft · Dancing Lights cantrip'],
+          },
+          {
+            label: 'High Elf',
+            value: 'high-elf',
+            summaryLines: ['L1: Prestidigitation cantrip'],
+          },
+        ]}
+      />,
+    )
+
+    const drow = screen.getByRole('radio', { name: /Drow/i })
+    expect(drow).toHaveClass('rounded-md')
+    expect(drow).not.toHaveClass('shadow-sm')
+    expect(drow).toHaveClass('border-0')
+    expect(drow).toHaveClass('data-[state=checked]:bg-muted/50')
+    expect(drow).not.toHaveClass('data-[state=checked]:ring-1')
+  })
+
+  it('renders embedded panel slot edge-to-edge inside the card shell', () => {
+    const { container } = render(
+      <RadioCard
+        aria-label="Species"
+        density="compact"
+        value="elf"
+        options={[
+          {
+            label: 'Elf',
+            value: 'elf',
+            description: 'Humanoid',
+            onDetails: vi.fn(),
+            embeddedSlotTone: 'panel',
+            embeddedContent: <p>Configuration panel</p>,
+          },
+        ]}
+      />,
+    )
+
+    const panel = container.querySelector('[class*="bg-muted"]')
+    expect(panel).toHaveTextContent('Configuration panel')
+    expect(panel?.className).toContain('-mx-3')
+    expect(panel?.className).toContain('rounded-b-xl')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<RadioCard aria-label="Edition preset" options={options} />)
     await expectNoAxeViolations(container)

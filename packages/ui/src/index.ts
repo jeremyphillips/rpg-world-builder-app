@@ -145,12 +145,20 @@ export {
   type RadioGroupFieldOption,
 } from './components/ui/radio-group-field'
 export {
+  radioCardCompactBodyInsetClasses,
+  radioCardCompactPanelPaddingClasses,
+  radioCardCompactPaddingRightClasses,
+  radioCardCompactPaddingXClasses,
+} from './components/ui/radio-card.variants'
+export {
   RadioCard,
   RadioCardItem,
   radioCardVariants,
   RADIO_CARD_DEFAULT_DETAILS_LABEL,
   RADIO_CARD_SUMMARY_SEPARATOR,
   type RadioCardDensity,
+  type RadioCardVariant,
+  type RadioCardEmbeddedSlotTone,
   type RadioCardOption,
   type RadioCardProps,
   type RadioCardItemProps,

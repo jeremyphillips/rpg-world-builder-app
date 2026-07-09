@@ -73,6 +73,17 @@ describe('AttentionFrame', () => {
     expect(screen.getByText('Dependent choice')).toBeInTheDocument()
   })
 
+  it('renders children without a visible border when inactive', () => {
+    const { container } = render(
+      <AttentionFrame>
+        <p>Dependent choice</p>
+      </AttentionFrame>,
+    )
+
+    expect(container.firstChild).toHaveClass('border-transparent')
+    expect(container.firstChild).not.toHaveClass('border-border')
+  })
+
   it('has no axe accessibility violations', async () => {
     vi.useRealTimers()
     const { container } = render(

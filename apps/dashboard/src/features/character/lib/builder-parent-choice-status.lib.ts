@@ -7,15 +7,15 @@ import {
 /** Internal kind label for species heritage dependent choices. */
 export const DEPENDENT_KIND_HERITAGE = DEPENDENT_CHOICE_KINDS.heritage
 
-/** Sheet/manage affordance for species heritage choices. */
-export const MANAGE_HERITAGE_LABEL = formatFieldMessage(
-  characterBuilderDependentChoiceMessages.manageHeritage(),
+/** Sheet and panel affordance for revisiting species heritage choices. */
+export const CHANGE_HERITAGE_LABEL = formatFieldMessage(
+  characterBuilderDependentChoiceMessages.changeHeritage(),
 )
 
 // Future subclass step:
 // export const DEPENDENT_KIND_SUBCLASS = DEPENDENT_CHOICE_KINDS.subclass
-// export const MANAGE_SUBCLASS_LABEL = formatFieldMessage(
-//   characterBuilderDependentChoiceMessages.manageSubclass(),
+// export const CHANGE_SUBCLASS_LABEL = formatFieldMessage(
+//   characterBuilderDependentChoiceMessages.changeSubclass(),
 // )
 
 export type ParentChoiceTitleMetaInput = {

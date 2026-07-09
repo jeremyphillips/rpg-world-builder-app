@@ -122,7 +122,7 @@ from validation issues; see
 `character-builder-dependent-choice-messages.ts`) — inline parent→dependent workflow
 copy for species heritage and future subclass steps. Ids use
 `validation.characterBuilder.dependentChoice.*` (e.g. `requiredStatus`, `helperText`,
-`manageHeritage`, `parentChoiceRequired`, `optionSelected`). Domain kinds live in
+`changeHeritage`, `parentChoiceRequired`, `optionSelected`). Domain kinds live in
 `DEPENDENT_CHOICE_KINDS` (`heritage`, `subclass`). Dashboard formatters in
 `builder-parent-choice-status.lib.ts` and `builder-dependent-choice.lib.ts` call
 `formatFieldMessage(...)` — see

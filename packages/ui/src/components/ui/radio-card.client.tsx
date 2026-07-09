@@ -15,6 +15,7 @@ import {
   radioCardDetailsInlineSlotVariants,
   radioCardDetailsLinkVariants,
   radioCardEmbeddedSlotVariants,
+  radioCardGroupGapVariants,
   radioCardIndicatorVariants,
   radioCardItemWithDetailsVariants,
   radioCardMetaListVariants,
@@ -35,6 +36,10 @@ export const RADIO_CARD_SUMMARY_SEPARATOR = ' · '
 
 export type RadioCardDensity = 'default' | 'compact'
 
+export type RadioCardVariant = 'card' | 'row'
+
+export type RadioCardEmbeddedSlotTone = 'divider' | 'panel'
+
 export interface RadioCardOption {
   label: string
   value: string
@@ -51,6 +56,8 @@ export interface RadioCardOption {
   summaryLines?: string[]
   /** Rendered inside the card shell when this option is selected (e.g. dependent-choice flow). */
   embeddedContent?: React.ReactNode
+  /** Visual treatment for the embedded region below the primary card row. */
+  embeddedSlotTone?: RadioCardEmbeddedSlotTone
   onDetails?: () => void
   detailsLabel?: string
 }
@@ -66,6 +73,7 @@ export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
   summaryItems?: string[]
   summaryLines?: string[]
   density?: RadioCardDensity
+  variant?: RadioCardVariant
   /** Horizontal placement of the decorative radio control within the card. */
   controlPosition?: 'left' | 'right'
 }
@@ -88,6 +96,7 @@ type RadioCardItemContentProps = Pick<
   | 'summaryItems'
   | 'summaryLines'
   | 'density'
+  | 'variant'
   | 'controlPosition'
 >
 
@@ -114,11 +123,22 @@ function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
   )
 }
 
-function RadioCardControl({ className }: { className?: string }) {
+function RadioCardControl({
+  className,
+  variant = 'card',
+}: {
+  className?: string
+  variant?: RadioCardVariant
+}) {
   return (
-    <span className={cn(radioCardControlVariants(), 'mt-0.5', className)} aria-hidden="true">
+    <span
+      className={cn(radioCardControlVariants({ variant }), 'mt-0.5', className)}
+      aria-hidden="true"
+    >
       <span className={radioCardIndicatorVariants()}>
-        <Circle className="size-3 fill-primary text-primary" />
+        <Circle
+          className={cn('fill-primary text-primary', variant === 'row' ? 'size-2.5' : 'size-3')}
+        />
       </span>
     </span>
   )
@@ -196,6 +216,7 @@ function RadioCardItemContent({
   summaryItems,
   summaryLines,
   density = 'default',
+  variant = 'card',
   controlPosition = 'left',
 }: RadioCardItemContentProps) {
   const isCompact = density === 'compact'
@@ -206,7 +227,7 @@ function RadioCardItemContent({
 
   return (
     <div className={radioCardRootLayoutVariants({ controlPosition, density })}>
-      <RadioCardControl />
+      <RadioCardControl variant={variant} />
       <div className={radioCardBodyVariants({ density })}>
         <RadioCardTitleRowContent label={label} titleMeta={titleMeta} badge={badge} />
         <RadioCardSecondaryContent
@@ -236,6 +257,7 @@ const RadioCardItem = React.forwardRef<
       summaryItems,
       summaryLines,
       density = 'default',
+      variant = 'card',
       controlPosition = 'left',
       disabled,
       ...props
@@ -245,7 +267,7 @@ const RadioCardItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       disabled={disabled}
-      className={cn(radioCardVariants({ density }), className)}
+      className={cn(radioCardVariants({ density, variant }), className)}
       {...props}
     >
       <RadioCardItemContent
@@ -257,6 +279,7 @@ const RadioCardItem = React.forwardRef<
         summaryItems={summaryItems}
         summaryLines={summaryLines}
         density={density}
+        variant={variant}
         controlPosition={controlPosition}
       />
     </RadioGroupPrimitive.Item>
@@ -292,7 +315,7 @@ function RadioCardOptionWithDetails({
           disabled={option.disabled}
           className={cn(radioCardItemWithDetailsVariants(), 'group')}
         >
-          <RadioCardControl className="col-start-1 row-start-1" />
+          <RadioCardControl variant="card" className="col-start-1 row-start-1" />
           <div
             className={cn(radioCardBodyVariants({ density }), 'col-start-2 row-start-1 min-w-0')}
           >
@@ -313,7 +336,14 @@ function RadioCardOptionWithDetails({
         </div>
       </div>
       {selected && option.embeddedContent ? (
-        <div className={radioCardEmbeddedSlotVariants({ density })}>{option.embeddedContent}</div>
+        <div
+          className={radioCardEmbeddedSlotVariants({
+            density,
+            tone: option.embeddedSlotTone ?? 'divider',
+          })}
+        >
+          {option.embeddedContent}
+        </div>
       ) : null}
     </div>
   )
@@ -325,6 +355,7 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<
   options: RadioCardOption[]
   /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
+  variant?: RadioCardVariant
   density?: RadioCardDensity
   /** Horizontal placement of the decorative radio control within each card. */
   controlPosition?: 'left' | 'right'
@@ -338,13 +369,18 @@ function RadioCard({
   className,
   options,
   idPrefix = 'radio-card',
+  variant = 'card',
   density = 'default',
   controlPosition = 'left',
   value,
   ...props
 }: RadioCardProps) {
   return (
-    <RadioGroup className={cn('grid gap-3', className)} value={value} {...props}>
+    <RadioGroup
+      className={cn(radioCardGroupGapVariants({ variant }), className)}
+      value={value}
+      {...props}
+    >
       {options.map((option) => {
         if (option.onDetails) {
           return (
@@ -372,6 +408,7 @@ function RadioCard({
             summaryItems={option.summaryItems}
             summaryLines={option.summaryLines}
             density={density}
+            variant={variant}
             controlPosition={controlPosition}
           />
         )

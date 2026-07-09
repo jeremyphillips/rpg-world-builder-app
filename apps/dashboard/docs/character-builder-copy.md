@@ -13,7 +13,7 @@ Rules vocabulary (layer 1): [vocabulary.md](../../../docs/vocabulary.md).
 | --------------------------- | ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
 | **1 — Rules vocabulary**    | Campaign-customizable reference option sets | Creature type, language labels                               | `docs/vocabulary.md`, `features/homebrew/lib/vocabulary/`     |
 | **2 — Content / ChoiceSet** | DM-authored rules-facing names              | `Elven Lineage`, `Giant Ancestry`, `Drow`                    | Catalog → `resolve*ChoiceSets()`                              |
-| **3 — Builder UI copy**     | Workflow chrome (status, helpers, manage)   | `Heritage required`, `Manage heritage`, `Choose one option.` | `characterBuilderDependentChoiceMessages` in `@rpg/contracts` |
+| **3 — Builder UI copy**     | Workflow chrome (status, helpers, change)   | `Heritage required`, `Change heritage`, `Choose one option.` | `characterBuilderDependentChoiceMessages` in `@rpg/contracts` |
 
 **Display vocabulary** (grant summaries, stat rows) is a fourth _resolution_ concern —
 `GrantDisplayVocabulary`, `buildSpellGrantVocabulary`, `getCreatureTypeLabel` — not a
@@ -40,9 +40,9 @@ When adding a string:
 | ----------------------- | ---------------------------------------- | ----------------- |
 | Parent card `titleMeta` | `Heritage required`                      | `Drow heritage`   |
 | Section heading         | `Elven Lineage` (from `choiceSet.label`) | same              |
-| Section status          | `Required`                               | `Drow selected`   |
+| Section status          | `Required`                               | `Selected: Drow`  |
 | Section helper          | `Choose one option.`                     | _(none)_          |
-| Sheet affordance        | —                                        | `Manage heritage` |
+| Panel affordance        | —                                        | `Change heritage` |
 
 Catalog: `characterBuilderDependentChoiceMessages` in
 `packages/contracts/src/rpg/runtime/character-builder/character-builder-dependent-choice-messages.ts`.

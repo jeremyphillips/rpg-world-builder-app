@@ -7,9 +7,9 @@ import {
 } from '@rpg/contracts'
 
 import {
+  CHANGE_HERITAGE_LABEL,
   DEPENDENT_KIND_HERITAGE,
   formatParentChoiceTitleMeta,
-  MANAGE_HERITAGE_LABEL,
 } from './builder-parent-choice-status.lib'
 
 describe('builder-parent-choice-status.lib', () => {
@@ -45,9 +45,9 @@ describe('builder-parent-choice-status.lib', () => {
     )
   })
 
-  it('exports explicit manage label from contracts messages', () => {
-    expect(MANAGE_HERITAGE_LABEL).toBe(
-      formatFieldMessage(characterBuilderDependentChoiceMessages.manageHeritage()),
+  it('exports explicit change label from contracts messages', () => {
+    expect(CHANGE_HERITAGE_LABEL).toBe(
+      formatFieldMessage(characterBuilderDependentChoiceMessages.changeHeritage()),
     )
   })
 })
