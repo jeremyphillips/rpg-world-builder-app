@@ -6,9 +6,10 @@ import {
   type AbilityRecommendation,
   type Ability,
 } from '@rpg/contracts'
-import { Badge } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import {
+  abilityRecommendationBadgePrimaryClasses,
   abilityRecommendationBadgeSecondaryClasses,
   abilityRecommendationBadgeSlotClasses,
 } from './ability-recommendation.variants'
@@ -18,7 +19,7 @@ export type AbilityScoreCardBadgeProps = {
   recommendation: AbilityRecommendation | null
 }
 
-/** Compact reserved badge slot above ability cards; empty space when not recommended. */
+/** Compact reserved label slot above ability cards; empty space when not recommended. */
 export function AbilityScoreCardBadge({ ability, recommendation }: AbilityScoreCardBadgeProps) {
   const isPrimary = recommendation?.primary.includes(ability) ?? false
   const isSecondary = recommendation?.secondary.includes(ability) ?? false
@@ -26,14 +27,14 @@ export function AbilityScoreCardBadge({ ability, recommendation }: AbilityScoreC
   return (
     <div className={abilityRecommendationBadgeSlotClasses} aria-hidden={!isPrimary && !isSecondary}>
       {isPrimary ? (
-        <Badge size="sm" variant="secondary">
+        <Text as="span" className={abilityRecommendationBadgePrimaryClasses}>
           {formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgePrimary())}
-        </Badge>
+        </Text>
       ) : null}
       {isSecondary ? (
-        <Badge size="sm" variant="outline" className={abilityRecommendationBadgeSecondaryClasses}>
+        <Text as="span" className={abilityRecommendationBadgeSecondaryClasses}>
           {formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgeSecondary())}
-        </Badge>
+        </Text>
       ) : null}
     </div>
   )

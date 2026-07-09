@@ -16,6 +16,7 @@ import {
   abilitiesFormValuesToDraft,
   areAbilitiesDraftsEqual,
 } from '../../lib/steps/abilities-form-values'
+import { AbilitiesScoreFieldRegistry } from './abilities-score-field-registry.client'
 
 type AbilitiesDraftSyncProps = {
   context: CharacterBuildContext
@@ -32,28 +33,23 @@ export function AbilitiesDraftSync({
   draftAbilities,
   onDraftChange,
 }: AbilitiesDraftSyncProps) {
-  const { control, reset } = useFormContext<AbilitiesFormValues>()
-  const str = useWatch({ control, name: 'str' })
-  const dex = useWatch({ control, name: 'dex' })
-  const con = useWatch({ control, name: 'con' })
-  const intScore = useWatch({ control, name: 'int' })
-  const wis = useWatch({ control, name: 'wis' })
-  const cha = useWatch({ control, name: 'cha' })
+  const { control, getValues, reset } = useFormContext<AbilitiesFormValues>()
+  const watchedValues = useWatch({ control }) as AbilitiesFormValues | undefined
   const onDraftChangeRef = useRef(onDraftChange)
   const priorDraftRef = useRef(draftAbilities)
+  const draftAbilitiesRef = useRef(draftAbilities)
   const resolvedMethod = resolveAbilityGenerationMethod(
     context.characterCreationRules.abilityGeneration,
   )
 
   onDraftChangeRef.current = onDraftChange
+  draftAbilitiesRef.current = draftAbilities
 
   useEffect(() => {
     const previousDraft = priorDraftRef.current
     const draftChanged = !areAbilitiesDraftsEqual(previousDraft, draftAbilities)
-    const formAbilities = abilitiesFormValuesToDraft(
-      { str, dex, con, int: intScore, wis, cha },
-      resolvedMethod,
-    )
+    const formValues = watchedValues ?? getValues()
+    const formAbilities = abilitiesFormValuesToDraft(formValues, resolvedMethod)
 
     if (draftChanged) {
       priorDraftRef.current = draftAbilities
@@ -66,7 +62,15 @@ export function AbilitiesDraftSync({
     if (!areAbilitiesDraftsEqual(draftAbilities, formAbilities)) {
       onDraftChangeRef.current({ abilities: formAbilities })
     }
-  }, [cha, con, dex, draftAbilities, intScore, reset, resolvedMethod, str, wis])
+  }, [draftAbilities, getValues, reset, resolvedMethod, watchedValues])
 
-  return null
+  useEffect(() => {
+    return () => {
+      const formAbilities = abilitiesFormValuesToDraft(getValues(), resolvedMethod)
+      if (areAbilitiesDraftsEqual(draftAbilitiesRef.current, formAbilities)) return
+      onDraftChangeRef.current({ abilities: formAbilities })
+    }
+  }, [getValues, resolvedMethod])
+
+  return <AbilitiesScoreFieldRegistry />
 }

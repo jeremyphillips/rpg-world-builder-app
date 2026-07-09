@@ -7,6 +7,7 @@ export const abilitiesFormCopy = {
   availableScores: 'Available scores',
   dropScoreHere: 'Drop score here',
   chooseScore: 'Choose score',
+  changeScore: 'Change score',
   emptyScore: '—',
   emptyModifier: '—',
   scoresRemaining: (count: number) =>

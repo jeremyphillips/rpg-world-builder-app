@@ -4,8 +4,10 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import {
+  characterBuilderValidationMessages,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  formatFieldMessage,
   getCharacterBuilderStorageKey,
 } from '@rpg/contracts'
 
@@ -129,6 +131,9 @@ describe('CharacterBuilderShell', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+    )
     expect(screen.getByRole('heading', { name: 'Abilities', level: 2 })).toBeInTheDocument()
     expect(
       within(stepRail).getByRole('button', { name: /Abilities, has blocking validation issues/i }),
@@ -158,5 +163,33 @@ describe('CharacterBuilderShell', () => {
     await waitFor(() => {
       expect(screen.getByLabelText('Strength score 15')).toBeInTheDocument()
     })
+  })
+
+  it('clears the step alert and rail error when a failed step becomes valid', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('heading', { name: 'Identity' })
+    const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.nameRequired()),
+    )
+    expect(
+      within(stepRail).getByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText(/Character name/i), 'Verna')
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+    expect(
+      within(stepRail).queryByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).not.toBeInTheDocument()
   })
 })

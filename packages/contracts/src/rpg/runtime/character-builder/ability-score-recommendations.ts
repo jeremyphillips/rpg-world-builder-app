@@ -1,4 +1,6 @@
 import { getAbilityLabel, type Ability } from '../../vocab/ability'
+
+import { findAbilityAssignedToScore } from './ability-generation'
 import { pluralizeTermLabel } from '../../vocab/types'
 
 import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
@@ -123,7 +125,7 @@ export function formatAbilityRecommendationSuggestedInline(
   })
 }
 
-/** True when every suggested pair matches and no other abilities are assigned. */
+/** True when every suggested pair matches current assignments (extra abilities are allowed). */
 export function isSuggestedAssignmentSatisfied(
   currentScores: Partial<Record<Ability, number>>,
   suggestedAssignment: Partial<Record<Ability, number>>,
@@ -137,17 +139,10 @@ export function isSuggestedAssignmentSatisfied(
     }
   }
 
-  for (const [ability, currentScore] of Object.entries(currentScores) as [Ability, number][]) {
-    if (currentScore === undefined) continue
-    if (suggestedAssignment[ability] === undefined) {
-      return false
-    }
-  }
-
   return true
 }
 
-/** True when applying the suggestion would clear or overwrite any existing assignment. */
+/** True when applying the suggestion would overwrite or relocate an existing assignment. */
 export function willSuggestedAssignmentReplaceExisting(
   currentScores: Partial<Record<Ability, number>>,
   suggestedAssignment: Partial<Record<Ability, number>>,
@@ -160,11 +155,8 @@ export function willSuggestedAssignmentReplaceExisting(
     if (currentScore !== undefined && currentScore !== suggestedScore) {
       return true
     }
-  }
 
-  for (const [ability, currentScore] of Object.entries(currentScores) as [Ability, number][]) {
-    if (currentScore === undefined) continue
-    if (suggestedAssignment[ability] === undefined) {
+    if (findAbilityAssignedToScore(currentScores, suggestedScore, ability) !== undefined) {
       return true
     }
   }
@@ -190,9 +182,30 @@ export function resolveSuggestedAssignmentActionState(
   return 'unapplied'
 }
 
-/** Builds scores after Apply/Replace: suggested pairs only, others cleared. */
-export function scoresFromSuggestedAssignment(
+/**
+ * Merges suggested pairs into current scores. Each suggested ability receives its
+ * score; displaced scores return to the pool. Abilities outside the suggestion are
+ * left unchanged.
+ */
+export function mergeSuggestedAssignmentIntoScores(
+  currentScores: Partial<Record<Ability, number>>,
   suggestedAssignment: Partial<Record<Ability, number>>,
 ): Partial<Record<Ability, number>> {
-  return { ...suggestedAssignment }
+  const next = { ...currentScores }
+
+  for (const [ability, suggestedScore] of Object.entries(suggestedAssignment) as [
+    Ability,
+    number,
+  ][]) {
+    if (next[ability] === suggestedScore) continue
+
+    const holder = findAbilityAssignedToScore(next, suggestedScore, ability)
+    if (holder) {
+      delete next[holder]
+    }
+
+    next[ability] = suggestedScore
+  }
+
+  return next
 }

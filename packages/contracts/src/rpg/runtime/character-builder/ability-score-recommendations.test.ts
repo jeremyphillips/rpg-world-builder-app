@@ -7,8 +7,8 @@ import {
   formatAbilityRecommendationBenefit,
   formatAbilityRecommendationSuggestedInline,
   isSuggestedAssignmentSatisfied,
+  mergeSuggestedAssignmentIntoScores,
   resolveSuggestedAssignmentActionState,
-  scoresFromSuggestedAssignment,
   willSuggestedAssignmentReplaceExisting,
 } from './ability-score-recommendations'
 
@@ -111,8 +111,8 @@ describe('isSuggestedAssignmentSatisfied', () => {
     expect(isSuggestedAssignmentSatisfied({ str: 15, dex: 14 }, suggestion)).toBe(true)
   })
 
-  it('returns false when an extra ability is assigned', () => {
-    expect(isSuggestedAssignmentSatisfied({ str: 15, dex: 14, cha: 8 }, suggestion)).toBe(false)
+  it('returns true when suggested pairs match even when extra abilities are assigned', () => {
+    expect(isSuggestedAssignmentSatisfied({ str: 15, dex: 14, cha: 8 }, suggestion)).toBe(true)
   })
 
   it('returns false when a suggested pair does not match', () => {
@@ -133,10 +133,16 @@ describe('resolveSuggestedAssignmentActionState', () => {
     expect(resolveSuggestedAssignmentActionState({}, suggestion)).toBe('unapplied')
   })
 
-  it('returns wouldReplace when applying would overwrite or clear assignments', () => {
+  it('returns wouldReplace when applying would overwrite or relocate assignments', () => {
     expect(resolveSuggestedAssignmentActionState({ cha: 15 }, suggestion)).toBe('wouldReplace')
     expect(resolveSuggestedAssignmentActionState({ str: 13, dex: 14 }, suggestion)).toBe(
       'wouldReplace',
+    )
+  })
+
+  it('returns unapplied when extra assignments do not conflict with the suggestion', () => {
+    expect(resolveSuggestedAssignmentActionState({ wis: 10, con: 13 }, suggestion)).toBe(
+      'unapplied',
     )
   })
 })
@@ -156,14 +162,43 @@ describe('willSuggestedAssignmentReplaceExisting', () => {
     expect(willSuggestedAssignmentReplaceExisting({ str: 13, dex: 14 }, suggestion)).toBe(true)
   })
 
-  it('returns true when a non-suggested ability has a score', () => {
+  it('returns false when extra non-suggested abilities are assigned', () => {
+    expect(willSuggestedAssignmentReplaceExisting({ wis: 10, con: 13 }, suggestion)).toBe(false)
+  })
+
+  it('returns true when a non-suggested ability holds a score needed by the suggestion', () => {
     expect(willSuggestedAssignmentReplaceExisting({ cha: 15 }, suggestion)).toBe(true)
   })
 })
 
-describe('scoresFromSuggestedAssignment', () => {
-  it('returns only the suggested pairs', () => {
-    expect(scoresFromSuggestedAssignment({ str: 15, dex: 14 })).toEqual({
+describe('mergeSuggestedAssignmentIntoScores', () => {
+  const suggestion = { str: 15, dex: 14 } as const
+
+  it('assigns suggested pairs on an empty board', () => {
+    expect(mergeSuggestedAssignmentIntoScores({}, suggestion)).toEqual({
+      str: 15,
+      dex: 14,
+    })
+  })
+
+  it('preserves assignments outside the suggestion', () => {
+    expect(mergeSuggestedAssignmentIntoScores({ wis: 10, con: 13 }, suggestion)).toEqual({
+      str: 15,
+      dex: 14,
+      wis: 10,
+      con: 13,
+    })
+  })
+
+  it('returns a displaced score to the pool when the target ability already had one', () => {
+    expect(mergeSuggestedAssignmentIntoScores({ wis: 8, str: 13 }, { wis: 15 })).toEqual({
+      wis: 15,
+      str: 13,
+    })
+  })
+
+  it('relocates a score token when it is already assigned elsewhere', () => {
+    expect(mergeSuggestedAssignmentIntoScores({ cha: 15 }, suggestion)).toEqual({
       str: 15,
       dex: 14,
     })

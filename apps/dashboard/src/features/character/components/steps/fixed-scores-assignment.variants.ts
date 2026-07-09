@@ -6,9 +6,9 @@ export const fixedScoresTokenPoolSectionClasses = 'space-y-2'
 
 /** Dashed container for unassigned score tokens — expandable token set. */
 export const fixedScoresScorePoolContainerClasses =
-  'flex flex-col gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted/20 p-4 transition-colors'
+  'flex flex-col gap-2 rounded-md border border-dashed border-muted-foreground/20 bg-muted/5 p-4 transition-colors'
 
-export const fixedScoresScorePoolContainerDragOverClasses = 'border-primary/50 bg-muted/30'
+export const fixedScoresScorePoolContainerDragOverClasses = 'border-primary/50 bg-muted/10'
 
 export const fixedScoresScorePoolContainerTokensClasses =
   'flex min-h-16 flex-wrap items-center gap-3'
@@ -54,4 +54,5 @@ export const abilityScoreCardChooseScoreSectionClasses = 'flex w-full justify-ce
 export const abilityScoreCardModifierClasses =
   'text-sm font-medium tabular-nums text-muted-foreground'
 
-export const abilityScoreCardChooseScoreClasses = 'h-auto p-0 text-xs font-normal'
+export const abilityScoreCardChooseScoreClasses =
+  'h-auto p-0 text-xs font-normal text-muted-foreground'

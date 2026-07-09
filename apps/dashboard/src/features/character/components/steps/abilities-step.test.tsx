@@ -5,6 +5,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   createEmptyCharacterBuilderDraft,
   characterBuilderAbilityRecommendationMessages,
+  characterBuilderValidationMessages,
   formatFieldMessage,
 } from '@rpg/contracts'
 
@@ -107,8 +108,11 @@ describe('AbilitiesStep', () => {
       />,
     )
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Complete this step before continuing.')
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+    )
     expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
+    expect(screen.getByRole('alert').textContent).not.toMatch(/\{"f":/)
   })
 
   it('has no axe accessibility violations', async () => {

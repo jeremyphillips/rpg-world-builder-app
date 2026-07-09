@@ -74,9 +74,12 @@ function getScorePoolSection() {
   return screen.getByRole('region', { name: abilitiesFormCopy.availableScores })
 }
 
-function getChooseScoreButton(abilityLabel: string) {
+function getScoreActionButton(
+  abilityLabel: string,
+  actionLabel: string = abilitiesFormCopy.chooseScore,
+) {
   return screen.getByRole('button', {
-    name: new RegExp(`${abilitiesFormCopy.chooseScore} for ${abilityLabel}`, 'i'),
+    name: new RegExp(`${actionLabel} for ${abilityLabel}`, 'i'),
   })
 }
 
@@ -111,7 +114,7 @@ describe('FixedScoresAssignment', () => {
   it('assigns a score via choose score, updates the pool, and shows the modifier', async () => {
     renderAssignment()
 
-    await userEvent.click(getChooseScoreButton('Strength'))
+    await userEvent.click(getScoreActionButton('Strength'))
     await userEvent.click(screen.getByRole('menuitem', { name: '15' }))
 
     await waitFor(() => {
@@ -125,7 +128,7 @@ describe('FixedScoresAssignment', () => {
   it('disables scores already assigned to another ability in choose score', async () => {
     renderAssignment({ str: 15 })
 
-    await userEvent.click(getChooseScoreButton('Dexterity'))
+    await userEvent.click(getScoreActionButton('Dexterity'))
     expect(screen.getByRole('menuitem', { name: '15 — assigned to STR' })).toHaveAttribute(
       'aria-disabled',
       'true',
@@ -135,7 +138,7 @@ describe('FixedScoresAssignment', () => {
   it('clears an assigned score and restores the pool via choose score', async () => {
     renderAssignment({ str: 15, dex: 14 })
 
-    await userEvent.click(getChooseScoreButton('Strength'))
+    await userEvent.click(getScoreActionButton('Strength', abilitiesFormCopy.changeScore))
     await userEvent.click(screen.getByRole('menuitem', { name: '—' }))
 
     await waitFor(() => {
@@ -173,8 +176,15 @@ describe('FixedScoresAssignment', () => {
       'Wisdom',
       'Charisma',
     ]) {
-      expect(getChooseScoreButton(label)).toBeVisible()
+      expect(getScoreActionButton(label)).toBeVisible()
     }
+  })
+
+  it('shows change score when an ability already has a value', () => {
+    renderAssignment({ str: 15 })
+
+    expect(getScoreActionButton('Strength', abilitiesFormCopy.changeScore)).toBeVisible()
+    expect(getScoreActionButton('Dexterity')).toBeVisible()
   })
 
   it('renders drop placeholders without grab affordance on empty cards', () => {
@@ -259,8 +269,8 @@ describe('FixedScoresAssignment', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('applies suggestions and clears non-suggested assignments', async () => {
-    renderAssignment({ cha: 15 }, fighterRecommendation)
+  it('applies suggestions while preserving unrelated assignments', async () => {
+    renderAssignment({ cha: 15, wis: 10 }, fighterRecommendation)
 
     await userEvent.click(
       screen.getByRole('button', {
@@ -271,6 +281,7 @@ describe('FixedScoresAssignment', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Strength score 15' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Dexterity score 14' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Wisdom score 10' })).toBeInTheDocument()
     })
 
     expect(screen.queryByRole('button', { name: /Charisma score/ })).not.toBeInTheDocument()

@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 import {
-  characterBuilderValidationMessages,
   deriveAbilityScoreRecommendations,
   resolveAbilityGenerationMethod,
   type CharacterBuildContext,
@@ -125,11 +124,7 @@ export function AbilitiesStep({
   )
 
   return (
-    <BuilderStepFrame
-      stepId="abilities"
-      validationIssues={validationIssues}
-      validationHeading={characterBuilderValidationMessages.stepIncomplete()}
-    >
+    <BuilderStepFrame stepId="abilities" validationIssues={validationIssues}>
       <Form
         id={BUILDER_STEP_FORM_IDS.abilities}
         schema={abilitiesFormSchema}

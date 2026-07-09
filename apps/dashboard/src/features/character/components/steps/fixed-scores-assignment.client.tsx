@@ -21,7 +21,7 @@ import {
   getAbilityGenerationMethodAssignmentDescription,
   getAbilityGenerationMethodDisplayName,
   getAvailableStandardArrayScores,
-  scoresFromSuggestedAssignment,
+  mergeSuggestedAssignmentIntoScores,
   type Ability,
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
@@ -136,6 +136,11 @@ function ChooseScoreMenu({
 }) {
   const entry = ABILITY_ENTRIES[ability]
   const options = getScoreOptionsForAbility(ability, scores, scorePool)
+  const assignedScore = scores[ability]
+  const actionLabel =
+    typeof assignedScore === 'number'
+      ? abilitiesFormCopy.changeScore
+      : abilitiesFormCopy.chooseScore
 
   return (
     <DropdownMenu>
@@ -145,9 +150,9 @@ function ChooseScoreMenu({
           variant="link"
           size="sm"
           className={abilityScoreCardChooseScoreClasses}
-          aria-label={`${abilitiesFormCopy.chooseScore} for ${entry.label}`}
+          aria-label={`${actionLabel} for ${entry.label}`}
         >
-          {abilitiesFormCopy.chooseScore}
+          {actionLabel}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center">
@@ -424,9 +429,9 @@ export function FixedScoresAssignment({
 
   const handleApplySuggestions = useCallback(
     (suggestedAssignment: Partial<Record<Ability, number>>) => {
-      syncScoresToForm(scoresFromSuggestedAssignment(suggestedAssignment))
+      syncScoresToForm(mergeSuggestedAssignmentIntoScores(scores, suggestedAssignment))
     },
-    [syncScoresToForm],
+    [scores, syncScoresToForm],
   )
 
   const overlayScore =
@@ -448,14 +453,6 @@ export function FixedScoresAssignment({
           </Text>
         ) : null}
       </div>
-
-      <AbilityRecommendationPanel
-        classInput={classInput}
-        recommendation={recommendation}
-        currentScores={scores}
-        showSuggestedAssignment
-        onApplySuggestions={handleApplySuggestions}
-      />
 
       <DndContext
         sensors={sensors}
@@ -500,6 +497,14 @@ export function FixedScoresAssignment({
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      <AbilityRecommendationPanel
+        classInput={classInput}
+        recommendation={recommendation}
+        currentScores={scores}
+        showSuggestedAssignment
+        onApplySuggestions={handleApplySuggestions}
+      />
     </div>
   )
 }

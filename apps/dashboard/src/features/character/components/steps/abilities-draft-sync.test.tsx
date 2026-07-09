@@ -154,4 +154,34 @@ describe('AbilitiesDraftSync', () => {
       expect(onDraftChange).not.toHaveBeenCalled()
     })
   })
+
+  it('flushes score edits to the draft when the step unmounts', async () => {
+    const onDraftChange = vi.fn()
+    const draft = createEmptyCharacterBuilderDraft()
+
+    const { unmount } = render(
+      <AbilitiesStep
+        context={context}
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    await assignStrengthScore(15)
+    onDraftChange.mockClear()
+
+    unmount()
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        abilities: expect.objectContaining({
+          method: 'standard-array',
+          scores: expect.objectContaining({ str: 15 }),
+        }),
+      }),
+    )
+  })
 })

@@ -137,12 +137,6 @@ export function ManualAbilitiesAssignment({
         </Text>
       </div>
 
-      <AbilityRecommendationPanel
-        classInput={classInput}
-        recommendation={recommendation}
-        currentScores={scores}
-      />
-
       <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
         {ABILITY_IDS.map((ability) => (
           <ManualAbilityScoreCard
@@ -155,6 +149,12 @@ export function ManualAbilitiesAssignment({
           />
         ))}
       </div>
+
+      <AbilityRecommendationPanel
+        classInput={classInput}
+        recommendation={recommendation}
+        currentScores={scores}
+      />
     </div>
   )
 }
