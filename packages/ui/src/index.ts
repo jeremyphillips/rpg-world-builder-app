@@ -322,6 +322,25 @@ export {
 } from './components/ui/builder-option-details-sheet.client'
 export type { BuilderOptionPrimaryActionPlacement } from './components/ui/builder-option-details-sheet.variants'
 export {
+  CollapsibleListItem,
+  CollapsibleListItemActions,
+  CollapsibleListItemBody,
+  CollapsibleListItemCollapseButton,
+  CollapsibleListItemDragHandle,
+  CollapsibleListItemShell,
+  CollapsibleListItemToolbar,
+  collapsibleListItemBodyClasses,
+  type CollapsibleListItemActionsProps,
+  type CollapsibleListItemBodyProps,
+  type CollapsibleListItemCollapseButtonProps,
+  type CollapsibleListItemDragHandleConfig,
+  type CollapsibleListItemDragHandleProps,
+  type CollapsibleListItemProps,
+  type CollapsibleListItemShellProps,
+  type CollapsibleListItemShellTone,
+  type CollapsibleListItemToolbarProps,
+} from './components/ui/collapsible-list-item'
+export {
   CatalogPickerSheet,
   type CatalogPickerSheetProps,
   type CatalogPickerTab,
