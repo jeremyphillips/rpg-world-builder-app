@@ -17,7 +17,16 @@ export {
 
 export type EquipmentPickerItemState = PickerItemStateBase & {
   isProficient: boolean
+  /**
+   * UI shorthand: fits starting budget. When no budget applies, always `true` — budget
+   * gating is inactive, not proof that a comparison ran.
+   */
   isAffordable: boolean
+  /**
+   * Fits remaining budget after purchases. When no budget applies, always `true` — budget
+   * gating is inactive, not proof that a comparison ran.
+   */
+  isWithinRemainingBudget: boolean
   /** Tiered classification; `isRecommended` mirrors Recommended-tab membership (essential/strong). */
   recommendation: EquipmentRecommendation
 }
@@ -29,10 +38,10 @@ export type EquipmentPickerItem = {
 }
 
 /**
- * Stable picker browse ordering: tier → best reason → kind bucket → weapon category → name.
- * Search (`CatalogPickerSheet` / `rankItems`) stays text-score-first; an empty
- * query preserves this order. Kind and weapon-category ranks are tiebreakers only
- * after tier and reason.
+ * Stable picker browse ordering: tier → best reason → starting affordability → kind bucket
+ * → weapon category → name. Search (`CatalogPickerSheet` / `rankItems`) stays
+ * text-score-first; an empty query preserves this order. Kind and weapon-category ranks
+ * are tiebreakers only after tier, reason, and affordability.
  */
 export function compareEquipmentPickerItemsByRecommendation(
   left: EquipmentPickerItem,
@@ -50,6 +59,10 @@ export function compareEquipmentPickerItemsByRecommendation(
     right.state.recommendation.reasons,
   )
   if (leftReasonRank !== rightReasonRank) return leftReasonRank - rightReasonRank
+
+  if (left.state.isAffordable !== right.state.isAffordable) {
+    return left.state.isAffordable ? -1 : 1
+  }
 
   const leftKindRank = getEquipmentRecommendationKindRank(left.equipment)
   const rightKindRank = getEquipmentRecommendationKindRank(right.equipment)

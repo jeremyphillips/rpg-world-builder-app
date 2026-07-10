@@ -11,7 +11,9 @@ import {
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
   getEquipmentPickerBadge,
+  getEquipmentPickerDisabledNote,
   getEquipmentPickerItemTab,
+  isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
@@ -72,14 +74,92 @@ describe('equipment-picker-drawer.lib', () => {
     expect(compatibleRope.state.isRecommended).toBe(false)
   })
 
-  it('filters unaffordable and non-proficient rows', () => {
-    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
-      filterOutUnaffordable: true,
-      filterOutNonProficient: true,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-    })
+  it('filters starting-unaffordable and non-proficient rows', () => {
+    const startingUnaffordable: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[1]!,
+      equipment: {
+        ...equipmentPickerItemsFixture[1]!.equipment,
+        id: 'srd-cc-5.2.1:plate-armor',
+        slug: 'plate-armor',
+        name: 'Plate Armor',
+        cost: { amount: 1500, currency: 'gp' },
+      },
+      state: {
+        ...equipmentPickerItemsFixture[1]!.state,
+        isAffordable: false,
+        isWithinRemainingBudget: false,
+        isProficient: true,
+      },
+    }
+
+    const filtered = filterEquipmentPickerItems(
+      [equipmentPickerItemsFixture[0]!, startingUnaffordable, equipmentPickerItemsFixture[2]!],
+      {
+        filterOutUnaffordable: true,
+        filterOutNonProficient: true,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+      },
+    )
 
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+  })
+
+  it('keeps remaining-unaffordable rows visible but disables purchase', () => {
+    const chainMail = equipmentPickerItemsFixture[1]!
+
+    expect(
+      filterEquipmentPickerItems([chainMail], {
+        filterOutUnaffordable: true,
+        filterOutNonProficient: false,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+      }),
+    ).toHaveLength(1)
+    expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
+    expect(getEquipmentPickerDisabledNote(chainMail, equipmentPickerBudgetFixture)).toBe(
+      'Need 75 GP, you have 40 GP',
+    )
+  })
+
+  it('shows starting-unaffordable rows with filter off but keeps purchase disabled', () => {
+    const startingUnaffordable: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[1]!,
+      equipment: {
+        ...equipmentPickerItemsFixture[1]!.equipment,
+        id: 'srd-cc-5.2.1:plate-armor',
+        slug: 'plate-armor',
+        name: 'Plate Armor',
+        cost: { amount: 1500, currency: 'gp' },
+      },
+      state: {
+        ...equipmentPickerItemsFixture[1]!.state,
+        isAffordable: false,
+        isWithinRemainingBudget: false,
+        isProficient: true,
+      },
+    }
+
+    expect(
+      filterEquipmentPickerItems([startingUnaffordable], {
+        filterOutUnaffordable: false,
+        filterOutNonProficient: false,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+      }),
+    ).toHaveLength(1)
+    expect(isEquipmentPickerItemDisabled(startingUnaffordable)).toBe(true)
+  })
+
+  it('prefers structural disabled reasons over remaining-budget notes', () => {
+    const restricted: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[1]!,
+      state: {
+        ...equipmentPickerItemsFixture[1]!.state,
+        disabledReasons: ['Already selected'],
+      },
+    }
+
+    expect(getEquipmentPickerDisabledNote(restricted, equipmentPickerBudgetFixture)).toBe(
+      'Already selected',
+    )
   })
 
   it('filters rows by selected kind', () => {
@@ -156,6 +236,7 @@ describe('equipment-picker-drawer.lib', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          isWithinRemainingBudget: true,
           recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },
@@ -168,6 +249,7 @@ describe('equipment-picker-drawer.lib', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          isWithinRemainingBudget: true,
           recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },

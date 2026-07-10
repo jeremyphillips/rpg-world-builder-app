@@ -42,6 +42,7 @@ function gear(slug, name, description, cost, weight, gearKind, extra = {}) {
     'druidic_focus',
     'holy_symbol',
     'spellbook',
+    'component_pouch',
   ])
   if (spellcastingSubKinds.has(gearKind)) {
     return base(slug, name, description, cost, weight, 'adventuring_gear', {
@@ -257,7 +258,7 @@ const adventuringGear = [
     'A Component Pouch is watertight and filled with compartments that hold all the free Material components of your spells.',
     gp(25),
     lb(2),
-    'general',
+    'component_pouch',
   ),
   gear(
     'costume',

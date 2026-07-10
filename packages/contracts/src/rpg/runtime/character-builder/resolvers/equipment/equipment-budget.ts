@@ -32,8 +32,16 @@ export {
   wealthToCopper,
 }
 
-/** Returns true when the item cost fits in the remaining budget. */
-export function isEquipmentAffordable(
+/** Returns true when the item cost fits in the starting (package) budget. */
+export function isEquipmentAffordableAtStartingBudget(
+  equipment: Equipment,
+  budget: EquipmentBudgetSummary,
+): boolean {
+  return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
+}
+
+/** Returns true when the item cost fits in the remaining budget after purchases. */
+export function isEquipmentWithinRemainingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {

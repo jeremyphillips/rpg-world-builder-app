@@ -102,6 +102,7 @@ describe('deriveEquipmentBudgetSummary', () => {
       spent: { cp: 0, sp: 0, gp: 3, pp: 0 },
       remaining: { cp: 3, sp: 5, gp: 6, pp: 0 },
     })
+    expect(wealthToCopper(budget!.remaining)).toBeLessThanOrEqual(wealthToCopper(budget!.starting))
   })
 
   it('computes max affordable quantity from remaining budget', () => {

@@ -124,6 +124,19 @@ const spellbook = equipmentSchema.parse({
   spellcastingGearKind: 'spellbook',
 })
 
+const componentPouch = equipmentSchema.parse({
+  ...CONTENT_META,
+  id: `${RULESET}:component-pouch`,
+  slug: 'component-pouch',
+  name: 'Component Pouch',
+  description: '',
+  cost: { amount: 25, currency: 'gp' },
+  weight: { value: 2, unit: 'lb' },
+  kind: 'adventuring_gear',
+  gearKind: 'spellcasting',
+  spellcastingGearKind: 'component_pouch',
+})
+
 const rope = equipmentSchema.parse({
   ...CONTENT_META,
   id: `${RULESET}:rope`,
@@ -376,6 +389,32 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(rope.id)?.tier).toBe('neutral')
   })
 
+  it('applies recommendedGear from spellcasting config as strong', () => {
+    const wizardWithRecommendedGear: ClassStored = {
+      ...storedWizard,
+      spellcasting: {
+        ...storedWizard.spellcasting!,
+        recommendedGear: ['component_pouch'],
+      },
+    }
+    const { catalogIndex, proficiencies } = buildContext(wizardWithRecommendedGear, [
+      componentPouch,
+      rope,
+    ])
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: wizardWithRecommendedGear,
+      catalogIndex,
+      proficiencies,
+    })
+
+    expect(recommendations.get(componentPouch.id)).toMatchObject({
+      tier: 'strong',
+      reasons: ['classSuggested'],
+    })
+    expect(recommendations.get(rope.id)?.tier).toBe('neutral')
+  })
+
   it('ignores authored rules below their minLevel', () => {
     const gatedWizard: ClassStored = {
       ...storedWizard,
@@ -435,7 +474,8 @@ describe('resolveEquipmentPickerItems', () => {
     const chainMailItem = items.find((item) => item.equipment.id === chainMail.id)!
     expect(chainMailItem.state.isAvailable).toBe(true)
     expect(chainMailItem.state.isProficient).toBe(false)
-    expect(chainMailItem.state.isAffordable).toBe(false)
+    expect(chainMailItem.state.isAffordable).toBe(true)
+    expect(chainMailItem.state.isWithinRemainingBudget).toBe(false)
     expect(chainMailItem.state.isRecommended).toBe(false)
     expect(chainMailItem.state.recommendation.tier).toBe('notRecommended')
 

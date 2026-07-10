@@ -86,18 +86,22 @@ export function sortEquipmentPickerItems(
 }
 
 export function isEquipmentPickerItemDisabled(item: EquipmentPickerItem): boolean {
-  return !item.state.isAffordable || item.state.disabledReasons.length > 0
+  return item.state.disabledReasons.length > 0 || !item.state.isWithinRemainingBudget
 }
 
 export function getEquipmentPickerDisabledNote(
   item: EquipmentPickerItem,
   budget?: EquipmentBudgetSummary,
 ): string | undefined {
-  if (!item.state.isAffordable) {
+  if (item.state.disabledReasons.length > 0) {
+    return item.state.disabledReasons[0]
+  }
+
+  if (!item.state.isWithinRemainingBudget) {
     return formatEquipmentUnaffordableReason(item, budget)
   }
 
-  return item.state.disabledReasons[0]
+  return undefined
 }
 
 /**

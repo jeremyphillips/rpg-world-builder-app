@@ -13,7 +13,11 @@ export const SPELLCASTING_FOCUS_GEAR_KINDS = [
   'holy_symbol',
 ] as const
 
-export const SPELLCASTING_GEAR_KINDS = [...SPELLCASTING_FOCUS_GEAR_KINDS, 'spellbook'] as const
+export const SPELLCASTING_GEAR_KINDS = [
+  ...SPELLCASTING_FOCUS_GEAR_KINDS,
+  'spellbook',
+  'component_pouch',
+] as const
 
 export const spellcastingFocusGearKindSchema = z.enum(SPELLCASTING_FOCUS_GEAR_KINDS)
 
@@ -45,6 +49,10 @@ export const SPELLCASTING_GEAR_KIND_ENTRIES = {
   spellbook: {
     label: 'Spellbook',
     description: 'A personal tome used to record and prepare spells, such as a Wizard spellbook.',
+  },
+  component_pouch: {
+    label: 'Component Pouch',
+    description: 'A watertight pouch with compartments for the material components of spells.',
   },
 } as const satisfies Record<SpellcastingGearKind, GameTermEntry>
 

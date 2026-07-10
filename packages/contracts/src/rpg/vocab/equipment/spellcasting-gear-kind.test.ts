@@ -27,6 +27,7 @@ describe('isSpellcastingFocusGearKind', () => {
       expect(isSpellcastingFocusGearKind(kind)).toBe(true)
     }
     expect(isSpellcastingFocusGearKind('spellbook')).toBe(false)
+    expect(isSpellcastingFocusGearKind('component_pouch')).toBe(false)
     expect(isSpellcastingFocusGearKind('general')).toBe(false)
   })
 })

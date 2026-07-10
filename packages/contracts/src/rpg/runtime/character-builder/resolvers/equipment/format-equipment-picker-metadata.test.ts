@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../../content/equipment'
 import { buildEquipmentPickerSearchText } from './format-equipment-picker-metadata'
-import { isEquipmentAffordable, wealthToCopper } from './equipment-budget'
+import {
+  isEquipmentAffordableAtStartingBudget,
+  isEquipmentWithinRemainingBudget,
+  wealthToCopper,
+} from './equipment-budget'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -31,7 +35,7 @@ describe('format-equipment-picker-metadata', () => {
 })
 
 describe('equipment-budget', () => {
-  it('compares affordability using remaining wealth in copper', () => {
+  it('compares starting and remaining affordability separately', () => {
     const budget = {
       starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
       spent: { cp: 0, sp: 0, gp: 60, pp: 0 },
@@ -39,9 +43,13 @@ describe('equipment-budget', () => {
     }
 
     expect(wealthToCopper(budget.remaining)).toBe(4000)
-    expect(isEquipmentAffordable(rope, budget)).toBe(true)
-    expect(isEquipmentAffordable({ ...rope, cost: { amount: 75, currency: 'gp' } }, budget)).toBe(
-      false,
-    )
+    expect(isEquipmentAffordableAtStartingBudget(rope, budget)).toBe(true)
+    expect(isEquipmentWithinRemainingBudget(rope, budget)).toBe(true)
+    const expensive = { ...rope, cost: { amount: 75, currency: 'gp' as const } }
+    expect(isEquipmentAffordableAtStartingBudget(expensive, budget)).toBe(true)
+    expect(isEquipmentWithinRemainingBudget(expensive, budget)).toBe(false)
+    const unaffordableAtStart = { ...rope, cost: { amount: 150, currency: 'gp' as const } }
+    expect(isEquipmentAffordableAtStartingBudget(unaffordableAtStart, budget)).toBe(false)
+    expect(isEquipmentWithinRemainingBudget(unaffordableAtStart, budget)).toBe(false)
   })
 })

@@ -543,7 +543,8 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "general",
+    "gearKind": "spellcasting",
+    "spellcastingGearKind": "component_pouch",
     "weight": {
       "value": 2,
       "unit": "lb"

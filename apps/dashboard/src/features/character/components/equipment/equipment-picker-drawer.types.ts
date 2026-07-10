@@ -50,6 +50,7 @@ export type EquipmentPickerDrawerProps = {
   budget?: EquipmentBudgetSummary
   defaultTab?: typeof EQUIPMENT_PICKER_TAB_RECOMMENDED | typeof EQUIPMENT_PICKER_TAB_ALL
   allowedKinds?: readonly EquipmentPickerSupportedKind[]
+  /** Hides rows whose cost exceeds the starting (package) budget. */
   filterOutUnaffordable?: boolean
   filterOutNonProficient?: boolean
   showCharacterPreview?: boolean

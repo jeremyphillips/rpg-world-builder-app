@@ -33,6 +33,10 @@ function makeEquipment(
 function makePickerItem(
   equipment: Equipment,
   recommendation: EquipmentPickerItem['state']['recommendation'],
+  affordability: Pick<EquipmentPickerItem['state'], 'isAffordable' | 'isWithinRemainingBudget'> = {
+    isAffordable: true,
+    isWithinRemainingBudget: true,
+  },
 ): EquipmentPickerItem {
   return {
     equipment,
@@ -41,7 +45,7 @@ function makePickerItem(
       isAvailable: true,
       isRecommended: recommendation.tier === 'essential' || recommendation.tier === 'strong',
       isProficient: true,
-      isAffordable: true,
+      ...affordability,
       recommendation,
       disabledReasons: [],
     },
@@ -238,7 +242,8 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         slug: 'component-pouch',
         name: 'Component Pouch',
         kind: 'adventuring_gear',
-        gearKind: 'general',
+        gearKind: 'spellcasting',
+        spellcastingGearKind: 'component_pouch',
       }),
       { tier: 'essential', reasons: ['classSuggested'] },
     )
@@ -352,6 +357,35 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(reasoned, noReasons)).toBeLessThan(0)
+  })
+
+  it('orders starting-affordable rows above starting-unaffordable within the same tier and reason', () => {
+    const affordable = makePickerItem(
+      makeEquipment({
+        id: 'test:staff',
+        slug: 'staff',
+        name: 'Staff',
+        kind: 'adventuring_gear',
+        gearKind: 'spellcasting',
+        spellcastingGearKind: 'arcane_focus',
+      }),
+      { tier: 'essential', reasons: ['spellcastingFocus'] },
+      { isAffordable: true, isWithinRemainingBudget: true },
+    )
+    const unaffordable = makePickerItem(
+      makeEquipment({
+        id: 'test:orb',
+        slug: 'orb',
+        name: 'Orb',
+        kind: 'adventuring_gear',
+        gearKind: 'spellcasting',
+        spellcastingGearKind: 'arcane_focus',
+      }),
+      { tier: 'essential', reasons: ['spellcastingFocus'] },
+      { isAffordable: false, isWithinRemainingBudget: false },
+    )
+
+    expect(compareEquipmentPickerItemsByRecommendation(affordable, unaffordable)).toBeLessThan(0)
   })
 
   it('breaks final ties with base localeCompare on name', () => {
