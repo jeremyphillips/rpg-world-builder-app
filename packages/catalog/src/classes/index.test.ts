@@ -731,6 +731,45 @@ describe('SRD 5.2.1 class seed', () => {
     })
   })
 
+  it('Monk stores one artisan-or-instrument tool proficiency choice', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    expect(monk.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: "Artisan's Tools or Musical Instrument",
+      choose: 1,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['artisan', 'musical_instrument'],
+      },
+    })
+  })
+
+  it('Monk tool pool resolves to artisan and musical-instrument seed tools', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const choice = monk.characterCreation?.proficiencies?.tools?.choices?.[0]
+    expect(choice?.pool).toMatchObject({
+      source: 'filtered',
+      toolCategories: ['artisan', 'musical_instrument'],
+    })
+
+    const equipment = new Map(loadSeedEquipment(RULESET).map((row) => [row.id, row]))
+    const resolved = listToolsMatchingPool({
+      pool: choice!.pool!,
+      equipment,
+      rulesetId: RULESET,
+    })
+
+    expect(resolved).toHaveLength(27)
+    expect(
+      resolved.every(
+        (row) =>
+          row.kind === 'tool' &&
+          (row.toolCategory === 'artisan' || row.toolCategory === 'musical_instrument'),
+      ),
+    ).toBe(true)
+    expect(choice!.choose).toBeLessThanOrEqual(resolved.length)
+  })
+
   it('Bard tool pool resolves to all musical-instrument seed tools', () => {
     const bard = getClassBySlug(RULESET, 'bard')
     const choice = bard.characterCreation?.proficiencies?.tools?.choices?.[0]

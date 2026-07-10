@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   classCharacterCreationSchema,
+  normalizeStartingEquipmentGrant,
   resolveEquipmentContentId,
   startingEquipmentChoiceSchema,
+  startingEquipmentGrantedItemSchema,
 } from './starting-equipment'
 
 const DRUID_STARTING_EQUIPMENT = {
@@ -40,11 +42,76 @@ const DRUID_STARTING_EQUIPMENT = {
   ],
 }
 
+describe('startingEquipmentGrantedItemSchema', () => {
+  it('normalizes legacy equipmentSlug grants to target.source equipment', () => {
+    expect(
+      startingEquipmentGrantedItemSchema.parse({
+        kind: 'grant',
+        equipmentSlug: 'spear',
+        quantity: 1,
+        equipped: true,
+      }),
+    ).toEqual({
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: 'spear' },
+      quantity: 1,
+      equipped: true,
+    })
+  })
+
+  it('accepts proficiency_choice targets without modifiers', () => {
+    expect(
+      startingEquipmentGrantedItemSchema.parse({
+        kind: 'grant',
+        target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+        quantity: 1,
+      }),
+    ).toEqual({
+      kind: 'grant',
+      target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+      quantity: 1,
+    })
+  })
+
+  it('rejects modifiers on proficiency_choice grants', () => {
+    expect(
+      startingEquipmentGrantedItemSchema.safeParse({
+        kind: 'grant',
+        target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+        modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('strips legacy equipmentSlug when target is present', () => {
+    expect(
+      normalizeStartingEquipmentGrant({
+        kind: 'grant',
+        equipmentSlug: 'spear',
+        target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+      }),
+    ).toEqual({
+      kind: 'grant',
+      target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+    })
+  })
+})
+
 describe('startingEquipmentChoiceSchema', () => {
   it('accepts granted items, modifiers, and wealth on options', () => {
-    expect(startingEquipmentChoiceSchema.parse(DRUID_STARTING_EQUIPMENT)).toEqual(
-      DRUID_STARTING_EQUIPMENT,
-    )
+    const parsed = startingEquipmentChoiceSchema.parse(DRUID_STARTING_EQUIPMENT)
+    expect(parsed.choose).toBe(1)
+    expect(parsed.options).toHaveLength(2)
+    expect(parsed.options[0]?.items[0]).toMatchObject({
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+      equipped: true,
+    })
+    expect(parsed.options[0]?.items[3]).toMatchObject({
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: 'quarterstaff' },
+      modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
+    })
   })
 
   it('accepts structured item choices filtered by tool category', () => {
@@ -133,12 +200,13 @@ describe('startingEquipmentChoiceSchema', () => {
 
 describe('classCharacterCreationSchema', () => {
   it('wraps starting equipment on the class body', () => {
-    expect(
-      classCharacterCreationSchema.parse({
-        startingEquipment: DRUID_STARTING_EQUIPMENT,
-      }),
-    ).toEqual({
+    const parsed = classCharacterCreationSchema.parse({
       startingEquipment: DRUID_STARTING_EQUIPMENT,
+    })
+
+    expect(parsed.startingEquipment?.options[0]?.items[0]).toMatchObject({
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: 'leather-armor' },
     })
   })
 

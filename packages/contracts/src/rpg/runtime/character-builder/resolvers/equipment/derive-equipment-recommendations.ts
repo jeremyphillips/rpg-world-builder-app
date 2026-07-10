@@ -3,6 +3,7 @@ import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellca
 import type { Equipment } from '../../../../content/equipment'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
 import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
+import { startingEquipmentGrantEquipmentSlug } from '../../../../content/starting-equipment'
 import {
   isSpellcastingFocusGearKind,
   type SpellcastingGearKind,
@@ -76,7 +77,10 @@ function listStartingEquipmentIds(
     for (const item of option.items) {
       const slugs =
         item.kind === 'grant'
-          ? [item.equipmentSlug]
+          ? (() => {
+              const equipmentSlug = startingEquipmentGrantEquipmentSlug(item)
+              return equipmentSlug ? [equipmentSlug] : []
+            })()
           : item.pool.source === 'explicit'
             ? item.pool.equipmentSlugs
             : []

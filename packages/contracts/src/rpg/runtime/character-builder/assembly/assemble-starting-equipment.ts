@@ -1,10 +1,14 @@
 import type { Equipment } from '../../../content/equipment'
-import type {
-  EquipmentChoiceGrant,
-  GrantedEquipmentItem,
-} from '../../../content/lib/equipment-grant'
+import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
 import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
-import type { StartingEquipmentOption } from '../../../content/starting-equipment'
+import type {
+  StartingEquipmentGrantedItem,
+  StartingEquipmentOption,
+} from '../../../content/starting-equipment'
+import {
+  isProficiencyLinkedStartingEquipmentGrant,
+  startingEquipmentGrantEquipmentSlug,
+} from '../../../content/starting-equipment'
 import type { CharacterClass } from '../../../content/classes/class'
 import { toEquipmentContentId } from '../../creature/equipment'
 import {
@@ -32,7 +36,7 @@ import {
 
 export type ResolvedStartingEquipmentGrantedItem = {
   kind: 'grant'
-  grant: GrantedEquipmentItem
+  grant: StartingEquipmentGrantedItem
   equipmentId: string
   equipment: Equipment | undefined
 }
@@ -64,11 +68,16 @@ function classStartingEquipmentSource(
 }
 
 function resolveGrantedItem(
-  grant: GrantedEquipmentItem,
+  grant: StartingEquipmentGrantedItem,
   rulesetId: string,
   catalogIndex: CharacterBuildCatalogIndex,
 ): ResolvedStartingEquipmentGrantedItem {
-  const equipmentId = toEquipmentContentId(rulesetId, grant.equipmentSlug)
+  const equipmentSlug = startingEquipmentGrantEquipmentSlug(grant)
+  if (!equipmentSlug) {
+    throw new Error('Expected equipment starting-equipment grant target')
+  }
+
+  const equipmentId = toEquipmentContentId(rulesetId, equipmentSlug)
   return {
     kind: 'grant',
     grant,
@@ -108,17 +117,20 @@ export function resolveStartingEquipmentOption(
   return {
     option,
     wealth: option.wealth,
-    items: option.items.map((item, itemIndex) =>
-      item.kind === 'grant'
-        ? resolveGrantedItem(item, rulesetId, catalogIndex)
-        : resolveItemChoice(item, characterClass.id, option.id, itemIndex, draft, catalogIndex),
-    ),
+    items: option.items.flatMap((item, itemIndex): ResolvedStartingEquipmentItem[] => {
+      if (item.kind === 'grant') {
+        if (isProficiencyLinkedStartingEquipmentGrant(item)) return []
+        return [resolveGrantedItem(item, rulesetId, catalogIndex)]
+      }
+
+      return [resolveItemChoice(item, characterClass.id, option.id, itemIndex, draft, catalogIndex)]
+    }),
   }
 }
 
 function equipmentEntryFromGrant(
   equipmentId: string,
-  grant: GrantedEquipmentItem,
+  grant: StartingEquipmentGrantedItem,
   sources: CharacterSelectionSource[],
 ): CharacterEquipmentEntry {
   return {

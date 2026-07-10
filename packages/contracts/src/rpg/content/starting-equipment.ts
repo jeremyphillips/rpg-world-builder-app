@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/choice'
 import {
   equipmentChoiceGrantObjectSchema,
-  grantedEquipmentItemSchema,
   normalizeEquipmentChoiceGrant,
 } from './lib/equipment-grant'
+import { equipmentModifierSchema } from './equipment/modifier'
 import { equipmentRecommendationsSchema } from './equipment-recommendation'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
 import {
@@ -17,16 +17,94 @@ import {
 // Starting equipment — class/background character-creation gear packages.
 // ---------------------------------------------------------------------------
 
-export const startingEquipmentGrantedItemSchema = grantedEquipmentItemSchema
+export const startingEquipmentGrantTargetSchema = z.discriminatedUnion('source', [
+  z.object({ source: z.literal('equipment'), equipmentSlug: z.string().min(1) }),
+  z.object({ source: z.literal('proficiency_choice'), choiceId: z.string().min(1) }),
+])
 
-export type StartingEquipmentGrantedItem = z.infer<typeof startingEquipmentGrantedItemSchema>
+export type StartingEquipmentGrantTarget = z.infer<typeof startingEquipmentGrantTargetSchema>
+
+const PROFICIENCY_LINKED_GRANT_MODIFIERS_MESSAGE =
+  'Proficiency-linked starting equipment grants cannot carry modifiers.'
+
+const startingEquipmentGrantedItemObjectSchema = z
+  .object({
+    kind: z.literal('grant'),
+    target: startingEquipmentGrantTargetSchema,
+    quantity: z.number().int().min(1).default(1),
+    equipped: z.boolean().optional(),
+    modifiers: z.array(equipmentModifierSchema).optional(),
+  })
+  .strict()
+  .superRefine((grant, ctx) => {
+    if (grant.target.source === 'proficiency_choice' && (grant.modifiers?.length ?? 0) > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: PROFICIENCY_LINKED_GRANT_MODIFIERS_MESSAGE,
+        path: ['modifiers'],
+      })
+    }
+  })
+
+/**
+ * Maps legacy `{ kind: 'grant', equipmentSlug }` rows to `target.source === 'equipment'`.
+ * Strips bare `equipmentSlug` on output when `target` is present.
+ */
+export function normalizeStartingEquipmentGrant(input: unknown): unknown {
+  if (typeof input !== 'object' || input === null) return input
+
+  const record = input as Record<string, unknown>
+  if (record.kind !== 'grant') return input
+
+  const { equipmentSlug: legacySlug, target: rawTarget, ...rest } = record
+
+  if (rawTarget !== undefined) {
+    return { ...rest, target: rawTarget }
+  }
+
+  if (typeof legacySlug === 'string' && legacySlug.length > 0) {
+    return {
+      ...rest,
+      target: { source: 'equipment', equipmentSlug: legacySlug },
+    }
+  }
+
+  return input
+}
+
+export const startingEquipmentGrantedItemSchema = z.preprocess(
+  normalizeStartingEquipmentGrant,
+  startingEquipmentGrantedItemObjectSchema,
+)
+
+export type StartingEquipmentGrantedItem = z.infer<typeof startingEquipmentGrantedItemObjectSchema>
+
+export function isProficiencyLinkedStartingEquipmentGrant(
+  grant: Pick<StartingEquipmentGrantedItem, 'target'> | { target?: StartingEquipmentGrantTarget },
+): grant is StartingEquipmentGrantedItem & {
+  target: Extract<StartingEquipmentGrantTarget, { source: 'proficiency_choice' }>
+} {
+  return grant.target?.source === 'proficiency_choice'
+}
+
+export function startingEquipmentGrantEquipmentSlug(
+  grant: Pick<StartingEquipmentGrantedItem, 'target'> & { equipmentSlug?: string },
+): string | undefined {
+  if (grant.target?.source === 'equipment') return grant.target.equipmentSlug
+  return grant.equipmentSlug
+}
+
+export function startingEquipmentGrantProficiencyChoiceId(
+  grant: Pick<StartingEquipmentGrantedItem, 'target'>,
+): string | undefined {
+  return grant.target?.source === 'proficiency_choice' ? grant.target.choiceId : undefined
+}
 
 /**
  * Structured pick within a starting package (e.g. Bard musical instrument).
  *
- * Cross-reference choices tied to another proficiency pick (Monk tool/instrument
- * linked to class tool proficiency) are prose-only in v1 — see catalog Monk seed
- * and FOLLOWUP: proficiencyLinkedChoice.
+ * Proficiency-linked grants use `target.source === 'proficiency_choice'` and resolve
+ * from the referenced character-creation tool proficiency ChoiceSet answer.
  */
 export const startingEquipmentItemChoiceSchema = z.preprocess(
   normalizeEquipmentChoiceGrant,
@@ -36,14 +114,16 @@ export const startingEquipmentItemChoiceSchema = z.preprocess(
 export type StartingEquipmentItemChoice = z.infer<typeof equipmentChoiceGrantObjectSchema>
 
 export const startingEquipmentItemSchema = z.preprocess(
-  (input) =>
-    typeof input === 'object' &&
-    input !== null &&
-    (input as Record<string, unknown>).kind === 'choice'
-      ? normalizeEquipmentChoiceGrant(input)
-      : input,
+  (input) => {
+    if (typeof input !== 'object' || input === null) return input
+
+    const record = input as Record<string, unknown>
+    if (record.kind === 'grant') return normalizeStartingEquipmentGrant(input)
+    if (record.kind === 'choice') return normalizeEquipmentChoiceGrant(input)
+    return input
+  },
   z.discriminatedUnion('kind', [
-    startingEquipmentGrantedItemSchema,
+    startingEquipmentGrantedItemObjectSchema,
     equipmentChoiceGrantObjectSchema,
   ]),
 )

@@ -4,6 +4,7 @@ import type {
   StartingEquipmentItem,
   StartingEquipmentOption,
 } from '@rpg/contracts'
+import { startingEquipmentGrantEquipmentSlug } from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
 import {
@@ -27,7 +28,7 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
   if (item.kind === 'grant') {
     return {
       itemKind: 'grant',
-      equipmentSlug: item.equipmentSlug,
+      equipmentSlug: startingEquipmentGrantEquipmentSlug(item) ?? '',
       quantity: item.quantity,
       equipped: item.equipped,
       modifiers: item.modifiers?.map((modifier) => ({
@@ -41,13 +42,25 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
   if (row.itemKind === 'grant') {
-    const grant = equipmentGrantFromFormRow(row) as StartingEquipmentGrantedItem
-    if (row.modifiers?.length) {
-      grant.modifiers = row.modifiers
+    const grant = equipmentGrantFromFormRow(row)
+    if (grant.kind !== 'grant') {
+      throw new Error('Starting equipment grant rows require an equipment slug in v1')
     }
-    return grant
+
+    const item: StartingEquipmentGrantedItem = {
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: grant.equipmentSlug },
+      quantity: grant.quantity ?? 1,
+    }
+    if (grant.equipped !== undefined) {
+      item.equipped = grant.equipped
+    }
+    if (row.modifiers?.length) {
+      item.modifiers = row.modifiers
+    }
+    return item
   }
-  return equipmentGrantFromFormRow(row)
+  return equipmentGrantFromFormRow(row) as StartingEquipmentItem
 }
 
 export function startingEquipmentOptionToFormRow(

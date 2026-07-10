@@ -150,9 +150,46 @@ export const bardClass: ClassStored = {
   features: [],
 }
 
+export const monkClass: ClassStored = {
+  id: 'srd-cc-5.2.1:monk',
+  slug: 'monk',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Monk',
+  primaryAbilities: ['dex', 'wis'],
+  hitDie: 8,
+  proficiencies: {
+    savingThrows: ['str', 'dex'],
+    armor: { categories: [], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: {
+    proficiencies: {
+      tools: {
+        choices: [
+          {
+            id: 'class-tools',
+            label: "Artisan's Tools or Musical Instrument",
+            choose: 1,
+            pool: {
+              source: 'filtered',
+              toolCategories: ['artisan', 'musical_instrument'],
+            },
+          },
+        ],
+      },
+    },
+  },
+  features: [],
+}
+
 export const proficiencyTestCatalog: CharacterBuildCatalog = {
   species: [dwarfSpecies],
-  classes: [rogueClass, bardClass],
+  classes: [rogueClass, bardClass, monkClass],
   spells: [],
   equipment: [luteTool, fluteTool],
   skillProficiencies: [stealthSkill, acrobaticsSkill, perceptionSkill],

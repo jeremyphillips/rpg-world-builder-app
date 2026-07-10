@@ -159,6 +159,18 @@ function summarizeChoiceItem(
   return `${item.choose}× ${item.poolLabel}`
 }
 
+function summarizeProficiencyLinkedGrantItem(
+  item: Extract<StartingEquipmentOptionSummaryItem, { kind: 'proficiency_linked_grant' }>,
+): string {
+  if (item.status === 'invalid') {
+    return item.issue ?? `Invalid link to "${item.choiceLabel}"`
+  }
+  if (item.status === 'resolved' && item.resolvedEquipment) {
+    return item.resolvedEquipment.name
+  }
+  return `Selection from "${item.choiceLabel}"`
+}
+
 export function formatStartingEquipmentOptionMeta(
   summary: StartingEquipmentOptionSummary,
 ): string[] {
@@ -168,7 +180,13 @@ export function formatStartingEquipmentOptionMeta(
     EQUIPMENT_INVENTORY_GROUP_LABELS,
   ) as (keyof CharacterEquipment)[]) {
     for (const item of summary.itemsByGroup[group]) {
-      meta.push(item.kind === 'grant' ? summarizeGrantItem(item) : summarizeChoiceItem(item))
+      if (item.kind === 'grant') {
+        meta.push(summarizeGrantItem(item))
+      } else if (item.kind === 'proficiency_linked_grant') {
+        meta.push(summarizeProficiencyLinkedGrantItem(item))
+      } else {
+        meta.push(summarizeChoiceItem(item))
+      }
     }
   }
 

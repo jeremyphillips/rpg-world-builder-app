@@ -2015,6 +2015,19 @@
               "from": ["acrobatics", "history", "insight", "religion", "stealth"]
             }
           ]
+        },
+        "tools": {
+          "choices": [
+            {
+              "id": "class-tools",
+              "label": "Artisan's Tools or Musical Instrument",
+              "choose": 1,
+              "pool": {
+                "source": "filtered",
+                "toolCategories": ["artisan", "musical_instrument"]
+              }
+            }
+          ]
         }
       }
     },

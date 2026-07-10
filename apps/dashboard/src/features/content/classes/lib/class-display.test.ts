@@ -138,6 +138,20 @@ describe('class-display', () => {
     })
   })
 
+  it('summarizes Monk tool choices with a semantic pool label', () => {
+    const monk = pickClass('monk')
+    const proficiencies = getProficienciesSection(
+      buildClassDetailViewModel(monk, vocabulary, { surface: 'content-detail' }),
+    )
+
+    const toolsRow = proficiencies.choices.find((row) => row.id === 'tools')
+    expect(toolsRow).toMatchObject({
+      choose: 1,
+      optionSlugs: [],
+      compactSummary: "Choose 1 from Artisan's Tools and Musical Instrument",
+    })
+  })
+
   it('omits empty choice rows on builder-sheet', () => {
     const proficiencies = getProficienciesSection(
       buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'builder-sheet' }),

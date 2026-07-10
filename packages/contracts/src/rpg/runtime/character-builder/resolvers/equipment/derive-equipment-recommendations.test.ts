@@ -171,8 +171,18 @@ const storedFighter: ClassStored = {
           id: 'heavy',
           label: 'Heavy Armor',
           items: [
-            { kind: 'grant', equipmentSlug: 'chain-mail', quantity: 1, equipped: true },
-            { kind: 'grant', equipmentSlug: 'longsword', quantity: 1, equipped: true },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'chain-mail' },
+              quantity: 1,
+              equipped: true,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'longsword' },
+              quantity: 1,
+              equipped: true,
+            },
           ],
           wealth: { gp: 4 },
         },
@@ -210,7 +220,13 @@ const storedWizard: ClassStored = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          items: [{ kind: 'grant', equipmentSlug: 'dagger', quantity: 2 }],
+          items: [
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'dagger' },
+              quantity: 2,
+            },
+          ],
           wealth: { gp: 5 },
         },
       ],
@@ -349,7 +365,13 @@ describe('deriveEquipmentRecommendations', () => {
             {
               id: 'standard',
               label: 'Standard Equipment',
-              items: [{ kind: 'grant', equipmentSlug: 'holy-symbol', quantity: 1 }],
+              items: [
+                {
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'holy-symbol' },
+                  quantity: 1,
+                },
+              ],
             },
           ],
         },

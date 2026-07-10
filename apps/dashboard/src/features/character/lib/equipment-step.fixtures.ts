@@ -70,7 +70,12 @@ export const equipmentStepBardClassFixture = {
           label: 'Standard Equipment',
           description: 'Leather armor, a musical instrument, and starting gold.',
           items: [
-            { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+              quantity: 1,
+              equipped: true,
+            },
             {
               kind: 'choice',
               choose: 1,
