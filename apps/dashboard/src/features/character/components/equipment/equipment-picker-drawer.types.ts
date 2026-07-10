@@ -23,7 +23,12 @@ export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 /** Sparse recommendation badges — most rows (including proficient gear) get none. */
 export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
 export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
+export const EQUIPMENT_PICKER_STANDARD_GEAR_LABEL = 'Standard gear'
 export const EQUIPMENT_PICKER_CLASS_TOOL_LABEL = 'Class tool'
+export const EQUIPMENT_PICKER_PROFICIENT_LABEL = 'Proficient'
+export const EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL = 'Proficiency available'
+export const EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL = 'Common for your class'
+/** @deprecated Use {@link EQUIPMENT_PICKER_PROFICIENT_LABEL} for badge display. */
 export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficiency'
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
@@ -102,5 +107,7 @@ export type EquipmentPickerDrawerProps = {
   ownedPurchaseQuantities?: Readonly<Record<string, number>>
   /** Mutually exclusive toolbar action — default resets full view including sort and tab. */
   toolbarResetMode?: EquipmentPickerToolbarResetMode
+  /** When true, `availableInStartingOption` rows show the Standard gear badge. */
+  isGoldShoppingPath?: boolean
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
 }

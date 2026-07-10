@@ -114,6 +114,7 @@ export function EquipmentStepInteractive({
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
+        isGoldShoppingPath={activePickerFlow === 'gold'}
         onAddItem={handleAddItem}
       />
 

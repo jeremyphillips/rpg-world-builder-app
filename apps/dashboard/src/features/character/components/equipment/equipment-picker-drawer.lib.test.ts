@@ -26,11 +26,15 @@ import {
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
+  EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
+  EQUIPMENT_PICKER_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
+  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
@@ -233,6 +237,133 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
     expect(getEquipmentPickerBadge(labeledRule)?.label).toBe('Spellbook')
+  })
+
+  describe('getEquipmentPickerBadge proficiency and recommendation precedence', () => {
+    function badgeItem(
+      overrides: Partial<EquipmentPickerItem['state']> & {
+        recommendation: EquipmentPickerItem['state']['recommendation']
+      },
+    ): EquipmentPickerItem {
+      const base = equipmentPickerItemsFixture[0]!
+      return {
+        ...base,
+        state: {
+          ...base.state,
+          ...overrides,
+        },
+      }
+    }
+
+    it('shows Proficiency available for unresolved tool proficiency pools', () => {
+      const item = badgeItem({
+        isProficient: false,
+        isRecommended: true,
+        recommendation: {
+          tier: 'strong',
+          reasons: ['unresolvedToolProficiencyChoice', 'notProficient'],
+        },
+      })
+
+      expect(getEquipmentPickerBadge(item)).toEqual({
+        label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
+        emphasis: 'highlight',
+      })
+    })
+
+    it('prefers Proficiency available over Starting option and Not proficient', () => {
+      const item = badgeItem({
+        isProficient: false,
+        isRecommended: true,
+        recommendation: {
+          tier: 'strong',
+          reasons: ['unresolvedToolProficiencyChoice', 'startingEquipmentChoice', 'notProficient'],
+        },
+      })
+
+      expect(getEquipmentPickerBadge(item)?.label).toBe(
+        EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
+      )
+    })
+
+    it('shows Proficient only for selected tool proficiency reason', () => {
+      const item = badgeItem({
+        isProficient: true,
+        isRecommended: true,
+        recommendation: { tier: 'strong', reasons: ['selectedToolProficiency'] },
+      })
+
+      expect(getEquipmentPickerBadge(item)?.label).toBe(EQUIPMENT_PICKER_PROFICIENT_LABEL)
+    })
+
+    it('shows Common for your class for category siblings', () => {
+      const item = badgeItem({
+        isProficient: false,
+        isRecommended: false,
+        recommendation: { tier: 'compatible', reasons: ['classToolCategory'] },
+      })
+
+      expect(getEquipmentPickerBadge(item)?.label).toBe(EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL)
+    })
+
+    it('shows Standard gear for gold-path fixed grants', () => {
+      const item = badgeItem({
+        isProficient: true,
+        isRecommended: true,
+        recommendation: { tier: 'strong', reasons: ['availableInStartingOption', 'proficient'] },
+      })
+
+      expect(getEquipmentPickerBadge(item, { isGoldShoppingPath: true })?.label).toBe(
+        EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
+      )
+      expect(getEquipmentPickerBadge(item, { isGoldShoppingPath: false })).toBeUndefined()
+    })
+
+    it('shows Starting option for unresolved package pools without proficiency overlap', () => {
+      const item = badgeItem({
+        isProficient: true,
+        isRecommended: true,
+        recommendation: { tier: 'strong', reasons: ['startingEquipmentChoice', 'proficient'] },
+      })
+
+      expect(getEquipmentPickerBadge(item)?.label).toBe(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)
+    })
+
+    it('leaves ordinary proficient weapons without a badge', () => {
+      const item = badgeItem({
+        isProficient: true,
+        isRecommended: false,
+        recommendation: { tier: 'compatible', reasons: ['proficient'] },
+      })
+
+      expect(getEquipmentPickerBadge(item)).toBeUndefined()
+    })
+
+    it('shows Not proficient for unrelated tools', () => {
+      const item = badgeItem({
+        isProficient: false,
+        isRecommended: false,
+        recommendation: { tier: 'notRecommended', reasons: ['notProficient'] },
+      })
+
+      expect(getEquipmentPickerBadge(item)).toEqual({
+        label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+        emphasis: 'warning',
+      })
+    })
+
+    it('prefers essential blockers over proficiency-state copy', () => {
+      const item = badgeItem({
+        isProficient: false,
+        isRecommended: true,
+        recommendation: {
+          tier: 'essential',
+          reasons: ['classToolNeed', 'unresolvedToolProficiencyChoice'],
+        },
+      })
+
+      expect(getEquipmentPickerBadge(item)?.label).toBe('Class tool')
+    })
   })
 
   it('excludes vehicle and service kinds from category filter and results', () => {

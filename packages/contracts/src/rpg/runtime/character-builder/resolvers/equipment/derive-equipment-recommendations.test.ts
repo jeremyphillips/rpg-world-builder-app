@@ -557,6 +557,21 @@ const panFlute = equipmentSchema.parse({
   utilizes: [{ description: 'Play', dc: 10 }],
 })
 
+const leatherArmor = equipmentSchema.parse({
+  ...CONTENT_META,
+  id: `${RULESET}:leather-armor`,
+  slug: 'leather-armor',
+  name: 'Leather Armor',
+  description: '',
+  cost: { amount: 10, currency: 'gp' },
+  weight: { value: 10, unit: 'lb' },
+  kind: 'armor',
+  category: 'light',
+  baseAc: 11,
+  addDexModifier: true,
+  stealthDisadvantage: false,
+})
+
 const storedBard: ClassStored = {
   ...CONTENT_META,
   id: `${RULESET}:bard`,
@@ -591,6 +606,17 @@ const storedBard: ClassStored = {
           id: 'standard',
           label: 'Standard Equipment',
           items: [
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+              quantity: 1,
+              equipped: true,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'dagger' },
+              quantity: 2,
+            },
             {
               kind: 'choice',
               choose: 1,
@@ -667,12 +693,13 @@ const storedMonk: ClassStored = {
 }
 
 const bardInstruments = [lute, flute, drum, viol, panFlute]
+const bardCatalogEquipment = [leatherArmor, dagger, ...bardInstruments]
 const bardToolChoiceSetId = buildChoiceSetId('class', storedBard.id, 'class-tools')
 const monkToolChoiceSetId = buildChoiceSetId('class', storedMonk.id, 'class-tools')
 
 describe('deriveEquipmentRecommendations proficiency inference', () => {
   it('recommends all musical instruments before bard proficiency selection', () => {
-    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardInstruments)
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment)
 
     const recommendations = deriveEquipmentRecommendations({
       characterClass: storedBard,
@@ -691,7 +718,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
   })
 
   it('excludes selected instruments from unresolved pool recommendations when partially resolved', () => {
-    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardInstruments, {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
       choiceSelections: { [bardToolChoiceSetId]: [lute.id] },
     })
 
@@ -711,7 +738,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
   })
 
   it('marks selected proficiencies and category siblings after bard proficiency resolution', () => {
-    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardInstruments, {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
       choiceSelections: {
         [bardToolChoiceSetId]: [lute.id, flute.id, drum.id],
       },
@@ -736,8 +763,8 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
   })
 
   it('keeps bard standard-package fulfillment separate from proficiency recommendations', () => {
-    const nestedChoiceSetId = nestedStartingEquipmentChoiceSetId(storedBard.id, 'standard', 0)
-    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardInstruments, {
+    const nestedChoiceSetId = nestedStartingEquipmentChoiceSetId(storedBard.id, 'standard', 2)
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['standard'],
         [bardToolChoiceSetId]: [flute.id, drum.id, viol.id],
@@ -761,7 +788,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
   })
 
   it('elevates bard category siblings on gold path when category equipment need remains unfulfilled', () => {
-    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardInstruments, {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['gold'],
         [bardToolChoiceSetId]: [lute.id, flute.id, drum.id],
@@ -823,6 +850,73 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       tier: 'strong',
       reasons: expect.arrayContaining(['unresolvedToolProficiencyChoice']),
     })
+  })
+
+  it('adds starting-equipment shopping guidance on gold path', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedBard.id)]: ['gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+    })
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(lute.id)?.reasons).toEqual(
+      expect.arrayContaining(['unresolvedToolProficiencyChoice', 'startingEquipmentChoice']),
+    )
+    expect(recommendations.get(leatherArmor.id)).toMatchObject({
+      tier: 'strong',
+      reasons: expect.arrayContaining(['availableInStartingOption']),
+    })
+    expect(recommendations.get(dagger.id)).toMatchObject({
+      tier: 'strong',
+      reasons: expect.arrayContaining(['availableInStartingOption']),
+    })
+  })
+
+  it('keeps no-package-selected fixed grants at compatible tier', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment)
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(leatherArmor.id)).toMatchObject({
+      tier: 'compatible',
+      reasons: expect.arrayContaining(['availableInStartingOption', 'proficient']),
+    })
+    expect(recommendations.get(leatherArmor.id)?.reasons).not.toContain('startingEquipmentChoice')
+  })
+
+  it('does not duplicate monk linked grants as fixed package guidance on gold path', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedMonk, bardInstruments, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedMonk.id)]: ['gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+    })
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedMonk,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(lute.id)?.reasons).toContain('unresolvedToolProficiencyChoice')
+    expect(recommendations.get(lute.id)?.reasons).not.toContain('availableInStartingOption')
   })
 })
 

@@ -29,6 +29,7 @@ import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_STEP_CUSTOMIZE_LABEL,
 } from '../../lib/equipment-step.lib'
+import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({
@@ -195,6 +196,36 @@ describe('EquipmentStep', () => {
     expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
   })
 
+  it('shows Proficiency available for instruments on the gold path before proficiency picks', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+
+    const luteRow = screen
+      .getAllByRole('listitem')
+      .find((row) => within(row).queryByText(equipmentStepLuteFixture.name))!
+
+    expect(
+      within(luteRow).getByText(EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL),
+    ).toBeInTheDocument()
+    expect(within(luteRow).queryByText('Not proficient')).not.toBeInTheDocument()
+  })
+
   it('adds a gold purchase from the picker drawer', async () => {
     const user = userEvent.setup()
     const draft = {
@@ -213,7 +244,6 @@ describe('EquipmentStep', () => {
     const { onDraftChange } = renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.click(screen.getByRole('tab', { name: /All/i }))
     const leatherArmorRow = screen
       .getAllByRole('listitem')
       .find((row) => within(row).queryByText(equipmentStepLeatherArmorFixture.name))!

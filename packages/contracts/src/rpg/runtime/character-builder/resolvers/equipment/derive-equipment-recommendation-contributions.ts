@@ -39,6 +39,12 @@ export type EquipmentRecommendationContribution = {
   excludeEquipmentIds?: ReadonlySet<string>
 }
 
+/** Controls tier/reason when deriving starting-equipment shopping guidance. */
+export type StartingEquipmentContributionContext =
+  | 'unselected_option'
+  | 'selected_package'
+  | 'gold_alternative'
+
 export function poolHasSemanticCategories(pool: ToolProficiencyPool): boolean {
   return pool.source === 'filtered' && (pool.toolCategories?.length ?? 0) > 0
 }
@@ -387,32 +393,61 @@ export function deriveProficiencyRecommendationContributions(args: {
   ]
 }
 
+function tierForAvailableInStartingOption(
+  context: StartingEquipmentContributionContext,
+): EquipmentRecommendationTier {
+  return context === 'unselected_option' ? 'compatible' : 'strong'
+}
+
+function contributionForStartingGrant(args: {
+  item: Extract<StartingEquipmentItem, { kind: 'grant' }>
+  sourceKey: string
+  characterClass: CharacterClass
+  context: StartingEquipmentContributionContext
+  fulfilledIds: Set<string>
+}): EquipmentRecommendationContribution[] {
+  const { item, sourceKey, characterClass, context, fulfilledIds } = args
+
+  if (isProficiencyLinkedStartingEquipmentGrant(item)) return []
+
+  const slug = startingEquipmentGrantEquipmentSlug(item)
+  if (!slug) return []
+
+  const equipmentId = toEquipmentContentId(characterClass.rulesetId, slug)
+  if (fulfilledIds.has(equipmentId)) return []
+
+  return [
+    {
+      selector: { kind: 'equipment', equipmentId },
+      tier: tierForAvailableInStartingOption(context),
+      reason: 'availableInStartingOption',
+      sourceKey,
+    },
+  ]
+}
+
 function contributionForStartingItem(args: {
   item: StartingEquipmentItem
   itemIndex: number
-  option: StartingEquipmentOption
   optionId: string
   classId: string
   characterClass: CharacterClass
   draft: CharacterBuilderDraft
-  preselected: boolean
+  context: StartingEquipmentContributionContext
   fulfilledIds: Set<string>
 }): EquipmentRecommendationContribution[] {
-  const { item, itemIndex, optionId, classId, characterClass, draft, preselected, fulfilledIds } =
-    args
+  const { item, itemIndex, optionId, classId, characterClass, draft, context, fulfilledIds } = args
 
   const sourceKey = `${classId}:starting-equipment:${optionId}:${itemIndex}`
 
   if (item.kind === 'grant') {
-    if (isProficiencyLinkedStartingEquipmentGrant(item)) return []
-
-    const slug = startingEquipmentGrantEquipmentSlug(item)
-    if (!slug) return []
-
-    const equipmentId = toEquipmentContentId(characterClass.rulesetId, slug)
-    if (fulfilledIds.has(equipmentId)) return []
-
-    return []
+    return contributionForStartingGrant({
+      item,
+      sourceKey,
+      characterClass,
+      context,
+      fulfilledIds,
+    })
   }
 
   if (item.kind !== 'choice') return []
@@ -421,7 +456,7 @@ function contributionForStartingItem(args: {
   const selections = draft.choiceSelections[choiceSetId] ?? []
   const choose = item.choose ?? 1
 
-  if (!preselected) {
+  if (context === 'unselected_option') {
     return [
       {
         selector: { kind: 'equipment_pool', pool: item.pool },
@@ -451,6 +486,54 @@ function contributionForStartingItem(args: {
   }))
 }
 
+/** Non-wealth starting options used as shopping guidance when gold is selected. */
+function listGoldAlternativeStartingOptions(
+  startingEquipment: NonNullable<CharacterClass['characterCreation']>['startingEquipment'],
+): StartingEquipmentOption[] {
+  if (!startingEquipment) return []
+
+  return startingEquipment.options.filter((option) => !isWealthOnlyStartingEquipmentOption(option))
+}
+
+function dedupeContributionsBySourceKey(
+  contributions: readonly EquipmentRecommendationContribution[],
+): EquipmentRecommendationContribution[] {
+  const seenSourceKeys = new Set<string>()
+  const deduped: EquipmentRecommendationContribution[] = []
+
+  for (const contribution of contributions) {
+    if (seenSourceKeys.has(contribution.sourceKey)) continue
+    seenSourceKeys.add(contribution.sourceKey)
+    deduped.push(contribution)
+  }
+
+  return deduped
+}
+
+function contributionsForStartingOption(args: {
+  option: StartingEquipmentOption
+  classId: string
+  characterClass: CharacterClass
+  draft: CharacterBuilderDraft
+  context: StartingEquipmentContributionContext
+  fulfilledIds: Set<string>
+}): EquipmentRecommendationContribution[] {
+  const { option, classId, characterClass, draft, context, fulfilledIds } = args
+
+  return option.items.flatMap((item, itemIndex) =>
+    contributionForStartingItem({
+      item,
+      itemIndex,
+      optionId: option.id,
+      classId,
+      characterClass,
+      draft,
+      context,
+      fulfilledIds,
+    }),
+  )
+}
+
 export function deriveStartingEquipmentRecommendationContributions(args: {
   characterClass: CharacterClass
   draft: CharacterBuilderDraft
@@ -468,27 +551,38 @@ export function deriveStartingEquipmentRecommendationContributions(args: {
     for (const option of startingEquipment.options) {
       if (isWealthOnlyStartingEquipmentOption(option)) continue
 
-      for (const [itemIndex, item] of option.items.entries()) {
-        contributions.push(
-          ...contributionForStartingItem({
-            item,
-            itemIndex,
-            option,
-            optionId: option.id,
-            classId,
-            characterClass,
-            draft,
-            preselected: false,
-            fulfilledIds: new Set(),
-          }),
-        )
-      }
+      contributions.push(
+        ...contributionsForStartingOption({
+          option,
+          classId,
+          characterClass,
+          draft,
+          context: 'unselected_option',
+          fulfilledIds: new Set(),
+        }),
+      )
     }
     return contributions
   }
 
   const selectedOption = startingEquipment.options.find((option) => option.id === selectedOptionId)
-  if (!selectedOption || isWealthOnlyStartingEquipmentOption(selectedOption)) return []
+  if (!selectedOption) return []
+
+  if (isWealthOnlyStartingEquipmentOption(selectedOption)) {
+    for (const option of listGoldAlternativeStartingOptions(startingEquipment)) {
+      contributions.push(
+        ...contributionsForStartingOption({
+          option,
+          classId,
+          characterClass,
+          draft,
+          context: 'gold_alternative',
+          fulfilledIds: new Set(),
+        }),
+      )
+    }
+    return dedupeContributionsBySourceKey(contributions)
+  }
 
   const fulfilledIds = listFulfilledPackageEquipmentIds({
     selectedOption,
@@ -498,21 +592,16 @@ export function deriveStartingEquipmentRecommendationContributions(args: {
     rulesetId: characterClass.rulesetId,
   })
 
-  for (const [itemIndex, item] of selectedOption.items.entries()) {
-    contributions.push(
-      ...contributionForStartingItem({
-        item,
-        itemIndex,
-        option: selectedOption,
-        optionId: selectedOptionId,
-        classId,
-        characterClass,
-        draft,
-        preselected: true,
-        fulfilledIds,
-      }),
-    )
-  }
+  contributions.push(
+    ...contributionsForStartingOption({
+      option: selectedOption,
+      classId,
+      characterClass,
+      draft,
+      context: 'selected_package',
+      fulfilledIds,
+    }),
+  )
 
   return contributions
 }

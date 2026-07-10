@@ -305,6 +305,7 @@ export function EquipmentPickerDrawer({
   characterPreviewContext,
   ownedPurchaseQuantities = {},
   toolbarResetMode = 'reset_view',
+  isGoldShoppingPath = false,
   onAddItem,
 }: EquipmentPickerDrawerProps) {
   const supportedItems = React.useMemo(
@@ -469,7 +470,7 @@ export function EquipmentPickerDrawer({
       )}
       renderItemHeader={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
-        const badge = getEquipmentPickerBadge(item)
+        const badge = getEquipmentPickerBadge(item, { isGoldShoppingPath })
         const disabled = isEquipmentPickerItemDisabled(item)
 
         return (

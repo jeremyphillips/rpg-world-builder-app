@@ -113,6 +113,52 @@ Row disabled notes and the budget header use the shared `EmphasisDetailLine`
 pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted
 secondary tail (`100 GP starting · 95 GP spent`, `40 GP remaining`).
 
+## Equipment picker badge precedence
+
+`getEquipmentPickerBadge` in `equipment-picker-drawer.lib.ts` emits **one badge per
+row**. Copy is **reason-driven** — do not infer proficiency-state labels from
+equipment kind alone.
+
+`state.isProficient` remains factual (resolved proficiencies only). Badge copy
+interprets unresolved recommendation context; it does not redefine proficiency for
+preview or combat semantics.
+
+### Single-badge order
+
+1. **Essential / class-required blockers** — authored `label`, `classRequired`,
+   `classToolNeed`, `spellcastingFocus`
+2. **Proficiency-state explanations** — `selectedToolProficiency` → **Proficient**;
+   `unresolvedToolProficiencyChoice` → **Proficiency available**;
+   `classToolCategory` → **Common for your class**
+3. **Starting-equipment / class recommendation source** — `startingEquipmentChoice` →
+   **Starting option**; `availableInStartingOption` → **Standard gear** on gold path
+   only (`isGoldShoppingPath` on the drawer)
+4. **Not proficient** — when `!isProficient` and no higher-priority reason applies
+
+Proficiency-state badges outrank ordinary recommendation-source badges (e.g. a Bard
+instrument with both `unresolvedToolProficiencyChoice` and `startingEquipmentChoice`
+shows **Proficiency available**). Essential blockers outrank generic proficiency copy.
+
+Ordinary weapon/armor category proficiency (`proficient` reason, `isProficient: true`
+without `selectedToolProficiency`) stays **badge-less**.
+
+## Starting-equipment contribution context
+
+`deriveStartingEquipmentRecommendationContributions` uses
+`StartingEquipmentContributionContext`:
+
+| Context             | Nested unresolved pool                     | Fixed grant (not fulfilled)                |
+| ------------------- | ------------------------------------------ | ------------------------------------------ |
+| `unselected_option` | `compatible` + `availableInStartingOption` | `compatible` + `availableInStartingOption` |
+| `selected_package`  | `strong` + `startingEquipmentChoice`       | suppressed when fulfilled                  |
+| `gold_alternative`  | `strong` + `startingEquipmentChoice`       | `strong` + `availableInStartingOption`     |
+
+When a wealth-only (gold) option is selected, shopping guidance is derived from
+non-wealth starting options. Without explicit pairing metadata, all non-wealth
+options are unioned (mutually exclusive branches); contributions are deduplicated by
+`sourceKey`. Proficiency-linked grants are skipped — tools come from the proficiency
+layer only.
+
 ## Related modules
 
 - Recommendations: `deriveEquipmentRecommendations` — tier/reason assignment only; no sort.
