@@ -1,9 +1,11 @@
 import {
+  formatToolProficiencyPoolLabel,
   getAbilityLabel,
   getArmorCategoryEntry,
   getToolCategoryEntry,
   getWeaponCategoryEntry,
   isMeaningfulProficiencyChoice,
+  isMeaningfulToolProficiencyChoice,
   type CharacterClass,
   type ClassFeature,
   type ProficiencyChoice,
@@ -244,15 +246,37 @@ function buildSkillsChoiceRow(characterClass: CharacterClass): ClassProficiencyC
 }
 
 function buildToolsChoiceRow(characterClass: CharacterClass): ClassProficiencyChoiceRow {
-  const { choose, optionSlugs } = aggregateMeaningfulChoices(
-    characterClass.characterCreation?.proficiencies?.tools?.choices,
+  const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
+    isMeaningfulToolProficiencyChoice,
   )
 
+  if (!choice) {
+    return buildProficiencyChoiceRow({
+      id: 'tools',
+      label: CLASS_PROFICIENCY_ROW_LABELS.tools,
+      choose: 0,
+      optionSlugs: [],
+    })
+  }
+
+  if (choice.pool) {
+    const poolLabel = formatToolProficiencyPoolLabel(choice.pool)
+    return {
+      id: 'tools',
+      label: CLASS_PROFICIENCY_ROW_LABELS.tools,
+      choose: choice.choose,
+      optionSlugs: [],
+      choicePrefix: `Choose ${choice.choose} from`,
+      compactSummary: `Choose ${choice.choose} from ${poolLabel}`,
+    }
+  }
+
+  const legacyFrom = (choice as ProficiencyChoice).from ?? []
   return buildProficiencyChoiceRow({
     id: 'tools',
     label: CLASS_PROFICIENCY_ROW_LABELS.tools,
-    choose,
-    optionSlugs,
+    choose: choice.choose,
+    optionSlugs: legacyFrom,
   })
 }
 

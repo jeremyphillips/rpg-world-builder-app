@@ -8,6 +8,8 @@ import {
   proficiencyChoiceGroupSchema,
   proficiencyGrantSetSchema,
   skillProficiencyChoiceGroupSchema,
+  toolProficiencyChoiceGroupSchema,
+  toolProficiencyChoiceSchema,
 } from './proficiency-grant-set'
 
 describe('proficiencyGrantSetSchema', () => {
@@ -142,6 +144,36 @@ describe('languageProficiencyChoiceSchema', () => {
       from: ['draconic'],
       categories: [],
     })
+  })
+})
+
+describe('toolProficiencyChoiceSchema', () => {
+  it('normalizes legacy from slugs to explicit pool', () => {
+    expect(
+      toolProficiencyChoiceSchema.parse({
+        id: 'class-tools',
+        choose: 3,
+        from: ['lute', 'flute'],
+      }),
+    ).toEqual({
+      id: 'class-tools',
+      choose: 3,
+      pool: { source: 'explicit', toolSlugs: ['lute', 'flute'] },
+    })
+  })
+
+  it('accepts filtered pool choices', () => {
+    expect(
+      toolProficiencyChoiceGroupSchema.safeParse({
+        choices: [
+          {
+            id: 'class-tools',
+            choose: 3,
+            pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+          },
+        ],
+      }).success,
+    ).toBe(true)
   })
 })
 

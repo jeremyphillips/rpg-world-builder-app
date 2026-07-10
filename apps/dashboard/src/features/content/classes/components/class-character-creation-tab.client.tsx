@@ -87,7 +87,7 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
 /**
  * Character creation tab: starting equipment (optional) and class-owned skill
- * proficiency choices under `characterCreation.proficiencies`.
+ * and tool proficiency choices under `characterCreation.proficiencies`.
  */
 export function ClassCharacterCreationTab({ formCtx }: ClassCharacterCreationTabProps) {
   const startingEquipment = useWatch({ name: STARTING_EQUIPMENT_FIELD_NAME }) as

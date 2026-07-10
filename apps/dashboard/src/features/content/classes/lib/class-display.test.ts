@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickEquipment } from '../../lib/fixtures/pick'
+import { pickClass, pickEquipment } from '../../lib/fixtures/pick'
 import { FIGHTER, ROGUE } from '../fixtures'
 
 import {
@@ -121,6 +121,20 @@ describe('class-display', () => {
       choose: 4,
       optionSlugs: expect.arrayContaining(['acrobatics', 'stealth']),
       compactSummary: 'Choose 4 from 9 options',
+    })
+  })
+
+  it('summarizes Bard tool choices with a semantic pool label', () => {
+    const bard = pickClass('bard')
+    const proficiencies = getProficienciesSection(
+      buildClassDetailViewModel(bard, vocabulary, { surface: 'content-detail' }),
+    )
+
+    const toolsRow = proficiencies.choices.find((row) => row.id === 'tools')
+    expect(toolsRow).toMatchObject({
+      choose: 3,
+      optionSlugs: [],
+      compactSummary: 'Choose 3 from Musical Instrument',
     })
   })
 

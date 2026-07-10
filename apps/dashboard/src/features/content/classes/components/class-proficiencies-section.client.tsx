@@ -127,7 +127,11 @@ function ProficiencyChoiceRow({
       </Heading>
       <dd className="space-y-2">
         {isEmpty ? (
-          <Text variant="muted">{CLASS_DISPLAY_NONE}</Text>
+          row.compactSummary !== CLASS_DISPLAY_NONE ? (
+            <Text variant="muted">{row.compactSummary}</Text>
+          ) : (
+            <Text variant="muted">{CLASS_DISPLAY_NONE}</Text>
+          )
         ) : row.id === 'skills' ? (
           <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
             <Text variant="muted" as="span">
@@ -141,12 +145,16 @@ function ProficiencyChoiceRow({
             />
           </div>
         ) : row.id === 'tools' ? (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-            <Text variant="muted" as="span">
-              {row.choicePrefix}
-            </Text>
-            <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
-          </div>
+          row.optionSlugs.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+              <Text variant="muted" as="span">
+                {row.choicePrefix}
+              </Text>
+              <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
+            </div>
+          ) : (
+            <Text variant="muted">{row.compactSummary}</Text>
+          )
         ) : (
           <Text variant="muted">{row.compactSummary}</Text>
         )}

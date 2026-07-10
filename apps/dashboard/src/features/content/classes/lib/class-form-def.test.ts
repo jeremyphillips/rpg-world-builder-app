@@ -84,6 +84,17 @@ describe('classFormDef round-trips', () => {
       expect(input.characterCreation?.proficiencies?.skills?.choices).toEqual(expectedChoices)
     })
 
+    it(`${characterClass.slug}: character creation tool choices round-trip`, () => {
+      const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+      const input = classFormDef.toInput(formValues, { entity: characterClass })
+      const expectedChoices = characterClass.characterCreation?.proficiencies?.tools?.choices
+      if (!expectedChoices?.length) {
+        expect(input.characterCreation?.proficiencies?.tools).toBeUndefined()
+        return
+      }
+      expect(input.characterCreation?.proficiencies?.tools?.choices).toEqual(expectedChoices)
+    })
+
     it(`${characterClass.slug}: starting equipment round-trips`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues, { entity: characterClass })
@@ -173,6 +184,23 @@ describe('classFormDef round-trips', () => {
       'skirmisher',
       'gold',
     ])
+  })
+
+  it('bard: tool proficiency choices round-trip through characterCreation', () => {
+    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    expect(formValues.characterCreation?.proficiencies?.tools).toMatchObject({
+      choose: 3,
+      poolSource: 'filtered',
+      poolToolCategories: ['musical_instrument'],
+    })
+    const input = classFormDef.toInput(formValues, { entity: bard })
+    expect(input.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: 'Musical Instruments',
+      choose: 3,
+      pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+    })
   })
 
   it('bard: pool choice items round-trip through the class form', () => {

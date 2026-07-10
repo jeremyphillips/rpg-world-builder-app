@@ -125,9 +125,8 @@ const proficiencyGrantRowFieldsSchema = z.object({
   toolProficiencySlugs: z.array(z.string().min(1)).optional(),
   toolProficiencyCategories: z.array(toolCategorySchema).optional(),
   toolProficiencyPoolSlugs: z.array(z.string().min(1)).optional(),
-  toolProficiencyPoolCategory: z
-    .union([toolCategorySchema, z.literal(PROFICIENCY_POOL_CATEGORY_ANY)])
-    .optional(),
+  toolProficiencyPoolCategories: z.array(toolCategorySchema).optional(),
+  toolProficiencyPoolFilteredToolSlugs: z.array(z.string().min(1)).optional(),
   skillProficiencyIds: z.array(skillSchema).optional(),
   skillProficiencyPoolIds: z.array(skillSchema).optional(),
   armorTrainingSlugs: z.array(z.string().min(1)).optional(),

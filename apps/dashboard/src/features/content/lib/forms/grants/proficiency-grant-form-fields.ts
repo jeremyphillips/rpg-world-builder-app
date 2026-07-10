@@ -20,12 +20,16 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
+import { refineToolProficiencyPoolFormRow } from '../tool-proficiency-pool-form-validation'
+import {
+  GRANT_TOOL_PROFICIENCY_POOL_FIELD_NAMES,
+  toolProficiencyPoolFormFields,
+} from '../tool-proficiency-pool-form-fields'
 import {
   ARMOR_TRAINING_POOL_KIND_LABELS,
   ARMOR_TRAINING_SOURCE_LABELS,
   SKILL_PROFICIENCY_POOL_KIND_LABELS,
   SKILL_PROFICIENCY_SOURCE_LABELS,
-  TOOL_PROFICIENCY_POOL_KIND_LABELS,
   TOOL_PROFICIENCY_SOURCE_LABELS,
   WEAPON_PROFICIENCY_POOL_KIND_LABELS,
   WEAPON_PROFICIENCY_SOURCE_LABELS,
@@ -51,6 +55,11 @@ export const proficiencyGrantValidationMessages = {
     () => 'Specific lists require at least one item.',
     () => 'Missing pool items',
   ),
+  filteredPoolCategoriesRequired: defineMessage(
+    'validation.proficiencyGrant.filteredPoolCategoriesRequired',
+    () => 'Filtered pools require at least one category or specific tool.',
+    () => 'Missing pool categories',
+  ),
   explicitSkillPoolRequired: defineMessage(
     'validation.proficiencyGrant.explicitSkillPoolRequired',
     () => 'Selected skill lists require at least one skill.',
@@ -66,10 +75,6 @@ const armorSourceOptions = toOptions(ARMOR_TRAINING_SOURCES, ARMOR_TRAINING_SOUR
 const weaponPoolKindOptions = toOptions(
   WEAPON_PROFICIENCY_POOL_SOURCES,
   WEAPON_PROFICIENCY_POOL_KIND_LABELS,
-)
-const toolPoolKindOptions = toOptions(
-  TOOL_PROFICIENCY_POOL_SOURCES,
-  TOOL_PROFICIENCY_POOL_KIND_LABELS,
 )
 const skillPoolKindOptions = toOptions(
   SKILL_PROFICIENCY_POOL_SOURCES,
@@ -290,18 +295,15 @@ export const toolProficiencyPoolFormSchema = z
     choose: z.coerce.number().int().min(1).default(1),
     poolSource: z.enum(TOOL_PROFICIENCY_POOL_SOURCES).default('filtered'),
     toolProficiencyPoolSlugs: z.array(z.string().min(1)).optional(),
-    toolProficiencyPoolCategory: z
-      .union([toolCategorySchema, z.literal(PROFICIENCY_POOL_CATEGORY_ANY)])
-      .optional(),
+    toolProficiencyPoolCategories: z.array(toolCategorySchema).optional(),
+    toolProficiencyPoolFilteredToolSlugs: z.array(z.string().min(1)).optional(),
   })
   .superRefine((row, ctx) => {
-    if (row.poolSource === 'explicit' && !row.toolProficiencyPoolSlugs?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
-        path: ['toolProficiencyPoolSlugs'],
-      })
-    }
+    refineToolProficiencyPoolFormRow(row, ctx, {
+      slugPath: 'toolProficiencyPoolSlugs',
+      categoriesPath: 'toolProficiencyPoolCategories',
+      filteredSlugsPath: 'toolProficiencyPoolFilteredToolSlugs',
+    })
   })
 
 export const toolProficiencyItemFormSchema = z.discriminatedUnion('proficiencySource', [
@@ -313,55 +315,11 @@ export const toolProficiencyItemFormSchema = z.discriminatedUnion('proficiencySo
 export type ToolProficiencyItemForm = z.infer<typeof toolProficiencyItemFormSchema>
 
 function toolProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const toolOptions = ctx.options?.tools ?? []
-
-  return [
-    {
-      type: 'inlineSentence',
-      name: 'choose',
-      label: '',
-      hideLabel: true,
-      visibility: visibleForProficiencySource('pool', guard),
-      segments: [
-        { kind: 'text', value: 'Character chooses', tone: 'label' },
-        {
-          kind: 'number',
-          name: 'choose',
-          min: 1,
-          digits: 1,
-          defaultValue: 1,
-        },
-        { kind: 'text', value: 'proficiency from', tone: 'label' },
-        {
-          kind: 'select',
-          name: 'poolSource',
-          options: toolPoolKindOptions,
-          width: 'lg',
-          defaultValue: 'filtered',
-          ariaLabel: 'Pool kind',
-        },
-      ],
-    },
-    {
-      type: 'combobox',
-      name: 'toolProficiencyPoolSlugs',
-      label: 'Tools',
-      multiple: true,
-      options: toolOptions,
-      placeholder: 'Choose tools…',
-      required: true,
-      visibility: visibleForPoolSource('explicit', guard),
-    },
-    {
-      type: 'select',
-      name: 'toolProficiencyPoolCategory',
-      label: 'Tool category',
-      options: categoryOptionsWithAny(toolCategoryOptions),
-      defaultValue: PROFICIENCY_POOL_CATEGORY_ANY,
-      visibility: visibleForPoolSource('filtered', guard),
-      width: 'lg',
-    },
-  ]
+  return toolProficiencyPoolFormFields(ctx, {
+    names: GRANT_TOOL_PROFICIENCY_POOL_FIELD_NAMES,
+    guard,
+    proficiencySourceGuard: visibleForProficiencySource('pool', guard),
+  })
 }
 
 export function toolProficiencyGrantItemFields(

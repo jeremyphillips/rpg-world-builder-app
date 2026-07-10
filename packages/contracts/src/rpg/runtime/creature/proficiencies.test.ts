@@ -172,6 +172,47 @@ describe('listToolsMatchingPool', () => {
       ),
     ).toEqual([{ id: lute.id, label: 'Lute' }])
   })
+
+  it('expands filtered pools across multiple categories with deduplication', () => {
+    const drum = {
+      id: 'srd-cc-5.2.1:drum',
+      slug: 'drum',
+      rulesetId: 'srd-cc-5.2.1',
+      name: 'Drum',
+      kind: 'tool',
+      toolCategory: 'musical_instrument',
+    } as Extract<Equipment, { kind: 'tool' }>
+
+    const expandedEquipment = new Map([
+      ...equipment.entries(),
+      [drum.id, drum],
+      [
+        thievesTools.id,
+        {
+          ...thievesTools,
+          toolCategory: 'thieves',
+        },
+      ],
+    ])
+
+    expect(
+      toolPoolChoiceOptions(
+        listToolsMatchingPool({
+          pool: {
+            source: 'filtered',
+            toolCategories: ['musical_instrument', 'thieves'],
+            toolSlugs: ['lute'],
+          },
+          equipment: expandedEquipment,
+          rulesetId: 'srd-cc-5.2.1',
+        }),
+      ),
+    ).toEqual([
+      { id: drum.id, label: 'Drum' },
+      { id: lute.id, label: 'Lute' },
+      { id: thievesTools.id, label: "Thieves' Tools" },
+    ])
+  })
 })
 
 describe('listArmorMatchingPool', () => {

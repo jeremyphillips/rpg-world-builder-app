@@ -141,7 +141,7 @@ export const bardClass: ClassStored = {
             id: 'class-tools',
             label: 'Bard Tools',
             choose: 1,
-            from: ['lute', 'flute'],
+            pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
           },
         ],
       },

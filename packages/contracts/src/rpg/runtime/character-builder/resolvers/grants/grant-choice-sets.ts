@@ -8,12 +8,11 @@ import {
   armorPoolChoiceOptions,
   listArmorMatchingPool,
   listSkillsMatchingPool,
-  listToolsMatchingPool,
   listWeaponsMatchingPool,
   skillPoolChoiceOptions,
-  toolPoolChoiceOptions,
   weaponPoolChoiceOptions,
 } from '../../../creature/proficiencies'
+import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
 import type { ChoiceSet, ChoiceSourceType, ChoiceType } from '../../choice-set'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -198,16 +197,7 @@ function toolProficiencyChoiceSet(
 
   const pool = grant.grant.pool
   const rulesetId = rulesetIdFromContentId(ctx.sourceId)
-  const options =
-    pool.source === 'explicit'
-      ? pool.toolSlugs.map((id) => ({ id, label: id }))
-      : toolPoolChoiceOptions(
-          listToolsMatchingPool({
-            pool,
-            equipment: catalogIndex.equipment,
-            rulesetId,
-          }),
-        )
+  const options = resolveToolPoolChoiceOptions(pool, catalogIndex.equipment, rulesetId)
 
   return buildGrantChoiceSet(
     ctx,
@@ -215,7 +205,7 @@ function toolProficiencyChoiceSet(
     grant.grant.choose,
     grant.grant.choose,
     options,
-    true,
+    options.length > 0,
     'Choose Tool Proficiency',
   )
 }

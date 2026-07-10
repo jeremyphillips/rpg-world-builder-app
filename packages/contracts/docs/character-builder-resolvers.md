@@ -123,16 +123,16 @@ Registry entries are **thin adapters** (`resolve-*-choices.ts`) that delegate to
 **implementation modules** (`resolve-*-choice-sets.ts`). See
 `ruleset/resolve-ruleset-language-choices.ts` → `ruleset/resolve-language-choice-sets.ts`.
 
-| Entry (adapter)                   | Folder          | Implementation module                        | Status                      | Emits                                                                                                                       |
-| --------------------------------- | --------------- | -------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `resolveRulesetLanguageChoices`   | `ruleset/`      | `resolve-language-choice-sets.ts`            | **Implemented**             | Ruleset origin language picks (`language`).                                                                                 |
-| `resolveSpeciesHeritageChoices`   | `species/`      | `resolve-species-heritage-choice-sets.ts`    | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                     |
-| `resolveSpeciesTraitGrantChoices` | `species/`      | `resolve-species-trait-grant-choice-sets.ts` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants. |
-| `resolveClassSkillChoices`        | `class/`        | `resolve-class-skill-choice-sets.ts`         | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                     |
-| `resolveClassToolChoices`         | `class/`        | `resolve-class-tool-choice-sets.ts`          | **Implemented** (BENCH-116) | Class `characterCreation.proficiencies.tools` pick (`toolProficiency`).                                                     |
-| `resolveClassFeatureGrantChoices` | `class/`        | `resolve-class-feature-grant-choice-sets.ts` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                      |
-| `resolveStartingEquipmentChoices` | `equipment/`    | `resolve-starting-equipment-choice-sets.ts`  | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                           |
-| `resolveSpellcastingChoices`      | `spellcasting/` | `resolve-spellcasting-choice-sets.ts`        | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                      |
+| Entry (adapter)                   | Folder          | Implementation module                        | Status                      | Emits                                                                                                                              |
+| --------------------------------- | --------------- | -------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `resolveRulesetLanguageChoices`   | `ruleset/`      | `resolve-language-choice-sets.ts`            | **Implemented**             | Ruleset origin language picks (`language`).                                                                                        |
+| `resolveSpeciesHeritageChoices`   | `species/`      | `resolve-species-heritage-choice-sets.ts`    | **Implemented**             | Heritage `trait` ChoiceSet when species has `heritage`.                                                                            |
+| `resolveSpeciesTraitGrantChoices` | `species/`      | `resolve-species-trait-grant-choice-sets.ts` | **Implemented**             | L1 trait grants via `resolveGrantGroupsFromContent` + `getUnlockedGrantsAtLevel`; includes selected heritage option grants.        |
+| `resolveClassSkillChoices`        | `class/`        | `resolve-class-skill-choice-sets.ts`         | **Implemented**             | Class `proficiencies.skills` pick (`skillProficiency`).                                                                            |
+| `resolveClassToolChoices`         | `class/`        | `resolve-class-tool-choice-sets.ts`          | **Implemented** (BENCH-116) | Class `characterCreation.proficiencies.tools` pick (`toolProficiency`) via `ToolProficiencyPool` + `resolveToolPoolChoiceOptions`. |
+| `resolveClassFeatureGrantChoices` | `class/`        | `resolve-class-feature-grant-choice-sets.ts` | **Implemented**             | L1 class feature grants (feat/proficiency/equipment/language choices).                                                             |
+| `resolveStartingEquipmentChoices` | `equipment/`    | `resolve-starting-equipment-choice-sets.ts`  | **Implemented** (BENCH-088) | Starting-equipment package picks.                                                                                                  |
+| `resolveSpellcastingChoices`      | `spellcasting/` | `resolve-spellcasting-choice-sets.ts`        | **Implemented** (BENCH-089) | Cantrip and prepared-spell ChoiceSets.                                                                                             |
 
 ### Grant traversal contract
 
@@ -147,16 +147,16 @@ Resolvers never read the deprecated `grants` bag directly.
 
 ### Level-1 seed choice shapes (BENCH-086 inventory)
 
-| Shape key                   | Resolver                                                                   |
-| --------------------------- | -------------------------------------------------------------------------- |
-| `heritage`                  | `resolveSpeciesHeritageChoices`                                            |
-| `classSkills:choose:from`   | `resolveClassSkillChoices`                                                 |
-| `classTools:choose:from`    | `resolveClassToolChoices`                                                  |
-| `featChoice:origin`         | `resolveSpeciesTraitGrantChoices` (`required: false` — MVP defers feat UI) |
-| `featChoice:fighting-style` | `resolveClassFeatureGrantChoices` (`required: false`)                      |
-| `starting-equipment`        | `resolveStartingEquipmentChoices`                                          |
-| `equipment:filtered:tool`   | `resolveStartingEquipmentChoices` (nested package pick)                    |
-| `damageType:heritage`       | Not a top-level ChoiceSet — applied when heritage option is selected       |
+| Shape key                   | Resolver                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| `heritage`                  | `resolveSpeciesHeritageChoices`                                                  |
+| `classSkills:choose:from`   | `resolveClassSkillChoices`                                                       |
+| `classTools:choose:pool`    | `resolveClassToolChoices` (legacy `from[]` normalized to explicit pool on parse) |
+| `featChoice:origin`         | `resolveSpeciesTraitGrantChoices` (`required: false` — MVP defers feat UI)       |
+| `featChoice:fighting-style` | `resolveClassFeatureGrantChoices` (`required: false`)                            |
+| `starting-equipment`        | `resolveStartingEquipmentChoices`                                                |
+| `equipment:filtered:tool`   | `resolveStartingEquipmentChoices` (nested package pick)                          |
+| `damageType:heritage`       | Not a top-level ChoiceSet — applied when heritage option is selected             |
 
 ## Builder orchestration (`character-builder/assembly/`)
 

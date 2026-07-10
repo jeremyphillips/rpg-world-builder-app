@@ -21,6 +21,7 @@ import {
   getSkillName,
   getToolCategoryLabel,
   getWeaponCategoryLabel,
+  isMeaningfulToolProficiencyPool,
   joinNaturalList,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
@@ -263,7 +264,10 @@ export function toolProficiencyPoolToFormRow(
   pool: ToolProficiencyPool,
 ): Pick<
   ToolProficiencyPoolItemForm,
-  'poolSource' | 'toolProficiencyPoolSlugs' | 'toolProficiencyPoolCategory'
+  | 'poolSource'
+  | 'toolProficiencyPoolSlugs'
+  | 'toolProficiencyPoolCategories'
+  | 'toolProficiencyPoolFilteredToolSlugs'
 > {
   if (pool.source === 'explicit') {
     return {
@@ -277,7 +281,8 @@ export function toolProficiencyPoolToFormRow(
 
   return {
     poolSource: 'filtered',
-    toolProficiencyPoolCategory: pool.toolCategory ?? PROFICIENCY_POOL_CATEGORY_ANY,
+    toolProficiencyPoolCategories: pool.toolCategories ?? [],
+    toolProficiencyPoolFilteredToolSlugs: pool.toolSlugs,
   }
 }
 
@@ -294,13 +299,12 @@ export function toolProficiencyPoolFromFormRow(
     return { source: 'any' }
   }
 
-  const toolCategory = categoryFormValueToDomain(row.toolProficiencyPoolCategory)
   const pool: Extract<ToolProficiencyPool, { source: 'filtered' }> = { source: 'filtered' }
-  if (toolCategory) {
-    pool.toolCategory = toolCategory as Extract<
-      ToolProficiencyPool,
-      { source: 'filtered' }
-    >['toolCategory']
+  if (row.toolProficiencyPoolCategories?.length) {
+    pool.toolCategories = row.toolProficiencyPoolCategories
+  }
+  if (row.toolProficiencyPoolFilteredToolSlugs?.length) {
+    pool.toolSlugs = row.toolProficiencyPoolFilteredToolSlugs
   }
   return pool
 }
@@ -370,19 +374,13 @@ function toolPoolTitleDetail(row: ToolProficiencyPoolItemForm): string {
   if (row.poolSource === 'any')
     return formatProficiencyGrantChooseFromAnyScopePhrase('tool', choose)
   if (row.poolSource === 'filtered') {
-    const category = categoryFormValueToDomain(row.toolProficiencyPoolCategory)
-    if (category) {
+    const pool = toolProficiencyPoolFromFormRow(row)
+    if (isMeaningfulToolProficiencyPool(pool)) {
       return choiceSentenceTitleDetail(
         formatToolProficiencyGrantSentence({
           kind: 'choice',
           choose,
-          pool: {
-            source: 'filtered',
-            toolCategory: category as Extract<
-              ToolProficiencyPool,
-              { source: 'filtered' }
-            >['toolCategory'],
-          },
+          pool,
         }),
       )
     }

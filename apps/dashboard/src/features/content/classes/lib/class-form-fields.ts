@@ -30,6 +30,7 @@ import { startingEquipmentFormSchema } from './character-creation/class-starting
 import {
   characterCreationProficienciesFormSchema,
   characterCreationSkillChoiceFields,
+  characterCreationToolChoiceFields,
 } from './character-creation/class-character-creation-proficiencies-form-fields'
 import {
   STARTING_EQUIPMENT_FIELD_NAME,
@@ -135,6 +136,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           startingEquipmentOptionItemFields(ctx),
         ),
         ...characterCreationSkillChoiceFields(ctx),
+        ...characterCreationToolChoiceFields(ctx),
       ],
       header: createElement(ClassCharacterCreationTab, { formCtx: ctx }),
     },

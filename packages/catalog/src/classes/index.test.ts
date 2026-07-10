@@ -12,8 +12,10 @@ import {
   normalizeGrantGroups,
   subclassChoiceFeatureId,
   skillSlugsFromClassChoices,
+  listToolsMatchingPool,
   type CharacterClass,
 } from '@rpg/contracts'
+import { loadSeedEquipment } from '../equipment'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -714,6 +716,41 @@ describe('SRD 5.2.1 class seed', () => {
       expect(choice?.from).toEqual(from)
       expect(choice?.choose).toBeGreaterThan(0)
     }
+  })
+
+  it('Bard stores three musical-instrument tool proficiency choices', () => {
+    const bard = getClassBySlug(RULESET, 'bard')
+    expect(bard.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: 'Musical Instruments',
+      choose: 3,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['musical_instrument'],
+      },
+    })
+  })
+
+  it('Bard tool pool resolves to all musical-instrument seed tools', () => {
+    const bard = getClassBySlug(RULESET, 'bard')
+    const choice = bard.characterCreation?.proficiencies?.tools?.choices?.[0]
+    expect(choice?.pool).toMatchObject({
+      source: 'filtered',
+      toolCategories: ['musical_instrument'],
+    })
+
+    const equipment = new Map(loadSeedEquipment(RULESET).map((row) => [row.id, row]))
+    const resolved = listToolsMatchingPool({
+      pool: choice!.pool!,
+      equipment,
+      rulesetId: RULESET,
+    })
+
+    expect(resolved).toHaveLength(10)
+    expect(
+      resolved.every((row) => row.kind === 'tool' && row.toolCategory === 'musical_instrument'),
+    ).toBe(true)
+    expect(choice!.choose).toBeLessThanOrEqual(resolved.length)
   })
 
   it('ships starting equipment for every class with at least two options', () => {

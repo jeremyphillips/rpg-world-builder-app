@@ -45,8 +45,8 @@ describe('resolveClassToolChoiceSets', () => {
         min: 1,
         max: 1,
         options: [
-          { id: luteTool.id, label: 'Lute' },
           { id: fluteTool.id, label: 'Flute' },
+          { id: luteTool.id, label: 'Lute' },
         ],
         required: true,
       },

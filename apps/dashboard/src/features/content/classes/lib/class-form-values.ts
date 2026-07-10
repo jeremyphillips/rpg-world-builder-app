@@ -252,6 +252,7 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
   characterCreation: {
     proficiencies: {
       skills: { choose: 2, from: [] },
+      tools: { choose: 0, poolSource: 'filtered', poolToolCategories: [] },
     },
   },
   features: [

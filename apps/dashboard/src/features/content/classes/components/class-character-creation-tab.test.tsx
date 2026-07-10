@@ -51,9 +51,9 @@ const bardStartingEquipment = startingEquipmentToFormValues(
 const monkSeedIds = monkStartingEquipment.options.map((option) => option.id!)
 
 describe('ClassCharacterCreationTab', () => {
-  it('shows skill proficiency choices even when there is no starting equipment', () => {
+  it('shows skill and tool proficiency choices even when there is no starting equipment', () => {
     render(<TabShell />)
-    expect(screen.getByText('Character can choose')).toBeInTheDocument()
+    expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
     expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
   })
@@ -154,6 +154,16 @@ describe('ClassCharacterCreationTab', () => {
     await user.click(screen.getByRole('switch', { name: /Active in campaign/i }))
 
     expect(screen.getByText('Inactive')).toBeInTheDocument()
+  })
+
+  it('renders bard tool proficiency choices when pre-filled', () => {
+    const bardProficiencies = characterCreationProficienciesToFormValues(
+      pickClass('bard').characterCreation,
+    )
+    render(<TabShell proficiencies={bardProficiencies} />)
+    const chooseSpinbuttons = screen.getAllByRole('spinbutton')
+    expect(chooseSpinbuttons.some((input) => input.getAttribute('value') === '3')).toBe(true)
+    expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders rogue skill choices when pre-filled', () => {

@@ -122,22 +122,67 @@ const explicitToolProficiencyPoolSchema = z.object({
   toolSlugs: z.array(z.string().min(1)).min(1),
 })
 
-const filteredToolProficiencyPoolSchema = z.object({
-  source: z.literal('filtered'),
-  toolCategory: toolCategorySchema.optional(),
-})
+const filteredToolProficiencyPoolSchema = z
+  .object({
+    source: z.literal('filtered'),
+    toolCategories: z.array(toolCategorySchema).optional(),
+    toolSlugs: z.array(z.string().min(1)).optional(),
+  })
+  .superRefine((val, ctx) => {
+    const hasCategories = (val.toolCategories?.length ?? 0) > 0
+    const hasSlugs = (val.toolSlugs?.length ?? 0) > 0
+    if (!hasCategories && !hasSlugs) {
+      ctx.addIssue({
+        code: 'custom',
+        message: grantValidationMessages.filteredToolPoolRequiresTarget(),
+        path: ['toolCategories'],
+      })
+    }
+  })
+
+/** Coerces legacy single `toolCategory` filtered pools to `toolCategories` arrays. */
+export function normalizeLegacyFilteredToolPool(input: unknown): unknown {
+  if (typeof input !== 'object' || input === null) return input
+
+  const pool = input as Record<string, unknown>
+  if (pool.source !== 'filtered') return input
+
+  const { toolCategory, toolCategories, ...rest } = pool
+  if (toolCategory !== undefined && toolCategories === undefined) {
+    return { ...rest, source: 'filtered', toolCategories: [toolCategory] }
+  }
+
+  const { toolCategory: _legacyCategory, ...stripped } = pool
+  return stripped
+}
 
 const anyToolProficiencyPoolSchema = z.object({
   source: z.literal('any'),
 })
 
-export const toolProficiencyPoolSchema = z.discriminatedUnion('source', [
+const toolProficiencyPoolObjectSchema = z.discriminatedUnion('source', [
   explicitToolProficiencyPoolSchema,
   filteredToolProficiencyPoolSchema,
   anyToolProficiencyPoolSchema,
 ])
 
+export const toolProficiencyPoolSchema = z.preprocess(
+  normalizeLegacyFilteredToolPool,
+  toolProficiencyPoolObjectSchema,
+)
+
 export type ToolProficiencyPool = z.infer<typeof toolProficiencyPoolSchema>
+
+/** Returns true when a tool proficiency pool has at least one resolvable target. */
+export function isMeaningfulToolProficiencyPool(pool: ToolProficiencyPool | undefined): boolean {
+  if (!pool) return false
+  if (pool.source === 'explicit') return pool.toolSlugs.length > 0
+  if (pool.source === 'any') return true
+  if (pool.source === 'filtered') {
+    return (pool.toolCategories?.length ?? 0) > 0 || (pool.toolSlugs?.length ?? 0) > 0
+  }
+  return false
+}
 
 export const fixedToolProficiencyGrantSchema = z
   .object({
@@ -297,8 +342,17 @@ export function formatToolProficiencyPoolLabel(pool: ToolProficiencyPool): strin
   if (pool.source === 'any') {
     return getProficiencyPoolAnyLabel('tool')
   }
-  if (pool.toolCategory) {
-    return getToolCategoryLabel(pool.toolCategory)
+  if (pool.source === 'filtered') {
+    const parts: string[] = []
+    pool.toolCategories?.forEach((category) => {
+      parts.push(getToolCategoryLabel(category))
+    })
+    pool.toolSlugs?.forEach((slug) => {
+      parts.push(formatVocabularySlugLabel(slug))
+    })
+    if (parts.length > 0) {
+      return joinNaturalList(parts)
+    }
   }
   return getProficiencyPoolAnyLabel('tool')
 }
@@ -434,8 +488,12 @@ function formatToolChoiceSentence(choose: number, pool: ToolProficiencyPool): st
   if (pool.source === 'any') {
     return `Character chooses ${choose} ${getProficiencyDomainSentenceForm('tool', choose)} from ${getProficiencyPoolAnyScopePhrase('tool')}.`
   }
-  if (pool.source === 'filtered' && pool.toolCategory) {
-    return `Character chooses ${choose} ${getProficiencyDomainSentenceForm('tool', choose)} from ${getToolCategorySentenceForm(pool.toolCategory, 2)}.`
+  if (pool.source === 'filtered') {
+    const categories = pool.toolCategories ?? []
+    if (categories.length === 1 && !(pool.toolSlugs?.length ?? 0)) {
+      return `Character chooses ${choose} ${getProficiencyDomainSentenceForm('tool', choose)} from ${getToolCategorySentenceForm(categories[0]!, 2)}.`
+    }
+    return `Character chooses ${choose} ${getProficiencyDomainSentenceForm('tool', choose)} from ${formatToolProficiencyPoolLabel(pool)}.`
   }
   if (pool.source === 'explicit') {
     return `Character chooses ${choose} ${getProficiencyDomainSentenceForm('tool', choose)} from ${getProficiencyPoolSelectedPhrase('tool')}.`
