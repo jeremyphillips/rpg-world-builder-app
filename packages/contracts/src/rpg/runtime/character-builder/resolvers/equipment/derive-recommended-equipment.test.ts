@@ -7,6 +7,7 @@ import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
 import { deriveRecommendedEquipment } from './derive-recommended-equipment'
 import { resolveEquipmentPickerItems } from './resolve-equipment-picker-items'
+import { rogueClass } from '../../proficiency-test-fixtures'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -193,6 +194,49 @@ describe('deriveRecommendedEquipment', () => {
     expect(recommended.has(dagger.id)).toBe(true)
     expect(recommended.has(longsword.id)).toBe(false)
     expect(recommended.has(chainMail.id)).toBe(false)
+  })
+
+  it('includes proficient tools for classes with fixed tool grants', () => {
+    const thievesTools = equipmentSchema.parse({
+      id: `${RULESET}:thieves-tools`,
+      slug: 'thieves-tools',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: "Thieves' Tools",
+      description: '',
+      cost: { amount: 25, currency: 'gp' },
+      weight: { value: 1, unit: 'lb' },
+      kind: 'tool',
+      toolCategory: 'thieves',
+      ability: 'dex',
+      utilizes: [{ description: 'Pick a lock', dc: 15 }],
+    })
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [rogueClass],
+      spells: [],
+      equipment: [thievesTools, longsword],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: rogueClass.id, level: 1 as const },
+    }
+    const proficiencies = assembleCharacterProficiencies(draft, catalogIndex, [], rogueClass)
+
+    const recommended = deriveRecommendedEquipment({
+      characterClass: rogueClass,
+      catalogIndex,
+      proficiencies,
+    })
+
+    expect(recommended.has(thievesTools.id)).toBe(true)
+    expect(recommended.has(longsword.id)).toBe(true)
   })
 })
 

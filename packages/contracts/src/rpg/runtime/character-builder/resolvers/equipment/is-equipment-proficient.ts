@@ -1,4 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
+import { isToolProficient } from '../../../creature/proficiencies'
 import type { CharacterProficiencies } from '../../../character/proficiencies'
 
 /** Returns true when the character's assembled proficiencies cover this equipment row. */
@@ -14,11 +15,7 @@ export function isEquipmentProficient(
     case 'armor':
       return proficiencies.armor.some((entry) => entry.armorCategory === equipment.category)
     case 'tool':
-      return proficiencies.tools.some(
-        (entry) =>
-          entry.toolId === equipment.id ||
-          (entry.toolCategory !== undefined && entry.toolCategory === equipment.toolCategory),
-      )
+      return isToolProficient({ equipment, proficiencies: proficiencies.tools })
     default:
       return true
   }

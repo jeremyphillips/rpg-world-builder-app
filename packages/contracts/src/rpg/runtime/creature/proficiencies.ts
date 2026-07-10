@@ -8,6 +8,7 @@ import type {
   WeaponProficiencyPool,
 } from '../../content/lib/proficiency-grant'
 import { getSkillName } from '../../content/skill-proficiency'
+import type { ToolCategory } from '../../vocab/equipment/tool-category'
 import type { CreatureEquipmentCatalog } from './equipment'
 import { toEquipmentContentId } from './equipment'
 
@@ -18,6 +19,37 @@ import { toEquipmentContentId } from './equipment'
 // ---------------------------------------------------------------------------
 
 export type CreatureSkillCatalog = ReadonlyMap<string, SkillProficiency>
+
+/** Neutral tool-proficiency target shared by character sheets and future monster stat blocks. */
+export type CreatureToolProficiencyTarget = {
+  toolId?: string
+  toolCategory?: ToolCategory
+}
+
+function toolIdMatchesEquipment(
+  toolId: string,
+  equipment: Extract<Equipment, { kind: 'tool' }>,
+): boolean {
+  return (
+    toolId === equipment.id ||
+    toolId === equipment.slug ||
+    toEquipmentContentId(equipment.rulesetId, toolId) === equipment.id
+  )
+}
+
+/** Returns true when proficiency rows cover a catalog tool row. */
+export function isToolProficient(args: {
+  equipment: Extract<Equipment, { kind: 'tool' }>
+  proficiencies: readonly CreatureToolProficiencyTarget[]
+}): boolean {
+  const { equipment, proficiencies } = args
+
+  return proficiencies.some(
+    (entry) =>
+      (entry.toolCategory !== undefined && entry.toolCategory === equipment.toolCategory) ||
+      (entry.toolId !== undefined && toolIdMatchesEquipment(entry.toolId, equipment)),
+  )
+}
 
 function findSkillByIdOrSlug(
   skills: CreatureSkillCatalog,

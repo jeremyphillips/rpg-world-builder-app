@@ -5,8 +5,8 @@ import type { CharacterProficiencies } from '../../../character/proficiencies'
 import { isEquipmentProficient } from './is-equipment-proficient'
 
 /**
- * Recommended picker rows: package grants plus weapons and armor in proficient
- * categories. Availability-filtered to catalog rows present in the index.
+ * Recommended picker rows: package grants plus proficient weapons, armor, and
+ * tools. Availability-filtered to catalog rows present in the index.
  */
 export function deriveRecommendedEquipment(args: {
   characterClass: CharacterClass
@@ -31,7 +31,9 @@ export function deriveRecommendedEquipment(args: {
   }
 
   for (const equipment of catalogIndex.equipment.values()) {
-    if (equipment.kind !== 'weapon' && equipment.kind !== 'armor') continue
+    if (equipment.kind !== 'weapon' && equipment.kind !== 'armor' && equipment.kind !== 'tool') {
+      continue
+    }
     if (!isEquipmentProficient(equipment, proficiencies)) continue
     recommended.add(equipment.id)
   }

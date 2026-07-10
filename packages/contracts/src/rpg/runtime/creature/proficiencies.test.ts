@@ -4,6 +4,7 @@ import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import {
   armorPoolChoiceOptions,
+  isToolProficient,
   listArmorMatchingPool,
   listSkillsMatchingPool,
   listToolsMatchingPool,
@@ -49,10 +50,20 @@ const shortbow = {
 const lute = {
   id: 'srd-cc-5.2.1:lute',
   slug: 'lute',
+  rulesetId: 'srd-cc-5.2.1',
   name: 'Lute',
   kind: 'tool',
   toolCategory: 'musical_instrument',
-} as Equipment
+} as Extract<Equipment, { kind: 'tool' }>
+
+const thievesTools = {
+  id: 'srd-cc-5.2.1:thieves-tools',
+  slug: 'thieves-tools',
+  rulesetId: 'srd-cc-5.2.1',
+  name: "Thieves' Tools",
+  kind: 'tool',
+  toolCategory: 'thieves',
+} as Extract<Equipment, { kind: 'tool' }>
 
 const leatherArmor = {
   id: 'srd-cc-5.2.1:leather-armor',
@@ -68,6 +79,44 @@ const equipment = new Map([
   [lute.id, lute],
   [leatherArmor.id, leatherArmor],
 ])
+
+describe('isToolProficient', () => {
+  it('matches tool proficiency by content id', () => {
+    expect(
+      isToolProficient({
+        equipment: lute,
+        proficiencies: [{ toolId: lute.id }],
+      }),
+    ).toBe(true)
+  })
+
+  it('matches tool proficiency by slug', () => {
+    expect(
+      isToolProficient({
+        equipment: thievesTools,
+        proficiencies: [{ toolId: 'thieves-tools' }],
+      }),
+    ).toBe(true)
+  })
+
+  it('matches tool proficiency by category', () => {
+    expect(
+      isToolProficient({
+        equipment: lute,
+        proficiencies: [{ toolCategory: 'musical_instrument' }],
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when no proficiency covers the tool', () => {
+    expect(
+      isToolProficient({
+        equipment: lute,
+        proficiencies: [{ toolId: 'thieves-tools' }],
+      }),
+    ).toBe(false)
+  })
+})
 
 describe('listSkillsMatchingPool', () => {
   it('expands explicit skill ids against the catalog', () => {
