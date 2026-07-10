@@ -12,6 +12,7 @@ import type {
 } from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetSearchRowVariants,
+  catalogPickerSheetTabRowVariants,
   catalogPickerSheetToolbarVariants,
 } from './catalog-picker-sheet.variants'
 
@@ -25,6 +26,7 @@ type CatalogPickerSheetToolbarProps = {
   onActiveTabIdChange: (tabId: string) => void
   onResetActiveTab: () => void
   tabCounts: Record<string, number>
+  tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   /** @deprecated Use {@link CatalogPickerSheetToolbarProps.toolbarControls}. */
   filters?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
@@ -40,6 +42,7 @@ export function CatalogPickerSheetToolbar({
   onActiveTabIdChange,
   onResetActiveTab,
   tabCounts,
+  tabToolbarActions,
   toolbarControls,
   filters,
 }: CatalogPickerSheetToolbarProps) {
@@ -53,25 +56,30 @@ export function CatalogPickerSheetToolbar({
 
   const controls = toolbarControls ?? filters
   const renderedControls = typeof controls === 'function' ? controls(toolbarContext) : controls
+  const renderedTabActions =
+    typeof tabToolbarActions === 'function' ? tabToolbarActions(toolbarContext) : tabToolbarActions
 
   return (
     <div className={catalogPickerSheetToolbarVariants()}>
       {tabs && tabs.length > 0 ? (
-        <Tabs value={activeTabId} onValueChange={onActiveTabIdChange}>
-          <TabsList aria-label={`${title} views`}>
-            {tabs.map((tab) => {
-              const count = tab.count ?? tabCounts[tab.id] ?? 0
-              return (
-                <TabsTrigger key={tab.id} value={tab.id}>
-                  {tab.label}
-                  <Text as="span" variant="muted" className="ml-1 tabular-nums">
-                    ({count})
-                  </Text>
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
-        </Tabs>
+        <div className={catalogPickerSheetTabRowVariants()}>
+          <Tabs value={activeTabId} onValueChange={onActiveTabIdChange} className="min-w-0 flex-1">
+            <TabsList aria-label={`${title} views`} className="w-full border-b-0">
+              {tabs.map((tab) => {
+                const count = tab.count ?? tabCounts[tab.id] ?? 0
+                return (
+                  <TabsTrigger key={tab.id} value={tab.id}>
+                    {tab.label}
+                    <Text as="span" variant="muted" className="ml-1 tabular-nums">
+                      ({count})
+                    </Text>
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </Tabs>
+          {renderedTabActions ? <div className="shrink-0">{renderedTabActions}</div> : null}
+        </div>
       ) : null}
 
       <div className={catalogPickerSheetSearchRowVariants()}>

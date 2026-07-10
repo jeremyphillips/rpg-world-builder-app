@@ -131,6 +131,23 @@ function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string
   return scoreItem({ fields: [{ text: item.searchText, weight: 1, role: 'label' }] }, searchQuery)
 }
 
+function filterEquipmentPickerItemsBySearch(
+  items: readonly EquipmentPickerItem[],
+  searchQuery: string,
+): EquipmentPickerItem[] {
+  const normalizedQuery = normalizeSearchQuery(searchQuery)
+  if (!normalizedQuery) return [...items]
+
+  return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
+}
+
+function filterEquipmentPickerItemsForTab(
+  items: readonly EquipmentPickerItem[],
+  activeTabId: string,
+): EquipmentPickerItem[] {
+  return items.filter((item) => getEquipmentPickerItemTab(item) === activeTabId)
+}
+
 function compareEquipmentPickerItemsByPrice(
   left: EquipmentPickerItem,
   right: EquipmentPickerItem,
@@ -316,6 +333,44 @@ export function filterEquipmentPickerItems(
     }
     return true
   })
+}
+
+/**
+ * Rows hidden by Affordable now within the active tab, after search/category/starting-budget
+ * filters. Informational only — not part of checkbox label or active-filter counts.
+ */
+export function countEquipmentPickerAffordableHiddenImpact(
+  items: readonly EquipmentPickerItem[],
+  options: {
+    activeTabId: string
+    searchQuery: string
+    filterOutUnaffordable: boolean
+    filterOutNonProficient: boolean
+    selectedKind: EquipmentPickerKindFilter
+    showAffordableOnly: boolean
+  },
+): number {
+  if (!options.showAffordableOnly) return 0
+
+  const tabScoped = filterEquipmentPickerItemsForTab(items, options.activeTabId)
+  const searchScoped = filterEquipmentPickerItemsBySearch(tabScoped, options.searchQuery)
+  const structuredFilterOptions = {
+    filterOutUnaffordable: options.filterOutUnaffordable,
+    filterOutNonProficient: options.filterOutNonProficient,
+    selectedKind: options.selectedKind,
+  }
+
+  const beforeAffordable = filterEquipmentPickerItems(searchScoped, {
+    ...structuredFilterOptions,
+    showAffordableOnly: false,
+  })
+  const afterAffordable = filterEquipmentPickerItems(searchScoped, {
+    ...structuredFilterOptions,
+    showAffordableOnly: true,
+  })
+
+  const hiddenCount = beforeAffordable.length - afterAffordable.length
+  return hiddenCount > 0 ? hiddenCount : 0
 }
 
 /** Stable within-tab ordering: essential → strong → compatible → neutral → not proficient. */

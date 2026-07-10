@@ -30,6 +30,8 @@ type CatalogPickerSheetBaseProps<TItem> = {
   defaultTabId?: string
   getItemTab?: (item: TItem) => string
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
+  /** Trailing actions rendered inline with the tab row (e.g. Reset view). */
+  tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   /** @deprecated Use {@link CatalogPickerSheetBaseProps.toolbarControls}. */
   filters?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   transformVisibleItems?: (

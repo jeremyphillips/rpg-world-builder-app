@@ -117,6 +117,10 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(within(list).getByText('Cheap Gear')).toBeInTheDocument()
     expect(within(list).queryByText('Mid Gear')).not.toBeInTheDocument()
+    expect(screen.getByText('1 hidden')).toBeInTheDocument()
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).not.toHaveAccessibleName(/hidden/i)
   })
 
   it('clears search, category, and affordable filters together with clear_filters mode', async () => {
@@ -254,6 +258,29 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
       'Name: Z–A',
     )
+  })
+
+  it('renders reset view inline with the tab row', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    await user.click(screen.getByRole('tab', { name: /Recommended/i }))
+
+    const resetButton = screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL })
+    expect(tablist.parentElement?.parentElement).toContainElement(resetButton)
+    expect(resetButton).toHaveClass('[&_svg]:size-3')
   })
 
   it('shows the sort control with an accessible label', () => {

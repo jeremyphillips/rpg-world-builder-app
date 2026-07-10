@@ -17,14 +17,19 @@ export const equipmentPickerFiltersMainClasses =
   'flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4'
 
 export const equipmentPickerSortActionsGroupClasses =
-  'flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center sm:gap-4 sm:border-border sm:max-sm:pt-1 sm:border-l sm:pl-4'
+  'flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center sm:gap-4'
+
+export const equipmentPickerTabActionButtonClasses = 'gap-1 text-xs [&_svg]:size-3'
+
+export const equipmentPickerAffordableFilterClasses = 'flex items-center gap-2'
+
+export const equipmentPickerAffordableHiddenCountClasses =
+  'text-xs text-muted-foreground tabular-nums'
 
 export const equipmentPickerSortFilterClasses =
   'flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2'
 
 export const equipmentPickerSortLabelClasses = 'text-sm text-muted-foreground'
-
-export const equipmentPickerAffordableFilterClasses = 'flex items-center gap-2'
 
 export const equipmentPickerAffordableLabelClasses = 'text-sm'
 

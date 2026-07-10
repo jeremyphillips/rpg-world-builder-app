@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   equipmentPickerBudgetFixture,
+  equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerRopeFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
+  countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
   countEquipmentPickerStructuredFilters,
   filterAndSortEquipmentPickerItems,
@@ -442,5 +444,42 @@ describe('equipment-picker-drawer.lib', () => {
         defaultTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
       }),
     ).toBe(false)
+  })
+
+  it('counts affordable hidden impact within the active tab after search and structured filters', () => {
+    expect(
+      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
+        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
+        searchQuery: '',
+        filterOutUnaffordable: true,
+        filterOutNonProficient: false,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: true,
+      }),
+    ).toBe(1)
+
+    expect(
+      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
+        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
+        searchQuery: 'cheap',
+        filterOutUnaffordable: true,
+        filterOutNonProficient: false,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: true,
+      }),
+    ).toBe(0)
+  })
+
+  it('hides affordable impact count when the toggle is off or nothing is excluded', () => {
+    expect(
+      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
+        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
+        searchQuery: '',
+        filterOutUnaffordable: true,
+        filterOutNonProficient: false,
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: false,
+      }),
+    ).toBe(0)
   })
 })

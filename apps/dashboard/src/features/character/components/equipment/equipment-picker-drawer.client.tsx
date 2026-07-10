@@ -30,6 +30,7 @@ import {
 import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 
 import {
+  countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
   countEquipmentPickerStructuredFilters,
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
@@ -66,6 +67,7 @@ import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import {
   equipmentPickerAffordableFilterClasses,
+  equipmentPickerAffordableHiddenCountClasses,
   equipmentPickerAffordableLabelClasses,
   equipmentPickerDisabledRowClasses,
   equipmentPickerHeaderDividerClasses,
@@ -80,42 +82,32 @@ import {
   equipmentPickerSortActionsGroupClasses,
   equipmentPickerSortFilterClasses,
   equipmentPickerSortLabelClasses,
+  equipmentPickerTabActionButtonClasses,
   equipmentPickerWarningBadgeClasses,
   EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentPickerToolbarControls({
-  kinds,
-  selectedKind,
-  onSelectedKindChange,
-  showAffordableOnly,
-  onShowAffordableOnlyChange,
-  showAffordableFilter,
-  sortMode,
-  onSortModeChange,
-  toolbarContext,
+function EquipmentPickerTabToolbarActions({
   toolbarResetMode,
   defaultTabId,
+  selectedKind,
+  showAffordableOnly,
+  sortMode,
+  toolbarContext,
   onClearStructuredFilters,
   onResetView,
 }: {
-  kinds: EquipmentPickerSupportedKind[]
-  selectedKind: EquipmentPickerKindFilter
-  onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
-  showAffordableOnly: boolean
-  onShowAffordableOnlyChange: (checked: boolean) => void
-  showAffordableFilter: boolean
-  sortMode: EquipmentPickerSortMode
-  onSortModeChange: (mode: EquipmentPickerSortMode) => void
-  toolbarContext: CatalogPickerSheetToolbarContext
   toolbarResetMode: EquipmentPickerToolbarResetMode
   defaultTabId: string
+  selectedKind: EquipmentPickerKindFilter
+  showAffordableOnly: boolean
+  sortMode: EquipmentPickerSortMode
+  toolbarContext: CatalogPickerSheetToolbarContext
   onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
-  const showCategoryFilter = kinds.length > 1
   const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
     selectedKind,
     showAffordableOnly,
@@ -139,6 +131,62 @@ function EquipmentPickerToolbarControls({
     toolbarContext.clearSearchQuery()
     onClearStructuredFilters()
   }
+
+  if (!showClearFilters && !showResetView) {
+    return null
+  }
+
+  if (showClearFilters) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={equipmentPickerTabActionButtonClasses}
+        onClick={handleClearFilters}
+      >
+        <RotateCcw aria-hidden className="size-3" />
+        {EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
+      </Button>
+    )
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className={equipmentPickerTabActionButtonClasses}
+      onClick={onResetView}
+    >
+      <RotateCcw aria-hidden className="size-3" />
+      {EQUIPMENT_PICKER_RESET_VIEW_LABEL}
+    </Button>
+  )
+}
+
+function EquipmentPickerFilterToolbarControls({
+  kinds,
+  selectedKind,
+  onSelectedKindChange,
+  showAffordableOnly,
+  onShowAffordableOnlyChange,
+  showAffordableFilter,
+  affordableHiddenCount,
+  sortMode,
+  onSortModeChange,
+}: {
+  kinds: EquipmentPickerSupportedKind[]
+  selectedKind: EquipmentPickerKindFilter
+  onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
+  showAffordableOnly: boolean
+  onShowAffordableOnlyChange: (checked: boolean) => void
+  showAffordableFilter: boolean
+  affordableHiddenCount: number
+  sortMode: EquipmentPickerSortMode
+  onSortModeChange: (mode: EquipmentPickerSortMode) => void
+}) {
+  const showCategoryFilter = kinds.length > 1
 
   return (
     <div className={equipmentPickerFiltersRowClasses}>
@@ -182,6 +230,11 @@ function EquipmentPickerToolbarControls({
             >
               {EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
             </Text>
+            {showAffordableOnly && affordableHiddenCount > 0 ? (
+              <Text as="span" className={equipmentPickerAffordableHiddenCountClasses}>
+                {affordableHiddenCount} hidden
+              </Text>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -207,26 +260,6 @@ function EquipmentPickerToolbarControls({
             </SelectContent>
           </Select>
         </div>
-
-        {showClearFilters ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-xs"
-            onClick={handleClearFilters}
-          >
-            <RotateCcw aria-hidden />
-            {EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
-          </Button>
-        ) : null}
-
-        {showResetView ? (
-          <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={onResetView}>
-            <RotateCcw aria-hidden />
-            {EQUIPMENT_PICKER_RESET_VIEW_LABEL}
-          </Button>
-        ) : null}
       </div>
     </div>
   )
@@ -392,7 +425,7 @@ export function EquipmentPickerDrawer({
       hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
       transformVisibleItems={transformVisibleItems}
-      toolbarControls={(toolbarContext) => {
+      tabToolbarActions={(toolbarContext) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
           setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
@@ -402,23 +435,38 @@ export function EquipmentPickerDrawer({
         }
 
         return (
-          <EquipmentPickerToolbarControls
-            kinds={kindOptions}
-            selectedKind={selectedKind}
-            onSelectedKindChange={handleSelectedKindChange}
-            showAffordableOnly={showAffordableOnly}
-            onShowAffordableOnlyChange={setShowAffordableOnly}
-            showAffordableFilter={Boolean(budget)}
-            sortMode={sortMode}
-            onSortModeChange={setSortMode}
-            toolbarContext={toolbarContext}
+          <EquipmentPickerTabToolbarActions
             toolbarResetMode={toolbarResetMode}
             defaultTabId={defaultTab}
+            selectedKind={selectedKind}
+            showAffordableOnly={showAffordableOnly}
+            sortMode={sortMode}
+            toolbarContext={toolbarContext}
             onClearStructuredFilters={handleClearStructuredFilters}
             onResetView={handleResetView}
           />
         )
       }}
+      toolbarControls={(toolbarContext) => (
+        <EquipmentPickerFilterToolbarControls
+          kinds={kindOptions}
+          selectedKind={selectedKind}
+          onSelectedKindChange={handleSelectedKindChange}
+          showAffordableOnly={showAffordableOnly}
+          onShowAffordableOnlyChange={setShowAffordableOnly}
+          showAffordableFilter={Boolean(budget)}
+          affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
+            activeTabId: toolbarContext.activeTabId,
+            searchQuery: toolbarContext.searchQuery,
+            filterOutUnaffordable,
+            filterOutNonProficient,
+            selectedKind,
+            showAffordableOnly,
+          })}
+          sortMode={sortMode}
+          onSortModeChange={setSortMode}
+        />
+      )}
       renderItemHeader={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
         const badge = getEquipmentPickerBadge(item)

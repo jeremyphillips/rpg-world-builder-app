@@ -112,6 +112,31 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Query:')).toBeInTheDocument()
   })
 
+  it('renders tab toolbar actions inline with tabs', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        tabToolbarActions={<button type="button">Reset view</button>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    const resetButton = screen.getByRole('button', { name: 'Reset view' })
+    expect(tablist.parentElement?.parentElement).toContainElement(resetButton)
+  })
+
   it('preserves custom order from transformVisibleItems', () => {
     render(
       <CatalogPickerSheet

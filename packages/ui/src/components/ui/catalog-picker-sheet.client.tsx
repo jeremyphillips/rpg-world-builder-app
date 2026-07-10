@@ -84,6 +84,7 @@ export function CatalogPickerSheet<TItem>({
   getItemTab,
   toolbarControls,
   filters,
+  tabToolbarActions,
   transformVisibleItems,
   hasStructuredFilters = false,
   headerExtra,
@@ -159,6 +160,7 @@ export function CatalogPickerSheet<TItem>({
           onActiveTabIdChange={setActiveTabId}
           onResetActiveTab={resetActiveTab}
           tabCounts={tabCounts}
+          tabToolbarActions={tabToolbarActions}
           toolbarControls={toolbarControls ?? filters}
           filters={filters}
         />
