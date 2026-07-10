@@ -10,6 +10,7 @@ import {
 import {
   countEquipmentPickerClearableCriteria,
   countEquipmentPickerStructuredFilters,
+  filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
   getEquipmentPickerBadge,
@@ -17,6 +18,7 @@ import {
   getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
+  hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   sortEquipmentPickerItems,
@@ -25,6 +27,8 @@ import {
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_PRICE_ASC,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
@@ -323,5 +327,120 @@ describe('equipment-picker-drawer.lib', () => {
         equipmentPickerBudgetFixture,
       ),
     ).toBeUndefined()
+  })
+
+  it('matches recommendation order for empty-query best_match', () => {
+    const shuffled = [
+      equipmentPickerItemsFixture[1]!,
+      equipmentPickerItemsFixture[2]!,
+      equipmentPickerItemsFixture[0]!,
+    ]
+
+    expect(
+      filterAndSortEquipmentPickerItems(shuffled, {
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(sortEquipmentPickerItems(shuffled).map((item) => item.equipment.name))
+  })
+
+  it('sorts by price ascending with best-match tiebreaker for equal prices', () => {
+    const cheapRope: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'srd-cc-5.2.1:cheap-rope',
+        slug: 'cheap-rope',
+        name: 'Cheap Rope',
+        cost: { amount: 1, currency: 'gp' },
+      },
+      searchText: 'cheap rope adventuring gear',
+    }
+    const priceyRope: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'srd-cc-5.2.1:pricey-rope',
+        slug: 'pricey-rope',
+        name: 'Pricey Rope',
+        cost: { amount: 5, currency: 'gp' },
+      },
+      searchText: 'pricey rope adventuring gear',
+    }
+
+    const sorted = filterAndSortEquipmentPickerItems([priceyRope, cheapRope], {
+      searchQuery: '',
+      sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+    })
+
+    expect(sorted.map((item) => item.equipment.name)).toEqual(['Cheap Rope', 'Pricey Rope'])
+  })
+
+  it('sorts priceless items after priced rows in both price directions', () => {
+    const priced = equipmentPickerItemsFixture[2]!
+    const priceless: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'srd-cc-5.2.1:priceless-rope',
+        slug: 'priceless-rope',
+        name: 'Priceless Rope',
+        cost: undefined as never,
+      },
+      searchText: 'priceless rope adventuring gear',
+    }
+
+    const asc = filterAndSortEquipmentPickerItems([priceless, priced], {
+      searchQuery: '',
+      sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+    })
+    const desc = filterAndSortEquipmentPickerItems([priceless, priced], {
+      searchQuery: '',
+      sortMode: 'price_desc',
+    })
+
+    expect(asc.map((item) => item.equipment.name)).toEqual(['Rope', 'Priceless Rope'])
+    expect(desc.map((item) => item.equipment.name)).toEqual(['Rope', 'Priceless Rope'])
+  })
+
+  it('excludes search score-zero rows and lets price sort beat relevance with a query', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+    const chainMail = equipmentPickerItemsFixture[1]!
+    const rope = equipmentPickerItemsFixture[2]!
+
+    const filtered = filterAndSortEquipmentPickerItems([longsword, chainMail, rope], {
+      searchQuery: 'rope',
+      sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+    })
+    expect(filtered.map((item) => item.equipment.name)).toEqual(['Rope'])
+
+    const priceSorted = filterAndSortEquipmentPickerItems([longsword, rope], {
+      searchQuery: 'long',
+      sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+    })
+    expect(priceSorted.map((item) => item.equipment.name)).toEqual(['Longsword'])
+  })
+
+  it('detects reset-view criteria including sort and tab drift', () => {
+    expect(
+      hasEquipmentPickerResetViewCriteria({
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: false,
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
+        defaultTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
+      }),
+    ).toBe(true)
+    expect(
+      hasEquipmentPickerResetViewCriteria({
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: false,
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+        activeTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
+        defaultTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
+      }),
+    ).toBe(false)
   })
 })

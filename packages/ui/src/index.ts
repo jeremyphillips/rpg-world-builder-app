@@ -350,6 +350,7 @@ export {
   CatalogPickerSheet,
   type CatalogPickerSheetFilterContext,
   type CatalogPickerSheetProps,
+  type CatalogPickerSheetToolbarContext,
   type CatalogPickerTab,
 } from './components/ui/catalog-picker-sheet.client'
 export {

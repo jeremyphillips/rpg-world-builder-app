@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
 import {
@@ -17,9 +17,22 @@ import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_RESET_VIEW_LABEL,
+  EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
 } from './equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from './equipment-picker-purchase.lib'
+
+beforeAll(() => {
+  if (!HTMLElement.prototype.hasPointerCapture) {
+    HTMLElement.prototype.hasPointerCapture = () => false
+    HTMLElement.prototype.setPointerCapture = () => {}
+    HTMLElement.prototype.releasePointerCapture = () => {}
+  }
+  if (!HTMLElement.prototype.scrollIntoView) {
+    HTMLElement.prototype.scrollIntoView = () => {}
+  }
+})
 
 describe('EquipmentPickerDrawer', () => {
   it('renders picker header titles and shows non-proficient warnings with disabled quick-add', () => {
@@ -106,7 +119,48 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).queryByText('Mid Gear')).not.toBeInTheDocument()
   })
 
-  it('clears search, category, and affordable filters together', async () => {
+  it('clears search, category, and affordable filters together with clear_filters mode', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        toolbarResetMode="clear_filters"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+    ).toHaveTextContent(EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL)
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }).textContent,
+    ).not.toMatch(/\(\d+\)/)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
+
+    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).not.toBeChecked()
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
+      'Best match',
+    )
+    expect(screen.getByRole('tab', { selected: true, name: /All/i })).toBeInTheDocument()
+  })
+
+  it('resets sort, tab, search, and structured filters with reset_view mode', async () => {
     const user = userEvent.setup()
 
     render(
@@ -123,20 +177,99 @@ describe('EquipmentPickerDrawer', () => {
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
+    await user.click(screen.getByRole('tab', { name: /Recommended/i }))
 
     expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
     ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
+      'Best match',
+    )
+    expect(screen.getByRole('tab', { selected: true, name: /All/i })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+      screen.queryByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
     ).not.toBeInTheDocument()
+  })
+
+  it('reorders rows when sort is set to price ascending', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerDefaultPathItemsFixture}
+        budget={equipmentPickerLowRemainingBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent),
+    ).toEqual(expect.arrayContaining([expect.stringContaining('Cheap Gear')]))
+
+    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
+
+    const names = within(list)
+      .getAllByRole('listitem')
+      .map((row) => row.textContent?.match(/^(Cheap Gear|Mid Gear|Expensive Gear)/)?.[0])
+      .filter(Boolean)
+
+    expect(names).toEqual(['Cheap Gear', 'Mid Gear', 'Expensive Gear'])
+  })
+
+  it('preserves sort mode across tab switches', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('option', { name: 'Name: Z–A' }))
+    await user.click(screen.getByRole('tab', { name: /All/i }))
+
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
+      'Name: Z–A',
+    )
+  })
+
+  it('shows the sort control with an accessible label', () => {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('group', { name: 'Sort equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_SORT_LABEL)).toBeInTheDocument()
   })
 
   it('preserves browse filters across close and reopen', async () => {

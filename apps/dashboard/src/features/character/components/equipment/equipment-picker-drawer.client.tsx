@@ -16,7 +16,7 @@ import {
   SelectValue,
   Text,
   cn,
-  type CatalogPickerSheetFilterContext,
+  type CatalogPickerSheetToolbarContext,
 } from '@rpg/ui'
 import {
   formatMoney,
@@ -32,14 +32,16 @@ import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 import {
   countEquipmentPickerClearableCriteria,
   countEquipmentPickerStructuredFilters,
+  EQUIPMENT_PICKER_VIEW_DEFAULTS,
+  filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   getEquipmentPickerBadge,
   getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
+  hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
-  sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
@@ -48,11 +50,17 @@ import {
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
+  EQUIPMENT_PICKER_RESET_VIEW_LABEL,
+  EQUIPMENT_PICKER_SORT_LABEL,
+  EQUIPMENT_PICKER_SORT_LABELS,
+  EQUIPMENT_PICKER_SORT_MODES,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
+  type EquipmentPickerSortMode,
+  type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
@@ -69,22 +77,29 @@ import {
   equipmentPickerFiltersMainClasses,
   equipmentPickerFiltersRowClasses,
   equipmentPickerHighlightBadgeClasses,
+  equipmentPickerSortActionsGroupClasses,
+  equipmentPickerSortFilterClasses,
+  equipmentPickerSortLabelClasses,
   equipmentPickerWarningBadgeClasses,
   EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentPickerFilters({
+function EquipmentPickerToolbarControls({
   kinds,
   selectedKind,
   onSelectedKindChange,
   showAffordableOnly,
   onShowAffordableOnlyChange,
   showAffordableFilter,
-  filterContext,
-  onClearFilters,
-  clearableCriteriaCount,
+  sortMode,
+  onSortModeChange,
+  toolbarContext,
+  toolbarResetMode,
+  defaultTabId,
+  onClearStructuredFilters,
+  onResetView,
 }: {
   kinds: EquipmentPickerSupportedKind[]
   selectedKind: EquipmentPickerKindFilter
@@ -92,20 +107,37 @@ function EquipmentPickerFilters({
   showAffordableOnly: boolean
   onShowAffordableOnlyChange: (checked: boolean) => void
   showAffordableFilter: boolean
-  filterContext: CatalogPickerSheetFilterContext
-  onClearFilters: () => void
-  clearableCriteriaCount: number
+  sortMode: EquipmentPickerSortMode
+  onSortModeChange: (mode: EquipmentPickerSortMode) => void
+  toolbarContext: CatalogPickerSheetToolbarContext
+  toolbarResetMode: EquipmentPickerToolbarResetMode
+  defaultTabId: string
+  onClearStructuredFilters: () => void
+  onResetView: () => void
 }) {
   const showCategoryFilter = kinds.length > 1
-  const hasClearableCriteria = hasEquipmentPickerClearableCriteria(clearableCriteriaCount)
+  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+    selectedKind,
+    showAffordableOnly,
+    searchQuery: toolbarContext.searchQuery,
+  })
+  const showClearFilters =
+    toolbarResetMode === 'clear_filters' &&
+    hasEquipmentPickerClearableCriteria(clearableCriteriaCount)
+  const showResetView =
+    toolbarResetMode === 'reset_view' &&
+    hasEquipmentPickerResetViewCriteria({
+      selectedKind,
+      showAffordableOnly,
+      searchQuery: toolbarContext.searchQuery,
+      sortMode,
+      activeTabId: toolbarContext.activeTabId,
+      defaultTabId,
+    })
 
-  if (!showCategoryFilter && !showAffordableFilter && !hasClearableCriteria) {
-    return null
-  }
-
-  const handleClear = () => {
-    filterContext.clearSearchQuery()
-    onClearFilters()
+  const handleClearFilters = () => {
+    toolbarContext.clearSearchQuery()
+    onClearStructuredFilters()
   }
 
   return (
@@ -154,20 +186,48 @@ function EquipmentPickerFilters({
         ) : null}
       </div>
 
-      {hasClearableCriteria ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="ml-auto text-xs"
-          onClick={handleClear}
-        >
-          <RotateCcw aria-hidden />
-          {clearableCriteriaCount > 2
-            ? `${EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL} (${clearableCriteriaCount})`
-            : EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
-        </Button>
-      ) : null}
+      <div className={equipmentPickerSortActionsGroupClasses}>
+        <div className={equipmentPickerSortFilterClasses} role="group" aria-label="Sort equipment">
+          <Text as="span" className={equipmentPickerSortLabelClasses}>
+            {EQUIPMENT_PICKER_SORT_LABEL}
+          </Text>
+          <Select
+            value={sortMode}
+            onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
+          >
+            <SelectTrigger size="sm" aria-label="Equipment sort order">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {EQUIPMENT_PICKER_SORT_MODES.map((mode) => (
+                <SelectItem key={mode} value={mode}>
+                  {EQUIPMENT_PICKER_SORT_LABELS[mode]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {showClearFilters ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-xs"
+            onClick={handleClearFilters}
+          >
+            <RotateCcw aria-hidden />
+            {EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
+          </Button>
+        ) : null}
+
+        {showResetView ? (
+          <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={onResetView}>
+            <RotateCcw aria-hidden />
+            {EQUIPMENT_PICKER_RESET_VIEW_LABEL}
+          </Button>
+        ) : null}
+      </div>
     </div>
   )
 }
@@ -211,6 +271,7 @@ export function EquipmentPickerDrawer({
   showCharacterPreview = false,
   characterPreviewContext,
   ownedPurchaseQuantities = {},
+  toolbarResetMode = 'reset_view',
   onAddItem,
 }: EquipmentPickerDrawerProps) {
   const supportedItems = React.useMemo(
@@ -221,13 +282,19 @@ export function EquipmentPickerDrawer({
     () => resolveEquipmentKindFilterOptions(supportedItems, allowedKinds),
     [allowedKinds, supportedItems],
   )
-  const [selectedKind, setSelectedKind] =
-    React.useState<EquipmentPickerKindFilter>(EQUIPMENT_PICKER_KIND_ALL)
-  const [showAffordableOnly, setShowAffordableOnly] = React.useState(false)
+  const [selectedKind, setSelectedKind] = React.useState<EquipmentPickerKindFilter>(
+    EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
+  )
+  const [showAffordableOnly, setShowAffordableOnly] = React.useState<boolean>(
+    EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
+  )
+  const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
+    EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
+  )
   const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
 
-  // Browse context (category, affordable toggle) preserved across close/reopen.
-  // Reset only via explicit Clear filters or a future context-key change.
+  // Browse context (category, affordable toggle, sort) preserved across close/reopen.
+  // Reset only via explicit Clear filters / Reset view or a future context-key change.
   React.useEffect(() => {
     if (!open) {
       setAddQuantities({})
@@ -246,19 +313,15 @@ export function EquipmentPickerDrawer({
     showAffordableOnly,
   })
 
-  const visibleItems = React.useMemo(
+  const filteredItems = React.useMemo(
     () =>
-      sortEquipmentPickerItems(
-        filterEquipmentPickerItems(supportedItems, {
-          filterOutUnaffordable,
-          filterOutNonProficient,
-          selectedKind,
-          showAffordableOnly,
-        }),
-        browseSortContext,
-      ),
+      filterEquipmentPickerItems(supportedItems, {
+        filterOutUnaffordable,
+        filterOutNonProficient,
+        selectedKind,
+        showAffordableOnly,
+      }),
     [
-      browseSortContext,
       filterOutNonProficient,
       filterOutUnaffordable,
       showAffordableOnly,
@@ -267,13 +330,23 @@ export function EquipmentPickerDrawer({
     ],
   )
 
+  const transformVisibleItems = React.useCallback(
+    (tabItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
+      filterAndSortEquipmentPickerItems(tabItems, {
+        searchQuery: context.searchQuery,
+        sortMode,
+        browseSortContext,
+      }),
+    [browseSortContext, sortMode],
+  )
+
   const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
     setSelectedKind(kind)
   }, [])
 
   const handleClearStructuredFilters = React.useCallback(() => {
-    setSelectedKind(EQUIPMENT_PICKER_KIND_ALL)
-    setShowAffordableOnly(false)
+    setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
+    setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
   }, [])
 
   const handleQuickAdd = React.useCallback(
@@ -305,7 +378,7 @@ export function EquipmentPickerDrawer({
       onOpenChange={onOpenChange}
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
-      items={visibleItems}
+      items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
       getSearchText={(item) => item.searchText}
@@ -318,24 +391,31 @@ export function EquipmentPickerDrawer({
       noScopedItemsMessage={EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
-      filters={(filterContext) => {
-        const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
-          selectedKind,
-          showAffordableOnly,
-          searchQuery: filterContext.searchQuery,
-        })
+      transformVisibleItems={transformVisibleItems}
+      toolbarControls={(toolbarContext) => {
+        const handleResetView = () => {
+          setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
+          setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
+          setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
+          toolbarContext.clearSearchQuery()
+          toolbarContext.resetActiveTab()
+        }
 
         return (
-          <EquipmentPickerFilters
+          <EquipmentPickerToolbarControls
             kinds={kindOptions}
             selectedKind={selectedKind}
             onSelectedKindChange={handleSelectedKindChange}
             showAffordableOnly={showAffordableOnly}
             onShowAffordableOnlyChange={setShowAffordableOnly}
             showAffordableFilter={Boolean(budget)}
-            filterContext={filterContext}
-            onClearFilters={handleClearStructuredFilters}
-            clearableCriteriaCount={clearableCriteriaCount}
+            sortMode={sortMode}
+            onSortModeChange={setSortMode}
+            toolbarContext={toolbarContext}
+            toolbarResetMode={toolbarResetMode}
+            defaultTabId={defaultTab}
+            onClearStructuredFilters={handleClearStructuredFilters}
+            onResetView={handleResetView}
           />
         )
       }}

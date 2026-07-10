@@ -66,7 +66,7 @@ describe('CatalogPickerSheet', () => {
     expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('resolves filter render props in the toolbar', async () => {
+  it('resolves toolbar control render props with tab reset helpers', async () => {
     const user = userEvent.setup()
 
     render(
@@ -77,12 +77,22 @@ describe('CatalogPickerSheet', () => {
         items={items}
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
         renderItemHeader={(item) => <span>{item.name}</span>}
-        filters={({ searchQuery, clearSearchQuery }) => (
+        toolbarControls={({ searchQuery, clearSearchQuery, activeTabId, resetActiveTab }) => (
           <div>
             <span>Query: {searchQuery}</span>
+            <span>Tab: {activeTabId}</span>
             <button type="button" onClick={clearSearchQuery}>
               Clear search
+            </button>
+            <button type="button" onClick={resetActiveTab}>
+              Reset tab
             </button>
           </div>
         )}
@@ -92,8 +102,32 @@ describe('CatalogPickerSheet', () => {
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
     expect(screen.getByText('Query: rope')).toBeInTheDocument()
 
+    await user.click(screen.getByRole('tab', { name: /All/i }))
+    expect(screen.getByText('Tab: all')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Reset tab' }))
+    expect(screen.getByText('Tab: featured')).toBeInTheDocument()
+
     await user.click(screen.getByRole('button', { name: 'Clear search' }))
     expect(screen.getByText('Query:')).toBeInTheDocument()
+  })
+
+  it('preserves custom order from transformVisibleItems', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        transformVisibleItems={(visibleItems) => [...visibleItems].reverse()}
+      />,
+    )
+
+    const rendered = screen.getAllByText(/Item$/).map((node) => node.textContent)
+    expect(rendered).toEqual(['Beta Item', 'Alpha Item'])
   })
 
   it('switches tabs and expands collapsible details via leading caret', async () => {

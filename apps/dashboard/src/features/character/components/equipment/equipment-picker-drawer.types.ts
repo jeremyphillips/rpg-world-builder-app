@@ -38,12 +38,51 @@ export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Category'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
+export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
 export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
+export const EQUIPMENT_PICKER_RESET_VIEW_LABEL = 'Reset view'
 export const EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE = 'No recommendations match this view.'
+
+export const EQUIPMENT_PICKER_SORT_BEST_MATCH = 'best_match' as const
+export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
+export const EQUIPMENT_PICKER_SORT_PRICE_DESC = 'price_desc' as const
+export const EQUIPMENT_PICKER_SORT_NAME_ASC = 'name_asc' as const
+export const EQUIPMENT_PICKER_SORT_NAME_DESC = 'name_desc' as const
+
+export type EquipmentPickerSortMode =
+  | typeof EQUIPMENT_PICKER_SORT_BEST_MATCH
+  | typeof EQUIPMENT_PICKER_SORT_PRICE_ASC
+  | typeof EQUIPMENT_PICKER_SORT_PRICE_DESC
+  | typeof EQUIPMENT_PICKER_SORT_NAME_ASC
+  | typeof EQUIPMENT_PICKER_SORT_NAME_DESC
+
+export const EQUIPMENT_PICKER_SORT_MODES = [
+  EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_PRICE_ASC,
+  EQUIPMENT_PICKER_SORT_PRICE_DESC,
+  EQUIPMENT_PICKER_SORT_NAME_ASC,
+  EQUIPMENT_PICKER_SORT_NAME_DESC,
+] as const satisfies readonly EquipmentPickerSortMode[]
+
+export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, string> = {
+  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: 'Best match',
+  [EQUIPMENT_PICKER_SORT_PRICE_ASC]: 'Price: Low to high',
+  [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High to low',
+  [EQUIPMENT_PICKER_SORT_NAME_ASC]: 'Name: A–Z',
+  [EQUIPMENT_PICKER_SORT_NAME_DESC]: 'Name: Z–A',
+}
+
+export type EquipmentPickerToolbarResetMode = 'clear_filters' | 'reset_view' | 'none'
 
 export type EquipmentPickerKindFilter =
   | typeof EQUIPMENT_PICKER_KIND_ALL
   | EquipmentPickerSupportedKind
+
+export type EquipmentPickerViewDefaults = {
+  selectedKind: EquipmentPickerKindFilter
+  showAffordableOnly: boolean
+  sortMode: EquipmentPickerSortMode
+}
 
 export type EquipmentPickerDrawerProps = {
   open: boolean
@@ -60,5 +99,7 @@ export type EquipmentPickerDrawerProps = {
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   /** Purchased quantities for the active source mode, keyed by equipment id. */
   ownedPurchaseQuantities?: Readonly<Record<string, number>>
+  /** Mutually exclusive toolbar action — default resets full view including sort and tab. */
+  toolbarResetMode?: EquipmentPickerToolbarResetMode
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
 }

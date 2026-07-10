@@ -7,7 +7,7 @@ import { Input } from './input.client'
 import { Tabs, TabsList, TabsTrigger } from './tabs.client'
 import { Text } from './text'
 import type {
-  CatalogPickerSheetFilterContext,
+  CatalogPickerSheetToolbarContext,
   CatalogPickerTab,
 } from './catalog-picker-sheet.types'
 import {
@@ -23,8 +23,11 @@ type CatalogPickerSheetToolbarProps = {
   tabs?: readonly CatalogPickerTab[]
   activeTabId: string
   onActiveTabIdChange: (tabId: string) => void
+  onResetActiveTab: () => void
   tabCounts: Record<string, number>
-  filters?: ReactNode | ((context: CatalogPickerSheetFilterContext) => ReactNode)
+  toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
+  /** @deprecated Use {@link CatalogPickerSheetToolbarProps.toolbarControls}. */
+  filters?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
 }
 
 export function CatalogPickerSheetToolbar({
@@ -35,16 +38,21 @@ export function CatalogPickerSheetToolbar({
   tabs,
   activeTabId,
   onActiveTabIdChange,
+  onResetActiveTab,
   tabCounts,
+  toolbarControls,
   filters,
 }: CatalogPickerSheetToolbarProps) {
-  const filterContext: CatalogPickerSheetFilterContext = {
+  const toolbarContext: CatalogPickerSheetToolbarContext = {
     searchQuery,
     setSearchQuery: onSearchQueryChange,
     clearSearchQuery: () => onSearchQueryChange(''),
+    activeTabId,
+    resetActiveTab: onResetActiveTab,
   }
 
-  const renderedFilters = typeof filters === 'function' ? filters(filterContext) : filters
+  const controls = toolbarControls ?? filters
+  const renderedControls = typeof controls === 'function' ? controls(toolbarContext) : controls
 
   return (
     <div className={catalogPickerSheetToolbarVariants()}>
@@ -80,7 +88,7 @@ export function CatalogPickerSheetToolbar({
         />
       </div>
 
-      {renderedFilters ? <div>{renderedFilters}</div> : null}
+      {renderedControls ? <div>{renderedControls}</div> : null}
     </div>
   )
 }

@@ -18,6 +18,7 @@ import {
 export type {
   CatalogPickerSheetFilterContext,
   CatalogPickerSheetProps,
+  CatalogPickerSheetToolbarContext,
   CatalogPickerTab,
 } from './catalog-picker-sheet.types'
 
@@ -81,7 +82,9 @@ export function CatalogPickerSheet<TItem>({
   tabs,
   defaultTabId,
   getItemTab,
+  toolbarControls,
   filters,
+  transformVisibleItems,
   hasStructuredFilters = false,
   headerExtra,
   footer,
@@ -97,6 +100,7 @@ export function CatalogPickerSheet<TItem>({
     setSearchQuery,
     activeTabId,
     setActiveTabId,
+    resetActiveTab,
     tabCounts,
     visibleItems,
     hasSearchOrFilters,
@@ -108,6 +112,7 @@ export function CatalogPickerSheet<TItem>({
     tabs,
     defaultTabId,
     hasStructuredFilters,
+    transformVisibleItems,
   })
 
   const emptyMessage = resolveEmptyMessage({
@@ -152,7 +157,9 @@ export function CatalogPickerSheet<TItem>({
           tabs={tabs}
           activeTabId={activeTabId}
           onActiveTabIdChange={setActiveTabId}
+          onResetActiveTab={resetActiveTab}
           tabCounts={tabCounts}
+          toolbarControls={toolbarControls ?? filters}
           filters={filters}
         />
 

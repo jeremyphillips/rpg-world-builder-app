@@ -6,14 +6,16 @@ this document is the canonical description of rank semantics.
 
 ## Equipment picker browse order
 
-When the equipment picker search query is empty, rows sort via
-`compareEquipmentPickerItemsByRecommendation` in
+When the equipment picker search query is empty and sort mode is **Best match**,
+rows sort via `compareEquipmentPickerItemsByRecommendation` in
 [`equipment-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/equipment-picker-item.ts).
 
-Search (`CatalogPickerSheet` / `rankItems`) stays **text-score-first**; the browse
-order below applies only when the query is empty.
+The equipment picker owns search inclusion and ordering through
+`filterAndSortEquipmentPickerItems` in the dashboard
+(`equipment-picker-drawer.lib.ts`). Spell and proficiency pickers still use the
+default `CatalogPickerSheet` `rankPickerItems` path (text-score-first).
 
-### Comparator steps
+### Comparator steps (recommendation / best-match tiebreaker)
 
 1. **Recommendation tier** — `compareEquipmentRecommendationTiers` (essential → strong → compatible → neutral → notRecommended). Constants: [`equipment-recommendation.ts`](../src/rpg/content/equipment-recommendation.ts) `EQUIPMENT_RECOMMENDATION_TIER_RANK`.
 2. **Best reason** — lowest rank among `recommendation.reasons` via `getBestEquipmentRecommendationReasonRank`. Constants: `EQUIPMENT_RECOMMENDATION_REASON_RANK`.
@@ -21,6 +23,38 @@ order below applies only when the query is empty.
 4. **Kind bucket** — `getEquipmentRecommendationKindRank` (weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other). Constants: [`equipment-picker-item-kind-rank.ts`](../src/rpg/runtime/character-builder/resolvers/picker/equipment-picker-item-kind-rank.ts).
 5. **Weapon category** — `getEquipmentWeaponCategoryBrowseRank` when both rows are weapons; martial-first only when `preferMartialWeaponBrowseOrder` is set on the browse context.
 6. **Name** — `localeCompare` (base sensitivity).
+
+### Equipment picker sort modes
+
+| Mode                       | Primary                           | Tiebreaker 1 (query only) | Tiebreaker 2              |
+| -------------------------- | --------------------------------- | ------------------------- | ------------------------- |
+| `best_match`               | search score when query non-empty | —                         | recommendation comparator |
+| `price_asc` / `price_desc` | price (`moneyToCopper`)           | search score              | recommendation comparator |
+| `name_asc` / `name_desc`   | `Intl.Collator` on name           | search score              | recommendation comparator |
+
+**Empty-query best match:** recommendation comparator only — no search-score step.
+
+**Search inclusion:** when the query is non-empty, rows with `scoreItem` ≤ 0 on
+`searchText` (`role: 'label'`, `weight: 1`) are excluded before sort.
+
+**Unknown cost:** rows without a known `equipment.cost` are not treated as zero
+or expensive. In price sorts, priced rows come first in both directions;
+unknown-cost pairs defer to search score / recommendation tiebreakers.
+
+**View defaults:** `EQUIPMENT_PICKER_VIEW_DEFAULTS` in `equipment-picker-drawer.lib.ts`
+— category All, Affordable now off, sort Best match.
+
+### Clear filters vs Reset view
+
+Mutually exclusive toolbar actions (`toolbarResetMode` on `EquipmentPickerDrawer`;
+production default `reset_view`):
+
+| Action            | Resets                                                       | Preserves        |
+| ----------------- | ------------------------------------------------------------ | ---------------- |
+| **Clear filters** | search, category, Affordable now                             | sort, active tab |
+| **Reset view**    | search, category, Affordable now, sort, tab → `defaultTabId` | —                |
+
+Action buttons show no counts.
 
 ## Picker state: dual affordability
 
@@ -58,10 +92,10 @@ The equipment picker exposes two independent affordability controls:
 | `filterOutUnaffordable` prop                       | `state.isAffordable`            | `true`  | Hides rows above the package starting budget.                                                                     |
 | **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | User opt-in; hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
-Browse context (search, category, affordable toggle, active tab) is **preserved**
-across drawer close/reopen within a builder session. **Clear filters** resets
-search, category, and Affordable now together. Context-key reset (character,
-equipment method, budget change) is a documented follow-up.
+Browse context (search, category, affordable toggle, sort, active tab) is **preserved**
+across drawer close/reopen within a builder session. **Reset view** (default) resets
+the full view; **Clear filters** resets structured inclusion and search only.
+Context-key reset (character, equipment method, budget change) is a documented follow-up.
 
 Row disabled notes and the budget header use the shared `EmphasisDetailLine`
 pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted

@@ -109,3 +109,28 @@ export const CharacterPreview: Story = {
     onAddItem: () => undefined,
   },
 }
+
+export const ClearFilters: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerItemsFixture,
+    budget: equipmentPickerBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    toolbarResetMode: 'clear_filters',
+    onAddItem: () => undefined,
+  },
+}
+
+export const SortByPrice: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+}
