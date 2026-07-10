@@ -23,7 +23,7 @@ describe('buildEquipmentPickerPurchaseViewModel', () => {
       quantity: 1,
       unitPriceLabel: '15 GP',
       totalLabel: '15 GP',
-      remainingAfterLabel: '2 PP, 5 GP',
+      remainingAfterLabel: '25 GP',
       commitLabel: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
     })
   })

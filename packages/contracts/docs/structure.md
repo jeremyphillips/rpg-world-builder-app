@@ -71,7 +71,7 @@ flowchart BT
 | ----------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | A shared validation message or message primitive      | `validation/`           | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)   | `rpg/vocab/`            | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
-| A reusable value type used across content types       | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/level.ts`                                                                          |
+| A reusable value type used across content types       | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/wealth.ts`                                              |
 | A catalog content type or its DTOs/patches            | `rpg/content/`          | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
 | Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/`      | `rpg/content/lib/grants.ts`                                                                                                  |
 | Creature-like runtime primitives (PC, NPC, monster)   | `rpg/runtime/creature/` | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |

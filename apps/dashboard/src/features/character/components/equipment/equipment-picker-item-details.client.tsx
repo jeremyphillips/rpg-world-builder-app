@@ -75,7 +75,9 @@ export function EquipmentPickerItemDetails({
     <div className={equipmentPickerItemDetailsSectionClasses}>
       <EquipmentDetailMetadata
         viewModel={detailViewModel}
+        sectionId={`${equipment.id}-detail-metadata`}
         omitStatLabels={[EQUIPMENT_STAT_LABELS.kind, EQUIPMENT_STAT_LABELS.cost]}
+        omitSectionTitle
       />
 
       {previewLines && previewLines.length > 0 ? (

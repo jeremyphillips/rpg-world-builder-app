@@ -1,12 +1,11 @@
 import {
   formatMoney,
+  formatWealthAsGold,
   moneyToCopper,
   subtractFromWealth,
   type Equipment,
   type EquipmentBudgetSummary,
 } from '@rpg/contracts'
-
-import { formatEquipmentBudgetWealth } from './equipment-picker-drawer.lib'
 
 export const EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL = 'Purchase'
 export const EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL = 'Quantity'
@@ -52,7 +51,7 @@ function formatRemainingAfterPurchase(
   quantity: number,
 ): string {
   const totalCp = moneyToCopper(equipment.cost) * quantity
-  return formatEquipmentBudgetWealth(subtractFromWealth(budget.remaining, totalCp))
+  return formatWealthAsGold(subtractFromWealth(budget.remaining, totalCp))
 }
 
 export function buildEquipmentPickerPurchaseViewModel(args: {

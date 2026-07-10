@@ -30,6 +30,13 @@ describe('EquipmentDetailMetadata', () => {
     expect(screen.getByText(/Category/)).toBeInTheDocument()
   })
 
+  it('omits the section title for picker surfaces', () => {
+    render(<EquipmentDetailMetadata viewModel={longswordDetail} omitSectionTitle />)
+
+    expect(screen.queryByRole('heading', { name: 'Weapon details' })).not.toBeInTheDocument()
+    expect(screen.getByText(/Category/)).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<EquipmentDetailMetadata viewModel={longswordDetail} />)
 

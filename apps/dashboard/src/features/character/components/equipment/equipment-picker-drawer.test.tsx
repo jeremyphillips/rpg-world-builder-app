@@ -117,7 +117,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
   })
 
-  it('excludes vehicle and service rows from search results and kind chips', () => {
+  it('excludes vehicle and service rows from search results and category filter', () => {
     const unsupportedItems = [
       {
         equipment: equipmentPickerRowboatFixture,
@@ -159,8 +159,8 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(within(list).queryByText('Rowboat')).not.toBeInTheDocument()
     expect(within(list).queryByText('Skilled Hireling')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Vehicle' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Service' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Vehicle' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Service' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

@@ -9,6 +9,7 @@ import {
   resolveEquippedArmorFromInventory,
   resolveWeaponAttackAbilityModifier,
   subtractFromWealth,
+  formatWealthAsGold,
   weaponAttackBonus,
   type Ability,
   type ArmorClassBase,
@@ -20,7 +21,6 @@ import {
 } from '@rpg/contracts'
 
 import type { EquipmentBudgetSummary } from './equipment-picker-drawer.types'
-import { formatEquipmentBudgetWealth } from './equipment-picker-drawer.lib'
 
 export const EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL = 'Character preview'
 
@@ -111,7 +111,7 @@ function resolveBudgetPreviewLine(
   if (!context.budget) return undefined
 
   const remaining = subtractFromWealth(context.budget.remaining, equipment.cost)
-  return `${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: ${formatEquipmentBudgetWealth(remaining)}`
+  return `${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: ${formatWealthAsGold(remaining)}`
 }
 
 export function resolveEquipmentPickerCharacterPreviewLines(

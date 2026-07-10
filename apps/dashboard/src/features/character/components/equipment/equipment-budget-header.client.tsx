@@ -1,12 +1,14 @@
 'use client'
 
-import type { EquipmentBudgetSummary } from '@rpg/contracts'
+import { formatWealthAsGold, type EquipmentBudgetSummary } from '@rpg/contracts'
 
-import { formatEquipmentBudgetWealth } from './equipment-picker-drawer.lib'
 import {
   equipmentBudgetHeaderClasses,
+  equipmentBudgetHeaderDividerClasses,
   equipmentBudgetHeaderLabelClasses,
-  equipmentBudgetHeaderValueClasses,
+  equipmentBudgetHeaderMutedClasses,
+  equipmentBudgetHeaderRemainingClasses,
+  EQUIPMENT_BUDGET_HEADER_DIVIDER,
 } from './equipment-budget-header.variants'
 
 export type EquipmentBudgetHeaderProps = {
@@ -15,25 +17,21 @@ export type EquipmentBudgetHeaderProps = {
 
 export function EquipmentBudgetHeader({ budget }: EquipmentBudgetHeaderProps) {
   return (
-    <dl className={equipmentBudgetHeaderClasses}>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Starting</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.starting)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Spent</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.spent)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Remaining</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.remaining)}
-        </dd>
-      </div>
-    </dl>
+    <p className={equipmentBudgetHeaderClasses}>
+      <span className={equipmentBudgetHeaderLabelClasses}>Budget:</span>{' '}
+      <span className={equipmentBudgetHeaderRemainingClasses}>
+        {formatWealthAsGold(budget.remaining)} remaining
+      </span>
+      <span className={equipmentBudgetHeaderDividerClasses} aria-hidden>
+        {EQUIPMENT_BUDGET_HEADER_DIVIDER}
+      </span>
+      <span className={equipmentBudgetHeaderMutedClasses}>
+        {formatWealthAsGold(budget.starting)} starting
+        <span className={equipmentBudgetHeaderDividerClasses} aria-hidden>
+          {EQUIPMENT_BUDGET_HEADER_DIVIDER}
+        </span>
+        {formatWealthAsGold(budget.spent)} spent
+      </span>
+    </p>
   )
 }

@@ -2,18 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
-import { indexCharacterBuildCatalog } from '../../context'
-import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import {
-  copperToWealth,
-  deriveEquipmentBudgetSummary,
   formatWealth,
-  maxAffordableEquipmentQuantity,
   moneyToCopper,
   subtractFromWealth,
   wealthToCopper,
-} from './equipment-budget'
+} from '../../../../primitives/wealth'
+import { indexCharacterBuildCatalog } from '../../context'
+import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
+import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -72,35 +70,6 @@ const storedDruid: ClassStored = {
   },
 }
 
-describe('equipment-budget helpers', () => {
-  it('normalizes wealth and money to copper', () => {
-    expect(wealthToCopper({ cp: 3, sp: 5, gp: 9, pp: 0 })).toBe(953)
-    expect(moneyToCopper({ amount: 2, currency: 'gp' })).toBe(200)
-  })
-
-  it('subtracts mixed-denomination costs and formats remaining wealth', () => {
-    const starting = { cp: 3, sp: 5, gp: 9, pp: 0 }
-    const remaining = subtractFromWealth(starting, { amount: 4, currency: 'gp' })
-    expect(remaining).toEqual({ cp: 3, sp: 5, gp: 5, pp: 0 })
-    expect(formatWealth(remaining)).toBe('5 GP, 5 SP, 3 CP')
-  })
-
-  it('round-trips copper totals through copperToWealth', () => {
-    expect(copperToWealth(953)).toEqual({ cp: 3, sp: 5, gp: 9, pp: 0 })
-    expect(copperToWealth(0)).toEqual({ cp: 0, sp: 0, gp: 0, pp: 0 })
-  })
-
-  it('computes max affordable quantity from remaining budget', () => {
-    const budget = {
-      starting: { cp: 0, sp: 0, gp: 10, pp: 0 },
-      spent: { cp: 0, sp: 0, gp: 4, pp: 0 },
-      remaining: { cp: 0, sp: 0, gp: 6, pp: 0 },
-    }
-
-    expect(maxAffordableEquipmentQuantity(rope, budget, 2)).toBe(8)
-  })
-})
-
 describe('deriveEquipmentBudgetSummary', () => {
   it('derives starting, spent, and remaining from purchases', () => {
     const catalogIndex = indexCharacterBuildCatalog({
@@ -133,5 +102,26 @@ describe('deriveEquipmentBudgetSummary', () => {
       spent: { cp: 0, sp: 0, gp: 3, pp: 0 },
       remaining: { cp: 3, sp: 5, gp: 6, pp: 0 },
     })
+  })
+
+  it('computes max affordable quantity from remaining budget', () => {
+    const budget = {
+      starting: { cp: 0, sp: 0, gp: 10, pp: 0 },
+      spent: { cp: 0, sp: 0, gp: 4, pp: 0 },
+      remaining: { cp: 0, sp: 0, gp: 6, pp: 0 },
+    }
+
+    expect(maxAffordableEquipmentQuantity(rope, budget, 2)).toBe(8)
+  })
+})
+
+describe('equipment-budget re-exports', () => {
+  it('re-exports wealth helpers from primitives', () => {
+    const starting = { cp: 3, sp: 5, gp: 9, pp: 0 }
+    expect(wealthToCopper(starting)).toBe(953)
+    expect(moneyToCopper({ amount: 2, currency: 'gp' })).toBe(200)
+
+    const remaining = subtractFromWealth(starting, { amount: 4, currency: 'gp' })
+    expect(formatWealth(remaining)).toBe('5 GP, 5 SP, 3 CP')
   })
 })

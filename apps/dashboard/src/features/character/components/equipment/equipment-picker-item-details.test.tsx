@@ -41,7 +41,6 @@ describe('EquipmentPickerItemDetails', () => {
 
     const headings = screen.getAllByRole('heading', { level: 3 }).map((node) => node.textContent)
     expect(headings).toEqual([
-      'Weapon details',
       EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL,
       EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
     ])

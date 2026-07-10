@@ -1,5 +1,11 @@
-export const equipmentBudgetHeaderClasses = 'grid gap-4 sm:grid-cols-3'
+export const EQUIPMENT_BUDGET_HEADER_DIVIDER = '·'
 
-export const equipmentBudgetHeaderLabelClasses = 'text-sm text-muted-foreground'
+export const equipmentBudgetHeaderClasses = 'text-sm text-foreground'
 
-export const equipmentBudgetHeaderValueClasses = 'text-base font-medium text-foreground'
+export const equipmentBudgetHeaderLabelClasses = 'font-medium'
+
+export const equipmentBudgetHeaderRemainingClasses = 'font-bold tabular-nums'
+
+export const equipmentBudgetHeaderMutedClasses = 'text-muted-foreground tabular-nums'
+
+export const equipmentBudgetHeaderDividerClasses = 'mx-1.5 text-muted-foreground'

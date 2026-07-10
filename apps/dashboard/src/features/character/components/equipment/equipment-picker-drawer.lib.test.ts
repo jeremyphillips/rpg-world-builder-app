@@ -14,6 +14,7 @@ import {
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
 import {
+  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
 } from './equipment-picker-drawer.types'
@@ -29,10 +30,20 @@ describe('equipment-picker-drawer.lib', () => {
     const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
       filterOutUnaffordable: true,
       filterOutNonProficient: true,
-      selectedKinds: ['weapon', 'armor', 'adventuring_gear'],
+      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
     })
 
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+  })
+
+  it('filters rows by selected kind', () => {
+    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      selectedKind: 'weapon',
+    })
+
+    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword'])
   })
 
   it('builds unaffordable copy and warning badges', () => {
@@ -43,7 +54,7 @@ describe('equipment-picker-drawer.lib', () => {
     expect(getEquipmentPickerBadgeLabel(chainMail)).toBe(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)
   })
 
-  it('excludes vehicle and service kinds from filter chips and results', () => {
+  it('excludes vehicle and service kinds from category filter and results', () => {
     const items = [
       ...equipmentPickerItemsFixture,
       {
@@ -79,7 +90,7 @@ describe('equipment-picker-drawer.lib', () => {
     const filtered = filterEquipmentPickerItems(items, {
       filterOutUnaffordable: false,
       filterOutNonProficient: false,
-      selectedKinds: resolveEquipmentKindFilterOptions(items),
+      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
     })
 
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])

@@ -20,6 +20,15 @@ export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 
+/** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
+export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
+
+export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Category'
+
+export type EquipmentPickerKindFilter =
+  | typeof EQUIPMENT_PICKER_KIND_ALL
+  | EquipmentPickerSupportedKind
+
 export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void

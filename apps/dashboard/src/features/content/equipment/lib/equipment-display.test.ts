@@ -28,7 +28,7 @@ function expectedDetailStatRows(slug: string) {
     { label: EQUIPMENT_STAT_LABELS.kind, value: getEquipmentKindLabel(equipment.kind) },
     { label: EQUIPMENT_STAT_LABELS.cost, value: formatMoney(equipment.cost) },
     ...getEquipmentKindStatRows(equipment),
-  ]
+  ].filter((row) => row.label !== EQUIPMENT_STAT_LABELS.gearKind)
 }
 
 describe('equipment-display', () => {

@@ -59,7 +59,7 @@ export function CatalogPickerSheetToolbar({
               return (
                 <TabsTrigger key={tab.id} value={tab.id}>
                   {tab.label}
-                  <Text as="span" variant="muted" className="tabular-nums">
+                  <Text as="span" variant="muted" className="ml-1 tabular-nums">
                     ({count})
                   </Text>
                 </TabsTrigger>

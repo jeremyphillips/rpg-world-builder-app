@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { coinWealthSchema, type CoinWealth } from '../../primitives/wealth'
 import type { ArmorEquipment, Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
 import type { CharacterWealthGrant } from '../../content/lib/wealth-grant'
@@ -96,14 +97,9 @@ export function resolveEquippedArmorFromInventory(args: {
   })
 }
 
-export const characterWealthSchema = z.object({
-  cp: z.number().int().min(0).default(0),
-  sp: z.number().int().min(0).default(0),
-  gp: z.number().int().min(0).default(0),
-  pp: z.number().int().min(0).default(0),
-})
+export const characterWealthSchema = coinWealthSchema
 
-export type CharacterWealth = z.infer<typeof characterWealthSchema>
+export type CharacterWealth = CoinWealth
 
 export const characterFeatEntrySchema = z.object({
   featId: z.string().min(1),

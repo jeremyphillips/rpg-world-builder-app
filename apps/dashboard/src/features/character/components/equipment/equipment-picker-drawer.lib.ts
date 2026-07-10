@@ -1,29 +1,23 @@
 import {
   EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
+  formatWealthAsGold,
   isEquipmentPickerSupportedKind,
   type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
 import {
+  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
+  type EquipmentPickerKindFilter,
 } from './equipment-picker-drawer.types'
 
 export function getEquipmentPickerItemTab(item: EquipmentPickerItem): string {
   return item.state.isRecommended ? EQUIPMENT_PICKER_TAB_RECOMMENDED : EQUIPMENT_PICKER_TAB_ALL
-}
-
-export function formatEquipmentBudgetWealth(wealth: EquipmentBudgetSummary['remaining']): string {
-  const parts: string[] = []
-  if (wealth.pp > 0) parts.push(`${wealth.pp} PP`)
-  if (wealth.gp > 0) parts.push(`${wealth.gp} GP`)
-  if (wealth.sp > 0) parts.push(`${wealth.sp} SP`)
-  if (wealth.cp > 0) parts.push(`${wealth.cp} CP`)
-  return parts.length > 0 ? parts.join(', ') : '0 GP'
 }
 
 export function formatEquipmentUnaffordableReason(
@@ -31,7 +25,7 @@ export function formatEquipmentUnaffordableReason(
   budget?: EquipmentBudgetSummary,
 ): string {
   const need = formatMoney(item.equipment.cost)
-  const have = budget ? formatEquipmentBudgetWealth(budget.remaining) : '—'
+  const have = budget ? formatWealthAsGold(budget.remaining) : '—'
   return `Need ${need}, you have ${have}`
 }
 
@@ -57,14 +51,19 @@ export function filterEquipmentPickerItems(
   options: {
     filterOutUnaffordable: boolean
     filterOutNonProficient: boolean
-    selectedKinds: readonly EquipmentPickerSupportedKind[]
+    selectedKind: EquipmentPickerKindFilter
   },
 ): EquipmentPickerItem[] {
   return items.filter((item) => {
     if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
     if (options.filterOutUnaffordable && !item.state.isAffordable) return false
     if (options.filterOutNonProficient && !item.state.isProficient) return false
-    if (!options.selectedKinds.includes(item.equipment.kind)) return false
+    if (
+      options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL &&
+      item.equipment.kind !== options.selectedKind
+    ) {
+      return false
+    }
     return true
   })
 }

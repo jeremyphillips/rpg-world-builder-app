@@ -2,7 +2,18 @@
 
 import * as React from 'react'
 
-import { Badge, Button, CatalogPickerSheet, Text, cn } from '@rpg/ui'
+import {
+  Badge,
+  Button,
+  CatalogPickerSheet,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Text,
+  cn,
+} from '@rpg/ui'
 import {
   getEquipmentKindLabel,
   isEquipmentPickerSupportedKind,
@@ -22,10 +33,13 @@ import {
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
+  EQUIPMENT_PICKER_CATEGORY_LABEL,
+  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
+  type EquipmentPickerKindFilter,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
@@ -35,44 +49,47 @@ import {
   equipmentPickerHeaderKindClasses,
   equipmentPickerHeaderTextClasses,
   equipmentPickerHeaderTitleClasses,
-  equipmentPickerKindChipActiveClasses,
-  equipmentPickerKindChipInactiveClasses,
-  equipmentPickerKindFiltersClasses,
+  equipmentPickerCategoryFilterClasses,
+  equipmentPickerCategoryLabelClasses,
   equipmentPickerWarningBadgeClasses,
   EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentKindFilters({
+function EquipmentCategoryFilter({
   kinds,
-  selectedKinds,
-  onToggleKind,
+  selectedKind,
+  onSelectedKindChange,
 }: {
   kinds: EquipmentPickerSupportedKind[]
-  selectedKinds: readonly EquipmentPickerSupportedKind[]
-  onToggleKind: (kind: EquipmentPickerSupportedKind) => void
+  selectedKind: EquipmentPickerKindFilter
+  onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
 }) {
   if (kinds.length <= 1) return null
 
   return (
-    <div className={equipmentPickerKindFiltersClasses} role="group" aria-label="Filter by kind">
-      {kinds.map((kind) => {
-        const active = selectedKinds.includes(kind)
-        return (
-          <button
-            key={kind}
-            type="button"
-            aria-pressed={active}
-            className={
-              active ? equipmentPickerKindChipActiveClasses : equipmentPickerKindChipInactiveClasses
-            }
-            onClick={() => onToggleKind(kind)}
-          >
-            {getEquipmentKindLabel(kind)}
-          </button>
-        )
-      })}
+    <div
+      className={equipmentPickerCategoryFilterClasses}
+      role="group"
+      aria-label="Filter by category"
+    >
+      <Text as="span" className={equipmentPickerCategoryLabelClasses}>
+        {EQUIPMENT_PICKER_CATEGORY_LABEL}
+      </Text>
+      <Select value={selectedKind} onValueChange={onSelectedKindChange}>
+        <SelectTrigger size="sm" aria-label="Equipment category">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={EQUIPMENT_PICKER_KIND_ALL}>All</SelectItem>
+          {kinds.map((kind) => (
+            <SelectItem key={kind} value={kind}>
+              {getEquipmentKindLabel(kind)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
@@ -118,20 +135,21 @@ export function EquipmentPickerDrawer({
     () => resolveEquipmentKindFilterOptions(supportedItems, allowedKinds),
     [allowedKinds, supportedItems],
   )
-  const [selectedKinds, setSelectedKinds] = React.useState(kindOptions)
+  const [selectedKind, setSelectedKind] =
+    React.useState<EquipmentPickerKindFilter>(EQUIPMENT_PICKER_KIND_ALL)
   const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
 
   React.useEffect(() => {
     if (!open) {
       setAddQuantities({})
-      setSelectedKinds(kindOptions)
+      setSelectedKind(EQUIPMENT_PICKER_KIND_ALL)
     }
-  }, [kindOptions, open])
+  }, [open])
 
   React.useEffect(() => {
-    setSelectedKinds((current) => {
-      const next = current.filter((kind) => kindOptions.includes(kind))
-      return next.length > 0 ? next : kindOptions
+    setSelectedKind((current) => {
+      if (current === EQUIPMENT_PICKER_KIND_ALL) return current
+      return kindOptions.includes(current) ? current : EQUIPMENT_PICKER_KIND_ALL
     })
   }, [kindOptions])
 
@@ -140,23 +158,14 @@ export function EquipmentPickerDrawer({
       filterEquipmentPickerItems(supportedItems, {
         filterOutUnaffordable,
         filterOutNonProficient,
-        selectedKinds,
+        selectedKind,
       }),
-    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKinds],
+    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKind],
   )
 
-  const handleToggleKind = React.useCallback(
-    (kind: EquipmentPickerSupportedKind) => {
-      setSelectedKinds((current) => {
-        if (current.includes(kind)) {
-          const next = current.filter((entry) => entry !== kind)
-          return next.length > 0 ? next : kindOptions
-        }
-        return [...current, kind]
-      })
-    },
-    [kindOptions],
-  )
+  const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
+    setSelectedKind(kind)
+  }, [])
 
   const handleQuickAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
@@ -199,10 +208,10 @@ export function EquipmentPickerDrawer({
       ]}
       headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
       filters={
-        <EquipmentKindFilters
+        <EquipmentCategoryFilter
           kinds={kindOptions}
-          selectedKinds={selectedKinds}
-          onToggleKind={handleToggleKind}
+          selectedKind={selectedKind}
+          onSelectedKindChange={handleSelectedKindChange}
         />
       }
       renderItemHeader={(item) => {

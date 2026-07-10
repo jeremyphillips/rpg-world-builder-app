@@ -11,7 +11,10 @@ import { getEquipmentKindStatRows } from './shared/equipment-detail-stat-rows'
 export const EQUIPMENT_STAT_LABELS = {
   kind: 'Kind',
   cost: 'Cost',
+  gearKind: 'Gear kind',
 } as const
+
+const OMITTED_EQUIPMENT_DETAIL_STAT_ROW_LABELS = new Set<string>([EQUIPMENT_STAT_LABELS.gearKind])
 
 export const EQUIPMENT_DETAILS_SECTION_TITLES = {
   weapon: 'Weapon details',
@@ -43,7 +46,7 @@ function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
     { label: EQUIPMENT_STAT_LABELS.kind, value: getEquipmentKindLabel(equipment.kind) },
     { label: EQUIPMENT_STAT_LABELS.cost, value: formatMoney(equipment.cost) },
     ...getEquipmentKindStatRows(equipment),
-  ]
+  ].filter((row) => !OMITTED_EQUIPMENT_DETAIL_STAT_ROW_LABELS.has(row.label))
 }
 
 export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): EquipmentCardViewModel {
