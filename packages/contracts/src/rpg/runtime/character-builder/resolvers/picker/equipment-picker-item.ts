@@ -1,5 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
 import {
+  compareEquipmentRecommendationSpecificity,
   compareEquipmentRecommendationTiers,
   getBestEquipmentRecommendationReasonRank,
   type EquipmentRecommendation,
@@ -38,10 +39,10 @@ export type EquipmentPickerItem = {
 }
 
 /**
- * Stable picker browse ordering: tier → best reason → starting affordability → kind bucket
- * → weapon category → name. Search (`CatalogPickerSheet` / `rankItems`) stays
+ * Stable picker browse ordering: tier → specificity → best reason → starting affordability
+ * → kind bucket → weapon category → name. Search (`CatalogPickerSheet` / `rankItems`) stays
  * text-score-first; an empty query preserves this order. Kind and weapon-category ranks
- * are tiebreakers only after tier, reason, and affordability.
+ * are tiebreakers only after tier, specificity, reason, and affordability.
  */
 export function compareEquipmentPickerItemsByRecommendation(
   left: EquipmentPickerItem,
@@ -53,6 +54,12 @@ export function compareEquipmentPickerItemsByRecommendation(
     right.state.recommendation.tier,
   )
   if (tierOrder !== 0) return tierOrder
+
+  const specificityOrder = compareEquipmentRecommendationSpecificity(
+    left.state.recommendation.specificity,
+    right.state.recommendation.specificity,
+  )
+  if (specificityOrder !== 0) return specificityOrder
 
   const leftReasonRank = getBestEquipmentRecommendationReasonRank(left.state.recommendation.reasons)
   const rightReasonRank = getBestEquipmentRecommendationReasonRank(

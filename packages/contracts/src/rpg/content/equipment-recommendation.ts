@@ -64,9 +64,27 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
 
 export type EquipmentRecommendationReason = (typeof EQUIPMENT_RECOMMENDATION_REASONS)[number]
 
+export const EQUIPMENT_RECOMMENDATION_SPECIFICITIES = [
+  'exact',
+  'narrow_pool',
+  'broad_pool',
+] as const
+
+export type EquipmentRecommendationSpecificity =
+  (typeof EQUIPMENT_RECOMMENDATION_SPECIFICITIES)[number]
+
+/** Sort rank per specificity — lower ranks list first within the same tier. */
+export const EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK = {
+  exact: 0,
+  narrow_pool: 1,
+  broad_pool: 2,
+} as const satisfies Record<EquipmentRecommendationSpecificity, number>
+
 export type EquipmentRecommendation = {
   tier: EquipmentRecommendationTier
   reasons: readonly EquipmentRecommendationReason[]
+  /** Collapsed best (most specific) evidence among contributing signals. */
+  specificity: EquipmentRecommendationSpecificity
   /** Authored badge override from the matching rule, when present. */
   label?: string
 }
@@ -75,11 +93,13 @@ export type EquipmentRecommendationEvidence = {
   reason: EquipmentRecommendationReason
   tier: EquipmentRecommendationTier
   sourceKey: string
+  specificity: EquipmentRecommendationSpecificity
 }
 
 export const NEUTRAL_EQUIPMENT_RECOMMENDATION: EquipmentRecommendation = {
   tier: 'neutral',
   reasons: [],
+  specificity: 'broad_pool',
 }
 
 /** Recommended-tab membership is intentionally narrow: essential and strong only. */
@@ -121,6 +141,36 @@ export function getBestEquipmentRecommendationReasonRank(
 ): number {
   if (reasons.length === 0) return Number.POSITIVE_INFINITY
   return Math.min(...reasons.map((reason) => EQUIPMENT_RECOMMENDATION_REASON_RANK[reason]))
+}
+
+/** Comparator over specificity — exact first, broad pool last. */
+export function compareEquipmentRecommendationSpecificity(
+  left: EquipmentRecommendationSpecificity,
+  right: EquipmentRecommendationSpecificity,
+): number {
+  return (
+    EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[left] -
+    EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[right]
+  )
+}
+
+function bestSpecificityFromEvidence(
+  evidence: readonly EquipmentRecommendationEvidence[],
+): EquipmentRecommendationSpecificity {
+  return evidence.reduce<EquipmentRecommendationSpecificity>((best, row) => {
+    return compareEquipmentRecommendationSpecificity(row.specificity, best) < 0
+      ? row.specificity
+      : best
+  }, 'broad_pool')
+}
+
+/** Best (most specific) specificity for browse ordering within the same tier. */
+export function getBestEquipmentRecommendationSpecificity(
+  input: EquipmentRecommendation | readonly EquipmentRecommendationEvidence[],
+): EquipmentRecommendationSpecificity {
+  if ('specificity' in input && !Array.isArray(input)) return input.specificity
+  if (input.length === 0) return 'broad_pool'
+  return bestSpecificityFromEvidence(input)
 }
 
 // ---------------------------------------------------------------------------

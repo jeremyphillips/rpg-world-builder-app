@@ -8,6 +8,7 @@ import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
 import { deriveEquipmentRecommendations } from './derive-equipment-recommendations'
 import { resolveEquipmentPickerItems } from './resolve-equipment-picker-items'
+import { compareEquipmentPickerItemsByRecommendation } from '../picker/equipment-picker-item'
 import {
   nestedStartingEquipmentChoiceSetId,
   startingEquipmentChoiceSetId,
@@ -917,6 +918,90 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
 
     expect(recommendations.get(lute.id)?.reasons).toContain('unresolvedToolProficiencyChoice')
     expect(recommendations.get(lute.id)?.reasons).not.toContain('availableInStartingOption')
+  })
+
+  it('assigns exact specificity to bard gold-path grants and pool specificity to unresolved instruments', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedBard.id)]: ['gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+    })
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(leatherArmor.id)).toMatchObject({
+      tier: 'strong',
+      specificity: 'exact',
+      reasons: expect.arrayContaining(['availableInStartingOption']),
+    })
+    expect(recommendations.get(dagger.id)).toMatchObject({
+      tier: 'strong',
+      specificity: 'exact',
+    })
+    expect(recommendations.get(lute.id)).toMatchObject({
+      tier: 'strong',
+      specificity: 'narrow_pool',
+      reasons: expect.arrayContaining(['unresolvedToolProficiencyChoice']),
+    })
+    expect(recommendations.get(flute.id)?.specificity).toBe('narrow_pool')
+  })
+
+  it('keeps selected tool proficiencies at exact specificity', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
+      choiceSelections: {
+        [bardToolChoiceSetId]: [lute.id],
+      },
+    })
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(lute.id)).toMatchObject({
+      tier: 'strong',
+      specificity: 'exact',
+      reasons: expect.arrayContaining(['selectedToolProficiency']),
+    })
+  })
+
+  it('sorts bard gold-path leather armor before lute in picker browse order', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedBard.id)]: ['gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+    })
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+    const items = resolveEquipmentPickerItems({
+      equipment: bardCatalogEquipment,
+      proficiencies,
+      recommendations,
+    })
+    const sorted = [...items].sort(compareEquipmentPickerItemsByRecommendation)
+    const leatherIndex = sorted.findIndex((item) => item.equipment.id === leatherArmor.id)
+    const luteIndex = sorted.findIndex((item) => item.equipment.id === lute.id)
+
+    expect(leatherIndex).toBeGreaterThanOrEqual(0)
+    expect(luteIndex).toBeGreaterThanOrEqual(0)
+    expect(leatherIndex).toBeLessThan(luteIndex)
   })
 })
 

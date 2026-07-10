@@ -26,6 +26,7 @@ import {
 } from './resolve-starting-equipment-choice-sets'
 import type { EquipmentRecommendationSelector } from './equipment-recommendation-selector'
 import { expandRecommendationSelector } from './equipment-recommendation-selector'
+import { specificityForSelectorExpansion } from './equipment-recommendation-specificity'
 import {
   addRecommendationContribution,
   type AccumulatorMap,
@@ -215,6 +216,7 @@ function applyContribution(
     equipment: catalogIndex.equipment,
     rulesetId,
   })
+  const specificity = specificityForSelectorExpansion(contribution.selector, matches.length)
 
   for (const equipment of matches) {
     if (contribution.excludeEquipmentIds?.has(equipment.id)) continue
@@ -225,6 +227,7 @@ function applyContribution(
       contribution.tier,
       contribution.reason,
       contribution.sourceKey,
+      specificity,
     )
   }
 }

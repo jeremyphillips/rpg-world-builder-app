@@ -5,6 +5,7 @@ import { DEFAULT_SYSTEM_RULESET_ID } from '../../../../primitives/ruleset'
 import {
   EQUIPMENT_RECOMMENDATION_REASON_RANK,
   getBestEquipmentRecommendationReasonRank,
+  type EquipmentRecommendation,
 } from '../../../../content/equipment-recommendation'
 import {
   compareEquipmentPickerItemsByRecommendation,
@@ -32,7 +33,8 @@ function makeEquipment(
 
 function makePickerItem(
   equipment: Equipment,
-  recommendation: EquipmentPickerItem['state']['recommendation'],
+  recommendation: Pick<EquipmentRecommendation, 'tier' | 'reasons'> &
+    Partial<Pick<EquipmentRecommendation, 'specificity' | 'label'>>,
   affordability: Pick<EquipmentPickerItem['state'], 'isAffordable' | 'isWithinRemainingBudget'> = {
     isAffordable: true,
     isWithinRemainingBudget: true,
@@ -46,7 +48,10 @@ function makePickerItem(
       isRecommended: recommendation.tier === 'essential' || recommendation.tier === 'strong',
       isProficient: true,
       ...affordability,
-      recommendation,
+      recommendation: {
+        ...recommendation,
+        specificity: recommendation.specificity ?? 'exact',
+      },
       disabledReasons: [],
     },
   }
@@ -353,7 +358,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'adventuring_gear',
         gearKind: 'general',
       }),
-      { tier: 'neutral', reasons: [] },
+      { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(reasoned, noReasons)).toBeLessThan(0)
@@ -388,6 +393,81 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     expect(compareEquipmentPickerItemsByRecommendation(affordable, unaffordable)).toBeLessThan(0)
   })
 
+  it('orders specificity before reason within the same tier', () => {
+    const broadPool = makePickerItem(
+      makeEquipment({
+        id: 'test:lute',
+        slug: 'lute',
+        name: 'Lute',
+        kind: 'tool',
+        toolCategory: 'musical_instrument',
+        utilizes: [],
+      }),
+      {
+        tier: 'strong',
+        reasons: ['unresolvedToolProficiencyChoice'],
+        specificity: 'broad_pool',
+      },
+    )
+    const exactGrant = makePickerItem(
+      makeEquipment({
+        id: 'test:leather-armor',
+        slug: 'leather-armor',
+        name: 'Leather Armor',
+        kind: 'armor',
+        category: 'light',
+        baseAc: 11,
+        addDexModifier: true,
+      }),
+      {
+        tier: 'strong',
+        reasons: ['availableInStartingOption'],
+        specificity: 'exact',
+      },
+    )
+
+    expect(compareEquipmentPickerItemsByRecommendation(exactGrant, broadPool)).toBeLessThan(0)
+  })
+
+  it('orders exact before narrow_pool before broad_pool with the same tier and reason', () => {
+    const exact = makePickerItem(
+      makeEquipment({
+        id: 'test:exact',
+        slug: 'exact',
+        name: 'Exact',
+        kind: 'tool',
+        toolCategory: 'thieves',
+        utilizes: [],
+      }),
+      { tier: 'strong', reasons: ['selectedToolProficiency'], specificity: 'exact' },
+    )
+    const narrow = makePickerItem(
+      makeEquipment({
+        id: 'test:narrow',
+        slug: 'narrow',
+        name: 'Narrow',
+        kind: 'tool',
+        toolCategory: 'thieves',
+        utilizes: [],
+      }),
+      { tier: 'strong', reasons: ['selectedToolProficiency'], specificity: 'narrow_pool' },
+    )
+    const broad = makePickerItem(
+      makeEquipment({
+        id: 'test:broad',
+        slug: 'broad',
+        name: 'Broad',
+        kind: 'tool',
+        toolCategory: 'thieves',
+        utilizes: [],
+      }),
+      { tier: 'strong', reasons: ['selectedToolProficiency'], specificity: 'broad_pool' },
+    )
+
+    expect(compareEquipmentPickerItemsByRecommendation(exact, narrow)).toBeLessThan(0)
+    expect(compareEquipmentPickerItemsByRecommendation(narrow, broad)).toBeLessThan(0)
+  })
+
   it('breaks final ties with base localeCompare on name', () => {
     const alpha = makePickerItem(
       makeEquipment({
@@ -397,7 +477,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'adventuring_gear',
         gearKind: 'general',
       }),
-      { tier: 'neutral', reasons: [] },
+      { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
     )
     const beta = makePickerItem(
       makeEquipment({
@@ -407,7 +487,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'adventuring_gear',
         gearKind: 'general',
       }),
-      { tier: 'neutral', reasons: [] },
+      { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(alpha, beta)).toBeLessThan(0)

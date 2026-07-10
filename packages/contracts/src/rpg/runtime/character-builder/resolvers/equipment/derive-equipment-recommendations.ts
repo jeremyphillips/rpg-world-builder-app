@@ -35,6 +35,7 @@ import {
   deriveStartingEquipmentRecommendationContributions,
   listSelectedStartingEquipmentGrantIds,
 } from './derive-equipment-recommendation-contributions'
+import { specificityForMatchCount } from './equipment-recommendation-specificity'
 
 /** MVP builds level-1 characters; the level-up wizard will pass real levels. */
 const DEFAULT_CLASS_LEVEL = 1
@@ -141,6 +142,7 @@ function applyAuthoredRules(args: {
       equipment: catalogIndex.equipment,
       rulesetId: characterClass.rulesetId,
     })
+    const specificity = specificityForMatchCount(matches.length)
 
     for (const equipment of matches) {
       if (rule.tag !== undefined && !(equipment.tags ?? []).includes(rule.tag)) continue
@@ -150,6 +152,7 @@ function applyAuthoredRules(args: {
         tier,
         reason,
         `${characterClass.id}:authored-rule`,
+        specificity,
         rule.label,
       )
     }
@@ -164,20 +167,23 @@ function applyRequiredGearContributions(args: {
   const requiredGear = args.characterClass.spellcasting?.requiredGear
   if (!requiredGear || requiredGear.length === 0) return
 
-  for (const equipment of args.catalogIndex.equipment.values()) {
+  const matches = [...args.catalogIndex.equipment.values()].filter((equipment) => {
     const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
-    if (
-      spellcastingGearKind === undefined ||
-      !(requiredGear as readonly string[]).includes(spellcastingGearKind)
-    ) {
-      continue
-    }
+    return (
+      spellcastingGearKind !== undefined &&
+      (requiredGear as readonly string[]).includes(spellcastingGearKind)
+    )
+  })
+  const specificity = specificityForMatchCount(matches.length)
+
+  for (const equipment of matches) {
     addRecommendationContribution(
       args.accumulators,
       equipment.id,
       'essential',
       'classRequired',
       `${args.characterClass.id}:required-gear`,
+      specificity,
     )
   }
 }
@@ -190,20 +196,23 @@ function applyRecommendedGearContributions(args: {
   const recommendedGear = args.characterClass.spellcasting?.recommendedGear
   if (!recommendedGear || recommendedGear.length === 0) return
 
-  for (const equipment of args.catalogIndex.equipment.values()) {
+  const matches = [...args.catalogIndex.equipment.values()].filter((equipment) => {
     const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
-    if (
-      spellcastingGearKind === undefined ||
-      !(recommendedGear as readonly SpellcastingGearKind[]).includes(spellcastingGearKind)
-    ) {
-      continue
-    }
+    return (
+      spellcastingGearKind !== undefined &&
+      (recommendedGear as readonly SpellcastingGearKind[]).includes(spellcastingGearKind)
+    )
+  })
+  const specificity = specificityForMatchCount(matches.length)
+
+  for (const equipment of matches) {
     addRecommendationContribution(
       args.accumulators,
       equipment.id,
       'strong',
       'classSuggested',
       `${args.characterClass.id}:recommended-gear`,
+      specificity,
     )
   }
 }
@@ -229,21 +238,24 @@ function applySpellcastingFocusContributions(args: {
     ? 'essential'
     : 'strong'
 
-  for (const equipment of catalogIndex.equipment.values()) {
-    if (equipment.kind !== 'adventuring_gear') continue
+  const matches = [...catalogIndex.equipment.values()].filter((equipment) => {
+    if (equipment.kind !== 'adventuring_gear') return false
     const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
-    if (
-      spellcastingGearKind === undefined ||
-      !(focusKinds as readonly string[]).includes(spellcastingGearKind)
-    ) {
-      continue
-    }
+    return (
+      spellcastingGearKind !== undefined &&
+      (focusKinds as readonly string[]).includes(spellcastingGearKind)
+    )
+  })
+  const specificity = specificityForMatchCount(matches.length)
+
+  for (const equipment of matches) {
     addRecommendationContribution(
       accumulators,
       equipment.id,
       focusTier,
       'spellcastingFocus',
       `${characterClass.id}:spellcasting-focus`,
+      specificity,
     )
   }
 }
@@ -261,6 +273,7 @@ function applyProficiencyContributions(
       'essential',
       'classToolNeed',
       `${characterClass.id}:fixed-tool`,
+      'exact',
     )
   }
 
@@ -275,6 +288,7 @@ function applyProficiencyContributions(
       'compatible',
       'proficient',
       `${characterClass.id}:proficiency`,
+      'exact',
     )
   } else {
     addRecommendationContribution(
@@ -283,6 +297,7 @@ function applyProficiencyContributions(
       'notRecommended',
       'notProficient',
       `${characterClass.id}:proficiency`,
+      'exact',
     )
   }
 }

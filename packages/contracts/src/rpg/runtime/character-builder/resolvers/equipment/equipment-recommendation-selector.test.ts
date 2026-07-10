@@ -5,7 +5,12 @@ import { equipmentSchema } from '../../../../content/equipment'
 import {
   equipmentMatchesRecommendationSelector,
   expandRecommendationSelector,
+  type EquipmentRecommendationSelector,
 } from './equipment-recommendation-selector'
+import {
+  specificityForMatchCount,
+  specificityForSelectorExpansion,
+} from './equipment-recommendation-specificity'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -99,5 +104,97 @@ describe('expandRecommendationSelector', () => {
     })
 
     expect(matches.map((row) => row.id)).toEqual([lute.id])
+  })
+})
+
+function makeMusicalInstrument(slug: string, name: string) {
+  return equipmentSchema.parse({
+    ...CONTENT_META,
+    id: `${RULESET}:${slug}`,
+    slug,
+    name,
+    description: '',
+    cost: { amount: 10, currency: 'gp' },
+    weight: { value: 1, unit: 'lb' },
+    kind: 'tool',
+    toolCategory: 'musical_instrument',
+    ability: 'cha',
+    utilizes: [{ description: 'Play', dc: 10 }],
+  })
+}
+
+describe('specificityForSelectorExpansion', () => {
+  it('classifies exact equipment selectors as exact regardless of match count', () => {
+    expect(specificityForSelectorExpansion({ kind: 'equipment', equipmentId: lute.id }, 10)).toBe(
+      'exact',
+    )
+  })
+
+  it('classifies pool expansion counts at threshold boundaries', () => {
+    const oneToolCatalog = new Map([[lute.id, lute]])
+    const threeTools = [
+      makeMusicalInstrument('flute', 'Flute'),
+      makeMusicalInstrument('drum', 'Drum'),
+    ]
+    const threeToolCatalog = new Map([
+      [lute.id, lute],
+      ...threeTools.map((tool) => [tool.id, tool] as const),
+    ])
+    const tenTools = [
+      makeMusicalInstrument('bagpipes', 'Bagpipes'),
+      makeMusicalInstrument('dulcimer', 'Dulcimer'),
+      makeMusicalInstrument('horn', 'Horn'),
+      makeMusicalInstrument('lyre', 'Lyre'),
+      makeMusicalInstrument('pan-flute', 'Pan Flute'),
+      makeMusicalInstrument('shawm', 'Shawm'),
+      makeMusicalInstrument('viol', 'Viol'),
+    ]
+    const tenToolCatalog = new Map([
+      [lute.id, lute],
+      ...threeTools.map((tool) => [tool.id, tool] as const),
+      ...tenTools.map((tool) => [tool.id, tool] as const),
+    ])
+    const pool: EquipmentRecommendationSelector = {
+      kind: 'tool_proficiency_pool',
+      pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+    }
+
+    expect(
+      specificityForSelectorExpansion(
+        pool,
+        expandRecommendationSelector({
+          selector: pool,
+          equipment: oneToolCatalog,
+          rulesetId: RULESET,
+        }).length,
+      ),
+    ).toBe('exact')
+    expect(
+      specificityForSelectorExpansion(
+        pool,
+        expandRecommendationSelector({
+          selector: pool,
+          equipment: threeToolCatalog,
+          rulesetId: RULESET,
+        }).length,
+      ),
+    ).toBe('narrow_pool')
+    expect(
+      specificityForSelectorExpansion(
+        pool,
+        expandRecommendationSelector({
+          selector: pool,
+          equipment: tenToolCatalog,
+          rulesetId: RULESET,
+        }).length,
+      ),
+    ).toBe('broad_pool')
+  })
+
+  it('classifies match counts directly via specificityForMatchCount', () => {
+    expect(specificityForMatchCount(1)).toBe('exact')
+    expect(specificityForMatchCount(2)).toBe('narrow_pool')
+    expect(specificityForMatchCount(5)).toBe('narrow_pool')
+    expect(specificityForMatchCount(6)).toBe('broad_pool')
   })
 })

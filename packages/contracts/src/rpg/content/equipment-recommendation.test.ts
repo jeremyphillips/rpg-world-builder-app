@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  compareEquipmentRecommendationSpecificity,
   compareEquipmentRecommendationTiers,
   EQUIPMENT_RECOMMENDATION_REASON_RANK,
+  EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK,
   EQUIPMENT_RECOMMENDATION_TIER_RANK,
   EQUIPMENT_RECOMMENDATION_TIERS,
   equipmentRecommendationRuleSchema,
   getBestEquipmentRecommendationReasonRank,
+  getBestEquipmentRecommendationSpecificity,
   isRecommendedEquipmentTier,
 } from './equipment-recommendation'
 
@@ -51,12 +54,52 @@ describe('equipment recommendation reason ranks', () => {
     )
   })
 
-  it('returns the best reason rank and treats empty reasons as neutral', () => {
+  it('returns positive infinity when reasons are empty', () => {
     expect(getBestEquipmentRecommendationReasonRank(['classRequired'])).toBe(0)
     expect(getBestEquipmentRecommendationReasonRank(['proficient', 'classToolNeed'])).toBe(
       EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed,
     )
     expect(getBestEquipmentRecommendationReasonRank([])).toBe(Number.POSITIVE_INFINITY)
+  })
+})
+
+describe('equipment recommendation specificity ranks', () => {
+  it('assigns a unique rank to every specificity', () => {
+    const ranks = Object.values(EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK)
+    expect(new Set(ranks).size).toBe(ranks.length)
+  })
+
+  it('orders exact before narrow_pool before broad_pool', () => {
+    expect(compareEquipmentRecommendationSpecificity('exact', 'narrow_pool')).toBeLessThan(0)
+    expect(compareEquipmentRecommendationSpecificity('narrow_pool', 'broad_pool')).toBeLessThan(0)
+    expect(compareEquipmentRecommendationSpecificity('broad_pool', 'exact')).toBeGreaterThan(0)
+  })
+
+  it('returns the best specificity from evidence and collapsed recommendations', () => {
+    expect(
+      getBestEquipmentRecommendationSpecificity([
+        {
+          reason: 'unresolvedToolProficiencyChoice',
+          tier: 'strong',
+          sourceKey: 'pool',
+          specificity: 'broad_pool',
+        },
+        {
+          reason: 'availableInStartingOption',
+          tier: 'strong',
+          sourceKey: 'grant',
+          specificity: 'exact',
+        },
+      ]),
+    ).toBe('exact')
+    expect(
+      getBestEquipmentRecommendationSpecificity({
+        tier: 'strong',
+        reasons: ['startingEquipment'],
+        specificity: 'exact',
+      }),
+    ).toBe('exact')
+    expect(getBestEquipmentRecommendationSpecificity([])).toBe('broad_pool')
   })
 })
 

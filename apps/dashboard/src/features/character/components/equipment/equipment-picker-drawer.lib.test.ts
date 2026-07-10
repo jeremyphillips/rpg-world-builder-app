@@ -78,7 +78,7 @@ describe('equipment-picker-drawer.lib', () => {
       state: {
         ...neutralRope.state,
         isRecommended: false,
-        recommendation: { tier: 'compatible', reasons: ['proficient'] },
+        recommendation: { tier: 'compatible', reasons: ['proficient'], specificity: 'exact' },
       },
     }
 
@@ -211,7 +211,11 @@ describe('equipment-picker-drawer.lib', () => {
       ...longsword,
       state: {
         ...longsword.state,
-        recommendation: { tier: 'essential' as const, reasons: ['classToolNeed' as const] },
+        recommendation: {
+          tier: 'essential' as const,
+          reasons: ['classToolNeed' as const],
+          specificity: 'exact' as const,
+        },
       },
     }
     expect(getEquipmentPickerBadge(essentialTool)?.label).toBe('Class tool')
@@ -220,7 +224,11 @@ describe('equipment-picker-drawer.lib', () => {
       ...longsword,
       state: {
         ...longsword.state,
-        recommendation: { tier: 'essential' as const, reasons: ['classRequired' as const] },
+        recommendation: {
+          tier: 'essential' as const,
+          reasons: ['classRequired' as const],
+          specificity: 'exact' as const,
+        },
       },
     }
     expect(getEquipmentPickerBadge(essentialRule)?.label).toBe(EQUIPMENT_PICKER_ESSENTIAL_LABEL)
@@ -232,6 +240,7 @@ describe('equipment-picker-drawer.lib', () => {
         recommendation: {
           tier: 'essential' as const,
           reasons: ['classRequired' as const],
+          specificity: 'exact' as const,
           label: 'Spellbook',
         },
       },
@@ -241,16 +250,22 @@ describe('equipment-picker-drawer.lib', () => {
 
   describe('getEquipmentPickerBadge proficiency and recommendation precedence', () => {
     function badgeItem(
-      overrides: Partial<EquipmentPickerItem['state']> & {
-        recommendation: EquipmentPickerItem['state']['recommendation']
+      args: Partial<Omit<EquipmentPickerItem['state'], 'recommendation'>> & {
+        recommendation: Pick<EquipmentPickerItem['state']['recommendation'], 'tier' | 'reasons'> &
+          Partial<Pick<EquipmentPickerItem['state']['recommendation'], 'specificity' | 'label'>>
       },
     ): EquipmentPickerItem {
+      const { recommendation, ...stateOverrides } = args
       const base = equipmentPickerItemsFixture[0]!
       return {
         ...base,
         state: {
           ...base.state,
-          ...overrides,
+          ...stateOverrides,
+          recommendation: {
+            ...recommendation,
+            specificity: recommendation.specificity ?? 'exact',
+          },
         },
       }
     }
@@ -378,7 +393,11 @@ describe('equipment-picker-drawer.lib', () => {
           isProficient: true,
           isAffordable: true,
           isWithinRemainingBudget: true,
-          recommendation: { tier: 'neutral' as const, reasons: [] },
+          recommendation: {
+            tier: 'neutral' as const,
+            reasons: [],
+            specificity: 'broad_pool' as const,
+          },
           disabledReasons: [],
         },
       },
@@ -391,7 +410,11 @@ describe('equipment-picker-drawer.lib', () => {
           isProficient: true,
           isAffordable: true,
           isWithinRemainingBudget: true,
-          recommendation: { tier: 'neutral' as const, reasons: [] },
+          recommendation: {
+            tier: 'neutral' as const,
+            reasons: [],
+            specificity: 'broad_pool' as const,
+          },
           disabledReasons: [],
         },
       },

@@ -1,14 +1,18 @@
 import {
+  EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK,
   EQUIPMENT_RECOMMENDATION_TIER_RANK,
   EQUIPMENT_RECOMMENDATION_TIERS,
+  getBestEquipmentRecommendationSpecificity,
   type EquipmentRecommendation,
   type EquipmentRecommendationEvidence,
   type EquipmentRecommendationReason,
+  type EquipmentRecommendationSpecificity,
   type EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
 
 export type RecommendationAccumulator = {
   minRank: number
+  minSpecificityRank: number
   reasons: Set<EquipmentRecommendationReason>
   evidence: EquipmentRecommendationEvidence[]
   label?: string
@@ -26,15 +30,18 @@ export function addRecommendationContribution(
   tier: EquipmentRecommendationTier,
   reason: EquipmentRecommendationReason,
   sourceKey: string,
+  specificity: EquipmentRecommendationSpecificity,
   label?: string,
 ): void {
   const rank = EQUIPMENT_RECOMMENDATION_TIER_RANK[tier]
+  const specificityRank = EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[specificity]
   const existing = accumulators.get(equipmentId)
-  const nextEvidence: EquipmentRecommendationEvidence = { reason, tier, sourceKey }
+  const nextEvidence: EquipmentRecommendationEvidence = { reason, tier, sourceKey, specificity }
 
   if (!existing) {
     accumulators.set(equipmentId, {
       minRank: rank,
+      minSpecificityRank: specificityRank,
       reasons: new Set([reason]),
       evidence: [nextEvidence],
       label,
@@ -54,6 +61,19 @@ export function addRecommendationContribution(
   } else if (rank === existing.minRank && existing.label === undefined) {
     existing.label = label
   }
+
+  if (specificityRank < existing.minSpecificityRank) {
+    existing.minSpecificityRank = specificityRank
+  }
+}
+
+function evidenceForSpecificityCollapse(
+  evidence: readonly EquipmentRecommendationEvidence[],
+): readonly EquipmentRecommendationEvidence[] {
+  const selective = evidence.filter(
+    (row) => row.reason !== 'proficient' && row.reason !== 'notProficient',
+  )
+  return selective.length > 0 ? selective : evidence
 }
 
 export function toEquipmentRecommendation(
@@ -65,6 +85,9 @@ export function toEquipmentRecommendation(
   return {
     tier,
     reasons: [...accumulator.reasons],
+    specificity: getBestEquipmentRecommendationSpecificity(
+      evidenceForSpecificityCollapse(accumulator.evidence),
+    ),
     ...(accumulator.label !== undefined ? { label: accumulator.label } : {}),
   }
 }
