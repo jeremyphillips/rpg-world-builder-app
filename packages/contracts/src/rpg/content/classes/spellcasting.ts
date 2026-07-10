@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
 import { absoluteLevelSchema } from '../../primitives/level'
+import { spellcastingFocusGearKindSchema } from '../equipment/modifier'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — progressions and preparation modes shared by class records
@@ -57,6 +58,12 @@ export const spellcastingSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
   preparation: spellPreparationModeSchema,
+  /**
+   * Spellcasting focus gear kinds this class can use (arcane/druidic focus,
+   * holy symbol). Drives equipment picker recommendations; when absent, focus
+   * kinds are inferred from starting-equipment package contents.
+   */
+  focus: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
   cantrips: cantripsProgressionSchema.optional(),
   spellsAvailable: spellsAvailableProgressionSchema.optional(),
 })

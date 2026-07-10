@@ -6,6 +6,7 @@ import {
   grantedEquipmentItemSchema,
   normalizeEquipmentChoiceGrant,
 } from './lib/equipment-grant'
+import { equipmentRecommendationsSchema } from './equipment-recommendation'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
 import {
   skillProficiencyChoiceGroupSchema,
@@ -73,10 +74,19 @@ export const classCharacterCreationSchema = z
   .object({
     startingEquipment: startingEquipmentChoiceSchema.optional(),
     proficiencies: characterCreationProficienciesSchema.optional(),
+    /** Authored picker recommendation rules where inference cannot reach (soft catalog references). */
+    equipmentRecommendations: equipmentRecommendationsSchema.optional(),
   })
-  .refine((value) => value.startingEquipment !== undefined || value.proficiencies !== undefined, {
-    message: 'characterCreation requires startingEquipment and/or proficiencies',
-  })
+  .refine(
+    (value) =>
+      value.startingEquipment !== undefined ||
+      value.proficiencies !== undefined ||
+      value.equipmentRecommendations !== undefined,
+    {
+      message:
+        'characterCreation requires startingEquipment, proficiencies, and/or equipmentRecommendations',
+    },
+  )
 
 export type ClassCharacterCreation = z.infer<typeof classCharacterCreationSchema>
 

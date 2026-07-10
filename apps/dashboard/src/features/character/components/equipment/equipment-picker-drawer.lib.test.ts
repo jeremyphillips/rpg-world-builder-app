@@ -9,21 +9,41 @@ import {
 import {
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
-  getEquipmentPickerBadgeLabel,
+  getEquipmentPickerBadge,
   getEquipmentPickerItemTab,
   resolveEquipmentKindFilterOptions,
+  sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
+  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
+  EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
 } from './equipment-picker-drawer.types'
 
 describe('equipment-picker-drawer.lib', () => {
-  it('routes recommended items to the recommended tab', () => {
+  it('routes essential/strong tiers to the recommended tab and the rest to all', () => {
     expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[0]!)).toBe(
       EQUIPMENT_PICKER_TAB_RECOMMENDED,
     )
+    expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[1]!)).toBe(
+      EQUIPMENT_PICKER_TAB_ALL,
+    )
+    expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[2]!)).toBe(
+      EQUIPMENT_PICKER_TAB_ALL,
+    )
+  })
+
+  it('sorts items by recommendation tier with not-proficient gear last', () => {
+    const sorted = sortEquipmentPickerItems([
+      equipmentPickerItemsFixture[1]!,
+      equipmentPickerItemsFixture[2]!,
+      equipmentPickerItemsFixture[0]!,
+    ])
+
+    expect(sorted.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope', 'Chain Mail'])
   })
 
   it('filters unaffordable and non-proficient rows', () => {
@@ -51,7 +71,52 @@ describe('equipment-picker-drawer.lib', () => {
     expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
       'Need 75 GP, you have 40 GP',
     )
-    expect(getEquipmentPickerBadgeLabel(chainMail)).toBe(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)
+    expect(getEquipmentPickerBadge(chainMail)).toEqual({
+      label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+      emphasis: 'warning',
+    })
+  })
+
+  it('badges recommendation tiers sparsely', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+    expect(getEquipmentPickerBadge(longsword)).toEqual({
+      label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
+      emphasis: 'highlight',
+    })
+
+    const rope = equipmentPickerItemsFixture[2]!
+    expect(getEquipmentPickerBadge(rope)).toBeUndefined()
+
+    const essentialTool = {
+      ...longsword,
+      state: {
+        ...longsword.state,
+        recommendation: { tier: 'essential' as const, reasons: ['classToolNeed' as const] },
+      },
+    }
+    expect(getEquipmentPickerBadge(essentialTool)?.label).toBe('Class tool')
+
+    const essentialRule = {
+      ...longsword,
+      state: {
+        ...longsword.state,
+        recommendation: { tier: 'essential' as const, reasons: ['classRequired' as const] },
+      },
+    }
+    expect(getEquipmentPickerBadge(essentialRule)?.label).toBe(EQUIPMENT_PICKER_ESSENTIAL_LABEL)
+
+    const labeledRule = {
+      ...longsword,
+      state: {
+        ...longsword.state,
+        recommendation: {
+          tier: 'essential' as const,
+          reasons: ['classRequired' as const],
+          label: 'Spellbook',
+        },
+      },
+    }
+    expect(getEquipmentPickerBadge(labeledRule)?.label).toBe('Spellbook')
   })
 
   it('excludes vehicle and service kinds from category filter and results', () => {
@@ -65,6 +130,7 @@ describe('equipment-picker-drawer.lib', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },
       },
@@ -76,6 +142,7 @@ describe('equipment-picker-drawer.lib', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },
       },

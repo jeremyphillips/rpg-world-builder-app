@@ -1,7 +1,7 @@
 import {
   assembleCharacterProficiencies,
   deriveEquipmentBudgetSummary,
-  deriveRecommendedEquipment,
+  deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
   formatWealth,
   isEquipmentStackable,
@@ -362,16 +362,17 @@ export function resolveEquipmentStepPickerItems(args: {
     characterClass,
   )
   const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
-  const recommendedEquipmentIds = deriveRecommendedEquipment({
+  const recommendations = deriveEquipmentRecommendations({
     characterClass,
     catalogIndex,
     proficiencies,
+    classLevel: draft.class.level,
   })
 
   return resolveEquipmentPickerItems({
     equipment: [...catalogIndex.equipment.values()],
     proficiencies,
-    recommendedEquipmentIds,
+    recommendations,
     budget,
   })
 }

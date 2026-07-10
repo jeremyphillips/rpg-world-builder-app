@@ -49,6 +49,25 @@ describe('spellcastingSchema', () => {
     expect(withLevel.description).toBe('<p>Delayed caster.</p>')
   })
 
+  it('parses optional focus gear kinds and rejects non-focus kinds', () => {
+    const spellcasting = spellcastingSchema.parse({
+      progression: 'full',
+      ability: 'int',
+      preparation: 'prepared',
+      focus: ['arcane_focus'],
+    })
+    expect(spellcasting.focus).toEqual(['arcane_focus'])
+
+    expect(
+      spellcastingSchema.safeParse({
+        progression: 'full',
+        ability: 'int',
+        preparation: 'prepared',
+        focus: ['general'],
+      }).success,
+    ).toBe(false)
+  })
+
   it('parses spellsAvailable with count instead of prepared', () => {
     const spellcasting = spellcastingSchema.parse({
       progression: 'full',

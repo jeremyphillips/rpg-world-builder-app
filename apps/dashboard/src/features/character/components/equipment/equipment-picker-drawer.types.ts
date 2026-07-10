@@ -18,7 +18,18 @@ export const EQUIPMENT_PICKER_TAB_ALL = 'all'
 
 export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 
+/** Sparse recommendation badges — most rows (including proficient gear) get none. */
+export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
+export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
+export const EQUIPMENT_PICKER_CLASS_TOOL_LABEL = 'Class tool'
+export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
+
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
+
+export type EquipmentPickerBadge = {
+  label: string
+  emphasis: 'warning' | 'highlight'
+}
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const

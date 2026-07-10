@@ -13,6 +13,7 @@ import {
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
 } from './equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from './equipment-picker-purchase.lib'
 
@@ -22,7 +23,7 @@ describe('EquipmentPickerDrawer', () => {
       <EquipmentPickerDrawer
         open
         onOpenChange={vi.fn()}
-        items={equipmentPickerItemsFixture}
+        items={[equipmentPickerItemsFixture[1]!]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
         defaultTab="all"
@@ -37,6 +38,24 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByText(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toBeInTheDocument()
     expect(screen.getByText(/Need 75 GP, you have 40 GP/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
+  })
+
+  it('shows recommendation badges on the recommended tab', () => {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+
+    expect(within(list).getByText('Longsword')).toBeInTheDocument()
+    expect(within(list).getByText(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toBeInTheDocument()
+    expect(within(list).queryByText('Rope')).not.toBeInTheDocument()
   })
 
   it('hides unaffordable rows by default', () => {
@@ -67,6 +86,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
+        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
@@ -87,6 +107,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
+        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
@@ -114,7 +135,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     expect(screen.getByText(EQUIPMENT_PICKER_ADDED_LABEL)).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
+    expect(screen.queryAllByRole('button', { name: 'Add' })).toHaveLength(0)
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {
@@ -127,6 +148,7 @@ describe('EquipmentPickerDrawer', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },
       },
@@ -138,6 +160,7 @@ describe('EquipmentPickerDrawer', () => {
           isRecommended: false,
           isProficient: true,
           isAffordable: true,
+          recommendation: { tier: 'neutral' as const, reasons: [] },
           disabledReasons: [],
         },
       },

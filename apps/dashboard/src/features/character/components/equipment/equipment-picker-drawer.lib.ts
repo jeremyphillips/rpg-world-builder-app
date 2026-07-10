@@ -1,4 +1,5 @@
 import {
+  compareEquipmentPickerItemsByRecommendation,
   EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
   formatWealthAsGold,
@@ -7,11 +8,16 @@ import {
 } from '@rpg/contracts'
 
 import {
+  EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
+  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
+  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentBudgetSummary,
+  type EquipmentPickerBadge,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
 } from './equipment-picker-drawer.types'
@@ -68,6 +74,13 @@ export function filterEquipmentPickerItems(
   })
 }
 
+/** Stable within-tab ordering: essential → strong → compatible → neutral → not proficient. */
+export function sortEquipmentPickerItems(
+  items: readonly EquipmentPickerItem[],
+): EquipmentPickerItem[] {
+  return [...items].sort(compareEquipmentPickerItemsByRecommendation)
+}
+
 export function isEquipmentPickerItemDisabled(item: EquipmentPickerItem): boolean {
   return !item.state.isAffordable || item.state.disabledReasons.length > 0
 }
@@ -83,7 +96,33 @@ export function getEquipmentPickerDisabledNote(
   return item.state.disabledReasons[0]
 }
 
-export function getEquipmentPickerBadgeLabel(item: EquipmentPickerItem): string | undefined {
-  if (!item.state.isProficient) return EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL
+/**
+ * Sparse single-badge policy: the not-proficient warning wins; otherwise only
+ * essential/strong rows earn a badge (proficiency alone is sort-only signal).
+ */
+export function getEquipmentPickerBadge(
+  item: EquipmentPickerItem,
+): EquipmentPickerBadge | undefined {
+  if (!item.state.isProficient) {
+    return { label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL, emphasis: 'warning' }
+  }
+
+  const { tier, reasons, label } = item.state.recommendation
+  if (label) return { label, emphasis: 'highlight' }
+
+  if (tier === 'essential') {
+    if (reasons.includes('spellcastingFocus')) {
+      return { label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL, emphasis: 'highlight' }
+    }
+    if (reasons.includes('classToolNeed')) {
+      return { label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL, emphasis: 'highlight' }
+    }
+    return { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, emphasis: 'highlight' }
+  }
+
+  if (tier === 'strong' && reasons.includes('startingEquipment')) {
+    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, emphasis: 'highlight' }
+  }
+
   return undefined
 }

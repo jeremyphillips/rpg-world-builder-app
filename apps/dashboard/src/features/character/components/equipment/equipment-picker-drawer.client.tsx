@@ -25,11 +25,12 @@ import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 
 import {
   filterEquipmentPickerItems,
-  getEquipmentPickerBadgeLabel,
+  getEquipmentPickerBadge,
   getEquipmentPickerDisabledNote,
   getEquipmentPickerItemTab,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
+  sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
@@ -51,6 +52,7 @@ import {
   equipmentPickerHeaderTitleClasses,
   equipmentPickerCategoryFilterClasses,
   equipmentPickerCategoryLabelClasses,
+  equipmentPickerHighlightBadgeClasses,
   equipmentPickerWarningBadgeClasses,
   EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
@@ -155,11 +157,13 @@ export function EquipmentPickerDrawer({
 
   const visibleItems = React.useMemo(
     () =>
-      filterEquipmentPickerItems(supportedItems, {
-        filterOutUnaffordable,
-        filterOutNonProficient,
-        selectedKind,
-      }),
+      sortEquipmentPickerItems(
+        filterEquipmentPickerItems(supportedItems, {
+          filterOutUnaffordable,
+          filterOutNonProficient,
+          selectedKind,
+        }),
+      ),
     [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKind],
   )
 
@@ -216,7 +220,7 @@ export function EquipmentPickerDrawer({
       }
       renderItemHeader={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
-        const badgeLabel = getEquipmentPickerBadgeLabel(item)
+        const badge = getEquipmentPickerBadge(item)
         const disabled = isEquipmentPickerItemDisabled(item)
 
         return (
@@ -233,9 +237,17 @@ export function EquipmentPickerDrawer({
               </span>
               <span className={equipmentPickerHeaderKindClasses}>{header.kindLabel}</span>
             </span>
-            {badgeLabel ? (
-              <Badge size="sm" variant="outline" className={equipmentPickerWarningBadgeClasses}>
-                {badgeLabel}
+            {badge ? (
+              <Badge
+                size="sm"
+                variant="outline"
+                className={
+                  badge.emphasis === 'warning'
+                    ? equipmentPickerWarningBadgeClasses
+                    : equipmentPickerHighlightBadgeClasses
+                }
+              >
+                {badge.label}
               </Badge>
             ) : null}
           </span>

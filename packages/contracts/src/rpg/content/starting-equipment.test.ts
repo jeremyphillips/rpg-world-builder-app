@@ -159,6 +159,40 @@ describe('classCharacterCreationSchema', () => {
       },
     })
   })
+
+  it('accepts equipment-recommendations-only character creation', () => {
+    expect(
+      classCharacterCreationSchema.parse({
+        equipmentRecommendations: {
+          essential: [
+            {
+              match: { source: 'explicit', equipmentSlugs: ['spellbook'] },
+              label: 'Spellbook',
+            },
+          ],
+          strong: [
+            {
+              match: {
+                source: 'filtered',
+                equipmentKind: 'adventuring_gear',
+                gearKind: 'holy_symbol',
+              },
+              minLevel: 2,
+            },
+          ],
+        },
+      }),
+    ).toMatchObject({
+      equipmentRecommendations: {
+        essential: [{ label: 'Spellbook' }],
+        strong: [{ minLevel: 2 }],
+      },
+    })
+  })
+
+  it('rejects empty character creation', () => {
+    expect(classCharacterCreationSchema.safeParse({}).success).toBe(false)
+  })
 })
 
 describe('resolveEquipmentContentId', () => {
