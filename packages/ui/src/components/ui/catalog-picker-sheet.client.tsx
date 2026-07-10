@@ -55,6 +55,7 @@ export function CatalogPickerSheet<TItem>({
   getSearchText,
   renderItem,
   renderItemHeader,
+  renderItemSummary,
   renderItemActions,
   renderItemDetails,
   getItemToolbarLabel,
@@ -90,6 +91,7 @@ export function CatalogPickerSheet<TItem>({
   const rowProps = {
     renderItem,
     renderItemHeader,
+    renderItemSummary,
     renderItemActions,
     renderItemDetails,
     getItemToolbarLabel,

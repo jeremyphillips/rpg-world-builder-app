@@ -60,6 +60,38 @@ export const equipmentPickerRopeFixture = {
   description: '<p>Hempen rope, 50 feet.</p>',
 } as const satisfies Equipment
 
+export const equipmentPickerRowboatFixture = {
+  id: 'srd-cc-5.2.1:rowboat',
+  slug: 'rowboat',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rowboat',
+  kind: 'vehicle',
+  vehicleCategory: 'water',
+  speed: { value: 1.5, unit: 'mph' },
+  cost: { amount: 50, currency: 'gp' },
+  description: '<p>A small rowboat.</p>',
+} as const satisfies Equipment
+
+export const equipmentPickerSkilledHirelingFixture = {
+  id: 'srd-cc-5.2.1:skilled-hireling',
+  slug: 'skilled-hireling',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Skilled Hireling',
+  kind: 'service',
+  serviceCategory: 'hireling',
+  duration: { value: 1, unit: 'day' },
+  cost: { amount: 2, currency: 'gp' },
+  description: '<p>A skilled hireling for one day.</p>',
+} as const satisfies Equipment
+
 export const equipmentPickerBudgetFixture: EquipmentBudgetSummary = {
   starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
   spent: { cp: 0, sp: 0, gp: 15, pp: 0 },

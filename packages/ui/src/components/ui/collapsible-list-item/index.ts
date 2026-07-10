@@ -13,9 +13,12 @@ export {
   collapsibleListItemCollapseButtonClasses,
   collapsibleListItemDraggingClasses,
   collapsibleListItemDragHandleClasses,
+  collapsibleListItemHeaderRowClasses,
+  collapsibleListItemHeaderSummaryClasses,
   collapsibleListItemMainClasses,
   collapsibleListItemShellClasses,
   collapsibleListItemShellInsetClasses,
+  collapsibleListItemShellPaddingClasses,
   collapsibleListItemShellVariants,
   collapsibleListItemToolbarContentClasses,
   collapsibleListItemToolbarRowClasses,
@@ -26,6 +29,7 @@ export type { CollapsibleListItemActionsProps } from './collapsible-list-item-ac
 
 export { CollapsibleListItemShell } from './collapsible-list-item-shell.client'
 export type {
+  CollapsibleListItemActionsAlign,
   CollapsibleListItemShellProps,
   CollapsibleListItemShellTone,
 } from './collapsible-list-item-shell.client'

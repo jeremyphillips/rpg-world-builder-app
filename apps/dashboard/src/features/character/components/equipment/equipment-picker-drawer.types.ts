@@ -1,4 +1,8 @@
-import type { EquipmentBudgetSummary, EquipmentKind, EquipmentPickerItem } from '@rpg/contracts'
+import type {
+  EquipmentBudgetSummary,
+  EquipmentPickerItem,
+  EquipmentPickerSupportedKind,
+} from '@rpg/contracts'
 
 import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
 
@@ -6,6 +10,7 @@ export type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
   EquipmentPickerItemState,
+  EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
 export const EQUIPMENT_PICKER_TAB_RECOMMENDED = 'recommended'
@@ -21,7 +26,7 @@ export type EquipmentPickerDrawerProps = {
   items: readonly EquipmentPickerItem[]
   budget?: EquipmentBudgetSummary
   defaultTab?: typeof EQUIPMENT_PICKER_TAB_RECOMMENDED | typeof EQUIPMENT_PICKER_TAB_ALL
-  allowedKinds?: readonly EquipmentKind[]
+  allowedKinds?: readonly EquipmentPickerSupportedKind[]
   filterOutUnaffordable?: boolean
   filterOutNonProficient?: boolean
   showCharacterPreview?: boolean

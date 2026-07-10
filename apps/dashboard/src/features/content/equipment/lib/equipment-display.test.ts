@@ -38,7 +38,8 @@ describe('equipment-display', () => {
       expect(equipment.kind).toBe(kind)
 
       expect(buildEquipmentPickerHeaderViewModel(equipment)).toEqual({
-        title: `${equipment.name} · ${getEquipmentKindLabel(kind)}`,
+        name: equipment.name,
+        kindLabel: getEquipmentKindLabel(kind),
         priceLabel: formatMoney(equipment.cost),
       })
     })

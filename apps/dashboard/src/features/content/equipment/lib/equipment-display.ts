@@ -25,8 +25,8 @@ export const EQUIPMENT_DETAILS_SECTION_TITLES = {
 } as const satisfies Record<EquipmentKind, string>
 
 export type EquipmentCardViewModel = {
-  /** Picker header: "{name} · {kind label}" */
-  title: string
+  name: string
+  kindLabel: string
   /** Picker header rail: unit price */
   priceLabel: string
 }
@@ -48,7 +48,8 @@ function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
 
 export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): EquipmentCardViewModel {
   return {
-    title: `${equipment.name} · ${getEquipmentKindLabel(equipment.kind)}`,
+    name: equipment.name,
+    kindLabel: getEquipmentKindLabel(equipment.kind),
     priceLabel: formatMoney(equipment.cost),
   }
 }

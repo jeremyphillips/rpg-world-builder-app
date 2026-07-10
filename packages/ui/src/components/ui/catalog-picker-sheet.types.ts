@@ -32,6 +32,7 @@ export type CatalogPickerSheetLegacyRowProps<TItem> = {
   renderItem: (item: TItem) => ReactNode
   renderItemDetails?: (item: TItem) => ReactNode
   renderItemHeader?: never
+  renderItemSummary?: never
   renderItemActions?: never
   getItemToolbarLabel?: never
 }
@@ -39,6 +40,7 @@ export type CatalogPickerSheetLegacyRowProps<TItem> = {
 /** Preferred row API — `CollapsibleListItem` with leading caret and actions rail. */
 export type CatalogPickerSheetCollapsibleRowProps<TItem> = {
   renderItemHeader: (item: TItem) => ReactNode
+  renderItemSummary?: (item: TItem) => ReactNode
   renderItemActions?: (item: TItem) => ReactNode
   renderItemDetails?: (item: TItem) => ReactNode
   /** Collapse button label suffix; defaults to `getItemKey`. */

@@ -3,7 +3,12 @@
 import * as React from 'react'
 
 import { Badge, Button, CatalogPickerSheet, Text, cn } from '@rpg/ui'
-import { getEquipmentKindLabel, isEquipmentStackable, type EquipmentKind } from '@rpg/contracts'
+import {
+  getEquipmentKindLabel,
+  isEquipmentPickerSupportedKind,
+  isEquipmentStackable,
+  type EquipmentPickerSupportedKind,
+} from '@rpg/contracts'
 
 import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 
@@ -26,10 +31,15 @@ import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import {
   equipmentPickerDisabledRowClasses,
+  equipmentPickerHeaderDividerClasses,
+  equipmentPickerHeaderKindClasses,
+  equipmentPickerHeaderTextClasses,
+  equipmentPickerHeaderTitleClasses,
   equipmentPickerKindChipActiveClasses,
   equipmentPickerKindChipInactiveClasses,
   equipmentPickerKindFiltersClasses,
   equipmentPickerWarningBadgeClasses,
+  EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
@@ -39,9 +49,9 @@ function EquipmentKindFilters({
   selectedKinds,
   onToggleKind,
 }: {
-  kinds: EquipmentKind[]
-  selectedKinds: readonly EquipmentKind[]
-  onToggleKind: (kind: EquipmentKind) => void
+  kinds: EquipmentPickerSupportedKind[]
+  selectedKinds: readonly EquipmentPickerSupportedKind[]
+  onToggleKind: (kind: EquipmentPickerSupportedKind) => void
 }) {
   if (kinds.length <= 1) return null
 
@@ -74,24 +84,14 @@ function EquipmentPickerRowSummary({
   item: EquipmentPickerItem
   budget?: EquipmentPickerDrawerProps['budget']
 }) {
-  const badgeLabel = getEquipmentPickerBadgeLabel(item)
   const disabledNote = getEquipmentPickerDisabledNote(item, budget)
 
-  if (!badgeLabel && !disabledNote) return null
+  if (!disabledNote) return null
 
   return (
-    <div className="space-y-1">
-      {badgeLabel ? (
-        <Badge variant="outline" className={equipmentPickerWarningBadgeClasses}>
-          {badgeLabel}
-        </Badge>
-      ) : null}
-      {disabledNote ? (
-        <Text as="p" variant="muted" className="text-xs">
-          {disabledNote}
-        </Text>
-      ) : null}
-    </div>
+    <Text as="p" variant="muted" className="text-xs">
+      {disabledNote}
+    </Text>
   )
 }
 
@@ -110,9 +110,13 @@ export function EquipmentPickerDrawer({
   ownedPurchaseQuantities = {},
   onAddItem,
 }: EquipmentPickerDrawerProps) {
+  const supportedItems = React.useMemo(
+    () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
+    [items],
+  )
   const kindOptions = React.useMemo(
-    () => resolveEquipmentKindFilterOptions(items, allowedKinds),
-    [allowedKinds, items],
+    () => resolveEquipmentKindFilterOptions(supportedItems, allowedKinds),
+    [allowedKinds, supportedItems],
   )
   const [selectedKinds, setSelectedKinds] = React.useState(kindOptions)
   const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
@@ -133,16 +137,16 @@ export function EquipmentPickerDrawer({
 
   const visibleItems = React.useMemo(
     () =>
-      filterEquipmentPickerItems(items, {
+      filterEquipmentPickerItems(supportedItems, {
         filterOutUnaffordable,
         filterOutNonProficient,
         selectedKinds,
       }),
-    [filterOutNonProficient, filterOutUnaffordable, items, selectedKinds],
+    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKinds],
   )
 
   const handleToggleKind = React.useCallback(
-    (kind: EquipmentKind) => {
+    (kind: EquipmentPickerSupportedKind) => {
       setSelectedKinds((current) => {
         if (current.includes(kind)) {
           const next = current.filter((entry) => entry !== kind)
@@ -203,20 +207,32 @@ export function EquipmentPickerDrawer({
       }
       renderItemHeader={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
+        const badgeLabel = getEquipmentPickerBadgeLabel(item)
         const disabled = isEquipmentPickerItemDisabled(item)
 
         return (
-          <div
+          <span
             className={cn(
-              'min-w-0 space-y-1',
+              equipmentPickerHeaderTitleClasses,
               disabled ? equipmentPickerDisabledRowClasses : undefined,
             )}
           >
-            <span className="truncate text-sm font-medium">{header.title}</span>
-            <EquipmentPickerRowSummary item={item} budget={budget} />
-          </div>
+            <span className={equipmentPickerHeaderTextClasses}>
+              <span>{header.name}</span>
+              <span className={equipmentPickerHeaderDividerClasses} aria-hidden>
+                {EQUIPMENT_PICKER_HEADER_DIVIDER}
+              </span>
+              <span className={equipmentPickerHeaderKindClasses}>{header.kindLabel}</span>
+            </span>
+            {badgeLabel ? (
+              <Badge size="sm" variant="outline" className={equipmentPickerWarningBadgeClasses}>
+                {badgeLabel}
+              </Badge>
+            ) : null}
+          </span>
         )
       }}
+      renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
       renderItemActions={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
         const owned = (ownedPurchaseQuantities[item.equipment.id] ?? 0) > 0

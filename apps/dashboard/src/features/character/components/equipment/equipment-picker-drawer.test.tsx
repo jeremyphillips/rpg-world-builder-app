@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
@@ -7,6 +7,8 @@ import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerRowboatFixture,
+  equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
@@ -28,7 +30,10 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('Chain Mail · Armor')).toBeInTheDocument()
+    const list = screen.getByRole('list')
+
+    expect(within(list).getByText('Chain Mail')).toBeInTheDocument()
+    expect(within(list).getByText('Armor')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toBeInTheDocument()
     expect(screen.getByText(/Need 75 GP, you have 40 GP/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
@@ -45,8 +50,11 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.queryByText('Chain Mail · Armor')).not.toBeInTheDocument()
-    expect(screen.getByText('Longsword · Weapon')).toBeInTheDocument()
+    const list = screen.getByRole('list')
+
+    expect(within(list).queryByText('Chain Mail')).not.toBeInTheDocument()
+    expect(within(list).getByText('Longsword')).toBeInTheDocument()
+    expect(within(list).getByText('Weapon')).toBeInTheDocument()
   })
 
   it('quick-adds quantity 1 from the header rail', async () => {
@@ -107,6 +115,52 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(screen.getByText(EQUIPMENT_PICKER_ADDED_LABEL)).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
+  })
+
+  it('excludes vehicle and service rows from search results and kind chips', () => {
+    const unsupportedItems = [
+      {
+        equipment: equipmentPickerRowboatFixture,
+        searchText: 'rowboat water vehicle',
+        state: {
+          isAvailable: true,
+          isRecommended: false,
+          isProficient: true,
+          isAffordable: true,
+          disabledReasons: [],
+        },
+      },
+      {
+        equipment: equipmentPickerSkilledHirelingFixture,
+        searchText: 'skilled hireling service',
+        state: {
+          isAvailable: true,
+          isRecommended: false,
+          isProficient: true,
+          isAffordable: true,
+          disabledReasons: [],
+        },
+      },
+    ]
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[...equipmentPickerItemsFixture, ...unsupportedItems]}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+
+    expect(within(list).queryByText('Rowboat')).not.toBeInTheDocument()
+    expect(within(list).queryByText('Skilled Hireling')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Vehicle' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Service' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

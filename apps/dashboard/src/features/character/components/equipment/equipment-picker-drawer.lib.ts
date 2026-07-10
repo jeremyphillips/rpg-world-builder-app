@@ -1,4 +1,9 @@
-import { formatMoney, type EquipmentKind } from '@rpg/contracts'
+import {
+  EQUIPMENT_PICKER_SUPPORTED_KINDS,
+  formatMoney,
+  isEquipmentPickerSupportedKind,
+  type EquipmentPickerSupportedKind,
+} from '@rpg/contracts'
 
 import {
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -30,13 +35,21 @@ export function formatEquipmentUnaffordableReason(
   return `Need ${need}, you have ${have}`
 }
 
+export function resolveEquipmentPickerAllowedKinds(
+  allowedKinds?: readonly EquipmentPickerSupportedKind[],
+): EquipmentPickerSupportedKind[] {
+  const sourceKinds = allowedKinds ?? EQUIPMENT_PICKER_SUPPORTED_KINDS
+  return sourceKinds.filter(isEquipmentPickerSupportedKind)
+}
+
 export function resolveEquipmentKindFilterOptions(
   items: readonly EquipmentPickerItem[],
-  allowedKinds?: readonly EquipmentKind[],
-): EquipmentKind[] {
-  const kindsInItems = new Set(items.map((item) => item.equipment.kind))
-  const sourceKinds = allowedKinds ?? [...kindsInItems]
-  return sourceKinds.filter((kind) => kindsInItems.has(kind))
+  allowedKinds?: readonly EquipmentPickerSupportedKind[],
+): EquipmentPickerSupportedKind[] {
+  const kindsInItems = new Set(
+    items.map((item) => item.equipment.kind).filter(isEquipmentPickerSupportedKind),
+  )
+  return resolveEquipmentPickerAllowedKinds(allowedKinds).filter((kind) => kindsInItems.has(kind))
 }
 
 export function filterEquipmentPickerItems(
@@ -44,10 +57,11 @@ export function filterEquipmentPickerItems(
   options: {
     filterOutUnaffordable: boolean
     filterOutNonProficient: boolean
-    selectedKinds: readonly EquipmentKind[]
+    selectedKinds: readonly EquipmentPickerSupportedKind[]
   },
 ): EquipmentPickerItem[] {
   return items.filter((item) => {
+    if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
     if (options.filterOutUnaffordable && !item.state.isAffordable) return false
     if (options.filterOutNonProficient && !item.state.isProficient) return false
     if (!options.selectedKinds.includes(item.equipment.kind)) return false

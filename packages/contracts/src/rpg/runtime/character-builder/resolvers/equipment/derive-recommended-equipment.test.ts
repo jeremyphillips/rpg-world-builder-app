@@ -234,4 +234,64 @@ describe('resolveEquipmentPickerItems', () => {
     expect(chainMailItem.state.isAffordable).toBe(false)
     expect(chainMailItem.state.isRecommended).toBe(false)
   })
+
+  it('excludes vehicle and service rows from picker results', () => {
+    const rowboat = equipmentSchema.parse({
+      id: `${RULESET}:rowboat`,
+      slug: 'rowboat',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Rowboat',
+      description: '',
+      cost: { amount: 50, currency: 'gp' },
+      kind: 'vehicle',
+      vehicleCategory: 'water',
+      speed: { value: 1.5, unit: 'mph' },
+    })
+    const skilledHireling = equipmentSchema.parse({
+      id: `${RULESET}:skilled-hireling`,
+      slug: 'skilled-hireling',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Skilled Hireling',
+      description: '',
+      cost: { amount: 2, currency: 'gp' },
+      kind: 'service',
+      serviceCategory: 'hireling',
+      duration: { value: 1, unit: 'day' },
+    })
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedWizard],
+      spells: [],
+      equipment: [longsword, rowboat, skilledHireling],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedWizard.id, level: 1 as const },
+    }
+    const proficiencies = assembleCharacterProficiencies(draft, catalogIndex, [], storedWizard)
+    const recommended = deriveRecommendedEquipment({
+      characterClass: storedWizard,
+      catalogIndex,
+      proficiencies,
+    })
+
+    const items = resolveEquipmentPickerItems({
+      equipment: [longsword, rowboat, skilledHireling],
+      proficiencies,
+      recommendedEquipmentIds: recommended,
+    })
+
+    expect(items.map((item) => item.equipment.name)).toEqual(['Longsword'])
+  })
 })

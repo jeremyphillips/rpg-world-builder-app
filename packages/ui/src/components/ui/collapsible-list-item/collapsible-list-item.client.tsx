@@ -8,6 +8,7 @@ import { cn } from '../../../lib/utils'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
   CollapsibleListItemShell,
+  type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellTone,
 } from './collapsible-list-item-shell.client'
 import {
@@ -38,6 +39,7 @@ export interface CollapsibleListItemProps {
   dragHandleProps?: CollapsibleListItemDragHandleConfig
   tone?: CollapsibleListItemShellTone
   layout?: 'default' | 'compactRow'
+  actionsAlign?: CollapsibleListItemActionsAlign
   dragging?: boolean
   itemPrefix?: string
   className?: string
@@ -91,6 +93,7 @@ function CollapsibleListItemRoot({
   dragHandleProps,
   tone = 'default',
   layout = 'default',
+  actionsAlign: actionsAlignProp,
   dragging = false,
   itemPrefix,
   className,
@@ -102,6 +105,8 @@ function CollapsibleListItemRoot({
 }: CollapsibleListItemProps) {
   const resolvedBodyId = resolveBodyId(itemId, bodyId)
   const gripVisible = showDragHandle && Boolean(dragHandleProps)
+  const actionsAlign =
+    actionsAlignProp ?? (gripVisible || layout === 'compactRow' ? 'start' : 'center')
   const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
     showDragHandle: gripVisible,
     collapsible,
@@ -162,33 +167,35 @@ function CollapsibleListItemRoot({
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={layout}
+        actionsAlign={actionsAlign}
         tone={tone}
         className={className}
-        main={
-          <>
-            <CollapsibleListItemToolbar
-              titleId={titleId}
-              toolbarAriaLabel={toolbarAriaLabel}
-              leadingChrome={leadingChrome}
-              gripVisible={gripVisible}
-              dragHandleProps={resolvedDragHandleProps}
-              collapsible={collapsible}
-              collapsed={collapsed}
-              onToggleCollapse={onToggleCollapse}
+        toolbar={
+          <CollapsibleListItemToolbar
+            titleId={titleId}
+            toolbarAriaLabel={toolbarAriaLabel}
+            leadingChrome={leadingChrome}
+            gripVisible={gripVisible}
+            dragHandleProps={resolvedDragHandleProps}
+            collapsible={collapsible}
+            collapsed={collapsed}
+            onToggleCollapse={onToggleCollapse}
+            bodyId={resolvedBodyId}
+            header={header}
+            summary={actionsAlign === 'center' ? undefined : summary}
+          />
+        }
+        summary={actionsAlign === 'center' ? summary : undefined}
+        body={
+          body ? (
+            <CollapsibleListItemBody
               bodyId={resolvedBodyId}
-              header={header}
-              summary={summary}
-            />
-            {body ? (
-              <CollapsibleListItemBody
-                bodyId={resolvedBodyId}
-                hidden={collapsed}
-                className={collapsibleListItemBodyClasses(leadingChrome)}
-              >
-                {body}
-              </CollapsibleListItemBody>
-            ) : null}
-          </>
+              hidden={collapsed}
+              className={collapsibleListItemBodyClasses(leadingChrome)}
+            >
+              {body}
+            </CollapsibleListItemBody>
+          ) : undefined
         }
         actions={actions}
       />

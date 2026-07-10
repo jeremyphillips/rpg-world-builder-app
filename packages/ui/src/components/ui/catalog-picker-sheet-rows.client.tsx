@@ -69,6 +69,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   itemKey,
   toolbarLabel,
   renderItemHeader,
+  renderItemSummary,
   renderItemActions,
   renderItemDetails,
 }: {
@@ -76,6 +77,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   itemKey: string
   toolbarLabel: string
   renderItemHeader: (item: TItem) => React.ReactNode
+  renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
 }) {
@@ -91,11 +93,14 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         titleId={titleId}
         bodyId={bodyId}
         toolbarAriaLabel={toolbarLabel}
+        tone="main"
+        actionsAlign="center"
         collapsible={hasDetails}
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((current) => !current)}
         showDragHandle={false}
         header={renderItemHeader(item)}
+        summary={renderItemSummary?.(item)}
         actions={renderItemActions?.(item)}
         body={hasDetails ? renderItemDetails?.(item) : undefined}
       />
@@ -127,6 +132,7 @@ export function CatalogPickerSheetResults<TItem>({
                 itemKey={itemKey}
                 toolbarLabel={rowProps.getItemToolbarLabel?.(item) ?? itemKey}
                 renderItemHeader={rowProps.renderItemHeader}
+                renderItemSummary={rowProps.renderItemSummary}
                 renderItemActions={rowProps.renderItemActions}
                 renderItemDetails={rowProps.renderItemDetails}
               />

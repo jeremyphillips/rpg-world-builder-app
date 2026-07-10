@@ -8,6 +8,7 @@ import { collapsibleListItemActionsRailClasses } from './collapsible-list-item.v
 export interface CollapsibleListItemActionsProps {
   compact?: boolean
   embedded?: boolean
+  centered?: boolean
   className?: string
   children: React.ReactNode
 }
@@ -16,6 +17,7 @@ export interface CollapsibleListItemActionsProps {
 export function CollapsibleListItemActions({
   compact = false,
   embedded = false,
+  centered = false,
   className,
   children,
 }: CollapsibleListItemActionsProps) {
@@ -23,7 +25,10 @@ export function CollapsibleListItemActions({
     <div
       role="group"
       aria-label="Item actions"
-      className={cn(collapsibleListItemActionsRailClasses({ compact, embedded }), className)}
+      className={cn(
+        collapsibleListItemActionsRailClasses({ compact, embedded, centered }),
+        className,
+      )}
     >
       {children}
     </div>

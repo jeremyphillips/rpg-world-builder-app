@@ -17,29 +17,38 @@ export {
 /**
  * Collapsible list item chrome geometry — shell padding and action hit targets.
  *
- * Layout contract: content flows in the main column; trailing actions live in a top-aligned
- * rail pinned to the shell's top-right corner. Leading inset for grip/caret is resolved via
- * `resolveCollapsibleListItemLeadingChrome`.
+ * Layout contract:
+ * - Shell owns fixed box insets via `collapsibleListItemShellPaddingClasses`.
+ * - Leading inset for summary/body aligns with toolbar content via
+ *   `resolveCollapsibleListItemLeadingChrome`.
+ * - Array items use a two-column grid so the actions rail shares row 1 only;
+ *   catalog rows use a flex header row with summary/body stacked below.
  */
 export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
+
+/** Fixed shell padding — inline-start matches legacy inset; inline-end/block-end use spacing 3. */
+export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
 export const collapsibleListItemChromeButtonClasses =
   'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
-/** Item shell — border, left/bottom inset; actions rail occupies the top-right with no inset. */
+/** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
 export const collapsibleListItemShellVariants = cva(cn('relative rounded-md border'), {
   variants: {
     layout: {
       default: cn(
         'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-        'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
+        collapsibleListItemShellPaddingClasses,
       ),
+      /** Flex header row + stacked summary/body — catalog picker rows. */
+      headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
       /** Compact inline row — single column; actions live inside the row grid. */
-      compactRow: 'p-2 pt-[calc(var(--spacing)*2)]',
+      compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
     },
     tone: {
       default: 'border-border',
+      main: fieldSurfaceToneVariants({ tone: 'main' }),
       subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
       warning: fieldSurfaceToneVariants({ tone: 'warning' }),
       error: fieldSurfaceToneVariants({ tone: 'error' }),
@@ -57,19 +66,35 @@ export const collapsibleListItemShellClasses = collapsibleListItemShellVariants(
 /** Main content column — top inset matches shell vertical rhythm. */
 export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
 
+/** Toolbar + actions on one row when actions center on the title row only. */
+export const collapsibleListItemHeaderRowClasses = cn(
+  'flex w-full min-w-0 items-center gap-2',
+  'pt-[calc(var(--spacing)*2)]',
+)
+
+/** Summary below the header row — left indent matches body/content column. */
+export function collapsibleListItemHeaderSummaryClasses(
+  options: CollapsibleListItemLeadingChromeOptions,
+): string {
+  return cn('min-w-0', resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses)
+}
+
 /**
  * Trailing actions rail — top-right of the shell, independent of content height.
  *
  * When `embedded`, the rail sits inside the compact row grid's actions column.
+ * When `centered`, the rail vertically centers against the toolbar row only.
  */
 export function collapsibleListItemActionsRailClasses(
-  options: { compact?: boolean; embedded?: boolean } = {},
+  options: { compact?: boolean; embedded?: boolean; centered?: boolean } = {},
 ): string {
   return cn(
     'flex shrink-0 items-center gap-1',
     options.embedded
       ? 'justify-self-end'
-      : cn('self-start', options.compact ? 'mt-1 mr-1' : 'mt-2 mr-1'),
+      : options.centered
+        ? 'shrink-0'
+        : cn('self-start', options.compact ? 'mt-1' : 'mt-2'),
   )
 }
 

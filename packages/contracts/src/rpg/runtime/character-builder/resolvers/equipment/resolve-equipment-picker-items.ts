@@ -1,6 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import type { CharacterProficiencies } from '../../../character/proficiencies'
 import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
+import { isEquipmentPickerSupportedKind } from '../picker/equipment-picker-supported-kinds'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import { isEquipmentAffordable } from './equipment-budget'
 import { buildEquipmentPickerSearchText } from './format-equipment-picker-metadata'
@@ -20,15 +21,17 @@ export function resolveEquipmentPickerItems({
   recommendedEquipmentIds,
   budget,
 }: ResolveEquipmentPickerItemsArgs): EquipmentPickerItem[] {
-  return equipment.map((row) => ({
-    equipment: row,
-    searchText: buildEquipmentPickerSearchText(row),
-    state: {
-      isAvailable: true,
-      isRecommended: recommendedEquipmentIds.has(row.id),
-      isProficient: isEquipmentProficient(row, proficiencies),
-      isAffordable: budget ? isEquipmentAffordable(row, budget) : true,
-      disabledReasons: [],
-    },
-  }))
+  return equipment
+    .filter((row) => isEquipmentPickerSupportedKind(row.kind))
+    .map((row) => ({
+      equipment: row,
+      searchText: buildEquipmentPickerSearchText(row),
+      state: {
+        isAvailable: true,
+        isRecommended: recommendedEquipmentIds.has(row.id),
+        isProficient: isEquipmentProficient(row, proficiencies),
+        isAffordable: budget ? isEquipmentAffordable(row, budget) : true,
+        disabledReasons: [],
+      },
+    }))
 }

@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldStackDependentsChromeVariants, fieldSurfaceToneVariants } from './field-stack.variants'
+import {
+  fieldStackDependentsChromeVariants,
+  fieldSurfaceToneVariants,
+} from './field-stack.variants'
 
 describe('fieldSurfaceToneVariants', () => {
+  it('applies main tone classes', () => {
+    const classes = fieldSurfaceToneVariants({ tone: 'main' })
+    expect(classes).toContain('border-border')
+    expect(classes).toContain('bg-background')
+  })
+
   it('applies subtle tone classes', () => {
     const classes = fieldSurfaceToneVariants({ tone: 'subtle' })
     expect(classes).toContain('border-border')
@@ -17,6 +26,12 @@ describe('fieldSurfaceToneVariants', () => {
 })
 
 describe('fieldStackDependentsChromeVariants', () => {
+  it('applies main tone classes', () => {
+    const classes = fieldStackDependentsChromeVariants({ tone: 'main' })
+    expect(classes).toContain('border-border')
+    expect(classes).toContain('bg-background')
+  })
+
   it('applies subtle tone classes by default', () => {
     const classes = fieldStackDependentsChromeVariants()
     expect(classes).toContain('border-border')
