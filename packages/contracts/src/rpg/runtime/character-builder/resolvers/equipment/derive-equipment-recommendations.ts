@@ -3,24 +3,38 @@ import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellca
 import type { Equipment } from '../../../../content/equipment'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
 import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
-import { startingEquipmentGrantEquipmentSlug } from '../../../../content/starting-equipment'
+import {
+  isWealthOnlyStartingEquipmentOption,
+  startingEquipmentGrantEquipmentSlug,
+} from '../../../../content/starting-equipment'
 import {
   isSpellcastingFocusGearKind,
   type SpellcastingGearKind,
 } from '../../../../vocab/equipment/spellcasting-gear-kind'
 import {
-  EQUIPMENT_RECOMMENDATION_TIER_RANK,
-  EQUIPMENT_RECOMMENDATION_TIERS,
   NEUTRAL_EQUIPMENT_RECOMMENDATION,
   type EquipmentRecommendation,
-  type EquipmentRecommendationReason,
   type EquipmentRecommendationRule,
   type EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
+import { equipmentIdMatchesReference } from '../../../creature/equipment-id-match'
 import { listEquipmentMatchingPool, toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterProficiencies } from '../../../character/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../../context'
+import type { CharacterBuilderDraft } from '../../draft'
+import type { ChoiceSet } from '../../choice-set'
 import { isEquipmentProficient } from './is-equipment-proficient'
+import {
+  addRecommendationContribution,
+  toEquipmentRecommendation,
+  type AccumulatorMap,
+} from './equipment-recommendation-accumulator'
+import {
+  applyRecommendationContributions,
+  deriveProficiencyRecommendationContributions,
+  deriveStartingEquipmentRecommendationContributions,
+  listSelectedStartingEquipmentGrantIds,
+} from './derive-equipment-recommendation-contributions'
 
 /** MVP builds level-1 characters; the level-up wizard will pass real levels. */
 const DEFAULT_CLASS_LEVEL = 1
@@ -30,42 +44,12 @@ export type DeriveEquipmentRecommendationsArgs = {
   catalogIndex: CharacterBuildCatalogIndex
   proficiencies: CharacterProficiencies
   classLevel?: number
+  draft?: CharacterBuilderDraft
+  choiceSets?: readonly ChoiceSet[]
 }
 
-type RecommendationAccumulator = {
-  minRank: number
-  reasons: Set<EquipmentRecommendationReason>
-  label?: string
-}
-
-type AccumulatorMap = Map<string, RecommendationAccumulator>
-
-function addContribution(
-  accumulators: AccumulatorMap,
-  equipmentId: string,
-  tier: EquipmentRecommendationTier,
-  reason: EquipmentRecommendationReason,
-  label?: string,
-): void {
-  const rank = EQUIPMENT_RECOMMENDATION_TIER_RANK[tier]
-  const existing = accumulators.get(equipmentId)
-
-  if (!existing) {
-    accumulators.set(equipmentId, { minRank: rank, reasons: new Set([reason]), label })
-    return
-  }
-
-  existing.reasons.add(reason)
-  if (rank < existing.minRank) {
-    existing.minRank = rank
-    existing.label = label ?? existing.label
-  } else if (rank === existing.minRank && existing.label === undefined) {
-    existing.label = label
-  }
-}
-
-/** Named starting-package items: direct grants plus explicit pool entries (filtered pools are too broad). */
-function listStartingEquipmentIds(
+/** Named starting-package items for focus inference when no package is selected yet. */
+function listFallbackStartingEquipmentGrantIds(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string[] {
@@ -74,30 +58,46 @@ function listStartingEquipmentIds(
 
   const ids: string[] = []
   for (const option of startingEquipment.options) {
+    if (isWealthOnlyStartingEquipmentOption(option)) continue
+
     for (const item of option.items) {
-      const slugs =
-        item.kind === 'grant'
-          ? (() => {
-              const equipmentSlug = startingEquipmentGrantEquipmentSlug(item)
-              return equipmentSlug ? [equipmentSlug] : []
-            })()
-          : item.pool.source === 'explicit'
-            ? item.pool.equipmentSlugs
-            : []
-      for (const slug of slugs) {
-        const equipmentId = toEquipmentContentId(characterClass.rulesetId, slug)
-        if (catalogIndex.equipment.has(equipmentId)) ids.push(equipmentId)
-      }
+      if (item.kind !== 'grant') continue
+      const equipmentSlug = startingEquipmentGrantEquipmentSlug(item)
+      if (!equipmentSlug) continue
+      const equipmentId = toEquipmentContentId(characterClass.rulesetId, equipmentSlug)
+      if (catalogIndex.equipment.has(equipmentId)) ids.push(equipmentId)
     }
   }
   return ids
 }
 
-/** Item-level tool proficiencies (fixed grants or player picks) signal class tool needs. */
-function isClassToolNeed(equipment: Equipment, proficiencies: CharacterProficiencies): boolean {
+function resolveFocusInferenceIds(
+  characterClass: CharacterClass,
+  catalogIndex: CharacterBuildCatalogIndex,
+  draft: CharacterBuilderDraft | undefined,
+): string[] {
+  if (!draft) return listFallbackStartingEquipmentGrantIds(characterClass, catalogIndex)
+
+  const selectedIds = listSelectedStartingEquipmentGrantIds({
+    characterClass,
+    draft,
+    catalogIndex,
+  })
+  if (selectedIds.length > 0) return selectedIds
+
+  return listFallbackStartingEquipmentGrantIds(characterClass, catalogIndex)
+}
+
+function isFixedClassToolGrant(equipment: Equipment, characterClass: CharacterClass): boolean {
   if (equipment.kind !== 'tool') return false
-  return proficiencies.tools.some(
-    (entry) => entry.toolId === equipment.id || entry.toolId === equipment.slug,
+
+  const items = characterClass.proficiencies.tools?.items ?? []
+  return items.some((reference) =>
+    equipmentIdMatchesReference({
+      reference,
+      equipment,
+      rulesetId: characterClass.rulesetId,
+    }),
   )
 }
 
@@ -126,7 +126,7 @@ function applyAuthoredRules(args: {
   accumulators: AccumulatorMap
   rules: readonly EquipmentRecommendationRule[] | undefined
   tier: EquipmentRecommendationTier
-  reason: EquipmentRecommendationReason
+  reason: 'classRequired' | 'classSuggested'
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
   classLevel: number
@@ -136,7 +136,6 @@ function applyAuthoredRules(args: {
   for (const rule of rules ?? []) {
     if (rule.minLevel !== undefined && classLevel < rule.minLevel) continue
 
-    // Soft resolution: unresolved slugs/empty pools match nothing and never block.
     const matches = listEquipmentMatchingPool({
       pool: rule.match,
       equipment: catalogIndex.equipment,
@@ -145,12 +144,18 @@ function applyAuthoredRules(args: {
 
     for (const equipment of matches) {
       if (rule.tag !== undefined && !(equipment.tags ?? []).includes(rule.tag)) continue
-      addContribution(accumulators, equipment.id, tier, reason, rule.label)
+      addRecommendationContribution(
+        accumulators,
+        equipment.id,
+        tier,
+        reason,
+        `${characterClass.id}:authored-rule`,
+        rule.label,
+      )
     }
   }
 }
 
-/** Class-critical spellcasting gear is essential regardless of spellcasting unlock level. */
 function applyRequiredGearContributions(args: {
   accumulators: AccumulatorMap
   characterClass: CharacterClass
@@ -167,11 +172,16 @@ function applyRequiredGearContributions(args: {
     ) {
       continue
     }
-    addContribution(args.accumulators, equipment.id, 'essential', 'classRequired')
+    addRecommendationContribution(
+      args.accumulators,
+      equipment.id,
+      'essential',
+      'classRequired',
+      `${args.characterClass.id}:required-gear`,
+    )
   }
 }
 
-/** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
 function applyRecommendedGearContributions(args: {
   accumulators: AccumulatorMap
   characterClass: CharacterClass
@@ -188,11 +198,16 @@ function applyRecommendedGearContributions(args: {
     ) {
       continue
     }
-    addContribution(args.accumulators, equipment.id, 'strong', 'classSuggested')
+    addRecommendationContribution(
+      args.accumulators,
+      equipment.id,
+      'strong',
+      'classSuggested',
+      `${args.characterClass.id}:recommended-gear`,
+    )
   }
 }
 
-/** Foci strengthen to essential once the class's spellcasting is active at the current level. */
 function applySpellcastingFocusContributions(args: {
   accumulators: AccumulatorMap
   characterClass: CharacterClass
@@ -223,7 +238,13 @@ function applySpellcastingFocusContributions(args: {
     ) {
       continue
     }
-    addContribution(accumulators, equipment.id, focusTier, 'spellcastingFocus')
+    addRecommendationContribution(
+      accumulators,
+      equipment.id,
+      focusTier,
+      'spellcastingFocus',
+      `${characterClass.id}:spellcasting-focus`,
+    )
   }
 }
 
@@ -231,9 +252,16 @@ function applyProficiencyContributions(
   accumulators: AccumulatorMap,
   equipment: Equipment,
   proficiencies: CharacterProficiencies,
+  characterClass: CharacterClass,
 ): void {
-  if (isClassToolNeed(equipment, proficiencies)) {
-    addContribution(accumulators, equipment.id, 'essential', 'classToolNeed')
+  if (isFixedClassToolGrant(equipment, characterClass)) {
+    addRecommendationContribution(
+      accumulators,
+      equipment.id,
+      'essential',
+      'classToolNeed',
+      `${characterClass.id}:fixed-tool`,
+    )
   }
 
   if (equipment.kind !== 'weapon' && equipment.kind !== 'armor' && equipment.kind !== 'tool') {
@@ -241,43 +269,60 @@ function applyProficiencyContributions(
   }
 
   if (isEquipmentProficient(equipment, proficiencies)) {
-    addContribution(accumulators, equipment.id, 'compatible', 'proficient')
+    addRecommendationContribution(
+      accumulators,
+      equipment.id,
+      'compatible',
+      'proficient',
+      `${characterClass.id}:proficiency`,
+    )
   } else {
-    addContribution(accumulators, equipment.id, 'notRecommended', 'notProficient')
-  }
-}
-
-function toRecommendation(accumulator: RecommendationAccumulator): EquipmentRecommendation {
-  const tier = EQUIPMENT_RECOMMENDATION_TIERS.find(
-    (candidate) => EQUIPMENT_RECOMMENDATION_TIER_RANK[candidate] === accumulator.minRank,
-  )!
-  return {
-    tier,
-    reasons: [...accumulator.reasons],
-    ...(accumulator.label !== undefined ? { label: accumulator.label } : {}),
+    addRecommendationContribution(
+      accumulators,
+      equipment.id,
+      'notRecommended',
+      'notProficient',
+      `${characterClass.id}:proficiency`,
+    )
   }
 }
 
 /**
  * Tiered picker recommendations for every catalog equipment row.
  *
- * Inference-first: starting packages, item-level tool proficiencies, and
- * spellcasting gear kinds (`requiredGear`, `focusKinds`, `recommendedGear`) are
- * derived from data classes already author. Authored
- * `characterCreation.equipmentRecommendations` rules augment where inference
- * cannot reach; unresolved rule targets are silently skipped.
+ * Inference-first: proficiency pools, starting-equipment pools, item-level tool
+ * proficiencies, and spellcasting gear kinds are derived from data classes
+ * already author. Authored `characterCreation.equipmentRecommendations` rules
+ * augment where inference cannot reach.
  */
 export function deriveEquipmentRecommendations(
   args: DeriveEquipmentRecommendationsArgs,
 ): ReadonlyMap<string, EquipmentRecommendation> {
-  const { characterClass, catalogIndex, proficiencies } = args
+  const { characterClass, catalogIndex, proficiencies, draft, choiceSets } = args
   const classLevel = args.classLevel ?? DEFAULT_CLASS_LEVEL
   const accumulators: AccumulatorMap = new Map()
 
-  const startingEquipmentIds = listStartingEquipmentIds(characterClass, catalogIndex)
-  for (const equipmentId of startingEquipmentIds) {
-    addContribution(accumulators, equipmentId, 'strong', 'startingEquipment')
+  if (draft && choiceSets) {
+    applyRecommendationContributions({
+      accumulators,
+      contributions: [
+        ...deriveProficiencyRecommendationContributions({
+          characterClass,
+          draft,
+          catalogIndex,
+        }),
+        ...deriveStartingEquipmentRecommendationContributions({
+          characterClass,
+          draft,
+          catalogIndex,
+        }),
+      ],
+      catalogIndex,
+      rulesetId: characterClass.rulesetId,
+    })
   }
+
+  const startingEquipmentIds = resolveFocusInferenceIds(characterClass, catalogIndex, draft)
 
   applyRequiredGearContributions({
     accumulators,
@@ -321,11 +366,11 @@ export function deriveEquipmentRecommendations(
 
   const recommendations = new Map<string, EquipmentRecommendation>()
   for (const equipment of catalogIndex.equipment.values()) {
-    applyProficiencyContributions(accumulators, equipment, proficiencies)
+    applyProficiencyContributions(accumulators, equipment, proficiencies, characterClass)
     const accumulator = accumulators.get(equipment.id)
     recommendations.set(
       equipment.id,
-      accumulator ? toRecommendation(accumulator) : NEUTRAL_EQUIPMENT_RECOMMENDATION,
+      accumulator ? toEquipmentRecommendation(accumulator) : NEUTRAL_EQUIPMENT_RECOMMENDATION,
     )
   }
 

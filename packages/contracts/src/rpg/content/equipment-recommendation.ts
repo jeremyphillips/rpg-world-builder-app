@@ -40,12 +40,22 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
   'classRequired',
   /** Authored strong rule match. */
   'classSuggested',
-  /** Item-level tool proficiency (Rogue thieves' tools, chosen Bard instrument). */
+  /** Fixed class tool grant (Rogue thieves' tools). */
   'classToolNeed',
+  /** Player-selected tool proficiency from a ChoiceSet. */
+  'selectedToolProficiency',
   /** Gear matching the class's usable spellcasting focus kinds. */
   'spellcastingFocus',
-  /** Named item in a class starting-equipment package (grant or explicit pool). */
+  /** Resolved item in the selected starting-equipment package. */
   'startingEquipment',
+  /** Unselected members of an in-progress tool proficiency pool choice. */
+  'unresolvedToolProficiencyChoice',
+  /** Active unresolved nested starting-equipment pool in the selected package. */
+  'startingEquipmentChoice',
+  /** Semantic category sibling after a multi-select proficiency pool resolves. */
+  'classToolCategory',
+  /** Item appears in an unselected or preview starting-equipment branch. */
+  'availableInStartingOption',
   /** Weapon/armor/tool covered by the character's proficiencies. */
   'proficient',
   /** Weapon/armor/tool outside the character's proficiencies. */
@@ -59,6 +69,12 @@ export type EquipmentRecommendation = {
   reasons: readonly EquipmentRecommendationReason[]
   /** Authored badge override from the matching rule, when present. */
   label?: string
+}
+
+export type EquipmentRecommendationEvidence = {
+  reason: EquipmentRecommendationReason
+  tier: EquipmentRecommendationTier
+  sourceKey: string
 }
 
 export const NEUTRAL_EQUIPMENT_RECOMMENDATION: EquipmentRecommendation = {
@@ -87,11 +103,16 @@ export function compareEquipmentRecommendationTiers(
 export const EQUIPMENT_RECOMMENDATION_REASON_RANK = {
   classRequired: 0,
   classToolNeed: 1,
-  spellcastingFocus: 2,
-  classSuggested: 3,
+  selectedToolProficiency: 2,
+  spellcastingFocus: 3,
   startingEquipment: 4,
-  proficient: 5,
-  notProficient: 6,
+  unresolvedToolProficiencyChoice: 5,
+  startingEquipmentChoice: 6,
+  classToolCategory: 7,
+  availableInStartingOption: 8,
+  classSuggested: 9,
+  proficient: 10,
+  notProficient: 11,
 } as const satisfies Record<EquipmentRecommendationReason, number>
 
 /** Best (lowest) reason rank for browse ordering; empty reasons sort after reasoned peers. */

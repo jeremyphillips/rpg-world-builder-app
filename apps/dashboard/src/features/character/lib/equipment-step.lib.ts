@@ -478,6 +478,8 @@ export function resolveEquipmentStepPickerItems(args: {
     catalogIndex,
     proficiencies,
     classLevel: draft.class.level,
+    draft,
+    choiceSets,
   })
 
   return {

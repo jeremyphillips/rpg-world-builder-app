@@ -16,6 +16,7 @@ import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 import {
   EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
+  EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
@@ -426,8 +427,13 @@ export function getEquipmentPickerBadge(
     return { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, emphasis: 'highlight' }
   }
 
-  if (tier === 'strong' && reasons.includes('startingEquipment')) {
-    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, emphasis: 'highlight' }
+  if (tier === 'strong') {
+    if (reasons.includes('selectedToolProficiency')) {
+      return { label: EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL, emphasis: 'highlight' }
+    }
+    if (reasons.includes('startingEquipment') || reasons.includes('startingEquipmentChoice')) {
+      return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, emphasis: 'highlight' }
+    }
   }
 
   return undefined

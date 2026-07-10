@@ -24,6 +24,7 @@ export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
 export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
 export const EQUIPMENT_PICKER_CLASS_TOOL_LABEL = 'Class tool'
+export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficiency'
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'

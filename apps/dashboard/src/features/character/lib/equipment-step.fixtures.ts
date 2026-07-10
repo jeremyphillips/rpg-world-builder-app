@@ -141,6 +141,18 @@ export const equipmentStepBardClassFixture = {
   },
   features: [],
   characterCreation: {
+    proficiencies: {
+      tools: {
+        choices: [
+          {
+            id: 'class-tools',
+            label: 'Musical Instruments',
+            choose: 3,
+            pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+          },
+        ],
+      },
+    },
     startingEquipment: {
       choose: 1,
       options: [

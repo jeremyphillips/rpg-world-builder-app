@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
@@ -213,7 +213,11 @@ describe('EquipmentStep', () => {
     const { onDraftChange } = renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getByRole('tab', { name: /All/i }))
+    const leatherArmorRow = screen
+      .getAllByRole('listitem')
+      .find((row) => within(row).queryByText(equipmentStepLeatherArmorFixture.name))!
+    await user.click(within(leatherArmorRow).getByRole('button', { name: 'Add' }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({

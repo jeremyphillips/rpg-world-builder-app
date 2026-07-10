@@ -100,6 +100,11 @@ export function startingEquipmentGrantProficiencyChoiceId(
   return grant.target?.source === 'proficiency_choice' ? grant.target.choiceId : undefined
 }
 
+/** Wealth-only starting packages carry no gear items — structural gold-path detection. */
+export function isWealthOnlyStartingEquipmentOption(option: StartingEquipmentOption): boolean {
+  return option.items.length === 0 && option.wealth != null
+}
+
 /**
  * Structured pick within a starting package (e.g. Bard musical instrument).
  *

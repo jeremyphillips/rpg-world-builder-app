@@ -24,6 +24,18 @@ default `CatalogPickerSheet` `rankPickerItems` path (text-score-first).
 5. **Weapon category** — `getEquipmentWeaponCategoryBrowseRank` when both rows are weapons; martial-first only when `preferMartialWeaponBrowseOrder` is set on the browse context.
 6. **Name** — `localeCompare` (base sensitivity).
 
+### Recommendation reason ranks
+
+Lower ranks list first within the same tier (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
+
+`classRequired` → `classToolNeed` → `selectedToolProficiency` → `spellcastingFocus` →
+`startingEquipment` → `unresolvedToolProficiencyChoice` → `startingEquipmentChoice` →
+`classToolCategory` → `availableInStartingOption` → `classSuggested` → `proficient` →
+`notProficient`.
+
+Inference layers live in `derive-equipment-recommendation-contributions.ts` (proficiency
+pools, starting-equipment pools, fulfillment-aware gold elevation).
+
 ### Equipment picker sort modes
 
 | Mode                       | Primary                           | Tiebreaker 1 (query only) | Tiebreaker 2              |

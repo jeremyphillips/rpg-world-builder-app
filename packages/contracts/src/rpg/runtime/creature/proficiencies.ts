@@ -10,6 +10,7 @@ import type {
 import { getSkillName } from '../../content/skill-proficiency'
 import type { ToolCategory } from '../../vocab/equipment/tool-category'
 import type { CreatureEquipmentCatalog } from './equipment'
+import { equipmentIdMatchesReference } from './equipment-id-match'
 import { toEquipmentContentId } from './equipment'
 
 // ---------------------------------------------------------------------------
@@ -30,11 +31,11 @@ function toolIdMatchesEquipment(
   toolId: string,
   equipment: Extract<Equipment, { kind: 'tool' }>,
 ): boolean {
-  return (
-    toolId === equipment.id ||
-    toolId === equipment.slug ||
-    toEquipmentContentId(equipment.rulesetId, toolId) === equipment.id
-  )
+  return equipmentIdMatchesReference({
+    reference: toolId,
+    equipment,
+    rulesetId: equipment.rulesetId,
+  })
 }
 
 /** Returns true when proficiency rows cover a catalog tool row. */
