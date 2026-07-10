@@ -1,12 +1,4 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { GearKind } from '../../../../vocab/equipment/gear-kind'
-
-/** Gear kinds that classify adventuring gear as a spellcasting focus bucket. */
-const SPELLCASTING_FOCUS_GEAR_KINDS: ReadonlySet<GearKind> = new Set([
-  'arcane_focus',
-  'druidic_focus',
-  'holy_symbol',
-])
 
 /**
  * Browse-sort bucket rank for equipment kind — lower ranks list first.
@@ -17,7 +9,7 @@ export const EQUIPMENT_RECOMMENDATION_KIND_RANK = {
   shield: 1,
   armor: 2,
   tool: 3,
-  spellcastingFocus: 4,
+  spellcastingGear: 4,
   gear: 5,
   ammunition: 6,
   other: 7,
@@ -42,7 +34,7 @@ function getEquipmentRecommendationKindBucket(
       return 'tool'
     case 'adventuring_gear': {
       const { gearKind } = equipment
-      if (SPELLCASTING_FOCUS_GEAR_KINDS.has(gearKind)) return 'spellcastingFocus'
+      if (gearKind === 'spellcasting') return 'spellcastingGear'
       if (gearKind === 'ammunition') return 'ammunition'
       return 'gear'
     }

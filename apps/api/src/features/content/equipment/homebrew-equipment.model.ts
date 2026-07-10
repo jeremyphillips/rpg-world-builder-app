@@ -10,6 +10,7 @@ import {
   PHYSICAL_DAMAGE_TYPE_IDS,
   SERVICE_CATEGORIES,
   HOLY_SYMBOL_USAGES,
+  SPELLCASTING_GEAR_KINDS,
   TOOL_CATEGORIES,
   VEHICLE_CATEGORIES,
   WEAPON_MASTERIES,
@@ -51,6 +52,7 @@ const homebrewEquipmentSchema = new Schema(
     strengthRequirement: { type: Number },
     // adventuring gear
     gearKind: { type: String, enum: [...GEAR_KINDS] },
+    spellcastingGearKind: { type: String, enum: [...SPELLCASTING_GEAR_KINDS] },
     bundleSize: { type: Number },
     storage: { type: String },
     capacity: { type: Schema.Types.Mixed },

@@ -10,9 +10,7 @@ export const GEAR_KINDS = [
   'general',
   'ammunition',
   'book',
-  'arcane_focus',
-  'druidic_focus',
-  'holy_symbol',
+  'spellcasting',
   'container',
   'consumable',
 ] as const
@@ -43,23 +41,10 @@ export const GEAR_KIND_ENTRIES = {
     label: 'Book',
     description: 'A reference or lore volume, such as occult texts used by Warlocks.',
   },
-  arcane_focus: {
-    label: 'Arcane Focus',
-    description: 'An arcane spellcasting focus such as a crystal, orb, rod, staff, or wand.',
-    sentence: {
-      plural: 'arcane focuses',
-    },
-  },
-  druidic_focus: {
-    label: 'Druidic Focus',
-    description: 'A druidic spellcasting focus such as mistletoe, a totem, or a wooden staff.',
-    sentence: {
-      plural: 'druidic focuses',
-    },
-  },
-  holy_symbol: {
-    label: 'Holy Symbol',
-    description: 'A divine spellcasting focus such as an amulet, emblem, or reliquary.',
+  spellcasting: {
+    label: 'Spellcasting',
+    description:
+      'Spellcasting gear such as foci, a holy symbol, or a spellbook. Use spellcasting kind for the specific sub-classification.',
   },
   container: {
     label: 'Container',

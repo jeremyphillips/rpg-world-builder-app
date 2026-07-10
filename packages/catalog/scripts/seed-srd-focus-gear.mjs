@@ -14,7 +14,14 @@ const TS = '2024-05-21T00:00:00.000Z'
 const gp = (amount) => ({ amount, currency: 'gp' })
 const lb = (value) => ({ value, unit: 'lb' })
 
-function gear(slug, name, description, cost, gearKind, { weight, ...extra } = {}) {
+const SPELLCASTING_SUB_KINDS = new Set([
+  'arcane_focus',
+  'druidic_focus',
+  'holy_symbol',
+  'spellbook',
+])
+
+function gear(slug, name, description, cost, spellcastingGearKind, { weight, ...extra } = {}) {
   return {
     id: `${RULESET}:${slug}`,
     slug,
@@ -27,7 +34,8 @@ function gear(slug, name, description, cost, gearKind, { weight, ...extra } = {}
     description,
     cost,
     kind: 'adventuring_gear',
-    gearKind,
+    gearKind: 'spellcasting',
+    spellcastingGearKind,
     ...(weight !== undefined && { weight }),
     ...extra,
   }
@@ -56,7 +64,7 @@ const NEW_ITEMS = [
     'Spellbook',
     'A leather-bound tome with one hundred blank vellum pages used to record and prepare spells.',
     gp(50),
-    'general',
+    'spellbook',
     { weight: lb(3) },
   ),
   gear('sprig-of-mistletoe', 'Sprig of Mistletoe', '', gp(1), 'druidic_focus'),

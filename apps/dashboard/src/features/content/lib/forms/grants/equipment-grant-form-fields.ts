@@ -7,6 +7,8 @@ import {
   EQUIPMENT_KINDS,
   GEAR_KIND_ENTRIES,
   GEAR_KINDS,
+  SPELLCASTING_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   toolCategorySchema,
@@ -16,6 +18,7 @@ import {
   armorCategorySchema,
   equipmentKindSchema,
   gearKindSchema,
+  spellcastingGearKindSchema,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -89,6 +92,13 @@ const gearKindOptions = toOptions(
   >,
 )
 
+const spellcastingGearKindOptions = toOptions(
+  SPELLCASTING_GEAR_KINDS,
+  Object.fromEntries(
+    SPELLCASTING_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
+  ) as Record<(typeof SPELLCASTING_GEAR_KINDS)[number], string>,
+)
+
 function categoryOptionsWithAny(options: { value: string; label: string }[]) {
   return [{ value: EQUIPMENT_POOL_CATEGORY_ANY, label: 'Any' }, ...options]
 }
@@ -117,6 +127,9 @@ export const equipmentGrantChoiceItemFormSchema = z
       .union([armorCategorySchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
       .optional(),
     poolGearKind: z.union([gearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)]).optional(),
+    poolSpellcastingGearKind: z
+      .union([spellcastingGearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
+      .optional(),
   })
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit') {
@@ -197,6 +210,20 @@ function visibleForFilteredEquipmentKind(
         watched['itemKind'] === 'choice' &&
         watched['poolSource'] === 'filtered' &&
         watched['poolEquipmentKind'] === equipmentKind,
+    },
+    guard,
+  )!
+}
+
+function visibleForSpellcastingGearPoolFilter(guard?: FieldVisibility): FieldVisibility {
+  return withGuard(
+    {
+      dependsOn: ['itemKind', 'poolSource', 'poolEquipmentKind', 'poolGearKind'],
+      visibleWhen: (watched) =>
+        watched['itemKind'] === 'choice' &&
+        watched['poolSource'] === 'filtered' &&
+        watched['poolEquipmentKind'] === 'adventuring_gear' &&
+        watched['poolGearKind'] === 'spellcasting',
     },
     guard,
   )!
@@ -328,6 +355,14 @@ export function equipmentChoiceGrantFields(
           options: categoryOptionsWithAny(gearKindOptions),
           defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
           visibility: visibleForFilteredEquipmentKind('adventuring_gear', guard),
+        },
+        {
+          type: 'select',
+          name: 'poolSpellcastingGearKind',
+          label: 'Spellcasting kind',
+          options: categoryOptionsWithAny(spellcastingGearKindOptions),
+          defaultValue: EQUIPMENT_POOL_CATEGORY_ANY,
+          visibility: visibleForSpellcastingGearPoolFilter(guard),
         },
       ],
     },

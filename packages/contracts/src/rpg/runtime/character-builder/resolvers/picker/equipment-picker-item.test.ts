@@ -125,10 +125,11 @@ describe('getEquipmentRecommendationKindRank', () => {
           slug: 'wand',
           name: 'Wand',
           kind: 'adventuring_gear',
-          gearKind: 'arcane_focus',
+          gearKind: 'spellcasting',
+          spellcastingGearKind: 'arcane_focus',
         }),
       ),
-    ).toBe(EQUIPMENT_RECOMMENDATION_KIND_RANK.spellcastingFocus)
+    ).toBe(EQUIPMENT_RECOMMENDATION_KIND_RANK.spellcastingGear)
 
     expect(
       getEquipmentRecommendationKindRank(
@@ -164,7 +165,8 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         slug: 'spellbook',
         name: 'Spellbook',
         kind: 'adventuring_gear',
-        gearKind: 'book',
+        gearKind: 'spellcasting',
+        spellcastingGearKind: 'spellbook',
       }),
       { tier: 'essential', reasons: ['classRequired'] },
     )
@@ -225,7 +227,8 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         slug: 'wand',
         name: 'Wand',
         kind: 'adventuring_gear',
-        gearKind: 'arcane_focus',
+        gearKind: 'spellcasting',
+        spellcastingGearKind: 'arcane_focus',
       }),
       { tier: 'essential', reasons: ['spellcastingFocus'] },
     )

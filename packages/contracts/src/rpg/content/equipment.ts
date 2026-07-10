@@ -73,7 +73,6 @@ export {
   EQUIPMENT_MODIFIER_KINDS,
   equipmentModifierKindSchema,
   equipmentModifierSchema,
-  isSpellcastingFocusGearKind,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   spellcastingFocusGearKindSchema,
   spellcastingFocusModifierSchema,
@@ -82,6 +81,22 @@ export {
   type SpellcastingFocusGearKind,
   type SpellcastingFocusModifier,
 } from './equipment/modifier'
+
+export {
+  getEquipmentSpellcastingGearKind,
+  type AdventuringGearEquipmentKindFields,
+} from './equipment/adventuring-gear-variant'
+
+export {
+  getSpellcastingGearKindEntry,
+  getSpellcastingGearKindLabel,
+  isSpellcastingFocusGearKind,
+  isSpellcastingGearKind,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
+  SPELLCASTING_GEAR_KINDS,
+  spellcastingGearKindSchema,
+  type SpellcastingGearKind,
+} from '../vocab/equipment/spellcasting-gear-kind'
 
 // ---------------------------------------------------------------------------
 // Equipment — unified catalog content type discriminated by `kind`. Weapons,

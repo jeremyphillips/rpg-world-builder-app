@@ -1,5 +1,6 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
+import { getEquipmentSpellcastingGearKind } from '../../content/equipment/adventuring-gear-variant'
 import type { EquipmentPool } from '../../content/lib/equipment-grant'
 import { resolveEquipmentContentId } from '../../content/starting-equipment'
 
@@ -40,10 +41,15 @@ function matchesArmorPool(equipment: Equipment, pool: FilteredEquipmentPool): bo
 }
 
 function matchesGearPool(equipment: Equipment, pool: FilteredEquipmentPool): boolean {
-  return (
-    equipment.kind === 'adventuring_gear' &&
-    (!pool.gearKind || equipment.gearKind === pool.gearKind)
-  )
+  if (equipment.kind !== 'adventuring_gear') return false
+  if (pool.gearKind && equipment.gearKind !== pool.gearKind) return false
+  if (
+    pool.spellcastingGearKind &&
+    getEquipmentSpellcastingGearKind(equipment) !== pool.spellcastingGearKind
+  ) {
+    return false
+  }
+  return true
 }
 
 function matchesMagicItemPool(equipment: Equipment, pool: FilteredEquipmentPool): boolean {

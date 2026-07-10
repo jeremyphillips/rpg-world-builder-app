@@ -93,7 +93,8 @@ const arcaneCrystal = equipmentSchema.parse({
   cost: { amount: 10, currency: 'gp' },
   weight: { value: 1, unit: 'lb' },
   kind: 'adventuring_gear',
-  gearKind: 'arcane_focus',
+  gearKind: 'spellcasting',
+  spellcastingGearKind: 'arcane_focus',
 })
 
 const holySymbol = equipmentSchema.parse({
@@ -105,7 +106,8 @@ const holySymbol = equipmentSchema.parse({
   cost: { amount: 5, currency: 'gp' },
   weight: { value: 1, unit: 'lb' },
   kind: 'adventuring_gear',
-  gearKind: 'holy_symbol',
+  gearKind: 'spellcasting',
+  spellcastingGearKind: 'holy_symbol',
   holySymbolUsage: ['held'],
 })
 
@@ -118,7 +120,8 @@ const spellbook = equipmentSchema.parse({
   cost: { amount: 50, currency: 'gp' },
   weight: { value: 3, unit: 'lb' },
   kind: 'adventuring_gear',
-  gearKind: 'book',
+  gearKind: 'spellcasting',
+  spellcastingGearKind: 'spellbook',
 })
 
 const rope = equipmentSchema.parse({
@@ -177,7 +180,8 @@ const storedWizard: ClassStored = {
     progression: 'full',
     ability: 'int',
     preparation: 'prepared',
-    focus: ['arcane_focus'],
+    requiredGear: ['spellbook'],
+    focusKinds: ['arcane_focus'],
   },
   proficiencies: {
     savingThrows: ['int', 'wis'],
@@ -195,14 +199,6 @@ const storedWizard: ClassStored = {
           label: 'Standard Equipment',
           items: [{ kind: 'grant', equipmentSlug: 'dagger', quantity: 2 }],
           wealth: { gp: 5 },
-        },
-      ],
-    },
-    equipmentRecommendations: {
-      essential: [
-        {
-          match: { source: 'explicit', equipmentSlugs: ['spellbook'] },
-          label: 'Spellbook',
         },
       ],
     },
@@ -326,7 +322,7 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(arcaneCrystal.id)?.tier).toBe('strong')
   })
 
-  it('infers focus kinds from starting-package grants when spellcasting.focus is absent', () => {
+  it('infers focus kinds from starting-package grants when spellcasting.focusKinds is absent', () => {
     const inferredCleric: ClassStored = {
       ...storedWizard,
       id: `${RULESET}:cleric`,
@@ -364,7 +360,7 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(arcaneCrystal.id)?.tier).toBe('neutral')
   })
 
-  it('applies authored essential rules with badge labels and skips unresolved targets', () => {
+  it('applies requiredGear from spellcasting config as essential', () => {
     const { catalogIndex, proficiencies } = buildContext(storedWizard, [spellbook, rope])
 
     const recommendations = deriveEquipmentRecommendations({
@@ -376,7 +372,6 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(spellbook.id)).toMatchObject({
       tier: 'essential',
       reasons: ['classRequired'],
-      label: 'Spellbook',
     })
     expect(recommendations.get(rope.id)?.tier).toBe('neutral')
   })
@@ -384,6 +379,10 @@ describe('deriveEquipmentRecommendations', () => {
   it('ignores authored rules below their minLevel', () => {
     const gatedWizard: ClassStored = {
       ...storedWizard,
+      spellcasting: {
+        ...storedWizard.spellcasting!,
+        requiredGear: undefined,
+      },
       characterCreation: {
         ...storedWizard.characterCreation!,
         equipmentRecommendations: {

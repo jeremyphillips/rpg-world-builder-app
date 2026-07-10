@@ -168,6 +168,9 @@ export function spellcastingToFormValues(spellcasting: Spellcasting | undefined)
     progression: spellcasting.progression,
     ability: spellcasting.ability,
     preparation: spellcasting.preparation,
+    requiredGear: spellcasting.requiredGear,
+    focusKinds: spellcasting.focusKinds,
+    recommendedGear: spellcasting.recommendedGear,
     progressionTable: progressionTableToFormValues(
       spellcasting.cantrips,
       spellcasting.spellsAvailable,
@@ -213,6 +216,15 @@ function spellcastingFromFormValues(
   }
   if (spellcasting.description?.trim()) {
     result.description = spellcasting.description.trim()
+  }
+  if (spellcasting.requiredGear?.length) {
+    result.requiredGear = spellcasting.requiredGear
+  }
+  if (spellcasting.focusKinds?.length) {
+    result.focusKinds = spellcasting.focusKinds
+  }
+  if (spellcasting.recommendedGear?.length) {
+    result.recommendedGear = spellcasting.recommendedGear
   }
   appendOptionalProgressionTables(result, spellcasting.progressionTable)
   return result

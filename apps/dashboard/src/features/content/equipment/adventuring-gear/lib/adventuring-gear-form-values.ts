@@ -21,6 +21,7 @@ export function adventuringGearFormValuesFromEntity(
 ): Pick<
   AdventuringGearEquipmentFormValues,
   | 'gearKind'
+  | 'spellcastingGearKind'
   | 'bundleSize'
   | 'storage'
   | 'propertiesText'
@@ -30,6 +31,7 @@ export function adventuringGearFormValuesFromEntity(
 > {
   return {
     gearKind: item.gearKind,
+    spellcastingGearKind: item.spellcastingGearKind,
     bundleSize: item.bundleSize,
     storage: item.storage,
     propertiesText: formatPropertiesText(item.properties),
@@ -49,6 +51,7 @@ export function buildAdventuringGearInput({
     ...equipmentInputBase(values, ctx),
     kind: 'adventuring_gear',
     gearKind: values.gearKind ?? 'general',
+    ...(values.spellcastingGearKind && { spellcastingGearKind: values.spellcastingGearKind }),
     ...(weight && { weight }),
     ...(values.bundleSize !== undefined && { bundleSize: values.bundleSize }),
     ...(values.storage && { storage: values.storage }),

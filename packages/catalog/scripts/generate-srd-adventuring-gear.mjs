@@ -37,6 +37,19 @@ const sp = (amount) => ({ amount, currency: 'sp' })
 const cp = (amount) => ({ amount, currency: 'cp' })
 
 function gear(slug, name, description, cost, weight, gearKind, extra = {}) {
+  const spellcastingSubKinds = new Set([
+    'arcane_focus',
+    'druidic_focus',
+    'holy_symbol',
+    'spellbook',
+  ])
+  if (spellcastingSubKinds.has(gearKind)) {
+    return base(slug, name, description, cost, weight, 'adventuring_gear', {
+      gearKind: 'spellcasting',
+      spellcastingGearKind: gearKind,
+      ...extra,
+    })
+  }
   return base(slug, name, description, cost, weight, 'adventuring_gear', { gearKind, ...extra })
 }
 

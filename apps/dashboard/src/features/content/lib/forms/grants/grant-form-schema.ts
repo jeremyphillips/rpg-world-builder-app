@@ -7,6 +7,7 @@ import {
   equipmentKindSchema,
   featCategorySchema,
   gearKindSchema,
+  spellcastingGearKindSchema,
   INNATE_SPELL_KINDS,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
@@ -108,6 +109,9 @@ const equipmentGrantRowFieldsSchema = z.object({
     .union([armorCategorySchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
     .optional(),
   poolGearKind: z.union([gearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)]).optional(),
+  poolSpellcastingGearKind: z
+    .union([spellcastingGearKindSchema, z.literal(EQUIPMENT_POOL_CATEGORY_ANY)])
+    .optional(),
 })
 
 const proficiencyGrantRowFieldsSchema = z.object({

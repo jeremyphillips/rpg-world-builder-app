@@ -3,26 +3,38 @@ import {
   GEAR_KIND_ENTRIES,
   HOLY_SYMBOL_USAGES,
   HOLY_SYMBOL_USAGE_ENTRIES,
+  SPELLCASTING_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const gearKindOptions = toOptions(GEAR_KINDS, labelsFromEntries(GEAR_KIND_ENTRIES))
+const spellcastingGearKindOptions = toOptions(
+  SPELLCASTING_GEAR_KINDS,
+  labelsFromEntries(SPELLCASTING_GEAR_KIND_ENTRIES),
+)
 const holySymbolUsageOptions = toOptions(
   HOLY_SYMBOL_USAGES,
   labelsFromEntries(HOLY_SYMBOL_USAGE_ENTRIES),
 )
 
-const visibleWhenHolySymbol: FieldVisibility = {
+const visibleWhenSpellcastingGear: FieldVisibility = {
   dependsOn: ['gearKind'],
-  visibleWhen: (values) => values.gearKind === 'holy_symbol',
+  visibleWhen: (values) => values.gearKind === 'spellcasting',
+}
+
+const visibleWhenHolySymbol: FieldVisibility = {
+  dependsOn: ['spellcastingGearKind'],
+  visibleWhen: (values) => values.spellcastingGearKind === 'holy_symbol',
 }
 
 const visibleWhenFocusStaff: FieldVisibility = {
-  dependsOn: ['gearKind'],
+  dependsOn: ['spellcastingGearKind'],
   visibleWhen: (values) =>
-    values.gearKind === 'arcane_focus' || values.gearKind === 'druidic_focus',
+    values.spellcastingGearKind === 'arcane_focus' ||
+    values.spellcastingGearKind === 'druidic_focus',
 }
 
 /** Adventuring gear-specific form field group for the unified equipment form. */
@@ -37,6 +49,14 @@ export function adventuringGearFormFieldGroup(): FormItem {
         label: 'Gear kind',
         options: gearKindOptions,
         required: true,
+      },
+      {
+        type: 'select',
+        name: 'spellcastingGearKind',
+        label: 'Spellcasting kind',
+        options: spellcastingGearKindOptions,
+        required: true,
+        visibility: visibleWhenSpellcastingGear,
       },
       {
         type: 'combobox',

@@ -1,10 +1,12 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
 import type { Equipment } from '../../../../content/equipment'
+import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
+import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
 import {
   isSpellcastingFocusGearKind,
-  type SpellcastingFocusGearKind,
-} from '../../../../content/equipment/modifier'
+  type SpellcastingGearKind,
+} from '../../../../vocab/equipment/spellcasting-gear-kind'
 import {
   EQUIPMENT_RECOMMENDATION_TIER_RANK,
   EQUIPMENT_RECOMMENDATION_TIERS,
@@ -95,20 +97,23 @@ function isClassToolNeed(equipment: Equipment, proficiencies: CharacterProficien
   )
 }
 
-/** Authored `spellcasting.focus` wins; otherwise infer from focus gear named in starting packages. */
+/** Authored `spellcasting.focusKinds` wins; otherwise infer from focus gear in starting packages. */
 function resolveFocusKinds(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
   startingEquipmentIds: readonly string[],
 ): SpellcastingFocusGearKind[] {
-  const authored = characterClass.spellcasting?.focus
+  const authored = characterClass.spellcasting?.focusKinds
   if (authored !== undefined) return [...authored]
 
   const inferred = new Set<SpellcastingFocusGearKind>()
   for (const equipmentId of startingEquipmentIds) {
     const equipment = catalogIndex.equipment.get(equipmentId)
     if (equipment?.kind !== 'adventuring_gear') continue
-    if (isSpellcastingFocusGearKind(equipment.gearKind)) inferred.add(equipment.gearKind)
+    const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
+    if (spellcastingGearKind !== undefined && isSpellcastingFocusGearKind(spellcastingGearKind)) {
+      inferred.add(spellcastingGearKind)
+    }
   }
   return [...inferred]
 }
@@ -141,6 +146,48 @@ function applyAuthoredRules(args: {
   }
 }
 
+/** Class-critical spellcasting gear is essential regardless of spellcasting unlock level. */
+function applyRequiredGearContributions(args: {
+  accumulators: AccumulatorMap
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+}): void {
+  const requiredGear = args.characterClass.spellcasting?.requiredGear
+  if (!requiredGear || requiredGear.length === 0) return
+
+  for (const equipment of args.catalogIndex.equipment.values()) {
+    const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
+    if (
+      spellcastingGearKind === undefined ||
+      !(requiredGear as readonly string[]).includes(spellcastingGearKind)
+    ) {
+      continue
+    }
+    addContribution(args.accumulators, equipment.id, 'essential', 'classRequired')
+  }
+}
+
+/** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
+function applyRecommendedGearContributions(args: {
+  accumulators: AccumulatorMap
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+}): void {
+  const recommendedGear = args.characterClass.spellcasting?.recommendedGear
+  if (!recommendedGear || recommendedGear.length === 0) return
+
+  for (const equipment of args.catalogIndex.equipment.values()) {
+    const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
+    if (
+      spellcastingGearKind === undefined ||
+      !(recommendedGear as readonly SpellcastingGearKind[]).includes(spellcastingGearKind)
+    ) {
+      continue
+    }
+    addContribution(args.accumulators, equipment.id, 'strong', 'classSuggested')
+  }
+}
+
 /** Foci strengthen to essential once the class's spellcasting is active at the current level. */
 function applySpellcastingFocusContributions(args: {
   accumulators: AccumulatorMap
@@ -165,7 +212,13 @@ function applySpellcastingFocusContributions(args: {
 
   for (const equipment of catalogIndex.equipment.values()) {
     if (equipment.kind !== 'adventuring_gear') continue
-    if (!(focusKinds as readonly string[]).includes(equipment.gearKind)) continue
+    const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
+    if (
+      spellcastingGearKind === undefined ||
+      !(focusKinds as readonly string[]).includes(spellcastingGearKind)
+    ) {
+      continue
+    }
     addContribution(accumulators, equipment.id, focusTier, 'spellcastingFocus')
   }
 }
@@ -205,9 +258,10 @@ function toRecommendation(accumulator: RecommendationAccumulator): EquipmentReco
  * Tiered picker recommendations for every catalog equipment row.
  *
  * Inference-first: starting packages, item-level tool proficiencies, and
- * spellcasting focus kinds are derived from data classes already author.
- * Authored `characterCreation.equipmentRecommendations` rules augment where
- * inference cannot reach; unresolved rule targets are silently skipped.
+ * spellcasting gear kinds (`requiredGear`, `focusKinds`, `recommendedGear`) are
+ * derived from data classes already author. Authored
+ * `characterCreation.equipmentRecommendations` rules augment where inference
+ * cannot reach; unresolved rule targets are silently skipped.
  */
 export function deriveEquipmentRecommendations(
   args: DeriveEquipmentRecommendationsArgs,
@@ -221,12 +275,24 @@ export function deriveEquipmentRecommendations(
     addContribution(accumulators, equipmentId, 'strong', 'startingEquipment')
   }
 
+  applyRequiredGearContributions({
+    accumulators,
+    characterClass,
+    catalogIndex,
+  })
+
   applySpellcastingFocusContributions({
     accumulators,
     characterClass,
     catalogIndex,
     classLevel,
     startingEquipmentIds,
+  })
+
+  applyRecommendedGearContributions({
+    accumulators,
+    characterClass,
+    catalogIndex,
   })
 
   const authoredRecommendations = characterClass.characterCreation?.equipmentRecommendations

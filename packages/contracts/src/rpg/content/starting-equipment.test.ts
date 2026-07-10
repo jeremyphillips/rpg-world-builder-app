@@ -23,7 +23,7 @@ const DRUID_STARTING_EQUIPMENT = {
           equipmentSlug: 'quarterstaff',
           quantity: 1,
           equipped: false,
-          modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+          modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
         },
         { kind: 'grant', equipmentSlug: 'explorers-pack', quantity: 1 },
         { kind: 'grant', equipmentSlug: 'herbalism-kit', quantity: 1 },
@@ -175,7 +175,7 @@ describe('classCharacterCreationSchema', () => {
               match: {
                 source: 'filtered',
                 equipmentKind: 'adventuring_gear',
-                gearKind: 'holy_symbol',
+                gearKind: 'spellcasting',
               },
               minLevel: 2,
             },

@@ -2,8 +2,8 @@ import { z } from 'zod'
 import {
   choiceOptionTitle,
   defineMessage,
-  GEAR_KIND_ENTRIES,
   SPELLCASTING_FOCUS_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -44,7 +44,7 @@ export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipmen
 const focusKindOptions = toOptions(
   SPELLCASTING_FOCUS_GEAR_KINDS,
   Object.fromEntries(
-    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, GEAR_KIND_ENTRIES[kind].label]),
+    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
   ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
 )
 
@@ -55,7 +55,7 @@ const wealthGrantMoneyFormSchema = z.object({
 
 export const startingEquipmentModifierFormSchema = z.object({
   kind: z.literal('spellcasting_focus'),
-  focusKind: spellcastingFocusGearKindSchema,
+  spellcastingGearKind: spellcastingFocusGearKindSchema,
 })
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
@@ -137,8 +137,8 @@ export function startingEquipmentModifierFields(): FormItem[] {
         fallback: () => 'Modifier',
         primary: (values) => {
           const row = values as StartingEquipmentModifierForm | undefined
-          if (row?.focusKind) {
-            return GEAR_KIND_ENTRIES[row.focusKind].label
+          if (row?.spellcastingGearKind) {
+            return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
           }
           return undefined
         },
@@ -154,7 +154,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
         },
         {
           type: 'select',
-          name: 'focusKind',
+          name: 'spellcastingGearKind',
           label: 'Focus kind',
           options: focusKindOptions,
           required: true,

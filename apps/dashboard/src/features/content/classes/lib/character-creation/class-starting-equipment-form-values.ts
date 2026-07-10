@@ -32,7 +32,7 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
       equipped: item.equipped,
       modifiers: item.modifiers?.map((modifier) => ({
         kind: modifier.kind,
-        focusKind: modifier.focusKind,
+        spellcastingGearKind: modifier.spellcastingGearKind,
       })),
     }
   }

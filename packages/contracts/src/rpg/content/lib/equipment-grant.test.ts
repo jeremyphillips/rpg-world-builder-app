@@ -159,11 +159,11 @@ describe('grantedEquipmentItemSchema', () => {
         equipmentSlug: 'quarterstaff',
         quantity: 1,
         equipped: false,
-        modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+        modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
       }),
     ).toMatchObject({
       kind: 'grant',
-      modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+      modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
     })
   })
 })

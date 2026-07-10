@@ -39,6 +39,10 @@ export function applyEquipmentGrantKindSync(
       row.poolEquipmentKind === 'armor' ? row.poolArmorCategory : EQUIPMENT_POOL_CATEGORY_ANY,
     poolGearKind:
       row.poolEquipmentKind === 'adventuring_gear' ? row.poolGearKind : EQUIPMENT_POOL_CATEGORY_ANY,
+    poolSpellcastingGearKind:
+      row.poolEquipmentKind === 'adventuring_gear' && row.poolGearKind === 'spellcasting'
+        ? row.poolSpellcastingGearKind
+        : EQUIPMENT_POOL_CATEGORY_ANY,
   }
 }
 
@@ -58,6 +62,7 @@ export function equipmentPoolToFormRow(
   | 'poolWeaponCategory'
   | 'poolArmorCategory'
   | 'poolGearKind'
+  | 'poolSpellcastingGearKind'
 > {
   if (pool.source === 'explicit') {
     return {
@@ -73,6 +78,7 @@ export function equipmentPoolToFormRow(
     poolWeaponCategory: pool.weaponCategory ?? EQUIPMENT_POOL_CATEGORY_ANY,
     poolArmorCategory: pool.armorCategory ?? EQUIPMENT_POOL_CATEGORY_ANY,
     poolGearKind: pool.gearKind ?? EQUIPMENT_POOL_CATEGORY_ANY,
+    poolSpellcastingGearKind: pool.spellcastingGearKind ?? EQUIPMENT_POOL_CATEGORY_ANY,
   }
 }
 
@@ -115,6 +121,13 @@ export function equipmentPoolFromFormRow(row: EquipmentGrantChoiceItemForm): Equ
   const gearKind = categoryFormValueToDomain(synced.poolGearKind)
   if (gearKind) {
     pool.gearKind = gearKind as Extract<EquipmentPool, { source: 'filtered' }>['gearKind']
+  }
+  const spellcastingGearKind = categoryFormValueToDomain(synced.poolSpellcastingGearKind)
+  if (spellcastingGearKind) {
+    pool.spellcastingGearKind = spellcastingGearKind as Extract<
+      EquipmentPool,
+      { source: 'filtered' }
+    >['spellcastingGearKind']
   }
 
   return pool

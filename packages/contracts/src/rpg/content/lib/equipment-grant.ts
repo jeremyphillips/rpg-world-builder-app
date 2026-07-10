@@ -7,6 +7,11 @@ import {
 } from '../../vocab/armor/category'
 import { gearKindSchema, getGearKindEntry, getGearKindLabel } from '../../vocab/equipment/gear-kind'
 import {
+  getSpellcastingGearKindEntry,
+  getSpellcastingGearKindLabel,
+  spellcastingGearKindSchema,
+} from '../../vocab/equipment/spellcasting-gear-kind'
+import {
   getServiceCategoryEntry,
   getServiceCategoryLabel,
   serviceCategorySchema,
@@ -61,7 +66,7 @@ const EQUIPMENT_KIND_CATEGORY_FIELDS = {
   tool: ['toolCategory'],
   weapon: ['weaponCategory'],
   armor: ['armorCategory'],
-  adventuring_gear: ['gearKind'],
+  adventuring_gear: ['gearKind', 'spellcastingGearKind'],
   magic_item: ['magicItemCategory', 'magicItemRarity'],
   vehicle: ['vehicleCategory'],
   service: ['serviceCategory'],
@@ -76,6 +81,7 @@ const FILTERED_POOL_CATEGORY_FIELDS = [
   'weaponCategory',
   'armorCategory',
   'gearKind',
+  'spellcastingGearKind',
   'magicItemCategory',
   'magicItemRarity',
   'vehicleCategory',
@@ -87,6 +93,7 @@ const FILTERED_POOL_CATEGORY_LABELS = {
   weaponCategory: 'Weapon category',
   armorCategory: 'Armor category',
   gearKind: 'Gear kind',
+  spellcastingGearKind: 'Spellcasting kind',
   magicItemCategory: 'Magic item category',
   magicItemRarity: 'Magic item rarity',
   vehicleCategory: 'Vehicle category',
@@ -100,6 +107,7 @@ function refineFilteredEquipmentPool(
     weaponCategory?: z.infer<typeof weaponCategorySchema>
     armorCategory?: z.infer<typeof armorCategorySchema>
     gearKind?: z.infer<typeof gearKindSchema>
+    spellcastingGearKind?: z.infer<typeof spellcastingGearKindSchema>
     magicItemCategory?: z.infer<typeof magicItemCategorySchema>
     magicItemRarity?: z.infer<typeof magicItemRaritySchema>
     vehicleCategory?: z.infer<typeof vehicleCategorySchema>
@@ -142,6 +150,21 @@ function refineFilteredEquipmentPool(
       })
     }
   }
+
+  if (
+    val.spellcastingGearKind !== undefined &&
+    val.gearKind !== undefined &&
+    val.gearKind !== 'spellcasting'
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: grantValidationMessages.categoryFilterWrongKind({
+        filterLabel: FILTERED_POOL_CATEGORY_LABELS.spellcastingGearKind,
+        equipmentKindLabel: getGearKindLabel('spellcasting'),
+      }),
+      path: ['spellcastingGearKind'],
+    })
+  }
 }
 
 const explicitEquipmentPoolSchema = z.object({
@@ -159,6 +182,7 @@ const filteredEquipmentPoolSchema = z
     weaponCategory: weaponCategorySchema.optional(),
     armorCategory: armorCategorySchema.optional(),
     gearKind: gearKindSchema.optional(),
+    spellcastingGearKind: spellcastingGearKindSchema.optional(),
     magicItemCategory: magicItemCategorySchema.optional(),
     magicItemRarity: magicItemRaritySchema.optional(),
     vehicleCategory: vehicleCategorySchema.optional(),
@@ -315,6 +339,9 @@ export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
   if (pool.armorCategory) {
     return getArmorCategoryLabel(pool.armorCategory)
   }
+  if (pool.spellcastingGearKind) {
+    return getSpellcastingGearKindLabel(pool.spellcastingGearKind)
+  }
   if (pool.gearKind) {
     return getGearKindLabel(pool.gearKind)
   }
@@ -338,6 +365,7 @@ function getEquipmentPoolSentenceEntry(pool: Extract<EquipmentPool, { source: 'f
   if (pool.toolCategory) return getToolCategoryEntry(pool.toolCategory)
   if (pool.weaponCategory) return getWeaponCategoryEntry(pool.weaponCategory)
   if (pool.armorCategory) return getArmorCategoryEntry(pool.armorCategory)
+  if (pool.spellcastingGearKind) return getSpellcastingGearKindEntry(pool.spellcastingGearKind)
   if (pool.gearKind) return getGearKindEntry(pool.gearKind)
   if (pool.magicItemCategory) return getMagicItemCategoryEntry(pool.magicItemCategory)
   if (pool.magicItemRarity) return getMagicItemRarityEntry(pool.magicItemRarity)
