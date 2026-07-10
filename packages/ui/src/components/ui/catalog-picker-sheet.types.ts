@@ -6,6 +6,13 @@ export type CatalogPickerTab = {
   count?: number
 }
 
+/** Coordinated toolbar actions (e.g. Clear filters) — not for implementing search inside filter components. */
+export type CatalogPickerSheetFilterContext = {
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  clearSearchQuery: () => void
+}
+
 type CatalogPickerSheetBaseProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -17,13 +24,16 @@ type CatalogPickerSheetBaseProps<TItem> = {
   tabs?: readonly CatalogPickerTab[]
   defaultTabId?: string
   getItemTab?: (item: TItem) => string
-  filters?: ReactNode
+  filters?: ReactNode | ((context: CatalogPickerSheetFilterContext) => ReactNode)
+  /** Domain-structured filters (category, affordability, etc.) — excludes search and tabs. */
+  hasStructuredFilters?: boolean
   headerExtra?: ReactNode
   footer?: ReactNode
   emptyState?: ReactNode
   loading?: boolean
   searchPlaceholder?: string
   noResultsMessage?: string
+  noScopedItemsMessage?: string
   noItemsMessage?: string
 }
 

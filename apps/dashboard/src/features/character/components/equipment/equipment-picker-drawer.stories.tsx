@@ -7,7 +7,9 @@ import { Button } from '@rpg/ui'
 import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
 import {
   equipmentPickerBudgetFixture,
+  equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerLowRemainingBudgetFixture,
 } from './equipment-picker-drawer.fixtures'
 
 const meta = {
@@ -39,6 +41,30 @@ export const Default: Story = {
         <EquipmentPickerDrawer {...args} open={open} onOpenChange={setOpen} />
       </>
     )
+  },
+}
+
+export const DefaultPathAffordableNow: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: true,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+}
+
+export const LowRemainingBudget: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
   },
 }
 

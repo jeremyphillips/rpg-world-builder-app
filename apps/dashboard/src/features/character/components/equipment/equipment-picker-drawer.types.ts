@@ -37,6 +37,9 @@ export type EquipmentPickerBadge = {
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Category'
+export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
+export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
+export const EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE = 'No recommendations match this view.'
 
 export type EquipmentPickerKindFilter =
   | typeof EQUIPMENT_PICKER_KIND_ALL

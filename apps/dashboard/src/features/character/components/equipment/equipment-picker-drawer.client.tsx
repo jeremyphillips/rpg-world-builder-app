@@ -1,11 +1,14 @@
 'use client'
 
 import * as React from 'react'
+import { CircleAlert, RotateCcw } from 'lucide-react'
 
 import {
   Badge,
   Button,
   CatalogPickerSheet,
+  Checkbox,
+  EmphasisDetailLine,
   Select,
   SelectContent,
   SelectItem,
@@ -13,8 +16,11 @@ import {
   SelectValue,
   Text,
   cn,
+  type CatalogPickerSheetFilterContext,
 } from '@rpg/ui'
 import {
+  formatMoney,
+  formatWealthAsGold,
   getEquipmentKindLabel,
   isEquipmentPickerSupportedKind,
   isEquipmentStackable,
@@ -24,18 +30,24 @@ import {
 import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
 
 import {
+  countEquipmentPickerClearableCriteria,
+  countEquipmentPickerStructuredFilters,
   filterEquipmentPickerItems,
   getEquipmentPickerBadge,
-  getEquipmentPickerDisabledNote,
+  getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
+  hasEquipmentPickerClearableCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
+  EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
+  EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
+  EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
@@ -45,6 +57,8 @@ import {
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import {
+  equipmentPickerAffordableFilterClasses,
+  equipmentPickerAffordableLabelClasses,
   equipmentPickerDisabledRowClasses,
   equipmentPickerHeaderDividerClasses,
   equipmentPickerHeaderKindClasses,
@@ -52,6 +66,8 @@ import {
   equipmentPickerHeaderTitleClasses,
   equipmentPickerCategoryFilterClasses,
   equipmentPickerCategoryLabelClasses,
+  equipmentPickerFiltersMainClasses,
+  equipmentPickerFiltersRowClasses,
   equipmentPickerHighlightBadgeClasses,
   equipmentPickerWarningBadgeClasses,
   EQUIPMENT_PICKER_HEADER_DIVIDER,
@@ -59,39 +75,99 @@ import {
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentCategoryFilter({
+function EquipmentPickerFilters({
   kinds,
   selectedKind,
   onSelectedKindChange,
+  showAffordableOnly,
+  onShowAffordableOnlyChange,
+  showAffordableFilter,
+  filterContext,
+  onClearFilters,
+  clearableCriteriaCount,
 }: {
   kinds: EquipmentPickerSupportedKind[]
   selectedKind: EquipmentPickerKindFilter
   onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
+  showAffordableOnly: boolean
+  onShowAffordableOnlyChange: (checked: boolean) => void
+  showAffordableFilter: boolean
+  filterContext: CatalogPickerSheetFilterContext
+  onClearFilters: () => void
+  clearableCriteriaCount: number
 }) {
-  if (kinds.length <= 1) return null
+  const showCategoryFilter = kinds.length > 1
+  const hasClearableCriteria = hasEquipmentPickerClearableCriteria(clearableCriteriaCount)
+
+  if (!showCategoryFilter && !showAffordableFilter && !hasClearableCriteria) {
+    return null
+  }
+
+  const handleClear = () => {
+    filterContext.clearSearchQuery()
+    onClearFilters()
+  }
 
   return (
-    <div
-      className={equipmentPickerCategoryFilterClasses}
-      role="group"
-      aria-label="Filter by category"
-    >
-      <Text as="span" className={equipmentPickerCategoryLabelClasses}>
-        {EQUIPMENT_PICKER_CATEGORY_LABEL}
-      </Text>
-      <Select value={selectedKind} onValueChange={onSelectedKindChange}>
-        <SelectTrigger size="sm" aria-label="Equipment category">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={EQUIPMENT_PICKER_KIND_ALL}>All</SelectItem>
-          {kinds.map((kind) => (
-            <SelectItem key={kind} value={kind}>
-              {getEquipmentKindLabel(kind)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className={equipmentPickerFiltersRowClasses}>
+      <div className={equipmentPickerFiltersMainClasses}>
+        {showCategoryFilter ? (
+          <div
+            className={equipmentPickerCategoryFilterClasses}
+            role="group"
+            aria-label="Filter by category"
+          >
+            <Text as="span" className={equipmentPickerCategoryLabelClasses}>
+              {EQUIPMENT_PICKER_CATEGORY_LABEL}
+            </Text>
+            <Select value={selectedKind} onValueChange={onSelectedKindChange}>
+              <SelectTrigger size="sm" aria-label="Equipment category">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={EQUIPMENT_PICKER_KIND_ALL}>All</SelectItem>
+                {kinds.map((kind) => (
+                  <SelectItem key={kind} value={kind}>
+                    {getEquipmentKindLabel(kind)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
+
+        {showAffordableFilter ? (
+          <div className={equipmentPickerAffordableFilterClasses}>
+            <Checkbox
+              id="equipment-picker-affordable-now"
+              checked={showAffordableOnly}
+              onCheckedChange={(checked) => onShowAffordableOnlyChange(checked === true)}
+            />
+            <Text
+              as="label"
+              htmlFor="equipment-picker-affordable-now"
+              className={equipmentPickerAffordableLabelClasses}
+            >
+              {EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
+            </Text>
+          </div>
+        ) : null}
+      </div>
+
+      {hasClearableCriteria ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="ml-auto text-xs"
+          onClick={handleClear}
+        >
+          <RotateCcw aria-hidden />
+          {clearableCriteriaCount > 2
+            ? `${EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL} (${clearableCriteriaCount})`
+            : EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
+        </Button>
+      ) : null}
     </div>
   )
 }
@@ -103,13 +179,20 @@ function EquipmentPickerRowSummary({
   item: EquipmentPickerItem
   budget?: EquipmentPickerDrawerProps['budget']
 }) {
-  const disabledNote = getEquipmentPickerDisabledNote(item, budget)
+  const amounts = getEquipmentUnaffordableAmounts(item, budget)
+  if (!amounts) return null
 
-  if (!disabledNote) return null
+  const need = formatMoney(amounts.required)
+  const have = formatWealthAsGold(amounts.remaining)
 
   return (
-    <Text as="p" variant="muted" className="text-xs">
-      {disabledNote}
+    <Text as="p" variant="warning" className="flex items-start gap-1.5 text-xs">
+      <CircleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+      <EmphasisDetailLine
+        primary={`${need} needed`}
+        secondary={`${have} remaining`}
+        secondaryTone="subtle"
+      />
     </Text>
   )
 }
@@ -140,12 +223,14 @@ export function EquipmentPickerDrawer({
   )
   const [selectedKind, setSelectedKind] =
     React.useState<EquipmentPickerKindFilter>(EQUIPMENT_PICKER_KIND_ALL)
+  const [showAffordableOnly, setShowAffordableOnly] = React.useState(false)
   const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
 
+  // Browse context (category, affordable toggle) preserved across close/reopen.
+  // Reset only via explicit Clear filters or a future context-key change.
   React.useEffect(() => {
     if (!open) {
       setAddQuantities({})
-      setSelectedKind(EQUIPMENT_PICKER_KIND_ALL)
     }
   }, [open])
 
@@ -156,6 +241,11 @@ export function EquipmentPickerDrawer({
     })
   }, [kindOptions])
 
+  const structuredFilterCount = countEquipmentPickerStructuredFilters({
+    selectedKind,
+    showAffordableOnly,
+  })
+
   const visibleItems = React.useMemo(
     () =>
       sortEquipmentPickerItems(
@@ -163,6 +253,7 @@ export function EquipmentPickerDrawer({
           filterOutUnaffordable,
           filterOutNonProficient,
           selectedKind,
+          showAffordableOnly,
         }),
         browseSortContext,
       ),
@@ -170,6 +261,7 @@ export function EquipmentPickerDrawer({
       browseSortContext,
       filterOutNonProficient,
       filterOutUnaffordable,
+      showAffordableOnly,
       supportedItems,
       selectedKind,
     ],
@@ -177,6 +269,11 @@ export function EquipmentPickerDrawer({
 
   const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
     setSelectedKind(kind)
+  }, [])
+
+  const handleClearStructuredFilters = React.useCallback(() => {
+    setSelectedKind(EQUIPMENT_PICKER_KIND_ALL)
+    setShowAffordableOnly(false)
   }, [])
 
   const handleQuickAdd = React.useCallback(
@@ -218,14 +315,30 @@ export function EquipmentPickerDrawer({
         { id: EQUIPMENT_PICKER_TAB_RECOMMENDED, label: 'Recommended' },
         { id: EQUIPMENT_PICKER_TAB_ALL, label: 'All' },
       ]}
+      noScopedItemsMessage={EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE}
+      hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
-      filters={
-        <EquipmentCategoryFilter
-          kinds={kindOptions}
-          selectedKind={selectedKind}
-          onSelectedKindChange={handleSelectedKindChange}
-        />
-      }
+      filters={(filterContext) => {
+        const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+          selectedKind,
+          showAffordableOnly,
+          searchQuery: filterContext.searchQuery,
+        })
+
+        return (
+          <EquipmentPickerFilters
+            kinds={kindOptions}
+            selectedKind={selectedKind}
+            onSelectedKindChange={handleSelectedKindChange}
+            showAffordableOnly={showAffordableOnly}
+            onShowAffordableOnlyChange={setShowAffordableOnly}
+            showAffordableFilter={Boolean(budget)}
+            filterContext={filterContext}
+            onClearFilters={handleClearStructuredFilters}
+            clearableCriteriaCount={clearableCriteriaCount}
+          />
+        )
+      }}
       renderItemHeader={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
         const badge = getEquipmentPickerBadge(item)

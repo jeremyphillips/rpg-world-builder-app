@@ -42,12 +42,30 @@ starting-unaffordable / remaining-affordable (`false` / `true`) pair cannot occu
 In `equipment-picker-drawer.lib.ts`, `getEquipmentPickerDisabledNote` resolves in order:
 
 1. `disabledReasons[0]` — structural restrictions (selection full, already granted, etc.)
-2. Remaining-budget failure — `!isWithinRemainingBudget` → "Need X, you have Y" using `budget.remaining`
+2. Remaining-budget failure — `!isWithinRemainingBudget` → `{cost} needed · {remaining} remaining` using `budget.remaining`
 3. `undefined`
 
 `isEquipmentPickerItemDisabled` is `true` when `disabledReasons.length > 0` or
 `!isWithinRemainingBudget`. Starting-budget unaffordability alone does not disable
 purchase when a row is shown with `filterOutUnaffordable={false}`.
+
+## Dashboard affordability filters
+
+The equipment picker exposes two independent affordability controls:
+
+| Control                                            | Source                          | Default | Semantics                                                                                                         |
+| -------------------------------------------------- | ------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `filterOutUnaffordable` prop                       | `state.isAffordable`            | `true`  | Hides rows above the package starting budget.                                                                     |
+| **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | User opt-in; hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
+
+Browse context (search, category, affordable toggle, active tab) is **preserved**
+across drawer close/reopen within a builder session. **Clear filters** resets
+search, category, and Affordable now together. Context-key reset (character,
+equipment method, budget change) is a documented follow-up.
+
+Row disabled notes and the budget header use the shared `EmphasisDetailLine`
+pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted
+secondary tail (`100 GP starting · 95 GP spent`, `40 GP remaining`).
 
 ## Related modules
 

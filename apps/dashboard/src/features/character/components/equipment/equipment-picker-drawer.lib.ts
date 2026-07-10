@@ -4,8 +4,10 @@ import {
   formatMoney,
   formatWealthAsGold,
   isEquipmentPickerSupportedKind,
+  type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerSupportedKind,
+  type Money,
 } from '@rpg/contracts'
 
 import {
@@ -23,17 +25,61 @@ import {
   type EquipmentPickerKindFilter,
 } from './equipment-picker-drawer.types'
 
+export type EquipmentUnaffordableAmounts = {
+  required: Money
+  remaining: CharacterWealth
+}
+
 export function getEquipmentPickerItemTab(item: EquipmentPickerItem): string {
   return item.state.isRecommended ? EQUIPMENT_PICKER_TAB_RECOMMENDED : EQUIPMENT_PICKER_TAB_ALL
+}
+
+export function getEquipmentUnaffordableAmounts(
+  item: EquipmentPickerItem,
+  budget?: EquipmentBudgetSummary,
+): EquipmentUnaffordableAmounts | undefined {
+  if (!budget || item.state.isWithinRemainingBudget) return undefined
+
+  return {
+    required: item.equipment.cost,
+    remaining: budget.remaining,
+  }
 }
 
 export function formatEquipmentUnaffordableReason(
   item: EquipmentPickerItem,
   budget?: EquipmentBudgetSummary,
 ): string {
-  const need = formatMoney(item.equipment.cost)
-  const have = budget ? formatWealthAsGold(budget.remaining) : '—'
-  return `Need ${need}, you have ${have}`
+  const amounts = getEquipmentUnaffordableAmounts(item, budget)
+  if (!amounts) return ''
+
+  const need = formatMoney(amounts.required)
+  const have = formatWealthAsGold(amounts.remaining)
+  return `${need} needed · ${have} remaining`
+}
+
+/** Structured filters only — category + affordable toggle. Excludes search. */
+export function countEquipmentPickerStructuredFilters(args: {
+  selectedKind: EquipmentPickerKindFilter
+  showAffordableOnly: boolean
+}): number {
+  let count = 0
+  if (args.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) count += 1
+  if (args.showAffordableOnly) count += 1
+  return count
+}
+
+/** Total clearable criteria — structured filters + non-empty search. */
+export function countEquipmentPickerClearableCriteria(args: {
+  selectedKind: EquipmentPickerKindFilter
+  showAffordableOnly: boolean
+  searchQuery: string
+}): number {
+  return countEquipmentPickerStructuredFilters(args) + Number(args.searchQuery.trim().length > 0)
+}
+
+export function hasEquipmentPickerClearableCriteria(count: number): boolean {
+  return count > 0
 }
 
 export function resolveEquipmentPickerAllowedKinds(
@@ -59,12 +105,14 @@ export function filterEquipmentPickerItems(
     filterOutUnaffordable: boolean
     filterOutNonProficient: boolean
     selectedKind: EquipmentPickerKindFilter
+    showAffordableOnly?: boolean
   },
 ): EquipmentPickerItem[] {
   return items.filter((item) => {
     if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
     if (options.filterOutUnaffordable && !item.state.isAffordable) return false
     if (options.filterOutNonProficient && !item.state.isProficient) return false
+    if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
     if (
       options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL &&
       item.equipment.kind !== options.selectedKind

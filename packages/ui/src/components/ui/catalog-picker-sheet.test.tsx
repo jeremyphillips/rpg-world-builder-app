@@ -42,6 +42,60 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
   })
 
+  it('renders tabs before the search input', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('resolves filter render props in the toolbar', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        filters={({ searchQuery, clearSearchQuery }) => (
+          <div>
+            <span>Query: {searchQuery}</span>
+            <button type="button" onClick={clearSearchQuery}>
+              Clear search
+            </button>
+          </div>
+        )}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    expect(screen.getByText('Query: rope')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+    expect(screen.getByText('Query:')).toBeInTheDocument()
+  })
+
   it('switches tabs and expands collapsible details via leading caret', async () => {
     const user = userEvent.setup()
 
@@ -73,6 +127,48 @@ describe('CatalogPickerSheet', () => {
 
     await user.click(screen.getByRole('button', { name: 'Expand Beta Item' }))
     expect(screen.getByText('Details for Beta Item')).toBeVisible()
+  })
+
+  it('shows scoped empty copy when a tab has no rows without treating tabs as filters', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={[{ id: 'beta', name: 'Beta Item', tab: 'all', searchText: 'beta rope' }]}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
+        noScopedItemsMessage="No featured items."
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('No featured items.')
+  })
+
+  it('shows no-results copy when structured filters are active', () => {
+    const emptyItems: DemoItem[] = []
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={emptyItems}
+        hasStructuredFilters
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('No items match your search.')
   })
 
   it('keeps legacy rows expandable via the right-side details button', async () => {

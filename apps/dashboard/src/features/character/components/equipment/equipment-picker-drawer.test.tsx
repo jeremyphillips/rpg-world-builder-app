@@ -6,12 +6,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
 import {
   equipmentPickerBudgetFixture,
+  equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerLowRemainingBudgetFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
+  EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
+  EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
 } from './equipment-picker-drawer.types'
@@ -36,7 +40,8 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).getByText('Chain Mail')).toBeInTheDocument()
     expect(within(list).getByText('Armor')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toBeInTheDocument()
-    expect(screen.getByText(/Need 75 GP, you have 40 GP/i)).toBeInTheDocument()
+    expect(within(list).getByText(/75 GP needed/i)).toBeInTheDocument()
+    expect(within(list).getByText(/40 GP remaining/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
   })
 
@@ -74,6 +79,135 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).queryByText('Chain Mail')).not.toBeInTheDocument()
     expect(within(list).getByText('Longsword')).toBeInTheDocument()
     expect(within(list).getByText('Weapon')).toBeInTheDocument()
+  })
+
+  it('filters to affordable rows when Affordable now is checked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerDefaultPathItemsFixture}
+        budget={equipmentPickerLowRemainingBudgetFixture}
+        filterOutUnaffordable
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+    expect(within(list).getByText('Cheap Gear')).toBeInTheDocument()
+    expect(within(list).getByText('Mid Gear')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+
+    expect(within(list).getByText('Cheap Gear')).toBeInTheDocument()
+    expect(within(list).queryByText('Mid Gear')).not.toBeInTheDocument()
+  })
+
+  it('clears search, category, and affordable filters together', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
+
+    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).not.toBeChecked()
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('preserves browse filters across close and reopen', async () => {
+    const user = userEvent.setup()
+
+    const { rerender } = render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+
+    rerender(
+      <EquipmentPickerDrawer
+        open={false}
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    rerender(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).toBeChecked()
+  })
+
+  it('keeps added rows visible after quick-add while affordable filter is on', async () => {
+    const user = userEvent.setup()
+    const onAddItem = vi.fn()
+    const cheapGear = equipmentPickerDefaultPathItemsFixture[0]!
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerDefaultPathItemsFixture}
+        budget={equipmentPickerLowRemainingBudgetFixture}
+        filterOutUnaffordable
+        defaultTab="all"
+        ownedPurchaseQuantities={{}}
+        onAddItem={onAddItem}
+      />,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(onAddItem).toHaveBeenCalledWith(cheapGear, 1)
+    expect(screen.getByText('Cheap Gear')).toBeInTheDocument()
   })
 
   it('quick-adds quantity 1 from the header rail', async () => {

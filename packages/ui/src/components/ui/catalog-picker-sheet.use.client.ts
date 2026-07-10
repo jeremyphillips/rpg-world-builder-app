@@ -8,25 +8,21 @@ import {
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 
 export function useCatalogPickerSheetState<TItem>({
-  open,
   items,
   getSearchText,
   getItemTab,
   tabs,
   defaultTabId,
+  hasStructuredFilters = false,
 }: Pick<
   CatalogPickerSheetProps<TItem>,
-  'open' | 'items' | 'getSearchText' | 'getItemTab' | 'tabs' | 'defaultTabId'
+  'items' | 'getSearchText' | 'getItemTab' | 'tabs' | 'defaultTabId' | 'hasStructuredFilters'
 >) {
   const [searchQuery, setSearchQuery] = React.useState('')
   const [activeTabId, setActiveTabId] = React.useState(() => defaultTabId ?? tabs?.[0]?.id ?? '')
 
-  React.useEffect(() => {
-    if (!open) {
-      setSearchQuery('')
-      setActiveTabId(defaultTabId ?? tabs?.[0]?.id ?? '')
-    }
-  }, [defaultTabId, open, tabs])
+  // Browse context (search, tab) is preserved across close/reopen within a builder session.
+  // Reset only via explicit Clear filters or a future context-key change (character, method, budget).
 
   const tabIds = React.useMemo(() => tabs?.map((tab) => tab.id) ?? [], [tabs])
   const tabCounts = React.useMemo(
@@ -42,7 +38,9 @@ export function useCatalogPickerSheetState<TItem>({
     () => rankPickerItems(tabFilteredItems, searchQuery, getSearchText),
     [getSearchText, searchQuery, tabFilteredItems],
   )
-  const hasActiveFilters = searchQuery.trim().length > 0 || Boolean(tabs?.length)
+
+  const hasSearchOrFilters = searchQuery.trim().length > 0 || Boolean(hasStructuredFilters)
+  const isScopedView = activeTabId.length > 0 && Boolean(tabs?.length)
 
   return {
     searchQuery,
@@ -51,6 +49,7 @@ export function useCatalogPickerSheetState<TItem>({
     setActiveTabId,
     tabCounts,
     visibleItems,
-    hasActiveFilters,
+    hasSearchOrFilters,
+    isScopedView,
   }
 }

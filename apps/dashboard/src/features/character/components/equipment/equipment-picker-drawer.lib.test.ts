@@ -8,11 +8,15 @@ import {
   equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
+  countEquipmentPickerClearableCriteria,
+  countEquipmentPickerStructuredFilters,
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
   getEquipmentPickerBadge,
   getEquipmentPickerDisabledNote,
+  getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
+  hasEquipmentPickerClearableCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   sortEquipmentPickerItems,
@@ -116,7 +120,7 @@ describe('equipment-picker-drawer.lib', () => {
     ).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
     expect(getEquipmentPickerDisabledNote(chainMail, equipmentPickerBudgetFixture)).toBe(
-      'Need 75 GP, you have 40 GP',
+      '75 GP needed · 40 GP remaining',
     )
   })
 
@@ -175,7 +179,7 @@ describe('equipment-picker-drawer.lib', () => {
   it('builds unaffordable copy and warning badges', () => {
     const chainMail = equipmentPickerItemsFixture[1]!
     expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
-      'Need 75 GP, you have 40 GP',
+      '75 GP needed · 40 GP remaining',
     )
     expect(getEquipmentPickerBadge(chainMail)).toEqual({
       label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -269,5 +273,55 @@ describe('equipment-picker-drawer.lib', () => {
     })
 
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])
+  })
+
+  it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {
+    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+      showAffordableOnly: true,
+    })
+
+    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+  })
+
+  it('counts structured filters separately from clearable criteria', () => {
+    expect(
+      countEquipmentPickerStructuredFilters({
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: false,
+      }),
+    ).toBe(0)
+    expect(
+      countEquipmentPickerStructuredFilters({
+        selectedKind: 'weapon',
+        showAffordableOnly: true,
+      }),
+    ).toBe(2)
+    expect(
+      countEquipmentPickerClearableCriteria({
+        selectedKind: 'weapon',
+        showAffordableOnly: true,
+        searchQuery: 'rope',
+      }),
+    ).toBe(3)
+    expect(hasEquipmentPickerClearableCriteria(0)).toBe(false)
+    expect(hasEquipmentPickerClearableCriteria(1)).toBe(true)
+  })
+
+  it('returns domain amounts for remaining-budget failures', () => {
+    const chainMail = equipmentPickerItemsFixture[1]!
+    expect(getEquipmentUnaffordableAmounts(chainMail, equipmentPickerBudgetFixture)).toEqual({
+      required: chainMail.equipment.cost,
+      remaining: equipmentPickerBudgetFixture.remaining,
+    })
+    expect(getEquipmentUnaffordableAmounts(chainMail)).toBeUndefined()
+    expect(
+      getEquipmentUnaffordableAmounts(
+        equipmentPickerItemsFixture[0]!,
+        equipmentPickerBudgetFixture,
+      ),
+    ).toBeUndefined()
   })
 })

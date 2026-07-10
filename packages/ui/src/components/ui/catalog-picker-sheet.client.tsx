@@ -15,28 +15,47 @@ import {
   catalogPickerSheetLoadingVariants,
 } from './catalog-picker-sheet.variants'
 
-export type { CatalogPickerSheetProps, CatalogPickerTab } from './catalog-picker-sheet.types'
+export type {
+  CatalogPickerSheetFilterContext,
+  CatalogPickerSheetProps,
+  CatalogPickerTab,
+} from './catalog-picker-sheet.types'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
+const DEFAULT_NO_SCOPED_ITEMS_MESSAGE = 'No items match this view.'
 const DEFAULT_NO_ITEMS_MESSAGE = 'No items are available.'
+
+function resolveEmptyMessage({
+  hasSearchOrFilters,
+  isScopedView,
+  noResultsMessage,
+  noScopedItemsMessage,
+  noItemsMessage,
+}: {
+  hasSearchOrFilters: boolean
+  isScopedView: boolean
+  noResultsMessage: string
+  noScopedItemsMessage: string
+  noItemsMessage: string
+}): string {
+  if (hasSearchOrFilters) return noResultsMessage
+  if (isScopedView) return noScopedItemsMessage
+  return noItemsMessage
+}
 
 function CatalogPickerSheetEmpty({
   emptyState,
-  hasActiveFilters,
-  noResultsMessage,
-  noItemsMessage,
+  message,
 }: {
   emptyState?: React.ReactNode
-  hasActiveFilters: boolean
-  noResultsMessage: string
-  noItemsMessage: string
+  message: string
 }) {
   if (emptyState) return <>{emptyState}</>
 
   return (
     <div className={catalogPickerSheetEmptyVariants()} role="status">
-      {hasActiveFilters ? noResultsMessage : noItemsMessage}
+      {message}
     </div>
   )
 }
@@ -63,12 +82,14 @@ export function CatalogPickerSheet<TItem>({
   defaultTabId,
   getItemTab,
   filters,
+  hasStructuredFilters = false,
   headerExtra,
   footer,
   emptyState,
   loading = false,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
+  noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
 }: CatalogPickerSheetProps<TItem>) {
   const {
@@ -78,14 +99,23 @@ export function CatalogPickerSheet<TItem>({
     setActiveTabId,
     tabCounts,
     visibleItems,
-    hasActiveFilters,
+    hasSearchOrFilters,
+    isScopedView,
   } = useCatalogPickerSheetState({
-    open,
     items,
     getSearchText,
     getItemTab,
     tabs,
     defaultTabId,
+    hasStructuredFilters,
+  })
+
+  const emptyMessage = resolveEmptyMessage({
+    hasSearchOrFilters,
+    isScopedView,
+    noResultsMessage,
+    noScopedItemsMessage,
+    noItemsMessage,
   })
 
   const rowProps = {
@@ -102,12 +132,7 @@ export function CatalogPickerSheet<TItem>({
       <Spinner size="lg" />
     </div>
   ) : visibleItems.length === 0 ? (
-    <CatalogPickerSheetEmpty
-      emptyState={emptyState}
-      hasActiveFilters={hasActiveFilters}
-      noResultsMessage={noResultsMessage}
-      noItemsMessage={noItemsMessage}
-    />
+    <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
   ) : (
     <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
   )

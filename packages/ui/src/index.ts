@@ -24,6 +24,11 @@ export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
 export { textVariants, type TextVariantProps } from './components/ui/text.variants'
+export {
+  EmphasisDetailLine,
+  type EmphasisDetailLineProps,
+  type EmphasisDetailLineSecondaryTone,
+} from './components/ui/emphasis-detail-line'
 export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
   alertVariants,
@@ -343,6 +348,7 @@ export {
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
+  type CatalogPickerSheetFilterContext,
   type CatalogPickerSheetProps,
   type CatalogPickerTab,
 } from './components/ui/catalog-picker-sheet.client'

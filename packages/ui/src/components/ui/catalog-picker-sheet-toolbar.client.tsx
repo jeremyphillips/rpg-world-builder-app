@@ -6,7 +6,10 @@ import { Search } from 'lucide-react'
 import { Input } from './input.client'
 import { Tabs, TabsList, TabsTrigger } from './tabs.client'
 import { Text } from './text'
-import type { CatalogPickerTab } from './catalog-picker-sheet.types'
+import type {
+  CatalogPickerSheetFilterContext,
+  CatalogPickerTab,
+} from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetSearchRowVariants,
   catalogPickerSheetToolbarVariants,
@@ -21,7 +24,7 @@ type CatalogPickerSheetToolbarProps = {
   activeTabId: string
   onActiveTabIdChange: (tabId: string) => void
   tabCounts: Record<string, number>
-  filters?: ReactNode
+  filters?: ReactNode | ((context: CatalogPickerSheetFilterContext) => ReactNode)
 }
 
 export function CatalogPickerSheetToolbar({
@@ -35,22 +38,16 @@ export function CatalogPickerSheetToolbar({
   tabCounts,
   filters,
 }: CatalogPickerSheetToolbarProps) {
+  const filterContext: CatalogPickerSheetFilterContext = {
+    searchQuery,
+    setSearchQuery: onSearchQueryChange,
+    clearSearchQuery: () => onSearchQueryChange(''),
+  }
+
+  const renderedFilters = typeof filters === 'function' ? filters(filterContext) : filters
+
   return (
     <div className={catalogPickerSheetToolbarVariants()}>
-      <div className={catalogPickerSheetSearchRowVariants()}>
-        <Search
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden
-        />
-        <Input
-          value={searchQuery}
-          onChange={(event) => onSearchQueryChange(event.target.value)}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
-          className="pl-9"
-        />
-      </div>
-
       {tabs && tabs.length > 0 ? (
         <Tabs value={activeTabId} onValueChange={onActiveTabIdChange}>
           <TabsList aria-label={`${title} views`}>
@@ -69,7 +66,21 @@ export function CatalogPickerSheetToolbar({
         </Tabs>
       ) : null}
 
-      {filters ? <div>{filters}</div> : null}
+      <div className={catalogPickerSheetSearchRowVariants()}>
+        <Search
+          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
+        <Input
+          value={searchQuery}
+          onChange={(event) => onSearchQueryChange(event.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label={searchPlaceholder}
+          className="pl-9"
+        />
+      </div>
+
+      {renderedFilters ? <div>{renderedFilters}</div> : null}
     </div>
   )
 }

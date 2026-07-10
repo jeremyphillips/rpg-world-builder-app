@@ -5,9 +5,20 @@ export const equipmentPickerBudgetLabelClasses = 'text-muted-foreground'
 
 export const equipmentPickerBudgetValueClasses = 'font-body-emphasis tabular-nums'
 
-export const equipmentPickerCategoryFilterClasses = 'flex items-center gap-2'
+export const equipmentPickerCategoryFilterClasses =
+  'flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2'
 
 export const equipmentPickerCategoryLabelClasses = 'text-sm text-muted-foreground'
+
+export const equipmentPickerFiltersRowClasses =
+  'flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'
+
+export const equipmentPickerFiltersMainClasses =
+  'flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4'
+
+export const equipmentPickerAffordableFilterClasses = 'flex items-center gap-2'
+
+export const equipmentPickerAffordableLabelClasses = 'text-sm'
 
 export const equipmentPickerWarningBadgeClasses =
   'shrink-0 border-accent bg-accent/20 text-foreground'

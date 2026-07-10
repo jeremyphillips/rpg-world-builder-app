@@ -98,6 +98,102 @@ export const equipmentPickerBudgetFixture: EquipmentBudgetSummary = {
   remaining: { cp: 0, sp: 0, gp: 40, pp: 0 },
 }
 
+export const equipmentPickerLowRemainingBudgetFixture: EquipmentBudgetSummary = {
+  starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
+  spent: { cp: 0, sp: 0, gp: 95, pp: 0 },
+  remaining: { cp: 0, sp: 0, gp: 5, pp: 0 },
+}
+
+export const equipmentPickerCheapGearFixture = {
+  id: 'srd-cc-5.2.1:cheap-gear',
+  slug: 'cheap-gear',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Cheap Gear',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 2, currency: 'gp' },
+  weight: { value: 1, unit: 'lb' },
+  description: '<p>Inexpensive adventuring gear.</p>',
+} as const satisfies Equipment
+
+export const equipmentPickerMidGearFixture = {
+  id: 'srd-cc-5.2.1:mid-gear',
+  slug: 'mid-gear',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Mid Gear',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 25, currency: 'gp' },
+  weight: { value: 2, unit: 'lb' },
+  description: '<p>Mid-priced adventuring gear.</p>',
+} as const satisfies Equipment
+
+export const equipmentPickerExpensiveGearFixture = {
+  id: 'srd-cc-5.2.1:expensive-gear',
+  slug: 'expensive-gear',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Expensive Gear',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 150, currency: 'gp' },
+  weight: { value: 3, unit: 'lb' },
+  description: '<p>Expensive adventuring gear.</p>',
+} as const satisfies Equipment
+
+export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
+  {
+    equipment: equipmentPickerCheapGearFixture,
+    searchText: 'cheap gear adventuring gear',
+    state: {
+      isAvailable: true,
+      isRecommended: false,
+      isProficient: true,
+      isAffordable: true,
+      isWithinRemainingBudget: true,
+      recommendation: { tier: 'neutral', reasons: [] },
+      disabledReasons: [],
+    },
+  },
+  {
+    equipment: equipmentPickerMidGearFixture,
+    searchText: 'mid gear adventuring gear',
+    state: {
+      isAvailable: true,
+      isRecommended: false,
+      isProficient: true,
+      isAffordable: true,
+      isWithinRemainingBudget: false,
+      recommendation: { tier: 'neutral', reasons: [] },
+      disabledReasons: [],
+    },
+  },
+  {
+    equipment: equipmentPickerExpensiveGearFixture,
+    searchText: 'expensive gear adventuring gear',
+    state: {
+      isAvailable: true,
+      isRecommended: false,
+      isProficient: true,
+      isAffordable: false,
+      isWithinRemainingBudget: false,
+      recommendation: { tier: 'neutral', reasons: [] },
+      disabledReasons: [],
+    },
+  },
+]
+
 export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
   {
     equipment: equipmentPickerLongswordFixture,
