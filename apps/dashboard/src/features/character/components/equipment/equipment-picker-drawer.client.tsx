@@ -299,7 +299,7 @@ export function EquipmentPickerDrawer({
   budget,
   defaultTab = EQUIPMENT_PICKER_TAB_RECOMMENDED,
   allowedKinds,
-  filterOutUnaffordable = true,
+  filterOutUnaffordable = false,
   filterOutNonProficient = false,
   showCharacterPreview = false,
   characterPreviewContext,
@@ -318,9 +318,6 @@ export function EquipmentPickerDrawer({
   )
   const [selectedKind, setSelectedKind] = React.useState<EquipmentPickerKindFilter>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
-  )
-  const [showAffordableOnly, setShowAffordableOnly] = React.useState<boolean>(
-    EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
   )
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
@@ -344,7 +341,7 @@ export function EquipmentPickerDrawer({
 
   const structuredFilterCount = countEquipmentPickerStructuredFilters({
     selectedKind,
-    showAffordableOnly,
+    showAffordableOnly: false,
   })
 
   const filteredItems = React.useMemo(
@@ -353,15 +350,9 @@ export function EquipmentPickerDrawer({
         filterOutUnaffordable,
         filterOutNonProficient,
         selectedKind,
-        showAffordableOnly,
+        showAffordableOnly: false,
       }),
-    [
-      filterOutNonProficient,
-      filterOutUnaffordable,
-      showAffordableOnly,
-      supportedItems,
-      selectedKind,
-    ],
+    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKind],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -380,7 +371,6 @@ export function EquipmentPickerDrawer({
 
   const handleClearStructuredFilters = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
-    setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
   }, [])
 
   const handleQuickAdd = React.useCallback(
@@ -429,7 +419,6 @@ export function EquipmentPickerDrawer({
       tabToolbarActions={(toolbarContext) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
-          setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
           toolbarContext.clearSearchQuery()
           toolbarContext.resetActiveTab()
@@ -440,7 +429,7 @@ export function EquipmentPickerDrawer({
             toolbarResetMode={toolbarResetMode}
             defaultTabId={defaultTab}
             selectedKind={selectedKind}
-            showAffordableOnly={showAffordableOnly}
+            showAffordableOnly={false}
             sortMode={sortMode}
             toolbarContext={toolbarContext}
             onClearStructuredFilters={handleClearStructuredFilters}
@@ -453,16 +442,16 @@ export function EquipmentPickerDrawer({
           kinds={kindOptions}
           selectedKind={selectedKind}
           onSelectedKindChange={handleSelectedKindChange}
-          showAffordableOnly={showAffordableOnly}
-          onShowAffordableOnlyChange={setShowAffordableOnly}
-          showAffordableFilter={Boolean(budget)}
+          showAffordableOnly={false}
+          onShowAffordableOnlyChange={() => undefined}
+          showAffordableFilter={false}
           affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
             activeTabId: toolbarContext.activeTabId,
             searchQuery: toolbarContext.searchQuery,
             filterOutUnaffordable,
             filterOutNonProficient,
             selectedKind,
-            showAffordableOnly,
+            showAffordableOnly: false,
           })}
           sortMode={sortMode}
           onSortModeChange={setSortMode}

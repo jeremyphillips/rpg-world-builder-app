@@ -6,6 +6,27 @@ import {
   type Equipment,
 } from '@rpg/contracts'
 
+export const equipmentStepBreastplateFixture = {
+  id: 'srd-cc-5.2.1:breastplate',
+  slug: 'breastplate',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Breastplate',
+  description: '',
+  cost: { amount: 400, currency: 'gp' },
+  weight: { value: 20, unit: 'lb' },
+  kind: 'armor',
+  category: 'medium',
+  material: 'metal',
+  baseAc: 14,
+  addDexModifier: true,
+  maxDexBonus: 2,
+  stealthDisadvantage: false,
+} as const satisfies Equipment
+
 export const equipmentStepLeatherArmorFixture = {
   id: 'srd-cc-5.2.1:leather-armor',
   slug: 'leather-armor',
@@ -275,6 +296,7 @@ export const equipmentStepCatalogFixture = {
   classes: [equipmentStepBardClassFixture, equipmentStepMonkClassFixture],
   spells: [],
   equipment: [
+    equipmentStepBreastplateFixture,
     equipmentStepLeatherArmorFixture,
     equipmentStepLuteFixture,
     equipmentStepDrumFixture,

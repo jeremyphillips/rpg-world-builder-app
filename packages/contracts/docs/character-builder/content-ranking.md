@@ -100,14 +100,14 @@ purchase when a row is shown with `filterOutUnaffordable={false}`.
 
 The equipment picker exposes two independent affordability controls:
 
-| Control                                            | Source                          | Default | Semantics                                                                                                         |
-| -------------------------------------------------- | ------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
-| `filterOutUnaffordable` prop                       | `state.isAffordable`            | `true`  | Hides rows above the package starting budget.                                                                     |
-| **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | User opt-in; hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
+| Control                                            | Source                          | Default | Semantics                                                                                                                                                                       |
+| -------------------------------------------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filterOutUnaffordable` prop                       | `state.isAffordable`            | `false` | When `true`, hides rows above the package starting budget; default shows them disabled instead.                                                                                 |
+| **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
-Browse context (search, category, affordable toggle, sort, active tab) is **preserved**
-across drawer close/reopen within a builder session. **Reset view** (default) resets
-the full view; **Clear filters** resets structured inclusion and search only.
+Browse context (search, category, sort, active tab) is **preserved** across drawer
+close/reopen within a builder session. **Reset view** (default) resets the full view;
+**Clear filters** resets structured inclusion and search only.
 Context-key reset (character, equipment method, budget change) is a documented follow-up.
 
 Row disabled notes and the budget header use the shared `EmphasisDetailLine`

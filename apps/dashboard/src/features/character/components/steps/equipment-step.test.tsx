@@ -17,6 +17,7 @@ import { characterBuilderStepReadinessMessages, formatFieldMessage } from '@rpg/
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import {
   equipmentStepBardClassFixture,
+  equipmentStepBreastplateFixture,
   equipmentStepCatalogFixture,
   equipmentStepDrumFixture,
   equipmentStepLeatherArmorFixture,
@@ -224,6 +225,36 @@ describe('EquipmentStep', () => {
       within(luteRow).getByText(EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL),
     ).toBeInTheDocument()
     expect(within(luteRow).queryByText('Not proficient')).not.toBeInTheDocument()
+  })
+
+  it('shows over-budget catalog armor on the gold path with purchase disabled', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+    await user.click(screen.getByRole('tab', { name: /All/i }))
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'breastplate')
+
+    const breastplateRow = screen
+      .getAllByRole('listitem')
+      .find((row) => within(row).queryByText(equipmentStepBreastplateFixture.name))!
+
+    expect(within(breastplateRow).getByText('400 GP needed')).toBeInTheDocument()
+    expect(within(breastplateRow).getByRole('button', { name: 'Add' })).toBeDisabled()
   })
 
   it('adds a gold purchase from the picker drawer', async () => {
