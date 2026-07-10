@@ -3,14 +3,188 @@ import { describe, expect, it } from 'vitest'
 import { getAbilityLabel } from '../../vocab/ability'
 import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
 import {
+  canAutoFillEmptyAbilities,
+  clearAllAbilityScores,
+  deriveAbilityAssignmentPriority,
   deriveAbilityScoreRecommendations,
+  fillEmptyAbilitiesWithClassRecommendations,
   formatAbilityRecommendationBenefit,
   formatAbilityRecommendationSuggestedInline,
   isSuggestedAssignmentSatisfied,
   mergeSuggestedAssignmentIntoScores,
+  resolveAbilityScorePoolActionState,
   resolveSuggestedAssignmentActionState,
+  shuffleAbilityScores,
   willSuggestedAssignmentReplaceExisting,
 } from './ability-score-recommendations'
+
+describe('deriveAbilityAssignmentPriority', () => {
+  it('places primaryAbilities first and appends remaining ABILITY_IDS', () => {
+    expect(deriveAbilityAssignmentPriority(['str', 'dex'])).toEqual([
+      'str',
+      'dex',
+      'con',
+      'int',
+      'wis',
+      'cha',
+    ])
+  })
+
+  it('dedupes primaryAbilities entries', () => {
+    expect(deriveAbilityAssignmentPriority(['str', 'str', 'dex'])).toEqual([
+      'str',
+      'dex',
+      'con',
+      'int',
+      'wis',
+      'cha',
+    ])
+  })
+})
+
+describe('canAutoFillEmptyAbilities', () => {
+  const source = [15, 14, 13, 12, 10, 8] as const
+
+  it('returns true when pool scores remain', () => {
+    expect(canAutoFillEmptyAbilities({ str: 15 }, source)).toBe(true)
+  })
+
+  it('returns false when all scores are assigned', () => {
+    expect(
+      canAutoFillEmptyAbilities({ str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 }, source),
+    ).toBe(false)
+  })
+})
+
+describe('fillEmptyAbilitiesWithClassRecommendations', () => {
+  const source = [15, 14, 13, 12, 10, 8] as const
+  const fighterPrimary = ['str', 'dex'] as const
+  const identityShuffle = (scores: readonly number[]) => [...scores]
+
+  it('fills recommended abilities deterministically and shuffles non-recommended scores', () => {
+    const result = fillEmptyAbilitiesWithClassRecommendations(
+      {},
+      source,
+      fighterPrimary,
+      identityShuffle,
+    )
+
+    expect(result).toEqual({
+      str: 15,
+      dex: 14,
+      con: 13,
+      int: 12,
+      wis: 10,
+      cha: 8,
+    })
+  })
+
+  it('produces different non-recommended assignments when shuffle order changes', () => {
+    const identityShuffle = (scores: readonly number[]) => [...scores]
+    const reverseShuffle = (scores: readonly number[]) => [...scores].reverse()
+
+    const first = fillEmptyAbilitiesWithClassRecommendations(
+      {},
+      source,
+      fighterPrimary,
+      identityShuffle,
+    )
+    const second = fillEmptyAbilitiesWithClassRecommendations(
+      {},
+      source,
+      fighterPrimary,
+      reverseShuffle,
+    )
+
+    expect(first.str).toBe(15)
+    expect(first.dex).toBe(14)
+    expect(second.str).toBe(15)
+    expect(second.dex).toBe(14)
+    expect(first).not.toEqual(second)
+  })
+
+  it('preserves existing assignments and fills recommended abilities next', () => {
+    expect(
+      fillEmptyAbilitiesWithClassRecommendations(
+        { con: 15 },
+        source,
+        fighterPrimary,
+        identityShuffle,
+      ),
+    ).toEqual({
+      con: 15,
+      str: 14,
+      dex: 13,
+      int: 12,
+      wis: 10,
+      cha: 8,
+    })
+  })
+
+  it('does not overwrite assigned abilities', () => {
+    expect(
+      fillEmptyAbilitiesWithClassRecommendations(
+        { str: 8, con: 15 },
+        source,
+        fighterPrimary,
+        identityShuffle,
+      ),
+    ).toEqual({
+      str: 8,
+      con: 15,
+      dex: 14,
+      int: 13,
+      wis: 12,
+      cha: 10,
+    })
+  })
+
+  it('returns current scores unchanged when the pool is empty', () => {
+    const current = { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 }
+    expect(
+      fillEmptyAbilitiesWithClassRecommendations(current, source, fighterPrimary, identityShuffle),
+    ).toEqual(current)
+  })
+})
+
+describe('shuffleAbilityScores', () => {
+  it('returns a permutation of the input scores', () => {
+    const source = [15, 14, 13, 12, 10, 8]
+    const shuffled = shuffleAbilityScores(source, () => 0)
+
+    expect(shuffled.toSorted((left, right) => left - right)).toEqual(
+      source.toSorted((left, right) => left - right),
+    )
+    expect(shuffled).not.toEqual(source)
+  })
+})
+
+describe('resolveAbilityScorePoolActionState', () => {
+  it('returns hidden when no class is selected', () => {
+    expect(resolveAbilityScorePoolActionState({}, false)).toBe('hidden')
+    expect(resolveAbilityScorePoolActionState({ str: 15 }, false)).toBe('hidden')
+  })
+
+  it('returns auto-fill when a class is selected and fewer than six scores are assigned', () => {
+    expect(resolveAbilityScorePoolActionState({}, true)).toBe('auto-fill')
+    expect(resolveAbilityScorePoolActionState({ str: 15 }, true)).toBe('auto-fill')
+  })
+
+  it('returns clear when all six scores are assigned', () => {
+    expect(
+      resolveAbilityScorePoolActionState(
+        { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
+        true,
+      ),
+    ).toBe('clear')
+  })
+})
+
+describe('clearAllAbilityScores', () => {
+  it('returns an empty scores object', () => {
+    expect(clearAllAbilityScores()).toEqual({})
+  })
+})
 
 describe('deriveAbilityScoreRecommendations', () => {
   it('returns null when no class is selected', () => {

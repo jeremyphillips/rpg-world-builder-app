@@ -1,6 +1,10 @@
-import { getAbilityLabel, type Ability } from '../../vocab/ability'
+import { ABILITY_IDS, getAbilityLabel, type Ability } from '../../vocab/ability'
 
-import { findAbilityAssignedToScore } from './ability-generation'
+import {
+  findAbilityAssignedToScore,
+  getAssignedScoreCount,
+  getAvailableStandardArrayScores,
+} from './ability-generation'
 import { pluralizeTermLabel } from '../../vocab/types'
 
 import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
@@ -32,6 +36,15 @@ export type AbilityScoreRecommendation = AbilityRecommendation & {
   suggestedAssignment?: Partial<Record<Ability, number>>
 }
 
+/** Auto-fill strategy for empty ability slots (MVP: class-recommendations only). */
+export type AbilityAutoFillStrategy = 'class-recommendations'
+
+export type AbilityScorePoolActionState = 'hidden' | 'auto-fill' | 'clear'
+
+export type AbilityScoreRandomizer = () => number
+
+export type ScoreShuffleFn = (scores: readonly number[]) => number[]
+
 function deriveAbilityRecommendation(
   classes: readonly AbilityScoreRecommendationClassInput[],
 ): AbilityRecommendation {
@@ -47,25 +60,155 @@ function deriveAbilityRecommendation(
   return { primary, secondary }
 }
 
+/** Ordered ability list: primaryAbilities first (deduped), then remaining ABILITY_IDS. */
+export function deriveAbilityAssignmentPriority(primaryAbilities: readonly Ability[]): Ability[] {
+  const seen = new Set<Ability>()
+  const order: Ability[] = []
+
+  for (const ability of primaryAbilities) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+
+  for (const ability of ABILITY_IDS) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+
+  return order
+}
+
+function zipScoresToAbilitiesInOrder(
+  abilities: readonly Ability[],
+  scores: readonly number[],
+): Partial<Record<Ability, number>> {
+  const assignment: Partial<Record<Ability, number>> = {}
+  const pairCount = Math.min(scores.length, abilities.length)
+
+  for (let index = 0; index < pairCount; index += 1) {
+    const ability = abilities[index]
+    const score = scores[index]
+    if (ability !== undefined && score !== undefined) {
+      assignment[ability] = score
+    }
+  }
+
+  return assignment
+}
+
+function pairScoresToAbilitiesInOrder(
+  abilities: readonly Ability[],
+  scores: readonly number[],
+): Partial<Record<Ability, number>> {
+  const sortedScores = [...scores].sort((left, right) => right - left)
+  return zipScoresToAbilitiesInOrder(abilities, sortedScores)
+}
+
+function removeScoresFromPool(
+  pool: readonly number[],
+  scoresToRemove: readonly number[],
+): number[] {
+  const remaining = [...pool]
+
+  for (const score of scoresToRemove) {
+    const index = remaining.indexOf(score)
+    if (index !== -1) {
+      remaining.splice(index, 1)
+    }
+  }
+
+  return remaining
+}
+
+/** Fisher–Yates shuffle for score tokens; injectable randomizer for tests. */
+export function shuffleAbilityScores(
+  scores: readonly number[],
+  random: AbilityScoreRandomizer = Math.random,
+): number[] {
+  const result = [...scores]
+
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1))
+    const current = result[index]
+    const swap = result[swapIndex]
+    if (current !== undefined && swap !== undefined) {
+      result[index] = swap
+      result[swapIndex] = current
+    }
+  }
+
+  return result
+}
+
 function deriveSuggestedAssignment(
   primaryAbilities: readonly Ability[],
   scoreSource: readonly number[],
 ): Partial<Record<Ability, number>> | undefined {
   if (primaryAbilities.length === 0 || scoreSource.length === 0) return undefined
 
-  const sortedScores = [...scoreSource].sort((left, right) => right - left)
-  const assignment: Partial<Record<Ability, number>> = {}
-  const pairCount = Math.min(sortedScores.length, primaryAbilities.length)
+  const assignment = pairScoresToAbilitiesInOrder(primaryAbilities, scoreSource)
+  return Object.keys(assignment).length > 0 ? assignment : undefined
+}
 
-  for (let index = 0; index < pairCount; index += 1) {
-    const ability = primaryAbilities[index]
-    const score = sortedScores[index]
-    if (ability !== undefined && score !== undefined) {
-      assignment[ability] = score
-    }
+/** True when unassigned pool scores remain to fill empty abilities. */
+export function canAutoFillEmptyAbilities(
+  currentScores: Partial<Record<Ability, number>>,
+  scoreSource: readonly number[],
+): boolean {
+  return getAvailableStandardArrayScores(currentScores, scoreSource).length > 0
+}
+
+/** Resolves the score-pool header action from assignment progress and class selection. */
+export function resolveAbilityScorePoolActionState(
+  currentScores: Partial<Record<Ability, number>>,
+  hasClass: boolean,
+): AbilityScorePoolActionState {
+  if (!hasClass) return 'hidden'
+  if (getAssignedScoreCount(currentScores) === ABILITY_IDS.length) return 'clear'
+  return 'auto-fill'
+}
+
+/** Clears every ability assignment so all scores return to the pool. */
+export function clearAllAbilityScores(): Partial<Record<Ability, number>> {
+  return {}
+}
+
+/**
+ * Fills only empty ability slots from the available pool. Recommended abilities
+ * (primaryAbilities) receive the highest remaining scores in order; other empty
+ * abilities receive the rest in shuffled order so repeated fills vary.
+ */
+export function fillEmptyAbilitiesWithClassRecommendations(
+  currentScores: Partial<Record<Ability, number>>,
+  scoreSource: readonly number[],
+  primaryAbilities: readonly Ability[],
+  shuffleScores: ScoreShuffleFn = shuffleAbilityScores,
+): Partial<Record<Ability, number>> {
+  const available = getAvailableStandardArrayScores(currentScores, scoreSource)
+  if (available.length === 0) return currentScores
+
+  const recommendedAbilities = new Set(primaryAbilities)
+  const priority = deriveAbilityAssignmentPriority(primaryAbilities)
+  const emptyRecommended = priority.filter(
+    (ability) => recommendedAbilities.has(ability) && typeof currentScores[ability] !== 'number',
+  )
+  const emptyNonRecommended = priority.filter(
+    (ability) => !recommendedAbilities.has(ability) && typeof currentScores[ability] !== 'number',
+  )
+
+  if (emptyRecommended.length === 0 && emptyNonRecommended.length === 0) {
+    return currentScores
   }
 
-  return Object.keys(assignment).length > 0 ? assignment : undefined
+  const recommendedPatch = pairScoresToAbilitiesInOrder(emptyRecommended, available)
+  const recommendedScores = Object.values(recommendedPatch)
+  const remainingScores = removeScoresFromPool(available, recommendedScores)
+  const shuffledScores = shuffleScores(remainingScores)
+  const nonRecommendedPatch = zipScoresToAbilitiesInOrder(emptyNonRecommended, shuffledScores)
+
+  return { ...currentScores, ...recommendedPatch, ...nonRecommendedPatch }
 }
 
 /** Advisory recommendation from selected class(es) and optional fixed score source. */

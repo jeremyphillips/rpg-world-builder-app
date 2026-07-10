@@ -25,6 +25,17 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const fighterClassInput = {
+  className: 'Fighter',
+  primaryAbilities: ['str', 'dex'] as const,
+}
+
+const fighterRecommendation = {
+  primary: ['str'] as const,
+  secondary: ['dex'] as const,
+  suggestedAssignment: { str: 15, dex: 14 },
+}
+
 export const Empty: Story = {
   args: {
     scorePool: [...STANDARD_ARRAY],
@@ -36,13 +47,15 @@ export const PartialAssignment: Story = {
   args: {
     scorePool: [...STANDARD_ARRAY],
     showInvalidStates: false,
+    classInput: fighterClassInput,
+    recommendation: fighterRecommendation,
   },
   decorators: [
     (Story) => (
       <Form
         schema={abilitiesFormSchema}
         fields={[{ kind: 'slot', name: 'fixedScoresAssignment', render: () => <Story /> }]}
-        defaultValues={{ str: 15, con: 13 }}
+        defaultValues={{ con: 15 }}
         onSubmit={() => undefined}
       />
     ),
@@ -53,6 +66,8 @@ export const CompleteAssignment: Story = {
   args: {
     scorePool: [...STANDARD_ARRAY],
     showInvalidStates: false,
+    classInput: fighterClassInput,
+    recommendation: fighterRecommendation,
   },
   decorators: [
     (Story) => (

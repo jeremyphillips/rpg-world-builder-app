@@ -1,10 +1,6 @@
 export const abilityRecommendationBadgeSlotClasses =
   'flex min-h-5 items-center justify-center empty:min-h-5'
 
-export const abilityRecommendationBadgePrimaryClasses = 'text-xs font-medium text-primary'
-
-export const abilityRecommendationBadgeSecondaryClasses = 'text-xs text-primary/60'
-
 /** Column wrapper — badge sits above the ability card surface, not inside it. */
 export const abilityScoreCardColumnClasses = 'flex min-w-0 flex-col gap-1'
 

@@ -47,3 +47,19 @@ export const Sizes: Story = {
     </div>
   ),
 }
+
+export const Tones: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <Eyebrow size="xs" tone="muted">
+        Muted eyebrow
+      </Eyebrow>
+      <Eyebrow size="xs" tone="foreground">
+        Foreground eyebrow
+      </Eyebrow>
+      <Eyebrow size="xs" tone="primary">
+        Primary eyebrow
+      </Eyebrow>
+    </div>
+  ),
+}

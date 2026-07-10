@@ -74,6 +74,18 @@ function getScorePoolSection() {
   return screen.getByRole('region', { name: abilitiesFormCopy.availableScores })
 }
 
+function getAutoFillButton() {
+  return screen.getByRole('button', {
+    name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.autoFillRemaining()),
+  })
+}
+
+function getClearScoresButton() {
+  return screen.getByRole('button', {
+    name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.clearScores()),
+  })
+}
+
 function getScoreActionButton(
   abilityLabel: string,
   actionLabel: string = abilitiesFormCopy.chooseScore,
@@ -288,5 +300,92 @@ describe('FixedScoresAssignment', () => {
     expect(
       within(getScorePoolSection()).queryByRole('button', { name: 'Score 15' }),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows auto-fill remaining when a class is selected and scores remain', () => {
+    renderAssignment({}, fighterRecommendation)
+
+    expect(getAutoFillButton()).toBeInTheDocument()
+    expect(getAutoFillButton()).toBeVisible()
+  })
+
+  it('hides auto-fill remaining when no class is selected', () => {
+    renderAssignment()
+
+    expect(
+      screen.queryByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.autoFillRemaining()),
+      }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.clearScores()),
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows clear scores when all scores are assigned and a class is selected', () => {
+    renderAssignment({ str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 }, fighterRecommendation)
+
+    expect(getClearScoresButton()).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: formatFieldMessage(characterBuilderAbilityRecommendationMessages.autoFillRemaining()),
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('clears all assignments when clear scores is clicked', async () => {
+    renderAssignment({ str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 }, fighterRecommendation)
+
+    await userEvent.click(getClearScoresButton())
+
+    await waitFor(() => {
+      expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
+    })
+
+    const pool = within(getScorePoolSection())
+    for (const score of STANDARD_ARRAY) {
+      expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
+    }
+  })
+
+  it('auto-fills empty abilities without changing existing assignments', async () => {
+    renderAssignment({ con: 15 }, fighterRecommendation)
+
+    await userEvent.click(getAutoFillButton())
+
+    await waitFor(() => {
+      expect(screen.getByText('All scores assigned')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('button', { name: 'Constitution score 15' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Strength score 14' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dexterity score 13' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Intelligence score \d+/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Wisdom score \d+/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Charisma score \d+/ })).toBeInTheDocument()
+  })
+
+  it('can clear and auto-fill again after all scores are assigned', async () => {
+    renderAssignment({}, fighterRecommendation)
+
+    await userEvent.click(getAutoFillButton())
+    await waitFor(() => {
+      expect(getClearScoresButton()).toBeInTheDocument()
+    })
+
+    await userEvent.click(getClearScoresButton())
+    await waitFor(() => {
+      expect(getAutoFillButton()).toBeInTheDocument()
+      expect(screen.getByText('6 scores remaining')).toBeInTheDocument()
+    })
+
+    await userEvent.click(getAutoFillButton())
+    await waitFor(() => {
+      expect(getClearScoresButton()).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Strength score 15' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Dexterity score 14' })).toBeInTheDocument()
+    })
   })
 })

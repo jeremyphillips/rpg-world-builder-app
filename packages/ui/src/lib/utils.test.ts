@@ -59,6 +59,10 @@ describe('cn', () => {
     )
   })
 
+  it('preserves layout and color classes when merging eyebrow composites', () => {
+    expect(cn('eyebrow-style-xs', 'text-foreground')).toBe('eyebrow-style-xs text-foreground')
+  })
+
   it('preserves layout and color classes when merging heading composites', () => {
     expect(cn('heading-style-section', 'mb-4 text-foreground')).toBe(
       'heading-style-section mb-4 text-foreground',
