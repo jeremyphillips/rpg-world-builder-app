@@ -3625,8 +3625,8 @@
         "items": []
       },
       "weapons": {
-        "categories": [],
-        "items": ["dagger", "dart", "sling", "quarterstaff", "light-crossbow"]
+        "categories": ["simple"],
+        "items": []
       },
       "skills": {
         "categories": [],

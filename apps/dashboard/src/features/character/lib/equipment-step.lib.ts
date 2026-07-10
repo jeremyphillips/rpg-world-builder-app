@@ -1,5 +1,6 @@
 import {
   assembleCharacterProficiencies,
+  characterPrefersMartialWeaponBrowseOrder,
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
@@ -25,6 +26,7 @@ import {
   type ChoiceSet,
   type Equipment,
   type EquipmentBudgetSummary,
+  type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
@@ -348,12 +350,17 @@ export function resolveEquipmentStepBudget(
   return deriveEquipmentBudgetSummary(draft, catalogIndex)
 }
 
+export type EquipmentStepPickerItemsResult = {
+  items: EquipmentPickerItem[]
+  browseSortContext: EquipmentPickerBrowseSortContext
+}
+
 export function resolveEquipmentStepPickerItems(args: {
   draft: CharacterBuilderDraft
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
   choiceSets: readonly ChoiceSet[]
-}): EquipmentPickerItem[] {
+}): EquipmentStepPickerItemsResult {
   const { draft, characterClass, catalogIndex, choiceSets } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
@@ -369,12 +376,17 @@ export function resolveEquipmentStepPickerItems(args: {
     classLevel: draft.class.level,
   })
 
-  return resolveEquipmentPickerItems({
-    equipment: [...catalogIndex.equipment.values()],
-    proficiencies,
-    recommendations,
-    budget,
-  })
+  return {
+    items: resolveEquipmentPickerItems({
+      equipment: [...catalogIndex.equipment.values()],
+      proficiencies,
+      recommendations,
+      budget,
+    }),
+    browseSortContext: {
+      preferMartialWeaponBrowseOrder: characterPrefersMartialWeaponBrowseOrder(proficiencies),
+    },
+  }
 }
 
 function inventoryGroupForEquipment(

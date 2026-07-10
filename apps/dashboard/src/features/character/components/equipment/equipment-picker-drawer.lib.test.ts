@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerRopeFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
@@ -21,6 +22,7 @@ import {
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
+  type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 
 describe('equipment-picker-drawer.lib', () => {
@@ -44,6 +46,30 @@ describe('equipment-picker-drawer.lib', () => {
     ])
 
     expect(sorted.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope', 'Chain Mail'])
+  })
+
+  it('sorts compatible proficient items above neutral in All without Recommended-tab membership', () => {
+    const neutralRope = equipmentPickerItemsFixture[2]!
+    const compatibleRope: EquipmentPickerItem = {
+      ...neutralRope,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'srd-cc-5.2.1:silk-rope',
+        slug: 'silk-rope',
+        name: 'Silk Rope',
+      },
+      searchText: 'silk rope adventuring gear',
+      state: {
+        ...neutralRope.state,
+        isRecommended: false,
+        recommendation: { tier: 'compatible', reasons: ['proficient'] },
+      },
+    }
+
+    const sorted = sortEquipmentPickerItems([neutralRope, compatibleRope])
+    expect(sorted.map((item) => item.equipment.name)).toEqual(['Silk Rope', 'Rope'])
+    expect(getEquipmentPickerItemTab(compatibleRope)).toBe(EQUIPMENT_PICKER_TAB_ALL)
+    expect(compatibleRope.state.isRecommended).toBe(false)
   })
 
   it('filters unaffordable and non-proficient rows', () => {

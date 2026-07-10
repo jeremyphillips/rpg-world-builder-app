@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   compareEquipmentRecommendationTiers,
+  EQUIPMENT_RECOMMENDATION_REASON_RANK,
   EQUIPMENT_RECOMMENDATION_TIER_RANK,
   EQUIPMENT_RECOMMENDATION_TIERS,
   equipmentRecommendationRuleSchema,
+  getBestEquipmentRecommendationReasonRank,
   isRecommendedEquipmentTier,
 } from './equipment-recommendation'
 
@@ -28,6 +30,33 @@ describe('equipment recommendation tiers', () => {
     expect(compareEquipmentRecommendationTiers('essential', 'strong')).toBeLessThan(0)
     expect(compareEquipmentRecommendationTiers('notRecommended', 'neutral')).toBeGreaterThan(0)
     expect(compareEquipmentRecommendationTiers('compatible', 'compatible')).toBe(0)
+  })
+})
+
+describe('equipment recommendation reason ranks', () => {
+  it('assigns a unique rank to every reason', () => {
+    const ranks = Object.values(EQUIPMENT_RECOMMENDATION_REASON_RANK)
+    expect(new Set(ranks).size).toBe(ranks.length)
+  })
+
+  it('ranks needs before nice-to-have reasons', () => {
+    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.classRequired).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_REASON_RANK.startingEquipment,
+    )
+    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_REASON_RANK.startingEquipment,
+    )
+    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.spellcastingFocus).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_REASON_RANK.classSuggested,
+    )
+  })
+
+  it('returns the best reason rank and treats empty reasons as neutral', () => {
+    expect(getBestEquipmentRecommendationReasonRank(['classRequired'])).toBe(0)
+    expect(getBestEquipmentRecommendationReasonRank(['proficient', 'classToolNeed'])).toBe(
+      EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed,
+    )
+    expect(getBestEquipmentRecommendationReasonRank([])).toBe(Number.POSITIVE_INFINITY)
   })
 })
 

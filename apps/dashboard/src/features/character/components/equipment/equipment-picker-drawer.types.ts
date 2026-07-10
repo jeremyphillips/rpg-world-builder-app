@@ -1,5 +1,6 @@
 import type {
   EquipmentBudgetSummary,
+  EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
@@ -8,6 +9,7 @@ import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-
 
 export type {
   EquipmentBudgetSummary,
+  EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
   EquipmentPickerItemState,
   EquipmentPickerSupportedKind,
@@ -44,6 +46,7 @@ export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   items: readonly EquipmentPickerItem[]
+  browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
   defaultTab?: typeof EQUIPMENT_PICKER_TAB_RECOMMENDED | typeof EQUIPMENT_PICKER_TAB_ALL
   allowedKinds?: readonly EquipmentPickerSupportedKind[]

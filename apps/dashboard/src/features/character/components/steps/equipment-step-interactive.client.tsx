@@ -42,6 +42,7 @@ export function EquipmentStepInteractive({
     showShopping,
     budget,
     pickerItems,
+    pickerBrowseSortContext,
     characterPreviewContext,
     activePickerFlow,
     ownedPurchaseQuantities,
@@ -103,6 +104,7 @@ export function EquipmentStepInteractive({
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         items={pickerItems}
+        browseSortContext={pickerBrowseSortContext}
         budget={budget}
         defaultTab="recommended"
         showCharacterPreview

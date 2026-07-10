@@ -4,6 +4,7 @@ import {
   formatMoney,
   formatWealthAsGold,
   isEquipmentPickerSupportedKind,
+  type EquipmentPickerBrowseSortContext,
   type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
@@ -77,8 +78,11 @@ export function filterEquipmentPickerItems(
 /** Stable within-tab ordering: essential → strong → compatible → neutral → not proficient. */
 export function sortEquipmentPickerItems(
   items: readonly EquipmentPickerItem[],
+  browseSortContext?: EquipmentPickerBrowseSortContext,
 ): EquipmentPickerItem[] {
-  return [...items].sort(compareEquipmentPickerItemsByRecommendation)
+  return [...items].sort((left, right) =>
+    compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
+  )
 }
 
 export function isEquipmentPickerItemDisabled(item: EquipmentPickerItem): boolean {

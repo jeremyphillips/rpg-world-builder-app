@@ -119,6 +119,7 @@ export function EquipmentPickerDrawer({
   open,
   onOpenChange,
   items,
+  browseSortContext,
   budget,
   defaultTab = EQUIPMENT_PICKER_TAB_RECOMMENDED,
   allowedKinds,
@@ -163,8 +164,15 @@ export function EquipmentPickerDrawer({
           filterOutNonProficient,
           selectedKind,
         }),
+        browseSortContext,
       ),
-    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKind],
+    [
+      browseSortContext,
+      filterOutNonProficient,
+      filterOutUnaffordable,
+      supportedItems,
+      selectedKind,
+    ],
   )
 
   const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {

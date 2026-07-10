@@ -79,6 +79,29 @@ export function compareEquipmentRecommendationTiers(
   return EQUIPMENT_RECOMMENDATION_TIER_RANK[left] - EQUIPMENT_RECOMMENDATION_TIER_RANK[right]
 }
 
+/**
+ * Browse-sort rank per reason — lower ranks list first within the same tier.
+ * Intentionally differs from `EQUIPMENT_RECOMMENDATION_REASONS` array order:
+ * needs (class-required, tools, foci) before nice-to-have (starting options, proficiency).
+ */
+export const EQUIPMENT_RECOMMENDATION_REASON_RANK = {
+  classRequired: 0,
+  classToolNeed: 1,
+  spellcastingFocus: 2,
+  classSuggested: 3,
+  startingEquipment: 4,
+  proficient: 5,
+  notProficient: 6,
+} as const satisfies Record<EquipmentRecommendationReason, number>
+
+/** Best (lowest) reason rank for browse ordering; empty reasons sort after reasoned peers. */
+export function getBestEquipmentRecommendationReasonRank(
+  reasons: readonly EquipmentRecommendationReason[],
+): number {
+  if (reasons.length === 0) return Number.POSITIVE_INFINITY
+  return Math.min(...reasons.map((reason) => EQUIPMENT_RECOMMENDATION_REASON_RANK[reason]))
+}
+
 // ---------------------------------------------------------------------------
 // Authored rules — class characterCreation.equipmentRecommendations.
 // Owner-agnostic shape so subclasses/backgrounds can adopt the same rules later

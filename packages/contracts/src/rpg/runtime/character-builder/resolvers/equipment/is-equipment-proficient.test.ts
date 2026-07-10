@@ -22,6 +22,24 @@ const lute = {
   toolCategory: 'musical_instrument',
 } as Extract<Equipment, { kind: 'tool' }>
 
+const dagger = {
+  id: 'srd-cc-5.2.1:dagger',
+  slug: 'dagger',
+  rulesetId: 'srd-cc-5.2.1',
+  name: 'Dagger',
+  kind: 'weapon',
+  category: 'simple',
+} as Extract<Equipment, { kind: 'weapon' }>
+
+const longsword = {
+  id: 'srd-cc-5.2.1:longsword',
+  slug: 'longsword',
+  rulesetId: 'srd-cc-5.2.1',
+  name: 'Longsword',
+  kind: 'weapon',
+  category: 'martial',
+} as Extract<Equipment, { kind: 'weapon' }>
+
 const emptyProficiencies = {
   skills: [],
   weapons: [],
@@ -54,6 +72,33 @@ describe('isEquipmentProficient', () => {
       isEquipmentProficient(lute, {
         ...emptyProficiencies,
         tools: [{ toolId: 'thieves-tools', rank: 'proficient', sources: [] }],
+      }),
+    ).toBe(false)
+  })
+
+  it('matches weapon proficiency by slug', () => {
+    expect(
+      isEquipmentProficient(dagger, {
+        ...emptyProficiencies,
+        weapons: [{ weaponId: 'dagger', rank: 'proficient', sources: [] }],
+      }),
+    ).toBe(true)
+  })
+
+  it('matches weapon proficiency by category', () => {
+    expect(
+      isEquipmentProficient(dagger, {
+        ...emptyProficiencies,
+        weapons: [{ weaponCategory: 'simple', rank: 'proficient', sources: [] }],
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when weapon proficiency does not cover the row', () => {
+    expect(
+      isEquipmentProficient(longsword, {
+        ...emptyProficiencies,
+        weapons: [{ weaponId: 'dagger', rank: 'proficient', sources: [] }],
       }),
     ).toBe(false)
   })

@@ -18,11 +18,21 @@ const CLASS_WEAPON_PROFICIENCY_SOURCE = (classId: string) => [
 function classFixedWeaponProficiencies(
   characterClass: CharacterClass,
 ): CharacterWeaponProficiencyEntry[] {
-  return characterClass.proficiencies.weapons.categories.map((weaponCategory) => ({
+  const weapons = characterClass.proficiencies.weapons
+
+  const fromCategories = weapons.categories.map((weaponCategory) => ({
     weaponCategory,
     rank: 'proficient' as const,
     sources: CLASS_WEAPON_PROFICIENCY_SOURCE(characterClass.id),
   }))
+
+  const fromItems = weapons.items.map((weaponId) => ({
+    weaponId,
+    rank: 'proficient' as const,
+    sources: CLASS_WEAPON_PROFICIENCY_SOURCE(characterClass.id),
+  }))
+
+  return [...fromCategories, ...fromItems]
 }
 
 /** Resolves a weapon slug from a ChoiceSet option id or catalog equipment row. */

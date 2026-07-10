@@ -142,19 +142,15 @@ describe('classFormDef round-trips', () => {
     expect(input.proficiencies.tools).toEqual(rogue.proficiencies.tools)
   })
 
-  it('sorcerer: specific weapon proficiencies round-trip as slug arrays', () => {
+  it('sorcerer: weaponProficiencyMode is categories when only simple weapons are granted', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
-    expect(formValues.weaponProficiencyMode).toBe('individual')
-    expect(formValues.proficiencies.weapons.items).toEqual([
-      'dagger',
-      'dart',
-      'sling',
-      'quarterstaff',
-      'light-crossbow',
-    ])
+    expect(formValues.weaponProficiencyMode).toBe('categories')
+    expect(formValues.proficiencies.weapons.categories).toEqual(['simple'])
+    expect(formValues.proficiencies.weapons.items).toEqual([])
     const input = classFormDef.toInput(formValues)
-    expect(input.proficiencies.weapons.items).toEqual(sorcerer.proficiencies.weapons.items)
+    expect(input.proficiencies.weapons.categories).toEqual(['simple'])
+    expect(input.proficiencies.weapons.items).toEqual([])
   })
 
   it('fighter: weaponProficiencyMode is categories when only categories are granted', () => {

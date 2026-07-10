@@ -75,7 +75,7 @@ export function useEquipmentStep(args: {
     () => (showShopping ? resolveEquipmentStepBudget(draft, catalogIndex) : undefined),
     [catalogIndex, draft, showShopping],
   )
-  const pickerItems = useMemo(
+  const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
       characterClass
         ? resolveEquipmentStepPickerItems({
@@ -84,7 +84,7 @@ export function useEquipmentStep(args: {
             catalogIndex,
             choiceSets: resolvedChoiceSets,
           })
-        : [],
+        : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
     [catalogIndex, characterClass, draft, resolvedChoiceSets],
   )
   const characterPreviewContext = useMemo(
@@ -190,6 +190,7 @@ export function useEquipmentStep(args: {
     showShopping,
     budget,
     pickerItems,
+    pickerBrowseSortContext,
     characterPreviewContext,
     activePickerFlow,
     ownedPurchaseQuantities,
