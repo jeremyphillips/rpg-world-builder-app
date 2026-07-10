@@ -136,6 +136,7 @@ export function equipmentPoolFromFormRow(row: EquipmentGrantChoiceItemForm): Equ
 function grantedItemToFormRow(grant: GrantedEquipmentItem): EquipmentGrantItemForm {
   return {
     itemKind: 'grant',
+    grantTargetSource: 'equipment',
     equipmentSlug: grant.equipmentSlug,
     quantity: grant.quantity,
     equipped: grant.equipped,
@@ -157,7 +158,7 @@ export function equipmentGrantToFormRow(grant: EquipmentGrant): EquipmentGrantIt
 function grantedItemFromFormRow(row: GrantedEquipmentItemForm): GrantedEquipmentItem {
   const grant: GrantedEquipmentItem = {
     kind: 'grant',
-    equipmentSlug: row.equipmentSlug,
+    equipmentSlug: row.equipmentSlug ?? '',
     quantity: row.quantity ?? 1,
   }
   if (row.equipped !== undefined) {
@@ -182,14 +183,24 @@ export function equipmentGrantTitle(
   row: EquipmentGrantItemForm | undefined,
   index: number,
   equipmentOptions: FieldOption[] = [],
+  proficiencyChoiceOptions: FieldOption[] = [],
 ): string {
   if (!row) return `Item ${index + 1}`
 
   if (row.itemKind === 'grant') {
+    if (row.grantTargetSource === 'proficiency_choice') {
+      const choiceLabel =
+        proficiencyChoiceOptions.find((option) => option.value === row.proficiencyChoiceId)
+          ?.label ?? row.proficiencyChoiceId
+      const quantity = row.quantity ?? 1
+      const prefix = quantity > 1 ? `${quantity} × ` : '1 × '
+      return choiceLabel ? `${prefix}Selection from "${choiceLabel}"` : `Item ${index + 1}`
+    }
+
     const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
     const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
     const quantity = row.quantity ?? 1
-    return quantity > 1 ? `${name} x${quantity}` : name
+    return quantity > 1 ? `${quantity} × ${name}` : `1 × ${name}`
   }
 
   const choose = row.choose ?? 1

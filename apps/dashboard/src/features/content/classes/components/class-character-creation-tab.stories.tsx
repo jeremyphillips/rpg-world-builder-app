@@ -89,6 +89,7 @@ export const HomebrewWithStartingEquipment: Story = {
             items: [
               {
                 itemKind: 'grant',
+                grantTargetSource: 'equipment',
                 equipmentSlug: 'dagger',
                 quantity: 1,
                 equipped: true,

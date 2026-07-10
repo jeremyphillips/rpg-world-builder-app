@@ -3,9 +3,18 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
 import { assembleStartingEquipment } from './assemble-starting-equipment'
+import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import { createEmptyCharacterBuilderDraft } from '../draft'
 import { indexCharacterBuildCatalog } from '../context'
+import { buildChoiceSetId } from '../choice-set'
+import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
 import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
+import {
+  fluteTool,
+  luteTool,
+  monkClass,
+  proficiencyTestContext,
+} from '../proficiency-test-fixtures'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -241,5 +250,127 @@ describe('assembleStartingEquipment', () => {
         sources: [{ kind: 'startingGold', sourceId: druidClass.id, grantId: 'standard' }],
       },
     ])
+  })
+})
+
+const drum = equipmentSchema.parse({
+  id: `${RULESET}:drum`,
+  slug: 'drum',
+  rulesetId: RULESET,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Drum',
+  description: '',
+  cost: { amount: 6, currency: 'gp' },
+  weight: { value: 3, unit: 'lb' },
+  kind: 'tool',
+  toolCategory: 'musical_instrument',
+  ability: 'wis',
+  utilizes: [{ description: 'Play a known tune', dc: 10 }],
+})
+
+const monkWithLinkedGrant: ClassStored = {
+  ...monkClass,
+  characterCreation: {
+    ...monkClass.characterCreation,
+    startingEquipment: {
+      choose: 1,
+      options: [
+        {
+          id: 'standard',
+          label: 'Standard Equipment',
+          items: [
+            {
+              kind: 'grant',
+              target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+              quantity: 1,
+            },
+          ],
+        },
+      ],
+    },
+  },
+}
+
+describe('proficiency-linked starting equipment lifecycle', () => {
+  const monkCatalog = {
+    ...proficiencyTestContext.catalog,
+    classes: [monkWithLinkedGrant],
+    equipment: [luteTool, fluteTool, drum],
+  }
+  const monkContext = { ...proficiencyTestContext, catalog: monkCatalog }
+  const catalogIndex = indexCharacterBuildCatalog(monkCatalog)
+  const monkToolChoiceSetId = buildChoiceSetId('class', monkWithLinkedGrant.id, 'class-tools')
+
+  it('resolves linked tool grants from proficiency answers without a nested equipment ChoiceSet', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: monkWithLinkedGrant.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [monkToolChoiceSetId]: [luteTool.id],
+      },
+    }
+
+    const choiceSets = resolveAvailableChoices(draft, monkContext)
+    const nestedEquipmentChoices = choiceSets.filter(
+      (choiceSet) =>
+        choiceSet.choiceType === 'equipment' &&
+        choiceSet.id.includes('starting-equipment:standard'),
+    )
+
+    expect(nestedEquipmentChoices).toEqual([])
+
+    const proficiencies = assembleCharacterProficiencies(
+      draft,
+      catalogIndex,
+      choiceSets,
+      monkWithLinkedGrant,
+    )
+    expect(proficiencies.tools.some((tool) => tool.toolId === luteTool.slug)).toBe(true)
+
+    const { equipment } = assembleStartingEquipment(draft, catalogIndex)
+    expect(equipment.tools).toEqual([
+      {
+        equipmentId: luteTool.id,
+        quantity: 1,
+        sources: [
+          {
+            kind: 'classStartingEquipment',
+            sourceId: monkWithLinkedGrant.id,
+            grantId: 'standard',
+          },
+        ],
+      },
+    ])
+  })
+
+  it('replaces linked inventory when the proficiency answer changes', () => {
+    const luteDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: monkWithLinkedGrant.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [monkToolChoiceSetId]: [luteTool.id],
+      },
+    }
+
+    expect(assembleStartingEquipment(luteDraft, catalogIndex).equipment.tools[0]?.equipmentId).toBe(
+      luteTool.id,
+    )
+
+    const drumDraft = {
+      ...luteDraft,
+      choiceSelections: {
+        ...luteDraft.choiceSelections,
+        [monkToolChoiceSetId]: [drum.id],
+      },
+    }
+
+    expect(assembleStartingEquipment(drumDraft, catalogIndex).equipment.tools[0]?.equipmentId).toBe(
+      drum.id,
+    )
   })
 })

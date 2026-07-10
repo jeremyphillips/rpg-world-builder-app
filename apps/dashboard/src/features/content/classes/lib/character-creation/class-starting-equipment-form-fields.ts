@@ -60,9 +60,27 @@ export const startingEquipmentModifierFormSchema = z.object({
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
-export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema.extend({
-  modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
-})
+export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema
+  .extend({
+    modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
+  })
+  .superRefine((row, ctx) => {
+    if (row.grantTargetSource === 'proficiency_choice' && (row.modifiers?.length ?? 0) > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Proficiency-linked starting equipment grants cannot carry modifiers.',
+        path: ['modifiers'],
+      })
+    }
+
+    if (
+      row.grantTargetSource === 'proficiency_choice' &&
+      row.proficiencyChoiceId &&
+      row.proficiencyChoiceId.length > 0
+    ) {
+      return
+    }
+  })
 
 export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
 
@@ -100,15 +118,6 @@ export const startingEquipmentFormSchema = z.object({
 
 export type StartingEquipmentForm = z.infer<typeof startingEquipmentFormSchema>
 
-function visibleForItemKind(
-  itemKind: (typeof STARTING_EQUIPMENT_ITEM_KINDS)[number],
-): FieldVisibility {
-  return {
-    dependsOn: ['itemKind'],
-    visibleWhen: (watched) => watched['itemKind'] === itemKind,
-  }
-}
-
 export function startingEquipmentOptionTitle(
   row: Pick<StartingEquipmentOptionForm, 'id' | 'label'> | undefined,
 ): string {
@@ -120,8 +129,18 @@ export function startingEquipmentItemTitle(
   row: StartingEquipmentItemForm | undefined,
   index: number,
   equipmentOptions: Parameters<typeof equipmentGrantTitle>[2] = [],
+  proficiencyChoiceOptions: Parameters<typeof equipmentGrantTitle>[3] = [],
 ): string {
-  return equipmentGrantTitle(row, index, equipmentOptions)
+  return equipmentGrantTitle(row, index, equipmentOptions, proficiencyChoiceOptions)
+}
+
+function visibleForEquipmentGrantTarget(): FieldVisibility {
+  return {
+    dependsOn: ['itemKind', 'grantTargetSource'],
+    visibleWhen: (watched) =>
+      watched['itemKind'] === 'grant' &&
+      (watched['grantTargetSource'] === 'equipment' || watched['grantTargetSource'] === undefined),
+  }
 }
 
 export function startingEquipmentModifierFields(): FormItem[] {
@@ -132,7 +151,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       addLabel: 'Add modifier',
       itemCollapsible: true,
-      visibility: visibleForItemKind('grant'),
+      visibility: visibleForEquipmentGrantTarget(),
       itemHeader: {
         fallback: () => 'Modifier',
         primary: (values) => {
@@ -186,11 +205,15 @@ export function startingEquipmentChooseFields(): FormItem[] {
 }
 
 export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
-  return equipmentGrantItemFields(ctx, { extraFields: startingEquipmentModifierFields() })
+  return equipmentGrantItemFields(ctx, {
+    allowProficiencyChoiceTarget: true,
+    extraFields: startingEquipmentModifierFields(),
+  })
 }
 
 export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
+  const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
 
   return [
     {
@@ -223,6 +246,7 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
             values as StartingEquipmentItemForm | undefined,
             index,
             equipmentOptions,
+            proficiencyChoiceOptions,
           ),
         summary: (values) =>
           equipmentGrantSummary(values as StartingEquipmentItemForm | undefined, equipmentOptions),

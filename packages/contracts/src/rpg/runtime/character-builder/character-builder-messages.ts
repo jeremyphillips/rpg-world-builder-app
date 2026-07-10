@@ -117,6 +117,10 @@ export const characterBuilderStepReadinessMessages = {
     'validation.characterBuilder.readiness.equipmentContinuingWithout',
     () => 'Continuing without starting equipment.',
   ),
+  equipmentPendingProficiencyLinked: defineMessage(
+    'validation.characterBuilder.readiness.equipmentPendingProficiencyLinked',
+    () => 'Complete Tool Proficiencies to resolve your included tool.',
+  ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
     () => 'Choose a class to see spell options.',

@@ -99,25 +99,58 @@ describe('startingEquipmentItemTitle', () => {
     { value: 'javelin', label: 'Javelin' },
     { value: 'greataxe', label: 'Greataxe' },
   ]
+  const proficiencyChoiceOptions = [
+    {
+      value: 'class-tools',
+      label: "Artisan's Tools or Musical Instrument",
+      description: 'Tool choice · Choose 1 · 27 options',
+    },
+  ]
 
   it('includes quantity when granted equipment count is greater than one', () => {
     expect(
       startingEquipmentItemTitle(
-        { itemKind: 'grant', equipmentSlug: 'javelin', quantity: 4 },
+        {
+          itemKind: 'grant',
+          grantTargetSource: 'equipment',
+          equipmentSlug: 'javelin',
+          quantity: 4,
+        },
         0,
         equipmentOptions,
       ),
-    ).toBe('Javelin x4')
+    ).toBe('4 × Javelin')
   })
 
   it('omits quantity suffix for a single granted item', () => {
     expect(
       startingEquipmentItemTitle(
-        { itemKind: 'grant', equipmentSlug: 'greataxe', quantity: 1 },
+        {
+          itemKind: 'grant',
+          grantTargetSource: 'equipment',
+          equipmentSlug: 'greataxe',
+          quantity: 1,
+        },
         0,
         equipmentOptions,
       ),
-    ).toBe('Greataxe')
+    ).toBe('1 × Greataxe')
+  })
+
+  it('formats linked proficiency grants with the choice label', () => {
+    expect(
+      startingEquipmentItemTitle(
+        {
+          itemKind: 'grant',
+          grantTargetSource: 'proficiency_choice',
+          proficiencyChoiceId: 'class-tools',
+          quantity: 1,
+        },
+        0,
+        equipmentOptions,
+        proficiencyChoiceOptions,
+      ),
+    ).toBe(`1 × Selection from "Artisan's Tools or Musical Instrument"`)
   })
 })
 
@@ -244,5 +277,53 @@ describe('startingEquipmentFormSchema validation', () => {
         startingEquipment,
       )
     }
+  })
+
+  it('round-trips a proficiency-linked grant target', () => {
+    const linkedGrant = {
+      kind: 'grant' as const,
+      target: { source: 'proficiency_choice' as const, choiceId: 'class-tools' },
+      quantity: 1,
+    }
+    const startingEquipment = {
+      choose: 1,
+      options: [
+        {
+          id: 'standard',
+          label: 'Standard Equipment',
+          items: [linkedGrant],
+        },
+      ],
+    }
+
+    const formValues = startingEquipmentToFormValues(startingEquipment)
+    expect(formValues.options[0]?.items[0]).toMatchObject({
+      itemKind: 'grant',
+      grantTargetSource: 'proficiency_choice',
+      proficiencyChoiceId: 'class-tools',
+      quantity: 1,
+    })
+
+    expect(startingEquipmentFromFormValues(formValues, startingEquipment)).toEqual(
+      startingEquipment,
+    )
+  })
+})
+
+describe('startingEquipmentItemFields capability', () => {
+  it('exposes proficiency-choice grant fields when capability is enabled', () => {
+    const fields = startingEquipmentItemFields({
+      options: {
+        equipment: [{ value: 'lute', label: 'Lute' }],
+        proficiencyChoiceTargets: [
+          { value: 'class-tools', label: "Artisan's Tools or Musical Instrument" },
+        ],
+      },
+    })
+
+    expect(fields.some((field) => 'name' in field && field.name === 'grantTargetSource')).toBe(true)
+    expect(fields.some((field) => 'name' in field && field.name === 'proficiencyChoiceId')).toBe(
+      true,
+    )
   })
 })

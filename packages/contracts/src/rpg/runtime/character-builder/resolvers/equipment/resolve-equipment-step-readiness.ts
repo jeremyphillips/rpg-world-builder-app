@@ -1,5 +1,7 @@
 import { characterBuilderStepReadinessMessages } from '../../character-builder-messages'
 import type { ChoiceSet } from '../../choice-set'
+import type { CharacterBuildContext } from '../../context'
+import { indexCharacterBuildCatalog } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
 import type { BuilderStepReadinessState } from '../../step-readiness'
 import {
@@ -7,10 +9,16 @@ import {
   formatStepReadinessMessage,
   isStepChoiceWorkComplete,
 } from '../../step-readiness-helpers'
+import {
+  getInvalidStartingEquipmentProficiencyLinks,
+  getUnresolvedStartingEquipmentDependencies,
+} from './get-unresolved-starting-equipment-dependencies'
+import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 
 export function resolveEquipmentStepReadiness(
   draft: CharacterBuilderDraft,
   resolvedChoiceSets: readonly ChoiceSet[],
+  context: CharacterBuildContext,
 ): BuilderStepReadinessState {
   if (!draft.class.classId) {
     return {
@@ -39,14 +47,54 @@ export function resolveEquipmentStepReadiness(
     }
   }
 
-  if (isStepChoiceWorkComplete(stepChoiceSets, draft)) {
-    return {
-      readiness: 'complete',
-      message: formatStepReadinessMessage(
-        characterBuilderStepReadinessMessages.equipmentReviewComplete,
-      ),
+  if (!isStepChoiceWorkComplete(stepChoiceSets, draft)) {
+    return { readiness: 'readyWithChoices' }
+  }
+
+  const classId = draft.class.classId
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const characterClass = catalogIndex.classes.get(classId)
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+
+  if (characterClass && option) {
+    const invalidLinks = getInvalidStartingEquipmentProficiencyLinks({
+      option,
+      classId,
+      characterClass,
+      choiceSelections: draft.choiceSelections,
+      catalogIndex,
+    })
+    if (invalidLinks.length > 0) {
+      return {
+        readiness: 'readyWithChoices',
+        message: invalidLinks[0]!.issue,
+      }
+    }
+
+    const pendingDependencies = getUnresolvedStartingEquipmentDependencies({
+      option,
+      classId,
+      characterClass,
+      choiceSelections: draft.choiceSelections,
+      catalogIndex,
+    })
+    if (pendingDependencies.length > 0) {
+      return {
+        readiness: 'readyWithChoices',
+        message: formatStepReadinessMessage(
+          characterBuilderStepReadinessMessages.equipmentPendingProficiencyLinked,
+        ),
+      }
     }
   }
 
-  return { readiness: 'readyWithChoices' }
+  return {
+    readiness: 'complete',
+    message: formatStepReadinessMessage(
+      characterBuilderStepReadinessMessages.equipmentReviewComplete,
+    ),
+  }
 }

@@ -444,6 +444,17 @@ function packageEntryFromResolvedItem(
     }
   }
 
+  if (item.kind === 'proficiency_linked_grant') {
+    if (item.status !== 'resolved' || !item.equipmentId || !item.equipment) return undefined
+    return {
+      equipmentId: item.equipmentId,
+      quantity: item.grant.quantity ?? 1,
+      equipped: item.grant.equipped,
+      modifiers: item.grant.modifiers,
+      sources,
+    }
+  }
+
   if (!item.selectedEquipmentId || !item.equipment) return undefined
 
   return {

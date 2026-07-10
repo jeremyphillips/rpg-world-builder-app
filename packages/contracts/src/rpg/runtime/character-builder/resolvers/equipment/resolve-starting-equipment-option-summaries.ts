@@ -17,7 +17,9 @@ import {
 } from '../../../creature/equipment'
 import type { CharacterEquipment } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
+import type { CharacterBuilderDraft } from '../../draft'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
+import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-linked-equipment-grant'
 
 export const STARTING_EQUIPMENT_MISSING_ITEM_MESSAGE = 'Missing from catalog'
 export const STARTING_EQUIPMENT_UNAVAILABLE_POOL_MESSAGE = 'No matching items in catalog'
@@ -145,6 +147,7 @@ function summarizeProficiencyLinkedGrantItem(
   grant: Extract<StartingEquipmentOption['items'][number], { kind: 'grant' }>,
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
+  draft?: CharacterBuilderDraft,
 ): {
   summary: StartingEquipmentOptionSummaryProficiencyLinkedGrant
   group: StartingEquipmentInventoryGroup | undefined
@@ -184,6 +187,43 @@ function summarizeProficiencyLinkedGrantItem(
       },
       group: undefined,
       reasons: [issue],
+    }
+  }
+
+  if (draft) {
+    const result = resolveProficiencyLinkedEquipmentGrant({
+      source: { ownerType: 'class', ownerId: characterClass.id, choiceId },
+      draft,
+      characterClass,
+      catalogIndex,
+    })
+
+    if (result.status === 'resolved') {
+      return {
+        summary: {
+          kind: 'proficiency_linked_grant',
+          choiceId,
+          choiceLabel,
+          status: 'resolved',
+          resolvedEquipment: result.equipment,
+        },
+        group: result.equipment ? inventoryGroupForEquipment(result.equipment) : 'tools',
+        reasons: [],
+      }
+    }
+
+    if (result.status === 'invalid') {
+      return {
+        summary: {
+          kind: 'proficiency_linked_grant',
+          choiceId,
+          choiceLabel,
+          status: 'invalid',
+          issue: result.issue,
+        },
+        group: undefined,
+        reasons: [result.issue],
+      }
     }
   }
 
@@ -236,6 +276,7 @@ function summarizeOption(
   characterClass: CharacterClass,
   option: StartingEquipmentOption,
   catalogIndex: CharacterBuildCatalogIndex,
+  draft?: CharacterBuilderDraft,
 ): StartingEquipmentOptionSummary {
   const rulesetId = characterClass.rulesetId
   const itemsByGroup = EMPTY_ITEMS_BY_GROUP()
@@ -249,6 +290,7 @@ function summarizeOption(
           item,
           characterClass,
           catalogIndex,
+          draft,
         )
         unselectableReasons.push(...reasons)
         if (group) itemsByGroup[group].push(summary)
@@ -286,11 +328,12 @@ function summarizeOption(
 export function resolveStartingEquipmentOptionSummaries(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
+  draft?: CharacterBuilderDraft,
 ): StartingEquipmentOptionSummary[] {
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
   return startingEquipment.options.map((option) =>
-    summarizeOption(characterClass, option, catalogIndex),
+    summarizeOption(characterClass, option, catalogIndex, draft),
   )
 }

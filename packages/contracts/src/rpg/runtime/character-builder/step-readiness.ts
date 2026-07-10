@@ -48,7 +48,7 @@ export function resolveBuilderStepReadiness(
 ): BuilderStepReadinessState {
   switch (stepId) {
     case 'equipment':
-      return resolveEquipmentStepReadiness(draft, resolvedChoiceSets)
+      return resolveEquipmentStepReadiness(draft, resolvedChoiceSets, context)
     case 'spells':
       return resolveSpellsStepReadiness(draft, context, resolvedChoiceSets)
     case 'proficiencies':

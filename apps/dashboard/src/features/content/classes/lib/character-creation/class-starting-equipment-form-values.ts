@@ -4,7 +4,10 @@ import type {
   StartingEquipmentItem,
   StartingEquipmentOption,
 } from '@rpg/contracts'
-import { startingEquipmentGrantEquipmentSlug } from '@rpg/contracts'
+import {
+  startingEquipmentGrantEquipmentSlug,
+  startingEquipmentGrantProficiencyChoiceId,
+} from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
 import {
@@ -26,8 +29,20 @@ import {
 
 function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
   if (item.kind === 'grant') {
+    const proficiencyChoiceId = startingEquipmentGrantProficiencyChoiceId(item)
+    if (proficiencyChoiceId) {
+      return {
+        itemKind: 'grant',
+        grantTargetSource: 'proficiency_choice',
+        proficiencyChoiceId,
+        quantity: item.quantity,
+        equipped: item.equipped,
+      }
+    }
+
     return {
       itemKind: 'grant',
+      grantTargetSource: 'equipment',
       equipmentSlug: startingEquipmentGrantEquipmentSlug(item) ?? '',
       quantity: item.quantity,
       equipped: item.equipped,
@@ -42,6 +57,18 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
   if (row.itemKind === 'grant') {
+    if (row.grantTargetSource === 'proficiency_choice') {
+      const item: StartingEquipmentGrantedItem = {
+        kind: 'grant',
+        target: { source: 'proficiency_choice', choiceId: row.proficiencyChoiceId! },
+        quantity: row.quantity ?? 1,
+      }
+      if (row.equipped !== undefined) {
+        item.equipped = row.equipped
+      }
+      return item
+    }
+
     const grant = equipmentGrantFromFormRow(row)
     if (grant.kind !== 'grant') {
       throw new Error('Starting equipment grant rows require an equipment slug in v1')

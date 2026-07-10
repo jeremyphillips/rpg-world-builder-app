@@ -64,8 +64,10 @@ export function useEquipmentStep(args: {
     : undefined
   const summaries = useMemo(
     () =>
-      characterClass ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex) : [],
-    [catalogIndex, characterClass],
+      characterClass
+        ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft)
+        : [],
+    [catalogIndex, characterClass, draft],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =

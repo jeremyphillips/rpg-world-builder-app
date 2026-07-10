@@ -25,6 +25,8 @@ import {
 } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentDefaultValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesFields } from '../lib/character-creation/class-character-creation-proficiencies-form-fields'
+import type { CharacterCreationProficienciesForm } from '../lib/character-creation/class-character-creation-proficiencies-form-fields'
+import { buildProficiencyChoiceTargetOptions } from '../lib/character-creation/class-starting-equipment-proficiency-targets.lib'
 
 export interface ClassCharacterCreationTabProps {
   formCtx: ContentFormCtx
@@ -55,14 +57,39 @@ function StartingEquipmentEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
 }
 
 function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
-  const optionFields = useMemo(() => startingEquipmentOptionItemFields(formCtx), [formCtx])
+  const proficiencies = useWatch({
+    name: 'characterCreation.proficiencies',
+  }) as CharacterCreationProficienciesForm | undefined
+  const enrichedFormCtx = useMemo((): ContentFormCtx => {
+    const equipmentEntities = formCtx.options?.equipmentEntities ?? []
+    const rulesetId = equipmentEntities[0]?.rulesetId ?? 'srd-cc-5.2.1'
+    const proficiencyChoiceTargets = buildProficiencyChoiceTargetOptions({
+      rulesetId,
+      classId: formCtx.entityId ?? 'draft-class',
+      proficiencies,
+      equipment: equipmentEntities,
+    })
+
+    return {
+      ...formCtx,
+      options: {
+        ...formCtx.options,
+        proficiencyChoiceTargets,
+      },
+    }
+  }, [formCtx, proficiencies])
+
+  const optionFields = useMemo(
+    () => startingEquipmentOptionItemFields(enrichedFormCtx),
+    [enrichedFormCtx],
+  )
   const chooseFields = useMemo(() => startingEquipmentChooseFields(), [])
   const makeOptionDefaults = useCallback(() => buildItemDefaultValues(optionFields), [optionFields])
   const editor = useMasterDetailArray(STARTING_EQUIPMENT_OPTIONS_FIELD_NAME, makeOptionDefaults)
 
   return (
     <FormEmbeddedMasterDetailEditor
-      formCtx={formCtx}
+      formCtx={enrichedFormCtx}
       fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
       itemFields={optionFields}
       itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}
