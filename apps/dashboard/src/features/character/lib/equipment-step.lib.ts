@@ -1,11 +1,14 @@
 import {
   assembleCharacterProficiencies,
+  buildChoiceSetId,
   characterPrefersMartialWeaponBrowseOrder,
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
   formatWealth,
+  getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
+  isProficiencyLinkedStartingEquipmentGrant,
   maxAffordableEquipmentQuantity,
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
@@ -13,6 +16,7 @@ import {
   resolveEquipmentPoolChoiceOptions,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
+  startingEquipmentGrantProficiencyChoiceId,
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   type CharacterBuildCatalogIndex,
@@ -55,6 +59,16 @@ export const EQUIPMENT_STEP_CUSTOMIZED_MESSAGE =
 
 export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
 
+export const EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL = 'Included tool'
+
+export const EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE =
+  'This is the same selection used for your Tool Proficiency.'
+
+export const EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION = 'Selected for Tool Proficiencies'
+
+export const EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE =
+  'The linked Tool Proficiency choice is unavailable. This class content must be corrected before the package can resolve.'
+
 export type EquipmentPickerFlow = 'gold' | 'customize'
 
 export type EquipmentInventoryRemoveTarget =
@@ -96,6 +110,14 @@ export type StartingEquipmentNestedPool = {
   label: string
   options: { id: string; label: string }[]
 }
+
+export type StartingEquipmentProficiencyLink = {
+  itemIndex: number
+  choiceId: string
+  choiceSetId: string
+}
+
+export type ProficiencyLinkFieldState = 'pending' | 'resolved' | 'invalid'
 
 /** ChoiceSets owned by the equipment builder step. */
 export function choiceSetsForEquipmentStep(choiceSets: readonly ChoiceSet[]): ChoiceSet[] {
@@ -230,6 +252,70 @@ export function areNestedPoolsResolved(
   if (nestedPools.length === 0) return true
 
   return nestedPools.every((pool) => (choiceSelections[pool.choiceSetId] ?? []).length > 0)
+}
+
+/** Maps package proficiency-linked grants to shared proficiency ChoiceSet references. */
+export function listProficiencyLinksForOption(
+  characterClass: CharacterClass,
+  option: StartingEquipmentOption,
+): StartingEquipmentProficiencyLink[] {
+  const seenChoiceSetIds = new Set<string>()
+  const links: StartingEquipmentProficiencyLink[] = []
+
+  for (const [itemIndex, item] of option.items.entries()) {
+    if (item.kind !== 'grant' || !isProficiencyLinkedStartingEquipmentGrant(item)) continue
+
+    const choiceId = startingEquipmentGrantProficiencyChoiceId(item)
+    if (!choiceId) continue
+
+    const choiceSetId = buildChoiceSetId('class', characterClass.id, choiceId)
+    if (seenChoiceSetIds.has(choiceSetId)) continue
+    seenChoiceSetIds.add(choiceSetId)
+
+    links.push({ itemIndex, choiceId, choiceSetId })
+  }
+
+  return links
+}
+
+export function findChoiceSetById(
+  choiceSets: readonly ChoiceSet[],
+  choiceSetId: string,
+): ChoiceSet | undefined {
+  return choiceSets.find((choiceSet) => choiceSet.id === choiceSetId)
+}
+
+export function areProficiencyLinksResolved(
+  links: readonly StartingEquipmentProficiencyLink[],
+  choiceSelections: CharacterBuilderDraft['choiceSelections'],
+): boolean {
+  if (links.length === 0) return true
+
+  return links.every((link) => (choiceSelections[link.choiceSetId] ?? []).length > 0)
+}
+
+export function resolveProficiencyLinkFieldState(args: {
+  link: StartingEquipmentProficiencyLink
+  option: StartingEquipmentOption
+  classId: string
+  characterClass: CharacterClass
+  choiceSet: ChoiceSet | undefined
+  choiceSelections: CharacterBuilderDraft['choiceSelections']
+  catalogIndex: CharacterBuildCatalogIndex
+}): ProficiencyLinkFieldState {
+  const { link, option, classId, characterClass, choiceSet, choiceSelections, catalogIndex } = args
+
+  const invalidIssue = getInvalidStartingEquipmentProficiencyLinks({
+    option,
+    classId,
+    characterClass,
+    choiceSelections,
+    catalogIndex,
+  }).find((entry) => entry.choiceId === link.choiceId)?.issue
+
+  if (!choiceSet || invalidIssue) return 'invalid'
+
+  return (choiceSelections[link.choiceSetId] ?? []).length > 0 ? 'resolved' : 'pending'
 }
 
 export function readSelectedStartingEquipmentOption(

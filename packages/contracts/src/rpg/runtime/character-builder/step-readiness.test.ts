@@ -327,7 +327,7 @@ describe('resolveBuilderStepReadiness', () => {
       expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
         readiness: 'readyWithChoices',
         message: formatFieldMessage(
-          characterBuilderStepReadinessMessages.equipmentPendingProficiencyLinked(),
+          characterBuilderStepReadinessMessages.equipmentPendingIncludedTool(),
         ),
       })
     })

@@ -85,7 +85,7 @@ export function resolveEquipmentStepReadiness(
       return {
         readiness: 'readyWithChoices',
         message: formatStepReadinessMessage(
-          characterBuilderStepReadinessMessages.equipmentPendingProficiencyLinked,
+          characterBuilderStepReadinessMessages.equipmentPendingIncludedTool,
         ),
       }
     }

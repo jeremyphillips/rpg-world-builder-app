@@ -57,6 +57,8 @@ export function EquipmentStepInteractive({
     applySelection,
     onRemoveItem,
     onNestedPoolChange,
+    onChoiceSelectionChange,
+    resolvedChoiceSets,
   } = step
 
   return (
@@ -76,9 +78,11 @@ export function EquipmentStepInteractive({
             catalogIndex={catalogIndex}
             summaries={summaries}
             draft={draft}
+            resolvedChoiceSets={resolvedChoiceSets}
             selectedOptionId={selectedOptionId}
             onSelectOption={requestSelection}
             onNestedPoolChange={onNestedPoolChange}
+            onChoiceSelectionChange={onChoiceSelectionChange}
           />
         ) : null}
 

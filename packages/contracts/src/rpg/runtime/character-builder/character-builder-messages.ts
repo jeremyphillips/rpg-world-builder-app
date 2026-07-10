@@ -121,6 +121,11 @@ export const characterBuilderStepReadinessMessages = {
     'validation.characterBuilder.readiness.equipmentPendingProficiencyLinked',
     () => 'Complete Tool Proficiencies to resolve your included tool.',
   ),
+  equipmentPendingIncludedTool: defineMessage(
+    'validation.characterBuilder.readiness.equipmentPendingIncludedTool',
+    () =>
+      'Choose the tool included with this equipment package. This selection also completes your Tool Proficiency choice.',
+  ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
     () => 'Choose a class to see spell options.',

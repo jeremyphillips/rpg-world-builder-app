@@ -28,6 +28,7 @@ import {
   shouldShowEquipmentShopping,
   type EquipmentPickerFlow,
 } from '../../lib/equipment-step.lib'
+import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
 import type { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import type { EquipmentStepInventorySectionProps } from './equipment-step-sections.client'
@@ -186,6 +187,7 @@ export function useEquipmentStep(args: {
     characterClass,
     classId,
     equipmentChoiceSets,
+    resolvedChoiceSets,
     summaries,
     selectedOptionId,
     showFallback,
@@ -221,6 +223,11 @@ export function useEquipmentStep(args: {
           ...nestedSelections,
           [choiceSetId]: selection,
         },
+      })
+    },
+    onChoiceSelectionChange: (choiceSetId: string, selection: readonly string[]) => {
+      onDraftChange({
+        choiceSelections: withChoiceSetSelections(draft, choiceSetId, [...selection]),
       })
     },
     readiness,

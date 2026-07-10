@@ -17,6 +17,7 @@ import {
   isStartingGoldOptionId,
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
+  listProficiencyLinksForOption,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
 } from './equipment-step.lib'
@@ -24,6 +25,7 @@ import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepLeatherArmorFixture,
+  equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
 
 describe('equipment-step.lib', () => {
@@ -241,6 +243,18 @@ describe('equipment-step.lib', () => {
       kind: 'package',
       packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
     })
+  })
+
+  it('lists proficiency links for monk standard package', () => {
+    const option = equipmentStepMonkClassFixture.characterCreation!.startingEquipment!.options[0]!
+
+    expect(listProficiencyLinksForOption(equipmentStepMonkClassFixture, option)).toEqual([
+      {
+        itemIndex: 2,
+        choiceId: 'class-tools',
+        choiceSetId: `class:${equipmentStepMonkClassFixture.id}:class-tools`,
+      },
+    ])
   })
 })
 

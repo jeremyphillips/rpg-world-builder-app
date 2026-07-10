@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import {
+  buildChoiceSetId,
   createEmptyCharacterBuilderDraft,
   nestedStartingEquipmentChoiceSetId,
   resolveAvailableChoices,
@@ -17,9 +18,14 @@ import { createStandaloneBuilderContextFixture } from '../../lib/character-build
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogFixture,
+  equipmentStepDrumFixture,
   equipmentStepLeatherArmorFixture,
+  equipmentStepLuteFixture,
+  equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
 import {
+  EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
+  EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_STEP_CUSTOMIZE_LABEL,
 } from '../../lib/equipment-step.lib'
@@ -47,6 +53,32 @@ function renderEquipmentStep(
     ...render(
       <EquipmentStep
         context={context}
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    ),
+  }
+}
+
+const monkToolChoiceSetId = buildChoiceSetId(
+  'class',
+  equipmentStepMonkClassFixture.id,
+  'class-tools',
+)
+
+function renderMonkEquipmentStep(draft: CharacterBuilderDraft, onDraftChange = vi.fn()) {
+  const monkContext = createStandaloneBuilderContextFixture({
+    catalog: equipmentStepCatalogFixture,
+  })
+  const resolvedChoiceSets = resolveAvailableChoices(draft, monkContext)
+
+  return {
+    onDraftChange,
+    ...render(
+      <EquipmentStep
+        context={monkContext}
         draft={draft}
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
@@ -230,5 +262,229 @@ describe('EquipmentStep', () => {
     const { container } = renderEquipmentStep()
 
     await expectNoAxeViolations(container)
+  })
+})
+
+describe('EquipmentStep monk proficiency-linked grants', () => {
+  it('shows the included tool field when standard equipment is selected', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderMonkEquipmentStep(draft)
+
+    expect(screen.getByText(EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE)).toBeInTheDocument()
+    expect(screen.getByText("Artisan's Tools or Musical Instrument")).toBeInTheDocument()
+  })
+
+  it('selects standard monk equipment without clearing proficiency answers', async () => {
+    const user = userEvent.setup()
+    const { onDraftChange } = renderMonkEquipmentStep({
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+    })
+
+    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        choiceSelections: expect.objectContaining({
+          [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        }),
+        equipment: expect.objectContaining({ mode: 'package' }),
+      }),
+    )
+  })
+
+  it('writes the shared class-tools answer when selecting a tool inline', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const { onDraftChange } = renderMonkEquipmentStep(draft)
+
+    await user.click(screen.getByRole('radio', { name: /^Lute$/ }))
+
+    expect(onDraftChange).toHaveBeenCalledWith({
+      choiceSelections: expect.objectContaining({
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      }),
+    })
+  })
+
+  it('syncs inline tool changes to inventory and replaces the previous tool', () => {
+    let draft: CharacterBuilderDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const monkContext = createStandaloneBuilderContextFixture({
+      catalog: equipmentStepCatalogFixture,
+    })
+
+    const { rerender } = render(
+      <EquipmentStep
+        context={monkContext}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: /^Lute$/ })).toBeChecked()
+
+    draft = {
+      ...draft,
+      choiceSelections: {
+        ...draft.choiceSelections,
+        [monkToolChoiceSetId]: [equipmentStepDrumFixture.id],
+      },
+    }
+
+    rerender(
+      <EquipmentStep
+        context={monkContext}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: /^Drum$/ })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /^Lute$/ })).not.toBeChecked()
+  })
+
+  it('displays a proficiencies preselection in the inline field', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [monkToolChoiceSetId]: [equipmentStepDrumFixture.id],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderMonkEquipmentStep(draft)
+
+    expect(screen.getByRole('radio', { name: /^Drum$/ })).toBeChecked()
+  })
+
+  it('preserves the class-tools answer when switching between standard and gold', async () => {
+    const user = userEvent.setup()
+    const monkContext = createStandaloneBuilderContextFixture({
+      catalog: equipmentStepCatalogFixture,
+    })
+
+    let draft: CharacterBuilderDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const onDraftChange = vi.fn()
+
+    const { rerender } = render(
+      <EquipmentStep
+        context={monkContext}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /^Starting Gold/ }))
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        choiceSelections: expect.objectContaining({
+          [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+        }),
+      }),
+    )
+
+    draft = {
+      ...draft,
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['gold'],
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    rerender(
+      <EquipmentStep
+        context={monkContext}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    expect(screen.queryByText(EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+
+    expect(onDraftChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        choiceSelections: expect.objectContaining({
+          [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+        }),
+      }),
+    )
   })
 })
