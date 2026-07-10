@@ -100,9 +100,88 @@ export const equipmentStepBardClassFixture = {
   },
 } as const satisfies ClassStored
 
+export const equipmentStepMonkClassFixture = {
+  id: 'srd-cc-5.2.1:monk',
+  slug: 'monk',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Monk',
+  primaryAbilities: ['dex', 'wis'],
+  hitDie: 8,
+  proficiencies: {
+    savingThrows: ['str', 'dex'],
+    armor: { categories: [], items: [] },
+    weapons: { categories: ['simple'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  features: [],
+  characterCreation: {
+    startingEquipment: {
+      choose: 1,
+      options: [
+        {
+          id: 'standard',
+          label: 'Standard Equipment',
+          description:
+            "Spear, 5 Daggers, Artisan's Tools or Musical Instrument (from your tool proficiency above), Explorer's Pack, and 11 GP.",
+          items: [
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'spear' },
+              quantity: 1,
+              equipped: true,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'dagger' },
+              quantity: 5,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+              quantity: 1,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'explorers-pack' },
+              quantity: 1,
+            },
+          ],
+          wealth: { gp: 11 },
+        },
+        {
+          id: 'gold',
+          label: 'Starting Gold',
+          description: 'Take gold instead of a gear package.',
+          items: [],
+          wealth: { gp: 50 },
+        },
+      ],
+    },
+    proficiencies: {
+      tools: {
+        choices: [
+          {
+            id: 'class-tools',
+            label: "Artisan's Tools or Musical Instrument",
+            choose: 1,
+            pool: {
+              source: 'filtered',
+              toolCategories: ['artisan', 'musical_instrument'],
+            },
+          },
+        ],
+      },
+    },
+  },
+} as const satisfies ClassStored
+
 export const equipmentStepCatalogFixture = {
   species: [],
-  classes: [equipmentStepBardClassFixture],
+  classes: [equipmentStepBardClassFixture, equipmentStepMonkClassFixture],
   spells: [],
   equipment: [equipmentStepLeatherArmorFixture, equipmentStepLuteFixture],
   skillProficiencies: [],

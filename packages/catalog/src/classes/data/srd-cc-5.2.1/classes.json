@@ -1971,22 +1971,27 @@
           {
             "id": "standard",
             "label": "Standard Equipment",
-            "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument chosen for the tool proficiency above, Explorer's Pack, and 11 GP. FOLLOWUP: proficiencyLinkedChoice — structured item choice deferred until class tool proficiency selection is modeled.",
+            "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument (from your tool proficiency above), Explorer's Pack, and 11 GP.",
             "items": [
               {
                 "kind": "grant",
-                "equipmentSlug": "spear",
+                "target": { "source": "equipment", "equipmentSlug": "spear" },
                 "quantity": 1,
                 "equipped": true
               },
               {
                 "kind": "grant",
-                "equipmentSlug": "dagger",
+                "target": { "source": "equipment", "equipmentSlug": "dagger" },
                 "quantity": 5
               },
               {
                 "kind": "grant",
-                "equipmentSlug": "explorers-pack",
+                "target": { "source": "proficiency_choice", "choiceId": "class-tools" },
+                "quantity": 1
+              },
+              {
+                "kind": "grant",
+                "target": { "source": "equipment", "equipmentSlug": "explorers-pack" },
                 "quantity": 1
               }
             ],

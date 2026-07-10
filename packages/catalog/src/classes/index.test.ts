@@ -13,6 +13,12 @@ import {
   subclassChoiceFeatureId,
   skillSlugsFromClassChoices,
   listToolsMatchingPool,
+  assembleStartingEquipment,
+  buildChoiceSetId,
+  createEmptyCharacterBuilderDraft,
+  indexCharacterBuildCatalog,
+  startingEquipmentChoiceSetId,
+  startingEquipmentGrantProficiencyChoiceId,
   type CharacterClass,
 } from '@rpg/contracts'
 import { loadSeedEquipment } from '../equipment'
@@ -842,14 +848,54 @@ describe('SRD 5.2.1 class seed', () => {
     }
   })
 
-  it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
+  it('Monk standard package includes a proficiency-linked tool grant', () => {
     const monk = getClassBySlug(RULESET, 'monk')
     const startingEquipment = monk.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
+
     const standard = startingEquipment!.options.find((option) => option.id === 'standard')
     expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
+    expect(standard?.description).not.toContain('FOLLOWUP')
+
+    const linkedGrant = standard?.items.find(
+      (item) =>
+        item.kind === 'grant' && startingEquipmentGrantProficiencyChoiceId(item) === 'class-tools',
+    )
+    expect(linkedGrant).toMatchObject({
+      kind: 'grant',
+      target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+      quantity: 1,
+    })
     expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)
+  })
+
+  it('Monk linked starting equipment resolves from the tool proficiency answer', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const equipment = loadSeedEquipment(RULESET)
+    const lute = equipment.find((row) => row.slug === 'lute')
+    expect(lute).toBeDefined()
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [monk],
+      spells: [],
+      equipment,
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const monkToolChoiceSetId = buildChoiceSetId('class', monk.id, 'class-tools')
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: monk.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(monk.id)]: ['standard'],
+        [monkToolChoiceSetId]: [lute!.id],
+      },
+    }
+
+    const { equipment: inventory } = assembleStartingEquipment(draft, catalogIndex)
+    expect(inventory.tools.some((row) => row.equipmentId === lute!.id)).toBe(true)
   })
 
   it('all seed grantGroups are already in canonical form (normalizeGrantGroups round-trip is identity)', () => {

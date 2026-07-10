@@ -6,7 +6,9 @@ import {
   toolProficiencyPoolToFormRow,
 } from '../../../lib/forms/grants/proficiency-grant-form-values'
 import type { ToolProficiencyItemForm } from '../../../lib/forms/grants/proficiency-grant-form-fields'
+import { CHARACTER_CREATION_TOOL_CHOICE_ID } from './class-character-creation-link-labels'
 import type { CharacterCreationProficienciesForm } from './class-character-creation-proficiencies-form-fields'
+import { suggestToolProficiencyChoiceLabel } from './suggest-tool-proficiency-choice-label'
 
 type ToolProficiencyPoolItemForm = Extract<ToolProficiencyItemForm, { proficiencySource: 'pool' }>
 type StoredToolChoice = ToolProficiencyChoice & { from?: string[] }
@@ -67,6 +69,7 @@ function toolsToFormValues(
 ): CharacterCreationProficienciesForm['tools'] {
   const toolPool = readToolPoolFromStoredChoice(toolChoice)
   return {
+    label: toolChoice?.label ?? '',
     choose: toolChoice?.choose ?? 0,
     ...(toolPool ? toolChoiceToPoolFormRow(toolPool) : DEFAULT_TOOL_POOL_FORM),
   }
@@ -102,10 +105,24 @@ function isMeaningfulSkillChoice(
   return Boolean(choice && choice.choose > 0 && choice.from.length > 0)
 }
 
-function isMeaningfulToolChoice(
+export function isMeaningfulCharacterCreationToolChoice(
   choice: CharacterCreationProficienciesForm['tools'] | undefined,
 ): choice is CharacterCreationProficienciesForm['tools'] {
   return Boolean(choice && choice.choose > 0 && toolChoiceFromPoolFormRow(choice))
+}
+
+function resolveToolChoiceLabel(
+  choice: CharacterCreationProficienciesForm['tools'],
+  entity?: CharacterClass,
+): string | undefined {
+  const trimmed = choice.label?.trim()
+  if (trimmed) return trimmed
+
+  const existingLabel = entity?.characterCreation?.proficiencies?.tools?.choices?.[0]?.label?.trim()
+  if (existingLabel) return existingLabel
+
+  const suggested = suggestToolProficiencyChoiceLabel(choice.poolToolCategories ?? [])
+  return suggested || undefined
 }
 
 function skillChoicesFromForm(
@@ -130,14 +147,14 @@ function toolChoicesFromForm(
   choice: CharacterCreationProficienciesForm['tools'] | undefined,
   entity?: CharacterClass,
 ): CharacterCreationProficienciesInput['tools'] | undefined {
-  if (!isMeaningfulToolChoice(choice)) return undefined
+  if (!isMeaningfulCharacterCreationToolChoice(choice)) return undefined
   const pool = toolChoiceFromPoolFormRow(choice)!
-  const existingLabel = entity?.characterCreation?.proficiencies?.tools?.choices?.[0]?.label
+  const label = resolveToolChoiceLabel(choice, entity)
   return {
     choices: [
       {
-        id: 'class-tools',
-        ...(existingLabel ? { label: existingLabel } : {}),
+        id: CHARACTER_CREATION_TOOL_CHOICE_ID,
+        ...(label ? { label } : {}),
         choose: choice.choose,
         pool,
       },
@@ -156,5 +173,23 @@ export function characterCreationProficienciesFromFormValues(
   return {
     ...(skills ? { skills } : {}),
     ...(tools ? { tools } : {}),
+  }
+}
+
+/** Applies live form label override when synthesizing proficiency choices for linked-grant UI. */
+export function characterCreationProficienciesWithLiveToolLabel(
+  proficiencies: CharacterCreationProficienciesForm | undefined,
+  entity?: CharacterClass,
+): CharacterCreationProficienciesInput | undefined {
+  const base = characterCreationProficienciesFromFormValues(proficiencies, entity)
+  if (!base?.tools?.choices?.[0] || !proficiencies?.tools?.label?.trim()) return base
+
+  return {
+    ...base,
+    tools: {
+      choices: base.tools.choices.map((choice, index) =>
+        index === 0 ? { ...choice, label: proficiencies.tools.label!.trim() } : choice,
+      ),
+    },
   }
 }

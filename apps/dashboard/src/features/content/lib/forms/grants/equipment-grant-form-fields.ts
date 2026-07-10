@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ARMOR_CATEGORIES,
@@ -28,6 +29,11 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
+import { ProficiencyLinkedGrantRowCue } from '../../../classes/components/character-creation/proficiency-linked-grant-row-cue.client'
+import {
+  LINKED_PROFICIENCY_CHOICE_LABEL,
+  PROFICIENCY_LINK_GRANT_HINT,
+} from '../../../classes/lib/character-creation/class-character-creation-link-labels'
 import {
   EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
@@ -54,11 +60,16 @@ export const equipmentGrantValidationMessages = {
     () => 'Select a proficiency choice for this grant.',
     () => 'Missing proficiency choice',
   ),
-  staleProficiencyChoice: defineMessage(
-    'validation.equipmentGrant.staleProficiencyChoice',
+  missingProficiencyChoice: defineMessage<{ choiceId: string }>(
+    'validation.equipmentGrant.missingProficiencyChoice',
+    ({ choiceId }) => `Linked proficiency choice unavailable. Could not find "${choiceId}".`,
+    () => 'Missing proficiency link',
+  ),
+  ineligibleProficiencyChoice: defineMessage(
+    'validation.equipmentGrant.ineligibleProficiencyChoice',
     () =>
-      'Linked proficiency choice is no longer available. Select another choice or change the grant type.',
-    () => 'Stale proficiency link',
+      'Linked proficiency choice is no longer eligible. It must be a tool choice that selects exactly one option.',
+    () => 'Ineligible proficiency link',
   ),
 }
 
@@ -284,14 +295,21 @@ function visibleForGrantTargetSource(
 
 export type GrantedEquipmentItemFieldsOptions = Pick<
   EquipmentGrantItemFieldsOptions,
-  'guardVisibility' | 'allowProficiencyChoiceTarget'
+  | 'guardVisibility'
+  | 'allowProficiencyChoiceTarget'
+  | 'itemKindOptions'
+  | 'grantTargetSourceOptions'
 >
 
 export function grantedEquipmentItemFields(
   ctx: ContentFormCtx,
   opts: GrantedEquipmentItemFieldsOptions = {},
 ): FormItem[] {
-  const { guardVisibility: guard, allowProficiencyChoiceTarget = false } = opts
+  const {
+    guardVisibility: guard,
+    allowProficiencyChoiceTarget = false,
+    grantTargetSourceOptions: grantTargetSelectOptions = grantTargetSourceOptions,
+  } = opts
   const equipmentOptions = ctx.options?.equipment ?? []
   const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
   const hasEligibleProficiencyChoices = proficiencyChoiceOptions.length > 0
@@ -301,17 +319,17 @@ export function grantedEquipmentItemFields(
         {
           type: 'select',
           name: 'grantTargetSource',
-          label: 'Grant type',
-          options: grantTargetSourceOptions,
+          label: 'Item source',
+          options: grantTargetSelectOptions,
           required: true,
           defaultValue: 'equipment',
           visibility: visibleForItemKind('grant', guard),
-          width: '1/2',
+          width: 'full',
         },
         {
           type: 'select',
           name: 'proficiencyChoiceId',
-          label: 'Proficiency choice',
+          label: LINKED_PROFICIENCY_CHOICE_LABEL,
           options: proficiencyChoiceOptions,
           required: true,
           placeholder: hasEligibleProficiencyChoices
@@ -319,9 +337,15 @@ export function grantedEquipmentItemFields(
             : 'No eligible choices',
           disabled: !hasEligibleProficiencyChoices,
           hint: hasEligibleProficiencyChoices
-            ? 'Grants the equipment selected by this character-creation proficiency choice.'
+            ? PROFICIENCY_LINK_GRANT_HINT
             : 'No eligible tool proficiency choices. Add a character-creation tool choice that selects exactly one tool.',
           visibility: visibleForGrantTargetSource('proficiency_choice', guard),
+        },
+        {
+          kind: 'slot',
+          name: '_proficiencyLinkedGrantCue',
+          visibility: visibleForGrantTargetSource('proficiency_choice', guard),
+          render: () => createElement(ProficiencyLinkedGrantRowCue),
         },
       ]
     : []
@@ -482,6 +506,10 @@ export type EquipmentGrantItemFieldsOptions = {
   extraFields?: FormItem[]
   /** Override the item-kind select label (e.g. when composed inside the grants array). */
   kindSelectLabel?: string
+  /** Override item-kind select options (starting equipment uses Granted item labels). */
+  itemKindOptions?: { value: string; label: string }[]
+  /** Override grant-target select options (starting equipment uses Item source labels). */
+  grantTargetSourceOptions?: { value: string; label: string }[]
   /** AND-combined visibility guard applied to every equipment grant field. */
   guardVisibility?: FieldVisibility
   /** Enables proficiency-linked grant targets for class starting equipment. */
@@ -493,13 +521,15 @@ export function equipmentGrantItemFields(
   opts: EquipmentGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
+  const itemKindSelectOptions = opts.itemKindOptions ?? itemKindOptions
+  const grantTargetSelectOptions = opts.grantTargetSourceOptions ?? grantTargetSourceOptions
 
   return [
     {
       type: 'select',
       name: 'itemKind',
       label: opts.kindSelectLabel ?? 'Grant type',
-      options: itemKindOptions,
+      options: itemKindSelectOptions,
       required: true,
       defaultValue: 'grant',
       visibility: guard,
@@ -508,6 +538,8 @@ export function equipmentGrantItemFields(
     ...grantedEquipmentItemFields(ctx, {
       guardVisibility: guard,
       allowProficiencyChoiceTarget: opts.allowProficiencyChoiceTarget,
+      itemKindOptions: itemKindSelectOptions,
+      grantTargetSourceOptions: grantTargetSelectOptions,
     }),
     ...(opts.extraFields ?? []),
     ...equipmentChoiceGrantFields(ctx, guard),

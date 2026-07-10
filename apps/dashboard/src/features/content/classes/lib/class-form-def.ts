@@ -29,7 +29,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   routeKey: 'classes',
 
   schema: classFormSchema,
-  resolveSchema: (ctx) => createClassFormSchema(maxLevelFromCtx(ctx)),
+  resolveSchema: (ctx) => createClassFormSchema(maxLevelFromCtx(ctx), ctx),
   createDefaultValues: classCreateDefaultValues,
 
   buildTabs: buildClassTabs,

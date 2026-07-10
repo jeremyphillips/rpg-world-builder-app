@@ -7,6 +7,7 @@ import type {
 import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import { PROFICIENCY_LINK_SUMMARY } from '../../../classes/lib/character-creation/class-character-creation-link-labels'
 import { EQUIPMENT_POOL_CATEGORY_ANY } from './equipment-grant-form-fields'
 import type {
   EquipmentGrantChoiceItemForm,
@@ -189,12 +190,14 @@ export function equipmentGrantTitle(
 
   if (row.itemKind === 'grant') {
     if (row.grantTargetSource === 'proficiency_choice') {
-      const choiceLabel =
-        proficiencyChoiceOptions.find((option) => option.value === row.proficiencyChoiceId)
-          ?.label ?? row.proficiencyChoiceId
+      const matchedOption = proficiencyChoiceOptions.find(
+        (option) => option.value === row.proficiencyChoiceId,
+      )
+      const choiceLabel = matchedOption?.label ?? row.proficiencyChoiceId
       const quantity = row.quantity ?? 1
       const prefix = quantity > 1 ? `${quantity} × ` : '1 × '
-      return choiceLabel ? `${prefix}Selection from "${choiceLabel}"` : `Item ${index + 1}`
+      if (!row.proficiencyChoiceId) return `Item ${index + 1}`
+      return `${prefix}Tool selected in "${choiceLabel}"`
     }
 
     const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
@@ -208,6 +211,8 @@ export function equipmentGrantTitle(
 
   if (row.poolSource === 'explicit') {
     poolLabel = formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentOptions)
+  } else if (!row.poolEquipmentKind) {
+    return `Item ${index + 1}`
   } else {
     poolLabel = formatEquipmentPoolLabel(equipmentPoolFromFormRow(row))
   }
@@ -215,12 +220,30 @@ export function equipmentGrantTitle(
   return `${poolLabel} — choose ${choose}`
 }
 
+function isEquipmentGrantSummaryComplete(row: EquipmentGrantItemForm): boolean {
+  if (row.itemKind === 'grant') {
+    if (row.grantTargetSource === 'proficiency_choice') {
+      return Boolean(row.proficiencyChoiceId)
+    }
+    return Boolean(row.equipmentSlug)
+  }
+
+  if (row.poolSource === 'explicit') {
+    return (row.poolEquipmentSlugs?.length ?? 0) > 0
+  }
+
+  return Boolean(row.poolEquipmentKind)
+}
+
 export function equipmentGrantSummary(
   row: EquipmentGrantItemForm | undefined,
   equipmentOptions: FieldOption[] = [],
 ): string {
-  if (!row?.itemKind) return ''
-  if (row.itemKind === 'grant' && !row.equipmentSlug) return ''
+  if (!row?.itemKind || !isEquipmentGrantSummaryComplete(row)) return ''
+
+  if (row.itemKind === 'grant' && row.grantTargetSource === 'proficiency_choice') {
+    return PROFICIENCY_LINK_SUMMARY
+  }
 
   const resolveEquipmentName = (slug: string) =>
     equipmentOptions.find((option) => option.value === slug)?.label

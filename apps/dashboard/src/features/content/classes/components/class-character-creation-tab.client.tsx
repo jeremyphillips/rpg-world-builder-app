@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { createElement, useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, Heading, Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
@@ -27,6 +27,7 @@ import { startingEquipmentDefaultValues } from '../lib/character-creation/class-
 import { characterCreationProficienciesFields } from '../lib/character-creation/class-character-creation-proficiencies-form-fields'
 import type { CharacterCreationProficienciesForm } from '../lib/character-creation/class-character-creation-proficiencies-form-fields'
 import { buildProficiencyChoiceTargetOptions } from '../lib/character-creation/class-starting-equipment-proficiency-targets.lib'
+import { ToolProficiencyReciprocalCue } from './character-creation/tool-proficiency-reciprocal-cue.client'
 
 export interface ClassCharacterCreationTabProps {
   formCtx: ContentFormCtx
@@ -60,6 +61,9 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const proficiencies = useWatch({
     name: 'characterCreation.proficiencies',
   }) as CharacterCreationProficienciesForm | undefined
+  const startingEquipment = useWatch({
+    name: STARTING_EQUIPMENT_FIELD_NAME,
+  }) as StartingEquipmentForm | undefined
   const enrichedFormCtx = useMemo((): ContentFormCtx => {
     const equipmentEntities = formCtx.options?.equipmentEntities ?? []
     const rulesetId = equipmentEntities[0]?.rulesetId ?? 'srd-cc-5.2.1'
@@ -68,6 +72,7 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       classId: formCtx.entityId ?? 'draft-class',
       proficiencies,
       equipment: equipmentEntities,
+      startingEquipment,
     })
 
     return {
@@ -77,7 +82,7 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
         proficiencyChoiceTargets,
       },
     }
-  }, [formCtx, proficiencies])
+  }, [formCtx, proficiencies, startingEquipment])
 
   const optionFields = useMemo(
     () => startingEquipmentOptionItemFields(enrichedFormCtx),
@@ -121,7 +126,14 @@ export function ClassCharacterCreationTab({ formCtx }: ClassCharacterCreationTab
     | StartingEquipmentForm
     | undefined
   const proficienciesFields = useMemo(
-    () => characterCreationProficienciesFields(formCtx),
+    () =>
+      characterCreationProficienciesFields(formCtx, [
+        {
+          kind: 'slot',
+          name: '_toolProficiencyReciprocalCue',
+          render: () => createElement(ToolProficiencyReciprocalCue),
+        },
+      ]),
     [formCtx],
   )
   const hasStartingEquipment = startingEquipment != null && typeof startingEquipment === 'object'

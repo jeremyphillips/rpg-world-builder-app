@@ -12,6 +12,10 @@ import {
   refineToolProficiencyPoolFormRow,
   type ToolProficiencyPoolFormRow,
 } from '../../../lib/forms/tool-proficiency-pool-form-validation'
+import {
+  CHARACTER_CREATION_TOOL_CHOICE_LABEL_PATH,
+  TOOL_PROFICIENCY_CHOICE_LABEL_FIELD,
+} from './class-character-creation-link-labels'
 
 const SKILL_CHOICE_CHOOSE_PATH = 'characterCreation.proficiencies.skills.choose' as const
 const SKILL_CHOICE_FROM_PATH = 'characterCreation.proficiencies.skills.from' as const
@@ -33,6 +37,7 @@ export const characterCreationSkillChoiceFormSchema = z.object({
  */
 export const characterCreationToolChoiceFormSchema = z
   .object({
+    label: z.string().optional(),
     choose: z.coerce.number().int().min(0),
     poolSource: z.enum(TOOL_PROFICIENCY_POOL_SOURCES).default('filtered'),
     poolToolSlugs: z.array(z.string().min(1)).optional(),
@@ -89,18 +94,32 @@ export function characterCreationSkillChoiceFields(ctx: ContentFormCtx): FormIte
 }
 
 /** Pool-backed tool proficiency choice for the first character-creation tool choice. */
-export function characterCreationToolChoiceFields(ctx: ContentFormCtx): FormItem[] {
-  return toolProficiencyPoolFormFields(ctx, {
-    names: CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES,
-    chooseMin: 0,
-    chooseDefault: 0,
-    chooseDigits: 1,
-    sentenceName: CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES.choose,
-  })
+export function characterCreationToolChoiceFields(
+  ctx: ContentFormCtx,
+  extraFields: FormItem[] = [],
+): FormItem[] {
+  return [
+    {
+      type: 'text',
+      name: CHARACTER_CREATION_TOOL_CHOICE_LABEL_PATH,
+      label: TOOL_PROFICIENCY_CHOICE_LABEL_FIELD,
+    },
+    ...toolProficiencyPoolFormFields(ctx, {
+      names: CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES,
+      chooseMin: 0,
+      chooseDefault: 0,
+      chooseDigits: 1,
+      sentenceName: CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES.choose,
+    }),
+    ...extraFields,
+  ]
 }
 
 /** Proficiencies group on the Character creation tab (skill and tool choices). */
-export function characterCreationProficienciesFields(ctx: ContentFormCtx): FormItem[] {
+export function characterCreationProficienciesFields(
+  ctx: ContentFormCtx,
+  toolChoiceExtraFields: FormItem[] = [],
+): FormItem[] {
   return [
     {
       kind: 'group',
@@ -116,7 +135,8 @@ export function characterCreationProficienciesFields(ctx: ContentFormCtx): FormI
           kind: 'group',
           legend: 'Tool Proficiencies',
           legendSize: 'subsection',
-          fields: characterCreationToolChoiceFields(ctx),
+          id: 'class-character-creation-tool-proficiencies',
+          fields: characterCreationToolChoiceFields(ctx, toolChoiceExtraFields),
         },
       ],
     },

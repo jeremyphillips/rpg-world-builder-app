@@ -27,6 +27,7 @@ import { proficienciesFields, proficienciesFormSchema } from './class-proficienc
 import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
 import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
+import { refineCharacterCreationSaveValidation } from './character-creation/class-character-creation-form-validation'
 import {
   characterCreationProficienciesFormSchema,
   characterCreationSkillChoiceFields,
@@ -47,7 +48,10 @@ export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)
 }
 
-export function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+export function createClassFormSchema(
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+  formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
+) {
   const levelField = campaignLevelField(maxLevel)
   const resourceEntryFormSchema = z.object({
     level: levelField,
@@ -75,7 +79,10 @@ export function createClassFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
         startingEquipment: startingEquipmentFormSchema.optional(),
         proficiencies: characterCreationProficienciesFormSchema.optional(),
       })
-      .optional(),
+      .optional()
+      .superRefine((characterCreation, ctx) => {
+        refineCharacterCreationSaveValidation(characterCreation, ctx, formCtx)
+      }),
   })
 }
 

@@ -103,8 +103,9 @@ export function startingEquipmentGrantProficiencyChoiceId(
 /**
  * Structured pick within a starting package (e.g. Bard musical instrument).
  *
- * Proficiency-linked grants use `target.source === 'proficiency_choice'` and resolve
- * from the referenced character-creation tool proficiency ChoiceSet answer.
+ * Use `kind: 'choice'` when the equipment step should collect a separate answer.
+ * Use `kind: 'grant'` with `target.source === 'proficiency_choice'` when the item
+ * resolves from an existing character-creation tool proficiency ChoiceSet answer.
  */
 export const startingEquipmentItemChoiceSchema = z.preprocess(
   normalizeEquipmentChoiceGrant,

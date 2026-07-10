@@ -358,7 +358,7 @@ export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
     return getServiceCategoryLabel(pool.serviceCategory)
   }
 
-  return getEquipmentKindLabel(pool.equipmentKind)
+  return getEquipmentKindLabel(pool.equipmentKind) || ''
 }
 
 function getEquipmentPoolSentenceEntry(pool: Extract<EquipmentPool, { source: 'filtered' }>) {
@@ -382,6 +382,7 @@ function formatEquipmentPoolSentenceForm(
   if (entry) return getTermSentenceForm(entry, count)
 
   const fallbackLabel = formatEquipmentPoolLabel(pool)
+  if (!fallbackLabel) return ''
   if (count === 1) return fallbackLabel.toLowerCase()
   return pluralizeTermLabel(fallbackLabel)
 }

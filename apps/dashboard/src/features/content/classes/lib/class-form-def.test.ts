@@ -221,6 +221,29 @@ describe('classFormDef round-trips', () => {
     )
   })
 
+  it('monk: proficiency-linked grant round-trips through the class form', () => {
+    const monk = SRD_CLASSES.find((c) => c.slug === 'monk')!
+    const formValues = classFormDef.toFormValues(monk) as ClassFormValues
+    const linkedGrant = formValues.characterCreation?.startingEquipment?.options
+      .find((option) => option.id === 'standard')
+      ?.items.find(
+        (item) =>
+          item.itemKind === 'grant' &&
+          item.grantTargetSource === 'proficiency_choice' &&
+          item.proficiencyChoiceId === 'class-tools',
+      )
+    expect(linkedGrant).toMatchObject({
+      itemKind: 'grant',
+      grantTargetSource: 'proficiency_choice',
+      proficiencyChoiceId: 'class-tools',
+      quantity: 1,
+    })
+    const input = classFormDef.toInput(formValues, { entity: monk })
+    expect(input.characterCreation?.startingEquipment).toEqual(
+      monk.characterCreation?.startingEquipment,
+    )
+  })
+
   it('druid: wooden staff starting equipment round-trips through the class form', () => {
     const druid = SRD_CLASSES.find((c) => c.slug === 'druid')!
     const formValues = classFormDef.toFormValues(druid) as ClassFormValues

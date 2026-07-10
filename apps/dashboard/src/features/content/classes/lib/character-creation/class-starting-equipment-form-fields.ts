@@ -15,10 +15,19 @@ import {
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
   equipmentGrantChoiceItemFormSchema,
-  grantedEquipmentItemFormSchema,
   equipmentGrantItemFields,
+  equipmentGrantValidationMessages,
+  grantedEquipmentItemFormSchema,
   EQUIPMENT_GRANT_ITEM_KINDS,
 } from '../../../lib/forms/grants/equipment-grant-form-fields'
+import {
+  STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
+  STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
+} from '../../../lib/forms/grants/equipment-grant-form-labels'
+import {
+  INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
+  STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
+} from './class-character-creation-link-labels'
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
@@ -72,15 +81,40 @@ export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSc
         path: ['modifiers'],
       })
     }
-
-    if (
-      row.grantTargetSource === 'proficiency_choice' &&
-      row.proficiencyChoiceId &&
-      row.proficiencyChoiceId.length > 0
-    ) {
-      return
-    }
   })
+
+export type StartingEquipmentProficiencyLinkValidationContext = {
+  definedToolChoiceIds: ReadonlySet<string>
+  eligibleProficiencyChoiceIds: ReadonlySet<string>
+}
+
+export function refineStartingEquipmentProficiencyLinkRow(
+  row: z.infer<typeof grantedEquipmentItemFormSchema>,
+  ctx: Pick<z.RefinementCtx, 'addIssue'>,
+  validation?: StartingEquipmentProficiencyLinkValidationContext,
+): void {
+  if (row.grantTargetSource !== 'proficiency_choice' || !row.proficiencyChoiceId?.trim()) return
+  if (!validation) return
+
+  const choiceId = row.proficiencyChoiceId.trim()
+
+  if (!validation.definedToolChoiceIds.has(choiceId)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: equipmentGrantValidationMessages.missingProficiencyChoice({ choiceId }),
+      path: ['proficiencyChoiceId'],
+    })
+    return
+  }
+
+  if (!validation.eligibleProficiencyChoiceIds.has(choiceId)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
+      path: ['proficiencyChoiceId'],
+    })
+  }
+}
 
 export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
 
@@ -204,9 +238,22 @@ export function startingEquipmentChooseFields(): FormItem[] {
   ]
 }
 
+const startingEquipmentItemKindOptions = toOptions(
+  EQUIPMENT_GRANT_ITEM_KINDS,
+  STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
+)
+
+const startingEquipmentGrantTargetSourceOptions = toOptions(
+  ['equipment', 'proficiency_choice'] as const,
+  STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
+)
+
 export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
   return equipmentGrantItemFields(ctx, {
     allowProficiencyChoiceTarget: true,
+    kindSelectLabel: STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
+    itemKindOptions: startingEquipmentItemKindOptions,
+    grantTargetSourceOptions: startingEquipmentGrantTargetSourceOptions,
     extraFields: startingEquipmentModifierFields(),
   })
 }

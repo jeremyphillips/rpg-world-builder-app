@@ -510,6 +510,16 @@ describe('formatEquipmentGrantSentence', () => {
   it('returns an empty string for incomplete granted items', () => {
     expect(formatEquipmentGrantSentence({ kind: 'grant', equipmentSlug: '', quantity: 1 })).toBe('')
   })
+
+  it('returns an empty string for filtered pool choices missing equipment kind', () => {
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered', equipmentKind: undefined as unknown as 'tool' },
+      }),
+    ).toBe('')
+  })
 })
 
 describe('formatEquipmentGrantCompact', () => {
