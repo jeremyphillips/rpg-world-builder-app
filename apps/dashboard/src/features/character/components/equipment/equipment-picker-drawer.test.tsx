@@ -17,12 +17,16 @@ import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
-import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from './equipment-picker-purchase.lib'
+import {
+  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
+} from './equipment-picker-purchase.lib'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -456,7 +460,58 @@ describe('EquipmentPickerDrawer', () => {
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
   })
 
-  it('shows Added in the header rail for owned items', () => {
+  it('commits purchase quantity greater than one for stackable gear', async () => {
+    const user = userEvent.setup()
+    const onAddItem = vi.fn()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[equipmentPickerItemsFixture[2]!]}
+        budget={equipmentPickerBudgetFixture}
+        defaultTab="all"
+        onAddItem={onAddItem}
+      />,
+    )
+
+    const ropeRow = equipmentPickerItemsFixture[2]!
+
+    await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
+    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
+
+    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
+  })
+
+  it('shows owned quantity and Add another for owned stackables', async () => {
+    const user = userEvent.setup()
+    const onAddItem = vi.fn()
+    const ropeRow = equipmentPickerItemsFixture[2]!
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[ropeRow]}
+        budget={equipmentPickerBudgetFixture}
+        ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
+        defaultTab="all"
+        onAddItem={onAddItem}
+      />,
+    )
+
+    expect(
+      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 2`),
+    ).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
+    )
+    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
+  })
+
+  it('shows Added in the header rail for owned unique items', () => {
     const longsword = equipmentPickerItemsFixture[0]!
 
     render(

@@ -32,6 +32,22 @@ describe('BuilderInventoryRow', () => {
     expect(onRemove).toHaveBeenCalledTimes(1)
   })
 
+  it('renders dense provenance and footer slots', () => {
+    render(
+      <BuilderInventoryRow
+        variant="dense"
+        label={<Text as="span">Rations</Text>}
+        itemLabel="Rations"
+        provenance={<Text variant="caption">Purchased with starting gold</Text>}
+        footer={<Text as="span">10 SP total</Text>}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Purchased with starting gold')).toBeInTheDocument()
+    expect(screen.getByText('10 SP total')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <BuilderInventoryRow

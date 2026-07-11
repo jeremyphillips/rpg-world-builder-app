@@ -11,6 +11,7 @@ import {
   buildEquipmentRemoveEntryPatch,
   buildEquipmentSelectionPatch,
   buildEquipmentSetPurchaseQuantityPatch,
+  formatEquipmentInventoryRemoveLabel,
   formatEquipmentSourceLabel,
   formatStartingEquipmentOptionMeta,
   hasSelectableStartingEquipmentOption,
@@ -132,6 +133,86 @@ describe('equipment-step.lib', () => {
     expect(removePatch.equipment?.purchases).toEqual([])
   })
 
+  it('removes the entire stackable purchase row instead of decrementing', () => {
+    const rationsId = 'srd-cc-5.2.1:rations'
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [{ equipmentId: rationsId, quantity: 4, sourceMode: 'startingGold' as const }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const removePatch = buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'purchase', purchaseIndex: 0 },
+    })
+
+    expect(removePatch.equipment?.purchases).toEqual([])
+  })
+
+  it('does not remove stackable purchases when quantity drops below one', () => {
+    const rationsId = 'srd-cc-5.2.1:rations'
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [{ equipmentId: rationsId, quantity: 2, sourceMode: 'startingGold' as const }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [
+          rationsId,
+          {
+            id: rationsId,
+            slug: 'rations',
+            rulesetId: 'srd-cc-5.2.1',
+            source: 'system',
+            campaignId: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            name: 'Rations',
+            description: '',
+            kind: 'adventuring_gear',
+            gearKind: 'consumable',
+            cost: { amount: 5, currency: 'sp' },
+            weight: { value: 2, unit: 'lb' },
+          },
+        ],
+      ]),
+    }
+
+    expect(
+      buildEquipmentSetPurchaseQuantityPatch({
+        draft,
+        catalogIndex,
+        purchaseIndex: 0,
+        quantity: 0,
+      }),
+    ).toBeUndefined()
+  })
+
+  it('formats remove labels for single and stacked rows', () => {
+    expect(formatEquipmentInventoryRemoveLabel('Rations', 1)).toBe('Remove Rations')
+    expect(formatEquipmentInventoryRemoveLabel('Rations', 4)).toBe('Remove all 4 Rations')
+  })
+
   it('stacks consumable purchases and updates quantity with budget-aware patches', () => {
     const rationsId = 'srd-cc-5.2.1:rations'
     const draft = {
@@ -243,6 +324,7 @@ describe('equipment-step.lib', () => {
       kind: 'package',
       packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
     })
+    expect(rows[0]?.quantityMode).toBe('locked')
   })
 
   it('lists proficiency links for monk standard package', () => {

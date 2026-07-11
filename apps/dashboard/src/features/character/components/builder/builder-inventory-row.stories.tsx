@@ -34,3 +34,13 @@ export const WithMetaAndRemove: Story = {
     onRemove: () => undefined,
   },
 }
+
+export const Dense: Story = {
+  args: {
+    variant: 'dense',
+    label: <Text as="span">Rations</Text>,
+    itemLabel: 'Rations',
+    provenance: <Text variant="caption">Purchased with starting gold · 5 SP each</Text>,
+    onRemove: () => undefined,
+  },
+}

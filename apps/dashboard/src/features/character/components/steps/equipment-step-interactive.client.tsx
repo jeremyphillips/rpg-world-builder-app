@@ -98,7 +98,6 @@ export function EquipmentStepInteractive({
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
-          budget={budget}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
         />

@@ -7,6 +7,11 @@ import {
   type EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
+import {
+  clampEquipmentStepQuantity,
+  resolveEquipmentStepPurchaseMaxQuantity,
+} from '../../lib/equipment-quantity.lib'
+
 export const EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL = 'Purchase'
 export const EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL = 'Quantity'
 export const EQUIPMENT_PICKER_PURCHASE_UNIT_PRICE_LABEL = 'Unit price'
@@ -14,29 +19,17 @@ export const EQUIPMENT_PICKER_PURCHASE_TOTAL_LABEL = 'Total'
 export const EQUIPMENT_PICKER_PURCHASE_REMAINING_LABEL = 'Remaining after purchase'
 export const EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL = 'Add to equipment'
 export const EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL = 'Already in equipment'
+export const EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL = 'Add another'
 
-/** Phase 1 caps purchase quantity at one until multi-qty support lands. */
-export const EQUIPMENT_PICKER_PURCHASE_MAX_QUANTITY = 1
-
-export type EquipmentPickerPurchaseViewModel =
-  | {
-      mode: 'new'
-      quantity: number
-      unitPriceLabel: string
-      totalLabel: string
-      remainingAfterLabel: string
-      commitLabel: typeof EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL
-    }
-  | {
-      mode: 'update'
-      ownedQuantity: number
-      quantity: number
-      unitPriceLabel: string
-      totalForItemLabel: string
-      changeInCostLabel: string
-      remainingAfterLabel: string
-      commitLabel: 'Update quantity'
-    }
+export type EquipmentPickerPurchaseViewModel = {
+  mode: 'new'
+  quantity: number
+  maxQuantity: number
+  unitPriceLabel: string
+  totalLabel: string
+  remainingAfterLabel: string
+  commitLabel: typeof EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL
+}
 
 function formatPurchaseTotal(equipment: Equipment, quantity: number): string {
   return formatMoney({
@@ -64,11 +57,17 @@ export function buildEquipmentPickerPurchaseViewModel(args: {
 
   if (ownedQuantity > 0) return undefined
 
-  const cappedQuantity = Math.min(Math.max(quantity, 1), EQUIPMENT_PICKER_PURCHASE_MAX_QUANTITY)
+  const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
+    equipment,
+    budget,
+    currentQuantity: ownedQuantity,
+  })
+  const cappedQuantity = clampEquipmentStepQuantity(quantity, maxQuantity)
 
   return {
     mode: 'new',
     quantity: cappedQuantity,
+    maxQuantity,
     unitPriceLabel: formatMoney(equipment.cost),
     totalLabel: formatPurchaseTotal(equipment, cappedQuantity),
     remainingAfterLabel: budget

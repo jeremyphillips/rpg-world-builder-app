@@ -33,6 +33,7 @@ export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficie
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
+export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
 
 export type EquipmentPickerBadge = {
   label: string

@@ -8,8 +8,10 @@ import { EquipmentPickerItemDetails } from './equipment-picker-item-details.clie
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
+  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
 } from './equipment-picker-purchase.lib'
@@ -52,7 +54,7 @@ describe('EquipmentPickerItemDetails', () => {
     expect(screen.getByText(/Remaining after purchase/)).toBeInTheDocument()
   })
 
-  it('shows an owned note instead of purchase controls when quantity is already owned', () => {
+  it('shows an owned note instead of purchase controls when a unique item is already owned', () => {
     render(
       <EquipmentPickerItemDetails
         equipment={longswordItem.equipment}
@@ -69,6 +71,31 @@ describe('EquipmentPickerItemDetails', () => {
     expect(
       screen.queryByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows Add another for owned stackable items', async () => {
+    const user = userEvent.setup()
+    const onAddAnother = vi.fn()
+    const ropeItem = equipmentPickerItemsFixture[2]!
+
+    render(
+      <EquipmentPickerItemDetails
+        equipment={equipmentPickerRopeFixture}
+        itemState={ropeItem.state}
+        budget={equipmentPickerBudgetFixture}
+        ownedQuantity={2}
+        addQuantity={1}
+        onAddQuantityChange={vi.fn()}
+        onCommit={vi.fn()}
+        onAddAnother={onAddAnother}
+      />,
+    )
+
+    expect(screen.getByText(/Already in equipment: 2/)).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
+    )
+    expect(onAddAnother).toHaveBeenCalledTimes(1)
   })
 
   it('commits purchase from the body CTA', async () => {

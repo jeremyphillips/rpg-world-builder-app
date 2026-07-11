@@ -3,7 +3,10 @@
 import { Button, Heading, NumberInput, Text } from '@rpg/ui'
 
 import {
-  EQUIPMENT_PICKER_PURCHASE_MAX_QUANTITY,
+  clampEquipmentStepQuantity,
+  EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
+} from '../../lib/equipment-quantity.lib'
+import {
   EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMAINING_LABEL,
   EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
@@ -56,15 +59,15 @@ export function EquipmentPickerPurchaseSection({
           <NumberInput
             aria-label={`${EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL} for ${equipmentName}`}
             size="sm"
-            digits={1}
+            digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
             min={1}
             stepperMin={1}
-            stepperMax={EQUIPMENT_PICKER_PURCHASE_MAX_QUANTITY}
+            stepperMax={viewModel.maxQuantity}
             value={viewModel.quantity}
             disabled={disabled}
             onChange={(event) => {
               const next = Number(event.target.value)
-              onQuantityChange(Number.isFinite(next) && next >= 1 ? next : 1)
+              onQuantityChange(clampEquipmentStepQuantity(next, viewModel.maxQuantity))
             }}
           />
         </div>

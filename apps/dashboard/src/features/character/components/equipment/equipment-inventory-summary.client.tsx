@@ -2,11 +2,7 @@
 
 import { useMemo } from 'react'
 
-import type {
-  CharacterBuildCatalogIndex,
-  CharacterBuilderDraft,
-  EquipmentBudgetSummary,
-} from '@rpg/contracts'
+import type { CharacterBuildCatalogIndex, CharacterBuilderDraft } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 
 import {
@@ -15,7 +11,10 @@ import {
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
-import { equipmentInventoryRowKey } from './equipment-inventory-summary.lib'
+import {
+  groupEquipmentInventoryRowsForDisplay,
+  equipmentInventoryDisplayItemKey,
+} from './equipment-inventory-summary.lib'
 import {
   equipmentInventorySummaryClasses,
   equipmentInventorySummaryGroupClasses,
@@ -25,7 +24,6 @@ import {
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  budget?: EquipmentBudgetSummary
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
@@ -33,7 +31,6 @@ export type EquipmentInventorySummaryProps = {
 export function EquipmentInventorySummary({
   draft,
   catalogIndex,
-  budget,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventorySummaryProps) {
@@ -61,11 +58,10 @@ export function EquipmentInventorySummary({
             {groupLabel}
           </Heading>
           <ul className={equipmentInventorySummaryListClasses}>
-            {groupRows.map((row) => (
-              <li key={equipmentInventoryRowKey(row)}>
+            {groupEquipmentInventoryRowsForDisplay(groupRows).map((display) => (
+              <li key={equipmentInventoryDisplayItemKey(display)}>
                 <EquipmentInventoryRowItem
-                  row={row}
-                  budget={budget}
+                  display={display}
                   onRemoveItem={onRemoveItem}
                   onSetPurchaseQuantity={onSetPurchaseQuantity}
                 />

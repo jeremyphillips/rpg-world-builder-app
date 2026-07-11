@@ -5,6 +5,9 @@ import {
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
+  formatEquipmentPurchaseTotalPriceLabel,
+  formatEquipmentPurchaseUnitPriceLabel,
+  formatEquipmentBundleLabel,
   formatWealth,
   getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
@@ -14,11 +17,13 @@ import {
   readSelectedStartingEquipmentOptionId,
   resolveEquipmentPickerItems,
   resolveEquipmentPoolChoiceOptions,
+  resolveEquipmentPurchaseQuantityLimits,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
+  wealthToCopper,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterBuilderDraftEquipmentPurchase,
@@ -37,6 +42,8 @@ import {
   type StartingEquipmentOptionSummaryGrant,
   type StartingEquipmentOptionSummaryItem,
 } from '@rpg/contracts'
+
+import { clampEquipmentStepQuantity } from './equipment-quantity.lib'
 
 export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
@@ -58,6 +65,8 @@ export const EQUIPMENT_STEP_CUSTOMIZED_MESSAGE =
   'Manual changes are tracked separately from your class starting equipment.'
 
 export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
+
+export const EQUIPMENT_INVENTORY_CLICK_TO_EDIT_QUANTITY_THRESHOLD = 10
 
 export const EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL = 'Included tool'
 
@@ -88,8 +97,19 @@ export type EquipmentInventoryRow = {
   equipmentName: string
   sourceLabel: string
   isStackable: boolean
+  quantityMode: 'editable' | 'locked'
+  maxQuantity?: number
+  unitPriceLabel?: string
+  totalPriceLabel?: string
+  bundleLabel?: string
+  removeLabel: string
   removeTarget?: EquipmentInventoryRemoveTarget
   quantityTarget?: EquipmentInventoryQuantityTarget
+}
+
+export function formatEquipmentInventoryRemoveLabel(name: string, quantity: number): string {
+  if (quantity <= 1) return `${EQUIPMENT_STEP_REMOVE_ITEM_LABEL} ${name}`
+  return `${EQUIPMENT_STEP_REMOVE_ITEM_LABEL} all ${quantity} ${name}`
 }
 
 export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
@@ -353,6 +373,11 @@ export function listEquipmentInventoryRows(
         equipmentName: equipment?.name ?? entry.equipmentId,
         sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
         isStackable: equipment ? isEquipmentStackable(equipment) : false,
+        quantityMode: 'locked',
+        removeLabel: formatEquipmentInventoryRemoveLabel(
+          equipment?.name ?? entry.equipmentId,
+          entry.quantity,
+        ),
       })
     }
   }
@@ -561,16 +586,47 @@ function purchaseSourcesForDraft(
   return [{ kind: 'startingGold', sourceId: classId, grantId: optionId }]
 }
 
-function purchaseRowFromEntry(args: {
+function formatPackageGrantSourceLabel(optionLabel: string, quantity: number): string {
+  if (quantity <= 1) return `Included with ${optionLabel}`
+  return `${quantity} included with ${optionLabel}`
+}
+
+function buildInventoryRowPresentation(args: {
   entry: CharacterEquipmentEntry
   equipment: Equipment
-  catalogIndex: CharacterBuildCatalogIndex
+  sourceLabel: string
+  sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  budget?: EquipmentBudgetSummary
+  isPurchaseRow: boolean
   purchaseIndex?: number
   packageItemKey?: string
 }): EquipmentInventoryRow {
-  const { entry, equipment, catalogIndex, purchaseIndex, packageItemKey } = args
+  const {
+    entry,
+    equipment,
+    sourceLabel,
+    sourceMode,
+    budget,
+    isPurchaseRow,
+    purchaseIndex,
+    packageItemKey,
+  } = args
   const group = inventoryGroupForEquipment(equipment)
   const stackable = isEquipmentStackable(equipment)
+  const limits = resolveEquipmentPurchaseQuantityLimits({
+    equipment,
+    sourceMode,
+    budget,
+    currentQuantity: entry.quantity,
+    isPurchaseRow,
+  })
+  const unitPriceLabel = limits.showCost
+    ? formatEquipmentPurchaseUnitPriceLabel(equipment)
+    : undefined
+  const totalPriceLabel =
+    limits.showCost && entry.quantity > 1
+      ? formatEquipmentPurchaseTotalPriceLabel(equipment, entry.quantity)
+      : undefined
 
   return {
     group,
@@ -578,17 +634,63 @@ function purchaseRowFromEntry(args: {
     entry,
     equipment,
     equipmentName: equipment.name,
-    sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
+    sourceLabel,
     isStackable: stackable,
+    quantityMode: limits.editable ? 'editable' : 'locked',
+    maxQuantity: limits.editable ? limits.max : undefined,
+    unitPriceLabel,
+    totalPriceLabel,
+    bundleLabel: formatEquipmentBundleLabel(equipment),
+    removeLabel: formatEquipmentInventoryRemoveLabel(equipment.name, entry.quantity),
     removeTarget:
       packageItemKey !== undefined
         ? { kind: 'package', packageItemKey }
-        : stackable
-          ? undefined
-          : { kind: 'purchase', purchaseIndex: purchaseIndex! },
+        : isPurchaseRow && purchaseIndex !== undefined
+          ? { kind: 'purchase', purchaseIndex }
+          : undefined,
     quantityTarget:
-      purchaseIndex !== undefined && stackable ? { kind: 'purchase', purchaseIndex } : undefined,
+      limits.editable && purchaseIndex !== undefined
+        ? { kind: 'purchase', purchaseIndex }
+        : undefined,
   }
+}
+
+function purchaseRowFromEntry(args: {
+  entry: CharacterEquipmentEntry
+  equipment: Equipment
+  catalogIndex: CharacterBuildCatalogIndex
+  purchaseIndex?: number
+  packageItemKey?: string
+  sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  budget?: EquipmentBudgetSummary
+  packageOptionLabel?: string
+}): EquipmentInventoryRow {
+  const {
+    entry,
+    equipment,
+    catalogIndex,
+    purchaseIndex,
+    packageItemKey,
+    sourceMode,
+    budget,
+    packageOptionLabel,
+  } = args
+  const isPurchaseRow = purchaseIndex !== undefined
+  const sourceLabel =
+    packageOptionLabel !== undefined
+      ? formatPackageGrantSourceLabel(packageOptionLabel, entry.quantity)
+      : formatEquipmentSourceLabel(entry.sources, catalogIndex)
+
+  return buildInventoryRowPresentation({
+    entry,
+    equipment,
+    sourceLabel,
+    sourceMode,
+    budget,
+    isPurchaseRow,
+    purchaseIndex,
+    packageItemKey,
+  })
 }
 
 function listPackageInventoryRows(args: {
@@ -598,8 +700,9 @@ function listPackageInventoryRows(args: {
   option: StartingEquipmentOption
   classId: string
   selectedOptionId: string
+  budget?: EquipmentBudgetSummary
 }): EquipmentInventoryRow[] {
-  const { draft, catalogIndex, characterClass, option, classId, selectedOptionId } = args
+  const { draft, catalogIndex, characterClass, option, classId, selectedOptionId, budget } = args
   const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
   const packageSources: CharacterSelectionSource[] = [
     { kind: 'classStartingEquipment', sourceId: classId, grantId: selectedOptionId },
@@ -616,7 +719,16 @@ function listPackageInventoryRows(args: {
     const equipment = catalogIndex.equipment.get(entry.equipmentId)
     if (!equipment) return []
 
-    return [purchaseRowFromEntry({ entry, equipment, catalogIndex, packageItemKey })]
+    return [
+      purchaseRowFromEntry({
+        entry,
+        equipment,
+        catalogIndex,
+        packageItemKey,
+        packageOptionLabel: option.label,
+        budget,
+      }),
+    ]
   })
 }
 
@@ -625,8 +737,9 @@ function listPurchaseInventoryRows(args: {
   catalogIndex: CharacterBuildCatalogIndex
   classId: string
   selectedOptionId: string
+  budget?: EquipmentBudgetSummary
 }): EquipmentInventoryRow[] {
-  const { draft, catalogIndex, classId, selectedOptionId } = args
+  const { draft, catalogIndex, classId, selectedOptionId, budget } = args
 
   return (draft.equipment?.purchases ?? []).flatMap((purchase, purchaseIndex) => {
     const equipment = catalogIndex.equipment.get(purchase.equipmentId)
@@ -640,10 +753,14 @@ function listPurchaseInventoryRows(args: {
     }
 
     return [
-      {
-        ...purchaseRowFromEntry({ entry, equipment, catalogIndex, purchaseIndex }),
-        sourceLabel: formatEquipmentSourceLabel(sources, catalogIndex),
-      },
+      purchaseRowFromEntry({
+        entry,
+        equipment,
+        catalogIndex,
+        purchaseIndex,
+        sourceMode: purchase.sourceMode,
+        budget,
+      }),
     ]
   })
 }
@@ -655,14 +772,31 @@ function canAddEquipmentPurchase(args: {
   equipmentId: string
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
+  budget?: EquipmentBudgetSummary
 }): boolean {
-  const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity } = args
+  const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity, budget } = args
+  if (quantity < 1) return false
+
   if (!isEquipmentStackable(equipment)) {
     if (quantity !== 1) return false
     if (readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode) > 0) return false
     if (isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId)) return false
   }
-  return true
+
+  const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
+  const limits = resolveEquipmentPurchaseQuantityLimits({
+    equipment,
+    sourceMode,
+    budget,
+    currentQuantity,
+    isPurchaseRow: true,
+  })
+
+  if (budget && wealthToCopper(budget.starting) > 0) {
+    return currentQuantity + quantity <= limits.max
+  }
+
+  return currentQuantity + quantity <= limits.max
 }
 
 /** Lists inventory rows with removal targets derived from draft decisions. */
@@ -681,6 +815,8 @@ export function listEquipmentInventoryRowsFromDraft(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []
 
+  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+
   const packageRows =
     draft.equipment?.mode === 'gold'
       ? []
@@ -691,11 +827,12 @@ export function listEquipmentInventoryRowsFromDraft(
           option,
           classId,
           selectedOptionId,
+          budget,
         })
 
   return [
     ...packageRows,
-    ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId }),
+    ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId, budget }),
   ]
 }
 
@@ -745,10 +882,19 @@ export function buildEquipmentAddPurchasePatch(args: {
   const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1 } = args
   const equipment = catalogIndex.equipment.get(equipmentId)
 
+  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+
   if (
-    quantity < 1 ||
     !equipment ||
-    !canAddEquipmentPurchase({ equipment, draft, catalogIndex, equipmentId, sourceMode, quantity })
+    !canAddEquipmentPurchase({
+      equipment,
+      draft,
+      catalogIndex,
+      equipmentId,
+      sourceMode,
+      quantity,
+      budget,
+    })
   ) {
     return undefined
   }
@@ -781,17 +927,24 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
   if (!purchase) return undefined
 
   const equipment = catalogIndex.equipment.get(purchase.equipmentId)
-  if (!equipment || !isEquipmentStackable(equipment)) return undefined
+  if (!equipment) return undefined
 
-  if (quantity < 1) {
-    return buildEquipmentRemoveEntryPatch({
-      draft,
-      target: { kind: 'purchase', purchaseIndex },
-    })
-  }
+  if (quantity < 1) return undefined
 
+  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+  const limits = resolveEquipmentPurchaseQuantityLimits({
+    equipment,
+    sourceMode: purchase.sourceMode,
+    budget,
+    currentQuantity: purchase.quantity,
+    isPurchaseRow: true,
+  })
+
+  if (!limits.editable) return undefined
+
+  const nextQuantity = clampEquipmentStepQuantity(quantity, limits.max)
   const purchases = current.purchases.map((entry, index) =>
-    index === purchaseIndex ? { ...entry, quantity } : entry,
+    index === purchaseIndex ? { ...entry, quantity: nextQuantity } : entry,
   )
 
   return {
@@ -828,11 +981,7 @@ export function buildEquipmentRemoveEntryPatch(args: {
     }
   }
 
-  const purchases = current.purchases.flatMap((purchase, index) => {
-    if (index !== target.purchaseIndex) return [purchase]
-    if (purchase.quantity > 1) return [{ ...purchase, quantity: purchase.quantity - 1 }]
-    return []
-  })
+  const purchases = current.purchases.filter((_, index) => index !== target.purchaseIndex)
 
   return {
     equipment: {

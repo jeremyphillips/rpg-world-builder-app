@@ -23,6 +23,7 @@ import {
   equipmentStepLeatherArmorFixture,
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
+  equipmentStepRationsFixture,
 } from '../../lib/equipment-step.fixtures'
 import {
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
@@ -290,6 +291,35 @@ describe('EquipmentStep', () => {
               sourceMode: 'startingGold',
             },
           ],
+        }),
+      }),
+    )
+  })
+
+  it('updates stackable purchase quantity from the inventory stepper', async () => {
+    const user = userEvent.setup()
+    const rationsId = equipmentStepRationsFixture.id
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [{ equipmentId: rationsId, quantity: 2, sourceMode: 'startingGold' as const }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const { onDraftChange } = renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('button', { name: 'Increment' }))
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        equipment: expect.objectContaining({
+          purchases: [{ equipmentId: rationsId, quantity: 3, sourceMode: 'startingGold' }],
         }),
       }),
     )

@@ -1,7 +1,6 @@
 'use client'
 
-import { Heading, Text } from '@rpg/ui'
-import type { Equipment } from '@rpg/contracts'
+import { isEquipmentStackable, type Equipment } from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -10,22 +9,20 @@ import {
 } from '@/features/content'
 
 import {
-  EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL,
   resolveEquipmentPickerCharacterPreviewLines,
   type EquipmentPickerCharacterPreviewContext,
 } from './equipment-picker-character-preview.lib'
-import {
-  buildEquipmentPickerPurchaseViewModel,
-  EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
-} from './equipment-picker-purchase.lib'
-import { EquipmentPickerPurchaseSection } from './equipment-picker-purchase-section.client'
+import { buildEquipmentPickerPurchaseViewModel } from './equipment-picker-purchase.lib'
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
   EquipmentPickerItemState,
 } from './equipment-picker-drawer.types'
 import { isEquipmentPickerItemDisabled } from './equipment-picker-drawer.lib'
+import {
+  EquipmentPickerCharacterPreviewSection,
+  EquipmentPickerPurchasePanel,
+} from './equipment-picker-item-details-sections.client'
 import { equipmentPickerItemDetailsSectionClasses } from './equipment-picker-item-details.variants'
 
 export type EquipmentPickerItemDetailsProps = {
@@ -36,6 +33,7 @@ export type EquipmentPickerItemDetailsProps = {
   addQuantity: number
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
+  onAddAnother?: () => void
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
 }
@@ -49,6 +47,7 @@ export function EquipmentPickerItemDetails({
   addQuantity,
   onAddQuantityChange,
   onCommit,
+  onAddAnother,
   showCharacterPreview = false,
   characterPreviewContext,
 }: EquipmentPickerItemDetailsProps) {
@@ -80,42 +79,23 @@ export function EquipmentPickerItemDetails({
         omitSectionTitle
       />
 
-      {previewLines && previewLines.length > 0 ? (
-        <section
-          aria-labelledby={`${equipment.id}-character-preview-heading`}
-          className="space-y-2"
-        >
-          <Heading variant="subsection" as="h3" id={`${equipment.id}-character-preview-heading`}>
-            {EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL}
-          </Heading>
-          <ul className="space-y-1" role="list">
-            {previewLines.map((line) => (
-              <li key={line}>
-                <Text variant="muted">{line}</Text>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {ownedQuantity > 0 ? (
-        <section aria-labelledby={`${equipment.id}-purchase-owned-heading`} className="space-y-2">
-          <Heading variant="subsection" as="h3" id={`${equipment.id}-purchase-owned-heading`}>
-            {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
-          </Heading>
-          <Text variant="muted">
-            {EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL}: {ownedQuantity}
-          </Text>
-        </section>
-      ) : purchaseViewModel?.mode === 'new' ? (
-        <EquipmentPickerPurchaseSection
-          equipmentName={equipment.name}
-          viewModel={purchaseViewModel}
-          disabled={disabled}
-          onQuantityChange={onAddQuantityChange}
-          onCommit={onCommit}
+      {previewLines ? (
+        <EquipmentPickerCharacterPreviewSection
+          equipmentId={equipment.id}
+          previewLines={previewLines}
         />
       ) : null}
+
+      <EquipmentPickerPurchasePanel
+        equipment={equipment}
+        ownedQuantity={ownedQuantity}
+        stackable={isEquipmentStackable(equipment)}
+        disabled={disabled}
+        purchaseViewModel={purchaseViewModel}
+        onAddQuantityChange={onAddQuantityChange}
+        onCommit={onCommit}
+        onAddAnother={onAddAnother}
+      />
     </div>
   )
 }

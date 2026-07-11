@@ -46,6 +46,7 @@ import {
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_ADDED_LABEL,
+  EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
@@ -65,6 +66,7 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
+import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 import {
   equipmentPickerAffordableFilterClasses,
   equipmentPickerAffordableHiddenCountClasses,
@@ -495,7 +497,9 @@ export function EquipmentPickerDrawer({
       renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
       renderItemActions={(item) => {
         const header = buildEquipmentPickerHeaderViewModel(item.equipment)
-        const owned = (ownedPurchaseQuantities[item.equipment.id] ?? 0) > 0
+        const ownedQuantity = ownedPurchaseQuantities[item.equipment.id] ?? 0
+        const owned = ownedQuantity > 0
+        const stackable = isEquipmentStackable(item.equipment)
         const disabled = isEquipmentPickerItemDisabled(item)
 
         return (
@@ -503,7 +507,22 @@ export function EquipmentPickerDrawer({
             <Text as="span" variant="muted" className="shrink-0 tabular-nums">
               {header.priceLabel}
             </Text>
-            {owned ? (
+            {owned && stackable ? (
+              <>
+                <Text as="span" variant="muted" className="tabular-nums">
+                  {EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} {ownedQuantity}
+                </Text>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={disabled}
+                  onClick={() => handleQuickAdd(item)}
+                >
+                  {EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL}
+                </Button>
+              </>
+            ) : owned ? (
               <Text as="span" variant="muted">
                 {EQUIPMENT_PICKER_ADDED_LABEL}
               </Text>
@@ -530,6 +549,7 @@ export function EquipmentPickerDrawer({
           addQuantity={addQuantities[item.equipment.id] ?? 1}
           onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
           onCommit={() => handleCommitAdd(item)}
+          onAddAnother={() => handleQuickAdd(item)}
           showCharacterPreview={showCharacterPreview}
           characterPreviewContext={characterPreviewContext}
         />

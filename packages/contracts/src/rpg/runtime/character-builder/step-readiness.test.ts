@@ -304,6 +304,34 @@ describe('resolveBuilderStepReadiness', () => {
       })
     })
 
+    it('stays complete when gold purchases include multi-quantity stackables', () => {
+      const draft = draftWith({
+        class: { classId: equipmentBardClass.id, level: 1 },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['gold'],
+        },
+        equipment: {
+          mode: 'gold',
+          purchases: [
+            {
+              equipmentId: leatherArmor.id,
+              quantity: 1,
+              sourceMode: 'startingGold',
+            },
+          ],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      })
+      const choiceSets = resolveAvailableChoices(draft, equipmentTestContext)
+
+      expect(
+        resolveBuilderStepReadiness('equipment', draft, equipmentTestContext, choiceSets),
+      ).toEqual({
+        readiness: 'complete',
+      })
+    })
+
     it('stays incomplete when a linked proficiency grant is still pending', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },

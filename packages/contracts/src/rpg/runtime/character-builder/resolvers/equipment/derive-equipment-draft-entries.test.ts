@@ -216,7 +216,7 @@ describe('deriveEquipmentDraftEntries', () => {
     ])
   })
 
-  it('adds purchases with startingGold and manual sources', () => {
+  it('preserves purchase quantities in derived equipment entries', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
@@ -226,7 +226,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [
-          { equipmentId: rope.id, quantity: 2, sourceMode: 'startingGold' as const },
+          { equipmentId: rope.id, quantity: 4, sourceMode: 'startingGold' as const },
           { equipmentId: shield.id, quantity: 1, sourceMode: 'manual' as const },
         ],
         removedPackageItemKeys: [],
@@ -239,7 +239,7 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(equipment.gear).toEqual([
       {
         equipmentId: rope.id,
-        quantity: 2,
+        quantity: 4,
         sources: [{ kind: 'startingGold', sourceId: storedDruid.id, grantId: 'gold' }],
       },
     ])

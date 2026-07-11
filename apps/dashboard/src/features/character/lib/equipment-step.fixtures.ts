@@ -82,6 +82,22 @@ export const equipmentStepDrumFixture = {
   utilizes: [{ description: 'Keep a steady beat', dc: 10 }],
 } as const satisfies Equipment
 
+export const equipmentStepRationsFixture = {
+  id: 'srd-cc-5.2.1:rations',
+  slug: 'rations',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rations',
+  description: '',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 5, currency: 'sp' },
+  weight: { value: 2, unit: 'lb' },
+} as const satisfies Equipment
+
 export const equipmentStepSpearFixture = {
   id: 'srd-cc-5.2.1:spear',
   slug: 'spear',
@@ -303,6 +319,7 @@ export const equipmentStepCatalogFixture = {
     equipmentStepSpearFixture,
     equipmentStepDaggerFixture,
     equipmentStepExplorersPackFixture,
+    equipmentStepRationsFixture,
   ],
   skillProficiencies: [],
   languages: [],
