@@ -1,0 +1,349 @@
+{
+  "id": "srd-cc-5.2.1:barbarian",
+  "slug": "barbarian",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Barbarian",
+  "description": "<p>A fierce warrior who can enter a battle rage.</p>",
+  "primaryAbilities": ["str"],
+  "hitDie": 12,
+  "proficiencies": {
+    "savingThrows": ["str", "con"],
+    "armor": {
+      "categories": ["light", "medium", "shields"],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple", "martial"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard Equipment",
+          "description": "Greataxe, 4 Javelins, Explorer's Pack, and 15 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "greataxe",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "javelin",
+              "quantity": 4
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "explorers-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 15
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 75 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 75
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Barbarian Skills",
+            "choose": 2,
+            "from": ["animal-handling", "athletics", "nature", "perception", "survival"]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "rage",
+      "name": "Rage",
+      "level": 1,
+      "description": "<p>You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren't wearing Heavy armor.</p><p>You can enter your Rage the number of times shown for your Barbarian level in the Rages column of the Barbarian Features table. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>While active, your Rage follows the rules below.</p><p><strong>Damage Resistance.</strong> You have Resistance to Bludgeoning, Piercing, and Slashing damage.</p><p><strong>Rage Damage.</strong> When you make an attack using Strength—with either a weapon or an Unarmed Strike—and deal damage to the target, you gain a bonus to the damage that increases as you gain levels as a Barbarian, as shown in the Rage Damage column of the Barbarian Features table.</p><p><strong>Strength Advantage.</strong> You have Advantage on Strength checks and Strength saving throws.</p><p><strong>No Concentration or Spells.</strong> You can't maintain Concentration, and you can't cast spells.</p><p><strong>Duration.</strong> The Rage lasts until the end of your next turn, and it ends early if you don Heavy armor or have the Incapacitated condition. If your Rage is still active on your next turn, you can extend the Rage for another round by doing one of the following:</p><p>Make an attack roll against an enemy.</p><p>Force an enemy to make a saving throw.</p><p>Take a Bonus Action to extend your Rage.</p><p>Each time the Rage is extended, it lasts until the end of your next turn. You can maintain a Rage for up to 10 minutes.</p>"
+    },
+    {
+      "id": "unarmored-defense",
+      "name": "Unarmored Defense",
+      "level": 1,
+      "description": "<p>While you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit.</p>"
+    },
+    {
+      "id": "weapon-mastery",
+      "name": "Weapon Mastery",
+      "level": 1,
+      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of Simple or Martial Melee weapons of your choice, such as Greataxes and Handaxes. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Barbarian levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Barbarian Features table.</p>"
+    },
+    {
+      "id": "danger-sense",
+      "name": "Danger Sense",
+      "level": 2,
+      "description": "<p>You gain an uncanny sense of when things aren't as they should be, giving you an edge when you dodge perils. You have Advantage on Dexterity saving throws unless you have the Incapacitated condition.</p>"
+    },
+    {
+      "id": "reckless-attack",
+      "name": "Reckless Attack",
+      "level": 2,
+      "description": "<p>You can throw aside all concern for defense to attack with increased ferocity. When you make your first attack roll on your turn, you can decide to attack recklessly. Doing so gives you Advantage on attack rolls using Strength until the start of your next turn, but attack rolls against you have Advantage during that time.</p>"
+    },
+    {
+      "id": "primal-knowledge",
+      "name": "Primal Knowledge",
+      "level": 3,
+      "description": "<p>You gain proficiency in another skill of your choice from the skill list available to Barbarians at level 1.</p><p>In addition, while your Rage is active, you can channel primal power when you attempt certain tasks; whenever you make an ability check using one of the following skills, you can make it as a Strength check even if it normally uses a different ability: Acrobatics, Intimidation, Perception, Stealth, or Survival. When you use this ability, your Strength represents primal power coursing through you, honing your agility, bearing, and senses.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "barbarian-subclass",
+      "name": "Barbarian Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra-attack",
+      "name": "Extra Attack",
+      "level": 5,
+      "description": "<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>"
+    },
+    {
+      "id": "fast-movement",
+      "name": "Fast Movement",
+      "level": 5,
+      "description": "<p>Your speed increases by 10 feet while you aren't wearing Heavy armor.</p>"
+    },
+    {
+      "id": "feral-instinct",
+      "name": "Feral Instinct",
+      "level": 7,
+      "description": "<p>Your instincts are so honed that you have Advantage on Initiative rolls.</p>"
+    },
+    {
+      "id": "instinctive-pounce",
+      "name": "Instinctive Pounce",
+      "level": 7,
+      "description": "<p>As part of the Bonus Action you take to enter your Rage, you can move up to half your Speed.</p>"
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "brutal-strike",
+      "name": "Brutal Strike",
+      "level": 9,
+      "description": "<p>If you use Reckless Attack, you can forgo any Advantage on one Strength-based attack roll of your choice on your turn. The chosen attack roll mustn't have Disadvantage. If the chosen attack roll hits, the target takes an extra 1d10 damage of the same type dealt by the weapon or Unarmed Strike, and you can cause one Brutal Strike effect of your choice. You have the following effect options.</p><p><strong>Forceful Blow.</strong> The target is pushed 15 feet straight away from you. You can then move up to half your Speed straight toward the target without provoking Opportunity Attacks.</p><p><strong>Hamstring Blow.</strong> The target's Speed is reduced by 15 feet until the start of your next turn. A target can be affected by only one Hamstring Blow at a time—the most recent one.</p>"
+    },
+    {
+      "id": "relentless-rage",
+      "name": "Relentless Rage",
+      "level": 11,
+      "description": "<p>Your Rage can keep you fighting despite grievous wounds. If you drop to 0 Hit Points while your Rage is active and don't die outright, you can make a DC 10 Constitution saving throw. If you succeed, your Hit Points instead change to a number equal to twice your Barbarian level.</p><p>Each time you use this feature after the first, the DC increases by 5. When you finish a Short or Long Rest, the DC resets to 10.</p>"
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "improved-brutal-strike",
+      "name": "Improved Brutal Strike",
+      "level": 13,
+      "description": "<p>You have honed new ways to attack furiously. The following effects are now among your Brutal Strike options.</p><p><strong>Staggering Blow.</strong> The target has Disadvantage on the next saving throw it makes, and it can't make Opportunity Attacks until the start of your next turn.</p><p><strong>Sundering Blow.</strong> Before the start of your next turn, the next attack roll made by another creature against the target gains a +5 bonus to the roll. An attack roll can gain only one Sundering Blow bonus.</p>"
+    },
+    {
+      "id": "persistent-rage",
+      "name": "Persistent Rage",
+      "level": 15,
+      "description": "<p>When you roll Initiative, you can regain all expended uses of Rage. After you regain uses of Rage in this way, you can't do so again until you finish a Long Rest.</p><p>In addition, your Rage is so fierce that it now lasts for 10 minutes without you needing to do anything to extend it from round to round. Your Rage ends early if you have the Unconscious condition (not just the Incapacitated condition) or don Heavy armor.</p>"
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "masterful-brutal-strike",
+      "name": "Improved Brutal Strike",
+      "level": 17,
+      "description": "<p>The extra damage of your Brutal Strike increases to 2d10. In addition, you can use two different Brutal Strike effects whenever you use your Brutal Strike feature.</p>"
+    },
+    {
+      "id": "indomitable-might",
+      "name": "Indomitable Might",
+      "level": 18,
+      "description": "<p>If your total for a Strength check or Strength saving throw is less than your Strength score, you can use that score in place of the total.</p>"
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-irresistible-offense"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primal-champion",
+      "name": "Primal Champion",
+      "level": 20,
+      "description": "<p>You embody primal power. Your Strength and Constitution scores increase by 4, to a maximum of 25.</p>"
+    }
+  ],
+  "resources": [
+    {
+      "name": "Rages",
+      "entries": [
+        {
+          "level": 1,
+          "value": 2
+        },
+        {
+          "level": 3,
+          "value": 3
+        },
+        {
+          "level": 6,
+          "value": 4
+        },
+        {
+          "level": 12,
+          "value": 5
+        },
+        {
+          "level": 17,
+          "value": 6
+        }
+      ]
+    },
+    {
+      "name": "Rage Damage",
+      "entries": [
+        {
+          "level": 1,
+          "value": 2
+        },
+        {
+          "level": 9,
+          "value": 3
+        },
+        {
+          "level": 16,
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "Weapon Mastery",
+      "entries": [
+        {
+          "level": 1,
+          "value": 2
+        },
+        {
+          "level": 4,
+          "value": 3
+        },
+        {
+          "level": 10,
+          "value": 4
+        }
+      ]
+    }
+  ]
+}

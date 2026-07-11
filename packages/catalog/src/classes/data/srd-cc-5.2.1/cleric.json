@@ -1,0 +1,361 @@
+{
+  "id": "srd-cc-5.2.1:cleric",
+  "slug": "cleric",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Cleric",
+  "description": "<p>A priestly champion who wields divine magic in service of a higher power.</p>",
+  "primaryAbilities": ["wis"],
+  "hitDie": 8,
+  "spellcasting": {
+    "progression": "full",
+    "ability": "wis",
+    "preparation": "prepared",
+    "cantrips": [
+      {
+        "level": 1,
+        "known": 3
+      },
+      {
+        "level": 4,
+        "known": 4
+      },
+      {
+        "level": 10,
+        "known": 5
+      }
+    ],
+    "spellsAvailable": [
+      {
+        "level": 1,
+        "count": 4
+      },
+      {
+        "level": 2,
+        "count": 5
+      },
+      {
+        "level": 3,
+        "count": 6
+      },
+      {
+        "level": 4,
+        "count": 7
+      },
+      {
+        "level": 5,
+        "count": 9
+      },
+      {
+        "level": 6,
+        "count": 10
+      },
+      {
+        "level": 7,
+        "count": 11
+      },
+      {
+        "level": 8,
+        "count": 12
+      },
+      {
+        "level": 9,
+        "count": 14
+      },
+      {
+        "level": 10,
+        "count": 15
+      },
+      {
+        "level": 11,
+        "count": 16
+      },
+      {
+        "level": 12,
+        "count": 16
+      },
+      {
+        "level": 13,
+        "count": 17
+      },
+      {
+        "level": 14,
+        "count": 17
+      },
+      {
+        "level": 15,
+        "count": 18
+      },
+      {
+        "level": 16,
+        "count": 18
+      },
+      {
+        "level": 17,
+        "count": 19
+      },
+      {
+        "level": 18,
+        "count": 20
+      },
+      {
+        "level": 19,
+        "count": 21
+      },
+      {
+        "level": 20,
+        "count": 22
+      }
+    ],
+    "description": "<p>You have learned to cast spells through prayer and meditation. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Cleric spells, which appear on the Cleric spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know three cantrips of your choice from the Cleric spell list. Guidance, Sacred Flame, and Thaumaturgy are recommended.</p><p>Whenever you gain a Cleric level, you can replace one of your cantrips with another cantrip of your choice from the Cleric spell list.</p><p>When you reach Cleric levels 4 and 10, you learn another cantrip of your choice from the Cleric spell list, as shown in the Cantrips column of the Cleric Features table.</p><p><strong>Spell Slots.</strong> The Cleric Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Cleric spell list. Bless, Cure Wounds, Guiding Bolt, and Shield of Faith are recommended.</p><p>The number of spells on your list increases as you gain Cleric levels, as shown in the Prepared Spells column of the Cleric Features table. Whenever that number increases, choose additional spells from the Cleric spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Cleric, your list of prepared spells can include six spells of levels 1 and 2 in any combination.</p><p>If another Cleric feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Cleric spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with other Cleric spells for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Wisdom is your spellcasting ability for your Cleric spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Holy Symbol as a Spellcasting Focus for your Cleric spells.</p>"
+  },
+  "proficiencies": {
+    "savingThrows": ["wis", "cha"],
+    "armor": {
+      "categories": ["light", "medium", "shields"],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard Equipment",
+          "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "chain-shirt",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "shield",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "mace",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "holy-symbol-amulet",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "priests-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 7
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 110 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 110
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Cleric Skills",
+            "choose": 2,
+            "from": ["history", "insight", "medicine", "persuasion", "religion"]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "divine-order",
+      "name": "Divine Order",
+      "level": 1,
+      "description": "<p>You have dedicated yourself to one of the following sacred roles of your choice.</p><p><strong>Protector.</strong> Trained for battle, you gain proficiency with Martial weapons and training with Heavy armor.</p><p><strong>Thaumaturge.</strong> You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus to your Intelligence (Arcana or Religion) checks. The bonus equals your Wisdom modifier (minimum of +1).</p>"
+    },
+    {
+      "id": "channel-divinity",
+      "name": "Channel Divinity",
+      "level": 2,
+      "description": "<p>You can channel divine energy directly from the Outer Planes to fuel magical effects. You start with two such effects: Divine Spark and Turn Undead, each of which is described below. Each time you use this class's Channel Divinity, choose which Channel Divinity effect from this class to create. You gain additional effect options at higher Cleric levels.</p><p>You can use this class's Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain additional uses when you reach certain Cleric levels, as shown in the Channel Divinity column of the Cleric Features table.</p><p>If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class's Spellcasting feature.</p><p><strong>Divine Spark.</strong> As a Magic action, you point your Holy Symbol at another creature you can see within 30 feet of yourself and focus divine energy at it. Roll 1d8 and add your Wisdom modifier. You either restore Hit Points to the creature equal to that total or force the creature to make a Constitution saving throw. On a failed save, the creature takes Necrotic or Radiant damage (your choice) equal to that total. On a successful save, the creature takes half as much damage (round down).</p><p>You roll an additional d8 when you reach Cleric levels 7 (2d8), 13 (3d8), and 18 (4d8).</p><p><strong>Turn Undead.</strong> As a Magic action, you present your Holy Symbol and censure Undead creatures. Each Undead of your choice within 30 feet of you must make a Wisdom saving throw. If the creature fails its save, it has the Frightened and Incapacitated conditions for 1 minute. For that duration, it tries to move as far from you as it can on its turns. This effect ends early on the creature if it takes any damage, if you have the Incapacitated condition, or if you die.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "cleric-subclass",
+      "name": "Cleric Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sear-undead",
+      "name": "Sear Undead",
+      "level": 5,
+      "description": "<p>Whenever you use Turn Undead, you can roll a number of d8s equal to your Wisdom modifier (minimum of 1d8) and add the rolls together. Each Undead that fails its saving throw against that use of Turn Undead takes Radiant damage equal to the roll's total. This damage doesn't end the turn effect.</p>"
+    },
+    {
+      "id": "blessed-strikes",
+      "name": "Blessed Strikes",
+      "level": 7,
+      "description": "<p>Divine power infuses you in battle. You gain one of the following options of your choice (if you get either option from a Cleric subclass in an older book, use only the option you choose for this feature).</p><p><strong>Divine Strike.</strong> Once on each of your turns when you hit a creature with an attack roll using a weapon, you can cause the target to take an extra 1d8 Necrotic or Radiant damage (your choice).</p><p><strong>Potent Spellcasting.</strong> Add your Wisdom modifier to the damage you deal with any Cleric cantrip.</p>"
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "divine-intervention",
+      "name": "Divine Intervention",
+      "level": 10,
+      "description": "<p>You can call on your deity or pantheon to intervene on your behalf. As a Magic action, choose any Cleric spell of level 5 or lower that doesn't require a Reaction to cast. As part of the same action, you cast that spell without expending a spell slot or needing Material components. You can't use this feature again until you finish a Long Rest.</p>"
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "improved-blessed-strikes",
+      "name": "Improved Blessed Strikes",
+      "level": 14,
+      "description": "<p>The option you chose for Blessed Strikes grows more powerful.</p><p><strong>Divine Strike.</strong> The extra damage of your Divine Strike increases to 2d8.</p><p><strong>Potent Spellcasting.</strong> When you cast a Cleric cantrip and deal damage to a creature with it, you can give vitality to yourself or another creature within 60 feet of yourself, granting a number of Temporary Hit Points equal to twice your Wisdom modifier.</p>"
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-fate"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greater-divine-intervention",
+      "name": "Greater Divine Intervention",
+      "level": 20,
+      "description": "<p>You can call on even more powerful divine intervention. When you use your Divine Intervention feature, you can choose <em>Wish</em> when you select a spell. If you do so, you can't use Divine Intervention again until you finish 2d4 Long Rests.</p>"
+    }
+  ],
+  "resources": [
+    {
+      "name": "Channel Divinity",
+      "entries": [
+        {
+          "level": 2,
+          "value": 2
+        },
+        {
+          "level": 6,
+          "value": 3
+        },
+        {
+          "level": 18,
+          "value": 4
+        }
+      ]
+    }
+  ]
+}

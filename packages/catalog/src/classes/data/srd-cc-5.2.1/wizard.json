@@ -1,0 +1,338 @@
+{
+  "id": "srd-cc-5.2.1:wizard",
+  "slug": "wizard",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Wizard",
+  "description": "<p>A scholarly magic-user capable of manipulating the structures of reality.</p>",
+  "primaryAbilities": ["int"],
+  "hitDie": 6,
+  "spellcasting": {
+    "progression": "full",
+    "ability": "int",
+    "preparation": "prepared",
+    "requiredGear": ["spellbook"],
+    "recommendedGear": ["component_pouch"],
+    "focusKinds": ["arcane_focus"],
+    "description": "<p>As a student of arcane magic, you have learned to cast spells. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Wizard spells, which appear in the Wizard spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know three Wizard cantrips of your choice. Light, Mage Hand, and Ray of Frost are recommended. Whenever you finish a Long Rest, you can replace one of your cantrips from this feature with another Wizard cantrip of your choice.</p><p>When you reach Wizard levels 4 and 10, you learn another Wizard cantrip of your choice, as shown in the Cantrips column of the Wizard Features table.</p><p><strong>Spellbook.</strong> Your wizardly apprenticeship culminated in the creation of a unique book: your spellbook. It is a Tiny object that weighs 3 pounds, contains 100 pages, and can be read only by you or someone casting Identify. You determine the book's appearance and materials, such as a gilt-edged tome or a collection of vellum bound with twine.</p><p>The book contains the level 1+ spells you know. It starts with six level 1 Wizard spells of your choice. Detect Magic, Feather Fall, Mage Armor, Magic Missile, Sleep, and Thunderwave are recommended.</p><p>Whenever you gain a Wizard level after 1, add two Wizard spells of your choice to your spellbook. Each of these spells must be of a level for which you have spell slots, as shown in the Wizard Features table. The spells are the culmination of arcane research you do regularly.</p><p><strong>Spell Slots.</strong> The Wizard Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To do so, choose four spells from your spellbook. The chosen spells must be of a level for which you have spell slots.</p><p>The number of spells on your list increases as you gain Wizard levels, as shown in the Prepared Spells column of the Wizard Features table. Whenever that number increases, choose additional Wizard spells until the number of spells on your list matches the number in the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Wizard, your list of prepared spells can include six spells of levels 1 and 2 in any combination, chosen from your spellbook.</p><p>If another Wizard feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Wizard spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with spells from your spellbook.</p><p><strong>Spellcasting Ability.</strong> Intelligence is your spellcasting ability for your Wizard spells.</p><p><strong>Spellcasting Focus.</strong> You can use an Arcane Focus or your spellbook as a Spellcasting Focus for your Wizard spells.</p>",
+    "cantrips": [
+      {
+        "level": 1,
+        "known": 3
+      },
+      {
+        "level": 4,
+        "known": 4
+      },
+      {
+        "level": 10,
+        "known": 5
+      }
+    ],
+    "spellsAvailable": [
+      {
+        "level": 1,
+        "count": 4
+      },
+      {
+        "level": 2,
+        "count": 5
+      },
+      {
+        "level": 3,
+        "count": 6
+      },
+      {
+        "level": 4,
+        "count": 7
+      },
+      {
+        "level": 5,
+        "count": 9
+      },
+      {
+        "level": 6,
+        "count": 10
+      },
+      {
+        "level": 7,
+        "count": 11
+      },
+      {
+        "level": 8,
+        "count": 12
+      },
+      {
+        "level": 9,
+        "count": 14
+      },
+      {
+        "level": 10,
+        "count": 15
+      },
+      {
+        "level": 11,
+        "count": 16
+      },
+      {
+        "level": 12,
+        "count": 16
+      },
+      {
+        "level": 13,
+        "count": 17
+      },
+      {
+        "level": 14,
+        "count": 18
+      },
+      {
+        "level": 15,
+        "count": 19
+      },
+      {
+        "level": 16,
+        "count": 21
+      },
+      {
+        "level": 17,
+        "count": 22
+      },
+      {
+        "level": 18,
+        "count": 23
+      },
+      {
+        "level": 19,
+        "count": 24
+      },
+      {
+        "level": 20,
+        "count": 25
+      }
+    ]
+  },
+  "proficiencies": {
+    "savingThrows": ["int", "wis"],
+    "armor": {
+      "categories": [],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard Equipment",
+          "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "dagger",
+              "quantity": 2
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "arcane-staff",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "robe",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "spellbook",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "scholars-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 5
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 55 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 55
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Wizard Skills",
+            "choose": 2,
+            "from": ["arcana", "history", "investigation", "religion"]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "arcane-recovery",
+      "name": "Arcane Recovery",
+      "level": 1,
+      "description": "<p>You can regain some of your magical energy by studying your spellbook. When you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level equal to no more than half your Wizard level (round up), and none of the slots can be level 6 or higher. For example, if you're a level 4 Wizard, you can recover up to two levels' worth of spell slots, regaining either one level 2 spell slot or two level 1 spell slots.</p><p>Once you use this feature, you can't do so again until you finish a Long Rest.</p>"
+    },
+    {
+      "id": "ritual-adept",
+      "name": "Ritual Adept",
+      "level": 1,
+      "description": "<p>You can cast any spell as a Ritual if that spell has the Ritual tag and the spell is in your spellbook. You needn't have the spell prepared, but you must read from the book to cast a spell in this way.</p>"
+    },
+    {
+      "id": "scholar",
+      "name": "Scholar",
+      "level": 2,
+      "description": "<p>While studying magic, you also specialized in another field of study. Choose one of the following skills in which you have proficiency: Arcana, History, Investigation, Medicine, Nature, or Religion. You have Expertise in the chosen skill.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "wizard-subclass",
+      "name": "Wizard Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memorize-spell",
+      "name": "Memorize Spell",
+      "level": 5,
+      "description": "<p>Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells you have prepared for your Spellcasting feature with another level 1+ spell from the book.</p>"
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spell-mastery",
+      "name": "Spell Mastery",
+      "level": 18,
+      "description": "<p>You have achieved such mastery over certain spells that you can cast them at will. Choose a level 1 and a level 2 spell in your spellbook that have a casting time of an action. You always have those spells prepared, and you can cast them at their lowest level without expending a spell slot. To cast either spell at a higher level, you must expend a spell slot.</p><p>Whenever you finish a Long Rest, you can study your spellbook and replace one of those spells with an eligible spell of the same level from the book.</p>"
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-spell-recall"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "signature-spells",
+      "name": "Signature Spells",
+      "level": 20,
+      "description": "<p>Choose two level 3 spells in your spellbook as your signature spells. You always have these spells prepared, and you can cast each of them once at level 3 without expending a spell slot. When you do so, you can't cast them in this way again until you finish a Short or Long Rest. To cast either spell at a higher level, you must expend a spell slot.</p>"
+    }
+  ]
+}
