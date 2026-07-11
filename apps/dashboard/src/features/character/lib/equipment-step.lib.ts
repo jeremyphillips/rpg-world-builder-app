@@ -63,8 +63,6 @@ export const EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION =
 
 export const EQUIPMENT_STEP_BROWSE_LABEL = 'Browse equipment'
 
-export const EQUIPMENT_STEP_CUSTOMIZE_LABEL = 'Customize equipment'
-
 export const EQUIPMENT_STEP_CUSTOMIZED_MESSAGE =
   'Manual changes are tracked separately from your class starting equipment.'
 
@@ -122,8 +120,6 @@ export const EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION = 'Selected for Tool Pr
 
 export const EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE =
   'The linked Tool Proficiency choice is unavailable. This class content must be corrected before the package can resolve.'
-
-export type EquipmentPickerFlow = 'gold' | 'customize'
 
 export type EquipmentInventoryRemoveTarget =
   | { kind: 'package'; packageItemKey: string }
@@ -501,20 +497,15 @@ export function shouldShowEquipmentShopping(
   draft: CharacterBuilderDraft,
   selectedOptionId: string | undefined,
 ): boolean {
-  return Boolean(selectedOptionId) && !draft.equipment?.skipped
+  return (
+    selectedOptionId !== undefined &&
+    isStartingGoldOptionId(selectedOptionId) &&
+    !draft.equipment?.skipped
+  )
 }
 
-export function resolveEquipmentPickerFlow(
-  selectedOptionId: string | undefined,
-): EquipmentPickerFlow | undefined {
-  if (!selectedOptionId) return undefined
-  return isStartingGoldOptionId(selectedOptionId) ? 'gold' : 'customize'
-}
-
-export function resolvePurchaseSourceMode(
-  flow: EquipmentPickerFlow,
-): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
-  return flow === 'gold' ? 'startingGold' : 'manual'
+export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
+  return 'startingGold'
 }
 
 export function resolveEquipmentStepBudget(
@@ -828,6 +819,7 @@ function canAddEquipmentPurchase(args: {
   budget?: EquipmentBudgetSummary
 }): boolean {
   const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity, budget } = args
+  if (sourceMode === 'manual') return false
   if (quantity < 1) return false
 
   if (!isEquipmentStackable(equipment)) {
@@ -1031,17 +1023,7 @@ export function buildEquipmentRemoveEntryPatch(args: {
   }
 
   if (target.kind === 'package') {
-    const removedPackageItemKeys = current.removedPackageItemKeys.includes(target.packageItemKey)
-      ? current.removedPackageItemKeys
-      : [...current.removedPackageItemKeys, target.packageItemKey]
-
-    return {
-      equipment: {
-        ...current,
-        removedPackageItemKeys,
-        customized: true,
-      },
-    }
+    return { equipment: current }
   }
 
   const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, target.purchaseId)

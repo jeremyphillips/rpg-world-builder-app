@@ -185,3 +185,132 @@ export const GoldPurchasesWithStackableQuantities: Story = {
     catalogIndex: equipmentStepCatalogIndexFixture,
   },
 }
+
+const torchFixture = {
+  id: 'srd-cc-5.2.1:torch',
+  slug: 'torch',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Torch',
+  description: '',
+  cost: { amount: 1, currency: 'cp' },
+  weight: { value: 1, unit: 'lb' },
+  kind: 'adventuring_gear',
+  gearKind: 'general',
+  bundleSize: 1,
+} as const
+
+const monkWithTorchGrantCatalog = {
+  ...equipmentStepCatalogIndexFixture,
+  equipment: new Map([
+    ...equipmentStepCatalogIndexFixture.equipment,
+    [torchFixture.id, torchFixture],
+  ]),
+  classes: new Map([
+    ...equipmentStepCatalogIndexFixture.classes,
+    [
+      equipmentStepMonkClassFixture.id,
+      {
+        ...equipmentStepMonkClassFixture,
+        characterCreation: {
+          ...equipmentStepMonkClassFixture.characterCreation!,
+          startingEquipment: {
+            choose: 1,
+            options: [
+              {
+                id: 'standard',
+                label: 'Standard Equipment',
+                items: [
+                  {
+                    kind: 'grant',
+                    target: { source: 'equipment', equipmentSlug: 'torch' },
+                    quantity: 2,
+                  },
+                ],
+                wealth: { gp: 11 },
+              },
+              {
+                id: 'gold',
+                label: 'Starting Gold',
+                items: [],
+                wealth: { gp: 50 },
+              },
+            ],
+          },
+        },
+      },
+    ],
+  ]),
+}
+
+export const PackageConversionSameOriginMerge: Story = {
+  args: {
+    draft: {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            id: 'picker-torch',
+            equipmentId: torchFixture.id,
+            quantity: 3,
+            sourceMode: 'startingGold',
+            origin: 'picker',
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    },
+    catalogIndex: monkWithTorchGrantCatalog,
+    conversionEditorOpen: true,
+    selectedPackageItemKeys: new Set([`${equipmentStepMonkClassFixture.id}:standard:0`]),
+  },
+}
+
+const packageOnlyClassCatalog = {
+  ...equipmentStepCatalogIndexFixture,
+  classes: new Map([
+    ...equipmentStepCatalogIndexFixture.classes,
+    [
+      equipmentStepMonkClassFixture.id,
+      {
+        ...equipmentStepMonkClassFixture,
+        characterCreation: {
+          ...equipmentStepMonkClassFixture.characterCreation!,
+          startingEquipment: {
+            choose: 1,
+            options: [
+              {
+                id: 'standard',
+                label: 'Standard Equipment',
+                items: [
+                  {
+                    kind: 'grant',
+                    target: { source: 'equipment', equipmentSlug: 'spear' },
+                    quantity: 1,
+                  },
+                ],
+                wealth: { gp: 11 },
+              },
+            ],
+          },
+        },
+      },
+    ],
+  ]),
+}
+
+export const PackageWithInvalidItem: Story = {
+  args: {
+    draft: monkStandardDraft(),
+    catalogIndex: packageOnlyClassCatalog,
+  },
+}

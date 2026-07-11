@@ -44,7 +44,6 @@ export function EquipmentStepInteractive({
     pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
-    activePickerFlow,
     ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
@@ -89,7 +88,6 @@ export function EquipmentStepInteractive({
         {showShopping && budget ? (
           <EquipmentStepShoppingSection
             budget={budget}
-            activePickerFlow={activePickerFlow}
             customized={draft.equipment?.customized}
             onOpenPicker={openPicker}
           />
@@ -130,7 +128,7 @@ export function EquipmentStepInteractive({
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
-        isGoldShoppingPath={activePickerFlow === 'gold'}
+        isGoldShoppingPath={showShopping}
         onAddItem={handleAddItem}
       />
 

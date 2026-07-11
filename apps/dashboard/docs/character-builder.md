@@ -57,6 +57,7 @@ See [character-builder-copy.md](character-builder-copy.md).
 ## Related docs
 
 - [character-builder-copy.md](character-builder-copy.md)
+- [equipment-inventory.md](equipment-inventory.md)
 
 - [feature-structure.md](feature-structure.md)
 - [feature-conventions.md](feature-conventions.md)

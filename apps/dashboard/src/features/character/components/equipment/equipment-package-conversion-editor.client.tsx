@@ -68,7 +68,7 @@ export function EquipmentPackageConversionEditor({
 
   useEffect(() => {
     headingRef.current?.focus()
-    headingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    headingRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
   }, [])
 
   if (!preview) return null

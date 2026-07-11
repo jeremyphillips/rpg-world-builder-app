@@ -23,6 +23,7 @@ import {
   listProficiencyLinksForOption,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
+  shouldShowEquipmentShopping,
 } from './equipment-step.lib'
 import {
   equipmentStepBardClassFixture,
@@ -37,6 +38,122 @@ describe('equipment-step.lib', () => {
   it('detects gold options', () => {
     expect(isStartingGoldOptionId('gold')).toBe(true)
     expect(isStartingGoldOptionId('standard')).toBe(false)
+  })
+
+  it('shows equipment shopping only on the gold path', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      shouldShowEquipmentShopping(
+        draft,
+        draft.choiceSelections[startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]?.[0],
+      ),
+    ).toBe(false)
+
+    const goldDraft = {
+      ...draft,
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: { ...draft.equipment, mode: 'gold' as const },
+    }
+
+    expect(
+      shouldShowEquipmentShopping(
+        goldDraft,
+        goldDraft.choiceSelections[
+          startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)
+        ]?.[0],
+      ),
+    ).toBe(true)
+  })
+
+  it('resolves purchase source mode to starting gold only', () => {
+    expect(resolvePurchaseSourceMode()).toBe('startingGold')
+  })
+
+  it('does not create manual purchases from the picker path', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      buildEquipmentAddPurchasePatch({
+        draft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        sourceMode: 'manual',
+      }),
+    ).toBeUndefined()
+  })
+
+  it('does not write removedPackageItemKeys when removing package rows from inventory', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const patch = buildEquipmentRemoveEntryPatch({
+      draft,
+      target: {
+        kind: 'package',
+        packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+      },
+    })
+
+    expect(patch.equipment?.removedPackageItemKeys).toEqual([])
+    expect(patch.equipment?.customized).toBe(false)
+  })
+
+  it('still hides legacy removed package items from inventory rows', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [`${equipmentStepBardClassFixture.id}:standard:0`],
+        customized: true,
+      },
+    }
+
+    const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
+
+    expect(rows).toHaveLength(0)
   })
 
   it('builds package and gold selection patches', () => {
@@ -104,7 +221,7 @@ describe('equipment-step.lib', () => {
       draft,
       catalogIndex: equipmentStepCatalogIndexFixture,
       equipmentId: 'srd-cc-5.2.1:leather-armor',
-      sourceMode: resolvePurchaseSourceMode('gold'),
+      sourceMode: resolvePurchaseSourceMode(),
     })
 
     expect(addPatch?.equipment?.purchases).toEqual([
@@ -121,7 +238,7 @@ describe('equipment-step.lib', () => {
       draft: { ...draft, equipment: addPatch?.equipment },
       catalogIndex: equipmentStepCatalogIndexFixture,
       equipmentId: 'srd-cc-5.2.1:leather-armor',
-      sourceMode: resolvePurchaseSourceMode('gold'),
+      sourceMode: resolvePurchaseSourceMode(),
     })
 
     expect(duplicatePatch).toBeUndefined()

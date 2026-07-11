@@ -28,8 +28,8 @@ import {
 import {
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
   EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL,
+  EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
-  EQUIPMENT_STEP_CUSTOMIZE_LABEL,
 } from '../../lib/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
@@ -393,7 +393,7 @@ describe('EquipmentStep', () => {
     )
   })
 
-  it('shows customize controls for a selected package', async () => {
+  it('shows package customize on the inventory card but not browse shopping on the package path', async () => {
     const user = userEvent.setup()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -414,11 +414,17 @@ describe('EquipmentStep', () => {
 
     renderEquipmentStep(draft)
 
-    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_CUSTOMIZE_LABEL })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }),
+    ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_CUSTOMIZE_LABEL }))
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
-    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Add equipment' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

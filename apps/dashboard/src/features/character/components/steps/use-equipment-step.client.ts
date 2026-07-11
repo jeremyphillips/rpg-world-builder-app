@@ -23,13 +23,11 @@ import {
   findStartingEquipmentChoiceSet,
   hasGoldStartingEquipmentOption,
   readSelectedStartingEquipmentOption,
-  resolveEquipmentPickerFlow,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
   shouldShowEquipmentShopping,
-  type EquipmentPickerFlow,
 } from '../../lib/equipment-step.lib'
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
@@ -50,7 +48,6 @@ export function useEquipmentStep(args: {
   const { context, draft, resolvedChoiceSets, onDraftChange } = args
   const [pendingSelection, setPendingSelection] = useState<PendingEquipmentSelection | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [pickerFlow, setPickerFlow] = useState<EquipmentPickerFlow | undefined>(undefined)
   const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
   const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -112,10 +109,7 @@ export function useEquipmentStep(args: {
         : undefined,
     [budget, catalogIndex, context.characterCreationRules, draft, showShopping],
   )
-  const activePickerFlow = pickerFlow ?? resolveEquipmentPickerFlow(selectedOptionId)
-  const activePurchaseSourceMode = activePickerFlow
-    ? resolvePurchaseSourceMode(activePickerFlow)
-    : undefined
+  const activePurchaseSourceMode = showShopping ? resolvePurchaseSourceMode() : undefined
   const ownedPurchaseQuantities = useMemo(() => {
     if (!activePurchaseSourceMode) return {}
 
@@ -158,8 +152,7 @@ export function useEquipmentStep(args: {
     applySelection(nextSelection)
   }
 
-  const openPicker = (flow: EquipmentPickerFlow) => {
-    setPickerFlow(flow)
+  const openPicker = () => {
     setPickerOpen(true)
   }
 
@@ -209,13 +202,13 @@ export function useEquipmentStep(args: {
     item,
     quantity,
   ) => {
-    if (!activePickerFlow) return
+    if (!showShopping) return
 
     const patch = buildEquipmentAddPurchasePatch({
       draft,
       catalogIndex,
       equipmentId: item.equipment.id,
-      sourceMode: resolvePurchaseSourceMode(activePickerFlow),
+      sourceMode: resolvePurchaseSourceMode(),
       quantity,
     })
     if (patch) onDraftChange(patch)
@@ -248,7 +241,6 @@ export function useEquipmentStep(args: {
     pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
-    activePickerFlow,
     ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
