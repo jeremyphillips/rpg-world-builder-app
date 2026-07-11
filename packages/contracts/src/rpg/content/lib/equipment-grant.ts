@@ -324,53 +324,68 @@ export const equipmentGrantSchema = z.preprocess(
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
 
+const FILTERED_POOL_CATEGORY_LABEL_RESOLVERS = [
+  (pool: FilteredEquipmentPool) =>
+    pool.toolCategory ? getToolCategoryLabel(pool.toolCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.weaponCategory ? getWeaponCategoryLabel(pool.weaponCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.armorCategory ? getArmorCategoryLabel(pool.armorCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.spellcastingGearKind ? getSpellcastingGearKindLabel(pool.spellcastingGearKind) : undefined,
+  (pool: FilteredEquipmentPool) => (pool.gearKind ? getGearKindLabel(pool.gearKind) : undefined),
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemCategory ? getMagicItemCategoryLabel(pool.magicItemCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemRarity ? getMagicItemRarityLabel(pool.magicItemRarity) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.vehicleCategory ? getVehicleCategoryLabel(pool.vehicleCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.serviceCategory ? getServiceCategoryLabel(pool.serviceCategory) : undefined,
+] as const
+
+const FILTERED_POOL_CATEGORY_ENTRY_RESOLVERS = [
+  (pool: FilteredEquipmentPool) =>
+    pool.toolCategory ? getToolCategoryEntry(pool.toolCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.weaponCategory ? getWeaponCategoryEntry(pool.weaponCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.armorCategory ? getArmorCategoryEntry(pool.armorCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.spellcastingGearKind ? getSpellcastingGearKindEntry(pool.spellcastingGearKind) : undefined,
+  (pool: FilteredEquipmentPool) => (pool.gearKind ? getGearKindEntry(pool.gearKind) : undefined),
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemCategory ? getMagicItemCategoryEntry(pool.magicItemCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemRarity ? getMagicItemRarityEntry(pool.magicItemRarity) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.vehicleCategory ? getVehicleCategoryEntry(pool.vehicleCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.serviceCategory ? getServiceCategoryEntry(pool.serviceCategory) : undefined,
+] as const
+
+function resolveFilteredPoolCategoryLabel(pool: FilteredEquipmentPool): string | undefined {
+  for (const resolveLabel of FILTERED_POOL_CATEGORY_LABEL_RESOLVERS) {
+    const label = resolveLabel(pool)
+    if (label) return label
+  }
+  return undefined
+}
+
 /** Display label for a pool-backed equipment choice (titles, character builder). */
 export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
   if (pool.source === 'explicit') {
     return pool.equipmentSlugs.join(', ')
   }
 
-  if (pool.toolCategory) {
-    return getToolCategoryLabel(pool.toolCategory)
-  }
-  if (pool.weaponCategory) {
-    return getWeaponCategoryLabel(pool.weaponCategory)
-  }
-  if (pool.armorCategory) {
-    return getArmorCategoryLabel(pool.armorCategory)
-  }
-  if (pool.spellcastingGearKind) {
-    return getSpellcastingGearKindLabel(pool.spellcastingGearKind)
-  }
-  if (pool.gearKind) {
-    return getGearKindLabel(pool.gearKind)
-  }
-  if (pool.magicItemCategory) {
-    return getMagicItemCategoryLabel(pool.magicItemCategory)
-  }
-  if (pool.magicItemRarity) {
-    return getMagicItemRarityLabel(pool.magicItemRarity)
-  }
-  if (pool.vehicleCategory) {
-    return getVehicleCategoryLabel(pool.vehicleCategory)
-  }
-  if (pool.serviceCategory) {
-    return getServiceCategoryLabel(pool.serviceCategory)
-  }
-
-  return getEquipmentKindLabel(pool.equipmentKind) || ''
+  return resolveFilteredPoolCategoryLabel(pool) ?? (getEquipmentKindLabel(pool.equipmentKind) || '')
 }
 
-function getEquipmentPoolSentenceEntry(pool: Extract<EquipmentPool, { source: 'filtered' }>) {
-  if (pool.toolCategory) return getToolCategoryEntry(pool.toolCategory)
-  if (pool.weaponCategory) return getWeaponCategoryEntry(pool.weaponCategory)
-  if (pool.armorCategory) return getArmorCategoryEntry(pool.armorCategory)
-  if (pool.spellcastingGearKind) return getSpellcastingGearKindEntry(pool.spellcastingGearKind)
-  if (pool.gearKind) return getGearKindEntry(pool.gearKind)
-  if (pool.magicItemCategory) return getMagicItemCategoryEntry(pool.magicItemCategory)
-  if (pool.magicItemRarity) return getMagicItemRarityEntry(pool.magicItemRarity)
-  if (pool.vehicleCategory) return getVehicleCategoryEntry(pool.vehicleCategory)
-  if (pool.serviceCategory) return getServiceCategoryEntry(pool.serviceCategory)
+function getEquipmentPoolSentenceEntry(pool: FilteredEquipmentPool) {
+  for (const resolveEntry of FILTERED_POOL_CATEGORY_ENTRY_RESOLVERS) {
+    const entry = resolveEntry(pool)
+    if (entry) return entry
+  }
   return getEquipmentKindEntry(pool.equipmentKind)
 }
 

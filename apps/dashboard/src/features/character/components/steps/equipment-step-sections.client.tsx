@@ -47,7 +47,7 @@ export function EquipmentStepShoppingSection({
       <div>
         <Button
           type="button"
-          variant="secondary"
+          variant="default"
           onClick={() => onOpenPicker(activePickerFlow ?? 'gold')}
         >
           {activePickerFlow === 'customize'

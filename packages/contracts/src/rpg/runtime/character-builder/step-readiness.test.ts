@@ -301,9 +301,6 @@ describe('resolveBuilderStepReadiness', () => {
         resolveBuilderStepReadiness('equipment', draft, equipmentTestContext, choiceSets),
       ).toEqual({
         readiness: 'complete',
-        message: formatFieldMessage(
-          characterBuilderStepReadinessMessages.equipmentReviewComplete(),
-        ),
       })
     })
 
@@ -353,9 +350,6 @@ describe('resolveBuilderStepReadiness', () => {
 
       expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
         readiness: 'complete',
-        message: formatFieldMessage(
-          characterBuilderStepReadinessMessages.equipmentReviewComplete(),
-        ),
       })
     })
 

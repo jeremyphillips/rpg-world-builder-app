@@ -93,8 +93,9 @@ export function resolveEquipmentStepReadiness(
 
   return {
     readiness: 'complete',
-    message: formatStepReadinessMessage(
-      characterBuilderStepReadinessMessages.equipmentReviewComplete,
-    ),
+    // TODO: move this elsewhere.
+    // message: formatStepReadinessMessage(
+    //   characterBuilderStepReadinessMessages.equipmentReviewComplete,
+    // ),
   }
 }

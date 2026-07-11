@@ -180,6 +180,61 @@ export function equipmentGrantFromFormRow(row: EquipmentGrantItemForm): Equipmen
   return row.itemKind === 'grant' ? grantedItemFromFormRow(row) : choiceGrantFromFormRow(row)
 }
 
+function formatQuantityPrefixedLabel(name: string, quantity: number): string {
+  return quantity > 1 ? `${quantity} × ${name}` : `1 × ${name}`
+}
+
+function equipmentGrantTitleForProficiencyChoice(
+  row: GrantedEquipmentItemForm,
+  index: number,
+  proficiencyChoiceOptions: FieldOption[],
+): string {
+  if (!row.proficiencyChoiceId) return `Item ${index + 1}`
+
+  const matchedOption = proficiencyChoiceOptions.find(
+    (option) => option.value === row.proficiencyChoiceId,
+  )
+  const choiceLabel = matchedOption?.label ?? row.proficiencyChoiceId
+  const quantity = row.quantity ?? 1
+  const prefix = quantity > 1 ? `${quantity} × ` : '1 × '
+  return `${prefix}Tool selected in "${choiceLabel}"`
+}
+
+function equipmentGrantTitleForEquipmentGrant(
+  row: GrantedEquipmentItemForm,
+  index: number,
+  equipmentOptions: FieldOption[],
+): string {
+  const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
+  const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
+  return formatQuantityPrefixedLabel(name, row.quantity ?? 1)
+}
+
+function equipmentGrantTitleForChoice(
+  row: EquipmentGrantChoiceItemForm,
+  index: number,
+  equipmentOptions: FieldOption[],
+): string {
+  const choose = row.choose ?? 1
+  const poolLabel = resolveChoicePoolLabel(row, equipmentOptions)
+  if (!poolLabel) return `Item ${index + 1}`
+
+  return `${poolLabel} — choose ${choose}`
+}
+
+function resolveChoicePoolLabel(
+  row: EquipmentGrantChoiceItemForm,
+  equipmentOptions: FieldOption[],
+): string | undefined {
+  if (row.poolSource === 'explicit') {
+    return formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentOptions)
+  }
+
+  if (!row.poolEquipmentKind) return undefined
+
+  return formatEquipmentPoolLabel(equipmentPoolFromFormRow(row))
+}
+
 export function equipmentGrantTitle(
   row: EquipmentGrantItemForm | undefined,
   index: number,
@@ -190,34 +245,12 @@ export function equipmentGrantTitle(
 
   if (row.itemKind === 'grant') {
     if (row.grantTargetSource === 'proficiency_choice') {
-      const matchedOption = proficiencyChoiceOptions.find(
-        (option) => option.value === row.proficiencyChoiceId,
-      )
-      const choiceLabel = matchedOption?.label ?? row.proficiencyChoiceId
-      const quantity = row.quantity ?? 1
-      const prefix = quantity > 1 ? `${quantity} × ` : '1 × '
-      if (!row.proficiencyChoiceId) return `Item ${index + 1}`
-      return `${prefix}Tool selected in "${choiceLabel}"`
+      return equipmentGrantTitleForProficiencyChoice(row, index, proficiencyChoiceOptions)
     }
-
-    const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
-    const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
-    const quantity = row.quantity ?? 1
-    return quantity > 1 ? `${quantity} × ${name}` : `1 × ${name}`
+    return equipmentGrantTitleForEquipmentGrant(row, index, equipmentOptions)
   }
 
-  const choose = row.choose ?? 1
-  let poolLabel: string
-
-  if (row.poolSource === 'explicit') {
-    poolLabel = formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentOptions)
-  } else if (!row.poolEquipmentKind) {
-    return `Item ${index + 1}`
-  } else {
-    poolLabel = formatEquipmentPoolLabel(equipmentPoolFromFormRow(row))
-  }
-
-  return `${poolLabel} — choose ${choose}`
+  return equipmentGrantTitleForChoice(row, index, equipmentOptions)
 }
 
 function isEquipmentGrantSummaryComplete(row: EquipmentGrantItemForm): boolean {
