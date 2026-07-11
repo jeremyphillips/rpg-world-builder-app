@@ -19,9 +19,9 @@ import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 
 describe('EquipmentInventorySummary', () => {
-  it('renders removable package rows', async () => {
+  it('renders package rows with qty-in-title and remove-from-package action', async () => {
     const user = userEvent.setup()
-    const onRemoveItem = vi.fn()
+    const onRemoveFromPackage = vi.fn()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -43,19 +43,20 @@ describe('EquipmentInventorySummary', () => {
       <EquipmentInventorySummary
         draft={draft}
         catalogIndex={equipmentStepCatalogIndexFixture}
-        onRemoveItem={onRemoveItem}
+        onRemoveFromPackage={onRemoveFromPackage}
       />,
     )
 
-    expect(screen.getByText('Leather Armor')).toBeInTheDocument()
-    expect(screen.getByText('Lute')).toBeInTheDocument()
+    expect(screen.getByText('1 × Leather Armor')).toBeInTheDocument()
+    expect(screen.getByText('1 × Lute')).toBeInTheDocument()
+    expect(screen.getByText('Starting Equipment')).toBeInTheDocument()
+    expect(screen.getByText('Purchased with Starting Gold')).toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: 'Remove Leather Armor' })[0]!)
+    await user.click(screen.getAllByRole('button', { name: 'Remove from package' })[0]!)
 
-    expect(onRemoveItem).toHaveBeenCalledWith({
-      kind: 'package',
-      packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
-    })
+    expect(onRemoveFromPackage).toHaveBeenCalledWith(
+      `${equipmentStepBardClassFixture.id}:standard:0`,
+    )
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {

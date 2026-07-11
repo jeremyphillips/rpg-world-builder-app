@@ -98,8 +98,25 @@ export function EquipmentStepInteractive({
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
+          conversionEditorOpen={step.conversionEditorOpen}
+          selectedPackageItemKeys={step.selectedPackageItemKeys}
+          conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
+          onCustomizePackage={() => step.openConversionEditor()}
+          onChangeEquipmentOption={() => {
+            document.getElementById('starting-equipment-options')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            })
+            document.getElementById('starting-equipment-options')?.focus()
+          }}
+          onRemoveFromPackage={(packageItemKey) =>
+            step.openConversionEditor(new Set([packageItemKey]))
+          }
+          onSelectedPackageItemKeysChange={step.setSelectedPackageItemKeys}
+          onCancelConversion={() => step.setConversionEditorOpen(false)}
+          onCommitConversion={step.handleCommitConversion}
         />
       </div>
 

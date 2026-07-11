@@ -1,6 +1,22 @@
-import type { CharacterEquipment } from '@rpg/contracts'
+import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuilderDraft,
+  CharacterEquipment,
+} from '@rpg/contracts'
+import {
+  readSelectedStartingEquipmentOptionId,
+  resolveGoldStartingEquipmentAlternative,
+} from '@rpg/contracts'
 
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import {
+  formatStartingEquipmentWealth,
+  isStartingGoldOptionId,
+  listEquipmentInventoryRowsFromDraft,
+  type EquipmentInventoryRow,
+  type PackageCustomizeAffordance,
+  type StartingPackageCategoryGroup,
+  type StartingPackageInventoryGroup,
+} from '../../lib/equipment-step.lib'
 
 export type EquipmentInventorySourceBreakdown = {
   included: number
@@ -46,7 +62,9 @@ export function formatEquipmentInventorySourceBreakdownLabel(
 
 export function groupEquipmentInventoryRowsForDisplay(
   rows: readonly EquipmentInventoryRow[],
+  options?: { allowCombinedRows?: boolean },
 ): EquipmentInventoryDisplayItem[] {
+  const allowCombinedRows = options?.allowCombinedRows ?? true
   const byEquipment = new Map<string, EquipmentInventoryRow[]>()
   const order: string[] = []
 
@@ -63,8 +81,10 @@ export function groupEquipmentInventoryRowsForDisplay(
 
   for (const key of order) {
     const groupRows = byEquipment.get(key)!
-    if (groupRows.length === 1) {
-      items.push({ kind: 'single', row: groupRows[0]! })
+    if (!allowCombinedRows || groupRows.length === 1) {
+      for (const row of groupRows) {
+        items.push({ kind: 'single', row })
+      }
       continue
     }
 
@@ -108,4 +128,116 @@ export function equipmentInventoryDisplayItemKey(item: EquipmentInventoryDisplay
   if (item.kind === 'single') return equipmentInventoryRowKey(item.row)
 
   return `${item.group}-${item.equipmentId}-combined-${item.rows.map((row) => equipmentInventoryRowKey(row)).join('|')}`
+}
+
+export type PurchasedCategoryGroup = {
+  group: keyof CharacterEquipment
+  groupLabel: string
+  displays: EquipmentInventoryDisplayItem[]
+}
+
+export type EquipmentInventoryLayout =
+  | {
+      mode: 'package'
+      startingPackage: StartingPackageInventoryGroup
+      purchased: PurchasedCategoryGroup[]
+    }
+  | { mode: 'gold'; purchased: PurchasedCategoryGroup[] }
+
+function groupRowsByCategory(
+  rows: readonly EquipmentInventoryRow[],
+): StartingPackageCategoryGroup[] {
+  const grouped = new Map<string, EquipmentInventoryRow[]>()
+  const order: string[] = []
+
+  for (const row of rows) {
+    if (!grouped.has(row.groupLabel)) {
+      grouped.set(row.groupLabel, [])
+      order.push(row.groupLabel)
+    }
+    grouped.get(row.groupLabel)!.push(row)
+  }
+
+  return order.map((groupLabel) => {
+    const groupRows = grouped.get(groupLabel)!
+    return {
+      group: groupRows[0]!.group,
+      groupLabel,
+      rows: groupRows,
+    }
+  })
+}
+
+function buildPurchasedCategoryGroups(
+  rows: readonly EquipmentInventoryRow[],
+  allowCombinedRows: boolean,
+): PurchasedCategoryGroup[] {
+  const grouped = new Map<string, EquipmentInventoryRow[]>()
+  const order: string[] = []
+
+  for (const row of rows) {
+    if (!grouped.has(row.groupLabel)) {
+      grouped.set(row.groupLabel, [])
+      order.push(row.groupLabel)
+    }
+    grouped.get(row.groupLabel)!.push(row)
+  }
+
+  return order.map((groupLabel) => {
+    const groupRows = grouped.get(groupLabel)!
+    return {
+      group: groupRows[0]!.group,
+      groupLabel,
+      displays: groupEquipmentInventoryRowsForDisplay(groupRows, { allowCombinedRows }),
+    }
+  })
+}
+
+/** Builds source-grouped inventory layout for package vs purchased sections. */
+export function buildEquipmentInventoryLayout(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): EquipmentInventoryLayout | undefined {
+  const classId = draft.class.classId
+  if (!classId) return undefined
+
+  const characterClass = catalogIndex.classes.get(classId)
+  const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  if (!characterClass || !startingEquipment || !selectedOptionId) return undefined
+
+  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
+  if (!option) return undefined
+
+  const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOptionId(selectedOptionId)
+  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex)
+  const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
+  const purchasedRows = allRows.filter((row) => row.removeTarget?.kind === 'purchase')
+
+  const purchased = buildPurchasedCategoryGroups(purchasedRows, isGoldPath)
+
+  if (isGoldPath) {
+    return { mode: 'gold', purchased }
+  }
+
+  const goldAlternative = resolveGoldStartingEquipmentAlternative(
+    startingEquipment.options,
+    selectedOptionId,
+  )
+  const customize: PackageCustomizeAffordance =
+    goldAlternative.status === 'available'
+      ? { status: 'available' }
+      : { status: 'disabled', reason: goldAlternative.reason }
+
+  return {
+    mode: 'package',
+    startingPackage: {
+      optionId: selectedOptionId,
+      optionLabel: option.label,
+      categoryGroups: groupRowsByCategory(packageRows),
+      includedWealthLabel: formatStartingEquipmentWealth(option.wealth),
+      customize,
+    },
+    purchased,
+  }
 }

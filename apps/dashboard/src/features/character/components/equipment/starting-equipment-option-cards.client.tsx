@@ -350,38 +350,45 @@ export function StartingEquipmentOptionCards({
   }
 
   return (
-    <RadioGroup
-      className={startingEquipmentOptionCardListClasses}
-      value={selectedOptionId ?? ''}
-      onValueChange={(optionId) => {
-        if (!optionId) return
-
-        const pending = pendingNestedSelections[optionId] ?? {}
-        const nestedSelections = {
-          ...draft.choiceSelections,
-          ...pending,
-        }
-
-        onSelectOption(optionId, nestedSelections)
-      }}
+    <section
+      id="starting-equipment-options"
+      tabIndex={-1}
+      className="outline-none"
+      aria-label="Starting equipment options"
     >
-      {packageSummaries.map((summary) => (
-        <PackageOptionCard
-          key={summary.optionId}
-          summary={summary}
-          characterClass={characterClass}
-          catalogIndex={catalogIndex}
-          draft={draft}
-          resolvedChoiceSets={resolvedChoiceSets}
-          selectedOptionId={selectedOptionId}
-          pendingNestedSelections={pendingNestedSelections}
-          onSelectOption={onSelectOption}
-          onNestedPoolChange={handleNestedPoolChange}
-          onChoiceSelectionChange={onChoiceSelectionChange}
-        />
-      ))}
+      <RadioGroup
+        className={startingEquipmentOptionCardListClasses}
+        value={selectedOptionId ?? ''}
+        onValueChange={(optionId) => {
+          if (!optionId) return
 
-      {goldSummary ? <GoldOptionCard summary={goldSummary} /> : null}
-    </RadioGroup>
+          const pending = pendingNestedSelections[optionId] ?? {}
+          const nestedSelections = {
+            ...draft.choiceSelections,
+            ...pending,
+          }
+
+          onSelectOption(optionId, nestedSelections)
+        }}
+      >
+        {packageSummaries.map((summary) => (
+          <PackageOptionCard
+            key={summary.optionId}
+            summary={summary}
+            characterClass={characterClass}
+            catalogIndex={catalogIndex}
+            draft={draft}
+            resolvedChoiceSets={resolvedChoiceSets}
+            selectedOptionId={selectedOptionId}
+            pendingNestedSelections={pendingNestedSelections}
+            onSelectOption={onSelectOption}
+            onNestedPoolChange={handleNestedPoolChange}
+            onChoiceSelectionChange={onChoiceSelectionChange}
+          />
+        ))}
+
+        {goldSummary ? <GoldOptionCard summary={goldSummary} /> : null}
+      </RadioGroup>
+    </section>
   )
 }

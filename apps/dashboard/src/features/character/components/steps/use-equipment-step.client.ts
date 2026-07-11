@@ -3,12 +3,15 @@
 import { useMemo, useState, type ComponentProps } from 'react'
 
 import {
+  buildStartingPackageConversionPatch,
+  buildStartingPackageConversionPreview,
   indexCharacterBuildCatalog,
   resolveBuilderStepReadiness,
   resolveStartingEquipmentOptionSummaries,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
+  type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 
 import {
@@ -48,6 +51,13 @@ export function useEquipmentStep(args: {
   const [pendingSelection, setPendingSelection] = useState<PendingEquipmentSelection | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerFlow, setPickerFlow] = useState<EquipmentPickerFlow | undefined>(undefined)
+  const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
+  const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
+  const [conversionCommitStatusMessage, setConversionCommitStatusMessage] = useState<
+    string | undefined
+  >(undefined)
 
   const classId = draft.class.classId
   const catalogIndex = useMemo(() => indexCharacterBuildCatalog(context.catalog), [context.catalog])
@@ -153,6 +163,48 @@ export function useEquipmentStep(args: {
     setPickerOpen(true)
   }
 
+  const defaultSelectedPackageItemKeys = (deselectedKeys: ReadonlySet<string> = new Set()) => {
+    if (!selectedOptionId) return new Set<string>()
+
+    const preview = buildStartingPackageConversionPreview({
+      draft,
+      catalogIndex,
+      departingOptionId: selectedOptionId,
+      selectedPackageItemKeys: new Set(),
+    })
+
+    if (!preview) return new Set<string>()
+
+    return new Set(
+      preview.items
+        .filter((item) => item.status === 'selectable' && !deselectedKeys.has(item.packageItemKey))
+        .map((item) => item.packageItemKey),
+    )
+  }
+
+  const openConversionEditor = (deselectedKeys: ReadonlySet<string> = new Set()) => {
+    setConversionCommitStatusMessage(undefined)
+    setSelectedPackageItemKeys(defaultSelectedPackageItemKeys(deselectedKeys))
+    setConversionEditorOpen(true)
+  }
+
+  const handleCommitConversion = (_preview: StartingPackageConversionPreview) => {
+    if (!selectedOptionId) return
+
+    const patch = buildStartingPackageConversionPatch({
+      draft,
+      catalogIndex,
+      departingOptionId: selectedOptionId,
+      selectedPackageItemKeys,
+    })
+
+    if (!patch) return
+
+    onDraftChange(patch)
+    setConversionEditorOpen(false)
+    setConversionCommitStatusMessage('Starting equipment converted to starting gold.')
+  }
+
   const handleAddItem: ComponentProps<typeof EquipmentPickerDrawer>['onAddItem'] = (
     item,
     quantity,
@@ -202,6 +254,13 @@ export function useEquipmentStep(args: {
     setPendingSelection,
     pickerOpen,
     setPickerOpen,
+    conversionEditorOpen,
+    setConversionEditorOpen,
+    selectedPackageItemKeys,
+    setSelectedPackageItemKeys,
+    conversionCommitStatusMessage,
+    openConversionEditor,
+    handleCommitConversion,
     requestSelection,
     openPicker,
     handleAddItem,

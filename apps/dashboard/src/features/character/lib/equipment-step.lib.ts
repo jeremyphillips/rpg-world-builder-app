@@ -70,6 +70,47 @@ export const EQUIPMENT_STEP_CUSTOMIZED_MESSAGE =
 
 export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
 
+export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
+  'No items purchased with starting gold yet.'
+
+export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
+
+export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased with Starting Gold'
+
+export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
+
+export const EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL = 'Change equipment option'
+
+export const EQUIPMENT_PACKAGE_REMOVE_FROM_PACKAGE_LABEL = 'Remove from package'
+
+export const EQUIPMENT_PACKAGE_INCLUDED_WEALTH_LABEL = 'included'
+
+export const EQUIPMENT_PACKAGE_CUSTOMIZE_UNAVAILABLE_REASON =
+  'No starting-gold alternative is configured for this package.'
+
+export type PackageCustomizeAffordance =
+  | { status: 'available' }
+  | { status: 'disabled'; reason: string }
+
+export type StartingPackageCategoryGroup = {
+  group: keyof CharacterEquipment
+  groupLabel: string
+  rows: EquipmentInventoryRow[]
+}
+
+export type StartingPackageInventoryGroup = {
+  optionId: string
+  optionLabel: string
+  categoryGroups: StartingPackageCategoryGroup[]
+  includedWealthLabel?: string
+  customize: PackageCustomizeAffordance
+}
+
+/** Formats package row titles with quantity prefix (`5 × Dagger`). */
+export function formatPackageInventoryRowTitle(name: string, quantity: number): string {
+  return `${quantity} × ${name}`
+}
+
 export const EQUIPMENT_INVENTORY_CLICK_TO_EDIT_QUANTITY_THRESHOLD = 10
 
 export const EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL = 'Included tool'
