@@ -4,6 +4,7 @@ import { formatMoney } from '../../../../primitives/units'
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
 import {
   maxAffordableEquipmentQuantity,
+  moneyToCopper,
   wealthToCopper,
   type EquipmentBudgetSummary,
 } from './equipment-budget'
@@ -16,6 +17,28 @@ export type EquipmentPurchaseQuantityLimits = {
   min: 1
   max: number
   showCost: boolean
+}
+
+/** Budget- and cap-limited max for starting-gold acquisition (picker / new purchase qty). */
+export function resolveEquipmentAcquisitionMaxQuantity(args: {
+  equipment: Equipment
+  budget?: EquipmentBudgetSummary
+  currentQuantity: number
+}): number {
+  const { equipment, budget, currentQuantity } = args
+  const unitCost = moneyToCopper(equipment.cost)
+  const hasSpendableBudget = budget !== undefined && wealthToCopper(budget.starting) > 0
+
+  let budgetMax: number
+  if (unitCost <= 0) {
+    budgetMax = currentQuantity + EQUIPMENT_PURCHASE_QUANTITY_MAX
+  } else if (hasSpendableBudget && budget) {
+    budgetMax = maxAffordableEquipmentQuantity(equipment, budget, currentQuantity)
+  } else {
+    budgetMax = EQUIPMENT_PURCHASE_QUANTITY_MAX
+  }
+
+  return Math.min(EQUIPMENT_PURCHASE_QUANTITY_MAX, Math.max(budgetMax, 1))
 }
 
 export function resolveEquipmentPurchaseQuantityLimits(args: {
@@ -33,15 +56,13 @@ export function resolveEquipmentPurchaseQuantityLimits(args: {
   }
 
   const editable = isEquipmentStackable(equipment) && sourceMode === 'startingGold'
-  const hasSpendableBudget = budget !== undefined && wealthToCopper(budget.starting) > 0
-  const budgetMax =
-    hasSpendableBudget && budget
-      ? maxAffordableEquipmentQuantity(equipment, budget, currentQuantity)
-      : EQUIPMENT_PURCHASE_QUANTITY_MAX
+  const acquisitionMax = resolveEquipmentAcquisitionMaxQuantity({
+    equipment,
+    budget,
+    currentQuantity,
+  })
 
-  const max = editable
-    ? Math.min(EQUIPMENT_PURCHASE_QUANTITY_MAX, budgetMax)
-    : Math.max(currentQuantity, 1)
+  const max = editable ? acquisitionMax : Math.max(currentQuantity, 1)
 
   return {
     editable,

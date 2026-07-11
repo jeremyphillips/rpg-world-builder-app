@@ -4,6 +4,7 @@ import { EQUIPMENT_PURCHASE_QUANTITY_MAX } from '@rpg/contracts'
 
 import {
   equipmentPickerBudgetFixture,
+  equipmentPickerLongswordFixture,
   equipmentPickerRopeFixture,
 } from '../components/equipment/equipment-picker-drawer.fixtures'
 import {
@@ -46,5 +47,15 @@ describe('equipment-quantity.lib', () => {
         currentQuantity: 0,
       }),
     ).toBe(99)
+  })
+
+  it('caps non-stackable picker purchases at one', () => {
+    expect(
+      resolveEquipmentStepPurchaseMaxQuantity({
+        equipment: equipmentPickerLongswordFixture,
+        budget: equipmentPickerBudgetFixture,
+        currentQuantity: 0,
+      }),
+    ).toBe(1)
   })
 })

@@ -1,6 +1,7 @@
 import {
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
-  resolveEquipmentPurchaseQuantityLimits,
+  isEquipmentStackable,
+  resolveEquipmentAcquisitionMaxQuantity,
   type CharacterBuilderDraftEquipmentPurchase,
   type Equipment,
   type EquipmentBudgetSummary,
@@ -28,14 +29,20 @@ export function resolveEquipmentStepPurchaseMaxQuantity(args: {
   currentQuantity?: number
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
 }): number {
+  const sourceMode = args.sourceMode ?? 'startingGold'
   const currentQuantity = args.currentQuantity ?? 0
-  const limits = resolveEquipmentPurchaseQuantityLimits({
+
+  if (sourceMode !== 'startingGold') {
+    return Math.max(currentQuantity, 1)
+  }
+
+  if (!isEquipmentStackable(args.equipment)) {
+    return currentQuantity > 0 ? currentQuantity : 1
+  }
+
+  return resolveEquipmentAcquisitionMaxQuantity({
     equipment: args.equipment,
-    sourceMode: args.sourceMode ?? 'startingGold',
     budget: args.budget,
     currentQuantity,
-    isPurchaseRow: true,
   })
-
-  return limits.max
 }

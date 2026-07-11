@@ -6,6 +6,7 @@ import {
   formatEquipmentPurchaseTotalPriceLabel,
   formatEquipmentPurchaseUnitPriceLabel,
   formatEquipmentBundleLabel,
+  resolveEquipmentAcquisitionMaxQuantity,
   resolveEquipmentPurchaseQuantityLimits,
 } from './resolve-equipment-purchase-quantity-limits'
 
@@ -53,6 +54,47 @@ const budget = {
   spent: { cp: 0, sp: 0, gp: 4, pp: 0 },
   remaining: { cp: 0, sp: 0, gp: 6, pp: 0 },
 }
+
+describe('resolveEquipmentAcquisitionMaxQuantity', () => {
+  it('caps starting-gold acquisition at 99 and respects remaining budget', () => {
+    expect(
+      resolveEquipmentAcquisitionMaxQuantity({
+        equipment: longsword,
+        budget,
+        currentQuantity: 0,
+      }),
+    ).toBe(1)
+
+    const surplusBudget = {
+      starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
+      spent: { cp: 0, sp: 0, gp: 60, pp: 0 },
+      remaining: { cp: 0, sp: 0, gp: 40, pp: 0 },
+    }
+
+    expect(
+      resolveEquipmentAcquisitionMaxQuantity({
+        equipment: longsword,
+        budget: surplusBudget,
+        currentQuantity: 0,
+      }),
+    ).toBe(2)
+
+    expect(
+      resolveEquipmentAcquisitionMaxQuantity({
+        equipment: rations,
+        budget,
+        currentQuantity: 0,
+      }),
+    ).toBe(12)
+
+    expect(
+      resolveEquipmentAcquisitionMaxQuantity({
+        equipment: rations,
+        currentQuantity: 0,
+      }),
+    ).toBe(EQUIPMENT_PURCHASE_QUANTITY_MAX)
+  })
+})
 
 describe('resolveEquipmentPurchaseQuantityLimits', () => {
   it('allows editing starting-gold stackable purchases within budget and cap', () => {
