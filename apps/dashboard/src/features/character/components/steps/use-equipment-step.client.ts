@@ -55,6 +55,7 @@ export function useEquipmentStep(args: {
   const [conversionCommitStatusMessage, setConversionCommitStatusMessage] = useState<
     string | undefined
   >(undefined)
+  const [isPackageChooserExpanded, setIsPackageChooserExpanded] = useState(false)
 
   const classId = draft.class.classId
   const catalogIndex = useMemo(() => indexCharacterBuildCatalog(context.catalog), [context.catalog])
@@ -134,6 +135,7 @@ export function useEquipmentStep(args: {
         nestedSelections: selection.nestedSelections,
       }),
     )
+    setIsPackageChooserExpanded(false)
   }
 
   const requestSelection = (
@@ -141,7 +143,10 @@ export function useEquipmentStep(args: {
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
     if (!classId || !startingEquipmentChoiceSet) return
-    if (optionId === selectedOptionId) return
+    if (optionId === selectedOptionId) {
+      setIsPackageChooserExpanded(false)
+      return
+    }
 
     const nextSelection = { optionId, nestedSelections }
     if (draft.equipment?.customized) {
@@ -154,6 +159,14 @@ export function useEquipmentStep(args: {
 
   const openPicker = () => {
     setPickerOpen(true)
+  }
+
+  const expandPackageChooser = () => {
+    setIsPackageChooserExpanded(true)
+  }
+
+  const collapsePackageChooser = () => {
+    setIsPackageChooserExpanded(false)
   }
 
   const defaultSelectedPackageItemKeys = (deselectedKeys: ReadonlySet<string> = new Set()) => {
@@ -251,6 +264,9 @@ export function useEquipmentStep(args: {
     selectedPackageItemKeys,
     setSelectedPackageItemKeys,
     conversionCommitStatusMessage,
+    isPackageChooserExpanded,
+    expandPackageChooser,
+    collapsePackageChooser,
     openConversionEditor,
     handleCommitConversion,
     requestSelection,

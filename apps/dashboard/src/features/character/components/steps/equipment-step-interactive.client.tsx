@@ -11,7 +11,7 @@ import {
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
-import { StartingEquipmentOptionCards } from '../equipment/starting-equipment-option-cards.client'
+import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
@@ -72,16 +72,19 @@ export function EquipmentStepInteractive({
             onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
           />
         ) : equipmentChoiceSets.length > 0 && summaries.length > 0 ? (
-          <StartingEquipmentOptionCards
+          <StartingEquipmentOptionSection
             characterClass={characterClass!}
             catalogIndex={catalogIndex}
             summaries={summaries}
             draft={draft}
             resolvedChoiceSets={resolvedChoiceSets}
             selectedOptionId={selectedOptionId}
+            isPackageChooserExpanded={step.isPackageChooserExpanded}
             onSelectOption={requestSelection}
             onNestedPoolChange={onNestedPoolChange}
             onChoiceSelectionChange={onChoiceSelectionChange}
+            onChangePackage={step.expandPackageChooser}
+            onCollapseChooser={step.collapsePackageChooser}
           />
         ) : null}
 
@@ -103,7 +106,8 @@ export function EquipmentStepInteractive({
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
-            document.getElementById('starting-equipment-options')?.scrollIntoView({
+            step.expandPackageChooser()
+            document.getElementById('starting-equipment-options')?.scrollIntoView?.({
               behavior: 'smooth',
               block: 'start',
             })

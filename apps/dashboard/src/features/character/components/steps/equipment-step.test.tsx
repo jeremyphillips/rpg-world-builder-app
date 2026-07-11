@@ -26,9 +26,11 @@ import {
   equipmentStepRationsFixture,
 } from '../../lib/equipment-step.fixtures'
 import {
+  EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
   EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL,
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
+  EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   EQUIPMENT_STEP_BROWSE_LABEL,
 } from '../../lib/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
@@ -190,13 +192,71 @@ describe('EquipmentStep', () => {
 
     renderEquipmentStep(draft)
 
+    expect(screen.getByText(EQUIPMENT_SELECTED_PACKAGE_EYEBROW)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Starting Gold' })).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
     expect(screen.getByText('Budget')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
-    expect(screen.getAllByText('90 GP').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/90 GP/).length).toBeGreaterThanOrEqual(1)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
 
     expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+  })
+
+  it('reveals the option list when changing the selected package', async () => {
+    const user = userEvent.setup()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
+
+    expect(screen.getByRole('radio', { name: /^Starting Gold/ })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Standard Equipment/i })).toBeInTheDocument()
+  })
+
+  it('collapses the chooser when clicking the already-selected package', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft, onDraftChange)
+
+    expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: /^Starting Gold/ }))
+
+    expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_SELECTED_PACKAGE_EYEBROW)).toBeInTheDocument()
+    expect(onDraftChange).not.toHaveBeenCalled()
   })
 
   it('shows Proficiency available for instruments on the gold path before proficiency picks', async () => {
@@ -502,7 +562,8 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     })
   })
 
-  it('syncs inline tool changes to inventory and replaces the previous tool', () => {
+  it('syncs inline tool changes to inventory and replaces the previous tool', async () => {
+    const user = userEvent.setup()
     let draft: CharacterBuilderDraft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
@@ -532,6 +593,13 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       />,
     )
 
+    expect(
+      within(screen.getByLabelText('Starting equipment options')).getByRole('heading', {
+        name: 'Standard Equipment',
+      }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
     expect(screen.getByRole('radio', { name: /^Lute$/ })).toBeChecked()
 
     draft = {
@@ -556,7 +624,8 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     expect(screen.getByRole('radio', { name: /^Lute$/ })).not.toBeChecked()
   })
 
-  it('displays a proficiencies preselection in the inline field', () => {
+  it('displays a proficiencies preselection in the inline field', async () => {
+    const user = userEvent.setup()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
@@ -573,6 +642,14 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     }
 
     renderMonkEquipmentStep(draft)
+
+    expect(
+      within(screen.getByLabelText('Starting equipment options')).getByRole('heading', {
+        name: 'Standard Equipment',
+      }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
 
     expect(screen.getByRole('radio', { name: /^Drum$/ })).toBeChecked()
   })
@@ -610,6 +687,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
     await user.click(screen.getByRole('radio', { name: /^Starting Gold/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
@@ -646,6 +724,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
 
     expect(screen.queryByText(EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL)).not.toBeInTheDocument()
 
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
     await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
 
     expect(onDraftChange).toHaveBeenLastCalledWith(

@@ -79,6 +79,10 @@ export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 
 export const EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL = 'Change equipment option'
 
+export const EQUIPMENT_SELECTED_PACKAGE_EYEBROW = 'Selected package'
+
+export const EQUIPMENT_CHANGE_PACKAGE_LABEL = 'Change package'
+
 export const EQUIPMENT_PACKAGE_REMOVE_FROM_PACKAGE_LABEL = 'Remove from package'
 
 export const EQUIPMENT_PACKAGE_INCLUDED_WEALTH_LABEL = 'included'
@@ -353,6 +357,26 @@ export function areProficiencyLinksResolved(
   if (links.length === 0) return true
 
   return links.every((link) => (choiceSelections[link.choiceSetId] ?? []).length > 0)
+}
+
+/** True when nested package pools and proficiency-linked grants are answered for the option. */
+export function isSelectedStartingEquipmentReady(args: {
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  draft: CharacterBuilderDraft
+  selectedOptionId: string
+}): boolean {
+  const { characterClass, catalogIndex, draft, selectedOptionId } = args
+  const nestedPools = listNestedPoolsForOption(characterClass, selectedOptionId, catalogIndex)
+  const option = characterClass.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+  const proficiencyLinks = option ? listProficiencyLinksForOption(characterClass, option) : []
+
+  return (
+    areNestedPoolsResolved(nestedPools, draft.choiceSelections) &&
+    areProficiencyLinksResolved(proficiencyLinks, draft.choiceSelections)
+  )
 }
 
 export function resolveProficiencyLinkFieldState(args: {

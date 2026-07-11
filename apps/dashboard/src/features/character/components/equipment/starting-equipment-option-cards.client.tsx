@@ -33,6 +33,7 @@ import {
   startingEquipmentOptionCardListClasses,
   startingEquipmentOptionCardNestedFieldsClasses,
   startingEquipmentOptionCardReasonsClasses,
+  startingEquipmentOptionCardSelectedShellClasses,
   startingEquipmentOptionCardShellClasses,
 } from './starting-equipment-option-cards.variants'
 
@@ -43,6 +44,7 @@ export type StartingEquipmentOptionCardsProps = {
   draft: CharacterBuilderDraft
   resolvedChoiceSets: readonly ChoiceSet[]
   selectedOptionId?: string
+  isPackageChooserExpanded: boolean
   onSelectOption: (
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
@@ -54,6 +56,7 @@ export type StartingEquipmentOptionCardsProps = {
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => void
   onChoiceSelectionChange: (choiceSetId: string, selection: readonly string[]) => void
+  onCollapseChooser: () => void
 }
 
 type PendingNestedSelections = Record<string, Record<string, string[]>>
@@ -164,6 +167,8 @@ function PackageOptionCard({
   onSelectOption,
   onNestedPoolChange,
   onChoiceSelectionChange,
+  isPackageChooserExpanded,
+  onCollapseChooser,
 }: {
   summary: StartingEquipmentOptionSummary
   characterClass: CharacterClass
@@ -175,6 +180,8 @@ function PackageOptionCard({
   onSelectOption: StartingEquipmentOptionCardsProps['onSelectOption']
   onNestedPoolChange: StartingEquipmentOptionCardsProps['onNestedPoolChange']
   onChoiceSelectionChange: StartingEquipmentOptionCardsProps['onChoiceSelectionChange']
+  isPackageChooserExpanded: boolean
+  onCollapseChooser: StartingEquipmentOptionCardsProps['onCollapseChooser']
 }) {
   const option = characterClass.characterCreation?.startingEquipment?.options.find(
     (entry) => entry.id === summary.optionId,
@@ -196,7 +203,7 @@ function PackageOptionCard({
     <div
       className={cn(
         startingEquipmentOptionCardShellClasses,
-        isSelected && 'border-primary ring-1 ring-primary/20',
+        isSelected && startingEquipmentOptionCardSelectedShellClasses,
       )}
     >
       <RadioCardItem
@@ -206,6 +213,9 @@ function PackageOptionCard({
         description={summary.description}
         meta={meta}
         className="border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0"
+        onClick={() => {
+          if (isPackageChooserExpanded && isSelected) onCollapseChooser()
+        }}
       />
 
       {showNestedFields ? (
@@ -286,11 +296,27 @@ function PackageOptionCard({
   )
 }
 
-function GoldOptionCard({ summary }: { summary: StartingEquipmentOptionSummary }) {
+function GoldOptionCard({
+  summary,
+  selectedOptionId,
+  isPackageChooserExpanded,
+  onCollapseChooser,
+}: {
+  summary: StartingEquipmentOptionSummary
+  selectedOptionId?: string
+  isPackageChooserExpanded: boolean
+  onCollapseChooser: StartingEquipmentOptionCardsProps['onCollapseChooser']
+}) {
   const wealth = formatStartingEquipmentWealth(summary.wealth)
+  const isSelected = selectedOptionId === summary.optionId
 
   return (
-    <div className={startingEquipmentOptionCardShellClasses}>
+    <div
+      className={cn(
+        startingEquipmentOptionCardShellClasses,
+        isSelected && startingEquipmentOptionCardSelectedShellClasses,
+      )}
+    >
       <RadioCardItem
         value={summary.optionId}
         disabled={!summary.isSelectable}
@@ -298,6 +324,9 @@ function GoldOptionCard({ summary }: { summary: StartingEquipmentOptionSummary }
         description={summary.description ?? 'Buy your own gear with starting gold.'}
         meta={wealth ? [wealth] : undefined}
         className="border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0"
+        onClick={() => {
+          if (isPackageChooserExpanded && isSelected) onCollapseChooser()
+        }}
       />
 
       {summary.unselectableReasons.length > 0 ? (
@@ -320,9 +349,11 @@ export function StartingEquipmentOptionCards({
   draft,
   resolvedChoiceSets,
   selectedOptionId,
+  isPackageChooserExpanded,
   onSelectOption,
   onNestedPoolChange,
   onChoiceSelectionChange,
+  onCollapseChooser,
 }: StartingEquipmentOptionCardsProps) {
   const [pendingNestedSelections, setPendingNestedSelections] = useState<PendingNestedSelections>(
     {},
@@ -350,45 +381,47 @@ export function StartingEquipmentOptionCards({
   }
 
   return (
-    <section
-      id="starting-equipment-options"
-      tabIndex={-1}
-      className="outline-none"
-      aria-label="Starting equipment options"
+    <RadioGroup
+      className={startingEquipmentOptionCardListClasses}
+      value={selectedOptionId ?? ''}
+      onValueChange={(optionId) => {
+        if (!optionId) return
+
+        const pending = pendingNestedSelections[optionId] ?? {}
+        const nestedSelections = {
+          ...draft.choiceSelections,
+          ...pending,
+        }
+
+        onSelectOption(optionId, nestedSelections)
+      }}
     >
-      <RadioGroup
-        className={startingEquipmentOptionCardListClasses}
-        value={selectedOptionId ?? ''}
-        onValueChange={(optionId) => {
-          if (!optionId) return
+      {packageSummaries.map((summary) => (
+        <PackageOptionCard
+          key={summary.optionId}
+          summary={summary}
+          characterClass={characterClass}
+          catalogIndex={catalogIndex}
+          draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
+          selectedOptionId={selectedOptionId}
+          pendingNestedSelections={pendingNestedSelections}
+          onSelectOption={onSelectOption}
+          onNestedPoolChange={handleNestedPoolChange}
+          onChoiceSelectionChange={onChoiceSelectionChange}
+          isPackageChooserExpanded={isPackageChooserExpanded}
+          onCollapseChooser={onCollapseChooser}
+        />
+      ))}
 
-          const pending = pendingNestedSelections[optionId] ?? {}
-          const nestedSelections = {
-            ...draft.choiceSelections,
-            ...pending,
-          }
-
-          onSelectOption(optionId, nestedSelections)
-        }}
-      >
-        {packageSummaries.map((summary) => (
-          <PackageOptionCard
-            key={summary.optionId}
-            summary={summary}
-            characterClass={characterClass}
-            catalogIndex={catalogIndex}
-            draft={draft}
-            resolvedChoiceSets={resolvedChoiceSets}
-            selectedOptionId={selectedOptionId}
-            pendingNestedSelections={pendingNestedSelections}
-            onSelectOption={onSelectOption}
-            onNestedPoolChange={handleNestedPoolChange}
-            onChoiceSelectionChange={onChoiceSelectionChange}
-          />
-        ))}
-
-        {goldSummary ? <GoldOptionCard summary={goldSummary} /> : null}
-      </RadioGroup>
-    </section>
+      {goldSummary ? (
+        <GoldOptionCard
+          summary={goldSummary}
+          selectedOptionId={selectedOptionId}
+          isPackageChooserExpanded={isPackageChooserExpanded}
+          onCollapseChooser={onCollapseChooser}
+        />
+      ) : null}
+    </RadioGroup>
   )
 }

@@ -3,6 +3,9 @@ export const startingEquipmentOptionCardListClasses = 'grid gap-3'
 export const startingEquipmentOptionCardShellClasses =
   'overflow-hidden rounded-xl border border-border bg-card shadow-sm'
 
+export const startingEquipmentOptionCardSelectedShellClasses =
+  'border-primary ring-1 ring-primary/20'
+
 export const startingEquipmentOptionCardReasonsClasses = 'space-y-1 px-4 pb-4'
 
 export const startingEquipmentOptionCardNestedFieldsClasses =

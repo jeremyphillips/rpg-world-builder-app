@@ -18,6 +18,7 @@ import {
   formatStartingEquipmentOptionMeta,
   hasSelectableStartingEquipmentOption,
   isStartingGoldOptionId,
+  isSelectedStartingEquipmentReady,
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
   listProficiencyLinksForOption,
@@ -498,6 +499,73 @@ describe('equipment-step.lib', () => {
         choiceSetId: `class:${equipmentStepMonkClassFixture.id}:class-tools`,
       },
     ])
+  })
+
+  it('requires proficiency-linked grants before collapsing to the selected package summary', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      isSelectedStartingEquipmentReady({
+        characterClass: equipmentStepMonkClassFixture,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        draft,
+        selectedOptionId: 'standard',
+      }),
+    ).toBe(false)
+
+    expect(
+      isSelectedStartingEquipmentReady({
+        characterClass: equipmentStepMonkClassFixture,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        draft: {
+          ...draft,
+          choiceSelections: {
+            ...draft.choiceSelections,
+            [buildChoiceSetId('class', equipmentStepMonkClassFixture.id, 'class-tools')]: [
+              equipmentStepLuteFixture.id,
+            ],
+          },
+        },
+        selectedOptionId: 'standard',
+      }),
+    ).toBe(true)
+  })
+
+  it('treats gold options as ready without nested package requirements', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      isSelectedStartingEquipmentReady({
+        characterClass: equipmentStepBardClassFixture,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        draft,
+        selectedOptionId: 'gold',
+      }),
+    ).toBe(true)
   })
 
   it('locks fixed grant quantities and keeps nested choice results at quantity one', () => {
