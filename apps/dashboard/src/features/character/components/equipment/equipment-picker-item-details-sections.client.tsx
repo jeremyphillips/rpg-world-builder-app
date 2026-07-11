@@ -93,6 +93,7 @@ export function EquipmentPickerOwnedUniqueSection({
 export type EquipmentPickerNewPurchaseSectionProps = {
   equipment: Equipment
   viewModel: Extract<EquipmentPickerPurchaseViewModel, { mode: 'new' }>
+  bundleLabel?: string
   disabled: boolean
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
@@ -101,6 +102,7 @@ export type EquipmentPickerNewPurchaseSectionProps = {
 export function EquipmentPickerNewPurchaseSection({
   equipment,
   viewModel,
+  bundleLabel,
   disabled,
   onAddQuantityChange,
   onCommit,
@@ -108,6 +110,7 @@ export function EquipmentPickerNewPurchaseSection({
   return (
     <EquipmentPickerPurchaseSection
       equipmentName={equipment.name}
+      bundleLabel={bundleLabel}
       viewModel={viewModel}
       disabled={disabled}
       onQuantityChange={onAddQuantityChange}
@@ -121,6 +124,7 @@ export type EquipmentPickerPurchasePanelProps = {
   ownedQuantity: number
   stackable: boolean
   disabled: boolean
+  bundleLabel?: string
   purchaseViewModel?: EquipmentPickerPurchaseViewModel
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
@@ -132,6 +136,7 @@ export function EquipmentPickerPurchasePanel({
   ownedQuantity,
   stackable,
   disabled,
+  bundleLabel,
   purchaseViewModel,
   onAddQuantityChange,
   onCommit,
@@ -159,6 +164,7 @@ export function EquipmentPickerPurchasePanel({
       <EquipmentPickerNewPurchaseSection
         equipment={equipment}
         viewModel={purchaseViewModel}
+        bundleLabel={bundleLabel}
         disabled={disabled}
         onAddQuantityChange={onAddQuantityChange}
         onCommit={onCommit}

@@ -6,6 +6,7 @@ import { EquipmentPickerItemDetails } from './equipment-picker-item-details.clie
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
 
 const longswordItem = equipmentPickerItemsFixture[0]!
@@ -45,5 +46,19 @@ export const Owned: Story = {
     ownedQuantity: 1,
     showCharacterPreview: false,
     characterPreviewContext: undefined,
+  },
+}
+
+export const OwnedStackable: Story = {
+  args: {
+    equipment: equipmentPickerRopeFixture,
+    itemState: equipmentPickerItemsFixture[2]!.state,
+    budget: equipmentPickerBudgetFixture,
+    ownedQuantity: 2,
+    addQuantity: 1,
+    onAddQuantityChange: () => undefined,
+    onCommit: () => undefined,
+    onAddAnother: () => undefined,
+    showCharacterPreview: false,
   },
 }

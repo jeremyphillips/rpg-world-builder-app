@@ -60,6 +60,23 @@ export const equipmentPickerRopeFixture = {
   description: '<p>Hempen rope, 50 feet.</p>',
 } as const satisfies Equipment
 
+export const equipmentPickerArrowsFixture = {
+  id: 'srd-cc-5.2.1:arrows',
+  slug: 'arrows',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Arrows',
+  kind: 'adventuring_gear',
+  gearKind: 'ammunition',
+  bundleSize: 20,
+  cost: { amount: 1, currency: 'gp' },
+  weight: { value: 1, unit: 'lb' },
+  description: '<p>Ammunition for a bow.</p>',
+} as const satisfies Equipment
+
 export const equipmentPickerRowboatFixture = {
   id: 'srd-cc-5.2.1:rowboat',
   slug: 'rowboat',

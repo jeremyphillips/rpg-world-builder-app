@@ -32,6 +32,7 @@ import {
   EQUIPMENT_STEP_CUSTOMIZE_LABEL,
 } from '../../lib/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({
@@ -291,6 +292,50 @@ describe('EquipmentStep', () => {
               sourceMode: 'startingGold',
             },
           ],
+        }),
+      }),
+    )
+  })
+
+  it('commits multi-quantity stackable purchases from the picker body', async () => {
+    const user = userEvent.setup()
+    const rationsId = equipmentStepRationsFixture.id
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const { onDraftChange } = renderEquipmentStep(draft)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+    await user.click(screen.getByRole('tab', { name: /All/i }))
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rations')
+
+    const rationsRow = screen
+      .getAllByRole('listitem')
+      .find((row) => within(row).queryByText(equipmentStepRationsFixture.name))!
+
+    await user.click(
+      within(rationsRow).getByRole('button', {
+        name: `Expand ${equipmentStepRationsFixture.name}`,
+      }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        equipment: expect.objectContaining({
+          purchases: [{ equipmentId: rationsId, quantity: 3, sourceMode: 'startingGold' }],
         }),
       }),
     )

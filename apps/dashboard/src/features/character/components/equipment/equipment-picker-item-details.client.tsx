@@ -1,6 +1,6 @@
 'use client'
 
-import { isEquipmentStackable, type Equipment } from '@rpg/contracts'
+import { isEquipmentStackable, formatEquipmentBundleLabel, type Equipment } from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -91,6 +91,7 @@ export function EquipmentPickerItemDetails({
         ownedQuantity={ownedQuantity}
         stackable={isEquipmentStackable(equipment)}
         disabled={disabled}
+        bundleLabel={formatEquipmentBundleLabel(equipment)}
         purchaseViewModel={purchaseViewModel}
         onAddQuantityChange={onAddQuantityChange}
         onCommit={onCommit}

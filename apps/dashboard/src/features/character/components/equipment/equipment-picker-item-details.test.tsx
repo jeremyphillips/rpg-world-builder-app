@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import {
+  equipmentPickerArrowsFixture,
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
   equipmentPickerRopeFixture,
@@ -71,6 +72,28 @@ describe('EquipmentPickerItemDetails', () => {
     expect(
       screen.queryByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows bundle copy for bundled adventuring gear purchases', () => {
+    const arrowsItem = {
+      equipment: equipmentPickerArrowsFixture,
+      searchText: 'arrows ammunition',
+      state: equipmentPickerItemsFixture[2]!.state,
+    }
+
+    render(
+      <EquipmentPickerItemDetails
+        equipment={arrowsItem.equipment}
+        itemState={arrowsItem.state}
+        budget={equipmentPickerBudgetFixture}
+        ownedQuantity={0}
+        addQuantity={2}
+        onAddQuantityChange={vi.fn()}
+        onCommit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('20 arrows per bundle')).toBeInTheDocument()
   })
 
   it('shows Add another for owned stackable items', async () => {

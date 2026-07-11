@@ -10,7 +10,9 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
+import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerDrawer',
@@ -132,5 +134,24 @@ export const SortByPrice: Story = {
     filterOutUnaffordable: false,
     defaultTab: 'all',
     onAddItem: () => undefined,
+  },
+}
+
+export const OwnedStackable: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [equipmentPickerItemsFixture[2]!],
+    budget: equipmentPickerBudgetFixture,
+    ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Owned stackables show ${EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL} in the header rail.`,
+      },
+    },
   },
 }

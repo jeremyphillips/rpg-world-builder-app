@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createEmptyCharacterBuilderDraft,
+  buildChoiceSetId,
   resolveStartingEquipmentOptionSummaries,
   startingEquipmentChoiceSetId,
 } from '@rpg/contracts'
@@ -25,7 +26,9 @@ import {
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepDaggerFixture,
   equipmentStepLeatherArmorFixture,
+  equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
 
@@ -337,6 +340,46 @@ describe('equipment-step.lib', () => {
         choiceSetId: `class:${equipmentStepMonkClassFixture.id}:class-tools`,
       },
     ])
+  })
+
+  it('locks fixed grant quantities and keeps nested choice results at quantity one', () => {
+    const monkToolChoiceSetId = buildChoiceSetId(
+      'class',
+      equipmentStepMonkClassFixture.id,
+      'class-tools',
+    )
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
+    const daggerRow = rows.find((row) => row.entry.equipmentId === equipmentStepDaggerFixture.id)
+    const luteRow = rows.find((row) => row.equipmentName === equipmentStepLuteFixture.name)
+
+    expect(daggerRow).toEqual(
+      expect.objectContaining({
+        entry: expect.objectContaining({ quantity: 5 }),
+        quantityMode: 'locked',
+        sourceLabel: '5 included with Standard Equipment',
+      }),
+    )
+    expect(luteRow).toEqual(
+      expect.objectContaining({
+        entry: expect.objectContaining({ quantity: 1 }),
+        quantityMode: 'locked',
+      }),
+    )
   })
 })
 

@@ -51,6 +51,22 @@ const leatherArmor = equipmentSchema.parse({
   stealthDisadvantage: false,
 })
 
+const rations = equipmentSchema.parse({
+  id: `${RULESET}:rations`,
+  slug: 'rations',
+  rulesetId: RULESET,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rations',
+  description: '',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 5, currency: 'sp' },
+  weight: { value: 2, unit: 'lb' },
+})
+
 const equipmentBardClass: ClassStored = {
   id: `${RULESET}:bard`,
   slug: 'bard',
@@ -118,7 +134,7 @@ const equipmentTestContext = {
   catalog: {
     ...builderTestContext.catalog,
     classes: [fighterClass, equipmentBardClass],
-    equipment: [leatherArmor],
+    equipment: [leatherArmor, rations],
   },
 }
 
@@ -131,7 +147,7 @@ function catalogFor(classes: ClassStored[]): CharacterBuildCatalog {
     species: [],
     classes,
     spells: [],
-    equipment: [leatherArmor],
+    equipment: [leatherArmor, rations],
     skillProficiencies: [],
     languages: [],
   }
@@ -314,8 +330,8 @@ describe('resolveBuilderStepReadiness', () => {
           mode: 'gold',
           purchases: [
             {
-              equipmentId: leatherArmor.id,
-              quantity: 1,
+              equipmentId: rations.id,
+              quantity: 4,
               sourceMode: 'startingGold',
             },
           ],

@@ -18,6 +18,7 @@ import { equipmentPickerPurchaseRowClasses } from './equipment-picker-purchase.v
 
 export type EquipmentPickerPurchaseSectionProps = {
   equipmentName: string
+  bundleLabel?: string
   viewModel: Extract<EquipmentPickerPurchaseViewModel, { mode: 'new' }>
   disabled?: boolean
   onQuantityChange: (quantity: number) => void
@@ -40,6 +41,7 @@ function PurchaseRow({ label, value }: { label: string; value: string }) {
 /** Purchase review block for new equipment rows in the picker collapsible body. */
 export function EquipmentPickerPurchaseSection({
   equipmentName,
+  bundleLabel,
   viewModel,
   disabled = false,
   onQuantityChange,
@@ -50,6 +52,12 @@ export function EquipmentPickerPurchaseSection({
       <Heading variant="subsection" as="h3" id={`${equipmentName}-purchase-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
+
+      {bundleLabel ? (
+        <Text as="p" variant="caption">
+          {bundleLabel}
+        </Text>
+      ) : null}
 
       <div className="space-y-2">
         <div className={equipmentPickerPurchaseRowClasses}>
