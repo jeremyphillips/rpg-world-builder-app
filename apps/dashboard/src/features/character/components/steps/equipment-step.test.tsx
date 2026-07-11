@@ -286,11 +286,13 @@ describe('EquipmentStep', () => {
       expect.objectContaining({
         equipment: expect.objectContaining({
           purchases: [
-            {
+            expect.objectContaining({
               equipmentId: equipmentStepLeatherArmorFixture.id,
               quantity: 1,
               sourceMode: 'startingGold',
-            },
+              origin: 'picker',
+              id: expect.any(String),
+            }),
           ],
         }),
       }),
@@ -335,7 +337,15 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         equipment: expect.objectContaining({
-          purchases: [{ equipmentId: rationsId, quantity: 3, sourceMode: 'startingGold' }],
+          purchases: [
+            expect.objectContaining({
+              equipmentId: rationsId,
+              quantity: 3,
+              sourceMode: 'startingGold',
+              origin: 'picker',
+              id: expect.any(String),
+            }),
+          ],
         }),
       }),
     )
@@ -352,7 +362,14 @@ describe('EquipmentStep', () => {
       },
       equipment: {
         mode: 'gold' as const,
-        purchases: [{ equipmentId: rationsId, quantity: 2, sourceMode: 'startingGold' as const }],
+        purchases: [
+          {
+            equipmentId: rationsId,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
         removedPackageItemKeys: [],
         customized: false,
       },
@@ -364,7 +381,13 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         equipment: expect.objectContaining({
-          purchases: [{ equipmentId: rationsId, quantity: 3, sourceMode: 'startingGold' }],
+          purchases: [
+            expect.objectContaining({
+              equipmentId: rationsId,
+              quantity: 3,
+              sourceMode: 'startingGold',
+            }),
+          ],
         }),
       }),
     )

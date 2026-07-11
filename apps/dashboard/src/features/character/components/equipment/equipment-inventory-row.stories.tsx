@@ -19,8 +19,8 @@ const editableStartingGoldRow: EquipmentInventoryRow = {
   unitPriceLabel: '5 SP each',
   totalPriceLabel: '10 SP',
   removeLabel: 'Remove all 2 Rations',
-  removeTarget: { kind: 'purchase', purchaseIndex: 0 },
-  quantityTarget: { kind: 'purchase', purchaseIndex: 0 },
+  removeTarget: { kind: 'purchase', purchaseId: 'purchase-story-0' },
+  quantityTarget: { kind: 'purchase', purchaseId: 'purchase-story-0' },
 }
 
 const lockedPackageGrantRow: EquipmentInventoryRow = {

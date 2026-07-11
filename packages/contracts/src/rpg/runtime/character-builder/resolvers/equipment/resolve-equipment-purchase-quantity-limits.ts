@@ -44,15 +44,25 @@ export function resolveEquipmentAcquisitionMaxQuantity(args: {
 export function resolveEquipmentPurchaseQuantityLimits(args: {
   equipment: Equipment
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
   budget?: EquipmentBudgetSummary
   currentQuantity: number
   isPurchaseRow: boolean
 }): EquipmentPurchaseQuantityLimits {
-  const { equipment, sourceMode, budget, currentQuantity, isPurchaseRow } = args
+  const { equipment, sourceMode, origin, budget, currentQuantity, isPurchaseRow } = args
   const showCost = sourceMode === 'startingGold'
 
   if (!isPurchaseRow) {
     return { editable: false, min: 1, max: Math.max(currentQuantity, 1), showCost: false }
+  }
+
+  if (origin === 'packageConversion' && !isEquipmentStackable(equipment)) {
+    return {
+      editable: false,
+      min: 1,
+      max: Math.max(currentQuantity, 1),
+      showCost,
+    }
   }
 
   const editable = isEquipmentStackable(equipment) && sourceMode === 'startingGold'

@@ -333,6 +333,7 @@ describe('resolveBuilderStepReadiness', () => {
               equipmentId: rations.id,
               quantity: 4,
               sourceMode: 'startingGold',
+              origin: 'picker',
             },
           ],
           removedPackageItemKeys: [],

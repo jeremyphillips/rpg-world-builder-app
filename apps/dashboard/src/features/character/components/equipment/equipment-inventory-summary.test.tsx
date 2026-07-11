@@ -6,6 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   createEmptyCharacterBuilderDraft,
   nestedStartingEquipmentChoiceSetId,
+  createDeterministicLegacyPurchaseId,
   startingEquipmentChoiceSetId,
 } from '@rpg/contracts'
 
@@ -69,7 +70,14 @@ describe('EquipmentInventorySummary', () => {
       },
       equipment: {
         mode: 'gold' as const,
-        purchases: [{ equipmentId: rationsId, quantity: 2, sourceMode: 'startingGold' as const }],
+        purchases: [
+          {
+            equipmentId: rationsId,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
         removedPackageItemKeys: [],
         customized: false,
       },
@@ -116,7 +124,17 @@ describe('EquipmentInventorySummary', () => {
 
     await user.click(screen.getByRole('button', { name: 'Increment' }))
 
-    expect(onSetPurchaseQuantity).toHaveBeenCalledWith({ kind: 'purchase', purchaseIndex: 0 }, 3)
+    expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
+      {
+        kind: 'purchase',
+        purchaseId: createDeterministicLegacyPurchaseId({
+          equipmentId: rationsId,
+          sourceMode: 'startingGold',
+          occurrenceIndex: 0,
+        }),
+      },
+      3,
+    )
   })
 
   it('renders locked package grants with quantity in provenance', () => {
@@ -171,8 +189,8 @@ describe('EquipmentInventorySummary', () => {
       unitPriceLabel: '5 SP each',
       totalPriceLabel: '60 SP',
       removeLabel: 'Remove all 12 Rations',
-      removeTarget: { kind: 'purchase', purchaseIndex: 0 },
-      quantityTarget: { kind: 'purchase', purchaseIndex: 0 },
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
     }
 
     render(

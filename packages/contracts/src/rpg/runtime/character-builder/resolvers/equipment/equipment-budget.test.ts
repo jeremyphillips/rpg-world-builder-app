@@ -89,7 +89,14 @@ describe('deriveEquipmentBudgetSummary', () => {
       },
       equipment: {
         mode: 'package' as const,
-        purchases: [{ equipmentId: rope.id, quantity: 3, sourceMode: 'startingGold' as const }],
+        purchases: [
+          {
+            equipmentId: rope.id,
+            quantity: 3,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
         removedPackageItemKeys: [],
         customized: true,
       },

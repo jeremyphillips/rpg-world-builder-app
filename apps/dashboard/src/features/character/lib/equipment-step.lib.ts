@@ -13,10 +13,14 @@ import {
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
   maxAffordableEquipmentQuantity,
+  mergeCompatiblePurchasedEntries,
+  normalizeEquipmentPurchase,
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
   resolveEquipmentPickerItems,
   resolveEquipmentPoolChoiceOptions,
+  resolveEquipmentPurchaseIndex,
+  resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
@@ -82,11 +86,11 @@ export type EquipmentPickerFlow = 'gold' | 'customize'
 
 export type EquipmentInventoryRemoveTarget =
   | { kind: 'package'; packageItemKey: string }
-  | { kind: 'purchase'; purchaseIndex: number }
+  | { kind: 'purchase'; purchaseId: string }
 
 export type EquipmentInventoryQuantityTarget = {
   kind: 'purchase'
-  purchaseIndex: number
+  purchaseId: string
 }
 
 export type EquipmentInventoryRow = {
@@ -596,9 +600,10 @@ function buildInventoryRowPresentation(args: {
   equipment: Equipment
   sourceLabel: string
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
   budget?: EquipmentBudgetSummary
   isPurchaseRow: boolean
-  purchaseIndex?: number
+  purchaseId?: string
   packageItemKey?: string
 }): EquipmentInventoryRow {
   const {
@@ -606,9 +611,10 @@ function buildInventoryRowPresentation(args: {
     equipment,
     sourceLabel,
     sourceMode,
+    origin,
     budget,
     isPurchaseRow,
-    purchaseIndex,
+    purchaseId,
     packageItemKey,
   } = args
   const group = inventoryGroupForEquipment(equipment)
@@ -616,6 +622,7 @@ function buildInventoryRowPresentation(args: {
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
     sourceMode,
+    origin,
     budget,
     currentQuantity: entry.quantity,
     isPurchaseRow,
@@ -645,13 +652,11 @@ function buildInventoryRowPresentation(args: {
     removeTarget:
       packageItemKey !== undefined
         ? { kind: 'package', packageItemKey }
-        : isPurchaseRow && purchaseIndex !== undefined
-          ? { kind: 'purchase', purchaseIndex }
+        : isPurchaseRow && purchaseId !== undefined
+          ? { kind: 'purchase', purchaseId }
           : undefined,
     quantityTarget:
-      limits.editable && purchaseIndex !== undefined
-        ? { kind: 'purchase', purchaseIndex }
-        : undefined,
+      limits.editable && purchaseId !== undefined ? { kind: 'purchase', purchaseId } : undefined,
   }
 }
 
@@ -659,9 +664,10 @@ function purchaseRowFromEntry(args: {
   entry: CharacterEquipmentEntry
   equipment: Equipment
   catalogIndex: CharacterBuildCatalogIndex
-  purchaseIndex?: number
+  purchaseId?: string
   packageItemKey?: string
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
   budget?: EquipmentBudgetSummary
   packageOptionLabel?: string
 }): EquipmentInventoryRow {
@@ -669,13 +675,14 @@ function purchaseRowFromEntry(args: {
     entry,
     equipment,
     catalogIndex,
-    purchaseIndex,
+    purchaseId,
     packageItemKey,
     sourceMode,
+    origin,
     budget,
     packageOptionLabel,
   } = args
-  const isPurchaseRow = purchaseIndex !== undefined
+  const isPurchaseRow = purchaseId !== undefined
   const sourceLabel =
     packageOptionLabel !== undefined
       ? formatPackageGrantSourceLabel(packageOptionLabel, entry.quantity)
@@ -686,9 +693,10 @@ function purchaseRowFromEntry(args: {
     equipment,
     sourceLabel,
     sourceMode,
+    origin,
     budget,
     isPurchaseRow,
-    purchaseIndex,
+    purchaseId,
     packageItemKey,
   })
 }
@@ -749,16 +757,20 @@ function listPurchaseInventoryRows(args: {
     const entry: CharacterEquipmentEntry = {
       equipmentId: purchase.equipmentId,
       quantity: purchase.quantity,
+      equipped: purchase.equipped,
+      modifiers: purchase.modifiers,
       sources,
     }
+    const purchaseId = resolveEquipmentPurchaseId(draft.equipment?.purchases ?? [], purchaseIndex)
 
     return [
       purchaseRowFromEntry({
         entry,
         equipment,
         catalogIndex,
-        purchaseIndex,
+        purchaseId,
         sourceMode: purchase.sourceMode,
+        origin: purchase.origin ?? 'picker',
         budget,
       }),
     ]
@@ -836,24 +848,29 @@ export function listEquipmentInventoryRowsFromDraft(
   ]
 }
 
-function upsertEquipmentPurchase(
-  purchases: CharacterBuilderDraftEquipmentPurchase[],
-  equipmentId: string,
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode'],
-  quantity: number,
-): CharacterBuilderDraftEquipmentPurchase[] {
-  const existingIndex = purchases.findIndex(
-    (purchase) => purchase.equipmentId === equipmentId && purchase.sourceMode === sourceMode,
+function upsertEquipmentPurchase(args: {
+  purchases: CharacterBuilderDraftEquipmentPurchase[]
+  equipment: Equipment
+  equipmentId: string
+  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
+  quantity: number
+}): CharacterBuilderDraftEquipmentPurchase[] {
+  const { purchases, equipment, equipmentId, sourceMode, quantity } = args
+
+  const normalizedPurchases = purchases.map((_, index) =>
+    normalizeEquipmentPurchase(purchases, index),
   )
 
-  if (existingIndex < 0) {
-    return [...purchases, { equipmentId, quantity, sourceMode }]
-  }
-
-  const existing = purchases[existingIndex]!
-  return purchases.map((purchase, index) =>
-    index === existingIndex ? { ...existing, quantity: existing.quantity + quantity } : purchase,
-  )
+  return mergeCompatiblePurchasedEntries({
+    purchases: normalizedPurchases,
+    incoming: {
+      equipmentId,
+      quantity,
+      sourceMode,
+      origin: 'picker',
+    },
+    equipment,
+  })
 }
 
 function buildEquipmentDraftFromPurchase(args: {
@@ -903,12 +920,13 @@ export function buildEquipmentAddPurchasePatch(args: {
     equipment: buildEquipmentDraftFromPurchase({
       draft,
       sourceMode,
-      purchases: upsertEquipmentPurchase(
-        [...(draft.equipment?.purchases ?? [])],
+      purchases: upsertEquipmentPurchase({
+        purchases: [...(draft.equipment?.purchases ?? [])],
+        equipment,
         equipmentId,
         sourceMode,
         quantity,
-      ),
+      }),
     }),
   }
 }
@@ -916,12 +934,15 @@ export function buildEquipmentAddPurchasePatch(args: {
 export function buildEquipmentSetPurchaseQuantityPatch(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  purchaseIndex: number
+  purchaseId: string
   quantity: number
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, purchaseIndex, quantity } = args
+  const { draft, catalogIndex, purchaseId, quantity } = args
   const current = draft.equipment
   if (!current) return undefined
+
+  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, purchaseId)
+  if (purchaseIndex === undefined) return undefined
 
   const purchase = current.purchases[purchaseIndex]
   if (!purchase) return undefined
@@ -935,6 +956,7 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
     sourceMode: purchase.sourceMode,
+    origin: purchase.origin,
     budget,
     currentQuantity: purchase.quantity,
     isPurchaseRow: true,
@@ -981,7 +1003,12 @@ export function buildEquipmentRemoveEntryPatch(args: {
     }
   }
 
-  const purchases = current.purchases.filter((_, index) => index !== target.purchaseIndex)
+  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, target.purchaseId)
+  if (purchaseIndex === undefined) {
+    return { equipment: current }
+  }
+
+  const purchases = current.purchases.filter((_, index) => index !== purchaseIndex)
 
   return {
     equipment: {

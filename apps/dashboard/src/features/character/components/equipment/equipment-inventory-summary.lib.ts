@@ -96,7 +96,7 @@ export function groupEquipmentInventoryRowsForDisplay(
 export function equipmentInventoryRowKey(row: EquipmentInventoryRow): string {
   const removeKey =
     row.removeTarget?.kind === 'purchase'
-      ? String(row.removeTarget.purchaseIndex)
+      ? row.removeTarget.purchaseId
       : row.removeTarget?.kind === 'package'
         ? row.removeTarget.packageItemKey
         : 'static'

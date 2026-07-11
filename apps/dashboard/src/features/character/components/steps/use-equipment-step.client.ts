@@ -176,7 +176,7 @@ export function useEquipmentStep(args: {
     const patch = buildEquipmentSetPurchaseQuantityPatch({
       draft,
       catalogIndex,
-      purchaseIndex: target.purchaseIndex,
+      purchaseId: target.purchaseId,
       quantity,
     })
     if (patch) onDraftChange(patch)

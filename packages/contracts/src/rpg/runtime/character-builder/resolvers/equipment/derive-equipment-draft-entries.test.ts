@@ -226,8 +226,18 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [
-          { equipmentId: rope.id, quantity: 4, sourceMode: 'startingGold' as const },
-          { equipmentId: shield.id, quantity: 1, sourceMode: 'manual' as const },
+          {
+            equipmentId: rope.id,
+            quantity: 4,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+          {
+            equipmentId: shield.id,
+            quantity: 1,
+            sourceMode: 'manual' as const,
+            origin: 'picker' as const,
+          },
         ],
         removedPackageItemKeys: [],
         customized: true,

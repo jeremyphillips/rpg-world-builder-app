@@ -231,6 +231,7 @@ describe('assembleStartingEquipment', () => {
             equipmentId: `${RULESET}:rope`,
             quantity: 1,
             sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
           },
         ],
         removedPackageItemKeys: [`${druidClass.id}:standard:0`],

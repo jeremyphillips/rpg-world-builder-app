@@ -114,6 +114,24 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
     })
   })
 
+  it('locks converted non-stackable package purchases at authored quantity', () => {
+    expect(
+      resolveEquipmentPurchaseQuantityLimits({
+        equipment: longsword,
+        sourceMode: 'startingGold',
+        origin: 'packageConversion',
+        budget,
+        currentQuantity: 5,
+        isPurchaseRow: true,
+      }),
+    ).toEqual({
+      editable: false,
+      min: 1,
+      max: 5,
+      showCost: true,
+    })
+  })
+
   it('locks manual and non-stackable purchase rows', () => {
     expect(
       resolveEquipmentPurchaseQuantityLimits({

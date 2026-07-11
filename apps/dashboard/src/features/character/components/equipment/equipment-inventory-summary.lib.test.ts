@@ -49,8 +49,8 @@ describe('equipment-inventory-summary.lib', () => {
       },
       sourceLabel: 'Purchased with starting gold',
       quantityMode: 'editable',
-      quantityTarget: { kind: 'purchase', purchaseIndex: 0 },
-      removeTarget: { kind: 'purchase', purchaseIndex: 0 },
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
       removeLabel: 'Remove all 2 Arrows',
     })
 
