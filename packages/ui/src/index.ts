@@ -25,6 +25,13 @@ export { headingVariants, type HeadingVariantProps } from './components/ui/headi
 export { Text, type TextProps } from './components/ui/text'
 export { textVariants, type TextVariantProps } from './components/ui/text.variants'
 export {
+  SemanticText,
+  semanticTextVariants,
+  type SemanticTextEmphasis,
+  type SemanticTextProps,
+  type SemanticTextTone,
+} from './components/ui/semantic-text/semantic-text'
+export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
   type EmphasisDetailLineSecondaryTone,

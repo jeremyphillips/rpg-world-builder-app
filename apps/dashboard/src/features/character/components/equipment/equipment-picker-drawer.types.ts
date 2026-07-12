@@ -32,16 +32,29 @@ export const EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL = 'Common for your class'
 export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficiency'
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
+export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
+
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
 
+export type EquipmentPickerCalloutIntent =
+  | 'informative'
+  | 'recommended'
+  | 'compatible'
+  | 'caution'
+  | 'blocking'
+
+export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'
+
 export type EquipmentPickerCallout = {
   label: string
-  emphasis: 'info' | 'warning'
+  intent: EquipmentPickerCalloutIntent
+  importance: EquipmentPickerCalloutImportance
 }
 
-/** @deprecated Use {@link EquipmentPickerCallout}. */
-export type EquipmentPickerBadge = EquipmentPickerCallout
+export type EquipmentPickerCalloutContext = {
+  isGoldShoppingPath?: boolean
+}
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const

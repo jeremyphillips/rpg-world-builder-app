@@ -11,13 +11,7 @@ export const EQUIPMENT_PICKER_ITEM_HEADER_INFO_CLASSES = 'flex min-w-0 flex-1 fl
 export const EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES =
   'flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs'
 
-export const EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES = 'text-muted-foreground'
-
-/** Recommendation / source copy — slightly stronger than kind, not link blue. */
-export const EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_INFO_CLASSES = 'text-foreground/75'
-
-/** Proficiency and budget warnings — distinct but still subdued. */
-export const EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_WARNING_CLASSES = 'text-foreground/80'
+export const EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES = 'text-muted-foreground font-normal'
 
 export const EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES = 'text-muted-foreground'
 

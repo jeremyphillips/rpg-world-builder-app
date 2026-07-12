@@ -14,8 +14,8 @@ import {
 } from './equipment-picker-drawer.fixtures'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
@@ -41,7 +41,7 @@ beforeAll(() => {
 })
 
 describe('EquipmentPickerDrawer', () => {
-  it('renders picker header titles and shows non-proficient warnings with disabled quick-add', () => {
+  it('renders picker header titles and shows cannot-afford callout with disabled quick-add', () => {
     render(
       <EquipmentPickerDrawer
         open
@@ -58,7 +58,7 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(within(list).getByText('Chain Mail')).toBeInTheDocument()
     expect(within(list).getByText('Armor')).toBeInTheDocument()
-    expect(screen.getByText(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)).toBeInTheDocument()
     expect(within(list).getByText(/75 GP needed/i)).toBeInTheDocument()
     expect(within(list).getByText(/40 GP remaining/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()

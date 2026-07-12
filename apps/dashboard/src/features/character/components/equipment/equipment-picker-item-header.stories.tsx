@@ -5,6 +5,12 @@ import { pickEquipment } from '@/features/content/lib/fixtures/pick'
 
 import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
+import {
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
+  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
+} from './equipment-picker-drawer.types'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerItemHeader',
@@ -30,28 +36,69 @@ function commerceRail(
   )
 }
 
-export const Dagger: Story = {
+export const StandardGear: Story = {
+  args: {
+    item: buildEquipmentPickerRowViewModel(pickEquipment('holy-symbol-amulet')),
+    callout: {
+      label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
+      intent: 'informative',
+      importance: 'low',
+    },
+    commerce: commerceRail('5 GP'),
+  },
+  decorators: [
+    (Story) => (
+      <div className="rounded-md bg-muted/30 p-3">
+        <Story />
+      </div>
+    ),
+  ],
+}
+
+export const Essential: Story = {
   args: {
     item: buildEquipmentPickerRowViewModel(pickEquipment('dagger')),
-    callout: { label: 'Essential', emphasis: 'info' },
+    callout: { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, intent: 'recommended', importance: 'high' },
     commerce: commerceRail('2 GP'),
   },
 }
 
-export const PlateArmor: Story = {
+export const NotProficient: Story = {
   args: {
     item: buildEquipmentPickerRowViewModel(pickEquipment('plate-armor')),
-    callout: { label: 'Not proficient', emphasis: 'warning' },
+    callout: {
+      label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+      intent: 'caution',
+      importance: 'medium',
+    },
     commerce: commerceRail('1,500 GP'),
   },
+  decorators: [
+    (Story) => (
+      <div className="rounded-md bg-muted/30 p-3">
+        <Story />
+      </div>
+    ),
+  ],
 }
 
-export const HolySymbol: Story = {
+export const CannotAfford: Story = {
   args: {
-    item: buildEquipmentPickerRowViewModel(pickEquipment('holy-symbol-amulet')),
-    callout: { label: 'Standard gear', emphasis: 'info' },
-    commerce: commerceRail('5 GP'),
+    item: buildEquipmentPickerRowViewModel(pickEquipment('plate-armor')),
+    callout: {
+      label: EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+      intent: 'blocking',
+      importance: 'high',
+    },
+    commerce: commerceRail('1,500 GP'),
   },
+  decorators: [
+    (Story) => (
+      <div className="rounded-md bg-muted/30 p-3">
+        <Story />
+      </div>
+    ),
+  ],
 }
 
 export const MagicItem: Story = {
@@ -64,7 +111,11 @@ export const MagicItem: Story = {
 export const OwnedStackable: Story = {
   args: {
     item: buildEquipmentPickerRowViewModel(pickEquipment('rope')),
-    callout: { label: 'Standard gear', emphasis: 'info' },
+    callout: {
+      label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
+      intent: 'informative',
+      importance: 'low',
+    },
     commerce: commerceRail('1 GP', { owned: true, stackable: true, ownedQuantity: 2 }),
   },
 }
@@ -75,7 +126,7 @@ export const WrappedLongName: Story = {
       ...buildEquipmentPickerRowViewModel(pickEquipment('longsword')),
       name: 'Vorpal Longsword of the Seven Suns and Endless Twilight',
     },
-    callout: { label: 'Essential', emphasis: 'info' },
+    callout: { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, intent: 'recommended', importance: 'high' },
     commerce: commerceRail('15 GP'),
   },
   decorators: [

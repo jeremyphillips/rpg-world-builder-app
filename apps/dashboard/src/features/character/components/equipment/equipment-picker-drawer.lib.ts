@@ -14,26 +14,15 @@ import {
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
 import {
-  EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
-  EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-  EQUIPMENT_PICKER_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
-  EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
-  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentBudgetSummary,
-  type EquipmentPickerBadge,
-  type EquipmentPickerCallout,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
@@ -405,97 +394,4 @@ export function getEquipmentPickerDisabledNote(
   }
 
   return undefined
-}
-
-export type EquipmentPickerBadgeContext = {
-  isGoldShoppingPath?: boolean
-}
-
-const INFO_CALLOUT = { emphasis: 'info' } as const satisfies Pick<
-  EquipmentPickerCallout,
-  'emphasis'
->
-const WARNING_CALLOUT = { emphasis: 'warning' } as const satisfies Pick<
-  EquipmentPickerCallout,
-  'emphasis'
->
-
-function essentialEquipmentPickerCallout(
-  tier: EquipmentPickerItem['state']['recommendation']['tier'],
-  reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][],
-): EquipmentPickerCallout | undefined {
-  if (tier !== 'essential') return undefined
-
-  if (reasons.includes('spellcastingFocus')) {
-    return { label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL, ...INFO_CALLOUT }
-  }
-  if (reasons.includes('classToolNeed')) {
-    return { label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL, ...INFO_CALLOUT }
-  }
-  return { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, ...INFO_CALLOUT }
-}
-
-function proficiencyStateEquipmentPickerCallout(
-  reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][],
-): EquipmentPickerCallout | undefined {
-  if (reasons.includes('selectedToolProficiency')) {
-    return { label: EQUIPMENT_PICKER_PROFICIENT_LABEL, ...INFO_CALLOUT }
-  }
-  if (reasons.includes('unresolvedToolProficiencyChoice')) {
-    return { label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL, ...INFO_CALLOUT }
-  }
-  if (reasons.includes('classToolCategory')) {
-    return { label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL, ...INFO_CALLOUT }
-  }
-  return undefined
-}
-
-function recommendationSourceEquipmentPickerCallout(args: {
-  tier: EquipmentPickerItem['state']['recommendation']['tier']
-  reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][]
-  isGoldShoppingPath: boolean
-}): EquipmentPickerCallout | undefined {
-  const { tier, reasons, isGoldShoppingPath } = args
-
-  if (reasons.includes('startingEquipmentChoice')) {
-    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...INFO_CALLOUT }
-  }
-  if (reasons.includes('availableInStartingOption') && isGoldShoppingPath) {
-    return { label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL, ...INFO_CALLOUT }
-  }
-  if (tier === 'strong' && reasons.includes('startingEquipment')) {
-    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...INFO_CALLOUT }
-  }
-  return undefined
-}
-
-/**
- * Single-callout policy: essential blockers → proficiency-state copy → starting-equipment
- * source → not-proficient warning. Proficiency copy is reason-driven, not kind-driven.
- */
-export function getEquipmentPickerCallout(
-  item: EquipmentPickerItem,
-  context: EquipmentPickerBadgeContext = {},
-): EquipmentPickerCallout | undefined {
-  const { tier, reasons, label } = item.state.recommendation
-  const isGoldShoppingPath = context.isGoldShoppingPath ?? false
-
-  if (label) return { label, ...INFO_CALLOUT }
-
-  return (
-    essentialEquipmentPickerCallout(tier, reasons) ??
-    proficiencyStateEquipmentPickerCallout(reasons) ??
-    recommendationSourceEquipmentPickerCallout({ tier, reasons, isGoldShoppingPath }) ??
-    (!item.state.isProficient
-      ? { label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL, ...WARNING_CALLOUT }
-      : undefined)
-  )
-}
-
-/** @deprecated Use {@link getEquipmentPickerCallout}. */
-export function getEquipmentPickerBadge(
-  item: EquipmentPickerItem,
-  context: EquipmentPickerBadgeContext = {},
-): EquipmentPickerBadge | undefined {
-  return getEquipmentPickerCallout(item, context)
 }

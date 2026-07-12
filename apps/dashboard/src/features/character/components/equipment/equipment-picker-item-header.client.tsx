@@ -1,17 +1,17 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { TriangleAlert } from 'lucide-react'
 
 import { EQUIPMENT_COMPACT_SEPARATOR } from '@rpg/contracts'
-import { Text, cn } from '@rpg/ui'
+import { SemanticText, Text, cn } from '@rpg/ui'
 
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
+import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
 import { EQUIPMENT_PICKER_HEADER_DIVIDER } from './equipment-picker-drawer.variants'
 import type { EquipmentPickerCallout } from './equipment-picker-drawer.types'
 import {
-  EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_INFO_CLASSES,
-  EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_WARNING_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_INFO_CLASSES,
@@ -64,21 +64,23 @@ export function EquipmentPickerItemHeader({
               <span className={EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES} aria-hidden>
                 {EQUIPMENT_PICKER_HEADER_DIVIDER}
               </span>
-              <Text
-                as="span"
-                className={
-                  callout.emphasis === 'warning'
-                    ? EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_WARNING_CLASSES
-                    : EQUIPMENT_PICKER_ITEM_HEADER_CALLOUT_INFO_CLASSES
-                }
-              >
-                {callout.label}
-              </Text>
+              <EquipmentPickerCalloutText callout={callout} />
             </>
           ) : null}
         </div>
       </div>
       {commerce}
     </div>
+  )
+}
+
+function EquipmentPickerCalloutText({ callout }: { callout: EquipmentPickerCallout }) {
+  const presentation = getEquipmentCalloutPresentation(callout)
+  const icon = presentation.icon === 'warning' ? <TriangleAlert aria-hidden /> : undefined
+
+  return (
+    <SemanticText tone={presentation.tone} emphasis={presentation.emphasis} icon={icon}>
+      {callout.label}
+    </SemanticText>
   )
 }

@@ -34,7 +34,6 @@ import {
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
-  getEquipmentPickerCallout,
   getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
@@ -42,6 +41,7 @@ import {
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
+import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,

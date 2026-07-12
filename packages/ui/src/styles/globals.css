@@ -67,6 +67,12 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
+  --color-semantic-neutral: var(--semantic-neutral);
+  --color-semantic-informative: var(--semantic-informative);
+  --color-semantic-informative-muted: var(--semantic-informative-muted);
+  --color-semantic-positive: var(--semantic-positive);
+  --color-semantic-caution: var(--semantic-caution);
+  --color-semantic-negative: var(--semantic-negative);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:
@@ -254,6 +260,13 @@
   --input: oklch(0.9 0.02 80);
   --ring: oklch(0.52 0.11 70);
   --overlay: oklch(0.2 0.015 60 / 0.5);
+  /* Inline semantic text — tuned for base and muted/subtle surfaces (AA on parchment). */
+  --semantic-neutral: oklch(0.5 0.025 70);
+  --semantic-informative: oklch(0.48 0.13 250);
+  --semantic-informative-muted: oklch(0.42 0.07 250);
+  --semantic-positive: oklch(0.48 0.13 145);
+  --semantic-caution: oklch(0.55 0.13 70);
+  --semantic-negative: oklch(0.52 0.2 27);
 }
 
 .dark {
@@ -292,6 +305,12 @@
   --input: oklch(0.95 0.02 80 / 16%);
   --ring: oklch(0.78 0.13 75);
   --overlay: oklch(0.05 0.005 60 / 0.7);
+  --semantic-neutral: oklch(0.72 0.02 80);
+  --semantic-informative: oklch(0.62 0.08 250);
+  --semantic-informative-muted: oklch(0.55 0.05 250);
+  --semantic-positive: oklch(0.72 0.11 145);
+  --semantic-caution: oklch(0.78 0.12 75);
+  --semantic-negative: oklch(0.72 0.16 22);
 }
 
 /*
