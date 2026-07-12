@@ -8,11 +8,11 @@ export const equipmentStartingPackageCardTitleClasses = 'font-heading text-base 
 
 export const equipmentStartingPackageCardActionsClasses = 'flex flex-wrap items-center gap-2'
 
-export const equipmentStartingPackageCardBodyClasses = 'space-y-4 px-4 py-4'
+export const equipmentStartingPackageCardBodyClasses = 'divide-y divide-border'
 
-export const equipmentStartingPackageCategoryClasses = 'space-y-1'
+export const equipmentStartingPackageCategoryClasses = 'space-y-1 px-4 py-3 first:pt-4 last:pb-4'
 
-export const equipmentStartingPackageRowListClasses = 'divide-y divide-border'
+export const equipmentStartingPackageRowListClasses = ''
 
 export const equipmentStartingPackageFooterClasses =
   'border-t border-border px-4 py-3 text-sm text-muted-foreground'

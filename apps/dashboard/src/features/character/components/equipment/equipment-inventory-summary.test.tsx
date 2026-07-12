@@ -109,7 +109,7 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toHaveTextContent('Remove')
+    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
 
@@ -202,10 +202,10 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('2 GP value · 4 GP total value')).toBeInTheDocument()
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Increase Quantity/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
-  it('uses click-to-edit for large stack quantities', async () => {
+  it('keeps the stepper visible for large stack quantities', async () => {
     const user = userEvent.setup()
     const onSetPurchaseQuantity = vi.fn()
     const row: EquipmentInventoryRow = {
@@ -234,11 +234,12 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Edit quantity for Rations' })).toHaveTextContent(
-      '12',
+    expect(screen.getByRole('spinbutton', { name: 'Quantity for Rations' })).toHaveValue(12)
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
+    expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
+      { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      13,
     )
-    await user.click(screen.getByRole('button', { name: 'Edit quantity for Rations' }))
-    expect(screen.getByRole('spinbutton', { name: 'Quantity for Rations' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

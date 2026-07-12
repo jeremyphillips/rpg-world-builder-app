@@ -13,8 +13,8 @@ import {
   type PurchasedCategoryGroup,
 } from './equipment-inventory-summary.lib'
 import {
-  equipmentInventorySummaryGroupClasses,
-  equipmentInventorySummaryListClasses,
+  equipmentPurchasedInventoryCategoryClasses,
+  equipmentPurchasedInventoryCategoryListClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventorySectionProps = {
@@ -35,12 +35,12 @@ export function EquipmentPurchasedInventorySection({
   }
 
   return (
-    <div className="space-y-6">
+    <div className={equipmentPurchasedInventoryCategoryListClasses}>
       {purchased.map((group) =>
         group.displays.length === 0 ? null : (
-          <section key={group.groupLabel} className={equipmentInventorySummaryGroupClasses}>
+          <section key={group.groupLabel} className={equipmentPurchasedInventoryCategoryClasses}>
             <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
-            <ul className={equipmentInventorySummaryListClasses}>
+            <ul>
               {group.displays.map((display) => (
                 <li key={equipmentInventoryDisplayItemKey(display)}>
                   <EquipmentInventoryRowItem

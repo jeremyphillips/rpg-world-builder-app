@@ -112,8 +112,6 @@ export function formatPackageInventoryRowTitle(name: string, quantity: number): 
   return `${quantity} × ${name}`
 }
 
-export const EQUIPMENT_INVENTORY_CLICK_TO_EDIT_QUANTITY_THRESHOLD = 10
-
 export const EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL = 'Included tool'
 
 export const EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE =

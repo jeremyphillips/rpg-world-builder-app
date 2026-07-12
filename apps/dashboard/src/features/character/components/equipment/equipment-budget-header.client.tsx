@@ -1,7 +1,13 @@
 'use client'
 
 import { formatWealthAsGold, type EquipmentBudgetSummary } from '@rpg/contracts'
-import { EmphasisDetailLine } from '@rpg/ui'
+import { Text } from '@rpg/ui'
+
+import {
+  equipmentBudgetHeaderMetaClasses,
+  equipmentBudgetHeaderPanelClasses,
+  equipmentBudgetHeaderRemainingClasses,
+} from './equipment-budget-header.variants'
 
 export type EquipmentBudgetHeaderProps = {
   budget: EquipmentBudgetSummary
@@ -9,12 +15,13 @@ export type EquipmentBudgetHeaderProps = {
 
 export function EquipmentBudgetHeader({ budget }: EquipmentBudgetHeaderProps) {
   return (
-    <EmphasisDetailLine
-      as="p"
-      className="text-sm text-foreground"
-      prefix={<span className="font-medium">Budget:</span>}
-      primary={`${formatWealthAsGold(budget.remaining)} remaining`}
-      secondary={`${formatWealthAsGold(budget.starting)} starting · ${formatWealthAsGold(budget.spent)} spent`}
-    />
+    <div className={equipmentBudgetHeaderPanelClasses}>
+      <Text as="p" className={equipmentBudgetHeaderRemainingClasses}>
+        {formatWealthAsGold(budget.remaining)} remaining
+      </Text>
+      <Text as="p" className={equipmentBudgetHeaderMetaClasses}>
+        {formatWealthAsGold(budget.starting)} starting · {formatWealthAsGold(budget.spent)} spent
+      </Text>
+    </div>
   )
 }

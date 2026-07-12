@@ -1,11 +1,10 @@
-import type {
-  CharacterBuildCatalogIndex,
-  CharacterBuilderDraft,
-  CharacterEquipment,
-} from '@rpg/contracts'
 import {
+  formatEquipmentInventoryPriceLine,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
+  type CharacterBuildCatalogIndex,
+  type CharacterBuilderDraft,
+  type CharacterEquipment,
 } from '@rpg/contracts'
 
 import {
@@ -58,6 +57,27 @@ export function formatEquipmentInventorySourceBreakdownLabel(
   if (breakdown.manual > 0) parts.push(`${breakdown.manual} manual`)
 
   return parts.join(' · ')
+}
+
+export function resolveCombinedInventoryDetailLineLabel(
+  display: Extract<EquipmentInventoryDisplayItem, { kind: 'combined' }>,
+): string {
+  const hasIncluded = display.rows.some((row) => row.removeTarget?.kind === 'package')
+  const hasManual = display.rows.some((row) =>
+    row.entry.sources?.some((source) => source.kind === 'manual'),
+  )
+
+  if (!hasIncluded && !hasManual && display.equipment) {
+    const priceLine = formatEquipmentInventoryPriceLine({
+      equipment: display.equipment,
+      quantity: display.totalQuantity,
+      priceContext: 'startingGold',
+    })
+    return display.bundleLabel ? `${priceLine} · ${display.bundleLabel}` : priceLine
+  }
+
+  if (display.bundleLabel) return `${display.breakdownLabel} · ${display.bundleLabel}`
+  return display.breakdownLabel
 }
 
 export function groupEquipmentInventoryRowsForDisplay(
@@ -170,7 +190,6 @@ function groupRowsByCategory(
 
 function buildPurchasedCategoryGroups(
   rows: readonly EquipmentInventoryRow[],
-  allowCombinedRows: boolean,
 ): PurchasedCategoryGroup[] {
   const grouped = new Map<string, EquipmentInventoryRow[]>()
   const order: string[] = []
@@ -188,7 +207,7 @@ function buildPurchasedCategoryGroups(
     return {
       group: groupRows[0]!.group,
       groupLabel,
-      displays: groupEquipmentInventoryRowsForDisplay(groupRows, { allowCombinedRows }),
+      displays: groupEquipmentInventoryRowsForDisplay(groupRows, { allowCombinedRows: true }),
     }
   })
 }
@@ -214,7 +233,7 @@ export function buildEquipmentInventoryLayout(
   const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
   const purchasedRows = allRows.filter((row) => row.removeTarget?.kind === 'purchase')
 
-  const purchased = buildPurchasedCategoryGroups(purchasedRows, isGoldPath)
+  const purchased = buildPurchasedCategoryGroups(purchasedRows)
 
   if (isGoldPath) {
     return { mode: 'gold', purchased }

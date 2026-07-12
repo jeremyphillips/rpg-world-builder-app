@@ -95,7 +95,7 @@ export const CombinedSourceBreakdown: Story = {
   },
 }
 
-export const ClickToEditQuantity: Story = {
+export const HighQuantity: Story = {
   args: {
     display: {
       kind: 'single',

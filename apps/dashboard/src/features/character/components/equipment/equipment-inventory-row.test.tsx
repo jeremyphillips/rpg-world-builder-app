@@ -27,7 +27,7 @@ const editableStackableRow: EquipmentInventoryRow = {
 }
 
 describe('EquipmentInventoryRowItem', () => {
-  it('renders price line with borderless stepper and text remove for editable stackables', async () => {
+  it('renders stepper and remove inline with the title for editable stackables', async () => {
     const user = userEvent.setup()
     const onSetPurchaseQuantity = vi.fn()
 
@@ -40,7 +40,7 @@ describe('EquipmentInventoryRowItem', () => {
     )
 
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toHaveTextContent('Remove')
+    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Increase Quantity for Rations' }),
     ).toBeInTheDocument()
@@ -50,6 +50,31 @@ describe('EquipmentInventoryRowItem', () => {
       { kind: 'purchase', purchaseId: 'purchase-row-test-0' },
       3,
     )
+  })
+
+  it('keeps the stepper visible for quantities at or above 10', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            entry: { ...editableStackableRow.entry, quantity: 12 },
+            priceLineLabel: '5 SP each · 6 GP total',
+            removeLabel: 'Remove all 12 Rations',
+          },
+        }}
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Increase Quantity for Rations' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Edit quantity for Rations' }),
+    ).not.toBeInTheDocument()
   })
 
   it('omits remove for package grants', () => {
@@ -82,7 +107,7 @@ describe('EquipmentInventoryRowItem', () => {
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

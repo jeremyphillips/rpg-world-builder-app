@@ -5,6 +5,7 @@ import { createEmptyCharacterBuilderDraft, startingEquipmentChoiceSetId } from '
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
@@ -12,6 +13,7 @@ import {
   buildEquipmentInventoryLayout,
   formatEquipmentInventorySourceBreakdownLabel,
   groupEquipmentInventoryRowsForDisplay,
+  resolveCombinedInventoryDetailLineLabel,
 } from './equipment-inventory-summary.lib'
 
 function row(
@@ -103,6 +105,36 @@ describe('equipment-inventory-summary.lib', () => {
       { kind: 'single', row: included },
       { kind: 'single', row: purchased },
     ])
+  })
+
+  it('uses purchase price lines for purchased-only combined rows', () => {
+    const purchasedA = row({
+      equipmentName: 'Leather Armor',
+      entry: {
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        quantity: 1,
+        sources: [{ kind: 'startingGold' }],
+      },
+      equipment: equipmentStepLeatherArmorFixture,
+      sourceLabel: 'Purchased with starting gold',
+      quantityMode: 'editable',
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      priceLineLabel: '2 GP',
+    })
+    const purchasedB = row({
+      ...purchasedA,
+      entry: { ...purchasedA.entry, quantity: 1 },
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-1' },
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-1' },
+      priceLineLabel: '2 GP',
+    })
+
+    const combined = groupEquipmentInventoryRowsForDisplay([purchasedA, purchasedB])[0]
+    expect(combined?.kind).toBe('combined')
+    if (combined?.kind !== 'combined') return
+
+    expect(resolveCombinedInventoryDetailLineLabel(combined)).toBe('10 GP each · 20 GP total')
   })
 
   it('builds package and purchased sections for monk standard equipment', () => {

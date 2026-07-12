@@ -9,10 +9,10 @@ dashboard IA and how the UI composes existing row controls.
 Inventory is split into two sections. Package-owned and purchased rows never
 interleave inside the same category list while a package is selected.
 
-| Section                          | When shown                           | Row behavior                                                                                                  |
-| -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **Starting package card**        | Package option selected              | Name + value line per row; qty 2+ shows read-only `Qty N`; Customize on package card only (no per-row remove) |
-| **Purchased with Starting Gold** | Always (empty state on package path) | Reuses `EquipmentInventoryRowItem` cart controls for `startingGold` purchases                                 |
+| Section                          | When shown                           | Row behavior                                                                                                                                                   |
+| -------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Starting package card**        | Package option selected              | Categories separated by dividers; rows are borderless within each category; qty 2+ shows read-only `Qty N`; Customize on package card only (no per-row remove) |
+| **Purchased with Starting Gold** | Always (empty state on package path) | Reuses `EquipmentInventoryRowItem` cart controls for `startingGold` purchases                                                                                  |
 
 Gold option selected: hide the starting package card; show purchased section and
 **Browse equipment** (picker). Package option selected: same **Browse equipment**
@@ -44,8 +44,8 @@ not ad-hoc VM rules.
 Purchased-cart rows use a two-line layout:
 
 ```text
-Line 1:  {name}  [Equipped]
-Line 2:  {priceLine}          {actions}
+Line 1:  {name}  [Equipped]          {stepper}  [trash]
+Line 2:  {priceLine}
 ```
 
 `priceLine` comes from `formatEquipmentInventoryPriceLine` in `@rpg/contracts`
@@ -55,7 +55,7 @@ parent row only (`7 total · 5 included · 2 purchased`).
 
 | Purchase                                                       | Controls                                                            |
 | -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Stackable `startingGold` (`origin: picker`)                    | Line 2: price + borderless `NumberStepper` + Remove text            |
+| Stackable `startingGold` (`origin: picker`)                    | Line 1: `NumberStepper` + Remove text; line 2: price                |
 | Non-stackable `startingGold`                                   | qty locked at 1, full-row Remove                                    |
 | Converted non-stackable (`origin: packageConversion`, qty > 1) | qty locked at authored amount, full-row Remove                      |
 | Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows |
@@ -71,9 +71,8 @@ non-stackable value lines follow the same resolver; see
 
 ### Remove semantics
 
-- **Remove** is a visible text button (`variant="link"` styling), not a trash
-  icon. `aria-label` still describes the full action (e.g. `Remove all 2
-Rations`).
+- **Remove** is a trash icon button, not visible text. `aria-label` still describes
+  the full action (e.g. `Remove all 2 Rations`).
 - Only `removeTarget.kind === 'purchase'` rows render Remove. Package grants
   clear `removeTarget` in `buildInventoryRowPresentation`.
 - Combined rows: only purchased-editable sub-rows get Remove; package portions
@@ -83,11 +82,8 @@ Rations`).
 
 Inventory and drawer purchase panels share `@rpg/ui` `NumberStepper`:
 
-- `size="sm"`, `bordered={false}` in cart and drawer bodies
+- `size="sm"`, `bordered={true}` in cart and drawer bodies
 - `digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}` (2)
-- At qty ≥ `EQUIPMENT_INVENTORY_CLICK_TO_EDIT_QUANTITY_THRESHOLD` (10), cart
-  rows show a click-to-edit quantity button first; expanding reveals the
-  stepper
 
 ## Picker
 

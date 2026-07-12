@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { Trash2 } from 'lucide-react'
 
 import { Badge, Text } from '@rpg/ui'
 
@@ -9,19 +10,20 @@ import {
   type EquipmentInventoryRemoveTarget,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
-import type { EquipmentInventoryDisplayItem } from './equipment-inventory-summary.lib'
 import {
-  EQUIPMENT_INVENTORY_REMOVE_VISIBLE_LABEL,
-  EquipmentInventoryQuantityControl,
-} from './equipment-inventory-quantity-control.client'
+  resolveCombinedInventoryDetailLineLabel,
+  type EquipmentInventoryDisplayItem,
+} from './equipment-inventory-summary.lib'
+import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantity-control.client'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowClasses,
   equipmentInventoryRowDetailLineClasses,
+  equipmentInventoryRowHeaderClasses,
   equipmentInventoryRowNameClasses,
   equipmentInventoryRowPriceLineClasses,
   equipmentInventoryRowQtyLabelClasses,
-  equipmentInventoryRowRemoveTextClasses,
+  equipmentInventoryRowRemoveButtonClasses,
 } from './equipment-inventory-summary.variants'
 import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
 
@@ -37,13 +39,6 @@ function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined 
   return row.sourceLabel
 }
 
-function resolveCombinedDetailLineLabel(
-  display: Extract<EquipmentInventoryDisplayItem, { kind: 'combined' }>,
-) {
-  if (display.bundleLabel) return `${display.breakdownLabel} · ${display.bundleLabel}`
-  return display.breakdownLabel
-}
-
 function canRemovePurchaseRow(
   row: EquipmentInventoryRow,
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void,
@@ -51,7 +46,7 @@ function canRemovePurchaseRow(
   return row.removeTarget?.kind === 'purchase' && onRemoveItem !== undefined
 }
 
-function InventoryRemoveTextButton({
+function InventoryRemoveIconButton({
   removeLabel,
   onRemove,
 }: {
@@ -61,11 +56,11 @@ function InventoryRemoveTextButton({
   return (
     <button
       type="button"
-      className={equipmentInventoryRowRemoveTextClasses}
+      className={equipmentInventoryRowRemoveButtonClasses}
       aria-label={removeLabel}
       onClick={onRemove}
     >
-      {EQUIPMENT_INVENTORY_REMOVE_VISIBLE_LABEL}
+      <Trash2 aria-hidden className="size-3" />
     </button>
   )
 }
@@ -99,7 +94,7 @@ function InventoryRowActions({
         </Text>
       ) : null}
       {showRemove ? (
-        <InventoryRemoveTextButton
+        <InventoryRemoveIconButton
           removeLabel={row.removeLabel}
           onRemove={() => onRemoveItem!(row.removeTarget)}
         />
@@ -111,37 +106,37 @@ function InventoryRowActions({
 function InventoryRowHeader({
   equipmentName,
   equipped,
+  actions,
 }: {
   equipmentName: string
   equipped: boolean
+  actions?: ReactNode
 }) {
   return (
-    <div className={builderInventoryRowMetaClasses}>
-      <Text as="p" className={equipmentInventoryRowNameClasses}>
-        {equipmentName}
-      </Text>
-      {equipped ? (
-        <Badge variant="secondary" size="sm">
-          Equipped
-        </Badge>
-      ) : null}
+    <div className={equipmentInventoryRowHeaderClasses}>
+      <div className={builderInventoryRowMetaClasses}>
+        <Text as="p" className={equipmentInventoryRowNameClasses}>
+          {equipmentName}
+        </Text>
+        {equipped ? (
+          <Badge variant="secondary" size="sm">
+            Equipped
+          </Badge>
+        ) : null}
+      </div>
+      {actions}
     </div>
   )
 }
 
-function InventoryRowDetailLine({ label, actions }: { label?: string; actions?: ReactNode }) {
-  if (!label && !actions) return null
+function InventoryRowDetailLine({ label }: { label?: string }) {
+  if (!label) return null
 
   return (
     <div className={equipmentInventoryRowDetailLineClasses}>
-      {label ? (
-        <Text as="p" variant="caption" className={equipmentInventoryRowPriceLineClasses}>
-          {label}
-        </Text>
-      ) : (
-        <span />
-      )}
-      {actions}
+      <Text as="p" variant="caption" className={equipmentInventoryRowPriceLineClasses}>
+        {label}
+      </Text>
     </div>
   )
 }
@@ -167,8 +162,9 @@ export function EquipmentInventoryRowItem({
         <InventoryRowHeader
           equipmentName={row.equipmentName}
           equipped={Boolean(row.entry.equipped)}
+          actions={actions}
         />
-        <InventoryRowDetailLine label={detailLabel} actions={actions} />
+        <InventoryRowDetailLine label={detailLabel} />
       </article>
     )
   }
@@ -178,14 +174,14 @@ export function EquipmentInventoryRowItem({
   )
   const removablePurchaseRow = display.rows.find((row) => canRemovePurchaseRow(row, onRemoveItem))
   const equipped = display.rows.some((row) => row.entry.equipped)
-  const detailLabel = resolveCombinedDetailLineLabel(display)
+  const detailLabel = resolveCombinedInventoryDetailLineLabel(display)
   const actionsRow = editableRow ?? removablePurchaseRow
 
   return (
     <article className={equipmentInventoryRowClasses}>
-      <InventoryRowHeader equipmentName={display.equipmentName} equipped={equipped} />
-      <InventoryRowDetailLine
-        label={detailLabel}
+      <InventoryRowHeader
+        equipmentName={display.equipmentName}
+        equipped={equipped}
         actions={
           actionsRow ? (
             <InventoryRowActions
@@ -196,6 +192,7 @@ export function EquipmentInventoryRowItem({
           ) : undefined
         }
       />
+      <InventoryRowDetailLine label={detailLabel} />
     </article>
   )
 }
