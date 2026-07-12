@@ -72,11 +72,11 @@ export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
 
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
-export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased with Starting Gold'
+export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 
-export const EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL = 'Change equipment option'
+export const EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL = 'Change option'
 
 export const EQUIPMENT_SELECTED_PACKAGE_EYEBROW = 'Selected package'
 

@@ -6,7 +6,6 @@ import type { EquipmentBudgetSummary } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
 import {
-  EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
   EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
 } from '../../lib/equipment-step.lib'
@@ -24,24 +23,13 @@ export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout
   )
 }
 
-export function EquipmentStepShoppingSection({
-  budget,
-  onOpenPicker,
-}: {
-  budget: EquipmentBudgetSummary
-  onOpenPicker: () => void
-}) {
+export function EquipmentStepShoppingSection({ budget }: { budget: EquipmentBudgetSummary }) {
   return (
     <section className="space-y-4">
       <Heading variant="subsection" as="h3">
         Budget
       </Heading>
       <EquipmentBudgetHeader budget={budget} />
-      <div>
-        <Button type="button" variant="default" onClick={onOpenPicker}>
-          {EQUIPMENT_STEP_BROWSE_LABEL}
-        </Button>
-      </div>
     </section>
   )
 }

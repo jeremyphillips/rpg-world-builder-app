@@ -13,7 +13,9 @@ import {
   buildEquipmentInventoryLayout,
   formatEquipmentInventorySourceBreakdownLabel,
   groupEquipmentInventoryRowsForDisplay,
+  hasEquipmentInventoryContent,
   resolveCombinedInventoryDetailLineLabel,
+  shouldRenderEquipmentInventorySummary,
 } from './equipment-inventory-summary.lib'
 
 function row(
@@ -181,5 +183,31 @@ describe('equipment-inventory-summary.lib', () => {
       mode: 'gold',
       purchased: [],
     })
+  })
+
+  it('renders empty gold inventory when browse equipment is available', () => {
+    const layout = buildEquipmentInventoryLayout(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        },
+        equipment: {
+          mode: 'gold' as const,
+          purchases: [],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      },
+      equipmentStepCatalogIndexFixture,
+    )
+
+    expect(layout).toBeDefined()
+    if (!layout) return
+
+    expect(hasEquipmentInventoryContent(layout)).toBe(false)
+    expect(shouldRenderEquipmentInventorySummary(layout, false)).toBe(false)
+    expect(shouldRenderEquipmentInventorySummary(layout, true)).toBe(true)
   })
 })

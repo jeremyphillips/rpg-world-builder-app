@@ -91,9 +91,7 @@ export function EquipmentStepInteractive({
           />
         ) : null}
 
-        {showBudget && budget ? (
-          <EquipmentStepShoppingSection budget={budget} onOpenPicker={openPicker} />
-        ) : null}
+        {showBudget && budget ? <EquipmentStepShoppingSection budget={budget} /> : null}
 
         <EquipmentStepInventorySection
           draft={draft}
@@ -103,6 +101,8 @@ export function EquipmentStepInteractive({
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
+          showBrowseEquipment={showBudget}
+          onOpenPicker={openPicker}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()

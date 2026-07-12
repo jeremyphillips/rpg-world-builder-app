@@ -7,10 +7,20 @@ import type {
   CharacterBuilderDraft,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
 
 import type { StartingPackageInventoryGroup } from '../../lib/equipment-step.lib'
+import {
+  equipmentInventoryColumnClasses,
+  equipmentInventoryColumnHeaderClasses,
+} from './equipment-inventory-summary.variants'
 import { EquipmentPackageConversionEditor } from './equipment-package-conversion-editor.client'
-import { EquipmentStartingPackageCard } from './equipment-starting-package-card.client'
+import {
+  EquipmentStartingPackageCard,
+  EquipmentStartingPackageInventory,
+} from './equipment-starting-package-card.client'
+import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
+import { equipmentStartingPackageCustomizeReasonClasses } from './equipment-starting-package.variants'
 
 export type EquipmentStartingPackageSectionProps = {
   packageGroup: StartingPackageInventoryGroup
@@ -40,29 +50,48 @@ export function EquipmentStartingPackageSection({
   onCommitConversion,
 }: EquipmentStartingPackageSectionProps) {
   const editorId = useId()
+  const customizeDisabled = packageGroup.customize.status === 'disabled'
 
   return (
-    <div className="space-y-0">
-      <EquipmentStartingPackageCard
-        packageGroup={packageGroup}
-        conversionEditorOpen={conversionEditorOpen}
-        customizeControlsId={editorId}
-        onCustomize={onCustomize}
-        onChangeEquipmentOption={onChangeEquipmentOption}
-      />
-      {conversionEditorOpen ? (
-        <EquipmentPackageConversionEditor
-          draft={draft}
-          catalogIndex={catalogIndex}
-          departingOptionId={packageGroup.optionId}
-          selectedPackageItemKeys={selectedPackageItemKeys}
-          editorId={editorId}
-          commitStatusMessage={commitStatusMessage}
-          onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
-          onCancel={onCancelConversion}
-          onCommit={onCommitConversion}
+    <div className={equipmentInventoryColumnClasses}>
+      <div className={equipmentInventoryColumnHeaderClasses}>
+        <Heading variant="subsection" as="h3">
+          {packageGroup.optionLabel}
+        </Heading>
+
+        <EquipmentStartingPackageToolbar
+          customizeDisabled={customizeDisabled}
+          conversionEditorOpen={conversionEditorOpen}
+          customizeControlsId={editorId}
+          onCustomize={onCustomize}
+          onChangeEquipmentOption={onChangeEquipmentOption}
         />
+      </div>
+
+      {packageGroup.customize.status === 'disabled' ? (
+        <Text as="p" className={equipmentStartingPackageCustomizeReasonClasses}>
+          {packageGroup.customize.reason}
+        </Text>
       ) : null}
+
+      <EquipmentStartingPackageCard optionLabel={packageGroup.optionLabel}>
+        {conversionEditorOpen ? (
+          <EquipmentPackageConversionEditor
+            embedded
+            draft={draft}
+            catalogIndex={catalogIndex}
+            departingOptionId={packageGroup.optionId}
+            selectedPackageItemKeys={selectedPackageItemKeys}
+            editorId={editorId}
+            commitStatusMessage={commitStatusMessage}
+            onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
+            onCancel={onCancelConversion}
+            onCommit={onCommitConversion}
+          />
+        ) : (
+          <EquipmentStartingPackageInventory packageGroup={packageGroup} />
+        )}
+      </EquipmentStartingPackageCard>
     </div>
   )
 }

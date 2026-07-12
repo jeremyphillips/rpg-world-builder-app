@@ -7,22 +7,25 @@ dashboard IA and how the UI composes existing row controls.
 ## Source groups
 
 Inventory is split into two sections. Package-owned and purchased rows never
-interleave inside the same category list while a package is selected.
+interleave inside the same category list while a package is selected. On `xl+`
+breakpoints, the starting package card and purchased cart render side by side in
+a two-column grid.
 
-| Section                          | When shown                           | Row behavior                                                                                                                                                   |
-| -------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Starting package card**        | Package option selected              | Categories separated by dividers; rows are borderless within each category; qty 2+ shows read-only `Qty N`; Customize on package card only (no per-row remove) |
-| **Purchased with Starting Gold** | Always (empty state on package path) | Reuses `EquipmentInventoryRowItem` cart controls for `startingGold` purchases                                                                                  |
+| Section                 | When shown                           | Row behavior                                                                                                                                                            |
+| ----------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Starting package**    | Package option selected              | `subsection` heading and Customize · Change option links sit above the bordered card; categories inside use dividers; qty 2+ shows read-only `Qty N`; no per-row remove |
+| **Purchased Equipment** | Always (empty state on package path) | `subsection` heading aligned with starting package; reuses `EquipmentInventoryRowItem` cart controls for `startingGold` purchases                                       |
 
-Gold option selected: hide the starting package card; show purchased section and
-**Browse equipment** (picker). Package option selected: same **Browse equipment**
-control once an option is chosen.
+Gold option selected: hide the starting package card; show purchased section (with
+**Browse equipment** inline on the purchased heading) and the budget block. Package
+option selected: same **Browse equipment** control on the purchased heading once an
+option is chosen.
 
 ## Package customization
 
-- **Customize** on the package card opens the conversion editor (draft-only until
-  confirm).
-- **Change equipment option** scrolls to starting-equipment option cards.
+- **Customize** and **Change option** text links sit above the package card.
+  Customize swaps the card body for the starting-gold conversion editor until
+  cancel or commit.
 - Package rows do not write `removedPackageItemKeys`; legacy keys are still read
   for session migration.
 

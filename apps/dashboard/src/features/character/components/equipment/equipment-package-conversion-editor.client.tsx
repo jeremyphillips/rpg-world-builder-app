@@ -17,6 +17,7 @@ import {
   equipmentPackageConversionEditorActionsClasses,
   equipmentPackageConversionEditorBodyClasses,
   equipmentPackageConversionEditorClasses,
+  equipmentPackageConversionEditorEmbeddedClasses,
   equipmentPackageConversionEditorHeaderClasses,
   equipmentPackageConversionEditorListClasses,
   equipmentPackageConversionStatusClasses,
@@ -29,6 +30,7 @@ export type EquipmentPackageConversionEditorProps = {
   selectedPackageItemKeys: ReadonlySet<string>
   editorId?: string
   commitStatusMessage?: string
+  embedded?: boolean
   onSelectedPackageItemKeysChange: (keys: ReadonlySet<string>) => void
   onCancel: () => void
   onCommit: (preview: StartingPackageConversionPreview) => void
@@ -51,6 +53,7 @@ export function EquipmentPackageConversionEditor({
   selectedPackageItemKeys,
   editorId,
   commitStatusMessage,
+  embedded = false,
   onSelectedPackageItemKeysChange,
   onCancel,
   onCommit,
@@ -88,7 +91,11 @@ export function EquipmentPackageConversionEditor({
   return (
     <section
       id={resolvedEditorId}
-      className={equipmentPackageConversionEditorClasses}
+      className={
+        embedded
+          ? equipmentPackageConversionEditorEmbeddedClasses
+          : equipmentPackageConversionEditorClasses
+      }
       aria-labelledby={`${resolvedEditorId}-heading`}
     >
       <header className={equipmentPackageConversionEditorHeaderClasses}>

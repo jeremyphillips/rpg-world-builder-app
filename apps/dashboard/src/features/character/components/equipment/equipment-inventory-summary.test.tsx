@@ -45,7 +45,7 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(screen.getByText('Lute')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove from package' })).not.toBeInTheDocument()
-    expect(screen.getByText('Purchased with Starting Gold')).toBeInTheDocument()
+    expect(screen.getByText('Purchased Equipment')).toBeInTheDocument()
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {

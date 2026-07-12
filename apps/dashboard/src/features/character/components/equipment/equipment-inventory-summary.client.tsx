@@ -3,22 +3,21 @@
 import { useMemo } from 'react'
 
 import type { CharacterBuildCatalogIndex, CharacterBuilderDraft } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
-import {
-  EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL,
-  type EquipmentInventoryQuantityTarget,
-  type EquipmentInventoryRemoveTarget,
+import type {
+  EquipmentInventoryQuantityTarget,
+  EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
+import { EquipmentPurchasedInventoryColumn } from './equipment-purchased-inventory-column.client'
 import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'
 import {
   buildEquipmentInventoryLayout,
-  type EquipmentInventoryLayout,
+  shouldRenderEquipmentInventorySummary,
 } from './equipment-inventory-summary.lib'
 import {
   equipmentInventorySummaryClasses,
-  equipmentPurchasedInventoryPanelClasses,
+  equipmentInventorySummaryGridClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
@@ -34,17 +33,8 @@ export type EquipmentInventorySummaryProps = {
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
   onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
-}
-
-function hasInventoryContent(layout: EquipmentInventoryLayout): boolean {
-  if (layout.mode === 'gold') {
-    return layout.purchased.some((group) => group.displays.length > 0)
-  }
-
-  return (
-    layout.startingPackage.categoryGroups.some((group) => group.rows.length > 0) ||
-    layout.purchased.some((group) => group.displays.length > 0)
-  )
+  showBrowseEquipment?: boolean
+  onOpenPicker?: () => void
 }
 
 export function EquipmentInventorySummary({
@@ -60,48 +50,50 @@ export function EquipmentInventorySummary({
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
+  showBrowseEquipment = false,
+  onOpenPicker,
 }: EquipmentInventorySummaryProps) {
   const layout = useMemo(
     () => buildEquipmentInventoryLayout(draft, catalogIndex),
     [catalogIndex, draft],
   )
 
-  if (!layout || !hasInventoryContent(layout)) {
+  if (!shouldRenderEquipmentInventorySummary(layout, showBrowseEquipment)) {
     return <Text variant="muted">No equipment selected yet.</Text>
   }
 
+  const isPackageMode = layout.mode === 'package'
+
   return (
-    <div className={equipmentInventorySummaryClasses}>
-      {layout.mode === 'package' ? (
-        <section className="space-y-3">
-          <EquipmentStartingPackageSection
-            packageGroup={layout.startingPackage}
-            draft={draft}
-            catalogIndex={catalogIndex}
-            conversionEditorOpen={conversionEditorOpen}
-            selectedPackageItemKeys={selectedPackageItemKeys}
-            commitStatusMessage={conversionCommitStatusMessage}
-            onCustomize={onCustomizePackage ?? (() => undefined)}
-            onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
-            onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
-            onCancelConversion={onCancelConversion ?? (() => undefined)}
-            onCommitConversion={onCommitConversion ?? (() => undefined)}
-          />
-        </section>
+    <div
+      className={
+        isPackageMode ? equipmentInventorySummaryGridClasses : equipmentInventorySummaryClasses
+      }
+    >
+      {isPackageMode ? (
+        <EquipmentStartingPackageSection
+          packageGroup={layout.startingPackage}
+          draft={draft}
+          catalogIndex={catalogIndex}
+          conversionEditorOpen={conversionEditorOpen}
+          selectedPackageItemKeys={selectedPackageItemKeys}
+          commitStatusMessage={conversionCommitStatusMessage}
+          onCustomize={onCustomizePackage ?? (() => undefined)}
+          onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
+          onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
+          onCancelConversion={onCancelConversion ?? (() => undefined)}
+          onCommitConversion={onCommitConversion ?? (() => undefined)}
+        />
       ) : null}
 
-      <section className="space-y-3">
-        <Heading variant="subsection" as="h3">
-          {EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL}
-        </Heading>
-        <div className={equipmentPurchasedInventoryPanelClasses}>
-          <EquipmentPurchasedInventorySection
-            purchased={layout.purchased}
-            onRemoveItem={onRemoveItem}
-            onSetPurchaseQuantity={onSetPurchaseQuantity}
-          />
-        </div>
-      </section>
+      <EquipmentPurchasedInventoryColumn
+        purchased={layout.purchased}
+        isPackageMode={isPackageMode}
+        showBrowseEquipment={showBrowseEquipment}
+        onOpenPicker={onOpenPicker}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
     </div>
   )
 }

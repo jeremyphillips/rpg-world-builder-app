@@ -1,5 +1,24 @@
 export const equipmentInventorySummaryClasses = 'space-y-6'
 
+export const equipmentInventorySummaryGridClasses =
+  'grid grid-cols-1 gap-6 xl:grid-cols-2 xl:items-start'
+
+export const equipmentInventoryColumnClasses = 'flex min-w-0 flex-col space-y-3'
+
+export const equipmentInventoryColumnHeaderClasses = 'space-y-1'
+
+export const equipmentInventoryColumnTitleRowClasses =
+  'flex flex-wrap items-center justify-between gap-2'
+
+/** Matches toolbar row height so purchased column boxes align in the two-column grid. */
+export const equipmentInventoryColumnToolbarClasses = 'flex min-h-5 flex-wrap items-center gap-x-1'
+
+export const equipmentInventoryColumnToolbarSpacerClasses = 'min-h-5'
+
+export const equipmentInventoryColumnToolbarLinkClasses = 'h-auto px-0 text-sm'
+
+export const equipmentInventoryColumnToolbarSeparatorClasses = 'text-muted-foreground'
+
 export const equipmentInventorySummaryGroupClasses = 'space-y-1'
 
 export const equipmentInventorySummaryListClasses = ''
@@ -25,10 +44,10 @@ export const equipmentInventoryRowPriceLineClasses = 'min-w-0 text-muted-foregro
 
 export const equipmentInventoryRowNameClasses = 'font-body-emphasis text-sm text-foreground'
 
-export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 tabular-nums text-foreground'
+export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
 
 export const equipmentInventoryRowRemoveButtonClasses =
-  'flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'mr-[-12px] flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 export {
   builderInventoryRowFooterClasses as equipmentInventoryRowFooterClasses,

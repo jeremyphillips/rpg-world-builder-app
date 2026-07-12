@@ -164,6 +164,25 @@ export type EquipmentInventoryLayout =
     }
   | { mode: 'gold'; purchased: PurchasedCategoryGroup[] }
 
+export function hasEquipmentInventoryContent(layout: EquipmentInventoryLayout): boolean {
+  if (layout.mode === 'gold') {
+    return layout.purchased.some((group) => group.displays.length > 0)
+  }
+
+  return (
+    layout.startingPackage.categoryGroups.some((group) => group.rows.length > 0) ||
+    layout.purchased.some((group) => group.displays.length > 0)
+  )
+}
+
+export function shouldRenderEquipmentInventorySummary(
+  layout: EquipmentInventoryLayout | undefined,
+  showBrowseEquipment: boolean,
+): layout is EquipmentInventoryLayout {
+  if (!layout) return false
+  return showBrowseEquipment || hasEquipmentInventoryContent(layout)
+}
+
 function groupRowsByCategory(
   rows: readonly EquipmentInventoryRow[],
 ): StartingPackageCategoryGroup[] {
