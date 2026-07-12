@@ -58,7 +58,7 @@ export function PurchaseQuantityRow({
       <NumberStepper
         aria-label={`${EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL} for ${equipmentName}`}
         size="sm"
-        bordered={false}
+        bordered={true}
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={1}
         max={maxQuantity}

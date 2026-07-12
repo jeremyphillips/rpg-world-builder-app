@@ -453,7 +453,7 @@ describe('EquipmentStep', () => {
     )
   })
 
-  it('shows package customize on the inventory card but not browse shopping on the package path', async () => {
+  it('shows package customize and browse shopping on the package path', async () => {
     const user = userEvent.setup()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -477,14 +477,17 @@ describe('EquipmentStep', () => {
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }),
     ).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }),
-    ).not.toBeInTheDocument()
+    expect(screen.getByText('Budget')).toBeInTheDocument()
+    expect(screen.getAllByText(/19 GP/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
 
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
     expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
-    expect(screen.queryByRole('dialog', { name: 'Add equipment' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

@@ -39,6 +39,7 @@ export function EquipmentStepInteractive({
     summaries,
     selectedOptionId,
     showFallback,
+    showBudget,
     showShopping,
     budget,
     pickerItems,
@@ -90,12 +91,8 @@ export function EquipmentStepInteractive({
           />
         ) : null}
 
-        {showShopping && budget ? (
-          <EquipmentStepShoppingSection
-            budget={budget}
-            customized={draft.equipment?.customized}
-            onOpenPicker={openPicker}
-          />
+        {showBudget && budget ? (
+          <EquipmentStepShoppingSection budget={budget} onOpenPicker={openPicker} />
         ) : null}
 
         <EquipmentStepInventorySection

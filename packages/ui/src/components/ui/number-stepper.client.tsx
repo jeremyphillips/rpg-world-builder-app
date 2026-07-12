@@ -8,6 +8,7 @@ import { buildStepOptions, normalizeInputValue, stepNumber } from './number-inpu
 import { useNumberInput } from './number-input.use.client'
 import {
   numberStepperButtonVariants,
+  numberStepperInputDigitWidths,
   numberStepperInputVariants,
   numberStepperRootVariants,
   numberStepperWidthVariants,
@@ -123,7 +124,10 @@ export function NumberStepper({
         autoFocus={autoFocus}
         onBlur={onBlur}
         onChange={handleInputChange}
-        className={numberStepperInputVariants({ size: resolvedSize })}
+        className={cn(
+          numberStepperInputVariants({ size: resolvedSize }),
+          numberStepperInputDigitWidths[digits],
+        )}
       />
 
       <button

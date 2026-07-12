@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Text } from '@rpg/ui'
+import { Button, Eyebrow, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL,
@@ -17,7 +17,6 @@ import {
   equipmentStartingPackageCardHeaderClasses,
   equipmentStartingPackageCardTitleClasses,
   equipmentStartingPackageCategoryClasses,
-  equipmentStartingPackageCategoryLabelClasses,
   equipmentStartingPackageCustomizeReasonClasses,
   equipmentStartingPackageFooterClasses,
   equipmentStartingPackageRowListClasses,
@@ -78,9 +77,7 @@ export function EquipmentStartingPackageCard({
       <div className={equipmentStartingPackageCardBodyClasses}>
         {packageGroup.categoryGroups.map((category) => (
           <div key={category.groupLabel} className={equipmentStartingPackageCategoryClasses}>
-            <Text as="p" className={equipmentStartingPackageCategoryLabelClasses}>
-              {category.groupLabel}
-            </Text>
+            <Eyebrow size="sm">{category.groupLabel}</Eyebrow>
             <ul className={equipmentStartingPackageRowListClasses}>
               {category.rows.map((row: EquipmentInventoryRow) => (
                 <li

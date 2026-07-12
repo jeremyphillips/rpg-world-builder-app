@@ -8,7 +8,6 @@ import { Button, Heading, Text } from '@rpg/ui'
 import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
-  EQUIPMENT_STEP_CUSTOMIZED_MESSAGE,
   EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
 } from '../../lib/equipment-step.lib'
 import { EquipmentBudgetHeader } from '../equipment/equipment-budget-header.client'
@@ -27,11 +26,9 @@ export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout
 
 export function EquipmentStepShoppingSection({
   budget,
-  customized,
   onOpenPicker,
 }: {
   budget: EquipmentBudgetSummary
-  customized?: boolean
   onOpenPicker: () => void
 }) {
   return (
@@ -45,7 +42,6 @@ export function EquipmentStepShoppingSection({
           {EQUIPMENT_STEP_BROWSE_LABEL}
         </Button>
       </div>
-      {customized ? <Text variant="muted">{EQUIPMENT_STEP_CUSTOMIZED_MESSAGE}</Text> : null}
     </section>
   )
 }
@@ -55,7 +51,7 @@ export type EquipmentStepInventorySectionProps = ComponentProps<typeof Equipment
 export function EquipmentStepInventorySection(props: EquipmentStepInventorySectionProps) {
   return (
     <section className="space-y-3">
-      <Heading variant="subsection" as="h3">
+      <Heading variant="sheetSection" as="h3">
         Inventory
       </Heading>
       <EquipmentInventorySummary {...props} />

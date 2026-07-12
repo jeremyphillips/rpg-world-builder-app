@@ -24,6 +24,7 @@ import {
   listProficiencyLinksForOption,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
+  shouldShowEquipmentBudget,
   shouldShowEquipmentShopping,
 } from './equipment-step.lib'
 import {
@@ -79,6 +80,33 @@ describe('equipment-step.lib', () => {
         ]?.[0],
       ),
     ).toBe(true)
+  })
+
+  it('shows equipment budget on any selected starting equipment option', () => {
+    const packageDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    expect(
+      shouldShowEquipmentBudget(
+        packageDraft,
+        packageDraft.choiceSelections[
+          startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)
+        ]?.[0],
+      ),
+    ).toBe(true)
+
+    expect(shouldShowEquipmentBudget(packageDraft, undefined)).toBe(false)
   })
 
   it('resolves purchase source mode to starting gold only', () => {

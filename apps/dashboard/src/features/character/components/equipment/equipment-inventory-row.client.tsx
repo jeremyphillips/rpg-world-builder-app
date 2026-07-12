@@ -16,16 +16,14 @@ import {
 } from './equipment-inventory-quantity-control.client'
 import {
   equipmentInventoryRowActionsClasses,
+  equipmentInventoryRowClasses,
   equipmentInventoryRowDetailLineClasses,
   equipmentInventoryRowNameClasses,
   equipmentInventoryRowPriceLineClasses,
   equipmentInventoryRowQtyLabelClasses,
   equipmentInventoryRowRemoveTextClasses,
 } from './equipment-inventory-summary.variants'
-import {
-  builderInventoryRowMetaClasses,
-  builderInventoryRowVariants,
-} from '../builder/builder-inventory-row.variants'
+import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
 
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
@@ -137,7 +135,7 @@ function InventoryRowDetailLine({ label, actions }: { label?: string; actions?: 
   return (
     <div className={equipmentInventoryRowDetailLineClasses}>
       {label ? (
-        <Text as="p" className={equipmentInventoryRowPriceLineClasses}>
+        <Text as="p" variant="caption" className={equipmentInventoryRowPriceLineClasses}>
           {label}
         </Text>
       ) : (
@@ -165,7 +163,7 @@ export function EquipmentInventoryRowItem({
     )
 
     return (
-      <article className={builderInventoryRowVariants({ variant: 'dense' })}>
+      <article className={equipmentInventoryRowClasses}>
         <InventoryRowHeader
           equipmentName={row.equipmentName}
           equipped={Boolean(row.entry.equipped)}
@@ -184,7 +182,7 @@ export function EquipmentInventoryRowItem({
   const actionsRow = editableRow ?? removablePurchaseRow
 
   return (
-    <article className={builderInventoryRowVariants({ variant: 'dense' })}>
+    <article className={equipmentInventoryRowClasses}>
       <InventoryRowHeader equipmentName={display.equipmentName} equipped={equipped} />
       <InventoryRowDetailLine
         label={detailLabel}

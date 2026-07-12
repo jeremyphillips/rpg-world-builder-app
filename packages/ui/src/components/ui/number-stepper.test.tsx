@@ -35,6 +35,14 @@ describe('NumberStepper', () => {
     expect(screen.getByLabelText('Decrease Quantity')).not.toBeDisabled()
   })
 
+  it('renders the current value with foreground text in the digit slot', () => {
+    render(<Harness initial={12} />)
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toHaveValue(12)
+    expect(input).toHaveClass('text-foreground')
+    expect(input).toHaveClass('w-[2ch]')
+  })
+
   it('applies bordered pill styles by default', () => {
     const { container } = render(<Harness />)
     const root = container.firstElementChild

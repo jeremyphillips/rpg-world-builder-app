@@ -11,11 +11,12 @@ interleave inside the same category list while a package is selected.
 
 | Section                          | When shown                           | Row behavior                                                                                                  |
 | -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **Starting Equipment**           | Package option selected              | Name + value line per row; qty 2+ shows read-only `Qty N`; Customize on package card only (no per-row remove) |
+| **Starting package card**        | Package option selected              | Name + value line per row; qty 2+ shows read-only `Qty N`; Customize on package card only (no per-row remove) |
 | **Purchased with Starting Gold** | Always (empty state on package path) | Reuses `EquipmentInventoryRowItem` cart controls for `startingGold` purchases                                 |
 
-Gold option selected: hide Starting Equipment; show purchased section and
-**Browse equipment** (picker).
+Gold option selected: hide the starting package card; show purchased section and
+**Browse equipment** (picker). Package option selected: same **Browse equipment**
+control once an option is chosen.
 
 ## Package customization
 

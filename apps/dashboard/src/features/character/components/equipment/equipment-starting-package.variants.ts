@@ -10,10 +10,7 @@ export const equipmentStartingPackageCardActionsClasses = 'flex flex-wrap items-
 
 export const equipmentStartingPackageCardBodyClasses = 'space-y-4 px-4 py-4'
 
-export const equipmentStartingPackageCategoryClasses = 'space-y-2'
-
-export const equipmentStartingPackageCategoryLabelClasses =
-  'font-body-emphasis text-sm text-muted-foreground'
+export const equipmentStartingPackageCategoryClasses = 'space-y-1'
 
 export const equipmentStartingPackageRowListClasses = 'divide-y divide-border'
 

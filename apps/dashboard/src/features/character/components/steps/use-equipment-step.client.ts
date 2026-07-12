@@ -28,6 +28,7 @@ import {
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   resolveStartingGoldPurchaseId,
+  shouldShowEquipmentBudget,
   shouldShowEquipmentFallback,
   shouldShowEquipmentShopping,
 } from '../../lib/equipment-step.lib'
@@ -83,10 +84,11 @@ export function useEquipmentStep(args: {
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =
     shouldShowEquipmentFallback(summaries) && !hasGoldStartingEquipmentOption(summaries)
+  const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
   const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId)
   const budget = useMemo(
-    () => (showShopping ? resolveEquipmentStepBudget(draft, catalogIndex) : undefined),
-    [catalogIndex, draft, showShopping],
+    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex) : undefined),
+    [catalogIndex, draft, showBudget],
   )
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
@@ -102,7 +104,7 @@ export function useEquipmentStep(args: {
   )
   const characterPreviewContext = useMemo(
     () =>
-      showShopping
+      showBudget
         ? resolveEquipmentPickerCharacterPreviewContext({
             draft,
             catalogIndex,
@@ -110,9 +112,9 @@ export function useEquipmentStep(args: {
             budget,
           })
         : undefined,
-    [budget, catalogIndex, context.characterCreationRules, draft, showShopping],
+    [budget, catalogIndex, context.characterCreationRules, draft, showBudget],
   )
-  const activePurchaseSourceMode = showShopping ? resolvePurchaseSourceMode() : undefined
+  const activePurchaseSourceMode = showBudget ? resolvePurchaseSourceMode() : undefined
   const ownedPurchaseQuantities = useMemo(() => {
     if (!activePurchaseSourceMode) return {}
 
@@ -217,7 +219,7 @@ export function useEquipmentStep(args: {
     item,
     quantity,
   ) => {
-    if (!showShopping) return
+    if (!showBudget) return
 
     const patch = buildEquipmentAddPurchasePatch({
       draft,
@@ -289,6 +291,7 @@ export function useEquipmentStep(args: {
     summaries,
     selectedOptionId,
     showFallback,
+    showBudget,
     showShopping,
     budget,
     pickerItems,

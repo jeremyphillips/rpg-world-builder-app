@@ -7,7 +7,6 @@ import { Heading, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL,
-  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
@@ -17,7 +16,10 @@ import {
   buildEquipmentInventoryLayout,
   type EquipmentInventoryLayout,
 } from './equipment-inventory-summary.lib'
-import { equipmentInventorySummaryClasses } from './equipment-inventory-summary.variants'
+import {
+  equipmentInventorySummaryClasses,
+  equipmentPurchasedInventoryPanelClasses,
+} from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
@@ -72,9 +74,6 @@ export function EquipmentInventorySummary({
     <div className={equipmentInventorySummaryClasses}>
       {layout.mode === 'package' ? (
         <section className="space-y-3">
-          <Heading variant="subsection" as="h3">
-            {EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}
-          </Heading>
           <EquipmentStartingPackageSection
             packageGroup={layout.startingPackage}
             draft={draft}
@@ -95,11 +94,13 @@ export function EquipmentInventorySummary({
         <Heading variant="subsection" as="h3">
           {EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL}
         </Heading>
-        <EquipmentPurchasedInventorySection
-          purchased={layout.purchased}
-          onRemoveItem={onRemoveItem}
-          onSetPurchaseQuantity={onSetPurchaseQuantity}
-        />
+        <div className={equipmentPurchasedInventoryPanelClasses}>
+          <EquipmentPurchasedInventorySection
+            purchased={layout.purchased}
+            onRemoveItem={onRemoveItem}
+            onSetPurchaseQuantity={onSetPurchaseQuantity}
+          />
+        </div>
       </section>
     </div>
   )

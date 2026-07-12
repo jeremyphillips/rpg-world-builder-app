@@ -529,6 +529,13 @@ export function buildEquipmentSelectionPatch(args: {
   }
 }
 
+export function shouldShowEquipmentBudget(
+  draft: CharacterBuilderDraft,
+  selectedOptionId: string | undefined,
+): boolean {
+  return selectedOptionId !== undefined && !draft.equipment?.skipped
+}
+
 export function shouldShowEquipmentShopping(
   draft: CharacterBuilderDraft,
   selectedOptionId: string | undefined,

@@ -1,6 +1,6 @@
 'use client'
 
-import { Heading, Text } from '@rpg/ui'
+import { Eyebrow, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE,
@@ -39,9 +39,7 @@ export function EquipmentPurchasedInventorySection({
       {purchased.map((group) =>
         group.displays.length === 0 ? null : (
           <section key={group.groupLabel} className={equipmentInventorySummaryGroupClasses}>
-            <Heading variant="subsection" as="h4">
-              {group.groupLabel}
-            </Heading>
+            <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
             <ul className={equipmentInventorySummaryListClasses}>
               {group.displays.map((display) => (
                 <li key={equipmentInventoryDisplayItemKey(display)}>

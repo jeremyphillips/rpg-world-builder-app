@@ -55,7 +55,7 @@ export function EquipmentInventoryQuantityControl({
       <NumberStepper
         aria-label={`Quantity for ${row.equipmentName}`}
         size="sm"
-        bordered={false}
+        bordered={true}
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={1}
         max={maxQuantity}

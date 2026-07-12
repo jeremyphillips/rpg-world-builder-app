@@ -35,7 +35,7 @@ export const numberStepperButtonVariants = cva(
 )
 
 export const numberStepperInputVariants = cva(
-  'min-w-0 flex-1 border-0 bg-transparent text-center tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
+  'shrink-0 border-0 bg-transparent text-center text-foreground tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
   {
     variants: {
       size: {
@@ -49,24 +49,33 @@ export const numberStepperInputVariants = cva(
   },
 )
 
+/** Fixed value-slot width per digit count — must stay in sync with root width formula. */
+export const numberStepperInputDigitWidths = {
+  1: 'w-[1ch] min-w-[1ch]',
+  2: 'w-[2ch] min-w-[2ch]',
+  3: 'w-[3ch] min-w-[3ch]',
+  4: 'w-[4ch] min-w-[4ch]',
+  5: 'w-[5ch] min-w-[5ch]',
+} as const satisfies Record<1 | 2 | 3 | 4 | 5, string>
+
 /**
  * Digit-based stepper widths: N×ch for the value slot plus two side-button columns.
- * Uses `N*1ch` (not `Nch`) to avoid Tailwind `w-5` collision during class detection.
+ * Button columns match `numberStepperButtonVariants` (sm: 2×size-7, md: 2×size-8).
  */
 export const numberStepperWidthVariants = {
   sm: {
-    1: 'w-[calc(1*1ch+3.25rem)]',
-    2: 'w-[calc(2*1ch+3.25rem)]',
-    3: 'w-[calc(3*1ch+3.25rem)]',
-    4: 'w-[calc(4*1ch+3.25rem)]',
-    5: 'w-[calc(5*1ch+3.25rem)]',
+    1: 'w-[calc(1*1ch+3.5rem)]',
+    2: 'w-[calc(2*1ch+3.5rem)]',
+    3: 'w-[calc(3*1ch+3.5rem)]',
+    4: 'w-[calc(4*1ch+3.5rem)]',
+    5: 'w-[calc(5*1ch+3.5rem)]',
   },
   md: {
-    1: 'w-[calc(1*1ch+3.75rem)]',
-    2: 'w-[calc(2*1ch+3.75rem)]',
-    3: 'w-[calc(3*1ch+3.75rem)]',
-    4: 'w-[calc(4*1ch+3.75rem)]',
-    5: 'w-[calc(5*1ch+3.75rem)]',
+    1: 'w-[calc(1*1ch+4rem)]',
+    2: 'w-[calc(2*1ch+4rem)]',
+    3: 'w-[calc(3*1ch+4rem)]',
+    4: 'w-[calc(4*1ch+4rem)]',
+    5: 'w-[calc(5*1ch+4rem)]',
   },
 } as const satisfies Record<'sm' | 'md', Record<1 | 2 | 3 | 4 | 5, string>>
 
