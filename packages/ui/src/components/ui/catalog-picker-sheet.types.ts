@@ -54,6 +54,12 @@ type CatalogPickerSheetBaseProps<TItem> = {
   rowTone?: CollapsibleListItemShellTone
   /** Top-align caret/grip with the first header line for multi-line headers. */
   toolbarCompact?: boolean
+  /** Optional class merged onto the sheet content panel. */
+  sheetContentClassName?: string
+  /** Optional class merged onto the scrollable sheet body. */
+  sheetBodyClassName?: string
+  /** Optional class merged onto each collapsible row expanded body. */
+  rowBodyClassName?: string
 }
 
 /** Legacy row API — right-side chevron expander; used until spell/proficiency pickers migrate. */

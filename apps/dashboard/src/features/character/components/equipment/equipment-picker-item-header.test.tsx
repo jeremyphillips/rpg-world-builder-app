@@ -5,17 +5,26 @@ import { describe, expect, it } from 'vitest'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 import { pickEquipment } from '@/features/content/lib/fixtures/pick'
 
+import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 
 describe('EquipmentPickerItemHeader', () => {
-  it('renders name, metadata, kind label, callout, and actions', () => {
+  it('renders name, metadata, kind label, callout, and commerce actions', () => {
     const item = buildEquipmentPickerRowViewModel(pickEquipment('dagger'))
 
     render(
       <EquipmentPickerItemHeader
         item={item}
         callout={{ label: 'Essential', emphasis: 'info' }}
-        actions={<button type="button">Add</button>}
+        commerce={
+          <EquipmentPickerCommerce
+            priceLabel="2 GP"
+            owned={false}
+            stackable={false}
+            ownedQuantity={0}
+            onAdd={() => undefined}
+          />
+        }
       />,
     )
 
@@ -33,7 +42,15 @@ describe('EquipmentPickerItemHeader', () => {
       <EquipmentPickerItemHeader
         item={item}
         callout={{ label: 'Not proficient', emphasis: 'warning' }}
-        actions={<button type="button">Add</button>}
+        commerce={
+          <EquipmentPickerCommerce
+            priceLabel="15 GP"
+            owned={false}
+            stackable={false}
+            ownedQuantity={0}
+            onAdd={() => undefined}
+          />
+        }
       />,
     )
 

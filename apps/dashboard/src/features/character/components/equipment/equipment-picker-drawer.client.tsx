@@ -43,8 +43,6 @@ import {
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
 import {
-  EQUIPMENT_PICKER_ADDED_LABEL,
-  EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
@@ -63,13 +61,13 @@ import {
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
+import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
-import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 import {
   equipmentPickerAffordableFilterClasses,
   equipmentPickerAffordableHiddenCountClasses,
@@ -78,6 +76,8 @@ import {
   equipmentPickerCategoryLabelClasses,
   equipmentPickerFiltersMainClasses,
   equipmentPickerFiltersRowClasses,
+  equipmentPickerRowBodyClasses,
+  equipmentPickerSheetContentClasses,
   equipmentPickerSortActionsGroupClasses,
   equipmentPickerSortFilterClasses,
   equipmentPickerSortLabelClasses,
@@ -416,6 +416,8 @@ export function EquipmentPickerDrawer({
       getItemToolbarLabel={(item) => item.equipment.name}
       rowTone="subtle"
       toolbarCompact
+      sheetContentClassName={equipmentPickerSheetContentClasses}
+      rowBodyClassName={equipmentPickerRowBodyClasses}
       getSearchText={(item) => item.searchText}
       getItemTab={getEquipmentPickerItemTab}
       defaultTabId={defaultTab}
@@ -481,42 +483,15 @@ export function EquipmentPickerDrawer({
             item={row}
             callout={callout}
             disabled={disabled}
-            actions={
-              <>
-                <Text as="span" variant="muted" className="shrink-0 tabular-nums">
-                  {row.priceLabel}
-                </Text>
-                {owned && stackable ? (
-                  <>
-                    <Text as="span" variant="muted" className="tabular-nums">
-                      {EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} {ownedQuantity}
-                    </Text>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={disabled}
-                      onClick={() => handleQuickAdd(item)}
-                    >
-                      {EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL}
-                    </Button>
-                  </>
-                ) : owned ? (
-                  <Text as="span" variant="muted">
-                    {EQUIPMENT_PICKER_ADDED_LABEL}
-                  </Text>
-                ) : (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    disabled={disabled}
-                    onClick={() => handleQuickAdd(item)}
-                  >
-                    Add
-                  </Button>
-                )}
-              </>
+            commerce={
+              <EquipmentPickerCommerce
+                priceLabel={row.priceLabel}
+                owned={owned}
+                stackable={stackable}
+                ownedQuantity={ownedQuantity}
+                disabled={disabled}
+                onAdd={() => handleQuickAdd(item)}
+              />
             }
           />
         )

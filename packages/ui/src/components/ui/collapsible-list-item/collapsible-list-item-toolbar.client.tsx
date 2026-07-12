@@ -103,7 +103,8 @@ export function CollapsibleListItemToolbar({
   summary,
 }: CollapsibleListItemToolbarProps) {
   const headerContentClasses = cn(
-    'flex min-w-0 min-h-0 flex-1 items-center',
+    'flex min-w-0 min-h-0 flex-1',
+    compact ? 'items-start' : 'items-center',
     collapsibleListItemToolbarContentClasses(leadingChrome),
   )
 

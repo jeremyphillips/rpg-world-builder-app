@@ -41,6 +41,7 @@ export interface CollapsibleListItemProps {
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
   toolbarCompact?: boolean
+  bodyClassName?: string
   dragging?: boolean
   itemPrefix?: string
   className?: string
@@ -96,6 +97,7 @@ function CollapsibleListItemRoot({
   layout = 'default',
   actionsAlign: actionsAlignProp,
   toolbarCompact = false,
+  bodyClassName,
   dragging = false,
   itemPrefix,
   className,
@@ -194,7 +196,7 @@ function CollapsibleListItemRoot({
             <CollapsibleListItemBody
               bodyId={resolvedBodyId}
               hidden={collapsed}
-              className={collapsibleListItemBodyClasses(leadingChrome)}
+              className={cn(collapsibleListItemBodyClasses(leadingChrome), bodyClassName)}
             >
               {body}
             </CollapsibleListItemBody>

@@ -97,6 +97,9 @@ export function CatalogPickerSheet<TItem>({
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
   rowTone,
   toolbarCompact,
+  sheetContentClassName,
+  sheetBodyClassName,
+  rowBodyClassName,
 }: CatalogPickerSheetProps<TItem>) {
   const {
     searchQuery,
@@ -135,6 +138,7 @@ export function CatalogPickerSheet<TItem>({
     getItemToolbarLabel,
     rowTone,
     toolbarCompact,
+    rowBodyClassName,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = loading ? (
@@ -149,7 +153,9 @@ export function CatalogPickerSheet<TItem>({
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content className={catalogPickerSheetContentVariants()}>
+      <Sheet.Content
+        className={catalogPickerSheetContentVariants({ className: sheetContentClassName })}
+      >
         <Sheet.Header headline={title} description={description}>
           {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
         </Sheet.Header>
@@ -169,7 +175,9 @@ export function CatalogPickerSheet<TItem>({
           filters={filters}
         />
 
-        <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyContent}</Sheet.Body>
+        <Sheet.Body className={catalogPickerSheetBodyVariants({ className: sheetBodyClassName })}>
+          {bodyContent}
+        </Sheet.Body>
 
         {footer ? <Sheet.Footer>{footer}</Sheet.Footer> : null}
       </Sheet.Content>

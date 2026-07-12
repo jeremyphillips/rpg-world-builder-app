@@ -51,3 +51,8 @@ export const equipmentPickerHeaderDividerClasses = 'mx-1.5 text-muted-foreground
 export const equipmentPickerHeaderKindClasses = 'text-xs font-normal text-muted-foreground'
 
 export const equipmentPickerDisabledRowClasses = 'opacity-60'
+
+export const equipmentPickerSheetContentClasses = 'bg-background'
+
+export const equipmentPickerRowBodyClasses =
+  'rounded-b-md border-t border-border/60 bg-muted/50 pt-3'
