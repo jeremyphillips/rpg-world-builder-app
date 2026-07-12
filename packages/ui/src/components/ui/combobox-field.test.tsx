@@ -152,7 +152,7 @@ describe('ComboboxField', () => {
       />,
     )
 
-    expect(screen.getByText('Dagger').parentElement).toHaveClass('text-badge-sm')
+    expect(screen.getByText('Dagger').closest('.text-sm-meta')).toBeInTheDocument()
   })
 
   it('opens with a chromeless search row that replaces the trigger', async () => {

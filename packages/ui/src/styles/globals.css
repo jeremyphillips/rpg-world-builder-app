@@ -73,6 +73,19 @@
   --color-semantic-positive: var(--semantic-positive);
   --color-semantic-caution: var(--semantic-caution);
   --color-semantic-negative: var(--semantic-negative);
+  --color-semantic-neutral-border: var(--semantic-neutral-border);
+  --color-semantic-neutral-subtle: var(--semantic-neutral-subtle);
+  --color-semantic-informative-border: var(--semantic-informative-border);
+  --color-semantic-informative-subtle: var(--semantic-informative-subtle);
+  --color-semantic-positive-border: var(--semantic-positive-border);
+  --color-semantic-positive-subtle: var(--semantic-positive-subtle);
+  --color-semantic-caution-border: var(--semantic-caution-border);
+  --color-semantic-caution-subtle: var(--semantic-caution-subtle);
+  --color-semantic-negative-border: var(--semantic-negative-border);
+  --color-semantic-negative-subtle: var(--semantic-negative-subtle);
+  --color-selected-control: var(--selected-control);
+  --color-selected-control-foreground: var(--selected-control-foreground);
+  --color-selected-control-border: var(--selected-control-border);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:
@@ -183,6 +196,14 @@
   --text-badge-sm: var(--text-xs);
   --text-badge-md: var(--text-md);
 
+  /* Compact label type scale — Badge + Chip (11 / 13 / 15px). */
+  --text-compact-label-sm: var(--text-xs-meta);
+  --text-compact-label-sm--line-height: var(--text-xs--line-height);
+  --text-compact-label-md: var(--text-sm-meta);
+  --text-compact-label-md--line-height: var(--text-sm--line-height);
+  --text-compact-label-lg: var(--text-md);
+  --text-compact-label-lg--line-height: var(--text-md--line-height);
+
   --text-table-body: var(--text-sm-meta);
   --text-table-stat: var(--text-xs);
 
@@ -267,6 +288,21 @@
   --semantic-positive: oklch(0.48 0.13 145);
   --semantic-caution: oklch(0.55 0.13 70);
   --semantic-negative: oklch(0.52 0.2 27);
+  /* Compact-label semantic surfaces — colored roles derive from alert tokens. */
+  --semantic-neutral-border: var(--border);
+  --semantic-neutral-subtle: var(--muted);
+  --semantic-informative-border: var(--info-muted);
+  --semantic-informative-subtle: var(--info-subtle);
+  --semantic-positive-border: var(--success-muted);
+  --semantic-positive-subtle: var(--success-subtle);
+  --semantic-caution-border: var(--warning-muted);
+  --semantic-caution-subtle: var(--warning-subtle);
+  --semantic-negative-border: var(--destructive-muted);
+  --semantic-negative-subtle: var(--destructive-subtle);
+  /* Chip selectable/selected — control state, not semantic hue. */
+  --selected-control: var(--foreground);
+  --selected-control-foreground: var(--background);
+  --selected-control-border: var(--foreground);
 }
 
 .dark {
@@ -311,6 +347,19 @@
   --semantic-positive: oklch(0.72 0.11 145);
   --semantic-caution: oklch(0.78 0.12 75);
   --semantic-negative: oklch(0.72 0.16 22);
+  --semantic-neutral-border: var(--border);
+  --semantic-neutral-subtle: var(--muted);
+  --semantic-informative-border: var(--info-muted);
+  --semantic-informative-subtle: var(--info-subtle);
+  --semantic-positive-border: var(--success-muted);
+  --semantic-positive-subtle: var(--success-subtle);
+  --semantic-caution-border: var(--warning-muted);
+  --semantic-caution-subtle: var(--warning-subtle);
+  --semantic-negative-border: var(--destructive-muted);
+  --semantic-negative-subtle: var(--destructive-subtle);
+  --selected-control: var(--foreground);
+  --selected-control-foreground: var(--background);
+  --selected-control-border: var(--foreground);
 }
 
 /*

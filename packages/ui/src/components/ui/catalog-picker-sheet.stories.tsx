@@ -153,7 +153,9 @@ export const Empty: Story = {
     renderItemHeader: () => null,
     emptyState: (
       <div className="rounded-md border border-dashed p-8 text-center">
-        <Badge variant="secondary">Custom empty state</Badge>
+        <Badge appearance="neutral" tone="neutral">
+          Custom empty state
+        </Badge>
       </div>
     ),
   },

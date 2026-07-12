@@ -26,7 +26,7 @@ export const WithMetaAndRemove: Story = {
     label: <Text as="span">Stealth</Text>,
     itemLabel: 'Stealth',
     meta: (
-      <Badge variant="secondary" size="sm">
+      <Badge appearance="neutral" tone="neutral" size="sm">
         Stale
       </Badge>
     ),

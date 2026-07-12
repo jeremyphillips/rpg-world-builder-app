@@ -22,7 +22,7 @@ export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
       cell: ({ row }) => {
         const status = row.getValue<VocabularyOptionWithUsage['status']>('status')
         return (
-          <TableBadgeCell variant={status === 'active' ? 'secondary' : 'outline'}>
+          <TableBadgeCell appearance={status === 'active' ? 'neutral' : 'outline'} tone="neutral">
             {getVocabularyStatusLabel(status)}
           </TableBadgeCell>
         )

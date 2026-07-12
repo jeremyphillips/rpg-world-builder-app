@@ -38,9 +38,12 @@ import {
 import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
 import { MasterDetailRowBadges } from './master-detail-row-badges.client'
 
+import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
+
 export interface MasterDetailListBadge {
   label: string
-  variant?: 'secondary' | 'outline'
+  appearance: BadgeAppearance
+  tone: BadgeTone
 }
 
 export interface MasterDetailListItem {

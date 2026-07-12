@@ -156,7 +156,7 @@ function RadioCardTitleRowContent({ label, titleMeta, badge }: RadioCardTitleRow
       <span className={radioCardTitleVariants()}>{label}</span>
       {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
       {badge ? (
-        <Badge variant="default" size="sm">
+        <Badge appearance="soft" tone="informative" size="sm">
           {badge}
         </Badge>
       ) : null}
@@ -196,7 +196,7 @@ function RadioCardSecondaryContent({
         <ul className={radioCardMetaListVariants()} aria-hidden="true">
           {meta.map((chip) => (
             <li key={chip}>
-              <Badge variant="secondary" size="sm">
+              <Badge appearance="neutral" tone="neutral" size="sm">
                 {chip}
               </Badge>
             </li>

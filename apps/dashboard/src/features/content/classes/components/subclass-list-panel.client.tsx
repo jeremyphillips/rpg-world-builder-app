@@ -19,12 +19,12 @@ export interface SubclassListPanelProps {
 }
 
 const SOURCE_BADGE = {
-  system: { variant: 'secondary', label: 'System' },
-  homebrew: { variant: 'outline', label: 'Homebrew' },
-  unsaved: { variant: 'outline', label: 'Unsaved' },
+  system: { appearance: 'neutral', tone: 'neutral', label: 'System' },
+  homebrew: { appearance: 'outline', tone: 'neutral', label: 'Homebrew' },
+  unsaved: { appearance: 'outline', tone: 'neutral', label: 'Unsaved' },
 } as const satisfies Record<
   SubclassListItem['source'],
-  { variant: 'secondary' | 'outline'; label: string }
+  { appearance: 'neutral' | 'outline'; tone: 'neutral'; label: string }
 >
 
 function subclassRowShellClass(isSelected: boolean, active: boolean) {
@@ -48,20 +48,20 @@ function SubclassListRowBadges({
   isModified: boolean
   active: boolean
 }) {
-  const { variant, label } = SOURCE_BADGE[source]
+  const { appearance, tone, label } = SOURCE_BADGE[source]
 
   return (
     <span className="mt-1 flex flex-wrap gap-1">
-      <Badge variant={variant} className="text-[10px]">
+      <Badge appearance={appearance} tone={tone} size="sm">
         {label}
       </Badge>
       {isModified ? (
-        <Badge variant="outline" className="text-[10px]">
+        <Badge appearance="outline" tone="neutral" size="sm">
           Modified
         </Badge>
       ) : null}
       {!active ? (
-        <Badge variant="outline" className="text-[10px]">
+        <Badge appearance="outline" tone="caution" size="sm">
           Inactive
         </Badge>
       ) : null}

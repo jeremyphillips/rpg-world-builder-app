@@ -18,13 +18,6 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const Outline: Story = {
-  args: {
-    variant: 'outline',
-    label: 'Fire Bolt',
-  },
-}
-
 export const Disabled: Story = {
   args: {
     disabled: true,
@@ -33,8 +26,9 @@ export const Disabled: Story = {
 }
 
 export const Small: Story = {
+  name: 'Deprecated sm (use md)',
   args: {
-    size: 'sm',
+    size: 'md',
     label: 'Dagger',
   },
 }

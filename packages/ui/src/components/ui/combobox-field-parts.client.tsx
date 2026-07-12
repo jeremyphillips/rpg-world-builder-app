@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils'
 import { DismissibleBadge } from './dismissible-badge.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
-import { fieldSizeToBadgeSize } from './field-sizing.variants'
+import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type { ComboboxFieldOption, ComboboxRenderSelectedItem } from './combobox-field.types'
@@ -286,7 +286,7 @@ export function ComboboxSelectedItems({
 }: ComboboxSelectedItemsProps) {
   if (options.length === 0) return null
 
-  const badgeSize = fieldSizeToBadgeSize[size]
+  const chipSize = fieldSizeToChipSize[size]
   const listClassName = renderSelectedItem
     ? comboboxSelectedListVariants()
     : comboboxSelectedItemsRowVariants()
@@ -304,7 +304,7 @@ export function ComboboxSelectedItems({
           ) : (
             <DismissibleBadge
               label={option.label}
-              size={badgeSize}
+              size={chipSize}
               disabled={disabled}
               onDismiss={() => onRemove(option.value)}
             />

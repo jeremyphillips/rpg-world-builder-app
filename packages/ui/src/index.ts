@@ -102,6 +102,7 @@ export {
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
   fieldSizeToBadgeSize,
+  fieldSizeToChipSize,
   fieldSizeTypographyClasses,
   fieldTextareaSizeClasses,
   type FieldSizeToken,
@@ -435,15 +436,28 @@ export {
 export {
   Badge,
   badgeVariants,
-  dismissibleBadgeVariants,
-  badgeDismissButtonVariants,
+  mapLegacyBadgeVariant,
+  type BadgeAppearance,
   type BadgeProps,
   type BadgeSize,
+  type BadgeTone,
+  type LegacyBadgeVariant,
 } from './components/ui/badge'
+export {
+  dismissibleBadgeVariants,
+  badgeDismissButtonVariants,
+} from './components/ui/badge.variants'
 export {
   DismissibleBadge,
   type DismissibleBadgeProps,
 } from './components/ui/dismissible-badge.client'
+export {
+  Chip,
+  type ChipProps,
+  type ChipSelectableProps,
+  type ChipRemovableProps,
+} from './components/ui/chip.client'
+export { ChipGroup, type ChipGroupProps } from './components/ui/chip-group.client'
 export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export {

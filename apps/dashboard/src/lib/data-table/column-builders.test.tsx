@@ -14,8 +14,8 @@ import {
 type Row = { id: string; name: string; source: 'system' | 'homebrew' }
 
 const SOURCE_BADGE = {
-  system: { variant: 'secondary' as const, label: 'System' },
-  homebrew: { variant: 'outline' as const, label: 'Homebrew' },
+  system: { appearance: 'neutral' as const, tone: 'neutral' as const, label: 'System' },
+  homebrew: { appearance: 'outline' as const, tone: 'neutral' as const, label: 'Homebrew' },
 }
 
 describe('stampDataColumns', () => {
@@ -52,7 +52,11 @@ describe('buildSourceColumn', () => {
       ...dataTableWidthMeta('compact'),
     })
 
-    render(<TableBadgeCell variant="secondary">System</TableBadgeCell>)
+    render(
+      <TableBadgeCell appearance="neutral" tone="neutral">
+        System
+      </TableBadgeCell>,
+    )
     expect(screen.getByText('System')).toBeInTheDocument()
   })
 })

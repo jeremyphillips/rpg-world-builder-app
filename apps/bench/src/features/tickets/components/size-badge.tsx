@@ -9,7 +9,7 @@ interface SizeBadgeProps {
 
 export function SizeBadge({ size, className }: SizeBadgeProps) {
   return (
-    <Badge variant="outline" size="sm" className={className}>
+    <Badge appearance="outline" tone="neutral" size="sm" className={className}>
       {getTicketSizeLabel(size)}
     </Badge>
   )

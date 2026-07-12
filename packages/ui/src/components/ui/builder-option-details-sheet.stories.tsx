@@ -96,7 +96,11 @@ export const SelectedSpecies: Story = {
           {...args}
           open={open}
           onOpenChange={setOpen}
-          primaryAction={<Badge variant="secondary">Selected</Badge>}
+          primaryAction={
+            <Badge appearance="neutral" tone="neutral">
+              Selected
+            </Badge>
+          }
         />
       </>
     )

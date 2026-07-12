@@ -2,6 +2,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { fieldSizeTypographyClasses } from './field-sizing.variants'
+import type { CompactLabelSize } from './compact-label.lib'
+
+export type ChipSize = CompactLabelSize
 
 export const chipPillVariants = cva(
   [
@@ -24,4 +27,3 @@ export const chipPillVariants = cva(
 )
 
 export type ChipPillVariantProps = VariantProps<typeof chipPillVariants>
-export type ChipSize = NonNullable<ChipPillVariantProps['size']>

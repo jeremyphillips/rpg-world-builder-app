@@ -32,9 +32,9 @@ describe('DismissibleBadge', () => {
     expect(screen.getByRole('button', { name: 'Remove Dagger' })).toBeDisabled()
   })
 
-  it('applies badge size classes', () => {
-    render(<DismissibleBadge label="Dagger" size="sm" onDismiss={vi.fn()} />)
-    expect(screen.getByText('Dagger').parentElement).toHaveClass('text-badge-sm')
+  it('applies compact label md size classes', () => {
+    render(<DismissibleBadge label="Dagger" onDismiss={vi.fn()} />)
+    expect(screen.getByText('Dagger').closest('.text-sm-meta')).toBeInTheDocument()
   })
 
   it('has no accessibility violations', async () => {

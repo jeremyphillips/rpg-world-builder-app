@@ -94,7 +94,7 @@ function LogicConnectorChip({
 }) {
   return (
     <div className={`flex py-1 ${align === 'start' ? 'justify-start' : 'justify-center'}`}>
-      <Badge variant="outline" aria-hidden="true">
+      <Badge appearance="outline" tone="neutral" aria-hidden="true">
         {LOGIC_CONNECTOR_LABELS[operator]}
       </Badge>
     </div>
