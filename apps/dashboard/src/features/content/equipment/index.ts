@@ -9,10 +9,12 @@ export { EquipmentDetailMetadata } from './components/equipment-detail-metadata.
 export {
   buildEquipmentDetailViewModel,
   buildEquipmentPickerHeaderViewModel,
+  buildEquipmentPickerRowViewModel,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
   type EquipmentCardViewModel,
   type EquipmentDetailViewModel,
+  type EquipmentPickerRowViewModel,
 } from './lib/equipment-display'
 export { useEquipment, equipmentQueryKey } from './hooks/use-equipment'
 export {

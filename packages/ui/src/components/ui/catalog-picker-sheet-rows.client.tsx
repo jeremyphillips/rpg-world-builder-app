@@ -8,6 +8,7 @@ import { Button } from './button.client'
 import { CollapsibleListItem } from './collapsible-list-item'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import { usesCatalogPickerCollapsibleRows } from './catalog-picker-sheet.types'
+import type { CollapsibleListItemShellTone } from './collapsible-list-item/collapsible-list-item-shell.client'
 import {
   catalogPickerSheetItemDetailsVariants,
   catalogPickerSheetItemMainVariants,
@@ -72,6 +73,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
+  rowTone = 'main',
+  toolbarCompact = false,
 }: {
   item: TItem
   itemKey: string
@@ -80,6 +83,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
+  rowTone?: CollapsibleListItemShellTone
+  toolbarCompact?: boolean
 }) {
   const titleId = `${itemKey}-title`
   const bodyId = `${itemKey}-body`
@@ -93,7 +98,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         titleId={titleId}
         bodyId={bodyId}
         toolbarAriaLabel={toolbarLabel}
-        tone="main"
+        tone={rowTone}
+        toolbarCompact={toolbarCompact}
         actionsAlign="center"
         collapsible={hasDetails}
         collapsed={collapsed}
@@ -135,6 +141,8 @@ export function CatalogPickerSheetResults<TItem>({
                 renderItemSummary={rowProps.renderItemSummary}
                 renderItemActions={rowProps.renderItemActions}
                 renderItemDetails={rowProps.renderItemDetails}
+                rowTone={rowProps.rowTone}
+                toolbarCompact={rowProps.toolbarCompact}
               />
             ) : (
               <CatalogPickerLegacyItemRow

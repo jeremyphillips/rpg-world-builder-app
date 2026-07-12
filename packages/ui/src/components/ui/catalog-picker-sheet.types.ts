@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { CollapsibleListItemShellTone } from './collapsible-list-item/collapsible-list-item-shell.client'
+
 export type CatalogPickerTab = {
   id: string
   label: string
@@ -48,6 +50,10 @@ type CatalogPickerSheetBaseProps<TItem> = {
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
+  /** Collapsible row shell tone — defaults to `main`. */
+  rowTone?: CollapsibleListItemShellTone
+  /** Top-align caret/grip with the first header line for multi-line headers. */
+  toolbarCompact?: boolean
 }
 
 /** Legacy row API — right-side chevron expander; used until spell/proficiency pickers migrate. */

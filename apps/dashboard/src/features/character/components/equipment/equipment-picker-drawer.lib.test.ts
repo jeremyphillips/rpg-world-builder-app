@@ -201,7 +201,7 @@ describe('equipment-picker-drawer.lib', () => {
     const longsword = equipmentPickerItemsFixture[0]!
     expect(getEquipmentPickerBadge(longsword)).toEqual({
       label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
-      emphasis: 'highlight',
+      emphasis: 'info',
     })
 
     const rope = equipmentPickerItemsFixture[2]!
@@ -282,7 +282,7 @@ describe('equipment-picker-drawer.lib', () => {
 
       expect(getEquipmentPickerBadge(item)).toEqual({
         label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-        emphasis: 'highlight',
+        emphasis: 'info',
       })
     })
 

@@ -6,7 +6,7 @@ import { pickEquipment } from '../../lib/fixtures/pick'
 import { getEquipmentKindStatRows } from './shared/equipment-detail-stat-rows'
 import {
   buildEquipmentDetailViewModel,
-  buildEquipmentPickerHeaderViewModel,
+  buildEquipmentPickerRowViewModel,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
 } from './equipment-display'
@@ -32,16 +32,51 @@ function expectedDetailStatRows(slug: string) {
 }
 
 describe('equipment-display', () => {
-  describe('buildEquipmentPickerHeaderViewModel', () => {
-    it.each(KIND_FIXTURES)('builds picker header for $kind', ({ slug, kind }) => {
+  describe('buildEquipmentPickerRowViewModel', () => {
+    it.each(KIND_FIXTURES)('builds picker row view model for $kind', ({ slug, kind }) => {
       const equipment = pickEquipment(slug)
       expect(equipment.kind).toBe(kind)
 
-      expect(buildEquipmentPickerHeaderViewModel(equipment)).toEqual({
-        name: equipment.name,
-        kindLabel: getEquipmentKindLabel(kind),
-        priceLabel: formatMoney(equipment.cost),
-      })
+      const viewModel = buildEquipmentPickerRowViewModel(equipment)
+
+      expect(viewModel.name).toBe(equipment.name)
+      expect(viewModel.priceLabel).toBe(formatMoney(equipment.cost))
+      expect(viewModel.kindLabel).toBe(getEquipmentKindLabel(kind))
+      expect(viewModel.metadata.length).toBeLessThanOrEqual(3)
+    })
+
+    it('builds dagger compact metadata segments', () => {
+      const equipment = pickEquipment('dagger')
+      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+        '1d4 Piercing',
+        'Finesse · Light · Thrown',
+      ])
+    })
+
+    it('builds plate armor compact metadata segments with restriction over weight', () => {
+      const equipment = pickEquipment('plate-armor')
+      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+        'AC 18',
+        'Heavy Armor',
+        'Str 15 required',
+      ])
+    })
+
+    it('builds holy symbol compact metadata segments', () => {
+      const equipment = pickEquipment('holy-symbol-amulet')
+      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+        'Holy Symbol',
+        'Worn or held',
+      ])
+    })
+
+    it('builds magic item compact metadata segments', () => {
+      const equipment = pickEquipment('bracers-of-defense')
+      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+        'Wondrous Item',
+        'Rare',
+        'Requires attunement',
+      ])
     })
   })
 

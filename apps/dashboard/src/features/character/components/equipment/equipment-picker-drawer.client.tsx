@@ -4,7 +4,6 @@ import * as React from 'react'
 import { CircleAlert, RotateCcw } from 'lucide-react'
 
 import {
-  Badge,
   Button,
   CatalogPickerSheet,
   Checkbox,
@@ -15,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
-  cn,
   type CatalogPickerSheetToolbarContext,
 } from '@rpg/ui'
 import {
@@ -27,7 +25,7 @@ import {
   type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-import { buildEquipmentPickerHeaderViewModel } from '@/features/content'
+import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import {
   countEquipmentPickerAffordableHiddenImpact,
@@ -36,7 +34,7 @@ import {
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
-  getEquipmentPickerBadge,
+  getEquipmentPickerCallout,
   getEquipmentUnaffordableAmounts,
   getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
@@ -66,6 +64,7 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
+import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
@@ -75,22 +74,14 @@ import {
   equipmentPickerAffordableFilterClasses,
   equipmentPickerAffordableHiddenCountClasses,
   equipmentPickerAffordableLabelClasses,
-  equipmentPickerDisabledRowClasses,
-  equipmentPickerHeaderDividerClasses,
-  equipmentPickerHeaderKindClasses,
-  equipmentPickerHeaderTextClasses,
-  equipmentPickerHeaderTitleClasses,
   equipmentPickerCategoryFilterClasses,
   equipmentPickerCategoryLabelClasses,
   equipmentPickerFiltersMainClasses,
   equipmentPickerFiltersRowClasses,
-  equipmentPickerHighlightBadgeClasses,
   equipmentPickerSortActionsGroupClasses,
   equipmentPickerSortFilterClasses,
   equipmentPickerSortLabelClasses,
   equipmentPickerTabActionButtonClasses,
-  equipmentPickerWarningBadgeClasses,
-  EQUIPMENT_PICKER_HEADER_DIVIDER,
 } from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
@@ -297,6 +288,10 @@ function EquipmentPickerRowSummary({
 }
 
 /** Equipment catalog drawer — thin wrapper over `CatalogPickerSheet`. */
+/**
+ * Equipment picker rows compose purchase actions inside {@link EquipmentPickerItemHeader}
+ * (line 3) instead of `renderItemActions` because the generic row API pins actions to row 1.
+ */
 export function EquipmentPickerDrawer({
   open,
   onOpenChange,
@@ -419,6 +414,8 @@ export function EquipmentPickerDrawer({
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
+      rowTone="subtle"
+      toolbarCompact
       getSearchText={(item) => item.searchText}
       getItemTab={getEquipmentPickerItemTab}
       defaultTabId={defaultTab}
@@ -472,86 +469,59 @@ export function EquipmentPickerDrawer({
         />
       )}
       renderItemHeader={(item) => {
-        const header = buildEquipmentPickerHeaderViewModel(item.equipment)
-        const badge = getEquipmentPickerBadge(item, { isGoldShoppingPath })
+        const row = buildEquipmentPickerRowViewModel(item.equipment)
+        const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
         const disabled = isEquipmentPickerItemDisabled(item)
-
-        return (
-          <span
-            className={cn(
-              equipmentPickerHeaderTitleClasses,
-              disabled ? equipmentPickerDisabledRowClasses : undefined,
-            )}
-          >
-            <span className={equipmentPickerHeaderTextClasses}>
-              <span>{header.name}</span>
-              <span className={equipmentPickerHeaderDividerClasses} aria-hidden>
-                {EQUIPMENT_PICKER_HEADER_DIVIDER}
-              </span>
-              <span className={equipmentPickerHeaderKindClasses}>{header.kindLabel}</span>
-            </span>
-            {badge ? (
-              <Badge
-                size="sm"
-                variant="outline"
-                className={
-                  badge.emphasis === 'warning'
-                    ? equipmentPickerWarningBadgeClasses
-                    : equipmentPickerHighlightBadgeClasses
-                }
-              >
-                {badge.label}
-              </Badge>
-            ) : null}
-          </span>
-        )
-      }}
-      renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
-      renderItemActions={(item) => {
-        const header = buildEquipmentPickerHeaderViewModel(item.equipment)
         const ownedQuantity = ownedPurchaseQuantities[item.equipment.id] ?? 0
         const owned = ownedQuantity > 0
         const stackable = isEquipmentStackable(item.equipment)
-        const disabled = isEquipmentPickerItemDisabled(item)
 
         return (
-          <div className="flex items-center gap-2">
-            <Text as="span" variant="muted" className="shrink-0 tabular-nums">
-              {header.priceLabel}
-            </Text>
-            {owned && stackable ? (
+          <EquipmentPickerItemHeader
+            item={row}
+            callout={callout}
+            disabled={disabled}
+            actions={
               <>
-                <Text as="span" variant="muted" className="tabular-nums">
-                  {EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} {ownedQuantity}
+                <Text as="span" variant="muted" className="shrink-0 tabular-nums">
+                  {row.priceLabel}
                 </Text>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={disabled}
-                  onClick={() => handleQuickAdd(item)}
-                >
-                  {EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL}
-                </Button>
+                {owned && stackable ? (
+                  <>
+                    <Text as="span" variant="muted" className="tabular-nums">
+                      {EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} {ownedQuantity}
+                    </Text>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={disabled}
+                      onClick={() => handleQuickAdd(item)}
+                    >
+                      {EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL}
+                    </Button>
+                  </>
+                ) : owned ? (
+                  <Text as="span" variant="muted">
+                    {EQUIPMENT_PICKER_ADDED_LABEL}
+                  </Text>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={disabled}
+                    onClick={() => handleQuickAdd(item)}
+                  >
+                    Add
+                  </Button>
+                )}
               </>
-            ) : owned ? (
-              <Text as="span" variant="muted">
-                {EQUIPMENT_PICKER_ADDED_LABEL}
-              </Text>
-            ) : (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                disabled={disabled}
-                onClick={() => handleQuickAdd(item)}
-              >
-                Add
-              </Button>
-            )}
-          </div>
+            }
+          />
         )
       }}
+      renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
       renderItemDetails={(item) => (
         <EquipmentPickerItemDetails
           equipment={item.equipment}

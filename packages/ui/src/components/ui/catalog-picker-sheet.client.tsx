@@ -95,6 +95,8 @@ export function CatalogPickerSheet<TItem>({
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
+  rowTone,
+  toolbarCompact,
 }: CatalogPickerSheetProps<TItem>) {
   const {
     searchQuery,
@@ -131,6 +133,8 @@ export function CatalogPickerSheet<TItem>({
     renderItemActions,
     renderItemDetails,
     getItemToolbarLabel,
+    rowTone,
+    toolbarCompact,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = loading ? (

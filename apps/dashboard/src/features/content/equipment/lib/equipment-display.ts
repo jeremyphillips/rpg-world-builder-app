@@ -1,4 +1,5 @@
 import {
+  buildEquipmentCompactSummary,
   formatMoney,
   getEquipmentKindLabel,
   type Equipment,
@@ -27,11 +28,11 @@ export const EQUIPMENT_DETAILS_SECTION_TITLES = {
   magic_item: 'Magic item details',
 } as const satisfies Record<EquipmentKind, string>
 
-export type EquipmentCardViewModel = {
+export type EquipmentPickerRowViewModel = {
   name: string
-  kindLabel: string
-  /** Picker header rail: unit price */
   priceLabel: string
+  kindLabel: string
+  metadata: string[]
 }
 
 export type EquipmentDetailViewModel = {
@@ -49,13 +50,38 @@ function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
   ].filter((row) => !OMITTED_EQUIPMENT_DETAIL_STAT_ROW_LABELS.has(row.label))
 }
 
-export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): EquipmentCardViewModel {
+export function buildEquipmentPickerRowViewModel(
+  equipment: Equipment,
+): EquipmentPickerRowViewModel {
+  const { kindLabel, metadata } = buildEquipmentCompactSummary(equipment)
+
   return {
     name: equipment.name,
-    kindLabel: getEquipmentKindLabel(equipment.kind),
     priceLabel: formatMoney(equipment.cost),
+    kindLabel,
+    metadata,
   }
 }
+
+/** @deprecated Use {@link buildEquipmentPickerRowViewModel}. */
+export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): {
+  name: string
+  kindLabel: string
+  priceLabel: string
+} {
+  const viewModel = buildEquipmentPickerRowViewModel(equipment)
+  return {
+    name: viewModel.name,
+    kindLabel: viewModel.kindLabel,
+    priceLabel: viewModel.priceLabel,
+  }
+}
+
+/** @deprecated Use {@link EquipmentPickerRowViewModel}. */
+export type EquipmentCardViewModel = Pick<
+  EquipmentPickerRowViewModel,
+  'name' | 'kindLabel' | 'priceLabel'
+>
 
 export function buildEquipmentDetailViewModel(equipment: Equipment): EquipmentDetailViewModel {
   return {

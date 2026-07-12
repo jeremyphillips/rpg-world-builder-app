@@ -33,6 +33,7 @@ import {
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentBudgetSummary,
   type EquipmentPickerBadge,
+  type EquipmentPickerCallout,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
@@ -410,83 +411,91 @@ export type EquipmentPickerBadgeContext = {
   isGoldShoppingPath?: boolean
 }
 
-const HIGHLIGHT_BADGE = { emphasis: 'highlight' } as const satisfies Pick<
-  EquipmentPickerBadge,
+const INFO_CALLOUT = { emphasis: 'info' } as const satisfies Pick<
+  EquipmentPickerCallout,
   'emphasis'
 >
-const WARNING_BADGE = { emphasis: 'warning' } as const satisfies Pick<
-  EquipmentPickerBadge,
+const WARNING_CALLOUT = { emphasis: 'warning' } as const satisfies Pick<
+  EquipmentPickerCallout,
   'emphasis'
 >
 
-function essentialEquipmentPickerBadge(
+function essentialEquipmentPickerCallout(
   tier: EquipmentPickerItem['state']['recommendation']['tier'],
   reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][],
-): EquipmentPickerBadge | undefined {
+): EquipmentPickerCallout | undefined {
   if (tier !== 'essential') return undefined
 
   if (reasons.includes('spellcastingFocus')) {
-    return { label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL, ...INFO_CALLOUT }
   }
   if (reasons.includes('classToolNeed')) {
-    return { label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL, ...INFO_CALLOUT }
   }
-  return { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, ...HIGHLIGHT_BADGE }
+  return { label: EQUIPMENT_PICKER_ESSENTIAL_LABEL, ...INFO_CALLOUT }
 }
 
-function proficiencyStateEquipmentPickerBadge(
+function proficiencyStateEquipmentPickerCallout(
   reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][],
-): EquipmentPickerBadge | undefined {
+): EquipmentPickerCallout | undefined {
   if (reasons.includes('selectedToolProficiency')) {
-    return { label: EQUIPMENT_PICKER_PROFICIENT_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_PROFICIENT_LABEL, ...INFO_CALLOUT }
   }
   if (reasons.includes('unresolvedToolProficiencyChoice')) {
-    return { label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL, ...INFO_CALLOUT }
   }
   if (reasons.includes('classToolCategory')) {
-    return { label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL, ...INFO_CALLOUT }
   }
   return undefined
 }
 
-function recommendationSourceEquipmentPickerBadge(args: {
+function recommendationSourceEquipmentPickerCallout(args: {
   tier: EquipmentPickerItem['state']['recommendation']['tier']
   reasons: readonly EquipmentPickerItem['state']['recommendation']['reasons'][number][]
   isGoldShoppingPath: boolean
-}): EquipmentPickerBadge | undefined {
+}): EquipmentPickerCallout | undefined {
   const { tier, reasons, isGoldShoppingPath } = args
 
   if (reasons.includes('startingEquipmentChoice')) {
-    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...INFO_CALLOUT }
   }
   if (reasons.includes('availableInStartingOption') && isGoldShoppingPath) {
-    return { label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL, ...INFO_CALLOUT }
   }
   if (tier === 'strong' && reasons.includes('startingEquipment')) {
-    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...HIGHLIGHT_BADGE }
+    return { label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL, ...INFO_CALLOUT }
   }
   return undefined
 }
 
 /**
- * Single-badge policy: essential blockers → proficiency-state copy → starting-equipment
+ * Single-callout policy: essential blockers → proficiency-state copy → starting-equipment
  * source → not-proficient warning. Proficiency copy is reason-driven, not kind-driven.
  */
+export function getEquipmentPickerCallout(
+  item: EquipmentPickerItem,
+  context: EquipmentPickerBadgeContext = {},
+): EquipmentPickerCallout | undefined {
+  const { tier, reasons, label } = item.state.recommendation
+  const isGoldShoppingPath = context.isGoldShoppingPath ?? false
+
+  if (label) return { label, ...INFO_CALLOUT }
+
+  return (
+    essentialEquipmentPickerCallout(tier, reasons) ??
+    proficiencyStateEquipmentPickerCallout(reasons) ??
+    recommendationSourceEquipmentPickerCallout({ tier, reasons, isGoldShoppingPath }) ??
+    (!item.state.isProficient
+      ? { label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL, ...WARNING_CALLOUT }
+      : undefined)
+  )
+}
+
+/** @deprecated Use {@link getEquipmentPickerCallout}. */
 export function getEquipmentPickerBadge(
   item: EquipmentPickerItem,
   context: EquipmentPickerBadgeContext = {},
 ): EquipmentPickerBadge | undefined {
-  const { tier, reasons, label } = item.state.recommendation
-  const isGoldShoppingPath = context.isGoldShoppingPath ?? false
-
-  if (label) return { label, ...HIGHLIGHT_BADGE }
-
-  return (
-    essentialEquipmentPickerBadge(tier, reasons) ??
-    proficiencyStateEquipmentPickerBadge(reasons) ??
-    recommendationSourceEquipmentPickerBadge({ tier, reasons, isGoldShoppingPath }) ??
-    (!item.state.isProficient
-      ? { label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL, ...WARNING_BADGE }
-      : undefined)
-  )
+  return getEquipmentPickerCallout(item, context)
 }

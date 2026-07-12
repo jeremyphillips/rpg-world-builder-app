@@ -35,10 +35,13 @@ export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
 
-export type EquipmentPickerBadge = {
+export type EquipmentPickerCallout = {
   label: string
-  emphasis: 'warning' | 'highlight'
+  emphasis: 'info' | 'warning'
 }
+
+/** @deprecated Use {@link EquipmentPickerCallout}. */
+export type EquipmentPickerBadge = EquipmentPickerCallout
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const

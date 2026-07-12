@@ -40,6 +40,7 @@ export interface CollapsibleListItemProps {
   tone?: CollapsibleListItemShellTone
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
+  toolbarCompact?: boolean
   dragging?: boolean
   itemPrefix?: string
   className?: string
@@ -94,6 +95,7 @@ function CollapsibleListItemRoot({
   tone = 'default',
   layout = 'default',
   actionsAlign: actionsAlignProp,
+  toolbarCompact = false,
   dragging = false,
   itemPrefix,
   className,
@@ -181,6 +183,7 @@ function CollapsibleListItemRoot({
             collapsed={collapsed}
             onToggleCollapse={onToggleCollapse}
             bodyId={resolvedBodyId}
+            compact={toolbarCompact}
             header={header}
             summary={actionsAlign === 'center' ? undefined : summary}
           />
