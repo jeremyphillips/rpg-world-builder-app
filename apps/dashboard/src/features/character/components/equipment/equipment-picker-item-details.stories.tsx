@@ -46,6 +46,7 @@ export const Owned: Story = {
     ownedQuantity: 1,
     showCharacterPreview: false,
     characterPreviewContext: undefined,
+    onRemoveFromInventory: () => undefined,
   },
 }
 
@@ -58,7 +59,8 @@ export const OwnedStackable: Story = {
     addQuantity: 1,
     onAddQuantityChange: () => undefined,
     onCommit: () => undefined,
-    onAddAnother: () => undefined,
+    onRemoveFromInventory: () => undefined,
+    onRemoveOneFromInventory: () => undefined,
     showCharacterPreview: false,
   },
 }

@@ -1,6 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/units'
+import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
 import {
   maxAffordableEquipmentQuantity,
@@ -82,18 +83,69 @@ export function resolveEquipmentPurchaseQuantityLimits(args: {
   }
 }
 
-export function formatEquipmentPurchaseUnitPriceLabel(equipment: Equipment): string {
-  return `${formatMoney(equipment.cost)} each`
+function isBundledEquipment(equipment: Equipment): boolean {
+  return equipment.kind === 'adventuring_gear' && equipment.bundleSize !== undefined
 }
 
+/** Normalizes a purchase total across denominations (e.g. 10 SP → 1 GP). */
 export function formatEquipmentPurchaseTotalPriceLabel(
   equipment: Equipment,
   quantity: number,
 ): string {
-  return formatMoney({
-    amount: equipment.cost.amount * quantity,
-    currency: equipment.cost.currency,
-  })
+  const totalCopper = moneyToCopper(equipment.cost) * quantity
+  return formatWealth(copperToDisplayWealth(totalCopper))
+}
+
+export function formatEquipmentPurchaseUnitPriceLabel(equipment: Equipment): string {
+  if (isBundledEquipment(equipment)) {
+    return `${formatMoney(equipment.cost)} per bundle`
+  }
+
+  return `${formatMoney(equipment.cost)} each`
+}
+
+/** Single-line price copy for inventory rows. */
+export function formatEquipmentInventoryPriceLine(args: {
+  equipment: Equipment
+  quantity: number
+  /** Package grants use a "value" suffix; starting-gold purchases do not. */
+  priceContext: 'package' | 'startingGold'
+}): string {
+  const { equipment, quantity, priceContext } = args
+  const stackable = isEquipmentStackable(equipment)
+  const bundled = isBundledEquipment(equipment)
+  const unitPrice = formatMoney(equipment.cost)
+  const bundleLabel = formatEquipmentBundleLabel(equipment)
+  const useValueSuffix = priceContext === 'package'
+
+  if (bundled) {
+    const unitCopy = `${unitPrice} per bundle`
+
+    if (quantity <= 1) {
+      return bundleLabel ? `${unitCopy} · ${bundleLabel}` : unitCopy
+    }
+
+    const parts = [unitCopy, `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`]
+    if (bundleLabel) parts.push(bundleLabel)
+    return parts.join(' · ')
+  }
+
+  if (stackable && !useValueSuffix) {
+    if (quantity <= 1) {
+      return unitPrice
+    }
+
+    return `${unitPrice} each · ${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`
+  }
+
+  if (quantity <= 1) {
+    return useValueSuffix ? `${unitPrice} value` : unitPrice
+  }
+
+  const total = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  return useValueSuffix
+    ? `${unitPrice} value · ${total} total value`
+    : `${unitPrice} · ${total} total`
 }
 
 /** Muted bundle copy for inventory/picker surfaces (purchase units, not item units). */

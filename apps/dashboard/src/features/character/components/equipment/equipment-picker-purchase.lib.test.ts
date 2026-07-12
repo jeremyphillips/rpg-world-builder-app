@@ -7,6 +7,7 @@ import {
 } from './equipment-picker-drawer.fixtures'
 import {
   buildEquipmentPickerPurchaseViewModel,
+  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
 } from './equipment-picker-purchase.lib'
 
@@ -22,7 +23,7 @@ describe('buildEquipmentPickerPurchaseViewModel', () => {
     ).toEqual({
       mode: 'new',
       quantity: 1,
-      maxQuantity: 1,
+      maxQuantity: 2,
       unitPriceLabel: '15 GP',
       totalLabel: '15 GP',
       remainingAfterLabel: '25 GP',
@@ -66,7 +67,27 @@ describe('buildEquipmentPickerPurchaseViewModel', () => {
     ).toBe(99)
   })
 
-  it('omits purchase VM when the item is already owned', () => {
+  it('builds owned stackable purchase VM with budget-aware max', () => {
+    expect(
+      buildEquipmentPickerPurchaseViewModel({
+        equipment: equipmentPickerRopeFixture,
+        quantity: 2,
+        budget: equipmentPickerBudgetFixture,
+        ownedQuantity: 2,
+      }),
+    ).toEqual({
+      mode: 'owned',
+      ownedQuantity: 2,
+      quantity: 2,
+      maxQuantity: 42,
+      unitPriceLabel: '1 GP',
+      totalLabel: '2 GP',
+      remainingAfterLabel: '38 GP',
+      commitLabel: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
+    })
+  })
+
+  it('builds owned purchase VM data for already-owned items', () => {
     expect(
       buildEquipmentPickerPurchaseViewModel({
         equipment: equipmentPickerLongswordFixture,
@@ -74,7 +95,16 @@ describe('buildEquipmentPickerPurchaseViewModel', () => {
         budget: equipmentPickerBudgetFixture,
         ownedQuantity: 1,
       }),
-    ).toBeUndefined()
+    ).toEqual({
+      mode: 'owned',
+      ownedQuantity: 1,
+      quantity: 1,
+      maxQuantity: 3,
+      unitPriceLabel: '15 GP',
+      totalLabel: '15 GP',
+      remainingAfterLabel: '25 GP',
+      commitLabel: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
+    })
   })
 
   it('uses an em dash when budget is unavailable', () => {

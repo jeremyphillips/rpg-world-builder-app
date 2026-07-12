@@ -66,6 +66,10 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
+import {
+  clampEquipmentStepQuantity,
+  resolveEquipmentStepPurchaseMaxQuantity,
+} from '../../lib/equipment-quantity.lib'
 import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 import {
   equipmentPickerAffordableFilterClasses,
@@ -309,6 +313,8 @@ export function EquipmentPickerDrawer({
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
   onAddItem,
+  onRemoveFromInventory,
+  onRemoveOneFromInventory,
 }: EquipmentPickerDrawerProps) {
   const supportedItems = React.useMemo(
     () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
@@ -385,13 +391,19 @@ export function EquipmentPickerDrawer({
   const handleCommitAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
       const itemKey = item.equipment.id
-      const quantity = addQuantities[itemKey] ?? 1
+      const ownedQuantity = ownedPurchaseQuantities[itemKey] ?? 0
+      const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
+        equipment: item.equipment,
+        budget,
+        currentQuantity: ownedQuantity,
+      })
+      const quantity = clampEquipmentStepQuantity(addQuantities[itemKey] ?? 1, maxQuantity)
       onAddItem(item, quantity)
       if (isEquipmentStackable(item.equipment)) {
         setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
       }
     },
-    [addQuantities, onAddItem],
+    [addQuantities, budget, onAddItem, ownedPurchaseQuantities],
   )
 
   const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
@@ -549,7 +561,12 @@ export function EquipmentPickerDrawer({
           addQuantity={addQuantities[item.equipment.id] ?? 1}
           onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
           onCommit={() => handleCommitAdd(item)}
-          onAddAnother={() => handleQuickAdd(item)}
+          onRemoveFromInventory={
+            onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
+          }
+          onRemoveOneFromInventory={
+            onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
+          }
           showCharacterPreview={showCharacterPreview}
           characterPreviewContext={characterPreviewContext}
         />

@@ -13,15 +13,14 @@ import {
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepLeatherArmorFixture,
 } from '../../lib/equipment-step.fixtures'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 
 describe('EquipmentInventorySummary', () => {
-  it('renders package rows with qty-in-title and remove-from-package action', async () => {
-    const user = userEvent.setup()
-    const onRemoveFromPackage = vi.fn()
+  it('renders package rows with name and value pricing', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -40,23 +39,14 @@ describe('EquipmentInventorySummary', () => {
     }
 
     render(
-      <EquipmentInventorySummary
-        draft={draft}
-        catalogIndex={equipmentStepCatalogIndexFixture}
-        onRemoveFromPackage={onRemoveFromPackage}
-      />,
+      <EquipmentInventorySummary draft={draft} catalogIndex={equipmentStepCatalogIndexFixture} />,
     )
 
-    expect(screen.getByText('1 × Leather Armor')).toBeInTheDocument()
-    expect(screen.getByText('1 × Lute')).toBeInTheDocument()
+    expect(screen.getByText('Leather Armor')).toBeInTheDocument()
+    expect(screen.getByText('Lute')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove from package' })).not.toBeInTheDocument()
     expect(screen.getByText('Starting Equipment')).toBeInTheDocument()
     expect(screen.getByText('Purchased with Starting Gold')).toBeInTheDocument()
-
-    await user.click(screen.getAllByRole('button', { name: 'Remove from package' })[0]!)
-
-    expect(onRemoveFromPackage).toHaveBeenCalledWith(
-      `${equipmentStepBardClassFixture.id}:standard:0`,
-    )
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {
@@ -119,11 +109,10 @@ describe('EquipmentInventorySummary', () => {
     )
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
-    expect(screen.getByText(/Purchased with starting gold · 5 SP each/)).toBeInTheDocument()
-    expect(screen.getByText('10 SP total')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
+    expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toHaveTextContent('Remove')
 
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
 
     expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
       {
@@ -138,7 +127,50 @@ describe('EquipmentInventorySummary', () => {
     )
   })
 
-  it('renders locked package grants with quantity in provenance', () => {
+  it('renders editable starting-gold non-stackable rows with quantity controls', async () => {
+    const user = userEvent.setup()
+    const onSetPurchaseQuantity = vi.fn()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepLeatherArmorFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onRemoveItem={vi.fn()}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />,
+    )
+
+    expect(screen.getByText('Leather Armor')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Increase Quantity for Leather Armor' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Leather Armor' }))
+
+    expect(onSetPurchaseQuantity).toHaveBeenCalled()
+  })
+
+  it('renders locked package grants with value pricing and read-only quantity', () => {
     const row: EquipmentInventoryRow = {
       group: 'weapons',
       groupLabel: 'Weapons',
@@ -157,6 +189,7 @@ describe('EquipmentInventorySummary', () => {
       sourceLabel: '2 included with Standard Equipment',
       isStackable: false,
       quantityMode: 'locked',
+      priceLineLabel: '2 GP value · 4 GP total value',
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
@@ -167,8 +200,10 @@ describe('EquipmentInventorySummary', () => {
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
     expect(screen.getByText('Dagger')).toBeInTheDocument()
-    expect(screen.getByText('2 included with Standard Equipment')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Increment' })).not.toBeInTheDocument()
+    expect(screen.getByText('2 GP value · 4 GP total value')).toBeInTheDocument()
+    expect(screen.getByText('Qty 2')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Increase Quantity/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
   })
 
   it('uses click-to-edit for large stack quantities', async () => {
@@ -187,8 +222,7 @@ describe('EquipmentInventorySummary', () => {
       isStackable: true,
       quantityMode: 'editable',
       maxQuantity: 20,
-      unitPriceLabel: '5 SP each',
-      totalPriceLabel: '60 SP',
+      priceLineLabel: '5 SP each · 6 GP total',
       removeLabel: 'Remove all 12 Rations',
       removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
       quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },

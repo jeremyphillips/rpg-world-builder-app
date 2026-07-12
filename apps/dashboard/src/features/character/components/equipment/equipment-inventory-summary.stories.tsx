@@ -108,7 +108,6 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
         onSelectedPackageItemKeysChange={(keys) => setSelectedPackageItemKeys(new Set(keys))}
         onCustomizePackage={() => undefined}
         onChangeEquipmentOption={() => undefined}
-        onRemoveFromPackage={() => undefined}
         onCancelConversion={() => undefined}
         onCommitConversion={() => undefined}
       />
@@ -124,7 +123,6 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
       onSelectedPackageItemKeysChange={(keys) => setSelectedPackageItemKeys(new Set(keys))}
       onCustomizePackage={() => undefined}
       onChangeEquipmentOption={() => undefined}
-      onRemoveFromPackage={() => undefined}
       onCancelConversion={() => undefined}
       onCommitConversion={() => undefined}
     />

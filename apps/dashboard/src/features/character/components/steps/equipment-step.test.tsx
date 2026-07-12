@@ -390,8 +390,8 @@ describe('EquipmentStep', () => {
         name: `Expand ${equipmentStepRationsFixture.name}`,
       }),
     )
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rations' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rations' }))
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
@@ -436,7 +436,7 @@ describe('EquipmentStep', () => {
     }
     const { onDraftChange } = renderEquipmentStep(draft)
 
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({

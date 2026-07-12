@@ -23,9 +23,11 @@ import {
   findStartingEquipmentChoiceSet,
   hasGoldStartingEquipmentOption,
   readSelectedStartingEquipmentOption,
+  readEquipmentPurchaseQuantity,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
+  resolveStartingGoldPurchaseId,
   shouldShowEquipmentFallback,
   shouldShowEquipmentShopping,
 } from '../../lib/equipment-step.lib'
@@ -240,6 +242,44 @@ export function useEquipmentStep(args: {
     if (patch) onDraftChange(patch)
   }
 
+  const handleRemoveFromInventory: ComponentProps<
+    typeof EquipmentPickerDrawer
+  >['onRemoveFromInventory'] = (item) => {
+    const purchaseId = resolveStartingGoldPurchaseId(draft, item.equipment.id)
+    if (!purchaseId) return
+
+    onDraftChange(
+      buildEquipmentRemoveEntryPatch({
+        draft,
+        target: { kind: 'purchase', purchaseId },
+      }),
+    )
+  }
+
+  const handleRemoveOneFromInventory: ComponentProps<
+    typeof EquipmentPickerDrawer
+  >['onRemoveOneFromInventory'] = (item) => {
+    const equipmentId = item.equipment.id
+    const purchaseId = resolveStartingGoldPurchaseId(draft, equipmentId)
+    if (!purchaseId) return
+
+    const sourceMode = resolvePurchaseSourceMode()
+    const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
+
+    if (currentQuantity <= 1) {
+      handleRemoveFromInventory(item)
+      return
+    }
+
+    const patch = buildEquipmentSetPurchaseQuantityPatch({
+      draft,
+      catalogIndex,
+      purchaseId,
+      quantity: currentQuantity - 1,
+    })
+    if (patch) onDraftChange(patch)
+  }
+
   return {
     catalogIndex,
     characterClass,
@@ -273,6 +313,8 @@ export function useEquipmentStep(args: {
     openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
+    handleRemoveFromInventory,
+    handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem: (target: Parameters<typeof buildEquipmentRemoveEntryPatch>[0]['target']) =>
       onDraftChange(buildEquipmentRemoveEntryPatch({ draft, target })),

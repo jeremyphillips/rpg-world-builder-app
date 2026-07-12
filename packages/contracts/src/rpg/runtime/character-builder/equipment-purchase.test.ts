@@ -207,7 +207,7 @@ describe('canMergeEquipmentPurchases', () => {
     })
   })
 
-  it('does not merge non-stackable equipment', () => {
+  it('merges purchases while stack rules are permissive', () => {
     expect(
       canMergeEquipmentPurchases({
         existing: {
@@ -224,7 +224,7 @@ describe('canMergeEquipmentPurchases', () => {
         },
         equipment: longsword,
       }),
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('ignores equipped differences for kinds without equipped semantics', () => {

@@ -53,6 +53,8 @@ export function EquipmentStepInteractive({
     openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
+    handleRemoveFromInventory,
+    handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem,
     onNestedPoolChange,
@@ -113,9 +115,6 @@ export function EquipmentStepInteractive({
             })
             document.getElementById('starting-equipment-options')?.focus()
           }}
-          onRemoveFromPackage={(packageItemKey) =>
-            step.openConversionEditor(new Set([packageItemKey]))
-          }
           onSelectedPackageItemKeysChange={step.setSelectedPackageItemKeys}
           onCancelConversion={() => step.setConversionEditorOpen(false)}
           onCommitConversion={step.handleCommitConversion}
@@ -134,6 +133,8 @@ export function EquipmentStepInteractive({
         ownedPurchaseQuantities={ownedPurchaseQuantities}
         isGoldShoppingPath={showShopping}
         onAddItem={handleAddItem}
+        onRemoveFromInventory={handleRemoveFromInventory}
+        onRemoveOneFromInventory={handleRemoveOneFromInventory}
       />
 
       <ConfirmDialog

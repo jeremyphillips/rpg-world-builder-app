@@ -29,7 +29,6 @@ export type EquipmentInventorySummaryProps = {
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onCustomizePackage?: () => void
   onChangeEquipmentOption?: () => void
-  onRemoveFromPackage?: (packageItemKey: string) => void
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
   onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
@@ -56,7 +55,6 @@ export function EquipmentInventorySummary({
   onSetPurchaseQuantity,
   onCustomizePackage,
   onChangeEquipmentOption,
-  onRemoveFromPackage,
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
@@ -86,7 +84,6 @@ export function EquipmentInventorySummary({
             commitStatusMessage={conversionCommitStatusMessage}
             onCustomize={onCustomizePackage ?? (() => undefined)}
             onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
-            onRemoveFromPackage={onRemoveFromPackage ?? (() => undefined)}
             onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
             onCancelConversion={onCancelConversion ?? (() => undefined)}
             onCommitConversion={onCommitConversion ?? (() => undefined)}

@@ -1,27 +1,25 @@
 'use client'
 
-import { Badge, Button, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import {
   EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL,
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
   EQUIPMENT_PACKAGE_INCLUDED_WEALTH_LABEL,
-  EQUIPMENT_PACKAGE_REMOVE_FROM_PACKAGE_LABEL,
-  formatPackageInventoryRowTitle,
   type EquipmentInventoryRow,
   type StartingPackageInventoryGroup,
 } from '../../lib/equipment-step.lib'
+import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import {
   equipmentStartingPackageCardActionsClasses,
   equipmentStartingPackageCardBodyClasses,
   equipmentStartingPackageCardClasses,
-  equipmentStartingPackageFooterClasses,
   equipmentStartingPackageCardHeaderClasses,
   equipmentStartingPackageCardTitleClasses,
   equipmentStartingPackageCategoryClasses,
   equipmentStartingPackageCategoryLabelClasses,
   equipmentStartingPackageCustomizeReasonClasses,
+  equipmentStartingPackageFooterClasses,
   equipmentStartingPackageRowListClasses,
 } from './equipment-starting-package.variants'
 
@@ -31,57 +29,6 @@ export type EquipmentStartingPackageCardProps = {
   customizeControlsId?: string
   onCustomize?: () => void
   onChangeEquipmentOption?: () => void
-  onRemoveFromPackage?: (packageItemKey: string) => void
-}
-
-function PackageInventoryRow({
-  row,
-  onRemoveFromPackage,
-}: {
-  row: EquipmentInventoryRow
-  onRemoveFromPackage?: (packageItemKey: string) => void
-}) {
-  const packageItemKey =
-    row.removeTarget?.kind === 'package' ? row.removeTarget.packageItemKey : undefined
-
-  return (
-    <BuilderInventoryRow
-      variant="dense"
-      label={
-        <Text as="p" className="font-body text-foreground">
-          {formatPackageInventoryRowTitle(row.equipmentName, row.entry.quantity)}
-        </Text>
-      }
-      itemLabel={row.equipmentName}
-      meta={
-        row.entry.equipped ? (
-          <Badge variant="secondary" size="sm">
-            Equipped
-          </Badge>
-        ) : undefined
-      }
-      provenance={
-        row.bundleLabel ? (
-          <Text as="p" variant="caption">
-            {row.bundleLabel}
-          </Text>
-        ) : undefined
-      }
-      footer={
-        packageItemKey && onRemoveFromPackage ? (
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className="h-auto px-0"
-            onClick={() => onRemoveFromPackage(packageItemKey)}
-          >
-            {EQUIPMENT_PACKAGE_REMOVE_FROM_PACKAGE_LABEL}
-          </Button>
-        ) : undefined
-      }
-    />
-  )
 }
 
 export function EquipmentStartingPackageCard({
@@ -90,7 +37,6 @@ export function EquipmentStartingPackageCard({
   customizeControlsId,
   onCustomize,
   onChangeEquipmentOption,
-  onRemoveFromPackage,
 }: EquipmentStartingPackageCardProps) {
   const customizeDisabled = packageGroup.customize.status === 'disabled'
 
@@ -136,7 +82,7 @@ export function EquipmentStartingPackageCard({
               {category.groupLabel}
             </Text>
             <ul className={equipmentStartingPackageRowListClasses}>
-              {category.rows.map((row) => (
+              {category.rows.map((row: EquipmentInventoryRow) => (
                 <li
                   key={
                     row.removeTarget?.kind === 'package'
@@ -144,7 +90,7 @@ export function EquipmentStartingPackageCard({
                       : row.equipmentName
                   }
                 >
-                  <PackageInventoryRow row={row} onRemoveFromPackage={onRemoveFromPackage} />
+                  <EquipmentInventoryRowItem display={{ kind: 'single', row }} />
                 </li>
               ))}
             </ul>

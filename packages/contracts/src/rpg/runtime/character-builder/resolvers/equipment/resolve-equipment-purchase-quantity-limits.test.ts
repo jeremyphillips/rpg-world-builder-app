@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../../content/equipment'
 import {
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
+  formatEquipmentInventoryPriceLine,
   formatEquipmentPurchaseTotalPriceLabel,
   formatEquipmentPurchaseUnitPriceLabel,
   formatEquipmentBundleLabel,
@@ -114,7 +115,7 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
     })
   })
 
-  it('locks converted non-stackable package purchases at authored quantity', () => {
+  it('treats converted package purchases as editable while stack rules are permissive', () => {
     expect(
       resolveEquipmentPurchaseQuantityLimits({
         equipment: longsword,
@@ -125,18 +126,18 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
         isPurchaseRow: true,
       }),
     ).toEqual({
-      editable: false,
+      editable: true,
       min: 1,
       max: 5,
       showCost: true,
     })
   })
 
-  it('locks manual and non-stackable purchase rows', () => {
+  it('locks manual purchase rows', () => {
     expect(
       resolveEquipmentPurchaseQuantityLimits({
         equipment: longsword,
-        sourceMode: 'startingGold',
+        sourceMode: 'manual',
         budget,
         currentQuantity: 1,
         isPurchaseRow: true,
@@ -145,7 +146,7 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
       editable: false,
       min: 1,
       max: 1,
-      showCost: true,
+      showCost: false,
     })
 
     expect(
@@ -199,9 +200,80 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
 })
 
 describe('equipment purchase price labels', () => {
-  it('formats unit and total bundle prices', () => {
+  it('formats unit and normalized total prices', () => {
     expect(formatEquipmentPurchaseUnitPriceLabel(longsword)).toBe('15 GP each')
     expect(formatEquipmentPurchaseTotalPriceLabel(longsword, 2)).toBe('30 GP')
+    expect(formatEquipmentPurchaseTotalPriceLabel(rations, 2)).toBe('1 GP')
+  })
+
+  it('formats inventory price lines for stackable, bundle, and non-stackable rows', () => {
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: longsword,
+        quantity: 1,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('15 GP')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: longsword,
+        quantity: 2,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('15 GP each · 30 GP total')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: longsword,
+        quantity: 1,
+        priceContext: 'package',
+      }),
+    ).toBe('15 GP value')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: longsword,
+        quantity: 2,
+        priceContext: 'package',
+      }),
+    ).toBe('15 GP value · 30 GP total value')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: rations,
+        quantity: 1,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('5 SP')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: rations,
+        quantity: 2,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('5 SP each · 1 GP total')
+
+    const arrows = equipmentSchema.parse({
+      ...rations,
+      id: `${RULESET}:arrows`,
+      slug: 'arrows',
+      name: 'Arrows',
+      gearKind: 'ammunition',
+      bundleSize: 20,
+      cost: { amount: 1, currency: 'gp' },
+    })
+
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: arrows,
+        quantity: 1,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('1 GP per bundle · 20 arrows per bundle')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: arrows,
+        quantity: 2,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('1 GP per bundle · 2 GP total · 20 arrows per bundle')
   })
 })
 

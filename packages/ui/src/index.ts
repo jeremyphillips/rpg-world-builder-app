@@ -63,6 +63,11 @@ export {
   type NumberInputDigits,
   type NumberInputProps,
 } from './components/ui/number-input.client'
+export {
+  NumberStepper,
+  type NumberStepperDigits,
+  type NumberStepperProps,
+} from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
   Card,

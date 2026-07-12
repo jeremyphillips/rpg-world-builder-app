@@ -5,9 +5,8 @@ import {
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
-  formatEquipmentPurchaseTotalPriceLabel,
-  formatEquipmentPurchaseUnitPriceLabel,
   formatEquipmentBundleLabel,
+  formatEquipmentInventoryPriceLine,
   formatWealth,
   getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
@@ -144,8 +143,8 @@ export type EquipmentInventoryRow = {
   isStackable: boolean
   quantityMode: 'editable' | 'locked'
   maxQuantity?: number
-  unitPriceLabel?: string
-  totalPriceLabel?: string
+  /** Normalized price line for purchased starting-gold rows (no source label). */
+  priceLineLabel?: string
   bundleLabel?: string
   removeLabel: string
   removeTarget?: EquipmentInventoryRemoveTarget
@@ -473,6 +472,19 @@ export function readEquipmentPurchaseQuantity(
   return purchase?.quantity ?? 0
 }
 
+/** Resolves the purchase row id for a starting-gold inventory item. */
+export function resolveStartingGoldPurchaseId(
+  draft: CharacterBuilderDraft,
+  equipmentId: string,
+): string | undefined {
+  const purchases = draft.equipment?.purchases ?? []
+  const purchaseIndex = purchases.findIndex(
+    (entry) => entry.equipmentId === equipmentId && entry.sourceMode === 'startingGold',
+  )
+  if (purchaseIndex === -1) return undefined
+  return resolveEquipmentPurchaseId(purchases, purchaseIndex)
+}
+
 export function resolveMaxAffordablePurchaseQuantity(args: {
   equipment: Equipment
   budget: EquipmentBudgetSummary
@@ -651,6 +663,60 @@ function formatPackageGrantSourceLabel(optionLabel: string, quantity: number): s
   return `${quantity} included with ${optionLabel}`
 }
 
+function resolveInventoryRowPriceLineLabel(args: {
+  equipment: Equipment
+  quantity: number
+  showCost: boolean
+  isPackageRow: boolean
+}): string | undefined {
+  const { equipment, quantity, showCost, isPackageRow } = args
+
+  if (showCost) {
+    return formatEquipmentInventoryPriceLine({
+      equipment,
+      quantity,
+      priceContext: 'startingGold',
+    })
+  }
+
+  if (isPackageRow) {
+    return formatEquipmentInventoryPriceLine({
+      equipment,
+      quantity,
+      priceContext: 'package',
+    })
+  }
+
+  return undefined
+}
+
+function resolveInventoryRowRemoveTarget(args: {
+  packageItemKey?: string
+  isPurchaseRow: boolean
+  purchaseId?: string
+}): EquipmentInventoryRemoveTarget | undefined {
+  const { packageItemKey, isPurchaseRow, purchaseId } = args
+
+  if (packageItemKey !== undefined) {
+    return { kind: 'package', packageItemKey }
+  }
+
+  if (isPurchaseRow && purchaseId !== undefined) {
+    return { kind: 'purchase', purchaseId }
+  }
+
+  return undefined
+}
+
+function resolveInventoryRowBundleLabel(
+  equipment: Equipment,
+  showCost: boolean,
+  bundledGear: boolean,
+): string | undefined {
+  if (showCost && bundledGear) return undefined
+  return formatEquipmentBundleLabel(equipment)
+}
+
 function buildInventoryRowPresentation(args: {
   entry: CharacterEquipmentEntry
   equipment: Equipment
@@ -683,13 +749,8 @@ function buildInventoryRowPresentation(args: {
     currentQuantity: entry.quantity,
     isPurchaseRow,
   })
-  const unitPriceLabel = limits.showCost
-    ? formatEquipmentPurchaseUnitPriceLabel(equipment)
-    : undefined
-  const totalPriceLabel =
-    limits.showCost && entry.quantity > 1
-      ? formatEquipmentPurchaseTotalPriceLabel(equipment, entry.quantity)
-      : undefined
+  const isPackageRow = packageItemKey !== undefined
+  const bundledGear = equipment.kind === 'adventuring_gear' && equipment.bundleSize !== undefined
 
   return {
     group,
@@ -701,16 +762,19 @@ function buildInventoryRowPresentation(args: {
     isStackable: stackable,
     quantityMode: limits.editable ? 'editable' : 'locked',
     maxQuantity: limits.editable ? limits.max : undefined,
-    unitPriceLabel,
-    totalPriceLabel,
-    bundleLabel: formatEquipmentBundleLabel(equipment),
+    priceLineLabel: resolveInventoryRowPriceLineLabel({
+      equipment,
+      quantity: entry.quantity,
+      showCost: limits.showCost,
+      isPackageRow,
+    }),
+    bundleLabel: resolveInventoryRowBundleLabel(equipment, limits.showCost, bundledGear),
     removeLabel: formatEquipmentInventoryRemoveLabel(equipment.name, entry.quantity),
-    removeTarget:
-      packageItemKey !== undefined
-        ? { kind: 'package', packageItemKey }
-        : isPurchaseRow && purchaseId !== undefined
-          ? { kind: 'purchase', purchaseId }
-          : undefined,
+    removeTarget: resolveInventoryRowRemoveTarget({
+      packageItemKey,
+      isPurchaseRow,
+      purchaseId,
+    }),
     quantityTarget:
       limits.editable && purchaseId !== undefined ? { kind: 'purchase', purchaseId } : undefined,
   }

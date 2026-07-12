@@ -33,7 +33,8 @@ export type EquipmentPickerItemDetailsProps = {
   addQuantity: number
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
-  onAddAnother?: () => void
+  onRemoveFromInventory?: () => void
+  onRemoveOneFromInventory?: () => void
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
 }
@@ -47,7 +48,8 @@ export function EquipmentPickerItemDetails({
   addQuantity,
   onAddQuantityChange,
   onCommit,
-  onAddAnother,
+  onRemoveFromInventory,
+  onRemoveOneFromInventory,
   showCharacterPreview = false,
   characterPreviewContext,
 }: EquipmentPickerItemDetailsProps) {
@@ -95,7 +97,8 @@ export function EquipmentPickerItemDetails({
         purchaseViewModel={purchaseViewModel}
         onAddQuantityChange={onAddQuantityChange}
         onCommit={onCommit}
-        onAddAnother={onAddAnother}
+        onRemoveFromInventory={onRemoveFromInventory}
+        onRemoveOneFromInventory={onRemoveOneFromInventory}
       />
     </div>
   )

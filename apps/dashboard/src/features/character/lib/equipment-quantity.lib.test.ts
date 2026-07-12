@@ -33,6 +33,14 @@ describe('equipment-quantity.lib', () => {
         currentQuantity: 0,
       }),
     ).toBe(40)
+
+    expect(
+      resolveEquipmentStepPurchaseMaxQuantity({
+        equipment: equipmentPickerLongswordFixture,
+        budget: equipmentPickerBudgetFixture,
+        currentQuantity: 0,
+      }),
+    ).toBe(2)
   })
 
   it('caps resolved max at 99 when budget allows more', () => {
@@ -47,15 +55,5 @@ describe('equipment-quantity.lib', () => {
         currentQuantity: 0,
       }),
     ).toBe(99)
-  })
-
-  it('caps non-stackable picker purchases at one', () => {
-    expect(
-      resolveEquipmentStepPurchaseMaxQuantity({
-        equipment: equipmentPickerLongswordFixture,
-        budget: equipmentPickerBudgetFixture,
-        currentQuantity: 0,
-      }),
-    ).toBe(1)
   })
 })

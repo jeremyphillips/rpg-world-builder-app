@@ -14,6 +14,9 @@ import {
 import {
   EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
   EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
 } from './equipment-picker-purchase.lib'
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
@@ -53,9 +56,10 @@ describe('EquipmentPickerItemDetails', () => {
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }),
     ).toBeInTheDocument()
     expect(screen.getByText(/Remaining after purchase/)).toBeInTheDocument()
+    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
   })
 
-  it('shows an owned note instead of purchase controls when a unique item is already owned', () => {
+  it('shows owned stackable purchase controls while stack rules are permissive', () => {
     render(
       <EquipmentPickerItemDetails
         equipment={longswordItem.equipment}
@@ -65,13 +69,18 @@ describe('EquipmentPickerItemDetails', () => {
         addQuantity={1}
         onAddQuantityChange={vi.fn()}
         onCommit={vi.fn()}
+        onRemoveFromInventory={vi.fn()}
       />,
     )
 
-    expect(screen.getByText(/Already in equipment: 1/)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL)).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }),
-    ).not.toBeInTheDocument()
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
+    ).toBeInTheDocument()
   })
 
   it('shows bundle copy for bundled adventuring gear purchases', () => {
@@ -96,9 +105,10 @@ describe('EquipmentPickerItemDetails', () => {
     expect(screen.getByText('20 arrows per bundle')).toBeInTheDocument()
   })
 
-  it('shows Add another for owned stackable items', async () => {
+  it('shows owned stackable purchase controls with remove actions', async () => {
     const user = userEvent.setup()
-    const onAddAnother = vi.fn()
+    const onCommit = vi.fn()
+    const onRemoveOneFromInventory = vi.fn()
     const ropeItem = equipmentPickerItemsFixture[2]!
 
     render(
@@ -109,16 +119,27 @@ describe('EquipmentPickerItemDetails', () => {
         ownedQuantity={2}
         addQuantity={1}
         onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
-        onAddAnother={onAddAnother}
+        onCommit={onCommit}
+        onRemoveFromInventory={vi.fn()}
+        onRemoveOneFromInventory={onRemoveOneFromInventory}
       />,
     )
 
-    expect(screen.getByText(/Already in equipment: 2/)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
+    ).toBeInTheDocument()
+
     await user.click(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
     )
-    expect(onAddAnother).toHaveBeenCalledTimes(1)
+    expect(onCommit).toHaveBeenCalledTimes(1)
+
+    await user.click(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
+    )
+    expect(onRemoveOneFromInventory).toHaveBeenCalledTimes(1)
   })
 
   it('commits purchase from the body CTA', async () => {

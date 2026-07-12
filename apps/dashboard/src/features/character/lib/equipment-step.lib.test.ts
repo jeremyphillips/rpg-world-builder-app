@@ -242,7 +242,13 @@ describe('equipment-step.lib', () => {
       sourceMode: resolvePurchaseSourceMode(),
     })
 
-    expect(duplicatePatch).toBeUndefined()
+    expect(duplicatePatch?.equipment?.purchases).toEqual([
+      expect.objectContaining({
+        equipmentId: 'srd-cc-5.2.1:leather-armor',
+        quantity: 2,
+        sourceMode: 'startingGold',
+      }),
+    ])
 
     const withPurchase = {
       ...draft,
@@ -440,7 +446,7 @@ describe('equipment-step.lib', () => {
     ])
   })
 
-  it('detects unique equipment already owned in draft inventory', () => {
+  it('does not treat package-owned items as unique while stack rules are permissive', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -461,7 +467,70 @@ describe('equipment-step.lib', () => {
         equipmentStepCatalogIndexFixture,
         equipmentStepLeatherArmorFixture.id,
       ),
-    ).toBe(true)
+    ).toBe(false)
+  })
+
+  it('builds purchased gold rows with normalized price lines and purchase remove targets', () => {
+    const rationsId = 'srd-cc-5.2.1:rations'
+    const purchaseId = 'purchase-presentation-test'
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            id: purchaseId,
+            equipmentId: rationsId,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [
+          rationsId,
+          {
+            id: rationsId,
+            slug: 'rations',
+            rulesetId: 'srd-cc-5.2.1',
+            source: 'system',
+            campaignId: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            name: 'Rations',
+            description: '',
+            kind: 'adventuring_gear',
+            gearKind: 'consumable',
+            cost: { amount: 5, currency: 'sp' },
+            weight: { value: 2, unit: 'lb' },
+          },
+        ],
+      ]),
+    }
+
+    const rows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex)
+
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        priceLineLabel: '5 SP each · 1 GP total',
+        quantityMode: 'editable',
+        removeTarget: { kind: 'purchase', purchaseId },
+        quantityTarget: { kind: 'purchase', purchaseId },
+      }),
+    )
   })
 
   it('lists removable inventory rows from draft decisions', () => {
@@ -689,7 +758,13 @@ describe('equipment purchase quantity regressions', () => {
       equipmentId: equipmentStepLeatherArmorFixture.id,
       sourceMode: 'startingGold',
     })
-    expect(duplicateArmor).toBeUndefined()
+    expect(duplicateArmor?.equipment?.purchases).toEqual([
+      expect.objectContaining({
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        quantity: 2,
+        sourceMode: 'startingGold',
+      }),
+    ])
   })
 })
 

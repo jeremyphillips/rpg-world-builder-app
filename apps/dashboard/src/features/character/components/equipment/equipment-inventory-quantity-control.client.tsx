@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { NumberInput } from '@rpg/ui'
+import { NumberStepper } from '@rpg/ui'
 
 import {
   clampEquipmentStepQuantity,
@@ -11,6 +11,7 @@ import {
 } from '../../lib/equipment-quantity.lib'
 import {
   EQUIPMENT_INVENTORY_CLICK_TO_EDIT_QUANTITY_THRESHOLD,
+  EQUIPMENT_STEP_REMOVE_ITEM_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
@@ -51,22 +52,24 @@ export function EquipmentInventoryQuantityControl({
 
   return (
     <div className={equipmentInventoryRowQuantityClasses}>
-      <NumberInput
+      <NumberStepper
         aria-label={`Quantity for ${row.equipmentName}`}
         size="sm"
+        bordered={false}
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
-        stepperMin={1}
-        stepperMax={maxQuantity}
+        min={1}
+        max={maxQuantity}
         value={row.entry.quantity}
         disabled={!onSetPurchaseQuantity}
         autoFocus={isEditing}
         onBlur={() => setIsEditing(false)}
-        onChange={(event) => {
+        onChange={(next) => {
           if (!row.quantityTarget || !onSetPurchaseQuantity) return
-          const next = Number(event.target.value)
           onSetPurchaseQuantity(row.quantityTarget, clampEquipmentStepQuantity(next, maxQuantity))
         }}
       />
     </div>
   )
 }
+
+export const EQUIPMENT_INVENTORY_REMOVE_VISIBLE_LABEL = EQUIPMENT_STEP_REMOVE_ITEM_LABEL

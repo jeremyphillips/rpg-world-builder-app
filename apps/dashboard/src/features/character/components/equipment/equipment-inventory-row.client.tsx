@@ -1,23 +1,31 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { Badge, Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
 import type { EquipmentInventoryDisplayItem } from './equipment-inventory-summary.lib'
-import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantity-control.client'
 import {
-  equipmentInventoryRowFooterClasses,
+  EQUIPMENT_INVENTORY_REMOVE_VISIBLE_LABEL,
+  EquipmentInventoryQuantityControl,
+} from './equipment-inventory-quantity-control.client'
+import {
+  equipmentInventoryRowActionsClasses,
+  equipmentInventoryRowDetailLineClasses,
   equipmentInventoryRowNameClasses,
-  equipmentInventoryRowRemoveButtonClasses,
-  equipmentInventoryRowTotalClasses,
+  equipmentInventoryRowPriceLineClasses,
+  equipmentInventoryRowQtyLabelClasses,
+  equipmentInventoryRowRemoveTextClasses,
 } from './equipment-inventory-summary.variants'
+import {
+  builderInventoryRowMetaClasses,
+  builderInventoryRowVariants,
+} from '../builder/builder-inventory-row.variants'
 
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
@@ -25,86 +33,117 @@ export type EquipmentInventoryRowProps = {
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
 
-function formatProvenanceLine(row: EquipmentInventoryRow): string {
-  if (row.unitPriceLabel) {
-    return `${row.sourceLabel} · ${row.unitPriceLabel}`
-  }
+function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined {
+  if (row.priceLineLabel) return row.priceLineLabel
+  if (row.bundleLabel) return `${row.sourceLabel} · ${row.bundleLabel}`
   return row.sourceLabel
 }
 
-function ProvenanceLines({ lines }: { lines: Array<string | undefined> }) {
-  const resolved = lines.filter((line): line is string => Boolean(line))
-  if (resolved.length === 0) return null
-
-  return (
-    <>
-      {resolved.map((line) => (
-        <Text key={line} as="p" variant="caption">
-          {line}
-        </Text>
-      ))}
-    </>
-  )
+function resolveCombinedDetailLineLabel(
+  display: Extract<EquipmentInventoryDisplayItem, { kind: 'combined' }>,
+) {
+  if (display.bundleLabel) return `${display.breakdownLabel} · ${display.bundleLabel}`
+  return display.breakdownLabel
 }
 
-function InventoryRemoveButton({
+function canRemovePurchaseRow(
+  row: EquipmentInventoryRow,
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void,
+): row is EquipmentInventoryRow & { removeTarget: EquipmentInventoryRemoveTarget } {
+  return row.removeTarget?.kind === 'purchase' && onRemoveItem !== undefined
+}
+
+function InventoryRemoveTextButton({
   removeLabel,
   onRemove,
 }: {
   removeLabel: string
   onRemove: () => void
 }) {
-  // TODO(equipment-quantity): Add undo toast when dashboard gains toast infra; removals are immediate today.
   return (
     <button
       type="button"
-      className={equipmentInventoryRowRemoveButtonClasses}
+      className={equipmentInventoryRowRemoveTextClasses}
       aria-label={removeLabel}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden className="size-4" />
+      {EQUIPMENT_INVENTORY_REMOVE_VISIBLE_LABEL}
     </button>
   )
 }
 
-function QuantityFooter({
+function InventoryRowActions({
   row,
+  onRemoveItem,
   onSetPurchaseQuantity,
 }: {
   row: EquipmentInventoryRow
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }) {
+  const showStepper = row.quantityMode === 'editable' && row.quantityTarget !== undefined
+  const showQtyLabel = row.quantityMode === 'locked' && row.entry.quantity > 1
+  const showRemove = canRemovePurchaseRow(row, onRemoveItem)
+
+  if (!showStepper && !showQtyLabel && !showRemove) return null
+
   return (
-    <div className={equipmentInventoryRowFooterClasses}>
-      <EquipmentInventoryQuantityControl row={row} onSetPurchaseQuantity={onSetPurchaseQuantity} />
-      {row.totalPriceLabel ? (
-        <Text as="span" className={equipmentInventoryRowTotalClasses}>
-          {row.totalPriceLabel} total
+    <div className={equipmentInventoryRowActionsClasses}>
+      {showStepper ? (
+        <EquipmentInventoryQuantityControl
+          row={row}
+          onSetPurchaseQuantity={onSetPurchaseQuantity}
+        />
+      ) : null}
+      {showQtyLabel ? (
+        <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+          Qty {row.entry.quantity}
         </Text>
+      ) : null}
+      {showRemove ? (
+        <InventoryRemoveTextButton
+          removeLabel={row.removeLabel}
+          onRemove={() => onRemoveItem!(row.removeTarget)}
+        />
       ) : null}
     </div>
   )
 }
 
-function InventoryRemoveActions({
-  rows,
-  onRemoveItem,
+function InventoryRowHeader({
+  equipmentName,
+  equipped,
 }: {
-  rows: EquipmentInventoryRow[]
-  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
+  equipmentName: string
+  equipped: boolean
 }) {
-  const removableRows = rows.filter((row) => row.removeTarget && onRemoveItem)
-  if (removableRows.length === 0) return null
+  return (
+    <div className={builderInventoryRowMetaClasses}>
+      <Text as="p" className={equipmentInventoryRowNameClasses}>
+        {equipmentName}
+      </Text>
+      {equipped ? (
+        <Badge variant="secondary" size="sm">
+          Equipped
+        </Badge>
+      ) : null}
+    </div>
+  )
+}
+
+function InventoryRowDetailLine({ label, actions }: { label?: string; actions?: ReactNode }) {
+  if (!label && !actions) return null
 
   return (
-    <div className="flex items-center gap-1">
-      {removableRows.map((row) => (
-        <InventoryRemoveButton
-          key={row.removeLabel}
-          removeLabel={row.removeLabel}
-          onRemove={() => onRemoveItem!(row.removeTarget!)}
-        />
-      ))}
+    <div className={equipmentInventoryRowDetailLineClasses}>
+      {label ? (
+        <Text as="p" className={equipmentInventoryRowPriceLineClasses}>
+          {label}
+        </Text>
+      ) : (
+        <span />
+      )}
+      {actions}
     </div>
   )
 }
@@ -116,70 +155,49 @@ export function EquipmentInventoryRowItem({
 }: EquipmentInventoryRowProps) {
   if (display.kind === 'single') {
     const { row } = display
-    const showQuantityControls = row.quantityMode === 'editable' && row.quantityTarget !== undefined
+    const detailLabel = resolveDetailLineLabel(row)
+    const actions = (
+      <InventoryRowActions
+        row={row}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
+    )
 
     return (
-      <BuilderInventoryRow
-        variant="dense"
-        label={
-          <Text as="p" className={equipmentInventoryRowNameClasses}>
-            {row.equipmentName}
-          </Text>
-        }
-        itemLabel={row.equipmentName}
-        meta={
-          row.entry.equipped ? (
-            <Badge variant="secondary" size="sm">
-              Equipped
-            </Badge>
-          ) : undefined
-        }
-        provenance={<ProvenanceLines lines={[formatProvenanceLine(row), row.bundleLabel]} />}
-        footer={
-          showQuantityControls ? (
-            <QuantityFooter row={row} onSetPurchaseQuantity={onSetPurchaseQuantity} />
-          ) : undefined
-        }
-        removeAriaLabel={row.removeLabel}
-        onRemove={
-          row.removeTarget && onRemoveItem ? () => onRemoveItem(row.removeTarget!) : undefined
-        }
-      />
+      <article className={builderInventoryRowVariants({ variant: 'dense' })}>
+        <InventoryRowHeader
+          equipmentName={row.equipmentName}
+          equipped={Boolean(row.entry.equipped)}
+        />
+        <InventoryRowDetailLine label={detailLabel} actions={actions} />
+      </article>
     )
   }
 
   const editableRow = display.rows.find(
     (row) => row.quantityMode === 'editable' && row.quantityTarget !== undefined,
   )
+  const removablePurchaseRow = display.rows.find((row) => canRemovePurchaseRow(row, onRemoveItem))
   const equipped = display.rows.some((row) => row.entry.equipped)
+  const detailLabel = resolveCombinedDetailLineLabel(display)
+  const actionsRow = editableRow ?? removablePurchaseRow
 
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0 flex-1">
-        <BuilderInventoryRow
-          variant="dense"
-          label={
-            <Text as="p" className={equipmentInventoryRowNameClasses}>
-              {display.equipmentName}
-            </Text>
-          }
-          itemLabel={display.equipmentName}
-          meta={
-            equipped ? (
-              <Badge variant="secondary" size="sm">
-                Equipped
-              </Badge>
-            ) : undefined
-          }
-          provenance={<ProvenanceLines lines={[display.breakdownLabel, display.bundleLabel]} />}
-          footer={
-            editableRow ? (
-              <QuantityFooter row={editableRow} onSetPurchaseQuantity={onSetPurchaseQuantity} />
-            ) : undefined
-          }
-        />
-      </div>
-      <InventoryRemoveActions rows={display.rows} onRemoveItem={onRemoveItem} />
-    </div>
+    <article className={builderInventoryRowVariants({ variant: 'dense' })}>
+      <InventoryRowHeader equipmentName={display.equipmentName} equipped={equipped} />
+      <InventoryRowDetailLine
+        label={detailLabel}
+        actions={
+          actionsRow ? (
+            <InventoryRowActions
+              row={actionsRow}
+              onRemoveItem={onRemoveItem}
+              onSetPurchaseQuantity={onSetPurchaseQuantity}
+            />
+          ) : undefined
+        }
+      />
+    </article>
   )
 }

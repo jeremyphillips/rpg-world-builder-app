@@ -1,16 +1,25 @@
 'use client'
 
-import { Button, Heading, Text } from '@rpg/ui'
+import { Button, Heading } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
 import {
-  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
   EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
   type EquipmentPickerPurchaseViewModel,
 } from './equipment-picker-purchase.lib'
 import { EquipmentPickerPurchaseSection } from './equipment-picker-purchase-section.client'
+import {
+  EquipmentPickerPurchaseDetailsRows,
+  PurchaseRow,
+} from './equipment-picker-purchase-rows.client'
+import {
+  equipmentPickerPurchaseRemoveActionClasses,
+  equipmentPickerPurchaseRemoveActionsClasses,
+} from './equipment-picker-purchase.variants'
 
 export type EquipmentPickerCharacterPreviewSectionProps = {
   equipmentId: string
@@ -31,7 +40,7 @@ export function EquipmentPickerCharacterPreviewSection({
       <ul className="space-y-1" role="list">
         {previewLines.map((line) => (
           <li key={line}>
-            <Text variant="muted">{line}</Text>
+            <span className="text-sm text-muted-foreground">{line}</span>
           </li>
         ))}
       </ul>
@@ -39,32 +48,88 @@ export function EquipmentPickerCharacterPreviewSection({
   )
 }
 
+function InventoryRemoveTextButton({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string
+  onClick: () => void
+  disabled?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      className={equipmentPickerPurchaseRemoveActionClasses}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  )
+}
+
 export type EquipmentPickerOwnedStackableSectionProps = {
-  equipmentId: string
-  ownedQuantity: number
+  equipment: Equipment
+  viewModel: Extract<EquipmentPickerPurchaseViewModel, { mode: 'owned' }>
   disabled: boolean
-  onAddAnother?: () => void
+  onAddQuantityChange: (quantity: number) => void
+  onCommit: () => void
+  onRemoveOneFromInventory?: () => void
+  onRemoveFromInventory?: () => void
 }
 
 export function EquipmentPickerOwnedStackableSection({
-  equipmentId,
-  ownedQuantity,
+  equipment,
+  viewModel,
   disabled,
-  onAddAnother,
+  onAddQuantityChange,
+  onCommit,
+  onRemoveOneFromInventory,
+  onRemoveFromInventory,
 }: EquipmentPickerOwnedStackableSectionProps) {
+  const showRemoveOne = viewModel.ownedQuantity > 1 && onRemoveOneFromInventory
+
   return (
-    <section aria-labelledby={`${equipmentId}-purchase-owned-heading`} className="space-y-3">
-      <Heading variant="subsection" as="h3" id={`${equipmentId}-purchase-owned-heading`}>
+    <section aria-labelledby={`${equipment.id}-purchase-owned-heading`} className="space-y-3">
+      <Heading variant="subsection" as="h3" id={`${equipment.id}-purchase-owned-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
-      <Text variant="muted">
-        {EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL}: {ownedQuantity}
-      </Text>
-      {onAddAnother ? (
-        <Button type="button" size="sm" disabled={disabled} onClick={onAddAnother}>
-          {EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL}
-        </Button>
+
+      <PurchaseRow
+        label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
+        value={String(viewModel.ownedQuantity)}
+      />
+
+      {showRemoveOne || onRemoveFromInventory ? (
+        <div className={equipmentPickerPurchaseRemoveActionsClasses}>
+          {showRemoveOne ? (
+            <InventoryRemoveTextButton
+              label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL}
+              disabled={disabled}
+              onClick={onRemoveOneFromInventory}
+            />
+          ) : null}
+          {onRemoveFromInventory ? (
+            <InventoryRemoveTextButton
+              label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
+              disabled={disabled}
+              onClick={onRemoveFromInventory}
+            />
+          ) : null}
+        </div>
       ) : null}
+
+      <EquipmentPickerPurchaseDetailsRows
+        equipmentName={equipment.name}
+        viewModel={viewModel}
+        disabled={disabled}
+        onQuantityChange={onAddQuantityChange}
+      />
+
+      <Button type="button" size="sm" disabled={disabled} onClick={onCommit}>
+        {viewModel.commitLabel}
+      </Button>
     </section>
   )
 }
@@ -72,20 +137,36 @@ export function EquipmentPickerOwnedStackableSection({
 export type EquipmentPickerOwnedUniqueSectionProps = {
   equipmentId: string
   ownedQuantity: number
+  disabled?: boolean
+  onRemoveFromInventory?: () => void
 }
 
 export function EquipmentPickerOwnedUniqueSection({
   equipmentId,
   ownedQuantity,
+  disabled = false,
+  onRemoveFromInventory,
 }: EquipmentPickerOwnedUniqueSectionProps) {
   return (
-    <section aria-labelledby={`${equipmentId}-purchase-owned-heading`} className="space-y-2">
+    <section aria-labelledby={`${equipmentId}-purchase-owned-heading`} className="space-y-3">
       <Heading variant="subsection" as="h3" id={`${equipmentId}-purchase-owned-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
-      <Text variant="muted">
-        {EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL}: {ownedQuantity}
-      </Text>
+
+      <PurchaseRow
+        label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
+        value={String(ownedQuantity)}
+      />
+
+      {onRemoveFromInventory ? (
+        <div className={equipmentPickerPurchaseRemoveActionsClasses}>
+          <InventoryRemoveTextButton
+            label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
+            disabled={disabled}
+            onClick={onRemoveFromInventory}
+          />
+        </div>
+      ) : null}
     </section>
   )
 }
@@ -128,7 +209,8 @@ export type EquipmentPickerPurchasePanelProps = {
   purchaseViewModel?: EquipmentPickerPurchaseViewModel
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
-  onAddAnother?: () => void
+  onRemoveFromInventory?: () => void
+  onRemoveOneFromInventory?: () => void
 }
 
 export function EquipmentPickerPurchasePanel({
@@ -140,22 +222,31 @@ export function EquipmentPickerPurchasePanel({
   purchaseViewModel,
   onAddQuantityChange,
   onCommit,
-  onAddAnother,
+  onRemoveFromInventory,
+  onRemoveOneFromInventory,
 }: EquipmentPickerPurchasePanelProps) {
-  if (ownedQuantity > 0 && stackable) {
+  if (purchaseViewModel?.mode === 'owned' && stackable) {
     return (
       <EquipmentPickerOwnedStackableSection
-        equipmentId={equipment.id}
-        ownedQuantity={ownedQuantity}
+        equipment={equipment}
+        viewModel={purchaseViewModel}
         disabled={disabled}
-        onAddAnother={onAddAnother}
+        onAddQuantityChange={onAddQuantityChange}
+        onCommit={onCommit}
+        onRemoveFromInventory={onRemoveFromInventory}
+        onRemoveOneFromInventory={onRemoveOneFromInventory}
       />
     )
   }
 
   if (ownedQuantity > 0) {
     return (
-      <EquipmentPickerOwnedUniqueSection equipmentId={equipment.id} ownedQuantity={ownedQuantity} />
+      <EquipmentPickerOwnedUniqueSection
+        equipmentId={equipment.id}
+        ownedQuantity={ownedQuantity}
+        disabled={disabled}
+        onRemoveFromInventory={onRemoveFromInventory}
+      />
     )
   }
 

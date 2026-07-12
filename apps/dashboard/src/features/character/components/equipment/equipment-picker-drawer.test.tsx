@@ -13,7 +13,6 @@ import {
   equipmentPickerSkilledHirelingFixture,
 } from './equipment-picker-drawer.fixtures'
 import {
-  EQUIPMENT_PICKER_ADDED_LABEL,
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -26,6 +25,8 @@ import {
 import {
   EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
 } from './equipment-picker-purchase.lib'
 
 beforeAll(() => {
@@ -478,8 +479,8 @@ describe('EquipmentPickerDrawer', () => {
     const ropeRow = equipmentPickerItemsFixture[2]!
 
     await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
-    await user.click(screen.getByRole('button', { name: 'Increment' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rope' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rope' }))
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
 
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
@@ -511,7 +512,39 @@ describe('EquipmentPickerDrawer', () => {
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
   })
 
-  it('shows Added in the header rail for owned unique items', () => {
+  it('wires remove handlers from the expanded owned stackable body', async () => {
+    const user = userEvent.setup()
+    const onRemoveFromInventory = vi.fn()
+    const onRemoveOneFromInventory = vi.fn()
+    const ropeRow = equipmentPickerItemsFixture[2]!
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[ropeRow]}
+        budget={equipmentPickerBudgetFixture}
+        ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+        onRemoveFromInventory={onRemoveFromInventory}
+        onRemoveOneFromInventory={onRemoveOneFromInventory}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
+    await user.click(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
+    )
+    await user.click(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL }),
+    )
+
+    expect(onRemoveOneFromInventory).toHaveBeenCalledWith(ropeRow)
+    expect(onRemoveFromInventory).toHaveBeenCalledWith(ropeRow)
+  })
+
+  it('shows owned stackable header controls for owned items while stack rules are permissive', () => {
     const longsword = equipmentPickerItemsFixture[0]!
 
     render(
@@ -525,8 +558,12 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByText(EQUIPMENT_PICKER_ADDED_LABEL)).toBeInTheDocument()
-    expect(screen.queryAllByRole('button', { name: 'Add' })).toHaveLength(0)
+    expect(
+      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 1`),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
+    ).toBeInTheDocument()
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {

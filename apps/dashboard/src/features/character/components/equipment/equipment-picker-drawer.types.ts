@@ -111,4 +111,6 @@ export type EquipmentPickerDrawerProps = {
   /** When true, `availableInStartingOption` rows show the Standard gear badge. */
   isGoldShoppingPath?: boolean
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
+  onRemoveFromInventory?: (item: EquipmentPickerItem) => void
+  onRemoveOneFromInventory?: (item: EquipmentPickerItem) => void
 }

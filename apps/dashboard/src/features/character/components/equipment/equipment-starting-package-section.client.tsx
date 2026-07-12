@@ -21,7 +21,6 @@ export type EquipmentStartingPackageSectionProps = {
   commitStatusMessage?: string
   onCustomize: () => void
   onChangeEquipmentOption: () => void
-  onRemoveFromPackage: (packageItemKey: string) => void
   onSelectedPackageItemKeysChange: (keys: ReadonlySet<string>) => void
   onCancelConversion: () => void
   onCommitConversion: (preview: StartingPackageConversionPreview) => void
@@ -36,7 +35,6 @@ export function EquipmentStartingPackageSection({
   commitStatusMessage,
   onCustomize,
   onChangeEquipmentOption,
-  onRemoveFromPackage,
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
@@ -51,7 +49,6 @@ export function EquipmentStartingPackageSection({
         customizeControlsId={editorId}
         onCustomize={onCustomize}
         onChangeEquipmentOption={onChangeEquipmentOption}
-        onRemoveFromPackage={onRemoveFromPackage}
       />
       {conversionEditorOpen ? (
         <EquipmentPackageConversionEditor
