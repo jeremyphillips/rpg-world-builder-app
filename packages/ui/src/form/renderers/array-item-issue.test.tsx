@@ -10,18 +10,18 @@ import {
 } from './array-item-issue.client'
 
 describe('array-item-issue', () => {
-  it('renders badge prominence classes', () => {
+  it('renders badge with semantic negative styling', () => {
     const { rerender } = render(
       <ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="action" />,
     )
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass('text-destructive')
+    expect(badge).toHaveClass('text-semantic-negative')
     expect(badge).toHaveTextContent('2 issues')
 
     rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
     expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
-      'text-destructive-subtle',
+      'text-semantic-negative',
     )
   })
 

@@ -444,7 +444,7 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
-  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
 }
 

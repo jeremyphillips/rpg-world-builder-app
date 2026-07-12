@@ -4,32 +4,6 @@ import { cn } from '../../lib/utils'
 
 export type ArrayItemIssueProminence = 'action' | 'structural' | 'nav' | 'aggregate'
 
-export const arrayItemIssueBadgeClasses = cva(
-  cn(
-    'inline-flex h-6 shrink-0 items-center gap-1 rounded-sm px-1.5',
-    'text-xs font-medium leading-none',
-    'hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-  ),
-  {
-    variants: {
-      compact: {
-        true: 'mt-0',
-        false: '',
-      },
-      prominence: {
-        action: 'text-destructive',
-        structural: 'text-destructive',
-        nav: 'text-destructive-muted',
-        aggregate: 'text-destructive-subtle',
-      },
-    },
-    defaultVariants: {
-      compact: false,
-      prominence: 'nav',
-    },
-  },
-)
-
 export const arrayItemIssueSummaryClasses = cva(
   cn(
     'flex min-w-0 items-center gap-1 text-xs leading-snug',

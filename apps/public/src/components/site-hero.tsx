@@ -1,19 +1,15 @@
 import Link from 'next/link'
 
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { Badge, buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/lib/routes'
 
 export function SiteHero() {
   return (
     <section className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-24 text-center">
-      <Text
-        variant="small"
-        as="span"
-        className="rounded-full border border-border px-3 py-1 text-xs font-medium"
-      >
+      <Badge appearance="outline" tone="neutral" size="sm">
         Campaign tooling for tabletop RPGs
-      </Text>
+      </Badge>
       <Heading variant="display" as="h1" className="text-balance">
         Build worlds your party will never forget
       </Heading>

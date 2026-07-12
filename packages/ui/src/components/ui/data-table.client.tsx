@@ -105,7 +105,6 @@ import {
   TableRow,
 } from './table'
 import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
-import { mapLegacyBadgeVariant, type LegacyBadgeVariant } from './badge.variants'
 import { dataTableWidthMeta } from './data-table-meta'
 import type {
   BooleanFilterDef,
@@ -743,17 +742,16 @@ export function NameCell({ children }: NameCellProps) {
 export interface TableBadgeCellProps {
   appearance?: BadgeAppearance
   tone?: BadgeTone
-  /** @deprecated Prefer `appearance` + `tone`. */
-  variant?: LegacyBadgeVariant
   children: React.ReactNode
 }
 
-export function TableBadgeCell({ appearance, tone, variant, children }: TableBadgeCellProps) {
-  const resolved =
-    appearance && tone ? { appearance, tone } : mapLegacyBadgeVariant(variant ?? 'secondary')
-
+export function TableBadgeCell({
+  appearance = 'neutral',
+  tone = 'neutral',
+  children,
+}: TableBadgeCellProps) {
   return (
-    <Badge size="sm" appearance={resolved.appearance} tone={resolved.tone}>
+    <Badge size="sm" appearance={appearance} tone={tone}>
       {children}
     </Badge>
   )

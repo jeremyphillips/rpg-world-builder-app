@@ -13,6 +13,7 @@ type ChipBaseProps = {
   children: React.ReactNode
   disabled?: boolean
   className?: string
+  id?: string
   /** Override auto-injected leading check on selectable/selected only when a real use case exists. */
   leadingIcon?: React.ReactNode
 }
@@ -47,6 +48,7 @@ function ChipLeadingCheck({ size }: { size: CompactLabelSize }) {
 
 function SelectableChip({
   children,
+  id,
   size = 'md',
   selected,
   onSelectedChange,
@@ -60,6 +62,7 @@ function SelectableChip({
 
   return (
     <button
+      id={id}
       type="button"
       role={selectionRole}
       aria-checked={selected}

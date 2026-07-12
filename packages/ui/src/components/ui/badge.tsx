@@ -8,11 +8,9 @@ import { compactLabelFilledFromAppearance } from './compact-label.lib'
 
 export {
   badgeVariants,
-  mapLegacyBadgeVariant,
   type BadgeAppearance,
   type BadgeSize,
   type BadgeTone,
-  type LegacyBadgeVariant,
 } from './badge.variants'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -46,23 +44,28 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const Comp = asChild ? Slot : 'span'
+  const resolvedClassName = resolveCompactLabelClassName({
+    size,
+    appearance,
+    tone,
+    filled: compactLabelFilledFromAppearance(appearance),
+    className,
+  })
+
+  if (asChild) {
+    return (
+      <Slot className={resolvedClassName} {...props}>
+        {children}
+      </Slot>
+    )
+  }
 
   return (
-    <Comp
-      className={resolveCompactLabelClassName({
-        size,
-        appearance,
-        tone,
-        filled: compactLabelFilledFromAppearance(appearance),
-        className,
-      })}
-      {...props}
-    >
+    <span className={resolvedClassName} {...props}>
       {leadingIcon ? <BadgeIconSlot icon={leadingIcon} size={size} /> : null}
       {children}
       {trailingIcon ? <BadgeIconSlot icon={trailingIcon} size={size} /> : null}
-    </Comp>
+    </span>
   )
 }
 

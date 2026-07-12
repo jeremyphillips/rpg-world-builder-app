@@ -45,7 +45,7 @@ export interface ComboboxFieldProps extends SelectFieldValueProps {
   emptyMessage?: string
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
-  /** Custom selected-value renderer in multi-select mode; defaults to `DismissibleBadge`. */
+  /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
   hintPosition?: FieldHintPosition
 }

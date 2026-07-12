@@ -148,7 +148,11 @@ describe('DataTable cell helpers', () => {
   })
 
   it('TableBadgeCell renders a compact badge', () => {
-    render(<TableBadgeCell variant="secondary">System</TableBadgeCell>)
+    render(
+      <TableBadgeCell appearance="neutral" tone="neutral">
+        System
+      </TableBadgeCell>,
+    )
     expect(screen.getByText('System')).toBeInTheDocument()
   })
 })

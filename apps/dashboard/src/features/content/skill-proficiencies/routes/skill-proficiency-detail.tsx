@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 import { classesOfferingSkillChoice, getAbilityLabel } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
@@ -13,9 +13,7 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
-
-const CLASS_SKILL_CHOICE_CHIP_CLASS =
-  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
+import { ContentLinkBadge } from '../../lib/detail/content-link-badge'
 
 function ClassSkillChoicesList({
   campaignId,
@@ -40,12 +38,9 @@ function ClassSkillChoicesList({
         <ul className="flex flex-wrap gap-2" role="list">
           {offeringClasses.map((cls) => (
             <li key={cls.slug}>
-              <Link
-                to={ROUTES.content.classes.detail(campaignId, cls.id)}
-                className={CLASS_SKILL_CHOICE_CHIP_CLASS}
-              >
+              <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
                 {cls.name}
-              </Link>
+              </ContentLinkBadge>
             </li>
           ))}
         </ul>

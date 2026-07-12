@@ -22,47 +22,8 @@ import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
 import { fieldHasValidationError, resolveFieldDescribedBy } from './field-validation-props'
-import { chipPillVariants, type ChipSize } from './chips-field.variants'
-
-interface ChipOptionButtonProps {
-  id: string
-  option: FieldOption
-  role: 'checkbox' | 'radio'
-  isActive: boolean
-  isDisabled: boolean
-  chipSize: ChipSize
-  onToggle: (value: string) => void
-}
-
-function ChipOptionButton({
-  id,
-  option,
-  role,
-  isActive,
-  isDisabled,
-  chipSize,
-  onToggle,
-}: ChipOptionButtonProps) {
-  return (
-    <button
-      id={id}
-      type="button"
-      role={role}
-      aria-checked={isActive}
-      aria-disabled={isDisabled || undefined}
-      disabled={isDisabled}
-      onClick={() => onToggle(option.value)}
-      className={cn(
-        chipPillVariants({ size: chipSize }),
-        isActive
-          ? 'border-foreground bg-foreground text-background'
-          : 'border-border bg-transparent text-foreground hover:bg-muted',
-      )}
-    >
-      {option.label}
-    </button>
-  )
-}
+import { Chip, type ChipSize } from './chip.client'
+import { ChipGroup } from './chip-group.client'
 
 function nextMultiSelection(
   selected: string[],
@@ -92,7 +53,6 @@ export interface ChipsFieldOptionsProps {
 export function ChipsFieldOptions({
   id,
   options,
-  labelledBy,
   multiple = true,
   max,
   value,
@@ -108,42 +68,43 @@ export function ChipsFieldOptions({
     return value != null && value !== '' ? [String(value)] : []
   }, [multiple, value])
 
-  function toggle(optionValue: string) {
+  function handleSelectedChange(optionValue: string, next: boolean) {
     if (disabled) return
     if (multiple) {
-      onChange?.(nextMultiSelection(selected, optionValue, max))
+      onChange?.(
+        next
+          ? nextMultiSelection(selected, optionValue, max)
+          : selected.filter((value) => value !== optionValue),
+      )
       return
     }
-    onChange?.(selected[0] === optionValue ? undefined : optionValue)
+    onChange?.(next ? optionValue : undefined)
   }
 
   const selectionRole = multiple ? 'checkbox' : 'radio'
   const atMax = max !== undefined && selected.length >= max
 
   return (
-    <div
-      className={cn('flex flex-wrap', fieldChipWrapGapClasses)}
-      role="group"
-      aria-labelledby={labelledBy}
-      onBlur={onBlur}
-    >
+    <ChipGroup className={fieldChipWrapGapClasses} onBlur={onBlur}>
       {options.map((option) => {
         const isActive = selected.includes(option.value)
         const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
         return (
-          <ChipOptionButton
+          <Chip
             key={option.value}
             id={`${id}-${option.value}`}
-            option={option}
-            role={selectionRole}
-            isActive={isActive}
-            isDisabled={isDisabled}
-            chipSize={chipSize}
-            onToggle={toggle}
-          />
+            mode="selectable"
+            size={chipSize}
+            selected={isActive}
+            onSelectedChange={(next) => handleSelectedChange(option.value, next)}
+            selectionRole={selectionRole}
+            disabled={isDisabled}
+          >
+            {option.label}
+          </Chip>
         )
       })}
-    </div>
+    </ChipGroup>
   )
 }
 
@@ -270,3 +231,5 @@ export function ChipsFormField(props: ChipsFieldProps) {
     </Field.Root>
   )
 }
+
+export type { CompactLabelSize as ChipSize } from './compact-label.lib'

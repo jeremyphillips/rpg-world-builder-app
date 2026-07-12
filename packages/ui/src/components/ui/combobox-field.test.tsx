@@ -140,7 +140,7 @@ describe('ComboboxField', () => {
     expect(onChange).toHaveBeenCalledWith([])
   })
 
-  it('threads field size into dismissible badge size', () => {
+  it('threads field size into removable chip size', () => {
     render(
       <ComboboxField
         id="weapons"

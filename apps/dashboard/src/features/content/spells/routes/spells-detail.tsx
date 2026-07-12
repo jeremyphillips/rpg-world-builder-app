@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
 import {
   formatSlugAsLabel,
@@ -23,11 +23,7 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { buildSpellStatRows } from '../lib/spell-stat-rows'
-
-const CLASS_CHIP_CLASS =
-  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
-
-const TAG_CHIP_CLASS = 'rounded-md border px-2 py-1 text-sm'
+import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/content-link-badge'
 
 function SpellClassesList({ campaignId, classIds }: { campaignId: string; classIds: string[] }) {
   const { data: classes = [], isPending } = useClasses(campaignId)
@@ -50,14 +46,11 @@ function SpellClassesList({ campaignId, classIds }: { campaignId: string; classI
             return (
               <li key={slug}>
                 {cls ? (
-                  <Link
-                    to={ROUTES.content.classes.detail(campaignId, cls.id)}
-                    className={CLASS_CHIP_CLASS}
-                  >
+                  <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
                     {cls.name}
-                  </Link>
+                  </ContentLinkBadge>
                 ) : (
-                  <span className={CLASS_CHIP_CLASS}>{formatSlugAsLabel(slug)}</span>
+                  <ContentStaticBadge>{formatSlugAsLabel(slug)}</ContentStaticBadge>
                 )}
               </li>
             )
@@ -102,7 +95,7 @@ function SpellTagsSection({
       <ul className="flex flex-wrap gap-2" role="list">
         {labels.map((label) => (
           <li key={label}>
-            <span className={TAG_CHIP_CLASS}>{label}</span>
+            <ContentStaticBadge>{label}</ContentStaticBadge>
           </li>
         ))}
       </ul>

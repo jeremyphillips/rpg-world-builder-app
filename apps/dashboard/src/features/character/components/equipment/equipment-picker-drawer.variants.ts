@@ -33,12 +33,6 @@ export const equipmentPickerSortLabelClasses = 'text-sm text-muted-foreground'
 
 export const equipmentPickerAffordableLabelClasses = 'text-sm'
 
-export const equipmentPickerWarningBadgeClasses =
-  'shrink-0 border-accent bg-accent/20 text-foreground'
-
-export const equipmentPickerHighlightBadgeClasses =
-  'shrink-0 border-primary/40 bg-primary/10 text-foreground'
-
 export const EQUIPMENT_PICKER_HEADER_DIVIDER = '·'
 
 export const equipmentPickerHeaderTitleClasses =

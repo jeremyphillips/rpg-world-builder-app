@@ -1,9 +1,7 @@
 'use client'
 
-import {
-  tabbedFormTabIssueBadgeClasses,
-  tabbedFormTabIssueSeparatorClasses,
-} from './tabbed-form-tab-issue.variants'
+import { Badge } from '../../components/ui/badge'
+import { tabbedFormTabIssueSeparatorClasses } from './tabbed-form-tab-issue.variants'
 
 function tabIssueAttentionLabel(count: number): string {
   return `${count} ${count === 1 ? 'field needs' : 'fields need'} attention`
@@ -22,9 +20,15 @@ export function TabbedFormTabIssueBadge({ count }: TabbedFormTabIssueBadgeProps)
       <span aria-hidden className={tabbedFormTabIssueSeparatorClasses}>
         {' · '}
       </span>
-      <span aria-hidden className={tabbedFormTabIssueBadgeClasses}>
+      <Badge
+        appearance="soft"
+        tone="negative"
+        size="sm"
+        aria-hidden
+        className="min-w-5 justify-center px-1 tabular-nums leading-none"
+      >
         {count}
-      </span>
+      </Badge>
       <span className="sr-only">, {tabIssueAttentionLabel(count)}</span>
     </>
   )

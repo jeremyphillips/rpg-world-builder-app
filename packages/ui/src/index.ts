@@ -404,7 +404,7 @@ export {
   ChooseFromChipsField,
   type ChooseFromChipsFieldProps,
 } from './components/ui/choose-from-chips-field.client'
-export { type ChipSize } from './components/ui/chips-field.variants'
+export type { CompactLabelSize as ChipSize } from './components/ui/compact-label.lib'
 export {
   ComboboxField,
   type ComboboxFieldProps,
@@ -436,21 +436,11 @@ export {
 export {
   Badge,
   badgeVariants,
-  mapLegacyBadgeVariant,
   type BadgeAppearance,
   type BadgeProps,
   type BadgeSize,
   type BadgeTone,
-  type LegacyBadgeVariant,
 } from './components/ui/badge'
-export {
-  dismissibleBadgeVariants,
-  badgeDismissButtonVariants,
-} from './components/ui/badge.variants'
-export {
-  DismissibleBadge,
-  type DismissibleBadgeProps,
-} from './components/ui/dismissible-badge.client'
 export {
   Chip,
   type ChipProps,

@@ -6,7 +6,7 @@ import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
-import type { ChipSize } from './chips-field.variants'
+import type { CompactLabelSize } from './compact-label.lib'
 import { fieldInlineSentenceClasses, type FieldHintPosition } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Text } from './text'
@@ -36,7 +36,7 @@ export interface ChooseFromChipsFieldProps {
   required?: boolean
   disabled?: boolean
   size?: FieldSize
-  chipSize?: ChipSize
+  chipSize?: CompactLabelSize
   width?: FieldWidth
 }
 

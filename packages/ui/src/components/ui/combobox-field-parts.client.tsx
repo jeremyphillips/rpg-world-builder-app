@@ -5,7 +5,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown, Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { DismissibleBadge } from './dismissible-badge.client'
+import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
 import { fieldSizeToChipSize } from './field-sizing.variants'
@@ -302,12 +302,15 @@ export function ComboboxSelectedItems({
               size,
             })
           ) : (
-            <DismissibleBadge
-              label={option.label}
+            <Chip
+              mode="removable"
               size={chipSize}
               disabled={disabled}
-              onDismiss={() => onRemove(option.value)}
-            />
+              onRemove={() => onRemove(option.value)}
+              removeLabel={`Remove ${option.label}`}
+            >
+              {option.label}
+            </Chip>
           )}
         </div>
       ))}

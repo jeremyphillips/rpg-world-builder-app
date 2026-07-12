@@ -3,9 +3,9 @@
 import { AlertTriangle } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { Badge } from '../../components/ui/badge'
 import type { ArrayItemIssueGroup } from '../errors/form-issue.types'
 import {
-  arrayItemIssueBadgeClasses,
   arrayItemIssueSummaryClasses,
   arrayLegendIssueLinkClasses,
   type ArrayItemIssueProminence,
@@ -37,22 +37,29 @@ export function ArrayItemIssueBadge({
   rowLabel,
   onPress,
   compact = false,
-  prominence = 'nav',
+  prominence: _prominence = 'nav',
 }: ArrayItemIssueBadgeProps) {
   if (issueCount <= 0) return null
 
   return (
-    <button
-      type="button"
-      className={arrayItemIssueBadgeClasses({ compact, prominence })}
-      aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
-      onClick={onPress}
+    <Badge
+      asChild
+      appearance="soft"
+      tone="negative"
+      size="sm"
+      className={cn('h-6 shrink-0 gap-1', compact && 'mt-0')}
     >
-      <AlertTriangle className="size-3.5" aria-hidden />
-      <span className={compact ? 'tabular-nums' : undefined}>
-        {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
-      </span>
-    </button>
+      <button
+        type="button"
+        aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
+        onClick={onPress}
+      >
+        <AlertTriangle className="size-3.5" aria-hidden />
+        <span className={compact ? 'tabular-nums' : undefined}>
+          {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
+        </span>
+      </button>
+    </Badge>
   )
 }
 

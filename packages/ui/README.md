@@ -17,7 +17,8 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `cn`                                            | util       | `clsx` + `tailwind-merge` class composer                                                                                                                     |
 | `rankItems`, `scoreItem`, `WeightedSearchField` | util       | Shared ranked substring search for comboboxes, link picker, and `ButtonDropdown`                                                                             |
 | `Button`, `buttonVariants`, `ButtonProps`       | component  | 6 variants (`default` … `link`), 4 sizes                                                                                                                     |
-| `Badge`, `DismissibleBadge`                     | component  | Static label chip; dismissible variant with remove control for tags/filters                                                                                  |
+| `Badge`                                         | component  | Static compact label (`appearance` + `tone`); `asChild` for link/button styling                                                                              |
+| `Chip`, `ChipGroup`                             | component  | Interactive compact labels — `mode="selectable"` (toggle) or `mode="removable"` (dismiss)                                                                    |
 | `Input`                                         | component  | Styled text input                                                                                                                                            |
 | `NumberInput`                                   | component  | Numeric input with hover/focus stepper controls; hides native browser spinners                                                                               |
 | `Card` + subcomponents                          | component  | `CardHeader/Title/Description/Content/Footer`                                                                                                                |
@@ -88,6 +89,9 @@ for sanitized HTML. Do not wrap whole pages in `prose`.
 
 Full guide — hierarchy table, `RichTextContent` contract, dark mode, and internal
 primitive rules: **[docs/typography.md](docs/typography.md)**.
+
+Compact labels (`Badge`, `Chip`) — tone vs appearance, size scale, selected-control
+tokens: **[docs/compact-labels.md](docs/compact-labels.md)**.
 
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
