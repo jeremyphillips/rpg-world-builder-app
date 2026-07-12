@@ -13,13 +13,13 @@ import {
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
 
-export const EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL = 'Purchase'
+export const EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL = 'Add to inventory'
 export const EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL = 'Quantity to add'
 export const EQUIPMENT_PICKER_PURCHASE_UNIT_PRICE_LABEL = 'Unit price'
-export const EQUIPMENT_PICKER_PURCHASE_TOTAL_LABEL = 'Purchase total'
+export const EQUIPMENT_PICKER_PURCHASE_TOTAL_LABEL = 'Total'
 export const EQUIPMENT_PICKER_PURCHASE_REMAINING_LABEL = 'Remaining after purchase'
 export const EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL = 'Add to inventory'
-export const EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL = 'In inventory'
+export const EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL = 'Currently owned'
 export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL = 'Remove one from inventory'
 export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL = 'Remove from inventory'
 export const EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL = 'Add another'

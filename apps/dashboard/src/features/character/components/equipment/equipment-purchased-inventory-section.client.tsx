@@ -15,6 +15,7 @@ import {
 import {
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
+  equipmentPurchasedInventoryEmptyClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventorySectionProps = {
@@ -31,7 +32,11 @@ export function EquipmentPurchasedInventorySection({
   const hasPurchases = purchased.some((group) => group.displays.length > 0)
 
   if (!hasPurchases) {
-    return <Text variant="muted">{EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}</Text>
+    return (
+      <Text as="p" className={equipmentPurchasedInventoryEmptyClasses}>
+        {EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}
+      </Text>
+    )
   }
 
   return (

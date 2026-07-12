@@ -12,8 +12,10 @@ import {
   startingEquipmentOptionCardShellClasses,
 } from './starting-equipment-option-cards.variants'
 import {
-  startingEquipmentOptionSummaryActionsClasses,
   startingEquipmentOptionSummaryBodyClasses,
+  startingEquipmentOptionSummaryChangePackageLinkClasses,
+  startingEquipmentOptionSummaryDescriptionClasses,
+  startingEquipmentOptionSummaryEyebrowRowClasses,
   startingEquipmentOptionSummaryTitleClasses,
 } from './starting-equipment-option-summary.variants'
 
@@ -34,16 +36,26 @@ export function StartingEquipmentOptionSummaryCard({
       )}
     >
       <div className={startingEquipmentOptionSummaryBodyClasses}>
-        <Eyebrow>{EQUIPMENT_SELECTED_PACKAGE_EYEBROW}</Eyebrow>
+        <div className={startingEquipmentOptionSummaryEyebrowRowClasses}>
+          <Eyebrow>{EQUIPMENT_SELECTED_PACKAGE_EYEBROW}</Eyebrow>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className={startingEquipmentOptionSummaryChangePackageLinkClasses}
+            onClick={onChangePackage}
+          >
+            {EQUIPMENT_CHANGE_PACKAGE_LABEL}
+          </Button>
+        </div>
         <Text as="h3" className={startingEquipmentOptionSummaryTitleClasses}>
           {summary.label}
         </Text>
-        {summary.description ? <Text variant="muted">{summary.description}</Text> : null}
-      </div>
-      <div className={startingEquipmentOptionSummaryActionsClasses}>
-        <Button type="button" variant="secondary" size="sm" onClick={onChangePackage}>
-          {EQUIPMENT_CHANGE_PACKAGE_LABEL}
-        </Button>
+        {summary.description ? (
+          <Text as="p" className={startingEquipmentOptionSummaryDescriptionClasses}>
+            {summary.description}
+          </Text>
+        ) : null}
       </div>
     </article>
   )
