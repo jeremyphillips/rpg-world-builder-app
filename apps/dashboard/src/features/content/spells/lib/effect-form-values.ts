@@ -10,19 +10,19 @@ function parseSpellEffect(payload: Record<string, unknown>): SpellAtomicEffect |
 
 function stripEffectFieldsForKind(
   row: EffectFormRow,
-): Omit<EffectFormRow, 'roll' | 'damageType' | 'count'> &
-  Partial<Pick<EffectFormRow, 'roll' | 'damageType' | 'count'>> {
+): Omit<EffectFormRow, 'roll' | 'damageType' | 'count' | 'label' | 'unitLabel'> &
+  Partial<Pick<EffectFormRow, 'roll' | 'damageType' | 'count' | 'label' | 'unitLabel'>> {
   const base = {
     id: row.id,
     kind: row.kind,
-    ...(row.label?.trim() ? { label: row.label.trim() } : {}),
-    ...(row.description?.trim() ? { description: row.description } : {}),
+    ...(row.description?.trim() ? { description: row.description.trim() } : {}),
   }
 
   switch (row.kind) {
     case 'damage':
       return {
         ...base,
+        ...(row.label?.trim() ? { label: row.label.trim() } : {}),
         roll: row.roll,
         damageType: row.damageType,
       }
@@ -30,13 +30,17 @@ function stripEffectFieldsForKind(
     case 'temporary-hit-points':
       return {
         ...base,
+        ...(row.label?.trim() ? { label: row.label.trim() } : {}),
         roll: row.roll,
       }
-    case 'projectile-count':
+    case 'projectile-count': {
+      const unitLabel = row.unitLabel?.trim()
       return {
         ...base,
         count: row.count,
+        ...(unitLabel ? { unitLabel } : {}),
       }
+    }
     default: {
       const _exhaustive: never = row.kind
       return _exhaustive
@@ -70,7 +74,7 @@ function normalizeEffectRow(row: EffectFormRow): SpellAtomicEffect | undefined {
     case 'temporary-hit-points':
       return normalizeRollBearingEffect(stripped)
     case 'projectile-count':
-      if (stripped.count === undefined) return undefined
+      if (stripped.count === undefined || !stripped.unitLabel) return undefined
       return parseSpellEffect(stripped)
     default: {
       const _exhaustive: never = stripped.kind

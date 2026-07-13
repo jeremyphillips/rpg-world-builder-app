@@ -6,14 +6,17 @@ import { z } from 'zod'
 
 export const effectIdSchema = z.string().min(1)
 
-export const effectLabelSchema = z.string().optional()
+/** Optional distinguisher for roll-bearing effects (e.g. "Clenched Fist"). */
+export const effectLabelSchema = z.string().min(1).optional()
+
+/** Author-provided plural noun after projectile count (e.g. "darts", "beams"). */
+export const effectUnitLabelSchema = z.string().min(1)
 
 /** Rich-text HTML (TipTap) supplementary prose for an effect card. */
 export const effectDescriptionSchema = z.string().optional()
 
 export const effectBaseFields = {
   id: effectIdSchema,
-  label: effectLabelSchema,
   description: effectDescriptionSchema,
 } as const
 

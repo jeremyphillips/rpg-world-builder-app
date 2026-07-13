@@ -90,9 +90,13 @@ export type SpellPatch = z.infer<typeof spellPatchSchema>
 export {
   deriveEffectsModelingStatus,
   EFFECTS_MODELING_STATUS,
+  effectKindPrefix,
   formatAtomicEffectSummaries,
   formatAtomicEffectSummary,
   formatDamageValue,
+  formatEffectRowSentence,
+  formatEffectRowTitle,
+  formatEffectRowTitleFromParts,
   spellAtomicEffectSchema,
   SPELL_ATOMIC_EFFECT_KINDS,
   type EffectsModelingStatus,
@@ -103,3 +107,8 @@ export {
   type SpellProjectileCountEffect,
   type SpellTemporaryHitPointsEffect,
 } from './spell/effects'
+export {
+  getSpellAtomicEffectKindLabel,
+  HIT_POINTS_TERM,
+  SPELL_ATOMIC_EFFECT_KIND_ENTRIES,
+} from '../vocab/spell/atomic-effect-kind'

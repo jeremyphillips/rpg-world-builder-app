@@ -86,7 +86,20 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:burning-hands:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 3,
+            "faces": 6
+          }
+        },
+        "damageType": "fire"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:create-or-destroy-water",
@@ -163,7 +176,19 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The healing increases by 2d8 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The healing increases by 2d8 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:cure-wounds:healing",
+        "kind": "healing",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 8
+          }
+        }
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:detect-evil-and-good",
@@ -395,7 +420,20 @@
         "description": "a drop of alcohol"
       }
     },
-    "higherLevelSlotEffect": "<p>You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:false-life:temporary-hit-points",
+        "kind": "temporary-hit-points",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 4
+          },
+          "flat": 4
+        }
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:feather-fall",
@@ -529,7 +567,20 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:hellish-rebuke:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 10
+          }
+        },
+        "damageType": "fire"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:hex",
@@ -576,7 +627,21 @@
         "description": "the petrified eye of a newt"
       }
     },
-    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>"
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:hex:extra-damage",
+        "kind": "damage",
+        "label": "Extra",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 6
+          }
+        },
+        "damageType": "necrotic"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:hideous-laughter",
@@ -666,7 +731,21 @@
     "components": {
       "verbal": true
     },
-    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>"
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:hunters-mark:extra-damage",
+        "kind": "damage",
+        "label": "Extra",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 6
+          }
+        },
+        "damageType": "force"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:ice-knife",
@@ -709,7 +788,33 @@
       }
     },
     "deliveryMethod": "ranged-spell-attack",
-    "higherLevelSlotEffect": "<p>The Cold damage increases by 1d6 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The Cold damage increases by 1d6 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:ice-knife:piercing",
+        "kind": "damage",
+        "label": "Piercing hit",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 10
+          }
+        },
+        "damageType": "piercing"
+      },
+      {
+        "id": "srd-cc-5.2.1:ice-knife:cold-burst",
+        "kind": "damage",
+        "label": "Cold burst",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 6
+          }
+        },
+        "damageType": "cold"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:identify",
@@ -821,7 +926,20 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:inflict-wounds:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 10
+          }
+        },
+        "damageType": "necrotic"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:jump",
@@ -981,7 +1099,27 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The spell creates one more dart for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The spell creates one more dart for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:magic-missile:darts",
+        "kind": "projectile-count",
+        "count": 3,
+        "unitLabel": "darts"
+      },
+      {
+        "id": "srd-cc-5.2.1:magic-missile:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 4
+          },
+          "flat": 1
+        },
+        "damageType": "force"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:purify-food-and-drink",
@@ -1061,7 +1199,20 @@
       "somatic": true
     },
     "deliveryMethod": "ranged-spell-attack",
-    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:ray-of-sickness:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 8
+          }
+        },
+        "damageType": "poison"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:sanctuary",
@@ -1349,6 +1500,19 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:thunderwave:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 8
+          }
+        },
+        "damageType": "thunder"
+      }
+    ]
   }
 ]

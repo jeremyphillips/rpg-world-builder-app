@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { ArrayConfig, FormItem } from '@rpg/ui/form'
 
 import { effectArrayFields } from './effect-form-fields'
+import { formatEffectRowPrimary, formatEffectRowSummary } from './effect-display'
 
 function findEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
   return fields.find(
@@ -22,13 +23,11 @@ describe('effectArrayFields', () => {
     ])
   })
 
-  it('includes kind-specific subfields with visibility guards', () => {
+  it('does not expose a kind selector; kind is fixed at add time via templates', () => {
     const arrayField = findEffectsArray(effectArrayFields({}))
     const itemFields = arrayField?.fields ?? []
 
-    expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toMatchObject({
-      label: 'Effect kind',
-    })
+    expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
 
     const damageRow = itemFields.find(
       (field): field is Extract<(typeof itemFields)[number], { kind: 'row' }> =>
@@ -37,12 +36,91 @@ describe('effectArrayFields', () => {
         Boolean(field.visibility?.dependsOn?.includes('kind')),
     )
     expect(damageRow).toBeDefined()
+  })
 
-    const fieldNames = itemFields.flatMap((field) => {
-      if ('kind' in field) return []
-      if (!('name' in field) || typeof field.name !== 'string') return []
-      return [field.name]
+  it('shows effect label only for roll-bearing kinds and projectile label for projectile count', () => {
+    const itemFields = findEffectsArray(effectArrayFields({}))?.fields ?? []
+
+    expect(itemFields.find((field) => !('kind' in field) && field.name === 'label')).toMatchObject({
+      label: 'Effect label',
     })
-    expect(fieldNames[fieldNames.length - 1]).toBe('description')
+    expect(
+      itemFields.find((field) => !('kind' in field) && field.name === 'unitLabel'),
+    ).toMatchObject({
+      label: 'Projectile label',
+    })
+  })
+})
+
+describe('effect array item headers', () => {
+  it('formats grant-style titles and summaries', () => {
+    expect(
+      formatEffectRowPrimary(
+        {
+          id: 'fx-1',
+          kind: 'damage',
+          roll: { dice: { count: 1, faces: 6 } },
+          damageType: 'fire',
+        },
+        0,
+      ),
+    ).toBe('Damage')
+
+    expect(
+      formatEffectRowSummary({
+        id: 'fx-1',
+        kind: 'damage',
+        roll: { dice: { count: 1, faces: 6 } },
+        damageType: 'fire',
+      }),
+    ).toBe('Inflicts 1d6 Fire damage.')
+
+    expect(
+      formatEffectRowPrimary(
+        {
+          id: 'fx-2',
+          kind: 'damage',
+          label: 'Clenched Fist',
+          roll: { dice: { count: 5, faces: 8 } },
+          damageType: 'force',
+        },
+        0,
+      ),
+    ).toBe('Damage — Clenched Fist')
+
+    expect(
+      formatEffectRowSummary({
+        id: 'fx-3',
+        kind: 'healing',
+        label: 'Mass restoration',
+        roll: { dice: { count: 3, faces: 8 } },
+      }),
+    ).toBe('Character heals 3d8 Hit Points.')
+
+    expect(
+      formatEffectRowPrimary(
+        {
+          id: 'fx-4',
+          kind: 'projectile-count',
+          count: 3,
+          unitLabel: 'darts',
+        },
+        0,
+      ),
+    ).toBe('Projectile count — darts')
+
+    expect(
+      formatEffectRowSummary({
+        id: 'fx-5',
+        kind: 'projectile-count',
+        count: 3,
+        unitLabel: 'darts',
+      }),
+    ).toBe('Creates 3 darts.')
+  })
+
+  it('returns empty summary for incomplete rows', () => {
+    expect(formatEffectRowSummary({ id: 'fx-1', kind: 'damage' })).toBe('')
+    expect(formatEffectRowSummary({ id: 'fx-2', kind: 'projectile-count', count: 3 })).toBe('')
   })
 })

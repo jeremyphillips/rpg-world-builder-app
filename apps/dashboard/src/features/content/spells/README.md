@@ -42,14 +42,15 @@ damage, healing, temporary hit points, and projectile count. Prose in the Basics
 tab (`description`, scaling fields) remains the escape hatch — there is no
 `custom` effect kind.
 
-| Concern         | Behavior                                                                    |
-| --------------- | --------------------------------------------------------------------------- |
-| Form shape      | Contract `SpellAtomicEffect[]` via `effect-form-schema.ts` rows             |
-| Normalization   | `normalizeSpellEffects` in `effect-form-values.ts`                          |
-| Preview         | `SpellEffectsPreview` + `formatAtomicEffectSummary` (local form state)      |
-| Modeling status | **Derived** via `deriveEffectsModelingStatus` — not a persisted field       |
-| Save            | **Disabled** — banner: "Effects are not saved yet."                         |
-| Catalog seed    | No structured effects in SRD JSON; audit asserts all 92 spells → prose-only |
+| Concern         | Behavior                                                                       |
+| --------------- | ------------------------------------------------------------------------------ |
+| Form shape      | Contract `SpellAtomicEffect[]` via `effect-form-schema.ts` rows                |
+| Normalization   | `normalizeSpellEffects` in `effect-form-values.ts`                             |
+| Preview         | `SpellEffectsPreview` + `formatEffectRowSentence` (authoring sentences)        |
+| Detail display  | `formatAtomicEffectSummary` (compact roll fragments on spell detail)           |
+| Modeling status | **Derived** via `deriveEffectsModelingStatus` — not a persisted field          |
+| Save            | **Disabled** — banner: "Effects are not saved yet."                            |
+| Catalog seed    | 24 spells with structured effects; 68 prose-only (see `spell-seed-effects.ts`) |
 
 Shared roll/damage form atoms live under
 [`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,

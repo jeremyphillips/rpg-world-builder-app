@@ -37,7 +37,7 @@ export const SPELL_EFFECT_FIXTURES = {
       id: 'fx-magic-missile-count',
       kind: 'projectile-count',
       count: 3,
-      label: 'darts',
+      unitLabel: 'darts',
     },
     {
       id: 'fx-magic-missile-damage',

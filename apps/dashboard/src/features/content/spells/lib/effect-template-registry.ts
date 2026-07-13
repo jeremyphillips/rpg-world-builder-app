@@ -80,7 +80,7 @@ export const EFFECT_TEMPLATES: readonly EffectTemplate[] = [
       id: createEffectId(),
       kind: 'projectile-count',
       count: 3,
-      label: 'darts',
+      unitLabel: 'darts',
     }),
     search: { aliases: ['magic missile', 'darts', 'bolts'] },
   },

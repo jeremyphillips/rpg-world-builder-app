@@ -5,6 +5,9 @@ import {
   formatAtomicEffectSummary,
   formatAtomicEffectSummaries,
   formatDamageValue,
+  formatEffectRowSentence,
+  formatEffectRowTitle,
+  formatEffectRowTitleFromParts,
   spellAtomicEffectSchema,
 } from './effects'
 
@@ -23,9 +26,10 @@ describe('spellAtomicEffectSchema', () => {
       spellAtomicEffectSchema.parse({
         id: 'fx-2',
         kind: 'healing',
+        label: 'Mass restoration',
         roll: { dice: { count: 2, faces: 8 } },
       }),
-    ).toMatchObject({ kind: 'healing' })
+    ).toMatchObject({ kind: 'healing', label: 'Mass restoration' })
 
     expect(
       spellAtomicEffectSchema.parse({
@@ -40,14 +44,113 @@ describe('spellAtomicEffectSchema', () => {
         id: 'fx-4',
         kind: 'projectile-count',
         count: 3,
-        label: 'darts',
+        unitLabel: 'darts',
       }),
-    ).toMatchObject({ count: 3, label: 'darts' })
+    ).toMatchObject({ count: 3, unitLabel: 'darts' })
+  })
+
+  it('rejects projectile-count without unitLabel', () => {
+    expect(
+      spellAtomicEffectSchema.safeParse({
+        id: 'fx-5',
+        kind: 'projectile-count',
+        count: 3,
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('formatEffectRowTitle', () => {
+  it('uses kind label alone when no distinguisher is set', () => {
+    expect(
+      formatEffectRowTitle({
+        id: 'fx-1',
+        kind: 'damage',
+        roll: { dice: { count: 1, faces: 6 } },
+        damageType: 'fire',
+      }),
+    ).toBe('Damage')
+  })
+
+  it('appends effect label or unit label after an em dash', () => {
+    expect(
+      formatEffectRowTitle({
+        id: 'fx-2',
+        kind: 'damage',
+        label: 'Clenched Fist',
+        roll: { dice: { count: 5, faces: 8 } },
+        damageType: 'force',
+      }),
+    ).toBe('Damage — Clenched Fist')
+
+    expect(
+      formatEffectRowTitle({
+        id: 'fx-3',
+        kind: 'projectile-count',
+        count: 3,
+        unitLabel: 'darts',
+      }),
+    ).toBe('Projectile count — darts')
+  })
+})
+
+describe('formatEffectRowTitleFromParts', () => {
+  it('falls back when kind is missing', () => {
+    expect(formatEffectRowTitleFromParts(undefined, {}, 0)).toBe('Effect 1')
+  })
+})
+
+describe('formatEffectRowSentence', () => {
+  it('formats grant-style authoring sentences', () => {
+    expect(
+      formatEffectRowSentence({
+        id: 'fx-1',
+        kind: 'damage',
+        roll: { dice: { count: 1, faces: 6 } },
+        damageType: 'fire',
+      }),
+    ).toBe('Inflicts 1d6 Fire damage.')
+
+    expect(
+      formatEffectRowSentence({
+        id: 'fx-2',
+        kind: 'damage',
+        label: 'Clenched Fist',
+        roll: { dice: { count: 5, faces: 8 } },
+        damageType: 'force',
+      }),
+    ).toBe('Inflicts 5d8 Force damage.')
+
+    expect(
+      formatEffectRowSentence({
+        id: 'fx-3',
+        kind: 'healing',
+        label: 'Mass restoration',
+        roll: { dice: { count: 3, faces: 8 } },
+      }),
+    ).toBe('Character heals 3d8 Hit Points.')
+
+    expect(
+      formatEffectRowSentence({
+        id: 'fx-4',
+        kind: 'temporary-hit-points',
+        roll: { dice: { count: 2, faces: 4 }, flat: 4 },
+      }),
+    ).toBe('Character gains 2d4+4 temporary Hit Points.')
+
+    expect(
+      formatEffectRowSentence({
+        id: 'fx-5',
+        kind: 'projectile-count',
+        count: 3,
+        unitLabel: 'darts',
+      }),
+    ).toBe('Creates 3 darts.')
   })
 })
 
 describe('formatAtomicEffectSummary', () => {
-  it('formats single-effect summaries', () => {
+  it('formats compact detail lines without sentences', () => {
     expect(
       formatAtomicEffectSummary({
         id: 'fx-1',
@@ -80,7 +183,7 @@ describe('formatAtomicEffectSummary', () => {
         id: 'fx-count',
         kind: 'projectile-count',
         count: 3,
-        label: 'darts',
+        unitLabel: 'darts',
       },
       {
         id: 'fx-damage',

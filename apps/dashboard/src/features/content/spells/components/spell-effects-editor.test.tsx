@@ -28,7 +28,7 @@ describe('SpellEffectsEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('1d10 Fire damage').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Inflicts 1d10 Fire damage.').length).toBeGreaterThan(0)
     })
     expect(screen.getByText('Partially modeled')).toBeInTheDocument()
   })
@@ -52,7 +52,7 @@ describe('SpellEffectsEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('3 darts').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Creates 3 darts.').length).toBeGreaterThan(0)
     })
 
     await expectNoAxeViolations(container)

@@ -44,7 +44,20 @@
         "description": "a ball of bat guano and sulfur"
       }
     },
-    "higherLevelSlotEffect": "<p>The base damage increases by 1d6 for each spell slot level above 7.</p>"
+    "higherLevelSlotEffect": "<p>The base damage increases by 1d6 for each spell slot level above 7.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:delayed-blast-fireball:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 12,
+            "faces": 6
+          }
+        },
+        "damageType": "fire"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:simulacrum",

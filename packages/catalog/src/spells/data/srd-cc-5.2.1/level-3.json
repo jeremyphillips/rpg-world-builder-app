@@ -206,7 +206,20 @@
         "description": "a ball of bat guano and sulfur"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:fireball:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 8,
+            "faces": 6
+          }
+        },
+        "damageType": "fire"
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:glyph-of-warding",
@@ -283,7 +296,19 @@
     "components": {
       "verbal": true
     },
-    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>"
+    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:mass-healing-word:healing",
+        "kind": "healing",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 4
+          }
+        }
+      }
+    ]
   },
   {
     "id": "srd-cc-5.2.1:revivify",

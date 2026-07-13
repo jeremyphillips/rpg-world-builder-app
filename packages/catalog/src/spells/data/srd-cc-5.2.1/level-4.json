@@ -16,8 +16,16 @@
       "damageTypes": ["necrotic"],
       "roles": ["buff", "healing", "warding"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "self" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -25,7 +33,9 @@
       "concentration": true,
       "upTo": true
     },
-    "components": { "verbal": true }
+    "components": {
+      "verbal": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:death-ward",
@@ -43,10 +53,25 @@
     "tags": {
       "roles": ["warding"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "timed", "value": 8, "unit": "hour" },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 8,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:polymorph",
@@ -138,6 +163,19 @@
         "description": "a piece of charcoal"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 4.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 4.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:wall-of-fire:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 5,
+            "faces": 8
+          }
+        },
+        "damageType": "fire"
+      }
+    ]
   }
 ]

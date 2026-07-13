@@ -1,14 +1,13 @@
 import { SPELL_ATOMIC_EFFECT_KINDS } from '@rpg/contracts'
-import { toOptions, type FieldConfig, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import type { FieldConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import { damageEffectFieldConfigs } from '../../lib/forms/mechanics/damage-effect-fields'
 import { rollValueFieldConfigs } from '../../lib/forms/mechanics/roll-value-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { buildEffectArrayAddMenu } from './effect-add-menu.lib'
 import { formatEffectRowPrimary, formatEffectRowSummary } from './effect-display'
-import { SPELL_ATOMIC_EFFECT_KIND_LABELS } from './effect-form-schema'
 
-const effectKindOptions = toOptions(SPELL_ATOMIC_EFFECT_KINDS, SPELL_ATOMIC_EFFECT_KIND_LABELS)
+const rollBearingKinds = ['damage', 'healing', 'temporary-hit-points'] as const
 
 function visibleWhenEffectKind(
   kinds: readonly (typeof SPELL_ATOMIC_EFFECT_KINDS)[number][],
@@ -26,24 +25,7 @@ function fieldsWithVisibility(fields: FieldConfig[], visibility: FieldVisibility
 }
 
 function effectItemFields(ctx: ContentFormCtx): FormItem[] {
-  const rollKinds = ['healing', 'temporary-hit-points'] as const
-
   return [
-    {
-      type: 'select',
-      name: 'kind',
-      label: 'Effect kind',
-      options: effectKindOptions,
-      required: true,
-      width: 'lg',
-    },
-    {
-      type: 'text',
-      name: 'label',
-      label: 'Card label',
-      hint: 'Optional heading or projectile noun (e.g. "darts" for Magic Missile).',
-      width: 'lg',
-    },
     {
       kind: 'row',
       visibility: visibleWhenEffectKind(['damage']),
@@ -54,7 +36,7 @@ function effectItemFields(ctx: ContentFormCtx): FormItem[] {
     },
     ...fieldsWithVisibility(
       rollValueFieldConfigs({ namePrefix: 'roll', label: 'Roll', required: true }),
-      visibleWhenEffectKind(rollKinds),
+      visibleWhenEffectKind(rollBearingKinds),
     ),
     {
       kind: 'row',
@@ -73,6 +55,22 @@ function effectItemFields(ctx: ContentFormCtx): FormItem[] {
         ],
         visibleWhenEffectKind(['projectile-count']),
       ),
+    },
+    {
+      type: 'text',
+      name: 'unitLabel',
+      label: 'Projectile label',
+      hint: 'Word used after the count, such as "darts" or "beams".',
+      width: 'lg',
+      visibility: visibleWhenEffectKind(['projectile-count']),
+    },
+    {
+      type: 'text',
+      name: 'label',
+      label: 'Effect label',
+      hint: 'Optional name used to distinguish this effect, such as "Clenched Fist".',
+      width: 'lg',
+      visibility: visibleWhenEffectKind(rollBearingKinds),
     },
     {
       type: 'richtext',

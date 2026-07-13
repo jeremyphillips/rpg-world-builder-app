@@ -37,9 +37,10 @@ describe('normalizeSpellEffects', () => {
         id: 'fx-3',
         kind: 'projectile-count',
         count: 3,
-        label: 'darts',
+        unitLabel: 'darts',
         roll: { dice: { count: 1, faces: 4 }, flatOperator: '+', flatAmount: 1 },
         damageType: 'force',
+        label: 'Extra',
       },
     ])
 
@@ -47,10 +48,11 @@ describe('normalizeSpellEffects', () => {
     expect(normalized[0]).toMatchObject({
       kind: 'projectile-count',
       count: 3,
-      label: 'darts',
+      unitLabel: 'darts',
     })
     expect('roll' in (normalized[0] ?? {})).toBe(false)
     expect('damageType' in (normalized[0] ?? {})).toBe(false)
+    expect('label' in (normalized[0] ?? {})).toBe(false)
   })
 
   it('does not imply projectile-to-damage relationships for Magic Missile', () => {
@@ -59,7 +61,7 @@ describe('normalizeSpellEffects', () => {
         id: 'fx-count',
         kind: 'projectile-count',
         count: 3,
-        label: 'darts',
+        unitLabel: 'darts',
       },
       {
         id: 'fx-damage',
@@ -79,6 +81,7 @@ describe('spellEffectsToFormValues', () => {
       {
         id: 'fx-1',
         kind: 'healing' as const,
+        label: 'Mass restoration',
         roll: { dice: { count: 2, faces: 8 as const } },
       },
     ]
@@ -86,6 +89,7 @@ describe('spellEffectsToFormValues', () => {
       {
         id: 'fx-1',
         kind: 'healing',
+        label: 'Mass restoration',
         roll: { dice: { count: 2, faces: 8 } },
       },
     ])
