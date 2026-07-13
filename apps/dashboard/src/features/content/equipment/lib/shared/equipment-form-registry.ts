@@ -22,7 +22,7 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, KindFieldGroupBuilde
   adventuring_gear: () => [adventuringGearFormFieldGroup()],
   vehicle: () => [vehicleFormFieldGroup()],
   armor: () => [armorFormFieldGroup()],
-  weapon: () => [weaponFormFieldGroup()],
+  weapon: (ctx) => [weaponFormFieldGroup(ctx ?? {})],
 }
 
 /** Returns registered field groups for a kind. */
@@ -36,6 +36,6 @@ export function fieldGroupsForEquipmentKind(
 /** All registered kind groups for the unscoped (hub) form. */
 export function allRegisteredKindFieldGroups(): FormItem[] {
   return (Object.keys(kindFieldGroups) as EquipmentKind[]).flatMap((kind) =>
-    kindFieldGroups[kind]!(),
+    kindFieldGroups[kind]!({}),
   )
 }

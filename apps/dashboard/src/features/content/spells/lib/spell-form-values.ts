@@ -24,6 +24,7 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
+import { spellEffectsToFormValues } from './effect-form-values'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -100,6 +101,7 @@ export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   components: { verbal: true, somatic: true, material: { enabled: false } },
   areaOfEffect: { ...EMPTY_SPELL_AREA_OF_EFFECT },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
+  effects: [],
 }
 
 export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): SpellFormCastingTime {
@@ -404,6 +406,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     tags: spellTagsToFormValues(entity.tags),
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
+    effects: spellEffectsToFormValues(entity.effects),
   }
 }
 
@@ -411,30 +414,36 @@ export function buildSpellCreateInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
 ): CreateSpellInput {
-  const rawDelivery = values.deliveryMethod?.trim()
+  // TODO(spell.effect.persistence):
+  // Include effects after the atomic-effect model and authoring UX are validated.
+  const { effects: _effects, ...persistedValues } = values
+
+  const rawDelivery = persistedValues.deliveryMethod?.trim()
   const deliveryMethod =
     rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
       ? spellDeliveryMethodSchema.parse(rawDelivery)
       : undefined
 
   const areaOfEffect = spellAreaOfEffectFromFormValues(
-    values.areaOfEffect as SpellFormAreaOfEffect | undefined,
+    persistedValues.areaOfEffect as SpellFormAreaOfEffect | undefined,
   )
 
   const input = createSpellInputSchema.parse({
-    slug: slugForInputParse(values.name, ctx),
-    name: values.name,
-    description: values.description || undefined,
-    cantripScaling: values.cantripScaling || undefined,
-    higherLevelSlotEffect: values.higherLevelSlotEffect || undefined,
-    school: values.school,
-    level: values.level,
-    classIds: values.classIds,
-    castingTime: spellCastingTimeFromFormValues(values.castingTime as SpellFormCastingTime),
-    range: spellRangeFromFormValues(values.range as SpellFormRange),
-    duration: spellDurationFromFormValues(values.duration as SpellFormDuration),
-    components: spellComponentsFromFormValues(values.components as SpellFormComponents),
-    tags: spellTagsFromFormValues(values.tags),
+    slug: slugForInputParse(persistedValues.name, ctx),
+    name: persistedValues.name,
+    description: persistedValues.description || undefined,
+    cantripScaling: persistedValues.cantripScaling || undefined,
+    higherLevelSlotEffect: persistedValues.higherLevelSlotEffect || undefined,
+    school: persistedValues.school,
+    level: persistedValues.level,
+    classIds: persistedValues.classIds,
+    castingTime: spellCastingTimeFromFormValues(
+      persistedValues.castingTime as SpellFormCastingTime,
+    ),
+    range: spellRangeFromFormValues(persistedValues.range as SpellFormRange),
+    duration: spellDurationFromFormValues(persistedValues.duration as SpellFormDuration),
+    components: spellComponentsFromFormValues(persistedValues.components as SpellFormComponents),
+    tags: spellTagsFromFormValues(persistedValues.tags),
     ...(areaOfEffect !== undefined && { areaOfEffect }),
     ...(deliveryMethod !== undefined && { deliveryMethod }),
   })

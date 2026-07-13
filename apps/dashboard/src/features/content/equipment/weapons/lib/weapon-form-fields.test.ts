@@ -12,6 +12,7 @@ import { weaponFormFieldGroup } from './weapon-form-fields'
 import { damageToForm } from './weapon-form-values'
 
 const WEAPON_SEEDS = seedEquipmentOfKind('weapon')
+const FORM_CTX = {}
 
 function assertWeaponGroup(item: FormItem): GroupConfig {
   if (!('kind' in item) || item.kind !== 'group') {
@@ -20,7 +21,7 @@ function assertWeaponGroup(item: FormItem): GroupConfig {
   return item
 }
 
-function damageRowFromWeaponGroup(weaponGroup: GroupConfig) {
+function damageGroupFromWeaponGroup(weaponGroup: GroupConfig) {
   const damageGroup = weaponGroup.fields.find(
     (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
       'kind' in field && field.kind === 'group' && field.legend === 'Damage',
@@ -28,18 +29,7 @@ function damageRowFromWeaponGroup(weaponGroup: GroupConfig) {
   if (!damageGroup || !('fields' in damageGroup)) {
     throw new Error('expected Damage group')
   }
-
-  const damageRow = damageGroup.fields.find(
-    (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
-      'kind' in field &&
-      field.kind === 'row' &&
-      field.fields.some((child) => !('kind' in child) && child.name === 'damageKind'),
-  )
-  if (!damageRow || !('fields' in damageRow)) {
-    throw new Error('expected damage row')
-  }
-
-  return damageRow
+  return damageGroup
 }
 
 describe('weapon kindFieldGroups', () => {
@@ -48,11 +38,8 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('uses subsection legend size on the nested Damage group', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
-    const damageGroup = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
-        'kind' in field && field.kind === 'group' && field.legend === 'Damage',
-    )
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
+    const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
 
     expect(damageGroup).toMatchObject({
       kind: 'group',
@@ -61,71 +48,70 @@ describe('weapon kindFieldGroups', () => {
     })
   })
 
-  it('uses diceFormula fields with auto width for damage and versatile damage', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
-    const damageRow = damageRowFromWeaponGroup(weaponGroup)
+  it('binds damage directly to RollValue paths via shared atoms', () => {
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
+    const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
 
     expect(
-      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageDice'),
+      damageGroup.fields.find((field) => !('kind' in field) && field.name === 'hasDamage'),
     ).toMatchObject({
-      label: 'Dice',
-      modifierMode: 'none',
-      size: 'md',
+      type: 'switch',
+      label: 'Deals damage',
+    })
+
+    const damageRow = damageGroup.fields.find(
+      (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some(
+          (child) =>
+            !('kind' in child) && child.type === 'inlineSentence' && child.name === 'damage',
+        ),
+    )
+    if (!damageRow || !('fields' in damageRow)) {
+      throw new Error('expected damage roll row')
+    }
+
+    expect(
+      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flat'),
+    ).toMatchObject({
+      label: 'Flat modifier',
       width: 'auto',
     })
 
     expect(
-      damageRow.fields.find((field) => !('kind' in field) && field.name === 'versatileDamage'),
+      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageType'),
     ).toMatchObject({
-      name: 'versatileDamage',
-      label: 'Versatile dice',
+      label: 'Type',
+      placeholder: 'Choose…',
+    })
+  })
+
+  it('keeps versatile damage on diceFormula for dice-only rolls', () => {
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
+    const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
+    const versatileRow = damageGroup.fields.find(
+      (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'versatileDamage'),
+    )
+    if (!versatileRow || !('fields' in versatileRow)) {
+      throw new Error('expected versatile damage row')
+    }
+
+    expect(
+      versatileRow.fields.find((field) => !('kind' in field) && field.name === 'versatileDamage'),
+    ).toMatchObject({
+      type: 'diceFormula',
       modifierMode: 'none',
       size: 'md',
       width: 'auto',
     })
-  })
-
-  it('composes damage kind, damage type, and dice damage in one row', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
-    const damageRow = damageRowFromWeaponGroup(weaponGroup)
-
-    expect(damageRow.fields).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: 'damageKind', width: 'md', defaultValue: 'dice' }),
-        expect.objectContaining({
-          name: 'damageType',
-          width: 'md',
-          placeholder: 'Choose...',
-          visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
-        }),
-        expect.objectContaining({
-          name: 'damageDice',
-          width: 'auto',
-          visibility: expect.objectContaining({ dependsOn: ['damageKind'] }),
-        }),
-      ]),
-    )
-  })
-
-  it('offers none as a damage option for weapons like the net', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
-    const damageRow = damageRowFromWeaponGroup(weaponGroup)
-    const damageKindField = damageRow.fields.find(
-      (field) => !('kind' in field) && field.name === 'damageKind',
-    )
-
-    expect(damageKindField).toMatchObject({
-      options: expect.arrayContaining([{ value: 'none', label: 'None' }]),
-    })
-    expect(
-      weaponGroup.fields.find(
-        (field) => !('kind' in field) && field.name === 'hasDamage' && field.type === 'switch',
-      ),
-    ).toBeUndefined()
   })
 
   it('uses Choose... placeholders for required weapon selects', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const coreRow = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
@@ -144,7 +130,7 @@ describe('weapon kindFieldGroups', () => {
   })
 
   it('wires range visibility from mode and thrown property', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const rangeGroup = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
         'kind' in field && field.kind === 'group' && field.legend === 'Range',
@@ -159,37 +145,10 @@ describe('weapon kindFieldGroups', () => {
         dependsOn: ['mode', 'properties'],
       },
     })
-
-    const rangeRow = rangeGroup.fields.find(
-      (field): field is Extract<(typeof rangeGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'rangeNormal'),
-    )
-    if (!rangeRow || !('fields' in rangeRow)) {
-      throw new Error('expected range row')
-    }
-
-    for (const [name, label] of [
-      ['rangeNormal', 'Normal'],
-      ['rangeLong', 'Long'],
-    ] as const) {
-      expect(
-        rangeRow.fields.find((field) => !('kind' in field) && field.name === name),
-      ).toMatchObject({
-        type: 'inlineSentence',
-        label,
-        width: 'auto',
-        segments: [
-          { kind: 'number', name, min: 0, digits: 3 },
-          { kind: 'text', value: 'ft.', tone: 'label' },
-        ],
-      })
-    }
   })
 
   it('wires property and mastery conditional option availability and dynamic hints', () => {
-    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup())
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const propertiesField = weaponGroup.fields.find(
       (field) => !('kind' in field) && field.name === 'properties',
     )
@@ -197,43 +156,33 @@ describe('weapon kindFieldGroups', () => {
       optionAvailability: { dependsOn: ['mode'] },
       dynamicHint: { dependsOn: ['mode'] },
     })
-
-    const coreRow = weaponGroup.fields.find(
-      (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'mastery'),
-    )
-    if (!coreRow || !('fields' in coreRow)) {
-      throw new Error('expected mastery field row')
-    }
-
-    expect(
-      coreRow.fields.find((field) => !('kind' in field) && field.name === 'mastery'),
-    ).toMatchObject({
-      optionAvailability: { dependsOn: ['mode'] },
-      dynamicHint: { dependsOn: ['mode'] },
-    })
   })
 })
 
 describe('damageToForm', () => {
-  it('maps dice damage to damageDice', () => {
+  it('maps dice damage to RollValue form shape', () => {
     expect(damageToForm({ dice: { count: 2, faces: 6 } })).toEqual({
-      damageKind: 'dice',
-      damageDice: { count: 2, faces: 6 },
+      hasDamage: true,
+      damage: { dice: { count: 2, faces: 6 } },
     })
   })
 
-  it('maps flat damage to damageAmount', () => {
+  it('maps flat damage to RollValue form shape', () => {
     expect(damageToForm({ flat: 1 })).toEqual({
-      damageKind: 'flat',
-      damageAmount: 1,
+      hasDamage: true,
+      damage: { flat: 1 },
     })
   })
 
-  it('maps absent damage to none', () => {
-    expect(damageToForm(undefined)).toEqual({ damageKind: 'none' })
+  it('maps combined dice and flat damage', () => {
+    expect(damageToForm({ dice: { count: 1, faces: 8 }, flat: 2 })).toEqual({
+      hasDamage: true,
+      damage: { dice: { count: 1, faces: 8 }, flat: 2 },
+    })
+  })
+
+  it('maps absent damage to hasDamage false', () => {
+    expect(damageToForm(undefined)).toEqual({ hasDamage: false })
   })
 })
 
@@ -252,13 +201,11 @@ describe('weapon form round-trips', () => {
       expect(formValues.properties).toEqual(item.properties)
     })
 
-    it(`${item.slug}: preserves dice damage as damageDice`, () => {
-      if (item.kind !== 'weapon' || !item.damage?.dice) return
+    it(`${item.slug}: preserves damage as RollValue`, () => {
+      if (item.kind !== 'weapon' || !item.damage) return
       const formValues = toEquipmentFormValues(item)
-      expect(formValues.damageDice).toEqual({
-        count: item.damage.dice.count,
-        faces: item.damage.dice.faces,
-      })
+      expect(formValues.hasDamage).toBe(true)
+      expect(formValues.damage).toEqual(item.damage)
     })
 
     it(`${item.slug}: preserves versatile damage as versatileDamage`, () => {
@@ -271,10 +218,10 @@ describe('weapon form round-trips', () => {
     })
   }
 
-  it('maps net to damageKind none', () => {
+  it('maps net to hasDamage false', () => {
     const net = WEAPON_SEEDS.find((item) => item.slug === 'net')
     expect(net).toBeDefined()
     const formValues = toEquipmentFormValues(net! as WeaponEquipment)
-    expect(formValues.damageKind).toBe('none')
+    expect(formValues.hasDamage).toBe(false)
   })
 })

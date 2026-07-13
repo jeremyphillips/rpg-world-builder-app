@@ -8,6 +8,7 @@ import {
   armorCategorySchema,
   armorMaterialSchema,
   currencySchema,
+  dieFaceSchema,
   gearKindSchema,
   holySymbolUsageSchema,
   spellcastingGearKindSchema,
@@ -83,9 +84,18 @@ export const weaponEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend(
   mode: weaponModeSchema,
   mastery: weaponMasterySchema,
   properties: z.array(weaponPropertySchema).optional(),
-  damageKind: z.enum(['dice', 'flat', 'none']).optional(),
-  damageDice: diceSchema.optional(),
-  damageAmount: z.coerce.number().int().min(1).optional(),
+  hasDamage: z.boolean().optional(),
+  damage: z
+    .object({
+      dice: z
+        .object({
+          count: z.coerce.number().int().min(1).optional(),
+          faces: dieFaceSchema.optional(),
+        })
+        .optional(),
+      flat: z.coerce.number().int().optional(),
+    })
+    .optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   rangeNormal: z.coerce.number().int().min(0).optional(),
@@ -292,9 +302,18 @@ export const equipmentFormSchema = z.object({
   // weapon variant fields
   category: weaponCategorySchema.optional(),
   mode: weaponModeSchema.optional(),
-  damageKind: z.enum(['dice', 'flat', 'none']).optional(),
-  damageDice: diceSchema.optional(),
-  damageAmount: z.coerce.number().int().min(1).optional(),
+  hasDamage: z.boolean().optional(),
+  damage: z
+    .object({
+      dice: z
+        .object({
+          count: z.coerce.number().int().min(1).optional(),
+          faces: dieFaceSchema.optional(),
+        })
+        .optional(),
+      flat: z.coerce.number().int().optional(),
+    })
+    .optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   properties: z.array(weaponPropertySchema).optional(),

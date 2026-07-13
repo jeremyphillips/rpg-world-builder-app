@@ -202,6 +202,26 @@ describe('spellFormDef duration fields', () => {
   })
 })
 
+describe('spellFormDef effects tab', () => {
+  it('includes persistence banner, preview slot, and effect array', () => {
+    const effectsTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'effects')
+    expect(effectsTab).toBeDefined()
+
+    const names = collectFieldNames(effectsTab?.fields ?? [])
+    expect(names).toContain('effects')
+    expect(names).toContain('_effectsPersistenceNotice')
+    expect(names).toContain('_effectsPreview')
+
+    const effectsArray = effectsTab?.fields.find(
+      (field) => 'kind' in field && field.kind === 'array' && field.name === 'effects',
+    )
+    expect(effectsArray).toMatchObject({
+      addLabel: 'Add effect',
+      itemCollapsible: true,
+    })
+  })
+})
+
 describe('spellFormDef create vs update modes', () => {
   it('create: derives slug from name when slug is omitted', () => {
     const formValues = {

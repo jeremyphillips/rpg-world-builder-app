@@ -1,7 +1,9 @@
 import {
   createEquipmentInputSchema,
   dieFaceSchema,
+  rollSchema,
   type CreateEquipmentInput,
+  type RollValue,
   type WeaponDamage,
   type WeaponEquipment,
 } from '@rpg/contracts'
@@ -14,29 +16,38 @@ import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
+type WeaponDamageFormShape = {
+  dice?: { count?: number; faces?: number }
+  flat?: number
+}
+
+function normalizeWeaponRoll(damage: WeaponDamageFormShape | undefined): RollValue | undefined {
+  if (!damage) return undefined
+
+  const roll: RollValue = {}
+  const count = damage.dice?.count
+  const faces = damage.dice?.faces
+
+  if (count !== undefined && faces !== undefined) {
+    const parsedFaces = dieFaceSchema.safeParse(faces)
+    if (parsedFaces.success) {
+      roll.dice = { count, faces: parsedFaces.data }
+    }
+  }
+
+  if (damage.flat !== undefined && damage.flat !== ('' as unknown as number)) {
+    roll.flat = damage.flat
+  }
+
+  const parsed = rollSchema.safeParse(roll)
+  return parsed.success ? parsed.data : undefined
+}
+
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<WeaponEquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
-  if (!damage) return { damageKind: 'none' }
-  if (damage.dice !== undefined && damage.flat === undefined) {
-    return {
-      damageKind: 'dice',
-      damageDice: { count: damage.dice.count, faces: damage.dice.faces },
-    }
-  }
-  if (damage.flat !== undefined && damage.dice === undefined) {
-    return {
-      damageKind: 'flat',
-      damageAmount: damage.flat,
-    }
-  }
-  if (damage.dice !== undefined) {
-    return {
-      damageKind: 'dice',
-      damageDice: { count: damage.dice.count, faces: damage.dice.faces },
-    }
-  }
-  return { damageKind: 'none' }
+): Pick<WeaponEquipmentFormValues, 'hasDamage' | 'damage'> {
+  if (!damage) return { hasDamage: false }
+  return { hasDamage: true, damage }
 }
 
 export function weaponFormValuesFromEntity(
@@ -45,9 +56,8 @@ export function weaponFormValuesFromEntity(
   WeaponEquipmentFormValues,
   | 'category'
   | 'mode'
-  | 'damageKind'
-  | 'damageDice'
-  | 'damageAmount'
+  | 'hasDamage'
+  | 'damage'
   | 'damageType'
   | 'versatileDamage'
   | 'properties'
@@ -73,19 +83,8 @@ export function weaponFormValuesFromEntity(
 }
 
 function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
-  if (values.damageKind === 'none' || values.damageKind === undefined) return undefined
-  if (values.damageKind === 'flat') {
-    return values.damageAmount !== undefined ? { flat: values.damageAmount } : undefined
-  }
-  if (values.damageDice?.count !== undefined && values.damageDice?.faces !== undefined) {
-    return {
-      dice: {
-        count: values.damageDice.count,
-        faces: dieFaceSchema.parse(values.damageDice.faces),
-      },
-    }
-  }
-  return undefined
+  if (!values.hasDamage) return undefined
+  return normalizeWeaponRoll(values.damage as WeaponDamageFormShape | undefined)
 }
 
 function optionalWeaponDamage(
